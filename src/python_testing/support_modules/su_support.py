@@ -15,10 +15,12 @@
 #    limitations under the License.
 
 
+import asyncio
 import logging
 import struct
 import subprocess
 import tempfile
+import time
 from os import path
 from time import monotonic, sleep
 
@@ -40,6 +42,17 @@ AccessControlEntryPrivilegeEnum = AccessControlCluster.Enums.AccessControlEntryP
 AccessControlEntryAuthModeEnum = AccessControlCluster.Enums.AccessControlEntryAuthModeEnum
 
 log = logging.getLogger(__name__)
+
+# Upper bound for establishing a subscription to the DUT. On a reachable DUT this takes well
+# under a second; the bound exists because AttributeSubscriptionHandler.start() goes through
+# ReadAttribute(), whose autoResubscribe parameter defaults to True, so a DUT that has dropped
+# off the network makes it retry establishment indefinitely and the step stalls for the rest of
+# the test budget. Every step subscribes only after the DUT has already answered the controller,
+# so a minute is generous for the establishment itself.
+SUBSCRIPTION_START_TIMEOUT_SEC = 60
+# Bound for the reachability probe that runs when a subscription fails to establish. Only needs
+# to answer "does the DUT still talk to this controller at all", so it is kept short.
+SUBSCRIPTION_PROBE_TIMEOUT_MS = 5000
 
 
 class SoftwareUpdateBaseTest(MatterBaseTest):
@@ -78,6 +91,149 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         if self._test_budget_deadline is None:
             asserts.fail("remaining_test_budget_sec() called before start_test_budget_clock()")
         return max(minimum_sec, self._test_budget_deadline - monotonic() - reserve_sec)
+
+    async def _start_subscription_bounded(self, subscription, step_name: str, **start_kwargs) -> None:
+        """Start ``subscription``, failing the step if it is not established in time.
+
+        Subscription establishment has no timeout of its own: ReadAttribute() defaults to
+        autoResubscribe=True, so a DUT that has dropped off the network is retried forever and
+        the step blocks until the whole test budget is gone — reported, if at all, as an opaque
+        overall timeout hours later.
+
+        On timeout the DUT is probed with a plain GetConnectedDevice before the step is failed,
+        because "no subscription" has two causes that call for opposite reactions: a DUT that has
+        left the network, versus a DUT that still answers while only the subscription fails (an
+        earlier subscription of this run retrying in the background competes for CASE sessions to
+        the same node, and cannot be cancelled once the DUT stops acknowledging). Reporting which
+        one it is keeps the failure from being read as a verdict on the DUT.
+        """
+        try:
+            await asyncio.wait_for(subscription.start(**start_kwargs), timeout=SUBSCRIPTION_START_TIMEOUT_SEC)
+            return
+        except TimeoutError:
+            log.info('%s: no subscription after %ss; probing whether the DUT answers at all.',
+                     step_name, SUBSCRIPTION_START_TIMEOUT_SEC)
+
+        controller = start_kwargs.get('dev_ctrl', self.default_controller)
+        node_id = start_kwargs.get('node_id', self.dut_node_id)
+        probe_error = None
+        try:
+            # Bounded twice: GetConnectedDevice honours timeoutMs, and wait_for keeps a wedged
+            # probe from stalling the very failure it exists to explain.
+            await asyncio.wait_for(
+                controller.GetConnectedDevice(node_id, allowPASE=False, timeoutMs=SUBSCRIPTION_PROBE_TIMEOUT_MS),
+                timeout=SUBSCRIPTION_PROBE_TIMEOUT_MS / 1000 + 5)
+        except (TimeoutError, ChipDeviceCtrl.ChipStackError) as e:
+            probe_error = e
+
+        preamble = (f"{step_name}: could not establish a subscription to the DUT within "
+                    f"{SUBSCRIPTION_START_TIMEOUT_SEC}s")
+        no_verdict = ("No verdict: without a subscription this run observed nothing, so the DUT's OTA "
+                      "behaviour was neither proved nor disproved.")
+        if probe_error is None:
+            asserts.fail(
+                f"{preamble}, yet the DUT still answers the controller (GetConnectedDevice succeeded).\n"
+                f"{no_verdict} The DUT is not the suspect here — the controller's subscription machinery "
+                "is, most likely an earlier subscription of this run still retrying in the background.\n"
+                "ACTION: re-run the test. If this recurs at the same step, investigate the controller "
+                "side rather than the DUT.")
+        asserts.fail(
+            f"{preamble}, and the DUT does not answer the controller at all "
+            f"(GetConnectedDevice failed: {probe_error}).\n"
+            f"{no_verdict}\n"
+            "ACTION: check that the DUT is powered and on the network. A one-off drop-out is an "
+            "environment problem — re-run the test. A DUT that repeatedly stops answering at this "
+            "point is itself the defect and must not be retried away.")
+
+    async def _announce_until_provider_queried(self, controller, provider_node_id: int, requestor_node_id: int,
+                                               timeout_sec: float, step_name: str,
+                                               retry_interval_sec: float = 60.0) -> None:
+        """Announce the provider, repeating until the provider reports receiving a QueryImage.
+
+        One AnnounceOTAProvider does not guarantee the DUT queries this provider. The requestor
+        drops an announce that arrives while UpdateState is not kIdle, and a query it does send
+        can still die in a CASE session left over from the previous provider process — every step
+        replaces that process — costing a message-layer timeout before the DUT tries again.
+        Repeating the announce keeps the step moving in both cases instead of leaving it at the
+        mercy of the DUT's own retry policy: DefaultOTARequestorDriver grants a single automatic
+        retry per invalid session (kMaxInvalidSessionRetries) and the spec mandates none at all.
+
+        Waiting on the provider's own report of the query, rather than on a DUT state change, is
+        what makes the loop terminate for the right reason: it is the only signal that separates a
+        query this provider answered from one that never arrived.
+
+        The caller must arm the provider's matcher with PROVIDER_QUERY_RECEIVED_LOG right after
+        starting it and before calling this, so a receipt landing between the announce and the
+        wait cannot be missed.
+
+        Announces stop as soon as the provider reports the query, so this never perturbs a
+        timing guard that follows: any announce it sends is either dropped by a busy DUT or
+        answered by the query that ends the loop.
+        """
+        proc = self.current_provider_app_proc
+        t_start = time.time()
+        attempt = 0
+
+        while True:
+            remaining = timeout_sec - (time.time() - t_start)
+            if remaining <= 0:
+                asserts.fail(f"{step_name}: the provider received no QueryImage within {timeout_sec:.0f}s "
+                             f"of the first announce ({attempt} sent); the DUT never reached it.")
+            attempt += 1
+            try:
+                await self.announce_ota_provider(
+                    controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+                log.info('%s: AnnounceOTAProvider sent (attempt %d).', step_name, attempt)
+            except (TimeoutError, ChipDeviceCtrl.ChipStackError) as e:
+                # Expected while the DUT is recovering from an aborted transfer: its session to
+                # the controller can drop (e.g. under Wi-Fi power-save). Retry on the next pass.
+                log.info('%s: AnnounceOTAProvider failed (DUT transiently unreachable): %s; will retry.',
+                         step_name, e)
+
+            if proc.wait_for_output(timeout=min(retry_interval_sec, remaining)):
+                log.info('%s: provider received a QueryImage %.0fs after the first announce.',
+                         step_name, time.time() - t_start)
+                return
+
+            log.info('%s: no QueryImage reached the provider in %.0fs (elapsed %.0fs / %.0fs); re-announcing.',
+                     step_name, retry_interval_sec, time.time() - t_start, timeout_sec)
+
+    async def _wait_until_idle_before_announce(self, controller, requestor_node_id: int, subscription,
+                                               timeout_sec: float, step_name: str) -> None:
+        """Block until the DUT's UpdateState is kIdle, so the AnnounceOTAProvider that follows is
+        acted on instead of dropped.
+
+        The requestor silently ignores an AnnounceOTAProvider that arrives while UpdateState is
+        not kIdle ("State is not kIdle, ignoring the AnnounceOTAProviders"), which would leave the
+        step depending on whatever retry the DUT runs on its own rather than on the announce.
+
+        The current value is READ rather than awaited from ``subscription``:
+        AttributeSubscriptionHandler.start() registers its callback only after ReadAttribute() has
+        already consumed the priming report, so nothing is enqueued for a DUT that is idle when the
+        subscription starts — and an unchanged attribute is never reported again, so a pure wait
+        would block until it times out. The subscription is used only for the case where the DUT
+        still has to transition, which does produce a report.
+        """
+        kIdle = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        state = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            cluster=Clusters.OtaSoftwareUpdateRequestor,
+            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState)
+        if state == kIdle:
+            log.info('%s: DUT is already idle — the announce will be acted on.', step_name)
+            return
+
+        log.info('%s: DUT is in %s; waiting up to %.0fs for it to reach kIdle before announcing.',
+                 step_name, state, timeout_sec)
+        subscription.await_first_value_asserting_no_forbidden(
+            target_value=kIdle,
+            forbidden_values=set(),
+            timeout_sec=timeout_sec,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
+        )
+        log.info('%s: DUT reached kIdle — the announce will be acted on.', step_name)
 
     def start_provider(self,
                        provider_app_path: str = "",
@@ -229,7 +385,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         )
         log.info("OTA Providers List: %s", after_otap_info)
 
-    async def verify_version_applied_basic_information(self, controller: ChipDeviceCtrl.ChipDeviceController, node_id: int, target_version: int):
+    async def verify_version_applied_basic_information(self, controller: ChipDeviceCtrl.ChipDeviceController, node_id: int, target_version: int) -> int:
         """Verify the version from the BasicInformationCluster and compares against the provider target version.
 
         Args:
@@ -245,6 +401,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             node_id=node_id)
         asserts.assert_equal(basicinfo_softwareversion, target_version,
                              f"Version from basic info cluster is not {target_version}, current cluster version is {basicinfo_softwareversion}")
+        return int(basicinfo_softwareversion)
 
     def get_downloaded_ota_image_info(self, ota_path='/tmp/test.bin') -> dict:
         """Return the data of the downloaded image from the provider.

@@ -24,7 +24,8 @@ namespace Attributes {
 namespace SupportedAmbientContexts {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedAmbientContexts::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedAmbientContexts
 namespace ActiveAmbientContextTriggers {
@@ -34,8 +35,9 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace ActiveAmbientContextTriggers
 namespace MaxAnalysisStreamCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxAnalysisStreamCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxAnalysisStreamCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxAnalysisStreamCount
 namespace CurrentAnalysisStreamCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentAnalysisStreamCount::Id,
