@@ -15,6 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "MotionZoneAllocationCounter.h"
+
 #include <vector>
 
 #include <pw_unit_test/framework.h>
@@ -490,6 +492,12 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
     class ZoneDelegate : public TestPushAVStreamTransportDelegateImpl
     {
     public:
+        bool ValidateStreamUsage(StreamUsageEnum streamUsage) override
+        {
+            MotionZoneAllocationCounter::Begin();
+            return true;
+        }
+
         Status AllocatePushTransport(const TransportOptionsStruct & options, uint16_t connectionId,
                                      FabricIndex fabricIndex) override
         {
@@ -503,6 +511,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
         }
         bool ValidateMotionZoneListSize(size_t zoneListSize) override
         {
+            MotionZoneAllocationCounter::End();
             ++sizeChecks;
             return zoneListSize <= 2;
         }
@@ -661,6 +670,14 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
                 handler.SetFabricIndex(1);
                 const ConcreteCommandPath path{ 1, PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
                 const auto result = server.GetLogic().HandleAllocatePushTransport(handler, path, commandData);
+                MotionZoneAllocationCounter::End();
+#if defined(CHIP_TEST_MOTION_ZONE_ALLOCATION_TRACKING)
+                if (zonesCase == ZonesCase::Unique && zoneCount > 2)
+                {
+                    EXPECT_EQ(MotionZoneAllocationCounter::Calls(), 1u);
+                    EXPECT_LE(MotionZoneAllocationCounter::RequestedBytes(), zoneCount * sizeof(uint16_t));
+                }
+#endif
                 if (expectedStatus == Status::Success)
                 {
                     EXPECT_EQ(result, std::nullopt);
