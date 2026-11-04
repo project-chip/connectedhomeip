@@ -119,7 +119,6 @@ CHIP_ERROR IPv6Bind(int socket, const IPAddress & address, uint16_t port, Interf
     memset(&sa, 0, sizeof(sa));
     sa.sin6_family                        = AF_INET6;
     sa.sin6_port                          = htons(port);
-    sa.sin6_flowinfo                      = 0;
     sa.sin6_addr                          = address.ToIPv6();
     InterfaceId::PlatformType interfaceId = interface.GetPlatformInterface();
     if (!CanCastTo<decltype(sa.sin6_scope_id)>(interfaceId))
@@ -371,7 +370,6 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
     {
         peerSockAddr.in6.sin6_family     = AF_INET6;
         peerSockAddr.in6.sin6_port       = htons(aPktInfo->DestPort);
-        peerSockAddr.in6.sin6_flowinfo   = 0;
         peerSockAddr.in6.sin6_addr       = aPktInfo->DestAddress.ToIPv6();
         InterfaceId::PlatformType intfId = aPktInfo->Interface.GetPlatformInterface();
         VerifyOrReturnError(CanCastTo<decltype(peerSockAddr.in6.sin6_scope_id)>(intfId), CHIP_ERROR_INCORRECT_STATE);
