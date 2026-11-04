@@ -179,10 +179,13 @@ CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId clu
     }
 
 exit:
-
-    if(error != CHIP_NO_ERROR)
+    // bindingContext owns the context at this point. Returning an error would make the caller release
+    // the context a second time.
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to process BoundClusterChanged: %" CHIP_ERROR_FORMAT, error.Format());
+        ChipLogError(AppServer,
+                     "Failed to notify bound cluster change on endpoint %u, cluster " ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
+                     endpoint, ChipLogValueMEI(cluster), error.Format());
     }
 
     bindingContext->DecrementConsumersNumber();
