@@ -200,7 +200,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         timing guard that follows: any announce it sends is either dropped by a busy DUT or
         answered by the query that ends the loop.
         """
-        proc = self.current_provider_app_proc
         t_start = time.time()
         attempt = 0
 
