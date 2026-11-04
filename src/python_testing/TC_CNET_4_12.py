@@ -68,10 +68,19 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         return f'{compressed_fabric_id:016X}-{node_id:016X}'
 
-    async def wait_for_srp_update(self, timeout_seconds: int = 180):
-        instance_qname = f"{self.get_dut_instance_name()}.{MdnsServiceType.OPERATIONAL.value}"
+    async def wait_for_srp_addresses(self, timeout_seconds: int = 180) -> list[str]:
+        """Fetches the IPv6 (AAAA) addresses of the DUT's operational service.
 
+        Waits until the DUT's operational record is published via SRP and resolves to at least one
+        IPv6 address, then returns those addresses. Fails the test if none is found within timeout_seconds.
+        """
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + timeout_seconds
         mdns = MdnsDiscovery()
+
+        # The SRV record is needed first: it provides the DUT's host name, which the AAAA lookup requires
+        # (the host name can't be derived from the instance name), so the two lookups can't run in parallel.
+        instance_qname = f"{self.get_dut_instance_name()}.{MdnsServiceType.OPERATIONAL.value}"
         srv_record = await mdns.get_srv_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
@@ -80,23 +89,7 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
         )
         srv_record_returned = srv_record is not None and srv_record.service_name == instance_qname
         asserts.assert_true(srv_record_returned, "Unable to find device")
-        return srv_record
 
-    async def wait_for_srp_addresses(self, timeout_seconds: int = 180) -> list[str]:
-        """Fetches the IPv6 (AAAA) addresses of the DUT's operational service.
-
-        Waits until the DUT's operational record is published via SRP and resolves to at least one
-        IPv6 address, then returns those addresses. Fails the test if none is found within timeout_seconds.
-
-        Prefer this over wait_for_srp_update() when the DUT's address is needed: an SRV lookup is not
-        guaranteed to return the host's AAAA records, so they are queried separately if needed.
-        """
-        loop = asyncio.get_running_loop()
-        deadline = loop.time() + timeout_seconds
-
-        # The SRV record is needed first: it provides the DUT's host name, which the AAAA lookup requires
-        # (the host name can't be derived from the instance name), so the two lookups can't run in parallel.
-        srv_record = await self.wait_for_srp_update(timeout_seconds=timeout_seconds)
         # SRV addresses may include IPv4 (A records); keep IPv6 only.
         ipv6_addresses = [address for address in (srv_record.addresses or []) if ":" in address]
         if ipv6_addresses:
@@ -111,8 +104,7 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
             asserts.fail(f"Timed out after {timeout_seconds}s waiting for an IP address of the DUT via SRP")
         log.info("SRV record for %s returned no IPv6 addresses, querying AAAA for %s",
                  srv_record.service_name, srv_record.hostname)
-        quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_record.hostname,
-                                                                query_timeout_sec=remaining)
+        quada_records = await mdns.get_quada_records(hostname=srv_record.hostname, query_timeout_sec=remaining)
         asserts.assert_true(quada_records, f"No IP address found for {srv_record.hostname} within {timeout_seconds}s")
         return [record.address for record in quada_records]
 
