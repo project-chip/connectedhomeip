@@ -94,7 +94,7 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Unregister(ServerClusterInterface * w
                 prev->next = next;
             }
 
-            if (mCachedInterface == current->serverClusterInterface)
+            if (mCachedInterface == what)
             {
                 mCachedInterface = nullptr;
             }
