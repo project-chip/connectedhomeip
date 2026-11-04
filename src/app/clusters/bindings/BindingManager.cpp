@@ -179,9 +179,15 @@ CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId clu
     }
 
 exit:
+
+    if(error != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to process BoundClusterChanged: %" CHIP_ERROR_FORMAT, error.Format());
+    }
+
     bindingContext->DecrementConsumersNumber();
 
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Manager::AddBindingEntry(const Binding::TableEntry & entry)
