@@ -20117,6 +20117,12 @@ MTR_DEPRECATED("Please use MTRBaseClusterUnitTesting", ios(16.1, 16.4), macos(13
 @interface MTRBaseClusterTestCluster : MTRBaseClusterUnitTesting
 @end
 
+typedef NS_ENUM(uint8_t, MTRDataTypeAlarmSeverityTag) {
+    MTRDataTypeAlarmSeverityTagCritical MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeAlarmSeverityTagMajor MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeAlarmSeverityTagMinor MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeAreaTypeTag) {
     MTRDataTypeAreaTypeTagAisle MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeAreaTypeTagAttic MTR_PROVISIONALLY_AVAILABLE = 0x01,
@@ -20170,7 +20176,7 @@ typedef NS_ENUM(uint8_t, MTRDataTypeAreaTypeTag) {
     MTRDataTypeAreaTypeTagLibrary MTR_PROVISIONALLY_AVAILABLE = 0x33,
     MTRDataTypeAreaTypeTagLivingRoom MTR_PROVISIONALLY_AVAILABLE = 0x34,
     MTRDataTypeAreaTypeTagLounge MTR_PROVISIONALLY_AVAILABLE = 0x35,
-    MTRDataTypeAreaTypeTagMediaTVRoom MTR_PROVISIONALLY_AVAILABLE = 0x36,
+    MTRDataTypeAreaTypeTagMediaTvRoom MTR_PROVISIONALLY_AVAILABLE = 0x36,
     MTRDataTypeAreaTypeTagMudRoom MTR_PROVISIONALLY_AVAILABLE = 0x37,
     MTRDataTypeAreaTypeTagMusicRoom MTR_PROVISIONALLY_AVAILABLE = 0x38,
     MTRDataTypeAreaTypeTagNursery MTR_PROVISIONALLY_AVAILABLE = 0x39,
@@ -20225,6 +20231,20 @@ typedef NS_ENUM(uint8_t, MTRDataTypeCertificationTypeEnum) {
     MTRDataTypeCertificationTypeEnumVIDSignerPKI MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
+typedef NS_ENUM(uint8_t, MTRDataTypeClosureCabinetTag) {
+    MTRDataTypeClosureCabinetTagCabinetDoor MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeClosureCabinetTagDrawer MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeClosureCabinetTagFlap MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeClosureCoveringTag) {
+    MTRDataTypeClosureCoveringTagBlind MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeClosureCoveringTagAwning MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeClosureCoveringTagShutter MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeClosureCoveringTagVenetian MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeClosureCoveringTagCurtain MTR_PROVISIONALLY_AVAILABLE = 0x04,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeClosurePanelTag) {
     MTRDataTypeClosurePanelTagLift MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeClosurePanelTagTilt MTR_PROVISIONALLY_AVAILABLE = 0x01,
@@ -20240,6 +20260,137 @@ typedef NS_ENUM(uint8_t, MTRDataTypeClosureTag) {
     MTRDataTypeClosureTagGate MTR_PROVISIONALLY_AVAILABLE = 0x04,
     MTRDataTypeClosureTagGarageDoor MTR_PROVISIONALLY_AVAILABLE = 0x05,
     MTRDataTypeClosureTagDoor MTR_PROVISIONALLY_AVAILABLE = 0x06,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeClosureWindowTag) {
+    MTRDataTypeClosureWindowTagRoof MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeClosureWindowTagFacade MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommodityTariffChronologyTag) {
+    MTRDataTypeCommodityTariffChronologyTagCurrent MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommodityTariffChronologyTagPrevious MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCommodityTariffChronologyTagUpcoming MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommodityTariffCommodityTag) {
+    MTRDataTypeCommodityTariffCommodityTagElectricalEnergy MTR_PROVISIONALLY_AVAILABLE = 0x00,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommodityTariffFlowTag) {
+    MTRDataTypeCommodityTariffFlowTagImport MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommodityTariffFlowTagExport MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCommonClosureTag) {
+    MTRDataTypeCommonClosureTagOpening MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCommonClosureTagClosing MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCommonClosureTagStop MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCompassDirectionTag) {
+    MTRDataTypeCompassDirectionTagNorthward MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCompassDirectionTagNorthEastward MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCompassDirectionTagEastward MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeCompassDirectionTagSouthEastward MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeCompassDirectionTagSouthward MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeCompassDirectionTagSouthWestward MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeCompassDirectionTagWestward MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeCompassDirectionTagNorthWestward MTR_PROVISIONALLY_AVAILABLE = 0x07,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeCompassLocationTag) {
+    MTRDataTypeCompassLocationTagNorth MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeCompassLocationTagNorthEast MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeCompassLocationTagEast MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeCompassLocationTagSouthEast MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeCompassLocationTagSouth MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeCompassLocationTagSouthWest MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeCompassLocationTagWest MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeCompassLocationTagNorthWest MTR_PROVISIONALLY_AVAILABLE = 0x07,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeDirectionTag) {
+    MTRDataTypeDirectionTagUpward MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeDirectionTagDownward MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeDirectionTagLeftward MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeDirectionTagRightward MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeDirectionTagForward MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeDirectionTagBackward MTR_PROVISIONALLY_AVAILABLE = 0x05,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeElectricalDistributionFormFactorTag) {
+    MTRDataTypeElectricalDistributionFormFactorTagMiniature MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeElectricalDistributionFormFactorTagMoldedCase MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeElectricalDistributionOverVoltageTag) {
+    MTRDataTypeElectricalDistributionOverVoltageTagLineToNeutral MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeElectricalDistributionOverVoltageTagLineToGround MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeElectricalDistributionOverVoltageTagNeutralToGround MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeElectricalDistributionOverVoltageTagLineToLine MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeElectricalMeasurementTag) {
+    MTRDataTypeElectricalMeasurementTagDC MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeElectricalMeasurementTagAC MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeElectricalMeasurementTagACPhase1 MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeElectricalMeasurementTagACPhase2 MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeElectricalMeasurementTagACPhase3 MTR_PROVISIONALLY_AVAILABLE = 0x04,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeIdentifiedHumanActivityTag) {
+    MTRDataTypeIdentifiedHumanActivityTagUnknown MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeIdentifiedHumanActivityTagFall MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeIdentifiedHumanActivityTagSleeping MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeIdentifiedHumanActivityTagWalking MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeIdentifiedHumanActivityTagWorkout MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeIdentifiedHumanActivityTagSitting MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeIdentifiedHumanActivityTagStanding MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeIdentifiedHumanActivityTagDancing MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeIdentifiedHumanActivityTagPackageDelivery MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeIdentifiedHumanActivityTagPackageRetrieval MTR_PROVISIONALLY_AVAILABLE = 0x09,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeIdentifiedObjectTag) {
+    MTRDataTypeIdentifiedObjectTagUnknown MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeIdentifiedObjectTagAdult MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeIdentifiedObjectTagChild MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeIdentifiedObjectTagPerson MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeIdentifiedObjectTagRVC MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeIdentifiedObjectTagPet MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeIdentifiedObjectTagDog MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeIdentifiedObjectTagCat MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeIdentifiedObjectTagAnimal MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeIdentifiedObjectTagCar MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRDataTypeIdentifiedObjectTagVehicle MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeIdentifiedObjectTagPackage MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeIdentifiedObjectTagClothes MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeIdentifiedSoundTag) {
+    MTRDataTypeIdentifiedSoundTagUnknown MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeIdentifiedSoundTagObjectFall MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeIdentifiedSoundTagSnoring MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeIdentifiedSoundTagCoughing MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeIdentifiedSoundTagBarking MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeIdentifiedSoundTagShattering MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeIdentifiedSoundTagBabyCrying MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeIdentifiedSoundTagUtilityAlarm MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeIdentifiedSoundTagUrgentShouting MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeIdentifiedSoundTagDoorbell MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRDataTypeIdentifiedSoundTagKnocking MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeIdentifiedSoundTagUrgentSiren MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeIdentifiedSoundTagFaucetRunning MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRDataTypeIdentifiedSoundTagKettleBoiling MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeIdentifiedSoundTagFanDryer MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeIdentifiedSoundTagClapping MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeIdentifiedSoundTagFingerSnapping MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeIdentifiedSoundTagMeowing MTR_PROVISIONALLY_AVAILABLE = 0x11,
+    MTRDataTypeIdentifiedSoundTagLaughing MTR_PROVISIONALLY_AVAILABLE = 0x12,
+    MTRDataTypeIdentifiedSoundTagGlassBreaking MTR_PROVISIONALLY_AVAILABLE = 0x13,
+    MTRDataTypeIdentifiedSoundTagDoorKnocking MTR_PROVISIONALLY_AVAILABLE = 0x14,
+    MTRDataTypeIdentifiedSoundTagPersonTalking MTR_PROVISIONALLY_AVAILABLE = 0x15,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeLandmarkTag) {
@@ -20296,11 +20447,25 @@ typedef NS_ENUM(uint8_t, MTRDataTypeLandmarkTag) {
     MTRDataTypeLandmarkTagWineCooler MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x32,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+typedef NS_ENUM(uint8_t, MTRDataTypeLaundryTag) {
+    MTRDataTypeLaundryTagNormal MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeLaundryTagLightDry MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeLaundryTagExtraDry MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeLaundryTagNoDry MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeLevelTag) {
+    MTRDataTypeLevelTagLow MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeLevelTagMedium MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeLevelTagHigh MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeLocationTag) {
     MTRDataTypeLocationTagIndoor MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeLocationTagOutdoor MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRDataTypeLocationTagInside MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRDataTypeLocationTagOutside MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeLocationTagZone MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint16_t, MTRDataTypeMeasurementTypeEnum) {
@@ -20329,6 +20494,40 @@ typedef NS_ENUM(uint8_t, MTRDataTypeMediumType) {
     MTRDataTypeMediumTypeWater MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
+typedef NS_ENUM(uint8_t, MTRDataTypeNumberTag) {
+    MTRDataTypeNumberTagZero MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeNumberTagOne MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeNumberTagTwo MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeNumberTagThree MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeNumberTagFour MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeNumberTagFive MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeNumberTagSix MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeNumberTagSeven MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeNumberTagEight MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeNumberTagNine MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRDataTypeNumberTagTen MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeNumberTagEleven MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeNumberTagTwelve MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRDataTypeNumberTagThirteen MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeNumberTagFourteen MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeNumberTagFifteen MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeNumberTagSixteen MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeNumberTagSeventeen MTR_PROVISIONALLY_AVAILABLE = 0x11,
+    MTRDataTypeNumberTagEighteen MTR_PROVISIONALLY_AVAILABLE = 0x12,
+    MTRDataTypeNumberTagNineteen MTR_PROVISIONALLY_AVAILABLE = 0x13,
+    MTRDataTypeNumberTagTwenty MTR_PROVISIONALLY_AVAILABLE = 0x14,
+    MTRDataTypeNumberTagTwentyOne MTR_PROVISIONALLY_AVAILABLE = 0x15,
+    MTRDataTypeNumberTagTwentyTwo MTR_PROVISIONALLY_AVAILABLE = 0x16,
+    MTRDataTypeNumberTagTwentyThree MTR_PROVISIONALLY_AVAILABLE = 0x17,
+    MTRDataTypeNumberTagTwentyFour MTR_PROVISIONALLY_AVAILABLE = 0x18,
+    MTRDataTypeNumberTagTwentyFive MTR_PROVISIONALLY_AVAILABLE = 0x19,
+    MTRDataTypeNumberTagTwentySix MTR_PROVISIONALLY_AVAILABLE = 0x1A,
+    MTRDataTypeNumberTagTwentySeven MTR_PROVISIONALLY_AVAILABLE = 0x1B,
+    MTRDataTypeNumberTagTwentyEight MTR_PROVISIONALLY_AVAILABLE = 0x1C,
+    MTRDataTypeNumberTagTwentyNine MTR_PROVISIONALLY_AVAILABLE = 0x1D,
+    MTRDataTypeNumberTagThirty MTR_PROVISIONALLY_AVAILABLE = 0x1E,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypePositionTag) {
     MTRDataTypePositionTagLeft MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
     MTRDataTypePositionTagRight MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
@@ -20339,10 +20538,23 @@ typedef NS_ENUM(uint8_t, MTRDataTypePositionTag) {
     MTRDataTypePositionTagColumn MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+typedef NS_ENUM(uint8_t, MTRDataTypePowerSourceTag) {
+    MTRDataTypePowerSourceTagUnknown MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypePowerSourceTagGrid MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypePowerSourceTagSolar MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypePowerSourceTagBattery MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypePowerSourceTagEV MTR_PROVISIONALLY_AVAILABLE = 0x04,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypePowerThresholdSourceEnum) {
     MTRDataTypePowerThresholdSourceEnumContract MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypePowerThresholdSourceEnumRegulator MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRDataTypePowerThresholdSourceEnumEquipment MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeRefrigeratorTag) {
+    MTRDataTypeRefrigeratorTagRefrigerator MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeRefrigeratorTagFreezer MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeRelativePositionTag) {
@@ -20355,11 +20567,65 @@ typedef NS_ENUM(uint8_t, MTRDataTypeRelativePositionTag) {
     MTRDataTypeRelativePositionTagBehind MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+typedef NS_ENUM(uint8_t, MTRDataTypeRoomAirConditionerTag) {
+    MTRDataTypeRoomAirConditionerTagEvaporator MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeRoomAirConditionerTagCondenser MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeSemanticTagNamespaceId) {
+    MTRDataTypeSemanticTagNamespaceIdCommonClosure MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeSemanticTagNamespaceIdCompassDirection MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeSemanticTagNamespaceIdCompassLocation MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeSemanticTagNamespaceIdDirection MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeSemanticTagNamespaceIdLevel MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeSemanticTagNamespaceIdLocation MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeSemanticTagNamespaceIdNumber MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeSemanticTagNamespaceIdPosition MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeSemanticTagNamespaceIdElectricalMeasurement MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeSemanticTagNamespaceIdCommodityTariffChronology MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeSemanticTagNamespaceIdCommodityTariffCommodity MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeSemanticTagNamespaceIdLaundry MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeSemanticTagNamespaceIdPowerSource MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeSemanticTagNamespaceIdAreaType MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeSemanticTagNamespaceIdLandmark MTR_PROVISIONALLY_AVAILABLE = 0x11,
+    MTRDataTypeSemanticTagNamespaceIdRelativePosition MTR_PROVISIONALLY_AVAILABLE = 0x12,
+    MTRDataTypeSemanticTagNamespaceIdCommodityTariffFlow MTR_PROVISIONALLY_AVAILABLE = 0x13,
+    MTRDataTypeSemanticTagNamespaceIdRefrigerator MTR_PROVISIONALLY_AVAILABLE = 0x41,
+    MTRDataTypeSemanticTagNamespaceIdRoomAirConditioner MTR_PROVISIONALLY_AVAILABLE = 0x42,
+    MTRDataTypeSemanticTagNamespaceIdSwitches MTR_PROVISIONALLY_AVAILABLE = 0x43,
+    MTRDataTypeSemanticTagNamespaceIdClosure MTR_PROVISIONALLY_AVAILABLE = 0x44,
+    MTRDataTypeSemanticTagNamespaceIdClosurePanel MTR_PROVISIONALLY_AVAILABLE = 0x45,
+    MTRDataTypeSemanticTagNamespaceIdClosureCovering MTR_PROVISIONALLY_AVAILABLE = 0x46,
+    MTRDataTypeSemanticTagNamespaceIdClosureWindow MTR_PROVISIONALLY_AVAILABLE = 0x47,
+    MTRDataTypeSemanticTagNamespaceIdClosureCabinet MTR_PROVISIONALLY_AVAILABLE = 0x48,
+    MTRDataTypeSemanticTagNamespaceIdIdentifiedObject MTR_PROVISIONALLY_AVAILABLE = 0x49,
+    MTRDataTypeSemanticTagNamespaceIdIdentifiedSound MTR_PROVISIONALLY_AVAILABLE = 0x4A,
+    MTRDataTypeSemanticTagNamespaceIdIdentifiedHumanActivity MTR_PROVISIONALLY_AVAILABLE = 0x4B,
+    MTRDataTypeSemanticTagNamespaceIdAlarmSeverity MTR_PROVISIONALLY_AVAILABLE = 0x4C,
+    MTRDataTypeSemanticTagNamespaceIdElectricalDistributionFormFactor MTR_PROVISIONALLY_AVAILABLE = 0x4D,
+    MTRDataTypeSemanticTagNamespaceIdElectricalDistributionOverVoltage MTR_PROVISIONALLY_AVAILABLE = 0x4E,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeStreamUsageEnum) {
     MTRDataTypeStreamUsageEnumInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeStreamUsageEnumRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRDataTypeStreamUsageEnumAnalysis MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRDataTypeStreamUsageEnumLiveView MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeSwitchesTag) {
+    MTRDataTypeSwitchesTagOn MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeSwitchesTagOff MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeSwitchesTagToggle MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeSwitchesTagUp MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeSwitchesTagDown MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeSwitchesTagNext MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeSwitchesTagPrevious MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeSwitchesTagEnterOkSelect MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeSwitchesTagCustom MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeSwitchesTagOpen MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRDataTypeSwitchesTagClose MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeSwitchesTagStop MTR_PROVISIONALLY_AVAILABLE = 0x0B,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeTariffPriceTypeEnum) {
