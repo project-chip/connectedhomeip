@@ -21,7 +21,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/clusters/keypad-input-server/KeypadInputCluster.h>
+#include <app/clusters/keypad-input-server/CodegenIntegration.h>
 #include <app/clusters/keypad-input-server/keypad-input-delegate.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>

@@ -16,4 +16,4 @@
 
 #pragma once
 
-#include <app/clusters/keypad-input-server/KeypadInputCluster.h>
+#include <app/clusters/keypad-input-server/CodegenIntegration.h>
