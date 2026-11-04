@@ -301,8 +301,8 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-${BUILD_VARIANT} \
-                        --target linux-x64-all-clusters-no-wifi-openthread-endpoint-${BUILD_VARIANT} \
-                        --target linux-x64-all-clusters-no-wifi-no-ble-openthread-endpoint-${BUILD_VARIANT} \
+                        --target linux-x64-all-devices-no-wifi-openthread-endpoint-${BUILD_VARIANT} \
+                        --target linux-x64-all-devices-no-wifi-no-ble-openthread-endpoint-${BUILD_VARIANT} \
                         --target linux-x64-ota-requestor-${BUILD_VARIANT} \
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
@@ -382,14 +382,14 @@ jobs:
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
-                     --target TestOperationalState \
+                     --target 'Test_TC_OO_2_1:Test against all-devices/on-off-light' \
                      --test-order random \
                      run \
                      --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-no-wifi-openthread-endpoint-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-no-wifi-openthread-endpoint-${BUILD_VARIANT}/all-devices-app \
                      --commissioning-method ble-thread \
                      --summary-file test-summaries/ble-thread.json \
                   "
@@ -404,13 +404,13 @@ jobs:
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
-                     --target TestOperationalState \
+                     --target 'Test_TC_OO_2_1:Test against all-devices/on-off-light' \
                      run \
                      --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-no-wifi-no-ble-openthread-endpoint-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-no-wifi-no-ble-openthread-endpoint-${BUILD_VARIANT}/all-devices-app \
                      --commissioning-method thread-meshcop \
                      --summary-file test-summaries/thread-meshcop.json \
                   "
