@@ -147,4 +147,37 @@ public:
     static ServerClusterInterface * FindClusterOnEndpoint(const FindClusterOnEndpointOptions & options, Delegate & delegate);
 };
 
+/// Implementation of `CodegenRegisteredServerCluster` that does not depend on the cluster type.
+class CodegenRegisteredServerClusterBase
+{
+protected:
+    static CHIP_ERROR Register(ServerClusterRegistration & registration);
+    static void Unregister(ServerClusterRegistration & registration);
+};
+
+/// A `RegisteredServerCluster` for clusters created by the application, which is registered
+/// with the codegen data model provider via `Register()` and unregistered when destroyed.
+///
+/// This is for clusters whose lifetime the application manages, as opposed to clusters created
+/// via `CodegenClusterIntegration::RegisterServer` from ember callbacks.
+template <typename SERVER_CLUSTER>
+class CodegenRegisteredServerCluster : public RegisteredServerCluster<SERVER_CLUSTER>, private CodegenRegisteredServerClusterBase
+{
+public:
+    using RegisteredServerCluster<SERVER_CLUSTER>::RegisteredServerCluster;
+    ~CodegenRegisteredServerCluster() { Unregister(); }
+
+    /// Registers the cluster with the codegen data model provider.
+    ///
+    /// Fails with CHIP_ERROR_INVALID_ARGUMENT if the ember configuration does not contain a
+    /// server instance of the cluster for each of its paths. Errors are logged.
+    CHIP_ERROR Register() { return CodegenRegisteredServerClusterBase::Register(this->Registration()); }
+
+    /// Unregisters the cluster. Does nothing if the cluster is not registered.
+    ///
+    /// This remains safe to call after the codegen data model provider has been destroyed during
+    /// static destruction, because the provider unregisters all clusters when it is destroyed.
+    void Unregister() { CodegenRegisteredServerClusterBase::Unregister(this->Registration()); }
+};
+
 } // namespace chip::app
