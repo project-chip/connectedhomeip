@@ -228,6 +228,9 @@ class TestRestartFlagReader(unittest.TestCase):
             with self.subTest(name), self.assertNoLogs(run_python_test.log, "ERROR"):
                 self._poll_sequence(reads)
                 self.assertFalse(os.path.exists(self.flag))
+        # Rejection replaces the flag file only if it still exists and holds the unknown content.
+        with open(self.flag, "w") as f:
+            f.write(y)
         with self.assertLogs(run_python_test.log, "ERROR"):
             self._poll_sequence([x, x, None, y, y, y])
         with open(self.flag) as f:
@@ -290,6 +293,58 @@ class TestRestartFlagReader(unittest.TestCase):
             f.write("restart")
         self._wait_consumed()
         self.app_manager.assert_called_once_with(self.config)
+
+    def _write_flag_directly(self, content):
+        # Publish a request exactly as write_restart_flag_file does, bypassing any patched os.replace.
+        with builtins.open(self.flag + ".concurrent", "w") as f:
+            f.write(content)
+        self._real_replace(self.flag + ".concurrent", self.flag)
+
+    def _wait_for(self, condition, timeout_sec=5):
+        deadline = time.monotonic() + timeout_sec
+        while not condition() and time.monotonic() < deadline:
+            time.sleep(0.05)
+
+    def test_request_published_before_rejection_is_not_overwritten(self):
+        self._real_replace = os.replace
+        injected = []
+
+        def racing_replace(src, dst):
+            # The monitor is about to act on the flag file holding the unknown content: a valid request lands first.
+            if not injected and (src == self.flag or (dst == self.flag and src.endswith(".rejected"))):
+                injected.append(True)
+                self._write_flag_directly("restart")
+            return self._real_replace(src, dst)
+
+        with open(self.flag, "w") as f:
+            f.write("factory res3t")
+        with mock.patch.object(run_python_test.os, "replace", racing_replace):
+            self._start_monitor()
+            self._wait_for(lambda: self.app_manager.called)
+            self._wait_consumed()
+        self.assertEqual(injected, [True])
+        self.app_manager.assert_called_once_with(self.config)
+        self.reset.assert_not_called()
+        self.assertEqual(os.listdir(self.dir.name), [])
+
+    def test_request_published_during_restart_is_not_deleted(self):
+        self._real_replace = os.replace
+        published = []
+
+        def restart_with_new_request():
+            if not published:
+                published.append(True)
+                self._write_flag_directly("factory reset app only")
+
+        self.app_manager.return_value.start.side_effect = restart_with_new_request
+        with open(self.flag, "w") as f:
+            f.write("restart")
+        self._start_monitor()
+        self._wait_for(lambda: self.app_manager.call_count >= 2)
+        self.assertEqual(self.app_manager.call_count, 2, "request published during the restart was lost")
+        self.reset.assert_called_once_with("--KVS kvs1", "--storage-path admin.json", run_python_test.FactoryResetType.AppOnly)
+        self._wait_consumed()
+        self.assertEqual(os.listdir(self.dir.name), [])
 
     def test_stop_while_waiting_for_request(self):
         open(self.flag, "w").close()
