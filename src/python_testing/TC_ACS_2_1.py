@@ -261,12 +261,13 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                 find_ind = 0
                 for acts in ambientContextTypeSupported:
                     nsID = acts.namespaceID
-                    
+
                     if nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
                         tagID = acts.tag
                         if tagID == tag_read:
                             find_ind = find_ind+1
-                asserts.assert_greater_equal(find_ind, 1, "Counting object is not supported by the AmbientContextTypeSupported attribute")
+                asserts.assert_greater_equal(
+                    find_ind, 1, "Counting object is not supported by the AmbientContextTypeSupported attribute")
 
             # write the object count configuration back to the device (write a Person tag for clarity instead)
             semantic_tag = Globals.Structs.SemanticTagStruct(
