@@ -42,6 +42,9 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionReset;
 // Called on the Matter queue, with the device lock held, when the device starts a new subscription.
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionSetupStarted;
+@property (atomic, copy, nullable) dispatch_block_t onReadClientCreated;
+// Called synchronously on the Matter queue, with the device lock held, for each internal state change.
+@property (atomic, copy, nullable) void (^onInternalStateTransition)(NSUInteger state);
 @property (atomic, nullable) NSNumber * subscriptionMaxIntervalOverride;
 @property (atomic, copy, nullable) MTRDeviceTestDelegateHandler onUTCTimeSet;
 @property (atomic, copy, nullable) dispatch_block_t onTimeSynchronizationLossDetected;
