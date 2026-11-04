@@ -53,7 +53,8 @@
 import logging
 
 from mobly import asserts
-from support_modules.idm_support import ATTRIBUTE_CONSTRAINT_DENIED_ATTRIBUTES, IDMBaseTest, WritableAttributeInfo, spec_enum_values
+from support_modules.idm_support import (ATTRIBUTE_CONSTRAINT_DENIED_ATTRIBUTES, COMMAND_CONSTRAINT_BASELINE_EXCLUSIONS,
+                                         IDMBaseTest, WritableAttributeInfo, spec_enum_values)
 
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
@@ -100,6 +101,7 @@ class TC_IDM_9_1(IDMBaseTest):
         commands_probed_count = 0
         commands_rejected_count = 0
         accepted_command_fields = []
+        unsupported_command_fields = []
 
         for info in command_field_infos:
             try:
@@ -110,6 +112,8 @@ class TC_IDM_9_1(IDMBaseTest):
                 continue
             if result.probed == 0:
                 commands_skipped_count += 1
+                if (info.cluster_id, info.command_id) in COMMAND_CONSTRAINT_BASELINE_EXCLUSIONS:
+                    unsupported_command_fields.append(info.path_str)
                 continue
             commands_tested_count += 1
             commands_probed_count += result.probed
@@ -120,7 +124,7 @@ class TC_IDM_9_1(IDMBaseTest):
         log.info("Step 1 complete: Tested %s command fields, skipped %s",
                  commands_tested_count, commands_skipped_count)
 
-        if command_field_infos:
+        if len(command_field_infos) > len(unsupported_command_fields):
             asserts.assert_greater(commands_tested_count, 0,
                                    "DUT exposes constrained command fields but no constraint violation could be exercised")
         self.enforce_constraint_policy(subject="Command field", accepted_paths=accepted_command_fields,
@@ -203,6 +207,10 @@ class TC_IDM_9_1(IDMBaseTest):
 
         self.enforce_constraint_policy(subject="Writable attribute", accepted_paths=accepted_attributes,
                                        rejected_count=rejected_count, probed_count=probed_count)
+
+        if unsupported_command_fields:
+            asserts.skip("Unsupported constraint coverage: actual constraint enforcement not demonstrated for "
+                         + ", ".join(unsupported_command_fields))
 
 
 if __name__ == "__main__":

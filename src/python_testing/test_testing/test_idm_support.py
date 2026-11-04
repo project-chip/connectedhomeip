@@ -27,8 +27,13 @@ import sys
 import unittest
 from pathlib import Path
 from types import MethodType, SimpleNamespace
+from unittest.mock import AsyncMock, Mock
+
+from mobly import signals
 
 import matter.clusters as Clusters
+from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import UnknownProblemLocation
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters
@@ -37,8 +42,8 @@ from matter.tlv import TLVReader
 _CHIP_ROOT = Path(__file__).resolve().parents[3]
 sys.path.append(str(_CHIP_ROOT / "src/python_testing"))
 
-from support_modules.idm_support import (SPEC_VERSION_1_7, IDMBaseTest, _codegen_enum_values, enum_in_type,  # noqa: E402
-                                         smallest_legal_enum_value, spec_enum_values, undefined_enum_values)
+from support_modules.idm_support import (SPEC_VERSION_1_7, CommandFieldInfo, IDMBaseTest, _codegen_enum_values,  # noqa: E402
+                                         enum_in_type, smallest_legal_enum_value, spec_enum_values, undefined_enum_values)
 
 
 class TestCodegenEnumValues(unittest.TestCase):
@@ -212,6 +217,178 @@ class TestFeatureGatedCommandFields(unittest.TestCase):
         # ViewGroup has no side effects, so it is unlikely to be added to COMMAND_CONSTRAINT_DENIED_COMMANDS.
         commands = [Clusters.Groups.Commands.ViewGroup]
         self.assertIn(('ViewGroup', 'GroupID'), self._discovered(Clusters.Groups, 0, commands))
+
+
+class TestDiagnosticConstraintCoverage(unittest.IsolatedAsyncioTestCase):
+    """Exercise the real TC with mocked transport, not DUT enforcement."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
+
+    def setUp(self):
+        diagnostics = Clusters.GeneralDiagnostics
+        self.checker = SimpleNamespace(
+            ROOT_NODE_ENDPOINT_ID=0, xml_clusters=self.xml_clusters,
+            endpoints_tlv={0: {
+                Clusters.BasicInformation.id: {
+                    Clusters.BasicInformation.Attributes.SpecificationVersion.attribute_id: SPEC_VERSION_1_7,
+                    GlobalAttributeIds.ATTRIBUTE_LIST_ID: []},
+                diagnostics.id: {
+                    GlobalAttributeIds.FEATURE_MAP_ID: diagnostics.Bitmaps.Feature.kDataModelTest,
+                    GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: [diagnostics.Commands.TestEventTrigger.command_id,
+                                                                  diagnostics.Commands.PayloadTestRequest.command_id],
+                    GlobalAttributeIds.ATTRIBUTE_LIST_ID: []}}},
+            default_controller=SimpleNamespace(SendCommand=AsyncMock(side_effect=InteractionModelError(Status.ConstraintError))),
+            dut_node_id=1,
+            current_test_info=SimpleNamespace(name='test_TC_IDM_9_1'),
+            matter_test_config=SimpleNamespace(endpoint=0, global_test_params={}),
+            setup_class_helper=AsyncMock(), build_spec_xmls=Mock(), step=Mock(),
+            record_warning=Mock(), record_accepted_violation=Mock(),
+            resolve_dynamic_constraint=AsyncMock(return_value=None))
+        for name in ('_allowed_numeric_values', '_allowed_lengths', '_command_field_label', '_command_field_enum_type'):
+            setattr(self.checker, name, getattr(IDMBaseTest, name))
+        for name in ('_generate_valid_command_field_value', '_resolved_command_field_constraints',
+                     'generate_command_field_violations', 'check_command_constraint', 'discover_constrained_command_fields',
+                     'dut_spec_version', 'enforces_constraints_strictly', 'enforce_constraint_policy', 'checkable_attributes'):
+            setattr(self.checker, name, MethodType(getattr(IDMBaseTest, name), self.checker))
+
+    async def test_all_excluded_is_unsupported_not_pass(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        with self.assertRaisesRegex(signals.TestSkip, 'constraint enforcement not demonstrated'):
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        self.checker.default_controller.SendCommand.assert_not_awaited()
+        problems = [call.kwargs['problem'] for call in self.checker.record_warning.call_args_list]
+        self.assertEqual(len(problems), 3)
+        for field in ('TestEventTrigger.EnableKey', 'PayloadTestRequest.EnableKey', 'PayloadTestRequest.Count'):
+            self.assertTrue(any(field in problem and 'safe baseline' in problem for problem in problems))
+        self.checker.record_accepted_violation.assert_not_called()
+
+    def _ordinary_command(self, include_diagnostics: bool) -> CommandFieldInfo:
+        if not include_diagnostics:
+            self.checker.endpoints_tlv[0].pop(Clusters.GeneralDiagnostics.id)
+        cluster = Clusters.Thermostat
+        command = cluster.Commands.SetpointRaiseLower
+        self.checker.endpoints_tlv[1] = {cluster.id: {
+            GlobalAttributeIds.FEATURE_MAP_ID: 0,
+            GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: [command.command_id],
+            GlobalAttributeIds.ATTRIBUTE_LIST_ID: []}}
+        return next(info for info in self.checker.discover_constrained_command_fields() if info.cluster_id == cluster.id)
+
+    async def test_mixed_coverage_stays_unsupported_after_ordinary_probes(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        self._ordinary_command(include_diagnostics=True)
+        self.checker.enforce_constraint_policy = Mock(wraps=self.checker.enforce_constraint_policy)
+        with self.assertRaisesRegex(signals.TestSkip, 'PayloadTestRequest.Count'):
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        calls = self.checker.default_controller.SendCommand.await_args_list
+        self.assertGreater(len(calls), 0)
+        self.assertTrue(all(isinstance(call.kwargs['payload'], Clusters.Thermostat.Commands.SetpointRaiseLower) for call in calls))
+        self.checker.enforce_constraint_policy.assert_any_call(
+            subject='Command field', accepted_paths=[], rejected_count=len(calls), probed_count=len(calls))
+
+    async def test_ordinary_only_can_qualify(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        self._ordinary_command(include_diagnostics=False)
+        await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        self.assertGreater(self.checker.default_controller.SendCommand.await_count, 0)
+        self.checker.record_warning.assert_not_called()
+        self.checker.record_accepted_violation.assert_not_called()
+
+    async def test_exclusions_do_not_mask_ordinary_non_enforcement(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        self._ordinary_command(include_diagnostics=True)
+        self.checker.default_controller.SendCommand.side_effect = None
+        self.checker.default_controller.SendCommand.return_value = None
+        with self.assertRaisesRegex(signals.TestFailure, 'Command field constraints not enforced'):
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        self.checker.record_accepted_violation.assert_called()
+
+    async def test_diagnostics_never_send_with_missing_wrong_or_present_pixit(self):
+        cluster = Clusters.GeneralDiagnostics
+        for command in (cluster.Commands.TestEventTrigger, cluster.Commands.PayloadTestRequest):
+            fields = self.xml_clusters[cluster.id].accepted_commands[command.command_id].fields
+            for key in (None, '', b'', bytes(15), bytes(16), bytes(range(16))):
+                self.checker.matter_test_config.global_test_params = (
+                    {} if key is None else {'PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY': key})
+                for field in fields.values():
+                    with self.subTest(command=command.__name__, field=field.name, key=key):
+                        info = CommandFieldInfo(
+                            endpoint_id=0, cluster_id=cluster.id, cluster_name='GeneralDiagnostics',
+                            command_id=command.command_id, command_name=command.__name__, command_class=command,
+                            cluster_class=cluster, field=field, all_fields=fields, enum_values_by_field={})
+                        result = await self.checker.check_command_constraint(info)
+                        self.assertEqual((result.probed, result.rejected, result.accepted, result.other_error), (0, 0, 0, 0))
+        self.checker.default_controller.SendCommand.assert_not_awaited()
+        self.checker.record_accepted_violation.assert_not_called()
+
+    async def test_unrelated_errors_do_not_credit_ordinary_enforcement(self):
+        info = self._ordinary_command(include_diagnostics=False)
+        for status in (Status.InvalidCommand, Status.ResourceExhausted):
+            with self.subTest(status=status):
+                self.checker.default_controller.SendCommand.side_effect = InteractionModelError(status)
+                result = await self.checker.check_command_constraint(info)
+                self.assertGreater(result.other_error, 0)
+                self.assertEqual((result.rejected, result.accepted), (0, 0))
+        self.checker.default_controller.SendCommand.side_effect = ChipStackError(0x0b)
+        with self.assertRaises(ChipStackError):
+            await self.checker.check_command_constraint(info)
+        self.checker.record_accepted_violation.assert_not_called()
+
+    async def test_valid_baseline_invalid_target_rejects_but_accepted_target_fails(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        info = self._ordinary_command(include_diagnostics=False)
+        result = await self.checker.check_command_constraint(info)
+        self.assertGreater(result.rejected, 0)
+        self.assertEqual((result.accepted, result.other_error), (0, 0))
+        self.checker.default_controller.SendCommand.side_effect = None
+        self.checker.default_controller.SendCommand.return_value = None
+        with self.assertRaisesRegex(signals.TestFailure, 'constraints not enforced'):
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        self.checker.record_accepted_violation.assert_called()
+
+    async def test_invalid_baseline_with_valid_or_invalid_target_is_not_enforcement(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        matching_key = bytes(range(16))
+        command = Clusters.GeneralDiagnostics.Commands.PayloadTestRequest
+        for enforce_count in (False, True):
+            for key in (bytes(16), matching_key):
+                for count in (1, 2049):
+                    with self.subTest(enforce_count=enforce_count, valid_baseline=key == matching_key, count=count):
+                        payload = command(enableKey=key, value=0, count=count)
+                        encoded = TLVReader(payload.ToTLV()).get()['Any']
+                        model_status = (Status.ConstraintError if encoded[0] != matching_key
+                                        or (enforce_count and encoded[2] > 2048) else Status.Success)
+                        if key != matching_key:
+                            self.assertEqual(model_status, Status.ConstraintError)
+                        elif count == 2049:
+                            self.assertEqual(model_status, Status.ConstraintError if enforce_count else Status.Success)
+                        else:
+                            self.assertEqual(model_status, Status.Success)
+                        self.checker.matter_test_config.global_test_params = {'PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY': key}
+                        self.checker.default_controller.SendCommand.side_effect = (
+                            InteractionModelError(model_status) if model_status != Status.Success else None)
+                        with self.assertRaisesRegex(signals.TestSkip, 'constraint enforcement not demonstrated'):
+                            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        self.checker.default_controller.SendCommand.assert_not_awaited()
+        self.checker.record_accepted_violation.assert_not_called()
+
+    async def test_exclusion_is_not_qualification_in_either_policy_era(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        basic = self.checker.endpoints_tlv[0][Clusters.BasicInformation.id]
+        for version in (SPEC_VERSION_1_7, SPEC_VERSION_1_7 - 1, None):
+            with self.subTest(version=version):
+                basic[Clusters.BasicInformation.Attributes.SpecificationVersion.attribute_id] = version or 0
+                with self.assertRaises(signals.TestSkip):
+                    await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        self.checker.default_controller.SendCommand.assert_not_awaited()
 
 
 if __name__ == "__main__":
