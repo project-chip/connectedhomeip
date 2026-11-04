@@ -46,8 +46,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MeshLocalPrefix::Id, B
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MeshLocalPrefix
 namespace OverrunCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(OverrunCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(OverrunCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace OverrunCount
 namespace NeighborTable {
 inline constexpr DataModel::AttributeEntry
@@ -80,177 +81,243 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LeaderRouterId::Id, Bi
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LeaderRouterId
 namespace DetachedRoleCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(DetachedRoleCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(DetachedRoleCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace DetachedRoleCount
 namespace ChildRoleCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ChildRoleCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ChildRoleCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ChildRoleCount
 namespace RouterRoleCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RouterRoleCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RouterRoleCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RouterRoleCount
 namespace LeaderRoleCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(LeaderRoleCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(LeaderRoleCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace LeaderRoleCount
 namespace AttachAttemptCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(AttachAttemptCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AttachAttemptCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace AttachAttemptCount
 namespace PartitionIdChangeCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PartitionIdChangeCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(PartitionIdChangeCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace PartitionIdChangeCount
 namespace BetterPartitionAttachAttemptCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BetterPartitionAttachAttemptCount::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BetterPartitionAttachAttemptCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BetterPartitionAttachAttemptCount
 namespace ParentChangeCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ParentChangeCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ParentChangeCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ParentChangeCount
 namespace TxTotalCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxTotalCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxTotalCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxTotalCount
 namespace TxUnicastCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxUnicastCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxUnicastCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxUnicastCount
 namespace TxBroadcastCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxBroadcastCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxBroadcastCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxBroadcastCount
 namespace TxAckRequestedCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxAckRequestedCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxAckRequestedCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxAckRequestedCount
 namespace TxAckedCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxAckedCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxAckedCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxAckedCount
 namespace TxNoAckRequestedCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxNoAckRequestedCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxNoAckRequestedCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxNoAckRequestedCount
 namespace TxDataCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxDataCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxDataCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxDataCount
 namespace TxDataPollCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxDataPollCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxDataPollCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxDataPollCount
 namespace TxBeaconCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxBeaconCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxBeaconCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxBeaconCount
 namespace TxBeaconRequestCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxBeaconRequestCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxBeaconRequestCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxBeaconRequestCount
 namespace TxOtherCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxOtherCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxOtherCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxOtherCount
 namespace TxRetryCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxRetryCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxRetryCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxRetryCount
 namespace TxDirectMaxRetryExpiryCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxDirectMaxRetryExpiryCount::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxDirectMaxRetryExpiryCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxDirectMaxRetryExpiryCount
 namespace TxIndirectMaxRetryExpiryCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxIndirectMaxRetryExpiryCount::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxIndirectMaxRetryExpiryCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxIndirectMaxRetryExpiryCount
 namespace TxErrCcaCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxErrCcaCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxErrCcaCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxErrCcaCount
 namespace TxErrAbortCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxErrAbortCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxErrAbortCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxErrAbortCount
 namespace TxErrBusyChannelCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxErrBusyChannelCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxErrBusyChannelCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxErrBusyChannelCount
 namespace RxTotalCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxTotalCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxTotalCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxTotalCount
 namespace RxUnicastCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxUnicastCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxUnicastCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxUnicastCount
 namespace RxBroadcastCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxBroadcastCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxBroadcastCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxBroadcastCount
 namespace RxDataCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxDataCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxDataCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxDataCount
 namespace RxDataPollCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxDataPollCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxDataPollCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxDataPollCount
 namespace RxBeaconCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxBeaconCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxBeaconCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxBeaconCount
 namespace RxBeaconRequestCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxBeaconRequestCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxBeaconRequestCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxBeaconRequestCount
 namespace RxOtherCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxOtherCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxOtherCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxOtherCount
 namespace RxAddressFilteredCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxAddressFilteredCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxAddressFilteredCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxAddressFilteredCount
 namespace RxDestAddrFilteredCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxDestAddrFilteredCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxDestAddrFilteredCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxDestAddrFilteredCount
 namespace RxDuplicatedCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxDuplicatedCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxDuplicatedCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxDuplicatedCount
 namespace RxErrNoFrameCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxErrNoFrameCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxErrNoFrameCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxErrNoFrameCount
 namespace RxErrUnknownNeighborCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxErrUnknownNeighborCount::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxErrUnknownNeighborCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxErrUnknownNeighborCount
 namespace RxErrInvalidSrcAddrCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxErrInvalidSrcAddrCount::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxErrInvalidSrcAddrCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxErrInvalidSrcAddrCount
 namespace RxErrSecCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxErrSecCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxErrSecCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxErrSecCount
 namespace RxErrFcsCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxErrFcsCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxErrFcsCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxErrFcsCount
 namespace RxErrOtherCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RxErrOtherCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RxErrOtherCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RxErrOtherCount
 namespace ActiveTimestamp {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ActiveTimestamp::Id, BitFlags<DataModel::AttributeQualityFlags>(),

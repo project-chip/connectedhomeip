@@ -1,15 +1,18 @@
 # Matter ESP32 Lighting Example (Zephyr)
 
-This example demonstrates the Matter Lighting application on the ESP32-C6
-running Zephyr RTOS, with Wi-Fi or Thread transport and BLE commissioning.
+This example demonstrates the Matter Lighting application on ESP32 platforms
+running Zephyr RTOS.
 
 ## Supported Hardware
 
 | Board                            | SoC      | Transport                            |
 | -------------------------------- | -------- | ------------------------------------ |
 | `esp32c6_devkitc/esp32c6/hpcore` | ESP32-C6 | Wi-Fi (2.4 GHz) or Thread, BLE setup |
+| `esp32c3_devkitm`                | ESP32-C3 | Wi-Fi (2.4 GHz), BLE setup           |
 
-The light output is GPIO2 (`led0` alias in the board overlay).
+The light output is GPIO2 on ESP32-C6 and GPIO3 on ESP32-C3 (`led0` alias in the
+board overlay). Neither DevKit has an LED on that pin (the on-board LED is a
+WS2812 on GPIO8), so connect an external LED to see the light state.
 
 ## Prerequisites
 
@@ -20,19 +23,18 @@ The light output is GPIO2 (`led0` alias in the board overlay).
     [Zephyr Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html).
 -   Build [chip-tool](../../chip-tool/README.md).
 
-The Zephyr RTOS version used here is **v4.4.2**. It requires Python 3.12 or
+The Zephyr RTOS version used here is **v4.5.0**. It requires Python 3.12 or
 newer, so it uses its own venv.
 
 ### Setting up the Zephyr workspace
 
 ```shell
-export ZEPHYR_WORKSPACE=~/zephyr-4.4.2   # west workspace
+export ZEPHYR_WORKSPACE=~/zephyr-4.5.0   # west workspace
 export CHIP=~/connectedhomeip             # this repository
 
 mkdir -p "$ZEPHYR_WORKSPACE" && cd "$ZEPHYR_WORKSPACE"
-west init -m https://github.com/zephyrproject-rtos/zephyr --mr v4.4.2 .
+west init -m https://github.com/zephyrproject-rtos/zephyr --mr v4.5.0 .
 west update
-west blobs fetch hal_espressif
 
 python3 -m venv "$ZEPHYR_WORKSPACE/.venv"
 "$ZEPHYR_WORKSPACE/.venv/bin/pip" install west esptool
@@ -40,6 +42,7 @@ python3 -m venv "$ZEPHYR_WORKSPACE/.venv"
 "$ZEPHYR_WORKSPACE/.venv/bin/pip" install \
     -r "$CHIP/scripts/setup/requirements.build.txt" \
     -r "$CHIP/scripts/setup/requirements.zephyr.txt"
+"$ZEPHYR_WORKSPACE/.venv/bin/west" blobs fetch hal_espressif
 ```
 
 ### Setting up the build environment
@@ -67,6 +70,8 @@ cd "$CHIP/examples/lighting-app/esp32_zephyr"
 west build -b esp32c6_devkitc/esp32c6/hpcore
 ```
 
+For ESP32-C3, use `-b esp32c3_devkitm`.
+
 -   Pristine build (after changing Kconfig or board files):
 
     ```shell
@@ -89,14 +94,20 @@ west build -b esp32c6_devkitc/esp32c6/hpcore
         "./scripts/build/build_examples.py --target esp32-zephyr-c6devkitc-light build"
     ```
 
--   Wi-Fi only build (no BLE, provisioned from the Zephyr shell):
+    For ESP32-C3, use `--target esp32-zephyr-c3devkitm-light`.
+
+-   On-network commissioning build (Wi-Fi only, no BLE, provisioned from the
+    Zephyr shell):
 
     ```shell
+    # ESP32-C6
     west build -b esp32c6_devkitc/esp32c6/hpcore -- -DCONFIG_BT=n -DCONFIG_SHELL=y -DCONFIG_NET_L2_WIFI_SHELL=y -DCONFIG_NET_SHELL=y
+    # ESP32-C3
+    west build -b esp32c3_devkitm -- -DCONFIG_BT=n -DCONFIG_SHELL=y -DCONFIG_NET_L2_WIFI_SHELL=y -DCONFIG_NET_SHELL=y
     ```
 
     ```
-    uart:~$ wifi connect "MyNetwork" -p "MyPassword" -k 1
+    uart:~$ wifi connect -s "MyNetwork" -p "MyPassword" -k 1
     ```
 
 -   Thread only build (Wi-Fi radio off, BLE-Thread commissioning):
