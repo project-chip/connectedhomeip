@@ -1,5 +1,6 @@
 #include "MotionZoneAllocationCounter.h"
 
+#if defined(CHIP_TEST_MOTION_ZONE_ALLOCATION_TRACKING)
 namespace {
 thread_local bool gTracking         = false;
 thread_local size_t gCalls          = 0;
@@ -32,7 +33,6 @@ size_t MotionZoneAllocationCounter::RequestedBytes()
 
 } // namespace chip::app::Clusters::PushAvStreamTransport
 
-#if defined(CHIP_TEST_MOTION_ZONE_ALLOCATION_TRACKING)
 extern "C" void * __real__Znwm(size_t bytes);
 
 extern "C" void * __wrap__Znwm(size_t bytes)
