@@ -968,10 +968,18 @@ Run that group using:
 scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --dedicated-runner ble-wifi --env-file /tmp/cnet_env.yaml'
 ```
 
-The environment file must map `ALL_CLUSTERS_APP` to a binary built with BLE and
+The environment file must map `ALL_DEVICES_APP` to a binary built with BLE and
 Wi-Fi. Each test's CI arguments still provide its application and test options.
 Entries without the `ble-wifi` runner tag, such as COMPRO, retain their regular
 REPL selection. `--dedicated-runner` cannot be combined with `--nightly`.
+
+The BLE-WiFi runner uses the same isolation locally and in CI: it re-executes
+inside a private mount namespace before replacing `/run`, then starts the app
+and controller in separate network namespaces with a private D-Bus and BLE/WPA
+mocks. The internal `--internal-inside-unshare` marker prevents the re-executed
+runner from creating another mount namespace. It is set by the runner, not by
+the user. Root runs also need the private mount namespace so the temporary
+`/run` mount does not affect the host.
 
 # Test Module Guards
 

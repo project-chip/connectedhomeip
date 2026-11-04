@@ -110,7 +110,11 @@ def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event)
 
 @dataclasses.dataclass
 class TestRunConfig:
-    """Configuration for the app under test."""
+    """Configuration for the app under test.
+
+    app_command_prefix runs the app in its isolated network namespace for
+    BLE-WiFi tests. linux_ble_wifi_environment supplies it; other runs leave it empty.
+    """
     app: str
     app_args: str
     script_args: str
@@ -282,7 +286,9 @@ def linux_ble_wifi_environment() -> typing.Generator[tuple[tuple[str, ...], tupl
 @click.option("--summary-file", type=click.Path(dir_okay=False, path_type=pathlib.Path), default=None,
               help="Path to a summary JSON file to append test results to.")
 @click.option("--internal-inside-unshare", hidden=True, is_flag=True, default=False,
-              help="Internal flag for running inside a private mount namespace.")
+              help="Internal re-exec marker. ensure_namespace_availability passes it after entering a private "
+                   "mount namespace, so the re-executed runner does not create another. Local and CI runs use "
+                   "the same path.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
          script_gdb: bool, quiet: bool, load_from_env: str | None, run: tuple[str, ...], ip_packet_capture: bool,

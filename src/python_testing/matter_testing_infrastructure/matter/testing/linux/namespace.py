@@ -35,7 +35,12 @@ test_environ = os.environ.copy()
 
 
 def ensure_namespace_availability(*, isolate_root: bool = False) -> None:
-    """Re-execute in a private mount namespace, optionally including root."""
+    """Re-execute in a private mount namespace, optionally including root.
+
+    The calling CLI must accept and consume ``--internal-inside-unshare`` on
+    re-execution so it skips this call. Set ``isolate_root`` before replacing
+    mounts with ``ensure_private_state``, including when running as root in CI.
+    """
     unshare_args = ["unshare", "--mount", "--propagation", "private"]
     if os.getuid() == 0:
         if not isolate_root:
