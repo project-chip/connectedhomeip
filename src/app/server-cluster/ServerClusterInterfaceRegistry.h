@@ -36,8 +36,11 @@ namespace app {
 /// In practice this is a single-linked list element.
 struct ServerClusterRegistration
 {
-    // A single-linked list of clusters registered for the given `endpointId`
     ServerClusterInterface * const serverClusterInterface;
+
+    /// Managed by the registry. Null while the registration is not part of a registry.
+    /// The list is terminated by a sentinel rather than null, so a registration can tell
+    /// whether it is registered without accessing the registry.
     ServerClusterRegistration * next;
 
     constexpr ServerClusterRegistration(ServerClusterInterface & interface, ServerClusterRegistration * next_item = nullptr) :
@@ -48,6 +51,18 @@ struct ServerClusterRegistration
     // we generally do not want to allow copies as those may have different "next" entries.
     ServerClusterRegistration(const ServerClusterRegistration & other)             = delete;
     ServerClusterRegistration & operator=(const ServerClusterRegistration & other) = delete;
+
+    /// Returns true if this registration is currently part of a registry.
+    ///
+    /// Unlike calling into the registry, this remains safe to call after the registry
+    /// has been destroyed, which unregisters all its entries.
+    bool IsRegistered() const { return next != nullptr; }
+
+private:
+    friend class ServerClusterInterfaceRegistry;
+
+    // Used only for the end-of-list sentinel.
+    constexpr ServerClusterRegistration() : serverClusterInterface(nullptr), next(nullptr) {}
 };
 
 /// It is very typical to join together a registration and a Server
@@ -193,7 +208,7 @@ public:
 
             Iterator & operator++()
             {
-                if (mRegistration)
+                if (mRegistration != EndOfList())
                 {
                     mRegistration = mRegistration->next;
                 }
@@ -201,7 +216,8 @@ public:
             }
             bool operator==(const Iterator & other) const { return mRegistration == other.mRegistration; }
             bool operator!=(const Iterator & other) const { return mRegistration != other.mRegistration; }
-            ServerClusterInterface * operator*() { return mRegistration ? mRegistration->serverClusterInterface : nullptr; }
+            // Returns nullptr for end(), because the end-of-list sentinel has a null serverClusterInterface.
+            ServerClusterInterface * operator*() { return mRegistration->serverClusterInterface; }
 
         private:
             ServerClusterRegistration * mRegistration;
@@ -209,7 +225,7 @@ public:
 
         constexpr ServerClusterInstances(ServerClusterRegistration * start) : mStart(start) {}
         Iterator begin() { return { mStart }; }
-        Iterator end() { return { nullptr }; }
+        Iterator end() { return { EndOfList() }; }
 
     private:
         ServerClusterRegistration * mStart;
@@ -218,7 +234,9 @@ public:
     ServerClusterInstances AllServerClusterInstances();
 
 protected:
-    ServerClusterRegistration * mRegistrations = nullptr;
+    static constexpr ServerClusterRegistration * EndOfList() { return const_cast<ServerClusterRegistration *>(&kEndOfList); }
+
+    ServerClusterRegistration * mRegistrations = EndOfList();
 
     // A one-element cache to speed up finding a cluster within an endpoint.
     // The endpointId specifies which endpoint the cache belongs to.
@@ -226,6 +244,9 @@ protected:
 
     // Managing context for this registry
     std::optional<ServerClusterContext> mContext;
+
+private:
+    static const ServerClusterRegistration kEndOfList;
 };
 
 } // namespace app
