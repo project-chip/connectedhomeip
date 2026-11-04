@@ -73,7 +73,7 @@ jobs:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     build_darwin_fuzzing:
         name: Build on Darwin
-        runs-on: macos-26
+        runs-on: xcode-27
         if: github.actor != 'restyled-io[bot]'
 
         steps:

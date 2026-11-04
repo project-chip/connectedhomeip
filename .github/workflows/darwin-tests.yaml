@@ -38,7 +38,7 @@ jobs:
     strategy:
       matrix:
         include:
-        - os: macos-26    # NOTE: must match `runs-on`
+        - os: xcode-27    # NOTE: must match `runs-on`
           arch: arm64     # observed, not configured
           dry-run: true
           build_variant: no-ble-no-shell-asan-clang
@@ -62,7 +62,7 @@ jobs:
     # This is not yet enabled since namespace still has high concurrency limit: we have
     # 48 cores and are forced to 6 cores minimum.
     # runs-on: namespace-profile-macos-26
-    runs-on: macos-26
+    runs-on: xcode-27
 
     steps:
       - name: Checkout
