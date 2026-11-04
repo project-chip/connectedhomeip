@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
+  "KeypadInputCluster.cpp",
+  "KeypadInputCluster.h",
   "keypad-input-delegate.h",
-  "keypad-input-server.cpp",
   "keypad-input-server.h",
 ]
