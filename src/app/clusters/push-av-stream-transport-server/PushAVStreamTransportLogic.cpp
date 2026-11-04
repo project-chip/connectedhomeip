@@ -17,6 +17,7 @@
  */
 
 #include "constants.h"
+#include <algorithm>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -35,6 +36,7 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <set>
 #include <uriparser/Uri.h>
+#include <vector>
 
 static constexpr uint16_t kMaxConnectionId = 65535; // This is also invalid connectionID
 static constexpr uint16_t kMaxEndpointId   = 65534;
@@ -1034,7 +1036,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         TEMPORARY_RETURN_IGNORED motionZonesList.Value().Value().ComputeSize(&zoneListSize);
 
         // If there are duplicate entries, reject the command
-        std::set<uint16_t> zoneIDsFound;
+        std::vector<uint16_t> zoneIDsFound;
         bool nullFound = false;
 
         while (iterDupCheck.Next())
@@ -1042,20 +1044,11 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             auto & transportZoneOption = iterDupCheck.GetValue();
             if (!transportZoneOption.zone.IsNull())
             {
-                uint16_t zoneID = transportZoneOption.zone.Value();
-                if (zoneIDsFound.count(zoneID) == 0)
+                if (zoneIDsFound.empty())
                 {
-                    // Zone ID not found, add to set of IDs
-                    zoneIDsFound.emplace(zoneID);
+                    zoneIDsFound.reserve(zoneListSize);
                 }
-                else
-                {
-                    // This is a duplicate
-                    ChipLogError(
-                        Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Zone ID (=%d) in Motion Zones. ",
-                        mEndpointId, zoneID);
-                    return Status::AlreadyExists;
-                }
+                zoneIDsFound.push_back(transportZoneOption.zone.Value());
             }
             else
             {
@@ -1069,6 +1062,14 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 }
                 nullFound = true;
             }
+        }
+        std::sort(zoneIDsFound.begin(), zoneIDsFound.end());
+        const auto duplicate = std::adjacent_find(zoneIDsFound.begin(), zoneIDsFound.end());
+        if (duplicate != zoneIDsFound.end())
+        {
+            ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Zone ID (=%d) in Motion Zones. ",
+                         mEndpointId, *duplicate);
+            return Status::AlreadyExists;
         }
 
         bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
