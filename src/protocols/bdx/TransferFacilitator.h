@@ -96,14 +96,14 @@ protected:
      * PollForOutput calls this on every poll tick, so an override must be cheap and must not change the transfer state (other than,
      * for example, a flag used only for logging).
      *
-     * While this returns false, PollForOutput leaves all TransferSession output pending, timeouts included, and only
-     * re-arms the poll timer. Nothing is lost: a StatusReport or Block received in the meantime stays queued in the
-     * TransferSession and is handled on the first poll after this returns true.
+     * While this returns false, PollForOutput only checks the transfer timeout and leaves all other TransferSession output
+     * pending. Nothing is lost: a StatusReport or Block received in the meantime stays queued in the TransferSession and is
+     * handled on the first poll after this returns true. A timeout is handed to HandleTransferSessionOutput as usual, so a
+     * transfer that times out while output is held back ends as it would otherwise.
      *
-     * An override must only return false for a condition that is bounded and that ends without PollForOutput running,
+     * An override should only return false for a condition that is bounded and that ends without PollForOutput running,
      * for example the wait for an MRP ack. That wait ends when the ack arrives, or when MRP exhausts its retransmissions of
-     * the message and drops it, which clears the wait. A condition that can last forever would stall the transfer forever,
-     * because the transfer timeout is not evaluated while this returns false.
+     * the message and drops it, which clears the wait.
      *
      * @return true if output can be handled (the default).
      */
