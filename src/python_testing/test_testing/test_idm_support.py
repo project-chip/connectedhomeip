@@ -394,6 +394,37 @@ class TestDiagnosticConstraintCoverage(unittest.IsolatedAsyncioTestCase):
         self.checker.default_controller.SendCommand.assert_not_awaited()
         self.checker.record_accepted_violation.assert_not_called()
 
+    async def test_writable_attribute_checks_precede_unsupported_outcome(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        cluster = Clusters.OnOff
+        attribute = cluster.Attributes.StartUpOnOff
+        self.checker.endpoints_tlv[1] = {cluster.id: {
+            GlobalAttributeIds.FEATURE_MAP_ID: 0,
+            GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: [],
+            GlobalAttributeIds.ATTRIBUTE_LIST_ID: [attribute.attribute_id]}}
+        for name in ('generate_constraint_violations', 'check_attribute_constraint'):
+            setattr(self.checker, name, MethodType(getattr(IDMBaseTest, name), self.checker))
+        self.checker.read_single_attribute_check_success = AsyncMock(return_value=0)
+        self.checker.read_single_attribute = AsyncMock(return_value=0)
+        self.checker.default_controller.WriteAttribute = AsyncMock(return_value=[SimpleNamespace(Status=Status.ConstraintError)])
+        with self.assertRaisesRegex(signals.TestSkip, 'constraint enforcement not demonstrated'):
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        calls = self.checker.default_controller.WriteAttribute.await_args_list
+        self.assertGreater(len(calls), 0)
+        for call in calls:
+            endpoint, written = call.kwargs['attributes'][0]
+            self.assertEqual(endpoint, 1)
+            self.assertIsInstance(written, attribute)
+            self.assertNotIn(int(written.value), (0, 1, 2, 255))
+        self.checker.default_controller.WriteAttribute.reset_mock()
+        self.checker.default_controller.WriteAttribute.return_value = [SimpleNamespace(Status=Status.Success)]
+        with self.assertRaisesRegex(signals.TestFailure, 'Writable attribute constraints not enforced'):
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        self.assertGreater(self.checker.default_controller.WriteAttribute.await_count, 0)
+        self.checker.record_accepted_violation.assert_called()
+        self.checker.default_controller.SendCommand.assert_not_awaited()
+
     async def test_exclusion_is_not_qualification_in_either_policy_era(self):
         from TC_IDM_9_1 import TC_IDM_9_1
 
