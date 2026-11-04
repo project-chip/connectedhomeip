@@ -193,6 +193,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePush
     }
     mTotalUsedBandwidthbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthbps();
     mMediaController->UnregisterTransport(mTransportMap[connectionID].get());
+    mTransportMap[connectionID]->ClearPersistedSessionNumber();
     mTransportMap.erase(connectionID);
     mTransportOptionsMap.erase(connectionID);
 

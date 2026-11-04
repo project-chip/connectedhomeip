@@ -31,6 +31,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
+#include <atomic>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -147,17 +148,22 @@ public:
 
     uint64_t GetSessionNumber() const { return mSessionNumber; }
 
+    // Deletes the persisted SessionNumber. Call only when the transport is deallocated, so a reboot keeps the numbering.
+    void ClearPersistedSessionNumber();
+
 private:
     void CheckAndUpdateSession();
-    void GeneratePushTransportBeginEvent();
+    void GeneratePushTransportBeginEvent(uint64_t sessionNumber);
     void StartRecordingAndStreaming();
+    // Starts the next CMAF session: increments and persists mSessionNumber, sets mSessionStartedTimestamp and gives the
+    // recorder the new number. Returns the new SessionNumber.
+    uint64_t StartNewSession();
     bool ValidateZoneAndSensitivity(
         const std::vector<std::pair<chip::app::DataModel::Nullable<uint16_t>, uint8_t>> & zoneSensitivityList, int zoneId,
         int sensitivity);
 
     bool mHasAugmented                                                              = false;
     bool mStreaming                                                                 = false;
-    uint64_t mSessionNumber                                                         = 1;
     std::unique_ptr<PushAVClipRecorder> mRecorder                                   = nullptr;
     std::unique_ptr<PushAVUploader> mUploader                                       = nullptr;
     chip::FabricIndex mFabricIndex                                                  = 0;
@@ -192,6 +198,9 @@ private:
     uint32_t mCurrentlyUsedBandwidthbps     = 0;
     bool mCurrentActivationByManualTrigger  = false;
     bool mPreviousActivationByManualTrigger = false;
+
+    // SessionNumber of the current or most recent CMAF session; 0 until the first session starts. Persisted.
+    std::atomic<uint64_t> mSessionNumber{ 0 };
 
     // Mutex for synchronizing recorder access
     std::mutex mRecorderMutex;
