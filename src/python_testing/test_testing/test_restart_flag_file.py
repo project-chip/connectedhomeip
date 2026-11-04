@@ -273,8 +273,25 @@ class TestRestartFlagReader(unittest.TestCase):
         self.assertEqual(self.app_manager.call_count, 2)
 
     def test_writer_wait_tolerates_removal_during_check(self):
-        with mock.patch.object(matter_testing.os.path, "exists", side_effect=[True, False]):
+        with mock.patch.object(matter_testing.os.path, "exists", side_effect=[True, False, False]):
             asyncio.run(MatterBaseTest.wait_for_restart_flag_file_removal(None, self.flag, "restart"))
+
+    def test_writer_wait_fails_on_a_stranded_claim(self):
+        # The monitor kept a request at the claim path (both put-backs failed): the flag is absent, but the request was
+        # never acted on. The wait fails at timeout, naming the stranded claim, instead of reporting completion.
+        with open(self.flag + ".claim", "w") as f:
+            f.write("restart")
+        with self.assertRaisesRegex(signals.TestFailure, "stranded"):
+            asyncio.run(MatterBaseTest.wait_for_restart_flag_file_removal(None, self.flag, "restart", timeout_sec=0.5))
+
+    def test_writer_wait_completes_after_a_claim_is_put_back_and_acted_on(self):
+        # A claim that is put back and then acted on completes the wait normally.
+        self._start_monitor()
+        with open(self.flag + ".claim", "w") as f:
+            f.write("restart")
+        self.monitor._restore_claim(self.flag + ".claim")
+        asyncio.run(MatterBaseTest.wait_for_restart_flag_file_removal(None, self.flag, "restart", timeout_sec=10))
+        self.app_manager.assert_called_once_with(self.config)
 
     def test_flag_removed_between_check_and_read(self):
         real_exists = os.path.exists
@@ -358,8 +375,14 @@ class TestRestartFlagReader(unittest.TestCase):
                 self._write_flag_directly("restart")
             return self._real_replace(src, dst)
 
+        real_link, link_calls = os.link, []
+
         def failing_link(src, dst):
-            raise PermissionError("link not permitted")
+            # Only putting the claim itself back fails (a transient failure); recreating it from a copy then works.
+            link_calls.append(src)
+            if len(link_calls) == 1:
+                raise PermissionError("link not permitted")
+            return real_link(src, dst)
 
         with open(self.flag, "w") as f:
             f.write("factory res3t")
@@ -380,9 +403,15 @@ class TestRestartFlagReader(unittest.TestCase):
         with open(claim, "w") as f:
             f.write("restart")
 
+        real_link, link_calls = os.link, []
+
         def link_fails_after_newer_request(src, dst):
-            self._write_flag_directly("factory reset")
-            raise PermissionError("link not permitted")
+            # Putting the claim back fails just as a newer request lands; recreating it then finds the newer request.
+            link_calls.append(src)
+            if len(link_calls) == 1:
+                self._write_flag_directly("factory reset")
+                raise PermissionError("link not permitted")
+            return real_link(src, dst)
 
         with mock.patch.object(run_python_test.os, "link", link_fails_after_newer_request):
             self.monitor._restore_claim(claim)
@@ -412,15 +441,16 @@ class TestRestartFlagReader(unittest.TestCase):
         with open(target) as f:
             self.assertEqual(f.read(), "keep me")
 
-    def test_failed_write_while_recreating_keeps_the_claim(self):
-        # The claimed request cannot be linked back, the flag is created, but writing it fails. The half-written flag is
-        # removed and the claim is kept, so the request is not left as an empty or partial flag file.
+    def _recreate_with(self, on_write, link_errors):
+        # Drive _restore_claim with a claimed "restart": os.link raises the given errors in order (then succeeds), and
+        # writing the recreated copy runs on_write(file) instead of writing.
         claim = self.flag + ".claim"
         with open(claim, "w") as f:
             f.write("restart")
-        real_fdopen = os.fdopen
+        real_fdopen, real_link = os.fdopen, os.link
+        errors = list(link_errors)
 
-        class FailingFile:
+        class HookedFile:
             def __init__(self, fd):
                 self.f = real_fdopen(fd, "wb")
 
@@ -432,18 +462,59 @@ class TestRestartFlagReader(unittest.TestCase):
                 return False
 
             def write(self, data):
-                raise OSError("no space left")
+                on_write(self.f, data)
 
-        def failing_link(src, dst):
-            raise PermissionError("link not permitted")
+        def link(src, dst):
+            if errors:
+                raise errors.pop(0)
+            return real_link(src, dst)
 
-        with mock.patch.object(run_python_test.os, "link", failing_link), \
-                mock.patch.object(run_python_test.os, "fdopen", lambda fd, *args, **kwargs: FailingFile(fd)), \
-                self.assertLogs(run_python_test.log, "ERROR"):
+        with mock.patch.object(run_python_test.os, "link", link), \
+                mock.patch.object(run_python_test.os, "fdopen", lambda fd, *args, **kwargs: HookedFile(fd)):
             self.monitor._restore_claim(claim)
+        return claim
+
+    def test_failed_write_while_recreating_never_touches_the_flag_path(self):
+        # The claimed request cannot be linked back and writing its copy fails. Nothing opens, stats or removes the flag
+        # path (a check-then-remove there could delete a newer request), the claim is kept, and no copy is left behind.
+        flag_ops = []
+        real_open, real_stat, real_unlink = os.open, os.stat, os.unlink
+
+        def record(name, real):
+            def wrapper(path, *args, **kwargs):
+                if path == self.flag:
+                    flag_ops.append(name)
+                return real(path, *args, **kwargs)
+            return wrapper
+
+        def fail(f, data):
+            raise OSError("no space left")
+
+        with mock.patch.object(run_python_test.os, "open", record("open", real_open)), \
+                mock.patch.object(run_python_test.os, "stat", record("stat", real_stat)), \
+                mock.patch.object(run_python_test.os, "unlink", record("unlink", real_unlink)), \
+                self.assertLogs(run_python_test.log, "ERROR"):
+            claim = self._recreate_with(fail, [PermissionError("link not permitted")])
+        self.assertEqual(flag_ops, [])
         self.assertFalse(os.path.exists(self.flag))
         with open(claim) as f:
             self.assertEqual(f.read(), "restart")
+        self.assertEqual(sorted(os.listdir(self.dir.name)), [os.path.basename(claim)])
+
+    def test_newer_request_published_while_recreating_survives(self):
+        # The claimed request cannot be linked back, and a newer request is published by os.replace while its copy is
+        # written. The newer request stays at the flag path and the older claim is dropped.
+        self._real_replace = os.replace
+
+        def publish_newer(f, data):
+            f.write(data)
+            self._write_flag_directly("factory reset")
+
+        claim = self._recreate_with(publish_newer, [PermissionError("link not permitted")])
+        with open(self.flag) as f:
+            self.assertEqual(f.read(), "factory reset")
+        self.assertFalse(os.path.exists(claim))
+        self.assertEqual(os.listdir(self.dir.name), [os.path.basename(self.flag)])
 
     def test_stop_while_waiting_for_request(self):
         open(self.flag, "w").close()
