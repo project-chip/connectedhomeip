@@ -335,6 +335,8 @@ class AppRestartMonitor:
         Returns the path of the claimed file, or None if the flag file is gone or holds something else. A different
         (newer) request is put back at the flag path, unless an even newer one has already replaced it.
         Between the claim and a put back the flag path is briefly absent, which a waiting test reads as completion.
+        The match is on content only: a second, identical request (e.g. "restart" again) published while the first
+        is acted on matches the claim and is removed as if it had been acted on.
         """
         claim = f"{self.restart_flag_file}.claim"
         try:
