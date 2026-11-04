@@ -188,6 +188,17 @@ private:
 
     CHIP_ERROR RemoveStreamTransportConnection(const uint16_t connectionID);
 
+    /**
+     * @brief Adds delta to the ReferenceCount of a TLS endpoint provisioned on the root endpoint.
+     *
+     * Every transport in CurrentConnections holds one reference on its TLSEndpointID, so that TLS Client Management
+     * rejects RemoveEndpoint while a transport still uses the endpoint.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE if no TLS Client Management delegate is set, otherwise the delegate's result
+     *         (e.g. CHIP_ERROR_NOT_FOUND if the endpoint is not provisioned for the fabric).
+     */
+    CHIP_ERROR MutateTLSEndpointReferenceCount(FabricIndex fabricIndex, uint16_t tlsEndpointID, int8_t delta);
+
     static void PushAVStreamTransportDeallocateCallback(chip::System::Layer *, void * callbackContext);
 
     void RemoveTimerAppState(const uint16_t connectionID);
