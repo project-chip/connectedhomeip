@@ -292,6 +292,10 @@ class TestDiagnosticConstraintCoverage(unittest.IsolatedAsyncioTestCase):
     async def test_ordinary_only_can_qualify(self):
         from TC_IDM_9_1 import TC_IDM_9_1
 
+        expectation = TC_IDM_9_1.steps_TC_IDM_9_1(self.checker)[1].expectation
+        self.assertIn('GeneralDiagnostics.TestEventTrigger', expectation)
+        self.assertIn('GeneralDiagnostics.PayloadTestRequest', expectation)
+        self.assertIn('unsupported, not as demonstrated constraint enforcement', expectation)
         self._ordinary_command(include_diagnostics=False)
         await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
         self.assertGreater(self.checker.default_controller.SendCommand.await_count, 0)
@@ -346,6 +350,17 @@ class TestDiagnosticConstraintCoverage(unittest.IsolatedAsyncioTestCase):
         result = await self.checker.check_command_constraint(info)
         self.assertGreater(result.rejected, 0)
         self.assertEqual((result.accepted, result.other_error), (0, 0))
+        self.assertEqual(info.field.name, 'Mode')
+        calls = self.checker.default_controller.SendCommand.await_args_list
+        self.assertEqual(len(calls), result.rejected)
+        for call in calls:
+            payload = call.kwargs['payload']
+            self.assertIsInstance(payload, Clusters.Thermostat.Commands.SetpointRaiseLower)
+            self.assertEqual(payload.amount, 0, 'The sibling must retain its valid baseline')
+            self.assertNotIn(int(payload.mode), (0, 1, 2))
+            encoded = TLVReader(payload.ToTLV()).get()['Any']
+            self.assertEqual(encoded[1], 0)
+            self.assertEqual(encoded[0], int(payload.mode))
         self.checker.default_controller.SendCommand.side_effect = None
         self.checker.default_controller.SendCommand.return_value = None
         with self.assertRaisesRegex(signals.TestFailure, 'constraints not enforced'):
