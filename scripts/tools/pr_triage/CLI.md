@@ -96,7 +96,8 @@ means, grouped by the command that takes it.
 -   `--no-cost` - leave out the one-line cost footer every report ends with: the
     tool's time and API calls over the report's batches and the size of the
     material the judge read. For a report handed to someone else.
--   `--no-strict` - render even when the judgment fails validation.
+-   `--no-strict` - render even when the judgment fails validation. Its verdicts
+    are then left out of the state later runs read.
 
 ## cost
 
@@ -163,8 +164,8 @@ above, and most take `--pr`.
 
 -   `--full` - rebuild the corpus from scratch instead of fetching what changed
     since the last sync.
--   `--closed-months N` - how far back closed issues are kept. Default 18. -
-    `--sibling OWNER/REPO` - also keep a corpus of that repository's issues,
+-   `--closed-months N` - how far back closed issues are kept. Default 18.
+-   `--sibling OWNER/REPO` - also keep a corpus of that repository's issues,
     named as `owner/name` or as the path of a clone of it, so its issues that
     match a pull request by content appear under Referenced elsewhere.
     Remembered in `siblings.json` for later syncs, and
@@ -188,7 +189,8 @@ above, and most take `--pr`.
 
 -   `--out PATH` - also save a copy at that path, a file or a directory. The
     copy in the reports folder is kept either way.
--   `--no-strict` - render even when a judgment fails validation.
+-   `--no-strict` - render even when a judgment fails validation. Its verdicts
+    are then left out of the state later runs read.
 -   `--no-cost` - leave out the one-line cost footer every report ends with:
     issues read in full, the tool's time and API calls over every gather and
     report for this pull request, and the size of the material the judge read.

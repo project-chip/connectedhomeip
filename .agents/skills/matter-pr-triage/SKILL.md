@@ -18,9 +18,9 @@ on GitHub.
 Script: `scripts/tools/pr_triage/matter_pr_triage.py` in this repository. Every
 `matter_pr_triage.py` command below is run as
 `scripts/tools/pr_triage/matter_pr_triage.py <command>` from the repository
-root, or with `python3` in front of it. It needs only Python 3.8 or newer and an
-authenticated `gh`; no build environment. Run every command from a checkout of
-the repository being triaged, or add `--repo owner/name`.
+root, or with `python3` in front of it. It needs only Python 3.11 or newer and
+an authenticated `gh`; no build environment. Run every command from a checkout
+of the repository being triaged, or add `--repo owner/name`.
 
 ## Step 0 - Help
 
@@ -291,16 +291,19 @@ For each pull request:
    rather than pricing it: `cheap` is nothing in the way, `conflicts` means it
    no longer merges, `moved` means files it touches are gone from the base
    branch, `unowned` means it still applies but nobody has touched it in over a
-   year. 3a. **Check the quick wins** in `signals.quick_wins` before doing
-   anything expensive. A closed linked issue, a base branch that is not the
-   default, or a comment saying the work is finished with are each close to
-   decisive on their own. An abandonment comment written by the author carries
-   more weight than the same words from anyone else. 3b. **Say what it is
-   related to, and whether it is a duplicate.** Start from
-   `signals.related_candidates`, which pairs pull requests that share a changed
-   file or have similar titles, with `overlap` and `title_similarity` to weigh
-   them. Write `related` on the verdict as a list of
-   `{"pr": <number>, "kind": "duplicate" | "related", "why": "<short phrase>"}`.
+   year.
+
+    3a. **Check the quick wins** in `signals.quick_wins` before doing anything
+    expensive. A closed linked issue, a base branch that is not the default, or
+    a comment saying the work is finished with are each close to decisive on
+    their own. An abandonment comment written by the author carries more weight
+    than the same words from anyone else.
+
+    3b. **Say what it is related to, and whether it is a duplicate.** Start from
+    `signals.related_candidates`, which pairs pull requests that share a changed
+    file or have similar titles, with `overlap` and `title_similarity` to weigh
+    them. Write `related` on the verdict as a list of
+    `{"pr": <number>, "kind": "duplicate" | "related", "why": "<short phrase>"}`.
 
     No signal separates the two: only comparing the goals does. A duplicate
     means both pull requests set out to achieve the same thing, so one should

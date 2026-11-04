@@ -22,7 +22,7 @@ never post, comment, close, label or otherwise modify anything on GitHub.
 Script: `scripts/tools/pr_triage/matter_pr_triage_issues.py` in this repository.
 Every `matter_pr_triage_issues.py` command below is run as
 `scripts/tools/pr_triage/matter_pr_triage_issues.py <command>` from the
-repository root, or with `python3` in front of it. It needs only Python 3.8 or
+repository root, or with `python3` in front of it. It needs only Python 3.11 or
 newer and an authenticated `gh`; no build environment. It is the sibling of
 `matter_pr_triage.py` and reads that tool's cache for the pull request's
 verdict. Run every command from a checkout of the repository, or add

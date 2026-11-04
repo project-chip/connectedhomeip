@@ -40,7 +40,6 @@ Source files for these tools are located at `scripts/tools`.
 
 ../scripts/tools/pr_triage/README
 ../scripts/tools/pr_triage/CLI
-../scripts/tools/pr_triage/BENCHMARKS
 
 ```
 

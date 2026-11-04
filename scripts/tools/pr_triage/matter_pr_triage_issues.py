@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# ruff: noqa: UP017  -- timezone.utc rather than datetime.UTC keeps Python 3.8 to 3.10 working
 #
 #    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
@@ -42,14 +41,14 @@ import subprocess
 import sys
 import time
 from collections.abc import Iterable
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 # The sibling lives in the same folder, also when this file is reached through a symlink.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import matter_pr_triage as triage  # noqa: E402 isort:skip
 
-TOOL_VERSION = "1.1.0"          # the bundle ships as one version; check_sync keeps the two scripts equal
+TOOL_VERSION = "1.2.0"          # the bundle ships as one version; check_sync keeps the two scripts equal
 DOSSIER_VERSION = 1          # bumped when pr-<n>.json changes shape; report refuses older files
 DEFAULT_CANDIDATES = 8       # inferred issues per pull request; the model reads each one
 SEARCH_HITS = 10             # per anchor search
@@ -368,14 +367,14 @@ def compact_issue(node, owner, name):
         "comments": (node.get("comments") or {}).get("totalCount"),
         "attached_pull_requests": sorted(attached.values(), key=lambda a: a["number"]),
         "repository": f"{owner}/{name}",
-        "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "fetched_at": datetime.now(UTC).isoformat(timespec="seconds"),
     }
 
 
 def cache_is_fresh(fetched_at: str | None) -> bool:
     """A cached issue record is reused only while its state can be trusted."""
     try:
-        age = datetime.now(timezone.utc) - datetime.fromisoformat(str(fetched_at).replace("Z", "+00:00"))
+        age = datetime.now(UTC) - datetime.fromisoformat(str(fetched_at).replace("Z", "+00:00"))
     except (TypeError, ValueError):
         return False
     return timedelta(0) <= age < timedelta(hours=ISSUE_CACHE_FRESH_HOURS)
@@ -459,7 +458,7 @@ matter chip sdk github com https http www file files line lines code https
 """.split())
 STOPWORDS |= triage.TITLE_NOISE
 
-TOKEN_RE = re.compile(r"[a-z0-9]+(?:[._:/_-][a-z0-9]+)*")
+TOKEN_RE = re.compile(r"[a-z0-9]+(?:[._:/-]+[a-z0-9]+)*")
 CAMEL_RE = re.compile(r"\b(?:[A-Z][a-z0-9]+){2,}[A-Za-z0-9]*\b|\b[a-z]+(?:[A-Z][a-z0-9]+)+\b")
 ERROR_CODE_RE = re.compile(r"\b0x[0-9A-Fa-f]{4,}\b|\bCHIP_ERROR_[A-Z0-9_]+\b|\bCHIP_[A-Z0-9_]{4,}\b")
 BACKTICK_RE = re.compile(r"`([^`\n]{4,80})`")
@@ -480,6 +479,11 @@ def stem(word):
     return word
 
 
+def index_form(term):
+    """A term as the index stores it, so an anchor is looked up the way the text was tokenized."""
+    return stem(ALIASES.get(term, term))
+
+
 def tokenize(text):
     """Lower-case tokens, keeping joined identifiers whole: tc-jfds-2.3, readhandler.cpp,
     0x00000032, chip::app. Their parts are added too, so a title word still meets a compound;
@@ -490,11 +494,11 @@ def tokenize(text):
     spaced = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", text)
     spaced = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1 \2", spaced)
     for tok in TOKEN_RE.findall((text + "\n" + spaced).lower()):
-        parts = [p for p in re.split(r"[._:/_-]", tok) if p]
+        parts = [p for p in re.split(r"[._:/-]+", tok) if p]
         for cand in ([tok] if len(parts) == 1 else [tok] + parts):
             if len(cand) < 2 or cand in STOPWORDS or (len(cand) == 2 and cand in TWO_LETTER_STOP):
                 continue
-            out.append(stem(ALIASES.get(cand, cand)))
+            out.append(index_form(cand))
     return out
 
 
@@ -649,7 +653,7 @@ def sync_corpus(owner: str, name: str, full: bool, closed_months: int) -> dict:
     meta = triage.read_json(corpus_dir(root) / "meta.json", {}) or {}
     existing = (load_corpus(root) or []) if not full else []
     since = None if (full or not existing) else meta.get("synced_at")
-    started = datetime.now(timezone.utc)
+    started = datetime.now(UTC)
     window = (started - timedelta(days=30 * closed_months)).isoformat(timespec="seconds")
     fetched, pages = [], 0
     for state in ("OPEN", "CLOSED"):
@@ -765,7 +769,7 @@ class Index:
         return score if matched >= 2 else 0.0
 
     def has(self, number, term):
-        return term in (self.docs.get(number) or {})
+        return index_form(term) in (self.docs.get(number) or {})
 
 
 def parse_date(text):
@@ -807,7 +811,7 @@ def score_candidates(index: Index, pr: dict, seeds: set[int], exclude: set[int],
     anchors = {}
     for a, (kind, w) in exact_anchors(title, body, paths).items():
         # A pinned anchor that half the tracker's logs contain pins nothing.
-        if index.df.get(a, 0) <= COMMON_TERM_DF or kind in ("test_id", "file"):
+        if index.df.get(index_form(a), 0) <= COMMON_TERM_DF or kind in ("test_id", "file"):
             anchors[a] = (kind, w)
     terms = index.query_terms(title, f"{body}\n{' '.join(paths)}")
     title_terms = set(tokenize(title))
@@ -961,11 +965,11 @@ def benchmark(checkout, repo, sample, seed, k, keep_mentions):
     known = {r["number"] for r in records}
     listing = corpus_dir(root) / "linked_prs.json"
     cached_list = triage.read_json(listing)
-    if cached_list and (datetime.now(timezone.utc) - parse_date(cached_list["at"])).days < 1:
+    if cached_list and (datetime.now(UTC) - parse_date(cached_list["at"])).days < 1:
         nodes, total = cached_list["nodes"], cached_list["total"]
     else:
         nodes, total = triage.search_page(f"repo:{owner}/{name} is:pr linked:issue", cap_pages=10)
-        triage.write_json(listing, {"at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        triage.write_json(listing, {"at": datetime.now(UTC).isoformat(timespec="seconds"),
                                     "nodes": nodes, "total": total})
     nodes = [n for n in nodes if not triage.is_mechanical((n.get("author") or {}).get("login"))]
     rng = random.Random(seed)
@@ -1010,7 +1014,7 @@ def benchmark(checkout, repo, sample, seed, k, keep_mentions):
            "sampled": len(picked), "scored": len(rows), "skipped": skipped, "seed": seed, "k": k,
            "mentions_masked": not keep_mentions, **metrics,
            "signals_on_found_truths": signal_hits, "misses": misses[:40]}
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
     triage.write_json(corpus_dir(root) / f"benchmark-{stamp}.json", {**out, "rows": rows})
     print(json.dumps(out, indent=2))
 
@@ -1182,7 +1186,7 @@ def gather_one(root, owner, name, number, candidates, refetch, no_search, reads=
     dossier = {
         "dossier_version": DOSSIER_VERSION, "tool_version": TOOL_VERSION,
         "repository": f"{owner}/{name}",
-        "gathered_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "gathered_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "pr": {
             "number": number, "title": pr.get("title"), "url": pr.get("url"),
             "state": pr.get("state"), "merged": pr.get("merged"), "draft": pr.get("isDraft"),
@@ -1433,7 +1437,7 @@ def render(root, full, number):
              "*The results also cover related issues that are not internally linked on GitHub.*", ""]
     # Provenance only. The pull request's own verdict and state drive no action here: every entry
     # below carries its reason, and the verdict was verified before this report was asked for.
-    lines += ["| | |", "|---|---|", f"| **Run date** | {datetime.now(timezone.utc).strftime('%Y-%m-%d')} |"]
+    lines += ["| | |", "|---|---|", f"| **Run date** | {datetime.now(UTC).strftime('%Y-%m-%d')} |"]
     if judgment.get("judged_by"):
         lines.append(f"| **Judged by** | `{judgment['judged_by']}`, {effort if effort in EFFORT_LEVELS else 'unknown'} effort |")
     lines.append("")

@@ -332,6 +332,16 @@ class Scope(unittest.TestCase):
         self.assertEqual(r["prs"], [3, 4])
         self.assertEqual(r["skipped_by_verdict"], {"keep": 1, "close": 1})
 
+    def test_only_new_continuation_skips_its_own_unrendered_batches(self):
+        first = self.select(only_new=True, cap=1)
+        self.assertEqual(first["prs"], [3])
+        # batch 1 is judged but not rendered, so state.json does not know about #3 yet
+        (self.root / "runs" / first["run"] / "judgment.json").write_text(json.dumps(
+            {"verdicts": [{"pr": 3, "verdict": "keep"}]}))
+        nxt = self.select(continue_from=first["run"], cap=None)
+        self.assertEqual(nxt["prs"], [4])
+        self.assertEqual(nxt["scope"], "only-new")
+
     def test_continuation_skips_only_its_own_batches_and_keeps_its_scope(self):
         first = self.select(cap=2)
         self.assertEqual(first["prs"], [1, 2])
@@ -547,7 +557,14 @@ class MissingBinary(unittest.TestCase):
         self.assertEqual(m.run(["definitely-not-a-binary-xyz", "--v"], check=False), "")
         with self.assertRaises(RuntimeError) as e:
             m.run(["definitely-not-a-binary-xyz", "--v"])
-        self.assertIn("is not installed", str(e.exception))
+        self.assertIn("cannot run definitely-not-a-binary-xyz", str(e.exception))
+        self.assertIsInstance(e.exception.__cause__, FileNotFoundError)
+
+    def test_a_missing_working_directory_is_not_reported_as_a_missing_binary(self):
+        with self.assertRaises(RuntimeError) as e:
+            m.run(["git", "--version"], cwd="/nonexistent-dir-xyz")
+        self.assertIn("/nonexistent-dir-xyz", str(e.exception))
+        self.assertNotIn("not installed", str(e.exception))
 
 
 class RepoUrls(unittest.TestCase):
@@ -572,6 +589,74 @@ class RepoUrls(unittest.TestCase):
     def test_a_pull_request_url_is_not_a_repository(self):
         with self.assertRaises(RuntimeError):
             m.split_repo("https://github.com/project-chip/connectedhomeip/pull/40445")
+
+
+class ReviewFindings(unittest.TestCase):
+    """Defects found in review of the in-repo copy, each pinned by a test that failed before its fix."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        os.environ["MATTER_PR_TRIAGE_CACHE"] = self.tmp.name
+        self.root = m.cache_root("o", "r")
+        self.root.mkdir(parents=True)
+
+    def tearDown(self):
+        os.environ.pop("MATTER_PR_TRIAGE_CACHE", None)
+        self.tmp.cleanup()
+
+    def verdict(self, pr, **kw):
+        return dict({"pr": pr, "coverage": "not_covered", "revival": "cheap", "verdict": "keep",
+                     "evidence": "the guard is absent"}, **kw)
+
+    def test_unassessed_objects_account_for_their_pull_request(self):
+        sel = {"prs": [{"number": 1}, {"number": 2}, {"number": 3}]}
+        j = {"verdicts": [self.verdict(1)], "unassessed": [{"pr": "#2", "reason": "dossier fetch failed"}, 3]}
+        self.assertEqual(m.validate_judgment(j, sel), [])
+
+    def test_unassessed_entry_naming_nothing_is_a_problem_not_a_crash(self):
+        sel = {"prs": [{"number": 1}]}
+        j = {"verdicts": [self.verdict(1)], "unassessed": [{"reason": "no pr key"}, "seven"]}
+        problems = m.validate_judgment(j, sel)
+        self.assertEqual(sum("unassessed entry" in p for p in problems), 2)
+
+    def test_no_strict_render_with_problems_leaves_shared_state_alone(self):
+        rid = "20260101-000000"
+        run_dir = self.root / "runs" / rid
+        run_dir.mkdir(parents=True)
+        (self.root / "pr").mkdir()
+        (self.root / "pr" / "1.json").write_text(json.dumps({"number": 1, "title": "T1", "created_at": "2025-01-01T00:00:00Z"}))
+        (run_dir / "selection.json").write_text(json.dumps({"run": rid, "prs": [{"number": 1}]}))
+        (run_dir / "manifest.json").write_text(json.dumps({"run": rid, "repo": "o/r", "cutoff": "2025-06-01",
+                                                           "query": "q", "created_at": "2026-01-01T00:00:00"}))
+        (run_dir / "judgment.json").write_text(json.dumps({"verdicts": [self.verdict(1, evidence="")]}))
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            m.report(rid, self.tmp.name, "o/r", strict=False, out=pathlib.Path(self.tmp.name) / "reports")
+        result = json.loads(out.getvalue())
+        self.assertTrue(result["validation_problems"])
+        self.assertEqual(m.read_json(self.root / "state.json", {}) or {}, {})
+
+    def test_preflight_accepts_a_repository_url_for_the_same_checkout(self):
+        import subprocess
+        d = pathlib.Path(self.tmp.name) / "clone"
+        d.mkdir()
+        subprocess.run(["git", "init", "-q", str(d)], check=True)
+        subprocess.run(["git", "-C", str(d), "remote", "add", "upstream", "https://github.com/o/r.git"], check=True)
+        saved = m.default_branch
+        m.default_branch = lambda checkout: (_ for _ in ()).throw(RuntimeError("no network in tests"))
+        try:
+            same = m.preflight_checks(str(d), "https://github.com/O/R.git")
+            other = m.preflight_checks(str(d), "o/other")
+        finally:
+            m.default_branch = saved
+        self.assertFalse(any(i["item"] == "checkout/repo mismatch" for i in same))
+        self.assertTrue(any(i["item"] == "checkout/repo mismatch" for i in other))
+
+    def test_cost_log_failure_is_reported_not_swallowed(self):
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            m.log_cost(pathlib.Path(self.tmp.name) / "missing" / "dir", "select", "r1", 1.0)
+        self.assertIn("cost log not written", err.getvalue())
 
 
 if __name__ == "__main__":

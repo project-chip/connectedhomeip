@@ -16,9 +16,8 @@ or changes anything on GitHub, and neither touches the working tree.
     them close with it. It imports the first script, so the two stay in this
     folder together.
 
-Both need only Python 3.8 or newer and an authenticated `gh`; no build
-environment. Every flag is in [CLI.md](CLI.md); measured accuracy and the
-recipes to repeat it are in [BENCHMARKS.md](BENCHMARKS.md).
+Both need only Python 3.11 or newer and an authenticated `gh`; no build
+environment. Every flag is in [CLI.md](CLI.md).
 
 Unit tests, no network:
 

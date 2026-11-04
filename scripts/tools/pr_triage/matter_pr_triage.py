@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# ruff: noqa: UP017  -- timezone.utc rather than datetime.UTC keeps Python 3.8 to 3.10 working
 #
 #    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
@@ -35,7 +34,7 @@ import shutil
 import subprocess
 import sys
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 try:
@@ -43,8 +42,8 @@ try:
 except ImportError:                   # pragma: no cover
     fcntl = None
 
-TOOL_VERSION = "1.1.0"
-DEFAULT_CAP = 25      # pull requests per batch; measured, see BENCHMARKS.md
+TOOL_VERSION = "1.2.0"
+DEFAULT_PULL_REQUEST_BATCH_SIZE = 25
 SEARCH_RETRIEVAL_LIMIT = 1000  # GitHub will not page past this many search results
 # Authors whose pull requests --include-bots controls. Distinct from MECHANICAL_AUTHORS below,
 # which is about who wrote a comment: dependabot opens pull requests but rarely comments, and
@@ -67,13 +66,14 @@ def log_cost(root, command, run_id, seconds):
     instead of hiding the earlier attempt."""
     try:
         with (root / "cost.jsonl").open("a", encoding="utf-8") as fh:
-            fh.write(json.dumps({"at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            fh.write(json.dumps({"at": datetime.now(UTC).isoformat(timespec="seconds"),
                                  "command": command, "run": run_id, "seconds": round(seconds, 1),
                                  "graphql_calls": COST["graphql_calls"],
                                  "rest_calls": COST["rest_calls"],
                                  "rate_limit_waits": COST["rate_limit_waits"]}) + "\n")
-    except OSError:
-        pass                          # telemetry must never fail a run
+    except OSError as e:
+        # Telemetry must never fail a run, so the failure is reported and the run goes on.
+        print(f"note: cost log not written: {e}", file=sys.stderr)
 
 
 # ---------------------------------------------------------------- shell helpers
@@ -86,11 +86,10 @@ def run(cmd, cwd=None, check=True, timeout=120):
     try:
         p = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, errors="replace",
                            timeout=timeout)
-    except FileNotFoundError:
-        # The binary itself is missing. A traceback helps nobody; say which one, or report
-        # failure the way a non-zero exit would.
+    except FileNotFoundError as e:
+        # The binary or the working directory is missing; the message names which.
         if check:
-            raise RuntimeError(f"{cmd[0]} is not installed")
+            raise RuntimeError(f"cannot run {cmd[0]}: {e}") from e
         return ""
     if check and p.returncode != 0:
         raise RuntimeError(f"{' '.join(cmd[:3])}... failed ({p.returncode}): {p.stderr.strip()[:400]}")
@@ -398,7 +397,7 @@ def preflight_checks(checkout, repo_arg, remote=False, base_ref_for_check=None):
         if inside == "true" and repo_arg:
             try:
                 owner, repo = infer_repo(checkout)
-                if f"{owner}/{repo}".lower() != repo_arg.lower():
+                if (owner.lower(), repo.lower()) != tuple(x.lower() for x in split_repo(repo_arg)):
                     missing.append({
                         "item": "checkout/repo mismatch",
                         "why": f"checkout is {owner}/{repo} but --repo is {repo_arg}; "
@@ -541,7 +540,7 @@ def preflight(checkout, repo, fix, remote):
     if shutil.which("gh"):
         try:
             core = gh_rest("/rate_limit")["resources"]["core"]
-            resets = datetime.fromtimestamp(core["reset"], timezone.utc).isoformat(timespec="seconds")
+            resets = datetime.fromtimestamp(core["reset"], UTC).isoformat(timespec="seconds")
             payload["rate_limit"] = {"remaining": core["remaining"], "resets_at": resets}
             if core["remaining"] < 120:
                 payload["warning"] = (f"only {core['remaining']} API calls left until {resets}; "
@@ -578,7 +577,7 @@ def select(checkout, repo, state, older_than, updated_before, date_field, labels
             raise RuntimeError("--older-than must look like 365d, 12w, 18mo or 2y")
         n, unit = int(m.group(1)), m.group(2)
         days = {"d": 1, "w": 7, "mo": 30, "y": 365}[unit] * n
-        cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
+        cutoff = (datetime.now(UTC) - timedelta(days=days)).strftime("%Y-%m-%d")
 
     narrowed, continues, truncated = [], None, False
     root_early = cache_root(owner, name)
@@ -592,7 +591,7 @@ def select(checkout, repo, state, older_than, updated_before, date_field, labels
         cutoff = prior["cutoff"]
         continues = prior["run"]
         if cap is None:
-            cap = prior.get("cap", DEFAULT_CAP)
+            cap = prior.get("cap", DEFAULT_PULL_REQUEST_BATCH_SIZE)
         depth = prior.get("depth", depth)
         only_new = prior.get("scope") == "only-new"   # a continuation keeps the scope it started with
     else:
@@ -621,10 +620,11 @@ def select(checkout, repo, state, older_than, updated_before, date_field, labels
 
     nodes.sort(key=lambda n: n["updatedAt"])  # least recently updated first
     root = cache_root(owner, name)
+    recorded = run_chain_verdicts(root, continues)
     if only_new:
-        recorded = {k: (v or {}).get("verdict") for k, v in (read_json(root / "state.json", {}) or {}).items()}
-    else:
-        recorded = run_chain_verdicts(root, continues)
+        # state.json holds only rendered batches, so the current chain is laid over it.
+        history = {k: (v or {}).get("verdict") for k, v in (read_json(root / "state.json", {}) or {}).items()}
+        recorded = {**history, **recorded}
     for n in nodes:
         n["recorded_verdict"] = recorded.get(str(n["number"]))
         n["already_triaged"] = str(n["number"]) in recorded and n["recorded_verdict"] not in revisit
@@ -675,7 +675,7 @@ def select(checkout, repo, state, older_than, updated_before, date_field, labels
     # Timestamp first so runs sort chronologically and "latest" stays meaningful. An optional
     # label follows it, which is what makes a report findable by name months later.
     slug = re.sub(r"[^a-z0-9]+", "-", (label or "").lower()).strip("-")[:40]
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
     run_id = f"{stamp}-{slug}" if slug else stamp
     base_id, suffix = run_id, 1
     run_dir = root / "runs" / run_id
@@ -686,7 +686,7 @@ def select(checkout, repo, state, older_than, updated_before, date_field, labels
 
     COST["run"] = run_id
 
-    by_age, now = {}, datetime.now(timezone.utc)
+    by_age, now = {}, datetime.now(UTC)
     for n in nodes:
         age = (now - datetime.fromisoformat(n["updatedAt"].replace("Z", "+00:00"))).days
         bucket = "<1y" if age < 365 else "1-2y" if age < 730 else "2y+"
@@ -702,7 +702,7 @@ def select(checkout, repo, state, older_than, updated_before, date_field, labels
         "narrowed": narrowed, "truncated": truncated, "depth": depth,
         "matched": total, "retrieved": len(nodes), "selected": len(selected),
         "already_triaged_skipped": already, "not_examined": len(remaining) - len(selected),
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(UTC).isoformat(),
     })
     write_json(run_dir / "selection.json", {"run": run_id, "prs": [
         {"number": n["number"], "title": n["title"], "url": n["url"],
@@ -1014,7 +1014,7 @@ class LocalSource:
         out = run(["git", "-C", str(self.checkout), "blame", "-L", f"{start},{end}",
                    "-p", self.rev, "--", path], check=False)
         stamps = [int(s) for s in re.findall(r"^author-time (\d+)$", out, re.M)]
-        return datetime.fromtimestamp(max(stamps), timezone.utc) if stamps else None
+        return datetime.fromtimestamp(max(stamps), UTC) if stamps else None
 
     def tree(self):
         if self._tree is None:
@@ -1514,7 +1514,7 @@ def signals(run_id, checkout, repo, remote):
         else:
             coverage_hint = "unlocatable"
 
-        author_idle_days = (datetime.now(timezone.utc) -
+        author_idle_days = (datetime.now(UTC) -
                             datetime.fromisoformat(pr["updated_at"].replace("Z", "+00:00"))).days
         # Most specific obstacle wins. Moved code outranks a quiet author, because no amount of
         # ownership fixes a target that is gone.
@@ -1618,7 +1618,14 @@ def validate_judgment(judgment, selection):
             problems.append(f"#{number}: no reason given. Every entry carries one.")
         if v.get("confidence") in ("medium", "low") and not v.get("falsifier"):
             problems.append(f"#{number}: confidence {v['confidence']} without a falsifier")
-    unaccounted = wanted - seen - {int(str(x).lstrip('#')) for x in judgment.get("unassessed", [])}
+    listed = set()
+    for x in judgment.get("unassessed", []):
+        number = unassessed_number(x)
+        if number is None:
+            problems.append(f"unassessed entry {x!r} does not name a pull request")
+        else:
+            listed.add(number)
+    unaccounted = wanted - seen - listed
     for number in sorted(unaccounted):
         problems.append(f"#{number}: selected but has no verdict and is not listed unassessed")
     return problems
@@ -1757,6 +1764,11 @@ def as_number(value):
         return None
 
 
+def unassessed_number(entry):
+    """The pull request an `unassessed` entry names: a bare reference or a {pr, reason} object."""
+    return as_number(entry.get("pr") if isinstance(entry, dict) else entry)
+
+
 def related_pairs_unreviewed(root, verdicts, candidates=None):
     """Pairs of judged pull requests that the signals relate but no judgment mentions.
 
@@ -1829,8 +1841,8 @@ def render_campaign(root, full, group, filename, with_cost=False, out_dir=None):
     # An entry judged in a later run is no longer unassessed, and one carried by two runs is one.
     seen_unassessed, deduped = set(), []
     for u in unassessed:
-        number = int(str(u["pr"] if isinstance(u, dict) else u).lstrip("#"))
-        if number in verdicts or number in seen_unassessed:
+        number = unassessed_number(u)
+        if number is None or number in verdicts or number in seen_unassessed:
             continue
         seen_unassessed.add(number)
         deduped.append(u)
@@ -2074,7 +2086,7 @@ def run_window(root, run_id):
     for name in ("report.md", "judgment.json"):
         f = root / "runs" / run_id / name
         if f.exists():
-            ended = datetime.fromtimestamp(f.stat().st_mtime, timezone.utc).isoformat()
+            ended = datetime.fromtimestamp(f.stat().st_mtime, UTC).isoformat()
             break
     return started, ended
 
@@ -2378,9 +2390,10 @@ def report(run_id, checkout, repo, strict, out=None, with_cost=False):
     (run_dir / "report.md").write_text(text, encoding="utf-8")
     saved = save_copy(out, f"pr-triage-{run_id}.md", text)
 
-    state_file = root / "state.json"
-    with locked(state_file):
-        update_state(state_file, verdicts, prs, manifest, run_id)
+    if not problems:
+        state_file = root / "state.json"
+        with locked(state_file):
+            update_state(state_file, verdicts, prs, manifest, run_id)
 
     mismatch = sorted(n for n, pr in prs.items()
                       if (pr.get("signals") or {}).get("computed_against", {}).get("master_sha")
@@ -2414,7 +2427,7 @@ def update_state(state_file, verdicts, prs, manifest, run_id):
            (not prev_at and (recorded.get("run") or "") > run_id):
             continue
         state[str(number)] = {"verdict": v["verdict"], "run": run_id, "run_at": this_at,
-                              "at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                              "at": datetime.now(UTC).strftime("%Y-%m-%d"),
                               "head_sha": pr.get("head_sha")}
     write_json(state_file, state)
 
@@ -2454,7 +2467,7 @@ def build_parser():
                      default="include")
     sel.add_argument("--review", default=None, help="none|required|approved|changes_requested")
     sel.add_argument("--cap", type=int, default=None,
-                     help=f"How many pull requests to judge in one batch. Default {DEFAULT_CAP}, "
+                     help=f"How many pull requests to judge in one batch. Default {DEFAULT_PULL_REQUEST_BATCH_SIZE}, "
                      "which is the largest size measured end to end.")
     sel.add_argument("--include-bots", dest="include_bots", action="store_true")
     sel.add_argument("--revisit", action="append", default=[],
@@ -2551,7 +2564,7 @@ def main():
         # 25, not a round 50: judging a batch of 24 was measured at up to 112 model turns and
         # 560k tokens for the most thorough tier, so doubling it risks one batch outgrowing the
         # judging agent's context. Raise it with --cap once `cost` says what your repo costs.
-        kwargs["cap"] = DEFAULT_CAP
+        kwargs["cap"] = DEFAULT_PULL_REQUEST_BATCH_SIZE
     command = args.command
     # `report` with no --run is the whole window rather than one batch: batching is how the work
     # gets done, not something a reader of the result should have to reassemble.

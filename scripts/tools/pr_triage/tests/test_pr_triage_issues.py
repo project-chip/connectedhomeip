@@ -622,6 +622,19 @@ class Corpus(unittest.TestCase):
         self.assertIn("nrfconnect", mi.tokenize("nordic board"))         # platform aliases
         self.assertNotIn("the", mi.tokenize("the and for"))
 
+    def test_scoped_symbols_and_plural_identifiers_meet_their_anchors(self):
+        issue = {"number": 20, "title": "Crash in chip::app::ReadHandler::OnTimeout",
+                 "body": "Seen with SubscriptionHandlers and my__private__name", "state": "OPEN", "author": "z",
+                 "created_at": "2026-01-02T00:00:00Z", "labels": [], "parent": None, "sub_issues": [], "refs": [], "paths": []}
+        index = mi.Index(self.records() + [issue])
+        self.assertIn("chip::app::readhandler::ontimeout", mi.tokenize(issue["title"]))
+        self.assertIn("my__private__name", mi.tokenize(issue["body"]))
+        anchors = mi.exact_anchors("", "chip::app::ReadHandler::OnTimeout fires; SubscriptionHandlers leak", [])
+        self.assertEqual({kind for kind, _ in anchors.values()}, {"symbol", "identifier"})
+        for a in anchors:
+            self.assertTrue(index.has(20, a), a)
+            self.assertGreater(index.df.get(mi.index_form(a), 0), 0, a)
+
     def test_query_keeps_every_title_term(self):
         index = mi.Index(self.records())
         long_body = " ".join(f"distinctword{i}" for i in range(200)) + " actions cluster nordic"
