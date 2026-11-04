@@ -27,6 +27,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)removeMetricDataForKey:(NSString *)key;
 
+// The flow ID for a UUID string received from another process, or a new flow ID if it is not one.
++ (NSUUID *)_flowIDWithString:(id _Nullable)flowID;
+
+// The current flow ID, or a new one if there is none.
++ (NSUUID *)_currentOrNewFlowID;
+
+// Runs block with flowID current on this thread, then restores the previous current flow ID.
++ (void)_runWithFlowID:(NSUUID * _Nullable)flowID block:(void(NS_NOESCAPE ^)(void))block;
+
 @end
 
 NS_ASSUME_NONNULL_END

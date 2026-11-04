@@ -74,6 +74,15 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  */
 - (nullable MTRMetricData *)metricDataForKey:(NSString *)key;
 
+/**
+ * @brief The identifier of the incoming message being handled on this thread, or nil.
+ *
+ * Inside an MTRDeviceDelegate callback or a completion, this identifies the incoming message that
+ * caused it, or a new flow if no message did.  Every callback caused by one message sees the same
+ * identifier.  Outside such a callback it is nil.
+ */
+@property (class, nonatomic, readonly, nullable) NSUUID * currentFlowID MTR_NEWLY_AVAILABLE;
+
 @end
 
 NS_ASSUME_NONNULL_END
