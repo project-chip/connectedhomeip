@@ -653,9 +653,9 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
                 const bool rejectedBeforeZones = zonesCase == ZonesCase::Omitted || malformed || zonesCase == ZonesCase::Truncated;
                 const bool reachesSize         = !rejectedBeforeZones && zonesCase != ZonesCase::Null && !duplicate;
                 const Status expectedStatus    = rejectedBeforeZones ? Status::InvalidCommand
-                    : duplicate                                      ? Status::AlreadyExists
-                    : reachesSize && zoneCount > 2                   ? Status::DynamicConstraintError
-                    : zonesCase == ZonesCase::Invalid                ? Status::Failure
+                       : duplicate                                   ? Status::AlreadyExists
+                       : reachesSize && zoneCount > 2                ? Status::DynamicConstraintError
+                       : zonesCase == ZonesCase::Invalid             ? Status::Failure
                                                                      : Status::Success;
                 Testing::MockCommandHandler handler;
                 handler.SetFabricIndex(1);
