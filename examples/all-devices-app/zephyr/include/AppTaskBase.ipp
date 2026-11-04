@@ -148,6 +148,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitPersistence()
     SetSafeAttributePersistenceProvider(&mSafeAttributePersistenceProvider);
 
     mInitParams.groupDataProvider = &mGroupDataProvider;
+    mGroupDataProvider.SetGroupcastEnabled(CHIP_CONFIG_ENABLE_GROUPCAST);
     mGroupDataProvider.SetStorageDelegate(mInitParams.persistentStorageDelegate);
     mGroupDataProvider.SetSessionKeystore(mInitParams.sessionKeystore);
     ReturnErrorOnFailure(mGroupDataProvider.Init());
@@ -322,6 +323,14 @@ CHIP_ERROR AppTaskBase<Derived>::InitBoardControls()
 template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::PostServerInit()
 {
+<<<<<<< HEAD
+=======
+    // Runs before StartEventLoopTask(), so the Matter stack can be accessed without taking the stack lock.
+    auto & server = Server::GetInstance();
+    ReturnErrorOnFailure(mBindingHandler.Init(
+        Clusters::Binding::Manager::GetInstance(),
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }, server.GetExchangeManager()));
+>>>>>>> 8744414 ([all-devices-app] [Zephyr] Fix Groupcast and propagate Binding initialization errors (#75120))
     DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
     return CHIP_NO_ERROR;
