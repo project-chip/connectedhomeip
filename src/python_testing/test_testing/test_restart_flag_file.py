@@ -372,6 +372,24 @@ class TestRestartFlagReader(unittest.TestCase):
         self.app_manager.assert_called_once_with(self.config)
         self.assertEqual(os.listdir(self.dir.name), [])
 
+    def test_failed_link_does_not_overwrite_a_newer_request(self):
+        # The claimed request cannot be linked back, and a newer request lands at the flag path in that moment. The
+        # fallback must not overwrite the newer request with the older claimed one.
+        self._real_replace = os.replace
+        claim = self.flag + ".claim"
+        with open(claim, "w") as f:
+            f.write("restart")
+
+        def link_fails_after_newer_request(src, dst):
+            self._write_flag_directly("factory reset")
+            raise PermissionError("link not permitted")
+
+        with mock.patch.object(run_python_test.os, "link", link_fails_after_newer_request):
+            self.monitor._restore_claim(claim)
+        with open(self.flag) as f:
+            self.assertEqual(f.read(), "factory reset")
+        self.assertFalse(os.path.exists(claim))
+
     def test_rejection_marker_does_not_follow_a_symlink(self):
         # A symlink planted at the old fixed marker path must not be followed: its target stays untouched.
         target = os.path.join(self.dir.name, "victim")
