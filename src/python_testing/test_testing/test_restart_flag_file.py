@@ -346,6 +346,53 @@ class TestRestartFlagReader(unittest.TestCase):
         self._wait_consumed()
         self.assertEqual(os.listdir(self.dir.name), [])
 
+    def test_request_is_put_back_when_link_fails(self):
+        # A newer request arrives while the monitor rejects stale content. Putting it back with os.link fails with an
+        # error other than FileExistsError; the request must still end up at the flag path and be acted on.
+        self._real_replace = os.replace
+        injected = []
+
+        def racing_replace(src, dst):
+            if not injected and src == self.flag:
+                injected.append(True)
+                self._write_flag_directly("restart")
+            return self._real_replace(src, dst)
+
+        def failing_link(src, dst):
+            raise PermissionError("link not permitted")
+
+        with open(self.flag, "w") as f:
+            f.write("factory res3t")
+        with mock.patch.object(run_python_test.os, "replace", racing_replace), \
+                mock.patch.object(run_python_test.os, "link", failing_link):
+            self._start_monitor()
+            self._wait_for(lambda: self.app_manager.called)
+            self._wait_consumed()
+        self.assertEqual(injected, [True])
+        self.app_manager.assert_called_once_with(self.config)
+        self.assertEqual(os.listdir(self.dir.name), [])
+
+    def test_rejection_marker_does_not_follow_a_symlink(self):
+        # A symlink planted at the old fixed marker path must not be followed: its target stays untouched.
+        target = os.path.join(self.dir.name, "victim")
+        with open(target, "w") as f:
+            f.write("keep me")
+        os.symlink(target, f"{self.flag}.rejected")
+        with open(self.flag, "w") as f:
+            f.write("factory res3t")
+        self._start_monitor()
+
+        def rejected():
+            try:
+                with open(self.flag) as f:
+                    return f.read().startswith("rejected: ")
+            except FileNotFoundError:
+                return False
+
+        self._wait_for(rejected)
+        with open(target) as f:
+            self.assertEqual(f.read(), "keep me")
+
     def test_stop_while_waiting_for_request(self):
         open(self.flag, "w").close()
         self._start_monitor()
