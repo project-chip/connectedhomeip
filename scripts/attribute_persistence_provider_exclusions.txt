@@ -10,6 +10,7 @@ examples/all-devices-app/all-devices-common/devices/root-node/RootNodeDevice.h
 examples/all-devices-app/posix/main.cpp
 examples/evse-app/evse-common/src/EnergyEvseDelegateImpl.cpp
 examples/evse-app/evse-common/src/EnergyEvseManager.cpp
+examples/evse-app/evse-common/src/SafeAttributePersistenceAdapter.cpp
 
 # Build files
 src/app/BUILD.gn
