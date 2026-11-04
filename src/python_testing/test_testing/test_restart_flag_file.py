@@ -408,8 +408,42 @@ class TestRestartFlagReader(unittest.TestCase):
                 return False
 
         self._wait_for(rejected)
+        self.assertTrue(rejected(), "the unknown request was never rejected")
         with open(target) as f:
             self.assertEqual(f.read(), "keep me")
+
+    def test_failed_write_while_recreating_keeps_the_claim(self):
+        # The claimed request cannot be linked back, the flag is created, but writing it fails. The half-written flag is
+        # removed and the claim is kept, so the request is not left as an empty or partial flag file.
+        claim = self.flag + ".claim"
+        with open(claim, "w") as f:
+            f.write("restart")
+        real_fdopen = os.fdopen
+
+        class FailingFile:
+            def __init__(self, fd):
+                self.f = real_fdopen(fd, "wb")
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                self.f.close()
+                return False
+
+            def write(self, data):
+                raise OSError("no space left")
+
+        def failing_link(src, dst):
+            raise PermissionError("link not permitted")
+
+        with mock.patch.object(run_python_test.os, "link", failing_link), \
+                mock.patch.object(run_python_test.os, "fdopen", lambda fd, *args, **kwargs: FailingFile(fd)), \
+                self.assertLogs(run_python_test.log, "ERROR"):
+            self.monitor._restore_claim(claim)
+        self.assertFalse(os.path.exists(self.flag))
+        with open(claim) as f:
+            self.assertEqual(f.read(), "restart")
 
     def test_stop_while_waiting_for_request(self):
         open(self.flag, "w").close()
