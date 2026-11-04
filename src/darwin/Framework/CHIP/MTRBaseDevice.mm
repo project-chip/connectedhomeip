@@ -3119,6 +3119,10 @@ static BOOL MTRSharedPathsEqual(const void * item1, const void * item2, NSUInteg
 
 + (__kindof MTRClusterPath *)_sharedPathForPath:(MTRClusterPath *)path
 {
+    // Keys are held unretained and only -dealloc of the shared classes removes them, so no other class may be added.
+    if (!MTRIsSharedPathClass([path class])) {
+        return path;
+    }
     NSUInteger shard = MTRSharedPathShard(path);
     MTRClusterPath * shared;
     os_unfair_lock_lock(&sSharedPathLocks[shard]);
