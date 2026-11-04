@@ -140,6 +140,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifi
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AlarmSeverityTag val)
+{
+    using EnumType = Globals::AlarmSeverityTag;
+    switch (val)
+    {
+    case EnumType::kCritical:
+    case EnumType::kMajor:
+    case EnumType::kMinor:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AreaTypeTag val)
 {
     using EnumType = Globals::AreaTypeTag;
@@ -436,6 +449,32 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::DirectionTag v
     case EnumType::kRightward:
     case EnumType::kForward:
     case EnumType::kBackward:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ElectricalDistributionFormFactorTag val)
+{
+    using EnumType = Globals::ElectricalDistributionFormFactorTag;
+    switch (val)
+    {
+    case EnumType::kMiniature:
+    case EnumType::kMoldedCase:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ElectricalDistributionOverVoltageTag val)
+{
+    using EnumType = Globals::ElectricalDistributionOverVoltageTag;
+    switch (val)
+    {
+    case EnumType::kLineToNeutral:
+    case EnumType::kLineToGround:
+    case EnumType::kNeutralToGround:
+    case EnumType::kLineToLine:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -834,6 +873,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::SemanticTagNam
     case EnumType::kIdentifiedObject:
     case EnumType::kIdentifiedSound:
     case EnumType::kIdentifiedHumanActivity:
+    case EnumType::kAlarmSeverity:
+    case EnumType::kElectricalDistributionFormFactor:
+    case EnumType::kElectricalDistributionOverVoltage:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

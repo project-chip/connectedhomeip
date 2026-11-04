@@ -200,6 +200,16 @@ __all__ = [
 
 class Globals:
     class Enums:
+        class AlarmSeverityTag(MatterIntEnum):
+            kCritical = 0x00
+            kMajor = 0x01
+            kMinor = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
         class AreaTypeTag(MatterIntEnum):
             kAisle = 0x00
             kAttic = 0x01
@@ -455,6 +465,26 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6
+
+        class ElectricalDistributionFormFactorTag(MatterIntEnum):
+            kMiniature = 0x00
+            kMoldedCase = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
+        class ElectricalDistributionOverVoltageTag(MatterIntEnum):
+            kLineToNeutral = 0x00
+            kLineToGround = 0x01
+            kNeutralToGround = 0x02
+            kLineToLine = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
 
         class ElectricalMeasurementTag(MatterIntEnum):
             kDc = 0x00
@@ -794,6 +824,9 @@ class Globals:
             kIdentifiedObject = 0x49
             kIdentifiedSound = 0x4A
             kIdentifiedHumanActivity = 0x4B
+            kAlarmSeverity = 0x4C
+            kElectricalDistributionFormFactor = 0x4D
+            kElectricalDistributionOverVoltage = 0x4E
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown

@@ -1,6 +1,12 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+enum AlarmSeverityTag : enum8 {
+  kCritical = 0;
+  kMajor = 1;
+  kMinor = 2;
+}
+
 enum AreaTypeTag : enum8 {
   kAisle = 0;
   kAttic = 1;
@@ -195,6 +201,18 @@ enum DirectionTag : enum8 {
   kRightward = 3;
   kForward = 4;
   kBackward = 5;
+}
+
+enum ElectricalDistributionFormFactorTag : enum8 {
+  kMiniature = 0;
+  kMoldedCase = 1;
+}
+
+enum ElectricalDistributionOverVoltageTag : enum8 {
+  kLineToNeutral = 0;
+  kLineToGround = 1;
+  kNeutralToGround = 2;
+  kLineToLine = 3;
 }
 
 enum ElectricalMeasurementTag : enum8 {
@@ -467,6 +485,9 @@ enum SemanticTagNamespaceId : enum8 {
   kIdentifiedObject = 73;
   kIdentifiedSound = 74;
   kIdentifiedHumanActivity = 75;
+  kAlarmSeverity = 76;
+  kElectricalDistributionFormFactor = 77;
+  kElectricalDistributionOverVoltage = 78;
 }
 
 enum SoftwareVersionCertificationStatusEnum : enum8 {

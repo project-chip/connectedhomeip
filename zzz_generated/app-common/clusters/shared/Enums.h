@@ -150,6 +150,19 @@ enum class ProductIdentifierTypeEnum : uint8_t
 namespace Globals {
 // Global enums.
 
+// Enum for AlarmSeverityTag
+enum class AlarmSeverityTag : uint8_t
+{
+    kCritical = 0x00,
+    kMajor    = 0x01,
+    kMinor    = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
 // Enum for AreaTypeTag
 enum class AreaTypeTag : uint8_t
 {
@@ -449,6 +462,32 @@ enum class DirectionTag : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
+};
+
+// Enum for ElectricalDistributionFormFactorTag
+enum class ElectricalDistributionFormFactorTag : uint8_t
+{
+    kMiniature  = 0x00,
+    kMoldedCase = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for ElectricalDistributionOverVoltageTag
+enum class ElectricalDistributionOverVoltageTag : uint8_t
+{
+    kLineToNeutral   = 0x00,
+    kLineToGround    = 0x01,
+    kNeutralToGround = 0x02,
+    kLineToLine      = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
 };
 
 // Enum for ElectricalMeasurementTag
@@ -814,34 +853,37 @@ enum class RoomAirConditionerTag : uint8_t
 // Enum for SemanticTagNamespaceId
 enum class SemanticTagNamespaceId : uint8_t
 {
-    kCommonClosure             = 0x01,
-    kCompassDirection          = 0x02,
-    kCompassLocation           = 0x03,
-    kDirection                 = 0x04,
-    kLevel                     = 0x05,
-    kLocation                  = 0x06,
-    kNumber                    = 0x07,
-    kPosition                  = 0x08,
-    kElectricalMeasurement     = 0x0A,
-    kCommodityTariffChronology = 0x0B,
-    kCommodityTariffCommodity  = 0x0D,
-    kLaundry                   = 0x0E,
-    kPowerSource               = 0x0F,
-    kAreaType                  = 0x10,
-    kLandmark                  = 0x11,
-    kRelativePosition          = 0x12,
-    kCommodityTariffFlow       = 0x13,
-    kRefrigerator              = 0x41,
-    kRoomAirConditioner        = 0x42,
-    kSwitches                  = 0x43,
-    kClosure                   = 0x44,
-    kClosurePanel              = 0x45,
-    kClosureCovering           = 0x46,
-    kClosureWindow             = 0x47,
-    kClosureCabinet            = 0x48,
-    kIdentifiedObject          = 0x49,
-    kIdentifiedSound           = 0x4A,
-    kIdentifiedHumanActivity   = 0x4B,
+    kCommonClosure                     = 0x01,
+    kCompassDirection                  = 0x02,
+    kCompassLocation                   = 0x03,
+    kDirection                         = 0x04,
+    kLevel                             = 0x05,
+    kLocation                          = 0x06,
+    kNumber                            = 0x07,
+    kPosition                          = 0x08,
+    kElectricalMeasurement             = 0x0A,
+    kCommodityTariffChronology         = 0x0B,
+    kCommodityTariffCommodity          = 0x0D,
+    kLaundry                           = 0x0E,
+    kPowerSource                       = 0x0F,
+    kAreaType                          = 0x10,
+    kLandmark                          = 0x11,
+    kRelativePosition                  = 0x12,
+    kCommodityTariffFlow               = 0x13,
+    kRefrigerator                      = 0x41,
+    kRoomAirConditioner                = 0x42,
+    kSwitches                          = 0x43,
+    kClosure                           = 0x44,
+    kClosurePanel                      = 0x45,
+    kClosureCovering                   = 0x46,
+    kClosureWindow                     = 0x47,
+    kClosureCabinet                    = 0x48,
+    kIdentifiedObject                  = 0x49,
+    kIdentifiedSound                   = 0x4A,
+    kIdentifiedHumanActivity           = 0x4B,
+    kAlarmSeverity                     = 0x4C,
+    kElectricalDistributionFormFactor  = 0x4D,
+    kElectricalDistributionOverVoltage = 0x4E,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown

@@ -20117,6 +20117,12 @@ MTR_DEPRECATED("Please use MTRBaseClusterUnitTesting", ios(16.1, 16.4), macos(13
 @interface MTRBaseClusterTestCluster : MTRBaseClusterUnitTesting
 @end
 
+typedef NS_ENUM(uint8_t, MTRDataTypeAlarmSeverityTag) {
+    MTRDataTypeAlarmSeverityTagCritical MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeAlarmSeverityTagMajor MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeAlarmSeverityTagMinor MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeAreaTypeTag) {
     MTRDataTypeAreaTypeTagAisle MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeAreaTypeTagAttic MTR_PROVISIONALLY_AVAILABLE = 0x01,
@@ -20311,6 +20317,18 @@ typedef NS_ENUM(uint8_t, MTRDataTypeDirectionTag) {
     MTRDataTypeDirectionTagRightward MTR_PROVISIONALLY_AVAILABLE = 0x03,
     MTRDataTypeDirectionTagForward MTR_PROVISIONALLY_AVAILABLE = 0x04,
     MTRDataTypeDirectionTagBackward MTR_PROVISIONALLY_AVAILABLE = 0x05,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeElectricalDistributionFormFactorTag) {
+    MTRDataTypeElectricalDistributionFormFactorTagMiniature MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeElectricalDistributionFormFactorTagMoldedCase MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeElectricalDistributionOverVoltageTag) {
+    MTRDataTypeElectricalDistributionOverVoltageTagLineToNeutral MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeElectricalDistributionOverVoltageTagLineToGround MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeElectricalDistributionOverVoltageTagNeutralToGround MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeElectricalDistributionOverVoltageTagLineToLine MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeElectricalMeasurementTag) {
@@ -20583,6 +20601,9 @@ typedef NS_ENUM(uint8_t, MTRDataTypeSemanticTagNamespaceId) {
     MTRDataTypeSemanticTagNamespaceIdIdentifiedObject MTR_PROVISIONALLY_AVAILABLE = 0x49,
     MTRDataTypeSemanticTagNamespaceIdIdentifiedSound MTR_PROVISIONALLY_AVAILABLE = 0x4A,
     MTRDataTypeSemanticTagNamespaceIdIdentifiedHumanActivity MTR_PROVISIONALLY_AVAILABLE = 0x4B,
+    MTRDataTypeSemanticTagNamespaceIdAlarmSeverity MTR_PROVISIONALLY_AVAILABLE = 0x4C,
+    MTRDataTypeSemanticTagNamespaceIdElectricalDistributionFormFactor MTR_PROVISIONALLY_AVAILABLE = 0x4D,
+    MTRDataTypeSemanticTagNamespaceIdElectricalDistributionOverVoltage MTR_PROVISIONALLY_AVAILABLE = 0x4E,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeStreamUsageEnum) {
