@@ -25,7 +25,7 @@ namespace chip::app::NamedPipe {
  * AddBridgedDevice:
  * {
  *    "Name": "AddBridgedDevice"
- *    "EndpointId" | "AggregatorEndpointId": EndpointId (uint16_t)
+ *    "AggregatorEndpointId": EndpointId (uint16_t)
  *        Optional. An endpoint id of an existing aggregator device.
  *        If an aggregator is found, `Bridged Node` will be created as child,
  *        and the new device will be added as a child of the latter device.
@@ -51,6 +51,10 @@ namespace chip::app::NamedPipe {
  *    "DeviceInterfaceId" : BridgedDeviceManager::DeviceInterfaceId (uint16_t)
  *        The deviceInterfaceId of the bridged device to be removed.
  * }
+ *
+ * Note:
+ *    Unlike other translators, Add/RemoveBridgedDevice ignores the key "EndpointId",
+ *    but they will still fail if "EndpointId" key is present and the value is not valid.
  *
  * Examples:
  *  echo '{"Name": "AddBridgedDevice", "AggregatorEndpointId": 5, "Device": "electrical-sensor"}'> /tmp/acs_fifo

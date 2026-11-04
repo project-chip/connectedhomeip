@@ -115,7 +115,7 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
 {
     if (deviceName == "bridged-node" || deviceName == "aggregator")
     {
-        ChipLogError(AppServer, "Creation of `%s` bridged device is not allowed", deviceName.c_str());
+        ChipLogError(AppServer, "Creation of a standalone `%s` bridged device is not allowed.", deviceName.c_str());
         return std::nullopt;
     }
 

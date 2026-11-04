@@ -29,16 +29,12 @@ CHIP_ERROR BridgedDeviceTranslator::TranslateAndExecute(EndpointId endpointId, c
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        // By default if "EndpointId" not specified, TranslateAndExecute will provide `kRootEndpointId`,
-        // which is not the behaviour needed here.
-        endpointId = ExtractUInt<EndpointId>(json, "EndpointId").value_or(kInvalidEndpointId);
+        // Do not use "EndpointId", just accept "AggregatorEndpointId" for meaning clarity
         if (json.isMember("AggregatorEndpointId"))
         {
             auto aggregatorEndpointId = ExtractUInt<EndpointId>(json, "AggregatorEndpointId");
             VerifyOrReturnError(aggregatorEndpointId.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
             endpointId = aggregatorEndpointId.value();
-
-            // This check is also done for the "EndpointId" field before this function is called.
         }
 
         const std::string device = json["Device"].asString();
