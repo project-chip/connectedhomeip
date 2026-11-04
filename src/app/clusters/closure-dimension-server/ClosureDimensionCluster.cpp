@@ -328,7 +328,16 @@ CHIP_ERROR ClosureDimensionCluster::SetTargetState(const DataModel::Nullable<Gen
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturnError(mTargetState != incomingTargetState, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(ValidateTargetState(incomingTargetState));
 
+    SetAttributeValue(mTargetState, incomingTargetState, Attributes::TargetState::Id);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+ClosureDimensionCluster::ValidateTargetState(const DataModel::Nullable<GenericDimensionStateStruct> & incomingTargetState) const
+{
     if (!incomingTargetState.IsNull())
     {
         // Validate the incoming Position value has valid input parameters and FeatureMap conformance.
@@ -371,8 +380,6 @@ CHIP_ERROR ClosureDimensionCluster::SetTargetState(const DataModel::Nullable<Gen
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
-
-    SetAttributeValue(mTargetState, incomingTargetState, Attributes::TargetState::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -652,10 +659,12 @@ Status ClosureDimensionCluster::HandleStepCommand(StepDirectionEnum direction, u
         return Status::ConstraintError;
     }
 
+    stepTarget.Value().position.SetValue(DataModel::MakeNullable(static_cast<Percent100ths>(newPosition)));
+    VerifyOrReturnError(ValidateTargetState(stepTarget) == CHIP_NO_ERROR, Status::Failure);
+
     // TargetState should only be set when delegate function returns status as Success. Return failure otherwise
     VerifyOrReturnError(mDelegate.HandleStep(direction, numberOfSteps, speed) == Status::Success, Status::Failure);
 
-    stepTarget.Value().position.SetValue(DataModel::MakeNullable(static_cast<Percent100ths>(newPosition)));
     VerifyOrReturnError(SetTargetState(stepTarget) == CHIP_NO_ERROR, Status::Failure);
 
     return Status::Success;

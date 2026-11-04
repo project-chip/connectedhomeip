@@ -115,6 +115,36 @@ BitFlags<LatchControlModesBitmap> AllLatchModes()
     return modes;
 }
 
+template <typename Command>
+void CheckRejectedStepPreservesState()
+{
+    MockDelegate delegate;
+    ClosureDimensionCluster cluster(
+        ClosureDimensionCluster::Config(1, delegate).WithPositioning(3, 3).WithMotionLatching(AllLatchModes()).WithSpeed());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    const auto current = PositionLatchSpeedState(9999, false, MakeOptional(Globals::ThreeLevelAutoEnum::kLow));
+    const auto target  = PositionLatchSpeedState(9996, true, MakeOptional(Globals::ThreeLevelAutoEnum::kLow));
+    ASSERT_EQ(cluster.SetCurrentState(current), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetTargetState(target), CHIP_NO_ERROR);
+    auto & listener = tester.GetTestContext().ChangeListener();
+    listener.ChangedList().clear();
+    listener.DirtyList().clear();
+
+    Command request;
+    request.direction     = StepDirectionEnum::kIncrease;
+    request.numberOfSteps = 1;
+    request.speed.SetValue(Globals::ThreeLevelAutoEnum::kHigh);
+    EXPECT_EQ(tester.Invoke(request).status, Status::Failure);
+    EXPECT_EQ(delegate.stepCalls, 0);
+    EXPECT_EQ(delegate.setTargetCalls, 0);
+    EXPECT_EQ(cluster.GetCurrentState(), current);
+    EXPECT_EQ(cluster.GetTargetState(), target);
+    EXPECT_TRUE(listener.ChangedList().empty());
+    EXPECT_TRUE(listener.DirtyList().empty());
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 class TestClosureDimensionCluster : public ::testing::Test
 {
 public:
@@ -146,6 +176,16 @@ public:
 };
 
 } // namespace
+
+TEST_F(TestClosureDimensionCluster, StepRejectedCandidateHasNoDelegateSideEffects)
+{
+    CheckRejectedStepPreservesState<ClosureDimension::Commands::Step::Type>();
+}
+
+TEST_F(TestClosureDimensionCluster, GroupedStepRejectedCandidateHasNoDelegateSideEffects)
+{
+    CheckRejectedStepPreservesState<ClosureDimension::Commands::GroupedStep::Type>();
+}
 
 TEST_F(TestClosureDimensionCluster, TestAttributesList)
 {
