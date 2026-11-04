@@ -357,14 +357,25 @@ class AppRestartMonitor:
         try:
             os.link(claim, self.restart_flag_file)
         except FileExistsError:
-            pass  # An even newer request was published; keep it.
+            # An even newer request was published; keep it and drop the claimed one.
+            os.unlink(claim)
+            return
+        except OSError:
+            # The link failed for another reason: rename the claim back so the request is never stranded at the claim
+            # path (an absent flag reads as completion to the waiting test).
+            os.replace(claim, self.restart_flag_file)
+            return
         os.unlink(claim)
 
     def _publish_rejection(self, content: str) -> None:
         rejected_path = f"{self.restart_flag_file}.rejected"
         published = False
         try:
-            with open(rejected_path, "w", encoding="utf-8", errors="replace") as f:
+            # O_EXCL never follows a symlink planted at this path; unlinking first removes such a link, not its target.
+            with contextlib.suppress(FileNotFoundError):
+                os.unlink(rejected_path)
+            fd = os.open(rejected_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o666)
+            with os.fdopen(fd, "w", encoding="utf-8", errors="replace") as f:
                 f.write(f"rejected: {content}")
             # Only replace the flag file if it still holds the unknown content, not a request published since the read.
             claim = self._claim_flag_file(content)
