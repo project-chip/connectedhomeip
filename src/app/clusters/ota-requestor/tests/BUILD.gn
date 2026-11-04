@@ -25,6 +25,7 @@ source_set("dependent_sources") {
   sources = [
     "../BDXDownloader.cpp",
     "../BDXDownloader.h",
+    "../CodegenIntegrationInternal.h",
     "../DefaultOTARequestor.cpp",
     "../DefaultOTARequestor.h",
     "../DefaultOTARequestorDriver.cpp",
