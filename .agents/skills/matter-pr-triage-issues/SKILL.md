@@ -8,8 +8,8 @@ description:
 # matter-pr-triage-issues - judgment instructions
 
 Plain instructions, no assistant-specific syntax. Any agent can follow them. The
-invocation differs per harness: a slash command in Claude Code and Codex, pasted
-text elsewhere.
+invocation differs per harness: a slash command in Claude Code, the skill's name
+in a plain request in Codex, pasted text elsewhere.
 
 For any one pull request: the issues related to it, linked on GitHub or found by
 content, each with what it asks for and where the pull request's work stands.
@@ -68,7 +68,8 @@ The report has these sections.
   REFERENCED ELSEWHERE                issues and pull requests in other repositories the PR cites or that match it by content; context, not judged
 Safe to close appears for a pull request the triage found safe to close, Related for any other; the rest only when they have entries.
 
-An agent without slash commands, Codex included, is handed this file and the same words.
+In Codex, name the skill in a plain request with the same words: matter-pr-triage-issues #40453
+An agent that does not load skills is handed this file and the same words.
 ```
 
 ## Step 1 - Translate the arguments

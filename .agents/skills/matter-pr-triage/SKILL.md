@@ -8,8 +8,8 @@ description:
 # matter-pr-triage - judgment instructions
 
 Plain instructions, no assistant-specific syntax. Any agent can follow them. The
-invocation differs per harness: a slash command in Claude Code and Codex, pasted
-text elsewhere.
+invocation differs per harness: a slash command in Claude Code, the skill's name
+in a plain request in Codex, pasted text elsewhere.
 
 Triage a backlog of old pull requests. The backend script gathers evidence; you
 supply the judgment. You never post, comment, close or otherwise modify anything
@@ -60,7 +60,8 @@ example pr-triage-created-before-2025-09-18-as-of-2026-09-18.md: one document pe
 after every batch of the same day; a repeat on a later day gets its own file. Per-batch copies under
 the cache, runs/<run-id>/, are internal.
 
-An agent without slash commands, Codex included, is handed this file and the same words.
+In Codex, name the skill in a plain request with the same words: matter-pr-triage older than a year
+An agent that does not load skills is handed this file and the same words.
 
 The report has two sections.
   DECIDE      CLOSE, STALE FILE REFERENCES, SUPERSEDED, NEEDS AN OWNER
