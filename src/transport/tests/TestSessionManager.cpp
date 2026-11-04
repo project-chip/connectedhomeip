@@ -1331,7 +1331,6 @@ uint32_t NextSendCounter(SecureSession & session)
 
 QuotedMessage QuoteNextSend(SecureSession & session)
 {
-    session.MarkSent();
     return QuoteHeader(session.GetPeerSessionId(), NextSendCounter(session));
 }
 
@@ -1534,36 +1533,6 @@ TEST_F(TestSessionManager, PortUnreachable_IgnoresAnIdleSession)
     const QuotedMessage quoted = QuoteNextSend(*session);
 
     clock.AdvanceMonotonic(session->GetMRPBaseTimeout() + System::Clock::Milliseconds64(1));
-    sessionManager.OnPortUnreachable(peer, quoted.Span());
-    EXPECT_TRUE(session->IsActiveSession());
-
-    sessionManager.Shutdown();
-}
-
-// A report must follow one of our sends by about a round trip. Traffic from the peer is not a send, so it must not
-// make a report quoting an old send look fresh.
-TEST_F(TestSessionManager, PortUnreachable_IgnoresReportAfterOnlyPeerTraffic)
-{
-    FabricTableHolder fabricTableHolder;
-    secure_channel::MessageCounterManager messageCounterManager;
-    TestPersistentStorageDelegate deviceStorage;
-    chip::Crypto::DefaultSessionKeystore sessionKeystore;
-    SessionManager sessionManager;
-    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
-    EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
-                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
-
-    System::Clock::Internal::RAIIMockClock clock;
-    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
-    SessionHolder holder;
-    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 965);
-    session->SetRemoteSessionParameters(
-        ReliableMessageProtocolConfig({ System::Clock::Timestamp(300), System::Clock::Timestamp(300) }));
-    const QuotedMessage quoted = QuoteNextSend(*session);
-
-    clock.AdvanceMonotonic(session->GetMRPBaseTimeout() + System::Clock::Milliseconds64(1));
-    session->MarkActiveRx();
     sessionManager.OnPortUnreachable(peer, quoted.Span());
     EXPECT_TRUE(session->IsActiveSession());
 

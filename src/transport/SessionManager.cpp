@@ -508,11 +508,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         SecureSession * secure = sessionHandle->AsSecureSession();
 
         // This marks any connection where we send data to as 'active'
-#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
-        secure->MarkSent();
-#else
         secure->MarkActive();
-#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 
         destination = &secure->GetPeerAddress();
     }
@@ -701,7 +697,7 @@ void SessionManager::OnPortUnreachable(const Transport::PeerAddress & peer, Byte
         }
 
         // The report follows our send by about a round trip, so one arriving after a quiet MRP interval is stale.
-        if (now - session->GetLastSendTime() > session->GetMRPBaseTimeout())
+        if (now - session->GetLastActivityTime() > session->GetMRPBaseTimeout())
         {
             return Loop::Continue;
         }

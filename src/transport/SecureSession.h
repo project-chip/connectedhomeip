@@ -240,14 +240,6 @@ public:
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
     System::Clock::Timestamp GetLastPeerActivityTime() const { return mLastPeerActivityTime; }
     void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
-#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
-    System::Clock::Timestamp GetLastSendTime() const { return mLastSendTime; }
-    void MarkSent()
-    {
-        mLastSendTime = System::SystemClock().GetMonotonicTimestamp();
-        MarkActive();
-    }
-#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
     void MarkActiveRx()
     {
         mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
@@ -357,11 +349,6 @@ private:
 
     /// Timestamp of last rx. @see ActiveTimestamp in the spec
     System::Clock::Timestamp mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
-
-#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
-    /// Timestamp of last tx; a port-unreachable report is only fresh shortly after one.
-    System::Clock::Timestamp mLastSendTime = System::SystemClock().GetMonotonicTimestamp();
-#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 
     SessionParameters mRemoteSessionParams;
     CryptoContext mCryptoContext;
