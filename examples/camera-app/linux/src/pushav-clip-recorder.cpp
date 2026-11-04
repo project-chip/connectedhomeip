@@ -495,14 +495,15 @@ void PushAVClipRecorder::Stop()
                             "PushAVClipRecorder::~PushAVClipRecorder - Scheduling async cluster server API call for connection %u",
                             mConnectionID);
 
-            uint16_t connectionID = mConnectionID;
-            auto triggerType      = mTriggerType;
-            auto * server         = mPushAvStreamTransportServer;
+            uint16_t connectionID  = mConnectionID;
+            auto triggerType       = mTriggerType;
+            auto * server          = mPushAvStreamTransportServer;
+            uint64_t sessionNumber = mClipInfo.mSessionNumber;
 
-            std::thread([server, connectionID, triggerType]() {
+            std::thread([server, connectionID, triggerType, sessionNumber]() {
                 ChipLogProgress(Camera, "Async thread: Calling NotifyTransportStopped for connection %u", connectionID);
                 chip::DeviceLayer::PlatformMgr().LockChipStack();
-                server->NotifyTransportStopped(connectionID, triggerType);
+                server->NotifyTransportStopped(connectionID, triggerType, chip::MakeOptional(sessionNumber));
                 chip::DeviceLayer::PlatformMgr().UnlockChipStack();
                 ChipLogProgress(Camera, "Async thread: NotifyTransportStopped completed for connection %u", connectionID);
             }).detach();

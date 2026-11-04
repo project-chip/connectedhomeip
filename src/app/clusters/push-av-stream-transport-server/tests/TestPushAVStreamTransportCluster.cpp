@@ -485,6 +485,24 @@ TEST_F(TestPushAVStreamTransportServerLogic, AllocatePushTransportRejectsEndpoin
     EXPECT_EQ(status.GetClusterSpecificCode().value(), to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
 }
 
+TEST_F(TestPushAVStreamTransportServerLogic, ResolveCMAFSessionNumberPrefersSuppliedNumber)
+{
+    // Without a delegate, only a supplied session number can be reported.
+    EXPECT_FALSE(mServer.GetLogic().ResolveCMAFSessionNumber(1, NullOptional).HasValue());
+
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+
+    // The mock delegate reports connectionID + 2000.
+    Optional<uint64_t> fromDelegate = mServer.GetLogic().ResolveCMAFSessionNumber(1, NullOptional);
+    ASSERT_TRUE(fromDelegate.HasValue());
+    EXPECT_EQ(fromDelegate.Value(), 2001u);
+
+    Optional<uint64_t> supplied = mServer.GetLogic().ResolveCMAFSessionNumber(1, MakeOptional<uint64_t>(7));
+    ASSERT_TRUE(supplied.HasValue());
+    EXPECT_EQ(supplied.Value(), 7u);
+}
+
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
 {
     CMAFContainerOptionsStruct cmafContainerOptions;
