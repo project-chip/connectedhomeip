@@ -52,6 +52,7 @@ IdentifyCluster::IdentifyCluster(const Config & config) :
 void IdentifyCluster::Shutdown(ClusterShutdownType type)
 {
     StopIdentifying();
+    DefaultServerCluster::Shutdown(type);
 }
 
 DataModel::ActionReturnStatus IdentifyCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

@@ -36,6 +36,10 @@ CHIP_ERROR BridgedDeviceTranslator::TranslateAndExecute(EndpointId endpointId, c
             VerifyOrReturnError(aggregatorEndpointId.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
             endpointId = aggregatorEndpointId.value();
         }
+        else
+        {
+            endpointId = kInvalidEndpointId;
+        }
 
         const std::string device = json["Device"].asString();
         return DispatchStringAction(registry, "AddBridgedDevice"_span, endpointId, CharSpan(device.data(), device.size()));
