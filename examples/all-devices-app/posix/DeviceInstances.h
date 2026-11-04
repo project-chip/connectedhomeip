@@ -74,6 +74,16 @@ public:
         return mFactory.Create(deviceName, nodeLabel);
     }
 
+    DeviceRegistrationEntryOfConcreteType<BridgedNode> CreateBridgedNode(const std::string & nodeLabel) override
+    {
+        return mFactory.CreateBridgedNode(nodeLabel);
+    }
+
+    DeviceRegistrationEntryOfConcreteType<Aggregator> CreateAggregator(const std::string &) override
+    {
+        return mFactory.CreateAggregator();
+    }
+
 private:
     PosixDeviceFactory & mFactory;
 };

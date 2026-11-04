@@ -774,8 +774,8 @@ TEST_F(TestOOBAccessors, ModeSelectOOBAccessor)
 class MockBridgedDeviceManager : public BridgedDeviceManager
 {
 public:
-    MockBridgedDeviceManager(CodeDrivenDataModelProvider & provider, EndpointIdAllocator & allocator) :
-        BridgedDeviceManager(provider, allocator)
+    MockBridgedDeviceManager(CodeDrivenDataModelProvider & provider, EndpointIdAllocator & allocator, TimerDelegate & delegate) :
+        BridgedDeviceManager(provider, allocator), mTimerDelegate(delegate)
     {}
     DeviceRegistrationEntry CreateDevice(const std::string & deviceTypeArg, const std::string & nodeLabel) override
     {
@@ -798,29 +798,29 @@ public:
         return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(Span<const DataModel::DeviceTypeEntry>()), nullptr,
                                         nullptr };
     }
+
+    DeviceRegistrationEntryOfConcreteType<BridgedNode> CreateBridgedNode(const std::string & nodeLabel) override
+    {
+        return { std::make_unique<BridgedNode>(mTimerDelegate, "very-unique-test-id", nodeLabel), nullptr, nullptr };
+    }
+
+    DeviceRegistrationEntryOfConcreteType<Aggregator> CreateAggregator(const std::string &) override
+    {
+        return { std::make_unique<Aggregator>(mTimerDelegate), nullptr, nullptr };
+    }
+
+private:
+    TimerDelegate & mTimerDelegate;
 };
 
 class MockEndpointIdAllocator : public EndpointIdAllocator
 {
 public:
-    MockEndpointIdAllocator(EndpointId testStart = 1) : mNext(testStart), mAllocated(testStart) {}
+    MockEndpointIdAllocator(EndpointId testStart = 1) : mNext(testStart) {}
     EndpointId Allocate() override { return mNext++; }
-
-    // This will return the endpoint Ids that were allocated in the order they were allocated.
-    EndpointId NextAllocatedEndpoint()
-    {
-        if (mAllocated == mNext)
-        {
-            return kInvalidEndpointId;
-        }
-        return mAllocated++;
-    }
 
 private:
     EndpointId mNext;
-
-    // This will track the next endpoint that has been allocated but has not yet been returned by NextAllocatedEndpoint.
-    EndpointId mAllocated;
 };
 
 TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
@@ -828,7 +828,7 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
     MockEndpointIdAllocator allocator;
     CodeDrivenDataModelProvider provider(mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider());
     EXPECT_EQ(provider.Startup(mClusterContext.ImContext()), CHIP_NO_ERROR);
-    MockBridgedDeviceManager deviceManager(provider, allocator);
+    MockBridgedDeviceManager deviceManager(provider, allocator, mTimerDelegate);
 
     InMemoryOOBAccessorRegistry registry;
     EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor>(deviceManager)), CHIP_NO_ERROR);
@@ -871,7 +871,7 @@ TEST_F(TestOOBAccessors, RemoveBridgedDeviceOOBAccessor)
     MockEndpointIdAllocator allocator;
     CodeDrivenDataModelProvider provider(mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider());
     EXPECT_EQ(provider.Startup(mClusterContext.ImContext()), CHIP_NO_ERROR);
-    MockBridgedDeviceManager deviceManager(provider, allocator);
+    MockBridgedDeviceManager deviceManager(provider, allocator, mTimerDelegate);
 
     InMemoryOOBAccessorRegistry registry;
     EXPECT_EQ(registry.Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(deviceManager)), CHIP_NO_ERROR);

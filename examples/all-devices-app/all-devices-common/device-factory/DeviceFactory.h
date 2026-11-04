@@ -406,7 +406,7 @@ private:
         //       factories are usable.
         if constexpr (ALL_DEVICES_ENABLE_AGGREGATOR)
         {
-            RegisterCreator("aggregator", [this]() { return CreateAggregator(); });
+            RegisterCreator("aggregator", [this]() { return DeviceRegistrationEntry(CreateAggregator()); });
         }
         if constexpr (ALL_DEVICES_ENABLE_AIR_PURIFIER)
         {
@@ -517,7 +517,9 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_BRIDGED_NODE)
         {
-            RegisterCreator("bridged-node", [this](const std::string & nodeLabel) { return CreateBridgedNode(nodeLabel); });
+            RegisterCreator("bridged-node", [this](const std::string & nodeLabel) {
+                return DeviceRegistrationEntry(CreateBridgedNode(nodeLabel));
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_CHIME)
         {

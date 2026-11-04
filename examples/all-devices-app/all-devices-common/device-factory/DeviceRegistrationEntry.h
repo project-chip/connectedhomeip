@@ -41,7 +41,7 @@ struct DeviceRegistrationEntryOfConcreteType
     {}
 
     template <typename OtherInterfaceT, typename = std::enable_if_t<std::is_base_of_v<InterfaceT, OtherInterfaceT>>>
-    explicit DeviceRegistrationEntryOfConcreteType(DeviceRegistrationEntryOfConcreteType<InterfaceT> && other) :
+    explicit DeviceRegistrationEntryOfConcreteType(DeviceRegistrationEntryOfConcreteType<OtherInterfaceT> && other) :
         DeviceRegistrationEntryOfConcreteType(std::move(other.device), std::move(other.afterDeviceRegistration),
                                               std::move(other.beforeDeviceUnregistration), other.defaultTags)
     {}
@@ -54,7 +54,7 @@ struct DeviceRegistrationEntryOfConcreteType
         {
             composition.tagList = defaultTags;
         }
-        ReturnErrorOnFailure(device->Register(allocator, provider, composition));
+        ReturnErrorOnFailure(static_cast<DeviceInterface *>(device.get())->Register(allocator, provider, composition));
 
         if (afterDeviceRegistration)
         {
@@ -72,7 +72,7 @@ struct DeviceRegistrationEntryOfConcreteType
         {
             beforeDeviceUnregistration();
         }
-        device->Unregister(provider);
+        static_cast<DeviceInterface *>(device.get())->Unregister(provider);
     }
 };
 
