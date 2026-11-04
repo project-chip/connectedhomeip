@@ -361,10 +361,29 @@ class AppRestartMonitor:
             os.unlink(claim)
             return
         except OSError:
-            # The link failed for another reason: rename the claim back so the request is never stranded at the claim
-            # path (an absent flag reads as completion to the waiting test).
-            os.replace(claim, self.restart_flag_file)
+            # The link failed for another reason. Recreate the request at the flag path only while that path is
+            # still free (O_EXCL), so a request published meanwhile is never overwritten by this older one.
+            self._recreate_claim(claim)
             return
+        os.unlink(claim)
+
+    def _recreate_claim(self, claim: str) -> None:
+        try:
+            with open(claim, "rb") as f:
+                content = f.read()
+            fd = os.open(self.restart_flag_file, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o666)
+        except FileExistsError:
+            # A newer request is already at the flag path; it supersedes the claimed one.
+            os.unlink(claim)
+            return
+        except OSError as e:
+            # Keep the claim rather than lose or overwrite a request.
+            log.error("Could not restore restart request from '%s': %s", claim, e)
+            return
+        # The flag exists empty until this write lands; the monitor (this thread) is the only reader that acts on it, and
+        # it treats empty content as pending.
+        with os.fdopen(fd, "wb") as f:
+            f.write(content)
         os.unlink(claim)
 
     def _publish_rejection(self, content: str) -> None:
