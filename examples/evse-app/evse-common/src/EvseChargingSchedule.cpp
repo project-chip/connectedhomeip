@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
+#include <EnergyTimeUtils.h>
 #include <EvseChargingSchedule.h>
 #include <EvseTargetsConfig.h>
-#include <EnergyTimeUtils.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -39,7 +39,7 @@ CHIP_ERROR FindNextTarget(EvseChargingScheduleContext & context, const BitMask<T
                           bool allowTargetsInPast)
 {
     uint16_t minTimeToTarget_m = 24 * 60;
-    bool found               = false;
+    bool found                 = false;
 
     const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules =
         context.GetChargingTargets();
@@ -91,8 +91,7 @@ CHIP_ERROR FindNextTarget(EvseChargingScheduleContext & context, const BitMask<T
 }
 
 CHIP_ERROR DetermineRequiredEnergy(EvseChargingScheduleContext & context, int64_t & requiredEnergy_mWh,
-                                 DataModel::Nullable<Percent> & targetSoC,
-                                 DataModel::Nullable<int64_t> & targetAddedEnergy_mWh)
+                                   DataModel::Nullable<Percent> & targetSoC, DataModel::Nullable<int64_t> & targetAddedEnergy_mWh)
 {
     DataModel::Nullable<Percent> vehicleSoC;
     DataModel::Nullable<int64_t> batteryCapacity_mWh;
@@ -239,7 +238,7 @@ CHIP_ERROR ComputeEvseChargingSchedule(EvseChargingScheduleContext & context)
             if (DetermineRequiredEnergy(context, requiredEnergy_mWh, targetSoC, targetAddedEnergy_mWh) == CHIP_NO_ERROR)
             {
                 TEMPORARY_RETURN_IGNORED ComputeStartTime(context, startTime_epoch_s, tempTargetTime_epoch_s, now_epoch_s,
-                                                            requiredEnergy_mWh);
+                                                          requiredEnergy_mWh);
             }
         }
     }

@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/clusters/energy-evse-server/Constants.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/energy-evse-server/Constants.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <lib/core/CHIPError.h>
@@ -42,18 +42,18 @@ public:
 
     virtual const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & GetChargingTargets() const = 0;
 
-    virtual bool IsEvsePluggedIn() const                                              = 0;
-    virtual SupplyStateEnum GetSupplyState() const                                    = 0;
-    virtual bool HasSoCReportingFeature() const                                       = 0;
-    virtual DataModel::Nullable<Percent> GetStateOfCharge() const                     = 0;
-    virtual DataModel::Nullable<int64_t> GetBatteryCapacity() const                   = 0;
-    virtual int64_t HwGetNominalMainsVoltage() const                                    = 0;
-    virtual int64_t GetMaximumChargeCurrent() const                                     = 0;
+    virtual bool IsEvsePluggedIn() const                            = 0;
+    virtual SupplyStateEnum GetSupplyState() const                  = 0;
+    virtual bool HasSoCReportingFeature() const                     = 0;
+    virtual DataModel::Nullable<Percent> GetStateOfCharge() const   = 0;
+    virtual DataModel::Nullable<int64_t> GetBatteryCapacity() const = 0;
+    virtual int64_t HwGetNominalMainsVoltage() const                = 0;
+    virtual int64_t GetMaximumChargeCurrent() const                 = 0;
 
     virtual CHIP_ERROR SetNextChargeStartTime(DataModel::Nullable<uint32_t> value)     = 0;
     virtual CHIP_ERROR SetNextChargeTargetTime(DataModel::Nullable<uint32_t> value)    = 0;
-    virtual CHIP_ERROR SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> value)   = 0;
-    virtual CHIP_ERROR SetNextChargeTargetSoC(DataModel::Nullable<Percent> value)        = 0;
+    virtual CHIP_ERROR SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> value) = 0;
+    virtual CHIP_ERROR SetNextChargeTargetSoC(DataModel::Nullable<Percent> value)      = 0;
 };
 
 /**
