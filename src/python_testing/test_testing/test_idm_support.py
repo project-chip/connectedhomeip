@@ -258,7 +258,7 @@ class TestDiagnosticConstraintCoverage(unittest.IsolatedAsyncioTestCase):
 
         with self.assertRaisesRegex(signals.TestSkip, 'constraint enforcement not demonstrated'):
             await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
-        self.checker.default_controller.SendCommand.assert_not_awaited()
+        self.checker.default_controller.SendCommand.assert_not_called()
         problems = [call.kwargs['problem'] for call in self.checker.record_warning.call_args_list]
         self.assertEqual(len(problems), 3)
         for field in ('TestEventTrigger.EnableKey', 'PayloadTestRequest.EnableKey', 'PayloadTestRequest.Count'):
@@ -327,7 +327,7 @@ class TestDiagnosticConstraintCoverage(unittest.IsolatedAsyncioTestCase):
                             cluster_class=cluster, field=field, all_fields=fields, enum_values_by_field={})
                         result = await self.checker.check_command_constraint(info)
                         self.assertEqual((result.probed, result.rejected, result.accepted, result.other_error), (0, 0, 0, 0))
-        self.checker.default_controller.SendCommand.assert_not_awaited()
+        self.checker.default_controller.SendCommand.assert_not_called()
         self.checker.record_accepted_violation.assert_not_called()
 
     async def test_unrelated_errors_do_not_credit_ordinary_enforcement(self):
@@ -391,7 +391,7 @@ class TestDiagnosticConstraintCoverage(unittest.IsolatedAsyncioTestCase):
                             InteractionModelError(model_status) if model_status != Status.Success else None)
                         with self.assertRaisesRegex(signals.TestSkip, 'constraint enforcement not demonstrated'):
                             await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
-        self.checker.default_controller.SendCommand.assert_not_awaited()
+        self.checker.default_controller.SendCommand.assert_not_called()
         self.checker.record_accepted_violation.assert_not_called()
 
     async def test_writable_attribute_checks_precede_unsupported_outcome(self):
@@ -423,7 +423,7 @@ class TestDiagnosticConstraintCoverage(unittest.IsolatedAsyncioTestCase):
             await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
         self.assertGreater(self.checker.default_controller.WriteAttribute.await_count, 0)
         self.checker.record_accepted_violation.assert_called()
-        self.checker.default_controller.SendCommand.assert_not_awaited()
+        self.checker.default_controller.SendCommand.assert_not_called()
 
     async def test_exclusion_is_not_qualification_in_either_policy_era(self):
         from TC_IDM_9_1 import TC_IDM_9_1
@@ -434,7 +434,7 @@ class TestDiagnosticConstraintCoverage(unittest.IsolatedAsyncioTestCase):
                 basic[Clusters.BasicInformation.Attributes.SpecificationVersion.attribute_id] = version or 0
                 with self.assertRaises(signals.TestSkip):
                     await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
-        self.checker.default_controller.SendCommand.assert_not_awaited()
+        self.checker.default_controller.SendCommand.assert_not_called()
 
 
 if __name__ == "__main__":
