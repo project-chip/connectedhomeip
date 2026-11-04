@@ -73,6 +73,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/energy-evse/impl/simulation/AllDevicesEvseChargingSchedule.cpp"
     "${CHIP_ROOT}/examples/evse-app/evse-common/src/ChargingTargetsMemMgr.cpp"
     "${CHIP_ROOT}/examples/evse-app/evse-common/src/EvseChargingSchedule.cpp"
+    "${CHIP_ROOT}/examples/energy-management/utils/src/EnergyTimeUtils.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extended-color-light/ExtendedColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extended-color-light/impl/LoggingExtendedColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extractor-hood/ExtractorHood.cpp"
@@ -318,4 +319,5 @@ set(ALL_DEVICES_CLUSTER_SOURCES
 
 set(ALL_DEVICES_EXTRA_INCLUDE_DIRS
     "${CHIP_ROOT}/examples/evse-app/evse-common/include"
+    "${CHIP_ROOT}/examples/energy-management/utils/include"
 )
