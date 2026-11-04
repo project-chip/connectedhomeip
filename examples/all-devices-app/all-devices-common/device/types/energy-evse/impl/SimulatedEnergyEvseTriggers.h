@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #include <EvseSimulationDelegate.h>
+#include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 
 namespace chip::app {
 

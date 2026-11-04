@@ -38,8 +38,8 @@ CHIP_ERROR EvseTargetsDelegate::Init(PersistentStorageDelegate * targetStore, Fa
     ChipLogProgress(AppServer, "EVSE: Initializing EvseTargetsDelegate");
     VerifyOrReturnError(targetStore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mpTargetStore  = targetStore;
-    mpFabricTable  = &fabricTable;
+    mpTargetStore = targetStore;
+    mpFabricTable = &fabricTable;
 
     if (!mFabricDelegateRegistered)
     {

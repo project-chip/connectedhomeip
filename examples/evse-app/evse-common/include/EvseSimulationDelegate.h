@@ -19,10 +19,10 @@
 #pragma once
 
 #include <EVSECallbacks.h>
+#include <EnergyEvseTargetsStore.h>
 #include <EvseTargetsConfig.h>
 #include <app/clusters/energy-evse-server/EnergyEvseCluster.h>
 #include <app/persistence/AttributePersistenceProvider.h>
-#include <EnergyEvseTargetsStore.h>
 #include <lib/support/TimerDelegate.h>
 
 #include <cstring>
@@ -317,7 +317,7 @@ public:
     DataModel::Nullable<int64_t> GetSessionEnergyDischarged() const;
 
 private:
-    AttributePersistenceProvider * mAttributeStorage = nullptr;
+    AttributePersistenceProvider * mAttributeStorage                      = nullptr;
     static constexpr int kDefaultMinChargeCurrent_mA                      = 6000;  /* 6A */
     static constexpr int kDefaultUserMaximumChargeCurrent_mA              = 80000; /* 80A */
     static constexpr int kDefaultRandomizationDelayWindow_sec             = 600;   /* 600s */

@@ -17,8 +17,8 @@
 
 #include <device/types/energy-evse/impl/SimulatedEnergyEvse.h>
 
-#include <device/types/energy-evse/impl/simulation/AllDevicesEvseChargingSchedule.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <device/types/energy-evse/impl/simulation/AllDevicesEvseChargingSchedule.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -86,8 +86,7 @@ SimulatedEnergyEvse::SimulatedEnergyEvse(const Context & context) :
             Clusters::EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),
     }),
     mTimerDelegate(context.timerDelegate), mFabricTable(context.fabricTable),
-    mTestEventTriggerDelegate(context.testEventTriggerDelegate),
-    mPersistentStorageDelegate(context.persistentStorageDelegate)
+    mTestEventTriggerDelegate(context.testEventTriggerDelegate), mPersistentStorageDelegate(context.persistentStorageDelegate)
 {}
 
 SimulatedEnergyEvse::~SimulatedEnergyEvse()
@@ -160,7 +159,7 @@ CHIP_ERROR SimulatedEnergyEvse::HandleEventTrigger(uint64_t eventTrigger)
 
     eventTrigger = clearEndpointInEventTrigger(eventTrigger);
     if (HandleSimulatedEnergyEvseTestEventTrigger(static_cast<Clusters::EnergyEvse::EvseSimulationDelegate *>(this),
-                                                   mEvseTestEventSaveData, eventTrigger))
+                                                  mEvseTestEventSaveData, eventTrigger))
     {
         return CHIP_NO_ERROR;
     }
