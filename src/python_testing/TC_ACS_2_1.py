@@ -108,7 +108,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             self.write_to_app_pipe({
                 "Name": "SetAmbientContextSupport",
                 "EndpointId": endpoint,
-                "AmbientContextType": [{"TypeId": 73, "TagId": 3}, {"TypeId": 74, "TagId": 4}, {"TypeId": 75, "TagId": 3}]
+                "AmbientContextType": [{"TypeId": 73, "TagId": 0}, {"TypeId": 73, "TagId": 3}, {"TypeId": 74, "TagId": 4}, {"TypeId": 75, "TagId": 3}]
             })
             await asyncio.sleep(ci_wait_time)
 
