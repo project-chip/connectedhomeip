@@ -22,11 +22,21 @@ namespace app {
 namespace {
 
 // Number tags tell the variants apart when several run on one node (e.g. --device "*").
-const EndpointComposition::SemanticTag kBlindTag[]   = { { .namespaceID = CommonNamespace::kNumberId, .tag = 1 } };
-const EndpointComposition::SemanticTag kCurtainTag[] = { { .namespaceID = CommonNamespace::kNumberId, .tag = 2 } };
-const EndpointComposition::SemanticTag kShutterTag[] = { { .namespaceID = CommonNamespace::kNumberId, .tag = 3 } };
-const EndpointComposition::SemanticTag kAwningTag[]  = { { .namespaceID = CommonNamespace::kNumberId, .tag = 4 } };
-const EndpointComposition::SemanticTag kPergolaTag[] = { { .namespaceID = CommonNamespace::kNumberId, .tag = 5 } };
+const EndpointComposition::SemanticTag kBlindTag[] = {
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber), .tag = 1 }
+};
+const EndpointComposition::SemanticTag kCurtainTag[] = {
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber), .tag = 2 }
+};
+const EndpointComposition::SemanticTag kShutterTag[] = {
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber), .tag = 3 }
+};
+const EndpointComposition::SemanticTag kAwningTag[] = {
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber), .tag = 4 }
+};
+const EndpointComposition::SemanticTag kPergolaTag[] = {
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber), .tag = 5 }
+};
 
 WindowCovering::Config BlindConfig()
 {

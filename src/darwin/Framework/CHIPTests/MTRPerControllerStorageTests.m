@@ -2354,7 +2354,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         XCTAssertNotNil(value[MTRErrorKey]);
 
         NSError * pathError = value[MTRErrorKey];
-        XCTAssertEqual(pathError.domain, MTRInteractionErrorDomain);
+        XCTAssertEqualObjects(pathError.domain, MTRInteractionErrorDomain);
         XCTAssertEqual(pathError.code, expectedError);
     };
 

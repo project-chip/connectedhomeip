@@ -25,8 +25,10 @@ CHIP_ERROR ValidateClosureTagList(chip::Span<const chip::app::EndpointCompositio
     size_t closureTagCount = 0;
     for (auto & tag : tags)
     {
-        VerifyOrReturnError(tag.namespaceID != chip::app::CommonNamespace::kClosurePanelId, CHIP_ERROR_INVALID_ARGUMENT);
-        if (tag.namespaceID == chip::app::CommonNamespace::kClosureId)
+        VerifyOrReturnError(tag.namespaceID !=
+                                chip::to_underlying(chip::app::Clusters::Globals::SemanticTagNamespaceId::kClosurePanel),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+        if (tag.namespaceID == chip::to_underlying(chip::app::Clusters::Globals::SemanticTagNamespaceId::kClosure))
         {
             ++closureTagCount;
         }
@@ -42,7 +44,7 @@ bool IsAccess(chip::Span<const SemanticTag> tags)
 {
     for (const auto & tag : tags)
     {
-        if (tag.namespaceID == chip::app::CommonNamespace::kClosureId &&
+        if (tag.namespaceID == chip::to_underlying(chip::app::Clusters::Globals::SemanticTagNamespaceId::kClosure) &&
             (chip::to_underlying(ClosureTag::kWindow) == tag.tag || chip::to_underlying(ClosureTag::kDoor) == tag.tag ||
              chip::to_underlying(ClosureTag::kBarrier) == tag.tag || chip::to_underlying(ClosureTag::kGarageDoor) == tag.tag ||
              chip::to_underlying(ClosureTag::kGate) == tag.tag))
