@@ -52,8 +52,7 @@ CHIP_ERROR LoggingOccupancySensor::Register(EndpointId endpoint, CodeDrivenDataM
     ReturnErrorOnFailure(OccupancySensor::Register(endpoint, provider, composition));
 
     // The cluster only accepts predictions once started, which happens after Register(): push them from a timer.
-    LogErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Milliseconds32(1)));
-    return CHIP_NO_ERROR;
+    return mTimerDelegate.StartTimer(this, System::Clock::Milliseconds32(1));
 }
 
 void LoggingOccupancySensor::TimerFired()

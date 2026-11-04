@@ -141,7 +141,7 @@ returns `CHIP_ERROR_INVALID_ARGUMENT`, more than `N` entries returns
 using PredictedOccupancyStruct = chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type;
 
 PredictedOccupancyStruct predictions[] = {
-    { .startTimestamp = 1000, .endTimestamp = 1900, .occupancy = OccupancyBitmap::kOccupied, .confidence = 80 },
+    { .startTimestamp = 1000, .endTimestamp = 1900, .occupancy = chip::app::Clusters::OccupancySensing::OccupancyBitmap::kOccupied, .confidence = 80 },
 };
 cluster->SetPredictedOccupancy(chip::Span<const PredictedOccupancyStruct>(predictions));
 ```
