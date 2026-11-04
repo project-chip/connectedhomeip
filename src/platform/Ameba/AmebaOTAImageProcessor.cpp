@@ -246,8 +246,7 @@ void AmebaOTAImageProcessor::HandleApply(intptr_t context)
 
 #if CONFIG_ENABLE_AMEBA_OTA_RESTART_TIMER
     TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
-        chip::System::Clock::Milliseconds32(CONFIG_AMEBA_OTA_RESTART_DELAY_MS),
-        HandleRestart, nullptr);
+        chip::System::Clock::Milliseconds32(CONFIG_AMEBA_OTA_RESTART_DELAY_MS), HandleRestart, nullptr);
 #else
     matter_ota_platform_reset();
 #endif
