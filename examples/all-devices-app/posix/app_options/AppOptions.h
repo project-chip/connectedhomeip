@@ -55,7 +55,7 @@ public:
         bool emulateWiFi                      = false; // use EmulatedWiFiDriver; implies enableWiFi
         bool enableThread                     = false;
         std::vector<std::string> threadArgs;
-        uint32_t bleController                = 0;
+        uint32_t bleController = 0;
         /// Listen port for the Pigweed RPC server, unset when --rpc-server-port was not given.
         /// This is unconditionally parsed, but only consumed by builds compiled with Pigweed RPC
         /// support (chip_enable_pw_rpc), so that the option stays unit-testable and the struct
