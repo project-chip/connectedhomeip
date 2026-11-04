@@ -31,8 +31,8 @@ source_set("evse-charging-targets-lib") {
   public_configs = [ ":config" ]
 
   public_deps = [
-    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/clusters/energy-evse-server",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/credentials:credentials",
     "${chip_root}/src/lib/core",
   ]

@@ -113,7 +113,8 @@ executable("chip-evse-app") {
 }
 
 source_set("test-evse-targets-store") {
-  public_configs = [ "${chip_root}/examples/evse-app/evse-common/charging-targets:config" ]
+  public_configs =
+      [ "${chip_root}/examples/evse-app/evse-common/charging-targets:config" ]
 
   public_deps = [
     "${chip_root}/examples/evse-app/evse-common/charging-targets:evse-charging-targets-lib",
