@@ -1063,12 +1063,11 @@ def python_tests(
     with open("src/python_testing/test_metadata.yaml") as f:
         metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
-    nightly_tests = {item["name"] for item in metadata["nightly"]}
     dedicated_runner_tests = {item["name"]: item["reason"] for item in metadata["dedicated_runner"]}
 
     # NOTE: for slow tests. we add logs to not get impatient
     slow_test_duration = {
-        item["name"]: item["duration"] for item in metadata["slow_tests"] + metadata["nightly"]
+        item["name"]: item["duration"] for item in metadata["slow_tests"]
     }
 
     if not os.path.isdir("src/python_testing"):
@@ -1078,8 +1077,6 @@ def python_tests(
     skipped_dedicated_runner = []
     for file in glob.glob(os.path.join("src/python_testing/", "*.py")):
         if os.path.basename(file) in excluded_patterns:
-            continue
-        if not include_nightly and os.path.basename(file) in nightly_tests:
             continue
         if os.path.basename(file) in dedicated_runner_tests:
             skipped_dedicated_runner.append(os.path.basename(file))
@@ -1117,7 +1114,7 @@ def python_tests(
             selected_runs = [name for name, run_config in runs.items()
                              if include_nightly or runs_in_pull_requests(run_config['tags'])]
             if runs and not selected_runs:
-                log.info("Skipping '%s': all of its runs are tagged (use --include-nightly)", script)
+                log.info("Skipping '%s': all of its runs are tagged nightly (use --include-nightly)", script)
                 continue
 
             if app_filter_list:
@@ -1143,7 +1140,7 @@ def python_tests(
                     log.info("EXPLICIT SKIP '%s'", script)
                     continue
 
-            # Without --run, run_python_test.py executes the untagged runs.
+            # Without --run, run_python_test.py executes the runs not tagged nightly.
             default_runs = [name for name, run_config in runs.items() if runs_in_pull_requests(run_config['tags'])]
             to_run.append((script, [] if selected_runs == default_runs else selected_runs))
 

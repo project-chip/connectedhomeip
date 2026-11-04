@@ -961,6 +961,55 @@ except those on the `nightly` list unless `--include-nightly` is given, and runs
 their CI runs. It passes `--commission-by-device-requirement` and
 `--fail-on-ambiguous-commissioning` on to `run_python_test.py`.
 
+## Runner Global Wildcard Pre-Population
+
+By default, `run_tests_no_exit` performs a **global wildcard read** against the
+DUT before any test class runs, and stores the result in global storage so
+downstream guards (`attribute_guard`, `command_guard`, `feature_guard`) can
+consult it without issuing their own reads. The read covers the `Descriptor`
+cluster plus the `AttributeList`, `FeatureMap`, and `AcceptedCommandList` global
+attributes on every endpoint, and is dispatched over CASE if the device is
+already commissioned or over PASE otherwise.
+
+### The `--skip-global-wildcard-population` flag
+
+There are cases where the runner **cannot** or **should not** perform the
+pre-populate:
+
+-   **Discovery tests (`TC_DD_*`).** These verify the device's advertising state
+    directly. Opening a PASE session from the runner would suppress
+    commissionable advertisement and cause the tests to fail.
+-   **NFC in-test commissioning.** The onboarding data is read from the NFC tag
+    from within the test body, so at runner time there is no reachable DUT to
+    read from.
+-   **File-based `BasicComposition` runs.** The wildcard comes from a
+    pre-recorded file rather than a live device.
+-   **Ad-hoc runs** where the extra read at startup is unwanted (for example,
+    quick local iterations against a device whose state you do not want the
+    runner to disturb).
+
+For these cases, pass `--skip-global-wildcard-population` on the CLI:
+
+    python3 src/python_testing/TC_ACL_2_9.py \
+        --commissioning-method on-network \
+        --discriminator 1234 \
+        --passcode 20202021 \
+        --skip-global-wildcard-population
+
+With the flag set, the runner logs a message and leaves the stash empty for
+`stored_global_wildcard`. The first guard call inside a test triggers
+`MatterBaseTest._populate_wildcard`, which performs the read on-demand — at
+which point the DUT is guaranteed to be reachable — and writes the result to the
+stash so subsequent guard calls reuse it.
+
+Functionally the two paths produce the same behaviour: guards see a populated
+wildcard when they need one. The only difference is **when** the read happens.
+
+Tests that always need the flag (discovery, NFC, file-based `BasicComposition`)
+have it wired into their CI invocation. When adding a new test that falls into
+one of those categories, update the CI configuration to pass
+`--skip-global-wildcard-population` for that test.
+
 # Running tests in CI
 
 -   Add test to the `repl_tests_linux` section of `.github/workflows/tests.yaml`
@@ -1081,24 +1130,27 @@ for that run, e.g.:
 
     -   Example: `true`
 
--   `tags`: Moves the run out of PR CI and into the nightly job. See
+-   `tags`: Moves the run to the nightly job, or records known problems. See
     [Running a run only in the nightly job](#running-a-run-only-in-the-nightly-job).
 
-    -   `nightly`: for runs that are too slow for PR CI, or that use an app PR
-        CI doesn't run the test against. A failure fails the nightly job.
-    -   `needs-followup-fixes`: for runs that fail for reasons tracked in
-        `issues`. The nightly job reports the result with its issues, but a
+    -   `nightly`: moves the run out of PR CI and into the nightly job, for runs
+        that are too slow for PR CI, or that use an app PR CI doesn't run the
+        test against.
+    -   `needs-followup-fixes`: the run has problems tracked in `issues`, for
+        example a failure, or probes that a deny list skips. The tag doesn't
+        move the run, and alone it doesn't change what a failure does. With
+        `nightly`, the nightly job reports the result with its issues, and a
         failure doesn't fail the job. Remove the tag once every issue is fixed.
     -   Example: `[nightly]`
 
--   `issues`: The GitHub issues that track why a `needs-followup-fixes` run
-    fails, as full issue URLs, one per line. Required with
+-   `issues`: The GitHub issues that track the problems of a
+    `needs-followup-fixes` run, as full issue URLs, one per line. Required with
     `needs-followup-fixes`, and not allowed without it.
 
     -   Example:
 
         ```python
-        #     tags: [needs-followup-fixes]
+        #     tags: [nightly, needs-followup-fixes]
         #     issues:
         #       - https://github.com/project-chip/connectedhomeip/issues/12345
         ```
@@ -1116,25 +1168,26 @@ execution.
 
 ### Running a run only in the nightly job
 
-A tag moves one run of a test to the nightly job, while the test's other runs
-stay in PR CI. The `nightly` list in `src/python_testing/test_metadata.yaml`
-does the same for every run of a file.
+The `nightly` tag moves one run of a test to the nightly job, while the test's
+other runs stay in PR CI. To move a whole test, tag each of its runs.
 
-| Run                    | Pull requests | Nightly                                                        |
-| ---------------------- | ------------- | -------------------------------------------------------------- |
-| No tags                | Runs          | Runs only if the file is on the `nightly` list                 |
-| `nightly`              | Skipped       | Runs. A failure fails the job                                  |
-| `needs-followup-fixes` | Skipped       | Runs. Reported with its issues; a failure doesn't fail the job |
+| Run                               | Pull requests                 | Nightly                                                        |
+| --------------------------------- | ----------------------------- | -------------------------------------------------------------- |
+| No tags                           | Runs                          | Skipped                                                        |
+| `nightly`                         | Skipped                       | Runs. A failure fails the job                                  |
+| `needs-followup-fixes`            | Runs. A failure fails the job | Skipped                                                        |
+| `nightly`, `needs-followup-fixes` | Skipped                       | Runs. Reported with its issues; a failure doesn't fail the job |
 
--   The nightly job runs each tagged run on its own and reports it as
+-   The nightly job runs each `nightly` run on its own and reports it as
     `<script>::<run>`, for example `TC_ACE_1_2.py::run2`.
 -   An unknown tag is an error, so a misspelled tag fails the PR's own CI run.
 -   A file on the `not_automated` list runs nowhere, tagged runs included.
--   To run a tagged run locally, name it:
+-   To run a `nightly` run locally, name it:
     `./scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ACE_1_2.py --run run2`.
-    Without `--run`, `run_python_test.py --load-from-env` runs only the untagged
-    runs. `./scripts/tests/local.py python-tests --include-nightly` runs the
-    tagged runs too.
+    Without `--run`, `run_python_test.py --load-from-env` runs only the runs
+    without the `nightly` tag.
+    `./scripts/tests/local.py python-tests --include-nightly` runs the `nightly`
+    runs too.
 
 # Test Module Guards
 

@@ -308,7 +308,7 @@ def select_runs(script: str, load_from_env: str | None, cmd_run: Metadata, run_n
     else:
         for r in runs:
             if not runs_in_pull_requests(r.tags):
-                log.info("Skipping run '%s' tagged %s, select it with --run %s", r.run, ", ".join(r.tags), r.run)
+                log.info("Skipping nightly run '%s', select it with --run %s", r.run, r.run)
         runs = [r for r in runs if runs_in_pull_requests(r.tags)]
 
     if app_filter:
@@ -320,8 +320,8 @@ def select_runs(script: str, load_from_env: str | None, cmd_run: Metadata, run_n
 
     if not runs:
         raise click.ClickException(
-            f"No runs left to execute in '{script}' after --run, --app-filter and skipping tagged runs. "
-            "Name a tagged run with --run to execute it.")
+            f"No runs left to execute in '{script}' after --run, --app-filter and skipping nightly runs. "
+            "Name a nightly run with --run to execute it.")
     return runs
 
 
