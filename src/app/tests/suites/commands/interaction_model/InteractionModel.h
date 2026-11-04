@@ -286,6 +286,7 @@ protected:
         VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         chip::app::CommandSender commandSender(mCallback, exchangeManager);
+        ReturnErrorOnFailure(commandSender.PrepareForGroupcast());
         chip::app::CommandSender::AddRequestDataParameters addRequestDataParams;
         // Using TestOnly AddRequestData to allow for an intentionally malformed request for server validation testing.
         ReturnErrorOnFailure(commandSender.TestOnlyAddRequestDataNoTimedCheck(commandPath, value, addRequestDataParams));
@@ -468,6 +469,7 @@ protected:
         VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         chip::app::WriteClient writeClient(exchangeManager, &mChunkedWriteCallback, chip::NullOptional);
+        ReturnErrorOnFailure(writeClient.PrepareForGroupcast());
         ReturnErrorOnFailure(writeClient.EncodeAttribute(attributePathParams, value, dataVersion));
 
         chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
