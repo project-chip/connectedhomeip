@@ -188,6 +188,11 @@ class TC_ACS_3_3(MatterTestCommissionedDevice):
         event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
 
+        # Wait user to input capabilities
+        if not self.is_ci:
+            self.wait_for_user_input(
+                prompt_msg="Type any letter and press ENTER after DUT is clear of any detection state.")
+
         # Human Activity Feature Supported =======================================================================
         if (namespaceID1 == HUMAN_ACTIVITY_NAMESPACE_ID) and self.HumanActivitySupported:
 
