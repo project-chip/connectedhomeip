@@ -134,17 +134,17 @@ class TestRestartFlagReader(unittest.TestCase):
                         unknown_reads.append(file)
             return monitor_open(file, *args, **kwargs)
 
-        start = time.monotonic()
         with self.assertLogs(run_python_test.log, "ERROR") as logs, \
                 mock.patch.object(run_python_test, "open", counted_open, create=True):
             with open(self.flag + ".new", "wb") as f:
                 f.write(text)
             unknown_reads.clear()
             os.replace(self.flag + ".new", self.flag)
+            # The rejection, not the wait's own timeout, ends the wait; and it comes within a few polls (a read count, not a
+            # wall-clock bound, so a slow runner does not fail it).
             with self.assertRaisesRegex(signals.TestFailure, f"rejected by the test runner \\(rejected: {shown}\\)"):
                 asyncio.run(MatterBaseTest.wait_for_restart_flag_file_removal(None, self.flag, "factory reset", timeout_sec=10))
             self.assertLessEqual(len(unknown_reads), 5)
-        self.assertLess(time.monotonic() - start, 5)
         self.assertIn(f"'{shown}'", logs.output[0])
 
     def test_unknown_request_fails_writer(self):
