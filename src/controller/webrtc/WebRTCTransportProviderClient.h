@@ -91,8 +91,12 @@ private:
     StreamUsageEnum mCurrentStreamUsage = StreamUsageEnum::kUnknownEnumValue;
     PyObject mAppContext                = nullptr;
 
-    // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
-    std::string mSdpString;
+    // Copy of the caller's command payload. The spans in mSolicitOfferData / mProvideOfferData (SDP, SFrame
+    // keys) point into this buffer, so it must stay unchanged until the command is sent.
+    std::vector<uint8_t> mPayload;
+    // Backing storage for the VideoStreams / AudioStreams lists in mSolicitOfferData / mProvideOfferData.
+    std::vector<uint16_t> mVideoStreams;
+    std::vector<uint16_t> mAudioStreams;
     State mState = State::Idle;
 
     // Store the ICECandidates here to use to send asynchronously.

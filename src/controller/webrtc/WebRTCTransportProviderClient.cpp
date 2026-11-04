@@ -30,6 +30,28 @@ using namespace chip::app;
 using WebRTCSessionStruct                              = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
 static constexpr ClusterStatus kUndefinedClusterStatus = 0xFF;
 
+namespace {
+
+CHIP_ERROR CopyStreams(const Optional<DataModel::DecodableList<uint16_t>> & source, std::vector<uint16_t> & storage,
+                       Optional<DataModel::List<const uint16_t>> & destination)
+{
+    storage.clear();
+    destination.ClearValue();
+    VerifyOrReturnError(source.HasValue(), CHIP_NO_ERROR);
+
+    auto iter = source.Value().begin();
+    while (iter.Next())
+    {
+        storage.push_back(iter.GetValue());
+    }
+    ReturnErrorOnFailure(iter.GetStatus());
+
+    destination.SetValue(DataModel::List<const uint16_t>(storage.data(), storage.size()));
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
+
 void WebRTCTransportProviderClient::Init(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
 {
     mPeerId     = ScopedNodeId(nodeId, fabricIndex);
@@ -193,19 +215,24 @@ void WebRTCTransportProviderClient::OnDeviceConnectionFailure(void * context, co
 CHIP_ERROR WebRTCTransportProviderClient::ProvideOffer(const uint8_t * payload, size_t length)
 {
     ChipLogProgress(Camera, "Sending ProvideOffer to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
-    TLV::TLVReader data;
-    data.Init(payload, length);
-    CHIP_ERROR error = data.Next();
-
-    Clusters::WebRTCTransportProvider::Commands::ProvideOffer::DecodableType value;
-    error = (error == CHIP_NO_ERROR) ? value.Decode(data, mPeerId.GetFabricIndex()) : error;
-    ReturnErrorAndLogOnFailure(error, Camera, "Failed to decode command payload value");
 
     if (mState != State::Idle)
     {
         ChipLogError(Camera, "Operation NOT POSSIBLE: another sync is in progress");
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    mPayload.assign(payload, payload + length);
+    TLV::TLVReader data;
+    data.Init(mPayload.data(), mPayload.size());
+    CHIP_ERROR error = data.Next();
+
+    Clusters::WebRTCTransportProvider::Commands::ProvideOffer::DecodableType value;
+    error = (error == CHIP_NO_ERROR) ? value.Decode(data, mPeerId.GetFabricIndex()) : error;
+    ReturnErrorAndLogOnFailure(error, Camera, "Failed to decode command payload value");
+
+    ReturnErrorOnFailure(CopyStreams(value.videoStreams, mVideoStreams, mProvideOfferData.videoStreams));
+    ReturnErrorOnFailure(CopyStreams(value.audioStreams, mAudioStreams, mProvideOfferData.audioStreams));
 
     // Store the command type
     mCommandType = CommandType::kProvideOffer;
@@ -217,6 +244,8 @@ CHIP_ERROR WebRTCTransportProviderClient::ProvideOffer(const uint8_t * payload, 
     mProvideOfferData.originatingEndpointID = value.originatingEndpointID;
     mProvideOfferData.videoStreamID         = value.videoStreamID;
     mProvideOfferData.audioStreamID         = value.audioStreamID;
+    mProvideOfferData.metadataEnabled       = value.metadataEnabled;
+    mProvideOfferData.SFrameConfig          = value.SFrameConfig;
 
     // ICE info are sent during the ICE candidate exchange phase of this flow.
     mProvideOfferData.ICEServers         = NullOptional;
@@ -249,13 +278,17 @@ CHIP_ERROR WebRTCTransportProviderClient::SolicitOffer(const uint8_t * payload, 
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    mPayload.assign(payload, payload + length);
     TLV::TLVReader data;
-    data.Init(payload, length);
+    data.Init(mPayload.data(), mPayload.size());
     CHIP_ERROR error = data.Next();
 
     Clusters::WebRTCTransportProvider::Commands::SolicitOffer::DecodableType value;
     error = (error == CHIP_NO_ERROR) ? value.Decode(data, mPeerId.GetFabricIndex()) : error;
     ReturnErrorAndLogOnFailure(error, Camera, "Failed to decode command payload value");
+
+    ReturnErrorOnFailure(CopyStreams(value.videoStreams, mVideoStreams, mSolicitOfferData.videoStreams));
+    ReturnErrorOnFailure(CopyStreams(value.audioStreams, mAudioStreams, mSolicitOfferData.audioStreams));
 
     // Store the command type
     mCommandType = CommandType::kSolicitOffer;
@@ -264,6 +297,8 @@ CHIP_ERROR WebRTCTransportProviderClient::SolicitOffer(const uint8_t * payload, 
     mSolicitOfferData.originatingEndpointID = value.originatingEndpointID;
     mSolicitOfferData.videoStreamID         = value.videoStreamID;
     mSolicitOfferData.audioStreamID         = value.audioStreamID;
+    mSolicitOfferData.metadataEnabled       = value.metadataEnabled;
+    mSolicitOfferData.SFrameConfig          = value.SFrameConfig;
 
     // ICE info are sent during the ICE candidate exchange phase of this flow.
     mSolicitOfferData.ICEServers         = NullOptional;
@@ -354,8 +389,10 @@ void WebRTCTransportProviderClient::HandleSolicitOfferResponse(TLV::TLVReader da
     session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : chip::app::DataModel::NullNullable;
     session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : chip::app::DataModel::NullNullable;
 
-    // If DeferredOffer == FALSE these fields MUST be valid
-    if (!value.deferredOffer)
+    // The provider echoes VideoStreamID / AudioStreamID only when the request used them, so if DeferredOffer == FALSE
+    // they MUST be valid in that case. Requests using VideoStreams / AudioStreams get a response without stream IDs.
+    bool requestUsedStreamIDs = mSolicitOfferData.videoStreamID.HasValue() || mSolicitOfferData.audioStreamID.HasValue();
+    if (!value.deferredOffer && requestUsedStreamIDs)
     {
         if (session.videoStreamID.IsNull() && session.audioStreamID.IsNull())
         {
