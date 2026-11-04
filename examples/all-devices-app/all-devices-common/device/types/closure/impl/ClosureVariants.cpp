@@ -27,19 +27,24 @@ using namespace Clusters;
 
 // Spans over these are handed to the device, so they must outlive it.
 const EndpointComposition::SemanticTag kCabinetTag[] = {
-    { .namespaceID = CommonNamespace::kClosureId, .tag = to_underlying(Globals::ClosureTag::kCabinet) },
-    { .namespaceID = CommonNamespace::kNumberId, .tag = 1 },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosure),
+      .tag         = to_underlying(Globals::ClosureTag::kCabinet) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kNumber), .tag = 1 },
 };
 const EndpointComposition::SemanticTag kCabinetNoPsNoSpTag[] = {
-    { .namespaceID = CommonNamespace::kClosureId, .tag = to_underlying(Globals::ClosureTag::kCabinet) },
-    { .namespaceID = CommonNamespace::kNumberId, .tag = 3 },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosure),
+      .tag         = to_underlying(Globals::ClosureTag::kCabinet) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kNumber), .tag = 3 },
 };
-const EndpointComposition::SemanticTag kLiftTag[]   = { { .namespaceID = CommonNamespace::kClosurePanelId,
-                                                          .tag         = to_underlying(Globals::ClosurePanelTag::kLift) } };
-const EndpointComposition::SemanticTag kRotateTag[] = { { .namespaceID = CommonNamespace::kClosurePanelId,
-                                                          .tag         = to_underlying(Globals::ClosurePanelTag::kRotate) } };
-const EndpointComposition::SemanticTag kSlideTag[]  = { { .namespaceID = CommonNamespace::kClosurePanelId,
-                                                          .tag         = to_underlying(Globals::ClosurePanelTag::kSliding) } };
+const EndpointComposition::SemanticTag kLiftTag[]   = { { .namespaceID =
+                                                              to_underlying(Globals::SemanticTagNamespaceId::kClosurePanel),
+                                                          .tag = to_underlying(Globals::ClosurePanelTag::kLift) } };
+const EndpointComposition::SemanticTag kRotateTag[] = { { .namespaceID =
+                                                              to_underlying(Globals::SemanticTagNamespaceId::kClosurePanel),
+                                                          .tag = to_underlying(Globals::ClosurePanelTag::kRotate) } };
+const EndpointComposition::SemanticTag kSlideTag[]  = { { .namespaceID =
+                                                              to_underlying(Globals::SemanticTagNamespaceId::kClosurePanel),
+                                                          .tag = to_underlying(Globals::ClosurePanelTag::kSliding) } };
 
 constexpr Percent100ths kPanelResolution = 1;
 constexpr Percent100ths kPanelStepValue  = 1;
@@ -100,56 +105,67 @@ ClosurePanel::Config RotatingPanel()
 }
 
 const EndpointComposition::SemanticTag kDoorTag[] = {
-    { .namespaceID = CommonNamespace::kClosureId, .tag = to_underlying(Globals::ClosureTag::kDoor) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosure), .tag = to_underlying(Globals::ClosureTag::kDoor) },
 };
 
 const EndpointComposition::SemanticTag kGarageDoorTag[] = {
-    { .namespaceID = CommonNamespace::kClosureId, .tag = to_underlying(Globals::ClosureTag::kGarageDoor) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosure),
+      .tag         = to_underlying(Globals::ClosureTag::kGarageDoor) },
 };
 
 const EndpointComposition::SemanticTag kGateTag[] = {
-    { .namespaceID = CommonNamespace::kClosureId, .tag = to_underlying(Globals::ClosureTag::kGate) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosure), .tag = to_underlying(Globals::ClosureTag::kGate) },
 };
 // Both leaves use the Rotate tag, so each also carries a Position tag.
 const EndpointComposition::SemanticTag kGateLeftLeafTag[] = {
-    { .namespaceID = CommonNamespace::kClosurePanelId, .tag = to_underlying(Globals::ClosurePanelTag::kRotate) },
-    { .namespaceID = CommonNamespace::kPositionId, .tag = to_underlying(Globals::PositionTag::kLeft) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosurePanel),
+      .tag         = to_underlying(Globals::ClosurePanelTag::kRotate) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kPosition), .tag = to_underlying(Globals::PositionTag::kLeft) },
 };
 const EndpointComposition::SemanticTag kGateRightLeafTag[] = {
-    { .namespaceID = CommonNamespace::kClosurePanelId, .tag = to_underlying(Globals::ClosurePanelTag::kRotate) },
-    { .namespaceID = CommonNamespace::kPositionId, .tag = to_underlying(Globals::PositionTag::kRight) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosurePanel),
+      .tag         = to_underlying(Globals::ClosurePanelTag::kRotate) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kPosition),
+      .tag         = to_underlying(Globals::PositionTag::kRight) },
 };
 
 // Tilt-and-Turn window: Tilt panel + Turn panel
 const EndpointComposition::SemanticTag kWindowTag[] = {
-    { .namespaceID = CommonNamespace::kClosureId, .tag = to_underlying(Globals::ClosureTag::kWindow) },
-    { .namespaceID = CommonNamespace::kClosureWindowId, .tag = 0x01 }, // Facade
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosure), .tag = to_underlying(Globals::ClosureTag::kWindow) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosureWindow), .tag = 0x01 }, // Facade
 };
 const EndpointComposition::SemanticTag kTiltTag[] = {
-    { .namespaceID = CommonNamespace::kClosurePanelId, .tag = to_underlying(Globals::ClosurePanelTag::kTilt) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosurePanel),
+      .tag         = to_underlying(Globals::ClosurePanelTag::kTilt) },
 };
 
 // Drawer + Cabinet Door + Flap
 const EndpointComposition::SemanticTag kStorageCabinetTag[] = {
-    { .namespaceID = CommonNamespace::kClosureId, .tag = to_underlying(Globals::ClosureTag::kCabinet) },
-    { .namespaceID = CommonNamespace::kNumberId, .tag = 4 }, // closure-simulated and closure-no-ps-no-sp use Number 1 and 3
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosure),
+      .tag         = to_underlying(Globals::ClosureTag::kCabinet) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kNumber),
+      .tag         = 4 }, // closure-simulated and closure-no-ps-no-sp use Number 1 and 3
 };
 const EndpointComposition::SemanticTag kDrawerTag[] = {
-    { .namespaceID = CommonNamespace::kClosurePanelId, .tag = to_underlying(Globals::ClosurePanelTag::kSliding) },
-    { .namespaceID = CommonNamespace::kClosureCabinetId, .tag = 0x01 }, // Drawer
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosurePanel),
+      .tag         = to_underlying(Globals::ClosurePanelTag::kSliding) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosureCabinet), .tag = 0x01 }, // Drawer
 };
 const EndpointComposition::SemanticTag kCabinetDoorTag[] = {
-    { .namespaceID = CommonNamespace::kClosurePanelId, .tag = to_underlying(Globals::ClosurePanelTag::kRotate) },
-    { .namespaceID = CommonNamespace::kClosureCabinetId, .tag = 0x00 }, // CabinetDoor
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosurePanel),
+      .tag         = to_underlying(Globals::ClosurePanelTag::kRotate) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosureCabinet), .tag = 0x00 }, // CabinetDoor
 };
 // Tilt instead of Rotate, so the flap does not share a 0x45 tag with the cabinet door.
 const EndpointComposition::SemanticTag kFlapTag[] = {
-    { .namespaceID = CommonNamespace::kClosurePanelId, .tag = to_underlying(Globals::ClosurePanelTag::kTilt) },
-    { .namespaceID = CommonNamespace::kClosureCabinetId, .tag = 0x02 }, // Flap
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosurePanel),
+      .tag         = to_underlying(Globals::ClosurePanelTag::kTilt) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosureCabinet), .tag = 0x02 }, // Flap
 };
 
 const EndpointComposition::SemanticTag kBarrierTag[] = {
-    { .namespaceID = CommonNamespace::kClosureId, .tag = to_underlying(Globals::ClosureTag::kBarrier) },
+    { .namespaceID = to_underlying(Globals::SemanticTagNamespaceId::kClosure),
+      .tag         = to_underlying(Globals::ClosureTag::kBarrier) },
 };
 
 ClosurePanel::Config DoorPanel()

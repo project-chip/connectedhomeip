@@ -461,7 +461,7 @@ private:
                 VerifyOrDie(mContext.has_value());
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<AirQualitySensorCo2>(mContext->timerDelegate, mContext->identifyDelegate, kAirQualityTag);
@@ -470,7 +470,7 @@ private:
                 VerifyOrDie(mContext.has_value());
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualitySimulatedTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft),
                 };
                 return MakeDevice<SimulatedAirQualitySensorCo2>(mContext->timerDelegate, mContext->identifyDelegate,
@@ -480,7 +480,7 @@ private:
                 VerifyOrDie(mContext.has_value());
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityFullTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
                 return MakeDevice<AirQualitySensorFullType>(mContext->timerDelegate, mContext->identifyDelegate,
@@ -490,7 +490,7 @@ private:
                 VerifyOrDie(mContext.has_value());
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityFullSimulatedTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight),
                 };
                 return MakeDevice<SimulatedAirQualitySensorFullType>(mContext->timerDelegate, mContext->identifyDelegate,
@@ -732,7 +732,7 @@ private:
                 // Tagged with PositionTag::kTop to disambiguate from on-off-plug-with-sensors under wildcard allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kPlugTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<OnOffPlugInUnit>(OnOffPlugInUnit::Context{
@@ -752,7 +752,7 @@ private:
                 // allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kPlugWithSensorsTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
                 return MakeDevice<OnOffPlugWithSensors>(OnOffPlugWithSensors::Context{
@@ -771,7 +771,7 @@ private:
                 // Distinguish the two RAC variants when both are included by --device '*'.
                 const EndpointComposition::SemanticTag tag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<LoggingRoomAirConditioner>(mContext->timerDelegate, mContext->fabricTable, tag);
@@ -780,7 +780,7 @@ private:
                 VerifyOrDie(mContext.has_value());
                 const EndpointComposition::SemanticTag tag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
                 return MakeDevice<LoggingRoomAirConditionerWithSensors>(mContext->timerDelegate, mContext->fabricTable, tag);
@@ -800,7 +800,7 @@ private:
                 // Tagged with PositionTag::kTop to disambiguate from oven-2 under wildcard allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kOvenTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<LoggingOven>(mContext->timerDelegate,
@@ -814,7 +814,7 @@ private:
                 // Tagged with PositionTag::kBottom to disambiguate from oven (see comment above).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kOven2Tag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
                 return MakeDevice<LoggingOven>(mContext->timerDelegate,
@@ -831,7 +831,7 @@ private:
                 // Tagged with PositionTag::kTop to disambiguate from refrigerator-2 under wildcard allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kRefrigeratorTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<LoggingRefrigerator>(mContext->timerDelegate,
@@ -844,7 +844,7 @@ private:
                 // Tagged with PositionTag::kBottom to disambiguate from refrigerator (see comment above).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kRefrigerator2Tag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
                 return MakeDevice<LoggingRefrigerator>(mContext->timerDelegate,
@@ -882,12 +882,12 @@ private:
 
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kSoilSensorTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
             };
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kSoilSensorSimulatedTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
             };
 
@@ -918,12 +918,12 @@ private:
 
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kTemperatureSensorTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
             };
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kTemperatureSensorSimulatedTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
             };
 
@@ -972,7 +972,7 @@ private:
                 // Tagged with PositionTag::kTop to disambiguate from on-off-plug-with-sensors under wildcard allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kElectricalSensorTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<SimulatedElectricalSensor>(mContext->timerDelegate, mContext->testEventTriggerDelegate,
@@ -1006,7 +1006,7 @@ private:
                 // Tagged with PositionTag::kTop to disambiguate from fan-no-onoff under wildcard allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kFanTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<LoggingFan>(FanLoad::Context{
@@ -1022,7 +1022,7 @@ private:
                 // Tagged with PositionTag::kBottom to disambiguate from fan (see comments above).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kFanNoOnOffTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
                 return MakeDevice<LoggingFan>(FanLoad::Context{
@@ -1053,12 +1053,12 @@ private:
         {
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kPowerSourceTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
             };
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kPowerSourceSimulatedTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
             };
 
@@ -1161,12 +1161,12 @@ private:
 
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kHumiditySensorTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
             };
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kHumiditySensorSimulatedTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
             };
 
@@ -1218,12 +1218,12 @@ private:
 
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kLightSensorTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
             };
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kLightSensorSimulatedTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
             };
 
@@ -1268,12 +1268,12 @@ private:
 
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kPressureSensorTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
             };
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kPressureSensorSimulatedTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
             };
 
@@ -1300,12 +1300,12 @@ private:
 
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kFlowSensorTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
             };
             static const Clusters::Globals::Structs::SemanticTagStruct::Type kFlowSensorSimulatedTag = {
                 .mfgCode     = DataModel::NullNullable,
-                .namespaceID = CommonNamespace::kPositionId,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                 .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
             };
 
