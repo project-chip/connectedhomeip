@@ -247,14 +247,15 @@ class Windows(unittest.TestCase):
             root = pathlib.Path(d)
             (root / "pr").mkdir()
 
-            def run(rid, query, cutoff, prs, created, left=0):
+            def run(rid, query, cutoff, prs, created, left=0, continues=None):
                 (root / "runs" / rid).mkdir(parents=True)
                 (root / "runs" / rid / "manifest.json").write_text(json.dumps(
-                    {"query": query, "cutoff": cutoff, "date_field": "created", "created_at": created, "not_examined": left}))
+                    {"query": query, "cutoff": cutoff, "date_field": "created", "created_at": created, "not_examined": left,
+                     "continues": continues}))
                 (root / "runs" / rid / "judgment.json").write_text(json.dumps(
                     {"verdicts": [{"pr": p, "coverage": "not_covered", "revival": "cheap", "verdict": "keep", "evidence": "absent"} for p in prs]}))
             run("a1", "q1", "2025-09-18", [1, 2], "2026-01-01T00:00:00")
-            run("a2", "q1", "2025-09-18", [3], "2026-01-02T00:00:00")
+            run("a2", "q1", "2025-09-18", [3], "2026-01-02T00:00:00", continues="a1")   # crosses midnight
             run("b1", "q2", "2025-06-01", [4], "2026-01-03T00:00:00", left=5)
             out = root / "reports"
             rendered = m.render_all_campaigns(root, "o/r", out_dir=out)
@@ -279,6 +280,41 @@ class Windows(unittest.TestCase):
             self.assertTrue((out / "pr-triage-created-before-2025-09-18-as-of-2026-01-02.md").exists())
             index = json.loads((root / "reports.json").read_text())
             self.assertEqual(len(index), 3)
+            # the same query on a later day (a fixed --updated-before) does not carry the earlier day's verdicts
+            later = next(r for r in rendered if r["path"].name.endswith("as-of-2026-02-10.md"))
+            earlier = next(r for r in rendered if r["path"].name.endswith("2025-09-18-as-of-2026-01-02.md"))
+            self.assertEqual((later["verdicts"], earlier["verdicts"]), (1, 3))
+            self.assertTrue(later["newest"])
+
+    def test_runs_listing_counts_each_pull_request_once_per_window(self):
+        with tempfile.TemporaryDirectory() as d:
+            os.environ["MATTER_PR_TRIAGE_CACHE"] = d
+            os.environ["MATTER_PR_TRIAGE_REPORTS"] = str(pathlib.Path(d) / "reports")
+            try:
+                root = m.cache_root("o", "r")
+
+                def run(rid, prs, created, continues=None):
+                    (root / "runs" / rid).mkdir(parents=True)
+                    (root / "runs" / rid / "manifest.json").write_text(json.dumps(
+                        {"run": rid, "query": "q", "cutoff": "2025-09-18", "date_field": "created", "created_at": created,
+                         "selected": len(prs), "not_examined": 0, "continues": continues}))
+                    (root / "runs" / rid / "selection.json").write_text(json.dumps({"prs": [{"number": p} for p in prs]}))
+                    verdicts = [{"pr": p, "verdict": "keep"} for p in prs]
+                    (root / "runs" / rid / "judgment.json").write_text(json.dumps({"verdicts": verdicts}))
+                run("r1", [1, 2], "2026-01-01T09:00:00")
+                run("r2", [3], "2026-01-01T10:00:00", continues="r1")
+                run("r3", [1, 2, 3], "2026-01-01T15:00:00")          # the whole window again, same day
+                run("r4", [1], "2026-01-05T09:00:00")                # same query, a later day
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    m.list_runs(d, "o/r", 10)
+                windows = json.loads(out.getvalue())["windows"]
+                self.assertEqual([(w["selected"], w["judged"], len(w["batches"])) for w in windows], [(3, 3, 3), (1, 1, 1)])
+                self.assertTrue(windows[0]["report"].endswith("as-of-2026-01-01.md"))
+                self.assertTrue(windows[1]["report"].endswith("as-of-2026-01-05.md"))
+            finally:
+                os.environ.pop("MATTER_PR_TRIAGE_CACHE", None)
+                os.environ.pop("MATTER_PR_TRIAGE_REPORTS", None)
 
 
 class Scope(unittest.TestCase):

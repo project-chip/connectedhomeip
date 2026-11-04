@@ -782,27 +782,32 @@ def list_runs(checkout, repo, limit):
     root = cache_root(owner, name)
     reports = {}
     for path, q in sorted((read_json(root / "reports.json", {}) or {}).items()):
-        reports[q] = path          # sorted, so the newest as-of date wins for a window with several
+        reports.setdefault(q, []).append(path)
 
-    windows = {}
+    windows, counted = {}, {}
     for d in sorted((root / "runs").glob("*")):
         m = read_json(d / "manifest.json")
         if not m:
             continue
         judged = read_json(d / "judgment.json", {}) or {}
-        w = windows.setdefault(m.get("query", ""), {
+        key = window_key(root, m)
+        w = windows.setdefault(key, {
             "window": None, "first_batch": m["created_at"][:16], "last_batch": None,
             "selected": 0, "judged": 0, "still_to_triage": None,
             "report": None, "rendered": False, "batches": []})
         field = "created" if date_field_of(m) == "created" else "last active"
         w["window"] = f"{field} before {m['cutoff']}" if m.get("cutoff") else m.get("query", "")
         w["last_batch"] = m["created_at"][:16]
-        w["selected"] += m["selected"]
-        w["judged"] += len(judged.get("verdicts", []))
+        # A pull request judged by two runs of one window is still one pull request of that window.
+        selected, verdicts = counted.setdefault(key, (set(), set()))
+        selected.update(p["number"] for p in (read_json(d / "selection.json", {}) or {}).get("prs", []))
+        verdicts.update(as_number(v.get("pr")) for v in judged.get("verdicts", []))
+        w["selected"], w["judged"] = len(selected), len(verdicts - {None})
         w["still_to_triage"] = m.get("not_examined")
         # The path always shows, even before anything has been rendered: a window whose batches are
         # not all judged yet still has a filename it will land under, and null tells nobody where.
-        path_ = reports.get(m.get("query", ""))
+        as_of = m["created_at"][:10]
+        path_ = next((p for p in reversed(reports.get(m.get("query", ""), [])) if f"-as-of-{as_of}" in p), None)
         if path_:
             path_ = Path(path_) if ("/" in path_ or "\\" in path_) else root / path_
         else:
@@ -1915,6 +1920,21 @@ def render_campaign(root, full, group, filename, with_cost=False, out_dir=None):
             "pairs": pairs, "runs": [r[1] for r in group]}
 
 
+def window_key(root, manifest):
+    """The window a run belongs to: its query and the day its first batch ran.
+
+    A continuation belongs to the day its run began, so a run that crosses midnight stays one
+    window, while a repeat of the same query on a later day (a fixed --updated-before) is another."""
+    first, seen = manifest, set()
+    while first.get("continues") and first["continues"] not in seen:
+        seen.add(first["continues"])
+        prior = read_json(root / "runs" / first["continues"] / "manifest.json")
+        if not prior:
+            break
+        first = prior
+    return manifest.get("query", ""), (first.get("created_at") or "")[:10]
+
+
 def judged_runs(root):
     runs = []
     for d in sorted((root / "runs").glob("*")):
@@ -1926,10 +1946,10 @@ def judged_runs(root):
 
 
 def render_all_campaigns(root, full, label=None, with_cost=False, out_dir=None):
-    """One report file per window per day, under the reports folder. Runs sharing a query, including
-    its continuations and revisits, are one window; the file carries the date of the window's newest
-    batch, so a repeat on a later day gets its own file and the earlier one stays as the record of
-    what was acted on. Files this tool wrote for a window that has lost every run are removed; a
+    """One report file per window per day, under the reports folder. Runs sharing a query on one day,
+    with their continuations and revisits, are one window (see window_key); the file carries the date
+    of the window's newest batch, so a repeat on a later day gets its own file and the earlier one
+    stays as the record of what was acted on. Files this tool wrote for a window that has lost every run are removed; a
     file named with --name is left alone, since only its owner knows its purpose."""
     runs = judged_runs(root)
     if not runs:
@@ -1937,26 +1957,30 @@ def render_all_campaigns(root, full, label=None, with_cost=False, out_dir=None):
     out_dir = out_dir or reports_root(*full.split("/", 1))
     campaigns = {}
     for r in runs:
-        campaigns.setdefault(r[2].get("query", ""), []).append(r)
-    newest_query = runs[-1][2].get("query", "")
+        campaigns.setdefault(window_key(root, r[2]), []).append(r)
+    newest_key = window_key(root, runs[-1][2])
     # Two windows can share a cutoff and date field yet differ in some other filter; the second
     # then gets a short hash of its query appended rather than overwriting the first.
     names, taken = {}, set()
-    for query, group in campaigns.items():
+    for key, group in campaigns.items():
+        query, day = key
         as_of = (group[-1][2].get("created_at") or "")[:10] or None
-        if label and query == newest_query:
+        if label and key == newest_key:
             name = f"pr-triage-{label}-as-of-{as_of}.md" if as_of else f"pr-triage-{label}.md"
         else:
             name = campaign_filename(group[-1][2], as_of)
         if name in taken:
             name = name[:-3] + "-" + hashlib.sha1(query.encode()).hexdigest()[:6] + ".md"
-        names[query] = name
+        if name in taken:     # the same query begun on two days whose newest batches share a date
+            name = name[:-3] + f"-{day}.md"
+        names[key] = name
         taken.add(name)
     rendered = []
-    for query, group in campaigns.items():
-        result = render_campaign(root, full, group, names[query], with_cost, out_dir)
-        result["query"], result["newest"] = query, (query == newest_query)
+    for key, group in campaigns.items():
+        result = render_campaign(root, full, group, names[key], with_cost, out_dir)
+        result["query"], result["newest"] = key[0], (key == newest_key)
         rendered.append(result)
+    living = {query for query, _ in campaigns}
     # The index remembers every file this tool wrote, as a full path, with the window it belongs
     # to. A file whose window has no run left is removed; earlier days of a living window stay; a
     # user's own file is never in the index, so it is never mistaken for a stale one. Entries from
@@ -1966,7 +1990,7 @@ def render_all_campaigns(root, full, label=None, with_cost=False, out_dir=None):
     index = {}
     for key, query in previous.items():
         path = Path(key) if "/" in key or "\\" in key else root / key
-        if path.parent == root or query not in campaigns:
+        if path.parent == root or query not in living:
             if path.exists():
                 path.unlink()
             continue
