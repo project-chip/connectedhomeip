@@ -21,6 +21,8 @@
 #include <device-factory/DeviceRegistrationEntry.h>
 #include <device/api/Interface.h>
 #include <device/api/allocator/EndpointIdAllocator.h>
+#include <device/types/aggregator/Aggregator.h>
+#include <device/types/bridged-node/BridgedNode.h>
 
 #include <cstdint>
 #include <optional>
@@ -45,21 +47,22 @@ public:
      *
      * @param deviceName The name of the device type to create (e.g., "electrical-sensor").
      * @param nodeLabel The label for the new device.
-     *
-     * If `deviceName` is "bridged-node" or "aggregator", the returned
-     * `DeviceRegistrationEntry::device` MUST point to a
-     * `SingleEndpoint` or a class derived from `SingleEndpoint`.
-     *
-     * This requirement cannot be enforced by compile time or runtime checks, so violating it will result in UB.
-     *
-     *
-     * If `deviceName` is "bridged-node", the returned `DeviceRegistrationEntry::device`'s device type list MUST contain
-     * `Device::Type::kBridgedNode` entry. If `deviceName` is "aggregator", the returned `DeviceRegistrationEntry::device`'s device
-     * type list MUST contain `Device::Type::kAggregator` entry.
-     *
-     * These requirements will be enforced at runtime.
      */
     virtual DeviceRegistrationEntry CreateDevice(const std::string & deviceName, const std::string & nodeLabel) = 0;
+
+    /**
+     * @brief Creates a new bridged-node device instance.
+     *
+     * @param nodeLabel The label for the new device.
+     */
+    virtual DeviceRegistrationEntryOfConcreteType<BridgedNode> CreateBridgedNode(const std::string & nodeLabel) = 0;
+
+    /**
+     * @brief Creates a new aggregator device instance.
+     *
+     * @param nodeLabel The label for the new device.
+     */
+    virtual DeviceRegistrationEntryOfConcreteType<Aggregator> CreateAggregator(const std::string & nodeLabel) = 0;
 
     BridgedDeviceManager(CodeDrivenDataModelProvider & provider, EndpointIdAllocator & endpointIdAllocator);
 
@@ -111,7 +114,7 @@ private:
     {
         DeviceInterfaceId id;
         DeviceRegistrationEntry deviceEntry;
-        DeviceRegistrationEntry parentBridgedNodeDeviceEntry;
+        DeviceRegistrationEntryOfConcreteType<BridgedNode> parentBridgedNodeDeviceEntry;
     };
     std::vector<DeviceStorage>::iterator GetDeviceStorageIterator(DeviceInterfaceId deviceInterfaceId);
     bool IsValidAggregatorEndpoint(EndpointId endpointId);
@@ -122,7 +125,7 @@ private:
     std::vector<DeviceStorage> mDeviceEntries;
     CodeDrivenDataModelProvider & mProvider;
     EndpointIdAllocator & mEndpointIdAllocator;
-    DeviceRegistrationEntry mDefaultAggregatorEntry;
+    DeviceRegistrationEntryOfConcreteType<Aggregator> mDefaultAggregatorEntry;
 
     // id counter for created devices
     DeviceInterfaceId mNextDeviceId = 0;

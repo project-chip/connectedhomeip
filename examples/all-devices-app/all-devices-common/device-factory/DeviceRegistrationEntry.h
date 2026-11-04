@@ -23,12 +23,28 @@
 namespace chip::app {
 
 /// Bundles an allocated device with its post-registration and pre-unregistration callbacks.
-struct DeviceRegistrationEntry
+template <typename InterfaceT, typename = std::enable_if_t<std::is_base_of_v<DeviceInterface, InterfaceT>>>
+struct DeviceRegistrationEntryOfConcreteType
 {
-    std::unique_ptr<DeviceInterface> device;
+    std::unique_ptr<InterfaceT> device;
     std::function<void()> afterDeviceRegistration;
     std::function<void()> beforeDeviceUnregistration;
     Span<const EndpointComposition::SemanticTag> defaultTags = {};
+
+    DeviceRegistrationEntryOfConcreteType() = default;
+
+    DeviceRegistrationEntryOfConcreteType(std::unique_ptr<InterfaceT> dev, std::function<void()> afterRegistration,
+                                          std::function<void()> beforeUnregistration,
+                                          Span<const EndpointComposition::SemanticTag> tags = {}) :
+        device(std::move(dev)), afterDeviceRegistration(std::move(afterRegistration)),
+        beforeDeviceUnregistration(std::move(beforeUnregistration)), defaultTags(tags)
+    {}
+
+    template <typename OtherInterfaceT, typename = std::enable_if_t<std::is_base_of_v<InterfaceT, OtherInterfaceT>>>
+    explicit DeviceRegistrationEntryOfConcreteType(DeviceRegistrationEntryOfConcreteType<InterfaceT> && other) :
+        DeviceRegistrationEntryOfConcreteType(std::move(other.device), std::move(other.afterDeviceRegistration),
+                                              std::move(other.beforeDeviceUnregistration), other.defaultTags)
+    {}
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {})
@@ -59,5 +75,7 @@ struct DeviceRegistrationEntry
         device->Unregister(provider);
     }
 };
+
+using DeviceRegistrationEntry = DeviceRegistrationEntryOfConcreteType<DeviceInterface>;
 
 } // namespace chip::app
