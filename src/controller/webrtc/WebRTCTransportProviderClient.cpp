@@ -413,6 +413,15 @@ void WebRTCTransportProviderClient::HandleProvideOfferResponse(TLV::TLVReader da
     VerifyOrReturn(error == CHIP_NO_ERROR,
                    ChipLogError(Camera, "Failed to decode command response value. Error: %" CHIP_ERROR_FORMAT, error.Format()));
 
+    // A re-offer only changes the SDP: StreamUsage, the streams and MetadataEnabled apply to new sessions only, so an
+    // existing session record stays as it is.
+    if (!mProvideOfferData.webRTCSessionID.IsNull() &&
+        WebRTCTransportRequestorManager::Instance().HasSession(value.webRTCSessionID, mPeerId.GetNodeId(),
+                                                               mPeerId.GetFabricIndex()))
+    {
+        return;
+    }
+
     // Create a new session record and populate fields from the decoded command response and current secure session info
     WebRTCSessionStruct session;
     session.id             = value.webRTCSessionID;

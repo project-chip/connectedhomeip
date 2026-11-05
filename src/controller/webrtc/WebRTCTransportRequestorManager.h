@@ -76,8 +76,11 @@ public:
 
     CHIP_ERROR HandleEnd(const WebRTCSessionStruct & session, WebRTCEndReasonEnum reasonCode) override;
 
-    // method to be called by provider client
+    // methods to be called by provider client
     void UpsertSession(const chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type & session);
+
+    // Returns whether CurrentSessions has the session with this ID for the given peer node and fabric.
+    bool HasSession(uint16_t sessionId, chip::NodeId peerNodeId, chip::FabricIndex fabricIndex);
 
 private:
     WebRTCTransportRequestorManager()  = default;

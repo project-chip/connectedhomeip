@@ -136,3 +136,15 @@ void WebRTCTransportRequestorManager::UpsertSession(
 {
     mWebRTCRegisteredServerCluster.Cluster().UpsertSession(session);
 }
+
+bool WebRTCTransportRequestorManager::HasSession(uint16_t sessionId, chip::NodeId peerNodeId, chip::FabricIndex fabricIndex)
+{
+    for (const auto & session : mWebRTCRegisteredServerCluster.Cluster().GetCurrentSessions())
+    {
+        if (session.id == sessionId && session.peerNodeID == peerNodeId && session.GetFabricIndex() == fabricIndex)
+        {
+            return true;
+        }
+    }
+    return false;
+}
