@@ -96,7 +96,10 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
 
     ChipLogProgress(Camera, "PushAvStreamTransportManager, Create PushAV Transport for Connection: [%u]", connectionID);
 
-    auto transport = std::make_unique<PushAVTransport>(transportOptions, connectionID, mAudioStreamParams, mVideoStreamParams);
+    EndpointId endpointId =
+        (mPushAvStreamTransportServer != nullptr) ? mPushAvStreamTransportServer->GetLogic().mEndpointId : kInvalidEndpointId;
+    auto transport =
+        std::make_unique<PushAVTransport>(transportOptions, endpointId, connectionID, mAudioStreamParams, mVideoStreamParams);
 
     CHIP_ERROR err = transport->ConfigureRecorderSettings(transportOptions, mAudioStreamParams, mVideoStreamParams);
     if (err != CHIP_NO_ERROR)

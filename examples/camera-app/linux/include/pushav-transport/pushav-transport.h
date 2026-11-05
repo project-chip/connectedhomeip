@@ -56,8 +56,10 @@ static constexpr int kMaxSessionDurationMinutes = 5;  // Maximum session duratio
 class PushAVTransport : public Transport
 {
 public:
+    // endpointId is the endpoint of the Push AV Stream Transport cluster the transport belongs to.
     PushAVTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStruct & transportOptions,
-                    const uint16_t connectionID, AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams);
+                    chip::EndpointId endpointId, const uint16_t connectionID, AudioStreamStruct & audioStreamParams,
+                    VideoStreamStruct & videoStreamParams);
 
     ~PushAVTransport() override;
 
@@ -194,6 +196,7 @@ private:
 
     chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
+    chip::EndpointId mEndpointId;
     uint16_t mConnectionID;
     uint32_t mCurrentlyUsedBandwidthbps     = 0;
     bool mCurrentActivationByManualTrigger  = false;
