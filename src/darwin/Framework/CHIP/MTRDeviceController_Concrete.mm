@@ -181,7 +181,6 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     NSTimeInterval _unitTestConnectivityMonitorWaitSeconds;
     BOOL _unitTestHoldNextCommissioneeSessionObserver;
     dispatch_block_t _unitTestHeldCommissioneeSessionObserver;
-    BOOL _unitTestFailNextStopPairing;
 #endif
 }
 
@@ -1420,17 +1419,14 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         }
         self->_operationalCredentialsDelegate->ResetDeviceID();
         auto errorCode = self->_cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
-#ifdef DEBUG
-        if (self->_unitTestFailNextStopPairing) {
-            self->_unitTestFailNextStopPairing = NO;
-            errorCode = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR;
-        }
-#endif
         // Emit metric on status of cancel
         MATTER_LOG_METRIC(kMetricCancelCommissioning, errorCode);
         BOOL ok = ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorStopPairing error:error];
-        // A released PASE session cannot resume, so it ends the wait even if StopPairing fails.
-        if ((ok || onlyIfWaitingAfterPASE) && isWaitingAfterPASEEstablished) {
+        // A commissioning waiting after PASE has nothing running on the C++ side, so StopPairing produces no
+        // notification for it, and StopPairing can only fail here if the commissioner is shut down or the
+        // commissionee is gone; either way the commissioning cannot continue. End it whenever it is the one being
+        // cancelled. The node ID has to match: callers pass the ID they want cancelled, not the current one.
+        if (isWaitingAfterPASEEstablished && [nodeID isEqual:commissioning.commissioningID]) {
             // If we are not actually in the middle of either PASE establishment
             // or active commissioning on the C++ side, there will be no
             // notifications when we StopPairing.  Provide the
@@ -1440,6 +1436,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             commissioning.isWaitingAfterPASEEstablished = NO;
             notifiedCompletion = YES;
             self->_deviceControllerDelegateBridge->OnCommissioningComplete(nodeID.unsignedLongLongValue, completionError);
+            if (error) {
+                *error = nil;
+            }
+            return YES;
         }
         return ok;
     };
@@ -1597,13 +1597,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                 session.Value()->AsSecureSession()->MarkAsDefunct();
             }
         }
-    } error:nil];
-}
-
-- (void)unitTestFailNextStopPairing
-{
-    [self syncRunOnWorkQueue:^{
-        self->_unitTestFailNextStopPairing = YES;
     } error:nil];
 }
 

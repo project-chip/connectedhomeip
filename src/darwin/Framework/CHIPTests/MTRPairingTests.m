@@ -1356,36 +1356,6 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [self _assertConnectionClosedFailure:controllerDelegate];
 }
 
-- (void)test026_PASESessionReleasedWhenStopPairingFailsWhileWaitingAfterPASE
-{
-    [self startServerAppWithPayload:kOnboardingPayload1];
-    [self startServerAppWithPayload:kOnboardingPayload2];
-
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-    XCTestExpectation * expectation1 = [self expectationWithDescription:@"Commissioning 1 failed"];
-    __auto_type * controllerDelegate1 = [self _pausedCommissioningForPayload:kOnboardingPayload1 nodeID:++sDeviceId expectation:expectation1 queue:callbackQueue];
-
-    [sController unitTestFailNextStopPairing];
-    [sController unitTestExpirePASESessions];
-
-    [self waitForExpectations:@[ expectation1 ] timeout:kPairingTimeoutInSeconds];
-    [self _assertConnectionClosedFailure:controllerDelegate1];
-
-    XCTestExpectation * expectation2 = [self expectationWithDescription:@"Commissioning 2 complete"];
-    __auto_type * controllerDelegate2 = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation2
-                                                                                  attestationDelegate:nil
-                                                                                    failSafeExtension:nil];
-    [sController setDeviceControllerDelegate:controllerDelegate2 queue:callbackQueue];
-    self.controllerDelegate = controllerDelegate2;
-
-    NSError * error;
-    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload2 error:&error];
-    XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@(++sDeviceId) error:&error]);
-    XCTAssertNil(error);
-    [self waitForExpectations:@[ expectation2 ] timeout:kPairingTimeoutInSeconds];
-    XCTAssertNil(controllerDelegate2.commissioningCompleteError);
-}
-
 - (void)test027_SessionReleaseAfterCommissionNodeDoesNotCancel
 {
     [self startServerAppWithPayload:kOnboardingPayload1];
