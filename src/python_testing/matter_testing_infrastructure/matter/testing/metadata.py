@@ -67,8 +67,8 @@ class TagFilter:
         Runs with a dedicated job's tag stay left out unless a value names that tag. Raises ValueError for an unknown tag.
         """
         known_tags = [tag.value for tag in RunTag]
-        required = set()
-        skipped = set()
+        required: set[RunTag] = set()
+        skipped: set[RunTag] = set()
         for value in values:
             name = value.removeprefix(SKIP_TAG_PREFIX)
             if name not in known_tags:
