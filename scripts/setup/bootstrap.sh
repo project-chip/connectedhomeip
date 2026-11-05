@@ -167,6 +167,12 @@ EOF
         pw_finalize activate "$_SETUP_SH"
         _ACTION_TAKEN="activate"
     fi
+
+    # The activate.sh that Pigweed generates in the environment directory sets
+    # these to the checkout that bootstrapped it, which may not be this one if
+    # PW_ENVIRONMENT_ROOT is shared.
+    export PW_PROJECT_ROOT="$_CHIP_ROOT"
+    export PW_ROOT="$_CHIP_ROOT/third_party/pigweed/repo"
 }
 
 # remember PW_ENVIRONMENT_ROOT so that things like another
