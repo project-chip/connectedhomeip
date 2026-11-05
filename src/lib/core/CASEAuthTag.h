@@ -59,33 +59,18 @@ constexpr uint16_t GetCASEAuthTagVersion(CASEAuthTag aCAT)
 }
 
 /**
- * @brief Check whether a CAT identifier value is allowed.
- *
- * All identifier values are permitted, including 0x0000 (spec table lists it as
- * "Generally available") and the reserved Joint Fabric identifiers 0xFFFF (Admin CAT)
- * and 0xFFFE (Anchor CAT). Version validity is checked separately by IsValidCASEAuthTag().
- *
- * @param identifier The CAT identifier to validate
- * @return true always; kept as a named helper for readability and future use
- */
-constexpr bool IsValidCATIdentifier(uint16_t identifier)
-{
-    (void) identifier;
-    return true;
-}
-
-/**
  * @brief Check whether a full CASE Authenticated Tag value is valid.
  *
- * A tag is valid when its version is non-zero. The identifier field has no
- * invalid values per the spec CAT allocation table.
+ * A tag is valid when its version is non-zero. All identifier values are
+ * permitted per the spec CAT allocation table (identifier 0x0000 is listed as
+ * "Generally available"; only version 0 is forbidden).
  *
  * @param aCAT The full 32-bit CAT value to validate
  * @return true if the tag is valid, false otherwise
  */
 constexpr bool IsValidCASEAuthTag(CASEAuthTag aCAT)
 {
-    return (aCAT & kTagVersionMask) > 0 && IsValidCATIdentifier(GetCASEAuthTagIdentifier(aCAT));
+    return (aCAT & kTagVersionMask) > 0;
 }
 
 constexpr CASEAuthTag GetAdminCATWithVersion(uint16_t version)
