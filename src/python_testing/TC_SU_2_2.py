@@ -851,7 +851,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Poll UpdateStateProgress so the kill happens after some BDX bytes have landed.
         # Not a spec assertion: if 3% is never reported (quality Q, sparse updates), warn and
         # continue so the Idle / DownloadError checks below still run.
-        progress_poll_interval_sec = 10.0
+        progress_poll_interval_sec = 5.0
         progress_poll_timeout_sec = 300.0
         progress_deadline = time.time() + progress_poll_timeout_sec
         update_state_progress_s4 = None
