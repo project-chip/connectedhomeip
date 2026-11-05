@@ -581,6 +581,12 @@ void PushAVTransport::SetTLSCert(std::vector<uint8_t> bufferRootCert, std::vecto
     mCertBuffer.mClientCertBuffer       = bufferClientCert;
     mCertBuffer.mClientKeyBuffer        = bufferClientCertKey;
     mCertBuffer.mIntermediateCertBuffer = bufferIntermediateCerts;
+
+    // An active transport's uploader has its own copy of the certificates.
+    if (mUploader)
+    {
+        mUploader->setCertificateBuffer(mCertBuffer);
+    }
 }
 
 void PushAVTransport::SetTransportStatus(TransportStatusEnum status)

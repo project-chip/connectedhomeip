@@ -201,6 +201,15 @@ private:
     CHIP_ERROR MutateTLSEndpointReferenceCount(FabricIndex fabricIndex, uint16_t tlsEndpointID, int8_t delta);
 
     /**
+     * @brief Checks that tlsEndpointID is a TLS endpoint a push transport can use, and passes its certificates to the
+     *        delegate through SetTLSCerts().
+     *
+     * @return CHIP_NO_ERROR if the endpoint is provisioned for fabricIndex, has a client certificate, and its certificates
+     *         could be loaded; an error otherwise, which callers report as InvalidTLSEndpoint.
+     */
+    CHIP_ERROR LoadTLSEndpointCertificates(FabricIndex fabricIndex, uint16_t tlsEndpointID);
+
+    /**
      * @brief Raises the ReferenceCount of each TLS endpoint used by CurrentConnections to at least the number of
      *        connections that use it.
      *
