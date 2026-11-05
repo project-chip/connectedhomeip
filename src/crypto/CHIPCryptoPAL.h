@@ -860,6 +860,16 @@ CHIP_ERROR ConvertIntegerRawToDer(const ByteSpan & raw_integer, MutableByteSpan 
 CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer);
 
 /**
+ * @brief Copies the content octets of a DER INTEGER (no tag or length). If the first octet is the 0x00
+ *        sign byte that DER places before a non-negative value whose high bit is set, it is not copied;
+ *        otherwise the content is copied unchanged. The encoding is not validated.
+ * @param[in] der_integer_content Content octets of a DER INTEGER
+ * @param[out] out_value Buffer to receive the copy. Its size is reduced to the copied length.
+ * @return CHIP_ERROR_BUFFER_TOO_SMALL if `out_value` cannot hold the copy, CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR StripDerIntegerSignByte(ByteSpan der_integer_content, MutableByteSpan & out_value);
+
+/**
  * @brief A function that implements AES-CCM encryption
  *
  * This implements the CHIP_Crypto_AEAD_GenerateEncrypt() cryptographic primitive
@@ -1867,6 +1877,10 @@ CHIP_ERROR ExtractCDPExtensionCRLIssuerFromX509Cert(const ByteSpan & certificate
 
 /**
  * @brief Extracts Serial Number from X509 Certificate.
+ *
+ * The serial number is output as the big-endian bytes of its value, without the 0x00 sign byte that
+ * DER adds when the high bit of the value is set. The serial number is expected to be positive, as
+ * RFC 5280 requires; that is not validated here.
  **/
 CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, MutableByteSpan & serialNumber);
 
