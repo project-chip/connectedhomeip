@@ -221,20 +221,26 @@ class PAVSTIUtils:
             return
 
         # Each push transport holds a reference on its TLS endpoint, and RemoveEndpoint fails with INVALID_IN_STATE
-        # while any reference remains. A failure here is logged so that RemoveEndpoint below is still attempted.
+        # while any reference remains. Failures here are logged so that RemoveEndpoint below is still attempted.
         pvcluster = Clusters.PushAvStreamTransport
         try:
             connections = await self.read_single_attribute_check_success(
                 endpoint=self.get_endpoint(), cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
             )
-            for connection in connections:
-                if connection.transportOptions is not None and connection.transportOptions.TLSEndpointID == tlsEndPoint:
-                    await self.send_single_cmd(
-                        cmd=pvcluster.Commands.DeallocatePushTransport(connectionID=connection.connectionID),
-                        endpoint=self.get_endpoint(),
-                    )
         except Exception as e:
-            log.warning("Could not deallocate push transports using TLS endpoint %s: %s", tlsEndPoint, e)
+            log.warning("Could not read push transports using TLS endpoint %s: %s", tlsEndPoint, e)
+            connections = []
+        for connection in connections:
+            if connection.transportOptions is None or connection.transportOptions.TLSEndpointID != tlsEndPoint:
+                continue
+            # DeallocatePushTransport returns BUSY while uploads are queued; making the transport Inactive first drops them.
+            for cmd in (pvcluster.Commands.SetTransportStatus(connectionID=connection.connectionID,
+                                                              transportStatus=pvcluster.Enums.TransportStatusEnum.kInactive),
+                        pvcluster.Commands.DeallocatePushTransport(connectionID=connection.connectionID)):
+                try:
+                    await self.send_single_cmd(cmd=cmd, endpoint=self.get_endpoint())
+                except Exception as e:
+                    log.warning("%s failed for connection %s: %s", type(cmd).__name__, connection.connectionID, e)
 
         tls_utils = TLSUtils(self, endpoint=0)
         await tls_utils.send_remove_tls_endpoint_command(
