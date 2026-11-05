@@ -49,7 +49,6 @@ class RealtekApp(Enum):
     LIGHT = auto()
     LIGHT_SWITCH = auto()
     LOCK = auto()
-    WINDOW = auto()
     ALL_CLUSTERS = auto()
     THERMOSTAT = auto()
     OTA_REQUESTOR = auto()
@@ -62,8 +61,6 @@ class RealtekApp(Enum):
             return 'light-switch-app'
         if self == RealtekApp.LOCK:
             return 'lock-app'
-        if self == RealtekApp.WINDOW:
-            return 'window-app'
         if self == RealtekApp.ALL_CLUSTERS:
             return 'all-clusters-app'
         if self == RealtekApp.OTA_REQUESTOR:
@@ -79,8 +76,6 @@ class RealtekApp(Enum):
         if self == RealtekApp.LIGHT_SWITCH:
             return 'matter-cli-mtd'
         if self == RealtekApp.LOCK:
-            return 'matter-cli-mtd'
-        if self == RealtekApp.WINDOW:
             return 'matter-cli-mtd'
         if self == RealtekApp.ALL_CLUSTERS:
             return 'matter-cli-ftd'
@@ -98,8 +93,6 @@ class RealtekApp(Enum):
             return 'chip-rtl8777g-light-switch-app'
         if self == RealtekApp.LOCK:
             return 'chip-rtl8777g-lock-app'
-        if self == RealtekApp.WINDOW:
-            return 'chip-rtl8777g-window-app'
         if self == RealtekApp.ALL_CLUSTERS:
             return 'chip-rtl8777g-all-clusters-app'
         if self == RealtekApp.OTA_REQUESTOR:
