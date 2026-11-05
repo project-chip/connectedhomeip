@@ -17,6 +17,7 @@
  */
 
 #include "constants.h"
+#include <algorithm>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -204,6 +205,65 @@ CHIP_ERROR PushAvStreamTransportServerLogic::MutateTLSEndpointReferenceCount(Fab
     return mTLSClientManagementDelegate->MutateEndpointReferenceCount(kRootEndpointId, fabricIndex, tlsEndpointID, delta);
 }
 
+void PushAvStreamTransportServerLogic::RaiseTLSEndpointReferenceCounts()
+{
+    VerifyOrReturn(mTLSClientManagementDelegate != nullptr);
+
+    auto usesTLSEndpoint = [](const TransportConfigurationStorage & connection, FabricIndex fabricIndex, uint16_t tlsEndpointID) {
+        auto options = connection.GetTransportOptionsPtr();
+        return options != nullptr && connection.GetFabricIndex() == fabricIndex && options->TLSEndpointID == tlsEndpointID;
+    };
+
+    for (size_t i = 0; i < mCurrentConnections.size(); ++i)
+    {
+        auto options = mCurrentConnections[i].GetTransportOptionsPtr();
+        if (options == nullptr)
+        {
+            continue;
+        }
+        FabricIndex fabricIndex = mCurrentConnections[i].GetFabricIndex();
+        uint16_t tlsEndpointID  = options->TLSEndpointID;
+
+        // Handle each (fabric, TLS endpoint) pair once, at the first connection that uses it.
+        bool handledEarlier  = false;
+        size_t expectedCount = 0;
+        for (size_t j = 0; j < mCurrentConnections.size() && !handledEarlier; ++j)
+        {
+            if (usesTLSEndpoint(mCurrentConnections[j], fabricIndex, tlsEndpointID))
+            {
+                handledEarlier = (j < i);
+                expectedCount++;
+            }
+        }
+        if (handledEarlier)
+        {
+            continue;
+        }
+
+        size_t referenceCount   = 0;
+        auto readReferenceCount = [&referenceCount](auto & endpoint) -> CHIP_ERROR {
+            referenceCount = endpoint.referenceCount;
+            return CHIP_NO_ERROR;
+        };
+        CHIP_ERROR err = mTLSClientManagementDelegate->FindProvisionedEndpointByID(kRootEndpointId, fabricIndex, tlsEndpointID,
+                                                                                   readReferenceCount);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Push AV Stream Transport[ep=%d]: Cannot read TLS endpoint %u: %" CHIP_ERROR_FORMAT, mEndpointId,
+                         tlsEndpointID, err.Format());
+            continue;
+        }
+
+        if (referenceCount < expectedCount)
+        {
+            auto delta = static_cast<int8_t>(std::min<size_t>(expectedCount - referenceCount, static_cast<size_t>(INT8_MAX)));
+            ChipLogProgress(Zcl, "Push AV Stream Transport[ep=%d]: Raising TLS endpoint %u ReferenceCount by %d", mEndpointId,
+                            tlsEndpointID, delta);
+            LogErrorOnFailure(MutateTLSEndpointReferenceCount(fabricIndex, tlsEndpointID, delta));
+        }
+    }
+}
+
 void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connectionID)
 {
     // Erase-Remove idiom
@@ -225,6 +285,7 @@ void PushAvStreamTransportServerLogic::LoadPersistentAttributes()
 {
     // Load currentConnections
     LogErrorOnFailure(LoadCurrentConnections());
+    RaiseTLSEndpointReferenceCounts();
 
     // Signal delegate that all persistent configuration attributes have been loaded.
     TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();

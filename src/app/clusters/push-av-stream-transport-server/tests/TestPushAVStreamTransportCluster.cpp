@@ -421,6 +421,22 @@ public:
     }
 };
 
+// Reports the ReferenceCount recorded in referenceCounts, as a delegate that persists the count does.
+class TestTLSClientManagementDelegateReportingCounts : public TestTLSClientManagementDelegate
+{
+public:
+    CHIP_ERROR FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                           LoadedEndpointCallback callback) override
+    {
+        TlsClientManagement::Structs::TLSEndpointStruct::DecodableType endpoint;
+        endpoint.endpointID = endpointID;
+        endpoint.caid       = 0;
+        endpoint.ccdid.SetNonNull(1);
+        endpoint.referenceCount = static_cast<uint8_t>(referenceCounts[endpointID]);
+        return callback(endpoint);
+    }
+};
+
 class TestPushAVStreamTransportServerLogic : public ::testing::Test
 {
 public:
@@ -585,6 +601,102 @@ TEST_F(TestPushAVStreamTransportServerLogic, TransportsHoldReferenceOnTLSEndpoin
     EXPECT_EQ(mServer.GetLogic().HandleDeallocatePushTransport(deallocateHandler, kDeallocatePath, deallocateData), std::nullopt);
     EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
     EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[2], 0);
+}
+
+// Allocates a continuous CMAF transport for fabric 1 that uses tlsEndpointID.
+static void AllocateTransportUsingTLSEndpoint(PushAvStreamTransportServer & server, uint16_t tlsEndpointID)
+{
+    std::string url       = "https://192.168.1.100:554/stream/";
+    std::string trackName = "video";
+
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+
+    ContainerOptionsStruct containerOptions;
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kContinuous;
+
+    Commands::AllocatePushTransport::DecodableType commandData;
+    commandData.transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    commandData.transportOptions.videoStreamID.SetValue(1);
+    commandData.transportOptions.audioStreamID.SetValue(2);
+    commandData.transportOptions.TLSEndpointID    = tlsEndpointID;
+    commandData.transportOptions.url              = Span(url.data(), url.size());
+    commandData.transportOptions.triggerOptions   = triggerOptions;
+    commandData.transportOptions.containerOptions = containerOptions;
+
+    Testing::MockCommandHandler handler;
+    handler.SetFabricIndex(1);
+    ConcreteCommandPath kAllocatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(handler, kAllocatePath, commandData), std::nullopt);
+    EXPECT_TRUE(handler.HasResponse());
+}
+
+// The two tests below cover upgrading from firmware that did not count push transports in the ReferenceCount of their
+// TLS endpoint. That firmware persisted CurrentConnections, but the TLS endpoints those transports use kept a stored
+// ReferenceCount of 0. The first boot of the upgraded firmware must give the restored transports their references, and
+// later boots must not add them again.
+
+TEST_F(TestPushAVStreamTransportServerLogic, UpgradeFromUncountedFirmware_RestoredTransportsTakeReferences)
+{
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegateReportingCounts tlsClientManagementDelegate;
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    AllocateTransportUsingTLSEndpoint(mServer, 1);
+    AllocateTransportUsingTLSEndpoint(mServer, 1);
+    AllocateTransportUsingTLSEndpoint(mServer, 2);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 3);
+
+    // Recreate the state the earlier firmware left behind: the transports are stored, but their TLS endpoints count no
+    // references.
+    tlsClientManagementDelegate.referenceCounts.clear();
+
+    // First boot of the upgraded firmware: CurrentConnections is loaded from storage.
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 3);
+
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 2);
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[2], 1);
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, UpgradeFromUncountedFirmware_LaterBootsKeepReferenceCounts)
+{
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegateReportingCounts tlsClientManagementDelegate;
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    AllocateTransportUsingTLSEndpoint(mServer, 1);
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 1);
+
+    // Once the counts are correct, booting again (including attaching the TLS delegate again) adds nothing.
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 1);
+
+    // Counts are only raised: references beyond this cluster's transports, held by other users of the endpoint, are kept.
+    tlsClientManagementDelegate.referenceCounts[1] = 3;
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 3);
 }
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
