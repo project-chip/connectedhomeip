@@ -8,6 +8,10 @@ dependencies:
         rules:
             - if: "target == esp32s3"
 
+    ## espressif/m5stack_core_2 lives in main/board/core2/idf_component.yml instead:
+    ## it shares the esp32 target with the Basic/Gray, which these rules cannot
+    ## tell apart from the Core2.
+
     ## The Mosaico's USB-C port is the USB OTG controller: a CDC device carries the console.
     espressif/esp_tinyusb:
         version: "^3.0.0-rc2"

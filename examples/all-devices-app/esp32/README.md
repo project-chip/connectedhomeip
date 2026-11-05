@@ -18,6 +18,7 @@ M5Stack Basic/Gray and a touch-driven LVGL UI on the others.
 | Board              | SoC       | Defaults file                       |
 | :----------------- | :-------- | :---------------------------------- |
 | M5Stack Basic/Gray | ESP32     | `sdkconfig_m5stack.defaults`        |
+| M5Stack Core2      | ESP32     | `sdkconfig_m5stack_core2.defaults`  |
 | M5Stack CoreS3     | ESP32-S3  | `sdkconfig_m5stack_cores3.defaults` |
 | ESP-Mosaico        | ESP32-S31 | `sdkconfig_mosaico.defaults`        |
 
@@ -84,13 +85,14 @@ put it into ROM download mode by hand first:
 | -------------------- | ---------------------------------- | ----------------------------------- |
 | ESP32-DevKitC        | `esp32-devkitc-all-devices`        | headless                            |
 | M5Stack Basic / Gray | `esp32-m5stack-all-devices`        | LCD UI with the three front buttons |
+| M5Stack Core2        | `esp32-m5stack-core2-all-devices`  | ESP32, 16MB flash, 8MB PSRAM        |
 | M5Stack CoreS3       | `esp32-m5stack-cores3-all-devices` | ESP32-S3, 16MB flash, 8MB PSRAM     |
 
-> **Note:** The CoreS3 and the Mosaico have no menu buttons. They are driven
-> entirely through the capacitive touch panel: a breadcrumb-navigated LVGL UI
-> provides the commissioning codes, diagnostics, per-endpoint device screens
-> with live cluster controls, device type switching and reboot/factory reset.
-> The other M5Stack boards keep their button-driven menus. See
+> **Note:** The Core2, the CoreS3 and the Mosaico have no menu buttons. They are
+> driven entirely through the capacitive touch panel: a breadcrumb-navigated
+> LVGL UI provides the commissioning codes, diagnostics, per-endpoint device
+> screens with live cluster controls, device type switching and reboot/factory
+> reset. The other M5Stack boards keep their button-driven menus. See
 > [main/display/README.md](main/display/README.md) for the display architecture.
 
 ## Building the Example
@@ -158,13 +160,13 @@ supported types.
 
 ## Audio (Chime)
 
-The M5Stack CoreS3 and the ESP-Mosaico have a speaker, so they can act as a
-Chime device. Two switches gate it:
+The M5Stack Core2, the CoreS3 and the ESP-Mosaico have a speaker, so they can
+act as a Chime device. Two switches gate it:
 
-| Switch                     | Where                                                       | Effect                                               |
-| -------------------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
-| `CONFIG_HAVE_SPEAKER`      | `main/Kconfig.projbuild`, default `y` on CoreS3 and Mosaico | Compiles `main/devices/chime/` and the audio backend |
-| `ALL_DEVICES_ENABLE_CHIME` | device list passed to CMake (`enabled_devices_config.h.in`) | Registers the Chime device type in the factory       |
+| Switch                     | Where                                                              | Effect                                               |
+| -------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------- |
+| `CONFIG_HAVE_SPEAKER`      | `main/Kconfig.projbuild`, default `y` on Core2, CoreS3 and Mosaico | Compiles `main/devices/chime/` and the audio backend |
+| `ALL_DEVICES_ENABLE_CHIME` | device list passed to CMake (`enabled_devices_config.h.in`)        | Registers the Chime device type in the factory       |
 
 The three installed sounds are synthesized at playback time, so the build
 carries no audio assets:
@@ -182,8 +184,12 @@ Tone synthesis lives in `TonePlayingChime`; each board supplies only its audio
 output path. Audio hardware is brought up lazily, on the first `PlayChimeSound`.
 On the CoreS3 the `AXP2101` PMIC enables the amplifier rails, the `AW9523` I/O
 controller enables the boost rail and the amplifier PA, and the `AW88298`
-amplifier is configured over I2C, after which the I2S channel is created. On the
-Mosaico the BSP opens the `ES8311` codec. Everything stays initialized
+amplifier is configured over I2C, after which the I2S channel is created. The
+Core2 and the Mosaico instead open their speaker through the BSP's
+`bsp_audio_codec_speaker_init()` and play through the generic `esp_codec_dev`
+API: the Mosaico `ES8311` codec applies the chime volume in hardware, while the
+Core2's fixed-gain amplifier has no digital volume control, so `esp_codec_dev`
+scales the PCM samples in software instead. Everything stays initialized
 afterwards, so only the first chime pays that cost. The tone itself is rendered
 on a short-lived task so the CHIP event loop is not blocked for the duration of
 the sound.

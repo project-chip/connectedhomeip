@@ -1,0 +1,6 @@
+## Only discovered (and so only resolved by the component manager) when building
+## for the Core2; see this directory's CMakeLists.txt and the top-level
+## CMakeLists.txt for why that has to be done this way rather than with a rule.
+dependencies:
+    espressif/m5stack_core_2:
+        version: "^3.0"
