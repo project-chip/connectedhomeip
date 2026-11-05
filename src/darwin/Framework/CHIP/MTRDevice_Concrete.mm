@@ -157,9 +157,9 @@ public:
 private:
     void OnSubscriptionEstablished(chip::SubscriptionId aSubscriptionId) override;
 
-    void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
+    void HandleEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
 
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void HandleAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
 
     CHIP_ERROR OnResubscriptionNeeded(chip::app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 
@@ -5581,7 +5581,7 @@ void SubscriptionCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptio
     MTRBaseSubscriptionCallback::OnSubscriptionEstablished(aSubscriptionId);
 }
 
-void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
+void SubscriptionCallback::HandleEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
 {
     if (mEventReports == nil) {
         // Never got a OnReportBegin?  Not much to do other than tear things down.
@@ -5613,7 +5613,7 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
     QueueInterimReport();
 }
 
-void SubscriptionCallback::OnAttributeData(
+void SubscriptionCallback::HandleAttributeData(
     const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     if (aPath.IsListItemOperation()) {
