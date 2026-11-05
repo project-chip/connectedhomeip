@@ -93,6 +93,25 @@ CHIP_ERROR CopyICEServers(const Optional<DataModel::DecodableList<DecodableICESe
     return CHIP_NO_ERROR;
 }
 
+// Sets a session's stream list and its deprecated single stream ID, as WebRTCSessionStruct defines them: the list holds
+// every stream of the session (the requested list, or else the stream the provider reported) and the ID is its first entry.
+void SetSessionStreams(const Optional<DataModel::List<const uint16_t>> & requestedStreams,
+                       const Optional<DataModel::Nullable<uint16_t>> & reportedStreamID, uint16_t & singleStreamStorage,
+                       Optional<DataModel::List<const uint16_t>> & sessionStreams, DataModel::Nullable<uint16_t> & sessionStreamID)
+{
+    if (requestedStreams.HasValue() && !requestedStreams.Value().empty())
+    {
+        sessionStreams = requestedStreams;
+        sessionStreamID.SetNonNull(requestedStreams.Value()[0]);
+    }
+    else if (reportedStreamID.HasValue() && !reportedStreamID.Value().IsNull())
+    {
+        singleStreamStorage = reportedStreamID.Value().Value();
+        sessionStreams.SetValue(DataModel::List<const uint16_t>(&singleStreamStorage, 1));
+        sessionStreamID.SetNonNull(singleStreamStorage);
+    }
+}
+
 } // namespace
 
 void WebRTCTransportProviderClient::Init(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
@@ -402,9 +421,15 @@ void WebRTCTransportProviderClient::HandleProvideOfferResponse(TLV::TLVReader da
     session.peerEndpointID = mEndpointId;
     session.streamUsage    = mCurrentStreamUsage;
 
-    // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
-    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : DataModel::MakeNullable<uint16_t>();
-    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : DataModel::MakeNullable<uint16_t>();
+    session.metadataEnabled = mProvideOfferData.metadataEnabled.ValueOr(false);
+
+    // UpsertSession copies the stream lists, so the single-stream storage only needs to outlive that call.
+    uint16_t videoStream = 0;
+    uint16_t audioStream = 0;
+    SetSessionStreams(mProvideOfferData.videoStreams, value.videoStreamID, videoStream, session.videoStreams,
+                      session.videoStreamID);
+    SetSessionStreams(mProvideOfferData.audioStreams, value.audioStreamID, audioStream, session.audioStreams,
+                      session.audioStreamID);
 
     WebRTCTransportRequestorManager::Instance().UpsertSession(session);
 }
@@ -426,9 +451,15 @@ void WebRTCTransportProviderClient::HandleSolicitOfferResponse(TLV::TLVReader da
     session.peerEndpointID = mEndpointId;
     session.streamUsage    = mCurrentStreamUsage;
 
-    // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
-    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : chip::app::DataModel::NullNullable;
-    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : chip::app::DataModel::NullNullable;
+    session.metadataEnabled = mSolicitOfferData.metadataEnabled.ValueOr(false);
+
+    // UpsertSession copies the stream lists, so the single-stream storage only needs to outlive that call.
+    uint16_t videoStream = 0;
+    uint16_t audioStream = 0;
+    SetSessionStreams(mSolicitOfferData.videoStreams, value.videoStreamID, videoStream, session.videoStreams,
+                      session.videoStreamID);
+    SetSessionStreams(mSolicitOfferData.audioStreams, value.audioStreamID, audioStream, session.audioStreams,
+                      session.audioStreamID);
 
     // The provider echoes VideoStreamID / AudioStreamID only when the request used them, so if DeferredOffer == FALSE
     // they MUST be valid in that case. Requests using VideoStreams / AudioStreams get a response without stream IDs.

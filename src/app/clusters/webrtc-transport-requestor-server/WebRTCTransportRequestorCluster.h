@@ -39,6 +39,35 @@ using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandi
 using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
 using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
+/**
+ * A WebRTCSessionStruct that owns the storage for its VideoStreams and AudioStreams lists, so that it stays valid after
+ * the lists it was copied from are gone.
+ */
+class WebRTCSessionStorage : public WebRTCSessionStruct
+{
+public:
+    explicit WebRTCSessionStorage(const WebRTCSessionStruct & session) { Assign(session); }
+    WebRTCSessionStorage(const WebRTCSessionStorage & other) : WebRTCSessionStruct() { Assign(other); }
+
+    WebRTCSessionStorage & operator=(const WebRTCSessionStorage & other)
+    {
+        Assign(other);
+        return *this;
+    }
+
+    WebRTCSessionStorage & operator=(const WebRTCSessionStruct & session)
+    {
+        Assign(session);
+        return *this;
+    }
+
+private:
+    void Assign(const WebRTCSessionStruct & session);
+
+    std::vector<uint16_t> mVideoStreams;
+    std::vector<uint16_t> mAudioStreams;
+};
+
 /** @brief
  *  Defines methods for implementing application-specific logic for the WebRTCTransportRequestor Cluster.
  */
@@ -139,12 +168,21 @@ public:
     /**
      * @brief
      *   Gets the current sessions from the Requestor server.
+     *
+     * The VideoStreams and AudioStreams lists of the returned sessions point into storage owned by this cluster, and are
+     * valid until the session is updated or removed.
      */
-    std::vector<WebRTCSessionStruct> GetCurrentSessions() const { return mCurrentSessions; }
+    std::vector<WebRTCSessionStruct> GetCurrentSessions() const
+    {
+        return std::vector<WebRTCSessionStruct>(mCurrentSessions.begin(), mCurrentSessions.end());
+    }
 
     /**
      * @brief
      * Inserts a new session or updates an existing one based on session ID.
+     *
+     * The cluster keeps its own copy of the session, including its VideoStreams and AudioStreams lists, so the caller's
+     * lists only need to be valid during this call.
      *
      * @param session The session data to insert or update.
      * @return kInserted if a new session was added, kUpdated if an existing one was modified.
@@ -164,7 +202,7 @@ public:
 
 private:
     Delegate & mDelegate;
-    std::vector<WebRTCSessionStruct> mCurrentSessions;
+    std::vector<WebRTCSessionStorage> mCurrentSessions;
 
     // Helper functions
     WebRTCSessionStruct * FindSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex);

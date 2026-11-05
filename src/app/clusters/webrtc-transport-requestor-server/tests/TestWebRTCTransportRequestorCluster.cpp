@@ -170,6 +170,73 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestSessionManagement)
     EXPECT_EQ(sessions.size(), 1u);
 }
 
+TEST_F(TestWebRTCTransportRequestorCluster, TestUpsertSessionCopiesStreamLists)
+{
+    TestServerClusterContext context;
+    MockWebRTCTransportRequestorDelegate mockDelegate;
+    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
+
+    constexpr NodeId kPeerNodeId = 0x1234ULL;
+    {
+        uint16_t videoStreams[] = { 3, 4 };
+        uint16_t audioStreams[] = { 5 };
+
+        WebRTCSessionStruct session;
+        session.id          = 1;
+        session.peerNodeID  = kPeerNodeId;
+        session.fabricIndex = 1;
+        session.videoStreams.SetValue(DataModel::List<const uint16_t>(videoStreams));
+        session.audioStreams.SetValue(DataModel::List<const uint16_t>(audioStreams));
+        server.UpsertSession(session);
+
+        // The cluster keeps its own copy, so changing the caller's lists does not change the stored session.
+        videoStreams[0] = videoStreams[1] = audioStreams[0] = 0;
+    }
+
+    // Adding and removing sessions moves the stored sessions around; the lists must move with them.
+    for (uint16_t id = 2; id <= 8; ++id)
+    {
+        WebRTCSessionStruct other;
+        other.id          = id;
+        other.peerNodeID  = kPeerNodeId;
+        other.fabricIndex = 1;
+        server.UpsertSession(other);
+    }
+    server.RemoveSession(2, kPeerNodeId, 1);
+
+    auto sessions = server.GetCurrentSessions();
+    ASSERT_EQ(sessions.size(), 7u);
+    ASSERT_EQ(sessions[0].id, 1);
+    ASSERT_TRUE(sessions[0].videoStreams.HasValue());
+    ASSERT_EQ(sessions[0].videoStreams.Value().size(), 2u);
+    EXPECT_EQ(sessions[0].videoStreams.Value()[0], 3);
+    EXPECT_EQ(sessions[0].videoStreams.Value()[1], 4);
+    ASSERT_TRUE(sessions[0].audioStreams.HasValue());
+    ASSERT_EQ(sessions[0].audioStreams.Value().size(), 1u);
+    EXPECT_EQ(sessions[0].audioStreams.Value()[0], 5);
+    EXPECT_FALSE(sessions[1].videoStreams.HasValue());
+    EXPECT_FALSE(sessions[1].audioStreams.HasValue());
+
+    // The lists are also reported in the CurrentSessions attribute.
+    ClusterTester tester(server);
+    WebRTCTransportRequestor::Attributes::CurrentSessions::TypeInfo::DecodableType readSessions;
+    ASSERT_TRUE(tester.ReadAttribute(WebRTCTransportRequestor::Attributes::CurrentSessions::Id, readSessions).IsSuccess());
+    auto sessionIter = readSessions.begin();
+    ASSERT_TRUE(sessionIter.Next());
+    const auto & readSession = sessionIter.GetValue();
+    EXPECT_EQ(readSession.id, 1);
+    ASSERT_TRUE(readSession.videoStreams.HasValue());
+    auto videoIter = readSession.videoStreams.Value().begin();
+    ASSERT_TRUE(videoIter.Next());
+    EXPECT_EQ(videoIter.GetValue(), 3);
+    ASSERT_TRUE(videoIter.Next());
+    EXPECT_EQ(videoIter.GetValue(), 4);
+    EXPECT_FALSE(videoIter.Next());
+
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestWebRTCTransportRequestorCluster, TestReadCurrentSessionsAttribute)
 {
     TestServerClusterContext context;

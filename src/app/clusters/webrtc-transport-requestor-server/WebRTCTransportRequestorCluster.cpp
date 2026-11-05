@@ -66,7 +66,7 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::ReadAttribute(con
     {
     case CurrentSessions::Id:
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
-            for (auto & session : mCurrentSessions)
+            for (const WebRTCSessionStruct & session : mCurrentSessions)
             {
                 ReturnErrorOnFailure(listEncoder.Encode(session));
             }
@@ -281,6 +281,34 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::HandleEnd(const C
     return delegateResult;
 }
 
+void WebRTCSessionStorage::Assign(const WebRTCSessionStruct & session)
+{
+    // Copy the lists first: session may be this object, whose lists point into the vectors being replaced.
+    std::vector<uint16_t> videoStreams;
+    std::vector<uint16_t> audioStreams;
+    if (session.videoStreams.HasValue())
+    {
+        videoStreams.assign(session.videoStreams.Value().begin(), session.videoStreams.Value().end());
+    }
+    if (session.audioStreams.HasValue())
+    {
+        audioStreams.assign(session.audioStreams.Value().begin(), session.audioStreams.Value().end());
+    }
+
+    static_cast<WebRTCSessionStruct &>(*this) = session;
+    mVideoStreams                             = std::move(videoStreams);
+    mAudioStreams                             = std::move(audioStreams);
+
+    if (this->videoStreams.HasValue())
+    {
+        this->videoStreams.SetValue(DataModel::List<const uint16_t>(mVideoStreams.data(), mVideoStreams.size()));
+    }
+    if (this->audioStreams.HasValue())
+    {
+        this->audioStreams.SetValue(DataModel::List<const uint16_t>(mAudioStreams.data(), mAudioStreams.size()));
+    }
+}
+
 // Helper functions
 WebRTCSessionStruct * WebRTCTransportRequestorCluster::FindSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex)
 {
@@ -313,7 +341,7 @@ WebRTCTransportRequestorCluster::UpsertSession(const WebRTCSessionStruct & sessi
     }
     else
     {
-        mCurrentSessions.push_back(session);
+        mCurrentSessions.emplace_back(session);
         result = UpsertResultEnum::kInserted;
     }
 
