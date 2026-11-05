@@ -33,10 +33,6 @@
 #include <platform/ESP32/ScopedNvsHandle.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
-#ifdef CONFIG_NVS_ENCRYPTION
-#include "nvs_sec_provider.h"
-#endif
-
 #if defined(CONFIG_SECURE_ENABLE_TEE)
 #include <platform/ESP32/ESP32TEEOperationalKeystore.h>
 #endif
@@ -92,12 +88,6 @@ esp_err_t GetNvsSecurityConfig(nvs_sec_cfg_t & cfg)
     if (scheme != NULL && scheme->nvs_flash_read_cfg != NULL)
     {
         esp_err = nvs_flash_read_security_cfg_v2(scheme, &cfg);
-        // Generate the keys only if they do not exist; new keys would make existing encrypted data unreadable
-        if (esp_err == ESP_ERR_NVS_KEYS_NOT_INITIALIZED || esp_err == ESP_ERR_NVS_SEC_HMAC_KEY_NOT_FOUND)
-        {
-            ChipLogProgress(DeviceLayer, "NVS encryption keys not found, generating them");
-            esp_err = nvs_flash_generate_keys_v2(scheme, &cfg);
-        }
     }
     else
     {
