@@ -57,9 +57,21 @@ struct ControllerDeviceInitParams
 class CommissioneeDeviceProxy : public DeviceProxy, public SessionDelegate
 {
 public:
+    /**
+     * Told when the proxy's secure session is released, after the proxy has marked itself not connected.
+     */
+    class SessionReleaseDelegate
+    {
+    public:
+        virtual ~SessionReleaseDelegate()                                            = default;
+        virtual void OnCommissioneeSessionReleased(CommissioneeDeviceProxy & device) = 0;
+    };
+
     ~CommissioneeDeviceProxy() override;
     CommissioneeDeviceProxy() : mSecureSession(*this) {}
     CommissioneeDeviceProxy(const CommissioneeDeviceProxy &) = delete;
+
+    void SetSessionReleaseDelegate(SessionReleaseDelegate * delegate) { mSessionReleaseDelegate = delegate; }
 
     /**
      * @brief
@@ -182,6 +194,8 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
     SessionHolderWithDelegate mSecureSession;
+
+    SessionReleaseDelegate * mSessionReleaseDelegate = nullptr;
 };
 
 } // namespace chip

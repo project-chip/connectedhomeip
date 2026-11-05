@@ -144,6 +144,21 @@ void MTRDeviceControllerDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
     // This is never actually called; just do nothing.
 }
 
+void MTRDeviceControllerDelegateBridge::OnPASESessionLost(chip::NodeId deviceId)
+{
+    MTRDeviceController * strongController = mController;
+    MTR_LOG("%@ MTRDeviceControllerDelegate PASE session to node 0x%016llX was lost", strongController, deviceId);
+
+    auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
+    if (strongDelegate && mQueue && strongController
+        && [strongDelegate respondsToSelector:@selector(controller:commissioneePASESessionLostForNodeID:)]) {
+        NSNumber * nodeID = @(deviceId);
+        dispatch_async(mQueue, ^{
+            [strongDelegate controller:strongController commissioneePASESessionLostForNodeID:nodeID];
+        });
+    }
+}
+
 void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info)
 {
     MTRDeviceController * strongController = mController;

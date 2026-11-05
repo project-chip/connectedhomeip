@@ -256,6 +256,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)stopCommissioning:(MTRCommissioningOperation *)commissioning forCommissioningID:(NSNumber *)commissioningID;
 
 /**
+ * Notification that the PASE session to the commissionee of a commissioning waiting after PASE was released. Ends the
+ * commissioning with CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY if it is the current one and is still waiting.
+ */
+- (void)commissioneePASESessionLost:(MTRCommissioningOperation *)commissioning;
+
+/**
  * Notification that a commissioning operation is done.
  */
 - (void)commissioningDone:(MTRCommissioningOperation *)commissioning;
