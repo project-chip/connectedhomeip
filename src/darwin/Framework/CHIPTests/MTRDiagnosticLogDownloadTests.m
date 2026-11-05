@@ -181,7 +181,7 @@ static NSString * crashLogContent = nil;
                        XCTAssertNil(url);
                        XCTAssertNotNil(error);
 
-                       XCTAssertEqual(error.domain, MTRErrorDomain);
+                       XCTAssertEqualObjects(error.domain, MTRErrorDomain);
                        XCTAssertEqual(error.code, MTRErrorCodeCancelled);
                        [expectation fulfill];
                    }];

@@ -446,6 +446,45 @@ public:
     std::vector<std::optional<unsigned>> mReceivedListSizes;
 };
 
+class WildcardEventDataModel : public chip::app::TestImCustomDataModel
+{
+public:
+    CHIP_ERROR EventInfo(const chip::app::ConcreteEventPath & path, chip::app::DataModel::EventEntry & eventInfo) override
+    {
+        // Code-driven providers require concrete metadata paths; the codegen fallback does not.
+        VerifyOrReturnError(path == chip::app::ConcreteEventPath(kTestEventEndpointId, kTestEventClusterId, kTestEventIdCritical),
+                            CHIP_ERROR_NOT_FOUND);
+        eventInfo.readPrivilege = chip::Access::Privilege::kView;
+        return CHIP_NO_ERROR;
+    }
+};
+
+class WildcardEventCallback : public MockInteractionModelApp
+{
+public:
+    void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId) override { ++mSubscriptionsEstablished; }
+
+    void OnEventData(const chip::app::EventHeader & header, chip::TLV::TLVReader * data,
+                     const chip::app::StatusIB * status) override
+    {
+        MockInteractionModelApp::OnEventData(header, data, status);
+        ASSERT_TRUE(status == nullptr || status->IsSuccess());
+        EXPECT_EQ(header.mPath, chip::app::ConcreteEventPath(kTestEventEndpointId, kTestEventClusterId, kTestEventIdCritical));
+        ASSERT_NE(data, nullptr);
+        chip::TLV::TLVType container;
+        ASSERT_EQ(data->EnterContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(data->Next(), CHIP_NO_ERROR);
+        EXPECT_EQ(data->GetTag(), kTestEventTag);
+        int32_t payload;
+        ASSERT_EQ(data->Get(payload), CHIP_NO_ERROR);
+        EXPECT_EQ(payload, 1);
+        ASSERT_EQ(data->Next(), CHIP_ERROR_END_OF_TLV);
+        ASSERT_EQ(data->ExitContainer(container), CHIP_NO_ERROR);
+    }
+
+    unsigned mSubscriptionsEstablished = 0;
+};
+
 //
 // This dummy callback is used with a bunch of the tests below that don't go through
 // the normal call-path of having the IM engine allocate the ReadHandler object. Instead,
@@ -608,6 +647,7 @@ public:
     void TestSubscribeSendUnknownMessage();
     void TestSubscribeSetDirtyFullyOverlap();
     void TestSubscribeUrgentWildcardEvent();
+    void TestSubscribeWildcardEndpointEvent();
     void TestSubscribeWildcard();
     void TestSubscriptionReportWithDefunctSession();
     void TestSubscribeWithCache();
@@ -3199,6 +3239,50 @@ void TestReadInteraction::TestSubscribeEarlyReport()
 
     engine->Shutdown();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeWildcardEndpointEvent)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeWildcardEndpointEvent)
+void TestReadInteraction::TestSubscribeWildcardEndpointEvent()
+{
+    auto * engine = InteractionModelEngine::GetInstance();
+    {
+        WildcardEventDataModel provider;
+        struct RestoreDataModel
+        {
+            InteractionModelEngine * engine;
+            DataModel::Provider * provider;
+            ~RestoreDataModel()
+            {
+                engine->Shutdown();
+                engine->SetDataModelProvider(provider);
+            }
+        } restore{ engine, engine->SetDataModelProvider(&provider) };
+        ASSERT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+        GenerateEvents();
+
+        EventPathParams eventPath(kInvalidEndpointId, kTestEventClusterId, kTestEventIdCritical);
+        ReadPrepareParams params(GetSessionBobToAlice());
+        params.mpEventPathParamsList      = &eventPath;
+        params.mEventPathParamsListSize   = 1;
+        params.mMinIntervalFloorSeconds   = 1;
+        params.mMaxIntervalCeilingSeconds = 10;
+        WildcardEventCallback callback;
+        ReadClient client(engine, &GetExchangeManager(), callback, ReadClient::InteractionType::Subscribe);
+        ASSERT_EQ(client.SendRequest(params), CHIP_NO_ERROR);
+        DrainAndServiceIO();
+
+        EXPECT_EQ(callback.mSubscriptionsEstablished, 1u);
+        EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
+        EXPECT_EQ(callback.mError, CHIP_NO_ERROR);
+        EXPECT_EQ(callback.mNumDataElementIndex, 1);
+        EXPECT_TRUE(callback.mGotEventResponse);
+        EXPECT_EQ(callback.mNumReadEventFailureStatusReceived, 0);
+        EXPECT_EQ(callback.mNumAttributeResponse, 0);
+    }
+    EXPECT_EQ(engine->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetReliableMessageMgr()->TestGetCountRetransTable(), 0);
 }
 
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeUrgentWildcardEvent)
