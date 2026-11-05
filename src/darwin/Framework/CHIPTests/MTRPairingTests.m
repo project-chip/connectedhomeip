@@ -1153,7 +1153,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
 
     [sController unitTestReportCommissioningFailureForNodeID:@(sDeviceId)
                                   networkCommissioningStatus:@(MTRNetworkCommissioningStatusAuthFailure)
-                                                  errorValue:@(-5)
+                                    connectNetworkErrorValue:@(-5)
                                                    debugText:@"Wrong password"];
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 
@@ -1164,7 +1164,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
 
     expectation = [self expectationWithDescription:@"Commissioning complete without network commissioning info"];
     controllerDelegate.expectation = expectation;
-    [sController unitTestReportCommissioningFailureForNodeID:@(sDeviceId) networkCommissioningStatus:nil errorValue:nil debugText:nil];
+    [sController unitTestReportCommissioningFailureForNodeID:@(sDeviceId) networkCommissioningStatus:nil connectNetworkErrorValue:nil debugText:nil];
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 
     error = controllerDelegate.commissioningCompleteError;
@@ -1178,7 +1178,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [sController setDeviceControllerDelegate:metricsDelegate queue:dispatch_get_main_queue()];
     [sController unitTestReportCommissioningFailureForNodeID:@(sDeviceId)
                                   networkCommissioningStatus:@(MTRNetworkCommissioningStatusNetworkNotFound)
-                                                  errorValue:nil
+                                    connectNetworkErrorValue:nil
                                                    debugText:@"No such network"];
     [self waitForExpectations:@[ metricsDelegate.expectation ] timeout:kTimeoutInSeconds];
 

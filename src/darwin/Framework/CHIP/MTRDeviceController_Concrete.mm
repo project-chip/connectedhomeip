@@ -1529,7 +1529,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)unitTestReportCommissioningFailureForNodeID:(NSNumber *)nodeID
                          networkCommissioningStatus:(nullable NSNumber *)networkCommissioningStatus
-                                         errorValue:(nullable NSNumber *)errorValue
+                           connectNetworkErrorValue:(nullable NSNumber *)connectNetworkErrorValue
                                           debugText:(nullable NSString *)debugText
 {
     [self syncRunOnWorkQueue:^{
@@ -1539,13 +1539,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             completionStatus.networkCommissioningStatus.SetValue(
                 static_cast<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum>(networkCommissioningStatus.unsignedCharValue));
         }
-        if (errorValue != nil) {
-            completionStatus.connectNetworkErrorValue.SetValue(errorValue.intValue);
+        if (connectNetworkErrorValue != nil) {
+            completionStatus.connectNetworkErrorValue.SetValue(connectNetworkErrorValue.intValue);
         }
         if (debugText != nil) {
             completionStatus.networkCommissioningDebugText = debugText.UTF8String;
         }
-        self->_deviceControllerDelegateBridge->OnCommissioningFailure(chip::PeerId(0, nodeID.unsignedLongLongValue), completionStatus);
+        self->_deviceControllerDelegateBridge->OnCommissioningFailure(chip::PeerId(self->_cppCommissioner->GetCompressedFabricId(), nodeID.unsignedLongLongValue), completionStatus);
     } error:nil];
 }
 
