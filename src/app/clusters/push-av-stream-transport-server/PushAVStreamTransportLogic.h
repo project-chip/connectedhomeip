@@ -54,6 +54,7 @@ public:
             ChipLogError(Zcl, "Push AV Stream Transport : Trying to set TLS Client Management delegate to null");
             return;
         }
+        RaiseTLSEndpointReferenceCounts();
     }
 
     void SetTLSCertificateManagementDelegate(TLSCertificateManagementDelegate * delegate)
@@ -198,6 +199,17 @@ private:
      *         (e.g. CHIP_ERROR_NOT_FOUND if the endpoint is not provisioned for the fabric).
      */
     CHIP_ERROR MutateTLSEndpointReferenceCount(FabricIndex fabricIndex, uint16_t tlsEndpointID, int8_t delta);
+
+    /**
+     * @brief Raises the ReferenceCount of each TLS endpoint used by CurrentConnections to at least the number of
+     *        connections that use it.
+     *
+     * Connections restored from storage do not take references when they are loaded, and connections stored by firmware
+     * that did not count references hold none. Counts are only raised, never lowered, so that references held by other
+     * users of the endpoint (for example another Push AV Stream Transport instance) are kept. Running it again has no
+     * effect once the counts are high enough.
+     */
+    void RaiseTLSEndpointReferenceCounts();
 
     static void PushAVStreamTransportDeallocateCallback(chip::System::Layer *, void * callbackContext);
 
