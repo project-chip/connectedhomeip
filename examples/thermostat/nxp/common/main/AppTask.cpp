@@ -21,15 +21,15 @@
 #include "AppTask.h"
 #include "CHIPDeviceManager.h"
 #include "ICDUtil.h"
-#include <app/InteractionModelEngine.h>
-#include <app/util/attribute-storage.h>
-#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include "thermostat-delegate-impl.h"
-#include "thermostat-setpoints-delegate-impl.h"
 #include "thermostat-hold-delegate-impl.h"
 #include "thermostat-presets-delegate-impl.h"
-#include "thermostat-suggestions-delegate-impl.h"
 #include "thermostat-sensors-delegate-impl.h"
+#include "thermostat-setpoints-delegate-impl.h"
+#include "thermostat-suggestions-delegate-impl.h"
+#include <app/InteractionModelEngine.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
+#include <app/util/attribute-storage.h>
 
 using namespace chip;
 
@@ -59,8 +59,8 @@ ThermostatApp::AppTask & ThermostatApp::AppTask::GetDefaultInstance()
 
 void MatterThermostatClusterInitCallback(chip::EndpointId endpointId)
 {
-    chip::app::Clusters::Thermostat::ServerInit(
-        endpointId, gThermostatDelegate, gSetpointsDelegate, gHoldDelegate, gPresetsDelegate, gSuggestionsDelegate, gSensorsDelegate);
+    chip::app::Clusters::Thermostat::ServerInit(endpointId, gThermostatDelegate, gSetpointsDelegate, gHoldDelegate,
+                                                gPresetsDelegate, gSuggestionsDelegate, gSensorsDelegate);
 }
 
 chip::NXP::App::AppTaskBase & chip::NXP::App::GetAppTask()
