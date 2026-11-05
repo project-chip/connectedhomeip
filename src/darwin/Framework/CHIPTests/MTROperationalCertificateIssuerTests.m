@@ -42,6 +42,8 @@ static MTRTestKeys * sTestKeys = nil;
 @property (nonatomic) uint64_t nodeID;
 @property (nonatomic) MTRErrorCode expectedErrorCode;
 @property (nonatomic, nullable) NSNumber * expectedCHIPErrorCode;
+// Fulfilled once commissionNodeWithID: has returned, after the controller has updated the commissioning's state.
+@property (atomic, strong, nullable) XCTestExpectation * commissionStartedExpectation;
 // Number of commissioningComplete callbacks received since nodeID was last set. Failed commissionings report a nil node
 // ID, so every completion is counted rather than only those naming nodeID.
 @property (atomic, readonly) NSUInteger commissioningCompleteCount;
@@ -71,6 +73,7 @@ static MTRTestKeys * sTestKeys = nil;
                   commissioningParams:params
                                 error:&commissionError];
     XCTAssertNil(commissionError);
+    [self.commissionStartedExpectation fulfill];
 
     // Keep waiting for controller:commissioningComplete:
 }
@@ -283,10 +286,15 @@ typedef void (^IssuerCompletion)(MTROperationalCertificateChain * _Nullable info
     __auto_type * deviceControllerDelegate =
         [[MTROperationalCertificateIssureTestDeviceControllerDelegate alloc] initWithExpectation:cancelExpectation];
     deviceControllerDelegate.expectedErrorCode = MTRErrorCodeCancelled;
+    XCTestExpectation * commissionStarted = [self expectationWithDescription:@"First commissionNodeWithID returned"];
+    deviceControllerDelegate.commissionStartedExpectation = commissionStarted;
 
     MTRDeviceController * controller = [self startControllerWithIssuer:certificateIssuer delegate:deviceControllerDelegate];
     [self setUpCommissioningSessionWithController:controller payload:kOnboardingPayload nodeID:kDeviceId];
-    [self waitForExpectations:@[ requestExpectation ] timeout:kPairingTimeoutInSeconds];
+    // The NOC request can arrive before commissionNodeWithID: returns on the delegate queue; cancel only after it has
+    // returned, so the cancel doesn't race the controller's update of the commissioning's state.
+    [self waitForExpectations:@[ requestExpectation, commissionStarted ] timeout:kPairingTimeoutInSeconds];
+    deviceControllerDelegate.commissionStartedExpectation = nil;
 
     NSError * error;
     XCTAssertTrue([controller cancelCommissioningForNodeID:@(kDeviceId) error:&error]);
