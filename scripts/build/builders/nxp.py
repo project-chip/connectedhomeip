@@ -399,7 +399,9 @@ class NxpBuilder(GnBuilder):
 
             cmd = 'export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_NXP_SDK_INSTALL_DIR"'
             cmd += '\nexport ZEPHYR_BASE="$ZEPHYR_NXP_BASE"'
-            cmd += '\nunset ZEPHYR_TOOLCHAIN_VARIANT'
+            # An unset variant makes FindZephyr-sdk.cmake evaluate '("zephyr" STREQUAL )',
+            # which CMake rejects with "Unknown arguments specified".
+            cmd += '\nexport ZEPHYR_TOOLCHAIN_VARIANT=zephyr'
         else:
             if self.build_system is NxpBuildSystem.CMAKE:
                 build_flags += " " + "-DCONF_FILE_NAME=%s" % self.get_conf_file()
