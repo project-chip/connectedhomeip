@@ -1591,6 +1591,8 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL                    CHIP_CORE_ERROR(0xa8)
 
+// AVAILABLE: 0xa9
+
 /**
  *  @def CHIP_ERROR_CASE_WRONG_FABRIC
  *
@@ -1598,8 +1600,6 @@ using CHIP_ERROR = ::chip::ChipError;
  *    The CASE peer's NOC fabric ID does not match the expected fabric.
  */
 #define CHIP_ERROR_CASE_WRONG_FABRIC                           CHIP_CORE_ERROR(0xaa)
-
-// AVAILABLE: 0xa9
 
 /**
  * @def CHIP_EVENT_ID_FOUND
