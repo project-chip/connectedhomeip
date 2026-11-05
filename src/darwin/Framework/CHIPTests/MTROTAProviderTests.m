@@ -28,6 +28,7 @@
 
 // system dependencies
 #import <XCTest/XCTest.h>
+#import <os/lock.h>
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #define ENABLE_OTA_TESTS 0
@@ -46,6 +47,97 @@
 #endif
 
 #if ENABLE_OTA_TESTS
+
+// Reports the current flow each time the framework touches it on the Matter queue.  The framework reads
+// these objects only inside the completion it was handed, after the application calls the completion
+// later from another queue, so what they record is the flow the completion runs in.
+static BOOL OnMatterQueue(void)
+{
+    return strcmp(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL), "org.csa-iot.matter.workqueue") == 0;
+}
+
+static void NoteMatterQueueFlow(os_unfair_lock_t lock, NSMutableArray * flows)
+{
+    if (OnMatterQueue()) {
+        id flow = MTRMetrics.currentFlowID ?: NSNull.null;
+        os_unfair_lock_lock(lock);
+        [flows addObject:flow];
+        os_unfair_lock_unlock(lock);
+    }
+}
+
+@interface MTRFlowProbeData : NSData
+@property (nonatomic, readonly) NSArray * flows;
+- (instancetype)initWithLength:(NSUInteger)length;
+@end
+
+@implementation MTRFlowProbeData {
+    NSData * _data;
+    os_unfair_lock _lock;
+    NSMutableArray * _flows;
+}
+- (instancetype)initWithLength:(NSUInteger)length
+{
+    if (self = [super init]) {
+        _data = [NSMutableData dataWithLength:length];
+        _lock = OS_UNFAIR_LOCK_INIT;
+        _flows = [NSMutableArray array];
+    }
+    return self;
+}
+- (NSUInteger)length
+{
+    NoteMatterQueueFlow(&_lock, _flows);
+    return _data.length;
+}
+- (const void *)bytes
+{
+    NoteMatterQueueFlow(&_lock, _flows);
+    return _data.bytes;
+}
+- (NSArray *)flows
+{
+    os_unfair_lock_lock(&_lock);
+    NSArray * flows = [_flows copy];
+    os_unfair_lock_unlock(&_lock);
+    return flows;
+}
+@end
+
+@interface MTRFlowProbeError : NSError
+@property (nonatomic, readonly) NSArray * flows;
+@end
+
+@implementation MTRFlowProbeError {
+    os_unfair_lock _lock;
+    NSMutableArray * _flows;
+}
+- (instancetype)initWithDomain:(NSErrorDomain)domain code:(NSInteger)code userInfo:(NSDictionary *)dict
+{
+    if (self = [super initWithDomain:domain code:code userInfo:dict]) {
+        _lock = OS_UNFAIR_LOCK_INIT;
+        _flows = [NSMutableArray array];
+    }
+    return self;
+}
+- (NSErrorDomain)domain
+{
+    NoteMatterQueueFlow(&_lock, _flows);
+    return [super domain];
+}
+- (NSInteger)code
+{
+    NoteMatterQueueFlow(&_lock, _flows);
+    return [super code];
+}
+- (NSArray *)flows
+{
+    os_unfair_lock_lock(&_lock);
+    NSArray * flows = [_flows copy];
+    os_unfair_lock_unlock(&_lock);
+    return flows;
+}
+@end
 
 static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
@@ -1063,6 +1155,158 @@ static BOOL sStackInitRan = NO;
     [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
 }
 
+- (void)test003c_BDXBlockQueryCompletionRunsInTheFlowOfItsCallback
+{
+    // The begin, block query and end callbacks run in a flow.  The application completes the begin and the block query
+    // later, from another queue, and the framework handles each completion in the flow of its callback.
+    __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
+    __auto_type * device = [runner commissionWithNodeID:@(kDeviceId1)];
+
+    XCTestExpectation * queryExpectation = [self expectationWithDescription:@"handleQueryImageForNodeID called"];
+    XCTestExpectation * transferBeginExpectation = [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called"];
+    XCTestExpectation * blockQueryExpectation = [self expectationWithDescription:@"handleBDXQueryForNodeID called"];
+    XCTestExpectation * transferEndExpectation = [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called"];
+    __block id transferBeginFlow;
+    __block id blockQueryFlow;
+    __block id transferEndFlow;
+    __auto_type * blockData = [[MTRFlowProbeData alloc] initWithLength:16];
+
+    sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+            MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+            [sOTAProviderDelegate respondNotAvailableWithCompletion:completion];
+        };
+        [sOTAProviderDelegate respondAvailableWithDelay:@(0)
+                                                    uri:@"No such image, really"
+                                            updateToken:[sOTAProviderDelegate generateUpdateToken]
+                                        softwareVersion:kUpdatedSoftwareVersion_5
+                                  softwareVersionString:kUpdatedSoftwareVersionString_5
+                                             completion:completion];
+        [queryExpectation fulfill];
+    };
+    sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
+        NSNumber * offset, MTRStatusCompletion completion) {
+        sOTAProviderDelegate.transferBeginHandler = nil;
+        transferBeginFlow = MTRMetrics.currentFlowID ?: NSNull.null;
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+            [sOTAProviderDelegate respondSuccess:completion];
+            [transferBeginExpectation fulfill];
+        });
+    };
+    sOTAProviderDelegate.blockQueryHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSNumber * blockSize,
+        NSNumber * blockIndex, NSNumber * bytesToSkip, BlockQueryCompletion completion) {
+        sOTAProviderDelegate.blockQueryHandler = nil;
+        blockQueryFlow = MTRMetrics.currentFlowID ?: NSNull.null;
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+            completion(blockData, YES);
+            [blockQueryExpectation fulfill];
+        });
+    };
+    sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, MTRMetrics * metrics, NSError * _Nullable error) {
+        sOTAProviderDelegate.transferEndHandler = nil;
+        transferEndFlow = MTRMetrics.currentFlowID ?: NSNull.null;
+        [transferEndExpectation fulfill];
+    };
+    // The single block ends the image, so the requestor asks to apply it; discontinue the update. Wait for that
+    // request below so the teardown block cannot clear this handler before it arrives.
+    XCTestExpectation * applyUpdateRequestExpectation =
+        [self expectationWithDescription:@"handleApplyUpdateRequestForNodeID called"];
+    sOTAProviderDelegate.applyUpdateRequestHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * params, ApplyUpdateRequestCompletion completion) {
+        sOTAProviderDelegate.applyUpdateRequestHandler = nil;
+        [sOTAProviderDelegate respondToApplyUpdateRequestWithAction:MTROTASoftwareUpdateProviderApplyUpdateActionDiscontinue
+                                                         completion:completion];
+        [applyUpdateRequestExpectation fulfill];
+    };
+
+    [self addTeardownBlock:^{
+        sOTAProviderDelegate.queryImageHandler = nil;
+        sOTAProviderDelegate.transferBeginHandler = nil;
+        sOTAProviderDelegate.blockQueryHandler = nil;
+        sOTAProviderDelegate.transferEndHandler = nil;
+        sOTAProviderDelegate.applyUpdateRequestHandler = nil;
+    }];
+    XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
+    [self waitForExpectations:@[ queryExpectation, transferBeginExpectation, blockQueryExpectation, transferEndExpectation ]
+                      timeout:kTimeoutWithUpdateInSeconds
+                 enforceOrder:YES];
+    [self waitForExpectations:@[ announceResponseExpectation, applyUpdateRequestExpectation ] timeout:kTimeoutInSeconds];
+    sOTAProviderDelegate.queryImageHandler = nil;
+
+    XCTAssertTrue([transferBeginFlow isKindOfClass:NSUUID.class], @"%@", transferBeginFlow);
+    XCTAssertTrue([blockQueryFlow isKindOfClass:NSUUID.class], @"%@", blockQueryFlow);
+    XCTAssertTrue([transferEndFlow isKindOfClass:NSUUID.class], @"%@", transferEndFlow);
+    XCTAssertNotEqualObjects(transferBeginFlow, blockQueryFlow);
+
+    // The framework read the block on the Matter queue, from the completion the application called later.
+    NSArray * blockFlows = blockData.flows;
+    XCTAssertGreaterThan(blockFlows.count, 0, @"the block query completion did not run on the Matter queue");
+    for (id flow in blockFlows) {
+        XCTAssertEqualObjects(flow, blockQueryFlow, @"block query completion ran in flow %@, callback flow %@", flow, blockQueryFlow);
+    }
+}
+
+- (void)test003d_BDXTransferBeginCompletionRunsInTheFlowOfItsCallback
+{
+    // The application completes the begin callback with an error, from another queue.  The framework reads the
+    // error on the Matter queue, inside the completion, and that runs in the flow of the callback.
+    __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
+    __auto_type * device = [runner commissionWithNodeID:@(kDeviceId1)];
+
+    XCTestExpectation * queryExpectation = [self expectationWithDescription:@"handleQueryImageForNodeID called"];
+    XCTestExpectation * transferBeginExpectation = [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called"];
+    XCTestExpectation * transferEndExpectation = [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called"];
+    __block id transferBeginFlow;
+    __auto_type * beginError = [[MTRFlowProbeError alloc] initWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil];
+
+    sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+            MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+            [sOTAProviderDelegate respondNotAvailableWithCompletion:completion];
+        };
+        [sOTAProviderDelegate respondAvailableWithDelay:@(0)
+                                                    uri:@"No such image, really"
+                                            updateToken:[sOTAProviderDelegate generateUpdateToken]
+                                        softwareVersion:kUpdatedSoftwareVersion_5
+                                  softwareVersionString:kUpdatedSoftwareVersionString_5
+                                             completion:completion];
+        [queryExpectation fulfill];
+    };
+    sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
+        NSNumber * offset, MTRStatusCompletion completion) {
+        sOTAProviderDelegate.transferBeginHandler = nil;
+        transferBeginFlow = MTRMetrics.currentFlowID ?: NSNull.null;
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+            completion(beginError);
+            [transferBeginExpectation fulfill];
+        });
+    };
+    sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, MTRMetrics * metrics, NSError * _Nullable error) {
+        sOTAProviderDelegate.transferEndHandler = nil;
+        [transferEndExpectation fulfill];
+    };
+
+    [self addTeardownBlock:^{
+        sOTAProviderDelegate.queryImageHandler = nil;
+        sOTAProviderDelegate.transferBeginHandler = nil;
+        sOTAProviderDelegate.transferEndHandler = nil;
+    }];
+    XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
+    [self waitForExpectations:@[ queryExpectation, transferBeginExpectation, transferEndExpectation ]
+                      timeout:kTimeoutWithUpdateInSeconds
+                 enforceOrder:YES];
+    [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
+    sOTAProviderDelegate.queryImageHandler = nil;
+
+    XCTAssertTrue([transferBeginFlow isKindOfClass:NSUUID.class], @"%@", transferBeginFlow);
+    NSArray * errorFlows = beginError.flows;
+    XCTAssertGreaterThan(errorFlows.count, 0, @"the begin completion did not run on the Matter queue");
+    for (id flow in errorFlows) {
+        XCTAssertEqualObjects(flow, transferBeginFlow, @"begin completion ran in flow %@, callback flow %@", flow, transferBeginFlow);
+    }
+}
 - (void)test004_DoBDXTransferDenyUpdateRequest
 {
     // In this test we do the following:

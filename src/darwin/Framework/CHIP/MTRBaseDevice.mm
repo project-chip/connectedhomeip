@@ -357,9 +357,9 @@ public:
     {
     }
 
-    void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
+    void HandleEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
 
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void HandleAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
 };
 
 } // anonymous namespace
@@ -3808,7 +3808,7 @@ static bool EncodeDataValueToTLV(System::PacketBufferHandle & buffer, Platform::
 @end
 
 namespace {
-void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
+void SubscriptionCallback::HandleEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
 {
     id _Nullable value = nil;
     NSError * _Nullable error = nil;
@@ -3847,7 +3847,7 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
     }
 }
 
-void SubscriptionCallback::OnAttributeData(
+void SubscriptionCallback::HandleAttributeData(
     const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     if (aPath.IsListItemOperation()) {
