@@ -38,6 +38,11 @@ void ShutdownMetricsCollection();
  */
 @interface MTRMetricsCollector : NSObject
 
+/**
+ * Creates a collector that is not connected to the tracing backend, so it only holds what it is given through handleMetricEvent:,
+ * beginMetricForKey: and endMetricIfBegunForKey:error:.  Only the sharedInstance is registered as a tracing backend (by
+ * StartupMetricsCollection), so creating or releasing other instances does not affect that registration.
+ */
 - (instancetype)init;
 + (instancetype)new NS_UNAVAILABLE;
 
@@ -68,11 +73,33 @@ void ShutdownMetricsCollection();
  */
 - (MTRMetrics *)metricSnapshotForCategory:(NSString *)category removeMetrics:(BOOL)removeMetrics;
 
+/**
+ * Records a metric event.
+ */
 - (void)handleMetricEvent:(chip::Tracing::MetricEvent)event;
+
+/**
+ * Starts the begin/end metric for the key.  Whether a metric is open is inferred from the begin and end entries for the key.
+ * If the metric is already open (a begin with no end), nothing changes and this returns NO.  Otherwise any earlier begin and end
+ * entries for the key are discarded, a new begin is recorded, and this returns YES.
+ */
 - (BOOL)beginMetricForKey:(chip::Tracing::MetricKey)key;
+
+/**
+ * Ends the begin/end metric for the key with the given error.  If the metric is not open, nothing changes and this returns NO.
+ */
 - (BOOL)endMetricIfBegunForKey:(chip::Tracing::MetricKey)key error:(CHIP_ERROR)error;
 
-- (MTRMetrics *)takeFinishedMetrics; // keeps begins that have not ended
+/**
+ * Returns the metrics collected, and removes the finished ones.  A begin that has not ended is included in the result but stays
+ * collected, so that it can still end later.
+ */
+- (MTRMetrics *)takeFinishedMetrics;
+
+/**
+ * Returns the error code the begin/end metric for the key ended with, or nil if it has not ended.
+ */
+- (nullable NSNumber *)endErrorCodeForKey:(chip::Tracing::MetricKey)key;
 
 /**
  * @brief This method clears any metrics collected.

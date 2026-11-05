@@ -288,6 +288,19 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
             argumentIndex:1
                   ofReply:NO];
 
+    // device:collectedMetrics: gets an MTRMetrics, which holds an NSUUID and a dictionary of NSString to MTRMetricData, whose
+    // members are NSNumbers.
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTRMetrics class],
+        [MTRMetricData class],
+        [NSUUID class],
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(device:collectedMetrics:)
+            argumentIndex:1
+                  ofReply:NO];
+
     return interface;
 }
 
@@ -558,7 +571,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
 
 - (oneway void)device:(NSNumber *)nodeID collectedMetrics:(MTRMetrics *)metrics
 {
-    MTRDevice_XPC * device = [self _existingDeviceForNodeID:nodeID];
+    MTRDevice_XPC * device = [self _existingXPCDeviceForNodeID:nodeID];
     MTR_LOG_DEBUG("Received device: %@ collectedMetrics: %@ found device: %@", nodeID, metrics, device);
     [device device:nodeID collectedMetrics:metrics];
 }

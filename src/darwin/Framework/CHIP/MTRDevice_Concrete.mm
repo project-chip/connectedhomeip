@@ -157,10 +157,10 @@ public:
     // Used to reset Resubscription backoff on events that indicate likely availability of device to come back online
     void ResetResubscriptionBackoff() { mResubscriptionNumRetries = 0; }
 
-    void (^_Nullable mResubscriptionAttemptStartedHandler)(ReadClient::ResubscriptionSessionType sessionType);
+    void (^_Nullable mResubscriptionAttemptStartedHandler)(ReadClient::ResubscriptionSessionType sessionType, const Optional<SessionHandle> & session);
 
 private:
-    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType) override;
+    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType, const Optional<SessionHandle> & aSession) override;
 
     void OnSubscriptionEstablished(chip::SubscriptionId aSubscriptionId) override;
 
@@ -446,7 +446,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (void)unitTestReportBeginForDevice:(MTRDevice *)device;
 - (void)unitTestReportEndForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
-- (BOOL)unitTestHoldSessionRequestForDevice:(MTRDevice *)device failWith:(void (^)(NSError * error))fail succeedWith:(dispatch_block_t)succeed;
+- (BOOL)unitTestHoldSessionRequestForDevice:(MTRDevice *)device failWith:(void (^)(NSError * error))fail succeedWith:(BOOL (^)(void))succeed;
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
@@ -479,7 +479,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
     MTRMetricsCollector * _subscriptionMetrics;
     uint32_t _subscriptionRetryCount;
-    std::atomic<uint32_t> _subscriptionAttempt;
+    // Counts subscription attempts, to ignore the result of a superseded one.  Only accessed with _lock held.
+    uint32_t _subscriptionAttempt;
     NSNumber * _Nullable _subscriptionTransport;
 
     // _persistedClusterData stores data that we have already persisted (when we have
@@ -1566,6 +1567,9 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
     os_unfair_lock_assert_owner(&_lock);
 
+    // A nil error is an intentional end (reset, suspend, device removal): the metrics of whatever was in progress are delivered
+    // with a cancelled error, and a snapshot that ends an attempt says so by carrying CHIP_ERROR_CANCELLED, which is documented on
+    // device:collectedMetrics:.  Nothing is delivered if nothing was in progress.
     [self _subscriptionEndedWithError:(error ? [MTRError errorToCHIPErrorCode:error] : CHIP_ERROR_CANCELLED)];
 
     [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
@@ -3115,6 +3119,11 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     os_unfair_lock_assert_owner(&self->_lock);
     MTR_LOG_ERROR("%@ %@ - resetting subscription", self, reasonString);
 
+    // The reset itself runs later on the Matter queue.  Supersede the current attempt now, so that a session result already
+    // queued ahead of the reset is ignored instead of changing state or creating a ReadClient; _resetSubscription supersedes
+    // again when it runs.
+    ++_subscriptionAttempt;
+
     mtr_weakify(self);
     [_deviceController asyncDispatchToMatterQueue:^{
         mtr_strongify(self);
@@ -3152,6 +3161,19 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 #endif
 }
 
+// A session result belongs to the attempt that asked for it.  A reset (including the one a suspend does) or a newer attempt
+// supersedes that attempt, and its result is then ignored, so it neither changes the subscription state nor creates a ReadClient.
+- (BOOL)_isCurrentSubscriptionAttempt:(uint32_t)attempt
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (attempt != _subscriptionAttempt) {
+        MTR_LOG("%@ ignoring session result for superseded subscription attempt %u", self, attempt);
+        return NO;
+    }
+    return YES;
+}
+
 - (void)_sessionRequestForAttempt:(uint32_t)attempt failedWithError:(NSError *)error retryDelay:(NSNumber * _Nullable)retryDelay
 {
     MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
@@ -3162,10 +3184,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
         std::lock_guard lock(self->_lock);
-        if (attempt != self->_subscriptionAttempt) {
-            MTR_LOG("%@ ignoring session error for superseded subscription attempt %u", self, attempt);
-            return;
-        }
+        VerifyOrReturn([self _isCurrentSubscriptionAttempt:attempt]);
         self.doingCASEAttemptForDeviceMayBeReachable = NO;
         [self _doHandleSubscriptionError:error];
         [self _doHandleSubscriptionReset:retryDelay];
@@ -3174,10 +3193,9 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
 - (BOOL)_sessionRequestSucceededForAttempt:(uint32_t)attempt
 {
-    if (attempt != _subscriptionAttempt) {
-        MTR_LOG("%@ ignoring session for superseded subscription attempt %u", self, attempt);
-        return NO;
-    }
+    // Called from the session request's completion, which does not hold _lock.
+    std::lock_guard lock(_lock);
+    VerifyOrReturnValue([self _isCurrentSubscriptionAttempt:attempt], NO);
     self.doingCASEAttemptForDeviceMayBeReachable = NO;
     [_subscriptionMetrics endMetricIfBegunForKey:kMetricSubscriptionCASESessionRequest error:CHIP_NO_ERROR];
     return YES;
@@ -3232,17 +3250,19 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     [self _setupSubscriptionWithReason:@"Unit test attempt needing a new session"];
 }
 
-- (BOOL)unitTestStartReuseAttemptAfterHeldSessionMovesToTCP
+// Reaches into session internals (injects a TCP session and moves the held session to it, as a report on another session would),
+// because a held session that moved cannot be reached through the public API.  The ReadClient side (which session the callback
+// is given, and when it fires) is covered by TestRead.  Runs whileMoved with the held session on TCP, then moves it back.
+- (BOOL)_unitTestWithHeldSessionMovedToTCP:(void (^)(ReadClient::Callback * callback, Transport::SecureSession * tcpSession))whileMoved
 {
     assertChipStackLockedByCurrentThread();
-    ReadClient * readClient = self.matterCPPObjectsHolder.readClient;
-    VerifyOrReturnValue(readClient, NO);
-    auto held = readClient->GetHeldSession();
-    VerifyOrReturnValue(held.HasValue() && held.Value()->IsSecureSession(), NO);
+    auto * sessionManager = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager();
+    auto held = sessionManager->FindSecureSessionForNode(ScopedNodeId(_nodeID.unsignedLongLongValue, self._concreteController.fabricIndex),
+        MakeOptional(Transport::SecureSession::Type::kCASE));
+    auto * callback = static_cast<ReadClient::Callback *>(self.matterCPPObjectsHolder.subscriptionCallback);
+    VerifyOrReturnValue(callback && held.HasValue(), NO);
     auto * udpSession = held.Value()->AsSecureSession();
 
-    // Move every holder of the held session to a TCP session, as a report on that session would.
-    auto * sessionManager = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager();
     auto & udpAddress = udpSession->GetPeerAddress();
     SessionHolder tcpHolder;
     VerifyOrReturnValue(sessionManager->InjectCaseSessionWithTestKey(tcpHolder, 0xFFF0, 0xFFF1, udpSession->GetLocalNodeId(),
@@ -3252,9 +3272,37 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         NO);
     auto * tcpSession = tcpHolder->AsSecureSession();
     udpSession->NewerSessionAvailable(SessionHandle(*tcpSession));
-    static_cast<ReadClient::Callback *>(self.matterCPPObjectsHolder.subscriptionCallback)->OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType::kReuseHeldSession);
+    whileMoved(callback, tcpSession);
     tcpSession->NewerSessionAvailable(SessionHandle(*udpSession));
     tcpSession->MarkForEviction();
+    return YES;
+}
+
+- (BOOL)unitTestStartReuseAttemptAfterHeldSessionMovesToTCP
+{
+    return [self _unitTestWithHeldSessionMovedToTCP:^(ReadClient::Callback * callback, Transport::SecureSession * tcpSession) {
+        callback->OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType::kReuseHeldSession, MakeOptional<SessionHandle>(*tcpSession));
+    }];
+}
+
+- (BOOL)unitTestDeliverReportAfterHeldSessionMovesToTCP
+{
+    return [self _unitTestWithHeldSessionMovedToTCP:^(ReadClient::Callback * callback, Transport::SecureSession * tcpSession) {
+        callback->OnReportBegin();
+        callback->OnReportEnd();
+    }];
+}
+
+- (BOOL)unitTestAttachResubscriptionAttemptStarted
+{
+    assertChipStackLockedByCurrentThread();
+    auto * callback = self.matterCPPObjectsHolder.subscriptionCallback;
+    VerifyOrReturnValue(callback, NO);
+    auto * sessionManager = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager();
+    auto existing = sessionManager->FindSecureSessionForNode(ScopedNodeId(_nodeID.unsignedLongLongValue, self._concreteController.fabricIndex),
+        MakeOptional(Transport::SecureSession::Type::kCASE));
+    VerifyOrReturnValue(existing.HasValue(), NO);
+    static_cast<ReadClient::Callback *>(callback)->OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType::kAttachToExistingSession, existing);
     return YES;
 }
 
@@ -3263,8 +3311,15 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     assertChipStackLockedByCurrentThread();
     auto * callback = self.matterCPPObjectsHolder.subscriptionCallback;
     VerifyOrReturnValue(callback, NO);
-    static_cast<ReadClient::Callback *>(callback)->OnResubscriptionAttemptStarted(
-        findOrEstablishSession ? ReadClient::ResubscriptionSessionType::kFindOrEstablishSession : ReadClient::ResubscriptionSessionType::kReuseHeldSession);
+    if (findOrEstablishSession) {
+        static_cast<ReadClient::Callback *>(callback)->OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType::kEstablishNewSession, NullOptional);
+        return YES;
+    }
+    auto * sessionManager = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager();
+    auto held = sessionManager->FindSecureSessionForNode(ScopedNodeId(_nodeID.unsignedLongLongValue, self._concreteController.fabricIndex),
+        MakeOptional(Transport::SecureSession::Type::kCASE));
+    VerifyOrReturnValue(held.HasValue(), NO);
+    static_cast<ReadClient::Callback *>(callback)->OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType::kReuseHeldSession, held);
     return YES;
 }
 #endif
@@ -3316,6 +3371,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         }
     }];
 #endif
+    // Assign rather than only set: the flag is cleared when this attempt's session request finishes, but the result of a
+    // superseded attempt is ignored without clearing it, so a stale YES must not carry over to an attempt for another reason.
     self.doingCASEAttemptForDeviceMayBeReachable = [reason hasPrefix:sDeviceMayBeReachableReason];
 
     __block bool markUnreachableAfterWait = true;
@@ -3357,9 +3414,9 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                     mtr_strongify(self);
                     [self _sessionRequestForAttempt:attempt failedWithError:error retryDelay:nil];
                 }
-                succeedWith:^{
+                succeedWith:^BOOL {
                     mtr_strongify(self);
-                    [self _sessionRequestSucceededForAttempt:attempt];
+                    return [self _sessionRequestSucceededForAttempt:attempt];
                 }];
         }
     }];
@@ -3510,6 +3567,12 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                                    {
                                        std::lock_guard lock(self->_lock);
                                        self.lastSubscriptionActiveTime = [NSDate now];
+                                       // A report from the peer on another session moves the held session to it, so take the
+                                       // transport from the session the report arrived on.
+                                       ReadClient * readClient = self.matterCPPObjectsHolder.readClient;
+                                       if (readClient) {
+                                           [self _subscriptionUsesSession:readClient->GetHeldSession()];
+                                       }
                                    }
 
                                    MTR_LOG("%@ got report begin", self);
@@ -3535,10 +3598,10 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                                    [self->_subscriptionMetrics endMetricIfBegunForKey:kMetricSubscriptionCASESessionRequest error:CHIP_NO_ERROR];
                                    [self _handleCASESessionEstablished:session];
                                });
-                           callback->mResubscriptionAttemptStartedHandler = ^(ReadClient::ResubscriptionSessionType sessionType) {
+                           callback->mResubscriptionAttemptStartedHandler = ^(ReadClient::ResubscriptionSessionType sessionType, const Optional<SessionHandle> & session) {
                                mtr_strongify(self);
                                VerifyOrReturn(self);
-                               [self _subscriptionResubscriptionAttemptStarted:sessionType];
+                               [self _subscriptionResubscriptionAttemptStarted:sessionType session:session];
                            };
 
                            // Set up a cluster state cache.  We just want this for the logic it has for
@@ -5424,40 +5487,34 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
+    // Everything in the snapshot, including the device's attributes, is read now, with _lock held, so the snapshot describes the
+    // moment of the event even if the attribute cache changes before a delegate runs.  _callDelegatesWithBlock: only enqueues the
+    // call on each delegate's queue, so nothing here runs delegate code under the lock.
     [self _logSubscriptionMetric:kMetricSubscriptionRetryCount value:_subscriptionRetryCount];
     if (_subscriptionTransport != nil) {
         [self _logSubscriptionMetric:kMetricSubscriptionTransport value:_subscriptionTransport.unsignedIntValue];
     }
+    auto logValue = ^(chip::Tracing::MetricKey key, NSNumber * _Nullable value) {
+        if (value != nil) {
+            [self _logSubscriptionMetric:key value:value.unsignedIntValue];
+        }
+    };
+    logValue(kMetricSubscriptionDeviceVendorID, [self _informationalVendorID]);
+    logValue(kMetricSubscriptionDeviceProductID, [self _informationalProductID]);
+    // _deviceUsesThread is NO both for a non-Thread device and for one whose NetworkCommissioning FeatureMap is not known yet, so
+    // only report it when it is YES or the network features are known; otherwise "unknown" would read as "not Thread".
+    NSNumber * _Nullable networkFeatures = [self _networkFeatures];
+    BOOL usesThread = [self _deviceUsesThread];
+    logValue(kMetricSubscriptionDeviceUsesThread, (usesThread || networkFeatures != nil) ? @(usesThread) : nil);
+    logValue(kMetricSubscriptionNetworkFeatures, networkFeatures);
     MTRMetrics * metrics = [_subscriptionMetrics takeFinishedMetrics];
 
-    mtr_weakify(self);
-    dispatch_async(self.queue, ^{
-        mtr_strongify(self);
-        VerifyOrReturn(self);
-        std::lock_guard lock(self->_lock);
-
-        auto * deviceMetrics = [[MTRMetricsCollector alloc] init];
-        auto logValue = ^(chip::Tracing::MetricKey key, NSNumber * _Nullable value) {
-            if (value != nil) {
-                [deviceMetrics handleMetricEvent:MetricEvent(MetricEvent::Type::kInstantEvent, key, value.unsignedIntValue)];
-            }
-        };
-        logValue(kMetricSubscriptionDeviceVendorID, [self _informationalVendorID]);
-        logValue(kMetricSubscriptionDeviceProductID, [self _informationalProductID]);
-        logValue(kMetricSubscriptionDeviceUsesThread, @([self _deviceUsesThread]));
-        logValue(kMetricSubscriptionNetworkFeatures, [self _networkFeatures]);
-        MTRMetrics * deviceInfo = [deviceMetrics takeFinishedMetrics];
-        for (NSString * key in deviceInfo.allKeys) {
-            [metrics setMetricData:[deviceInfo metricDataForKey:key] forKey:key];
+    MTR_LOG_DEBUG("%@ subscription metrics %@", self, metrics);
+    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(device:collectedMetrics:)]) {
+            [delegate device:self collectedMetrics:metrics];
         }
-
-        MTR_LOG_DEBUG("%@ subscription metrics %@", self, metrics);
-        [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
-            if ([delegate respondsToSelector:@selector(device:collectedMetrics:)]) {
-                [delegate device:self collectedMetrics:metrics];
-            }
-        }];
-    });
+    }];
 }
 
 - (void)_subscriptionSetupStarted
@@ -5476,19 +5533,26 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     }
 }
 
-- (void)_subscriptionResubscriptionAttemptStarted:(ReadClient::ResubscriptionSessionType)sessionType
+- (void)_subscriptionResubscriptionAttemptStarted:(ReadClient::ResubscriptionSessionType)sessionType session:(const Optional<SessionHandle> &)session
 {
     assertChipStackLockedByCurrentThread();
     std::lock_guard lock(_lock);
 
     [self _subscriptionSetupStarted];
-    if (sessionType == ReadClient::ResubscriptionSessionType::kFindOrEstablishSession) {
+    if (sessionType == ReadClient::ResubscriptionSessionType::kEstablishNewSession) {
         [self _subscriptionCASESessionRequestStarted];
         return;
     }
-    ReadClient * readClient = self.matterCPPObjectsHolder.readClient;
-    VerifyOrReturn(readClient);
-    auto session = readClient->GetHeldSession();
+    // The attempt uses an existing session (the held one, or an active CASE session it attaches to), so no CASE session is
+    // negotiated.  Report the transport of that session: a message from the peer on another session can move the held session
+    // (for example to TCP).
+    [self _subscriptionUsesSession:session];
+}
+
+- (void)_subscriptionUsesSession:(const Optional<SessionHandle> &)session
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
     if (session.HasValue() && session.Value()->IsSecureSession()) {
         _subscriptionTransport = @(to_underlying(session.Value()->AsSecureSession()->GetPeerAddress().GetTransportType()));
     }
@@ -5897,10 +5961,10 @@ void SubscriptionCallback::OnAttributeData(
     QueueInterimReport();
 }
 
-void SubscriptionCallback::OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType)
+void SubscriptionCallback::OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType, const Optional<SessionHandle> & aSession)
 {
     if (mResubscriptionAttemptStartedHandler) {
-        mResubscriptionAttemptStartedHandler(aSessionType);
+        mResubscriptionAttemptStartedHandler(aSessionType, aSession);
     }
 }
 

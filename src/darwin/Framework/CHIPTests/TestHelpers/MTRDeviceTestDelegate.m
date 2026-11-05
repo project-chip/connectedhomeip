@@ -175,7 +175,7 @@
     }
 }
 
-- (BOOL)unitTestHoldSessionRequestForDevice:(MTRDevice *)device failWith:(void (^)(NSError * error))fail succeedWith:(dispatch_block_t)succeed
+- (BOOL)unitTestHoldSessionRequestForDevice:(MTRDevice *)device failWith:(void (^)(NSError * error))fail succeedWith:(BOOL (^)(void))succeed
 {
     if (self.holdSessionRequest) {
         if (_heldSessionRequestFailures == nil) {

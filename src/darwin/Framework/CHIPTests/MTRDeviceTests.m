@@ -27,6 +27,7 @@
 #import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRDeviceClusterData.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceController_XPC_Internal.h"
 #import "MTRDeviceDataValidation.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
@@ -8523,6 +8524,32 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertGreaterThan(values.count, 100);
 }
 
+// The subscription metrics tests each start a controller, and the suite's controller factory keeps every fabric it creates,
+// so they share one fabric (and one set of keys) instead of adding a fabric per test.
+static MTRTestKeys * sMetricsTestKeys = nil;
+static const uint64_t kMetricsTestFabricID = 2;
+
+- (MTRDeviceController *)_metricsTestController
+{
+    __auto_type * factory = MTRDeviceControllerFactory.sharedInstance;
+    if (sMetricsTestKeys == nil) {
+        sMetricsTestKeys = [[MTRTestKeys alloc] init];
+    }
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:sMetricsTestKeys.ipk
+                                                                        fabricID:@(kMetricsTestFabricID)
+                                                                       nocSigner:sMetricsTestKeys];
+    params.vendorID = @(kTestVendorId);
+    MTRDeviceController * controller = [factory createControllerOnExistingFabric:params error:nil];
+    if (controller == nil) {
+        controller = [factory createControllerOnNewFabric:params error:nil];
+    }
+    XCTAssertNotNil(controller);
+    [self addTeardownBlock:^{
+        [controller shutdown];
+    }];
+    return controller;
+}
+
 static NSNumber * _Nullable MetricValue(MTRMetrics * metrics, NSString * key)
 {
     return [metrics metricDataForKey:key].value;
@@ -8581,7 +8608,7 @@ static const NSTimeInterval kSetupHoldSeconds = 0.5;
 
 - (void)test051_SubscriptionMetricsOnEstablishment
 {
-    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    MTRDeviceController * controller = [self _metricsTestController];
     XCTAssertNotNil(controller);
     [self startCommissionedAppWithName:@"all-clusters" arguments:@[] controller:controller payload:kOnboardingPayload2 nodeID:@(kDeviceId2)];
 
@@ -8613,7 +8640,7 @@ static const NSTimeInterval kSetupHoldSeconds = 0.5;
 
 - (void)test052_SubscriptionMetricsOnDropAndResubscription
 {
-    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    MTRDeviceController * controller = [self _metricsTestController];
     XCTAssertNotNil(controller);
     MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
                                                           arguments:@[]
@@ -8663,7 +8690,7 @@ static const NSTimeInterval kSetupHoldSeconds = 0.5;
 
 - (void)test053_SubscriptionMetricsOnCASEFailure
 {
-    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    MTRDeviceController * controller = [self _metricsTestController];
     XCTAssertNotNil(controller);
 
     __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
@@ -8682,14 +8709,22 @@ static const NSTimeInterval kSetupHoldSeconds = 0.5;
     XCTAssertGreaterThanOrEqual(setup.duration.doubleValue, caseSession.duration.doubleValue);
     XCTAssertEqualObjects(MetricValue(metrics, @"dwnfw__subscription__retry_ctr_event"), @(1));
     XCTAssertNil(MetricValue(metrics, @"dwnfw__subscription__device_vendor_id_event"));
+    XCTAssertNil(MetricValue(metrics, @"dwnfw__subscription__device_uses_thread_bool_event"));
+    XCTAssertNil(MetricValue(metrics, @"dwnfw__subscription__network_features_event"));
     XCTAssertNil([metrics metricDataForKey:@"dwnfw__subscription__transport_event"]);
 }
 
 - (MTRDevice *)_heldSubscriptionDeviceWithDelegate:(MTRDeviceTestDelegate *)delegate deliveries:(NSMutableArray<MTRMetrics *> *)deliveries
 {
-    MTRDeviceController * controller = [self createControllerOnTestFabric];
-    XCTAssertNotNil(controller);
-    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    return [self _heldSubscriptionDeviceWithDelegate:delegate deliveries:deliveries controller:[self _metricsTestController] nodeID:@(kDeviceId2)];
+}
+
+- (MTRDevice *)_heldSubscriptionDeviceWithDelegate:(MTRDeviceTestDelegate *)delegate
+                                        deliveries:(NSMutableArray<MTRMetrics *> *)deliveries
+                                        controller:(MTRDeviceController *)controller
+                                            nodeID:(NSNumber *)nodeID
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:nodeID controller:controller];
     delegate.holdSessionRequest = YES;
     delegate.onCollectedMetrics = ^(MTRMetrics * metrics) {
         [deliveries addObject:metrics];
@@ -8743,6 +8778,8 @@ static const NSTimeInterval kSetupHoldSeconds = 0.5;
     XCTAssertEqualObjects(MetricValue(abandoned, @"dwnfw__subscription__retry_ctr_event"), @(1));
 
     [self waitForExpectations:@[ resubscribing ] timeout:60];
+    // The state change is delivered asynchronously, possibly before the Matter queue has run the hold hook for the new attempt.
+    [self _flushDeliveriesForDevice:device];
     XCTAssertEqual(delegate.heldSessionRequestSuccesses.count, 2u);
     XCTAssertEqual(delegate.heldSessionRequestFailures.count, 2u);
     [device.deviceController syncRunOnWorkQueue:^{
@@ -8806,7 +8843,7 @@ static const NSTimeInterval kSetupHoldSeconds = 0.5;
 
 - (void)test056_ResubscriptionOnExistingSessionKeepsTransport
 {
-    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    MTRDeviceController * controller = [self _metricsTestController];
     XCTAssertNotNil(controller);
     [self startCommissionedAppWithName:@"all-clusters" arguments:@[] controller:controller payload:kOnboardingPayload2 nodeID:@(kDeviceId2)];
 
@@ -8862,7 +8899,7 @@ static const NSTimeInterval kSetupHoldSeconds = 0.5;
 
 - (void)test057_StaleSessionRequestSuccessCreatesNoReadClient
 {
-    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    MTRDeviceController * controller = [self _metricsTestController];
     XCTAssertNotNil(controller);
     [self startCommissionedAppWithName:@"all-clusters" arguments:@[] controller:controller payload:kOnboardingPayload2 nodeID:@(kDeviceId2)];
 
@@ -8898,7 +8935,7 @@ static const NSTimeInterval kSetupHoldSeconds = 0.5;
 
 - (void)test058_SuspendSupersedesInFlightSessionRequest
 {
-    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    MTRDeviceController * controller = [self _metricsTestController];
     XCTAssertNotNil(controller);
     [self startCommissionedAppWithName:@"all-clusters" arguments:@[] controller:controller payload:kOnboardingPayload2 nodeID:@(kDeviceId2)];
 
@@ -8932,7 +8969,8 @@ static const NSTimeInterval kSetupHoldSeconds = 0.5;
     XCTAssertNotEqual(baseDevice.sessionTransportType, MTRTransportTypeUndefined);
     [self _flushDeliveriesForDevice:device];
     XCTAssertEqual([device unitTestReadClientsCreated] - readClientsBefore, 0u);
-    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, poolItemsBefore);
+    // The suspend drops this device's own pool work, so the count can go down; the superseded result must not add any.
+    XCTAssertLessThanOrEqual(controller.concurrentSubscriptionPool.itemCount, poolItemsBefore);
     XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
 
     XCTestExpectation * established = [self expectationWithDescription:@"subscription established after resume"];
@@ -8951,7 +8989,7 @@ static const NSTimeInterval kSetupHoldSeconds = 0.5;
 
 - (void)test059_ResubscriptionOnHeldSessionReportsItsCurrentTransport
 {
-    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    MTRDeviceController * controller = [self _metricsTestController];
     XCTAssertNotNil(controller);
     [self startCommissionedAppWithName:@"all-clusters" arguments:@[] controller:controller payload:kOnboardingPayload2 nodeID:@(kDeviceId2)];
 
@@ -8979,6 +9017,127 @@ static const NSTimeInterval kSetupHoldSeconds = 0.5;
     }];
     XCTAssertEqualObjects(MetricValue(failed, @"dwnfw__subscription__transport_event"), @(MTRTransportTypeTCP));
     XCTAssertNil([failed metricDataForKey:@"dwnfw__subscription__case_session_request_end"]);
+    [device unitTestResetSubscription];
+}
+
+- (void)test060_SuspendSupersedesSessionResultQueuedAheadOfItsReset
+{
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    NSMutableArray<MTRMetrics *> * deliveries = [NSMutableArray array];
+    __auto_type * device = [self _heldSubscriptionDeviceWithDelegate:delegate deliveries:deliveries];
+    [self _flushDeliveriesForDevice:device];
+    XCTAssertEqual(delegate.heldSessionRequestSuccesses.count, 1u);
+
+    MTRDeviceController * controller = device.deviceController;
+    [self addTeardownBlock:^{
+        [controller resume];
+    }];
+    // Suspending queues the subscription reset on the Matter queue behind this block, so the session result below arrives
+    // after the suspend and before the reset runs.
+    __block BOOL accepted = YES;
+    [controller syncRunOnWorkQueue:^{
+        [controller suspend];
+        accepted = delegate.heldSessionRequestSuccesses.firstObject();
+    } error:nil];
+    [self _flushDeliveriesForDevice:device];
+
+    XCTAssertFalse(accepted);
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+    XCTAssertEqual(deliveries.count, 1u);
+    NSNumber * cancelled = @(0x74);
+    XCTAssertEqualObjects([deliveries.firstObject metricDataForKey:@"dwnfw__subscription__case_session_request_end"].errorCode, cancelled);
+    XCTAssertEqualObjects([deliveries.firstObject metricDataForKey:@"dwnfw__subscription__setup_end"].errorCode, cancelled);
+}
+
+- (void)test061_SubscriptionMetricsArePerDevice
+{
+    MTRDeviceController * controller = [self _metricsTestController];
+    __auto_type * firstDelegate = [[MTRDeviceTestDelegate alloc] init];
+    NSMutableArray<MTRMetrics *> * firstDeliveries = [NSMutableArray array];
+    __auto_type * firstDevice = [self _heldSubscriptionDeviceWithDelegate:firstDelegate deliveries:firstDeliveries controller:controller nodeID:@(kDeviceId2)];
+
+    // The second device starts its setup at least this long after the first one.
+    const NSTimeInterval kSetupStartGapSeconds = 1.0;
+    usleep((useconds_t) (kSetupStartGapSeconds * USEC_PER_SEC));
+
+    NSDate * secondStart = [NSDate now];
+    __auto_type * secondDelegate = [[MTRDeviceTestDelegate alloc] init];
+    NSMutableArray<MTRMetrics *> * secondDeliveries = [NSMutableArray array];
+    __auto_type * secondDevice = [self _heldSubscriptionDeviceWithDelegate:secondDelegate deliveries:secondDeliveries controller:controller nodeID:@(kDeviceId2 + 1)];
+    [secondDevice unitTestResetSubscription];
+    [self _flushDeliveriesForDevice:secondDevice];
+    NSTimeInterval sinceSecondStart = -[secondStart timeIntervalSinceNow];
+
+    XCTAssertEqual(secondDeliveries.count, 1u);
+    MTRMetricData * secondSetup = [secondDeliveries.firstObject metricDataForKey:@"dwnfw__subscription__setup_end"];
+    XCTAssertEqualObjects(secondSetup.errorCode, @(0x74));
+    XCTAssertLessThan(secondSetup.duration.doubleValue, sinceSecondStart);
+    [self _flushDeliveriesForDevice:firstDevice];
+    XCTAssertEqual(firstDeliveries.count, 0u);
+}
+
+- (void)test062_ReportOnAnotherSessionUpdatesTransport
+{
+    MTRDeviceController * controller = [self _metricsTestController];
+    XCTAssertNotNil(controller);
+    [self startCommissionedAppWithName:@"all-clusters" arguments:@[] controller:controller payload:kOnboardingPayload2 nodeID:@(kDeviceId2)];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    MTRMetrics * established = [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__setup_end" delegate:delegate timeout:60 afterRunning:^{
+        [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    }];
+    XCTAssertEqualObjects(MetricValue(established, @"dwnfw__subscription__transport_event"), @(MTRTransportTypeUDP));
+
+    if (![device respondsToSelector:@selector(unitTestDeliverReportAfterHeldSessionMovesToTCP)]) {
+        XCTFail("device has no held-session report hook");
+        return;
+    }
+    // A report on a TCP session moves the held session there; the drop that follows reports that transport.
+    MTRMetrics * dropped = [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__active_end" delegate:delegate timeout:kTimeoutInSeconds afterRunning:^{
+        __block BOOL delivered = NO;
+        [controller syncRunOnWorkQueue:^{
+            delivered = [device unitTestDeliverReportAfterHeldSessionMovesToTCP];
+        } error:nil];
+        XCTAssertTrue(delivered);
+        [self _failSubscriptionAttemptOnDevice:device];
+    }];
+    XCTAssertEqualObjects(MetricValue(dropped, @"dwnfw__subscription__transport_event"), @(MTRTransportTypeTCP));
+    [device unitTestResetSubscription];
+}
+
+- (void)test063_AttachToExistingSessionIsNotACASESessionRequest
+{
+    MTRDeviceController * controller = [self _metricsTestController];
+    XCTAssertNotNil(controller);
+    [self startCommissionedAppWithName:@"all-clusters" arguments:@[] controller:controller payload:kOnboardingPayload2 nodeID:@(kDeviceId2)];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__setup_end" delegate:delegate timeout:60 afterRunning:^{
+        [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    }];
+    [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__active_end" delegate:delegate timeout:kTimeoutInSeconds afterRunning:^{
+        [self _failSubscriptionAttemptOnDevice:device];
+    }];
+
+    if (![device respondsToSelector:@selector(unitTestAttachResubscriptionAttemptStarted)]) {
+        XCTFail("device has no attach hook");
+        return;
+    }
+    // An attempt that attaches to an active CASE session negotiates none, so it is timed as setup but not as a CASE session
+    // request, and it reports the transport of the session it attaches to.
+    MTRMetrics * failed = [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__attempt_failed_event" delegate:delegate timeout:kTimeoutInSeconds afterRunning:^{
+        __block BOOL started = NO;
+        [controller syncRunOnWorkQueue:^{
+            started = [device unitTestAttachResubscriptionAttemptStarted];
+        } error:nil];
+        XCTAssertTrue(started);
+        [self _failSubscriptionAttemptOnDevice:device];
+    }];
+    XCTAssertNotNil([failed metricDataForKey:@"dwnfw__subscription__setup_end"]);
+    XCTAssertNil([failed metricDataForKey:@"dwnfw__subscription__case_session_request_end"]);
+    XCTAssertEqualObjects(MetricValue(failed, @"dwnfw__subscription__transport_event"), @(MTRTransportTypeUDP));
     [device unitTestResetSubscription];
 }
 
@@ -10155,6 +10314,30 @@ static MTRMetrics * TestSubscriptionMetrics(void)
 
     [device removeDelegate:delegateWithoutMetrics];
     [device removeDelegate:delegate];
+    [controller shutdown];
+}
+
+// Tests that the client interface allows every class an MTRMetrics argument is made of, and that such an argument survives a
+// secure-coding round trip limited to those classes.
+- (void)test015_CollectedMetricsInterfaceAllowsMetricsClasses
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = (MTRDeviceController_XPC *) [self createControllerWithServer:server];
+    NSXPCInterface * interface = [controller _interfaceForClientProtocol];
+    NSSet * allowed = [interface classesForSelector:@selector(device:collectedMetrics:) argumentIndex:1 ofReply:NO];
+    for (Class cls in @[ MTRMetrics.class, MTRMetricData.class, NSUUID.class, NSDictionary.class, NSString.class, NSNumber.class ]) {
+        XCTAssertTrue([allowed containsObject:cls], @"%@ missing from the allowed classes %@", cls, allowed);
+    }
+
+    __auto_type * metrics = TestSubscriptionMetrics();
+    NSError * error;
+    NSData * data = [NSKeyedArchiver archivedDataWithRootObject:metrics requiringSecureCoding:YES error:&error];
+    XCTAssertNil(error);
+    MTRMetrics * decoded = [NSKeyedUnarchiver unarchivedObjectOfClasses:allowed fromData:data error:&error];
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(decoded.allKeys, metrics.allKeys);
+    XCTAssertEqualObjects(decoded.uniqueIdentifier, metrics.uniqueIdentifier);
+
     [controller shutdown];
 }
 

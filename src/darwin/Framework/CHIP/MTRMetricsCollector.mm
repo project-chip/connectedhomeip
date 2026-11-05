@@ -121,13 +121,19 @@ static NSString * const sTypeCodingKey = @"t";
     if (!(self = [self init])) {
         return nil;
     }
+    // Like MTRMetrics, reject a corrupt message instead of accepting a partly decoded one.
     _value = [coder decodeObjectOfClass:NSNumber.class forKey:sValueCodingKey];
     _errorCode = [coder decodeObjectOfClass:NSNumber.class forKey:sErrorCodeCodingKey];
     _duration = [coder decodeObjectOfClass:NSNumber.class forKey:sDurationCodingKey];
-    NSInteger type = [coder containsValueForKey:sTypeCodingKey] ? [coder decodeIntegerForKey:sTypeCodingKey] : -1;
-    if (type >= static_cast<NSInteger>(MetricEvent::Type::kBeginEvent) && type <= static_cast<NSInteger>(MetricEvent::Type::kInstantEvent)) {
-        _type = static_cast<MetricEvent::Type>(type);
+    if (coder.error != nil || ![coder containsValueForKey:sTypeCodingKey]) {
+        return nil;
     }
+    NSInteger type = [coder decodeIntegerForKey:sTypeCodingKey];
+    if (type < static_cast<NSInteger>(MetricEvent::Type::kBeginEvent) || type > static_cast<NSInteger>(MetricEvent::Type::kInstantEvent)) {
+        MTR_LOG_ERROR("MTRMetricData decoded with invalid type %ld", static_cast<long>(type));
+        return nil;
+    }
+    _type = static_cast<MetricEvent::Type>(type);
     return self;
 }
 
@@ -402,6 +408,12 @@ static inline NSString * metricsKeyForType(const char * key, MetricEvent::Type t
     }];
     [_metricsDataCollection removeObjectsForKeys:keysToDelete];
     return metrics;
+}
+
+- (nullable NSNumber *)endErrorCodeForKey:(chip::Tracing::MetricKey)key
+{
+    std::lock_guard lock(_lock);
+    return _metricsDataCollection[metricsKeyForType(key, MetricEvent::Type::kEndEvent)].errorCode;
 }
 
 - (void)resetMetrics

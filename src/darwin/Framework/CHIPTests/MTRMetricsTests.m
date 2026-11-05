@@ -165,10 +165,11 @@
     }
     XCTAssertNil([self _decode:MTRMetrics.class objects:@{ @"id" : metrics.uniqueIdentifier } type:nil]);
     XCTAssertNil([self _decode:MTRMetrics.class objects:@{ @"md" : @ {} } type:nil]);
-    NSString * instant = [MTRMetricData new].description;
-    XCTAssertEqualObjects([[self _decode:MTRMetricData.class objects:@{} type:nil] description], instant);
-    XCTAssertEqualObjects([[self _decode:MTRMetricData.class objects:@{} type:@(99)] description], instant);
-    XCTAssertEqualObjects([[self _decode:MTRMetricData.class objects:@{} type:@(-1)] description], instant);
+    // A missing or unknown type is a corrupt message, as for MTRMetrics, and is not accepted.
+    XCTAssertNil([self _decode:MTRMetricData.class objects:@{} type:nil]);
+    XCTAssertNil([self _decode:MTRMetricData.class objects:@{} type:@(99)]);
+    XCTAssertNil([self _decode:MTRMetricData.class objects:@{} type:@(-1)]);
+    XCTAssertNotNil([self _decode:MTRMetricData.class objects:@{} type:@(2)]);
 }
 
 - (id)_decode:(Class)cls objects:(NSDictionary<NSString *, id> *)objects type:(NSNumber * _Nullable)type

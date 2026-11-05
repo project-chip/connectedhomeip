@@ -77,11 +77,13 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
 
     MTR_LOG("%@ DeviceControllerDelegate status updated: %d", strongController, status);
 
-    // If pairing failed, PASE failed. However, since OnPairingComplete(failure_code) might not be invoked in all cases, mark
-    // end of PASE with timeout as assumed failure. If OnPairingComplete is invoked, the right error code will be updated in
-    // the end event
+    // If pairing failed, PASE failed. OnPairingComplete(failure_code) might not be invoked in all cases, and the metrics are
+    // snapshotted below before it would be, so end PASE here. The commissioner has already ended its own PASE metric with the
+    // error that failed the session; use that, and only assume a timeout when it is not known.
     if (status == chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed) {
-        MATTER_LOG_METRIC_END(kMetricSetupPASESession, CHIP_ERROR_TIMEOUT);
+        NSNumber * paseError = [[MTRMetricsCollector sharedInstance] endErrorCodeForKey:chip::Tracing::kMetricDeviceCommissionerPASESession];
+        MATTER_LOG_METRIC_END(kMetricSetupPASESession,
+            paseError != nil ? chip::ChipError(static_cast<chip::ChipError::StorageType>(paseError.unsignedIntValue)) : CHIP_ERROR_TIMEOUT);
     }
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
@@ -112,6 +114,7 @@ void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error, cons
     } else {
         MTR_LOG_ERROR("%@ MTRDeviceControllerDelegate PASE session establishment failed: %" CHIP_ERROR_FORMAT, strongController, error.Format());
     }
+    // Logged before the PASE session metric ends; the snapshot is only taken at OnCommissioningComplete, so it holds both.
     if (rendezvousParameters.has_value()) {
         MATTER_LOG_METRIC(kMetricSetupPASETransport, static_cast<uint32_t>(chip::to_underlying(rendezvousParameters->GetPeerAddress().GetTransportType())));
     }

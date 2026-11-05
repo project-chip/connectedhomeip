@@ -222,9 +222,10 @@ public:
         NextCallback().OnCASESessionEstablished(aSession, aSubscriptionParams);
     }
 
-    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType) override
+    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType,
+                                        const Optional<SessionHandle> & aSession) override
     {
-        NextCallback().OnResubscriptionAttemptStarted(aSessionType);
+        NextCallback().OnResubscriptionAttemptStarted(aSessionType, aSession);
     }
 
     BufferedReadCallback mBufferedCallback;

@@ -20,5 +20,6 @@
 
 - (id)initWithMachServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options;
 - (void)_updateRegistrationInfo;
+- (NSXPCInterface *)_interfaceForClientProtocol;
 
 @end

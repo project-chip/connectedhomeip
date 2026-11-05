@@ -158,6 +158,7 @@ typedef void (^AttestationHandler)(dispatch_block_t);
       failedWithError:(NSError *)error
               metrics:(MTRMetrics *)metrics
 {
+    _metrics = metrics;
     if (self.expectFailure) {
         [_expectation fulfill];
     } else {
@@ -788,7 +789,68 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [commissioning startWithController:sController];
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
 
-    XCTAssertEqualObjects([commissioningDelegate.metrics metricDataForKey:@"dwnfw_setup_pase_transport_event"].value, @(MTRTransportTypeUDP));
+    MTRMetrics * metrics = commissioningDelegate.metrics;
+    XCTAssertEqualObjects([metrics metricDataForKey:@"dwnfw_setup_pase_transport_event"].value, @(MTRTransportTypeUDP));
+    XCTAssertNotNil([metrics metricDataForKey:@"dwnfw_setup_pase_session_begin"]);
+    MTRMetricData * pase = [metrics metricDataForKey:@"dwnfw_setup_pase_session_end"];
+    XCTAssertEqualObjects(pase.errorCode, @(0));
+    XCTAssertGreaterThan(pase.duration.doubleValue, 0);
+}
+
+- (void)test020_CommissioningOperationReportsPASEFailureError
+{
+    [self startServerApp];
+
+    // The same device with the wrong passcode: PASE fails when the device's key confirmation does not verify, which the
+    // commissioner reports as CHIP_ERROR_INTERNAL.
+    MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:nil];
+    XCTAssertNotNil(payload);
+    payload.setupPasscode = @(payload.setupPasscode.unsignedIntValue == 20202021 ? 20202022 : 20202021);
+    NSString * wrongPasscodePayload = [payload qrCodeString];
+    XCTAssertNotNil(wrongPasscodePayload);
+
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Commissioning failed"];
+    __auto_type * commissioningDelegate = [[MTRPairingTestsCommissioningDelegate alloc] initWithExpectation:expectation];
+    commissioningDelegate.expectFailure = YES;
+    __auto_type * commissioning = [[MTRCommissioningOperation alloc] initWithParameters:[[MTRCommissioningParameters alloc] init]
+                                                                           setupPayload:wrongPasscodePayload
+                                                                               delegate:commissioningDelegate
+                                                                                  queue:callbackQueue];
+    [commissioning startWithController:sController];
+    // The failure is reported once discovery stops looking for another device to try, which takes up to the discovery timeout.
+    [self waitForExpectations:@[ expectation ] timeout:2 * kPairingTimeoutInSeconds];
+
+    MTRMetrics * metrics = commissioningDelegate.metrics;
+    NSNumber * internalError = @(0xAC);
+    XCTAssertEqualObjects([metrics metricDataForKey:@"core_dcm_pase_session_end"].errorCode, internalError);
+    XCTAssertNotNil([metrics metricDataForKey:@"dwnfw_setup_pase_session_begin"]);
+    MTRMetricData * pase = [metrics metricDataForKey:@"dwnfw_setup_pase_session_end"];
+    XCTAssertEqualObjects(pase.errorCode, internalError);
+    XCTAssertGreaterThan(pase.duration.doubleValue, 0);
+}
+
+- (void)test021_CommissioningOperationStopReportsPASECancelled
+{
+    [self startServerApp];
+
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Commissioning stopped"];
+    __auto_type * commissioningDelegate = [[MTRPairingTestsCommissioningDelegate alloc] initWithExpectation:expectation];
+    commissioningDelegate.expectFailure = YES;
+    __auto_type * commissioning = [[MTRCommissioningOperation alloc] initWithParameters:[[MTRCommissioningParameters alloc] init]
+                                                                           setupPayload:kOnboardingPayload
+                                                                               delegate:commissioningDelegate
+                                                                                  queue:callbackQueue];
+    [commissioning startWithController:sController];
+    [commissioning stop];
+    [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+
+    MTRMetrics * metrics = commissioningDelegate.metrics;
+    XCTAssertNotNil([metrics metricDataForKey:@"dwnfw_setup_pase_session_begin"]);
+    MTRMetricData * pase = [metrics metricDataForKey:@"dwnfw_setup_pase_session_end"];
+    XCTAssertEqualObjects(pase.errorCode, @(0x74));
+    XCTAssertNotNil(pase.duration);
 }
 
 - (void)test012_CommissioningOperationStop

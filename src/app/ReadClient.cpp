@@ -1441,8 +1441,19 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * /* If this starts be
         !_this->mReadPrepareParams.mSessionHolder->AsSecureSession()->IsActiveSession())
     {
         // We don't have an active CASE session.  We need to go ahead and set
-        // one up, if we can.
-        _this->mpCallback.OnResubscriptionAttemptStarted(ResubscriptionSessionType::kFindOrEstablishSession);
+        // one up, if we can.  The CASE session manager attaches to an active
+        // CASE session to the peer if there is one (it looks it up the same
+        // way as below), and only negotiates a new one otherwise.
+        Optional<SessionHandle> existingSession;
+        if (InteractionModelEngine::GetInstance()->GetCASESessionManager() != nullptr)
+        {
+            existingSession = _this->mpImEngine->GetExchangeManager()->GetSessionManager()->FindSecureSessionForNode(
+                _this->mPeer, MakeOptional(Transport::SecureSession::Type::kCASE));
+        }
+        _this->mpCallback.OnResubscriptionAttemptStarted(existingSession.HasValue()
+                                                             ? ResubscriptionSessionType::kAttachToExistingSession
+                                                             : ResubscriptionSessionType::kEstablishNewSession,
+                                                         existingSession);
         if (_this->EstablishSessionToPeer() == CHIP_NO_ERROR)
         {
             return;
@@ -1460,7 +1471,8 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * /* If this starts be
         ExitNow();
     }
 
-    _this->mpCallback.OnResubscriptionAttemptStarted(ResubscriptionSessionType::kReuseHeldSession);
+    _this->mpCallback.OnResubscriptionAttemptStarted(ResubscriptionSessionType::kReuseHeldSession,
+                                                     _this->mReadPrepareParams.mSessionHolder.Get());
     err = _this->SendSubscribeRequest(_this->mReadPrepareParams);
 
 exit:

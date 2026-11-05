@@ -834,13 +834,14 @@ class ResubscriptionAttemptCountingCallback final : public ClusterStateCache::Ca
 {
 public:
     void OnDone(ReadClient *) override {}
-    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType) override
+    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType,
+                                        const Optional<SessionHandle> & aSession) override
     {
-        (aSessionType == ReadClient::ResubscriptionSessionType::kFindOrEstablishSession ? mFindOrEstablishSessionAttempts
-                                                                                        : mHeldSessionAttempts)++;
+        mAttempts[static_cast<size_t>(aSessionType)]++;
+        mLastHadSession = aSession.HasValue();
     }
-    int mFindOrEstablishSessionAttempts = 0;
-    int mHeldSessionAttempts            = 0;
+    int mAttempts[3]     = {};
+    bool mLastHadSession = true;
 };
 
 TEST_F(TestClusterStateCache, TestForwardsResubscriptionAttemptStarted)
@@ -848,11 +849,15 @@ TEST_F(TestClusterStateCache, TestForwardsResubscriptionAttemptStarted)
     ResubscriptionAttemptCountingCallback callback;
     ClusterStateCache cache(callback);
 
-    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType::kFindOrEstablishSession);
-    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType::kFindOrEstablishSession);
-    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType::kReuseHeldSession);
-    EXPECT_EQ(callback.mFindOrEstablishSessionAttempts, 2);
-    EXPECT_EQ(callback.mHeldSessionAttempts, 1);
+    using Type = ReadClient::ResubscriptionSessionType;
+    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(Type::kReuseHeldSession, NullOptional);
+    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(Type::kAttachToExistingSession, NullOptional);
+    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(Type::kEstablishNewSession, NullOptional);
+    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(Type::kEstablishNewSession, NullOptional);
+    EXPECT_EQ(callback.mAttempts[static_cast<size_t>(Type::kReuseHeldSession)], 1);
+    EXPECT_EQ(callback.mAttempts[static_cast<size_t>(Type::kAttachToExistingSession)], 1);
+    EXPECT_EQ(callback.mAttempts[static_cast<size_t>(Type::kEstablishNewSession)], 2);
+    EXPECT_FALSE(callback.mLastHadSession);
 }
 
 } // namespace

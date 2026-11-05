@@ -50,7 +50,7 @@ typedef void (^MTRDeviceTestDelegateMetricsHandler)(MTRMetrics * metrics);
 @property (atomic, copy, nullable) MTRDeviceTestDelegateMetricsHandler onCollectedMetrics;
 @property (atomic) BOOL holdSessionRequest;
 @property (atomic, readonly) NSMutableArray<void (^)(NSError *)> * heldSessionRequestFailures;
-@property (atomic, readonly) NSMutableArray<dispatch_block_t> * heldSessionRequestSuccesses;
+@property (atomic, readonly) NSMutableArray<BOOL (^)(void)> * heldSessionRequestSuccesses;
 @property (atomic, nullable) NSNumber * timeSynchronizationLossDetectionCadenceOverride;
 @end
 

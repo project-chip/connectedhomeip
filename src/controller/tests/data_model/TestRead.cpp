@@ -1456,11 +1456,27 @@ public:
                                                     mReestablishCASEOnResubscribe);
     }
 
-    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType) override
+    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType,
+                                        const Optional<SessionHandle> & aSession) override
     {
-        (aSessionType == ReadClient::ResubscriptionSessionType::kFindOrEstablishSession ? mFindOrEstablishSessionAttempts
-                                                                                        : mHeldSessionAttempts)++;
+        switch (aSessionType)
+        {
+        case ReadClient::ResubscriptionSessionType::kReuseHeldSession:
+            mHeldSessionAttempts++;
+            break;
+        case ReadClient::ResubscriptionSessionType::kAttachToExistingSession:
+            mAttachToExistingSessionAttempts++;
+            break;
+        case ReadClient::ResubscriptionSessionType::kEstablishNewSession:
+            mEstablishNewSessionAttempts++;
+            break;
+        }
         mSessionsEstablishedAtAttemptStart = mOnCASESessionEstablished;
+        mAttemptHeldSession.Release();
+        if (aSession.HasValue())
+        {
+            mAttemptHeldSession.Grab(aSession.Value());
+        }
     }
 
     void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) override
@@ -1484,11 +1500,13 @@ public:
     int32_t mOnResubscriptionsAttempted        = 0;
     int32_t mOnDone                            = 0;
     int32_t mOnError                           = 0;
-    int32_t mFindOrEstablishSessionAttempts    = 0;
+    int32_t mAttachToExistingSessionAttempts   = 0;
+    int32_t mEstablishNewSessionAttempts       = 0;
     int32_t mHeldSessionAttempts               = 0;
     int32_t mOnCASESessionEstablished          = 0;
     int32_t mSessionsEstablishedAtAttemptStart = -1;
     SessionHolder mLastEstablishedSession;
+    SessionHolder mAttemptHeldSession;
     std::function<void()> mBeforeResubscribe;
     CHIP_ERROR mLastError                   = CHIP_NO_ERROR;
     bool mScheduleLITResubscribeImmediately = false;
@@ -1575,8 +1593,10 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
         //
         EXPECT_EQ(callback.mOnError, 0);
         EXPECT_EQ(callback.mOnDone, 0);
-        EXPECT_GE(callback.mHeldSessionAttempts, 1);
-        EXPECT_EQ(callback.mFindOrEstablishSessionAttempts, 0);
+        EXPECT_EQ(callback.mHeldSessionAttempts, 1);
+        EXPECT_EQ(callback.mAttachToExistingSessionAttempts, 0);
+        EXPECT_EQ(callback.mEstablishNewSessionAttempts, 0);
+        EXPECT_TRUE(callback.mAttemptHeldSession.Contains(sessionHandle));
     }
 
     SetMRPMode(MessagingContext::MRPMode::kDefault);
@@ -1585,7 +1605,7 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestRead, TestResubscribeWithoutActiveSessionReportsFindOrEstablish)
+TEST_F(TestRead, TestResubscribeWithoutActiveSessionReportsEstablishNewSession)
 {
     SetMRPMode(MessagingContext::MRPMode::kResponsive);
 
@@ -1619,8 +1639,10 @@ TEST_F(TestRead, TestResubscribeWithoutActiveSessionReportsFindOrEstablish)
                                     [&]() { return callback.mOnDone > 0; });
         GetLoopback().mNumMessagesToDrop = 0;
 
-        EXPECT_EQ(callback.mFindOrEstablishSessionAttempts, 1);
+        EXPECT_EQ(callback.mEstablishNewSessionAttempts, 1);
+        EXPECT_EQ(callback.mAttachToExistingSessionAttempts, 0);
         EXPECT_EQ(callback.mHeldSessionAttempts, 0);
+        EXPECT_FALSE(callback.mAttemptHeldSession);
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
         EXPECT_EQ(callback.mOnError, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_INCORRECT_STATE);
@@ -1638,7 +1660,7 @@ TEST_F(TestRead, TestResubscribeWithoutActiveSessionReportsFindOrEstablish)
     EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
-TEST_F(TestRead, TestResubscribeAttachingToExistingSessionReportsFindOrEstablish)
+TEST_F(TestRead, TestResubscribeAttachingToExistingSessionReportsAttach)
 {
     Credentials::GroupDataProviderImpl groupDataProvider;
     CASEClientPool<1> caseClientPool;
@@ -1713,8 +1735,10 @@ TEST_F(TestRead, TestResubscribeAttachingToExistingSessionReportsFindOrEstablish
 
         EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 2);
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
-        EXPECT_EQ(callback.mFindOrEstablishSessionAttempts, 1);
+        EXPECT_EQ(callback.mAttachToExistingSessionAttempts, 1);
+        EXPECT_EQ(callback.mEstablishNewSessionAttempts, 0);
         EXPECT_EQ(callback.mHeldSessionAttempts, 0);
+        EXPECT_TRUE(callback.mAttemptHeldSession.Contains(existingBobToAlice.Get().Value()));
         EXPECT_EQ(callback.mOnCASESessionEstablished, 1);
         EXPECT_EQ(callback.mSessionsEstablishedAtAttemptStart, 0);
         EXPECT_EQ(callback.mOnError, 0);
