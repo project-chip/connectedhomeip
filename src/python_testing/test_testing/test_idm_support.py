@@ -75,6 +75,7 @@ class TestCodegenEnumValues(unittest.TestCase):
         self.assertTrue(any(member.name.startswith('kUnknownPlaceholder') for member in step_mode))
         self.assertEqual(_codegen_enum_values(step_mode), frozenset({1, 3}))
 
+
 class TestSpecEnumValues(unittest.TestCase):
 
     @classmethod
@@ -100,6 +101,7 @@ class TestSpecEnumValues(unittest.TestCase):
         ac_type = Clusters.Thermostat.Enums.ACTypeEnum
         self.assertEqual(smallest_legal_enum_value(ac_type, frozenset({2, 3})), 2)
 
+
 class TestUndefinedEnumValueEncoding(unittest.TestCase):
 
     def test_plain_int_encodes_as_sentinel(self):
@@ -117,6 +119,7 @@ class TestUndefinedEnumValueEncoding(unittest.TestCase):
             command = Clusters.Identify.Commands.TriggerEffect(effectIdentifier=value, effectVariant=0)
             self.assertEqual(TLVReader(command.ToTLV()).get()['Any'][0], int(value))
 
+
 class TestEnumInType(unittest.TestCase):
 
     def test_nullable_optional_enum(self):
@@ -131,6 +134,7 @@ class TestEnumInType(unittest.TestCase):
 
     def test_non_enum(self):
         self.assertIsNone(enum_in_type(Clusters.Identify.Attributes.IdentifyTime.attribute_type.Type))
+
 
 class TestRecordAcceptedViolation(unittest.TestCase):
 
@@ -161,6 +165,7 @@ class TestRecordAcceptedViolation(unittest.TestCase):
 
     def test_dut_without_spec_version_records_warning(self):
         self.assertEqual(self._severities_recorded(None), ['warning'])
+
 
 class TestFeatureGatedCommandFields(unittest.TestCase):
     """A field the DUT ignores for lack of a feature accepts any value, so it must not be probed."""
@@ -215,6 +220,7 @@ class TestFeatureGatedCommandFields(unittest.TestCase):
         # ViewGroup has no side effects, so it is unlikely to be added to COMMAND_CONSTRAINT_DENIED_COMMANDS.
         commands = [Clusters.Groups.Commands.ViewGroup]
         self.assertIn(('ViewGroup', 'GroupID'), self._discovered(Clusters.Groups, 0, commands))
+
 
 class TestValidCommandFieldValues(unittest.TestCase):
 
@@ -312,6 +318,7 @@ class TestValidCommandFieldValues(unittest.TestCase):
         self.assertEqual(self._value(None, enum_type=enum_type, enum_values=frozenset({1, 3})), 1)
         self.assertEqual(self._value(Constraints(min_length=2), 'string'), 'aa')
         self.assertEqual(self._value(Constraints(min_length=2), 'octstr'), b'\x00\x00')
+
 
 class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
 
@@ -472,18 +479,27 @@ class TestDiagnosticConstraintCoverage(unittest.IsolatedAsyncioTestCase):
             GlobalAttributeIds.ATTRIBUTE_LIST_ID: []}}
         return next(info for info in self.checker.discover_constrained_command_fields() if info.cluster_id == cluster.id)
 
-    async def test_mixed_coverage_stays_unsupported_after_ordinary_probes(self):
+    async def test_mixed_coverage_qualifies_only_executed_scope(self):
         from TC_IDM_9_1 import TC_IDM_9_1
 
         self._ordinary_command(include_diagnostics=True)
         self.checker.enforce_constraint_policy = Mock(wraps=self.checker.enforce_constraint_policy)
-        with self.assertRaisesRegex(signals.TestSkip, 'PayloadTestRequest.Count'):
+        with self.assertLogs('TC_IDM_9_1', level='WARNING') as captured:
             await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
         calls = self.checker.default_controller.SendCommand.await_args_list
         self.assertGreater(len(calls), 0)
         self.assertTrue(all(isinstance(call.kwargs['payload'], Clusters.Thermostat.Commands.SetpointRaiseLower) for call in calls))
         self.checker.enforce_constraint_policy.assert_any_call(
             subject='Command field', accepted_paths=[], rejected_count=len(calls), probed_count=len(calls))
+        summary = captured.output[-1]
+        self.assertIn('command fields exercised=1, excluded=3', summary)
+        self.assertIn(f'command probes={len(calls)}, CONSTRAINT_ERROR={len(calls)}', summary)
+        self.assertIn('writable attributes exercised=0, probes=0, CONSTRAINT_ERROR=0', summary)
+        self.assertIn('Verdict covers executed scope only; excluded enforcement is NOT DEMONSTRATED', summary)
+        for field in ('TestEventTrigger.EnableKey', 'PayloadTestRequest.EnableKey', 'PayloadTestRequest.Count'):
+            self.assertIn(field, summary)
+        self.assertEqual(self.checker.record_warning.call_count, 3)
+        self.checker.record_accepted_violation.assert_not_called()
 
     async def test_ordinary_only_can_qualify(self):
         from TC_IDM_9_1 import TC_IDM_9_1
@@ -491,7 +507,8 @@ class TestDiagnosticConstraintCoverage(unittest.IsolatedAsyncioTestCase):
         expectation = TC_IDM_9_1.steps_TC_IDM_9_1(self.checker)[1].expectation
         self.assertIn('GeneralDiagnostics.TestEventTrigger', expectation)
         self.assertIn('GeneralDiagnostics.PayloadTestRequest', expectation)
-        self.assertIn('unsupported, not as demonstrated constraint enforcement', expectation)
+        self.assertIn('the verdict covers only the executed scope', expectation)
+        self.assertIn('unsupported, never PASS', expectation)
         self._ordinary_command(include_diagnostics=False)
         await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
         self.assertGreater(self.checker.default_controller.SendCommand.await_count, 0)
@@ -620,6 +637,31 @@ class TestDiagnosticConstraintCoverage(unittest.IsolatedAsyncioTestCase):
         self.assertGreater(self.checker.default_controller.WriteAttribute.await_count, 0)
         self.checker.record_accepted_violation.assert_called()
         self.checker.default_controller.SendCommand.assert_not_called()
+
+    async def test_mixed_scope_accounting_is_preserved_in_earlier_era(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        self._ordinary_command(include_diagnostics=True)
+        basic = self.checker.endpoints_tlv[0][Clusters.BasicInformation.id]
+        basic[Clusters.BasicInformation.Attributes.SpecificationVersion.attribute_id] = SPEC_VERSION_1_7 - 1
+        with self.assertLogs('TC_IDM_9_1', level='WARNING') as captured:
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        self.assertIn('command fields exercised=1, excluded=3', captured.output[-1])
+        self.assertIn('excluded enforcement is NOT DEMONSTRATED', captured.output[-1])
+        self.assertEqual(self.checker.record_warning.call_count, 3)
+        self.assertGreater(self.checker.default_controller.SendCommand.await_count, 0)
+        self.checker.record_accepted_violation.assert_not_called()
+
+    async def test_all_excluded_accounting_has_no_command_enforcement_credit(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        with self.assertLogs('TC_IDM_9_1', level='WARNING') as captured, self.assertRaises(signals.TestSkip):
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        summary = captured.output[-1]
+        self.assertIn('command fields exercised=0, excluded=3; command probes=0, CONSTRAINT_ERROR=0', summary)
+        self.assertIn('excluded enforcement is NOT DEMONSTRATED', summary)
+        self.checker.default_controller.SendCommand.assert_not_called()
+        self.checker.record_accepted_violation.assert_not_called()
 
     async def test_exclusion_is_not_qualification_in_either_policy_era(self):
         from TC_IDM_9_1 import TC_IDM_9_1
