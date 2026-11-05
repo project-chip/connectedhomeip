@@ -21,7 +21,7 @@ import asyncio
 import logging
 
 from mobly import asserts
-from onboarding_payload_checks import OnboardingPayloadChecks
+from support_modules.onboarding_payload_checks import OnboardingPayloadChecks
 
 import matter.testing.nfc
 from matter.setup_payload import SetupPayload

@@ -42,7 +42,7 @@
 import logging
 
 from mobly import asserts
-from onboarding_payload_checks import OnboardingPayloadChecks
+from support_modules.onboarding_payload_checks import OnboardingPayloadChecks
 
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body, pics
