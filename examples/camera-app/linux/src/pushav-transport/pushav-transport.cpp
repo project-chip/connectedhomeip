@@ -31,9 +31,10 @@ using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
 
 namespace {
 
-chip::StorageKeyName SessionNumberKey(uint16_t connectionID)
+// Connection IDs are unique only within one Push AV Stream Transport cluster, so the key includes its endpoint.
+chip::StorageKeyName SessionNumberKey(chip::EndpointId endpointId, uint16_t connectionID)
 {
-    return chip::StorageKeyName::Formatted("cam/pavst/%x/sn", connectionID);
+    return chip::StorageKeyName::Formatted("cam/pavst/%x/%x/sn", endpointId, connectionID);
 }
 
 struct TransportStartedEvent
@@ -56,11 +57,13 @@ void NotifyTransportStartedOnChipThread(intptr_t arg)
 
 } // namespace
 
-PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
-                                 AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams) :
+PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, chip::EndpointId endpointId,
+                                 const uint16_t connectionID, AudioStreamStruct & audioStreamParams,
+                                 VideoStreamStruct & videoStreamParams) :
     mAudioStreamParams(audioStreamParams),
     mVideoStreamParams(videoStreamParams)
 {
+    mEndpointId                        = endpointId;
     mConnectionID                      = connectionID;
     mTransportStatus                   = TransportStatusEnum::kInactive;
     mBlindStartTime                    = std::chrono::steady_clock::time_point();
@@ -83,7 +86,8 @@ PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions
     mClipInfo.mOutputPath            = outputPath.string();
 
     uint64_t storedSessionNumber = 0;
-    CHIP_ERROR err               = KeyValueStoreMgr().Get(SessionNumberKey(connectionID).KeyName(), &storedSessionNumber);
+
+    CHIP_ERROR err = KeyValueStoreMgr().Get(SessionNumberKey(endpointId, connectionID).KeyName(), &storedSessionNumber);
     if (err == CHIP_NO_ERROR)
     {
         mSessionNumber = storedSessionNumber;
@@ -474,7 +478,7 @@ uint64_t PushAVTransport::StartNewSession()
     mClipInfo.mSessionNumber            = sessionNumber;
     mRecorder->mClipInfo.mSessionNumber = sessionNumber;
 
-    CHIP_ERROR err = KeyValueStoreMgr().Put(SessionNumberKey(mConnectionID).KeyName(), sessionNumber);
+    CHIP_ERROR err = KeyValueStoreMgr().Put(SessionNumberKey(mEndpointId, mConnectionID).KeyName(), sessionNumber);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Transport[%u] Failed to persist SessionNumber %" PRIu64 ": %" CHIP_ERROR_FORMAT, mConnectionID,
@@ -488,7 +492,7 @@ uint64_t PushAVTransport::StartNewSession()
 
 void PushAVTransport::ClearPersistedSessionNumber()
 {
-    CHIP_ERROR err = KeyValueStoreMgr().Delete(SessionNumberKey(mConnectionID).KeyName());
+    CHIP_ERROR err = KeyValueStoreMgr().Delete(SessionNumberKey(mEndpointId, mConnectionID).KeyName());
     if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         ChipLogError(Camera, "Transport[%u] Failed to delete SessionNumber: %" CHIP_ERROR_FORMAT, mConnectionID, err.Format());
