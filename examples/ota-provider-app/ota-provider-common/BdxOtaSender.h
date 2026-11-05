@@ -37,6 +37,7 @@ public:
     void SetFileDesignatorMap(const std::unordered_map<std::string, std::string> & map) { mFileDesignatorMap = map; }
 
     std::optional<uint16_t> GetRequestedMaxBlockSize() const { return mRequestedMaxBlockSize; }
+    std::optional<bool> GetIsTcpTransport() const { return mIsTcpTransport; }
 
 protected:
     // Inherited from bdx::TransferFacilitator
@@ -61,4 +62,6 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
 
     std::optional<uint16_t> mRequestedMaxBlockSize;
+    std::optional<bool> mIsTcpTransport;
+
 };

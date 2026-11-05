@@ -57,6 +57,7 @@ CHIP_ERROR BdxOtaSender::InitializeTransfer(chip::FabricIndex fabricIndex, chip:
         }
     }
     mRequestedMaxBlockSize.reset();
+    mIsTcpTransport.reset();
     mFabricIndex.SetValue(fabricIndex);
     mNodeId.SetValue(nodeId);
     mInitialized = true;
@@ -78,6 +79,11 @@ CHIP_ERROR BdxOtaSender::OnMessageReceived(chip::Messaging::ExchangeContext * ec
     // driving the transfer passes this by construction, so it is never rejected here.
     VerifyOrReturnError(session->GetFabricIndex() == mFabricIndex.Value() && session->GetPeer().GetNodeId() == mNodeId.Value(),
                         CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
+
+    if (payloadHeader.HasMessageType(chip::bdx::MessageType::ReceiveInit))
+    {
+        mIsTcpTransport = session->AsSecureSession()->GetPeerAddress().GetTransportType() == chip::Transport::Type::kTcp;
+    }
 
     return chip::bdx::TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
 }

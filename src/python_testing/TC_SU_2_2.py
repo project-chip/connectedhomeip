@@ -292,6 +292,20 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                 current_state = val
                 idle_since = None
 
+    def is_tcp_transport(self, block_size_payload: dict) -> bool | None:
+        """Payload dict from named pipe BuildBlockSizeSnapshot. Fails if is None.
+
+        Args:
+            block_size_payload (dict): Payload dict
+
+        Returns:
+            bool: _True or False for TCP Transport
+        """
+        is_tcp = block_size_payload.get("IsTCPTransport")
+        asserts.assert_is_not_none(
+            is_tcp, "Provider did not capture the BDX ReceiveInit transport")
+        return is_tcp
+
     @async_test_body
     async def test_TC_SU_2_2(self):
         # Each provider (re)start writes to its own log file under this directory instead of
@@ -874,7 +888,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                                    f"{step_number_s4}: TH Error: Provider did not capture the DUT BDX ReceiveInit")
 
         # Validate the DUTRequestedMaxBlockSize
-        if self.read_tcp_transport():
+        if self.is_tcp_transport(block_size_pipe_data["Payload"]):
             # BlockSize is no larger than 2^13 for tcp
             asserts.assert_less_equal(requested_block_size_s4, 8192, "Block size is greater than 8192 bytes.")
         else:

@@ -77,6 +77,15 @@ Json::Value OtaProviderAppCommandHandler::BuildBlockSizeSnapshot(uint16_t endpoi
         payload["DUTRequestedMaxBlockSize"] = Json::nullValue;
     }
 
+    const auto isTcpTransport = GetOtaProviderExample().GetIsTcpTransport();
+    if (isTcpTransport.has_value())
+    {
+        payload["IsTCPTransport"] = isTcpTransport.value();
+    }
+    else
+    {
+        payload["IsTCPTransport"] = Json::nullValue;
+    }
     return payload;
 }
 
