@@ -67,16 +67,23 @@ _submodules_need_updating() {
 _parse_arguments() {
     # Unknown arguments are ignored, because the shell passes on the caller's
     # positional parameters when this script is sourced without arguments.
+    # An option followed by another option or by nothing has an empty value.
     while [ $# -gt 0 ]; do
         case $1 in
         -p | --platform)
-            _CHIP_PLATFORM="${2:-}"
-            [ $# -gt 1 ] && shift
+            _CHIP_PLATFORM=
+            if [ $# -gt 1 ] && [[ "$2" != -* ]]; then
+                _CHIP_PLATFORM="$2"
+                shift
+            fi
             ;;
         --environment-root)
             _CHIP_ENVIRONMENT_ROOT_GIVEN=1
-            _CHIP_ENVIRONMENT_ROOT="${2:-}"
-            [ $# -gt 1 ] && shift
+            _CHIP_ENVIRONMENT_ROOT=
+            if [ $# -gt 1 ] && [[ "$2" != -* ]]; then
+                _CHIP_ENVIRONMENT_ROOT="$2"
+                shift
+            fi
             ;;
         esac
         shift
@@ -97,9 +104,15 @@ _set_environment_root() {
         return 1
     fi
 
+    # PW_ENVIRONMENT_ROOT must be absolute.
+    if [[ "$_CHIP_ENVIRONMENT_ROOT" != /* ]]; then
+        _CHIP_ENVIRONMENT_ROOT="$PWD/$_CHIP_ENVIRONMENT_ROOT"
+    fi
+
     # An environment requested via --environment-root is meant to be reused,
     # so only bootstrap.sh may create it.
-    if [ "${_BOOTSTRAP_PATH##*/}" != "bootstrap.sh" ] && [ ! -s "$_CHIP_ENVIRONMENT_ROOT/activate.sh" ]; then
+    if [ "${_BOOTSTRAP_PATH##*/}" != "bootstrap.sh" ] &&
+        { [ ! -f "$_CHIP_ENVIRONMENT_ROOT/activate.sh" ] || [ ! -s "$_CHIP_ENVIRONMENT_ROOT/activate.sh" ]; }; then
         echo "Error: $_CHIP_ENVIRONMENT_ROOT is not a bootstrapped environment" >&2
         return 1
     fi

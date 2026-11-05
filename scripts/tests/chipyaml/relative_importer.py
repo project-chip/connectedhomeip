@@ -21,12 +21,14 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 SCRIPT_PATH = os.path.join(DEFAULT_CHIP_ROOT, 'scripts')
 
+# Use this checkout's packages rather than installed ones, which may point at
+# another checkout sharing the same environment. This has to happen before
+# anything imports `matter`, because the controller's `matter` package computes
+# its `__path__` only once.
+for package in ('py_matter_idl', 'py_matter_yamltests'):
+    sys.path.insert(0, os.path.join(SCRIPT_PATH, package))
+
 try:
     import chiptest  # noqa: F401
 except ModuleNotFoundError:
     sys.path.append(os.path.join(SCRIPT_PATH, 'tests'))
-
-# Use this checkout's packages rather than editable installs in the pigweed
-# venv, which may point at another checkout sharing the same environment.
-for package in ('py_matter_idl', 'py_matter_yamltests'):
-    sys.path.insert(0, os.path.join(SCRIPT_PATH, package))
