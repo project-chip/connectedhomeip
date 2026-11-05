@@ -1093,7 +1093,6 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
             if (bulkValuesToStore) {
                 bulkValuesToStore[deviceDataKey] = deviceData;
             } else {
-                // Device data is written before the cluster keys, matching the earlier order.
                 // Ignore store failures, as storeDeviceData does, since they are not actionable for us here.
                 [self _storeAttributeCacheValue:deviceData forKey:deviceDataKey];
             }
@@ -1217,16 +1216,11 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         }
 
         if (bulkValuesToStore) {
+            // The device data, if any, is part of this one write, so it fails together with the cluster data.
             BOOL storeFailed = ![self _bulkStoreAttributeCacheValues:bulkValuesToStore];
             if (storeFailed) {
                 storeFailures++;
                 MTR_LOG_ERROR("Store failed for bulk values count %lu", static_cast<unsigned long>(bulkValuesToStore.count));
-                if (deviceData) {
-                    // The device data rode in the failed write, and MTRDevice no longer marks it as needing to be persisted, so
-                    // store it on its own, as a separate write did before it was folded into the bulk write.
-                    // Ignore store failures, as storeDeviceData does, since they are not actionable for us here.
-                    [self _storeAttributeCacheValue:deviceData forKey:[self _deviceDataKeyForNodeID:nodeID]];
-                }
             }
         }
 

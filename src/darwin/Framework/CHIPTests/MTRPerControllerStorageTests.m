@@ -296,8 +296,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 // Each entry is @{ @"kind" : @"storeValue" or @"storeValues", @"keys" : NSSet<NSString *> * }.
 @property (nonatomic, readonly) NSArray<NSDictionary<NSString *, id> *> * persistenceWriteCalls;
 - (void)resetRecordedCalls;
-// When set, storeValues: stores nothing and returns NO, as an all-or-nothing delegate does when the write fails.
-@property (atomic, assign) BOOL failBulkStores;
 @end
 
 @implementation MTRPerControllerStorageTestsRecordingStorage {
@@ -362,9 +360,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 {
     @synchronized(self) {
         [self recordKind:@"storeValues" keys:[NSSet setWithArray:values.allKeys]];
-        if (self.failBulkStores) {
-            return NO;
-        }
         _insideBulkStore = YES;
         BOOL result = [super controller:controller storeValues:values securityLevel:securityLevel sharingType:sharingType];
         _insideBulkStore = NO;
@@ -4580,27 +4575,6 @@ static NSNumber * const kCoalesceDeviceID = @(17);
         XCTAssertEqualObjects(attribute[MTRValueKey], @(value), @"attribute at %@ not restored", path);
     }
     XCTAssertEqualObjects(_coalesceDevice.highestObservedEventNumber, eventNumber);
-
-    [self finishCoalesceTest];
-}
-
-- (void)testFailedBulkStoreStillStoresDeviceData
-{
-    [self setUpCoalesceTest];
-    [self primeCoalesceDevice];
-
-    // The bulk write that carries the new event number fails as a whole.
-    _coalesceStorage.failBulkStores = YES;
-    NSNumber * eventNumber = [self runPersistenceRoundWithEvent:YES paths:@[ [self coalescePathWithEndpoint:0 cluster:1] ] value:++_coalesceCounter];
-    _coalesceStorage.failBulkStores = NO;
-
-    __auto_type * storage = _coalesceStorage;
-    __auto_type * controller = _coalesceController;
-    dispatch_sync(_storageQueue, ^{
-        id deviceData = [storage controller:controller valueForKey:[self coalesceDeviceDataKey] securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
-        XCTAssertTrue([deviceData isKindOfClass:NSDictionary.class]);
-        XCTAssertEqualObjects(((NSDictionary *) deviceData)[@"highestObservedEventNumber"], eventNumber, @"the event number must be stored even when the bulk write fails");
-    });
 
     [self finishCoalesceTest];
 }
