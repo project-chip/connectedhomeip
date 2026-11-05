@@ -2594,7 +2594,7 @@ TEST_F(TestChipCryptoPAL, TestStripDerIntegerSignByte)
     {
         uint8_t buf[kMaxCertificateSerialNumberLength] = { 0 };
         MutableByteSpan out(buf);
-        EXPECT_SUCCESS(StripDerIntegerSignByte(ByteSpan(testCase.derInteger.data(), testCase.derInteger.size()), out));
+        EXPECT_EQ(StripDerIntegerSignByte(ByteSpan(testCase.derInteger.data(), testCase.derInteger.size()), out), CHIP_NO_ERROR);
         EXPECT_TRUE(out.data_equal(ByteSpan(testCase.expected.data(), testCase.expected.size())));
     }
 
@@ -2602,7 +2602,7 @@ TEST_F(TestChipCryptoPAL, TestStripDerIntegerSignByte)
     uint8_t padded[kMaxCertificateSerialNumberLength + 1] = { 0x00, 0x8E };
     uint8_t buf[kMaxCertificateSerialNumberLength]        = { 0 };
     MutableByteSpan out(buf);
-    EXPECT_SUCCESS(StripDerIntegerSignByte(ByteSpan(padded), out));
+    EXPECT_EQ(StripDerIntegerSignByte(ByteSpan(padded), out), CHIP_NO_ERROR);
     EXPECT_EQ(out.size(), kMaxCertificateSerialNumberLength);
     EXPECT_EQ(out.data()[0], 0x8E);
 
@@ -2633,11 +2633,11 @@ TEST_F(TestChipCryptoPAL, TestSerialNumber_x509ExtractionHighBitSet)
 
     for (const auto & testCase : testCases)
     {
-        EXPECT_SUCCESS(VerifyAttestationCertificateFormat(testCase.cert, AttestationCertType::kDAC));
+        EXPECT_EQ(VerifyAttestationCertificateFormat(testCase.cert, AttestationCertType::kDAC), CHIP_NO_ERROR);
 
         uint8_t serialNumberBuf[kMaxCertificateSerialNumberLength] = { 0 };
         MutableByteSpan serialNumber(serialNumberBuf);
-        EXPECT_SUCCESS(ExtractSerialNumberFromX509Cert(testCase.cert, serialNumber));
+        EXPECT_EQ(ExtractSerialNumberFromX509Cert(testCase.cert, serialNumber), CHIP_NO_ERROR);
         EXPECT_TRUE(serialNumber.data_equal(testCase.expectedSerialNumber));
     }
 }

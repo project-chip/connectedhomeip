@@ -689,7 +689,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl_SerialNum
         }])";
 
         TestDACRevocationDelegateImpl revocationDelegateImpl;
-        EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
+        EXPECT_EQ(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData), CHIP_NO_ERROR);
         revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
         EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacRevoked);
     }
