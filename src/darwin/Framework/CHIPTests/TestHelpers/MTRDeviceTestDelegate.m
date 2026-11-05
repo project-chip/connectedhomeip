@@ -189,6 +189,11 @@
     return self.timeSynchronizationLossDetectionCadenceOverride;
 }
 
+- (NSNumber *)unitTestResolvingCASESetupKeepSecondsOverrideForDevice:(MTRDevice *)device
+{
+    return self.resolvingCASESetupKeepSecondsOverride;
+}
+
 - (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device
 {
     if (self.onTimeSynchronizationLossDetected != nil) {
