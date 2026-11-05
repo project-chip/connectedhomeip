@@ -95,6 +95,16 @@ public:
     virtual void OnPairingDeleted(CHIP_ERROR error) {}
 
     /**
+     * @brief
+     *   Called when the PASE session to a commissionee that is not being commissioned is released, for example after
+     *   OnPairingComplete when commissioning has not started. The commissioner releases the commissionee before calling
+     *   this, so no commissioning can be started for it without a new PASE session.
+     *
+     * @param deviceId The node ID the commissionee was paired with
+     */
+    virtual void OnPASESessionLost(NodeId deviceId) {}
+
+    /**
      *   Called when the commissioning process is complete (with success or error)
      */
     virtual void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) {}

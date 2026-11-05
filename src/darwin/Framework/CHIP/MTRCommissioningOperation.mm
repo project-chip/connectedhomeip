@@ -432,6 +432,14 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     });
 }
 
+- (void)controller:(MTRDeviceController *)controller commissioneePASESessionLostForNodeID:(NSNumber *)nodeID
+{
+    if (![nodeID isEqual:_commissioningID]) {
+        return;
+    }
+    [_controller commissioneePASESessionLost:self];
+}
+
 - (void)controllerStartingNetworkScan:(MTRDeviceController *)controller
 {
     id<MTRCommissioningDelegate> strongDelegate = _delegate;

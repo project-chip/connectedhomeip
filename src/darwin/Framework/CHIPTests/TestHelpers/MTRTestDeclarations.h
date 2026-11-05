@@ -20,6 +20,7 @@
 
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceClusterData.h"
+#import "MTRDeviceController_Test.h"
 #import "MTRDevice_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -94,17 +95,12 @@ MTR_TESTABLE_DIRECT_MEMBERS
 #pragma mark - Declarations for items compiled only for DEBUG configuration
 
 #ifdef DEBUG
-@interface MTRDeviceController (TestDebug)
+@interface MTRDeviceController (TestDebug) <MTRDeviceControllerCommissioningTestHooks>
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
 - (NSUInteger)unitTestDelegateCount;
 - (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds;
 // Syncs onto the Matter queue: call off that queue, while the controller is running.
 - (NSUInteger)unitTestSessionRequestsWaitingOnConnectivityMonitorCount;
-- (void)unitTestExpirePASESessions;
-- (void)unitTestHoldNextCommissioneeSessionObserver;
-- (void)unitTestReleaseHeldCommissioneeSessionObserver;
-- (void)unitTestMarkPASESessionDefunctForNodeID:(NSNumber *)nodeID;
-- (BOOL)unitTestNotifyCommissioneeSessionReleased;
 @end
 
 @interface MTRBaseDevice (TestDebug)

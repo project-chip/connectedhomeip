@@ -603,6 +603,8 @@ void DeviceCommissioner::Shutdown()
     WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown();
 #endif
 
+    mSystemState->SystemLayer()->CancelTimer(ReleaseCommissioneesWithLostSessions, this);
+
     // Release everything from the commissionee device pool here.
     // Make sure to use ReleaseCommissioneeDevice so we don't keep dangling
     // pointers to the device objects.
@@ -681,8 +683,55 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
 
     // Release the commissionee device after we have nulled out our pointers,
     // because that can call back in to us with error notifications as the
-    // session is released.
+    // session is released. A commissionee released here is not a lost session,
+    // so stop it reporting its own release to us.
+    device->SetSessionReleaseDelegate(nullptr);
     mCommissioneeDevicePool.ReleaseObject(device);
+}
+
+CommissioneeDeviceProxy * DeviceCommissioner::CreateCommissioneeDevice()
+{
+    CommissioneeDeviceProxy * device = mCommissioneeDevicePool.CreateObject();
+    if (device != nullptr)
+    {
+        device->SetSessionReleaseDelegate(this);
+    }
+    return device;
+}
+
+void DeviceCommissioner::OnCommissioneeSessionReleased(CommissioneeDeviceProxy & device)
+{
+    // A commissionee in PASE establishment or being commissioned has its own failure path.
+    VerifyOrReturn(&device != mDeviceInPASEEstablishment && &device != mDeviceBeingCommissioned);
+
+    // This runs inside the commissionee's session holder, so it cannot release the commissionee here.
+    CHIP_ERROR err = mSystemState->SystemLayer()->ScheduleWork(ReleaseCommissioneesWithLostSessions, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to schedule release of a commissionee whose PASE session was lost: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+    }
+}
+
+void DeviceCommissioner::ReleaseCommissioneesWithLostSessions(System::Layer *, void * context)
+{
+    auto * self = static_cast<DeviceCommissioner *>(context);
+    self->mCommissioneeDevicePool.ForEachActiveObject([self](CommissioneeDeviceProxy * device) {
+        if (device->IsSecureConnected() || device->IsSessionSetupInProgress() || device == self->mDeviceInPASEEstablishment ||
+            device == self->mDeviceBeingCommissioned)
+        {
+            return Loop::Continue;
+        }
+        NodeId deviceId = device->GetTemporaryCommissioningId();
+        ChipLogProgress(Controller, "PASE session to commissionee 0x" ChipLogFormatX64 " was lost; releasing it",
+                        ChipLogValueX64(deviceId));
+        self->ReleaseCommissioneeDevice(device);
+        if (self->mPairingDelegate != nullptr)
+        {
+            self->mPairingDelegate->OnPASESessionLost(deviceId);
+        }
+        return Loop::Continue;
+    });
 }
 
 CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** out_device)
@@ -895,7 +944,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         ReleaseCommissioneeDevice(current);
     }
 
-    device = mCommissioneeDevicePool.CreateObject();
+    device = CreateCommissioneeDevice();
     VerifyOrExit(device != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mDeviceInPASEEstablishment = device;
@@ -1181,7 +1230,7 @@ CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterConnectNetworkRequest(N
     CommissioneeDeviceProxy * device = nullptr;
     if (!mDeviceBeingCommissioned)
     {
-        device = mCommissioneeDevicePool.CreateObject();
+        device = CreateCommissioneeDevice();
         if (!device)
             return CHIP_ERROR_NO_MEMORY;
 
