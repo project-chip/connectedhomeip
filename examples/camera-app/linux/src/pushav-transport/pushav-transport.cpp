@@ -19,8 +19,10 @@
 #include <clusters/push-av-stream-transport/push-av-stream-manager.h>
 #include <ctime>
 #include <filesystem>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/PlatformManager.h>
 #include <pushav-transport.h>
 #include <time.h>
 
@@ -32,6 +34,24 @@ namespace {
 chip::StorageKeyName SessionNumberKey(uint16_t connectionID)
 {
     return chip::StorageKeyName::Formatted("cam/pavst/%x/sn", connectionID);
+}
+
+struct TransportStartedEvent
+{
+    chip::app::Clusters::PushAvStreamTransportServer * server;
+    uint16_t connectionID;
+    TransportTriggerTypeEnum triggerType;
+    chip::Optional<TriggerActivationReasonEnum> activationReason;
+    uint64_t sessionNumber;
+};
+
+// Runs on the CHIP thread through PlatformMgr().ScheduleWork(); takes ownership of the TransportStartedEvent.
+void NotifyTransportStartedOnChipThread(intptr_t arg)
+{
+    auto * event = reinterpret_cast<TransportStartedEvent *>(arg);
+    event->server->NotifyTransportStarted(event->connectionID, event->triggerType, event->activationReason,
+                                          chip::MakeOptional(event->sessionNumber));
+    chip::Platform::Delete(event);
 }
 
 } // namespace
@@ -483,10 +503,23 @@ void PushAVTransport::GeneratePushTransportBeginEvent(uint64_t sessionNumber)
 
     if (mPushAvStreamTransportServer != nullptr)
     {
-        ChipLogProgress(Camera, "GeneratePushTransportBeginEvent: Calling NotifyTransportStarted for connection %u", mConnectionID);
-        // mActivationReason is optional - if not set, it defaults to empty value
-        mPushAvStreamTransportServer->NotifyTransportStarted(mConnectionID, mTransportTriggerType, mActivationReason,
-                                                             chip::MakeOptional(sessionNumber));
+        // Posted to the CHIP event queue, like PushTransportEnd, so the events are reported in the order they happen even
+        // when a session starts on the media thread.
+        auto * event = chip::Platform::New<TransportStartedEvent>(TransportStartedEvent{
+            mPushAvStreamTransportServer, mConnectionID, mTransportTriggerType, mActivationReason, sessionNumber });
+
+        CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
+        if (event != nullptr)
+        {
+            err = chip::DeviceLayer::PlatformMgr().ScheduleWork(NotifyTransportStartedOnChipThread,
+                                                                reinterpret_cast<intptr_t>(event));
+        }
+        if (err != CHIP_NO_ERROR)
+        {
+            chip::Platform::Delete(event);
+            ChipLogError(Camera, "Failed to schedule PushTransportBegin for connection %u: %" CHIP_ERROR_FORMAT, mConnectionID,
+                         err.Format());
+        }
     }
     else
     {
@@ -862,7 +895,8 @@ void PushAVTransport::CheckAndUpdateSession()
             mRecorder.reset();
             InitializeRecorder();
         }
-        StartNewSession();
+        uint64_t sessionNumber = StartNewSession();
+
         auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() -
                                                                                mRecorder->mClipInfo.mActivationTime)
                                   .count();
@@ -871,5 +905,9 @@ void PushAVTransport::CheckAndUpdateSession()
         mRecorder->Start();
         mStreaming = true;
         UpdateSendFlags();
+        if (IsStreaming())
+        {
+            GeneratePushTransportBeginEvent(sessionNumber);
+        }
     }
 }
