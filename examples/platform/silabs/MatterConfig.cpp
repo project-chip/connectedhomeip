@@ -68,8 +68,11 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <data-model-providers/codegen/Instance.h>
 #endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 
-#if defined(MATTER_DM_PLUGIN_TIME_SYNCHRONIZATION_SERVER) && !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL && !SLI_SI91X_MCU_INTERFACE
+#if defined(MATTER_DM_PLUGIN_TIME_SYNCHRONIZATION_SERVER)
 #include "SilabsTimeSyncDelegate.h"
+#endif
+
+#if defined(SL_MATTER_ENABLE_CODEGEN_TIME_SYNC)
 #include <app/clusters/time-synchronization-server/CodegenIntegration.h>
 #include <app/static-cluster-config/TimeSynchronization.h>
 #endif
@@ -203,7 +206,7 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 
 namespace {
 
-#if defined(MATTER_DM_PLUGIN_TIME_SYNCHRONIZATION_SERVER) && !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL && !SLI_SI91X_MCU_INTERFACE
+#if defined(SL_MATTER_ENABLE_CODEGEN_TIME_SYNC)
 namespace TimeSync = Clusters::TimeSynchronization;
 
 static_assert(TimeSync::StaticApplicationConfig::kFixedClusterConfig.empty() ||
@@ -413,7 +416,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-#if defined(MATTER_DM_PLUGIN_TIME_SYNCHRONIZATION_SERVER) && !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL && !SLI_SI91X_MCU_INTERFACE
+#if defined(SL_MATTER_ENABLE_CODEGEN_TIME_SYNC)
     // Directly constructed clusters receive this delegate through their startup configuration instead.
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
 #endif

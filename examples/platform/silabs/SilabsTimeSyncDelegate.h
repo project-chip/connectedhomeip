@@ -16,6 +16,10 @@
 
 #pragma once
 
+#if defined(MATTER_DM_PLUGIN_TIME_SYNCHRONIZATION_SERVER) && !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL && !SLI_SI91X_MCU_INTERFACE
+#define SL_MATTER_ENABLE_CODEGEN_TIME_SYNC 1
+#endif
+
 #include <app/clusters/time-synchronization-server/DefaultTimeSyncDelegate.h>
 
 namespace chip::DeviceLayer::Silabs {
