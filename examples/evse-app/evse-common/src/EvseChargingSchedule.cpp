@@ -20,6 +20,8 @@
 #include <EvseChargingSchedule.h>
 #include <EvseTargetsConfig.h>
 
+#include <algorithm>
+
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
