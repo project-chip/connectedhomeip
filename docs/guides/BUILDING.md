@@ -324,8 +324,8 @@ environment if the directory does not contain one. Note that:
     provides the tool and Python package versions of the revision it was
     bootstrapped from.
 -   Only run `bootstrap.sh` in the checkout the environment was created from.
-    Bootstrapping it from another checkout ties the environment to that
-    checkout instead.
+    Bootstrapping it from another checkout ties the environment to that checkout
+    instead.
 
 ## Build for the host OS (Linux or macOS)
 
