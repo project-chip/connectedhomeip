@@ -572,6 +572,8 @@ TEST_F(TestOperationalSessionSetupFailover, DestroyedCASESessionLeavesNoSigma1De
         CASESession session;
         session.SetSigma1UnackedTransmissionLimit(1);
         EstablishDirect(session, delegate, peer.address);
+        // Sigma1 left before destruction, so the deadline was armed.
+        ASSERT_GT(peer.sigma1s, 0u);
     }
 
     // Under a memory checker a deadline left armed by the destroyed session fails here.
