@@ -43,7 +43,7 @@ class UnifiedCommissioningLogic {
       if (caps.contains(DiscoveryCapability.SOFT_AP)) {
         return NetworkType.WIFI
       }
-      return NetworkType.WIFI
+      return NetworkType.ON_NETWORK
     }
 
     fun isValidWifiCredentials(ssid: String, pass: String): Boolean {

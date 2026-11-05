@@ -63,8 +63,11 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
     private const val ARG_PAYLOAD_TEXT = "saved_payload_text"
     private const val PREFS_COMMISSIONING = "matter_unified_commissioning_prefs"
     private const val KEY_LAST_THREAD_DATASET = "last_thread_dataset_hex"
+
+    private object NoOpCompletionListener : GenericChipDeviceListener()
   }
 
+  private lateinit var appContext: Context
   private lateinit var deviceController: ChipDeviceController
   private lateinit var scope: CoroutineScope
   @Volatile private var gatt: BluetoothGatt? = null
@@ -106,7 +109,8 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    deviceController = ChipClient.getDeviceController(requireContext())
+    appContext = requireContext().applicationContext
+    deviceController = ChipClient.getDeviceController(appContext)
   }
 
   override fun onCreateView(
@@ -258,13 +262,13 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
     }
     closeGatt()
     credentialsRequest.onSessionEnded()
-    deviceController.setCompletionListener(null)
+    deviceController.setCompletionListener(NoOpCompletionListener)
     deviceController.setWiFiCredentialsNeededListener(null)
     deviceController.setThreadCredentialsNeededListener(null)
     val controller = deviceController
-    controller.setDeviceAttestationDelegate(0) { devicePtr, _, errorCode ->
+    controller.setDeviceAttestationDelegate(0) { devicePtr, _, _ ->
       try {
-        controller.continueCommissioning(devicePtr, errorCode == 0L)
+        controller.continueCommissioning(devicePtr, false)
       } catch (e: Exception) {
         Log.w(TAG, "Error in continueCommissioning", e)
       }
@@ -300,7 +304,15 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
   }
 
   private fun deviceInfoFor(payload: OnboardingPayload, code: String): CHIPDeviceInfo {
-    return CHIPDeviceInfo.fromSetupPayload(payload, true, code)
+    val isLitChecked =
+      if (this::icdSwitch.isInitialized) icdSwitch.isChecked else (deviceInfo?.isLIT ?: false)
+    val base = CHIPDeviceInfo.fromSetupPayload(payload, isLitChecked, code)
+    val existingIp = deviceInfo?.ipAddress
+    return if (existingIp != null) {
+      base.copy(ipAddress = existingIp, port = deviceInfo?.port ?: base.port)
+    } else {
+      base
+    }
   }
 
   private fun parsePayload(payloadString: String) {
@@ -350,7 +362,7 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
     startCommissioningButton.text = getString(R.string.start_commissioning)
     showError(message)
     closeGatt()
-    deviceController.setCompletionListener(null)
+    deviceController.setCompletionListener(NoOpCompletionListener)
   }
 
   private fun updateProgress(stage: String) {
@@ -394,7 +406,7 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
       pairingInProgress = false
     }
     closeGatt()
-    deviceController.setCompletionListener(null)
+    deviceController.setCompletionListener(NoOpCompletionListener)
     credentialsRequest.onSessionEnded()
 
     progressContainer.visibility = View.GONE
@@ -513,7 +525,8 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
   }
 
   private fun pairOnNetwork(info: CHIPDeviceInfo) {
-    deviceId = DeviceIdUtil.getNextAvailableId(requireContext())
+    deviceId = DeviceIdUtil.getNextAvailableId(appContext)
+    DeviceIdUtil.setNextAvailableId(appContext, deviceId + 1)
     pairingInProgress = true
     deviceController.setCompletionListener(ConnectionCallback(deviceId))
     setAttestationDelegate()
@@ -557,7 +570,7 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
           val bluetoothManager = BluetoothManager()
           val device =
             bluetoothManager.getBluetoothDevice(
-              requireContext(),
+              appContext,
               info.discriminator,
               info.isShortDiscriminator,
             )
@@ -572,9 +585,10 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
           activity?.runOnUiThread {
             if (isAdded) updateProgress(getString(R.string.stage_connecting_ble))
           }
-          gatt = bluetoothManager.connect(requireContext(), device)
+          gatt = bluetoothManager.connect(appContext, device)
 
-          deviceId = DeviceIdUtil.getNextAvailableId(requireContext())
+          deviceId = DeviceIdUtil.getNextAvailableId(appContext)
+          DeviceIdUtil.setNextAvailableId(appContext, deviceId + 1)
           pairingInProgress = true
           bleConnectionId = bluetoothManager.connectionId
           val connId = bleConnectionId
@@ -686,20 +700,32 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
 
       android.os.Handler(android.os.Looper.getMainLooper()).post {
         closeGatt()
-        deviceController.setCompletionListener(null)
+        deviceController.setCompletionListener(NoOpCompletionListener)
         credentialsRequest.onSessionEnded()
 
-        if (!isAdded) return@post
-
         if (errorCode == 0L) {
+          val resolvedNodeId = if (nodeId != 0L) nodeId else cbDeviceId
+          val registry = CenterConnectionManager.registry(appContext)
+          DeviceIdUtil.setCommissionedNodeId(appContext, resolvedNodeId)
+          val nextFloor =
+            maxOf(
+              DeviceIdUtil.getNextAvailableId(appContext),
+              maxOf(cbDeviceId, resolvedNodeId) + 1
+            )
+          DeviceIdUtil.setNextAvailableId(appContext, nextFloor)
+          PostCommissioningDialogHelper.autoRegisterNode(
+            registry,
+            resolvedNodeId,
+            deviceInfo,
+            appContext,
+          )
+
+          if (!isAdded) return@post
           updateProgress(getString(R.string.stage_done))
-          val registry = CenterConnectionManager.registry(requireContext())
-          DeviceIdUtil.setCommissionedNodeId(requireContext(), nodeId)
-          DeviceIdUtil.setNextAvailableId(requireContext(), maxOf(cbDeviceId, nodeId) + 1)
 
           PostCommissioningDialogHelper.showPostCommissioningDialog(
             requireActivity(),
-            nodeId,
+            resolvedNodeId,
             registry,
             deviceInfo,
           ) {
@@ -708,6 +734,7 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
             }
           }
         } else {
+          if (!isAdded) return@post
           onCommissioningFailed(getString(R.string.commissioning_failed, errorCode))
         }
       }

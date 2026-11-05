@@ -525,8 +525,21 @@ object HomeStateCache {
     )
   }
 
+  /** Evicts all cached attributes, switch events, IM events, and check-in records for [nodeId]. */
+  fun removeNode(nodeId: Long) {
+    val prefix = "$nodeId:"
+    cache.entries.removeIf { it.key.startsWith(prefix) }
+    switchEvents.entries.removeIf { it.key.startsWith(prefix) }
+    eventMins.remove(nodeId)
+    recentEvents.entries.removeIf { it.key.startsWith(prefix) }
+    checkInRecords.remove(nodeId)
+    scheduleSnapshot()
+  }
+
   // For tests
   fun clear() {
+    saveJob?.cancel()
+    saveJob = null
     cache.clear()
     switchEvents.clear()
     eventMins.clear()

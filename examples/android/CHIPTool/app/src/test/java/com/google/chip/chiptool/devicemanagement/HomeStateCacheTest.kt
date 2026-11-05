@@ -30,7 +30,6 @@ import org.junit.Before
 import org.junit.Test
 
 class HomeStateCacheTest {
-  private lateinit var tempDir: File
 
   private fun waitForSnapshotLoad(
     nodeId: Long,
@@ -276,5 +275,23 @@ class HomeStateCacheTest {
     // A counter from the past should not be considered greater
     val c0 = 0xFFFFFFFEL
     assertFalse(HomeStateCache.putCheckIn(1L, counter = c0, timestampMs = 3000L))
+  }
+
+  @Test
+  fun testRemoveNodeEvictsAllNodeEntries() {
+    HomeStateCache.put(1L, 1, 0x0006L, 0x0000L, true, 1000L, Source.UNICAST_READ)
+    HomeStateCache.put(2L, 1, 0x0006L, 0x0000L, true, 1000L, Source.UNICAST_READ)
+    HomeStateCache.putSwitchEvent(1L, 1, 0x01L, 1, 1, 1000L, 10L)
+    HomeStateCache.putEvent(1L, 1, 0x003BL, 0x01L, "InitialPress", 10L, 1, 1000L)
+    HomeStateCache.putCheckIn(1L, 42L, 1000L)
+
+    HomeStateCache.removeNode(1L)
+
+    assertNull(HomeStateCache.get(1L, 1, 0x0006L, 0x0000L))
+    assertNull(HomeStateCache.getLastSwitchEvent(1L))
+    assertNull(HomeStateCache.getEventMin(1L))
+    assertTrue(HomeStateCache.getRecentEvents(1L, 1).isEmpty())
+    assertTrue(HomeStateCache.getCheckInRecords(1L).isEmpty())
+    assertNotNull(HomeStateCache.get(2L, 1, 0x0006L, 0x0000L))
   }
 }

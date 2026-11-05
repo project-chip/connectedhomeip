@@ -17,6 +17,10 @@
  */
 package com.google.chip.chiptool.devicemanagement
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -25,11 +29,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class EndpointInspectorViewModelTest {
 
   private lateinit var registry: CommissionedNodeRegistry
   private lateinit var synchronizer: MatterStateSynchronizer
   private lateinit var dispatcher: UniversalMatterDispatcher
+  private lateinit var vmScope: CoroutineScope
   private lateinit var viewModel: EndpointInspectorViewModel
 
   private fun clearViewModel(vm: EndpointInspectorViewModel) {
@@ -40,17 +46,21 @@ class EndpointInspectorViewModelTest {
 
   @Before
   fun setUp() {
+    HomeStateCache.clear()
     registry = CommissionedNodeRegistry()
     registry.loadTestSmartHomeFabric()
     synchronizer = MatterStateSynchronizer(registry)
     dispatcher = UniversalMatterDispatcher(registry)
+    vmScope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher())
 
-    viewModel = EndpointInspectorViewModel(0x1001L, registry, synchronizer, dispatcher)
+    viewModel = EndpointInspectorViewModel(0x1001L, registry, synchronizer, dispatcher, vmScope)
   }
 
   @After
   fun tearDown() {
     clearViewModel(viewModel)
+    vmScope.cancel()
+    HomeStateCache.clear()
   }
 
   @Test

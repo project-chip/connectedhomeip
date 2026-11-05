@@ -375,6 +375,9 @@ class CommissionedNodeRegistry(context: Context? = null) {
 
   fun unregisterNode(nodeId: Long): CommissionedNode? {
     val removed = nodes.remove(nodeId)
+    try {
+      HomeStateCache.removeNode(nodeId)
+    } catch (_: Throwable) {}
     if (removed != null) {
       notifyNodeUpdated(removed.copy(isOnline = false))
     }

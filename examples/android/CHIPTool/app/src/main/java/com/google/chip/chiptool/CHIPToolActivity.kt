@@ -119,10 +119,10 @@ class CHIPToolActivity :
   }
 
   override fun onCommissioningComplete(code: Long, nodeId: Long) {
-    DeviceIdUtil.setCommissionedNodeId(this, nodeId)
     ChipClient.getDeviceController(this).close()
 
     if (code == 0L && nodeId > 0L) {
+      DeviceIdUtil.setCommissionedNodeId(this, nodeId)
       val registry =
         CenterConnectionManager.registry(this).also { reg ->
           PostCommissioningDialogHelper.autoRegisterNode(reg, nodeId, deviceInfo, this)

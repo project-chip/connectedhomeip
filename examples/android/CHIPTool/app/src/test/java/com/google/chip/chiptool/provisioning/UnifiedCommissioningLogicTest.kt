@@ -51,6 +51,16 @@ class UnifiedCommissioningLogicTest {
   }
 
   @Test
+  fun testGuessNetworkTypeFromPayload_EmptyCapabilities_DefaultsToOnNetwork() {
+    val payload = OnboardingPayload()
+    payload.discoveryCapabilities = mutableSetOf()
+    assertEquals(
+      NetworkType.ON_NETWORK,
+      UnifiedCommissioningLogic.guessNetworkTypeFromPayload(payload),
+    )
+  }
+
+  @Test
   fun testGuessNetworkTypeFromPayload_Null() {
     assertEquals(NetworkType.NONE, UnifiedCommissioningLogic.guessNetworkTypeFromPayload(null))
   }

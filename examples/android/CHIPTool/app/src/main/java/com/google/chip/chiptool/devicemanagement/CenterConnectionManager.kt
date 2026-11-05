@@ -310,9 +310,7 @@ object CenterConnectionManager {
    * must never run on the CHIP thread (the lock is not recursive) or block the Android UI thread.
    * Replaceable in tests.
    */
-  private val defaultIcdClientLookup: () -> Set<Long> = ::readRegisteredIcdPeers
-  @Volatile internal var icdClientLookup: () -> Set<Long> = defaultIcdClientLookup
-  @Volatile internal var forceAsyncIcdClientLookup: Boolean = false
+  @Volatile internal var icdClientLookup: () -> Set<Long> = ::readRegisteredIcdPeers
   @Volatile
   internal var icdLookupDispatcher: kotlinx.coroutines.CoroutineDispatcher = Dispatchers.IO
 
@@ -322,26 +320,19 @@ object CenterConnectionManager {
   }
 
   /**
-   * Called from the main thread (Center entry, commissioning), never from a CHIP callback.
-   * Production JNI lookup runs on [Dispatchers.IO] so `AcquireChipStackLock()` cannot block the UI
-   * thread; test overrides run synchronously.
+   * Called from the main thread (Center entry, commissioning), never from a CHIP callback. Runs on
+   * [icdLookupDispatcher] (production [Dispatchers.IO]; test-injected dispatcher in unit tests) so
+   * `AcquireChipStackLock()` cannot block the UI thread.
    */
   private fun refreshRegisteredIcdPeers(then: () -> Unit = {}) {
     val lookup = icdClientLookup
-    val update = {
+    scope.launch(icdLookupDispatcher) {
       try {
-        registeredIcdPeers = lookup()
+        val peers = lookup()
+        synchronized(stateLock) { registeredIcdPeers = peers }
       } catch (e: Exception) {
         logE("reading registered ICD clients failed; keeping ${registeredIcdPeers.size} cached", e)
       }
-    }
-    if (lookup === defaultIcdClientLookup || forceAsyncIcdClientLookup) {
-      scope.launch(icdLookupDispatcher) {
-        update()
-        then()
-      }
-    } else {
-      update()
       then()
     }
   }
@@ -581,7 +572,7 @@ object CenterConnectionManager {
   // ---------------------------------------------------------------------------------------------
 
   private fun CommissionedNode.isIcd(): Boolean =
-    getAllSupportedClusterIds().contains(CLUSTER_ICD_MANAGEMENT)
+    getAllSupportedClusterIds().contains(CLUSTER_ICD_MANAGEMENT) || nodeId in registeredIcdPeers
 
   /**
    * True if [this] node currently operates as a LIT ICD. Pure in-memory: it runs on the main thread
@@ -630,8 +621,7 @@ object CenterConnectionManager {
         when (mode) {
           Mode.ENTER ->
             inFlight || current.phase == LinkPhase.LIVE || current.phase == LinkPhase.RECOVERING
-          Mode.CONNECT_ALL ->
-            current.phase == LinkPhase.CONNECTING || current.phase == LinkPhase.PRIMING
+          Mode.CONNECT_ALL -> inFlight
           Mode.SINGLE -> inFlight || current.phase == LinkPhase.LIVE
           Mode.REFRESH_PATHS ->
             current.phase == LinkPhase.CONNECTING || current.phase == LinkPhase.WAKING
@@ -654,7 +644,12 @@ object CenterConnectionManager {
           sinceMs = clock(),
           lastHeardMs = current.lastHeardMs,
           isIcd = isIcd,
-          checkInCounter = if (mode == Mode.CHECK_IN) current.checkInCounter else null,
+          checkInCounter =
+            if (mode == Mode.CHECK_IN || current.phase == LinkPhase.WAKING) {
+              current.checkInCounter
+            } else {
+              null
+            },
           isLit = isLit,
         )
       nextState = state
@@ -1434,7 +1429,9 @@ object CenterConnectionManager {
       descriptorInFlight.clear()
       pendingFreshNodes.clear()
       registeredIcdPeers = emptySet()
-      icdClientLookup = defaultIcdClientLookup
+      icdClientLookup = ::readRegisteredIcdPeers
+      icdLookupDispatcher = Dispatchers.IO
+      checkInListenerRegistered = false
       _linkStates.value = emptyMap()
       _connectAllProgress.value = null
       sharedRegistry = registry

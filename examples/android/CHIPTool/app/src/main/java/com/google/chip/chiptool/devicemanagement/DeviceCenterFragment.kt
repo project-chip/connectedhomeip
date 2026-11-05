@@ -46,7 +46,9 @@ import com.google.chip.chiptool.databinding.ItemClusterAttributeEditorBinding
 import com.google.chip.chiptool.databinding.ItemDeviceCardBinding
 import com.google.chip.chiptool.databinding.ItemRoomSectionBinding
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /** Modern Room-Centric Matter Device & Dynamic Endpoint Management Center Fragment. */
@@ -92,6 +94,14 @@ class DeviceCenterFragment : Fragment() {
     setupEmptyStateActions()
     setupRecyclerView()
     viewModel.refreshFabric()
+    viewLifecycleOwner.lifecycleScope.launch {
+      while (isActive) {
+        delay(AGE_REFRESH_INTERVAL_MS)
+        if (isAdded && _binding != null) {
+          viewModel.refreshFabric()
+        }
+      }
+    }
   }
 
   override fun onStart() {
@@ -617,6 +627,7 @@ class DeviceCenterFragment : Fragment() {
 
   companion object {
     private const val CENTER_LEASE_OWNER = "device_center"
+    private const val AGE_REFRESH_INTERVAL_MS = 60_000L
 
     @JvmStatic fun newInstance() = DeviceCenterFragment()
   }
@@ -757,8 +768,7 @@ class DeviceCardAdapter(private val cardActions: DeviceCardActions) :
           }
 
           override fun onStopTrackingTouch(slider: Slider) {
-            val target =
-              boundCard?.takeIf { it.nodeId == trackingNodeId } ?: trackingCard ?: boundCard
+            val target = boundCard?.takeIf { it.nodeId == trackingNodeId } ?: trackingCard
             trackingNodeId = null
             trackingCard = null
             target?.let { cardActions.changeBrightness(it, slider.value.toInt()) }

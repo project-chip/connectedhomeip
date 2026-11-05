@@ -219,7 +219,7 @@ object RoomDeviceHierarchyMapper {
     val endpointDescriptors =
       endpointsToProcess.map { ep -> toEndpointDescriptor(ep, liveAttributeValues, node.nodeId) }
 
-    val now = System.currentTimeMillis()
+    val now = CenterConnectionManager.clock()
     // Online status comes only from the connection manager's link state; without a link the node
     // has not been reached in this session.
     val phase = linkState?.phase ?: LinkPhase.NOT_CONNECTED
@@ -262,7 +262,7 @@ object RoomDeviceHierarchyMapper {
         statusText =
           when {
             lastCheckIn != null -> "Asleep"
-            lastHeard > 0L -> "Asleep · heard ${formatAge(now - lastHeard)}"
+            lastHeard > 0L -> "Asleep · heard ${formatAge(maxOf(0L, now - lastHeard))}"
             else -> "Asleep"
           }
         statusColorHex = "#3C4F76"
@@ -518,15 +518,15 @@ object RoomDeviceHierarchyMapper {
     val lastSwitch = HomeStateCache.getLastSwitchEvent(node.nodeId)
     val switchEventText =
       if (lastSwitch != null) {
-        val switchAgeStr = formatAge(now - lastSwitch.updatedAtMs)
+        val switchAgeStr = formatAge(maxOf(0L, now - lastSwitch.updatedAtMs))
         "Button ${lastSwitch.position} · ${lastSwitch.describePressType()} · $switchAgeStr"
       } else null
 
     val lastCheckIn = HomeStateCache.lastCheckInMs(node.nodeId)
     val lastCheckInText =
       if (lastCheckIn != null) {
-        val ageMins = (now - lastCheckIn) / 60_000L
-        "Last check-in ${df.get()?.format(java.util.Date(lastCheckIn))} ($ageMins min ago)"
+        val ageText = formatAge(maxOf(0L, now - lastCheckIn))
+        "Last check-in ${df.get()?.format(java.util.Date(lastCheckIn))} ($ageText)"
       } else null
 
     return DeviceCardState(

@@ -41,7 +41,7 @@ data class CHIPDeviceInfo(
   val serialNumber: String = "",
   val ipAddress: String? = null,
   val port: Int = 5540,
-  val isLIT: Boolean = true,
+  val isLIT: Boolean = false,
   var setupCode: String = "",
 ) : Parcelable {
 
@@ -75,7 +75,7 @@ data class CHIPDeviceInfo(
 
     fun fromSetupPayload(
       setupPayload: OnboardingPayload,
-      isLIT: Boolean = true,
+      isLIT: Boolean = false,
       setupCode: String = "",
     ): CHIPDeviceInfo {
       val serialNumber =

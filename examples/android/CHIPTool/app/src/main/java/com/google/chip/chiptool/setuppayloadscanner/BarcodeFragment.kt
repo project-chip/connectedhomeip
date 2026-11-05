@@ -257,11 +257,11 @@ class BarcodeFragment : Fragment() {
     if (rawCode.isNullOrEmpty()) {
       return
     }
-    val isLIT = binding.enableLITCommissioningSwitchInBarcode.isChecked
     Handler(Looper.getMainLooper()).post {
       if (hasDeliveredQrCode || !isAdded || _binding == null) {
         return@post
       }
+      val isLIT = binding.enableLITCommissioningSwitchInBarcode.isChecked
       try {
         val payload = OnboardingPayloadParser().parseQrCode(rawCode)
         hasDeliveredQrCode = true

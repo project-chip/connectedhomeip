@@ -78,7 +78,10 @@ object PostCommissioningDialogHelper {
         productName = productName,
         roomName = "Unassigned",
       )
-      .also { context?.let { ctx -> registry.saveFabricToPreferences(ctx) } }
+      .also {
+        context?.let { ctx -> registry.saveFabricToPreferences(ctx) }
+        CenterConnectionManager.onNodeCommissioned(nodeId)
+      }
   }
 
   /**

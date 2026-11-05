@@ -53,6 +53,7 @@ object ChipClient {
   // Check-ins arrive on the Matter thread; several screens may listen at once.
   private val icdCheckInCallbacks = CopyOnWriteArraySet<ICDCheckInCallback>()
 
+  @Synchronized
   fun getDeviceController(context: Context): ChipDeviceController {
     getAndroidChipPlatform(context)
 
@@ -94,6 +95,7 @@ object ChipClient {
     return chipDeviceController
   }
 
+  @Synchronized
   fun getAndroidChipPlatform(context: Context?): AndroidChipPlatform {
     if (!this::androidPlatform.isInitialized && context != null) {
       // force ChipDeviceController load jni
@@ -127,6 +129,7 @@ object ChipClient {
     icdCheckInCallbacks.remove(callback)
   }
 
+  @Synchronized
   fun startDnssd(context: Context) {
     if (!this::chipDeviceController.isInitialized) {
       getDeviceController(context)
@@ -136,6 +139,7 @@ object ChipClient {
     }
   }
 
+  @Synchronized
   fun stopDnssd(context: Context) {
     if (!this::chipDeviceController.isInitialized) {
       getDeviceController(context)

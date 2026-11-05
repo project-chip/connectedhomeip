@@ -20,12 +20,19 @@ package com.google.chip.chiptool.devicemanagement
 import chip.devicecontroller.ChipStructs
 import chip.devicecontroller.model.NodeState
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CommissionedNodeRegistryTest {
+
+  @After
+  fun tearDown() {
+    CenterConnectionManager.resetForTest(null, null)
+    HomeStateCache.clear()
+  }
 
   private fun addAttr(
     nodeState: NodeState,

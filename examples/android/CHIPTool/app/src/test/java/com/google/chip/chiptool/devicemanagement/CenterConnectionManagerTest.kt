@@ -117,6 +117,8 @@ class CenterConnectionManagerTest {
     registry.registerNode(sensor)
     transport = FakeTransport()
     CenterConnectionManager.resetForTest(registry, transport, dispatcher)
+    CenterConnectionManager.icdLookupDispatcher =
+      kotlinx.coroutines.test.UnconfinedTestDispatcher(testScope.testScheduler)
     CenterConnectionManager.clock = { testScope.testScheduler.currentTime + 1_000_000L }
     CenterConnectionManager.icdClientLookup = {
       icdClientLookups++
@@ -128,7 +130,6 @@ class CenterConnectionManagerTest {
   fun tearDown() {
     CenterConnectionManager.resetForTest(null, null)
     HomeStateCache.clear()
-    CenterConnectionManager.forceAsyncIcdClientLookup = false
     CenterConnectionManager.icdLookupDispatcher = kotlinx.coroutines.Dispatchers.IO
   }
 
@@ -517,7 +518,8 @@ class CenterConnectionManagerTest {
         mainsReq.eventPaths[0].clusterId,
       )
 
-      // Node 1 is ICD -> targeted attribute (including Descriptor 0x001D and ICDManagement 0x0046),
+      // Node 1 is ICD -> targeted attribute (including Descriptor 0x001D and ICDManagement
+      // 0x0046),
       // wildcard event
       val icdReq = transport.lastRequest(1L)
       assertTrue(icdReq.attributePaths.size > 1)
@@ -555,7 +557,8 @@ class CenterConnectionManagerTest {
       transport.lastRequest(1L).established.onSubscriptionEstablished(1L)
       val before = registry.getNode(1L)!!.endpoints.map { it.endpointId }.toSet()
 
-      // A later report carries only EP1's ServerList (no EP0 PartsList): not a complete Descriptor.
+      // A later report carries only EP1's ServerList (no EP0 PartsList): not a complete
+      // Descriptor.
       val partial = NodeState()
       addAttr(partial, 1, 0x001DL, 0x0001L, arrayListOf(0x0402L))
       CenterConnectionManager.processNodeStateReport(1L, partial)
@@ -723,17 +726,39 @@ class CenterConnectionManagerTest {
   fun litsFeatureBitAloneIsNotLitAndNonIcdNeverLit() =
     testScope.runTest {
       // FeatureMap LITS (0x04) only means LIT is supported. With no registered client the device
-      // runs in SIT and must be dialed. A registered peer that is not an ICD is never LIT.
+      // runs in SIT and must be dialed. A peer that is neither an ICD nor in registeredIcdPeers
+      // is
+      // never LIT.
       HomeStateCache.put(1L, 0, 0x0046L, 0xFFFCL, 0x04, 0L, Source.UNICAST_READ)
-      registeredIcdPeers = setOf(3L)
+      HomeStateCache.put(3L, 0, 0x0046L, 0xFFFCL, 0x04, 0L, Source.UNICAST_READ)
       CenterConnectionManager.acquire(null, "center")
       runCurrent()
 
       assertEquals(LinkPhase.PRIMING, phase(1L))
+      assertTrue(CenterConnectionManager.linkState(1L).isIcd)
+      assertFalse(CenterConnectionManager.linkState(1L).isLit)
       assertEquals(LinkPhase.PRIMING, phase(3L))
       assertFalse(CenterConnectionManager.linkState(3L).isLit)
       assertFalse(CenterConnectionManager.linkState(3L).isIcd)
       assertEquals("one controller read per Center entry, not one per node", 1, icdClientLookups)
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun registeredIcdPeerWithoutDescriptorIsStillIcdAndLit() =
+    testScope.runTest {
+      // A LIT ICD that went to sleep before descriptor discovery finished has no 0x0046 cluster
+      // in
+      // its cached endpoints yet, but is present in registeredIcdPeers.
+      registry.autoRegisterCommissionedNode(9L)
+      registeredIcdPeers = setOf(9L)
+      CenterConnectionManager.acquire(null, "center")
+      runCurrent()
+
+      assertEquals(LinkPhase.ASLEEP, phase(9L))
+      assertTrue(CenterConnectionManager.linkState(9L).isIcd)
+      assertTrue(CenterConnectionManager.linkState(9L).isLit)
+      assertEquals(0, transport.count("subscribe:9"))
       CenterConnectionManager.release("center")
     }
 
@@ -752,7 +777,8 @@ class CenterConnectionManagerTest {
   @Test
   fun checkInListenerNeverRunsOnTheCallingThreadAndNeverReadsIcdClients() =
     testScope.runTest {
-      // The SDK calls the listener on the CHIP thread holding the non-recursive stack lock. Nothing
+      // The SDK calls the listener on the CHIP thread holding the non-recursive stack lock.
+      // Nothing
       // may happen synchronously, and the controller's ICD client list must not be read.
       registeredIcdPeers = setOf(1L)
       CenterConnectionManager.acquire(null, "center")
@@ -966,7 +992,7 @@ class CenterConnectionManagerTest {
     }
 
   @Test
-  fun connectAllSupersedesWakingAndUpdatesProgress() =
+  fun connectAllKeepsWakingAndUpdatesProgress() =
     testScope.runTest {
       registry.unregisterNode(3L)
       seedOperatingMode(1L, 1)
@@ -981,9 +1007,9 @@ class CenterConnectionManagerTest {
 
       CenterConnectionManager.connectAll()
       runCurrent()
-      assertEquals(LinkPhase.CONNECTING, phase(1L))
-      assertEquals(CheckInOutcome.CANCELLED, checkInRecord(1L, 10L).outcome)
-      assertEquals("CANCELLED: superseded by CONNECT_ALL", checkInRecord(1L, 10L).outcomeText)
+      assertEquals(LinkPhase.WAKING, phase(1L))
+      assertEquals(10L, CenterConnectionManager.linkState(1L).checkInCounter)
+      assertEquals(CheckInOutcome.WAKING, checkInRecord(1L, 10L).outcome)
       val progress = CenterConnectionManager.connectAllProgress.value
       assertNotNull(progress)
       assertTrue(progress!!.active)
@@ -993,6 +1019,7 @@ class CenterConnectionManagerTest {
       transport.lastRequest(1L).established.onSubscriptionEstablished(1L)
       runCurrent()
       assertEquals(LinkPhase.LIVE, phase(1L))
+      assertEquals(CheckInOutcome.LIVE, checkInRecord(1L, 10L).outcome)
       assertFalse(CenterConnectionManager.connectAllProgress.value!!.active)
       CenterConnectionManager.release("center")
     }
@@ -1075,7 +1102,6 @@ class CenterConnectionManagerTest {
   @Test
   fun coldStartAsyncLookupRace() =
     testScope.runTest {
-      CenterConnectionManager.forceAsyncIcdClientLookup = true
       CenterConnectionManager.icdLookupDispatcher =
         kotlinx.coroutines.test.StandardTestDispatcher(testScheduler)
       CenterConnectionManager.icdClientLookup = { setOf(1L) }
@@ -1096,6 +1122,7 @@ class CenterConnectionManagerTest {
         assertEquals(0, transport.count("connect:1"))
       } finally {
         CenterConnectionManager.release("center")
+        advanceUntilIdle()
       }
     }
 }
