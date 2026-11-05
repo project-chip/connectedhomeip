@@ -38,13 +38,10 @@
 
 #include "CHIPAttCert_test_vectors.h"
 
-<<<<<<< HEAD
-#include <fstream>
-=======
 #include <crypto/tests/DacValidationExplicitVectors.h>
 
+#include <fstream>
 #include <sstream>
->>>>>>> a877a96 ([Crypto] Fix mbedTLS ExtractSerialNumberFromX509Cert returning the DER sign byte (#75160))
 
 using namespace chip;
 using namespace chip::Crypto;
