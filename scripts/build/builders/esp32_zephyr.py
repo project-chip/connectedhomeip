@@ -26,15 +26,21 @@ log = logging.getLogger(__name__)
 
 class Esp32ZephyrApp(Enum):
     LIGHT = auto()
+    ALL_DEVICES = auto()
 
-    def ExampleName(self):
+    def ExampleDirectory(self):
+        """Application directory relative to the repository root."""
         if self == Esp32ZephyrApp.LIGHT:
-            return 'lighting-app'
+            return 'examples/lighting-app/esp32_zephyr'
+        if self == Esp32ZephyrApp.ALL_DEVICES:
+            return 'examples/all-devices-app/zephyr'
         raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == Esp32ZephyrApp.LIGHT:
             return 'chip-esp32-zephyr-lighting-example'
+        if self == Esp32ZephyrApp.ALL_DEVICES:
+            return 'chip-esp32-zephyr-all-devices-example'
         raise Exception(f'Unknown app type: {self!r}')
 
 
@@ -51,7 +57,10 @@ class Esp32ZephyrBoard(Enum):
 
 
 class Esp32ZephyrBuilder(Builder):
-    """Builds the ESP32 Zephyr examples (examples/<app>/esp32_zephyr) with west.
+    """Builds the ESP32 Zephyr examples with west.
+
+    Matter is passed to Zephyr as an extra module, so the west workspace does not
+    need a manifest entry for it.
 
     Required environment:
       ESP32_ZEPHYR_BASE      Zephyr tree of a west workspace with hal_espressif
@@ -81,6 +90,7 @@ class Esp32ZephyrBuilder(Builder):
                 raise Exception("ESP32 Zephyr builds require ESP32_ZEPHYR_BASE")
 
         cmd = 'export ZEPHYR_BASE="$ESP32_ZEPHYR_BASE"\n'
+        cmd += f'export ZEPHYR_EXTRA_MODULES={shlex.quote(self.root)}\n'
 
         if 'ESP32_ZEPHYR_SDK_DIR' in os.environ:
             cmd += 'export ZEPHYR_SDK_INSTALL_DIR="$ESP32_ZEPHYR_SDK_DIR"\n'
@@ -104,7 +114,7 @@ class Esp32ZephyrBuilder(Builder):
         cmd += 'west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}'.format(
             outdir=shlex.quote(self.output_dir),
             board=self.board.ZephyrBoardName(),
-            sourcedir=shlex.quote(os.path.join(self.root, 'examples', self.app.ExampleName(), 'esp32_zephyr')),
+            sourcedir=shlex.quote(os.path.join(self.root, self.app.ExampleDirectory())),
             build_flags=build_flags)
 
         self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)

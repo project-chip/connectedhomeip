@@ -16,7 +16,8 @@
 #    limitations under the License.
 #
 
-# Builds an ESP32 Zephyr example (examples/<application>/esp32_zephyr) with west.
+# Builds an ESP32 Zephyr example with west: examples/<application>/esp32_zephyr,
+# or the generic examples/<application>/zephyr (all-devices-app).
 #
 # Usage: scripts/examples/esp32_zephyr_example.sh <application> <board> [west build args...]
 #
@@ -31,7 +32,8 @@
 # The Matter environment (scripts/activate.sh) is sourced for gn and the
 # Pigweed environment; the venv is then put ahead of it on PATH.
 #
-# The output lands in examples/<application>/esp32_zephyr/build.
+# Matter is passed to Zephyr as an extra module, so the west workspace does not
+# need a manifest entry for it. The output lands in out/esp32-zephyr-<application>.
 
 set -e
 
@@ -41,10 +43,18 @@ APP="$1"
 BOARD="$2"
 shift 2 || true
 
-if [[ ! -f "examples/$APP/esp32_zephyr/CMakeLists.txt" || -z "$BOARD" ]]; then
+APP_DIR=""
+for candidate in "examples/$APP/esp32_zephyr" "examples/$APP/zephyr"; do
+    if [[ -n "$APP" && -f "$candidate/CMakeLists.txt" ]]; then
+        APP_DIR="$candidate"
+        break
+    fi
+done
+
+if [[ -z "$APP_DIR" || -z "$BOARD" ]]; then
     echo "Usage: $0 <application> <board> [west build args...]" >&2
     echo "Applications:" >&2
-    ls examples/*/esp32_zephyr/CMakeLists.txt | awk -F/ '{print "  "$2}' >&2
+    ls examples/*/esp32_zephyr/CMakeLists.txt examples/all-devices-app/zephyr/CMakeLists.txt | awk -F/ '{print "  "$2}' >&2
     echo "Boards: esp32c6_devkitc/esp32c6/hpcore, esp32c3_devkitm" >&2
     exit 1
 fi
@@ -67,5 +77,7 @@ if [[ -x "$VENV/bin/west" ]]; then
     export PATH="$VENV/bin:$PATH"
 fi
 
+export ZEPHYR_EXTRA_MODULES="$PWD"
+
 set -x
-west build -p auto -b "$BOARD" -d "examples/$APP/esp32_zephyr/build" "examples/$APP/esp32_zephyr" "$@"
+west build -p auto -b "$BOARD" -d "out/esp32-zephyr-$APP" "$APP_DIR" "$@"
