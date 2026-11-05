@@ -24,6 +24,7 @@ import logging
 import os
 import pathlib
 import re
+import time
 import sys
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
@@ -400,26 +401,43 @@ def read_global_wildcard(event_loop: asyncio.AbstractEventLoop, default_controll
     )
 
 
-async def _prepopulate_wildcard_via_case(default_controller, node_id, test_config):
+# Upper bound for the CASE probe used when no commissioning method is configured.
+# A fresh process has no cached CASE session, so a commissioned DUT still needs an
+# operational DNS-SD resolve plus a CASE handshake; 5 s leaves room for slower
+# transports (e.g. Thread) and matches the "DUT evidence" timeout used by
+# MatterBaseTest._capture_dut_baseline. A false negative is harmless: the wildcard
+# is then read on demand by guards / framework cleanup.
+_CASE_PROBE_TIMEOUT_MS = 5000
+
+
+async def _prepopulate_wildcard_via_case(default_controller, node_id, test_config) -> bool:
     """Device is already on this fabric — read via CASE, no side effects.
 
     Any downstream setup_class_helper will also reach the device via CASE.
+
+    Returns:
+        True if the wildcard was read and stashed, False otherwise.
     """
     try:
         stored_global_wildcard = await read_global_wildcard_async(default_controller, node_id)
         test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
             stored_global_wildcard)
+        return True
     except Exception:
         LOGGER.warning("Could not pre-populate global wildcard via CASE", exc_info=True)
+        return False
 
 
-async def _prepopulate_wildcard_via_pase(default_controller, node_id, matter_test_config, test_config):
+async def _prepopulate_wildcard_via_pase(default_controller, node_id, matter_test_config, test_config) -> bool:
     """Device is not commissioned — attempt PASE if credentials are available.
 
     The session is kept alive afterwards so that downstream consumers
     (CommissionDeviceTest or BasicCompositionTests.setup_class_helper)
     reuse it via FindOrEstablishPASESession instead of forcing the device
     to reopen its commissioning window.
+
+    Returns:
+        True if the wildcard was read and stashed, False otherwise.
     """
     # Local import: matter_testing imports runner at module level, so a top-level
     # import here would form a real cycle.
@@ -427,11 +445,11 @@ async def _prepopulate_wildcard_via_pase(default_controller, node_id, matter_tes
 
     setup_code = get_first_setup_code(default_controller, matter_test_config)
     if setup_code is None:
-        LOGGER.warning(
-            "Device not commissioned and no setup code available — "
-            "skipping global wildcard pre-population"
+        LOGGER.info(
+            "No setup code available for PASE — skipping global wildcard pre-population; "
+            "it will be read on demand once the DUT is reachable"
         )
-        return
+        return False
 
     try:
         commissionee = await default_controller.FindOrEstablishPASESession(
@@ -439,7 +457,7 @@ async def _prepopulate_wildcard_via_pase(default_controller, node_id, matter_tes
         )
         if commissionee is None:
             LOGGER.error("FindOrEstablishPASESession returned None")
-            return
+            return False
 
         stored_global_wildcard = await read_global_wildcard_async(default_controller, node_id)
         test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
@@ -448,36 +466,78 @@ async def _prepopulate_wildcard_via_pase(default_controller, node_id, matter_tes
             "Keeping PASE session alive for downstream reuse "
             "(CommissionDeviceTest or setup_class_helper)"
         )
+        return True
     except Exception:
         LOGGER.warning(
             "Could not pre-populate global wildcard before commissioning",
             exc_info=True
         )
+        return False
 
 
-async def _prepopulate_global_wildcard(default_controller, node_id, matter_test_config, test_config):
-    """Route to CASE or PASE pre-population based on the device's commissioning status.
+async def _prepopulate_global_wildcard(test_class, default_controller, node_id, matter_test_config, test_config) -> None:
+    """Pre-populate the global wildcard over CASE or PASE without DNS-SD browsing.
 
-    A failure to determine the commissioning status is treated as "not commissioned",
-    matching the previous sync behavior.
+    The previous implementation called is_commissioned(), whose operational and
+    commissionable DNS-SD browses wait their full windows (~5 s) whenever the DUT is
+    not on the fabric yet — the common case in CI — and browse an empty network in
+    mocked / no-DUT runs. The route is now chosen as follows:
+
+      1. requires_dut = False (e.g. CertificationUnitTestNoDevice): there is no DUT,
+         so nothing is read and no network I/O happens.
+      2. --commissioning-method or --in-test-commissioning-method is set: the run is
+         about to commission the DUT, so its starting state is known. Go straight to
+         PASE; the session is kept alive and reused by commissioning, so the only
+         added cost is the wildcard read itself.
+      3. No commissioning method: the DUT is expected on the fabric already. Probe
+         with GetConnectedDevice(allowPASE=False) bounded by _CASE_PROBE_TIMEOUT_MS
+         (returns immediately when a CASE session is cached). On success read over
+         CASE; on failure fall back to PASE, which is a no-op without a setup code.
+
+    Every failure path is non-fatal: if nothing is stashed here, guards and framework
+    cleanup read the wildcard on demand via MatterBaseTest._populate_wildcard().
     """
-    # Local import to avoid circular dependency.
-    from matter.testing.commissioning import is_commissioned
-
-    try:
-        already_commissioned = await is_commissioned(default_controller, node_id)
-    except Exception:
-        LOGGER.warning(
-            "Could not determine commissioning status for node %s, assuming not commissioned",
-            node_id
+    if not getattr(test_class, "requires_dut", True):
+        LOGGER.info(
+            "[WILDCARD] %s sets requires_dut=False; skipping global wildcard pre-population",
+            test_class.__name__,
         )
-        already_commissioned = False
+        return
 
-    if already_commissioned:
-        await _prepopulate_wildcard_via_case(default_controller, node_id, test_config)
-    else:
-        await _prepopulate_wildcard_via_pase(
+    start = time.monotonic()
+
+    expects_uncommissioned = (
+        matter_test_config.commissioning_method is not None
+        or matter_test_config.in_test_commissioning_method is not None
+    )
+
+    if expects_uncommissioned:
+        path = "pase"
+        populated = await _prepopulate_wildcard_via_pase(
             default_controller, node_id, matter_test_config, test_config)
+    else:
+        try:
+            await default_controller.GetConnectedDevice(
+                nodeId=node_id, allowPASE=False, timeoutMs=_CASE_PROBE_TIMEOUT_MS)
+        except Exception as e:
+            LOGGER.info(
+                "[WILDCARD] No CASE session to node %s within %dms, trying PASE: %s",
+                node_id, _CASE_PROBE_TIMEOUT_MS, e,
+            )
+            path = "pase-fallback"
+            populated = await _prepopulate_wildcard_via_pase(
+                default_controller, node_id, matter_test_config, test_config)
+        else:
+            path = "case"
+            populated = await _prepopulate_wildcard_via_case(
+                default_controller, node_id, test_config)
+
+    elapsed_ms = int((time.monotonic() - start) * 1000)
+    LOGGER.info(
+        "[WILDCARD] Pre-population %s in %dms (path=%s)",
+        "done" if populated else "skipped (will populate on demand)",
+        elapsed_ms, path,
+    )
 
 
 def run_tests_no_exit(
@@ -596,16 +656,14 @@ def run_tests_no_exit(
 
             # Decide whether to pre-populate the global wildcard from the runner.
             #
-            # Two mutually exclusive branches:
-            #
             #  1. CLI escape hatch --skip-global-wildcard-population is set. Used for
-            #     ad-hoc runs and for flows where the DUT is not reachable at runner
-            #     time (e.g. NFC in-test commissioning, file-based BasicComposition):
-            #     the populate must happen later, once the test itself can drive it.
+            #     ad-hoc runs and for tests where touching the DUT before the test body
+            #     would change what is being tested (e.g. a PASE session stops the DUT
+            #     from advertising as commissionable). Guards populate on demand.
             #
-            #  2. Default: pre-populate now via CASE or PASE depending on commissioning
-            #     status. Guards will find the value in the stash and never trigger
-            #     the on-demand read.
+            #  2. Default: pre-populate now. _prepopulate_global_wildcard picks the
+            #     route from requires_dut, the commissioning flags and a bounded CASE
+            #     probe (no DNS-SD browsing). Any failure falls back to on-demand.
             if getattr(matter_test_config, "skip_global_wildcard_population", False):
                 LOGGER.info(
                     "--skip-global-wildcard-population set; skipping runner pre-populate. "
@@ -614,7 +672,7 @@ def run_tests_no_exit(
             else:
                 event_loop.run_until_complete(
                     _prepopulate_global_wildcard(
-                        default_controller, node_id, matter_test_config, test_config)
+                        test_class, default_controller, node_id, matter_test_config, test_config)
                 )
 
             # Add the tests selected unless we have a commission-only request
