@@ -25,3 +25,8 @@ try:
     import chiptest  # noqa: F401
 except ModuleNotFoundError:
     sys.path.append(os.path.join(SCRIPT_PATH, 'tests'))
+
+# Use this checkout's packages rather than editable installs in the pigweed
+# venv, which may point at another checkout sharing the same environment.
+for package in ('py_matter_idl', 'py_matter_yamltests'):
+    sys.path.insert(0, os.path.join(SCRIPT_PATH, package))
