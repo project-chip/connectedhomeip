@@ -21,6 +21,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
@@ -314,6 +315,22 @@ void AppendSegmentTimeline(std::vector<std::string> & outputLines, const std::st
     outputLines.push_back(indent + "</SegmentTimeline>");
 }
 
+struct TransportStoppedEvent
+{
+    chip::app::Clusters::PushAvStreamTransportServer * server;
+    uint16_t connectionID;
+    chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum triggerType;
+    uint64_t sessionNumber;
+};
+
+// Runs on the CHIP thread through PlatformMgr().ScheduleWork(); takes ownership of the TransportStoppedEvent.
+void NotifyTransportStoppedOnChipThread(intptr_t arg)
+{
+    auto * event = reinterpret_cast<TransportStoppedEvent *>(arg);
+    event->server->NotifyTransportStopped(event->connectionID, event->triggerType, chip::MakeOptional(event->sessionNumber));
+    chip::Platform::Delete(event);
+}
+
 } // namespace
 
 bool PushAVClipRecorder::IsH264IFrame(const uint8_t * data, unsigned int length)
@@ -488,25 +505,26 @@ void PushAVClipRecorder::Stop()
     {
         SetRecorderStatus(false);
 
-        // Call the cluster server's NotifyTransportStopped method asynchronously to prevent blocking
+        // The event is posted to the CHIP event queue, which runs work in order, so this End is reported before the Begin of
+        // any session started after it.
         if (mPushAvStreamTransportServer != nullptr)
         {
-            ChipLogProgress(Camera,
-                            "PushAVClipRecorder::~PushAVClipRecorder - Scheduling async cluster server API call for connection %u",
-                            mConnectionID);
+            auto * event = chip::Platform::New<TransportStoppedEvent>(
+                TransportStoppedEvent{ mPushAvStreamTransportServer, mConnectionID, mTriggerType, mClipInfo.mSessionNumber });
 
-            uint16_t connectionID  = mConnectionID;
-            auto triggerType       = mTriggerType;
-            auto * server          = mPushAvStreamTransportServer;
-            uint64_t sessionNumber = mClipInfo.mSessionNumber;
-
-            std::thread([server, connectionID, triggerType, sessionNumber]() {
-                ChipLogProgress(Camera, "Async thread: Calling NotifyTransportStopped for connection %u", connectionID);
-                chip::DeviceLayer::PlatformMgr().LockChipStack();
-                server->NotifyTransportStopped(connectionID, triggerType, chip::MakeOptional(sessionNumber));
-                chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-                ChipLogProgress(Camera, "Async thread: NotifyTransportStopped completed for connection %u", connectionID);
-            }).detach();
+            CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
+            if (event != nullptr)
+            {
+                err = chip::DeviceLayer::PlatformMgr().ScheduleWork(NotifyTransportStoppedOnChipThread,
+                                                                    reinterpret_cast<intptr_t>(event));
+            }
+            if (err != CHIP_NO_ERROR)
+            {
+                chip::Platform::Delete(event);
+                ChipLogError(
+                    Camera, "PushAVClipRecorder::Stop - Failed to schedule PushTransportEnd for connection %u: %" CHIP_ERROR_FORMAT,
+                    mConnectionID, err.Format());
+            }
         }
         else
         {
