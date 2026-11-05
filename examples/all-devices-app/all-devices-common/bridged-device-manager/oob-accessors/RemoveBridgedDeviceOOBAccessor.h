@@ -17,8 +17,6 @@
 #pragma once
 
 #include <bridged-device-manager/BridgedDeviceManager.h>
-#include <lib/core/TLV.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessor.h>
 
 #include <optional>
@@ -27,10 +25,8 @@ namespace chip::app {
 
 /**
  * Usage:
- *    Tag(2): BridgedDeviceManager::DeviceInterfaceId deviceInterfaceId (uint16_t)
+ *    Tag(1): BridgedDeviceManager::DeviceInterfaceId deviceInterfaceId (uint16_t)
  *       The deviceInterfaceId of the bridged device to be removed.
- *
- * Note: Here Tag(2) is used for the deviceInterfaceId, because Tag(1) is commonly used for endpointId.
  */
 
 class RemoveBridgedDeviceOOBAccessor : public OOBAccessor

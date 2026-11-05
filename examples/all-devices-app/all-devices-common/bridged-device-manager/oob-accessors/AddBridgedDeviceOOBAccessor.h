@@ -17,8 +17,6 @@
 #pragma once
 
 #include <bridged-device-manager/BridgedDeviceManager.h>
-#include <lib/core/TLV.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessor.h>
 
 #include <optional>

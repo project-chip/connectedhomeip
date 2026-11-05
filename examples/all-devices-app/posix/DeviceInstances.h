@@ -79,7 +79,7 @@ public:
         return mFactory.CreateBridgedNode(nodeLabel);
     }
 
-    DeviceRegistrationEntryOfConcreteType<Aggregator> CreateAggregator(const std::string &) override
+    DeviceRegistrationEntryOfConcreteType<Aggregator> CreateAggregator() override
     {
         return mFactory.CreateAggregator();
     }

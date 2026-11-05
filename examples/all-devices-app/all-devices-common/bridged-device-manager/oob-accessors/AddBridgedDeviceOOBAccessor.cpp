@@ -70,14 +70,15 @@ std::optional<CHIP_ERROR> AddBridgedDeviceOOBAccessor::HandleAction(CharSpan act
 
     auto optionalDeviceInterfaceId =
         mBridgedDeviceManager.AddBridgedDevice(std::string(deviceType.data(), deviceType.size()), {}, aggregatorEndpointId);
+    std::string deviceTypeLoggable{ deviceType.data(), deviceType.size() };
     if (!optionalDeviceInterfaceId.has_value())
     {
-        ChipLogError(AppServer, "Failed to add bridged device: %s", NullTerminated(deviceType).c_str());
+        ChipLogError(AppServer, "Failed to add bridged device: %s", deviceTypeLoggable.c_str());
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
     ChipLogProgress(AppServer, "Successfully added bridged device: %s with DeviceInterfaceId: %u",
-                    NullTerminated(deviceType).c_str(), optionalDeviceInterfaceId.value());
+                    deviceTypeLoggable.c_str(), optionalDeviceInterfaceId.value());
     return CHIP_NO_ERROR;
 }
 

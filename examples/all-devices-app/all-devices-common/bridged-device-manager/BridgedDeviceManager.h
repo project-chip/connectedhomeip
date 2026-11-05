@@ -62,19 +62,9 @@ public:
      *
      * @param nodeLabel The label for the new device.
      */
-    virtual DeviceRegistrationEntryOfConcreteType<Aggregator> CreateAggregator(const std::string & nodeLabel) = 0;
+    virtual DeviceRegistrationEntryOfConcreteType<Aggregator> CreateAggregator() = 0;
 
     BridgedDeviceManager(CodeDrivenDataModelProvider & provider, EndpointIdAllocator & endpointIdAllocator);
-
-    /**
-     * @brief Initializes the default aggregator device.
-     *
-     * This function will be called lazily when adding a bridged device without specifying an aggregator endpointId for the first
-     * time.
-     *
-     * @return CHIP_ERROR indicating the success or failure of the operation.
-     */
-    CHIP_ERROR InitializeDefaultAggregator();
 
     /**
      * @brief Adds a new bridged device to the DataModelProvider.
@@ -91,7 +81,7 @@ public:
      * "aggregator" will be rejected.
      * @param composition The composition of the device. The parentId will be overridden.
      * @param aggregatorEndpointId The endpoint ID of the aggregator to use. If kInvalidEndpointId, the default aggregator will be
-     * used (it also will be lazily initilized if needed).
+     * used (it also will be lazily initialized if needed).
      * @param nodeLabel The label for the new device.
      *
      * @return An optional DeviceInterfaceId of the newly added device. If the operation fails, returns std::nullopt.
@@ -116,11 +106,10 @@ private:
         DeviceRegistrationEntry deviceEntry;
         DeviceRegistrationEntryOfConcreteType<BridgedNode> parentBridgedNodeDeviceEntry;
     };
-    std::vector<DeviceStorage>::iterator GetDeviceStorageIterator(DeviceInterfaceId deviceInterfaceId);
-    bool IsValidAggregatorEndpoint(EndpointId endpointId);
 
-    // Will work properly only after the device has been registered.
-    static bool InterfaceHasDeviceType(DeviceInterface & deviceInterface, const DataModel::DeviceTypeEntry & deviceType);
+    std::vector<DeviceStorage>::iterator GetDeviceStorageIterator(DeviceInterfaceId deviceInterfaceId);
+    CHIP_ERROR InitializeDefaultAggregator();
+    bool IsValidAggregatorEndpoint(EndpointId endpointId);
 
     std::vector<DeviceStorage> mDeviceEntries;
     CodeDrivenDataModelProvider & mProvider;

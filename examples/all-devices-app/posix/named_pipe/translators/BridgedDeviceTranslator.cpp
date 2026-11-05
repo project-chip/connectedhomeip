@@ -51,7 +51,20 @@ CHIP_ERROR BridgedDeviceTranslator::TranslateAndExecute(EndpointId endpointId, c
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return DispatchAction(registry, "RemoveBridgedDevice"_span, endpointId, deviceInterfaceId.value());
+
+        // Manually encode TLV data.
+        // DispatchAction() will encode endpointId with Tag(1), but we do not use it, so we don't want it to even be encoded.
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer, sizeof(buffer));
+
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), deviceInterfaceId.value()));
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
+        ReturnErrorOnFailure(writer.Finalize());
+
+        return registry.HandleAction("RemoveBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten()));
     }
     return CHIP_ERROR_NOT_FOUND;
 }
