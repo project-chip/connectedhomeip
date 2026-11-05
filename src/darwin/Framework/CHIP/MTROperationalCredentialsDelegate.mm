@@ -239,6 +239,8 @@ void MTROperationalCredentialsDelegate::ExternalNOCChainGenerated(
 
             if (mOnNOCCompletionCallback == nullptr || requestID != mExternalNOCChainRequestID
                 || commissioner->GetCommissioningStage() != Controller::CommissioningStage::kGenerateNOCChain) {
+                // Leave mOnNOCCompletionCallback set: it belongs to the current request, which a stale completion can
+                // arrive in the middle of, and clearing it here would leave that request's commissioning unfinished.
                 MTR_LOG("%@ ignoring a NOC chain completion for a request that is no longer current", mWeakController);
                 return;
             }
