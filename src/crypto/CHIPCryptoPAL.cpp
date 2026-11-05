@@ -675,6 +675,15 @@ CHIP_ERROR ConvertIntegerRawToDer(const ByteSpan & raw_integer, MutableByteSpan 
     return ConvertIntegerRawToDerInternal(raw_integer, out_der_integer, /* include_tag_and_length = */ true);
 }
 
+CHIP_ERROR StripDerIntegerSignByte(ByteSpan der_integer_content, MutableByteSpan & out_value)
+{
+    if (der_integer_content.size() > 1 && der_integer_content[0] == 0x00 && (der_integer_content[1] & 0x80) != 0)
+    {
+        der_integer_content = der_integer_content.SubSpan(1);
+    }
+    return CopySpanToMutableSpan(der_integer_content, out_value);
+}
+
 CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_sig, MutableByteSpan & out_asn1_sig)
 {
     VerifyOrReturnError(fe_length_bytes > 0, CHIP_ERROR_INVALID_ARGUMENT);
