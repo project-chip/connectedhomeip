@@ -8604,9 +8604,10 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     delegate.pretendThreadEnabled = thread;
 
     XCTestExpectation * subscribingExpectation = [self expectationWithDescription:@"Reattempt started a subscription"];
+    // Called synchronously right after the device enters the subscribing state, so the time isn't delayed by delegate delivery.
     __block NSDate * subscribingTime = nil;
-    delegate.onInternalStateChanged = ^{
-        if (subscribingTime == nil && [device _getInternalState] == MTRInternalDeviceStateSubscribing) {
+    delegate.onSubscriptionSetupStarted = ^{
+        if (subscribingTime == nil) {
             subscribingTime = [NSDate now];
             [subscribingExpectation fulfill];
         }
@@ -8620,7 +8621,9 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     [device setDelegate:delegate queue:queue];
 
     __block NSDate * finalResetTime = nil;
-    for (int i = 0; i < (supersedeWhileBlocked ? 1 : 3); i++) {
+    // When superseding while the Matter queue is blocked, the first reset happens inside the blocking block below, so its
+    // timer can't run its Matter-queue block before the queue is blocked.
+    for (int i = 0; i < (supersedeWhileBlocked ? 0 : 3); i++) {
         [controller syncRunOnWorkQueue:^{
             device.reattemptingSubscription = NO;
             finalResetTime = [NSDate now];
@@ -8629,6 +8632,10 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     }
     if (blockSeconds > 0 || supersedeWhileBlocked) {
         [controller syncRunOnWorkQueue:^{
+            if (supersedeWhileBlocked) {
+                device.reattemptingSubscription = NO;
+                [device _handleSubscriptionReset:nil];
+            }
             [NSThread sleepForTimeInterval:blockSeconds];
             if (supersedeWhileBlocked) {
                 // Supersede only once the timer has queued its Matter-queue block, so the on-queue check is what rejects it.
