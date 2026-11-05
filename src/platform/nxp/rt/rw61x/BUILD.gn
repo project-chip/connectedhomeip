@@ -193,15 +193,22 @@ static_library("nxp_platform") {
         sources += [
           "../../../OpenThread/OpenThreadDnssdImpl.cpp",
           "../../../OpenThread/OpenThreadDnssdImpl.h",
+<<<<<<< HEAD
           "../../common/DnssdImpl.cpp",
           "../../common/DnssdImplBr.cpp",
           "../../common/DnssdImplBr.h",
+=======
+          "../../../OpenThread/OpenThreadTxtEntries.h",
+          "../../../OpenThread/TxtEntries.h",
+>>>>>>> 807f881 ([OpenThread] Bound DNS-SD TXT entries by the entry array size (#75062))
         ]
       } else {
         sources += [
           "../../../OpenThread/DnssdImpl.cpp",
           "../../../OpenThread/OpenThreadDnssdImpl.cpp",
           "../../../OpenThread/OpenThreadDnssdImpl.h",
+          "../../../OpenThread/OpenThreadTxtEntries.h",
+          "../../../OpenThread/TxtEntries.h",
         ]
       }
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]

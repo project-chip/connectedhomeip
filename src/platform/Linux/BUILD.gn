@@ -151,7 +151,55 @@ static_library("Linux") {
     ]
 
     deps += [ "${chip_root}/src/app:app_config" ]
+<<<<<<< HEAD
     public_deps += [ "dbus/openthread" ]
+=======
+
+    if (chip_enable_otns) {
+      public_deps += [ "${chip_root}/third_party/openthread/platforms/otns" ]
+    } else {
+      public_deps +=
+          [ "${chip_root}/third_party/openthread/platforms/simulation" ]
+    }
+
+    if (chip_mdns == "platform") {
+      sources += [
+        "../OpenThread/DnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.h",
+        "../OpenThread/OpenThreadTxtEntries.h",
+        "../OpenThread/TxtEntries.h",
+      ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    }
+
+    public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
+  } else {
+    if (chip_mdns == "platform") {
+      sources += [
+        "DnssdImpl.cpp",
+        "DnssdImpl.h",
+      ]
+
+      deps += [
+        ":exponential-backoff",
+        "${chip_root}/src/lib/dnssd:platform_header",
+      ]
+
+      public_configs += [ ":avahi_client_config" ]
+    }
+
+    if (chip_enable_thread) {
+      sources += [
+        "NetworkCommissioningThreadDriver.cpp",
+        "ThreadStackManagerImpl.cpp",
+        "ThreadStackManagerImpl.h",
+      ]
+
+      deps += [ "${chip_root}/src/app:app_config" ]
+      public_deps += [ "dbus/openthread" ]
+    }
+>>>>>>> 807f881 ([OpenThread] Bound DNS-SD TXT entries by the entry array size (#75062))
   }
 
   if (chip_enable_wifi) {

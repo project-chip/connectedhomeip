@@ -124,7 +124,36 @@ static_library("nxp_zephyr") {
     sources += [ "../../Zephyr/SysHeapMalloc.cpp" ]
   }
 
+<<<<<<< HEAD:src/platform/nxp/zephyr/BUILD.gn
   cflags = [ "-Wconversion" ]
+=======
+  if (chip_enable_thread) {
+    sources += [
+      "../../OpenThread/OpenThreadUtils.cpp",
+      "../../Zephyr/ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+
+    if (chip_mdns == "platform") {
+      sources += [
+        "../../OpenThread/DnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.h",
+        "../../OpenThread/OpenThreadTxtEntries.h",
+        "../../OpenThread/TxtEntries.h",
+      ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    }
+  }
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
+  }
+>>>>>>> 807f881 ([OpenThread] Bound DNS-SD TXT entries by the entry array size (#75062)):src/platform/realtek/zephyr/BUILD.gn
 }
 
 source_set("logging") {
