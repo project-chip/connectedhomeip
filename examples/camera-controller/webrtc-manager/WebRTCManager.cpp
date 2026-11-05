@@ -110,6 +110,35 @@ void ScheduleOnMatterThread(const std::weak_ptr<rtc::PeerConnection> & weakPeerC
     }));
 }
 
+// VideoStreams and AudioStreams each hold 1 to 16 stream IDs when present.
+constexpr size_t kMaxStreamListLength = 16;
+
+bool IsValidStreamList(const std::optional<std::vector<uint16_t>> & streams)
+{
+    return !streams.has_value() || (!streams->empty() && streams->size() <= kMaxStreamListLength);
+}
+
+CHIP_ERROR ValidateOfferStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
+                                const WebRTCProviderClient::OfferOptions & options)
+{
+    if (!videoStreamId.HasValue() && !audioStreamId.HasValue() && !options.videoStreams.has_value() &&
+        !options.audioStreams.has_value())
+    {
+        ChipLogError(Camera, "One of VideoStreamID, AudioStreamID, VideoStreams or AudioStreams must be present");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (!IsValidStreamList(options.videoStreams) || !IsValidStreamList(options.audioStreams))
+    {
+        ChipLogError(Camera, "VideoStreams and AudioStreams must each hold 1 to %u stream IDs",
+                     static_cast<unsigned>(kMaxStreamListLength));
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace
 
 WebRTCManager::WebRTCManager() {}
@@ -400,13 +429,7 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, 
 
     VerifyOrReturnError(mPendingSdpContext.state == LocalSdpState::Idle, CHIP_ERROR_INCORRECT_STATE);
 
-    // At least one of VideoStreamID, AudioStreamID, VideoStreams and AudioStreams has to be present
-    if (!videoStreamId.HasValue() && !audioStreamId.HasValue() && !options.videoStreams.has_value() &&
-        !options.audioStreams.has_value())
-    {
-        ChipLogError(Camera, "One of VideoStreamID, AudioStreamID, VideoStreams or AudioStreams must be present");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    ReturnErrorOnFailure(ValidateOfferStreams(videoStreamId, audioStreamId, options));
 
     // Store the stream ID for the callback
     if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
@@ -414,7 +437,7 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, 
         mCurrentVideoStreamId = videoStreamId.Value().Value();
         ChipLogProgress(Camera, "Tracking stream ID %u for WebRTC session", mCurrentVideoStreamId);
     }
-    else if (options.videoStreams.has_value() && !options.videoStreams->empty())
+    else if (options.videoStreams.has_value())
     {
         mCurrentVideoStreamId = options.videoStreams->front();
         ChipLogProgress(Camera, "Tracking stream ID %u for WebRTC session", mCurrentVideoStreamId);
@@ -440,13 +463,7 @@ CHIP_ERROR WebRTCManager::SolicitOffer(StreamUsageEnum streamUsage, Optional<app
 {
     ChipLogProgress(Camera, "Sending SolicitOffer command to the peer device");
 
-    // At least one of VideoStreamID, AudioStreamID, VideoStreams and AudioStreams has to be present
-    if (!videoStreamId.HasValue() && !audioStreamId.HasValue() && !options.videoStreams.has_value() &&
-        !options.audioStreams.has_value())
-    {
-        ChipLogError(Camera, "One of VideoStreamID, AudioStreamID, VideoStreams or AudioStreams must be present");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    ReturnErrorOnFailure(ValidateOfferStreams(videoStreamId, audioStreamId, options));
 
     CHIP_ERROR err =
         mWebRTCProviderClient.SolicitOffer(streamUsage, kWebRTCRequesterDynamicEndpointId, videoStreamId, audioStreamId, options);
