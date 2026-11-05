@@ -88,8 +88,7 @@ private:
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mProvideOfferData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Type mProvideAnswerData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mProvideICECandidatesData;
-    StreamUsageEnum mCurrentStreamUsage = StreamUsageEnum::kUnknownEnumValue;
-    PyObject mAppContext                = nullptr;
+    PyObject mAppContext = nullptr;
 
     // Copy of the caller's command payload. The spans in mSolicitOfferData / mProvideOfferData (SDP, SFrame keys,
     // ICE server strings, ICE transport policy) point into this buffer, so it must stay unchanged until the command

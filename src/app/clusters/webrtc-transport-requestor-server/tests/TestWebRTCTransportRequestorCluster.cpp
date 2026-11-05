@@ -237,6 +237,107 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestUpsertSessionCopiesStreamLists)
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// An offered session for peer 0x1234 on fabric 1, with no streams or metadata set.
+WebRTCTransportRequestorCluster::OfferedSession MakeTestOffer(uint16_t sessionId)
+{
+    WebRTCTransportRequestorCluster::OfferedSession offer;
+    offer.sessionId      = sessionId;
+    offer.peerNodeId     = 0x1234ULL;
+    offer.fabricIndex    = 1;
+    offer.peerEndpointId = 2;
+    offer.streamUsage    = StreamUsageEnum::kLiveView;
+    return offer;
+}
+
+TEST_F(TestWebRTCTransportRequestorCluster, TestMakeOfferedSessionFromStreamLists)
+{
+    const uint16_t videoStreams[] = { 3, 4 };
+    const uint16_t audioStreams[] = { 5 };
+
+    auto offer = MakeTestOffer(7);
+    offer.requestedVideoStreams.SetValue(DataModel::List<const uint16_t>(videoStreams));
+    offer.requestedAudioStreams.SetValue(DataModel::List<const uint16_t>(audioStreams));
+    offer.requestedMetadataEnabled.SetValue(true);
+
+    WebRTCSessionStorage session = WebRTCTransportRequestorCluster::MakeOfferedSession(offer);
+    EXPECT_EQ(session.id, 7);
+    EXPECT_EQ(session.peerNodeID, 0x1234ULL);
+    EXPECT_EQ(session.GetFabricIndex(), 1);
+    EXPECT_EQ(session.peerEndpointID, 2);
+    EXPECT_EQ(session.streamUsage, StreamUsageEnum::kLiveView);
+    EXPECT_TRUE(session.metadataEnabled);
+
+    // The lists hold the requested streams, and the deprecated IDs their first entries.
+    ASSERT_TRUE(session.videoStreams.HasValue());
+    ASSERT_EQ(session.videoStreams.Value().size(), 2u);
+    EXPECT_EQ(session.videoStreams.Value()[0], 3);
+    EXPECT_EQ(session.videoStreams.Value()[1], 4);
+    ASSERT_FALSE(session.videoStreamID.IsNull());
+    EXPECT_EQ(session.videoStreamID.Value(), 3);
+    ASSERT_TRUE(session.audioStreams.HasValue());
+    ASSERT_EQ(session.audioStreams.Value().size(), 1u);
+    EXPECT_EQ(session.audioStreams.Value()[0], 5);
+    ASSERT_FALSE(session.audioStreamID.IsNull());
+    EXPECT_EQ(session.audioStreamID.Value(), 5);
+}
+
+TEST_F(TestWebRTCTransportRequestorCluster, TestMakeOfferedSessionFromReportedStreamIDs)
+{
+    // A request with the deprecated single IDs gets them back in the response; the provider may have chosen the stream.
+    auto offer = MakeTestOffer(7);
+    offer.reportedVideoStreamID.SetValue(DataModel::MakeNullable(static_cast<uint16_t>(9)));
+    offer.reportedAudioStreamID.SetValue(DataModel::NullNullable);
+
+    WebRTCSessionStorage session = WebRTCTransportRequestorCluster::MakeOfferedSession(offer);
+    ASSERT_TRUE(session.videoStreams.HasValue());
+    ASSERT_EQ(session.videoStreams.Value().size(), 1u);
+    EXPECT_EQ(session.videoStreams.Value()[0], 9);
+    ASSERT_FALSE(session.videoStreamID.IsNull());
+    EXPECT_EQ(session.videoStreamID.Value(), 9);
+    EXPECT_FALSE(session.audioStreams.HasValue());
+    EXPECT_TRUE(session.audioStreamID.IsNull());
+    EXPECT_FALSE(session.metadataEnabled);
+}
+
+TEST_F(TestWebRTCTransportRequestorCluster, TestMakeOfferedSessionWithoutStreams)
+{
+    WebRTCSessionStorage session = WebRTCTransportRequestorCluster::MakeOfferedSession(MakeTestOffer(7));
+    EXPECT_FALSE(session.videoStreams.HasValue());
+    EXPECT_TRUE(session.videoStreamID.IsNull());
+    EXPECT_FALSE(session.audioStreams.HasValue());
+    EXPECT_TRUE(session.audioStreamID.IsNull());
+}
+
+TEST_F(TestWebRTCTransportRequestorCluster, TestRecordOfferedSessionKeepsSessionOnReOffer)
+{
+    MockWebRTCTransportRequestorDelegate mockDelegate;
+    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
+
+    const uint16_t videoStreams[] = { 3 };
+    auto offer                    = MakeTestOffer(7);
+    offer.requestedVideoStreams.SetValue(DataModel::List<const uint16_t>(videoStreams));
+    offer.requestedMetadataEnabled.SetValue(true);
+    server.RecordOfferedSession(offer);
+
+    // A re-offer carries no streams or metadata, and leaves the known session unchanged.
+    auto reOffer      = MakeTestOffer(7);
+    reOffer.isReOffer = true;
+    server.RecordOfferedSession(reOffer);
+
+    auto sessions = server.GetCurrentSessions();
+    ASSERT_EQ(sessions.size(), 1u);
+    ASSERT_TRUE(sessions[0].videoStreams.HasValue());
+    ASSERT_EQ(sessions[0].videoStreams.Value().size(), 1u);
+    EXPECT_EQ(sessions[0].videoStreams.Value()[0], 3);
+    EXPECT_TRUE(sessions[0].metadataEnabled);
+
+    // A re-offer of a session the requestor does not know is recorded.
+    auto unknownReOffer      = MakeTestOffer(8);
+    unknownReOffer.isReOffer = true;
+    server.RecordOfferedSession(unknownReOffer);
+    EXPECT_EQ(server.GetCurrentSessions().size(), 2u);
+}
+
 TEST_F(TestWebRTCTransportRequestorCluster, TestReadCurrentSessionsAttribute)
 {
     TestServerClusterContext context;

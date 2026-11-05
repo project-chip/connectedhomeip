@@ -27,7 +27,6 @@
 
 using namespace chip;
 using namespace chip::app;
-using WebRTCSessionStruct                              = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
 static constexpr ClusterStatus kUndefinedClusterStatus = 0xFF;
 
 namespace {
@@ -52,6 +51,7 @@ CHIP_ERROR CopyStreams(const Optional<DataModel::DecodableList<uint16_t>> & sour
 
 using ICEServerStruct          = Clusters::Globals::Structs::ICEServerStruct::Type;
 using DecodableICEServerStruct = Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using OfferedSession           = Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster::OfferedSession;
 
 CHIP_ERROR CopyICEServers(const Optional<DataModel::DecodableList<DecodableICEServerStruct>> & source,
                           std::vector<std::vector<CharSpan>> & urlStorage, std::vector<ICEServerStruct> & serverStorage,
@@ -93,23 +93,24 @@ CHIP_ERROR CopyICEServers(const Optional<DataModel::DecodableList<DecodableICESe
     return CHIP_NO_ERROR;
 }
 
-// Sets a session's stream list and its deprecated single stream ID, as WebRTCSessionStruct defines them: the list holds
-// every stream of the session (the requested list, or else the stream the provider reported) and the ID is its first entry.
-void SetSessionStreams(const Optional<DataModel::List<const uint16_t>> & requestedStreams,
-                       const Optional<DataModel::Nullable<uint16_t>> & reportedStreamID, uint16_t & singleStreamStorage,
-                       Optional<DataModel::List<const uint16_t>> & sessionStreams, DataModel::Nullable<uint16_t> & sessionStreamID)
+// The requestor's record of a session started with offerData, given the provider's response fields.
+template <typename OfferData>
+OfferedSession MakeOfferedSession(const OfferData & offerData, uint16_t sessionId, const ScopedNodeId & peerId,
+                                  EndpointId peerEndpointId, const Optional<DataModel::Nullable<uint16_t>> & reportedVideoStreamID,
+                                  const Optional<DataModel::Nullable<uint16_t>> & reportedAudioStreamID)
 {
-    if (requestedStreams.HasValue() && !requestedStreams.Value().empty())
-    {
-        sessionStreams = requestedStreams;
-        sessionStreamID.SetNonNull(requestedStreams.Value()[0]);
-    }
-    else if (reportedStreamID.HasValue() && !reportedStreamID.Value().IsNull())
-    {
-        singleStreamStorage = reportedStreamID.Value().Value();
-        sessionStreams.SetValue(DataModel::List<const uint16_t>(&singleStreamStorage, 1));
-        sessionStreamID.SetNonNull(singleStreamStorage);
-    }
+    OfferedSession offer;
+    offer.sessionId                = sessionId;
+    offer.peerNodeId               = peerId.GetNodeId();
+    offer.fabricIndex              = peerId.GetFabricIndex();
+    offer.peerEndpointId           = peerEndpointId;
+    offer.streamUsage              = offerData.streamUsage;
+    offer.requestedVideoStreams    = offerData.videoStreams;
+    offer.requestedAudioStreams    = offerData.audioStreams;
+    offer.requestedMetadataEnabled = offerData.metadataEnabled;
+    offer.reportedVideoStreamID    = reportedVideoStreamID;
+    offer.reportedAudioStreamID    = reportedAudioStreamID;
+    return offer;
 }
 
 } // namespace
@@ -312,9 +313,6 @@ CHIP_ERROR WebRTCTransportProviderClient::ProvideOffer(const uint8_t * payload, 
     ReturnErrorOnFailure(CopyICEServers(value.ICEServers, mICEServerURLs, mICEServers, mProvideOfferData.ICEServers));
     mProvideOfferData.ICETransportPolicy = value.ICETransportPolicy;
 
-    // Store the streamUsage from the original command so we can build the WebRTCSessionStruct when the response arrives.
-    mCurrentStreamUsage = value.streamUsage;
-
     // Attempt to find or establish a CASE session to the target PeerId.
     InteractionModelEngine * engine     = InteractionModelEngine::GetInstance();
     CASESessionManager * caseSessionMgr = engine->GetCASESessionManager();
@@ -364,9 +362,6 @@ CHIP_ERROR WebRTCTransportProviderClient::SolicitOffer(const uint8_t * payload, 
     ReturnErrorOnFailure(CopyICEServers(value.ICEServers, mICEServerURLs, mICEServers, mSolicitOfferData.ICEServers));
     mSolicitOfferData.ICETransportPolicy = value.ICETransportPolicy;
 
-    // Store the streamUsage from the original command so we can build the WebRTCSessionStruct when the response arrives.
-    mCurrentStreamUsage = value.streamUsage;
-
     // Attempt to find or establish a CASE session to the target PeerId.
     InteractionModelEngine * engine     = InteractionModelEngine::GetInstance();
     CASESessionManager * caseSessionMgr = engine->GetCASESessionManager();
@@ -413,34 +408,10 @@ void WebRTCTransportProviderClient::HandleProvideOfferResponse(TLV::TLVReader da
     VerifyOrReturn(error == CHIP_NO_ERROR,
                    ChipLogError(Camera, "Failed to decode command response value. Error: %" CHIP_ERROR_FORMAT, error.Format()));
 
-    // A re-offer only changes the SDP: StreamUsage, the streams and MetadataEnabled apply to new sessions only, so an
-    // existing session record stays as it is.
-    if (!mProvideOfferData.webRTCSessionID.IsNull() &&
-        WebRTCTransportRequestorManager::Instance().HasSession(value.webRTCSessionID, mPeerId.GetNodeId(),
-                                                               mPeerId.GetFabricIndex()))
-    {
-        return;
-    }
-
-    // Create a new session record and populate fields from the decoded command response and current secure session info
-    WebRTCSessionStruct session;
-    session.id             = value.webRTCSessionID;
-    session.peerNodeID     = mPeerId.GetNodeId();
-    session.fabricIndex    = mPeerId.GetFabricIndex();
-    session.peerEndpointID = mEndpointId;
-    session.streamUsage    = mCurrentStreamUsage;
-
-    session.metadataEnabled = mProvideOfferData.metadataEnabled.ValueOr(false);
-
-    // UpsertSession copies the stream lists, so the single-stream storage only needs to outlive that call.
-    uint16_t videoStream = 0;
-    uint16_t audioStream = 0;
-    SetSessionStreams(mProvideOfferData.videoStreams, value.videoStreamID, videoStream, session.videoStreams,
-                      session.videoStreamID);
-    SetSessionStreams(mProvideOfferData.audioStreams, value.audioStreamID, audioStream, session.audioStreams,
-                      session.audioStreamID);
-
-    WebRTCTransportRequestorManager::Instance().UpsertSession(session);
+    auto offer      = MakeOfferedSession(mProvideOfferData, value.webRTCSessionID, mPeerId, mEndpointId, value.videoStreamID,
+                                         value.audioStreamID);
+    offer.isReOffer = !mProvideOfferData.webRTCSessionID.IsNull();
+    WebRTCTransportRequestorManager::Instance().RecordOfferedSession(offer);
 }
 
 void WebRTCTransportProviderClient::HandleSolicitOfferResponse(TLV::TLVReader data)
@@ -452,36 +423,18 @@ void WebRTCTransportProviderClient::HandleSolicitOfferResponse(TLV::TLVReader da
     VerifyOrReturn(error == CHIP_NO_ERROR,
                    ChipLogError(Camera, "Failed to decode command response value. Error: %" CHIP_ERROR_FORMAT, error.Format()));
 
-    // Create a new session record and populate fields from the decoded command response and current secure session info
-    WebRTCSessionStruct session;
-    session.id             = value.webRTCSessionID;
-    session.peerNodeID     = mPeerId.GetNodeId();
-    session.fabricIndex    = mPeerId.GetFabricIndex();
-    session.peerEndpointID = mEndpointId;
-    session.streamUsage    = mCurrentStreamUsage;
-
-    session.metadataEnabled = mSolicitOfferData.metadataEnabled.ValueOr(false);
-
-    // UpsertSession copies the stream lists, so the single-stream storage only needs to outlive that call.
-    uint16_t videoStream = 0;
-    uint16_t audioStream = 0;
-    SetSessionStreams(mSolicitOfferData.videoStreams, value.videoStreamID, videoStream, session.videoStreams,
-                      session.videoStreamID);
-    SetSessionStreams(mSolicitOfferData.audioStreams, value.audioStreamID, audioStream, session.audioStreams,
-                      session.audioStreamID);
-
-    // The provider echoes VideoStreamID / AudioStreamID only when the request used them, so if DeferredOffer == FALSE
-    // they MUST be valid in that case. Requests using VideoStreams / AudioStreams get a response without stream IDs.
+    // The provider reports VideoStreamID / AudioStreamID only when the request used them, so if DeferredOffer == FALSE at
+    // least one must be valid in that case. Requests using VideoStreams / AudioStreams get a response without stream IDs.
+    auto isValid = [](const Optional<DataModel::Nullable<uint16_t>> & streamID) {
+        return streamID.HasValue() && !streamID.Value().IsNull();
+    };
     bool requestUsedStreamIDs = mSolicitOfferData.videoStreamID.HasValue() || mSolicitOfferData.audioStreamID.HasValue();
-    if (!value.deferredOffer && requestUsedStreamIDs)
+    if (!value.deferredOffer && requestUsedStreamIDs && !isValid(value.videoStreamID) && !isValid(value.audioStreamID))
     {
-        if (session.videoStreamID.IsNull() && session.audioStreamID.IsNull())
-        {
-            ChipLogError(Camera, "Provider reported DeferredOffer=FALSE but did not supply valid Video and Audio stream IDs");
-            return;
-        }
+        ChipLogError(Camera, "Provider reported DeferredOffer=FALSE but did not supply a valid Video or Audio stream ID");
+        return;
     }
 
-    // Insert or update the Requestor cluster's CurrentSessions.
-    WebRTCTransportRequestorManager::Instance().UpsertSession(session);
+    WebRTCTransportRequestorManager::Instance().RecordOfferedSession(MakeOfferedSession(
+        mSolicitOfferData, value.webRTCSessionID, mPeerId, mEndpointId, value.videoStreamID, value.audioStreamID));
 }

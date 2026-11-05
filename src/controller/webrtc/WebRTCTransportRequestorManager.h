@@ -79,8 +79,8 @@ public:
     // methods to be called by provider client
     void UpsertSession(const chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type & session);
 
-    // Returns whether CurrentSessions has the session with this ID for the given peer node and fabric.
-    bool HasSession(uint16_t sessionId, chip::NodeId peerNodeId, chip::FabricIndex fabricIndex);
+    void RecordOfferedSession(
+        const chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster::OfferedSession & offer);
 
 private:
     WebRTCTransportRequestorManager()  = default;

@@ -271,7 +271,6 @@ private:
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mProvideOfferData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Type mProvideAnswerData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mProvideICECandidatesData;
-    StreamUsageEnum mCurrentStreamUsage = StreamUsageEnum::kUnknownEnumValue;
 
     // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
     std::string mSdpString;

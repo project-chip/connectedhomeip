@@ -187,6 +187,47 @@ public:
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
 
     /**
+     * A session the requestor started with SolicitOffer or ProvideOffer, as given by the request and the provider's
+     * response. The lists only need to be valid during RecordOfferedSession() / MakeOfferedSession().
+     */
+    struct OfferedSession
+    {
+        uint16_t sessionId          = 0;
+        NodeId peerNodeId           = kUndefinedNodeId;
+        FabricIndex fabricIndex     = kUndefinedFabricIndex;
+        EndpointId peerEndpointId   = kInvalidEndpointId;
+        StreamUsageEnum streamUsage = StreamUsageEnum::kUnknownEnumValue;
+
+        // From the request.
+        Optional<DataModel::List<const uint16_t>> requestedVideoStreams;
+        Optional<DataModel::List<const uint16_t>> requestedAudioStreams;
+        Optional<bool> requestedMetadataEnabled;
+        // A ProvideOffer with a non-null WebRTCSessionID.
+        bool isReOffer = false;
+
+        // From the provider's response, which reports stream IDs only when the request used VideoStreamID / AudioStreamID.
+        Optional<DataModel::Nullable<uint16_t>> reportedVideoStreamID;
+        Optional<DataModel::Nullable<uint16_t>> reportedAudioStreamID;
+    };
+
+    /**
+     * @brief Builds the CurrentSessions entry for an offered session.
+     *
+     * As WebRTCSessionStruct defines them, VideoStreams / AudioStreams hold every stream of the session: the requested
+     * list, or else the single stream the provider reported. VideoStreamID / AudioStreamID hold the first entry, or null.
+     * MetadataEnabled is the requested value.
+     */
+    static WebRTCSessionStorage MakeOfferedSession(const OfferedSession & offer);
+
+    /**
+     * @brief Inserts or updates the CurrentSessions entry for an offered session, built by MakeOfferedSession().
+     *
+     * A re-offer of a session that is already in CurrentSessions leaves the entry unchanged: a re-offer only changes the
+     * SDP, since StreamUsage, the streams and MetadataEnabled apply to new sessions only.
+     */
+    void RecordOfferedSession(const OfferedSession & offer);
+
+    /**
      * @brief
      *   Removes a session identified by its session ID, peer node ID, and fabric index from the internal list of current sessions.
      *

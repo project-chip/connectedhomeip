@@ -350,6 +350,56 @@ WebRTCTransportRequestorCluster::UpsertSession(const WebRTCSessionStruct & sessi
     return result;
 }
 
+namespace {
+
+void SetOfferedStreams(const Optional<DataModel::List<const uint16_t>> & requestedStreams,
+                       const Optional<DataModel::Nullable<uint16_t>> & reportedStreamID, uint16_t & singleStreamStorage,
+                       Optional<DataModel::List<const uint16_t>> & sessionStreams, DataModel::Nullable<uint16_t> & sessionStreamID)
+{
+    if (requestedStreams.HasValue() && !requestedStreams.Value().empty())
+    {
+        sessionStreams = requestedStreams;
+        sessionStreamID.SetNonNull(requestedStreams.Value()[0]);
+    }
+    else if (reportedStreamID.HasValue() && !reportedStreamID.Value().IsNull())
+    {
+        singleStreamStorage = reportedStreamID.Value().Value();
+        sessionStreams.SetValue(DataModel::List<const uint16_t>(&singleStreamStorage, 1));
+        sessionStreamID.SetNonNull(singleStreamStorage);
+    }
+}
+
+} // namespace
+
+WebRTCSessionStorage WebRTCTransportRequestorCluster::MakeOfferedSession(const OfferedSession & offer)
+{
+    WebRTCSessionStruct session;
+    session.id              = offer.sessionId;
+    session.peerNodeID      = offer.peerNodeId;
+    session.fabricIndex     = offer.fabricIndex;
+    session.peerEndpointID  = offer.peerEndpointId;
+    session.streamUsage     = offer.streamUsage;
+    session.metadataEnabled = offer.requestedMetadataEnabled.ValueOr(false);
+
+    // The storage below backs a single-entry list until WebRTCSessionStorage copies it.
+    uint16_t videoStream = 0;
+    uint16_t audioStream = 0;
+    SetOfferedStreams(offer.requestedVideoStreams, offer.reportedVideoStreamID, videoStream, session.videoStreams,
+                      session.videoStreamID);
+    SetOfferedStreams(offer.requestedAudioStreams, offer.reportedAudioStreamID, audioStream, session.audioStreams,
+                      session.audioStreamID);
+    return WebRTCSessionStorage(session);
+}
+
+void WebRTCTransportRequestorCluster::RecordOfferedSession(const OfferedSession & offer)
+{
+    if (offer.isReOffer && FindSession(offer.sessionId, offer.peerNodeId, offer.fabricIndex) != nullptr)
+    {
+        return;
+    }
+    UpsertSession(MakeOfferedSession(offer));
+}
+
 void WebRTCTransportRequestorCluster::RemoveSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex)
 {
     size_t originalSize = mCurrentSessions.size();
