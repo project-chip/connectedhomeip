@@ -223,7 +223,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             # Read the QueryImageShapShot every 3 seconds during the retry_interval_sec.
             # If the condition is not satisfied it reads the named pipe to obtain a new Snapshot
             query_image_snapshot_start_time = time.time()
-            while time.time() - query_image_snapshot_start_time < retry_interval_sec:
+            poll_window_sec = min(retry_interval_sec, timeout_sec - (time.time() - t_start))
+            while time.time() - query_image_snapshot_start_time < poll_window_sec:
                 query_image_request_count = self.read_query_image_request_count(step_name)
                 # If the counter increases this mean the QueryImage command was received
                 if query_image_request_count > self.current_provider_queryimage_request_count:
