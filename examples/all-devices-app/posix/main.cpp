@@ -170,35 +170,36 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SetDeviceAttestationCredentialsProvider(&sDacProvider);
 
     static DeviceInstances devices({
-        .storageDelegate                     = *initParams.persistentStorageDelegate,                                           //
-        .commissioningWindowManager          = Server::GetInstance().GetCommissioningWindowManager(),                           //
-        .configurationManager                = DeviceLayer::ConfigurationMgr(),                                                 //
-        .deviceControlServer                 = DeviceLayer::DeviceControlServer::DeviceControlSvr(),                            //
-        .fabricTable                         = Server::GetInstance().GetFabricTable(),                                          //
-        .accessControl                       = Server::GetInstance().GetAccessControl(),                                        //
-        .failSafeContext                     = Server::GetInstance().GetFailSafeContext(),                                      //
-        .deviceInstanceInfoProvider          = *provider,                                                                       //
-        .platformManager                     = DeviceLayer::PlatformMgr(),                                                      //
-        .groupDataProvider                   = gGroupDataProvider,                                                              //
-        .sessionManager                      = Server::GetInstance().GetSecureSessionManager(),                                 //
-        .dnssdServer                         = DnssdServer::Instance(),                                                         //
-        .deviceLoadStatusProvider            = *InteractionModelEngine::GetInstance(),                                          //
-        .diagnosticDataProvider              = DeviceLayer::GetDiagnosticDataProvider(),                                        //
-        .testEventTriggerDelegate            = sTestEventTriggerDelegate,                                                       //
-        .bindingTable                        = Binding::Table::GetInstance(),                                                   //
-        .bindingManager                      = Binding::Manager::GetInstance(),                                                 //
-        .bindingHandler                      = gBindingHandler,                                                                 //
-        .identifyDelegate                    = gIdentifyDelegate,                                                               //
-        .dacProvider                         = *Credentials::GetDeviceAttestationCredentialsProvider(),                         //
-        .eventManagement                     = EventManagement::GetInstance(),                                                  //
-        .timerDelegate                       = gTimerDelegate,                                                                  //
-        .minGuaranteedSubscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
-        .enableWiFi                          = AppOptions::GetConfig().IsWiFiEnabled(),                                         //
-        .emulateWiFi                         = AppOptions::GetConfig().emulateWiFi,                                             //
-        .enableThread                        = AppOptions::GetConfig().IsThreadEnabled(),                                       //
+        .storageDelegate                = *initParams.persistentStorageDelegate,                   //
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),   //
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),                         //
+            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
+            .fabricTable                = Server::GetInstance().GetFabricTable(),                  //
+            .accessControl              = Server::GetInstance().GetAccessControl(),                //
+            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),              //
+            .deviceInstanceInfoProvider = *provider,                                               //
+            .platformManager            = DeviceLayer::PlatformMgr(),                              //
+            .groupDataProvider          = gGroupDataProvider,                                      //
+            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),         //
+            .dnssdServer                = DnssdServer::Instance(),                                 //
+            .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                  //
+            .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),                //
+            .testEventTriggerDelegate   = sTestEventTriggerDelegate,                               //
+            .bindingTable               = Binding::Table::GetInstance(),                           //
+            .bindingManager             = Binding::Manager::GetInstance(),                         //
+            .bindingHandler             = gBindingHandler,                                         //
+            .identifyDelegate           = gIdentifyDelegate,                                       //
+            .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
+            .eventManagement            = EventManagement::GetInstance(),                          //
+            .timerDelegate              = gTimerDelegate,                                          //
+            .minGuaranteedSubscriptionsPerFabric =
+                InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
+            .enableWiFi   = AppOptions::GetConfig().IsWiFiEnabled(),                             //
+            .emulateWiFi  = AppOptions::GetConfig().emulateWiFi,                                 //
+            .enableThread = AppOptions::GetConfig().IsThreadEnabled(),                           //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
 
