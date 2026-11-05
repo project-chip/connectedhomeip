@@ -4,7 +4,6 @@
 
 -   To develop a Matter Application, learn more about how to develop with Matter
     on Apple's platforms [here](https://developer.apple.com/apple-home/matter/)
-
     -   Additional documentation about the Matter Support API is
         [here](https://developer.apple.com/documentation/mattersupport)
 
@@ -287,7 +286,6 @@ Example:
 ### Platform Guides
 
 -   [Bouffalo Lab](/examples/lighting-app/bouffalolab/README.md)
--   [EFR32 Window Covering](/examples/window-app/silabs/README.md)
 -   [ESP32 All Clusters](/examples/all-clusters-app/esp32/README.md)
 -   [ESP32 Lighting](/examples/lighting-app/esp32/README.md)
 -   [ESP32 Temperature Sensor](/examples/temperature-measurement-app/esp32/README.md)
