@@ -22,7 +22,10 @@ config("motion_zone_allocation_tracking") {
   if (current_os == "linux" && chip_device_platform == "linux" &&
       (current_cpu == "x64" || current_cpu == "arm64")) {
     defines = [ "CHIP_TEST_MOTION_ZONE_ALLOCATION_TRACKING=1" ]
-    ldflags = [ "-Wl,--wrap=_Znwm" ]
+    ldflags = [
+      "-Wl,--wrap=_Znwm",
+      "-Wl,--wrap=_ZN4chip8Platform11MemoryAllocEm",
+    ]
   }
 }
 

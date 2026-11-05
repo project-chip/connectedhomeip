@@ -33,6 +33,7 @@
 #include <assert.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <set>
 #include <uriparser/Uri.h>
@@ -894,7 +895,10 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(CommandHandler & handler, 
         size_t zoneListSize = 0;
         VerifyOrReturnValue(zones.ComputeSize(&zoneListSize) == CHIP_NO_ERROR, Status::InvalidCommand);
 
-        std::vector<uint16_t> zoneIDsFound;
+        Platform::ScopedMemoryBuffer<uint16_t> zoneIDsFound;
+        size_t zoneIDsCount = 0;
+        std::set<uint16_t> fallbackZoneIDs;
+        bool useFallback  = false;
         bool nullFound    = false;
         auto iterDupCheck = zones.begin();
         while (iterDupCheck.Next())
@@ -902,11 +906,29 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(CommandHandler & handler, 
             const auto & transportZoneOption = iterDupCheck.GetValue();
             if (!transportZoneOption.zone.IsNull())
             {
-                if (zoneIDsFound.empty())
+                if (zoneIDsCount == 0 && !useFallback)
                 {
-                    zoneIDsFound.reserve(zoneListSize);
+                    if (zoneListSize <= SIZE_MAX / sizeof(uint16_t))
+                    {
+                        zoneIDsFound.Alloc(zoneListSize);
+                    }
+                    useFallback = !zoneIDsFound;
                 }
-                zoneIDsFound.push_back(transportZoneOption.zone.Value());
+                if (useFallback)
+                {
+                    if (!fallbackZoneIDs.insert(transportZoneOption.zone.Value()).second)
+                    {
+                        ChipLogError(
+                            Zcl,
+                            "Transport Options verification from command data[ep=%d]: Duplicate Zone ID (=%d) in Motion Zones. ",
+                            mEndpointId, transportZoneOption.zone.Value());
+                        return Status::AlreadyExists;
+                    }
+                }
+                else
+                {
+                    zoneIDsFound[zoneIDsCount++] = transportZoneOption.zone.Value();
+                }
             }
             else
             {
@@ -920,13 +942,18 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(CommandHandler & handler, 
                 nullFound = true;
             }
         }
-        std::sort(zoneIDsFound.begin(), zoneIDsFound.end());
-        const auto duplicate = std::adjacent_find(zoneIDsFound.begin(), zoneIDsFound.end());
-        if (duplicate != zoneIDsFound.end())
+        if (zoneIDsCount != 0)
         {
-            ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Zone ID (=%d) in Motion Zones. ",
-                         mEndpointId, *duplicate);
-            return Status::AlreadyExists;
+            auto * zoneIDsEnd = zoneIDsFound.Get() + zoneIDsCount;
+            std::sort(zoneIDsFound.Get(), zoneIDsEnd);
+            const auto duplicate = std::adjacent_find(zoneIDsFound.Get(), zoneIDsEnd);
+            if (duplicate != zoneIDsEnd)
+            {
+                ChipLogError(Zcl,
+                             "Transport Options verification from command data[ep=%d]: Duplicate Zone ID (=%d) in Motion Zones. ",
+                             mEndpointId, *duplicate);
+                return Status::AlreadyExists;
+            }
         }
         VerifyOrReturnValue(iterDupCheck.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
 
