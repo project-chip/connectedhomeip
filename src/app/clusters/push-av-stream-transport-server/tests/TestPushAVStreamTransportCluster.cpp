@@ -830,13 +830,13 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
         {
             return busy ? PushAvStreamTransportStatusEnum::kBusy : PushAvStreamTransportStatusEnum::kIdle;
         }
-        size_t allocations = 0;
+        size_t allocations   = 0;
         size_t modifications = 0;
-        size_t sizeChecks = 0;
-        size_t idChecks = 0;
-        size_t streamChecks = 0;
-        bool busy = false;
-        bool invalidStream = false;
+        size_t sizeChecks    = 0;
+        size_t idChecks      = 0;
+        size_t streamChecks  = 0;
+        bool busy            = false;
+        bool invalidStream   = false;
     };
     class CountingPersistence : public DefaultAttributePersistenceProvider
     {
@@ -850,8 +850,23 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
     };
     enum class ZoneCase
     {
-        Valid, Mixed, NullId, Duplicate, DuplicateNull, MalformedFirst, MalformedTail, DuplicateMalformed,
-        Truncated, Oversized, InvalidId, InvalidTLS, Busy, NotFound, InvalidStream, TimeControl, GlobalSensitivity,
+        Valid,
+        Mixed,
+        NullId,
+        Duplicate,
+        DuplicateNull,
+        MalformedFirst,
+        MalformedTail,
+        DuplicateMalformed,
+        Truncated,
+        Oversized,
+        InvalidId,
+        InvalidTLS,
+        Busy,
+        NotFound,
+        InvalidStream,
+        TimeControl,
+        GlobalSensitivity,
     };
 
     for (const bool feature : { false, true })
@@ -862,11 +877,11 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
             {
                 for (const int sensitivity : { -1, 0, 1, 5, 10, 11, 255 })
                 {
-                    for (const auto zoneCase : { ZoneCase::Valid, ZoneCase::Mixed, ZoneCase::NullId, ZoneCase::Duplicate,
-                                                ZoneCase::DuplicateNull, ZoneCase::MalformedFirst, ZoneCase::MalformedTail,
-                                                ZoneCase::DuplicateMalformed, ZoneCase::Truncated, ZoneCase::Oversized,
-                                                ZoneCase::InvalidId, ZoneCase::InvalidTLS, ZoneCase::Busy, ZoneCase::NotFound,
-                                                ZoneCase::InvalidStream, ZoneCase::TimeControl, ZoneCase::GlobalSensitivity })
+                    for (const auto zoneCase :
+                         { ZoneCase::Valid, ZoneCase::Mixed, ZoneCase::NullId, ZoneCase::Duplicate, ZoneCase::DuplicateNull,
+                           ZoneCase::MalformedFirst, ZoneCase::MalformedTail, ZoneCase::DuplicateMalformed, ZoneCase::Truncated,
+                           ZoneCase::Oversized, ZoneCase::InvalidId, ZoneCase::InvalidTLS, ZoneCase::Busy, ZoneCase::NotFound,
+                           ZoneCase::InvalidStream, ZoneCase::TimeControl, ZoneCase::GlobalSensitivity })
                     {
                         if ((modify && zoneCase == ZoneCase::InvalidTLS) ||
                             (!modify && (zoneCase == ZoneCase::Busy || zoneCase == ZoneCase::NotFound)))
@@ -876,8 +891,9 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         ZoneDelegate delegate;
                         TestTLSClientManagementDelegate tlsDelegate;
                         TestTLSClientManagementDelegateNullClientCertId invalidTlsDelegate;
-                        PushAvStreamTransportServer server{ 1, feature ? BitFlags<Feature>(Feature::kPerZoneSensitivity)
-                                                                      : BitFlags<Feature>() };
+                        PushAvStreamTransportServer server{ 1,
+                                                            feature ? BitFlags<Feature>(Feature::kPerZoneSensitivity)
+                                                                    : BitFlags<Feature>() };
                         Testing::ClusterTester tester(server);
                         CountingPersistence persistence;
                         auto & originalContext = tester.GetServerClusterContext();
@@ -890,17 +906,17 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         logic.SetTLSClientManagementDelegate(&tlsDelegate);
                         ASSERT_EQ(server.Init(), CHIP_NO_ERROR);
                         Commands::AllocatePushTransport::DecodableType allocate;
-                        auto & options = allocate.transportOptions;
+                        auto & options      = allocate.transportOptions;
                         options.streamUsage = StreamUsageEnum::kAnalysis;
                         options.videoStreamID.SetValue(1);
                         options.TLSEndpointID = 1;
-                        options.url = "https://example.com/modified/"_span;
-                        auto & trigger = options.triggerOptions;
-                        trigger.triggerType = triggerType;
+                        options.url           = "https://example.com/modified/"_span;
+                        auto & trigger        = options.triggerOptions;
+                        trigger.triggerType   = triggerType;
                         trigger.maxPreRollLen.SetValue(1000);
                         TransportMotionTriggerTimeControlDecodableStruct timeControl;
                         timeControl.initialDuration = 1;
-                        timeControl.maxDuration = 1;
+                        timeControl.maxDuration     = 1;
                         if (triggerType == TransportTriggerTypeEnum::kMotion)
                         {
                             trigger.motionTimeControl.SetValue(timeControl);
@@ -910,20 +926,21 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                             }
                         }
                         CMAFContainerOptionsStruct cmaf;
-                        cmaf.CMAFInterface = CMAFInterfaceEnum::kInterface1;
-                        cmaf.segmentDuration = 1000;
-                        cmaf.chunkDuration = 500;
+                        cmaf.CMAFInterface                     = CMAFInterfaceEnum::kInterface1;
+                        cmaf.segmentDuration                   = 1000;
+                        cmaf.chunkDuration                     = 500;
                         options.containerOptions.containerType = ContainerFormatEnum::kCmaf;
                         options.containerOptions.CMAFContainerOptions.SetValue(cmaf);
                         Commands::ModifyPushTransport::DecodableType modification;
                         std::shared_ptr<TransportOptionsStorage> retained;
                         const ConcreteCommandPath allocatePath{ 1, PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
-                        const ConcreteAttributePath persistencePath{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
+                        const ConcreteAttributePath persistencePath{ 1, PushAvStreamTransport::Id,
+                                                                     Attributes::CurrentConnections::Id };
                         uint8_t beforeBuffer[1024];
                         MutableByteSpan before(beforeBuffer);
                         if (modify)
                         {
-                            auto seed = allocate;
+                            auto seed                 = allocate;
                             seed.transportOptions.url = "https://example.com/original/"_span;
                             seed.transportOptions.triggerOptions.motionZones.SetValue(DataModel::NullNullable);
                             Testing::MockCommandHandler seedHandler;
@@ -931,14 +948,16 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                             EXPECT_EQ(logic.HandleAllocatePushTransport(seedHandler, allocatePath, seed), std::nullopt);
                             ASSERT_TRUE(seedHandler.HasResponse());
                             ASSERT_EQ(logic.mCurrentConnections.size(), 1u);
-                            retained = logic.mCurrentConnections[0].GetTransportOptionsPtr();
+                            retained                  = logic.mCurrentConnections[0].GetTransportOptionsPtr();
                             modification.connectionID = logic.mCurrentConnections[0].connectionID;
                             ASSERT_EQ(persistence.ReadValue(persistencePath, before), CHIP_NO_ERROR);
                         }
                         const size_t writesBefore = persistence.writes;
-                        delegate.allocations = delegate.modifications = delegate.sizeChecks = delegate.idChecks = delegate.streamChecks = 0;
-                        const size_t count = zoneCase == ZoneCase::NullId ? 1u :
-                            (zoneCase == ZoneCase::Oversized || zoneCase == ZoneCase::DuplicateMalformed ? 3u : 2u);
+                        delegate.allocations = delegate.modifications = delegate.sizeChecks = delegate.idChecks =
+                            delegate.streamChecks                                           = 0;
+                        const size_t count                                                  = zoneCase == ZoneCase::NullId
+                                                                             ? 1u
+                                                                             : (zoneCase == ZoneCase::Oversized || zoneCase == ZoneCase::DuplicateMalformed ? 3u : 2u);
                         uint8_t buffer[128];
                         TLV::TLVWriter writer;
                         writer.Init(buffer, sizeof(buffer));
@@ -947,11 +966,16 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         for (size_t index = 0; index < count; ++index)
                         {
                             if ((zoneCase == ZoneCase::MalformedFirst && index == 0) ||
-                                ((zoneCase == ZoneCase::MalformedTail || zoneCase == ZoneCase::DuplicateMalformed) && index == count - 1))
+                                ((zoneCase == ZoneCase::MalformedTail || zoneCase == ZoneCase::DuplicateMalformed) &&
+                                 index == count - 1))
                             {
                                 TLV::TLVType structType;
-                                ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType), CHIP_NO_ERROR);
-                                ASSERT_EQ(writer.Put(TLV::ContextTag(to_underlying(Structs::TransportZoneOptionsStruct::Fields::kZone)), true), CHIP_NO_ERROR);
+                                ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType),
+                                          CHIP_NO_ERROR);
+                                ASSERT_EQ(
+                                    writer.Put(TLV::ContextTag(to_underlying(Structs::TransportZoneOptionsStruct::Fields::kZone)),
+                                               true),
+                                    CHIP_NO_ERROR);
                                 ASSERT_EQ(writer.EndContainer(structType), CHIP_NO_ERROR);
                                 continue;
                             }
@@ -1018,22 +1042,23 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         {
                             logic.SetTLSClientManagementDelegate(&invalidTlsDelegate);
                         }
-                        delegate.busy = zoneCase == ZoneCase::Busy;
+                        delegate.busy          = zoneCase == ZoneCase::Busy;
                         delegate.invalidStream = zoneCase == ZoneCase::InvalidStream;
                         if (zoneCase == ZoneCase::NotFound)
                         {
                             modification.connectionID = UINT16_MAX;
                         }
-                        Status sensitivityStatus = feature ? (sensitivity < 0 ? Status::InvalidCommand :
-                            (sensitivity < 1 || sensitivity > 10 ? Status::ConstraintError : Status::Success)) :
-                            (sensitivity < 0 ? Status::Success : Status::InvalidCommand);
-                        const bool motion = triggerType == TransportTriggerTypeEnum::kMotion;
-                        const bool malformed = zoneCase == ZoneCase::MalformedFirst || zoneCase == ZoneCase::MalformedTail ||
+                        Status sensitivityStatus = feature
+                            ? (sensitivity < 0 ? Status::InvalidCommand
+                                               : (sensitivity < 1 || sensitivity > 10 ? Status::ConstraintError : Status::Success))
+                            : (sensitivity < 0 ? Status::Success : Status::InvalidCommand);
+                        const bool motion        = triggerType == TransportTriggerTypeEnum::kMotion;
+                        const bool malformed     = zoneCase == ZoneCase::MalformedFirst || zoneCase == ZoneCase::MalformedTail ||
                             zoneCase == ZoneCase::DuplicateMalformed || zoneCase == ZoneCase::Truncated;
                         Status expected = Status::Success;
                         std::optional<uint8_t> clusterStatus;
-                        size_t sizeChecks = 0;
-                        size_t idChecks = 0;
+                        size_t sizeChecks   = 0;
+                        size_t idChecks     = 0;
                         size_t streamChecks = 0;
                         if (motion && zoneCase == ZoneCase::MalformedFirst)
                         {
@@ -1043,20 +1068,23 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         {
                             expected = sensitivityStatus;
                         }
-                        else if ((motion && malformed) || zoneCase == ZoneCase::TimeControl || zoneCase == ZoneCase::GlobalSensitivity)
+                        else if ((motion && malformed) || zoneCase == ZoneCase::TimeControl ||
+                                 zoneCase == ZoneCase::GlobalSensitivity)
                         {
-                            expected = zoneCase == ZoneCase::GlobalSensitivity && motion && !feature ? Status::ConstraintError : Status::InvalidCommand;
+                            expected = zoneCase == ZoneCase::GlobalSensitivity && motion && !feature ? Status::ConstraintError
+                                                                                                     : Status::InvalidCommand;
                         }
                         else if (zoneCase == ZoneCase::InvalidTLS)
                         {
-                            expected = Status::Failure;
+                            expected      = Status::Failure;
                             clusterStatus = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
                         }
                         else if (zoneCase == ZoneCase::Busy || zoneCase == ZoneCase::NotFound)
                         {
                             expected = zoneCase == ZoneCase::Busy ? Status::Busy : Status::NotFound;
                         }
-                        else if (zoneCase == ZoneCase::Duplicate || zoneCase == ZoneCase::DuplicateNull || zoneCase == ZoneCase::DuplicateMalformed)
+                        else if (zoneCase == ZoneCase::Duplicate || zoneCase == ZoneCase::DuplicateNull ||
+                                 zoneCase == ZoneCase::DuplicateMalformed)
                         {
                             expected = Status::AlreadyExists;
                         }
@@ -1076,7 +1104,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                                 idChecks = zoneCase == ZoneCase::NullId ? 0u : zoneCase == ZoneCase::InvalidId ? 1u : count;
                                 if (zoneCase == ZoneCase::InvalidId)
                                 {
-                                    expected = Status::Failure;
+                                    expected      = Status::Failure;
                                     clusterStatus = to_underlying(StatusCodeEnum::kInvalidZone);
                                 }
                                 else if (!motion && sensitivityStatus != Status::Success)
@@ -1088,7 +1116,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                                     streamChecks = 1;
                                     if (zoneCase == ZoneCase::InvalidStream)
                                     {
-                                        expected = Status::Failure;
+                                        expected      = Status::Failure;
                                         clusterStatus = to_underlying(StatusCodeEnum::kInvalidStream);
                                     }
                                 }
@@ -1098,12 +1126,14 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         Testing::MockCommandHandler handler;
                         handler.SetFabricIndex(1);
                         const ConcreteCommandPath path{ 1, PushAvStreamTransport::Id,
-                            modify ? Commands::ModifyPushTransport::Id : Commands::AllocatePushTransport::Id };
+                                                        modify ? Commands::ModifyPushTransport::Id
+                                                               : Commands::AllocatePushTransport::Id };
                         const auto result = modify ? logic.HandleModifyPushTransport(handler, path, modification)
                                                    : logic.HandleAllocatePushTransport(handler, path, allocate);
-                        std::printf("AMBIENT_SENSITIVITY_CASE feature=%u trigger=%u modify=%u sensitivity=%d shape=%u expected=%u\n",
-                            static_cast<unsigned>(feature), static_cast<unsigned>(triggerType), static_cast<unsigned>(modify), sensitivity,
-                            static_cast<unsigned>(zoneCase), static_cast<unsigned>(expected));
+                        std::printf(
+                            "AMBIENT_SENSITIVITY_CASE feature=%u trigger=%u modify=%u sensitivity=%d shape=%u expected=%u\n",
+                            static_cast<unsigned>(feature), static_cast<unsigned>(triggerType), static_cast<unsigned>(modify),
+                            sensitivity, static_cast<unsigned>(zoneCase), static_cast<unsigned>(expected));
                         const bool success = expected == Status::Success;
                         if (result.has_value())
                         {
@@ -1141,7 +1171,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                                 Commands::AllocatePushTransportResponse::DecodableType response;
                                 ASSERT_EQ(handler.DecodeResponse(response), CHIP_NO_ERROR);
                                 ASSERT_TRUE(response.transportConfiguration.transportOptions.HasValue());
-                                const auto & responseZones = response.transportConfiguration.transportOptions.Value().triggerOptions.motionZones;
+                                const auto & responseZones =
+                                    response.transportConfiguration.transportOptions.Value().triggerOptions.motionZones;
                                 auto responseIter = responseZones.Value().Value().begin();
                                 ASSERT_TRUE(responseIter.Next());
                                 EXPECT_EQ(responseIter.GetValue().sensitivity.HasValue(), feature);
@@ -1160,14 +1191,15 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                             EXPECT_EQ(storedTrigger.triggerType, triggerType);
                             EXPECT_EQ(storedTrigger.motionTimeControl.HasValue(), motion);
                             auto zoneIter = storedTrigger.motionZones.Value().Value().begin();
-                            size_t index = 0;
+                            size_t index  = 0;
                             while (zoneIter.Next())
                             {
                                 EXPECT_EQ(zoneIter.GetValue().zone.IsNull(), zoneCase == ZoneCase::NullId);
                                 EXPECT_EQ(zoneIter.GetValue().sensitivity.HasValue(), feature);
                                 if (feature)
                                 {
-                                    EXPECT_EQ(zoneIter.GetValue().sensitivity.Value(), zoneCase == ZoneCase::Mixed && index == 0 ? 5 : sensitivity);
+                                    EXPECT_EQ(zoneIter.GetValue().sensitivity.Value(),
+                                              zoneCase == ZoneCase::Mixed && index == 0 ? 5 : sensitivity);
                                 }
                                 ++index;
                             }
