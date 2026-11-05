@@ -1993,6 +1993,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     });
 }
 
+- (chip::Controller::DeviceCommissioner * _Nullable)commissionerOnMatterQueue
+{
+    assertChipStackLockedByCurrentThread();
+    return _cppCommissioner;
+}
+
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
 {
     auto adapter = ^(chip::Controller::DeviceCommissioner *) {
