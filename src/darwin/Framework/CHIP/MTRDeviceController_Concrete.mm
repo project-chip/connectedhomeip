@@ -42,6 +42,7 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
+#import "MTRMetricsScope_Internal.h"
 #import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
@@ -1970,7 +1971,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         }
     }
 
+    // The block runs in the flow that is current now, if any.
+    NSUUID * flowID = MTRMetrics.currentFlowID;
     dispatch_async(_chipWorkQueue, ^{
+        MTRMetricsScope blockScope(flowID);
         NSError * error;
         if (![self checkIsRunning:&error]) {
             if (errorHandler != nil) {
@@ -1982,6 +1986,17 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         block(self->_cppCommissioner);
     });
 }
+
+#ifdef DEBUG
+- (void)unitTestGetSessionForNode:(NSNumber *)nodeID completion:(void (^)(NSError * _Nullable error))completion
+{
+    [self directlyGetSessionForNode:nodeID.unsignedLongLongValue
+                         completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                             const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
+                             completion(error);
+                         }];
+}
+#endif
 
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
 {

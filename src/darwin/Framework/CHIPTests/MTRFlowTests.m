@@ -23,6 +23,7 @@
 #import "MTRDevice_Internal.h"
 #import "MTRMetricsScope_Internal.h"
 #import "MTRMetrics_Internal.h"
+#import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestDeclarations.h"
 
@@ -43,10 +44,12 @@ static NSString * const kInternalStateUpdated = @"internalStateUpdated";
 
 @interface MTRDevice (FlowTest)
 - (void)_handleUnsolicitedMessageFromPublisher;
+- (void)_handleSessionFailureWithError:(NSError *)error retryDelay:(NSNumber * _Nullable)retryDelay;
 @end
 
 @interface MTRDeviceController (FlowTest)
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
+- (void)unitTestGetSessionForNode:(NSNumber *)nodeID completion:(void (^)(NSError * _Nullable error))completion;
 @end
 
 static id CurrentFlowIDOrNull(void)
@@ -849,6 +852,566 @@ static NSArray * StampedValues(NSArray * values, id flowID)
     XCTAssertEqual(error.code, MTRErrorCodeNotFound);
     XCTAssertNil(error.userInfo[MTRErrorFlowIDKey]);
     XCTAssertEqualObjects(flow, sent);
+}
+
+@end
+
+#pragma mark - Hops to the Matter queue
+
+@interface MTRFlowMatterQueueTests : MTRFlowTestCase
+@end
+
+@implementation MTRFlowMatterQueueTests
+
+// A flow that is current when work is scheduled on the Matter queue is current when it runs.
+- (void)test001_AsyncDispatchToMatterQueueCarriesTheCurrentFlow
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    NSUUID * flowID = [NSUUID UUID];
+    XCTestExpectation * carried = [self expectationWithDescription:@"block ran in the caller's flow"];
+    __block id carriedFlow;
+    [MTRMetrics _runWithFlowID:flowID
+                         block:^{
+                             [controller asyncDispatchToMatterQueue:^{
+                                 carriedFlow = CurrentFlowIDOrNull();
+                                 [carried fulfill];
+                             }
+                                                       errorHandler:nil];
+                         }];
+
+    XCTestExpectation * plain = [self expectationWithDescription:@"block ran with no flow"];
+    __block id plainFlow;
+    [controller asyncDispatchToMatterQueue:^{
+        plainFlow = CurrentFlowIDOrNull();
+        [plain fulfill];
+    }
+                              errorHandler:nil];
+
+    [self waitForExpectations:@[ carried, plain ] timeout:kTimeoutInSeconds];
+    XCTAssertEqualObjects(carriedFlow, flowID);
+    XCTAssertEqualObjects(plainFlow, NSNull.null, @"a block scheduled with no current flow must not get one");
+}
+
+@end
+
+#pragma mark - Flows that survive copies and hops
+
+@interface MTRFlowCopyTests : MTRFlowTestCase
+@end
+
+@implementation MTRFlowCopyTests {
+    MTRDeviceController * _controller;
+    MTRDevice * _device;
+}
+
+- (void)setUp
+{
+    [super setUp];
+    [self setContinueAfterFailure:NO];
+    _controller = [self createControllerOnTestFabric];
+    _device = [MTRDevice deviceWithNodeID:@(kFlowTestNodeID + 0x100) controller:_controller];
+}
+
+- (void)tearDown
+{
+    [_controller removeDevice:_device];
+    _device = nil;
+    _controller = nil;
+    [super tearDown];
+}
+
+// A report whose array is copied into a smaller array for a delegate that has interested paths.
+- (void)test001_FlowSurvivesAFilteredArrayCopy
+{
+    __auto_type * everything = [[MTRFlowRecordingDelegate alloc] init];
+    __auto_type * filtered = [[MTRFlowRecordingDelegate alloc] init];
+    [_device addDelegate:everything queue:dispatch_queue_create("flow-test-copy-everything", DISPATCH_QUEUE_SERIAL)];
+    // Only the Level Control cluster; the report below also has an On/Off attribute.
+    [_device addDelegate:filtered
+                               queue:dispatch_queue_create("flow-test-copy-filtered", DISPATCH_QUEUE_SERIAL)
+        interestedPathsForAttributes:@[ [MTRClusterPath clusterPathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeLevelControlID)] ]
+            interestedPathsForEvents:nil];
+
+    NSUUID * flowID = [NSUUID UUID];
+    NSArray * report = [TestAttributeReport(@(MTRClusterIDTypeOnOffID), @(MTRAttributeIDTypeClusterOnOffAttributeOnOffID), 1)
+        arrayByAddingObjectsFromArray:TestConfigurationReport(22)];
+    [MTRMetrics _runWithFlowID:flowID
+                         block:^{
+                             [_device unitTestInjectAttributeReport:report fromSubscription:YES];
+                         }];
+    [self waitForRecordsOf:everything named:kAttributeReport count:1];
+    [self waitForRecordsOf:filtered named:kAttributeReport count:1];
+
+    NSDictionary * everythingRecord = [everything recordsNamed:kAttributeReport].firstObject;
+    NSDictionary * filteredRecord = [filtered recordsNamed:kAttributeReport].firstObject;
+    XCTAssertEqual([everythingRecord[kRecordPayload] count], 2);
+    XCTAssertEqual([filteredRecord[kRecordPayload] count], 1, @"the report was not copied into a smaller array");
+    XCTAssertEqualObjects(everythingRecord[kRecordFlow], flowID);
+    XCTAssertEqualObjects(filteredRecord[kRecordFlow], flowID);
+    [_device removeDelegate:everything];
+    [_device removeDelegate:filtered];
+}
+
+// Reports whose entries are copied into mutable dictionaries (an event gets its historical flag, a changed
+// attribute gets its previous value).
+- (void)test002_FlowSurvivesAMutableCopy
+{
+    __auto_type * delegate = [[MTRFlowRecordingDelegate alloc] init];
+    [_device addDelegate:delegate queue:dispatch_queue_create("flow-test-mutable-copy", DISPATCH_QUEUE_SERIAL)];
+
+    NSUUID * eventFlowID = [NSUUID UUID];
+    NSArray * eventReport = TestEventReport();
+    [MTRMetrics _runWithFlowID:eventFlowID
+                         block:^{
+                             [_device unitTestInjectEventReport:eventReport];
+                         }];
+    [self waitForRecordsOf:delegate named:kEventReport count:1];
+    NSDictionary * eventRecord = [delegate recordsNamed:kEventReport].firstObject;
+    XCTAssertTrue([eventRecord[kRecordPayload][0] isKindOfClass:NSMutableDictionary.class], @"the event entry was not copied");
+    XCTAssertEqualObjects(eventRecord[kRecordFlow], eventFlowID);
+
+    [_device unitTestInjectAttributeReport:TestLevelReport(31) fromSubscription:YES];
+    [self waitForRecordsOf:delegate named:kAttributeReport count:1];
+    NSUUID * changeFlowID = [NSUUID UUID];
+    [MTRMetrics _runWithFlowID:changeFlowID
+                         block:^{
+                             [_device unitTestInjectAttributeReport:TestLevelReport(32) fromSubscription:YES];
+                         }];
+    [self waitForRecordsOf:delegate named:kAttributeReport count:2];
+    NSDictionary * changeRecord = [delegate recordsNamed:kAttributeReport].lastObject;
+    XCTAssertTrue([changeRecord[kRecordPayload][0] isKindOfClass:NSMutableDictionary.class], @"the attribute entry was not copied");
+    XCTAssertNotNil(changeRecord[kRecordPayload][0][MTRPreviousDataKey]);
+    XCTAssertEqualObjects(changeRecord[kRecordFlow], changeFlowID);
+    [_device removeDelegate:delegate];
+}
+
+// A report with an error entry, whose NSError is a copy.
+- (void)test003_FlowSurvivesAnErrorCopy
+{
+    __auto_type * delegate = [[MTRFlowRecordingDelegate alloc] init];
+    [_device addDelegate:delegate queue:dispatch_queue_create("flow-test-error-copy", DISPATCH_QUEUE_SERIAL)];
+
+    // An error made by the framework, so it carries the framework's own underlying-error holder.
+    NSError * original;
+    XCTAssertNil([MTRSetupPayload setupPayloadWithOnboardingPayload:@"not a setup payload" error:&original]);
+    XCTAssertNotNil(original);
+    NSError * copied = [original copy];
+    NSError * rebuilt = [NSError errorWithDomain:original.domain code:original.code userInfo:original.userInfo];
+    NSData * archive = [NSKeyedArchiver archivedDataWithRootObject:original requiringSecureCoding:YES error:nil];
+    NSError * unarchived = [NSKeyedUnarchiver unarchivedObjectOfClass:NSError.class fromData:archive error:nil];
+    XCTAssertNotNil(unarchived);
+    NSArray * report = @[
+        @{
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeCurrentLevelID)],
+            MTRErrorKey : copied,
+        },
+        @{
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)],
+            MTRErrorKey : rebuilt,
+        },
+        @{
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeMaxLevelID)],
+            MTRErrorKey : unarchived,
+        },
+    ];
+    NSUUID * flowID = [NSUUID UUID];
+    [MTRMetrics _runWithFlowID:flowID
+                         block:^{
+                             [_device unitTestInjectAttributeReport:report fromSubscription:YES];
+                         }];
+    [self waitForRecordsOf:delegate named:kAttributeReport count:1];
+
+    NSDictionary * record = [delegate recordsNamed:kAttributeReport].firstObject;
+    XCTAssertEqual([record[kRecordPayload] count], 3);
+    for (NSDictionary * entry in record[kRecordPayload]) {
+        NSError * delivered = entry[MTRErrorKey];
+        XCTAssertEqual(delivered.code, original.code);
+    }
+    XCTAssertEqualObjects(record[kRecordFlow], flowID);
+    [_device removeDelegate:delegate];
+}
+
+@end
+
+#pragma mark - Subscription reset and failure
+
+@interface MTRFlowSubscriptionResetTests : MTRFlowTestCase
+@end
+
+@implementation MTRFlowSubscriptionResetTests {
+    MTRDeviceController * _controller;
+    MTRDevice * _device;
+    MTRFlowInternalStateRecordingDelegate * _delegate;
+    dispatch_queue_t _delegateQueue;
+}
+
+- (void)setUp
+{
+    [super setUp];
+    [self setContinueAfterFailure:NO];
+    _controller = [self createControllerOnTestFabric];
+    _device = [MTRDevice deviceWithNodeID:@(kFlowTestNodeID + 0x200) controller:_controller];
+    _delegate = [[MTRFlowInternalStateRecordingDelegate alloc] init];
+    _delegateQueue = dispatch_queue_create("flow-test-reset-delegate", DISPATCH_QUEUE_SERIAL);
+    [_device addDelegate:_delegate queue:_delegateQueue];
+}
+
+- (void)tearDown
+{
+    [_device removeDelegate:_delegate];
+    [_controller removeDevice:_device];
+    _device = nil;
+    _controller = nil;
+    [super tearDown];
+}
+
+// Makes the device reachable, so that a reset reports a state change.  Returns once every callback caused
+// by that has been delivered.
+- (void)makeDeviceReachable
+{
+    MTRDevice * device = _device;
+    XCTestExpectation * ran = [self expectationWithDescription:@"ran on Matter queue"];
+    [_controller asyncDispatchToMatterQueue:^{
+        [device _handleUnsolicitedMessageFromPublisher];
+        [ran fulfill];
+    }
+                               errorHandler:nil];
+    [self waitForExpectations:@[ ran ] timeout:kTimeoutInSeconds];
+    dispatch_sync(_delegateQueue, ^ {});
+    XCTAssertEqual([_delegate recordsNamed:kStateChanged].count, 1);
+}
+
+// The next `count` callbacks recorded after the first `from`.
+- (NSArray<NSDictionary *> *)recordsSince:(NSUInteger)from count:(NSUInteger)count
+{
+    __auto_type * delegate = _delegate;
+    XCTestExpectation * arrived = [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary * bindings) {
+        return delegate.records.count >= from + count;
+    }]
+                                            evaluatedWithObject:_delegate
+                                                        handler:nil];
+    [self waitForExpectations:@[ arrived ] timeout:kTimeoutInSeconds];
+    return [delegate.records subarrayWithRange:NSMakeRange(from, count)];
+}
+
+- (void)checkAllShareOneFlow:(NSArray<NSDictionary *> *)records
+{
+    NSUUID * flow = records.firstObject[kRecordFlow];
+    XCTAssertTrue([flow isKindOfClass:NSUUID.class], @"%@", flow);
+    for (NSDictionary * record in records) {
+        XCTAssertEqualObjects(record[kRecordFlow], flow, @"%@", records);
+    }
+}
+
+// _resetSubscriptionWithReasonString: and the hop to the Matter queue.  The reset reports the state change
+// to unreachable, the internal state update that goes with it, and the internal state update at the end of
+// the reset (the new retry wait): all three are one flow.
+- (void)test001_ResetWithReasonSharesOneFlowAcrossTheHop
+{
+    [self makeDeviceReachable];
+    NSUInteger from = _delegate.records.count;
+    [_device unitTestResetSubscription];
+    NSArray * records = [self recordsSince:from count:3];
+    XCTAssertEqualObjects(records.firstObject[kRecordName], kStateChanged, @"%@", records);
+    XCTAssertEqualObjects(records.firstObject[kRecordPayload], @(MTRDeviceStateUnreachable));
+    [self checkAllShareOneFlow:records];
+}
+
+// _resetSubscription, called on the Matter queue by _deviceMayBeReachable: the state change to unreachable and
+// its internal state update are one flow.
+- (void)test002_DirectResetSharesOneFlow
+{
+    [self makeDeviceReachable];
+    NSUInteger from = _delegate.records.count;
+    [_device _deviceMayBeReachable];
+    NSArray * records = [self recordsSince:from count:2];
+    XCTAssertEqualObjects(records.firstObject[kRecordName], kStateChanged, @"%@", records);
+    XCTAssertEqualObjects(records.firstObject[kRecordPayload], @(MTRDeviceStateUnreachable));
+    [self checkAllShareOneFlow:records];
+}
+
+@end
+
+@interface MTRFlowSubscriptionFailureTests : MTRFlowTestCase
+@end
+
+@implementation MTRFlowSubscriptionFailureTests
+
+// The session-failure block: the subscription's CASE attempt failed and reported it with no flow around it
+// (as it does when the controller is suspended or stopping).  The state change and the internal state updates
+// caused by the failure are one flow, though they run after a hop to the Matter queue.
+- (void)test001_SessionFailureSharesOneFlowAcrossTheHop
+{
+    [self setContinueAfterFailure:NO];
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    MTRDevice * device = [MTRDevice deviceWithNodeID:@(kFlowTestNodeID + 0x300) controller:controller];
+    __auto_type * delegate = [[MTRFlowInternalStateRecordingDelegate alloc] init];
+    dispatch_queue_t delegateQueue = dispatch_queue_create("flow-test-failure-delegate", DISPATCH_QUEUE_SERIAL);
+    [device addDelegate:delegate queue:delegateQueue];
+
+    XCTestExpectation * ran = [self expectationWithDescription:@"ran on Matter queue"];
+    [controller asyncDispatchToMatterQueue:^{
+        [device _handleUnsolicitedMessageFromPublisher];
+        [ran fulfill];
+    }
+                              errorHandler:nil];
+    [self waitForExpectations:@[ ran ] timeout:kTimeoutInSeconds];
+    dispatch_sync(delegateQueue, ^ {});
+    NSUInteger from = delegate.records.count;
+
+    XCTAssertNil(MTRMetrics.currentFlowID);
+    [device _handleSessionFailureWithError:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeTimeout userInfo:nil] retryDelay:nil];
+
+    XCTestExpectation * arrived = [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary * bindings) {
+        return delegate.records.count >= from + 3;
+    }]
+                                            evaluatedWithObject:delegate
+                                                        handler:nil];
+    [self waitForExpectations:@[ arrived ] timeout:kTimeoutInSeconds];
+    NSArray * records = [delegate.records subarrayWithRange:NSMakeRange(from, 3)];
+    XCTAssertEqualObjects(records.firstObject[kRecordName], kStateChanged, @"%@", records);
+    XCTAssertEqualObjects(records.firstObject[kRecordPayload], @(MTRDeviceStateUnreachable));
+    NSUUID * flow = records.firstObject[kRecordFlow];
+    XCTAssertTrue([flow isKindOfClass:NSUUID.class], @"%@", flow);
+    for (NSDictionary * record in records) {
+        XCTAssertEqualObjects(record[kRecordFlow], flow, @"%@", records);
+    }
+
+    [device removeDelegate:delegate];
+    [controller removeDevice:device];
+}
+
+@end
+
+#pragma mark - MTRBaseDevice and the CASE result, on a running accessory
+
+static const uint64_t kFlowWireNodeID = 0x7A3C4001;
+static const NSTimeInterval kFlowWireTimeoutInSeconds = 30;
+static MTRDeviceController * sFlowWireController;
+
+// What an MTRBaseDevice report handler or established handler saw.
+@interface MTRFlowReportRecorder : NSObject
+- (void)recordValues:(NSArray * _Nullable)values error:(NSError * _Nullable)error;
+- (void)recordEstablished;
+- (NSArray<NSDictionary *> *)calls;
+@end
+
+@implementation MTRFlowReportRecorder {
+    os_unfair_lock _lock;
+    NSMutableArray<NSDictionary *> * _calls;
+}
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _lock = OS_UNFAIR_LOCK_INIT;
+        _calls = [NSMutableArray array];
+    }
+    return self;
+}
+
+- (void)_add:(NSDictionary *)call
+{
+    os_unfair_lock_lock(&_lock);
+    [_calls addObject:call];
+    os_unfair_lock_unlock(&_lock);
+}
+
+- (void)recordValues:(NSArray * _Nullable)values error:(NSError * _Nullable)error
+{
+    [self _add:@{ kRecordName : @"report", kRecordFlow : CurrentFlowIDOrNull(), kRecordPayload : values ?: @[] }];
+}
+
+- (void)recordEstablished
+{
+    [self _add:@{ kRecordName : @"established", kRecordFlow : CurrentFlowIDOrNull() }];
+}
+
+- (NSArray<NSDictionary *> *)calls
+{
+    os_unfair_lock_lock(&_lock);
+    NSArray * calls = [_calls copy];
+    os_unfair_lock_unlock(&_lock);
+    return calls;
+}
+
+@end
+
+@interface MTRFlowWireTests : MTRFlowTestCase
+@end
+
+@implementation MTRFlowWireTests
+
++ (void)setUp
+{
+    [super setUp];
+    sFlowWireController = [self startCommissionedAppWithName:@"all-clusters" arguments:@[] nodeID:@(kFlowWireNodeID)];
+    XCTAssertNotNil(sFlowWireController);
+}
+
++ (void)tearDown
+{
+    sFlowWireController = nil;
+    [super tearDown];
+}
+
+- (void)setUp
+{
+    [super setUp];
+    [self setContinueAfterFailure:NO];
+}
+
+- (MTRFlowReportRecorder *)subscribeWithAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths eventPaths:(NSArray<MTREventRequestPath *> *)eventPaths
+{
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:@(kFlowWireNodeID) controller:sFlowWireController];
+    __auto_type * recorder = [[MTRFlowReportRecorder alloc] init];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
+    XCTestExpectation * established = [self expectationWithDescription:@"subscription established"];
+    [baseDevice subscribeToAttributePaths:attributePaths
+        eventPaths:eventPaths
+        params:params
+        queue:dispatch_queue_create("flow-test-wire-report", DISPATCH_QUEUE_SERIAL)
+        reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            [recorder recordValues:values error:error];
+        }
+        subscriptionEstablished:^{
+            [recorder recordEstablished];
+            [established fulfill];
+        }
+        resubscriptionScheduled:nil];
+    [self waitForExpectations:@[ established ] timeout:kFlowWireTimeoutInSeconds];
+    return recorder;
+}
+
+- (NSArray<NSDictionary *> *)primingCallsOf:(MTRFlowReportRecorder *)recorder
+{
+    NSMutableArray * priming = [NSMutableArray array];
+    for (NSDictionary * call in recorder.calls) {
+        if ([call[kRecordName] isEqualToString:@"established"]) {
+            break;
+        }
+        [priming addObject:call];
+    }
+    return priming;
+}
+
+- (void)checkAllShareOneFlow:(NSArray<NSDictionary *> *)calls
+{
+    XCTAssertGreaterThan(calls.count, 0);
+    id flow = calls.firstObject[kRecordFlow];
+    XCTAssertTrue([flow isKindOfClass:NSUUID.class], @"%@", flow);
+    for (NSDictionary * call in calls) {
+        XCTAssertEqualObjects(call[kRecordFlow], flow, @"%@", call[kRecordPayload]);
+    }
+}
+
+// Item 1: every attribute of one report shares a flow, and the next report has another.
+- (void)test001_MultipleAttributesOfOneReportShareOneFlow
+{
+    __auto_type * recorder = [self subscribeWithAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeOnOffID) attributeID:nil] ]
+                                                    eventPaths:nil];
+    NSArray * priming = [self primingCallsOf:recorder];
+    XCTAssertGreaterThan(priming.count, 1, @"wanted a report with several attributes: %@", priming);
+    NSDictionary * established = recorder.calls[priming.count];
+    XCTAssertTrue([established[kRecordFlow] isKindOfClass:NSUUID.class], @"subscriptionEstablished ran in no flow: %@", established);
+    [self checkAllShareOneFlow:priming];
+    id primingFlow = [priming.firstObject objectForKey:kRecordFlow];
+
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:@(kFlowWireNodeID) controller:sFlowWireController];
+    __auto_type * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice endpointID:@(1) queue:dispatch_get_main_queue()];
+    XCTestExpectation * toggled = [self expectationWithDescription:@"toggled"];
+    [onOff toggleWithCompletion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [toggled fulfill];
+    }];
+    [self waitForExpectations:@[ toggled ] timeout:kFlowWireTimeoutInSeconds];
+
+    XCTestExpectation * reported = [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary * bindings) {
+        return recorder.calls.count > priming.count + 1;
+    }]
+                                             evaluatedWithObject:recorder
+                                                         handler:nil];
+    [self waitForExpectations:@[ reported ] timeout:kFlowWireTimeoutInSeconds];
+    NSArray * after = [recorder.calls subarrayWithRange:NSMakeRange(priming.count + 1, recorder.calls.count - priming.count - 1)];
+    [self checkAllShareOneFlow:after];
+    XCTAssertNotEqualObjects(after.firstObject[kRecordFlow], primingFlow);
+}
+
+// Item 1: an attribute error is reported in the flow of the report it came in.
+- (void)test002_AttributeErrorSharesTheFlowOfItsReport
+{
+    __auto_type * recorder = [self subscribeWithAttributePaths:@[
+        [MTRAttributeRequestPath requestPathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeOnOffID) attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)],
+        [MTRAttributeRequestPath requestPathWithEndpointID:@(1) clusterID:@(5678) attributeID:@(1)],
+    ]
+                                                    eventPaths:nil];
+    NSArray * priming = [self primingCallsOf:recorder];
+    BOOL sawData = NO;
+    BOOL sawError = NO;
+    for (NSDictionary * call in priming) {
+        for (NSDictionary * value in call[kRecordPayload]) {
+            sawData = sawData || value[MTRDataKey] != nil;
+            sawError = sawError || value[MTRErrorKey] != nil;
+        }
+    }
+    XCTAssertTrue(sawData && sawError, @"%@", priming);
+    [self checkAllShareOneFlow:priming];
+}
+
+// Item 1: an event error and an attribute of one report share a flow.
+- (void)test003_EventErrorAndAttributeOfOneReportShareOneFlow
+{
+    __auto_type * recorder = [self subscribeWithAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeOnOffID) attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)] ]
+                                                    eventPaths:@[ [MTREventRequestPath requestPathWithEndpointID:@(1000) clusterID:@(MTRClusterIDTypeBasicInformationID) eventID:@(MTREventIDTypeClusterBasicInformationEventStartUpID)] ]];
+    NSArray * priming = [self primingCallsOf:recorder];
+    BOOL sawAttribute = NO;
+    BOOL sawEvent = NO;
+    for (NSDictionary * call in priming) {
+        for (NSDictionary * value in call[kRecordPayload]) {
+            sawAttribute = sawAttribute || value[MTRAttributePathKey] != nil;
+            sawEvent = sawEvent || value[MTREventPathKey] != nil;
+        }
+    }
+    XCTAssertTrue(sawAttribute && sawEvent, @"%@", priming);
+    [self checkAllShareOneFlow:priming];
+}
+
+// Item 3: the CASE result runs in a flow, though nothing around the request is in one.
+- (void)test004_CASEResultRunsInAFlow
+{
+    XCTAssertNil(MTRMetrics.currentFlowID);
+    XCTestExpectation * connected = [self expectationWithDescription:@"session result"];
+    __block id flow;
+    __block NSError * sessionError;
+    [sFlowWireController unitTestGetSessionForNode:@(kFlowWireNodeID)
+                                        completion:^(NSError * _Nullable error) {
+                                            flow = CurrentFlowIDOrNull();
+                                            sessionError = error;
+                                            [connected fulfill];
+                                        }];
+    [self waitForExpectations:@[ connected ] timeout:kFlowWireTimeoutInSeconds];
+    XCTAssertNil(sessionError);
+    XCTAssertTrue([flow isKindOfClass:NSUUID.class], @"%@", flow);
+}
+
+// Item 3: so does a failed CASE attempt (no one answers for this node).
+- (void)test005_CASEFailureRunsInAFlow
+{
+    XCTestExpectation * failed = [self expectationWithDescription:@"session failure"];
+    __block id flow;
+    __block NSError * sessionError;
+    [sFlowWireController unitTestGetSessionForNode:@(kFlowWireNodeID + 1)
+                                        completion:^(NSError * _Nullable error) {
+                                            flow = CurrentFlowIDOrNull();
+                                            sessionError = error;
+                                            [failed fulfill];
+                                        }];
+    [self waitForExpectations:@[ failed ] timeout:120];
+    XCTAssertNotNil(sessionError);
+    XCTAssertTrue([flow isKindOfClass:NSUUID.class], @"%@", flow);
 }
 
 @end

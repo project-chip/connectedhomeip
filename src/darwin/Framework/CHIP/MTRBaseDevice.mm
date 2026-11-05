@@ -31,6 +31,7 @@
 #import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
+#import "MTRMetricsScope_Internal.h"
 #import "MTRSetupPayload_Internal.h"
 #import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
@@ -931,9 +932,18 @@ public:
     void AdoptReadClient(Platform::UniquePtr<app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
 
 private:
+    // One flow per report: it starts at OnReportBegin and ends at OnReportEnd or OnError.  Anything
+    // outside a report (such as an error with no report in progress) runs in a flow of its own.
+    NSUUID * FlowForCallback() { return mReportFlowID ?: [MTRMetrics _currentOrNewFlowID]; }
+
+    void OnReportBegin() override { mReportFlowID = [NSUUID UUID]; }
+
+    void OnReportEnd() override { mReportFlowID = nil; }
+
     void OnAttributeData(
         const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const app::StatusIB & aStatus) override
     {
+        MTRMetricsScope metricsScope(FlowForCallback());
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableValueType value;
 
@@ -969,6 +979,7 @@ private:
 
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
     {
+        MTRMetricsScope metricsScope(FlowForCallback());
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableValueType value;
 
@@ -997,7 +1008,14 @@ private:
         }
     }
 
-    void OnError(CHIP_ERROR aError) override { mOnError(nullptr, nullptr, aError); }
+    void OnError(CHIP_ERROR aError) override
+    {
+        {
+            MTRMetricsScope metricsScope(FlowForCallback());
+            mOnError(nullptr, nullptr, aError);
+        }
+        mReportFlowID = nil;
+    }
 
     void OnDone(ReadClient *) override { mOnDone(this); }
 
@@ -1032,6 +1050,7 @@ private:
     OnDeviceResubscriptionScheduledCallbackType mOnDeviceResubscriptionScheduled;
     app::BufferedReadCallback mBufferedReadAdapter;
     Platform::UniquePtr<app::ReadClient> mReadClient;
+    NSUUID * _Nullable mReportFlowID = nil;
     app::AttributePathParams * mAttributePathParamsList;
     app::EventPathParams * mEventPathParamsList;
     size_t mAttributePathParamsSize;
@@ -2081,7 +2100,7 @@ private:
                                                   const MTRDataValueDictionaryDecodableType & data) {
                        id valueObject = data.GetDecodedObject();
                        ConcreteAttributePath pathCopy(attributePath);
-                       dispatch_async(queue, ^{
+                       MTRDispatchCallbackWithFlowID(queue, ^{
                            reportHandler(@[ @ {
                                MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy],
                                MTRDataKey : valueObject
@@ -2093,7 +2112,7 @@ private:
                    auto onEventReportCb = [queue, reportHandler](
                                               const EventHeader & eventHeader, const MTRDataValueDictionaryDecodableType & data) {
                        NSDictionary * report = [MTRBaseDevice eventReportForHeader:eventHeader andData:data.GetDecodedObject()];
-                       dispatch_async(queue, ^{
+                       MTRDispatchCallbackWithFlowID(queue, ^{
                            reportHandler(@[ report ], nil);
                        });
                    };
@@ -2102,7 +2121,7 @@ private:
                                           const app::ConcreteEventPath * eventPath, CHIP_ERROR error) {
                        if (attributePath != nullptr) {
                            ConcreteAttributePath pathCopy(*attributePath);
-                           dispatch_async(queue, ^{
+                           MTRDispatchCallbackWithFlowID(queue, ^{
                                reportHandler(@[ @ {
                                    MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy],
                                    MTRErrorKey : [MTRError errorForCHIPErrorCode:error]
@@ -2111,7 +2130,7 @@ private:
                            });
                        } else if (eventPath != nullptr) {
                            ConcreteEventPath pathCopy(*eventPath);
-                           dispatch_async(queue, ^{
+                           MTRDispatchCallbackWithFlowID(queue, ^{
                                reportHandler(@[ @ {
                                    MTREventPathKey : [[MTREventPath alloc] initWithPath:pathCopy],
                                    MTRErrorKey : [MTRError errorForCHIPErrorCode:error]
@@ -2119,7 +2138,7 @@ private:
                                    nil);
                            });
                        } else {
-                           dispatch_async(queue, ^{
+                           MTRDispatchCallbackWithFlowID(queue, ^{
                                reportHandler(nil, [MTRError errorForCHIPErrorCode:error]);
                            });
                        }
@@ -2127,14 +2146,14 @@ private:
 
                    auto onEstablishedCb = [queue, subscriptionEstablished]() {
                        if (subscriptionEstablished) {
-                           dispatch_async(queue, subscriptionEstablished);
+                           MTRDispatchCallbackWithFlowID(queue, subscriptionEstablished);
                        }
                    };
 
                    auto onResubscriptionScheduledCb
                        = [queue, resubscriptionScheduled](NSError * error, NSNumber * resubscriptionDelay) {
                              if (resubscriptionScheduled) {
-                                 dispatch_async(queue, ^{
+                                 MTRDispatchCallbackWithFlowID(queue, ^{
                                      resubscriptionScheduled(error, resubscriptionDelay);
                                  });
                              }
