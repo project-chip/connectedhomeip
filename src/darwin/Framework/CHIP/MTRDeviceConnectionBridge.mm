@@ -19,11 +19,14 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRConversion.h"
 #import "MTRError_Internal.h"
+#import "MTRMetricsScope_Internal.h"
 
 void MTRDeviceConnectionBridge::OnConnected(
     void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle)
 {
     auto * object = static_cast<MTRDeviceConnectionBridge *>(context);
+    // The result of the CASE session runs in the flow that is current, or in a new one.
+    MTRMetricsScope metricsScope([MTRMetrics _currentOrNewFlowID]);
     object->mCompletionHandler(&exchangeMgr, chip::MakeOptional<chip::SessionHandle>(*sessionHandle->AsSecureSession()), nil, nil);
     object->Release();
 }
@@ -35,6 +38,7 @@ void MTRDeviceConnectionBridge::OnConnectionFailure(void * context, const chip::
         retryDelay = @(DurationToTimeInterval(failureInfo.requestedBusyDelay.Value()));
     }
     auto * object = static_cast<MTRDeviceConnectionBridge *>(context);
+    MTRMetricsScope metricsScope([MTRMetrics _currentOrNewFlowID]);
     object->mCompletionHandler(nil, chip::NullOptional, [MTRError errorForCHIPErrorCode:failureInfo.error], retryDelay);
     object->Release();
 }
