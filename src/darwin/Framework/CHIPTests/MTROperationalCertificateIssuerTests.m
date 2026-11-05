@@ -42,6 +42,8 @@ static MTRTestKeys * sTestKeys = nil;
 @property (nonatomic) uint64_t nodeID;
 @property (nonatomic) MTRErrorCode expectedErrorCode;
 @property (nonatomic, nullable) NSNumber * expectedCHIPErrorCode;
+// Number of commissioningComplete callbacks received for nodeID since it was last set.
+@property (atomic, readonly) NSUInteger commissioningCompleteCount;
 @end
 
 @implementation MTROperationalCertificateIssureTestDeviceControllerDelegate
@@ -70,6 +72,20 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertNil(commissionError);
 
     // Keep waiting for controller:commissioningComplete:
+}
+
+- (void)setNodeID:(uint64_t)nodeID
+{
+    _nodeID = nodeID;
+    _commissioningCompleteCount = 0;
+}
+
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error nodeID:(NSNumber * _Nullable)nodeID metrics:(MTRMetrics *)metrics
+{
+    if (nodeID != nil && nodeID.unsignedLongLongValue == _nodeID) {
+        _commissioningCompleteCount++;
+    }
+    [self controller:controller commissioningComplete:error];
 }
 
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
@@ -302,6 +318,15 @@ typedef void (^IssuerCompletion)(MTROperationalCertificateChain * _Nullable info
         secondCompletion = nil;
     }
     [self waitForExpectations:@[ secondExpectation ] timeout:kPairingTimeoutInSeconds];
+
+    // The first request's completion must not complete the second commissioning again, now or later: wait for any late
+    // completion to arrive, then check that the second node was completed exactly once.
+    XCTestExpectation * settled = [self expectationWithDescription:@"Late completions had a chance to arrive"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [settled fulfill];
+    });
+    [self waitForExpectations:@[ settled ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertEqual(deviceControllerDelegate.commissioningCompleteCount, 1u);
 
     [self stopController:controller];
 }
