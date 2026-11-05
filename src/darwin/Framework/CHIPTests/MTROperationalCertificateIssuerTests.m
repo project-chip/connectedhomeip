@@ -42,7 +42,8 @@ static MTRTestKeys * sTestKeys = nil;
 @property (nonatomic) uint64_t nodeID;
 @property (nonatomic) MTRErrorCode expectedErrorCode;
 @property (nonatomic, nullable) NSNumber * expectedCHIPErrorCode;
-// Number of commissioningComplete callbacks received for nodeID since it was last set.
+// Number of commissioningComplete callbacks received since nodeID was last set. Failed commissionings report a nil node
+// ID, so every completion is counted rather than only those naming nodeID.
 @property (atomic, readonly) NSUInteger commissioningCompleteCount;
 @end
 
@@ -82,9 +83,7 @@ static MTRTestKeys * sTestKeys = nil;
 
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error nodeID:(NSNumber * _Nullable)nodeID metrics:(MTRMetrics *)metrics
 {
-    if (nodeID != nil && nodeID.unsignedLongLongValue == _nodeID) {
-        _commissioningCompleteCount++;
-    }
+    _commissioningCompleteCount++;
     [self controller:controller commissioningComplete:error];
 }
 
