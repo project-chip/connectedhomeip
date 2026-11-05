@@ -35,6 +35,63 @@ CHIP_ERROR ConnectCommand::RunCommand()
     return WebRTCManager::Instance().Connect(CurrentCommissioner(), mPeerNodeId, mPeerEndpointId);
 }
 
+WebRTCProviderClient::OfferOptions OfferOptionArguments::ToOfferOptions() const
+{
+    WebRTCProviderClient::OfferOptions options;
+
+    if (mVideoStreams.HasValue())
+    {
+        options.videoStreams.emplace(mVideoStreams.Value().begin(), mVideoStreams.Value().end());
+    }
+    if (mAudioStreams.HasValue())
+    {
+        options.audioStreams.emplace(mAudioStreams.Value().begin(), mAudioStreams.Value().end());
+    }
+    if (mMetadataEnabled.HasValue())
+    {
+        options.metadataEnabled = mMetadataEnabled.Value();
+    }
+    if (mSFrameConfig.HasValue())
+    {
+        const auto & sFrameConfig = mSFrameConfig.Value();
+        options.sFrameConfig.emplace();
+        options.sFrameConfig->cipherSuite = sFrameConfig.cipherSuite;
+        options.sFrameConfig->baseKey.assign(sFrameConfig.baseKey.begin(), sFrameConfig.baseKey.end());
+        options.sFrameConfig->kid.assign(sFrameConfig.kid.begin(), sFrameConfig.kid.end());
+    }
+    if (mICEServers.HasValue())
+    {
+        options.iceServers.emplace();
+        for (const auto & server : mICEServers.Value())
+        {
+            WebRTCProviderClient::OfferOptions::ICEServer iceServer;
+            for (const auto & url : server.URLs)
+            {
+                iceServer.urls.emplace_back(url.data(), url.size());
+            }
+            if (server.username.HasValue())
+            {
+                iceServer.username.emplace(server.username.Value().data(), server.username.Value().size());
+            }
+            if (server.credential.HasValue())
+            {
+                iceServer.credential.emplace(server.credential.Value().data(), server.credential.Value().size());
+            }
+            if (server.caid.HasValue())
+            {
+                iceServer.caid = server.caid.Value();
+            }
+            options.iceServers->push_back(std::move(iceServer));
+        }
+    }
+    if (mICETransportPolicy.HasValue())
+    {
+        options.iceTransportPolicy = mICETransportPolicy.Value();
+    }
+
+    return options;
+}
+
 CHIP_ERROR ProvideOfferCommand::RunCommand()
 {
     ChipLogProgress(Camera, "Run ProvideOfferCommand");
@@ -74,7 +131,8 @@ CHIP_ERROR ProvideOfferCommand::RunCommand()
         audioStreamIdOptional = NullOptional;
     }
 
-    return WebRTCManager::Instance().ProvideOffer(webrtcSessionId, streamUsage, videoStreamIdOptional, audioStreamIdOptional);
+    return WebRTCManager::Instance().ProvideOffer(webrtcSessionId, streamUsage, videoStreamIdOptional, audioStreamIdOptional,
+                                                  mOfferOptionArguments.ToOfferOptions());
 }
 
 CHIP_ERROR SolicitOfferCommand::RunCommand()
@@ -106,7 +164,8 @@ CHIP_ERROR SolicitOfferCommand::RunCommand()
         audioStreamIdOptional = NullOptional;
     }
 
-    return WebRTCManager::Instance().SolicitOffer(streamUsage, videoStreamIdOptional, audioStreamIdOptional);
+    return WebRTCManager::Instance().SolicitOffer(streamUsage, videoStreamIdOptional, audioStreamIdOptional,
+                                                  mOfferOptionArguments.ToOfferOptions());
 }
 
 CHIP_ERROR EstablishSessionCommand::RunCommand()
