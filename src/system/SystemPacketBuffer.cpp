@@ -614,7 +614,7 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
         pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(PacketBuffer::kMaxAllocSize), CHIP_SYSTEM_PACKETBUFFER_LWIP_PBUF_TYPE));
 #else
     // This cast is safe because lAllocSize is no larger than
-    // kMaxSizeWithoutReserve, which fits in uint16_t.
+    // kMaxAllocSize, which is asserted above to fit in uint16_t.
     lPacket = static_cast<PacketBuffer *>(
         pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(lAllocSize), CHIP_SYSTEM_PACKETBUFFER_LWIP_PBUF_TYPE));
 #endif
@@ -655,6 +655,18 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
         ChipLogError(chipSystemLayer, "PacketBuffer: pool EMPTY.");
         return PacketBufferHandle();
     }
+
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL
+    // New() guarantees aAvailableSize contiguous bytes at Start(). A PBUF_POOL allocation cannot meet that guarantee if it is
+    // a chain (no single pool buffer is large enough) or a buffer whose AllocSize() is smaller than requested (custom pools).
+    if (lPacket->next != nullptr || lPacket->AllocSize() < lAllocSize)
+    {
+        ChipLogError(chipSystemLayer, "PacketBuffer: %lu bytes do not fit in one pool buffer.",
+                     static_cast<unsigned long>(lAllocSize));
+        PacketBuffer::Free(lPacket);
+        return PacketBufferHandle();
+    }
+#endif // CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL
 
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
 
