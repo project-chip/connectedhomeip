@@ -28,12 +28,12 @@ Please enable the below options if you want to use ESP32 Factory Data Provider
 On SoCs with the HMAC peripheral (for example ESP32-C3, ESP32-C6 and ESP32-H2),
 NVS encryption can use the
 [HMAC based scheme](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/storage/nvs_encryption.html#nvs-encryption-hmac-peripheral-based-scheme).
-The NVS encryption keys are derived at runtime from an HMAC key stored in
-eFuse, so flash encryption and the `nvs_keys` partition are not required.
+The NVS encryption keys are derived at runtime from an HMAC key stored in eFuse,
+so flash encryption and the `nvs_keys` partition are not required.
 
 -   Enable NVS encryption [Component config → NVS → Enable NVS encryption]
--   Select the HMAC based scheme [Component config → NVS Security Provider →
-    NVS Encryption: Key Protection Scheme → Using HMAC peripheral]
+-   Select the HMAC based scheme [Component config → NVS Security Provider → NVS
+    Encryption: Key Protection Scheme → Using HMAC peripheral]
 -   Set the eFuse key block that stores the HMAC key [Component config → NVS
     Security Provider → eFuse key ID storing the HMAC key]
 
