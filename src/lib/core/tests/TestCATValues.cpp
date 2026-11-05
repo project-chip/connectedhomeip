@@ -208,8 +208,8 @@ TEST(TestCATValues, TestIsValidCATIdentifier)
     EXPECT_TRUE(IsValidCATIdentifier(0x1111));
     EXPECT_TRUE(IsValidCATIdentifier(0xFFFD));
 
-    // Undefined identifier (0x0000) should be invalid
-    EXPECT_FALSE(IsValidCATIdentifier(0x0000));
+    // Identifier 0x0000 is "Generally available" per spec — must be valid
+    EXPECT_TRUE(IsValidCATIdentifier(0x0000));
 }
 
 TEST(TestCATValues, TestReservedCATValues)
@@ -247,9 +247,8 @@ TEST(TestCATValues, TestReservedCATValues)
     CASEAuthTag anchorCatV0 = GetAnchorCATWithVersion(0x0000);
     EXPECT_FALSE(IsValidCASEAuthTag(anchorCatV0));
 
-    // Identifier 0x0000 with non-zero version must be rejected by IsValidCASEAuthTag
-    // (consistent with IsValidCATIdentifier(0x0000) == false)
-    EXPECT_FALSE(IsValidCASEAuthTag(0x0000'0001));
+    // Identifier 0x0000 with non-zero version must be valid per spec
+    EXPECT_TRUE(IsValidCASEAuthTag(0x0000'0001));
 
     // Test that reserved CATs can be used in CATValues
     auto catsWithAdmin = CATValues{ { adminCatV1 } };
