@@ -16,6 +16,7 @@
 
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
+#import <objc/runtime.h>
 #import <os/lock.h>
 
 #import "MTRDelegateManager.h"
@@ -26,6 +27,8 @@
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestDeclarations.h"
+#import "MTRTestKeys.h"
+#import "MTRTestPerControllerStorage.h"
 
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kFlowTestNodeID = 0x7A3C1001;
@@ -1239,6 +1242,80 @@ static MTRDeviceController * sFlowWireController;
 
 @end
 
+#pragma mark - Report decoding
+
+static BOOL OnMatterQueue(void)
+{
+    return strcmp(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL), "org.csa-iot.matter.workqueue") == 0;
+}
+
+// Records the flow that is current on the Matter queue each time the replaced method runs there.
+@interface MTRFlowMatterQueueProbe : NSObject
+- (instancetype)initWithMethod:(Method)method block:(id)block;
+- (void)note;
+- (NSArray *)flows;
+- (void)remove;
+@end
+
+@implementation MTRFlowMatterQueueProbe {
+    os_unfair_lock _lock;
+    NSMutableArray * _flows;
+    Method _method;
+    IMP _original;
+}
+
+- (instancetype)initWithMethod:(Method)method block:(id)block
+{
+    if (self = [super init]) {
+        _lock = OS_UNFAIR_LOCK_INIT;
+        _flows = [NSMutableArray array];
+        _method = method;
+        _original = method_getImplementation(method);
+        method_setImplementation(method, imp_implementationWithBlock(block));
+    }
+    return self;
+}
+
+- (void)note
+{
+    if (!OnMatterQueue()) {
+        return;
+    }
+    id flow = CurrentFlowIDOrNull();
+    os_unfair_lock_lock(&_lock);
+    [_flows addObject:flow];
+    os_unfair_lock_unlock(&_lock);
+}
+
+- (NSArray *)flows
+{
+    os_unfair_lock_lock(&_lock);
+    NSArray * flows = [_flows copy];
+    os_unfair_lock_unlock(&_lock);
+    return flows;
+}
+
+- (void)remove
+{
+    // The replacement block is not freed: a Matter-queue call may still be running it.
+    if (_method != NULL) {
+        method_setImplementation(_method, _original);
+        _method = NULL;
+    }
+}
+
+@end
+
+@interface MTRFlowSubscribingDelegate : MTRFlowRecordingDelegate
+@end
+
+@implementation MTRFlowSubscribingDelegate
+- (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device
+{
+    return YES;
+}
+@end
+
 @interface MTRFlowWireTests : MTRFlowTestCase
 @end
 
@@ -1335,7 +1412,8 @@ static MTRDeviceController * sFlowWireController;
                                              evaluatedWithObject:recorder
                                                          handler:nil];
     [self waitForExpectations:@[ reported ] timeout:kFlowWireTimeoutInSeconds];
-    NSArray * after = [recorder.calls subarrayWithRange:NSMakeRange(priming.count + 1, recorder.calls.count - priming.count - 1)];
+    NSArray * allCalls = recorder.calls; // one snapshot: a report can arrive between two reads of recorder.calls
+    NSArray * after = [allCalls subarrayWithRange:NSMakeRange(priming.count + 1, allCalls.count - priming.count - 1)];
     [self checkAllShareOneFlow:after];
     XCTAssertNotEqualObjects(after.firstObject[kRecordFlow], primingFlow);
 }
@@ -1412,6 +1490,357 @@ static MTRDeviceController * sFlowWireController;
     [self waitForExpectations:@[ failed ] timeout:120];
     XCTAssertNotNil(sessionError);
     XCTAssertTrue([flow isKindOfClass:NSUUID.class], @"%@", flow);
+}
+
+// Item 4: the events of an MTRDevice's priming report are decoded in a flow.
+- (void)test006_MTRDeviceEventDataIsDecodedInAFlow
+{
+    Method method = class_getClassMethod(MTRBaseDevice.class, NSSelectorFromString(@"eventReportForHeader:andData:"));
+    XCTAssertTrue(method != NULL);
+    IMP original = method_getImplementation(method);
+    __block __weak MTRFlowMatterQueueProbe * weakProbe;
+    __auto_type * probe = [[MTRFlowMatterQueueProbe alloc] initWithMethod:method block:^NSDictionary *(id self, const void * header, id data) {
+        [weakProbe note];
+        return ((NSDictionary * (*) (id, SEL, const void *, id)) original)(self, NSSelectorFromString(@"eventReportForHeader:andData:"), header, data);
+    }];
+    weakProbe = probe;
+    [self addTeardownBlock:^{
+        [probe remove];
+    }];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kFlowWireNodeID) controller:sFlowWireController];
+    __auto_type * delegate = [[MTRFlowSubscribingDelegate alloc] init];
+    [device addDelegate:delegate queue:dispatch_queue_create("flow-test-decode-delegate", DISPATCH_QUEUE_SERIAL)];
+    XCTestExpectation * primed = [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary * bindings) {
+        return [delegate recordsNamed:kCachePrimed].count >= 1;
+    }]
+                                           evaluatedWithObject:delegate
+                                                       handler:nil];
+    [self waitForExpectations:@[ primed ] timeout:kFlowWireTimeoutInSeconds];
+    [probe remove];
+    [sFlowWireController removeDevice:device];
+
+    NSArray * flows = probe.flows;
+    XCTAssertGreaterThan(flows.count, 0, @"no event data was decoded on the Matter queue");
+    for (id flow in flows) {
+        XCTAssertTrue([flow isKindOfClass:NSUUID.class], @"event data decoded with no flow");
+    }
+}
+
+// Item 4: so are the attributes of a subscription made with an MTRBaseDevice.
+- (void)test007_MTRBaseDeviceSubscriptionAttributeDataIsDecodedInAFlow
+{
+    Method method = class_getInstanceMethod(MTRAttributeReport.class, NSSelectorFromString(@"initWithPath:value:error:"));
+    XCTAssertTrue(method != NULL);
+    IMP original = method_getImplementation(method);
+    __block __weak MTRFlowMatterQueueProbe * weakProbe;
+    __auto_type * probe = [[MTRFlowMatterQueueProbe alloc] initWithMethod:method block:^id(id self, const void * path, id value, id error) {
+        [weakProbe note];
+        return ((id(*)(id, SEL, const void *, id, id)) original)(self, NSSelectorFromString(@"initWithPath:value:error:"), path, value, error);
+    }];
+    weakProbe = probe;
+    [self addTeardownBlock:^{
+        [probe remove];
+    }];
+
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:@(kFlowWireNodeID) controller:sFlowWireController];
+    XCTestExpectation * reported = [self expectationWithDescription:@"first attribute report"];
+    XCTestExpectation * established = [self expectationWithDescription:@"subscription established"];
+    __block BOOL sawReport = NO;
+    [baseDevice subscribeWithQueue:dispatch_queue_create("flow-test-decode-subscription", DISPATCH_QUEUE_SERIAL)
+        params:[[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)]
+        clusterStateCacheContainer:nil
+        attributeReportHandler:^(NSArray * value) {
+            if (!sawReport) {
+                sawReport = YES;
+                [reported fulfill];
+            }
+        }
+        eventReportHandler:nil
+        errorHandler:^(NSError * error) {
+        }
+        subscriptionEstablished:^{
+            [established fulfill];
+        }
+        resubscriptionScheduled:nil];
+    [self waitForExpectations:@[ reported, established ] timeout:kFlowWireTimeoutInSeconds];
+    [probe remove];
+
+    NSArray * flows = probe.flows;
+    XCTAssertGreaterThan(flows.count, 0, @"no attribute data was decoded on the Matter queue");
+    for (id flow in flows) {
+        XCTAssertTrue([flow isKindOfClass:NSUUID.class], @"attribute data decoded with no flow");
+    }
+}
+
+@end
+
+#pragma mark - OTA provider completions
+
+static const uint16_t kFlowOTATimeoutInSeconds = 60;
+static os_unfair_lock sFlowProbeLock = OS_UNFAIR_LOCK_INIT;
+static NSMutableDictionary<NSString *, NSMutableArray *> * sFlowProbes;
+
+// The framework reads each response object on the Matter queue, inside the completion the application called
+// later from another queue, so the flow current at that read is the flow the completion runs in.
+static void NoteResponseFlow(NSString * name)
+{
+    if (strcmp(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL), "org.csa-iot.matter.workqueue") != 0) {
+        return;
+    }
+    id flow = CurrentFlowIDOrNull();
+    os_unfair_lock_lock(&sFlowProbeLock);
+    NSMutableArray * flows = sFlowProbes[name];
+    if (flows == nil) {
+        flows = [NSMutableArray array];
+        sFlowProbes[name] = flows;
+    }
+    [flows addObject:flow];
+    os_unfair_lock_unlock(&sFlowProbeLock);
+}
+
+static NSArray * ResponseFlows(NSString * name)
+{
+    os_unfair_lock_lock(&sFlowProbeLock);
+    NSArray * flows = [sFlowProbes[name] copy];
+    os_unfair_lock_unlock(&sFlowProbeLock);
+    return flows ?: @[];
+}
+
+@interface MTRFlowProbeQueryImageResponse : MTROTASoftwareUpdateProviderClusterQueryImageResponseParams
+@end
+@implementation MTRFlowProbeQueryImageResponse
+- (NSNumber *)status
+{
+    NoteResponseFlow(@"QueryImage");
+    return [super status];
+}
+@end
+
+@interface MTRFlowProbeApplyUpdateResponse : MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams
+@end
+@implementation MTRFlowProbeApplyUpdateResponse
+- (NSNumber *)action
+{
+    NoteResponseFlow(@"ApplyUpdateRequest");
+    return [super action];
+}
+@end
+
+@interface MTRFlowProbeNotifyError : NSError
+@end
+@implementation MTRFlowProbeNotifyError
+- (NSString *)description
+{
+    NoteResponseFlow(@"NotifyUpdateApplied");
+    return [super description];
+}
+@end
+
+// Every response is sent from another queue, later, where no flow is current.
+@interface MTRFlowOTAProviderDelegate : NSObject <MTROTAProviderDelegate>
+@property (atomic, nullable) id queryImageFlow;
+@property (atomic, nullable) id applyUpdateFlow;
+@property (atomic, nullable) id notifyUpdateAppliedFlow;
+@end
+
+@implementation MTRFlowOTAProviderDelegate
+
+- (void)_later:(dispatch_block_t)block
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 100 * NSEC_PER_MSEC), dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), block);
+}
+
+- (void)handleQueryImageForNodeID:(NSNumber *)nodeID
+                       controller:(MTRDeviceController *)controller
+                           params:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
+                       completion:(void (^)(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    self.queryImageFlow = CurrentFlowIDOrNull();
+    [self _later:^{
+        __auto_type * response = [[MTRFlowProbeQueryImageResponse alloc] init];
+        response.status = @(MTROTASoftwareUpdateProviderStatusNotAvailable);
+        completion(response, nil);
+    }];
+}
+
+- (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
+                               controller:(MTRDeviceController *)controller
+                                   params:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                               completion:(void (^)(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    self.applyUpdateFlow = CurrentFlowIDOrNull();
+    [self _later:^{
+        __auto_type * response = [[MTRFlowProbeApplyUpdateResponse alloc] init];
+        response.action = @(MTROTASoftwareUpdateProviderApplyUpdateActionDiscontinue);
+        response.delayedActionTime = @(0);
+        completion(response, nil);
+    }];
+}
+
+- (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
+                                controller:(MTRDeviceController *)controller
+                                    params:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+                                completion:(MTRStatusCompletion)completion
+{
+    self.notifyUpdateAppliedFlow = CurrentFlowIDOrNull();
+    [self _later:^{
+        completion([[MTRFlowProbeNotifyError alloc] initWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+    }];
+}
+
+- (void)handleBDXTransferSessionBeginForNodeID:(NSNumber *)nodeID
+                                    controller:(MTRDeviceController *)controller
+                                fileDesignator:(NSString *)fileDesignator
+                                        offset:(NSNumber *)offset
+                                    completion:(MTRStatusCompletion)completion
+{
+    completion([NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+}
+
+- (void)handleBDXQueryForNodeID:(NSNumber *)nodeID
+                     controller:(MTRDeviceController *)controller
+                      blockSize:(NSNumber *)blockSize
+                     blockIndex:(NSNumber *)blockIndex
+                    bytesToSkip:(NSNumber *)bytesToSkip
+                     completion:(void (^)(NSData * _Nullable data, BOOL isEOF))completion
+{
+    completion(nil, YES);
+}
+
+@end
+
+@interface MTRFlowOTAProviderTests : MTRTestCase
+@end
+
+@implementation MTRFlowOTAProviderTests {
+    dispatch_queue_t _storageQueue;
+}
+
+- (void)setUp
+{
+    [super setUp];
+    [self setContinueAfterFailure:NO];
+    [MTRDeviceControllerFactory.sharedInstance stopControllerFactory];
+    _storageQueue = dispatch_queue_create("flow-test-ota-storage", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+}
+
+- (void)tearDown
+{
+    MTRSetLogCallback(0, nil);
+    [MTRDeviceControllerFactory.sharedInstance stopControllerFactory];
+    [super tearDown];
+}
+
+- (MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys nodeID:(NSNumber *)nodeID otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+{
+    NSError * error;
+    MTRCertificateDERBytes root = [MTRCertificates createRootCertificate:rootKeys issuerID:@(1) fabricID:nil error:&error];
+    XCTAssertNotNil(root, @"%@", error);
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    SecKeyRef publicKey = [operationalKeys copyPublicKey];
+    MTRCertificateDERBytes operational = [MTRCertificates createOperationalCertificate:rootKeys
+                                                                    signingCertificate:root
+                                                                  operationalPublicKey:publicKey
+                                                                              fabricID:@(0x7A3C)
+                                                                                nodeID:nodeID
+                                                                 caseAuthenticatedTags:nil
+                                                                                 error:&error];
+    CFRelease(publicKey);
+    XCTAssertNotNil(operational, @"%@", error);
+
+    __auto_type * storage = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * params = [[MTRDeviceControllerExternalCertificateParameters alloc] initWithStorageDelegate:storage
+                                                                                        storageDelegateQueue:_storageQueue
+                                                                                            uniqueIdentifier:storage.controllerID
+                                                                                                         ipk:rootKeys.ipk
+                                                                                                    vendorID:@(0xFFF1)
+                                                                                          operationalKeypair:operationalKeys
+                                                                                      operationalCertificate:operational
+                                                                                     intermediateCertificate:nil
+                                                                                             rootCertificate:root];
+    params.shouldAdvertiseOperational = YES;
+    if (otaProviderDelegate) {
+        [params setOTAProviderDelegate:otaProviderDelegate queue:dispatch_queue_create("flow-test-ota-provider", DISPATCH_QUEUE_SERIAL)];
+    }
+    MTRDeviceController * controller = [[MTRDeviceController alloc] initWithParameters:params error:&error];
+    XCTAssertNotNil(controller, @"%@", error);
+    return controller;
+}
+
+// Item 1: each request's delegate callback and its completion run in one flow of their own, though the
+// application calls the completion later, on another queue.
+- (void)test001_ProviderResponsesRunInTheirRequestFlow
+{
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    __auto_type * providerDelegate = [[MTRFlowOTAProviderDelegate alloc] init];
+    // Both controllers share one fabric; commands for it reach the first one started, the provider.
+    MTRDeviceController * provider = [self startControllerWithRootKeys:rootKeys nodeID:@(0x7A3C2001) otaProviderDelegate:providerDelegate];
+    MTRDeviceController * requestor = [self startControllerWithRootKeys:rootKeys nodeID:@(0x7A3C2002) otaProviderDelegate:nil];
+
+    __auto_type * cluster = [[MTRBaseClusterOTASoftwareUpdateProvider alloc] initWithDevice:[MTRBaseDevice deviceWithNodeID:provider.controllerNodeID controller:requestor]
+                                                                                 endpointID:@(0)
+                                                                                      queue:dispatch_get_main_queue()];
+    NSData * updateToken = [@"flow-test-token" dataUsingEncoding:NSUTF8StringEncoding];
+    os_unfair_lock_lock(&sFlowProbeLock);
+    sFlowProbes = [NSMutableDictionary dictionary];
+    os_unfair_lock_unlock(&sFlowProbeLock);
+
+    XCTestExpectation * queried = [self expectationWithDescription:@"QueryImage response"];
+    __auto_type * queryParams = [[MTROTASoftwareUpdateProviderClusterQueryImageParams alloc] init];
+    queryParams.vendorID = @(0xFFF1);
+    queryParams.productID = @(0x8001);
+    queryParams.softwareVersion = @(1);
+    queryParams.protocolsSupported = @[ @(MTROTASoftwareUpdateProviderDownloadProtocolBDXSynchronous) ];
+    [cluster queryImageWithParams:queryParams
+                       completion:^(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error) {
+                           XCTAssertNil(error);
+                           XCTAssertEqualObjects(data.status, @(MTROTASoftwareUpdateProviderStatusNotAvailable));
+                           [queried fulfill];
+                       }];
+    [self waitForExpectations:@[ queried ] timeout:kFlowOTATimeoutInSeconds];
+
+    XCTestExpectation * applied = [self expectationWithDescription:@"ApplyUpdateRequest response"];
+    __auto_type * applyParams = [[MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
+    applyParams.updateToken = updateToken;
+    applyParams.newVersion = @(2);
+    [cluster applyUpdateRequestWithParams:applyParams
+                               completion:^(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error) {
+                                   XCTAssertNil(error);
+                                   [applied fulfill];
+                               }];
+    [self waitForExpectations:@[ applied ] timeout:kFlowOTATimeoutInSeconds];
+
+    XCTestExpectation * notified = [self expectationWithDescription:@"NotifyUpdateApplied response"];
+    __auto_type * notifyParams = [[MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
+    notifyParams.updateToken = updateToken;
+    notifyParams.softwareVersion = @(2);
+    [cluster notifyUpdateAppliedWithParams:notifyParams
+                                completion:^(NSError * _Nullable error) {
+                                    XCTAssertNotNil(error);
+                                    [notified fulfill];
+                                }];
+    [self waitForExpectations:@[ notified ] timeout:kFlowOTATimeoutInSeconds];
+
+    NSDictionary * checks = @{
+        @"QueryImage" : providerDelegate.queryImageFlow ?: NSNull.null,
+        @"ApplyUpdateRequest" : providerDelegate.applyUpdateFlow ?: NSNull.null,
+        @"NotifyUpdateApplied" : providerDelegate.notifyUpdateAppliedFlow ?: NSNull.null,
+    };
+    for (NSString * request in checks) {
+        id requestFlow = checks[request];
+        XCTAssertTrue([requestFlow isKindOfClass:NSUUID.class], @"delegate callback for %@ ran in no flow", request);
+        NSArray * flows = ResponseFlows(request);
+        XCTAssertGreaterThan(flows.count, 0, @"the %@ completion did not run on the Matter queue", request);
+        for (id flow in flows) {
+            XCTAssertEqualObjects(flow, requestFlow, @"the %@ completion ran in flow %@, request flow %@", request, flow, requestFlow);
+        }
+    }
+    NSSet * requestFlows = [NSSet setWithArray:[checks allValues]];
+    XCTAssertEqual(requestFlows.count, 3, @"each request has a flow of its own: %@", checks);
+
+    [requestor shutdown];
+    [provider shutdown];
 }
 
 @end

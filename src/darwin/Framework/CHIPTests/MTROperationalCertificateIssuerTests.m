@@ -22,6 +22,7 @@
 #import "MTRTestCase.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
+#import <os/lock.h>
 
 static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint64_t kDeviceId = 0x12344321;
@@ -35,6 +36,42 @@ static MTRDeviceController * sController = nil;
 
 // Keys we can use to restart the controller.
 static MTRTestKeys * sTestKeys = nil;
+
+static os_unfair_lock sFlowLock = OS_UNFAIR_LOCK_INIT;
+static id sIssuerFlow;
+static NSMutableArray * sNOCChainResultFlows;
+
+static BOOL OnMatterQueue(void)
+{
+    return strcmp(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL), "org.csa-iot.matter.workqueue") == 0;
+}
+
+// The issuer fails with this error.  The framework reads it on the Matter queue, in the handling of the
+// result, so what it records is the flow that handling runs in.
+@interface MTRFlowProbeNOCError : NSError
+@end
+
+@implementation MTRFlowProbeNOCError
+- (void)_note
+{
+    if (OnMatterQueue()) {
+        id flow = MTRMetrics.currentFlowID ?: NSNull.null;
+        os_unfair_lock_lock(&sFlowLock);
+        [sNOCChainResultFlows addObject:flow];
+        os_unfair_lock_unlock(&sFlowLock);
+    }
+}
+- (NSErrorDomain)domain
+{
+    [self _note];
+    return [super domain];
+}
+- (NSInteger)code
+{
+    [self _note];
+    return [super code];
+}
+@end
 
 @interface MTROperationalCertificateIssureTestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
@@ -110,7 +147,13 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertEqualObjects(csrInfoCopy.csrElementsTLV, csrInfo.csrElementsTLV);
     XCTAssertEqualObjects(csrInfoCopy.attestationSignature, csrInfo.attestationSignature);
 
-    completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeIntegrityCheckFailed userInfo:nil]);
+    os_unfair_lock_lock(&sFlowLock);
+    sIssuerFlow = MTRMetrics.currentFlowID ?: NSNull.null;
+    os_unfair_lock_unlock(&sFlowLock);
+    // Complete later, from another queue, where no flow is current.
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+        completion(nil, [[MTRFlowProbeNOCError alloc] initWithDomain:MTRErrorDomain code:MTRErrorCodeIntegrityCheckFailed userInfo:nil]);
+    });
 }
 
 @end
@@ -175,10 +218,23 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
+    sNOCChainResultFlows = [NSMutableArray array];
+
     [controller setupCommissioningSessionWithPayload:payload newNodeID:@(kDeviceId) error:&error];
     XCTAssertNil(error);
 
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
+
+    // The result of the issuer is handled in the flow of the issuer's callback.
+    os_unfair_lock_lock(&sFlowLock);
+    id issuerFlow = sIssuerFlow;
+    NSArray * resultFlows = [sNOCChainResultFlows copy];
+    os_unfair_lock_unlock(&sFlowLock);
+    XCTAssertTrue([issuerFlow isKindOfClass:NSUUID.class], @"%@", issuerFlow);
+    XCTAssertGreaterThan(resultFlows.count, 0, @"the NOC chain result was not handled on the Matter queue");
+    for (id flow in resultFlows) {
+        XCTAssertEqualObjects(flow, issuerFlow, @"NOC chain result handled in flow %@, issuer callback flow %@", flow, issuerFlow);
+    }
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);

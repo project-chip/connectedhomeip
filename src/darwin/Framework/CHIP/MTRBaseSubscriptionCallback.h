@@ -127,14 +127,21 @@ private:
 
     void OnReportEnd() override;
 
-    // OnEventData and OnAttributeData must be implemented by subclasses.
-    void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
-        const chip::app::StatusIB * apStatus) override
+    // HandleEventData and HandleAttributeData must be implemented by subclasses.  They run in the flow of the
+    // report the data is part of.
+    virtual void HandleEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
+        const chip::app::StatusIB * apStatus)
         = 0;
 
-    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * apData,
-        const chip::app::StatusIB & aStatus) override
+    virtual void HandleAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * apData,
+        const chip::app::StatusIB & aStatus)
         = 0;
+
+    void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
+        const chip::app::StatusIB * apStatus) override;
+
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * apData,
+        const chip::app::StatusIB & aStatus) override;
 
     void OnError(CHIP_ERROR aError) override;
 
@@ -194,6 +201,10 @@ private:
     bool mHaveQueuedDeletion = false;
     OnDoneHandler _Nullable mOnDoneHandler = nil;
     dispatch_block_t mInterimReportBlock = nil;
+
+    // One flow per report: it starts at OnReportBegin and ends at OnReportEnd or OnError.  Data that arrives
+    // outside a report runs in the flow that is current, or in a new one.
+    NSUUID * _Nullable mReportFlowID = nil;
 };
 
 NS_ASSUME_NONNULL_END

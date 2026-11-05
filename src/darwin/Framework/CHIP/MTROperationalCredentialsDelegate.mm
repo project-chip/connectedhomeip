@@ -25,6 +25,7 @@
 #import "MTRConversion.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricsScope_Internal.h"
 #import "NSDataSpanConversion.h"
 
 #include <controller/CommissioningDelegate.h>
@@ -167,7 +168,11 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
                                      firmwareInfo:firmwareInfo];
 
     MTRDeviceController_Concrete * __weak weakController = mWeakController;
-    dispatch_async(mOperationalCertificateIssuerQueue, ^{
+    // The issuer callback and the handling of its result run in one flow, even if the issuer calls the completion
+    // later on another queue.
+    NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
+    MTRMetricsScope flowScope(flowID);
+    MTRDispatchCallbackWithFlowID(mOperationalCertificateIssuerQueue, ^{
         [mOperationalCertificateIssuer
             issueOperationalCertificateForRequest:csrInfo
                                   attestationInfo:attestationInfo
@@ -178,7 +183,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
                                                // No longer safe to touch "this"
                                                return;
                                            }
-                                           this->ExternalNOCChainGenerated(chain, error);
+                                           this->ExternalNOCChainGenerated(chain, error, flowID);
                                        }];
     });
 
@@ -186,12 +191,13 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
 }
 
 void MTROperationalCredentialsDelegate::ExternalNOCChainGenerated(
-    MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error)
+    MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error, NSUUID * flowID)
 {
     // Dispatch will only happen if the controller is still running, which means we
     // are safe to touch our members.
     [mWeakController
         asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
+            MTRMetricsScope flowScope(flowID);
             assertChipStackLockedByCurrentThread();
 
             if (mOnNOCCompletionCallback == nullptr) {
