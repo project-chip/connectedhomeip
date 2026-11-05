@@ -140,7 +140,6 @@ private:
     std::vector<uint8_t> mBufferClientCert;
     std::vector<uint8_t> mBufferClientCertKey;
     std::vector<std::vector<uint8_t>> mBufferIntermediateCerts;
-    std::vector<PushAvStream> pushavStreams;
 
     CHIP_ERROR IsAnyPrivacyModeActive(bool & isActive);
 
