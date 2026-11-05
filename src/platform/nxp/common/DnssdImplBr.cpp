@@ -20,10 +20,10 @@
 #include <lib/support/CodeUtils.h>
 <<<<<<< HEAD:src/platform/nxp/common/DnssdImplBr.cpp
 #include <lib/support/FixedBufferAllocator.h>
-=======
+    =======
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/logging/CHIPLogging.h>
->>>>>>> 807f881 ([OpenThread] Bound DNS-SD TXT entries by the entry array size (#75062)):src/platform/OpenThread/OpenThreadBrDnssdImpl.cpp
+    >>>>>>> 807f881 ([OpenThread] Bound DNS-SD TXT entries by the entry array size (#75062)):src/platform/OpenThread/OpenThreadBrDnssdImpl.cpp
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadTxtEntries.h>
@@ -38,7 +38,7 @@
 
 #include <DnssdImplBr.h>
 
-using namespace ::chip::DeviceLayer;
+    using namespace ::chip::DeviceLayer;
 using namespace chip::DeviceLayer::Internal;
 
 namespace chip {
