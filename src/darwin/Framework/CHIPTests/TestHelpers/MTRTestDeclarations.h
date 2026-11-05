@@ -104,7 +104,6 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)unitTestHoldNextCommissioneeSessionObserver;
 - (void)unitTestReleaseHeldCommissioneeSessionObserver;
 - (void)unitTestMarkPASESessionDefunctForNodeID:(NSNumber *)nodeID;
-- (void)unitTestFailNextStopPairing;
 - (BOOL)unitTestNotifyCommissioneeSessionReleased;
 @end
 
