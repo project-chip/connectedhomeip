@@ -552,7 +552,7 @@ static NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFrom
     case chip::TLV::kTLVType_Structure:
     case chip::TLV::kTLVType_Array: {
         if (depth >= kMaxTlvNestingDepth) {
-            MTR_LOG_ERROR("Error: TLV nesting depth limit (%zu) exceeded", kMaxTlvNestingDepth);
+            MTR_LOG_ERROR("Error: TLV nesting depth limit (%u) exceeded", static_cast<unsigned>(kMaxTlvNestingDepth));
             return nil;
         }
         NSString * typeName;

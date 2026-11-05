@@ -988,7 +988,7 @@ static jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGen
         if (depth >= kMaxTlvNestingDepth)
         {
             err = CHIP_ERROR_RECURSION_DEPTH_LIMIT;
-            ChipLogError(Controller, "TLV nesting depth limit (%zu) exceeded", kMaxTlvNestingDepth);
+            ChipLogError(Controller, "TLV nesting depth limit (%u) exceeded", static_cast<unsigned>(kMaxTlvNestingDepth));
             return nullptr;
         }
         TLV::TLVType containerType;
@@ -1018,7 +1018,7 @@ static jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGen
         if (depth >= kMaxTlvNestingDepth)
         {
             err = CHIP_ERROR_RECURSION_DEPTH_LIMIT;
-            ChipLogError(Controller, "TLV nesting depth limit (%zu) exceeded", kMaxTlvNestingDepth);
+            ChipLogError(Controller, "TLV nesting depth limit (%u) exceeded", static_cast<unsigned>(kMaxTlvNestingDepth));
             return nullptr;
         }
         TLV::TLVType containerType;

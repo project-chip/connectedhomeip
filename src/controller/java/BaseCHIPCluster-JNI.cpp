@@ -102,8 +102,9 @@ static jobject decodeValueFromTLV(JNIEnv * env, chip::TLV::TLVReader * data, siz
     }
     case chip::TLV::kTLVType_Structure:
     case chip::TLV::kTLVType_Array: {
-        VerifyOrReturnValue(depth < kMaxTlvNestingDepth, nullptr,
-                            ChipLogError(Controller, "Error: TLV nesting depth limit (%zu) exceeded", kMaxTlvNestingDepth));
+        VerifyOrReturnValue(
+            depth < kMaxTlvNestingDepth, nullptr,
+            ChipLogError(Controller, "Error: TLV nesting depth limit (%u) exceeded", static_cast<unsigned>(kMaxTlvNestingDepth)));
 
         chip::TLV::TLVType tlvType;
         CHIP_ERROR err = data->EnterContainer(tlvType);
