@@ -18,9 +18,15 @@
 
 #include "lib/dnssd/platform/Dnssd.h"
 #include <lib/support/CodeUtils.h>
+<<<<<<< HEAD:src/platform/nxp/common/DnssdImplBr.cpp
 #include <lib/support/FixedBufferAllocator.h>
+=======
+#include <lib/support/IntrusiveList.h>
+#include <lib/support/logging/CHIPLogging.h>
+>>>>>>> 807f881 ([OpenThread] Bound DNS-SD TXT entries by the entry array size (#75062)):src/platform/OpenThread/OpenThreadBrDnssdImpl.cpp
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+#include <platform/OpenThread/OpenThreadTxtEntries.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 
 #include <platform/nxp/common/ConnectivityManagerImpl.h>
@@ -59,11 +65,29 @@ static const char * GetProtocolString(DnssdServiceProtocol protocol)
     return protocol == DnssdServiceProtocol::kDnssdProtocolUdp ? "_udp" : "_tcp";
 }
 
+<<<<<<< HEAD:src/platform/nxp/common/DnssdImplBr.cpp
 struct DnsServiceTxtEntries
 {
     uint8_t mBuffer[kTotalMdnsServiceTxtBufferSize];
     Dnssd::TextEntry mTxtEntries[kMaxMdnsServiceTxtEntriesNumber];
 };
+=======
+enum ResolveStep : uint8_t
+{
+    kResolveStepSrv = 0,
+    kResolveStepTxt,
+    kResolveStepIpAddr,
+};
+
+enum NameType : uint8_t
+{
+    kNameTypeInstance = 0,
+    kNameTypeHost,
+    kNameTypeService,
+};
+
+using DnsServiceTxtEntries = OpenThreadTxtEntries<kMaxMdnsServiceTxtEntriesNumber, kTotalMdnsServiceTxtBufferSize>;
+>>>>>>> 807f881 ([OpenThread] Bound DNS-SD TXT entries by the entry array size (#75062)):src/platform/OpenThread/OpenThreadBrDnssdImpl.cpp
 
 struct mDnsQueryCtx
 {
@@ -713,35 +737,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
 
     // Extract TXT record SRP service
     txtStringPtr = otSrpServerServiceGetTxtData(service, &txtDataLen);
-    if (txtDataLen != 0)
-    {
-        otDnsTxtEntryIterator iterator;
-        otDnsInitTxtEntryIterator(&iterator, txtStringPtr, txtDataLen);
-
-        otDnsTxtEntry txtEntry;
-        chip::FixedBufferAllocator alloc(serviceTxtEntries.mBuffer);
-
-        uint8_t entryIndex = 0;
-        while ((otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE) && entryIndex < 64)
-        {
-            if (txtEntry.mKey == nullptr || txtEntry.mValue == nullptr)
-                continue;
-
-            serviceTxtEntries.mTxtEntries[entryIndex].mKey      = alloc.Clone(txtEntry.mKey);
-            serviceTxtEntries.mTxtEntries[entryIndex].mData     = alloc.Clone(txtEntry.mValue, txtEntry.mValueLength);
-            serviceTxtEntries.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
-            entryIndex++;
-        }
-
-        VerifyOrReturnError(!alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
-        mdnsService.mTextEntrySize = entryIndex;
-    }
-    else
-    {
-        mdnsService.mTextEntrySize = 0;
-    }
+    ReturnErrorOnFailure(serviceTxtEntries.Parse(ByteSpan(txtStringPtr, txtDataLen), mdnsService));
 
     mdnsService.mSubTypes    = nullptr;
     mdnsService.mSubTypeSize = 0;
@@ -869,9 +865,11 @@ static void OtTxtCallback(otInstance * aInstance, const otMdnsTxtResult * aResul
     pResolveContext = GetResolveElement(aResult->mServiceInstance, kNameTypeInstance);
     VerifyOrReturn(pResolveContext != nullptr);
 
-    // Check if TXT record was included in the response.
-    if (aResult->mTxtDataLength != 0)
+    CHIP_ERROR err = pResolveContext->mServiceTxtEntry.Parse(ByteSpan(aResult->mTxtData, aResult->mTxtDataLength),
+                                                             pResolveContext->mMdnsService);
+    if (err != CHIP_NO_ERROR)
     {
+<<<<<<< HEAD:src/platform/nxp/common/DnssdImplBr.cpp
         otDnsTxtEntryIterator iterator;
         otDnsInitTxtEntryIterator(&iterator, aResult->mTxtData, aResult->mTxtDataLength);
 
@@ -904,6 +902,10 @@ static void OtTxtCallback(otInstance * aInstance, const otMdnsTxtResult * aResul
     else
     {
         pResolveContext->mMdnsService.mTextEntrySize = 0;
+=======
+        bSendDispatch           = false;
+        pResolveContext->mError = err;
+>>>>>>> 807f881 ([OpenThread] Bound DNS-SD TXT entries by the entry array size (#75062)):src/platform/OpenThread/OpenThreadBrDnssdImpl.cpp
     }
 
     if (bSendDispatch)
