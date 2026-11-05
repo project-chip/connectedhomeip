@@ -99,7 +99,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (NSUInteger)unitTestSessionRequestsWaitingOnConnectivityMonitorCount;
 - (void)unitTestReportCommissioningFailureForNodeID:(NSNumber *)nodeID
                          networkCommissioningStatus:(nullable NSNumber *)networkCommissioningStatus
-                                         errorValue:(nullable NSNumber *)errorValue
+                           connectNetworkErrorValue:(nullable NSNumber *)connectNetworkErrorValue
                                           debugText:(nullable NSString *)debugText;
 @end
 
