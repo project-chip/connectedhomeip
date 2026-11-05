@@ -15,22 +15,7 @@
 #
 
 _install_additional_pip_requirements() {
-    _SETUP_PLATFORM=$1
-    shift
-
-    # figure out additional pip install items
-    while [ $# -gt 0 ]; do
-        case $1 in
-        -p | --platform)
-            _SETUP_PLATFORM=$2
-            shift # argument
-            shift # value
-            ;;
-        *)
-            shift
-            ;;
-        esac
-    done
+    _SETUP_PLATFORM="${_CHIP_PLATFORM-$1}"
 
     if [ -n "$_SETUP_PLATFORM" ]; then
         _OLD_IFS=$IFS
@@ -77,6 +62,20 @@ _submodules_need_updating() {
 
   unset _SUBMODULE_PATHS
   return 1 # Failure
+}
+
+_parse_arguments() {
+    # Unknown arguments are ignored, because the shell passes on the caller's
+    # positional parameters when this script is sourced without arguments.
+    while [ $# -gt 0 ]; do
+        case $1 in
+        -p | --platform)
+            _CHIP_PLATFORM="${2:-}"
+            [ $# -gt 1 ] && shift
+            ;;
+        esac
+        shift
+    done
 }
 
 _bootstrap_or_activate() {
@@ -175,6 +174,9 @@ EOF
     export PW_ROOT="$_CHIP_ROOT/third_party/pigweed/repo"
 }
 
+unset _CHIP_PLATFORM
+_parse_arguments "$@"
+
 # remember PW_ENVIRONMENT_ROOT so that things like another
 # bootstrap or run_in_build_env.sh can be executed in a build env
 _ORIGINAL_PW_ENVIRONMENT_ROOT="$PW_ENVIRONMENT_ROOT"
@@ -196,9 +198,9 @@ cd $original_pwd
 if [ "$_ACTION_TAKEN" = "bootstrap" ]; then
     # By default, install all extra pip dependencies even if slow. -p/--platform
     # arguments may override this default.
-    _install_additional_pip_requirements "all" "$@"
+    _install_additional_pip_requirements "all"
 else
-    _install_additional_pip_requirements "none" "$@"
+    _install_additional_pip_requirements "none"
 fi
 
 # Load bash completion helper if running bash and the bash-completion package
@@ -225,6 +227,7 @@ export CCACHE_NODIRECT=1
 export CCACHE_PREFIX_CPP="$_CHIP_ROOT/scripts/helpers/ccache-prefix-cpp.sh"
 
 unset -f _bootstrap_or_activate
+unset -f _parse_arguments
 unset -f _install_additional_pip_requirements
 
 pw_cleanup
@@ -244,6 +247,7 @@ if _submodules_need_updating; then
 fi
 
 unset _ACTION_TAKEN
+unset _CHIP_PLATFORM
 unset _CHIP_ROOT
 unset PW_CIPD_INSTALL_DIR
 unset _PW_BANNER_FUNC
