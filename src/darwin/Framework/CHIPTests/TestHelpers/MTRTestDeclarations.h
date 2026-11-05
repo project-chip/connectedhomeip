@@ -127,6 +127,10 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (BOOL)unitTestShouldDetectTimeSynchronizationLoss;
 - (NSUInteger)unitTestInterestedPathsChangedCount;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
+// Must be called on the Matter queue.
+- (NSUInteger)unitTestResolvingCASESetupKeptCount;
+// Must be called on the Matter queue.
+- (NSUInteger)unitTestCASESetupReleasedForReachabilityCount;
 - (NSUInteger)unitTestEventsReportedSinceLastCheck;
 - (void)unitTestClearClusterData;
 - (MTRInternalDeviceState)_getInternalState;

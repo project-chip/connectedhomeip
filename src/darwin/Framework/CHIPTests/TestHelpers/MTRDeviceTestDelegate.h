@@ -52,6 +52,8 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, nullable) NSNumber * timeSynchronizationLossDetectionCadenceOverride;
 // Called after a subscription reattempt timer has handed its work to the Matter queue.
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionReattemptDispatched;
+// Overrides how long a reachability signal keeps sparing a CASE setup that is resolving the node's address.
+@property (atomic, nullable) NSNumber * resolvingCASESetupKeepSecondsOverride;
 @end
 
 @interface MTRDeviceTestDelegateWithSubscriptionSetupOverride : MTRDeviceTestDelegate

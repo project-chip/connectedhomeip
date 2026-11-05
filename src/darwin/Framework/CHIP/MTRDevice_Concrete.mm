@@ -463,6 +463,9 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 #ifdef DEBUG
     NSUInteger _unitTestAttributesReportedSinceLastCheck;
     NSUInteger _unitTestEventsReportedSinceLastCheck;
+    // Reachability-signal decisions about the node's CASE setup; only accessed on the Matter queue.
+    NSUInteger _unitTestResolvingCASESetupKeptCount;
+    NSUInteger _unitTestCASESetupReleasedForReachabilityCount;
 #endif
 
     // _deviceCachePrimed is true if we have the data that comes from an initial
@@ -1320,9 +1323,15 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
             auto peerId = commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue);
             if (caseSessionMgr->IsResolvingAddress(peerId)) {
                 MTR_LOG("%@ not interrupting CASE setup that is still resolving the node's address", self);
+#ifdef DEBUG
+                self->_unitTestResolvingCASESetupKeptCount++;
+#endif
                 return;
             }
             caseSessionMgr->ReleaseSession(peerId);
+#ifdef DEBUG
+            self->_unitTestCASESetupReleasedForReachabilityCount++;
+#endif
         } errorHandler:nil /* not much we can do */];
     }
 
@@ -3587,6 +3596,18 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     NSUInteger eventsReportedSinceLastCheck = _unitTestEventsReportedSinceLastCheck;
     _unitTestEventsReportedSinceLastCheck = 0;
     return eventsReportedSinceLastCheck;
+}
+
+- (NSUInteger)unitTestResolvingCASESetupKeptCount
+{
+    assertChipStackLockedByCurrentThread();
+    return _unitTestResolvingCASESetupKeptCount;
+}
+
+- (NSUInteger)unitTestCASESetupReleasedForReachabilityCount
+{
+    assertChipStackLockedByCurrentThread();
+    return _unitTestCASESetupReleasedForReachabilityCount;
 }
 #endif
 
