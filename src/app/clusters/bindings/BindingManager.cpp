@@ -97,6 +97,7 @@ CHIP_ERROR Manager::EstablishConnection(const ScopedNodeId & nodeId)
             mLastSessionEstablishmentError = CHIP_NO_ERROR;
             // At this point connectionCallback is null since it deletes itself when the callback is called.
             connectionCallback = Platform::New<ConnectionCallback>(*this);
+            VerifyOrReturnError(connectionCallback != nullptr, CHIP_ERROR_NO_MEMORY);
             mInitParams.mCASESessionManager->FindOrEstablishSession(nodeId, connectionCallback->GetOnDeviceConnected(),
                                                                     connectionCallback->GetOnDeviceConnectionFailure());
         }
