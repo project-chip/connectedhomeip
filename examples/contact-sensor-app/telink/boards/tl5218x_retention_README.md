@@ -1,9 +1,8 @@
 # TL5218X Retention Contact-Sensor App Build Guide
 
 > **Note**: TL5218X retention mode is not yet fully implemented on this
-> platform. The configurations below are provided only to keep the app
-> can be built; full retention (low-power) support will be added in a future
-> release.
+> platform. The configurations below are provided only to keep the app can be
+> built; full retention (low-power) support will be added in a future release.
 
 ## 1. 2MB Flash (Matter only, NO OTA/MCUBoot, NO LZMA)
 
