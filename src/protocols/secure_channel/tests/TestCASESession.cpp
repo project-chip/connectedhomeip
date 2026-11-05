@@ -2521,6 +2521,7 @@ TEST_F(TestCASESession, FaultInjectedSigma2ResumeMICCorruptionSurfacesCaseSpecif
     EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
     EXPECT_EQ(delegateCommissioner.mNumResumeMicMismatch, 1u);
     EXPECT_EQ(delegateCommissioner.mLastError, CHIP_ERROR_CASE_RESUME_MIC_MISMATCH);
+    EXPECT_EQ(responderStorage.mSaveCount, 0u);
 
     chip::Platform::Delete(pairingCommissioner);
     gPairingServer.Shutdown();
