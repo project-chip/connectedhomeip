@@ -65,6 +65,9 @@ public:
 
     EndpointId GetEndpointId() const { return mPath.mEndpointId; }
 
+    /// Reports a change to the ProvisionedEndpoints attribute that was not made through this cluster's commands.
+    void NotifyProvisionedEndpointsChanged();
+
     /**
      * @brief ServerClusterInterface methods.
      */
@@ -191,6 +194,14 @@ public:
      */
     virtual CHIP_ERROR MutateEndpointReferenceCount(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
                                                     int8_t delta) = 0;
+
+    /**
+     * @brief Reports that the ProvisionedEndpoints attribute changed outside a TLS Client Management command, for example
+     *        after MutateEndpointReferenceCount(), so that subscribers are notified.
+     *
+     * Does nothing if the delegate is not attached to a TLSClientManagementCluster.
+     */
+    void NotifyProvisionedEndpointsChanged();
 
 protected:
     friend class TLSClientManagementCluster;

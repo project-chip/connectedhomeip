@@ -202,7 +202,10 @@ CHIP_ERROR PushAvStreamTransportServerLogic::MutateTLSEndpointReferenceCount(Fab
 {
     VerifyOrReturnError(mTLSClientManagementDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     // Note: TLS clusters are always on EP0, per spec
-    return mTLSClientManagementDelegate->MutateEndpointReferenceCount(kRootEndpointId, fabricIndex, tlsEndpointID, delta);
+    ReturnErrorOnFailure(
+        mTLSClientManagementDelegate->MutateEndpointReferenceCount(kRootEndpointId, fabricIndex, tlsEndpointID, delta));
+    mTLSClientManagementDelegate->NotifyProvisionedEndpointsChanged();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PushAvStreamTransportServerLogic::LoadTLSEndpointCertificates(FabricIndex fabricIndex, uint16_t tlsEndpointID)
