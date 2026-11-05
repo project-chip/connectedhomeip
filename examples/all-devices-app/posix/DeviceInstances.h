@@ -79,10 +79,7 @@ public:
         return mFactory.CreateBridgedNode(nodeLabel);
     }
 
-    DeviceRegistrationEntryOfConcreteType<Aggregator> CreateAggregator() override
-    {
-        return mFactory.CreateAggregator();
-    }
+    DeviceRegistrationEntryOfConcreteType<Aggregator> CreateAggregator() override { return mFactory.CreateAggregator(); }
 
 private:
     PosixDeviceFactory & mFactory;

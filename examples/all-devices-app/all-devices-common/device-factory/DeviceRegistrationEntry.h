@@ -38,8 +38,9 @@ struct DeviceRegistrationEntryOfConcreteType
     DeviceRegistrationEntryOfConcreteType(std::unique_ptr<InterfaceT> dev, std::function<void()> afterRegistration,
                                           std::function<void()> beforeUnregistration,
                                           Span<const EndpointComposition::SemanticTag> tags = {}) :
-        device(std::move(dev)), afterDeviceRegistration(std::move(afterRegistration)),
-        beforeDeviceUnregistration(std::move(beforeUnregistration)), defaultTags(tags)
+        device(std::move(dev)),
+        afterDeviceRegistration(std::move(afterRegistration)), beforeDeviceUnregistration(std::move(beforeUnregistration)),
+        defaultTags(tags)
     {}
 
     template <typename OtherInterfaceT>
