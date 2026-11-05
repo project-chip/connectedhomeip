@@ -27,6 +27,8 @@
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <algorithm>
+#include <cinttypes>
 #include <list>
 #include <string>
 
@@ -189,6 +191,78 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
     }
 
     TEMPORARY_RETURN_IGNORED helper.Success(response);
+}
+
+namespace {
+
+const char * QueueTypeName(QueueTypeEnum queueType)
+{
+    switch (queueType)
+    {
+    case QueueTypeEnum::kReplace:
+        return "Replace";
+    case QueueTypeEnum::kNext:
+        return "Next";
+    case QueueTypeEnum::kLast:
+        return "Last";
+    default:
+        return "Unknown";
+    }
+}
+
+} // namespace
+
+void ContentLauncherManager::HandleLaunchUrlRequest(CommandResponseHelper<LaunchResponseType> & helper,
+                                                    const LaunchUrlRequestType & request)
+{
+    // The spec requires ContentType to match an AcceptHeader entry.
+    if (request.contentType.HasValue() && !request.contentType.Value().IsNull())
+    {
+        const CharSpan & contentType = request.contentType.Value().Value();
+        const bool accepted = std::any_of(mAcceptHeaderList.begin(), mAcceptHeaderList.end(), [&](const std::string & entry) {
+            return contentType.data_equal(CharSpan(entry.data(), entry.size()));
+        });
+        if (!accepted)
+        {
+            ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrlRequest ContentType is not in AcceptHeader");
+            LaunchResponseType response;
+            response.status = ContentLauncher::StatusEnum::kURLNotAvailable;
+            LogErrorOnFailure(helper.Success(response));
+            return;
+        }
+        ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrlRequest ContentType matches an AcceptHeader entry");
+    }
+
+    // This example has no media player. Testers confirm TC-CONTENTLAUNCHER-10.9 playback steps
+    // from these log lines.
+    if (request.queueType.HasValue() && !request.queueType.Value().IsNull())
+    {
+        const QueueTypeEnum queueType = request.queueType.Value().Value();
+        ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrlRequest QueueType=%u (%s)", chip::to_underlying(queueType),
+                        QueueTypeName(queueType));
+    }
+    if (request.offsetMillisecs.HasValue() && !request.offsetMillisecs.Value().IsNull())
+    {
+        ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrlRequest OffsetMillisecs=%" PRIu32,
+                        request.offsetMillisecs.Value().Value());
+    }
+    if (request.nextUrl.HasValue() && !request.nextUrl.Value().IsNull())
+    {
+        ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrlRequest NextURL provided (%u bytes)",
+                        static_cast<unsigned>(request.nextUrl.Value().Value().size()));
+    }
+    if (request.contentHeaders.HasValue() && !request.contentHeaders.Value().IsNull())
+    {
+        size_t headerCount = 0;
+        if (request.contentHeaders.Value().Value().ComputeSize(&headerCount) == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrlRequest ContentHeaders count=%u",
+                            static_cast<unsigned>(headerCount));
+        }
+    }
+
+    HandleLaunchUrl(helper, request.contentURL, request.displayString.ValueOr(CharSpan()),
+                    request.brandingInformation.ValueOr(BrandingInformationType()));
 }
 
 void ContentLauncherManager::HandleContentReplicationRequest(CommandResponseHelper<ContentReplicationResponseType> & helper)

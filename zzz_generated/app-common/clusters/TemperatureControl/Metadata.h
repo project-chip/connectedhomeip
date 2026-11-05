@@ -26,16 +26,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureSetpoint::I
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TemperatureSetpoint
 namespace MinTemperature {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinTemperature::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MinTemperature::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MinTemperature
 namespace MaxTemperature {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxTemperature::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxTemperature::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxTemperature
 namespace Step {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Step::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Step::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Step
 namespace SelectedTemperatureLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SelectedTemperatureLevel::Id,

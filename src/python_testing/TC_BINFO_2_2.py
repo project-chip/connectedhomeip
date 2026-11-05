@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -81,7 +81,7 @@ class TC_BINFO_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_BINFO_2_2(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done.", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done."),
             TestStep(1, "TH reads from the DUT the SoftwareVersion attribute.",
                      "Store value for later use."),
             TestStep(2, "TH reads the StartUp event from the DUT", """

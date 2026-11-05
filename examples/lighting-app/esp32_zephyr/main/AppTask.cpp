@@ -28,9 +28,16 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#error "This example does not support Wi-Fi and Thread at the same time: set CONFIG_CHIP_WIFI=n when CONFIG_OPENTHREAD=y"
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/Zephyr/wifi/ZephyrWifiDriver.h>
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif
 
 #include <zephyr/drivers/gpio.h>
@@ -47,6 +54,9 @@ DeviceInfoProviderImpl sExampleDeviceInfoProvider;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0 /* endpoint */,
                                                                          &(NetworkCommissioning::ZephyrWifiDriver::Instance()));
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /* endpoint */);
 #endif
 
 } // namespace
@@ -75,6 +85,10 @@ CHIP_ERROR AppTask::Init()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ReturnErrorOnFailure(sWiFiCommissioningInstance.Init());
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack());
+    ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router));
+    ReturnErrorOnFailure(sThreadNetworkDriver.Init());
 #endif
 
     if (gpio_is_ready_dt(&sLightLed))

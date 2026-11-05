@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 
+def enableGms = !project.hasProperty('matterEnableGms') || matterEnableGms.toBoolean()
+
 android {
     namespace 'com.google.chip.chiptool'
     compileSdkVersion 34
@@ -62,6 +64,10 @@ android {
         allWarningsAsErrors = false
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
 
     buildFeatures {
         viewBinding = true
@@ -75,6 +81,12 @@ android {
                     details.useVersion "${targetSdk}.+"
                 }
             }
+        }
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs += enableGms ? ['src/gms/java'] : ['src/nogms/java']
         }
     }
 
@@ -109,6 +121,7 @@ dependencies {
     }
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.fragment:fragment:1.3.0-beta01'
     implementation "androidx.annotation:annotation:1.1.0"
@@ -116,6 +129,9 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     testImplementation 'junit:junit:4.12'
+    testImplementation 'org.robolectric:robolectric:4.10.3'
+    testImplementation 'org.mockito:mockito-core:4.11.0'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation "androidx.core:core-ktx:1.3.0"
@@ -131,6 +147,9 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:${camerax_version}"
     implementation "androidx.camera:camera-view:${camerax_version}"
 
+    if (enableGms) {
+        implementation 'com.google.android.gms:play-services-threadnetwork:16.2.1'
+    }
     implementation 'com.google.protobuf:protobuf-java:3.22.0'
 }
 

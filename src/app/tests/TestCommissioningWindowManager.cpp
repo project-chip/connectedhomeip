@@ -854,4 +854,42 @@ TEST_F(TestCommissioningWindowManager, TestShellCloseCommissioningWindowNotOpen)
     commissionMgr.CloseCommissioningWindow();
 }
 
+TEST_F(TestCommissioningWindowManager, TestStandaloneCommissioningWindowManager)
+{
+    CommissioningWindowManager standaloneMgr;
+    FabricTable fabricTable;
+    FailSafeContext failSafeContext;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer bleLayer;
+#endif
+
+    // Before Init(), opening a commissioning window must fail with CHIP_ERROR_INCORRECT_STATE.
+    EXPECT_EQ(standaloneMgr.OpenBasicCommissioningWindow(), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_FALSE(standaloneMgr.IsCommissioningWindowOpen());
+
+    standaloneMgr.Init({
+        .fabricTable = fabricTable, .sessionManager = GetSecureSessionManager(), .exchangeManager = GetExchangeManager(),
+        .failSafeContext = failSafeContext,
+#if CONFIG_NETWORK_LAYER_BLE
+        .bleLayer = bleLayer,
+#endif
+    });
+
+    // Arming the injected FailSafeContext (while Server's FailSafeContext remains disarmed)
+    // must prevent the standalone manager from opening a commissioning window.
+    ASSERT_FALSE(Server::GetInstance().GetFailSafeContext().IsFailSafeArmed());
+    ASSERT_EQ(failSafeContext.ArmFailSafe(kUndefinedFabricIndex, System::Clock::Seconds16(60)), CHIP_NO_ERROR);
+    EXPECT_EQ(standaloneMgr.OpenBasicCommissioningWindow(), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_FALSE(standaloneMgr.IsCommissioningWindowOpen());
+
+    // Disarming the injected FailSafeContext allows opening and closing the window cleanly.
+    failSafeContext.DisarmFailSafe();
+    EXPECT_EQ(standaloneMgr.OpenBasicCommissioningWindow(), CHIP_NO_ERROR);
+    EXPECT_TRUE(standaloneMgr.IsCommissioningWindowOpen());
+
+    standaloneMgr.CloseCommissioningWindow();
+    EXPECT_FALSE(standaloneMgr.IsCommissioningWindowOpen());
+    standaloneMgr.Shutdown();
+}
+
 } // namespace

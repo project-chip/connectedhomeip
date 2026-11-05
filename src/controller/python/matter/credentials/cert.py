@@ -66,3 +66,26 @@ def get_max_certificate_chain_document_size(subject_profile: int | None = None, 
     if subject_profile is None or issuer_profile is None:
         return _handle().pychip_GetMaxCertificateChainDocumentSize()
     return _handle().pychip_GetCertificateChainDocumentSizeForProfiles(subject_profile, issuer_profile)
+
+
+def get_supported_attestation_profiles() -> int:
+    """Return the attestation algorithm bitmap supported by the native crypto backend."""
+    handle = GetLibraryHandle()
+    if handle.pychip_GetSupportedAttestationProfiles.argtypes is None:
+        NativeLibraryHandleMethodArguments(handle).Set("pychip_GetSupportedAttestationProfiles", ctypes.c_uint32, [])
+    return handle.pychip_GetSupportedAttestationProfiles()
+
+
+def validate_attestation_certificate_profile(certificate: bytes, subject_profile: int, issuer_profile: int) -> None:
+    """Raise on a malformed certificate or algorithms differing from the requested profiles.
+
+    Signature and trust verification must still be performed separately.
+    """
+    handle = GetLibraryHandle()
+    if handle.pychip_ValidateAttestationCertificateProfile.argtypes is None:
+        NativeLibraryHandleMethodArguments(handle).Set(
+            "pychip_ValidateAttestationCertificateProfile", PyChipError,
+            [ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t, ctypes.c_uint8, ctypes.c_uint8])
+    handle.pychip_ValidateAttestationCertificateProfile(
+        ctypes.cast(certificate, ctypes.POINTER(ctypes.c_uint8)), len(certificate),
+        subject_profile, issuer_profile).raise_on_error()

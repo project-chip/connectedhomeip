@@ -78,7 +78,7 @@ class TC_DEM_2_11(MatterTestCommissionedDevice, DEMTestBase):
         # pylint: disable=too-many-locals, too-many-statements
         """4.1.3. [TC-DEM-2.11] Power Range Adjustment feature functionality with DUT as Server"""
 
-        self.step("1", "Commission DUT to TH", is_commissioning=True,
+        self.step("1", "Commission DUT to TH",
                   expectation="TH and DUT connection established")
         # Commission DUT - already done
 

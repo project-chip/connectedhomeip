@@ -45,7 +45,7 @@ _install_additional_pip_requirements() {
                 echo "Installing pip requirements for $platform..."
                 pip install -q \
                     -r "$_CHIP_ROOT/scripts/setup/requirements.$platform.txt" \
-                    -c "$_CHIP_ROOT/scripts/setup/constraints.txt"
+                    -c "$_CHIP_ROOT/scripts/setup/requirements.constraints.txt"
             fi
         done
         IFS=$_OLD_IFS

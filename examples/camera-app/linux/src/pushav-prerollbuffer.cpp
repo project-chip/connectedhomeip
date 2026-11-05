@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
+#include <vector>
 
 PreRollBuffer::PreRollBuffer() : mMaxTotalBytes(4096), mContentBufferSize(0) {}
 

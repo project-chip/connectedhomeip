@@ -49,7 +49,6 @@ class TelinkApp(Enum):
     SMOKE_CO_ALARM = auto()
     TEMPERATURE_MEASUREMENT = auto()
     THERMOSTAT = auto()
-    WINDOW_COVERING = auto()
 
     def ExampleName(self):
         if self == TelinkApp.AIR_QUALITY_SENSOR:
@@ -84,8 +83,6 @@ class TelinkApp(Enum):
             return 'temperature-measurement-app'
         if self == TelinkApp.THERMOSTAT:
             return 'thermostat'
-        if self == TelinkApp.WINDOW_COVERING:
-            return 'window-app'
         raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
@@ -123,8 +120,6 @@ class TelinkApp(Enum):
             return 'chip-telink-temperature-measurement-example'
         if self == TelinkApp.THERMOSTAT:
             return 'chip-telink-thermostat-example'
-        if self == TelinkApp.WINDOW_COVERING:
-            return 'chip-telink-window-example'
         raise Exception(f'Unknown app type: {self!r}')
 
 

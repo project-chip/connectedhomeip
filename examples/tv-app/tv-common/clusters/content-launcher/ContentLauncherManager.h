@@ -34,6 +34,7 @@ using ReplicationInfoType            = chip::app::Clusters::ContentLauncher::Str
 using ParameterType                  = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
 using BrandingInformationType        = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
 using PlaybackPreferencesType        = chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::DecodableType;
+using LaunchUrlRequestType           = chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType;
 using ContentPresetStructType        = chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type;
 
 class ContentEntry
@@ -55,6 +56,7 @@ public:
                              bool useCurrentContext) override;
     void HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
                          const CharSpan & displayString, const BrandingInformationType & brandingInformation) override;
+    void HandleLaunchUrlRequest(CommandResponseHelper<LaunchResponseType> & helper, const LaunchUrlRequestType & request) override;
     void HandleContentReplicationRequest(CommandResponseHelper<ContentReplicationResponseType> & helper) override;
     void HandlePlayPreset(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                           uint16_t presetID) override;

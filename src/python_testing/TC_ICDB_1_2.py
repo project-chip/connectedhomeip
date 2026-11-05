@@ -88,7 +88,7 @@ class TC_ICDB_1_2(MatterTestCommissionedDevice, ICDBaseTest):
 
     def steps_TC_ICDB_1_2(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(1, "TH reads from the DUT the RegisteredClients attribute.",
                      "If clients are registered, unregister them."),
             TestStep(2, "TH reads from the DUT the ActiveModeDuration, ActiveModeThreshold, UserActiveModeTriggerHint, and UserActiveModeTriggerInstruction attributes.",

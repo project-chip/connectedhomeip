@@ -95,7 +95,7 @@ for ((i = 2; i <= "$MAX_RANGE"; i++)); do
         strip --strip-all "$OUT_DIR"/chip-ota-requestor-app -o "$OUT_DIR"/chip-ota-requestor-app.min >/dev/null 2>&1
     fi
 
-    if [ ! .s "$OUT_DIR/chip-ota-requestor-app.min" ]; then
+    if [ ! -s "$OUT_DIR/chip-ota-requestor-app.min" ]; then
         echo "ERROR: Could not find .min file in $OUT_DIR"
         ls -l "$OUT_DIR"
         exit 1

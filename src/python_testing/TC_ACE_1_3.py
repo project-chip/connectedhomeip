@@ -21,10 +21,10 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     factory-reset: true
 #     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -75,7 +75,7 @@ class TC_ACE_1_3(MatterTestCommissionedDevice):
 
     def steps_TC_ACE_1_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH0 writes ACL all view on PIXIT.ACE.TESTENDPOINT"),
             TestStep(3, "TH1 reads EP0 descriptor - expect SUCCESS"),
             TestStep(4, "TH2 reads EP0 descriptor - expect SUCCESS"),

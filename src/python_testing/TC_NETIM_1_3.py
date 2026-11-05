@@ -90,50 +90,48 @@ class TC_NETIM_1_3(MatterTestCommissionedDevice):
         # Collects every Identity returned by a successful QueryIdentity for validation in step 16.
         returned_identities = []
 
-        self.step(1, "Commissioning, already done.",
-                  is_commissioning=True)
+        self.step(1, "Commissioning, already done.")
 
         self.step(2, "TH sends ImportAdminSecret with a valid Network Administrator Shared Secret to establish an active "
                      "identity.",
-                  expectation="DUT responds with SUCCESS.")
+                  expectation="DUT responds with SUCCESS. TH derives the Network Identity from the imported NASS and stores it "
+                              "as ExpectedNetworkIdentity, and its Network Identifier as ExpectedNetworkIdentifier.")
         raw_secret = secrets.token_bytes(NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH)
         nass = encode_network_administrator_secret(created=matter_epoch_now(), raw_secret=raw_secret)
         await self.send_single_cmd(cmd=commands.ImportAdminSecret(networkAdministratorSharedSecret=nass),
                                    endpoint=endpoint, timedRequestTimeoutMs=_TIMED_REQUEST_TIMEOUT_MS)
-        # The DUT must derive this exact identity from the NASS raw secret.
         _, expected_network_identity = derive_ecdsa_network_identity(raw_secret)
         expected_network_identifier = network_identity_identifier(expected_network_identity)
 
-        self.step(3, "TH reads ActiveNetworkIdentities and stores one entry's fields as aniIndex, aniType, aniIdentifier.",
-                  expectation="The fields are present and valid; aniIdentifier matches the identifier TH derives from the "
-                              "imported NASS.")
+        self.step(3, "TH reads ActiveNetworkIdentities and stores the fields of the entry with Current=true as aniIndex, "
+                     "aniType, aniIdentifier.",
+                  expectation="aniType is a valid IdentityTypeEnum and aniIdentifier = ExpectedNetworkIdentifier.")
         active_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.ActiveNetworkIdentities)
-        current = [identity for identity in active_list if identity.current]
-        asserts.assert_equal(len(current), 1, "Expected exactly one current active network identity after import.")
-        ani = current[0]
+        ani = next((identity for identity in active_list if identity.current), None)
+        asserts.assert_is_not_none(ani, "ActiveNetworkIdentities has no entry with Current=true.")
         ani_index = ani.index
         ani_type = ani.type
         ani_identifier = ani.identifier
-        matter_asserts.assert_int_in_range(ani_index, 1, 65534, "ActiveNetworkIdentityStruct.Index")
-        asserts.assert_equal(ani_type, cluster.Enums.IdentityTypeEnum.kEcdsa, "Active network identity should be ECDSA.")
+        matter_asserts.assert_valid_enum(ani_type, "ActiveNetworkIdentityStruct.Type", cluster.Enums.IdentityTypeEnum)
         asserts.assert_equal(ani_identifier, expected_network_identifier,
-                             "Active network identity Identifier does not match the identity derived from the NASS.")
+                             "aniIdentifier does not match ExpectedNetworkIdentifier derived from the imported NASS.")
 
         self.step(4, "TH sends AddClient with a new unique valid client identity.",
-                  expectation="DUT responds with AddClientResponse; the client identity is stored as ClientIdentifierA.")
+                  expectation="DUT responds with AddClientResponse. The client identity is stored as ClientIdentityA, and its "
+                              "Network Client Identifier as ClientIdentifierA.")
         _, client_identity_a = generate_network_client_identity()
-        expected_client_identifier = network_identity_identifier(client_identity_a)
+        client_identifier_a = network_identity_identifier(client_identity_a)
         add_response = await self.send_single_cmd(cmd=commands.AddClient(clientIdentity=client_identity_a),
                                                   endpoint=endpoint, timedRequestTimeoutMs=_TIMED_REQUEST_TIMEOUT_MS)
         asserts.assert_is_instance(add_response, commands.AddClientResponse, "AddClient did not return an AddClientResponse.")
 
         self.step(5, "TH reads Clients and stores one client's ClientIdentifier as clientIdentifier and ClientIndex as "
                      "clientIndex.",
-                  expectation="clientIdentifier is 20 bytes and matches the identifier of ClientIdentifierA.")
+                  expectation="clientIdentifier is 20 bytes and matches ClientIdentifierA from step 4.")
         clients_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.Clients)
-        matching = [c for c in clients_list if c.clientIdentifier == expected_client_identifier]
+        matching = [c for c in clients_list if c.clientIdentifier == client_identifier_a]
         asserts.assert_equal(len(matching), 1, "Clients does not contain the added ClientIdentifierA.")
         client = matching[0]
         client_index = client.clientIndex
@@ -142,44 +140,42 @@ class TC_NETIM_1_3(MatterTestCommissionedDevice):
                              "ClientIdentifier must be 20 bytes.")
 
         self.step(6, "TH sends QueryIdentity with only NetworkIdentityIndex=aniIndex.",
-                  expectation="DUT responds with QueryIdentityResponse whose Identity is the active network identity.")
+                  expectation="DUT responds with QueryIdentityResponse containing Identity that equals ExpectedNetworkIdentity.")
         response = await self._query(endpoint, networkIdentityIndex=ani_index)
         asserts.assert_equal(response.identity, expected_network_identity,
-                             "QueryIdentity by NetworkIdentityIndex returned the wrong Identity.")
+                             "QueryIdentity by NetworkIdentityIndex returned an Identity not equal to ExpectedNetworkIdentity.")
         returned_identities.append(response.identity)
 
         self.step(7, "TH sends QueryIdentity with only NetworkIdentityType=aniType.",
-                  expectation="DUT responds with QueryIdentityResponse whose Identity is the current network identity.")
+                  expectation="DUT responds with QueryIdentityResponse containing Identity that equals ExpectedNetworkIdentity.")
         response = await self._query(endpoint, networkIdentityType=ani_type)
         asserts.assert_equal(response.identity, expected_network_identity,
-                             "QueryIdentity by NetworkIdentityType returned the wrong current Identity.")
+                             "QueryIdentity by NetworkIdentityType returned an Identity not equal to ExpectedNetworkIdentity.")
         returned_identities.append(response.identity)
 
         self.step(8, "TH sends QueryIdentity with only Identifier=aniIdentifier.",
-                  expectation="DUT responds with QueryIdentityResponse whose Identity is the active network identity.")
+                  expectation="DUT responds with QueryIdentityResponse containing Identity that equals ExpectedNetworkIdentity.")
         response = await self._query(endpoint, identifier=ani_identifier)
         asserts.assert_equal(response.identity, expected_network_identity,
-                             "QueryIdentity by network Identifier returned the wrong Identity.")
+                             "QueryIdentity by network Identifier returned an Identity not equal to ExpectedNetworkIdentity.")
         returned_identities.append(response.identity)
 
         self.step(9, "TH sends QueryIdentity with only Identifier=clientIdentifier.",
-                  expectation="DUT responds with QueryIdentityResponse whose Identity is ClientIdentifierA.")
+                  expectation="DUT responds with QueryIdentityResponse containing Identity that equals ClientIdentityA.")
         response = await self._query(endpoint, identifier=client_identifier)
         asserts.assert_equal(response.identity, client_identity_a,
-                             "QueryIdentity by client Identifier returned the wrong Identity.")
+                             "QueryIdentity by client Identifier returned an Identity not equal to ClientIdentityA.")
         returned_identities.append(response.identity)
 
         self.step(10, "TH sends QueryIdentity with only ClientIndex=clientIndex.",
-                  expectation="DUT responds with QueryIdentityResponse whose Identity matches ClientIdentifierA.")
+                  expectation="DUT responds with QueryIdentityResponse containing Identity that equals ClientIdentityA.")
         response = await self._query(endpoint, clientIndex=client_index)
         asserts.assert_equal(response.identity, client_identity_a,
-                             "QueryIdentity by ClientIndex returned an Identity that does not match ClientIdentifierA.")
+                             "QueryIdentity by ClientIndex returned an Identity not equal to ClientIdentityA.")
         returned_identities.append(response.identity)
 
-        self.step(11, "TH sends QueryIdentity with only ClientIndex set to an index no entry in Clients occupies.",
+        self.step(11, "TH sends QueryIdentity with ClientIndex set to an index not occupied by any entry in Clients.",
                   expectation="DUT responds with NOT_FOUND.")
-        # Incrementing clientIndex is not enough: on a DUT that already holds another client at that index
-        # the query would succeed and fail the step for an unrelated reason.
         allocated_client_indices = {c.clientIndex for c in clients_list}
         unknown_client_index = next(i for i in range(1, _MAX_CLIENT_INDEX + 1) if i not in allocated_client_indices)
         await self._expect_query_status(

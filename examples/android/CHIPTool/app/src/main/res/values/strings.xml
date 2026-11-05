@@ -85,6 +85,17 @@
     <string name="enter_thread_xpanid_text">11:11:11:11:22:22:22:22</string>
     <string name="enter_thread_master_key_text">00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF</string>
     <string name="enter_thread_save_network_btn">Save network</string>
+    <string name="enter_thread_fetch_from_system_btn">Fetch dataset from system Thread manager</string>
+    <string name="enter_thread_fetch_success">Thread dataset successfully imported from system</string>
+    <string name="enter_thread_fetch_error">Failed to fetch Thread dataset: %1$s</string>
+    <string name="enter_thread_manager_unavailable">ThreadNetworkManager is not available on this device</string>
+    <string name="enter_thread_requires_api_34">ThreadNetworkManager requires Android 14 (API 34) or higher</string>
+    <string name="enter_thread_privileged_permission_required">THREAD_NETWORK_PRIVILEGED is not granted; install CHIPTool as a privileged app or build with matterEnableGms=true</string>
+    <string name="enter_thread_no_controller">No ThreadNetworkController available on this device</string>
+    <string name="enter_thread_pick_network_title">Select Thread network</string>
+    <string name="enter_thread_network_choice">%1$s (XPAN %2$s, channel %3$d)</string>
+    <string name="enter_thread_no_network_shared">No Thread network credentials were shared</string>
+    <string name="enter_thread_no_active_dataset">No active Thread operational dataset found on system</string>
 
     <string name="nfc_tag_action_title">CHIP NFC Tag read. Choose an action:</string>
     <string name="nfc_tag_action_show">Show device information</string>
@@ -285,6 +296,7 @@
     <string name="ota_provider_select_firmware_file_text">Select Firmware</string>
     <string name="ota_provider_update_ota_status_text">Update OTA Status</string>
     <string name="ota_provider_start_firmware_update_text">Start Firmware Update</string>
+    <string name="ota_provider_retry_failed_updates_text">Retry Failed OTA Updates</string>
     <string name="ota_provider_invalid_attribute">Invalid Attribute</string>
     <string name="ota_provider_write_default_ota_providers_text">Write Default OTA Providers</string>
     <string name="ota_provider_fabric_index_text">Fabric Index</string>
@@ -292,6 +304,15 @@
     <string name="ota_provider_endpoint_id_text">Endpoint ID</string>
     <string name="ota_provider_write_text">Write</string>
     <string name="ota_provider_node_id_text">Node ID</string>
+    <string name="ota_provider_target_device_ids_hint">Target Device IDs (comma-separated, e.g. 1, 2, 3)</string>
+    <string name="ota_provider_target_device_ids_label">Target Node IDs:</string>
+    <string name="ota_provider_multi_device_status_title">Multi-Device OTA Progress Status:</string>
+    <string name="ota_provider_summary_idle">Serving 0 / 8 concurrent transfers · Ready</string>
+    <string name="ota_provider_locks_idle">CPU WakeLock: IDLE · Wi-Fi Lock: IDLE · Foreground Service: IDLE</string>
+    <string name="ota_provider_no_firmware_selected">No firmware file selected</string>
+    <string name="ota_provider_retry_node_btn_text">Retry</string>
+    <string name="ota_transfer_channel_name">OTA transfers</string>
+    <string name="ota_transfer_notification_title">Serving OTA firmware update</string>
 
     <string name="mode_select_btn_text">Mode Select</string>
     <string name="mode_select_description_text">Description</string>
@@ -306,4 +327,16 @@
 
     <string name="icd_btn_text">Intermittently Connected Device</string>
     <string name="icd_registration_completed">ICD device registration completed, How to trigger to switch to Active Mode : %1$s</string>
+
+    <!-- Device Center -->
+    <string name="center_title">Device Center</string>
+    <string name="center_entry_btn">Device Center</string>
+    <string name="center_connect_all">Connect All</string>
+    <string name="center_cancel">Cancel</string>
+    <string name="center_connect">Connect</string>
+    <string name="center_status_live">Live</string>
+    <string name="center_status_connecting">Connecting…</string>
+    <string name="center_status_recovering">Still trying…</string>
+    <string name="center_status_not_connected">Not connected</string>
+    <string name="center_all_off">All off</string>
 </resources>

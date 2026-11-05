@@ -70,7 +70,7 @@ class TC_ELDIST_2_1(MatterTestCommissionedDevice):
         cluster = Clusters.ElectricalDistribution
         attributes = cluster.Attributes
 
-        self.step(1, "Commissioning, already done", is_commissioning=True)
+        self.step(1, "Commissioning, already done")
 
         self.step(2, "TH reads from the DUT the MaxContinuousCurrent attribute.",
                   expectation="Verify that the DUT response contains a value of type `amperage-mA` (int64) "

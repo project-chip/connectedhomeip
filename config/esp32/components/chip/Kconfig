@@ -1239,6 +1239,17 @@ menu "CHIP Device Layer"
             help
                 Enable esp32 as a BLE Commissioner.
 
+        config ESP32_BLE_COMMISSIONER_ACTIVE_SCAN
+            bool "Use active scanning for BLE commissioning"
+            default n
+            depends on ENABLE_ESP32_BLE_CONTROLLER
+            help
+                Use active scanning while discovering commissionable devices. Active scanning
+                requests scan responses and can increase discovery time, 2.4 GHz traffic, and
+                power use. Matter devices are required to place all critical discovery data in
+                Advertising Data, so passive scanning remains the default. Enable this only for
+                interoperability with devices that require Scan Response Data.
+
     endmenu
 
     menu "Enable BLE Extended Announcement"

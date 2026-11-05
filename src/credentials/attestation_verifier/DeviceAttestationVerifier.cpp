@@ -18,6 +18,7 @@
 
 #include <credentials/DeviceAttestationConstructor.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/asn1/ASN1.h>
 #include <lib/support/CHIPMem.h>
 
 using namespace chip::Crypto;
@@ -26,6 +27,55 @@ namespace chip {
 namespace Credentials {
 
 namespace {
+
+CHIP_ERROR ReadUniversalElement(ASN1::ASN1Reader & reader, ASN1::ASN1UniversalTags tag)
+{
+    ReturnErrorOnFailure(reader.Next());
+    VerifyOrReturnError(reader.GetClass() == ASN1::kASN1TagClass_Universal && reader.GetTag() == tag, ASN1_ERROR_INVALID_ENCODING);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnterSequence(ASN1::ASN1Reader & reader)
+{
+    ReturnErrorOnFailure(ReadUniversalElement(reader, ASN1::kASN1UniversalTag_Sequence));
+    return reader.EnterConstructedType();
+}
+
+CHIP_ERROR ValidateAlgorithmIdentifier(ASN1::ASN1Reader & reader, DeviceAttestationCertProfile profile, bool subjectKey)
+{
+    constexpr uint8_t kEcPublicKey[] = { 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01 };
+    constexpr uint8_t kPrime256v1[]  = { 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07 };
+    constexpr uint8_t kEcdsaSha256[] = { 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02 };
+    constexpr uint8_t kMlDsa44[]     = { 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x11 };
+    constexpr uint8_t kMlDsa65[]     = { 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x12 };
+    ByteSpan expectedOid;
+    switch (profile)
+    {
+    case DeviceAttestationCertProfile::kEcdsaMatterLegacy:
+        expectedOid = subjectKey ? ByteSpan(kEcPublicKey) : ByteSpan(kEcdsaSha256);
+        break;
+    case DeviceAttestationCertProfile::kMlDsa44:
+        expectedOid = ByteSpan(kMlDsa44);
+        break;
+    case DeviceAttestationCertProfile::kMlDsa65:
+        expectedOid = ByteSpan(kMlDsa65);
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    ReturnErrorOnFailure(EnterSequence(reader));
+    ReturnErrorOnFailure(ReadUniversalElement(reader, ASN1::kASN1UniversalTag_ObjectId));
+    VerifyOrReturnError(ByteSpan(reader.GetValue(), reader.GetValueLen()).data_equal(expectedOid),
+                        CHIP_ERROR_FAILED_DEVICE_ATTESTATION);
+    if (subjectKey && profile == DeviceAttestationCertProfile::kEcdsaMatterLegacy)
+    {
+        ReturnErrorOnFailure(ReadUniversalElement(reader, ASN1::kASN1UniversalTag_ObjectId));
+        VerifyOrReturnError(ByteSpan(reader.GetValue(), reader.GetValueLen()).data_equal(ByteSpan(kPrime256v1)),
+                            CHIP_ERROR_FAILED_DEVICE_ATTESTATION);
+    }
+    VerifyOrReturnError(reader.Next() == ASN1_END, ASN1_ERROR_INVALID_ENCODING);
+    return reader.ExitConstructedType();
+}
 
 // Version to have a default placeholder so the getter never
 // returns `nullptr` by default.
@@ -86,6 +136,42 @@ UnimplementedDACVerifier gDefaultDACVerifier;
 DeviceAttestationVerifier * gDacVerifier = &gDefaultDACVerifier;
 
 } // namespace
+
+CHIP_ERROR ValidateAttestationCertificateProfile(ByteSpan certificate, DeviceAttestationCertProfile subjectProfile,
+                                                 DeviceAttestationCertProfile issuerProfile)
+{
+    using namespace ASN1;
+    ASN1Reader reader;
+    reader.Init(certificate);
+    ReturnErrorOnFailure(EnterSequence(reader));
+    ReturnErrorOnFailure(EnterSequence(reader)); // TBSCertificate
+    ReturnErrorOnFailure(reader.Next());
+    VerifyOrReturnError(reader.GetClass() == kASN1TagClass_ContextSpecific && reader.GetTag() == 0, ASN1_ERROR_INVALID_ENCODING);
+    ReturnErrorOnFailure(reader.EnterConstructedType());
+    ReturnErrorOnFailure(ReadUniversalElement(reader, kASN1UniversalTag_Integer));
+    int64_t version;
+    ReturnErrorOnFailure(reader.GetInteger(version));
+    VerifyOrReturnError(version == 2, ASN1_ERROR_INVALID_ENCODING);
+    VerifyOrReturnError(reader.Next() == ASN1_END, ASN1_ERROR_INVALID_ENCODING);
+    ReturnErrorOnFailure(reader.ExitConstructedType());
+    ReturnErrorOnFailure(ReadUniversalElement(reader, kASN1UniversalTag_Integer)); // serialNumber
+    ReturnErrorOnFailure(ValidateAlgorithmIdentifier(reader, issuerProfile, false));
+    ReturnErrorOnFailure(ReadUniversalElement(reader, kASN1UniversalTag_Sequence)); // issuer
+    ReturnErrorOnFailure(ReadUniversalElement(reader, kASN1UniversalTag_Sequence)); // validity
+    ReturnErrorOnFailure(ReadUniversalElement(reader, kASN1UniversalTag_Sequence)); // subject
+    ReturnErrorOnFailure(EnterSequence(reader));                                    // subjectPublicKeyInfo
+    ReturnErrorOnFailure(ValidateAlgorithmIdentifier(reader, subjectProfile, true));
+    ReturnErrorOnFailure(ReadUniversalElement(reader, kASN1UniversalTag_BitString));
+    VerifyOrReturnError(reader.Next() == ASN1_END, ASN1_ERROR_INVALID_ENCODING);
+    ReturnErrorOnFailure(reader.ExitConstructedType());
+    ReturnErrorOnFailure(reader.ExitConstructedType()); // Remaining TBSCertificate fields are checked by the verifier.
+    ReturnErrorOnFailure(ValidateAlgorithmIdentifier(reader, issuerProfile, false));
+    ReturnErrorOnFailure(ReadUniversalElement(reader, kASN1UniversalTag_BitString));
+    VerifyOrReturnError(reader.Next() == ASN1_END, ASN1_ERROR_INVALID_ENCODING);
+    ReturnErrorOnFailure(reader.ExitConstructedType());
+    VerifyOrReturnError(reader.Next() == ASN1_END, ASN1_ERROR_INVALID_ENCODING);
+    return CHIP_NO_ERROR;
+}
 
 const char * GetAttestationResultDescription(AttestationVerificationResult resultCode)
 {

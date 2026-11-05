@@ -65,7 +65,7 @@ class TC_CHIME_2_1(MatterTestCommissionedDevice, CHIMETestBase):
 
     def steps_TC_CHIME_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read InstalledChimeSounds, verify list and field value conformance"),
             TestStep(3, "Verify that all of the ChimeIDs in InstalledChimeSounds are unique"),
             TestStep(4, "Verify that all of the Names in InstalledChimeSounds are unique"),

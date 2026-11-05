@@ -246,7 +246,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <from value="0"/>
+          <from value="1"/>
           <to value="100"/>
         </between>
       </constraint>
@@ -277,10 +277,16 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="MistType" type="MistTypeBitmap">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality nullable="true" persistence="nonVolatile"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="HUM"/>
       </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="3"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0009" name="Continuous" type="bool">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
@@ -331,6 +337,9 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="MistType" type="MistTypeBitmap">
         <optionalConform/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="Continuous" type="bool">
         <optionalConform/>

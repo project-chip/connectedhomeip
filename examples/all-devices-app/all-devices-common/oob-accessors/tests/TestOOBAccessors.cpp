@@ -24,6 +24,7 @@
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <device/api/Interface.h>
 #include <lib/core/TLV.h>
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 #include <oob-accessors/NoopOOBAccessorRegistry.h>
@@ -58,22 +59,88 @@ protected:
     Testing::TestServerClusterContext mClusterContext;
 };
 
+struct TestOOBAccessor : public OOBAccessor
+{
+    std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan /* tlvData */) override
+    {
+        if (!action.data_equal("TestAction"_span))
+        {
+            return std::nullopt;
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+struct MockDeviceInterface : public DeviceInterface
+{
+public:
+    MockDeviceInterface() : DeviceInterface({}) {}
+
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition comp = {}) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void Unregister(CodeDrivenDataModelProvider & provider) override {}
+};
+
 TEST_F(TestOOBAccessors, RegistryLifecycle)
 {
     InMemoryOOBAccessorRegistry registry;
     EXPECT_EQ(registry.Size(), 0U);
 
+    MockDeviceInterface dep1, dep2;
+
     EXPECT_EQ(registry.Register(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
 
-    uint8_t buffer[64];
-    TLV::TLVWriter writer;
-    writer.Init(buffer);
-    TLV::TLVType outer;
-    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+    {
+        auto scopedDep = registry.WithDependency(&dep1);
+        EXPECT_EQ(registry.Register(std::make_unique<TestOOBAccessor>()), CHIP_NO_ERROR);
+    }
 
-    EXPECT_EQ(registry.HandleAction("NonExistentAction"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
+    // Register accessor without dependency, should be present even after Unregister(NoDependency{})
+    EXPECT_EQ(registry.Register(std::make_unique<TestOOBAccessor>()), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Size(), 2U);
+
+    {
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("NonExistentAction"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+                  CHIP_ERROR_NOT_FOUND);
+    }
+
+    {
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("TestAction"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    }
+
+    registry.Unregister(&dep2);
+    EXPECT_EQ(registry.Size(), 2U);
+    registry.Unregister(&dep1);
+    EXPECT_EQ(registry.Size(), 1U);
+    registry.Unregister(NoDependency{});
+    EXPECT_EQ(registry.Size(), 1U);
+
+    {
+        auto scopedDep = registry.WithDependency(&dep2);
+        EXPECT_EQ(registry.Register(std::make_unique<TestOOBAccessor>()), CHIP_NO_ERROR);
+    }
+
+    registry.Unregister(&dep2);
+    EXPECT_EQ(registry.Size(), 1U);
 
     registry.Clear();
     EXPECT_EQ(registry.Size(), 0U);

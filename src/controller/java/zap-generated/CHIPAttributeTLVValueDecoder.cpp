@@ -10813,13 +10813,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                 value_DACSupportedProfilesClassName.c_str(), value_DACSupportedProfilesCtorSignature.c_str(),
                 jnivalue_DACSupportedProfiles, value_DACSupportedProfiles);
-            jobject value_CDSupportedProfiles;
-            std::string value_CDSupportedProfilesClassName     = "java/lang/Integer";
-            std::string value_CDSupportedProfilesCtorSignature = "(I)V";
-            jint jnivalue_CDSupportedProfiles                  = static_cast<jint>(cppValue.CDSupportedProfiles.Raw());
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                value_CDSupportedProfilesClassName.c_str(), value_CDSupportedProfilesCtorSignature.c_str(),
-                jnivalue_CDSupportedProfiles, value_CDSupportedProfiles);
 
             {
                 jclass PQCDeviceAttestationProfileStructStructClass_0;
@@ -10834,10 +10827,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jmethodID PQCDeviceAttestationProfileStructStructCtor_0;
-                err = chip::JniReferences::GetInstance().FindMethod(
-                    env, PQCDeviceAttestationProfileStructStructClass_0, "<init>",
-                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
-                    &PQCDeviceAttestationProfileStructStructCtor_0);
+                err = chip::JniReferences::GetInstance().FindMethod(env, PQCDeviceAttestationProfileStructStructClass_0, "<init>",
+                                                                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                                                    &PQCDeviceAttestationProfileStructStructCtor_0);
                 if (err != CHIP_NO_ERROR || PQCDeviceAttestationProfileStructStructCtor_0 == nullptr)
                 {
                     ChipLogError(
@@ -10846,9 +10838,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                value = env->NewObject(PQCDeviceAttestationProfileStructStructClass_0,
-                                       PQCDeviceAttestationProfileStructStructCtor_0, value_PAASupportedProfiles,
-                                       value_PAISupportedProfiles, value_DACSupportedProfiles, value_CDSupportedProfiles);
+                value =
+                    env->NewObject(PQCDeviceAttestationProfileStructStructClass_0, PQCDeviceAttestationProfileStructStructCtor_0,
+                                   value_PAASupportedProfiles, value_PAISupportedProfiles, value_DACSupportedProfiles);
             }
             return value;
         }
@@ -34338,8 +34330,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::Mode::Id: {
-            using TypeInfo = Attributes::Mode::TypeInfo;
+        case Attributes::HumidistatMode::Id: {
+            using TypeInfo = Attributes::HumidistatMode::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -34354,8 +34346,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
             return value;
         }
-        case Attributes::SystemState::Id: {
-            using TypeInfo = Attributes::SystemState::TypeInfo;
+        case Attributes::HumidistatSystemState::Id: {
+            using TypeInfo = Attributes::HumidistatSystemState::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

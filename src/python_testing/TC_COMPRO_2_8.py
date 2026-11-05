@@ -136,7 +136,7 @@ class TC_COMPRO_2_8(MatterTestCommissionedDevice, COMPROBaseTest):
 
     def steps_TC_COMPRO_2_8(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to Fabric A (TH1) and Fabric B (TH2)", is_commissioning=True),
+            TestStep(1, "Commission DUT to Fabric A (TH1) and Fabric B (TH2)"),
             TestStep(2, "Ensure ED is commissionable"),
             TestStep(3, "TH1 (Fabric A) reads Transport attribute",
                      "Store as valid_transports"),

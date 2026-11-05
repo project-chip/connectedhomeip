@@ -8311,7 +8311,7 @@
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
-            },
+            }
           ]
         },
         {

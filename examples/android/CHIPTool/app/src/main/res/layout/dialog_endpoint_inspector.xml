@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~   Copyright (c) 2026 Project CHIP Authors
+  ~   All rights reserved.
+  ~
+  ~   Licensed under the Apache License, Version 2.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?android:attr/colorBackground">
+
+  <!-- Top App Bar with Close and Info -->
+  <com.google.android.material.appbar.MaterialToolbar
+      android:id="@+id/inspectorToolbar"
+      android:layout_width="match_parent"
+      android:layout_height="?attr/actionBarSize"
+      app:title="Endpoint &amp; Cluster Inspector"
+      app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel" />
+
+  <!-- Device Overview Banner -->
+  <com.google.android.material.card.MaterialCardView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="16dp"
+      android:layout_marginEnd="16dp"
+      android:layout_marginTop="4dp"
+      android:layout_marginBottom="8dp"
+      app:cardCornerRadius="12dp"
+      app:cardElevation="0dp"
+      app:strokeWidth="1dp"
+      app:strokeColor="@color/colorOutlineVariant"
+      app:cardBackgroundColor="@color/colorSurfaceVariant">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+      <TextView
+          android:id="@+id/inspectorDeviceLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Living Room Ceiling Light"
+          android:textSize="16sp"
+          android:textStyle="bold"
+          android:textColor="@color/colorOnSurface" />
+
+      <TextView
+          android:id="@+id/inspectorDeviceMeta"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="2dp"
+          android:text="Node 0x1001 • Vendor: Standard Matter • Room: Living Room"
+          android:textSize="12sp"
+          android:textColor="@color/colorOnSurfaceVariant" />
+
+      <TextView
+          android:id="@+id/inspectorStatusBanner"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="4dp"
+          android:text="Real-time Matter Subscriptions Active"
+          android:textSize="11sp"
+          android:textColor="#34A853"
+          android:textStyle="bold" />
+    </LinearLayout>
+  </com.google.android.material.card.MaterialCardView>
+
+  <!-- Endpoint Selector Tabs (Endpoint 0, Endpoint 1, ...) -->
+  <com.google.android.material.tabs.TabLayout
+      android:id="@+id/endpointTabLayout"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:tabMode="scrollable"
+      app:tabGravity="fill" />
+
+  <!-- Selected Endpoint Info Badge -->
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:gravity="center_vertical"
+      android:paddingStart="16dp"
+      android:paddingEnd="16dp"
+      android:paddingTop="8dp"
+      android:paddingBottom="8dp"
+      android:background="@color/colorSurfaceVariant">
+
+    <TextView
+        android:id="@+id/endpointTitleText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Endpoint 1: Extended Color Light (0x010D)"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/clusterCountText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3 Server Clusters"
+        android:textSize="11sp"
+        android:textColor="@color/colorOnSurfaceVariant" />
+  </LinearLayout>
+
+  <!-- Clusters & In-Place Attribute Editors RecyclerView -->
+  <androidx.recyclerview.widget.RecyclerView
+      android:id="@+id/clustersRecyclerView"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1"
+      android:clipToPadding="false"
+      android:paddingTop="8dp"
+      android:paddingBottom="8dp"
+      tools:listitem="@layout/item_cluster_attribute_editor" />
+
+  <!-- Recent Events Section -->
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:background="@color/colorSurfaceVariant"
+      android:padding="8dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Recent events (all endpoints)"
+        android:textStyle="bold"
+        android:textSize="13sp"
+        android:paddingBottom="4dp"/>
+
+    <ScrollView
+        android:id="@+id/recentEventsScroll"
+        android:layout_width="match_parent"
+        android:layout_height="120dp">
+      <LinearLayout
+          android:id="@+id/recentEventsContainer"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical" />
+    </ScrollView>
+  </LinearLayout>
+
+</LinearLayout>
