@@ -455,6 +455,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
 - (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device;
 - (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device;
+- (void)unitTestSubscriptionReattemptDispatchedForDevice:(MTRDevice *)device;
 @end
 #endif
 
@@ -1962,6 +1963,14 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                 std::lock_guard lock(self->_lock);
                 [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
             }];
+
+#ifdef DEBUG
+        [self _lockAndCallDelegatesWithBlock:^(id testDelegate) {
+            if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionReattemptDispatchedForDevice:)]) {
+                [testDelegate unitTestSubscriptionReattemptDispatchedForDevice:self];
+            }
+        }];
+#endif
     };
 
     int64_t resubscriptionDelayNs = static_cast<int64_t>(secondsToWait * NSEC_PER_SEC);

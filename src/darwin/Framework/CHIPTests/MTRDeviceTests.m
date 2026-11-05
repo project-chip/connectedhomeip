@@ -8612,6 +8612,11 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
         }
     };
 
+    dispatch_semaphore_t reattemptDispatched = dispatch_semaphore_create(0);
+    delegate.onSubscriptionReattemptDispatched = ^{
+        dispatch_semaphore_signal(reattemptDispatched);
+    };
+
     [device setDelegate:delegate queue:queue];
 
     __block NSDate * finalResetTime = nil;
@@ -8622,10 +8627,12 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
             [device _handleSubscriptionReset:nil];
         } error:nil];
     }
-    if (blockSeconds > 0) {
+    if (blockSeconds > 0 || supersedeWhileBlocked) {
         [controller syncRunOnWorkQueue:^{
             [NSThread sleepForTimeInterval:blockSeconds];
             if (supersedeWhileBlocked) {
+                // Supersede only once the timer has queued its Matter-queue block, so the on-queue check is what rejects it.
+                XCTAssertEqual(dispatch_semaphore_wait(reattemptDispatched, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC)), 0);
                 device.reattemptingSubscription = NO;
                 finalResetTime = [NSDate now];
                 [device _handleSubscriptionReset:nil];
@@ -8660,12 +8667,12 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 
 - (void)test004_SupersededResubscriptionTimerAfterDispatchDoesNotFireEarly
 {
-    [self _checkSupersededResubscriptionTimersWithThread:NO subscriptionPoolWidth:1 blockingMatterQueueFor:3.0 supersedingWhileBlocked:YES];
+    [self _checkSupersededResubscriptionTimersWithThread:NO subscriptionPoolWidth:1 blockingMatterQueueFor:0 supersedingWhileBlocked:YES];
 }
 
 - (void)test005_SupersededResubscriptionTimerAfterDispatchDoesNotFireEarlyInSubscriptionPool
 {
-    [self _checkSupersededResubscriptionTimersWithThread:YES subscriptionPoolWidth:1 blockingMatterQueueFor:3.0 supersedingWhileBlocked:YES];
+    [self _checkSupersededResubscriptionTimersWithThread:YES subscriptionPoolWidth:1 blockingMatterQueueFor:0 supersedingWhileBlocked:YES];
 }
 
 @end
