@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <vector>
 
+#include <pw_preprocessor/compiler.h>
 #include <pw_unit_test/framework.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -489,6 +490,55 @@ TEST_F(TestPushAVStreamTransportServerLogic, AllocatePushTransportRejectsEndpoin
     EXPECT_EQ(status.GetClusterSpecificCode().value(), to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
 }
 
+namespace {
+
+PW_NO_INLINE void CheckMotionZoneResponse(Testing::MockCommandHandler & handler, const std::vector<uint16_t> & expectedIds)
+{
+    Commands::AllocatePushTransportResponse::DecodableType response;
+    ASSERT_EQ(handler.DecodeResponse(response), CHIP_NO_ERROR);
+    ASSERT_TRUE(response.transportConfiguration.transportOptions.HasValue());
+    const auto & storedZones = response.transportConfiguration.transportOptions.Value().triggerOptions.motionZones;
+    ASSERT_TRUE(storedZones.HasValue());
+    ASSERT_FALSE(storedZones.Value().IsNull());
+    auto storedIter = storedZones.Value().Value().begin();
+    for (const uint16_t expectedId : expectedIds)
+    {
+        ASSERT_TRUE(storedIter.Next());
+        EXPECT_EQ(storedIter.GetValue().zone.Value(), expectedId);
+    }
+    EXPECT_FALSE(storedIter.Next());
+    EXPECT_EQ(storedIter.GetStatus(), CHIP_NO_ERROR);
+}
+
+PW_NO_INLINE void CheckMotionZonePersistence(PushAvStreamTransportServer & server, MutableByteSpan sourceTlv,
+                                             const std::vector<uint16_t> & expectedIds)
+{
+    uint8_t encoded[2048];
+    TLV::TLVWriter storedWriter;
+    storedWriter.Init(encoded, sizeof(encoded));
+    ASSERT_EQ(server.GetLogic().mCurrentConnections[0].EncodeForRead(storedWriter, TLV::AnonymousTag(), 1), CHIP_NO_ERROR);
+    ASSERT_EQ(storedWriter.Finalize(), CHIP_NO_ERROR);
+    memset(sourceTlv.data(), 0, sourceTlv.size());
+    TLV::TLVReader storedReader;
+    storedReader.Init(encoded, storedWriter.GetLengthWritten());
+    ASSERT_EQ(storedReader.Next(), CHIP_NO_ERROR);
+    Structs::TransportConfigurationStruct::DecodableType decoded;
+    ASSERT_EQ(decoded.Decode(storedReader), CHIP_NO_ERROR);
+    ASSERT_TRUE(decoded.transportOptions.HasValue());
+    TransportOptionsStorage reloaded(decoded.transportOptions.Value());
+    ASSERT_TRUE(reloaded.triggerOptions.motionZones.HasValue());
+    ASSERT_FALSE(reloaded.triggerOptions.motionZones.Value().IsNull());
+    size_t reloadedIndex = 0;
+    for (const auto & zone : reloaded.triggerOptions.motionZones.Value().Value())
+    {
+        ASSERT_LT(reloadedIndex, expectedIds.size());
+        EXPECT_EQ(zone.zone.Value(), expectedIds[reloadedIndex++]);
+    }
+    EXPECT_EQ(reloadedIndex, expectedIds.size());
+}
+
+} // namespace
+
 TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreservesValidationOrder)
 {
     class ZoneDelegate : public TestPushAVStreamTransportDelegateImpl
@@ -758,21 +808,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
                                 }
                                 if (!modify && (zonesCase == ZonesCase::Unique || zonesCase == ZonesCase::HighIds))
                                 {
-                                    Commands::AllocatePushTransportResponse::DecodableType response;
-                                    ASSERT_EQ(handler.DecodeResponse(response), CHIP_NO_ERROR);
-                                    ASSERT_TRUE(response.transportConfiguration.transportOptions.HasValue());
-                                    const auto & storedZones =
-                                        response.transportConfiguration.transportOptions.Value().triggerOptions.motionZones;
-                                    ASSERT_TRUE(storedZones.HasValue());
-                                    ASSERT_FALSE(storedZones.Value().IsNull());
-                                    auto storedIter = storedZones.Value().Value().begin();
-                                    for (const uint16_t expectedId : expectedIds)
-                                    {
-                                        ASSERT_TRUE(storedIter.Next());
-                                        EXPECT_EQ(storedIter.GetValue().zone.Value(), expectedId);
-                                    }
-                                    EXPECT_FALSE(storedIter.Next());
-                                    EXPECT_EQ(storedIter.GetStatus(), CHIP_NO_ERROR);
+                                    CheckMotionZoneResponse(handler, expectedIds);
                                 }
                             }
                             else if (result.has_value())
@@ -810,30 +846,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
                             if (expectedStatus == Status::Success &&
                                 (zonesCase == ZonesCase::Unique || zonesCase == ZonesCase::HighIds))
                             {
-                                uint8_t encoded[2048];
-                                TLV::TLVWriter storedWriter;
-                                storedWriter.Init(encoded, sizeof(encoded));
-                                ASSERT_EQ(
-                                    server.GetLogic().mCurrentConnections[0].EncodeForRead(storedWriter, TLV::AnonymousTag(), 1),
-                                    CHIP_NO_ERROR);
-                                ASSERT_EQ(storedWriter.Finalize(), CHIP_NO_ERROR);
-                                memset(tlvBuffer, 0, sizeof(tlvBuffer));
-                                TLV::TLVReader storedReader;
-                                storedReader.Init(encoded, storedWriter.GetLengthWritten());
-                                ASSERT_EQ(storedReader.Next(), CHIP_NO_ERROR);
-                                Structs::TransportConfigurationStruct::DecodableType decoded;
-                                ASSERT_EQ(decoded.Decode(storedReader), CHIP_NO_ERROR);
-                                ASSERT_TRUE(decoded.transportOptions.HasValue());
-                                TransportOptionsStorage reloaded(decoded.transportOptions.Value());
-                                ASSERT_TRUE(reloaded.triggerOptions.motionZones.HasValue());
-                                ASSERT_FALSE(reloaded.triggerOptions.motionZones.Value().IsNull());
-                                size_t reloadedIndex = 0;
-                                for (const auto & zone : reloaded.triggerOptions.motionZones.Value().Value())
-                                {
-                                    ASSERT_LT(reloadedIndex, expectedIds.size());
-                                    EXPECT_EQ(zone.zone.Value(), expectedIds[reloadedIndex++]);
-                                }
-                                EXPECT_EQ(reloadedIndex, expectedIds.size());
+                                CheckMotionZonePersistence(server, MutableByteSpan(tlvBuffer), expectedIds);
                             }
                         }
                     }
