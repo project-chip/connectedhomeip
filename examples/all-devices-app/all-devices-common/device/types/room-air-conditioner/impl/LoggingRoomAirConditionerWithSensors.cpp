@@ -22,12 +22,12 @@ namespace {
 
 const EndpointComposition::SemanticTag kIndoorTag = {
     .mfgCode     = DataModel::NullNullable,
-    .namespaceID = CommonNamespace::kLocationId,
+    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kLocation),
     .tag         = static_cast<uint8_t>(Clusters::Globals::LocationTag::kIndoor),
 };
 const EndpointComposition::SemanticTag kOutdoorTag = {
     .mfgCode     = DataModel::NullNullable,
-    .namespaceID = CommonNamespace::kLocationId,
+    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kLocation),
     .tag         = static_cast<uint8_t>(Clusters::Globals::LocationTag::kOutdoor),
 };
 

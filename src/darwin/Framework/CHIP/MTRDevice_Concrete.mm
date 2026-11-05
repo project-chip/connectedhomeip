@@ -458,6 +458,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (void)unitTestSubscriptionCallbackDeleteForDevice:(MTRDevice *)device;
 - (void)unitTestSubscriptionResetForDevice:(MTRDevice *)device;
 - (void)unitTestSubscriptionSetupStartedForDevice:(MTRDevice *)device;
+- (void)unitTestReadClientCreatedForDevice:(MTRDevice *)device;
+- (void)unitTestInternalStateChangedForDevice:(MTRDevice *)device state:(MTRInternalDeviceState)state;
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error;
 - (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
 - (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device;
@@ -1489,6 +1491,14 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
             }
         }];
         /* END DRAGONS */
+
+#ifdef DEBUG
+        [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+            if ([testDelegate respondsToSelector:@selector(unitTestInternalStateChangedForDevice:state:)]) {
+                [testDelegate unitTestInternalStateChangedForDevice:self state:state];
+            }
+        }];
+#endif
 
         [self _notifyDelegateOfPrivateInternalPropertiesChanges];
     }
@@ -3693,6 +3703,20 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                            callback->AdoptReadClient(std::move(readClient));
                            callback->AdoptClusterStateCache(std::move(clusterStateCache));
                            callback.release();
+
+#ifdef DEBUG
+                           dispatch_async(self.queue, ^{
+                               mtr_strongify(self);
+                               VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason ReadClient created hook called back with nil MTRDevice"));
+
+                               std::lock_guard lock(self->_lock);
+                               [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+                                   if ([testDelegate respondsToSelector:@selector(unitTestReadClientCreatedForDevice:)]) {
+                                       [testDelegate unitTestReadClientCreatedForDevice:self];
+                                   }
+                               }];
+                           });
+#endif
                        }];
 
     // Set up connectivity monitoring in case network becomes routable after any part of the subscription process goes into backoff retries.
@@ -4222,7 +4246,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                   MTR_LOG("Invoke work item [%llu] received command response: %@ error: %@", workItemID, values, error);
                                   // TODO: This 5-retry cap is very arbitrary.
                                   // TODO: Should there be some sort of backoff here?
-                                  if (error != nil && error.domain == MTRInteractionErrorDomain && error.code == MTRInteractionErrorCodeBusy && retryCount < 5) {
+                                  if (error != nil && [error.domain isEqualToString:MTRInteractionErrorDomain] && error.code == MTRInteractionErrorCodeBusy && retryCount < 5) {
                                       workCompletion(MTRAsyncWorkNeedsRetry);
                                       return;
                                   }
