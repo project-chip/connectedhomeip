@@ -167,15 +167,12 @@ public:
 
     /**
      * @brief
-     *   Gets the current sessions from the Requestor server.
+     *   Gets a copy of the current sessions from the Requestor server.
      *
-     * The VideoStreams and AudioStreams lists of the returned sessions point into storage owned by this cluster, and are
-     * valid until the session is updated or removed.
+     * Each returned session owns its VideoStreams and AudioStreams lists, so the copy stays valid when the cluster's
+     * sessions change afterwards.
      */
-    std::vector<WebRTCSessionStruct> GetCurrentSessions() const
-    {
-        return std::vector<WebRTCSessionStruct>(mCurrentSessions.begin(), mCurrentSessions.end());
-    }
+    std::vector<WebRTCSessionStorage> GetCurrentSessions() const { return mCurrentSessions; }
 
     /**
      * @brief
