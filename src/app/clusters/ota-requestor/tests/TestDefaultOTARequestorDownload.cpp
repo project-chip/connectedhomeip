@@ -189,7 +189,8 @@ public:
     }
 
     bool IsStalled() const { return mStalledAt.has_value(); }
-    System::Clock::Timestamp StalledAt() const { return mStalledAt.value(); }
+    // Only meaningful once IsStalled() is true.
+    System::Clock::Timestamp StalledAt() const { return mStalledAt.value_or(System::Clock::kZero); }
 
 private:
     void MarkStalled()
@@ -467,6 +468,27 @@ TEST_F(TestDefaultOTARequestorDownload, SlowProviderGetsFullBdxTimeoutForEachRes
     EXPECT_TRUE(h.recorder.mCompleted);
     EXPECT_EQ(h.recorder.mTimeOutCount, 0u);
     EXPECT_FALSE(h.processor.mAborted);
+}
+
+TEST_F(TestDefaultOTARequestorDownload, ExchangeIsReleasedWhenFirstBlockQueryIsNeverAnswered)
+{
+    DownloadHarness h;
+    auto cleanup = MakeDefer([&]() { FinishDownload(h); });
+
+    const size_t exchangesBefore = GetExchangeManager().GetNumActiveExchanges();
+
+    // The provider accepts the transfer but never answers the BlockQuery that the requestor sends in reply to ReceiveAccept.
+    h.provider.mBlocksToServe = 0;
+    ASSERT_SUCCESS(BeginDownload(h));
+    WaitForProviderToStall(h);
+    ASSERT_TRUE(h.provider.IsStalled());
+
+    AdvanceClockTo(h.provider.StalledAt() + kBdxTimeout + 1_s, h);
+    EXPECT_EQ(h.recorder.mTimeOutCount, 1u);
+    EXPECT_EQ(h.downloader.GetState(), OTADownloader::State::kIdle);
+
+    // A timed-out transfer must not leave its exchange behind; repeated failures would otherwise exhaust the exchange pool.
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), exchangesBefore);
 }
 
 } // namespace chip
