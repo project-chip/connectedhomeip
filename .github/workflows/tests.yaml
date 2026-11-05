@@ -41,7 +41,6 @@ concurrency:
 
 env:
     CHIP_LOG_TIMESTAMPS: false
-    OPENSSL_3_5_TEST_REGEX: 'TC_(OPCREDS_3_9|DA_1_10|DA_1_12|NETIM_1_[1-4])\.py$'
 
 jobs:
     test_suites_linux:
@@ -784,7 +783,7 @@ jobs:
                 job-details: "${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.build_variant }}"
                 extra-details-file: "test-summaries/compact-failures.txt"
     # Keep this separate build until Ubuntu's system OpenSSL is upgraded to 3.5.
-    # Other tests requiring that library, such as TC_NETIM, can use this job.
+    # Other tests requiring that library can use this job: tag their runs openssl-3.5.
     openssl_3_5_tests:
         name: OpenSSL 3.5 Tests - Linux
         if: github.actor != 'restyled-io[bot]'
@@ -862,7 +861,7 @@ jobs:
                   "src/python_testing/execute_python_tests.py run
                   --env-file out/openssl-3.5/test_env.yaml
                   --search-directory src/python_testing
-                  --regex '${{env.OPENSSL_3_5_TEST_REGEX}}'
+                  --tag openssl-3.5
                   --summary-file out/openssl-3.5/results.json
                   --junit-file out/openssl-3.5/results.xml
                   --junit-suite-name 'OpenSSL 3.5 Tests'"
@@ -1383,7 +1382,7 @@ jobs:
                   # The tests trace into this directory, and perfetto fails if it
                   # is missing.
                   mkdir -p out/trace_data
-                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --regex '!${{env.OPENSSL_3_5_TEST_REGEX}}' --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
+                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --tag skip-nightly --tag skip-openssl-3.5 --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
             - name: Print python test summary
               if: ${{ matrix.filter != '' && always() }}
               run: |

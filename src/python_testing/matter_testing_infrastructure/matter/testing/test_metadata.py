@@ -17,8 +17,8 @@ import re
 import tempfile
 import unittest
 
-from metadata import (Metadata, MetadataReader, RunArgumentsError, RunTag, extract_runs_args, failure_fails_job,
-                      runs_in_pull_requests, script_runs_in_pull_requests)
+from metadata import (SKIP_TAG_PREFIX, Metadata, MetadataReader, RunArgumentsError, RunTag, TagFilter, extract_runs_args,
+                      failure_fails_job, runs_in_pull_requests, script_runs_in_pull_requests)
 
 
 class TestMetadataReader(unittest.TestCase):
@@ -93,6 +93,9 @@ class TestMetadataReader(unittest.TestCase):
     #     tags: [nightly, needs-followup-fixes]
     #     issues:
     #       - https://github.com/project-chip/connectedhomeip/issues/3
+    #   run5:
+    #     app: ${CHIP_LOCK_APP}
+    #     tags: [openssl-3.5]
     # === END CI TEST ARGUMENTS ===
     '''
 
@@ -112,9 +115,45 @@ class TestMetadataReader(unittest.TestCase):
                                                "https://github.com/project-chip/connectedhomeip/issues/2"])
         self.assertEqual(runs["run4"].tags, [RunTag.NIGHTLY, RunTag.NEEDS_FOLLOWUP_FIXES])
         self.assertEqual(runs["run4"].issues, ["https://github.com/project-chip/connectedhomeip/issues/3"])
+        self.assertEqual(runs["run5"].tags, [RunTag.OPENSSL_3_5])
 
         self.assertEqual([name for name, run in runs.items() if runs_in_pull_requests(run.tags)], ["run1", "run3"])
-        self.assertEqual([name for name, run in runs.items() if failure_fails_job(run.tags)], ["run1", "run2", "run3"])
+        self.assertEqual([name for name, run in runs.items() if failure_fails_job(run.tags)], ["run1", "run2", "run3", "run5"])
+
+    def test_tag_filter(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs = extract_runs_args(self.generate_temp_file(temp_dir, self.tagged_file_content))
+
+        cases = {
+            (): ["run1", "run3"],
+            ("skip-nightly", "skip-openssl-3.5"): ["run1", "run3"],
+            ("skip-nightly",): ["run1", "run3"],
+            ("nightly",): ["run2", "run4"],
+            ("openssl-3.5",): ["run5"],
+            ("needs-followup-fixes",): ["run3"],
+            ("skip-needs-followup-fixes",): ["run1"],
+            ("nightly", "needs-followup-fixes"): ["run4"],
+            ("nightly", "skip-needs-followup-fixes"): ["run2"],
+            ("nightly", "skip-nightly"): [],
+        }
+        for values, expected in cases.items():
+            with self.subTest(values=values):
+                tag_filter = TagFilter.parse(values)
+                self.assertEqual([name for name, args in runs.items() if tag_filter.matches(args["tags"])], expected)
+
+        self.assertEqual(TagFilter.parse([]), TagFilter())
+        self.assertEqual(str(TagFilter()), "skip-nightly skip-openssl-3.5")
+        self.assertEqual(str(TagFilter.parse(["nightly", "skip-needs-followup-fixes"])),
+                         "nightly skip-needs-followup-fixes skip-openssl-3.5")
+
+    def test_tag_filter_unknown_tag(self):
+        for value in ["slow", "skip-slow", "Nightly", "", "skip-"]:
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, f"unknown tag in {re.escape(repr(value))}"):
+                TagFilter.parse([value])
+
+    def test_no_tag_starts_with_skip_prefix(self):
+        for tag in RunTag:
+            self.assertFalse(tag.startswith(SKIP_TAG_PREFIX), tag)
 
     def test_invalid_tags_and_issues(self):
         issue = "https://github.com/project-chip/connectedhomeip/issues/1"
@@ -151,7 +190,7 @@ class TestMetadataReader(unittest.TestCase):
             self.assertEqual(extract_runs_args(test_file), {})
             self.assertEqual(MetadataReader(env_file).parse_script(test_file), [])
 
-    def test_script_runs_in_pull_requests(self):
+    def test_matches_script(self):
         def one_run_file_content(*block_lines: str) -> str:
             return '\n'.join([
                 "# === BEGIN CI TEST ARGUMENTS ===",
@@ -162,19 +201,24 @@ class TestMetadataReader(unittest.TestCase):
                 "# === END CI TEST ARGUMENTS ===",
             ])
         issue = "https://github.com/project-chip/connectedhomeip/issues/1"
+        # name: (file content, called by PR CI, called with --tag nightly)
         cases = {
-            "untagged and tagged runs": (self.tagged_file_content, True),
-            "only a nightly run": (one_run_file_content("tags: [nightly]"), False),
-            "only a needs-followup-fixes run": (one_run_file_content("tags: [needs-followup-fixes]", f"issues: [{issue}]"), True),
+            "untagged and tagged runs": (self.tagged_file_content, True, True),
+            "only a nightly run": (one_run_file_content("tags: [nightly]"), False, True),
+            "only a needs-followup-fixes run":
+                (one_run_file_content("tags: [needs-followup-fixes]", f"issues: [{issue}]"), True, False),
             "only a nightly needs-followup-fixes run":
-                (one_run_file_content("tags: [nightly, needs-followup-fixes]", f"issues: [{issue}]"), False),
-            "no CI test arguments": ("# A support module with no CI test arguments\n", True),
+                (one_run_file_content("tags: [nightly, needs-followup-fixes]", f"issues: [{issue}]"), False, True),
+            "only an openssl-3.5 run": (one_run_file_content("tags: [openssl-3.5]"), False, False),
+            "no CI test arguments": ("# A support module with no CI test arguments\n", True, False),
         }
+        nightly_filter = TagFilter.parse(["nightly"])
         with tempfile.TemporaryDirectory() as temp_dir:
-            for name, (file_content, expected) in cases.items():
+            for name, (file_content, in_pull_requests, in_nightly) in cases.items():
                 with self.subTest(name):
-                    test_file = self.generate_temp_file(temp_dir, file_content)
-                    self.assertEqual(script_runs_in_pull_requests(extract_runs_args(test_file)), expected)
+                    runs = extract_runs_args(self.generate_temp_file(temp_dir, file_content))
+                    self.assertEqual(script_runs_in_pull_requests(runs), in_pull_requests)
+                    self.assertEqual(nightly_filter.matches_script(runs), in_nightly)
 
 
 if __name__ == "__main__":
