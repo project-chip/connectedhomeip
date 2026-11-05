@@ -485,6 +485,7 @@ class ProximityRangingTestBase:
                     "DUT_R thread-meshcop requires dut_r_thread_ba_host and dut_r_thread_ba_port "
                     "or shared Thread border agent settings")
 
+            self.default_controller.ResetCommissioningParameters()
             status = await commission_device(self.default_controller, self.reflector_node_id, dut_r_info, dut_r_commissioning_info)
             asserts.assert_true(status, f"Failed to commission DUT_R to TH's fabric: {status}")
 
