@@ -17,9 +17,11 @@
 
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsTestEventTriggerHandler.h>
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
+#include <ctime>
 #include <lib/support/CHIPMemString.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <string>
 
 using namespace chip;
 using namespace chip::app;

@@ -239,6 +239,28 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
+enum SemanticTagNamespaceId : enum8 {
+  kCompassDirection = 2;
+  kCompassLocation = 3;
+  kDirection = 4;
+  kLevel = 5;
+  kLocation = 6;
+  kNumber = 7;
+  kPosition = 8;
+  kElectricalMeasurement = 10;
+  kCommodityTariffChronology = 11;
+  kCommodityTariffDirection = 13;
+  kLaundry = 14;
+  kPowerSource = 15;
+  kCommonArea = 16;
+  kCommonLandmark = 17;
+  kRelativePosition = 18;
+  kClosure = 68;
+  kClosurePanel = 69;
+  kClosureWindow = 71;
+  kClosureCabinet = 72;
+}
+
 enum SoftwareVersionCertificationStatusEnum : enum8 {
   kDevTest = 0;
   kProvisional = 1;
@@ -9522,7 +9544,7 @@ endpoint 0 {
   }
 
   server cluster WindowCovering {
-    callback attribute type default = 0x00;
+    callback attribute type default = 0x08;
     callback attribute currentPositionLift;
     callback attribute currentPositionTilt;
     callback attribute configStatus default = 0x03;
@@ -9916,6 +9938,8 @@ endpoint 1 {
   }
 
   server cluster ScenesManagement {
+    callback attribute sceneTableSize default = 16;
+    callback attribute fabricSceneInfo;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

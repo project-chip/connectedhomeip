@@ -43,6 +43,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #include <openthread/dns_client.h>
+#include <platform/OpenThread/OpenThreadTxtEntries.h>
 #endif
 
 #include <app/icd/server/ICDServerConfig.h>
@@ -285,11 +286,7 @@ private:
     DnsBrowseCallback mDnsBrowseCallback;
     DnsResolveCallback mDnsResolveCallback;
 
-    struct DnsServiceTxtEntries
-    {
-        uint8_t mBuffer[kTotalDnsServiceTxtBufferSize];
-        Dnssd::TextEntry mTxtEntries[kMaxDnsServiceTxtEntriesNumber];
-    };
+    using DnsServiceTxtEntries = OpenThreadTxtEntries<kMaxDnsServiceTxtEntriesNumber, kTotalDnsServiceTxtBufferSize>;
 
     struct DnsResult
     {

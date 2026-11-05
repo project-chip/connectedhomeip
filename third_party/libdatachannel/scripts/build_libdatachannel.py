@@ -33,7 +33,9 @@ def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
         "-DUSE_GNUTLS=0",
         "-DUSE_NICE=0",
         "-DCMAKE_BUILD_TYPE=Release",
-        "-DCMAKE_CXX_FLAGS=-Wno-shadow",
+        # libdatachannel's configuration.cpp uses std::transform without
+        # including <algorithm>, which fails with LLVM 24's libc++.
+        "-DCMAKE_CXX_FLAGS=-Wno-shadow -include algorithm",
     ]
 
     # Default compilers
