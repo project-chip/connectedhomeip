@@ -208,12 +208,6 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
         return Status::NotFound;
     }
 
-#ifndef TLS_CLUSTER_NOT_ENABLED
-    // The server passes the certificates of the transport's TLS endpoint through SetTLSCerts() before this call.
-    mTransportMap[connectionID].get()->SetTLSCert(mBufferRootCert, mBufferClientCert, mBufferClientCertKey,
-                                                  mBufferIntermediateCerts);
-#endif
-
     CHIP_ERROR err = mTransportMap[connectionID].get()->ModifyPushTransport(transportOptions);
     if (err != CHIP_NO_ERROR)
     {
@@ -221,6 +215,12 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
                      ErrorStr(err));
         return Status::Failure;
     }
+
+#ifndef TLS_CLUSTER_NOT_ENABLED
+    // The server passes the certificates of the transport's TLS endpoint through SetTLSCerts() before this call.
+    mTransportMap[connectionID].get()->SetTLSCert(mBufferRootCert, mBufferClientCert, mBufferClientCertKey,
+                                                  mBufferIntermediateCerts);
+#endif
 
     uint32_t newTransportBandwidthbps = 0;
     GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
