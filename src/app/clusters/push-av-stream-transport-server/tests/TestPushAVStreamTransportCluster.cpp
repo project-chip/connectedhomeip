@@ -742,103 +742,104 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
                                 {
                                     EXPECT_EQ(MotionZoneAllocationCounter::RequestedBytes(), zoneCount * sizeof(uint16_t));
                                 }
-                        }
+                            }
 #endif
-                        if (expectedStatus == Status::Success)
-                        {
-                            EXPECT_EQ(result, std::nullopt);
-                            if (modify)
+                            if (expectedStatus == Status::Success)
                             {
-                                ASSERT_TRUE(handler.HasStatus());
-                                EXPECT_EQ(handler.GetStatuses()[0].status.GetStatus(), Status::Success);
+                                EXPECT_EQ(result, std::nullopt);
+                                if (modify)
+                                {
+                                    ASSERT_TRUE(handler.HasStatus());
+                                    EXPECT_EQ(handler.GetStatuses()[0].status.GetStatus(), Status::Success);
+                                }
+                                else
+                                {
+                                    EXPECT_TRUE(handler.HasResponse());
+                                }
+                                if (!modify && (zonesCase == ZonesCase::Unique || zonesCase == ZonesCase::HighIds))
+                                {
+                                    Commands::AllocatePushTransportResponse::DecodableType response;
+                                    ASSERT_EQ(handler.DecodeResponse(response), CHIP_NO_ERROR);
+                                    ASSERT_TRUE(response.transportConfiguration.transportOptions.HasValue());
+                                    const auto & storedZones =
+                                        response.transportConfiguration.transportOptions.Value().triggerOptions.motionZones;
+                                    ASSERT_TRUE(storedZones.HasValue());
+                                    ASSERT_FALSE(storedZones.Value().IsNull());
+                                    auto storedIter = storedZones.Value().Value().begin();
+                                    for (const uint16_t expectedId : expectedIds)
+                                    {
+                                        ASSERT_TRUE(storedIter.Next());
+                                        EXPECT_EQ(storedIter.GetValue().zone.Value(), expectedId);
+                                    }
+                                    EXPECT_FALSE(storedIter.Next());
+                                    EXPECT_EQ(storedIter.GetStatus(), CHIP_NO_ERROR);
+                                }
+                            }
+                            else if (result.has_value())
+                            {
+                                EXPECT_EQ(result->GetStatusCode().GetStatus(), expectedStatus);
                             }
                             else
                             {
-                                EXPECT_TRUE(handler.HasResponse());
-                            }
-                            if (!modify && (zonesCase == ZonesCase::Unique || zonesCase == ZonesCase::HighIds))
-                            {
-                                Commands::AllocatePushTransportResponse::DecodableType response;
-                                ASSERT_EQ(handler.DecodeResponse(response), CHIP_NO_ERROR);
-                                ASSERT_TRUE(response.transportConfiguration.transportOptions.HasValue());
-                                const auto & storedZones =
-                                    response.transportConfiguration.transportOptions.Value().triggerOptions.motionZones;
-                                ASSERT_TRUE(storedZones.HasValue());
-                                ASSERT_FALSE(storedZones.Value().IsNull());
-                                auto storedIter = storedZones.Value().Value().begin();
-                                for (const uint16_t expectedId : expectedIds)
+                                ASSERT_TRUE(handler.HasStatus());
+                                EXPECT_EQ(handler.GetStatuses()[0].status.GetStatus(), expectedStatus);
+                                if (expectedStatus == Status::Failure)
                                 {
-                                    ASSERT_TRUE(storedIter.Next());
-                                    EXPECT_EQ(storedIter.GetValue().zone.Value(), expectedId);
+                                    EXPECT_EQ(handler.GetStatuses()[0].status.GetClusterSpecificCode(),
+                                              to_underlying(StatusCodeEnum::kInvalidZone));
                                 }
-                                EXPECT_FALSE(storedIter.Next());
-                                EXPECT_EQ(storedIter.GetStatus(), CHIP_NO_ERROR);
                             }
-                        }
-                        else if (result.has_value())
-                        {
-                            EXPECT_EQ(result->GetStatusCode().GetStatus(), expectedStatus);
-                        }
-                        else
-                        {
-                            ASSERT_TRUE(handler.HasStatus());
-                            EXPECT_EQ(handler.GetStatuses()[0].status.GetStatus(), expectedStatus);
-                            if (expectedStatus == Status::Failure)
+                            EXPECT_EQ(delegate.sizeChecks, reachesSize ? 1u : 0u);
+                            EXPECT_EQ(delegate.allocations, !modify && expectedStatus == Status::Success ? 1u : 0u);
+                            EXPECT_EQ(delegate.modifications, modify && expectedStatus == Status::Success ? 1u : 0u);
+                            if (reachesSize && expectedStatus == Status::Success)
                             {
-                                EXPECT_EQ(handler.GetStatuses()[0].status.GetClusterSpecificCode(),
-                                          to_underlying(StatusCodeEnum::kInvalidZone));
+                                EXPECT_EQ(delegate.checkedIds, expectedIds);
                             }
-                        }
-                        EXPECT_EQ(delegate.sizeChecks, reachesSize ? 1u : 0u);
-                        EXPECT_EQ(delegate.allocations, !modify && expectedStatus == Status::Success ? 1u : 0u);
-                        EXPECT_EQ(delegate.modifications, modify && expectedStatus == Status::Success ? 1u : 0u);
-                        if (reachesSize && expectedStatus == Status::Success)
-                        {
-                            EXPECT_EQ(delegate.checkedIds, expectedIds);
-                        }
-                        else if (expectedStatus == Status::Failure)
-                        {
-                            ASSERT_EQ(delegate.checkedIds.size(), 1u);
-                            EXPECT_EQ(delegate.checkedIds[0], 129u);
-                        }
-                        else
-                        {
-                            EXPECT_TRUE(delegate.checkedIds.empty());
-                        }
-                        EXPECT_EQ(server.GetLogic().mCurrentConnections.size(),
-                                  modify || expectedStatus == Status::Success ? 1u : 0u);
-                        if (expectedStatus == Status::Success &&
-                            (zonesCase == ZonesCase::Unique || zonesCase == ZonesCase::HighIds))
-                        {
-                            uint8_t encoded[2048];
-                            TLV::TLVWriter storedWriter;
-                            storedWriter.Init(encoded, sizeof(encoded));
-                            ASSERT_EQ(server.GetLogic().mCurrentConnections[0].EncodeForRead(storedWriter, TLV::AnonymousTag(), 1),
-                                      CHIP_NO_ERROR);
-                            ASSERT_EQ(storedWriter.Finalize(), CHIP_NO_ERROR);
-                            memset(tlvBuffer, 0, sizeof(tlvBuffer));
-                            TLV::TLVReader storedReader;
-                            storedReader.Init(encoded, storedWriter.GetLengthWritten());
-                            ASSERT_EQ(storedReader.Next(), CHIP_NO_ERROR);
-                            Structs::TransportConfigurationStruct::DecodableType decoded;
-                            ASSERT_EQ(decoded.Decode(storedReader), CHIP_NO_ERROR);
-                            ASSERT_TRUE(decoded.transportOptions.HasValue());
-                            TransportOptionsStorage reloaded(decoded.transportOptions.Value());
-                            ASSERT_TRUE(reloaded.triggerOptions.motionZones.HasValue());
-                            ASSERT_FALSE(reloaded.triggerOptions.motionZones.Value().IsNull());
-                            size_t reloadedIndex = 0;
-                            for (const auto & zone : reloaded.triggerOptions.motionZones.Value().Value())
+                            else if (expectedStatus == Status::Failure)
                             {
-                                ASSERT_LT(reloadedIndex, expectedIds.size());
-                                EXPECT_EQ(zone.zone.Value(), expectedIds[reloadedIndex++]);
+                                ASSERT_EQ(delegate.checkedIds.size(), 1u);
+                                EXPECT_EQ(delegate.checkedIds[0], 129u);
                             }
-                            EXPECT_EQ(reloadedIndex, expectedIds.size());
+                            else
+                            {
+                                EXPECT_TRUE(delegate.checkedIds.empty());
+                            }
+                            EXPECT_EQ(server.GetLogic().mCurrentConnections.size(),
+                                      modify || expectedStatus == Status::Success ? 1u : 0u);
+                            if (expectedStatus == Status::Success &&
+                                (zonesCase == ZonesCase::Unique || zonesCase == ZonesCase::HighIds))
+                            {
+                                uint8_t encoded[2048];
+                                TLV::TLVWriter storedWriter;
+                                storedWriter.Init(encoded, sizeof(encoded));
+                                ASSERT_EQ(
+                                    server.GetLogic().mCurrentConnections[0].EncodeForRead(storedWriter, TLV::AnonymousTag(), 1),
+                                    CHIP_NO_ERROR);
+                                ASSERT_EQ(storedWriter.Finalize(), CHIP_NO_ERROR);
+                                memset(tlvBuffer, 0, sizeof(tlvBuffer));
+                                TLV::TLVReader storedReader;
+                                storedReader.Init(encoded, storedWriter.GetLengthWritten());
+                                ASSERT_EQ(storedReader.Next(), CHIP_NO_ERROR);
+                                Structs::TransportConfigurationStruct::DecodableType decoded;
+                                ASSERT_EQ(decoded.Decode(storedReader), CHIP_NO_ERROR);
+                                ASSERT_TRUE(decoded.transportOptions.HasValue());
+                                TransportOptionsStorage reloaded(decoded.transportOptions.Value());
+                                ASSERT_TRUE(reloaded.triggerOptions.motionZones.HasValue());
+                                ASSERT_FALSE(reloaded.triggerOptions.motionZones.Value().IsNull());
+                                size_t reloadedIndex = 0;
+                                for (const auto & zone : reloaded.triggerOptions.motionZones.Value().Value())
+                                {
+                                    ASSERT_LT(reloadedIndex, expectedIds.size());
+                                    EXPECT_EQ(zone.zone.Value(), expectedIds[reloadedIndex++]);
+                                }
+                                EXPECT_EQ(reloadedIndex, expectedIds.size());
+                            }
                         }
                     }
                 }
             }
         }
-    }
     }
 }
 

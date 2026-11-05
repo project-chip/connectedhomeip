@@ -3,9 +3,9 @@
 
 #if defined(CHIP_TEST_MOTION_ZONE_ALLOCATION_TRACKING)
 namespace {
-thread_local bool gTracking         = false;
-thread_local size_t gCalls          = 0;
-thread_local size_t gRequestedBytes = 0;
+thread_local bool gTracking          = false;
+thread_local size_t gCalls           = 0;
+thread_local size_t gRequestedBytes  = 0;
 thread_local size_t gFailedCalls     = 0;
 thread_local size_t gPlatformCalls   = 0;
 thread_local size_t gSuccessfulBytes = 0;
@@ -17,12 +17,12 @@ namespace chip::app::Clusters::PushAvStreamTransport {
 
 void MotionZoneAllocationCounter::Begin()
 {
-    gCalls          = 0;
-    gRequestedBytes = 0;
+    gCalls           = 0;
+    gRequestedBytes  = 0;
     gFailedCalls     = 0;
     gPlatformCalls   = 0;
     gSuccessfulBytes = 0;
-    gTracking       = true;
+    gTracking        = true;
 }
 
 void MotionZoneAllocationCounter::End()
