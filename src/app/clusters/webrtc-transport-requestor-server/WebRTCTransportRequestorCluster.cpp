@@ -284,28 +284,28 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::HandleEnd(const C
 void WebRTCSessionStorage::Assign(const WebRTCSessionStruct & session)
 {
     // Copy the lists first: session may be this object, whose lists point into the vectors being replaced.
-    std::vector<uint16_t> videoStreams;
-    std::vector<uint16_t> audioStreams;
+    std::vector<uint16_t> videoStreamsCopy;
+    std::vector<uint16_t> audioStreamsCopy;
     if (session.videoStreams.HasValue())
     {
-        videoStreams.assign(session.videoStreams.Value().begin(), session.videoStreams.Value().end());
+        videoStreamsCopy.assign(session.videoStreams.Value().begin(), session.videoStreams.Value().end());
     }
     if (session.audioStreams.HasValue())
     {
-        audioStreams.assign(session.audioStreams.Value().begin(), session.audioStreams.Value().end());
+        audioStreamsCopy.assign(session.audioStreams.Value().begin(), session.audioStreams.Value().end());
     }
 
     static_cast<WebRTCSessionStruct &>(*this) = session;
-    mVideoStreams                             = std::move(videoStreams);
-    mAudioStreams                             = std::move(audioStreams);
+    mVideoStreams                             = std::move(videoStreamsCopy);
+    mAudioStreams                             = std::move(audioStreamsCopy);
 
-    if (this->videoStreams.HasValue())
+    if (videoStreams.HasValue())
     {
-        this->videoStreams.SetValue(DataModel::List<const uint16_t>(mVideoStreams.data(), mVideoStreams.size()));
+        videoStreams.SetValue(DataModel::List<const uint16_t>(mVideoStreams.data(), mVideoStreams.size()));
     }
-    if (this->audioStreams.HasValue())
+    if (audioStreams.HasValue())
     {
-        this->audioStreams.SetValue(DataModel::List<const uint16_t>(mAudioStreams.data(), mAudioStreams.size()));
+        audioStreams.SetValue(DataModel::List<const uint16_t>(mAudioStreams.data(), mAudioStreams.size()));
     }
 }
 
