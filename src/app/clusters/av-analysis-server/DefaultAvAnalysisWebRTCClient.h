@@ -399,9 +399,7 @@ private:
         AvAnalysisWebRTCClient::Callback * callback = nullptr;
         ScopedNodeId cameraNode;
         EndpointId providerEndpoint = kInvalidEndpointId;
-        // The requestor cluster's record holds its VideoStreams as a span over this field
-        uint16_t videoStreamId = 0;
-        bool inUse             = false;
+        bool inUse                  = false;
     };
 
     // Common preconditions of RequestSession/EndSession, checked before Request::Begin* runs
