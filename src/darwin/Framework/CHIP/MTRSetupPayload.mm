@@ -678,7 +678,8 @@ static NSString * const MTRSetupPayloadCodingKeyQRCode = @"qr";
     // did not encode it. When present, it carries almost the entire state of the object.
     NSString * qrCode = [coder decodeObjectOfClass:NSString.class forKey:MTRSetupPayloadCodingKeyQRCode];
     if (qrCode != nil) {
-        [self initializeFromQRCode:qrCode validate:NO];
+        // encodeWithCoder: always stores a QR code that parses
+        RETURN_SAFELY_IGNORED [self initializeFromQRCode:qrCode validate:NO];
     } else {
         self.version = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyVersion];
         self.vendorID = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyVendorID];
