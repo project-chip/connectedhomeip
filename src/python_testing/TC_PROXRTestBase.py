@@ -23,9 +23,9 @@ practice ``MatterTestCommissionedDevice``); it relies on the base class for
 ``default_controller`` and ``dut_node_id``.  It carries no ``MatterBaseTest``
 inheritance itself so the runner's "one leaf test class per file" rule holds.
 
-The two-device tests (2.3 / 2.4) launch a second all-devices-app instance as the
-reflector/responder (DUT_R) and commission it onto the DUT's fabric; the helpers
-here own that lifecycle so 2.3 and 2.4 share exactly one implementation.
+The two-device tests (2.3 / 2.4) commission a reflector/responder (DUT_R) onto
+the DUT's fabric, launching a second all-devices-app instance in CI. The helpers
+here own that lifecycle and route PROXR interactions to each device's endpoint.
 """
 
 import contextlib
@@ -42,6 +42,7 @@ import matter.clusters as Clusters
 import matter.testing.matter_asserts as matter_asserts
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError
+from matter.testing.commissioning import CommissioningInfo, SetupPayloadInfo, commission_device
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.tasks import Subprocess
 
@@ -104,14 +105,20 @@ class ProximityRangingTestBase:
 
     # ----- attribute reads -----------------------------------------------------
 
+    def _proxr_endpoint(self, node_id, endpoint):
+        if endpoint is not None:
+            return endpoint
+        if node_id is not None and node_id == getattr(self, "reflector_node_id", None):
+            return self.reflector_endpoint
+        return self.get_endpoint()
+
     async def read_proxr_attribute(self, attribute, node_id=None, endpoint=None):
-        """Read a single PROXR attribute, defaulting to the matched endpoint and
-        the primary DUT.  Wildcard-subscription verification is disabled: session
+        """Read a single PROXR attribute, defaulting to the target node's endpoint
+        and the primary DUT. Wildcard-subscription verification is disabled: session
         state (SessionIDList) mutates faster than the background subscription can
         track, and reflector reads target a node the subscription controller does
         not cover."""
-        if endpoint is None:
-            endpoint = self.get_endpoint()
+        endpoint = self._proxr_endpoint(node_id, endpoint)
         return await self.read_single_attribute_check_success(
             cluster=_PROXR, attribute=attribute, node_id=node_id, endpoint=endpoint,
             verify_wildcard_subscription=False)
@@ -296,13 +303,11 @@ class ProximityRangingTestBase:
 
     async def send_start_ranging(self, cmd, node_id=None, endpoint=None):
         """Send StartRangingRequest and return the StartRangingResponse."""
-        if endpoint is None:
-            endpoint = self.get_endpoint()
+        endpoint = self._proxr_endpoint(node_id, endpoint)
         return await self.send_single_cmd(cmd=cmd, node_id=node_id, endpoint=endpoint)
 
     async def send_stop_ranging(self, session_id, node_id=None, endpoint=None):
-        if endpoint is None:
-            endpoint = self.get_endpoint()
+        endpoint = self._proxr_endpoint(node_id, endpoint)
         return await self.send_single_cmd(
             cmd=_PROXR.Commands.StopRangingRequest(sessionID=session_id), node_id=node_id, endpoint=endpoint)
 
@@ -339,8 +344,7 @@ class ProximityRangingTestBase:
         event log, so without this drop a later exchange would consume an earlier
         exchange's RangingResult. Callers still match on SessionID (see
         wait_ranging_result / wait_session_status) as a second line of defence."""
-        if endpoint is None:
-            endpoint = self.get_endpoint()
+        endpoint = self._proxr_endpoint(node_id, endpoint)
         cb = EventSubscriptionHandler(expected_cluster=_PROXR)
         await cb.start(self.default_controller, node_id, endpoint)
         cb.flush_events()
@@ -373,10 +377,9 @@ class ProximityRangingTestBase:
     # ----- second-device (DUT_R) lifecycle ------------------------------------
 
     def setup_reflector_device(self):
-        """Launch a second all-devices-app proximity-ranger instance (DUT_R) and
-        record how to commission it onto the DUT's fabric.
+        """Prepare DUT_R, launching an all-devices-app instance only in CI.
 
-        The reflector's shared singletons are kept distinct from the primary DUT
+        The CI reflector's shared singletons are kept distinct from the primary DUT
         and any other host app: a private temp-dir KVS, a reflector-specific
         discriminator, and its own secure --port (see DECISIONS.md). Returns the
         reflector node id.
@@ -402,20 +405,88 @@ class ProximityRangingTestBase:
                 "--discriminator", str(self._reflector_discriminator),
                 output_cb=lambda line, is_stderr: b"[REFLECTOR]" + line)
             self.reflector.start(expected_output="Server initialization complete", timeout=90)
+            self.reflector_endpoint = 1
         else:
-            self.wait_for_user_input(prompt_msg="Put DUT_R enter commissioning mode and press ENTER.")
+            self.wait_for_user_input(prompt_msg="Put DUT_R into commissioning mode and press ENTER.")
 
             self._reflector_discriminator = self.dut_r_discriminator
             self._reflector_passcode = self.dut_r_passcode
+            self.reflector_endpoint = self.dut_r_endpoint
         self.reflector_node_id = self.dut_node_id + 1
         return self.reflector_node_id
 
     async def commission_reflector(self):
-        await self.default_controller.CommissionOnNetwork(
-            nodeId=self.reflector_node_id,
-            setupPinCode=self._reflector_passcode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=self._reflector_discriminator)
+        """Commission DUT_R using its own method, independently of DUT_I.
+
+        Supported methods are on-network, on-network-ip, ble-wifi, ble-thread
+        and thread-meshcop. Optional string args dut_r_wifi_ssid,
+        dut_r_wifi_passphrase, dut_r_thread_ba_host and int arg
+        dut_r_thread_ba_port override the shared network settings. The hex arg
+        dut_r_thread_operational_dataset overrides the shared Thread dataset.
+        on-network-ip requires the DUT_R-specific string arg dut_r_ip_addr.
+        CI always uses on-network commissioning for its local reflector app.
+        """
+        method = "on-network" if self.is_ci else self.dut_r_commissioning_method
+        asserts.assert_in(method, ("on-network", "on-network-ip", "ble-wifi", "ble-thread", "thread-meshcop"),
+                          f"Unsupported dut_r_commissioning_method: {method}")
+        if method == "on-network":
+            await self.default_controller.CommissionOnNetwork(
+                nodeId=self.reflector_node_id,
+                setupPinCode=self._reflector_passcode,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+                filter=self._reflector_discriminator)
+        else:
+            dut_r_info = SetupPayloadInfo(
+                passcode=self._reflector_passcode,
+                filter_type=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+                filter_value=self._reflector_discriminator,
+            )
+            dut_r_commissioning_info = CommissioningInfo(
+                commissionee_ip_address_just_for_testing=self.user_params.get("dut_r_ip_addr"),
+                commissioning_method=method,
+                thread_operational_dataset=self.user_params.get(
+                    "dut_r_thread_operational_dataset", self.matter_test_config.thread_operational_dataset),
+                wifi_passphrase=self.user_params.get("dut_r_wifi_passphrase", self.matter_test_config.wifi_passphrase),
+                wifi_ssid=self.user_params.get("dut_r_wifi_ssid", self.matter_test_config.wifi_ssid),
+                tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
+                tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
+                thread_ba_host=self.user_params.get("dut_r_thread_ba_host", self.matter_test_config.thread_ba_host),
+                thread_ba_port=self.user_params.get("dut_r_thread_ba_port", self.matter_test_config.thread_ba_port),
+            )
+            if method == "ble-wifi":
+                asserts.assert_true(
+                    dut_r_commissioning_info.wifi_ssid is not None and dut_r_commissioning_info.wifi_passphrase is not None,
+                    "DUT_R ble-wifi requires Wi-Fi credentials: provide dut_r_wifi_ssid and dut_r_wifi_passphrase "
+                    "via --string-arg, or configure shared Wi-Fi credentials")
+                dut_r_commissioning_info.thread_operational_dataset = None
+            elif method in ("ble-thread", "thread-meshcop"):
+                asserts.assert_is_not_none(
+                    dut_r_commissioning_info.thread_operational_dataset,
+                    "DUT_R Thread commissioning requires --hex-arg dut_r_thread_operational_dataset:<hex> "
+                    "or a shared Thread dataset")
+                dut_r_commissioning_info.wifi_ssid = None
+                dut_r_commissioning_info.wifi_passphrase = None
+
+            if method in ("ble-wifi", "ble-thread"):
+                await self.default_controller.EstablishPASESessionBLE(
+                    setupPinCode=self._reflector_passcode,
+                    discriminator=self._reflector_discriminator,
+                    nodeId=self.reflector_node_id)
+            elif method == "on-network-ip":
+                asserts.assert_true(dut_r_commissioning_info.commissionee_ip_address_just_for_testing,
+                                    "DUT_R on-network-ip requires --string-arg dut_r_ip_addr:<IP_ADDRESS>")
+                await self.default_controller.EstablishPASESessionIP(
+                    ipaddr=dut_r_commissioning_info.commissionee_ip_address_just_for_testing,
+                    setupPinCode=self._reflector_passcode,
+                    nodeId=self.reflector_node_id)
+            elif method == "thread-meshcop":
+                asserts.assert_true(
+                    dut_r_commissioning_info.thread_ba_host is not None and dut_r_commissioning_info.thread_ba_port is not None,
+                    "DUT_R thread-meshcop requires dut_r_thread_ba_host and dut_r_thread_ba_port "
+                    "or shared Thread border agent settings")
+
+            status = await commission_device(self.default_controller, self.reflector_node_id, dut_r_info, dut_r_commissioning_info)
+            asserts.assert_true(status, f"Failed to commission DUT_R to TH's fabric: {status}")
 
     def teardown_reflector_device(self):
         """Hermetic cleanup: terminate the reflector subprocess and delete its

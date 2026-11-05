@@ -30,8 +30,8 @@
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --endpoint 1
-#       --int-arg dut_r_discriminator:3841 dut_r_passcode:20202021
-#       --string-arg th_reflector_app_path:${ALL_DEVICES_APP}
+#       --int-arg dut_r_discriminator:3841 dut_r_passcode:20202021 dut_r_endpoint:1
+#       --string-arg th_reflector_app_path:${ALL_DEVICES_APP} dut_r_commissioning_method:on-network
 #       --bool-arg simulate_mounting:true
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -81,6 +81,14 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
     @property
     def dut_r_passcode(self) -> int:
         return self.user_params.get("dut_r_passcode", 20202021)
+
+    @property
+    def dut_r_endpoint(self) -> int:
+        return self.user_params.get("dut_r_endpoint", 1)
+
+    @property
+    def dut_r_commissioning_method(self) -> str:
+        return self.user_params.get("dut_r_commissioning_method", "on-network")
 
     def setup_class(self):
         super().setup_class()
@@ -274,7 +282,8 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
 
         self.step(2)
         caps_i = await self.read_proxr_attribute(_PROXR.Attributes.RangingCapabilities, node_id=self.dut_node_id)
-        caps_r = await self.read_proxr_attribute(_PROXR.Attributes.RangingCapabilities, node_id=self.reflector_node_id)
+        caps_r = await self.read_proxr_attribute(
+            _PROXR.Attributes.RangingCapabilities, node_id=self.reflector_node_id)
         matter_asserts.assert_list(caps_i, "DUT_I RangingCapabilities", min_length=1)
         matter_asserts.assert_list(caps_r, "DUT_R RangingCapabilities", min_length=1)
 
@@ -302,7 +311,8 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
 
         async def _wifi_identity_substep(technology):
             self.wifi_ik_i = await self.read_proxr_attribute(_PROXR.Attributes.WiFiDevIK, node_id=self.dut_node_id)
-            self.wifi_ik_r = await self.read_proxr_attribute(_PROXR.Attributes.WiFiDevIK, node_id=self.reflector_node_id)
+            self.wifi_ik_r = await self.read_proxr_attribute(
+                _PROXR.Attributes.WiFiDevIK, node_id=self.reflector_node_id)
             matter_asserts.assert_is_octstr(self.wifi_ik_i, "DUT_I WiFiDevIK")
             matter_asserts.assert_is_octstr(self.wifi_ik_r, "DUT_R WiFiDevIK")
             asserts.assert_is_not_none(self.capability_for_technology(caps_i, technology),
