@@ -63,5 +63,4 @@ private:
 
     std::optional<uint16_t> mRequestedMaxBlockSize;
     std::optional<bool> mIsTcpTransport;
-
 };
