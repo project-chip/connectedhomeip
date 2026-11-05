@@ -1779,12 +1779,8 @@ CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, Mutable
     serialNumberLen = static_cast<size_t>(serialNumberASN1->length);
     VerifyOrExit(serialNumberLen <= serialNumber.size(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-<<<<<<< HEAD
-    memcpy(serialNumber.data(), serialNumberASN1->data, serialNumberLen);
-=======
     // OpenSSL stores an ASN1_INTEGER as a magnitude (sign in the type), so a DER sign byte can never be present here.
-    memcpy(serialNumber.data(), ASN1_STRING_get0_data(serialNumberASN1), serialNumberLen);
->>>>>>> a877a96 ([Crypto] Fix mbedTLS ExtractSerialNumberFromX509Cert returning the DER sign byte (#75160))
+    memcpy(serialNumber.data(), serialNumberASN1->data, serialNumberLen);
     serialNumber.reduce_size(serialNumberLen);
 
 exit:
