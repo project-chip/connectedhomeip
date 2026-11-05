@@ -94,6 +94,9 @@ class TestPushAvCMAFSessionNumber(MatterTestCommissionedDevice, PAVSTTestBase, P
         uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
         await self.check_and_delete_all_push_av_transports(endpoint, pvcluster.Attributes)
+        # allocate_one_pushav_transport() expects the streams to be allocated already.
+        await self.allocate_one_video_stream()
+        await self.allocate_one_audio_stream()
         status = await self.allocate_one_pushav_transport(
             endpoint,
             trigger_Options={"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kCommand, "maxPreRollLen": 4000},
