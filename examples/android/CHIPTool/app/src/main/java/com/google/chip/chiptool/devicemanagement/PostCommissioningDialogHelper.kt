@@ -95,7 +95,8 @@ object PostCommissioningDialogHelper {
     deviceInfo: CHIPDeviceInfo? = null,
     onComplete: ((CommissionedNode) -> Unit)? = null,
   ) {
-    val node = autoRegisterNode(registry, nodeId, deviceInfo, activity)
+    // Callers usually auto-register first; re-registering would notify the manager again.
+    val node = registry.getNode(nodeId) ?: autoRegisterNode(registry, nodeId, deviceInfo, activity)
     registry.saveFabricToPreferences(activity)
     val binding = DialogPostCommissioningSetupBinding.inflate(LayoutInflater.from(activity))
 

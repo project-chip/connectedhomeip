@@ -1120,7 +1120,9 @@ class CommissionedNodeRegistry(context: Context? = null) {
         0x0001L -> newVendor = cleanBasicString
         0x0003L -> {
           newProduct = cleanBasicString
-          if (isGenericLabel) newLabel = cleanBasicString
+          if (isGenericLabel && !isGenericProductName(cleanBasicString)) {
+            newLabel = cleanBasicString
+          }
         }
         0x0005L ->
           if (isGenericLabel && !isGenericNodeLabel(existing.nodeId, cleanBasicString)) {

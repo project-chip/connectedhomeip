@@ -497,8 +497,7 @@ object CenterConnectionManager {
   fun onNodeCommissioned(nodeId: Long) {
     log("node commissioned node=$nodeId centerActive=${isCenterActive()}")
     pendingFreshNodes.add(nodeId)
-    refreshRegisteredIcdPeers()
-    startLink(nodeId, Mode.SINGLE)
+    refreshRegisteredIcdPeers { startLink(nodeId, Mode.SINGLE) }
   }
 
   fun onNodeRemoved(nodeId: Long) {

@@ -40,7 +40,12 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-/** Lazily instantiates [ChipDeviceController] and holds a reference to it. */
+/**
+ * Lazily instantiates [ChipDeviceController] and holds a reference to it.
+ *
+ * Not covered by JVM unit tests: creating the controller or platform calls
+ * [ChipDeviceController.loadJni], which needs the native CHIP library. Exercise it on a device.
+ */
 object ChipClient {
   private const val TAG = "ChipClient"
   private lateinit var chipDeviceController: ChipDeviceController
@@ -133,9 +138,8 @@ object ChipClient {
   fun startDnssd(context: Context) {
     if (!this::chipDeviceController.isInitialized) {
       getDeviceController(context)
-    } else if (!dnssdStarted) {
-      chipDeviceController.startDnssd()
-      dnssdStarted = true
+    } else {
+      ensureDnssdStarted(chipDeviceController)
     }
   }
 
@@ -146,6 +150,14 @@ object ChipClient {
     }
     chipDeviceController.stopDnssd()
     dnssdStarted = false
+  }
+
+  @Synchronized
+  private fun ensureDnssdStarted(controller: ChipDeviceController) {
+    if (!dnssdStarted) {
+      controller.startDnssd()
+      dnssdStarted = true
+    }
   }
 
   /**
@@ -161,10 +173,7 @@ object ChipClient {
     // worse than the memory leak that was introduced.
     return suspendCancellableCoroutine { continuation ->
       val controller = getDeviceController(context)
-      if (!dnssdStarted) {
-        controller.startDnssd()
-        dnssdStarted = true
-      }
+      ensureDnssdStarted(controller)
       controller.getConnectedDevicePointer(
         nodeId,
         object : GetConnectedDeviceCallback {

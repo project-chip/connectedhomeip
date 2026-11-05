@@ -23,6 +23,8 @@ import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -366,6 +368,35 @@ class CommissionedNodeRegistryTest {
     registry.recordDiscoveredEndpointCluster(null, 7L, 0, 0x0028L, 0x0003L, "Light Bulb")
     assertEquals("Light Bulb", registry.getNode(7L)!!.nodeLabel)
     assertEquals("Light Bulb", registry.getNode(7L)!!.productName)
+  }
+
+  @Test
+  fun testGenericProductNameDoesNotReplacePlaceholderLabel() {
+    val registry = CommissionedNodeRegistry()
+    PostCommissioningDialogHelper.autoRegisterNode(registry, 7L, qrDeviceInfo)
+
+    registry.recordDiscoveredEndpointCluster(null, 7L, 0, 0x0028L, 0x0003L, "Matter Product 32769")
+    assertEquals("Matter Device (VID:65521 PID:32769)", registry.getNode(7L)!!.nodeLabel)
+  }
+
+  @Test
+  fun testUnregisterNodeEvictsHomeStateCache() {
+    val registry = CommissionedNodeRegistry()
+    registry.autoRegisterCommissionedNode(7L)
+    registry.autoRegisterCommissionedNode(8L)
+    HomeStateCache.put(7L, 1, 0x0006L, 0x0000L, true, 1000L, Source.UNICAST_READ)
+    HomeStateCache.put(8L, 1, 0x0006L, 0x0000L, true, 1000L, Source.UNICAST_READ)
+    HomeStateCache.putEvent(7L, 1, 0x003BL, 0x01L, "InitialPress", 10L, 1, 1000L)
+    HomeStateCache.putCheckIn(7L, 42L, 1000L)
+
+    registry.unregisterNode(7L)
+
+    assertNull(registry.getNode(7L))
+    assertNull(HomeStateCache.get(7L, 1, 0x0006L, 0x0000L))
+    assertNull(HomeStateCache.getEventMin(7L))
+    assertTrue(HomeStateCache.getRecentEvents(7L, 1).isEmpty())
+    assertTrue(HomeStateCache.getCheckInRecords(7L).isEmpty())
+    assertNotNull(HomeStateCache.get(8L, 1, 0x0006L, 0x0000L))
   }
 
   @Test

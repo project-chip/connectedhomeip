@@ -846,6 +846,26 @@ class CenterConnectionManagerTest {
     }
 
   @Test
+  fun freshlyCommissionedNodeLinkUsesRefreshedIcdPeers() =
+    testScope.runTest {
+      CenterConnectionManager.acquire(null, "center")
+      advanceUntilIdle()
+
+      // A new LIT ICD with no cached OperatingMode; only the ICD peer lookup marks it as LIT.
+      registry.autoRegisterCommissionedNode(5L)
+      registeredIcdPeers = setOf(5L)
+      transport.pendingCase[5L] = CompletableDeferred()
+      CenterConnectionManager.icdLookupDispatcher = StandardTestDispatcher(testScheduler)
+
+      CenterConnectionManager.onNodeCommissioned(5L)
+      advanceUntilIdle()
+
+      assertEquals(LinkPhase.CONNECTING, phase(5L))
+      assertTrue(CenterConnectionManager.linkState(5L).isLit)
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
   fun litIcdCheckInTriggersWakingThenLive() =
     testScope.runTest {
       seedOperatingMode(1L, 1)
