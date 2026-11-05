@@ -213,6 +213,77 @@ TEST_F(TestNetworkCommissioningCluster, TestDeinitRemovesEventHandler)
     }
 }
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION &&                                                                           \
+    (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+// ConnectNetwork on a Wi-Fi instance disconnects any lingering connection on every other instance, through that
+// instance's wireless driver, when none of that instance's networks is connected. An Ethernet instance has no wireless
+// driver, so one whose network is not connected (for example, with the cable unplugged) must be skipped rather than
+// dereferenced, and the connect must proceed.
+TEST_F(TestNetworkCommissioningCluster, TestConnectNetworkWithDisconnectedEthernetInstance)
+{
+    constexpr EndpointId kEthernetEndpointId = 1;
+
+    Testing::FakeWiFiDriver wifiDriver;
+    Testing::FakeEthernetDriver ethernetDriver;
+
+    app::FailSafeContext failSafeContext;
+    // FailSafeContext has no destructor, so an armed context going out of scope would leave
+    // timers behind pointing at it. Disarm on every exit path, including a failed ASSERT_*.
+    auto deferDisarm = MakeDefer([&failSafeContext] { failSafeContext.DisarmFailSafe(); });
+    NetworkCommissioningCluster::Context context{
+        .breadcrumbTracker   = tracker,
+        .failSafeContext     = failSafeContext,
+        .platformManager     = DeviceLayer::PlatformMgr(),
+        .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+    };
+
+    NetworkCommissioningCluster wifiCluster(kRootEndpointId, &wifiDriver, context);
+    ClusterTester wifiTester(wifiCluster);
+    ASSERT_EQ(wifiCluster.Startup(wifiTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto deferWifiShutdown = MakeDefer([&wifiCluster] { wifiCluster.Shutdown(ClusterShutdownType::kClusterShutdown); });
+
+    NetworkCommissioningCluster ethernetCluster(kEthernetEndpointId, &ethernetDriver, context);
+    ClusterTester ethernetTester(ethernetCluster);
+    ASSERT_EQ(ethernetCluster.Startup(ethernetTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto deferEthernetShutdown = MakeDefer([&ethernetCluster] { ethernetCluster.Shutdown(ClusterShutdownType::kClusterShutdown); });
+
+    // Init() registers each instance in the list that ConnectNetwork walks; Deinit() removes it,
+    // so that no other test sees these instances.
+    ASSERT_EQ(wifiCluster.Init(), CHIP_NO_ERROR);
+    auto deferWifiDeinit = MakeDefer([&wifiCluster] { wifiCluster.Deinit(); });
+    ASSERT_EQ(ethernetCluster.Init(), CHIP_NO_ERROR);
+    auto deferEthernetDeinit = MakeDefer([&ethernetCluster] { ethernetCluster.Deinit(); });
+
+    ethernetDriver.SetNetwork(ByteSpan::fromCharSpan("eth0"_span));
+    ethernetDriver.SetNetworkConnected(false);
+
+    ASSERT_EQ(failSafeContext.ArmFailSafe(wifiTester.GetCommandHandler().GetSubjectDescriptor().fabricIndex,
+                                          System::Clock::Seconds16(60)),
+              CHIP_NO_ERROR);
+
+    NetworkCommissioning::Commands::ConnectNetwork::Type request;
+    request.networkID = ByteSpan::fromCharSpan("wifi-ssid"_span);
+
+    // Without the guard in DisconnectLingeringConnection(), this dereferences the Ethernet
+    // instance's null wireless driver.
+    auto result = wifiTester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_EQ(result.response.value().networkingStatus, NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess);
+
+    // The Ethernet instance is untouched: its one network is still listed, and still not connected.
+    {
+        Networks::TypeInfo::DecodableType value;
+        ASSERT_TRUE(ethernetTester.ReadAttribute(Networks::Id, value).IsSuccess());
+        auto it = value.begin();
+        ASSERT_TRUE(it.Next());
+        EXPECT_FALSE(it.GetValue().connected);
+        EXPECT_FALSE(it.Next());
+        EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION ||
+       // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC && (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
 
 void GenerateIdentity(MutableByteSpan & identity)

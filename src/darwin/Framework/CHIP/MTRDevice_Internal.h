@@ -185,13 +185,15 @@ MTR_DIRECT_MEMBERS
  * cached value of this attribute current, so reading it with these params
  * should also read it from the device.
  *
- * Does not depend on the state of any device or subscription.
+ * Depends on the cluster revisions the device has reported, but not on the
+ * state of its subscription.
  */
-+ (BOOL)_attributeReadNeedsReadThroughForPath:(MTRAttributePath *)attributePath params:(MTRReadParams * _Nullable)params;
+- (BOOL)_attributeReadNeedsReadThroughForPath:(MTRAttributePath *)attributePath params:(MTRReadParams * _Nullable)params;
 - (void)_deviceMayBeReachable;
 @end
 
-// Same as +[MTRDevice _attributeReadNeedsReadThroughForPath:params:], for callers inside the framework.
+// The answer -[MTRDevice _attributeReadNeedsReadThroughForPath:params:] gives
+// for a device that has not reported any cluster revisions.
 BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadParams * _Nullable params);
 
 #pragma mark - MTRDevice internal state monitoring

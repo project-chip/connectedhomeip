@@ -448,7 +448,7 @@ const std::vector<StageTransition> kStagePairs = {
     // Only linear transitions are tested here;
     // Branching cases (like kReadCommissioningInfo, kConfigureTCAcknowledgments, etc.) are tested separately
     { kSecurePairing, kReadCommissioningInfo },
-    { kArmFailsafe, kConfigRegulatory },
+    { kArmFailSafe, kConfigRegulatory },
     { kConfigRegulatory, kConfigureTCAcknowledgments },
     { kConfigureDefaultNTP, kSendPAICertificateRequest },
     { kSendPAICertificateRequest, kSendDACCertificateRequest },
@@ -522,7 +522,7 @@ TEST_F(AutoCommissionerTest, NextStageReadCommissioningInfo)
     privateConfigCommissioner.SetBreadcrumb(0);
     CommissioningStage nextStage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kReadCommissioningInfo, err);
 
-    EXPECT_EQ(nextStage, kArmFailsafe);
+    EXPECT_EQ(nextStage, kArmFailSafe);
 
     // if breadcrumb > 0, the stage changes to kSendNOC; subsequent stages progress accordingly.
     privateConfigCommissioner.SetBreadcrumb(1);

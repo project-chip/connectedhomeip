@@ -236,8 +236,9 @@ public:
         virtual void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) {}
 
         /**
-         * This function is invoked when constructing a read/subscribeRequest that does not have data
-         * version filters specified, to give the callback a chance to provide some.
+         * This function is invoked when constructing a read/subscribeRequest, to give the callback a chance
+         * to provide data version filters.  Data version filters from the ReadPrepareParams are then added
+         * for clusters this function did not encode a filter for.
          *
          * This function is expected to encode as many complete data version filters as will fit into
          * the buffer, rolling back any partially-encoded filters if it runs out of space, and set the
@@ -258,7 +259,9 @@ public:
         /**
          * Get highest received event number.
          * If the application does not want to filter events by event number, it should call ClearValue() on aEventNumber
-         * and return CHIP_NO_ERROR.  An error return from this function will fail the entire read client interaction.
+         * and return CHIP_NO_ERROR.  An error return from this function will fail the entire read client interaction,
+         * unless ReadPrepareParams::mEventNumber is set.  On success, the larger of this value plus one and
+         * ReadPrepareParams::mEventNumber (if any) is used as the minimum event number.
          *
          * The ReadClient MUST NOT be destroyed during execution of this callback (i.e. before the callback returns).
          */
@@ -587,7 +590,8 @@ private:
                                              const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
     CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                           const Span<AttributePathParams> & aAttributePaths,
-                                          const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
+                                          const Span<DataVersionFilter> & aDataVersionFilters, ByteSpan aCallbackFilters,
+                                          bool & aEncodedDataVersionList);
     CHIP_ERROR ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerType & aType);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
@@ -621,6 +625,7 @@ private:
     CHIP_ERROR SendSubscribeRequest(const ReadPrepareParams & aSubscribePrepareParams);
     CHIP_ERROR SendSubscribeRequestImpl(const ReadPrepareParams & aSubscribePrepareParams);
     void UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath);
+    void CommitPendingDataVersion();
     static void OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
     // Called to ensure OnReportBegin is called before calling OnEventData or OnAttributeData
     void NoteReportingData();
@@ -689,6 +694,11 @@ private:
     //
     ReadPrepareParams mReadPrepareParams;
     uint32_t mNumRetries = 0;
+
+    // The cluster whose data the current report is in the middle of, and its data version.  The version is copied into
+    // mReadPrepareParams' data version filters once all of the cluster's data has been received.
+    ConcreteClusterPath mPendingDataVersionCluster = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
+    DataVersion mPendingDataVersion                = 0;
 
     System::Clock::Timeout mLivenessTimeoutOverride = System::Clock::kZero;
 

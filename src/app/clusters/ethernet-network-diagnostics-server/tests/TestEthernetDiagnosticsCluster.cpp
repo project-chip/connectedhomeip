@@ -55,8 +55,8 @@ TEST_F(TestEthernetDiagnosticsCluster, CompileTest)
     NullProvider nullProvider;
     EthernetDiagnosticsServerCluster cluster(kRootEndpointId, nullProvider, {}, optionalAttributeSet);
 
-    // Essentially say "code executes"
-    ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, EthernetNetworkDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
+    ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, EthernetNetworkDiagnostics::Id }),
+              BitFlags<ClusterQualityFlags>(ClusterQualityFlags::kDiagnosticsData));
 }
 
 TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)

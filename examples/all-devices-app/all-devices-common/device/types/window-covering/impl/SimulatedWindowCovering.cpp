@@ -43,25 +43,24 @@ Percent100ths ComputeStepToTarget(Percent100ths current, Percent100ths target)
     return current;
 }
 
+// Positions are null while the device is uncalibrated (a client-requested calibration in progress).
+void LogHaltedPosition(const char * axis, DataModel::Nullable<Percent100ths> position)
+{
+    if (position.IsNull())
+    {
+        ChipLogProgress(DeviceLayer, "WindowCovering: %s position unknown (uncalibrated)", axis);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "WindowCovering: %s frozen at %" PRIu16, axis, position.Value());
+    }
+}
+
 } // namespace
 
-SimulatedWindowCovering::SimulatedWindowCovering(const WindowCovering::Context & context, const Context & simulatedContext) :
-    WindowCovering(context, Delegates{ .windowCovering = *this, .identify = *this },
-                   Config{ .features = BitFlags<Clusters::WindowCovering::Feature>(
-                               Clusters::WindowCovering::Feature::kLift, Clusters::WindowCovering::Feature::kPositionAwareLift,
-                               Clusters::WindowCovering::Feature::kTilt, Clusters::WindowCovering::Feature::kPositionAwareTilt),
-                           .optionalAttributes =
-                               []() {
-                                   Clusters::WindowCovering::OptionalAttributeSet optionals;
-                                   optionals.Set<Clusters::WindowCovering::Attributes::NumberOfActuationsLift::Id>()
-                                       .Set<Clusters::WindowCovering::Attributes::NumberOfActuationsTilt::Id>()
-                                       .Set<Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::Id>()
-                                       .Set<Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::Id>()
-                                       .Set<Clusters::WindowCovering::Attributes::SafetyStatus::Id>();
-                                   return optionals;
-                               }(),
-                           .type           = Clusters::WindowCovering::Type::kTiltBlindLiftAndTilt,
-                           .endProductType = Clusters::WindowCovering::EndProductType::kSheerShade }),
+SimulatedWindowCovering::SimulatedWindowCovering(const WindowCovering::Context & context, const Context & simulatedContext,
+                                                 const WindowCovering::Config & config) :
+    WindowCovering(context, Delegates{ .windowCovering = *this, .identify = *this }, config),
     mGroupDataProvider(simulatedContext.groupDataProvider)
 {}
 
@@ -81,13 +80,35 @@ CHIP_ERROR SimulatedWindowCovering::Register(EndpointId endpoint, CodeDrivenData
     // persisted from a previous run, Startup() will correctly load and overwrite this default with
     // the real value once it runs. A client can still enter calibration mode at any time by writing
     // Mode.CalibrationMode; see OnModeChanged()/TimerFired().
-    auto & cluster = WindowCoveringCluster();
-    cluster.SetCurrentPositionLiftPercent100ths(
-        DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
-    cluster.SetCurrentPositionTiltPercent100ths(
-        DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+    SetCurrentPositions(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
 
     return CHIP_NO_ERROR;
+}
+
+void SimulatedWindowCovering::SetCurrentPositions(DataModel::Nullable<Percent100ths> position)
+{
+    auto & cluster = WindowCoveringCluster();
+    if (cluster.GetFeatureMap().Has(Feature::kPositionAwareLift))
+    {
+        cluster.SetCurrentPositionLiftPercent100ths(position);
+    }
+    if (cluster.GetFeatureMap().Has(Feature::kPositionAwareTilt))
+    {
+        cluster.SetCurrentPositionTiltPercent100ths(position);
+    }
+}
+
+void SimulatedWindowCovering::SetTargetPositions(DataModel::Nullable<Percent100ths> position)
+{
+    auto & cluster = WindowCoveringCluster();
+    if (cluster.GetFeatureMap().Has(Feature::kPositionAwareLift))
+    {
+        cluster.SetTargetPositionLiftPercent100ths(position);
+    }
+    if (cluster.GetFeatureMap().Has(Feature::kPositionAwareTilt))
+    {
+        cluster.SetTargetPositionTiltPercent100ths(position);
+    }
 }
 
 void SimulatedWindowCovering::Unregister(CodeDrivenDataModelProvider & provider)
@@ -165,22 +186,14 @@ CHIP_ERROR SimulatedWindowCovering::HandleStopMotion()
     // No need to freeze targets here: WindowCoveringCluster::HandleStopMotion() already sets
     // target = current for us right after this returns CHIP_NO_ERROR.
 
-    auto currentLift               = cluster.GetCurrentPositionLiftPercent100ths();
-    auto currentTilt               = cluster.GetCurrentPositionTiltPercent100ths();
-    [[maybe_unused]] auto opStatus = cluster.GetOperationalStatus();
-
-    // Positions may be null while the device is uncalibrated (a client-requested calibration in
-    // progress), so only log the values when they are known.
-    if (currentLift.IsNull() || currentTilt.IsNull())
+    ChipLogProgress(DeviceLayer, "WindowCovering: Halted | OpStatus raw=0x%02X", cluster.GetOperationalStatus().Raw());
+    if (cluster.GetFeatureMap().Has(Feature::kPositionAwareLift))
     {
-        ChipLogProgress(DeviceLayer, "WindowCovering: Halted while uncalibrated, positions unknown | OpStatus raw=0x%02X",
-                        opStatus.Raw());
+        LogHaltedPosition("Lift", cluster.GetCurrentPositionLiftPercent100ths());
     }
-    else
+    if (cluster.GetFeatureMap().Has(Feature::kPositionAwareTilt))
     {
-        ChipLogProgress(DeviceLayer,
-                        "WindowCovering: Halted. Frozen State -> Lift: %" PRIu16 ", Tilt: %" PRIu16 " | OpStatus raw=0x%02X",
-                        currentLift.Value(), currentTilt.Value(), opStatus.Raw());
+        LogHaltedPosition("Tilt", cluster.GetCurrentPositionTiltPercent100ths());
     }
 
     return CHIP_NO_ERROR;
@@ -235,14 +248,8 @@ void SimulatedWindowCovering::OnModeChanged(chip::BitMask<Mode> newMode)
             // CalibratingState with no way to leave it (see GetMotionLockStatus()).
             mContext.timerDelegate.CancelTimer(this);
             mState = MovementState{};
-            cluster.SetCurrentPositionLiftPercent100ths(
-                DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
-            cluster.SetCurrentPositionTiltPercent100ths(
-                DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
-            cluster.SetTargetPositionLiftPercent100ths(
-                DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
-            cluster.SetTargetPositionTiltPercent100ths(
-                DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+            SetCurrentPositions(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+            SetTargetPositions(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
             ChipLogProgress(DeviceLayer, "WindowCovering: Calibration cleared externally, positions resolved");
         }
         else if (newMode.Has(Mode::kMaintenanceMode))
@@ -271,10 +278,8 @@ void SimulatedWindowCovering::OnModeChanged(chip::BitMask<Mode> newMode)
     mState = CalibratingState{};
     // Target is nulled too (not just Current), so OperationalStatus recomputes to Stall
     // immediately instead of reporting the pre-calibration direction for the whole 3s window.
-    cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>());
-    cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>());
-    cluster.SetTargetPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>());
-    cluster.SetTargetPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>());
+    SetCurrentPositions(DataModel::Nullable<Percent100ths>());
+    SetTargetPositions(DataModel::Nullable<Percent100ths>());
     mContext.timerDelegate.CancelTimer(this);
     LogErrorOnFailure(mContext.timerDelegate.StartTimer(this, kCalibrationDuration));
 }
@@ -290,20 +295,14 @@ void SimulatedWindowCovering::TimerFired()
         // while calibrating (see OnModeChanged()), so there's nothing deferred to resume here -
         // a client must send a fresh movement command now that the device is operational again.
         mState = MovementState{};
-        cluster.SetCurrentPositionLiftPercent100ths(
-            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
-        cluster.SetCurrentPositionTiltPercent100ths(
-            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+        SetCurrentPositions(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
 
         // Also reset targets to match: calibration overrides any movement that was in progress
         // when it started (see OnModeChanged()), and the cluster only clears OperationalStatus back
         // to Stall when current == target. Without this, a calibration that interrupts a move would
         // leave OperationalStatus permanently reporting the old direction, since current (now the
         // resolved calibration position) would otherwise never match the stale target.
-        cluster.SetTargetPositionLiftPercent100ths(
-            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
-        cluster.SetTargetPositionTiltPercent100ths(
-            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+        SetTargetPositions(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
 
         // WindowCoveringCluster::WriteAttribute() does not currently reject a client write that
         // clears CalibrationMode directly (spec 9.3.6.14.2 requires FAILURE in that case; see the
