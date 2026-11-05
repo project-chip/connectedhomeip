@@ -24,8 +24,8 @@ import logging
 import os
 import pathlib
 import re
-import time
 import sys
+import time
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
