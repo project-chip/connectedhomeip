@@ -4042,7 +4042,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                   MTR_LOG("Invoke work item [%llu] received command response: %@ error: %@", workItemID, values, error);
                                   // TODO: This 5-retry cap is very arbitrary.
                                   // TODO: Should there be some sort of backoff here?
-                                  if (error != nil && error.domain == MTRInteractionErrorDomain && error.code == MTRInteractionErrorCodeBusy && retryCount < 5) {
+                                  if (error != nil && [error.domain isEqualToString:MTRInteractionErrorDomain] && error.code == MTRInteractionErrorCodeBusy && retryCount < 5) {
                                       workCompletion(MTRAsyncWorkNeedsRetry);
                                       return;
                                   }

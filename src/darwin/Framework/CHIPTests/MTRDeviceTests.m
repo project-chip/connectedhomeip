@@ -1587,7 +1587,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * bogusDeviceTypesWaitExpectation = [self expectationWithDescription:@"bogusDeviceTypes wait should time out"];
     __auto_type * waiter2 = [device waitForAttributeValues:bogusDeviceType timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNotNil(error);
-        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
         XCTAssertEqual(error.code, MTRErrorCodeTimeout);
         [bogusDeviceTypesWaitExpectation fulfill];
     }];
@@ -1629,7 +1629,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                                      queue:queue
                                                 completion:^(NSError * _Nullable error) {
                                                     XCTAssertNotNil(error);
-                                                    XCTAssertEqual(error.domain, MTRErrorDomain);
+                                                    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
                                                     XCTAssertEqual(error.code, MTRErrorCodeTimeout);
                                                     [nonexistentAttributeValueWaitExpectation fulfill];
                                                 }];
@@ -1712,7 +1712,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [onTimeAndBogusDeviceTypeValuesToWaitFor addEntriesFromDictionary:bogusDeviceType];
     __auto_type * waiter6 = [device waitForAttributeValues:onTimeAndBogusDeviceTypeValuesToWaitFor timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNotNil(error);
-        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
         XCTAssertEqual(error.code, MTRErrorCodeTimeout);
         [waitingForOnTimeValue3Expectation fulfill];
     }];
@@ -1721,7 +1721,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * waitingForOnTimeValue4Expectation = [self expectationWithDescription:@"Waiter should have been canceled"];
     __auto_type * waiter7 = [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNotNil(error);
-        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
         XCTAssertEqual(error.code, MTRErrorCodeCancelled);
         [waitingForOnTimeValue4Expectation fulfill];
     }];
@@ -1733,7 +1733,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         // To force the waiter created here to die quickly.
         [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
             XCTAssertNotNil(error);
-            XCTAssertEqual(error.domain, MTRErrorDomain);
+            XCTAssertEqualObjects(error.domain, MTRErrorDomain);
             XCTAssertEqual(error.code, MTRErrorCodeCancelled);
             [waitingForOnTimeValue5Expectation fulfill];
         }];

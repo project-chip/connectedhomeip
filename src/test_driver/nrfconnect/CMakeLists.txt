@@ -44,14 +44,17 @@ set(CHIP_CFLAGS
     -I${CMAKE_CURRENT_SOURCE_DIR}/main/include
 )
 
-# Load NCS/Zephyr build system
-list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
-list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/third_party/pigweed/repo)
-find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
-
 # ==================================================
 # Setup Pigweed
 # ==================================================
+
+# Pigweed backends must be configured before find_package(Zephyr) because Zephyr
+# processes the Pigweed module during find_package(Zephyr) and binds each facade
+# to its backend at that point.
+include(${CHIP_ROOT}/third_party/pigweed/repo/pw_build/pigweed.cmake)
+include(${CHIP_ROOT}/third_party/pigweed/repo/pw_log/backend.cmake)
+include(${CHIP_ROOT}/third_party/pigweed/repo/pw_assert/backend.cmake)
+include(${CHIP_ROOT}/third_party/pigweed/repo/pw_sys_io/backend.cmake)
 
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert.check pw_assert_log.check_backend)
@@ -59,6 +62,11 @@ pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
 # native_sim runs as a host process; stdio avoids pw_sys_io_zephyr's dependency on
 # Zephyr kernel headers (heap_constants.h build-order issue on Zephyr 4.4).
 pw_set_backend(pw_sys_io pw_sys_io_stdio)
+
+# Load NCS/Zephyr build system
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/third_party/pigweed/repo)
+find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 # ==================================================
 # Build 'all tests' runner
