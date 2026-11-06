@@ -430,6 +430,21 @@ CHIP_ERROR InstallMdnsInterfaceFilter(const char * const * names, size_t count)
     mdns::Minimal::SetAddressPolicy(&sPolicy);
     sInstalled = true;
 
+    // A misspelled name leaves discovery without any interface and nothing
+    // else would say so. The null interface always passes and proves nothing.
+    bool anyMatched = false;
+    auto endpoints  = sPolicy.GetListenEndpoints();
+    chip::Inet::InterfaceId interfaceId;
+    chip::Inet::IPAddressType addressType;
+    while (!anyMatched && endpoints && endpoints->Next(&interfaceId, &addressType))
+    {
+        anyMatched = interfaceId.IsPresent();
+    }
+    if (!anyMatched)
+    {
+        ChipLogError(Discovery, "None of the given mDNS interfaces is present and usable");
+    }
+
     return CHIP_NO_ERROR;
 }
 #endif // PYCHIP_USE_MINMDNS
