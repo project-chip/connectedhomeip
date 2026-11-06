@@ -177,6 +177,9 @@ public:
     void TestWriteClient();
     void TestWriteClientGroup();
     void TestWriteHandlerReceiveInvalidMessage();
+    void TestWriteOptionalFlagsAfterReuse();
+    void TestWriteOptionalFlagsInFinalChunk();
+    void TestWriteSuppressResponseDefaults();
     void TestWriteHandlerListWriteEndAfterExchangeRelease();
     void TestWriteHandlerReceiveEmptyWriteRequest();
     void TestWriteInvalidMessage1();
@@ -189,7 +192,14 @@ public:
     static void AddAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
     static void AddInvalidAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
     static void AddAttributeStatus(WriteHandler & aWriteHandler);
+<<<<<<< HEAD
     static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload, bool aIncludeFlags = true);
+=======
+    static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload);
+    static CHIP_ERROR GenerateOptionalFlagWriteRequest(System::PacketBufferHandle & payload, std::optional<bool> suppressResponse,
+                                                       std::optional<bool> moreChunks, bool listWrite);
+    static void GenerateSuppressResponseChunkedWriteRequest(System::PacketBufferHandle & aPayload);
+>>>>>>> 786dd38 ([IM] Default omitted write-request flags to false (#74727))
     static void GenerateWriteResponse(System::PacketBufferHandle & aPayload);
 
 private:
@@ -437,6 +447,109 @@ void TestWriteInteraction::GenerateWriteRequest(bool aIsTimedWrite, System::Pack
     EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
 }
 
+<<<<<<< HEAD
+=======
+// Builds a single WriteRequest that combines SuppressResponse=true with MoreChunkedMessages=true on one valid
+// AttributeDataIB. A conformant WriteClient never emits this combination; it is constructed directly here to
+// exercise the first-chunk handler lifecycle on the receive path.
+void TestWriteInteraction::GenerateSuppressResponseChunkedWriteRequest(System::PacketBufferHandle & aPayload)
+{
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(aPayload));
+
+    WriteRequestMessage::Builder writeRequestBuilder;
+    EXPECT_SUCCESS(writeRequestBuilder.Init(&writer));
+    writeRequestBuilder.SuppressResponse(true);
+    writeRequestBuilder.TimedRequest(false);
+    EXPECT_SUCCESS(writeRequestBuilder.GetError());
+    AttributeDataIBs::Builder & attributeDataIBsBuilder = writeRequestBuilder.CreateWriteRequests();
+    EXPECT_SUCCESS(writeRequestBuilder.GetError());
+    AttributeDataIB::Builder & attributeDataIBBuilder = attributeDataIBsBuilder.CreateAttributeDataIBBuilder();
+    EXPECT_SUCCESS(attributeDataIBsBuilder.GetError());
+
+    attributeDataIBBuilder.DataVersion(0);
+    EXPECT_SUCCESS(attributeDataIBBuilder.GetError());
+    AttributePathIB::Builder & attributePathBuilder = attributeDataIBBuilder.CreatePath();
+    EXPECT_SUCCESS(attributePathBuilder.GetError());
+    EXPECT_SUCCESS(attributePathBuilder.Node(1)
+                       .Endpoint(2)
+                       .Cluster(3)
+                       .Attribute(4)
+                       .ListIndex(DataModel::Nullable<ListIndex>())
+                       .EndOfAttributePathIB());
+
+    {
+        chip::TLV::TLVWriter * pWriter = attributeDataIBBuilder.GetWriter();
+        chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
+        EXPECT_SUCCESS(
+            pWriter->StartContainer(chip::TLV::ContextTag(AttributeDataIB::Tag::kData), chip::TLV::kTLVType_Structure, dummyType));
+        EXPECT_SUCCESS(pWriter->PutBoolean(chip::TLV::ContextTag(1), true));
+        EXPECT_SUCCESS(pWriter->EndContainer(dummyType));
+    }
+
+    EXPECT_SUCCESS(attributeDataIBBuilder.EndOfAttributeDataIB());
+    EXPECT_SUCCESS(attributeDataIBBuilder.GetError());
+
+    EXPECT_SUCCESS(attributeDataIBsBuilder.EndOfAttributeDataIBs());
+    EXPECT_SUCCESS(attributeDataIBsBuilder.GetError());
+    // MoreChunkedMessages is emitted after the AttributeDataIBs, mirroring WriteClient::FinishMessage.
+    EXPECT_SUCCESS(writeRequestBuilder.MoreChunkedMessages(true).EndOfWriteRequestMessage());
+    EXPECT_SUCCESS(writeRequestBuilder.GetError());
+
+    EXPECT_SUCCESS(writer.Finalize(&aPayload));
+}
+
+CHIP_ERROR TestWriteInteraction::GenerateOptionalFlagWriteRequest(System::PacketBufferHandle & payload,
+                                                                  std::optional<bool> suppressResponse,
+                                                                  std::optional<bool> moreChunks, bool listWrite)
+{
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(payload));
+    WriteRequestMessage::Builder request;
+    ReturnErrorOnFailure(request.Init(&writer));
+    if (suppressResponse.has_value())
+    {
+        request.SuppressResponse(suppressResponse.value());
+    }
+    request.TimedRequest(false);
+    ReturnErrorOnFailure(request.GetError());
+    auto & requests = request.CreateWriteRequests();
+    ReturnErrorOnFailure(request.GetError());
+    auto & attribute = requests.CreateAttributeDataIBBuilder();
+    ReturnErrorOnFailure(requests.GetError());
+    auto & path = attribute.CreatePath();
+    ReturnErrorOnFailure(attribute.GetError());
+    path.Endpoint(kTestEndpointId).Cluster(Clusters::UnitTesting::Id);
+    if (listWrite)
+    {
+        path.Attribute(Clusters::UnitTesting::Attributes::ListStructOctetString::Id);
+    }
+    else
+    {
+        path.Attribute(Clusters::UnitTesting::Attributes::Boolean::Id);
+    }
+    ReturnErrorOnFailure(path.EndOfAttributePathIB());
+    if (listWrite)
+    {
+        TLV::TLVType container;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(AttributeDataIB::Tag::kData), TLV::kTLVType_Array, container));
+        ReturnErrorOnFailure(writer.EndContainer(container));
+    }
+    else
+    {
+        ReturnErrorOnFailure(writer.PutBoolean(TLV::ContextTag(AttributeDataIB::Tag::kData), true));
+    }
+    ReturnErrorOnFailure(attribute.EndOfAttributeDataIB());
+    ReturnErrorOnFailure(requests.EndOfAttributeDataIBs());
+    if (moreChunks.has_value())
+    {
+        request.MoreChunkedMessages(moreChunks.value());
+    }
+    ReturnErrorOnFailure(request.EndOfWriteRequestMessage());
+    return writer.Finalize(&payload);
+}
+
+>>>>>>> 786dd38 ([IM] Default omitted write-request flags to false (#74727))
 void TestWriteInteraction::GenerateWriteResponse(System::PacketBufferHandle & aPayload)
 {
     System::PacketBufferTLVWriter writer;
@@ -565,6 +678,7 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
     }
 }
 
+<<<<<<< HEAD
 TEST_F(TestWriteInteraction, TestWriteHandlerUnicastRejectsMissingTimedRequest)
 {
     using namespace Protocols::InteractionModel;
@@ -611,6 +725,142 @@ TEST_F(TestWriteInteraction, TestWriteHandlerGroupcastMissingTimedRequestIsFalse
         EXPECT_EQ(status, transactionIsTimed ? Status::TimedRequestMismatch : Status::Success);
 
         DrainAndServiceIO();
+=======
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteOptionalFlagsAfterReuse)
+{
+    using namespace Protocols::InteractionModel;
+    const std::optional<bool> encodings[] = { std::nullopt, false };
+    for (const bool toBob : { true, false })
+    {
+        for (const auto moreChunks : encodings)
+        {
+            for (const bool reuse : { false, true })
+            {
+                WriteHandler handler;
+                TestExchangeDelegate delegate;
+                auto cleanup = MakeDefer([&] {
+                    handler.Close();
+                    DrainAndServiceIO();
+                });
+                if (reuse)
+                {
+                    ASSERT_SUCCESS(handler.Init(&TestImCustomDataModel::Instance(), InteractionModelEngine::GetInstance()));
+                    auto payload = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+                    ASSERT_FALSE(payload.IsNull());
+                    ASSERT_SUCCESS(GenerateOptionalFlagWriteRequest(payload, false, true, false));
+                    auto * exchange = toBob ? NewExchangeToBob(&delegate) : NewExchangeToAlice(&delegate);
+                    ASSERT_NE(exchange, nullptr);
+                    ASSERT_EQ(handler.OnWriteRequest(exchange, std::move(payload), false), Status::Success);
+                    ASSERT_FALSE(handler.IsFree());
+                    ASSERT_TRUE(handler.mStateFlags.Has(WriteHandler::StateBits::kHasMoreChunks));
+                    handler.mStateFlags.Set(WriteHandler::StateBits::kIsTimedRequest);
+                    handler.mStateFlags.Set(WriteHandler::StateBits::kSuppressResponse);
+                    handler.mStateFlags.Set(WriteHandler::StateBits::kProcessingAttributeIsList);
+                    handler.mStateFlags.Set(WriteHandler::StateBits::kAttributeWriteSuccessful);
+                    handler.Close();
+                    EXPECT_FALSE(handler.mStateFlags.HasAny());
+                    DrainAndServiceIO();
+                }
+
+                ASSERT_SUCCESS(handler.Init(&TestImCustomDataModel::Instance(), InteractionModelEngine::GetInstance()));
+                auto payload = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+                ASSERT_FALSE(payload.IsNull());
+                ASSERT_SUCCESS(GenerateOptionalFlagWriteRequest(payload, std::nullopt, moreChunks, false));
+                auto * exchange = toBob ? NewExchangeToBob(&delegate) : NewExchangeToAlice(&delegate);
+                ASSERT_NE(exchange, nullptr);
+                const auto sentBefore = GetLoopback().mSentMessageCount;
+                ASSERT_EQ(handler.OnWriteRequest(exchange, std::move(payload), false), Status::Success);
+                EXPECT_TRUE(handler.IsFree());
+                EXPECT_FALSE(handler.mStateFlags.Has(WriteHandler::StateBits::kHasMoreChunks));
+                EXPECT_EQ(GetLoopback().mSentMessageCount, sentBefore + 1);
+                handler.Close();
+                DrainAndServiceIO();
+                EXPECT_EQ(GetExchangeManager().GetReliableMessageMgr()->TestGetCountRetransTable(), 0);
+            }
+        }
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteOptionalFlagsInFinalChunk)
+{
+    using namespace Protocols::InteractionModel;
+    const std::optional<bool> encodings[] = { std::nullopt, false };
+    for (const bool toBob : { true, false })
+    {
+        for (const auto moreChunks : encodings)
+        {
+            ListWriteNotificationProvider provider;
+            WriteHandler handler;
+            TestExchangeDelegate delegate;
+            auto cleanup = MakeDefer([&] {
+                handler.Close();
+                DrainAndServiceIO();
+            });
+            ASSERT_SUCCESS(handler.Init(&provider, InteractionModelEngine::GetInstance()));
+            auto payload = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+            ASSERT_FALSE(payload.IsNull());
+            ASSERT_SUCCESS(GenerateOptionalFlagWriteRequest(payload, false, true, true));
+            auto * exchange = toBob ? NewExchangeToBob(&delegate) : NewExchangeToAlice(&delegate);
+            ASSERT_NE(exchange, nullptr);
+            const FabricIndex fabric = exchange->GetSessionHandle()->GetFabricIndex();
+            ASSERT_EQ(handler.OnWriteRequest(exchange, std::move(payload), false), Status::Success);
+            ASSERT_FALSE(handler.IsFree());
+            ASSERT_TRUE(exchange->IsResponseExpected());
+            ASSERT_EQ(provider.mNotificationCount, 1u);
+            EXPECT_EQ(provider.mLastOperation, DataModel::ListWriteOperation::kListWriteBegin);
+            EXPECT_EQ(provider.mLastFabric, fabric);
+
+            payload = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+            ASSERT_FALSE(payload.IsNull());
+            ASSERT_SUCCESS(GenerateOptionalFlagWriteRequest(payload, std::nullopt, moreChunks, true));
+            GetExchangeManager().GetReliableMessageMgr()->ClearRetransTable(exchange);
+            const auto sentBefore = GetLoopback().mSentMessageCount;
+            PayloadHeader header;
+            header.SetMessageType(MsgType::WriteRequest);
+            EXPECT_EQ(exchange->HandleMessage(0, header, {}, std::move(payload)), CHIP_NO_ERROR);
+            EXPECT_TRUE(handler.IsFree());
+            EXPECT_FALSE(handler.mStateFlags.Has(WriteHandler::StateBits::kHasMoreChunks));
+            EXPECT_EQ(GetLoopback().mSentMessageCount, sentBefore + 1);
+            EXPECT_EQ(provider.mNotificationCount, 2u);
+            EXPECT_EQ(provider.mLastOperation, DataModel::ListWriteOperation::kListWriteSuccess);
+            EXPECT_EQ(provider.mLastFabric, fabric);
+            handler.Close();
+            DrainAndServiceIO();
+            EXPECT_EQ(GetExchangeManager().GetReliableMessageMgr()->TestGetCountRetransTable(), 0);
+        }
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteSuppressResponseDefaults)
+{
+    using namespace Protocols::InteractionModel;
+    const std::optional<bool> encodings[] = { std::nullopt, false, true };
+    for (const bool toBob : { true, false })
+    {
+        for (const auto suppressResponse : encodings)
+        {
+            WriteHandler handler;
+            TestExchangeDelegate delegate;
+            auto cleanup = MakeDefer([&] {
+                handler.Close();
+                DrainAndServiceIO();
+            });
+            ASSERT_SUCCESS(handler.Init(&TestImCustomDataModel::Instance(), InteractionModelEngine::GetInstance()));
+            handler.mStateFlags.Set(WriteHandler::StateBits::kSuppressResponse);
+            auto payload = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+            ASSERT_FALSE(payload.IsNull());
+            ASSERT_SUCCESS(GenerateOptionalFlagWriteRequest(payload, suppressResponse, false, false));
+            auto * exchange = toBob ? NewExchangeToBob(&delegate) : NewExchangeToAlice(&delegate);
+            ASSERT_NE(exchange, nullptr);
+            const auto sentBefore = GetLoopback().mSentMessageCount;
+            EXPECT_EQ(handler.OnWriteRequest(exchange, std::move(payload), false), Status::Success);
+            EXPECT_TRUE(handler.IsFree());
+            EXPECT_EQ(GetLoopback().mSentMessageCount, sentBefore + (suppressResponse.value_or(false) ? 0u : 1u));
+            handler.Close();
+            DrainAndServiceIO();
+            EXPECT_EQ(GetExchangeManager().GetReliableMessageMgr()->TestGetCountRetransTable(), 0);
+        }
+>>>>>>> 786dd38 ([IM] Default omitted write-request flags to false (#74727))
     }
 }
 

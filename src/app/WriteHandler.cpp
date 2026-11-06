@@ -103,7 +103,7 @@ void WriteHandler::Close()
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
     mAccessingFabricIndex = kUndefinedFabricIndex;
-    mStateFlags.Clear(StateBits::kSuppressResponse);
+    mStateFlags.ClearAll();
     mDataModelProvider = nullptr;
     MoveToState(State::Uninitialized);
 }
@@ -648,7 +648,14 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
     bool boolValue;
 
+<<<<<<< HEAD
     if (mExchangeCtx->IsGroupExchangeContext())
+=======
+    // SuppressResponse may be omitted when false, so do not inherit its value from a previous message.
+    boolValue = false;
+    err       = writeRequestParser.GetSuppressResponse(&boolValue);
+    if (err == CHIP_END_OF_TLV)
+>>>>>>> 786dd38 ([IM] Default omitted write-request flags to false (#74727))
     {
         // Groupcast may omit SuppressResponse and TimedRequest; a missing field is FALSE.
         boolValue = false;
@@ -656,6 +663,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
         SuccessOrExit(err);
         mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
 
+<<<<<<< HEAD
         boolValue = false;
         err       = writeRequestParser.GetTimedRequest(&boolValue).NoErrorIf(CHIP_END_OF_TLV);
         SuccessOrExit(err);
@@ -677,8 +685,15 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
         SuccessOrExit(err);
         mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
     }
+=======
+    boolValue = false;
+    err       = writeRequestParser.GetTimedRequest(&boolValue);
+    SuccessOrExit(err);
+    mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
+>>>>>>> 786dd38 ([IM] Default omitted write-request flags to false (#74727))
 
-    boolValue = mStateFlags.Has(StateBits::kHasMoreChunks);
+    // MoreChunkedMessages may be omitted when false, including on the final chunk; do not inherit its previous value.
+    boolValue = false;
     err       = writeRequestParser.GetMoreChunkedMessages(&boolValue);
     if (err == CHIP_ERROR_END_OF_TLV)
     {
