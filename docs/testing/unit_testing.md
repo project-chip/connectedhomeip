@@ -225,21 +225,28 @@ own text context class.
 
 ## Best practices
 
--   Include `<lib/support/tests/ExtraPwTestMacros.h>` in every test source.
-    `chip_test_suite` already depends on it, so this adds no dependency. The
-    header provides:
+-   Include `<lib/support/tests/ExtraPwTestMacros.h>` in test sources.
+    `chip_test_suite` already depends on it, so this normally adds no
+    dependency. The header provides:
 
     -   `ASSERT_SUCCESS(expr)` and `EXPECT_SUCCESS(expr)`, shorthand for
         comparing a `CHIP_ERROR` against `CHIP_NO_ERROR`.
     -   Versions of `ASSERT_TRUE` / `ASSERT_FALSE` that clang-tidy understands
-        as guards, so `ASSERT_TRUE(value.has_value())` makes a later `*value` or
-        `value->` pass `bugprone-unchecked-optional-access`.
+        as guards.
 
-    Don't silence `bugprone-unchecked-optional-access` in tests with `NOLINT` or
-    work around it with helpers like `value_or()`. Assert on `has_value()`
-    first, or compare the optional directly, e.g.
-    `EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success))`. CI
-    rejects these `NOLINT` comments under `tests/` directories.
+    clang-tidy's `bugprone-unchecked-optional-access` check needs to see that an
+    optional has a value before it is accessed. Any guard it can follow works,
+    for example:
+
+    -   `ASSERT_TRUE(x.has_value())` in a test body.
+    -   `if (!x.has_value())` or `VerifyOrDie(x.has_value())` in a helper that
+        returns a value and so can't use `ASSERT_*`.
+    -   Comparing the optional directly, which avoids the access altogether,
+        e.g.
+        `EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success))`.
+
+    Tests shouldn't need `NOLINT` comments for this check, and CI rejects them
+    under `tests/` directories.
 
 -   Try to use as specific an assertion as possible. For example use these
 
