@@ -105,10 +105,13 @@ the tests. Please see [Running tests in CI](#running-tests-in-ci).
 whether a test needs a commissioned device, an uncommissioned one, performs
 commissioning itself, or needs no device at all. Instead of deriving from
 `MatterBaseTest` directly, a test should derive from the marker base class that
-matches what it requires. These markers are currently **declarative only** —
-they add no runtime behavior and do not change method resolution order, setup,
-teardown, or test discovery. They give tooling (the Test Harness, CI selection,
-the structural check below) a single static signal for what each test needs.
+matches what it requires. The markers add no runtime behavior to the test: they
+do not change method resolution order, setup, teardown, or test discovery. They
+give tooling a single static signal for what each test needs. The Test Harness
+and `run_python_test.py --commission-by-device-requirement` (see
+[Running tests the way the Test Harness does](#running-tests-the-way-the-test-harness-does))
+use it to decide whether to commission the DUT before the test, and CI selection
+and the structural check below read it too.
 
 | Base class                       | The test...                                                                   |
 | -------------------------------- | ----------------------------------------------------------------------------- |
@@ -845,6 +848,119 @@ For example, to run TC-ACE-1.2 tests against the linux `chip-lighting-app`:
 ./scripts/tests/run_python_test.py --factory-reset --app ./out/linux-x64-light-no-ble/chip-lighting-app --app-args "--trace-to json:log" --script src/python_testing/TC_ACE_1_2.py --script-args "--commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00"
 ```
 
+## Running tests the way the Test Harness does
+
+The Test Harness (TH) and `run_python_test.py` commission the DUT differently:
+
+|                                      | Test Harness                                              | `run_python_test.py`                                                    |
+| ------------------------------------ | --------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Who commissions the DUT              | The TH, in a separate commission-only run before the test | The test process, from `--commissioning-method` in the script arguments |
+| Commissioning argument the test gets | `--in-test-commissioning-method <method>`                 | `--commissioning-method <method>`                                       |
+| DUT state between tests              | Kept for the whole suite                                  | Reset when the run sets `factory-reset`                                 |
+
+With `--commission-by-device-requirement`, or with
+`commission-by-device-requirement: true` in a run block, `run_python_test.py`
+decides for each run the way the TH decides for each test function:
+
+| Test function                                                                                             | Test Harness              | `run_python_test.py --commission-by-device-requirement`                                                           |
+| --------------------------------------------------------------------------------------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `MatterTestCommissionedDevice`, or no marker and step 1 sets `is_commissioning=True`                      | Commissions the DUT first | Commissions the DUT in a separate commission-only run, then starts the test with `--in-test-commissioning-method` |
+| Any other marker, or no marker and step 1 doesn't set `is_commissioning`                                  | Doesn't commission        | Starts the test with `--in-test-commissioning-method` and doesn't commission                                      |
+| Only a "Run entire test" step (LEGACY), or TC-IDM-10.2 to 10.5 and TC-IDM-12.1 (the TH's mandatory tests) | Asks the operator         | Starts the test with its own arguments                                                                            |
+| Name doesn't start with `test_TC_` (a Supplemental test)                                                  | Never lists or runs it    | Starts the test with its own arguments                                                                            |
+
+-   The run's script arguments must still contain the commissioning arguments
+    (`--commissioning-method`, `--discriminator`, `--passcode` or a setup code).
+    The commission-only run uses them as they are. The test gets the same
+    arguments with `--commissioning-method` changed to
+    `--in-test-commissioning-method`, so it uses the fabric the commission-only
+    run stored in `--storage-path`.
+-   Each run's log line, and the summary at the end, say how the run was
+    started. Only these labels mean that the run matched the TH:
+
+    -   `TH-style: commissioned in a separate step`
+    -   `TH-style: DUT left uncommissioned`
+    -   `TH-style test args: DUT commissioned by an earlier run` (a run without
+        `--commissioning-method` whose test needs a commissioned DUT)
+
+    Runs labelled `As written: ...` were started with their own arguments: the
+    TH asks the operator, or the test functions the run selects disagree.
+    `--tests` can select one group of functions. Runs labelled
+    `Supplemental: not run by the TH` were also started with their own
+    arguments: the TH lists only `test_TC_*` functions, so it never runs these.
+
+-   `--fail-on-ambiguous-commissioning` turns the `As written` cases, and a step
+    1 `is_commissioning` flag that contradicts the marker, into errors before
+    any app starts.
+-   The DUT is commissioned again for every run, after the run's factory reset.
+    A TH suite commissions once and keeps the DUT's state between its tests.
+
+For example:
+
+```shell
+./scripts/tests/run_python_test.py --factory-reset --commission-by-device-requirement --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-clang-test/chip-all-clusters-app --app-args "--discriminator 1234 --KVS kvs1" --script src/python_testing/TC_IDM_4_2.py --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"
+```
+
+### Running all tests of a cluster
+
+`--cluster` runs every test module whose name is `TC_<CLUSTER>_<n>...` in
+`src/python_testing`, in place of `--script`. Several clusters are separated by
+commas, for example `--cluster IDM,ACL`.
+
+-   The name is matched exactly: `--cluster CC` selects `TC_CC_2_1.py` but not
+    `TC_CCTRL_2_1.py`. Test functions of the cluster in modules with other
+    names, such as `test_TC_IDM_12_1` in `TC_DeviceBasicComposition.py`, are not
+    selected.
+-   Modules on the `not_automated` and `dedicated_runner` lists in
+    `src/python_testing/test_metadata.yaml` are skipped.
+-   With `--load-from-env`, each module runs its own CI runs except those tagged
+    `nightly`, and each run's `factory-reset` setting decides whether it starts
+    from a clean app and controller state. A module whose runs are all tagged
+    `nightly` is skipped.
+-   Without `--load-from-env`, every module gets the `--app`, `--app-args` and
+    `--script-args` given, so they must include the arguments each module needs,
+    such as its PIXIT values. A module that needs more fails. The app and
+    controller state are reset before every module. With `--no-factory-reset`,
+    the modules share that state, so one module's result can depend on the
+    modules before it; the summary says so.
+-   Every module runs, even after one fails. The summary lists each run as
+    `PASS` or `FAIL`, and each module that didn't run as `SKIPPED` or `ERROR`
+    (for example, its test class can't be imported). The exit code is non-zero
+    when a run fails, a module has an error, no module matches, or every
+    matching module is skipped.
+
+For example, to run every IDM test against all-clusters-app the way the TH does
+(`TC_IDM_1_4.py` needs the test event trigger key: `--enable-key` for the app
+and the `PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY` value for the test):
+
+```shell
+./scripts/tests/run_python_test.py --cluster IDM --commission-by-device-requirement --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-clang-test/chip-all-clusters-app --app-args "--discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --hex-arg PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f"
+```
+
+To run each module with its own CI arguments instead, use `--load-from-env`.
+
+Two `--cluster` values select modules by something other than their name. Both
+need `--load-from-env`, because each module needs its own app and arguments:
+
+-   `ALL` selects every module in `src/python_testing`. The summary lists each
+    module on the `not_automated` and `dedicated_runner` lists as `SKIPPED` with
+    its reason.
+-   `SUPPLEMENTAL` selects the modules with CI runs whose test functions the TH
+    never runs, because none of their names starts with `test_TC_`. Their runs
+    are labelled `Supplemental: not run by the TH`, with or without
+    `--commission-by-device-requirement`.
+
+For example:
+
+```shell
+./scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --cluster SUPPLEMENTAL
+```
+
+`./scripts/tests/local.py python-tests --cluster IDM` selects the same modules
+and runs their CI runs, except those tagged `nightly` unless `--include-nightly`
+is given. It passes `--commission-by-device-requirement` and
+`--fail-on-ambiguous-commissioning` on to `run_python_test.py`.
+
 ## Runner Global Wildcard Pre-Population
 
 By default, `run_tests_no_exit` performs a **global wildcard read** against the
@@ -997,6 +1113,22 @@ for that run, e.g.:
 
     -   Example:
         `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
+
+-   `pre-existing-fabric`: Before the test, commissions the app onto a separate
+    fabric and re-opens its commissioning window. The test then starts against a
+    device that already has a fabric. That fabric's controller storage is the
+    `--storage-path` file with `_pre` added to its name, for example
+    `admin_storage_pre.json`. Needs `--commissioning-method on-network` in
+    `script-args`.
+
+    -   Example: `true`
+
+-   `commission-by-device-requirement`: Commissions the DUT the way the Test
+    Harness does. See
+    [Running tests the way the Test Harness does](#running-tests-the-way-the-test-harness-does).
+    Must be `true` or `false`.
+
+    -   Example: `true`
 
 -   `tags`: Moves the run to the nightly job, or records known problems. See
     [Running a run only in the nightly job](#running-a-run-only-in-the-nightly-job).
