@@ -495,7 +495,7 @@ void TimeSynchronizationCluster::OnDone(ReadClient * apReadClient)
 
 void TimeSynchronizationCluster::OnTimeSyncCompletionFn(TimeSourceEnum timeSource, GranularityEnum granularity)
 {
-    if (timeSource != TimeSourceEnum::kNone && granularity == GranularityEnum::kNoTimeGranularity)
+    if (granularity == GranularityEnum::kNoTimeGranularity)
     {
         // Unable to get time from the delegate. Try remaining sources.
         CHIP_ERROR err = AttemptToGetTimeFromTrustedNode();

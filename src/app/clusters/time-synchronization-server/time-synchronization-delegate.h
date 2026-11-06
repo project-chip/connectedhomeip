@@ -79,7 +79,8 @@ public:
      * If the delegate is successful in obtaining the time, it sets the time using the platform time API (SetClock_RealTime)
      * and calls the callback with the time source and granularity set as appropriate.
      * If the delegate is unsuccessful in obtaining the time, it calls the callback with timeSource set to kNone and
-     * granularity set to kNoTimeGranularity.
+     * granularity set to kNoTimeGranularity. (Any callback with granularity kNoTimeGranularity is treated as a failure,
+     * whatever the timeSource.)
      */
     virtual CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback) = 0;
 

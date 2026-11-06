@@ -31,7 +31,12 @@
 #include <clusters/TimeSynchronization/Events.h>
 #include <clusters/TimeSynchronization/Metadata.h>
 #include <clusters/TimeSynchronization/Structs.h>
+#include <lib/support/Defer.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/Constants.h>
+
+#include <optional>
+#include <utility>
 
 namespace {
 
@@ -50,8 +55,15 @@ struct TestTimeSyncDelegate : public TimeSynchronization::DefaultTimeSyncDelegat
 {
     CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<TimeSynchronization::OnTimeSyncCompletion> * callback) override
     {
+        if (platformTimeResult.has_value())
+        {
+            callback->mCall(callback->mContext, platformTimeResult->first, platformTimeResult->second);
+        }
         return CHIP_NO_ERROR;
     }
+
+    // If set, UpdateTimeFromPlatformSource() calls the callback synchronously with this result.
+    std::optional<std::pair<TimeSourceEnum, GranularityEnum>> platformTimeResult;
 };
 
 struct TestTimeSynchronizationCluster : public ::testing::Test
@@ -61,6 +73,13 @@ struct TestTimeSynchronizationCluster : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     TestTimeSynchronizationCluster() {}
+
+    // Returns kInvalidEventId if there is no further event.
+    EventId NextEventId()
+    {
+        auto event = testContext.EventsGenerator().GetNextEvent();
+        return event.has_value() ? event->eventOptions.mPath.mEventId : kInvalidEventId;
+    }
 
     TestServerClusterContext testContext;
     TestTimeSyncDelegate delegate;
@@ -429,7 +448,7 @@ TEST_F(TestTimeSynchronizationCluster, SetTrustedTimeSourceTest)
     // Verify that MissingTrustedTimeSource event is emitted when set to null
     auto eventInfo = testContext.EventsGenerator().GetNextEvent();
     ASSERT_TRUE(eventInfo.has_value());
-    auto & event = *eventInfo; // NOLINT(bugprone-unchecked-optional-access)
+    auto & event = *eventInfo;
     EXPECT_EQ(event.eventOptions.mPath.mEventId, Events::MissingTrustedTimeSource::Id);
     Events::MissingTrustedTimeSource::DecodableType missingEvent;
     EXPECT_EQ(event.GetEventData(missingEvent), CHIP_NO_ERROR);
@@ -442,4 +461,63 @@ TEST_F(TestTimeSynchronizationCluster, SetTrustedTimeSourceTest)
     EXPECT_TRUE(readBackTTS.IsNull());
 
     timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A failed platform time sync (kNoTimeGranularity) falls back to the trusted node and then to NTP.
+// With neither configured, the fallback ends in a TimeFailure event.
+TEST_F(TestTimeSynchronizationCluster, PlatformTimeFailureFallsBack)
+{
+    const std::pair<TimeSourceEnum, GranularityEnum> failureResults[] = {
+        { TimeSourceEnum::kNone, GranularityEnum::kNoTimeGranularity },  // documented failure result
+        { TimeSourceEnum::kAdmin, GranularityEnum::kNoTimeGranularity }, // timeSource is ignored on failure
+    };
+
+    for (const auto & result : failureResults)
+    {
+        delegate.platformTimeResult = result;
+        const BitFlags<Feature> features{ Feature::kTimeSyncClient };
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
+        ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
+        auto deferShutdown =
+            MakeDefer([&timeSynchronization] { timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown); });
+        ClusterTester tester(timeSynchronization);
+
+        // Clearing the trusted time source makes the cluster ask the delegate for the time.
+        Commands::SetTrustedTimeSource::Type request;
+        request.trustedTimeSource.SetNull();
+        EXPECT_TRUE(tester.Invoke(request).IsSuccess());
+
+        EXPECT_EQ(NextEventId(), Events::MissingTrustedTimeSource::Id);
+        EXPECT_EQ(NextEventId(), Events::TimeFailure::Id);
+        EXPECT_EQ(NextEventId(), kInvalidEventId);
+
+        Granularity::TypeInfo::DecodableType granularity{};
+        EXPECT_EQ(tester.ReadAttribute(Granularity::Id, granularity), CHIP_NO_ERROR);
+        EXPECT_EQ(granularity, GranularityEnum::kNoTimeGranularity);
+    }
+}
+
+TEST_F(TestTimeSynchronizationCluster, PlatformTimeSuccessSetsGranularity)
+{
+    delegate.platformTimeResult = { TimeSourceEnum::kAdmin, GranularityEnum::kSecondsGranularity };
+    const BitFlags<Feature> features{ Feature::kTimeSyncClient };
+    TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                   TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate },
+                                                   context);
+    ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
+    auto deferShutdown = MakeDefer([&timeSynchronization] { timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    ClusterTester tester(timeSynchronization);
+
+    Commands::SetTrustedTimeSource::Type request;
+    request.trustedTimeSource.SetNull();
+    EXPECT_TRUE(tester.Invoke(request).IsSuccess());
+
+    EXPECT_EQ(NextEventId(), Events::MissingTrustedTimeSource::Id);
+    EXPECT_EQ(NextEventId(), kInvalidEventId);
+
+    Granularity::TypeInfo::DecodableType granularity{};
+    EXPECT_EQ(tester.ReadAttribute(Granularity::Id, granularity), CHIP_NO_ERROR);
+    EXPECT_EQ(granularity, GranularityEnum::kSecondsGranularity);
 }
