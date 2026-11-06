@@ -127,9 +127,9 @@ public:
      *    (e.g. when no binding matches or only multicast bindings match), so the caller must not access @p context
      *    after a successful call.
      *
-     * Failures that happen after the BindingManager took @p context (e.g. a unicast session cannot be started) are
-     * logged and do not change the return value. A queued unicast notification is still delivered if a session to
-     * the peer is established later.
+     * Failures for a single unicast binding (e.g. a session cannot be started) are logged, do not change the
+     * return value, and do not stop the notification of the remaining bindings. A queued unicast notification
+     * is still delivered if a session to the peer is established later.
      *
      * @retval CHIP_ERROR_INCORRECT_STATE if the BindingManager is not initialized.
      * @retval CHIP_ERROR_HANDLER_NOT_SET if no BoundDeviceChangedHandler is registered.

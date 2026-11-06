@@ -190,4 +190,35 @@ TEST_F(TestBindingManager, MixedBindingsReleaseContextOnceAllConsumersAreDone)
     EXPECT_EQ(gRecord.lastReleased, &mContext);
 }
 
+// A unicast binding whose session setup fails synchronously must not stop the notification of the
+// bindings that follow it in the table.
+TEST_F(TestBindingManager, SessionSetupFailureDoesNotSkipLaterBindings)
+{
+    ASSERT_EQ(mManager.GetBindingTable().Add(
+                  Binding::TableEntry::ForNode(kUnknownFabric, 0x1234 /* node */, kLocalEndpoint, 2 /* remote */, kTestClusterId)),
+              CHIP_NO_ERROR);
+    ASSERT_EQ(mManager.GetBindingTable().Add(
+                  Binding::TableEntry::ForNode(kUnknownFabric, 0x5678 /* node */, kLocalEndpoint, 2 /* remote */, kTestClusterId)),
+              CHIP_NO_ERROR);
+    ASSERT_EQ(mManager.GetBindingTable().Add(
+                  Binding::TableEntry::ForGroup(GetAliceFabricIndex(), 0x0101, kLocalEndpoint, kTestClusterId)),
+              CHIP_NO_ERROR);
+
+    auto iter                        = mManager.GetBindingTable().begin();
+    const uint8_t firstUnicastIndex  = iter.GetIndex();
+    const uint8_t secondUnicastIndex = (++iter).GetIndex();
+
+    EXPECT_EQ(mManager.NotifyBoundClusterChanged(kLocalEndpoint, kTestClusterId, &mContext), CHIP_NO_ERROR);
+    EXPECT_EQ(gRecord.changedCount, 1);
+    EXPECT_TRUE(gRecord.lastPeerWasNullptr);
+    EXPECT_EQ(gRecord.releaseCount, 0);
+
+    // Both unicast notifications were queued, so the context is released only after both are removed.
+    EXPECT_EQ(mManager.UnicastBindingRemoved(firstUnicastIndex), CHIP_NO_ERROR);
+    EXPECT_EQ(gRecord.releaseCount, 0);
+    EXPECT_EQ(mManager.UnicastBindingRemoved(secondUnicastIndex), CHIP_NO_ERROR);
+    EXPECT_EQ(gRecord.releaseCount, 1);
+    EXPECT_EQ(gRecord.lastReleased, &mContext);
+}
+
 } // namespace
