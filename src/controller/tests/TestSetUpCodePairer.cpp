@@ -359,8 +359,12 @@ TEST_F(TestSetUpCodePairer, NFCPASEFailure_ReportedWithoutWaitingForDNSSD)
 TEST_F(TestSetUpCodePairer, NFCPASEFailure_EndsPairingAttempt)
 {
     StartPASEAttempt(Transport::PeerAddress::NFC(0x1234));
+    // StartPASEAttempt never arms the discovery timer, so arm it to prove the failure cancels it.
+    Access().ArmDiscoveryTimer();
+    ASSERT_TRUE(Access().IsDiscoveryTimerActive());
     FailPASE(CHIP_ERROR_INTEGRITY_CHECK_FAILED);
 
+    EXPECT_FALSE(Access().IsDiscoveryTimerActive());
     EXPECT_EQ(Access().GetRemoteId(), kUndefinedNodeId);
     EXPECT_EQ(Access().GetSetupPayloadsCount(), 0u);
 
@@ -393,6 +397,27 @@ TEST_F(TestSetUpCodePairer, NFCPASEFailure_KeepsDNSSDWhileCandidatesQueued)
 
     EXPECT_EQ(mDelegate.mStatusUpdates, 0u);
     EXPECT_TRUE(Access().GetWaitingForDiscovery(PairerAccess::kIPTransport));
+}
+
+// A failed PASE attempt must start the next queued candidate.  mLastPASEAttemptWasOverNFC is only set
+// when ConnectToDiscoveredDevice starts an attempt, so it tells an attempt apart from a dropped
+// candidate (both empty the queue and both leave DNS-SD running).
+TEST_F(TestSetUpCodePairer, QueuedCandidate_AttemptedAfterPASEFailure)
+{
+    StartPASEAttempt(Transport::PeerAddress::UDP(Inet::IPAddress::Any, 5540));
+    SetUpCodePairerParameters queued;
+    queued.SetPeerAddress(Transport::PeerAddress::NFC(0x5678));
+    Access().PushDiscoveredParameters(queued);
+    ASSERT_FALSE(Access().GetLastPASEAttemptWasOverNFC());
+    ASSERT_EQ(Access().GetDiscoveredParametersCount(), 1u);
+
+    FailPASE(CHIP_ERROR_INTEGRITY_CHECK_FAILED);
+
+    EXPECT_TRUE(Access().GetLastPASEAttemptWasOverNFC());
+    EXPECT_EQ(Access().GetDiscoveredParametersCount(), 0u);
+    EXPECT_EQ(Access().GetLastPASEError(), CHIP_ERROR_INTEGRITY_CHECK_FAILED);
+    EXPECT_EQ(mDelegate.mPairingCompletes, 0u);
+    EXPECT_NE(Access().GetRemoteId(), kUndefinedNodeId);
 }
 
 TEST_F(TestSetUpCodePairer, UDPPASEFailure_WaitsForDNSSD)

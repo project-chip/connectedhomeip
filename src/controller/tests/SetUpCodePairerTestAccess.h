@@ -74,6 +74,19 @@ public:
 
     void FireTimeoutCallback() { Controller::SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(nullptr, mPairer); }
 
+    void ArmDiscoveryTimer()
+    {
+        TEMPORARY_RETURN_IGNORED mPairer->mSystemLayer->StartTimer(
+            System::Clock::Milliseconds32(60000), Controller::SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback, mPairer);
+    }
+    bool IsDiscoveryTimerActive()
+    {
+        return mPairer->mSystemLayer->IsTimerActive(Controller::SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback, mPairer);
+    }
+
+    // Set only when ConnectToDiscoveredDevice starts a PASE attempt, so it shows a candidate was attempted.
+    bool GetLastPASEAttemptWasOverNFC() const { return mPairer->mLastPASEAttemptWasOverNFC; }
+
 private:
     Controller::SetUpCodePairer * mPairer = nullptr;
 };
