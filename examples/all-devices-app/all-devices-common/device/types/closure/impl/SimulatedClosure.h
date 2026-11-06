@@ -60,12 +60,6 @@ public:
         std::vector<PanelList> panels;
     };
 
-    /// Closure configs, each combining the closure's features with its panel configs to simulate a
-    /// specific closure device such as a cabinet.
-    static Config ThreePanelCabinetClosureConfig();
-    static Config ThreePanelCabinetClosureConfigNoLT();
-    static Config ThreePanelCabinetClosureConfigNoPSNoSP();
-
     SimulatedClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Config config,
                      Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
                      TestEventTriggerDelegate & testEventTriggerDelegate);

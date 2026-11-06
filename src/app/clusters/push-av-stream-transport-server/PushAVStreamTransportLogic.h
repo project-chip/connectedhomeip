@@ -8,6 +8,7 @@
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
 #include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
 #include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <functional>
 #include <protocols/interaction_model/StatusCode.h>
@@ -98,7 +99,12 @@ public:
 
     std::vector<PushAvStreamTransport::TransportConfigurationStorage> mCurrentConnections;
 
-    CHIP_ERROR Init();
+    /**
+     * Loads the persisted CurrentConnections from `attributeStorage` and notifies the delegate.
+     *
+     * `attributeStorage` is used for all later CurrentConnections writes and must stay valid until Shutdown().
+     */
+    CHIP_ERROR Init(AttributePersistenceProvider & attributeStorage);
 
     void Shutdown();
 
@@ -153,6 +159,7 @@ private:
     TLSClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
     TLSCertificateManagementDelegate * mTLSCertificateManagementDelegate = nullptr;
     PushAvStreamTransportServer * mCluster                               = nullptr;
+    AttributePersistenceProvider * mAttributeStorage                     = nullptr;
 
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true
