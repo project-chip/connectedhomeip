@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/ConcreteAttributePath.h>
@@ -429,7 +430,7 @@ TEST_F(TestTimeSynchronizationCluster, SetTrustedTimeSourceTest)
     // Verify that MissingTrustedTimeSource event is emitted when set to null
     auto eventInfo = testContext.EventsGenerator().GetNextEvent();
     ASSERT_TRUE(eventInfo.has_value());
-    auto & event = *eventInfo; // NOLINT(bugprone-unchecked-optional-access)
+    auto & event = *eventInfo;
     EXPECT_EQ(event.eventOptions.mPath.mEventId, Events::MissingTrustedTimeSource::Id);
     Events::MissingTrustedTimeSource::DecodableType missingEvent;
     EXPECT_EQ(event.GetEventData(missingEvent), CHIP_NO_ERROR);
