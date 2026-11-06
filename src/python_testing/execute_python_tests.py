@@ -36,15 +36,14 @@ import click
 import coloredlogs
 import yaml
 
-from matter.testing.metadata import (RunArgumentsError, extract_runs_args, failure_fails_job, runs_in_pull_requests,
-                                     script_runs_in_pull_requests)
+from matter.testing.metadata import TAG_OPTION_HELP, RunArgumentsError, TagFilter, extract_runs_args, failure_fails_job
 
 log = logging.getLogger(__name__)
 
 
 @dataclass
 class ScriptRun:
-    """One run_python_test.py call: a script's PR CI runs (run is None), or one nightly run."""
+    """One run_python_test.py call: a script's runs that match the tag filter (run is None), or one run."""
     script: str
     run: str | None = None
     tags: list[str] = field(default_factory=list)
@@ -52,7 +51,7 @@ class ScriptRun:
 
     @property
     def path(self) -> str:
-        """The script path, plus '::<run>' when the call executes one nightly run."""
+        """The script path, plus '::<run>' when the call executes one run."""
         return self.script if self.run is None else f"{self.script}::{self.run}"
 
 
@@ -148,22 +147,23 @@ def load_env_from_yaml(file_path):
             os.environ[key] = value
 
 
-def select_script_runs(python_files: list[str], nightly: bool, not_automated: set[str]) -> list[ScriptRun]:
-    """Return the run_python_test.py calls for a PR run, or for the nightly run when nightly is set.
+def select_script_runs(python_files: list[str], tag_filter: TagFilter, not_automated: set[str]) -> list[ScriptRun]:
+    """Return the run_python_test.py calls for the runs that match tag_filter, except in the not_automated files.
 
-    A PR run calls every script that has runs without the nightly tag, except the not_automated
-    files. The nightly run calls each nightly run of every automated script on its own, so that each
-    nightly run gets its own result.
+    A script whose matching runs have tags is called once per run, so that each result carries the run's tags and
+    issues. Any other script is called once, and run_python_test.py picks the same runs with the same --tag values.
     """
     script_runs = []
     for script in python_files:
         if os.path.basename(script) in not_automated:
             continue
         runs = extract_runs_args(script)
-        if nightly:
-            script_runs.extend(ScriptRun(script, run, args["tags"], args["issues"])
-                               for run, args in runs.items() if not runs_in_pull_requests(args["tags"]))
-        elif script_runs_in_pull_requests(runs):
+        if not tag_filter.matches_script(runs):
+            continue
+        matching_runs = {run: args for run, args in runs.items() if tag_filter.matches(args["tags"])}
+        if any(args["tags"] for args in matching_runs.values()):
+            script_runs.extend(ScriptRun(script, run, args["tags"], args["issues"]) for run, args in matching_runs.items())
+        else:
             script_runs.append(ScriptRun(script))
     return script_runs
 
@@ -321,9 +321,10 @@ def main():
     help="Regex the tests to pick. Use `!` to negate the expression. Expressions FILTERS out non-matching (i.e. you can use it to restrict more and more, but not to add)",
 )
 @click.option(
-    "--nightly",
-    is_flag=True,
-    help="If set, run every run tagged nightly.",
+    "--tag",
+    "tags",
+    multiple=True,
+    help=TAG_OPTION_HELP,
 )
 @click.option(
     "--summary-file",
@@ -343,8 +344,13 @@ def main():
     default="execute_python_tests script",
     help="Name for the JUnit XML test suite (default: execute_python_tests script).",
 )
-def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool, summary_file: Path | None, junit_file: Path | None, junit_suite_name: str):
+def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], tags: tuple[str, ...], summary_file: Path | None, junit_file: Path | None, junit_suite_name: str):
     chip_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+    try:
+        tag_filter = TagFilter.parse(tags)
+    except ValueError as e:
+        raise click.BadParameter(str(e), param_hint="--tag")
 
     load_env_from_yaml(env_file)
 
@@ -373,7 +379,7 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
         all_python_files = [path for path in all_python_files if match(path)]
 
     try:
-        script_runs = select_script_runs(all_python_files, nightly, excluded_patterns)
+        script_runs = select_script_runs(all_python_files, tag_filter, excluded_patterns)
     except RunArgumentsError as e:
         raise click.ClickException(str(e))
 
@@ -395,6 +401,8 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
                 full_command = f"{base_command} --load-from-env {env_file} --script {script_run.script}"
                 if script_run.run is not None:
                     full_command += f" --run {script_run.run}"
+                else:
+                    full_command += "".join(f" --tag {value}" for value in tags)
                 if dry_run:
                     print(f"DRY-RUN(skip): {full_command}", flush=True)
                     run_summary.record(script_run, "dry_run", time.monotonic() - test_start)

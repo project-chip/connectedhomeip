@@ -14,6 +14,7 @@
 
 import logging
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import StrEnum
 from io import StringIO
@@ -32,6 +33,65 @@ class RunTag(StrEnum):
     # The block has problems tracked in its `issues:`, such as a failure or probes a deny list skips. The tag doesn't
     # change where the block runs. With nightly, a failure is reported with the issues and doesn't fail the job.
     NEEDS_FOLLOWUP_FIXES = "needs-followup-fixes"
+    # The block needs an app and controller built with OpenSSL 3.5, so it runs only in the OpenSSL 3.5 job.
+    OPENSSL_3_5 = "openssl-3.5"
+
+
+# A --tag value with this prefix leaves out the runs that have the tag. No RunTag value may start with it.
+SKIP_TAG_PREFIX = "skip-"
+
+# Runs with these tags run only in their own CI job, so a TagFilter leaves them out unless a --tag value names the tag.
+_DEDICATED_JOB_TAGS = frozenset({RunTag.NIGHTLY, RunTag.OPENSSL_3_5})
+
+TAG_OPTION_HELP = (
+    f"Select runs by tag: '<tag>' keeps only the runs with the tag, '{SKIP_TAG_PREFIX}<tag>' leaves them out. "
+    "Repeat to combine; a run must match every value. "
+    f"Runs tagged {' or '.join(sorted(_DEDICATED_JOB_TAGS))} are left out unless a value names the tag."
+)
+
+
+@dataclass(frozen=True)
+class TagFilter:
+    """Selects runs by their tags, as the runners' --tag option does.
+
+    A run must have every required tag and none of the skipped tags. TagFilter() selects the runs PR CI runs.
+    """
+
+    required: frozenset[RunTag] = frozenset()
+    skipped: frozenset[RunTag] = _DEDICATED_JOB_TAGS
+
+    @classmethod
+    def parse(cls, values: Iterable[str]) -> "TagFilter":
+        """Return the filter for --tag values: '<tag>' requires the tag, 'skip-<tag>' leaves out the runs with it.
+
+        Runs with a dedicated job's tag stay left out unless a value names that tag. Raises ValueError for an unknown tag.
+        """
+        known_tags = [tag.value for tag in RunTag]
+        required: set[RunTag] = set()
+        skipped: set[RunTag] = set()
+        for value in values:
+            name = value.removeprefix(SKIP_TAG_PREFIX)
+            if name not in known_tags:
+                raise ValueError(f"unknown tag in {value!r}, expected <tag> or {SKIP_TAG_PREFIX}<tag> with a tag from {known_tags}")
+            (skipped if value.startswith(SKIP_TAG_PREFIX) else required).add(RunTag(name))
+        return cls(frozenset(required), frozenset((_DEDICATED_JOB_TAGS - required) | skipped))
+
+    def matches(self, tags: list[RunTag]) -> bool:
+        """Return whether the filter selects a run with these tags."""
+        return self.required.issubset(tags) and self.skipped.isdisjoint(tags)
+
+    def matches_script(self, runs: dict[str, dict[str, Any]]) -> bool:
+        """Return whether a runner calls a script with these runs, as returned by extract_runs_args().
+
+        A runner calls a script that has a matching run. It also calls a script with no runs when a run without
+        tags would match, so that run_python_test.py reports the missing CI test arguments.
+        """
+        if not runs:
+            return self.matches([])
+        return any(self.matches(args["tags"]) for args in runs.values())
+
+    def __str__(self) -> str:
+        return " ".join(sorted([*self.required, *(f"{SKIP_TAG_PREFIX}{tag}" for tag in self.skipped)]))
 
 
 _ISSUE_URL = re.compile(r"https://github\.com/[\w.-]+/[\w.-]+/issues/\d+")
@@ -62,7 +122,7 @@ class Metadata:
 
 def runs_in_pull_requests(tags: list[RunTag]) -> bool:
     """Return whether PR CI runs a block with these tags."""
-    return RunTag.NIGHTLY not in tags
+    return TagFilter().matches(tags)
 
 
 def script_runs_in_pull_requests(runs: dict[str, dict[str, Any]]) -> bool:
@@ -71,7 +131,7 @@ def script_runs_in_pull_requests(runs: dict[str, dict[str, Any]]) -> bool:
     PR CI calls a script that has a run PR CI runs. It also calls a script with no runs, so that
     run_python_test.py reports the missing CI test arguments.
     """
-    return not runs or any(runs_in_pull_requests(args["tags"]) for args in runs.values())
+    return TagFilter().matches_script(runs)
 
 
 def failure_fails_job(tags: list[RunTag]) -> bool:

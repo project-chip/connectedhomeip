@@ -80,7 +80,7 @@ def load_workflow_filters(workflow: Path) -> list[str]:
 
 
 def list_ci_test_scripts() -> list[str]:
-    """List test script paths the same way execute_python_tests.py does (non-nightly run).
+    """List test script paths the same way execute_python_tests.py does for PR CI (the default tag filter).
 
     Paths are relative to CHIP_ROOT (e.g. "src/python_testing/TC_ACE_1_2.py"), matching
     what the CI regex filters are applied to.

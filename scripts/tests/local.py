@@ -40,7 +40,7 @@ import tabulate
 import yaml
 
 with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-    from matter.testing.metadata import extract_runs_args, runs_in_pull_requests
+    from matter.testing.metadata import TAG_OPTION_HELP, TagFilter, extract_runs_args, runs_in_pull_requests
     from matter.testing.tasks import SubprocessKind
 
 
@@ -931,11 +931,10 @@ def gen_coverage(flat):
     help="Run only tests that are for the given app. Comma separated list of apps. E.g. --app-filter ALL_CLUSTERS_APP,CHIP_TOOL",
 )
 @click.option(
-    "--include-nightly",
-    default=False,
-    is_flag=True,
-    show_default=True,
-    help="Include nightly tests (normally excluded as they are slow and reserved for nightly CI runs).",
+    "--tag",
+    "tags",
+    multiple=True,
+    help=TAG_OPTION_HELP,
 )
 def python_tests(
     test_filter,
@@ -950,7 +949,7 @@ def python_tests(
     fail_log_dir,
     override_binary_path,
     app_filter,
-    include_nightly,
+    tags,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -958,6 +957,11 @@ def python_tests(
     Constructs the run yaml in `out/test_env.yaml`. Assumes that binaries
     were built already, generally with `build` (or separate `build-python` and `build-apps`).
     """
+    try:
+        tag_filter = TagFilter.parse(tags)
+    except ValueError as e:
+        raise click.BadParameter(str(e), param_hint="--tag")
+
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage
@@ -1069,11 +1073,10 @@ def python_tests(
         to_run = []
         for script in [t for t in test_scripts if test_filter.any_matches(t)]:
             runs = _get_runs_from_script(script)
-            selected_runs = [name for name, run_config in runs.items()
-                             if include_nightly or runs_in_pull_requests(run_config['tags'])]
-            if runs and not selected_runs:
-                log.info("Skipping '%s': all of its runs are tagged nightly (use --include-nightly)", script)
+            if not tag_filter.matches_script(runs):
+                log.info("Skipping '%s': none of its runs match the tag filter '%s'", script, tag_filter)
                 continue
+            selected_runs = [name for name, run_config in runs.items() if tag_filter.matches(run_config['tags'])]
 
             if app_filter_list:
                 selected_runs = [name for name in selected_runs if app_filter_list.any_matches(_get_app_from_run(runs[name]))]
@@ -1098,7 +1101,7 @@ def python_tests(
                     log.info("EXPLICIT SKIP '%s'", script)
                     continue
 
-            # Without --run, run_python_test.py executes the runs not tagged nightly.
+            # Without --run or --tag, run_python_test.py executes the runs PR CI runs.
             default_runs = [name for name, run_config in runs.items() if runs_in_pull_requests(run_config['tags'])]
             to_run.append((script, [] if selected_runs == default_runs else selected_runs))
 
