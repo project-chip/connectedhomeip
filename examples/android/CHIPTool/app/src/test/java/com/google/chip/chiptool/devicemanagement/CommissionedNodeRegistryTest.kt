@@ -19,12 +19,22 @@ package com.google.chip.chiptool.devicemanagement
 
 import chip.devicecontroller.ChipStructs
 import chip.devicecontroller.model.NodeState
+import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CommissionedNodeRegistryTest {
+
+  @After
+  fun tearDown() {
+    CenterConnectionManager.resetForTest(null, null)
+    HomeStateCache.clear()
+  }
 
   private fun addAttr(
     nodeState: NodeState,
@@ -327,5 +337,175 @@ class CommissionedNodeRegistryTest {
     val result = registry.recordDiscoveredEndpointCluster(null, 99L, 0, 0x0028L, 0x0001L, "Aqara")
     assertEquals(null, result)
     assertEquals(null, registry.getNode(99L))
+  }
+
+  private val qrDeviceInfo =
+    CHIPDeviceInfo(
+      version = 0,
+      vendorId = 0xFFF1,
+      productId = 0x8001,
+      discriminator = 3840,
+      setupPinCode = 20202021L,
+    )
+
+  @Test
+  fun testAutoRegisterDefaultsAreGenericAndUpgradeToProductName() {
+    val registry = CommissionedNodeRegistry()
+    val node = PostCommissioningDialogHelper.autoRegisterNode(registry, 7L, qrDeviceInfo)
+    assertEquals("Matter Device (VID:65521 PID:32769)", node.nodeLabel)
+    assertEquals("Matter Product 32769", node.productName)
+    assertTrue(CommissionedNodeRegistry.isGenericNodeLabel(7L, node.nodeLabel))
+    assertTrue(CommissionedNodeRegistry.isGenericProductName(node.productName))
+
+    // BasicInformation arrives in attribute order: DataModelRevision, VendorName, ProductName.
+    registry.recordDiscoveredEndpointCluster(null, 7L, 0, 0x0028L, 0x0000L, 17)
+    registry.recordDiscoveredEndpointCluster(null, 7L, 0, 0x0028L, 0x0001L, "TEST_VENDOR")
+    assertEquals(
+      "a placeholder product name never becomes the label",
+      "Matter Device (VID:65521 PID:32769)",
+      registry.getNode(7L)!!.nodeLabel,
+    )
+    registry.recordDiscoveredEndpointCluster(null, 7L, 0, 0x0028L, 0x0003L, "Light Bulb")
+    assertEquals("Light Bulb", registry.getNode(7L)!!.nodeLabel)
+    assertEquals("Light Bulb", registry.getNode(7L)!!.productName)
+  }
+
+  @Test
+  fun testGenericProductNameDoesNotReplacePlaceholderLabel() {
+    val registry = CommissionedNodeRegistry()
+    PostCommissioningDialogHelper.autoRegisterNode(registry, 7L, qrDeviceInfo)
+
+    registry.recordDiscoveredEndpointCluster(null, 7L, 0, 0x0028L, 0x0003L, "Matter Product 32769")
+    assertEquals("Matter Device (VID:65521 PID:32769)", registry.getNode(7L)!!.nodeLabel)
+  }
+
+  @Test
+  fun testUnregisterNodeEvictsHomeStateCache() {
+    val registry = CommissionedNodeRegistry()
+    registry.autoRegisterCommissionedNode(7L)
+    registry.autoRegisterCommissionedNode(8L)
+    HomeStateCache.put(7L, 1, 0x0006L, 0x0000L, true, 1000L, Source.UNICAST_READ)
+    HomeStateCache.put(8L, 1, 0x0006L, 0x0000L, true, 1000L, Source.UNICAST_READ)
+    HomeStateCache.putEvent(7L, 1, 0x003BL, 0x01L, "InitialPress", 10L, 1, 1000L)
+    HomeStateCache.putCheckIn(7L, 42L, 1000L)
+
+    registry.unregisterNode(7L)
+
+    assertNull(registry.getNode(7L))
+    assertNull(HomeStateCache.get(7L, 1, 0x0006L, 0x0000L))
+    assertNull(HomeStateCache.getEventMin(7L))
+    assertTrue(HomeStateCache.getRecentEvents(7L, 1).isEmpty())
+    assertTrue(HomeStateCache.getCheckInRecords(7L).isEmpty())
+    assertNotNull(HomeStateCache.get(8L, 1, 0x0006L, 0x0000L))
+  }
+
+  @Test
+  fun testPersistedPlaceholderLabelStillUpgrades() {
+    // A label stuck at the decimal placeholder (persisted by an older build) must still upgrade.
+    for (stuck in listOf("Matter Product 32769", "Matter Product 0x8001")) {
+      val registry = CommissionedNodeRegistry()
+      registry.registerNode(
+        CommissionedNode(
+          nodeId = 7L,
+          nodeLabel = stuck,
+          roomName = "Unassigned",
+          productName = stuck,
+          endpoints = emptyList(),
+        )
+      )
+      registry.recordDiscoveredEndpointCluster(null, 7L, 0, 0x0028L, 0x0003L, "Light Bulb")
+      assertEquals(stuck, "Light Bulb", registry.getNode(7L)!!.nodeLabel)
+    }
+  }
+
+  @Test
+  fun testGenericNodeLabelFromDeviceNeverReplacesGenericLabel() {
+    val registry = CommissionedNodeRegistry()
+    PostCommissioningDialogHelper.autoRegisterNode(registry, 1L, qrDeviceInfo)
+
+    // The device reports a generic NodeLabel while our label is still the generic placeholder.
+    registry.recordDiscoveredEndpointCluster(null, 1L, 0, 0x0028L, 0x0005L, "New Device 1")
+    assertEquals("Matter Device (VID:65521 PID:32769)", registry.getNode(1L)!!.nodeLabel)
+
+    // ProductName then upgrades the label.
+    registry.recordDiscoveredEndpointCluster(
+      null,
+      1L,
+      0,
+      0x0028L,
+      0x0003L,
+      "AQARA CLIMATE SENSOR W100",
+    )
+    assertEquals("AQARA CLIMATE SENSOR W100", registry.getNode(1L)!!.nodeLabel)
+
+    // A real custom NodeLabel (0x0005) upgrades a generic label.
+    PostCommissioningDialogHelper.autoRegisterNode(registry, 2L, qrDeviceInfo)
+    registry.recordDiscoveredEndpointCluster(null, 2L, 0, 0x0028L, 0x0005L, "Office Smart Plug")
+    assertEquals("Office Smart Plug", registry.getNode(2L)!!.nodeLabel)
+
+    // Placeholder VID/PID labels are generic, while user-entered "Matter Device (...)" labels are
+    // preserved across ProductName reports.
+    assertTrue(
+      CommissionedNodeRegistry.isGenericNodeLabel(3L, "Matter Device (VID:4447 PID:32802)")
+    )
+    assertTrue(
+      CommissionedNodeRegistry.isGenericNodeLabel(3L, "Matter Device (VID:0x115f PID:0x8022)")
+    )
+    assertFalse(CommissionedNodeRegistry.isGenericNodeLabel(3L, "Matter Device (Living Room)"))
+    registry.registerNode(
+      CommissionedNode(
+        nodeId = 3L,
+        nodeLabel = "Matter Device (Living Room)",
+        productName = "Matter Product 32802",
+        roomName = "Living Room",
+      )
+    )
+    registry.recordDiscoveredEndpointCluster(
+      null,
+      3L,
+      0,
+      0x0028L,
+      0x0003L,
+      "AQARA CLIMATE SENSOR W100",
+    )
+    assertEquals("Matter Device (Living Room)", registry.getNode(3L)!!.nodeLabel)
+  }
+
+  @Test
+  fun testIdenticalDescriptorReportDoesNotEmitRedundantNotification() {
+    val registry = CommissionedNodeRegistry()
+    registry.autoRegisterCommissionedNode(1L)
+    var notifications = 0
+    val listener: (CommissionedNode) -> Unit = { notifications++ }
+    registry.addNodeRegistryChangeListener(listener)
+
+    val report = NodeState()
+    addAttr(report, 0, 0x001DL, 0x0003L, arrayListOf(1L))
+    addAttr(report, 0, 0x001DL, 0x0001L, arrayListOf(0x001DL, 0x0028L))
+    addAttr(report, 1, 0x001DL, 0x0001L, arrayListOf(0x0402L))
+    addAttr(
+      report,
+      1,
+      0x001DL,
+      0x0000L,
+      arrayListOf(ChipStructs.DescriptorClusterDeviceTypeStruct(0x0302L, 1)),
+    )
+
+    assertTrue(registry.applyDescriptorReport(null, 1L, report))
+    assertEquals(1, notifications)
+
+    // Applying identical Descriptor report again returns true without redundant listener churn
+    assertTrue(registry.applyDescriptorReport(null, 1L, report))
+    assertEquals(1, notifications)
+    registry.removeNodeRegistryChangeListener(listener)
+  }
+
+  @Test
+  fun testUnsignedFormatting() {
+    val msbSetNodeId = -1L // 0xFFFFFFFFFFFFFFFF
+    val expectedHex = "ffffffffffffffff"
+    val placeholder = CommissionedNodeRegistry.placeholderNodeLabel(msbSetNodeId, null, null)
+    assertEquals("Device 0x$expectedHex", placeholder)
+    assertTrue(CommissionedNodeRegistry.isGenericNodeLabel(msbSetNodeId, placeholder))
   }
 }
