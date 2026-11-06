@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 #include <algorithm>
+#include <ios>
 #include <optional>
 #include <pw_unit_test/framework.h>
 
