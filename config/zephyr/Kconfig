@@ -52,10 +52,29 @@ config CHIP_APP_LOG_LEVEL
 
 # Device and firmware identifers
 
+<<<<<<< HEAD
 config CHIP_DEVICE_VENDOR_ID
 	int "Device Vendor ID"
 	default 65521 # 0xFFF1
 	range 0 65535
+=======
+config CHIP_OTA_BACKEND_CUSTOM
+	bool
+	help
+	  Selected by a platform that provides its own OTA image processor and
+	  OTA image packaging instead of MCUboot.
+
+# Default: MCUboot slot-based DFU.
+config CHIP_OTA_BACKEND_MCUBOOT
+	def_bool CHIP_OTA_REQUESTOR && !CHIP_OTA_BACKEND_CUSTOM
+
+# See config/common/cmake/Kconfig for full definition
+config CHIP_LIB_SHELL
+	imply SHELL
+
+config CHIP_DATA_MODEL_CODEDRIVEN
+	bool "Code-driven data model provider"
+>>>>>>> 6f40041 ([Zephyr] Fix Zephyr all-device-app build with OTA enabled for SiWx917 (#74919))
 	help
 	  Provides the 16-bit numeric identifier of the device manufacturer,
 	  assigned by Connectivity Standards Alliance. The identifier is exposed as

@@ -14,4 +14,23 @@
 #   limitations under the License.
 #
 
+<<<<<<< HEAD
 rsource "../Kconfig"
+=======
+rsource "../Kconfig"
+
+if CHIP
+rsource "Kconfig.bt"
+endif # CHIP
+
+rsource "../../nxp/chip-module/Kconfig"
+rsource "../../silabs/chip-module/Kconfig"
+
+config CHIP_ZEPHYR_USE_POSIX_DEFAULT_SOURCE
+    bool "Use _DEFAULT_SOURCE macro for POSIX API"
+    depends on POSIX_API
+    default y
+    help
+      Enables defining _DEFAULT_SOURCE macro when POSIX API is enabled
+      on Zephyr platform.
+>>>>>>> 6f40041 ([Zephyr] Fix Zephyr all-device-app build with OTA enabled for SiWx917 (#74919))
