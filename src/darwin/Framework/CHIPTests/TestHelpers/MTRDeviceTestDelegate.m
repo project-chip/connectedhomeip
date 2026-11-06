@@ -61,6 +61,20 @@
     }
 }
 
+- (BOOL)unitTestShouldIgnoreOperationalAdvertisementForDevice:(MTRDevice *)device
+{
+    return self.ignoreOperationalAdvertisements;
+}
+
+- (NSNumber *)unitTestResubscriptionDelayOverrideForDevice:(MTRDevice *)device
+{
+    NSNumber * delayOverrideMs = self.resubscriptionDelayOverrideMs;
+    if (self.onResubscriptionDelayRequested != nil) {
+        self.onResubscriptionDelayRequested();
+    }
+    return delayOverrideMs;
+}
+
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device
 {
     if (self.subscriptionMaxIntervalOverride) {
