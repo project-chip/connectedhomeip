@@ -160,6 +160,7 @@ public:
 
     // There is no delegate, nothing to do here
     virtual void OnSessionHang() {}
+    virtual void OnSessionActivated() {}
 
 protected:
     // Helper for use by the Grab methods.
@@ -196,6 +197,7 @@ public:
     }
 
     void OnSessionHang() override { mDelegate.OnSessionHang(); }
+    void OnSessionActivated() override { mDelegate.OnSessionActivated(); }
 
 private:
     SessionDelegate & mDelegate;
@@ -335,6 +337,16 @@ public:
         ForEachHolder([](SessionHolder & holder, void *) { holder.OnSessionHang(); });
     }
 
+    void NotifySessionActivated()
+    {
+        // A holder that makes the session defunct and active again while being notified would start a nested walk; the
+        // holders are already being told that the session is active, so that activation is not notified again.
+        VerifyOrReturn(!mNotifyingActivation);
+        mNotifyingActivation = true;
+        ForEachHolder([](SessionHolder & holder, void *) { holder.OnSessionActivated(); });
+        mNotifyingActivation = false;
+    }
+
     // Return a session id that is usable for logging. This is the local session
     // id for secure unicast sessions, 0 for non-secure unicast sessions, and
     // the group id for group sessions.
@@ -373,8 +385,9 @@ private:
     // Each running ForEachHolder adds a cursor to mHolders. Cursors are the only elements that hold no session.
     IntrusiveList<SessionHolder> mHolders;
 
-    FabricIndex mFabricIndex = kUndefinedFabricIndex;
-    bool mReleasing          = false;
+    FabricIndex mFabricIndex  = kUndefinedFabricIndex;
+    bool mReleasing           = false;
+    bool mNotifyingActivation = false;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // The underlying TCP connection object over which the session is
     // established.

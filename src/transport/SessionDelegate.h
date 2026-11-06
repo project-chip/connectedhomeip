@@ -71,6 +71,10 @@ public:
      */
     virtual void OnSessionHang() {}
 
+    // Called when a defunct session becomes active again on traffic from the peer, not on first establishment.
+    // Callees SHALL NOT make synchronous calls into SessionManager to allocate a new session.
+    virtual void OnSessionActivated() {}
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     virtual void OnSessionConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR connErr) {}
     virtual void OnConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR connErr) {}
