@@ -17,8 +17,9 @@ import re
 import tempfile
 import unittest
 
-from metadata import (SKIP_TAG_PREFIX, Metadata, MetadataReader, RunArgumentsError, RunTag, TagFilter, extract_runs_args,
-                      failure_fails_job, runs_in_pull_requests, script_runs_in_pull_requests)
+from metadata import (NEEDS_FOLLOWUP_FIXES_TAG, NIGHTLY_TAG, OPENSSL_3_5_TAG, Metadata, MetadataReader, RunArgumentsError,
+                      TagFilter, extract_runs_args, failure_fails_job, is_valid_tag_name, runs_in_pull_requests,
+                      script_runs_in_pull_requests, unused_tag_values)
 
 
 class TestMetadataReader(unittest.TestCase):
@@ -96,6 +97,9 @@ class TestMetadataReader(unittest.TestCase):
     #   run5:
     #     app: ${CHIP_LOCK_APP}
     #     tags: [openssl-3.5]
+    #   run6:
+    #     app: ${CHIP_LOCK_APP}
+    #     tags: [slow]
     # === END CI TEST ARGUMENTS ===
     '''
 
@@ -108,30 +112,34 @@ class TestMetadataReader(unittest.TestCase):
 
         self.assertEqual(runs["run1"].tags, [])
         self.assertEqual(runs["run1"].issues, [])
-        self.assertEqual(runs["run2"].tags, [RunTag.NIGHTLY])
+        self.assertEqual(runs["run2"].tags, [NIGHTLY_TAG])
         self.assertEqual(runs["run2"].issues, [])
-        self.assertEqual(runs["run3"].tags, [RunTag.NEEDS_FOLLOWUP_FIXES])
+        self.assertEqual(runs["run3"].tags, [NEEDS_FOLLOWUP_FIXES_TAG])
         self.assertEqual(runs["run3"].issues, ["https://github.com/project-chip/connectedhomeip/issues/1",
                                                "https://github.com/project-chip/connectedhomeip/issues/2"])
-        self.assertEqual(runs["run4"].tags, [RunTag.NIGHTLY, RunTag.NEEDS_FOLLOWUP_FIXES])
+        self.assertEqual(runs["run4"].tags, [NIGHTLY_TAG, NEEDS_FOLLOWUP_FIXES_TAG])
         self.assertEqual(runs["run4"].issues, ["https://github.com/project-chip/connectedhomeip/issues/3"])
-        self.assertEqual(runs["run5"].tags, [RunTag.OPENSSL_3_5])
+        self.assertEqual(runs["run5"].tags, [OPENSSL_3_5_TAG])
+        self.assertEqual(runs["run6"].tags, ["slow"])
 
-        self.assertEqual([name for name, run in runs.items() if runs_in_pull_requests(run.tags)], ["run1", "run3"])
-        self.assertEqual([name for name, run in runs.items() if failure_fails_job(run.tags)], ["run1", "run2", "run3", "run5"])
+        self.assertEqual([name for name, run in runs.items() if runs_in_pull_requests(run.tags)], ["run1", "run3", "run6"])
+        self.assertEqual([name for name, run in runs.items() if failure_fails_job(run.tags)],
+                         ["run1", "run2", "run3", "run5", "run6"])
 
     def test_tag_filter(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             runs = extract_runs_args(self.generate_temp_file(temp_dir, self.tagged_file_content))
 
         cases = {
-            (): ["run1", "run3"],
-            ("skip-nightly", "skip-openssl-3.5"): ["run1", "run3"],
-            ("skip-nightly",): ["run1", "run3"],
+            (): ["run1", "run3", "run6"],
+            ("skip-nightly", "skip-openssl-3.5"): ["run1", "run3", "run6"],
+            ("skip-nightly",): ["run1", "run3", "run6"],
             ("nightly",): ["run2", "run4"],
             ("openssl-3.5",): ["run5"],
             ("needs-followup-fixes",): ["run3"],
-            ("skip-needs-followup-fixes",): ["run1"],
+            ("skip-needs-followup-fixes",): ["run1", "run6"],
+            ("slow",): ["run6"],
+            ("skip-slow",): ["run1", "run3"],
             ("nightly", "needs-followup-fixes"): ["run4"],
             ("nightly", "skip-needs-followup-fixes"): ["run2"],
             ("nightly", "skip-nightly"): [],
@@ -146,20 +154,30 @@ class TestMetadataReader(unittest.TestCase):
         self.assertEqual(str(TagFilter.parse(["nightly", "skip-needs-followup-fixes"])),
                          "nightly skip-needs-followup-fixes skip-openssl-3.5")
 
-    def test_tag_filter_unknown_tag(self):
-        for value in ["slow", "skip-slow", "Nightly", "", "skip-"]:
-            with self.subTest(value=value), self.assertRaisesRegex(ValueError, f"unknown tag in {re.escape(repr(value))}"):
+    def test_tag_filter_invalid_tag(self):
+        for value in ["Nightly", "skip-Nightly", "", "skip-", "skip-skip-slow", "-slow", "slow tag"]:
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, f"invalid tag in {re.escape(repr(value))}"):
                 TagFilter.parse([value])
 
-    def test_no_tag_starts_with_skip_prefix(self):
-        for tag in RunTag:
-            self.assertFalse(tag.startswith(SKIP_TAG_PREFIX), tag)
+    def test_tag_names(self):
+        for name in [NIGHTLY_TAG, NEEDS_FOLLOWUP_FIXES_TAG, OPENSSL_3_5_TAG, "slow", "a", "tls1.3"]:
+            with self.subTest(name=name):
+                self.assertTrue(is_valid_tag_name(name))
+        for name in ["", "Nightly", "skip-slow", "-slow", ".slow", "slow tag", "slow_tag"]:
+            with self.subTest(name=name):
+                self.assertFalse(is_valid_tag_name(name))
+
+    def test_unused_tag_values(self):
+        values = ["nightly", "skip-slow", "nightyl", "skip-nigthly"]
+        self.assertEqual(unused_tag_values(values, {"nightly", "slow"}), ["nightyl", "skip-nigthly"])
+        self.assertEqual(unused_tag_values([], set()), [])
 
     def test_invalid_tags_and_issues(self):
         issue = "https://github.com/project-chip/connectedhomeip/issues/1"
         cases = {
             "tags: nightly": "tags must be a list",
-            "tags: [nightly, slow]": "unknown tags ['slow']",
+            "tags: [nightly, Slow]": "invalid tags ['Slow']",
+            "tags: [skip-slow]": "invalid tags ['skip-slow']",
             "tags: [needs-followup-fixes]": "needs-followup-fixes needs issues",
             "tags: [nightly, needs-followup-fixes]": "needs-followup-fixes needs issues",
             f"tags: [needs-followup-fixes]\n#     issues: {issue}": "issues must be a list",
@@ -210,6 +228,7 @@ class TestMetadataReader(unittest.TestCase):
             "only a nightly needs-followup-fixes run":
                 (one_run_file_content("tags: [nightly, needs-followup-fixes]", f"issues: [{issue}]"), False, True),
             "only an openssl-3.5 run": (one_run_file_content("tags: [openssl-3.5]"), False, False),
+            "only a run with a tag that only selects": (one_run_file_content("tags: [slow]"), True, False),
             "no CI test arguments": ("# A support module with no CI test arguments\n", True, False),
         }
         nightly_filter = TagFilter.parse(["nightly"])

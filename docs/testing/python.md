@@ -949,9 +949,12 @@ for that run, e.g.:
     -   Example:
         `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
 
--   `tags`: Moves the run to a dedicated CI job, or records known problems. See
+-   `tags`: Labels the run, so that the runners can select it with `--tag`. A
+    tag is any lowercase name of letters, digits, `.` and `-` that doesn't
+    start with `skip-`. See
     [Running a run only in the nightly job](#running-a-run-only-in-the-nightly-job)
-    and [Selecting runs by tag](#selecting-runs-by-tag).
+    and [Selecting runs by tag](#selecting-runs-by-tag). These tags also change
+    what CI does with the run:
 
     -   `nightly`: moves the run out of PR CI and into the nightly job, for runs
         that are too slow for PR CI, or that use an app PR CI doesn't run the
@@ -1002,7 +1005,7 @@ other runs stay in PR CI. To move a whole test, tag each of its runs.
 
 -   The nightly job runs each `nightly` run on its own and reports it as
     `<script>::<run>`, for example `TC_ACE_1_2.py::run2`.
--   An unknown tag is an error, so a misspelled tag fails the PR's own CI run.
+-   Tags are free-form, so a misspelled `nightly` leaves the run in PR CI.
 -   A file on the `not_automated` list runs nowhere, tagged runs included.
 -   To run a `nightly` run locally, name it:
     `./scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ACE_1_2.py --run run2`,
@@ -1017,6 +1020,8 @@ select runs with the same `--tag` option:
     leaves them out. With several `--tag` values, a run must match each one.
 -   Runs tagged `nightly` or `openssl-3.5` are left out unless a `--tag` value
     names the tag. Without `--tag`, the runners select the runs PR CI runs.
+-   `execute_python_tests.py` and `local.py` reject a `--tag` value whose tag
+    no run has, such as a misspelled tag.
 -   `run_python_test.py --run` names runs whatever their tags, and can't be
     combined with `--tag`.
 -   `execute_python_tests.py` calls each selected run that has tags on its own,

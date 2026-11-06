@@ -40,7 +40,7 @@ import tabulate
 import yaml
 
 with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-    from matter.testing.metadata import TAG_OPTION_HELP, TagFilter, extract_runs_args, runs_in_pull_requests
+    from matter.testing.metadata import TAG_OPTION_HELP, TagFilter, extract_runs_args, runs_in_pull_requests, unused_tag_values
     from matter.testing.tasks import SubprocessKind
 
 
@@ -1066,6 +1066,12 @@ def python_tests(
 
     for name in sorted(skipped_dedicated_runner):
         log.warning("Skipping '%s': %s", name, dedicated_runner_tests[name])
+
+    if tags:
+        used_tags = {tag for script in test_scripts for run_config in _get_runs_from_script(script).values()
+                     for tag in run_config['tags']}
+        if unused := unused_tag_values(tags, used_tags):
+            raise click.BadParameter(f"no run has the tag in {', '.join(map(repr, unused))}", param_hint="--tag")
 
     execution_times = []
     failed_tests = []

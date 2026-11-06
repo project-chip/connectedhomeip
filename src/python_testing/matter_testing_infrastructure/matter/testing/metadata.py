@@ -16,7 +16,6 @@ import logging
 import re
 from collections.abc import Iterable
 from dataclasses import dataclass, field
-from enum import StrEnum
 from io import StringIO
 from typing import Any
 
@@ -25,23 +24,31 @@ import yaml
 LOGGER = logging.getLogger(__name__)
 
 
-class RunTag(StrEnum):
-    """Values for the `tags:` list of a run block."""
+# A run block's `tags:` list takes any tag name, so a tag that only selects runs with --tag needs no code.
+# These tags also change what the runners do with a run.
 
-    # The block runs only in the nightly job.
-    NIGHTLY = "nightly"
-    # The block has problems tracked in its `issues:`, such as a failure or probes a deny list skips. The tag doesn't
-    # change where the block runs. With nightly, a failure is reported with the issues and doesn't fail the job.
-    NEEDS_FOLLOWUP_FIXES = "needs-followup-fixes"
-    # The block needs an app and controller built with OpenSSL 3.5, so it runs only in the OpenSSL 3.5 job.
-    OPENSSL_3_5 = "openssl-3.5"
+# The run runs only in the nightly job.
+NIGHTLY_TAG = "nightly"
+# The run has problems tracked in its `issues:`, such as a failure or probes a deny list skips. The tag doesn't
+# change where the run runs. With nightly, a failure is reported with the issues and doesn't fail the job.
+NEEDS_FOLLOWUP_FIXES_TAG = "needs-followup-fixes"
+# The run needs an app and controller built with OpenSSL 3.5, so it runs only in the OpenSSL 3.5 job.
+OPENSSL_3_5_TAG = "openssl-3.5"
 
-
-# A --tag value with this prefix leaves out the runs that have the tag. No RunTag value may start with it.
+# A --tag value with this prefix leaves out the runs that have the tag, so no tag name may start with it.
 SKIP_TAG_PREFIX = "skip-"
 
+# Lowercase only, so that a tag differing only in case from nightly can't put a nightly run into PR CI.
+_TAG_NAME = re.compile(r"[a-z0-9][a-z0-9.-]*")
+
 # Runs with these tags run only in their own CI job, so a TagFilter leaves them out unless a --tag value names the tag.
-_DEDICATED_JOB_TAGS = frozenset({RunTag.NIGHTLY, RunTag.OPENSSL_3_5})
+_DEDICATED_JOB_TAGS = frozenset({NIGHTLY_TAG, OPENSSL_3_5_TAG})
+
+
+def is_valid_tag_name(name: str) -> bool:
+    """Return whether a run block may use this tag: lowercase letters, digits, '.' and '-', not starting with 'skip-'."""
+    return bool(_TAG_NAME.fullmatch(name)) and not name.startswith(SKIP_TAG_PREFIX)
+
 
 TAG_OPTION_HELP = (
     f"Select runs by tag: '<tag>' keeps only the runs with the tag, '{SKIP_TAG_PREFIX}<tag>' leaves them out. "
@@ -57,26 +64,26 @@ class TagFilter:
     A run must have every required tag and none of the skipped tags. TagFilter() selects the runs PR CI runs.
     """
 
-    required: frozenset[RunTag] = frozenset()
-    skipped: frozenset[RunTag] = _DEDICATED_JOB_TAGS
+    required: frozenset[str] = frozenset()
+    skipped: frozenset[str] = _DEDICATED_JOB_TAGS
 
     @classmethod
     def parse(cls, values: Iterable[str]) -> "TagFilter":
         """Return the filter for --tag values: '<tag>' requires the tag, 'skip-<tag>' leaves out the runs with it.
 
-        Runs with a dedicated job's tag stay left out unless a value names that tag. Raises ValueError for an unknown tag.
+        Runs with a dedicated job's tag stay left out unless a value names that tag. Raises ValueError for a value
+        whose tag isn't a valid tag name. Whether any run has the tag is for the caller to check, with unused_tag_values().
         """
-        known_tags = [tag.value for tag in RunTag]
-        required: set[RunTag] = set()
-        skipped: set[RunTag] = set()
+        required: set[str] = set()
+        skipped: set[str] = set()
         for value in values:
             name = value.removeprefix(SKIP_TAG_PREFIX)
-            if name not in known_tags:
-                raise ValueError(f"unknown tag in {value!r}, expected <tag> or {SKIP_TAG_PREFIX}<tag> with a tag from {known_tags}")
-            (skipped if value.startswith(SKIP_TAG_PREFIX) else required).add(RunTag(name))
+            if not is_valid_tag_name(name):
+                raise ValueError(f"invalid tag in {value!r}, expected <tag> or {SKIP_TAG_PREFIX}<tag> with a lowercase tag name")
+            (skipped if value.startswith(SKIP_TAG_PREFIX) else required).add(name)
         return cls(frozenset(required), frozenset((_DEDICATED_JOB_TAGS - required) | skipped))
 
-    def matches(self, tags: list[RunTag]) -> bool:
+    def matches(self, tags: list[str]) -> bool:
         """Return whether the filter selects a run with these tags."""
         return self.required.issubset(tags) and self.skipped.isdisjoint(tags)
 
@@ -92,6 +99,15 @@ class TagFilter:
 
     def __str__(self) -> str:
         return " ".join(sorted([*self.required, *(f"{SKIP_TAG_PREFIX}{tag}" for tag in self.skipped)]))
+
+
+def unused_tag_values(values: Iterable[str], used_tags: set[str]) -> list[str]:
+    """Return the --tag values that name a tag no run has, such as a misspelled tag.
+
+    used_tags must be the tags of every run the runner could select, before any other filter, so that a value
+    doesn't count as unused only because, for example, a --regex left out the runs with the tag.
+    """
+    return [value for value in values if value.removeprefix(SKIP_TAG_PREFIX) not in used_tags]
 
 
 _ISSUE_URL = re.compile(r"https://github\.com/[\w.-]+/[\w.-]+/issues/\d+")
@@ -116,11 +132,11 @@ class Metadata:
     timeout: float | None = None
     quiet: bool = False
     pre_existing_fabric: bool = False
-    tags: list[RunTag] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
     issues: list[str] = field(default_factory=list)
 
 
-def runs_in_pull_requests(tags: list[RunTag]) -> bool:
+def runs_in_pull_requests(tags: list[str]) -> bool:
     """Return whether PR CI runs a block with these tags."""
     return TagFilter().matches(tags)
 
@@ -134,12 +150,12 @@ def script_runs_in_pull_requests(runs: dict[str, dict[str, Any]]) -> bool:
     return TagFilter().matches_script(runs)
 
 
-def failure_fails_job(tags: list[RunTag]) -> bool:
+def failure_fails_job(tags: list[str]) -> bool:
     """Return whether a failure of a block with these tags fails the job that runs it.
 
     Only a nightly block with tracked issues can fail without failing its job, so every PR CI failure fails PR CI.
     """
-    return not (RunTag.NIGHTLY in tags and RunTag.NEEDS_FOLLOWUP_FIXES in tags)
+    return not (NIGHTLY_TAG in tags and NEEDS_FOLLOWUP_FIXES_TAG in tags)
 
 
 class NamedStringIO(StringIO):
@@ -156,12 +172,11 @@ def _validate_tags_and_issues(py_script_path: str, run: str, args: dict[str, Any
 
     tags = args.get("tags", [])
     if not isinstance(tags, list) or not all(isinstance(tag, str) for tag in tags):
-        raise error(f"tags must be a list such as [{RunTag.NIGHTLY}], got {tags!r}")
-    known_tags = [tag.value for tag in RunTag]
-    unknown_tags = [tag for tag in tags if tag not in known_tags]
-    if unknown_tags:
-        raise error(f"unknown tags {unknown_tags}, expected some of {known_tags}")
-    tags = [RunTag(tag) for tag in tags]
+        raise error(f"tags must be a list such as [{NIGHTLY_TAG}], got {tags!r}")
+    invalid_tags = [tag for tag in tags if not is_valid_tag_name(tag)]
+    if invalid_tags:
+        raise error(f"invalid tags {invalid_tags}: a tag is a lowercase name of letters, digits, '.' and '-' "
+                    f"that doesn't start with {SKIP_TAG_PREFIX!r}")
 
     issues = args.get("issues", [])
     if not isinstance(issues, list) or not all(isinstance(issue, str) for issue in issues):
@@ -169,10 +184,10 @@ def _validate_tags_and_issues(py_script_path: str, run: str, args: dict[str, Any
     invalid_issues = [issue for issue in issues if not _ISSUE_URL.fullmatch(issue)]
     if invalid_issues:
         raise error(f"issues must be GitHub issue URLs (https://github.com/<owner>/<repo>/issues/<number>), got {invalid_issues}")
-    if RunTag.NEEDS_FOLLOWUP_FIXES in tags and not issues:
-        raise error(f"{RunTag.NEEDS_FOLLOWUP_FIXES} needs issues: the issues that track the problems")
-    if issues and RunTag.NEEDS_FOLLOWUP_FIXES not in tags:
-        raise error(f"issues is only used with the {RunTag.NEEDS_FOLLOWUP_FIXES} tag")
+    if NEEDS_FOLLOWUP_FIXES_TAG in tags and not issues:
+        raise error(f"{NEEDS_FOLLOWUP_FIXES_TAG} needs issues: the issues that track the problems")
+    if issues and NEEDS_FOLLOWUP_FIXES_TAG not in tags:
+        raise error(f"issues is only used with the {NEEDS_FOLLOWUP_FIXES_TAG} tag")
 
     args["tags"] = tags
     args["issues"] = issues

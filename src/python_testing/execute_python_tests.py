@@ -36,7 +36,8 @@ import click
 import coloredlogs
 import yaml
 
-from matter.testing.metadata import TAG_OPTION_HELP, RunArgumentsError, TagFilter, extract_runs_args, failure_fails_job
+from matter.testing.metadata import (TAG_OPTION_HELP, RunArgumentsError, TagFilter, extract_runs_args, failure_fails_job,
+                                     unused_tag_values)
 
 log = logging.getLogger(__name__)
 
@@ -361,6 +362,15 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
 
     all_python_files = g.glob(os.path.join(search_directory, "*.py"))
+
+    if tags:
+        try:
+            used_tags = {tag for script in all_python_files if os.path.basename(script) not in excluded_patterns
+                         for args in extract_runs_args(script).values() for tag in args["tags"]}
+        except RunArgumentsError as e:
+            raise click.ClickException(str(e))
+        if unused := unused_tag_values(tags, used_tags):
+            raise click.BadParameter(f"no run has the tag in {', '.join(map(repr, unused))}", param_hint="--tag")
 
     for pattern in glob:
         if pattern.startswith('!'):
