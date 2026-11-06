@@ -111,12 +111,13 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
 {
     CORE_DECLARE_IRQ_STATE;
     CORE_ENTER_CRITICAL();
-    const uint64_t bootTimeUS = sBootTimeUS;
+    const uint64_t bootTimeUS  = sBootTimeUS;
+    const uint64_t monotonicUS = GetMonotonicMicroseconds();
     CORE_EXIT_CRITICAL();
 
     VerifyOrReturnError(bootTimeUS != 0, CHIP_ERROR_REAL_TIME_NOT_SYNCED);
 
-    aCurTime = Microseconds64(bootTimeUS + GetMonotonicMicroseconds());
+    aCurTime = Microseconds64(bootTimeUS + monotonicUS);
     return CHIP_NO_ERROR;
 }
 
@@ -133,11 +134,15 @@ CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
 {
     VerifyOrReturnError(IsPlausibleRealTime(aNewCurTime.count()), CHIP_ERROR_INVALID_TIME);
 
-    const uint64_t monotonicUS = GetMonotonicMicroseconds();
-    VerifyOrReturnError(aNewCurTime.count() > monotonicUS, CHIP_ERROR_INVALID_TIME);
-
     CORE_DECLARE_IRQ_STATE;
     CORE_ENTER_CRITICAL();
+    const uint64_t monotonicUS = GetMonotonicMicroseconds();
+    if (aNewCurTime.count() <= monotonicUS)
+    {
+        CORE_EXIT_CRITICAL();
+        return CHIP_ERROR_INVALID_TIME;
+    }
+
     sBootTimeUS = aNewCurTime.count() - monotonicUS;
     CORE_EXIT_CRITICAL();
 
