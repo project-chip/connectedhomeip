@@ -105,6 +105,8 @@ if (CONFIG_CHIP_FACTORY_DATA OR CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
     matter_add_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
 endif()
 
+
+include(chip-module/ota.cmake)
 if (CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg_string("chip_mdns" "platform")
     matter_add_gn_arg_bool("chip_inet_config_enable_tcp_endpoint" FALSE)

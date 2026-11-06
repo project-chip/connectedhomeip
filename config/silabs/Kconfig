@@ -15,6 +15,7 @@
 #
 
 rsource "../zephyr/Kconfig"
+rsource "chip-module/Kconfig"
 
 if CHIP
 menu "Silabs Matter Config"
@@ -28,6 +29,10 @@ config CHIP_DEVICE_VENDOR_NAME
 config CHIP_OTA_REQUESTOR
 	bool "Enable OTA Requestor"
 	default n
+# OTA backends are defined in config/zephyr/Kconfig and chip-module/Kconfig.
+# EFR32 (and other non-SiWx): MCUboot slot-based DFU.
+config CHIP_OTA_BACKEND_MCUBOOT
+
 	imply BOOTLOADER_MCUBOOT
 	imply IMG_MANAGER
 	imply STREAM_FLASH
