@@ -27,7 +27,7 @@ import time
 from dataclasses import dataclass
 from typing import Any, get_args
 
-from mobly import asserts, signals
+from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -1127,15 +1127,15 @@ class IDMBaseTest(BasicCompositionTests):
 
         # Read the original value once: every probe below restores it before the next one
         # runs, so each of them starts from the value read here.
-        try:
-            original_value = await self.read_single_attribute_check_success(
-                endpoint=attr_info.endpoint_id,
-                cluster=attr_info.cluster_class,
-                attribute=attr_info.attribute
-            )
-        except signals.TestFailure as error:
-            log.warning("Unable to qualify readable baseline for %s.%s: %s",
-                        attr_info.cluster_name, attr_info.attribute_name, error)
+        original_value = await self.read_single_attribute_check_success(
+            endpoint=attr_info.endpoint_id,
+            cluster=attr_info.cluster_class,
+            attribute=attr_info.attribute,
+            assert_on_error=False
+        )
+        if original_value is None:
+            log.warning("Unable to qualify readable baseline for %s.%s",
+                        attr_info.cluster_name, attr_info.attribute_name)
             return ConstraintProbeResult()
 
         # A non-timed write to a timed-write attribute is answered with
@@ -1158,11 +1158,14 @@ class IDMBaseTest(BasicCompositionTests):
                     attributes=[(attr_info.endpoint_id, attr_info.attribute(test_value))],
                     timedRequestTimeoutMs=timed_request_timeout_ms
                 )
+            except InteractionModelError as error:
+                result_status = error.status
             except ChipStackError as error:  # chipstack-ok
                 result.execution_error += 1
                 log.warning("Execution failed writing %s: %s", attribute_path, error)
                 raise ConstraintProbeExecutionError(error, result) from error
-            result_status = write_result[0].Status
+            else:
+                result_status = write_result[0].Status
 
             # Status is an IntEnum, which formats as a bare number under Python 3.11; log
             # the name alongside it so the result reads as SUCCESS rather than as "got 0".
@@ -1184,6 +1187,10 @@ class IDMBaseTest(BasicCompositionTests):
             # abandon the probe, so it has to come back as a value this loop can classify
             # instead of as an assertion. Reads that did decode still go through the
             # wildcard-subscription cross-check inside the helper.
+            execution_failure = None
+            restore_needed = True
+            restore_failed = False
+            stored_violation = False
             try:
                 stored_value = await self.read_single_attribute(
                     dev_ctrl=self.default_controller,
@@ -1191,36 +1198,48 @@ class IDMBaseTest(BasicCompositionTests):
                     endpoint=attr_info.endpoint_id,
                     attribute=attr_info.attribute
                 )
+                read_back_failed = isinstance(stored_value, ValueDecodeFailure)
+                restore_needed = read_back_failed or stored_value != original_value
+                stored_violation = read_back_failed or stored_value == test_value
+                if result_status != Status.Success and stored_violation:
+                    self.record_accepted_violation(
+                        location=location,
+                        problem=(f"{attribute_path} stored an out-of-bounds value despite answering {status_name}; "
+                                 f"readback={stored_value}"))
+                    result.accepted += 1
             except ChipStackError as error:  # chipstack-ok
                 result.execution_error += 1
                 log.warning("Execution failed reading back %s: %s", attribute_path, error)
-                raise ConstraintProbeExecutionError(error, result) from error
-            read_back_failed = isinstance(stored_value, ValueDecodeFailure)
-            if result_status != Status.Success and (
-                    read_back_failed or (result_status == Status.ConstraintError and stored_value == test_value)):
-                self.record_accepted_violation(
-                    location=location,
-                    problem=(f"{attribute_path} stored an out-of-bounds value despite answering {status_name}; "
-                             f"readback={stored_value}"))
-                result.accepted += 1
-            if read_back_failed or stored_value != original_value:
-                try:
-                    restore_result = await self.default_controller.WriteAttribute(
-                        nodeId=self.dut_node_id,
-                        attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))],
-                        timedRequestTimeoutMs=timed_request_timeout_ms
-                    )
-                except ChipStackError as error:  # chipstack-ok
-                    result.execution_error += 1
-                    log.warning("Execution failed restoring %s: %s", attribute_path, error)
-                    raise ConstraintProbeExecutionError(error, result) from error
-                if restore_result[0].Status != Status.Success:
-                    result.execution_error += 1
-                    log.warning("Failed to restore %s to %s: %s", attribute_path, original_value,
-                                restore_result[0].Status)
-                    break
+                execution_failure = error
+            finally:
+                if restore_needed:
+                    try:
+                        restore_result = await self.default_controller.WriteAttribute(
+                            nodeId=self.dut_node_id,
+                            attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))],
+                            timedRequestTimeoutMs=timed_request_timeout_ms
+                        )
+                    except InteractionModelError as error:
+                        result.execution_error += 1
+                        restore_failed = True
+                        log.warning("Execution failed restoring %s: %s", attribute_path, error.status)
+                    except ChipStackError as error:  # chipstack-ok
+                        result.execution_error += 1
+                        log.warning("Execution failed restoring %s: %s", attribute_path, error)
+                        if execution_failure is None:
+                            execution_failure = error
+                    else:
+                        if restore_result[0].Status != Status.Success:
+                            result.execution_error += 1
+                            restore_failed = True
+                            log.warning("Failed to restore %s to %s: %s", attribute_path, original_value,
+                                        restore_result[0].Status)
+            if execution_failure is not None:
+                raise ConstraintProbeExecutionError(execution_failure, result) from execution_failure
+            if restore_failed:
+                break
 
-            if read_back_failed:
+            if stored_violation:
                 # The baseline read above proved this attribute readable, so a read-back
                 # that no longer decodes is a state change this write caused: the DUT
                 # stored a value its own encoder refuses to send. The constraint was not
@@ -1634,7 +1653,16 @@ class IDMBaseTest(BasicCompositionTests):
                 result.rejected += 1
                 continue
 
-            # No IM error and no CONSTRAINT_ERROR in the response payload means the DUT
+            if embedded_status is not None and embedded_status != Status.Success:
+                result.other_error += 1
+                self.record_warning(
+                    test_name=self.current_test_info.name,
+                    location=location,
+                    problem=(f"{info.path_str} rejected violating payload ({description}) with response-command status "
+                             f"{getattr(embedded_status, 'name', embedded_status)} instead of CONSTRAINT_ERROR"))
+                continue
+
+            # No IM error and no rejection status in the response payload means the DUT
             # executed the command. Commands that return no response command at all land
             # here with a None response, which is the ordinary Invoke success case.
             result.accepted += 1

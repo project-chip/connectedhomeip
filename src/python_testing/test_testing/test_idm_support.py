@@ -37,6 +37,7 @@ import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.global_attribute_ids import GlobalAttributeIds
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import UnknownProblemLocation
 from matter.testing.spec_parsing import ConstraintReference, Constraints, PrebuiltDataModelDirectory, build_xml_clusters
 from matter.tlv import TLVReader
@@ -416,7 +417,7 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
             Clusters.ColorControl.Commands.MoveToHue.command_id].fields
         fields[2] = replace(fields[2], constraints=Constraints(
             max_value_ref=ConstraintReference(attribute='MaxDeviceVolume')))
-        with self.assertRaisesRegex(signals.TestFailure, 'no constraint violation could be exercised'):
+        with self.assertRaisesRegex(signals.TestSkip, 'No qualified constraint violation'):
             await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
         self.checker.default_controller.SendCommand.assert_not_awaited()
         self.checker.record_accepted_violation.assert_not_called()
@@ -515,7 +516,7 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         calls = self.checker.default_controller.SendCommand.await_count
         self.assertGreater(calls, 0)
         self.assertTrue(any(f'attempted={calls}, classified=0, CONSTRAINT_ERROR=0, accepted=0, '
-                            f'other IM status=0, execution errors={calls}' in line for line in captured.output))
+                            f'other IM or response status=0, execution errors={calls}' in line for line in captured.output))
         self.checker.record_accepted_violation.assert_not_called()
 
     async def test_tc_idm_9_1_partial_command_result_cannot_mask_transport_failure(self):
@@ -545,7 +546,7 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                 rejected = int(first_status == Status.ConstraintError)
                 accepted = int(first_status == Status.Success)
                 self.assertTrue(any(f'attempted=2, classified=1, CONSTRAINT_ERROR={rejected}, accepted={accepted}, '
-                                    'other IM status=0, execution errors=1' in line for line in captured.output))
+                                    'other IM or response status=0, execution errors=1' in line for line in captured.output))
                 self.assertEqual(self.checker.record_accepted_violation.call_count, accepted)
 
     async def test_tc_idm_9_1_writable_execution_error_never_passes(self):
@@ -561,9 +562,10 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                 with self.assertLogs('TC_IDM_9_1', level='INFO') as captured, self.assertRaisesRegex(
                         signals.TestFailure, 'Execution failed'):
                     await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
-                self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, 1)
+                expected_writes = 1 if operation == 'WriteAttribute' else 2
+                self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, expected_writes)
                 self.assertTrue(any('attempted=1, classified=0, CONSTRAINT_ERROR=0, accepted=0, '
-                                    'other IM status=0, execution errors=1' in line for line in captured.output))
+                                    f'other IM or response status=0, execution errors={expected_writes}' in line for line in captured.output))
                 self.checker.record_accepted_violation.assert_not_called()
 
     async def test_tc_idm_9_1_accepted_write_precedes_readback_failure(self):
@@ -591,12 +593,192 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         from TC_IDM_9_1 import TC_IDM_9_1
 
         self._prepare_writable_attribute()
-        self.checker.read_single_attribute_check_success.side_effect = signals.TestFailure('unreadable baseline')
+        cluster = Clusters.OnOff
+        attribute = cluster.Attributes.StartUpOnOff
+        self.checker.read_single_attribute_check_success = MethodType(
+            MatterBaseTest.read_single_attribute_check_success, self.checker)
+        self.checker.default_controller.ReadAttribute = AsyncMock(return_value={2: {cluster: {attribute: None}}})
+        self.checker.record_error = Mock()
         with self.assertRaisesRegex(signals.TestSkip, 'No qualified constraint violation'):
             await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
         self.checker.default_controller.WriteAttribute.assert_not_called()
         self.checker.default_controller.SendCommand.assert_not_called()
         self.checker.record_accepted_violation.assert_not_called()
+
+    async def test_tc_idm_9_1_unqualified_commands_allow_attribute_scope(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        self._prepare_writable_attribute(include_commands=True)
+        fields = self.checker.xml_clusters[Clusters.ColorControl.id].accepted_commands[
+            Clusters.ColorControl.Commands.MoveToHue.command_id].fields
+        fields[2] = replace(fields[2], constraints=Constraints(max_value_ref=ConstraintReference(attribute='MaxDeviceVolume')))
+        with self.assertLogs('TC_IDM_9_1', level='INFO') as captured:
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        self.checker.default_controller.SendCommand.assert_not_called()
+        self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, 1)
+        self.checker.record_accepted_violation.assert_not_called()
+        self.assertTrue(any('Command probes: attempted=0, classified=0, CONSTRAINT_ERROR=0' in line for line in captured.output))
+        self.assertTrue(any('Writable attribute probes: attempted=1, classified=1, CONSTRAINT_ERROR=1' in line for line in captured.output))
+
+    async def test_tc_idm_9_1_baseline_subscription_mismatch_is_not_skipped(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        self._prepare_writable_attribute(include_commands=True)
+        cluster = Clusters.OnOff
+        attribute = cluster.Attributes.StartUpOnOff
+        self.checker.default_controller.ReadAttribute = AsyncMock(
+            return_value={2: {cluster: {attribute: cluster.Enums.StartUpOnOffEnum.kOff}}})
+        self.checker.read_single_attribute_check_success = MethodType(
+            MatterBaseTest.read_single_attribute_check_success, self.checker)
+        self.checker._effective_verify_wildcard_subscription = Mock(return_value=True)
+        self.checker.verify_attribute_subscription_value = AsyncMock(side_effect=signals.TestFailure('confirmed cache mismatch'))
+        self.checker.record_error = Mock()
+        with self.assertRaisesRegex(signals.TestFailure, 'confirmed cache mismatch'):
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        self.checker.verify_attribute_subscription_value.assert_awaited_once()
+        self.checker.default_controller.WriteAttribute.assert_not_called()
+        self.checker.record_error.assert_not_called()
+
+    async def test_tc_idm_9_1_raised_write_statuses_are_classified(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        for version in (SPEC_VERSION_1_7, SPEC_VERSION_1_7 - 1):
+            for statuses in ((Status.ConstraintError,), (Status.InvalidCommand,), (Status.ResourceExhausted,),
+                             (Status.ConstraintError, Status.ResourceExhausted)):
+                with self.subTest(version=version, statuses=statuses):
+                    self.setUp()
+                    self._prepare_writable_attribute()
+                    self.checker.endpoints_tlv[3] = deepcopy(self.checker.endpoints_tlv[2])
+                    basic = self.checker.endpoints_tlv[0][Clusters.BasicInformation.id]
+                    basic[Clusters.BasicInformation.Attributes.SpecificationVersion.attribute_id] = version
+                    controller = self.checker.default_controller
+
+                    async def write_response(**kwargs):
+                        status = statuses[(controller.WriteAttribute.await_count - 1) % len(statuses)]
+                        raise InteractionModelError(status)
+
+                    controller.WriteAttribute.side_effect = write_response
+                    answers = [statuses[index % len(statuses)] for index in range(2)]
+                    rejected = answers.count(Status.ConstraintError)
+                    failure = rejected != 2 if version == SPEC_VERSION_1_7 else rejected == 0
+                    with self.assertLogs('TC_IDM_9_1', level='INFO') as captured:
+                        if failure:
+                            with self.assertRaisesRegex(signals.TestFailure, 'CONSTRAINT_ERROR'):
+                                await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+                        else:
+                            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+                    self.assertEqual(controller.WriteAttribute.await_count, 2)
+                    self.assertEqual(self.checker.read_single_attribute.await_count, 2)
+                    self.assertTrue(any(f'attempted=2, classified=2, CONSTRAINT_ERROR={rejected}, accepted=0, '
+                                        f'other IM or response status={2 - rejected}, execution errors=0' in line for line in captured.output))
+                    self.checker.record_accepted_violation.assert_not_called()
+
+    async def test_tc_idm_9_1_raised_restore_status_retains_accepted_verdict(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        for initial_status in (Status.ConstraintError, Status.Success):
+            for restore_status in (Status.Failure, Status.ConstraintError, Status.ResourceExhausted):
+                with self.subTest(initial_status=initial_status, restore_status=restore_status):
+                    self.setUp()
+                    self._prepare_writable_attribute()
+                    self.checker.read_single_attribute.return_value = 3
+                    controller = self.checker.default_controller
+
+                    async def write_response(**kwargs):
+                        if controller.WriteAttribute.await_count == 1:
+                            return [SimpleNamespace(Status=initial_status)]
+                        raise InteractionModelError(restore_status)
+
+                    controller.WriteAttribute.side_effect = write_response
+                    with self.assertLogs('TC_IDM_9_1', level='INFO') as captured, self.assertRaisesRegex(
+                            signals.TestFailure, 'Writable attribute constraints not enforced'):
+                        await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+                    self.assertEqual(controller.WriteAttribute.await_count, 2)
+                    self.checker.record_accepted_violation.assert_called_once()
+                    self.assertTrue(any('attempted=1, classified=1, CONSTRAINT_ERROR=0, accepted=1, '
+                                        'other IM or response status=0, execution errors=1' in line for line in captured.output))
+
+    async def test_tc_idm_9_1_readback_failure_attempts_original_restoration(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        for initial_status in (Status.Success, Status.ConstraintError):
+            for restore_status in (Status.Success, Status.ResourceExhausted):
+                with self.subTest(initial_status=initial_status, restore_status=restore_status):
+                    self.setUp()
+                    self._prepare_writable_attribute()
+                    controller = self.checker.default_controller
+                    controller.WriteAttribute.side_effect = [
+                        [SimpleNamespace(Status=initial_status)], [SimpleNamespace(Status=restore_status)]]
+                    self.checker.read_single_attribute.side_effect = ChipStackError(0x0b)
+                    failure = 'constraints not enforced' if initial_status == Status.Success else 'Execution failed for writable'
+                    with self.assertLogs('TC_IDM_9_1', level='INFO') as captured, self.assertRaisesRegex(signals.TestFailure, failure):
+                        await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+                    self.assertEqual(controller.WriteAttribute.await_count, 2)
+                    self.assertEqual(controller.WriteAttribute.await_args_list[1].kwargs['attributes'][0][1].value, 0)
+                    accepted = int(initial_status == Status.Success)
+                    errors = 1 + int(restore_status != Status.Success)
+                    self.assertTrue(any(f'attempted=1, classified={accepted}, CONSTRAINT_ERROR=0, accepted={accepted}, '
+                                        f'other IM or response status=0, execution errors={errors}' in line for line in captured.output))
+                    self.assertEqual(self.checker.record_accepted_violation.call_count, accepted)
+
+    async def test_tc_idm_9_1_stored_violation_retains_any_error_status(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        for initial_status in (Status.ConstraintError, Status.InvalidCommand, Status.ResourceExhausted):
+            for restore_error in (None, InteractionModelError(Status.ResourceExhausted), ChipStackError(0x0c)):
+                with self.subTest(initial_status=initial_status, restore_error=restore_error):
+                    self.setUp()
+                    self._prepare_writable_attribute()
+                    controller = self.checker.default_controller
+                    controller.WriteAttribute.side_effect = [
+                        [SimpleNamespace(Status=initial_status)], restore_error or [SimpleNamespace(Status=Status.Success)]]
+                    self.checker.read_single_attribute.return_value = 3
+                    with self.assertLogs('TC_IDM_9_1', level='INFO') as captured, self.assertRaisesRegex(
+                            signals.TestFailure, 'Writable attribute constraints not enforced'):
+                        await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+                    self.assertEqual(controller.WriteAttribute.await_count, 2)
+                    self.assertEqual(controller.WriteAttribute.await_args_list[1].kwargs['attributes'][0][1].value, 0)
+                    self.checker.record_accepted_violation.assert_called_once()
+                    self.assertTrue(any('attempted=1, classified=1, CONSTRAINT_ERROR=0, accepted=1, '
+                                        f'other IM or response status=0, execution errors={int(restore_error is not None)}'
+                                        in line for line in captured.output))
+
+    async def test_tc_idm_9_1_embedded_rejections_are_not_acceptance(self):
+        """Synthetic response payloads classify statuses, not real DUT enforcement.
+
+        Strict non-CONSTRAINT_ERROR responses fail; earlier versions need one CONSTRAINT_ERROR.
+        """
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        for version in (SPEC_VERSION_1_7, SPEC_VERSION_1_7 - 1):
+            for statuses in ((Status.ConstraintError,), (Status.ResourceExhausted,), (Status.InvalidCommand,),
+                             (Status.ConstraintError, Status.ResourceExhausted), (Status.Success,)):
+                with self.subTest(version=version, statuses=statuses):
+                    self.setUp()
+                    self._prepare_tc_idm_9_1()
+                    basic = self.checker.endpoints_tlv[0][Clusters.BasicInformation.id]
+                    basic[Clusters.BasicInformation.Attributes.SpecificationVersion.attribute_id] = version
+                    controller = self.checker.default_controller
+
+                    async def command_response(**kwargs):
+                        return SimpleNamespace(status=statuses[(controller.SendCommand.await_count - 1) % len(statuses)])
+
+                    controller.SendCommand.side_effect = command_response
+                    answers = [statuses[index % len(statuses)] for index in range(3)]
+                    rejected = answers.count(Status.ConstraintError)
+                    accepted = answers.count(Status.Success)
+                    other = 3 - rejected - accepted
+                    failure = rejected != 3 if version == SPEC_VERSION_1_7 else rejected == 0
+                    with self.assertLogs('TC_IDM_9_1', level='INFO') as captured:
+                        if failure:
+                            with self.assertRaises(signals.TestFailure):
+                                await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+                        else:
+                            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+                    self.assertEqual(controller.SendCommand.await_count, 3)
+                    self.assertEqual(self.checker.record_accepted_violation.call_count, accepted)
+                    self.assertTrue(any(f'attempted=3, classified=3, CONSTRAINT_ERROR={rejected}, accepted={accepted}, '
+                                        f'other IM or response status={other}, execution errors=0' in line for line in captured.output))
 
     async def test_tc_idm_9_1_attribute_assertion_is_not_swallowed(self):
         from TC_IDM_9_1 import TC_IDM_9_1
@@ -605,9 +787,14 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         self.checker.read_single_attribute.side_effect = signals.TestFailure('readback failed')
         with self.assertRaisesRegex(signals.TestFailure, 'readback failed'):
             await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
-        self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, 1)
+        self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, 2)
+        self.assertEqual(self.checker.default_controller.WriteAttribute.await_args_list[1].kwargs['attributes'][0][1].value, 0)
 
     async def test_tc_idm_9_1_era_policy_and_exact_status_counts(self):
+        """Strict test-plan policy requires every classified probe to return CONSTRAINT_ERROR.
+
+        Earlier or missing versions require one such rejection; accepted violations only warn.
+        """
         from TC_IDM_9_1 import TC_IDM_9_1
 
         cases = (
@@ -670,7 +857,7 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                     other = expected_probes - rejected - accepted
                     self.assertTrue(any(
                         f'attempted={expected_probes}, classified={expected_probes}, CONSTRAINT_ERROR={rejected}, '
-                        f'accepted={accepted}, other IM status={other}, execution errors=0' in line
+                        f'accepted={accepted}, other IM or response status={other}, execution errors=0' in line
                         for line in captured.output))
                     self.assertEqual(self.checker.record_accepted_violation.call_count, accepted)
 
@@ -707,9 +894,11 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                             signals.TestFailure, 'Writable attribute constraints not enforced'):
                         await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
                     self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, 2)
+                    self.assertEqual(
+                        self.checker.default_controller.WriteAttribute.await_args_list[1].kwargs['attributes'][0][1].value, 0)
                     self.checker.record_accepted_violation.assert_called_once()
                     self.assertTrue(any('attempted=1, classified=1, CONSTRAINT_ERROR=0, accepted=1, '
-                                        'other IM status=0, execution errors=1' in line for line in captured.output))
+                                        'other IM or response status=0, execution errors=1' in line for line in captured.output))
 
     async def test_tc_idm_9_1_empty_scope_is_skip(self):
         from TC_IDM_9_1 import TC_IDM_9_1

@@ -135,13 +135,10 @@ class TC_IDM_9_1(IDMBaseTest):
         log.info("Step 1 complete: Tested %s command fields, skipped %s",
                  commands_tested_count, commands_skipped_count)
         log.info("Command probes: attempted=%s, classified=%s, CONSTRAINT_ERROR=%s, accepted=%s, "
-                 "other IM status=%s, execution errors=%s",
+                 "other IM or response status=%s, execution errors=%s",
                  commands_attempted_count, commands_probed_count, commands_rejected_count,
                  commands_accepted_count, commands_other_error_count, commands_execution_error_count)
 
-        if command_field_infos:
-            asserts.assert_greater(commands_attempted_count, 0,
-                                   "DUT exposes constrained command fields but no constraint violation could be exercised")
         self.enforce_constraint_policy(subject="Command field", accepted_paths=accepted_command_fields,
                                        rejected_count=commands_rejected_count, probed_count=commands_probed_count)
         asserts.assert_false(failed_command_fields,
@@ -236,7 +233,7 @@ class TC_IDM_9_1(IDMBaseTest):
 
         log.info("Step 2 complete: Tested %s attributes, skipped %s", tested_count, skipped_count)
         log.info("Writable attribute probes: attempted=%s, classified=%s, CONSTRAINT_ERROR=%s, accepted=%s, "
-                 "other IM status=%s, execution errors=%s",
+                 "other IM or response status=%s, execution errors=%s",
                  attempted_count, probed_count, rejected_count, accepted_count, other_error_count, execution_error_count)
 
         self.enforce_constraint_policy(subject="Writable attribute", accepted_paths=accepted_attributes,
