@@ -407,39 +407,45 @@ EndpointInterfaceRegistration * CodeDrivenDataModelProvider::GetEndpointInterfac
     return nullptr;
 }
 
-void CodeDrivenDataModelProvider::NotifyChangedDescriptorPartsListOfAncestors(EndpointId endpointId)
+void CodeDrivenDataModelProvider::NotifyChangedDescriptorPartsListOfAncestors(EndpointId parentEndpointId)
 {
-    if (endpointId == kInvalidEndpointId)
+    EndpointId currentId = parentEndpointId;
+    while (true)
     {
-        endpointId = kRootEndpointId;
-    }
-
-    NotifyAttributeChanged({ endpointId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id },
-                           DataModel::AttributeChangeType::kReportable);
-
-    auto * registration = GetEndpointInterfaceRegistration(endpointId);
-    VerifyOrReturn(registration != nullptr);
-
-    do
-    {
-        // Go up the endpoint hierarchy.
-        endpointId = registration->GetEndpointEntry().parentId;
-        if (endpointId == kInvalidEndpointId)
+        if (currentId == kInvalidEndpointId)
         {
-            endpointId = kRootEndpointId;
+            currentId = kRootEndpointId;
         }
 
-        registration = GetEndpointInterfaceRegistration(endpointId);
-        VerifyOrReturn(registration != nullptr);
-        if (registration->GetEndpointEntry().compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily ||
-            endpointId == kRootEndpointId)
+        auto * registration = GetEndpointInterfaceRegistration(currentId);
+        if (registration == nullptr)
         {
-            // If full family type ancestor, notify attribute change. Root endpoint is full-family even if its pattern is not set to
-            // it.
-            NotifyAttributeChanged({ endpointId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id },
+            // This should not happen, but if it is for some reason, just notify the root endpoint and return, because if currentId
+            // is not registered, as it should have been a parent endpoint of some other endpoint, that other endpoint is now
+            // parentless, so it is implicitely a child of the root endpoint.
+            NotifyAttributeChanged({ kRootEndpointId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id },
+                                   DataModel::AttributeChangeType::kReportable);
+            return;
+        }
+
+        auto compositionPattern = registration->GetEndpointEntry().compositionPattern;
+
+        // If currentId is the starting endpoint, or if it is a full-family type ancestor, notify attribute change. Root endpoint is
+        // full-family even if its pattern is not set to full-family.
+        if (currentId == parentEndpointId || compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily ||
+            currentId == kRootEndpointId)
+        {
+            NotifyAttributeChanged({ currentId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id },
                                    DataModel::AttributeChangeType::kReportable);
         }
-    } while (endpointId != kRootEndpointId);
+
+        if (currentId == kRootEndpointId)
+        {
+            break;
+        }
+
+        currentId = registration->GetEndpointEntry().parentId;
+    }
 }
 } // namespace app
 } // namespace chip

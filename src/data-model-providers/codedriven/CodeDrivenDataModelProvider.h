@@ -216,8 +216,8 @@ private:
     ServerClusterInterface * GetServerClusterInterface(const ConcreteClusterPath & path);
 
     /// Notify `PartsList` attribute of the `Descriptor` cluster of the given endpoint and its ancestors if they have a full-family
-    /// composition. The `endpointId` input is meant to be the parent of an endpoint that was changed (added or removed)
-    void NotifyChangedDescriptorPartsListOfAncestors(EndpointId endpointId);
+    /// composition. The `parentEndpointId` input is meant to be the parent of an endpoint that was changed (added or removed)
+    void NotifyChangedDescriptorPartsListOfAncestors(EndpointId parentEndpointId);
 };
 
 } // namespace app
