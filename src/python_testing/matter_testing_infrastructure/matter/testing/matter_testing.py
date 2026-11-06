@@ -3688,7 +3688,9 @@ def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
 EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
-def get_cluster_from_attribute(attribute: type[ClusterObjects.ClusterAttributeDescriptor]) -> ClusterObjects.Cluster:
+def get_cluster_from_attribute(
+    attribute: ClusterObjects.ClusterAttributeDescriptor | type[ClusterObjects.ClusterAttributeDescriptor],
+) -> ClusterObjects.Cluster:
     """Returns the cluster object for a given attribute descriptor."""
     return ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
 
