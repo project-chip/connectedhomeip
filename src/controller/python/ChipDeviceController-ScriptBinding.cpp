@@ -92,7 +92,7 @@
 
 #if PYCHIP_USE_MINMDNS
 #include <lib/dnssd/MinimalMdnsServer.h>
-#include <lib/dnssd/minimal_mdns/AddressPolicy_FilteredImpl.h>
+#include <lib/dnssd/minimal_mdns/AddressPolicy_FilteredImpl.h> // nogncheck
 #endif
 
 using namespace chip;

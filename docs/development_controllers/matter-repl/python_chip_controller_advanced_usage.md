@@ -80,10 +80,9 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
 
 Minimal mDNS opens a fixed number of endpoints (`kMaxEndPoints`, 30) and
 assigns them in interface order. On a host with many network interfaces, such
-as a Docker or Kubernetes node with one virtual Ethernet pair per container, the
-pool can run out before the interface that reaches the Matter devices gets an
-endpoint. Discovery then fails with `No endpoint was available to send the
-message`.
+as a container host with one virtual Ethernet pair per container, the pool can
+run out before the interface that reaches the Matter devices gets an endpoint.
+Discovery then fails with `No endpoint was available to send the message`.
 
 `ChipStack` accepts a list of interface names to restrict minimal mDNS to:
 
