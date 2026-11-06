@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/ConcreteAttributePath.h>
@@ -36,7 +37,6 @@
 #include <lib/core/CancelableOperation.h>
 #include <lib/support/Defer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/RAIIMockClock.h>
 
