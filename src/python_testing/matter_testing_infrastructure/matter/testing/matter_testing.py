@@ -2679,22 +2679,22 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def read_single_attribute_assert_expected(
             self,
             endpoint: int,
-            attribute: type[ClusterObjects.ClusterAttributeDescriptor],
+            attribute: ClusterObjects.ClusterAttributeDescriptor,
             assert_func: Callable[..., Any],
-            *assert_expectations: Any) -> None:
+            *assert_args: Any) -> None:
         """Reads a single attribute and asserts it meets the expectations.
 
         Args:
             endpoint: Endpoint on which to read the attribute.
-            attribute: Full attribute object.
-            assert_func: Assert callable. Called with the first arg passed is attr value read. And the remaining args are unpacked
-                from *assert_expectations.
-            assert_expectations: Remaining args passed to the assert callable.
+            attribute: Instantiated attribute descriptor object holding the expected value.
+            assert_func: Assert callable. Called with the read attribute value as the first arg,
+                `attribute.value` as the second arg, and any remaining args unpacked from `*assert_args`.
+            assert_args: Remaining args passed to the assert callable.
         """
         val = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=get_cluster_from_attribute(attribute), attribute=attribute
+            endpoint=endpoint, cluster=get_cluster_from_attribute(attribute), attribute=type(attribute)
         )
-        assert_func(val, *assert_expectations)
+        assert_func(val, attribute.value, *assert_args)  # type: ignore[attr-defined]
 
     async def verify_attribute_subscription_value(
             self,
@@ -3688,9 +3688,7 @@ def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
 EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
-def get_cluster_from_attribute(
-    attribute: ClusterObjects.ClusterAttributeDescriptor | type[ClusterObjects.ClusterAttributeDescriptor],
-) -> ClusterObjects.Cluster:
+def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
     """Returns the cluster object for a given attribute descriptor."""
     return ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
 
