@@ -57,6 +57,7 @@ CHIP_ERROR BdxOtaSender::InitializeTransfer(chip::FabricIndex fabricIndex, chip:
         }
     }
     mRequestedMaxBlockSize.reset();
+    mPendingIsTcpTransport.reset();
     mIsTcpTransport.reset();
     mFabricIndex.SetValue(fabricIndex);
     mNodeId.SetValue(nodeId);
@@ -80,12 +81,15 @@ CHIP_ERROR BdxOtaSender::OnMessageReceived(chip::Messaging::ExchangeContext * ec
     VerifyOrReturnError(session->GetFabricIndex() == mFabricIndex.Value() && session->GetPeer().GetNodeId() == mNodeId.Value(),
                         CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
 
-    if (payloadHeader.HasMessageType(chip::bdx::MessageType::ReceiveInit))
+    const bool isReceiveInit  = payloadHeader.HasMessageType(chip::bdx::MessageType::ReceiveInit);
+    const bool isTcpTransport = session->AsSecureSession()->GetPeerAddress().GetTransportType() == chip::Transport::Type::kTcp;
+    CHIP_ERROR err            = chip::bdx::TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
+    if (err == CHIP_NO_ERROR && isReceiveInit)
     {
-        mIsTcpTransport = session->AsSecureSession()->GetPeerAddress().GetTransportType() == chip::Transport::Type::kTcp;
+        mPendingIsTcpTransport = isTcpTransport;
     }
 
-    return chip::bdx::TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
+    return err;
 }
 
 void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
@@ -134,6 +138,8 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         // common supported control modes. It will also default to the smaller
         // block size.
         mRequestedMaxBlockSize = event.transferInitData.MaxBlockSize;
+        mIsTcpTransport        = mPendingIsTcpTransport;
+        mPendingIsTcpTransport.reset();
 
         TransferSession::TransferAcceptData acceptData;
         acceptData.ControlMode  = TransferControlFlags::kReceiverDrive; // OTA must use receiver drive

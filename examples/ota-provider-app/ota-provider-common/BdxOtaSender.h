@@ -62,5 +62,6 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
 
     std::optional<uint16_t> mRequestedMaxBlockSize;
+    std::optional<bool> mPendingIsTcpTransport;
     std::optional<bool> mIsTcpTransport;
 };
