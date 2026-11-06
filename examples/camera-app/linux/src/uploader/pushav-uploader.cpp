@@ -459,6 +459,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     std::string rootCertPEM;
     std::string clientCertPEM;
     std::string derKeyToPemstr;
+    PushAVCertBuffer certBuffer;
     std::error_code ec;
     size_t sessionPos;
     CURLcode res;
@@ -496,7 +497,6 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     // TODO: The logic to provide DER-formatted certificates and keys in memory (blob) format to curl is currently unstable. As a
     // temporary workaround, PEM-format files are being provided as input to curl.
 
-    PushAVCertBuffer certBuffer;
     {
         std::lock_guard<std::mutex> lock(mCertMutex);
         certBuffer = mCertBuffer;
