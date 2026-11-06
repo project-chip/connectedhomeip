@@ -988,14 +988,13 @@ execution.
 ### Running a run only in the nightly job
 
 The `nightly` tag moves one run of a test to the nightly job, while the test's
-other runs stay in PR CI. The `nightly` list in
-`src/python_testing/test_metadata.yaml` does the same for every run of a file.
+other runs stay in PR CI. To move a whole test, tag each of its runs.
 
 | Run                               | Pull requests                 | Nightly                                                        |
 | --------------------------------- | ----------------------------- | -------------------------------------------------------------- |
-| No tags                           | Runs                          | Runs only if the file is on the `nightly` list                 |
+| No tags                           | Runs                          | Skipped                                                        |
 | `nightly`                         | Skipped                       | Runs. A failure fails the job                                  |
-| `needs-followup-fixes`            | Runs. A failure fails the job | Runs only if the file is on the `nightly` list                 |
+| `needs-followup-fixes`            | Runs. A failure fails the job | Skipped                                                        |
 | `nightly`, `needs-followup-fixes` | Skipped                       | Runs. Reported with its issues; a failure doesn't fail the job |
 
 -   The nightly job runs each `nightly` run on its own and reports it as
