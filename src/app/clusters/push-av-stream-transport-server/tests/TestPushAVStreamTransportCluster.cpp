@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <cstdio>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <vector>
 
 #include <pw_unit_test/framework.h>
@@ -546,20 +547,25 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
         bool busy            = false;
         bool invalidStream   = false;
     };
-    class CountingPersistence : public DefaultSafeAttributePersistenceProvider
+    class CountingPersistence : public TestPersistentStorageDelegate
     {
     public:
-        CountingPersistence() { SetSafeAttributePersistenceProvider(this); }
-        ~CountingPersistence() override { SetSafeAttributePersistenceProvider(mPrevious); }
-        CHIP_ERROR SafeWriteValue(const ConcreteAttributePath & path, const ByteSpan & value) override
+        CountingPersistence(decltype(mPersistenceProvider) & provider, PersistentStorageDelegate & previous) :
+            mProvider(provider), mPrevious(previous)
+        {
+            VerifyOrDie(mProvider.Init(this) == CHIP_NO_ERROR);
+        }
+        ~CountingPersistence() override { VerifyOrDie(mProvider.Init(&mPrevious) == CHIP_NO_ERROR); }
+        CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
         {
             ++writes;
-            return DefaultSafeAttributePersistenceProvider::SafeWriteValue(path, value);
+            return TestPersistentStorageDelegate::SyncSetKeyValue(key, value, size);
         }
         size_t writes = 0;
 
     private:
-        SafeAttributePersistenceProvider * mPrevious = GetSafeAttributePersistenceProvider();
+        decltype(mPersistenceProvider) & mProvider;
+        PersistentStorageDelegate & mPrevious;
     };
     enum class ZoneCase
     {
@@ -608,11 +614,10 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                                                             feature ? BitFlags<Feature>(Feature::kPerZoneSensitivity)
                                                                     : BitFlags<Feature>() };
                         Testing::ClusterTester tester(server);
-                        CountingPersistence persistence;
+                        CountingPersistence persistence(mPersistenceProvider, mClusterTester.GetServerClusterContext().storage);
                         auto & originalContext = tester.GetServerClusterContext();
-                        ASSERT_EQ(persistence.Init(&originalContext.storage), CHIP_NO_ERROR);
-                        ServerClusterContext context{ originalContext.provider, originalContext.storage,
-                                                      originalContext.attributeStorage, originalContext.interactionContext };
+                        ServerClusterContext context{ originalContext.provider, persistence, originalContext.attributeStorage,
+                                                      originalContext.interactionContext };
                         ASSERT_EQ(server.Startup(context), CHIP_NO_ERROR);
                         auto & logic = server.GetLogic();
                         logic.SetDelegate(&delegate);
@@ -663,7 +668,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                             ASSERT_EQ(logic.mCurrentConnections.size(), 1u);
                             retained                  = logic.mCurrentConnections[0].GetTransportOptionsPtr();
                             modification.connectionID = logic.mCurrentConnections[0].connectionID;
-                            ASSERT_EQ(persistence.SafeReadValue(persistencePath, before), CHIP_NO_ERROR);
+                            ASSERT_EQ(mPersistenceProvider.SafeReadValue(persistencePath, before), CHIP_NO_ERROR);
                         }
                         const size_t writesBefore = persistence.writes;
                         delegate.allocations = delegate.modifications = delegate.sizeChecks = delegate.idChecks =
@@ -874,7 +879,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                             EXPECT_EQ(logic.mCurrentConnections[0].GetTransportOptionsPtr(), retained);
                             uint8_t afterBuffer[1024];
                             MutableByteSpan after(afterBuffer);
-                            ASSERT_EQ(persistence.SafeReadValue(persistencePath, after), CHIP_NO_ERROR);
+                            ASSERT_EQ(mPersistenceProvider.SafeReadValue(persistencePath, after), CHIP_NO_ERROR);
                             EXPECT_TRUE(before.data_equal(after));
                         }
                         if (success)
