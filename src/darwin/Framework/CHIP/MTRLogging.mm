@@ -19,6 +19,7 @@
 #import "MTRLogging_Internal.h"
 
 #import "MTRFramework.h"
+#import "MTRMetrics.h"
 #import "MTRUnfairLock.h"
 
 #import <algorithm>
@@ -48,6 +49,12 @@ static void MTRLogCallbackTrampoline(const char * moduleName, uint8_t category, 
     // Note: Format using NSString so that '%@' placeholders are supported
     NSString * message = [[NSString alloc] initWithFormat:@(format) arguments:args];
 #pragma clang diagnostic pop
+
+    // Tell the application which flow (see +[MTRMetrics currentFlowID]) this line belongs to.
+    NSUUID * flowID = MTRMetrics.currentFlowID;
+    if (flowID != nil) {
+        message = [NSString stringWithFormat:@"[Flow: %@] %@", flowID.UUIDString, message];
+    }
 
     auto type = std::min(static_cast<MTRLogType>(category), MTRLogTypeDetail); // hide kLogCategory_Automation
     callback(type, @(moduleName), message);

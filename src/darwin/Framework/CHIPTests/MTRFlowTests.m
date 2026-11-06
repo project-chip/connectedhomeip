@@ -449,6 +449,57 @@ static NSArray * StampedValues(NSArray * values, id flowID)
     [_device removeDelegate:second];
 }
 
+// The log callback gets the message of the one line -[MTRDevice addDelegate:queue:] logs for this delegate.
+- (NSArray<NSString *> *)messagesLoggedByAddingDelegate:(id<MTRDeviceDelegate>)delegate inFlow:(NSUUID * _Nullable)flowID
+{
+    os_unfair_lock lock = OS_UNFAIR_LOCK_INIT;
+    os_unfair_lock_t lockPtr = &lock;
+    NSMutableArray<NSString *> * messages = [NSMutableArray array];
+    NSString * delegateDescription = [NSString stringWithFormat:@"%@", delegate];
+    MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if ([message containsString:@"addDelegate"] && [message containsString:delegateDescription]) {
+            os_unfair_lock_lock(lockPtr);
+            [messages addObject:message];
+            os_unfair_lock_unlock(lockPtr);
+        }
+    });
+    dispatch_queue_t queue = dispatch_queue_create("flow-test-log", DISPATCH_QUEUE_SERIAL);
+    if (flowID) {
+        [MTRMetrics _runWithFlowID:flowID
+                             block:^{
+                                 [self->_device addDelegate:delegate queue:queue];
+                             }];
+    } else {
+        [_device addDelegate:delegate queue:queue];
+    }
+    MTRSetLogCallback(0, nil);
+    [_device removeDelegate:delegate];
+    os_unfair_lock_lock(lockPtr);
+    NSArray<NSString *> * result = [messages copy];
+    os_unfair_lock_unlock(lockPtr);
+    return result;
+}
+
+// Part C, item 1: the log callback gets "[Flow: <UUID>] " in front of a line logged in a flow.
+- (void)test004_LogCallbackMessageStartsWithTheCurrentFlow
+{
+    NSUUID * flowID = [NSUUID UUID];
+    NSArray<NSString *> * messages = [self messagesLoggedByAddingDelegate:[[MTRFlowRecordingDelegate alloc] init] inFlow:flowID];
+    XCTAssertEqual(messages.count, 1, @"%@", messages);
+    NSString * prefix = [NSString stringWithFormat:@"[Flow: %@] ", flowID.UUIDString];
+    XCTAssertTrue([messages.firstObject hasPrefix:prefix], @"expected prefix %@ in: %@", prefix, messages.firstObject);
+}
+
+// Part C, item 1: a line logged outside any flow is delivered unchanged.
+- (void)test005_LogCallbackMessageHasNoPrefixWithoutAFlow
+{
+    XCTAssertNil(MTRMetrics.currentFlowID);
+    NSArray<NSString *> * messages = [self messagesLoggedByAddingDelegate:[[MTRFlowRecordingDelegate alloc] init] inFlow:nil];
+    XCTAssertEqual(messages.count, 1, @"%@", messages);
+    XCTAssertFalse([messages.firstObject hasPrefix:@"[Flow: "], @"%@", messages.firstObject);
+    XCTAssertTrue([messages.firstObject containsString:@" addDelegate "], @"%@", messages.firstObject);
+}
+
 - (void)test002_InternalStateCarriesTheFlowOfItsCallback
 {
     __auto_type * delegate = [[MTRFlowInternalStateRecordingDelegate alloc] init];
