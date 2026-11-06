@@ -118,6 +118,14 @@ if(CONFIG_CHIP)
         DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
     )
 
+<<<<<<< HEAD
+=======
+    if(CONFIG_CHIP_OTA_REQUESTOR)
+        matter_add_gn_arg_bool("chip_enable_ota_requestor" TRUE)
+    endif()
+    include(${CHIP_ROOT}/config/silabs/chip-module/ota.cmake)
+
+>>>>>>> 6f40041 ([Zephyr] Fix Zephyr all-device-app build with OTA enabled for SiWx917 (#74919))
     matter_add_gn_arg_string("zephyr_ar" ${CMAKE_AR})
     matter_add_gn_arg_string("zephyr_cc" ${CMAKE_C_COMPILER})
     matter_add_gn_arg_string("zephyr_cxx" ${CMAKE_CXX_COMPILER})

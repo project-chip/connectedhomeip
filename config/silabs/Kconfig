@@ -15,6 +15,7 @@
 #
 
 rsource "../zephyr/Kconfig"
+rsource "chip-module/Kconfig"
 
 if CHIP
 menu "Silabs Matter Config"
@@ -28,9 +29,17 @@ config CHIP_DEVICE_VENDOR_NAME
 config CHIP_OTA_REQUESTOR
 	bool "Enable OTA Requestor"
 	default n
+<<<<<<< HEAD
 	imply DFU_MULTI_IMAGE
 	imply DFU_TARGET
 	#imply BOOTLOADER_MCUBOOT # TODO MATTER-4888
+=======
+
+# OTA backends are defined in config/zephyr/Kconfig and chip-module/Kconfig.
+# EFR32 (and other non-SiWx): MCUboot slot-based DFU.
+config CHIP_OTA_BACKEND_MCUBOOT
+	imply BOOTLOADER_MCUBOOT
+>>>>>>> 6f40041 ([Zephyr] Fix Zephyr all-device-app build with OTA enabled for SiWx917 (#74919))
 	imply IMG_MANAGER
 	imply STREAM_FLASH
 	imply STREAM_FLASH_ERASE
