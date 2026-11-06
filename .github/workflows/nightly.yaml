@@ -131,6 +131,12 @@ jobs:
                 --target linux-x64-all-devices-${BUILD_VARIANT}-clang-test
                 --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                 && rm -rf out/linux-x64-all-devices-${BUILD_VARIANT}-clang-test"
+            - name: Build linux-x64-light-data-model-no-unique-id
+              run: >-
+                ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang
+                --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                && rm -rf out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang"
             - name: Build linux-x64-fabric-admin-rpc
               run: >-
                 ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
@@ -297,6 +303,8 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
 
+            # Run blocks tagged nightly read these variables. PR CI does not run those
+            # blocks, so a variable missing here fails only the next nightly.
             - name: Generate an argument environment file
               run: |
                   echo -n "" >/tmp/test_env.yaml
@@ -312,6 +320,7 @@ jobs:
                   echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-clang-test/all-devices-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: objdir-clone/linux-x64-camera-${BUILD_VARIANT}/chip-camera-app" >> /tmp/test_env.yaml
                   echo "CHIP_LOCK_APP: objdir-clone/linux-x64-lock-${BUILD_VARIANT}-clang-test-unified/chip-lock-app" >> /tmp/test_env.yaml
+                  echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-data-model-no-unique-id-app" >> /tmp/test_env.yaml
                   echo "FABRIC_ADMIN_APP: objdir-clone/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang/fabric-admin" >> /tmp/test_env.yaml
                   echo "FABRIC_BRIDGE_APP: objdir-clone/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
                   echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
@@ -449,8 +458,9 @@ jobs:
                   retention-days: 30
                   if-no-files-found: warn
 
+            # The live report shows master only. Manual runs on other branches keep their report in the artifact above.
             - name: Deploy to GitHub Pages
-              if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
+              if: github.event_name != 'pull_request' && github.event_name != 'merge_group' && github.ref == 'refs/heads/master'
               uses: peaceiris/actions-gh-pages@v4
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}

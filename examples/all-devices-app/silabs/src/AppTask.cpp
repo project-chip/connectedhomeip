@@ -23,6 +23,7 @@
 #include "AppKeys.h"
 #include "SilabsIdentifyDelegate.h"
 
+#include "delegates/SilabsColorLight.h"
 #include "delegates/SilabsDimmableLight.h"
 #include "delegates/SilabsHumiditySensor.h"
 #include "delegates/SilabsTemperatureSensor.h"
@@ -42,7 +43,6 @@
 #include <string>
 #include <string_view>
 
-#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 
 #include <app/EventManagement.h>
@@ -100,7 +100,6 @@ using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
 chip::app::DefaultAttributePersistenceProvider sAttributePersistenceProvider;
-chip::app::DefaultSafeAttributePersistenceProvider sSafeAttributePersistenceProvider;
 std::unique_ptr<chip::app::CodeDrivenDataModelProvider> sDataModelProvider;
 std::unique_ptr<chip::app::RootNode> sRootNode;
 chip::app::BindingHandler sBindingHandler;
@@ -187,7 +186,7 @@ CHIP_ERROR AppTask::AppInit()
     sl_status_t si70xxStatus = Si70xxSensor::Init();
     if (si70xxStatus != SL_STATUS_OK)
     {
-        ChipLogError(AppServer, "Si70xxSensor::Init failed: %x", si70xxStatus);
+        ChipLogError(AppServer, "Si70xxSensor::Init failed: %lx", si70xxStatus);
     }
 #endif
     return CHIP_NO_ERROR;
@@ -228,12 +227,9 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
                                             chip::Crypto::SessionKeystore * sessionKeyStore)
 {
     ReturnErrorOnFailure(sAttributePersistenceProvider.Init(&storage));
-    ReturnErrorOnFailure(sSafeAttributePersistenceProvider.Init(&storage));
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     VerifyOrReturnError(sessionKeyStore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 #endif
-
-    chip::app::SetSafeAttributePersistenceProvider(&sSafeAttributePersistenceProvider);
 
     sDataModelProvider = std::make_unique<chip::app::CodeDrivenDataModelProvider>(storage, sAttributePersistenceProvider);
     VerifyOrReturnError(sDataModelProvider != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -412,12 +408,31 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         });
     }
 
+    if constexpr (ALL_DEVICES_ENABLE_EXTENDED_COLOR_LIGHT)
+    {
+        deviceFactory.RegisterCreator("extended-color-light", [groupDataProvider]() {
+            return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsColorLight>(
+                chip::app::SilabsColorLight::Context{
+                    .groupDataProvider = *groupDataProvider,
+                    .fabricTable       = chip::Server::GetInstance().GetFabricTable(),
+                    .timerDelegate     = sTimerDelegate,
+                },
+                sIdentifyDelegate
+#if SL_MATTER_DISPLAY_ENABLED
+                ,
+                BaseApplication::GetLCD()
+#endif
+            );
+        });
+    }
+
     if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
     {
         deviceFactory.RegisterCreator("temperature-sensor", []() {
-            return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsTemperatureSensor>(
+            return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsTemperatureSensor>(sTimerDelegate
 #if SL_MATTER_DISPLAY_ENABLED
-                BaseApplication::GetLCD()
+                                                                                                   ,
+                                                                                                   BaseApplication::GetLCD()
 #endif
             );
         });

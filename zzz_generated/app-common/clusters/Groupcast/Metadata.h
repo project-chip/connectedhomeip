@@ -27,16 +27,19 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace Membership
 namespace MaxMembershipCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxMembershipCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxMembershipCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxMembershipCount
 namespace MaxMcastAddrCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxMcastAddrCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxMcastAddrCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxMcastAddrCount
 namespace UsedMcastAddrCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(UsedMcastAddrCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(UsedMcastAddrCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace UsedMcastAddrCount
 namespace FabricUnderTest {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(FabricUnderTest::Id, BitFlags<DataModel::AttributeQualityFlags>(),

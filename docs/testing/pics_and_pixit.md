@@ -159,11 +159,19 @@ The `--PICS` flag accepts three input formats, auto-detected from the path:
     `zip -r <folder>` produce) are handled automatically, so exports from the
     PICS tool can be passed as-is without re-zipping.
 
-For directory and zip inputs, top-level XML files are always loaded, but
-per-endpoint XML files are only loaded when `--endpoint` is also supplied.
-Non-matching endpoint subdirectories are skipped so per-endpoint checks do not
-see foreign clusters. This means the same PICS bundle can be reused across
-endpoints by varying only `--endpoint`.
+`--PICS` accepts either shape of input:
+
+-   A full PICSGenerator tree, with a subdirectory per endpoint (`endpoint0`,
+    `EP1`, ...) and the device-wide files such as `Base.xml` at the top level.
+    Each endpoint's codes are checked against that endpoint. If the tree has no
+    subdirectory for the endpoint passed to `--endpoint`, the test fails
+    immediately rather than reporting every element on the endpoint as a missing
+    PICS code.
+-   A single set of PICS with no endpoint structure: the XML directory for one
+    endpoint, or a CI-format text file such as
+    `src/app/tests/suites/certification/ci-pics-values`. These carry no endpoint
+    labels, so their codes are checked against whichever endpoint `--endpoint`
+    names.
 
 ## Setting PIXITs for Matter devices
 

@@ -37,7 +37,6 @@ from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 
 from .target import BuildTarget, TargetPart
 
-
 # IMPORTANT: Keep list in sync with:
 #   - enabled_devices.cmake
 #   - enabled_devices.gni
@@ -48,6 +47,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'aggregator',
     'air-purifier',
     'ambient-context-sensor',
+    'battery-storage',
     'bridged-node',
     'chime',
     'color-temperature-light',
@@ -253,6 +253,7 @@ def BuildHostTarget():
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("no-thread", enable_thread=False)
     target.AppendModifier("openthread-endpoint", openthread_endpoint=True)
+    target.AppendModifier("otns", enable_otns=True).OnlyIfRe('-openthread-endpoint')
     target.AppendModifier('nfc-commission', chip_enable_nfc_based_commissioning=True)
     target.AppendModifier('no-shell', disable_shell=True)
     target.AppendModifier(
@@ -363,6 +364,7 @@ def BuildEsp32ZephyrTarget() -> BuildTarget:
     # boards
     target.AppendFixedTargets([
         TargetPart('c6devkitc', board=Esp32ZephyrBoard.C6_DEVKITC),
+        TargetPart('c3devkitm', board=Esp32ZephyrBoard.C3_DEVKITM),
     ])
 
     # applications

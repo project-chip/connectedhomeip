@@ -86,8 +86,8 @@ bool MayHaveAccessibleEventPathForEndpointAndCluster(DataModel::Provider * aProv
         DataModel::EventEntry eventInfo;
         if (aProvider->EventInfo(
                 {
-                    aEventPath.mEndpointId,
-                    aEventPath.mClusterId,
+                    path.mEndpointId,
+                    path.mClusterId,
                     aEventPath.mEventId,
                 },
                 eventInfo) != CHIP_NO_ERROR)

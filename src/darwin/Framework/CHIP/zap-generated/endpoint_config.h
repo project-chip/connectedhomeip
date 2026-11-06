@@ -36,3 +36,10 @@
 
 #define GENERATED_ATTRIBUTES {}
 
+/**
+ * Server clusters are defined at runtime through MTRServerCluster and MTRServerAttribute, which carry no Fixed or
+ * Changes Omitted information, so there are no attributes to list.
+ */
+#define GENERATED_FIXED_ATTRIBUTES
+#define GENERATED_CHANGES_OMITTED_ATTRIBUTES
+
