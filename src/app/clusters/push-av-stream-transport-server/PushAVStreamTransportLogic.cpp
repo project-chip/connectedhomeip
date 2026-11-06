@@ -945,6 +945,29 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(CommandHandler & handler, 
             }
         }
         VerifyOrReturnValue(iter.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
+
+        if (triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext)
+        {
+            auto sensitivityIter = zones.begin();
+            while (sensitivityIter.Next())
+            {
+                const auto & zone = sensitivityIter.GetValue();
+                if (HasFeature(Feature::kPerZoneSensitivity))
+                {
+                    VerifyOrReturnValue(zone.sensitivity.HasValue(), Status::InvalidCommand,
+                                        ChipLogError(Zcl, "Ambient zone is missing Sensitivity on endpoint %u", mEndpointId));
+                    VerifyOrReturnValue(zone.sensitivity.Value() >= 1 && zone.sensitivity.Value() <= 10, Status::ConstraintError,
+                                        ChipLogError(Zcl, "Ambient zone Sensitivity is out of range on endpoint %u", mEndpointId));
+                }
+                else
+                {
+                    VerifyOrReturnValue(
+                        !zone.sensitivity.HasValue(), Status::InvalidCommand,
+                        ChipLogError(Zcl, "Ambient zone Sensitivity requires PerZoneSensitivity on endpoint %u", mEndpointId));
+                }
+            }
+            VerifyOrReturnValue(sensitivityIter.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
+        }
     }
     return Status::Success;
 }
