@@ -33,7 +33,7 @@ EndpointComposition ChildComposition(EndpointId parent, Span<const EndpointCompo
 
 SimulatedSolarPowerFourParallelPanels::SimulatedSolarPowerFourParallelPanels(const Context & context) :
     SimulatedSolarPower(context, {}), mParallelPanel1(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
-                                                  Span(SolarPowerTags::kParallelPanel1Tag)),
+                                                      Span(SolarPowerTags::kParallelPanel1Tag)),
     mParallelPanel2(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
                     Span(SolarPowerTags::kParallelPanel2Tag)),
     mParallelPanel3(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
