@@ -1,0 +1,12 @@
+# ASan ignorelist for Matter builds.
+#
+# Only the field-padding category is excluded here. Clang's
+# -fsanitize-address-field-padding instrumentation computes each
+# intra-object redzone as (next field offset - field offset - sizeof(field))
+# and does not account for [[no_unique_address]] members, which Clang may
+# place at a lower offset than the preceding field. The result is a negative
+# redzone size and an ASan runtime CHECK failure in the constructor.
+# Exclude every class that uses CHIP_NO_UNIQUE_ADDRESS.
+[address]
+type:chip::app::Clusters::Thermostat::ThermostatCluster*=field-padding
+type:chip::app::Clusters::Thermostat::ThermostatSetpoints*=field-padding
