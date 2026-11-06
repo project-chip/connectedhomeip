@@ -2857,23 +2857,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         )
         return True
 
-    async def read_single_attribute_assert_expected(
-            self,
-            endpoint: int,
-            attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            assert_func: Callable,
-            *assert_expectations) -> None:
-        """Reads a single attribute and asserts it meets with the expectatins.
-
-        Args:
-            endpoint: Endponit on which to read the attribute.
-            attribute: Full attribute object.
-            assert_func: Assert callable.
-            assert_expectations: Remaining args passed to the assert callable. The first arg passed is attr value read.
-        """
-        val = await self.read_single_attribute_check_success(endpoint, get_cluster_from_attribute(attribute), attribute)
-        assert_func(val, *assert_expectations)
-
     @staticmethod
     def _fabric_filtered_match(read_value: Any, cached_value: Any) -> bool:
         """Check whether a read-vs-cache mismatch is caused by fabric-scoped filtering.
@@ -3705,7 +3688,9 @@ def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
 EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
-def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
+def get_cluster_from_attribute(
+    attribute: type[ClusterObjects.ClusterAttributeDescriptor] | ClusterObjects.ClusterAttributeDescriptor,
+) -> ClusterObjects.Cluster:
     """Returns the cluster object for a given attribute descriptor."""
     return ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
 
