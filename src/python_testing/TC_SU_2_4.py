@@ -46,7 +46,8 @@
 #     factory-reset: true
 #     app-ready-pattern: Server initialization complete
 #     quiet: true
-#     tags: [nightly]
+#     tags: [nightly, slow]
+#     duration: 10 minutes
 # === END CI TEST ARGUMENTS ===
 
 import asyncio

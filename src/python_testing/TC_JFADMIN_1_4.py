@@ -36,6 +36,8 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 #     quiet: true
+#     tags: [slow]
+#     duration: 1.5 minutes
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
