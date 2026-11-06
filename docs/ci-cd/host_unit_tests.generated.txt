@@ -65,31 +65,31 @@ examples-nrfconnect.yaml / nRF Connect SDK / Run unit tests for Zephyr native_po
   targets: nrf-native-sim-tests
 
 nightly.yaml / Nightly ASAN Testing across Crypto Backends / ASAN unit tests - BoringSSL
-  on:     schedule[{"cron": "0 0 * * *"}], workflow_dispatch
+  on:     schedule[{"cron": "0 0 * * *"}], push{"branches": ["master", "v*-branch"]}, pull_request, merge_group, workflow_dispatch
   job-if: github.actor != 'restyled-io[bot]'
   if:     -
   targets: linux-x64-tests-boringssl-asan-clang
 
 nightly.yaml / Nightly ASAN Testing across Crypto Backends / ASAN unit tests - mbedTLS
-  on:     schedule[{"cron": "0 0 * * *"}], workflow_dispatch
+  on:     schedule[{"cron": "0 0 * * *"}], push{"branches": ["master", "v*-branch"]}, pull_request, merge_group, workflow_dispatch
   job-if: github.actor != 'restyled-io[bot]'
   if:     -
   targets: linux-x64-tests-mbedtls-asan-clang
 
 nightly.yaml / Nightly ASAN Testing across Crypto Backends / ASAN unit tests - PSA
-  on:     schedule[{"cron": "0 0 * * *"}], workflow_dispatch
+  on:     schedule[{"cron": "0 0 * * *"}], push{"branches": ["master", "v*-branch"]}, pull_request, merge_group, workflow_dispatch
   job-if: github.actor != 'restyled-io[bot]'
   if:     -
   targets: linux-x64-tests-psa-asan-clang
 
 nightly.yaml / Nightly MSAN Tests - Linux / Build and Run MSAN unit tests
-  on:     schedule[{"cron": "0 0 * * *"}], workflow_dispatch
+  on:     schedule[{"cron": "0 0 * * *"}], push{"branches": ["master", "v*-branch"]}, pull_request, merge_group, workflow_dispatch
   job-if: github.actor != 'restyled-io[bot]'
   if:     -
   targets: linux-x64-tests-msan-clang
 
 nightly.yaml / Nightly Unit Tests - Linux (various features) / Run Tests
-  on:     schedule[{"cron": "0 0 * * *"}], workflow_dispatch
+  on:     schedule[{"cron": "0 0 * * *"}], push{"branches": ["master", "v*-branch"]}, pull_request, merge_group, workflow_dispatch
   job-if: github.actor != 'restyled-io[bot]'
   if:     -
   gn: is_clang=true is_asan=true chip_crypto="boringssl" chip_enable_rotating_device_id=true chip_enable_icd_server=true chip_enable_icd_lit=true chip_enable_access_restrictions=true chip_build_all_platform_tests=true
