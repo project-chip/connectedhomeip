@@ -431,9 +431,11 @@ void CodeDrivenDataModelProvider::NotifyChangedDescriptorPartsListOfAncestors(En
 
         registration = GetEndpointInterfaceRegistration(endpointId);
         VerifyOrReturn(registration != nullptr);
-        if (registration->GetEndpointEntry().compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily || endpointId == kRootEndpointId)
+        if (registration->GetEndpointEntry().compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily ||
+            endpointId == kRootEndpointId)
         {
-            // If full family type ancestor, notify attribute change. Root endpoint is full-family even if its pattern is not set to it.
+            // If full family type ancestor, notify attribute change. Root endpoint is full-family even if its pattern is not set to
+            // it.
             NotifyAttributeChanged({ endpointId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id },
                                    DataModel::AttributeChangeType::kReportable);
         }
