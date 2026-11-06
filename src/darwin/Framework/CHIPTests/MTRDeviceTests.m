@@ -8682,6 +8682,55 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     [self _checkSupersededResubscriptionTimersWithThread:YES subscriptionPoolWidth:1 blockingMatterQueueFor:0 supersedingWhileBlocked:YES];
 }
 
+- (void)test006_SupersededResubscriptionTimersReleaseOnlyTheirOwnPoolSlot
+{
+    // Pins the owner-checked slot release in the superseded branch; no behaviour change.
+    // Once the surviving reattempt holds the pool slot, the superseded timers that ran
+    // must leave exactly that one item in the pool: none stranded, and the survivor's not released.
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:kDefaultSubscriptionPoolSizeOverrideKey];
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kDefaultSubscriptionPoolSizeOverrideKey];
+    XCTAssertNotNil(controller);
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(0x12344399) controller:controller];
+    dispatch_queue_t queue = dispatch_queue_create("superseded-resubscription-pool-slot", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscribingExpectation = [self expectationWithDescription:@"Surviving reattempt started a subscription"];
+    delegate.onInternalStateChanged = ^{
+        if ([device _getInternalState] == MTRInternalDeviceStateSubscribing) {
+            [subscribingExpectation fulfill];
+        }
+    };
+    subscribingExpectation.assertForOverFulfill = NO;
+
+    [device setDelegate:delegate queue:queue];
+    NSUInteger baselinePoolItemCount = controller.concurrentSubscriptionPool.itemCount;
+
+    for (int i = 0; i < 3; i++) {
+        [controller syncRunOnWorkQueue:^{
+            device.reattemptingSubscription = NO;
+            [device _handleSubscriptionReset:nil];
+        } error:nil];
+    }
+    [self waitForExpectations:@[ subscribingExpectation ] timeout:15];
+
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    [controller syncRunOnWorkQueue:^{
+    } error:nil];
+    // skipSetupSubscription leaves the survivor holding its slot.
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1);
+
+    [device removeDelegate:delegate];
+    [controller syncRunOnWorkQueue:^{
+    } error:nil];
+    [controller removeDevice:device];
+}
+
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase
