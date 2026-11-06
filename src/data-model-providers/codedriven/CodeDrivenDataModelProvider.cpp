@@ -18,6 +18,8 @@
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <clusters/Descriptor/Attributes.h>
+#include <clusters/Descriptor/ClusterId.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
@@ -293,6 +295,9 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
     }
 
     NotifyEndpointChanged(registration.endpointEntry.id, DataModel::EndpointChangeType::kAdded);
+    ConcreteAttributePath partsListAttributePath{ registration.endpointEntry.parentId, Clusters::Descriptor::Id,
+                                                  Clusters::Descriptor::Attributes::PartsList::Id };
+    NotifyAttributeChanged(partsListAttributePath, DataModel::AttributeChangeType::kReportable);
 
     return CHIP_NO_ERROR;
 }
@@ -331,9 +336,21 @@ CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId, Cl
         }
     }
 
+    EndpointId parentEndpointId = kInvalidEndpointId;
+    for (auto & registration : mEndpointInterfaceRegistry)
+    {
+        if (registration.GetEndpointEntry().id == endpointId)
+        {
+            parentEndpointId = registration.GetEndpointEntry().parentId;
+        }
+    }
+
     ReturnErrorOnFailure(mEndpointInterfaceRegistry.Unregister(endpointId));
 
     NotifyEndpointChanged(endpointId, DataModel::EndpointChangeType::kRemoved);
+    ConcreteAttributePath partsListAttributePath{ parentEndpointId, Clusters::Descriptor::Id,
+                                                  Clusters::Descriptor::Attributes::PartsList::Id };
+    NotifyAttributeChanged(partsListAttributePath, DataModel::AttributeChangeType::kReportable);
 
     return CHIP_NO_ERROR;
 }
