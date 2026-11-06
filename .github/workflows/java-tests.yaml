@@ -33,14 +33,19 @@ env:
     CHIP_LOG_TIMESTAMPS: false
 
 jobs:
+    pr_scope:
+        if: github.event_name == 'pull_request'
+        uses: ./.github/workflows/pull-request-scope.yaml
+
     java_tests_linux:
         name: Linux
+        needs: pr_scope
 
         env:
             PW_PROJECT_ROOT: ${GITHUB_WORKSPACE}
             TSAN_OPTIONS: "halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
         runs-on: ubuntu-latest
 
         container:

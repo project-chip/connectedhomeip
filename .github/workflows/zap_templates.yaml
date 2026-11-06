@@ -30,8 +30,13 @@ env:
     CHIP_LOG_TIMESTAMPS: false
 
 jobs:
+    pr_scope:
+        if: github.event_name == 'pull_request'
+        uses: ./.github/workflows/pull-request-scope.yaml
+
     zap_templates:
         name: ZAP templates generation
+        needs: pr_scope
 
         runs-on: ubuntu-latest
         container:
@@ -39,7 +44,7 @@ jobs:
         defaults:
             run:
                 shell: sh
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
 
         steps:
             - name: Checkout

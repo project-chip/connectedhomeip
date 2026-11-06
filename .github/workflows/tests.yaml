@@ -44,8 +44,13 @@ env:
     OPENSSL_3_5_TEST_REGEX: 'TC_(OPCREDS_3_9|DA_1_10|DA_1_12|NETIM_1_[1-4])\.py$'
 
 jobs:
+    pr_scope:
+        if: github.event_name == 'pull_request'
+        uses: ./.github/workflows/pull-request-scope.yaml
+
     test_suites_linux:
         name: Test Suites - Linux
+        needs: pr_scope
 
         strategy:
             matrix:
@@ -58,7 +63,7 @@ jobs:
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
         runs-on: ubuntu-latest
 
         container:
@@ -573,6 +578,7 @@ jobs:
                 extra-details-file: "test-summaries/compact-failures.txt"
     test_suites_darwin:
         name: Test Suites - Darwin
+        needs: pr_scope
 
         strategy:
             matrix:
@@ -591,7 +597,7 @@ jobs:
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
         runs-on: ${{ matrix.os }}
 
         steps:
@@ -896,6 +902,9 @@ jobs:
 
         if: github.actor != 'restyled-io[bot]'
 
+        outputs:
+            python_test_slices: ${{ steps.select_python_tests.outputs.python_test_slices }}
+
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
             BLE_WIFI_BUILD_VARIANT: asan
@@ -934,6 +943,24 @@ jobs:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-${{ env.BUILD_VARIANT }}
 
+            # On a pull request that only changes Python tests, choose the tests each
+            # REPL shard runs; see scripts/tests/python_test_scope.py. The base branch's
+            # copy of the script chooses, so a pull request cannot change the rules that
+            # select its own tests. A failure here leaves the output empty, and every
+            # shard then runs as usual.
+            - name: Select Python tests for this pull request
+              id: select_python_tests
+              if: github.event_name == 'pull_request'
+              continue-on-error: true
+              run: |
+                  git fetch --no-tags --quiet --depth=2 origin "$GITHUB_SHA"
+                  git diff --no-renames --name-only HEAD^1 HEAD > "$RUNNER_TEMP/changed-files.txt"
+                  git show HEAD^1:src/python_testing/test_metadata.yaml > "$RUNNER_TEMP/previous-test-metadata.yaml"
+                  base_script="$RUNNER_TEMP/base/scripts/tests/python_test_scope.py"
+                  mkdir -p "$(dirname "$base_script")"
+                  git show HEAD^1:scripts/tests/python_test_scope.py > "$base_script"
+                  scripts/run_in_build_env.sh "python3 '$base_script' select --chip-root '$PWD' --previous-metadata '$RUNNER_TEMP/previous-test-metadata.yaml' --output '$GITHUB_OUTPUT' --github-env '$GITHUB_ENV' --summary '$GITHUB_STEP_SUMMARY' < '$RUNNER_TEMP/changed-files.txt'"
+
             - name: Setup and Restore Cache
               id: ccache
               uses: ./.github/actions/setup-ccache
@@ -945,7 +972,12 @@ jobs:
             - name: Build python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
 
+            # On a pull request that only changes Python tests, the selection step sets
+            # PYTHON_TEST_APPS to the apps its tests and the unfiltered REPL job need,
+            # and each app build below runs only when it builds one of them. Unset,
+            # as on every other run, everything builds.
             - name: Build apps for REPL tests with unified build
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',AIR_PURIFIER_APP,') || contains(env.PYTHON_TEST_APPS, ',BRIDGE_APP,') || contains(env.PYTHON_TEST_APPS, ',CHIP_LOCK_APP,') || contains(env.PYTHON_TEST_APPS, ',CHIP_MICROWAVE_OVEN_APP,') || contains(env.PYTHON_TEST_APPS, ',CHIP_RVC_APP,') || contains(env.PYTHON_TEST_APPS, ',OTA_PROVIDER_APP,') || contains(env.PYTHON_TEST_APPS, ',WATER_LEAK_DETECTOR_APP,')
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -963,6 +995,7 @@ jobs:
                   rm -rf out/unified-build
 
             - name: Build linux-x64-closure
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',CLOSURE_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-closure-${BUILD_VARIANT}-clang-test
@@ -971,6 +1004,7 @@ jobs:
                   "
 
             - name: Build linux-x64-all-clusters
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',ALL_CLUSTERS_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-clusters-${BUILD_VARIANT}-clang-test
@@ -979,6 +1013,7 @@ jobs:
                   "
 
             - name: Build linux-x64-all-clusters-no-groupcast
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',ALL_CLUSTERS_NO_GROUPCAST_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-clusters-no-groupcast-${BUILD_VARIANT}-clang-test
@@ -987,6 +1022,7 @@ jobs:
                   "
 
             - name: Build linux-x64-all-devices
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',ALL_DEVICES_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-devices-${BUILD_VARIANT}-clang-test
@@ -996,6 +1032,7 @@ jobs:
             # The Commissioning Proxy tests drive BLE and Wi-Fi through mock D-Bus
             # servers, so they need an application with both compiled in.
             - name: Build linux-x64-all-devices with BLE and Wi-Fi
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',ALL_DEVICES_BLE_WIFI_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-devices-${BLE_WIFI_BUILD_VARIANT}-clang-test
@@ -1003,6 +1040,7 @@ jobs:
                   && rm -rf out/linux-x64-all-devices-${BLE_WIFI_BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-lit-icd
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',LIT_ICD_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-lit-icd-${BUILD_VARIANT}-clang-test
@@ -1010,6 +1048,7 @@ jobs:
                   && rm -rf out/linux-x64-lit-icd-${BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-electrical-protection
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',ELECTRICAL_PROTECTION_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-electrical-protection-${BUILD_VARIANT}-clang-test
@@ -1017,6 +1056,7 @@ jobs:
                   && rm -rf out/linux-x64-electrical-protection-${BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-energy-gateway
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',ENERGY_GATEWAY_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-energy-gateway-${BUILD_VARIANT}-clang-test
@@ -1024,6 +1064,7 @@ jobs:
                   && rm -rf out/linux-x64-energy-gateway-${BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-evse
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',EVSE_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-evse-${BUILD_VARIANT}-clang-test
@@ -1031,6 +1072,7 @@ jobs:
                   && rm -rf out/linux-x64-evse-${BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-water-heater
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',WATER_HEATER_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-water-heater-${BUILD_VARIANT}-clang-test
@@ -1038,6 +1080,7 @@ jobs:
                   && rm -rf out/linux-x64-water-heater-${BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-network-manager
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',NETWORK_MANAGEMENT_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-network-manager-${BUILD_VARIANT}-clang-test
@@ -1045,6 +1088,7 @@ jobs:
                   && rm -rf out/linux-x64-network-manager-${BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-fabric-admin-rpc
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',FABRIC_ADMIN_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang
@@ -1052,6 +1096,7 @@ jobs:
                   && rm -rf out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-fabric-bridge-rpc
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',FABRIC_BRIDGE_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang
@@ -1059,6 +1104,7 @@ jobs:
                   && rm -rf out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-fabric-sync
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',FABRIC_SYNC_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang
@@ -1068,6 +1114,7 @@ jobs:
             # TODO: camera app works for asan-gcc, while asan-clang reports some false positives related to libdatachannel,
             # consider switching camera and camera-controller to asan-clang once Issue #43340 is resolved.
             - name: Build linux-x64-camera
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',CAMERA_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-camera-${BUILD_VARIANT}
@@ -1075,6 +1122,7 @@ jobs:
                   && rm -rf out/linux-x64-camera-${BUILD_VARIANT}"
 
             - name: Build linux-x64-camera-controller
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',CAMERA_CONTROLLER_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-camera-controller-${BUILD_VARIANT}
@@ -1082,6 +1130,7 @@ jobs:
                   && rm -rf out/linux-x64-camera-controller-${BUILD_VARIANT}"
 
             - name: Build linux-x64-light-data-model-no-unique-id
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',LIGHTING_APP_NO_UNIQUE_ID,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang
@@ -1089,6 +1138,7 @@ jobs:
                   && rm -rf out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-terms-and-conditions
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',TERMS_AND_CONDITIONS_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang
@@ -1096,6 +1146,7 @@ jobs:
                   && rm -rf out/linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-tv-app
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',TV_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-tv-app-${BUILD_VARIANT}-clang
@@ -1103,6 +1154,7 @@ jobs:
                   && rm -rf out/linux-x64-tv-app-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-python-bindings
+              if: env.PYTHON_TEST_APPS == ''
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-python-bindings-webrtc-${BUILD_VARIANT}-clang
@@ -1110,6 +1162,7 @@ jobs:
                   && rm -rf out/linux-x64-python-bindings-webrtc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-jf-control-app
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',JF_CONTROL_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-jf-control-app-${BUILD_VARIANT}-clang
@@ -1117,6 +1170,7 @@ jobs:
                   && rm -rf out/linux-x64-jf-control-app-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-jf-admin-app
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',JF_ADMIN_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-jf-admin-app-${BUILD_VARIANT}-clang
@@ -1127,6 +1181,7 @@ jobs:
               run: ccache -s
 
             - name: Build linux-x64-requestor-app
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',OTA_REQUESTOR_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-ota-requestor-${BUILD_VARIANT}-clang-test
@@ -1224,6 +1279,10 @@ jobs:
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
             CHIP_IP_PACKET_CAPTURE: 1
+            # On a pull request that only changes Python tests: a regex for this shard's
+            # share of the selected tests, or "none" when it has none. Empty otherwise,
+            # and the shard runs its whole filter.
+            PYTHON_TEST_SELECTION: ${{ fromJSON(needs.repl_tests_linux_build.outputs.python_test_slices || '{}')[matrix.filter] }}
 
         # Tests are I/O bound, so run on a smaller machine
         runs-on: namespace-profile-1x2
@@ -1248,21 +1307,26 @@ jobs:
               run: |
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
+              if: env.PYTHON_TEST_SELECTION != 'none'
               uses: actions/checkout@v7
 
             - name: Checkout submodules & Bootstrap
+              if: env.PYTHON_TEST_SELECTION != 'none'
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-${{ env.BUILD_VARIANT }}-${{ matrix.filter }}
 
             - name: Set ASAN symbolizer path
+              if: env.PYTHON_TEST_SELECTION != 'none'
               run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
 
             - name: Set up a IPV6 known environment
+              if: env.PYTHON_TEST_SELECTION != 'none'
               uses: ./.github/actions/add-ipv6
 
             - name: Download artifacts for running
+              if: env.PYTHON_TEST_SELECTION != 'none'
               uses: namespace-actions/download-artifact@v2
               with:
                 name: repl-build-data
@@ -1271,12 +1335,14 @@ jobs:
             # "Directory renamed before its status could be extracted" during rapid unpack.
             - uses: Wandalen/wretry.action@e68c23e6309f2871ca8ae4763e7629b9c258e1ea # v3.8.0
               name: Unpack artifacts
+              if: env.PYTHON_TEST_SELECTION != 'none'
               with:
                   command: tar xfJ repl-build-data.tar.xz
                   attempt_limit: 3
                   attempt_delay: 2000
 
             - name: Generate an argument environment file
+              if: env.PYTHON_TEST_SELECTION != 'none'
               run: |
                   echo -n "" >/tmp/test_env.yaml
                   # keep-sorted: start
@@ -1377,30 +1443,34 @@ jobs:
                       --script src/python_testing/test_testing/test_manufacturer_specific_cluster.py"
 
             - name: Run Tests ${{matrix.filter}}
-              if: ${{matrix.filter != ''}}
+              if: ${{ matrix.filter != '' && env.PYTHON_TEST_SELECTION != 'none' }}
               env:
                   KEEP_GOING: ${{ github.event_name != 'pull_request' && '--keep-going' || '' }}
               run: |
                   # The tests trace into this directory, and perfetto fails if it
                   # is missing.
                   mkdir -p out/trace_data
-                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --regex '!${{env.OPENSSL_3_5_TEST_REGEX}}' --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
+                  SELECTION=""
+                  if [ -n "$PYTHON_TEST_SELECTION" ]; then
+                      SELECTION="--regex '$PYTHON_TEST_SELECTION'"
+                  fi
+                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --regex '!${{env.OPENSSL_3_5_TEST_REGEX}}' $SELECTION --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
             - name: Print python test summary
-              if: ${{ matrix.filter != '' && always() }}
+              if: ${{ matrix.filter != '' && always() && env.PYTHON_TEST_SELECTION != 'none' }}
               run: |
                   [ -f test-summaries/python-tests.json ] && \
                     scripts/run_in_python_env.sh out/venv \
                       'src/python_testing/execute_python_tests.py summarize --summary-file test-summaries/python-tests.json --compact-failures-file test-summaries/compact-failures.txt' || true
             - name: Upload python test summary
               uses: actions/upload-artifact@v7
-              if: ${{ matrix.filter != '' && always() }}
+              if: ${{ matrix.filter != '' && always() && env.PYTHON_TEST_SELECTION != 'none' }}
               with:
                   name: test-summaries-python-${{ matrix.filter }}
                   path: test-summaries/python-tests.json
                   retention-days: 30
 
             - name: Upload JUnit XML Results
-              if: always() && matrix.filter != ''
+              if: always() && matrix.filter != '' && env.PYTHON_TEST_SELECTION != 'none'
               uses: actions/upload-artifact@v7
               with:
                   name: junit-results-repl-${{ matrix.filter }}
@@ -1547,6 +1617,7 @@ jobs:
               job-name: "Deploy to GitHub Pages"
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
+        needs: pr_scope
         strategy:
             matrix:
                 include:
@@ -1563,7 +1634,7 @@ jobs:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
 
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
         runs-on: ${{ matrix.os }}
 
         steps:

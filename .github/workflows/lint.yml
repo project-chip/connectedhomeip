@@ -64,6 +64,12 @@ jobs:
               # Keeps docs/ci-cd/host_unit_tests.md reviewed when workflows change which unit tests run.
               run: scripts/tools/list_unit_test_steps.py --check
 
+            - name: Check Python test scope rules
+              if: always()
+              # The rules that let Python-test-only pull requests skip unrelated CI read the workflows,
+              # test_metadata.yaml and execute_python_tests.py; this fails with the fix to apply when any drifts.
+              run: python3 -m unittest scripts/tests/test_python_test_scope.py
+
             - name: Check for orphaned gn files
               if: always()
               # We should enforce that ALL new files are referenced in our build scripts.

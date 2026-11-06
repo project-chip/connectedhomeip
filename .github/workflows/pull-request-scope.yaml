@@ -1,0 +1,70 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Called by the workflows that only build or test code outside the Python
+# certification test tree. A pull request whose changes all sit in that tree
+# skips their jobs; see scripts/tests/python_test_scope.py for the rule.
+#
+# Callers run this job on pull requests only, and their gated jobs use
+#
+#     needs: pr_scope
+#     if: ${{ !cancelled() && needs.pr_scope.outputs.python_tests_only != 'true' }}
+#
+# so a skipped or failed scope job runs everything, as on a push to master.
+# Without !cancelled() a skipped scope job would skip them all.
+
+name: Pull request scope
+
+on:
+    workflow_call:
+        outputs:
+            python_tests_only:
+                description:
+                    "'true' when only Python tests or test helpers changed"
+                value: ${{ jobs.classify.outputs.python_tests_only }}
+
+jobs:
+    classify:
+        name: Classify changed files
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        permissions:
+            contents: read
+        outputs:
+            python_tests_only: ${{ steps.classify.outputs.python_tests_only }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  # The pull request's merge commit and its base parent are all
+                  # the history the comparison needs, and only one file is read.
+                  fetch-depth: 2
+                  filter: blob:none
+                  sparse-checkout: scripts/tests/python_test_scope.py
+                  sparse-checkout-cone-mode: false
+                  persist-credentials: false
+            # The base branch's copy of the script classifies the change, so a pull
+            # request cannot change the rules that classify it. Without a base copy,
+            # as on the pull request that adds the script, everything runs.
+            - name: Classify changed files
+              id: classify
+              run: |
+                  git diff --no-renames --name-only HEAD^1 HEAD > "$RUNNER_TEMP/changed-files.txt"
+                  base_script="$RUNNER_TEMP/base/scripts/tests/python_test_scope.py"
+                  mkdir -p "$(dirname "$base_script")"
+                  if git show HEAD^1:scripts/tests/python_test_scope.py > "$base_script"; then
+                      python3 "$base_script" classify < "$RUNNER_TEMP/changed-files.txt" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "python_tests_only=false" >> "$GITHUB_OUTPUT"
+                  fi

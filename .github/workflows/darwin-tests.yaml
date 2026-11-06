@@ -32,8 +32,13 @@ env:
   CHIP_LOG_TIMESTAMPS: false
 
 jobs:
+  pr_scope:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/pull-request-scope.yaml
+
   test_suites_chip_tool_darwin:
     name: Test Suites - Darwin
+    needs: pr_scope
 
     strategy:
       matrix:
@@ -57,7 +62,7 @@ jobs:
       DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
       CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
-    if: github.actor != 'restyled-io[bot]'
+    if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
     # Namespace MacOS 26 profile is configured as "26.3 with Xcode 26.2" currently
     # This is not yet enabled since namespace still has high concurrency limit: we have
     # 48 cores and are forced to 6 cores minimum.

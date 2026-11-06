@@ -11,6 +11,10 @@ below in the same PR. The `code-lints` job in `lint.yml` runs it with `--check`.
 Release branches (`v*-branch`) run their own copy of each workflow. On push they
 behave like a master push; scheduled (nightly) workflows do not run on them.
 
+A pull request that only changes Python tests skips the `build.yaml`,
+`qemu.yaml` and `examples-nrfconnect.yaml` jobs below; see "Pull requests that
+only change Python tests" in `docs/testing/python.md`.
+
 ## Linux and macOS host
 
 | Configuration                                        | Job (workflow)                                                 | PR           | Master push  | Nightly | Why                                                 |

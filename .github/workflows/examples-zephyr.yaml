@@ -34,10 +34,15 @@ env:
     CCACHE_MAXSIZE: 500M
 
 jobs:
+    pr_scope:
+        if: github.event_name == 'pull_request'
+        uses: ./.github/workflows/pull-request-scope.yaml
+
     zephyr:
         name: all-devices-app (${{ matrix.board }}, ${{ matrix.toolchain }})
+        needs: pr_scope
         runs-on: ubuntu-24.04
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
 
         permissions:
             contents: read

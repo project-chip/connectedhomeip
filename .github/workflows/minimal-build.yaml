@@ -27,10 +27,15 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
+    pr_scope:
+        if: github.event_name == 'pull_request'
+        uses: ./.github/workflows/pull-request-scope.yaml
+
     minimal-all-clusters:
         name: Linux / configure build of all-clusters-app
+        needs: pr_scope
 
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
         runs-on: ubuntu-latest
 
         container:
@@ -56,8 +61,9 @@ jobs:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     minimal-network-manager:
         name: Linux / configure build of network-manager-app
+        needs: pr_scope
 
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
         runs-on: ubuntu-latest
 
         container:
