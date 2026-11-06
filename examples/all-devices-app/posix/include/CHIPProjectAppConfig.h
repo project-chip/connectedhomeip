@@ -25,21 +25,11 @@
  *
  */
 
-// CHIPProjectAppConfig.h is used as both chip_project_config_include (included early by
-// SystemConfig.h before CHIPDeviceBuildConfig.h) and chip_device_project_config_include
-// (included by CHIPDeviceConfig.h after CHIPDeviceBuildConfig.h). Evaluate this device-layer
-// override whenever CHIPDeviceBuildConfig.h has been included, even if CHIPProjectAppConfig.h
-// was already included earlier via SystemConfig.h.
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP) && defined(CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
+#pragma once
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP && !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#ifndef CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 #define CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION 0
 #endif
-#endif
-#endif
-
-#ifndef CHIP_ALL_DEVICES_PROJECT_APP_CONFIG_H
-#define CHIP_ALL_DEVICES_PROJECT_APP_CONFIG_H
 
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY 1
 
@@ -54,5 +44,3 @@
 
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>
-
-#endif // CHIP_ALL_DEVICES_PROJECT_APP_CONFIG_H
