@@ -1115,6 +1115,7 @@ operationalDataset
 operationalstate
 opkg
 OPTIGA
+optionals
 optionMask
 optionOverride
 optionsMask
