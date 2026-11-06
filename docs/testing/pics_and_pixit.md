@@ -148,6 +148,20 @@ Note that you can run tests locally against the PICS XMLs for an endpoint by
 supplying the name of the directory containing the set of PICS XML files for
 that endpoint.
 
+`--PICS` accepts either shape of input:
+
+-   A full PICSGenerator tree, with a subdirectory per endpoint (`endpoint0`,
+    `EP1`, ...) and the device-wide files such as `Base.xml` at the top level.
+    Each endpoint's codes are checked against that endpoint. If the tree has no
+    subdirectory for the endpoint passed to `--endpoint`, the test fails
+    immediately rather than reporting every element on the endpoint as a missing
+    PICS code.
+-   A single set of PICS with no endpoint structure: the XML directory for one
+    endpoint, or a CI-format text file such as
+    `src/app/tests/suites/certification/ci-pics-values`. These carry no endpoint
+    labels, so their codes are checked against whichever endpoint `--endpoint`
+    names.
+
 ## Setting PIXITs for Matter devices
 
 Matter tests do not currently have support to read PIXIT values from the PICS

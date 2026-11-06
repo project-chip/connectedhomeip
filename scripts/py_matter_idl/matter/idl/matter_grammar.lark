@@ -49,6 +49,8 @@ attribute_quality: "readonly"i -> attr_readonly
                  | "writeonly"i -> attr_writeonly
                  | "nosubscribe"i -> attr_nosubscribe
                  | "timedwrite"i -> attr_timed
+                 | "changes_omitted"i -> attr_changes_omitted
+                 | "fixed"i -> attr_fixed
 attribute_qualities: attribute_quality* -> attribute_qualities
 
 request_struct: "request"i struct

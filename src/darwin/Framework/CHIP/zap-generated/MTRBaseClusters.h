@@ -11124,19 +11124,19 @@ MTR_PROVISIONALLY_AVAILABLE
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeSupportedModesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeModeWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeModeWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeModeWithParams:(MTRSubscribeParams *)params
-                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeHumidistatModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeHumidistatModeWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeHumidistatModeWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeHumidistatModeWithParams:(MTRSubscribeParams *)params
+                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeHumidistatModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeSystemStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeSystemStateWithParams:(MTRSubscribeParams *)params
-                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeSystemStateWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeHumidistatSystemStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeHumidistatSystemStateWithParams:(MTRSubscribeParams *)params
+                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeHumidistatSystemStateWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeUserSetpointWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeUserSetpointWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
@@ -20354,6 +20354,28 @@ typedef NS_ENUM(uint8_t, MTRDataTypeRelativePositionTag) {
     MTRDataTypeRelativePositionTagFrontOf MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x05,
     MTRDataTypeRelativePositionTagBehind MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+typedef NS_ENUM(uint8_t, MTRDataTypeSemanticTagNamespaceId) {
+    MTRDataTypeSemanticTagNamespaceIdCompassDirection MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeSemanticTagNamespaceIdCompassLocation MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeSemanticTagNamespaceIdDirection MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeSemanticTagNamespaceIdLevel MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeSemanticTagNamespaceIdLocation MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeSemanticTagNamespaceIdNumber MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeSemanticTagNamespaceIdPosition MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeSemanticTagNamespaceIdElectricalMeasurement MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeSemanticTagNamespaceIdCommodityTariffChronology MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeSemanticTagNamespaceIdCommodityTariffDirection MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeSemanticTagNamespaceIdLaundry MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeSemanticTagNamespaceIdPowerSource MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeSemanticTagNamespaceIdCommonArea MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeSemanticTagNamespaceIdCommonLandmark MTR_PROVISIONALLY_AVAILABLE = 0x11,
+    MTRDataTypeSemanticTagNamespaceIdRelativePosition MTR_PROVISIONALLY_AVAILABLE = 0x12,
+    MTRDataTypeSemanticTagNamespaceIdClosure MTR_PROVISIONALLY_AVAILABLE = 0x44,
+    MTRDataTypeSemanticTagNamespaceIdClosurePanel MTR_PROVISIONALLY_AVAILABLE = 0x45,
+    MTRDataTypeSemanticTagNamespaceIdClosureWindow MTR_PROVISIONALLY_AVAILABLE = 0x47,
+    MTRDataTypeSemanticTagNamespaceIdClosureCabinet MTR_PROVISIONALLY_AVAILABLE = 0x48,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeStreamUsageEnum) {
     MTRDataTypeStreamUsageEnumInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,

@@ -151,8 +151,13 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     };
 
+    CHIP_ERROR ConnectToNetwork(const WiFiNetwork & network, ConnectCallback * callback);
+
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
+    // Set when ConnectNetwork may have written mStagingNetwork to wpa_supplicant, cleared on commit and revert.
+    // Revert only needs to touch wpa_supplicant when this is set.
+    bool mStagingNetworkApplied = false;
     // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
     bool mIs5gSupported = false;
 };

@@ -14695,8 +14695,8 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
         }
         return value;
     }
-    case Attributes::Mode::Id: {
-        using TypeInfo = Attributes::Mode::TypeInfo;
+    case Attributes::HumidistatMode::Id: {
+        using TypeInfo = Attributes::HumidistatMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -14706,8 +14706,8 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
-    case Attributes::SystemState::Id: {
-        using TypeInfo = Attributes::SystemState::TypeInfo;
+    case Attributes::HumidistatSystemState::Id: {
+        using TypeInfo = Attributes::HumidistatSystemState::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

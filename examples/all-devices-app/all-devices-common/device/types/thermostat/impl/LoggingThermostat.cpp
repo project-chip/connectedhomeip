@@ -31,6 +31,11 @@ constexpr thermostat::PresetScenarioEnum kPresetScenarios[] = {
     thermostat::PresetScenarioEnum::kUserDefined,
 };
 
+constexpr thermostat::SystemModeEnum kScheduleModes[] = {
+    thermostat::SystemModeEnum::kHeat,
+    thermostat::SystemModeEnum::kCool,
+};
+
 bool IsSupportedMode(thermostat::SystemModeEnum mode)
 {
     if (mode == thermostat::SystemModeEnum::kOff || mode == thermostat::SystemModeEnum::kAuto ||
@@ -69,8 +74,8 @@ FullThermostat::Context MakeLoggingContext(const LoggingThermostat::Context & co
 } // namespace
 
 LoggingThermostat::LoggingThermostat(const Context & context) :
-    FullThermostat(MakeLoggingContext(context), *this, *this, *this, *this, *this, *this, *this), mFabricTable(context.fabricTable),
-    mGroupDataProvider(context.groupDataProvider)
+    FullThermostat(MakeLoggingContext(context), *this, *this, *this, *this, *this, *this, *this, *this),
+    mFabricTable(context.fabricTable), mGroupDataProvider(context.groupDataProvider)
 {
     static_assert(MATTER_ARRAY_SIZE(kPresetScenarios) == kPresetCapacity);
     // Start with two built-in presets, leaving room for a user-defined preset.
@@ -85,6 +90,27 @@ LoggingThermostat::LoggingThermostat(const Context & context) :
         preset.SetCoolingSetpoint(MakeOptional(thermostat::kDefaultCoolingSetpoint));
         ++mPresetCount;
     }
+
+    // Start with a single built-in heating schedule with morning and evening transitions.
+    auto & schedule        = mSchedules[0];
+    const uint8_t handle[] = { to_underlying(thermostat::SystemModeEnum::kHeat) };
+    VerifyOrDie(schedule.SetScheduleHandle(DataModel::MakeNullable(ByteSpan(handle))) == CHIP_NO_ERROR);
+    schedule.SetSystemMode(thermostat::SystemModeEnum::kHeat);
+    VerifyOrDie(schedule.SetName(NullOptional) == CHIP_NO_ERROR);
+    VerifyOrDie(schedule.SetPresetHandle(NullOptional) == CHIP_NO_ERROR);
+
+    const BitMask<thermostat::ScheduleDayOfWeekBitmap> everyDay(0x7F);
+    thermostat::Structs::ScheduleTransitionStruct::Type transitions[2];
+    transitions[0].dayOfWeek       = everyDay;
+    transitions[0].transitionTime  = 360; // 06:00
+    transitions[0].heatingSetpoint = MakeOptional(static_cast<int16_t>(2100));
+    transitions[1].dayOfWeek       = everyDay;
+    transitions[1].transitionTime  = 1320; // 22:00
+    transitions[1].heatingSetpoint = MakeOptional(static_cast<int16_t>(1800));
+    VerifyOrDie(schedule.SetTransitions(DataModel::List<const thermostat::Structs::ScheduleTransitionStruct::Type>(transitions)) ==
+                CHIP_NO_ERROR);
+    schedule.SetBuiltIn(DataModel::MakeNullable(true));
+    mScheduleCount = 1;
 }
 
 CHIP_ERROR LoggingThermostat::RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
@@ -273,11 +299,113 @@ CHIP_ERROR LoggingThermostat::CommitPendingPresets()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR LoggingThermostat::GetScheduleTypeAtIndex(size_t index, thermostat::Structs::ScheduleTypeStruct::Type & value)
+{
+    VerifyOrReturnError(index < MATTER_ARRAY_SIZE(kScheduleModes), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+    value.systemMode        = kScheduleModes[index];
+    value.numberOfSchedules = kScheduleCapacity;
+    value.scheduleTypeFeatures =
+        BitMask<thermostat::ScheduleTypeFeaturesBitmap>(thermostat::ScheduleTypeFeaturesBitmap::kSupportsSetpoints);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LoggingThermostat::GetScheduleAtIndex(size_t index, thermostat::ScheduleStructWithOwnedMembers & value)
+{
+    VerifyOrReturnError(index < mScheduleCount, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+    value = mSchedules[index];
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LoggingThermostat::GetPendingScheduleAtIndex(size_t index, thermostat::ScheduleStructWithOwnedMembers & value)
+{
+    VerifyOrReturnError(index < mPendingScheduleCount, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+    value = mPendingSchedules[index];
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LoggingThermostat::GetActiveScheduleHandle(DataModel::Nullable<MutableByteSpan> & value)
+{
+    if (mActiveScheduleHandle.IsNull())
+    {
+        value.SetNull();
+        return CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(!value.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+    const uint8_t handle[] = { mActiveScheduleHandle.Value() };
+    return CopySpanToMutableSpan(ByteSpan(handle), value.Value());
+}
+
+CHIP_ERROR LoggingThermostat::SetActiveScheduleHandle(const DataModel::Nullable<ByteSpan> & value)
+{
+    if (value.IsNull())
+    {
+        mActiveScheduleHandle.SetNull();
+    }
+    else
+    {
+        VerifyOrReturnError(value.Value().size() == 1, CHIP_ERROR_INVALID_ARGUMENT);
+        mActiveScheduleHandle.SetNonNull(value.Value()[0]);
+    }
+    return CHIP_NO_ERROR;
+}
+
+void LoggingThermostat::InitializePendingSchedules()
+{
+    mPendingSchedules     = mSchedules;
+    mPendingScheduleCount = mScheduleCount;
+}
+
+CHIP_ERROR LoggingThermostat::AppendToPendingScheduleList(const thermostat::ScheduleStructWithOwnedMembers & value)
+{
+    VerifyOrReturnError(mPendingScheduleCount < mPendingSchedules.size(), CHIP_ERROR_NO_MEMORY);
+    auto & pending = mPendingSchedules[mPendingScheduleCount];
+    pending        = value;
+    if (pending.GetScheduleHandle().IsNull())
+    {
+        // Do not derive new handles from SystemMode so a new schedule cannot collide with a built-in schedule handle.
+        static_assert(2 * kScheduleCapacity + 1 <= UINT8_MAX);
+        for (int handle = 1; handle <= 2 * kScheduleCapacity + 1; ++handle)
+        {
+            const uint8_t handleByte = static_cast<uint8_t>(handle);
+            const ByteSpan candidate(&handleByte, 1);
+            const auto containsHandle = [&](const auto & schedules, uint8_t count) {
+                for (uint8_t index = 0; index < count; ++index)
+                {
+                    const auto existing = schedules[index].GetScheduleHandle();
+                    if (!existing.IsNull() && existing.Value().data_equal(candidate))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            };
+            if (!containsHandle(mSchedules, mScheduleCount) && !containsHandle(mPendingSchedules, mPendingScheduleCount))
+            {
+                ReturnErrorOnFailure(pending.SetScheduleHandle(DataModel::MakeNullable(candidate)));
+                break;
+            }
+        }
+    }
+    ++mPendingScheduleCount;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LoggingThermostat::CommitPendingSchedules()
+{
+    mSchedules     = mPendingSchedules;
+    mScheduleCount = mPendingScheduleCount;
+    return CHIP_NO_ERROR;
+}
+
 std::optional<System::Clock::Milliseconds16> LoggingThermostat::GetMaxAtomicWriteTimeout(AttributeId attributeId)
 {
     if (attributeId == thermostat::Attributes::Presets::Id)
     {
         return System::Clock::Milliseconds16(3000);
+    }
+    if (attributeId == thermostat::Attributes::Schedules::Id)
+    {
+        return System::Clock::Milliseconds16(9000);
     }
     return std::nullopt;
 }
