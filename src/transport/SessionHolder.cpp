@@ -28,50 +28,40 @@ SessionHolder::~SessionHolder()
 
 SessionHolder::SessionHolder(const SessionHolder & that) : IntrusiveListNodeBase()
 {
-    mSession = that.mSession;
-    if (mSession.HasValue())
-    {
-        mSession.Value()->AddHolder(*this);
-    }
+    ShareSession(that);
 }
 
 SessionHolder::SessionHolder(SessionHolder && that) : IntrusiveListNodeBase()
 {
-    mSession = that.mSession;
-    if (mSession.HasValue())
-    {
-        mSession.Value()->AddHolder(*this);
-    }
-
+    ShareSession(that);
     that.Release();
 }
 
 SessionHolder & SessionHolder::operator=(const SessionHolder & that)
 {
     Release();
-
-    mSession = that.mSession;
-    if (mSession.HasValue())
-    {
-        mSession.Value()->AddHolder(*this);
-    }
-
+    ShareSession(that);
     return *this;
 }
 
 SessionHolder & SessionHolder::operator=(SessionHolder && that)
 {
     Release();
-
-    mSession = that.mSession;
-    if (mSession.HasValue())
-    {
-        mSession.Value()->AddHolder(*this);
-    }
-
+    ShareSession(that);
     that.Release();
-
     return *this;
+}
+
+void SessionHolder::ShareSession(const SessionHolder & that)
+{
+    if (that.mSession.HasValue())
+    {
+        mSession = that.mSession;
+        if (!mSession.Value()->AddHolder(*this))
+        {
+            mSession.ClearValue();
+        }
+    }
 }
 
 bool SessionHolder::GrabPairingSession(const SessionHandle & session)
@@ -84,8 +74,7 @@ bool SessionHolder::GrabPairingSession(const SessionHandle & session)
     if (!session->AsSecureSession()->IsEstablishing())
         return false;
 
-    GrabUnchecked(session);
-    return true;
+    return GrabUnchecked(session);
 }
 
 bool SessionHolder::Grab(const SessionHandle & session)
@@ -95,15 +84,19 @@ bool SessionHolder::Grab(const SessionHandle & session)
     if (!session->IsActiveSession())
         return false;
 
-    GrabUnchecked(session);
-    return true;
+    return GrabUnchecked(session);
 }
 
-void SessionHolder::GrabUnchecked(const SessionHandle & session)
+bool SessionHolder::GrabUnchecked(const SessionHandle & session)
 {
     VerifyOrDie(!mSession.HasValue());
     mSession.Emplace(session.mSession);
-    session->AddHolder(*this);
+    if (!session->AddHolder(*this))
+    {
+        mSession.ClearValue();
+        return false;
+    }
+    return true;
 }
 
 void SessionHolder::Release()

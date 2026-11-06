@@ -112,6 +112,8 @@ private:
  *    Managed session reference. The object is used to store a session, the stored session will be automatically
  *    released when the underlying session is released. One must verify it is available before use. The object can be
  *    created using SessionHandle.Grab()
+ *
+ *    While a session releases its holders, grabbing it or copying a holder of it leaves the new holder empty.
  */
 class SessionHolder : public IntrusiveListNodeBase<>
 {
@@ -161,9 +163,13 @@ public:
 
 protected:
     // Helper for use by the Grab methods.
-    void GrabUnchecked(const SessionHandle & session);
+    bool GrabUnchecked(const SessionHandle & session);
 
     Optional<ReferenceCountedHandle<Transport::Session>> mSession;
+
+private:
+    // Helper for the copy and move operations. Leaves this holder empty if the session refuses it.
+    void ShareSession(const SessionHolder & that);
 };
 
 /// @brief Extends SessionHolder to allow propagate SessionDelegate::* events to a given destination
@@ -218,11 +224,14 @@ public:
 
     virtual SessionType GetSessionType() const = 0;
 
-    void AddHolder(SessionHolder & holder)
+    // Returns false, without adding the holder, while NotifySessionReleased runs.
+    bool AddHolder(SessionHolder & holder)
     {
         assertChipStackLockedByCurrentThread();
         VerifyOrDie(!holder.IsInList());
+        VerifyOrReturnValue(!mReleasing, false);
         mHolders.PushFront(&holder); // In front of any ForEachHolder cursor, so running walks don't visit it.
+        return true;
     }
 
     void RemoveHolder(SessionHolder & holder)
@@ -337,8 +346,12 @@ protected:
     void NotifySessionReleased()
     {
         SessionHandle session(*this);
+        // Callbacks can't add holders while mReleasing is set, so this releases every holder.
         // SessionReleased must release the holder.
+        VerifyOrDie(!mReleasing);
+        mReleasing = true;
         ForEachHolder([](SessionHolder & holder, void *) { holder.SessionReleased(); });
+        mReleasing = false;
     }
 
     using HolderVisitor = void (*)(SessionHolder & holder, void * context);
@@ -361,6 +374,7 @@ private:
     IntrusiveList<SessionHolder> mHolders;
 
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
+    bool mReleasing          = false;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // The underlying TCP connection object over which the session is
     // established.
