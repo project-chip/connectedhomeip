@@ -34,6 +34,11 @@
 #       --enable-spec-errata-ci-only-disallowed-for-certification
 #     factory-reset: true
 #     quiet: true
+#     tags: [needs-followup-fixes]
+#     issues:
+#       - https://github.com/project-chip/connectedhomeip/issues/74288
+#       - https://github.com/project-chip/connectedhomeip/issues/73090
+#       - https://github.com/project-chip/connectedhomeip/issues/73072
 #   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device "*" --groupcast --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -48,6 +53,47 @@
 #       --enable-spec-errata-ci-only-disallowed-for-certification
 #     factory-reset: true
 #     quiet: true
+#     tags: [needs-followup-fixes]
+#     issues:
+#       - https://github.com/project-chip/connectedhomeip/issues/74288
+#   run3:
+#     app: ${CAMERA_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --enable-spec-errata-ci-only-disallowed-for-certification
+#     factory-reset: true
+#     quiet: true
+#     tags: [nightly, needs-followup-fixes]
+#     issues:
+#       - https://github.com/project-chip/connectedhomeip/issues/74718
+#       - https://github.com/project-chip/connectedhomeip/issues/74716
+#       - https://github.com/project-chip/connectedhomeip/issues/74288
+#       - https://github.com/project-chip/connectedhomeip/issues/73072
+#   run4:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --enable-spec-errata-ci-only-disallowed-for-certification
+#     factory-reset: true
+#     quiet: true
+#     tags: [nightly, needs-followup-fixes]
+#     issues:
+#       - https://github.com/project-chip/connectedhomeip/issues/75104
+#       - https://github.com/project-chip/connectedhomeip/issues/73072
 # === END CI TEST ARGUMENTS ===
 
 import logging
