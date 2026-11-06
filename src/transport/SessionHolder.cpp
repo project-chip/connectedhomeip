@@ -54,14 +54,9 @@ SessionHolder & SessionHolder::operator=(SessionHolder && that)
 
 void SessionHolder::ShareSession(const SessionHolder & that)
 {
-    if (that.mSession.HasValue())
-    {
-        mSession = that.mSession;
-        if (!mSession.Value()->AddHolder(*this))
-        {
-            mSession.ClearValue();
-        }
-    }
+    VerifyOrReturn(that.mSession.HasValue());
+    VerifyOrReturn(that.mSession.Value()->AddHolder(*this));
+    mSession = that.mSession;
 }
 
 bool SessionHolder::GrabPairingSession(const SessionHandle & session)
@@ -90,12 +85,8 @@ bool SessionHolder::Grab(const SessionHandle & session)
 bool SessionHolder::GrabUnchecked(const SessionHandle & session)
 {
     VerifyOrDie(!mSession.HasValue());
+    VerifyOrReturnValue(session->AddHolder(*this), false);
     mSession.Emplace(session.mSession);
-    if (!session->AddHolder(*this))
-    {
-        mSession.ClearValue();
-        return false;
-    }
     return true;
 }
 
