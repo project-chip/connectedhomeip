@@ -197,7 +197,8 @@ def extract_runs_args(py_script_path: str) -> dict[str, dict[str, Any]]:
     """Extract the run arguments from the CI test arguments blocks.
 
     A script without a CI test arguments block has no runs. Every run gets `tags` and `issues`
-    lists. Raises RunArgumentsError when a run's tags or issues are not valid.
+    lists. Raises RunArgumentsError when `test-runner-runs` or a run is empty or not a mapping, or
+    when a run's tags or issues are not valid.
     """
 
     found_ci_args_section = False
@@ -226,7 +227,14 @@ def extract_runs_args(py_script_path: str) -> dict[str, dict[str, Any]]:
     if not runs_arg_lines:
         try:
             runs = yaml.safe_load(NamedStringIO("\n".join(ci_args_section_lines), py_script_path)) or {}
-            for run, args in runs.get("test-runner-runs", {}).items():
+            test_runner_runs = runs.get("test-runner-runs", {})
+            if not isinstance(test_runner_runs, dict):
+                raise RunArgumentsError(
+                    f"{py_script_path}: test-runner-runs must list the runs with their arguments, got {test_runner_runs!r}")
+            for run, args in test_runner_runs.items():
+                if not isinstance(args, dict):
+                    raise RunArgumentsError(
+                        f"{py_script_path}: run '{run}': expected arguments such as app and script-args, got {args!r}")
                 runs_arg_lines[run] = {}
                 runs_arg_lines[run]['run'] = run
                 runs_arg_lines[run].update(args)
@@ -295,7 +303,8 @@ class MetadataReader:
          the run arguments associated with a particular run defined in
          the script file.
 
-        Raises RunArgumentsError when a run's tags or issues are not valid.
+        Raises RunArgumentsError when `test-runner-runs` or a run is empty or not a mapping, or
+        when a run's tags or issues are not valid.
         """
         runs_metadata: list[Metadata] = []
         runs_args = extract_runs_args(py_script_path)

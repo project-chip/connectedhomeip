@@ -200,6 +200,25 @@ class TestMetadataReader(unittest.TestCase):
                     with self.assertRaisesRegex(RunArgumentsError, f"run 'run1': .*{re.escape(expected_error)}"):
                         extract_runs_args(test_file)
 
+    def test_invalid_run_blocks(self):
+        cases = {
+            "an empty run": (["#   run1:", "#   run2:", "#     app: ${ALL_CLUSTERS_APP}"], "run 'run1': expected arguments"),
+            "a run that is not a mapping": (["#   run1: ${ALL_CLUSTERS_APP}"], "run 'run1': expected arguments"),
+            "no runs": ([], "test-runner-runs must list the runs"),
+            "runs that are not a mapping": (["#   - run1"], "test-runner-runs must list the runs"),
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            for name, (run_lines, expected_error) in cases.items():
+                with self.subTest(name):
+                    test_file = self.generate_temp_file(temp_dir, '\n'.join([
+                        "# === BEGIN CI TEST ARGUMENTS ===",
+                        "# test-runner-runs:",
+                        *run_lines,
+                        "# === END CI TEST ARGUMENTS ===",
+                    ]))
+                    with self.assertRaisesRegex(RunArgumentsError, f"^{re.escape(test_file)}: .*{re.escape(expected_error)}"):
+                        extract_runs_args(test_file)
+
     def test_script_without_ci_arguments(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             test_file = self.generate_temp_file(temp_dir, "# A support module with no CI test arguments\n")
