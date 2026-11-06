@@ -52,8 +52,8 @@ log = logging.getLogger(__name__)
 
 
 # BasicInformation.SpecificationVersion value for Matter 1.7, encoded as 0xMMNNPP00.
-# Matter 1.7 is the first release that requires a DUT to reject every constraint
-# violation; earlier releases are held to the weaker bar described in
+# TC-IDM-9.1 applies strict per-probe rejection from Matter 1.7; earlier releases
+# are held to the weaker bar described in
 # IDMBaseTest.enforces_constraints_strictly.
 SPEC_VERSION_1_7 = 0x01070000
 
@@ -62,7 +62,7 @@ SPEC_VERSION_1_7 = 0x01070000
 class ConstraintProbeResult:
     """Tallies how the DUT answered each violating value probed for one field or attribute.
 
-    A result with `probed == 0` means nothing could be exercised: no violation could
+    A result with `attempted == 0` means nothing could be exercised: no violation could
     be synthesized, or the preconditions for an unambiguous answer were not met.
     """
     # Answered with CONSTRAINT_ERROR: the constraint is enforced.
@@ -71,6 +71,8 @@ class ConstraintProbeResult:
     accepted: int = 0
     # Rejected with some other status, so enforcement is neither proven nor disproven.
     other_error: int = 0
+    attempted: int = 0
+    execution_error: int = 0
 
     @property
     def probed(self) -> int:
@@ -1014,8 +1016,10 @@ class IDMBaseTest(BasicCompositionTests):
     def enforces_constraints_strictly(self) -> bool:
         """Whether the DUT must reject every constraint violation it is sent.
 
-        Matter 1.7 onward requires constraint violations to be rejected on every
-        command field and writable attribute, so a DUT that accepts one fails.
+        The TC-IDM-9.1 test plan for Matter 1.7 onward expects CONSTRAINT_ERROR on
+        every eligible violating command field and writable attribute probe.
+        This is the certification-test policy, not a change to the core Invoke
+        Execution clause's SHOULD or the Write Path Data Process clause's SHALL.
         Earlier releases were only ever verified by hand against a manually chosen
         command or attribute, so holding them to the full automated sweep would fail
         devices that were certified as conformant. Those are held to the weaker bar
@@ -1048,6 +1052,10 @@ class IDMBaseTest(BasicCompositionTests):
         if self.enforces_constraints_strictly():
             if accepted_paths:
                 asserts.fail(f"{subject} constraints not enforced: {', '.join(accepted_paths)}")
+            asserts.assert_equal(
+                rejected_count, probed_count,
+                f"{subject} must return CONSTRAINT_ERROR for every violating value; "
+                f"got {rejected_count} CONSTRAINT_ERROR response(s) for {probed_count} answered probe(s)")
             return
 
         if accepted_paths:
@@ -1130,16 +1138,27 @@ class IDMBaseTest(BasicCompositionTests):
 
         result = ConstraintProbeResult()
         for test_value in test_values:
-            write_result = await self.default_controller.WriteAttribute(
-                nodeId=self.dut_node_id,
-                attributes=[(attr_info.endpoint_id, attr_info.attribute(test_value))],
-                timedRequestTimeoutMs=timed_request_timeout_ms
-            )
+            result.attempted += 1
+            try:
+                write_result = await self.default_controller.WriteAttribute(
+                    nodeId=self.dut_node_id,
+                    attributes=[(attr_info.endpoint_id, attr_info.attribute(test_value))],
+                    timedRequestTimeoutMs=timed_request_timeout_ms
+                )
+            except ChipStackError as error:  # chipstack-ok
+                result.execution_error += 1
+                log.warning("Execution failed writing %s: %s", attribute_path, error)
+                break
             result_status = write_result[0].Status
 
             # Status is an IntEnum, which formats as a bare number under Python 3.11; log
             # the name alongside it so the result reads as SUCCESS rather than as "got 0".
             status_name = getattr(result_status, 'name', result_status)
+            if result_status == Status.Success:
+                self.record_accepted_violation(
+                    location=location,
+                    problem=f"{attribute_path} accepted out-of-bounds value {test_value}")
+                result.accepted += 1
 
             # Read back to distinguish a DUT that stored the out-of-bounds value (and is
             # now holding an illegal one) from one that ignored or clamped the write.
@@ -1152,22 +1171,41 @@ class IDMBaseTest(BasicCompositionTests):
             # abandon the probe, so it has to come back as a value this loop can classify
             # instead of as an assertion. Reads that did decode still go through the
             # wildcard-subscription cross-check inside the helper.
-            stored_value = await self.read_single_attribute(
-                dev_ctrl=self.default_controller,
-                node_id=self.dut_node_id,
-                endpoint=attr_info.endpoint_id,
-                attribute=attr_info.attribute
-            )
-            read_back_failed = isinstance(stored_value, ValueDecodeFailure)
-            if read_back_failed or stored_value != original_value:
-                restore_result = await self.default_controller.WriteAttribute(
-                    nodeId=self.dut_node_id,
-                    attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))],
-                    timedRequestTimeoutMs=timed_request_timeout_ms
+            try:
+                stored_value = await self.read_single_attribute(
+                    dev_ctrl=self.default_controller,
+                    node_id=self.dut_node_id,
+                    endpoint=attr_info.endpoint_id,
+                    attribute=attr_info.attribute
                 )
+            except ChipStackError as error:  # chipstack-ok
+                result.execution_error += 1
+                log.warning("Execution failed reading back %s: %s", attribute_path, error)
+                break
+            read_back_failed = isinstance(stored_value, ValueDecodeFailure)
+            if result_status != Status.Success and (
+                    read_back_failed or (result_status == Status.ConstraintError and stored_value == test_value)):
+                self.record_accepted_violation(
+                    location=location,
+                    problem=(f"{attribute_path} stored an out-of-bounds value despite answering {status_name}; "
+                             f"readback={stored_value}"))
+                result.accepted += 1
+            if read_back_failed or stored_value != original_value:
+                try:
+                    restore_result = await self.default_controller.WriteAttribute(
+                        nodeId=self.dut_node_id,
+                        attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))],
+                        timedRequestTimeoutMs=timed_request_timeout_ms
+                    )
+                except ChipStackError as error:  # chipstack-ok
+                    result.execution_error += 1
+                    log.warning("Execution failed restoring %s: %s", attribute_path, error)
+                    break
                 if restore_result[0].Status != Status.Success:
+                    result.execution_error += 1
                     log.warning("Failed to restore %s to %s: %s", attribute_path, original_value,
                                 restore_result[0].Status)
+                    break
 
             if read_back_failed:
                 # The baseline read above proved this attribute readable, so a read-back
@@ -1177,12 +1215,6 @@ class IDMBaseTest(BasicCompositionTests):
                 # the other accepted violations. Reachable on any enum-typed attribute
                 # whose cluster decodes an unknown value without an EnsureKnownEnumValue
                 # guard.
-                self.record_accepted_violation(
-                    location=location,
-                    problem=(f"{attribute_path} answered {status_name} for out-of-bounds value "
-                             f"{test_value} and then could not be read back ({stored_value.Reason}), "
-                             f"so it stored a value it cannot encode"))
-                result.accepted += 1
                 continue
 
             if result_status == Status.ConstraintError:
@@ -1195,11 +1227,6 @@ class IDMBaseTest(BasicCompositionTests):
                 # The DUT reported the write as rejected but stored the violating value
                 # anyway, so the constraint was not enforced regardless of the status it
                 # returned.
-                self.record_accepted_violation(
-                    location=location,
-                    problem=(f"{attribute_path} was set to out-of-bounds value {test_value} "
-                             f"despite returning CONSTRAINT_ERROR"))
-                result.accepted += 1
                 continue
 
             if result_status != Status.Success:
@@ -1215,10 +1242,6 @@ class IDMBaseTest(BasicCompositionTests):
 
             log.warning("%s got %s (%s) instead of CONSTRAINT_ERROR for value %s; attribute now reads %s",
                         attribute_path, status_name, int(result_status), test_value, stored_value)
-            self.record_accepted_violation(
-                location=location,
-                problem=f"{attribute_path} accepted out-of-bounds value {test_value}")
-            result.accepted += 1
 
         return result
 
@@ -1508,7 +1531,7 @@ class IDMBaseTest(BasicCompositionTests):
         report enumerates them in both eras: an accepted one through
         record_accepted_violation, and one rejected with another status as a warning.
         Deciding whether an accepted violation fails the test is left to the caller,
-        which applies enforces_constraints_strictly. A result with `probed == 0` means the field
+        which applies enforces_constraints_strictly. A result with `attempted == 0` means the field
         could not be tested: no violation could be generated for it, or a constrained
         required sibling could not be given a valid value (which would make a
         CONSTRAINT_ERROR ambiguous).
@@ -1562,6 +1585,7 @@ class IDMBaseTest(BasicCompositionTests):
         result = ConstraintProbeResult()
         for description, bad_value in violations:
             command = info.command_class(**base_kwargs, **{target_label: bad_value})
+            result.attempted += 1
             try:
                 response = await self.default_controller.SendCommand(
                     nodeId=self.dut_node_id, endpoint=info.endpoint_id, payload=command,
@@ -1581,6 +1605,10 @@ class IDMBaseTest(BasicCompositionTests):
                     problem=(f"{info.path_str} rejected violating payload ({description}) with "
                              f"{getattr(e.status, 'name', e.status)} instead of CONSTRAINT_ERROR"))
                 continue
+            except ChipStackError as error:  # chipstack-ok
+                result.execution_error += 1
+                log.warning("Execution failed invoking %s: %s", info.path_str, error)
+                break
 
             # Some commands convey their result in a Status field of their response
             # command (e.g. AddGroupResponse.Status, AddSceneResponse.Status) rather

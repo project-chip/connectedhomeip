@@ -99,17 +99,29 @@ class TC_IDM_9_1(IDMBaseTest):
         commands_skipped_count = 0
         commands_probed_count = 0
         commands_rejected_count = 0
+        commands_attempted_count = 0
+        commands_execution_error_count = 0
+        commands_other_error_count = 0
+        commands_accepted_count = 0
         accepted_command_fields = []
+        failed_command_fields = []
 
         for info in command_field_infos:
             try:
                 result = await self.check_command_constraint(info)
             except ChipStackError as e:  # chipstack-ok
-                log.warning("Transport error testing %s: %s", info.path_str, e)
+                log.warning("Unable to qualify baseline for %s: %s", info.path_str, e)
                 commands_skipped_count += 1
                 continue
+            commands_attempted_count += result.attempted
+            commands_execution_error_count += result.execution_error
+            commands_other_error_count += result.other_error
+            commands_accepted_count += result.accepted
+            if result.execution_error:
+                failed_command_fields.append(info.path_str)
             if result.probed == 0:
-                commands_skipped_count += 1
+                if result.attempted == 0:
+                    commands_skipped_count += 1
                 continue
             commands_tested_count += 1
             commands_probed_count += result.probed
@@ -119,12 +131,18 @@ class TC_IDM_9_1(IDMBaseTest):
 
         log.info("Step 1 complete: Tested %s command fields, skipped %s",
                  commands_tested_count, commands_skipped_count)
+        log.info("Command probes: attempted=%s, answered=%s, CONSTRAINT_ERROR=%s, accepted=%s, "
+                 "other IM status=%s, execution errors=%s",
+                 commands_attempted_count, commands_probed_count, commands_rejected_count,
+                 commands_accepted_count, commands_other_error_count, commands_execution_error_count)
 
         if command_field_infos:
-            asserts.assert_greater(commands_tested_count, 0,
+            asserts.assert_greater(commands_attempted_count, 0,
                                    "DUT exposes constrained command fields but no constraint violation could be exercised")
         self.enforce_constraint_policy(subject="Command field", accepted_paths=accepted_command_fields,
                                        rejected_count=commands_rejected_count, probed_count=commands_probed_count)
+        asserts.assert_false(failed_command_fields,
+                             f"Execution failed for command field probe(s): {', '.join(failed_command_fields)}")
 
         # Step 2: Test all writable attributes with constraints
         self.step(2)
@@ -175,7 +193,12 @@ class TC_IDM_9_1(IDMBaseTest):
         skipped_count = 0
         probed_count = 0
         rejected_count = 0
+        attempted_count = 0
+        execution_error_count = 0
+        other_error_count = 0
+        accepted_count = 0
         accepted_attributes = []
+        failed_attributes = []
 
         for attr_info in writable_attributes:
             # Whether an attribute has anything violable is decided by
@@ -185,13 +208,20 @@ class TC_IDM_9_1(IDMBaseTest):
             # violating value could be built.
             try:
                 result = await self.check_attribute_constraint(attr_info, attr_info.constraints)
-            except Exception as e:
-                log.warning("Exception testing %s.%s: %s", attr_info.cluster_name, attr_info.attribute_name, e)
+            except ChipStackError as e:  # chipstack-ok
+                log.warning("Unable to qualify baseline for %s.%s: %s", attr_info.cluster_name, attr_info.attribute_name, e)
                 skipped_count += 1
                 continue
 
+            attempted_count += result.attempted
+            execution_error_count += result.execution_error
+            other_error_count += result.other_error
+            accepted_count += result.accepted
+            if result.execution_error:
+                failed_attributes.append(f"{attr_info.cluster_name}.{attr_info.attribute_name}")
             if result.probed == 0:
-                skipped_count += 1
+                if result.attempted == 0:
+                    skipped_count += 1
                 continue
             tested_count += 1
             probed_count += result.probed
@@ -200,9 +230,16 @@ class TC_IDM_9_1(IDMBaseTest):
                 accepted_attributes.append(f"{attr_info.cluster_name}.{attr_info.attribute_name}")
 
         log.info("Step 2 complete: Tested %s attributes, skipped %s", tested_count, skipped_count)
+        log.info("Writable attribute probes: attempted=%s, answered=%s, CONSTRAINT_ERROR=%s, accepted=%s, "
+                 "other IM status=%s, execution errors=%s",
+                 attempted_count, probed_count, rejected_count, accepted_count, other_error_count, execution_error_count)
 
         self.enforce_constraint_policy(subject="Writable attribute", accepted_paths=accepted_attributes,
                                        rejected_count=rejected_count, probed_count=probed_count)
+        asserts.assert_false(failed_attributes,
+                             f"Execution failed for writable attribute probe(s): {', '.join(failed_attributes)}")
+        if commands_attempted_count + attempted_count == 0:
+            asserts.skip("No qualified constraint violation could be exercised")
 
 
 if __name__ == "__main__":
