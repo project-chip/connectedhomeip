@@ -428,11 +428,12 @@ void CodeDrivenDataModelProvider::NotifyChangedDescriptorPartsListOfAncestors(En
             return;
         }
 
-        auto compositionPattern = registration->GetEndpointEntry().compositionPattern;
+        // Get entry before notifying the change, in case that callback will change something in the endpoint registry.
+        auto currentEndpointEntry = registration->GetEndpointEntry();
 
         // If currentId is the starting endpoint, or if it is a full-family type ancestor, notify attribute change. Root endpoint is
         // full-family even if its pattern is not set to full-family.
-        if (currentId == parentEndpointId || compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily ||
+        if (currentId == parentEndpointId || currentEndpointEntry.compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily ||
             currentId == kRootEndpointId)
         {
             NotifyAttributeChanged({ currentId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id },
@@ -444,7 +445,7 @@ void CodeDrivenDataModelProvider::NotifyChangedDescriptorPartsListOfAncestors(En
             break;
         }
 
-        currentId = registration->GetEndpointEntry().parentId;
+        currentId = currentEndpointEntry.parentId;
     }
 }
 } // namespace app
