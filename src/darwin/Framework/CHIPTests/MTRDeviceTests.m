@@ -50,7 +50,9 @@ static const uint64_t kDeviceId1 = 0x12344321;
 static const uint64_t kDeviceId2 = 0x12344322;
 static NSString * kOnboardingPayload1 = @"MT:-24J0AFN00KA0648G00";
 static NSString * kOnboardingPayload2 = @"MT:-24J0AFN00L10648G00";
+#ifdef DEBUG
 static const NSTimeInterval kMaxRecoveryAfterNodeReturnsSeconds = 15;
+#endif
 static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
 
@@ -8549,6 +8551,8 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertGreaterThan(values.count, 100);
 }
 
+#ifdef DEBUG
+// test051 needs the resubscription delay override, which MTRDevice only honours in DEBUG builds.
 - (NSTimeInterval)_secondsUntilReachableAfterLongResubscriptionDelay:(MTRDevice *)device nodeReturn:(dispatch_block_t)nodeReturn
 {
     dispatch_queue_t queue = dispatch_queue_create("reattempt-test.delegate", DISPATCH_QUEUE_SERIAL);
@@ -8618,6 +8622,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     NSLog(@"GAP-RECOVERY recovery=%.3fs", recovery);
     XCTAssertLessThan(recovery, kMaxRecoveryAfterNodeReturnsSeconds);
 }
+#endif // DEBUG
 
 @end
 
