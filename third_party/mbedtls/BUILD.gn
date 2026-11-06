@@ -22,8 +22,22 @@ if (mbedtls_target != "") {
     public_deps = [ mbedtls_target ]
   }
 } else {
-  import("mbedtls.gni")
+  import("mbedtls3.gni")
 
-  mbedtls_target("mbedtls") {
+  # Default (host) Mbed TLS: 3.6 LTS. Platform SDK targets that still build the
+  # 2.28 tree in ./repo use mbedtls.gni directly.
+  mbedtls3_target("mbedtls") {
+    mbedtls_root = "v3/repo"
+
+    # Files added after 3.6.4 (the version mbedtls3.gni lists).
+    sources = [
+      "${mbedtls_root}/library/chacha20_internal.h",
+      "${mbedtls_root}/library/psa_crypto_random.c",
+      "${mbedtls_root}/library/psa_crypto_random.h",
+      "${mbedtls_root}/library/threading_internal.h",
+    ]
+
+    output_name = "libmbedtls"
+    output_dir = "${root_out_dir}/lib"
   }
 }
