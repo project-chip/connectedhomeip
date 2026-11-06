@@ -36,6 +36,7 @@ namespace KeypadInput {
 ///
 /// May be called before or after the cluster on `endpoint` is created. The delegate must stay valid
 /// until it is replaced or the cluster on `endpoint` is shut down. Passing nullptr clears the delegate.
+/// Shutting down the cluster clears the delegate, so it must be set again if the cluster is recreated.
 ///
 /// On endpoints that belong to a ContentApp (when CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED is set), the
 /// ContentApp delegate takes precedence over the delegate set here.

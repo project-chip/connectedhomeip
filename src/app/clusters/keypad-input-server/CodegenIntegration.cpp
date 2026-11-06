@@ -138,7 +138,11 @@ public:
         return &gClusters[clusterInstanceIndex].server.Cluster();
     }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gClusters[clusterInstanceIndex].server.Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override
+    {
+        gClusters[clusterInstanceIndex].server.Destroy();
+        gClusters[clusterInstanceIndex].integrationDelegateWrapper.SetWrapped(nullptr);
+    }
 };
 
 } // namespace
