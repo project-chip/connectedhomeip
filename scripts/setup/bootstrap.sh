@@ -15,22 +15,7 @@
 #
 
 _install_additional_pip_requirements() {
-    _SETUP_PLATFORM=$1
-    shift
-
-    # figure out additional pip install items
-    while [ $# -gt 0 ]; do
-        case $1 in
-        -p | --platform)
-            _SETUP_PLATFORM=$2
-            shift # argument
-            shift # value
-            ;;
-        *)
-            shift
-            ;;
-        esac
-    done
+    _SETUP_PLATFORM="${_CHIP_PLATFORM-$1}"
 
     if [ -n "$_SETUP_PLATFORM" ]; then
         _OLD_IFS=$IFS
@@ -77,6 +62,70 @@ _submodules_need_updating() {
 
   unset _SUBMODULE_PATHS
   return 1 # Failure
+}
+
+_parse_arguments() {
+    # Unknown arguments are ignored, because the shell passes on the caller's
+    # positional parameters when this script is sourced without arguments.
+    # An option followed by another option or by nothing has an empty value.
+    while [ $# -gt 0 ]; do
+        case $1 in
+        -p | --platform)
+            _CHIP_PLATFORM=
+            if [ $# -gt 1 ] && [[ "$2" != -* ]]; then
+                _CHIP_PLATFORM="$2"
+                shift
+            fi
+            ;;
+        --environment-root)
+            _CHIP_ENVIRONMENT_ROOT_GIVEN=1
+            _CHIP_ENVIRONMENT_ROOT=
+            if [ $# -gt 1 ] && [[ "$2" != -* ]]; then
+                _CHIP_ENVIRONMENT_ROOT="$2"
+                shift
+            fi
+            ;;
+        esac
+        shift
+    done
+}
+
+_set_environment_root() {
+    [ -n "$_CHIP_ENVIRONMENT_ROOT_GIVEN" ] || return 0
+
+    if [ -n "$BASH" ]; then
+        local _BOOTSTRAP_PATH="${BASH_SOURCE[0]}"
+    else
+        local _BOOTSTRAP_PATH="$1"
+    fi
+
+    if [ -z "$_CHIP_ENVIRONMENT_ROOT" ]; then
+        echo "Error: --environment-root requires a directory" >&2
+        return 1
+    fi
+
+    # PW_ENVIRONMENT_ROOT must be absolute.
+    if [[ "$_CHIP_ENVIRONMENT_ROOT" != /* ]]; then
+        _CHIP_ENVIRONMENT_ROOT="$PWD/$_CHIP_ENVIRONMENT_ROOT"
+    fi
+
+    # An environment requested via --environment-root is meant to be reused,
+    # so only bootstrap.sh may create it.
+    if [ "${_BOOTSTRAP_PATH##*/}" != "bootstrap.sh" ] &&
+        { [ ! -f "$_CHIP_ENVIRONMENT_ROOT/activate.sh" ] || [ ! -s "$_CHIP_ENVIRONMENT_ROOT/activate.sh" ]; }; then
+        echo "Error: $_CHIP_ENVIRONMENT_ROOT is not a bootstrapped environment" >&2
+        return 1
+    fi
+
+    # pw_finalize compares the environment root against the path recorded at
+    # bootstrap time as a string, so use that path if it names the same directory.
+    if [ -f "$_CHIP_ENVIRONMENT_ROOT/env_root.txt" ]; then
+        local _RECORDED_ROOT="$(cat "$_CHIP_ENVIRONMENT_ROOT/env_root.txt")"
+        if [ "$(cd "$_RECORDED_ROOT" 2>/dev/null && pwd -P)" = "$(cd "$_CHIP_ENVIRONMENT_ROOT" && pwd -P)" ]; then
+            _CHIP_ENVIRONMENT_ROOT="$_RECORDED_ROOT"
+        fi
+    fi
+    export PW_ENVIRONMENT_ROOT="$_CHIP_ENVIRONMENT_ROOT"
 }
 
 _bootstrap_or_activate() {
@@ -163,11 +212,33 @@ EOF
         pw_finalize bootstrap "$_SETUP_SH"
         _ACTION_TAKEN="bootstrap"
     else
+        # Bootstrapping copies this file from Pigweed into the checkout, so it
+        # is missing in a checkout that uses an environment bootstrapped elsewhere.
+        local _GNI_FILE="$_CHIP_ROOT/build_overrides/pigweed_environment.gni"
+        if [ ! -e "$_GNI_FILE" ]; then
+            cp "$PW_ROOT/build_overrides/pigweed_environment.gni" "$_GNI_FILE"
+        fi
         pw_activate
         pw_finalize activate "$_SETUP_SH"
         _ACTION_TAKEN="activate"
     fi
+
+    # The activate.sh that Pigweed generates in the environment directory sets
+    # these to the checkout that bootstrapped it, which may not be this one if
+    # PW_ENVIRONMENT_ROOT is shared.
+    export PW_PROJECT_ROOT="$_CHIP_ROOT"
+    export PW_ROOT="$_CHIP_ROOT/third_party/pigweed/repo"
 }
+
+unset _CHIP_PLATFORM
+_CHIP_ENVIRONMENT_ROOT=
+_CHIP_ENVIRONMENT_ROOT_GIVEN=
+_parse_arguments "$@"
+if ! _set_environment_root "$0"; then
+    unset -f _bootstrap_or_activate _parse_arguments _set_environment_root _install_additional_pip_requirements
+    unset _CHIP_PLATFORM _CHIP_ENVIRONMENT_ROOT _CHIP_ENVIRONMENT_ROOT_GIVEN
+    return 1
+fi
 
 # remember PW_ENVIRONMENT_ROOT so that things like another
 # bootstrap or run_in_build_env.sh can be executed in a build env
@@ -190,9 +261,9 @@ cd $original_pwd
 if [ "$_ACTION_TAKEN" = "bootstrap" ]; then
     # By default, install all extra pip dependencies even if slow. -p/--platform
     # arguments may override this default.
-    _install_additional_pip_requirements "all" "$@"
+    _install_additional_pip_requirements "all"
 else
-    _install_additional_pip_requirements "none" "$@"
+    _install_additional_pip_requirements "none"
 fi
 
 # Load bash completion helper if running bash and the bash-completion package
@@ -219,6 +290,8 @@ export CCACHE_NODIRECT=1
 export CCACHE_PREFIX_CPP="$_CHIP_ROOT/scripts/helpers/ccache-prefix-cpp.sh"
 
 unset -f _bootstrap_or_activate
+unset -f _parse_arguments
+unset -f _set_environment_root
 unset -f _install_additional_pip_requirements
 
 pw_cleanup
@@ -238,6 +311,9 @@ if _submodules_need_updating; then
 fi
 
 unset _ACTION_TAKEN
+unset _CHIP_PLATFORM
+unset _CHIP_ENVIRONMENT_ROOT
+unset _CHIP_ENVIRONMENT_ROOT_GIVEN
 unset _CHIP_ROOT
 unset PW_CIPD_INSTALL_DIR
 unset _PW_BANNER_FUNC
