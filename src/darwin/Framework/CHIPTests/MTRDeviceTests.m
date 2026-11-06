@@ -8498,16 +8498,39 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
         XCTAssertFalse([line containsString:descriptionMarker], @"%@", line);
     }
     // DataVersion and reported-values lines keep the full path, so the cluster and attribute names stay in the log.
-    NSString * clusterPathPrefix = [NSString stringWithFormat:@"%@1 cluster 0x%llx (", pathObjectMarker, (unsigned long long) MTRClusterIDTypeUnitTestingID];
+    NSString * clusterName = MTRClusterNameForID(MTRClusterIDTypeUnitTestingID);
+    NSString * attributeName = MTRAttributeNameForID(MTRClusterIDTypeUnitTestingID, (MTRAttributeIDType) changedIndex);
+    for (NSString * name in @[ clusterName, attributeName ]) {
+        XCTAssertGreaterThan(name.length, 0);
+        XCTAssertFalse([name hasPrefix:@"<Unknown"], @"%@", name);
+    }
+    NSString * clusterPair = [NSString stringWithFormat:@"(%llu, %@)", (unsigned long long) MTRClusterIDTypeUnitTestingID, clusterName];
+    NSString * attributePair = [NSString stringWithFormat:@"(%llu, %@)", (unsigned long long) changedIndex, attributeName];
+    NSString * reportedLine = reportedLines.firstObject;
+    NSString * changedAttribute = [NSString stringWithFormat:@"attribute 0x%llx %@", (unsigned long long) changedIndex, attributePair];
+    // The tests stop at the first failed assertion, so the name checks run first and together: one failure lists
+    // every line that lost a name.
+    NSMutableArray<NSString *> * missingNames = [NSMutableArray array];
+    for (NSString * line in dataVersionLines) {
+        if (![line containsString:clusterPair]) {
+            [missingNames addObject:[NSString stringWithFormat:@"DataVersion line lacks %@: %@", clusterPair, line]];
+        }
+    }
+    if (![reportedLine containsString:clusterPair]) {
+        [missingNames addObject:[NSString stringWithFormat:@"reported-values line lacks %@: %@", clusterPair, reportedLine]];
+    }
+    if (![reportedLine containsString:changedAttribute]) {
+        [missingNames addObject:[NSString stringWithFormat:@"reported-values line lacks %@: %@", changedAttribute, reportedLine]];
+    }
+    XCTAssertEqual(missingNames.count, 0, @"%@", [missingNames componentsJoinedByString:@"\n"]);
+
+    NSString * clusterPathPrefix = [NSString stringWithFormat:@"%@1 cluster 0x%llx ", pathObjectMarker, (unsigned long long) MTRClusterIDTypeUnitTestingID];
     for (NSString * line in dataVersionLines) {
         XCTAssertTrue([line containsString:clusterPathPrefix], @"%@", line);
         XCTAssertTrue([line hasSuffix:@"to 2"], @"%@", line);
     }
-    NSString * reportedLine = reportedLines.firstObject;
-    NSString * attributePathPrefix = [NSString stringWithFormat:@"%@1 cluster 0x%llx (", attributePathObjectMarker, (unsigned long long) MTRClusterIDTypeUnitTestingID];
+    NSString * attributePathPrefix = [NSString stringWithFormat:@"%@1 cluster 0x%llx ", attributePathObjectMarker, (unsigned long long) MTRClusterIDTypeUnitTestingID];
     XCTAssertTrue([reportedLine containsString:attributePathPrefix], @"%@", reportedLine);
-    NSString * changedAttributeID = [NSString stringWithFormat:@") attribute 0x%llx (", (unsigned long long) changedIndex];
-    XCTAssertTrue([reportedLine containsString:changedAttributeID], @"%@", reportedLine);
     NSString * summaryLine = summaryLines.firstObject;
     XCTAssertFalse([summaryLine containsString:pathObjectMarker], @"%@", summaryLine);
     XCTAssertFalse([summaryLine containsString:attributePathObjectMarker], @"%@", summaryLine);
