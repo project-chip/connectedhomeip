@@ -120,12 +120,21 @@ bool IsValidStreamList(const std::optional<std::vector<uint16_t>> & streams)
 
 CHIP_ERROR ValidateOfferStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                 const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
-                                const WebRTCProviderClient::OfferOptions & options)
+                                const WebRTCProviderClient::OfferOptions & options, bool isNewSession)
 {
-    if (!videoStreamId.HasValue() && !audioStreamId.HasValue() && !options.videoStreams.has_value() &&
-        !options.audioStreams.has_value())
+    const bool hasStreamIds   = videoStreamId.HasValue() || audioStreamId.HasValue();
+    const bool hasStreamLists = options.videoStreams.has_value() || options.audioStreams.has_value();
+
+    if (!hasStreamIds && !hasStreamLists)
     {
         ChipLogError(Camera, "One of VideoStreamID, AudioStreamID, VideoStreams or AudioStreams must be present");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // The provider rejects a new session that combines the single stream IDs with the stream lists.
+    if (isNewSession && hasStreamIds && hasStreamLists)
+    {
+        ChipLogError(Camera, "VideoStreamID and AudioStreamID cannot be combined with VideoStreams or AudioStreams");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -429,7 +438,7 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, 
 
     VerifyOrReturnError(mPendingSdpContext.state == LocalSdpState::Idle, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(ValidateOfferStreams(videoStreamId, audioStreamId, options));
+    ReturnErrorOnFailure(ValidateOfferStreams(videoStreamId, audioStreamId, options, sessionId.IsNull()));
 
     // Store the stream ID for the callback
     if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
@@ -463,7 +472,7 @@ CHIP_ERROR WebRTCManager::SolicitOffer(StreamUsageEnum streamUsage, Optional<app
 {
     ChipLogProgress(Camera, "Sending SolicitOffer command to the peer device");
 
-    ReturnErrorOnFailure(ValidateOfferStreams(videoStreamId, audioStreamId, options));
+    ReturnErrorOnFailure(ValidateOfferStreams(videoStreamId, audioStreamId, options, /* isNewSession = */ true));
 
     CHIP_ERROR err =
         mWebRTCProviderClient.SolicitOffer(streamUsage, kWebRTCRequesterDynamicEndpointId, videoStreamId, audioStreamId, options);
