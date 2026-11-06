@@ -1039,8 +1039,8 @@ select runs with the same `--tag` option:
     combined with `--tag`.
 -   When a selected run of a script is tagged `nightly`, `openssl-3.5` or
     `needs-followup-fixes`, `execute_python_tests.py` calls each selected run of
-    the script on its own, and reports it as `<script>::<run>` with its tags
-    and issues. Other tags, such as `slow`, leave the script as one call.
+    the script on its own, and reports it as `<script>::<run>` with its tags and
+    issues. Other tags, such as `slow`, leave the script as one call.
 
 | Selection                      | `--tag` values                     |
 | ------------------------------ | ---------------------------------- |
