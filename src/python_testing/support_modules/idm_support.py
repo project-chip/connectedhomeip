@@ -27,7 +27,7 @@ import time
 from dataclasses import dataclass
 from typing import Any, get_args
 
-from mobly import asserts
+from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -76,8 +76,16 @@ class ConstraintProbeResult:
 
     @property
     def probed(self) -> int:
-        """Number of violating values the DUT actually answered."""
+        """Number of violating values whose outcomes could be classified."""
         return self.rejected + self.accepted + self.other_error
+
+
+class ConstraintProbeExecutionError(ChipStackError):
+    """A qualified probe failed in transport; retain its partial result."""
+
+    def __init__(self, error: ChipStackError, result: ConstraintProbeResult) -> None:
+        super().__init__(error.err)
+        self.result = result
 
 
 @dataclass
@@ -1046,8 +1054,8 @@ class IDMBaseTest(BasicCompositionTests):
             subject: What was probed, for the failure message (e.g. "Command field").
             accepted_paths: Paths whose violating values the DUT accepted.
             rejected_count: Violating values the DUT answered with CONSTRAINT_ERROR.
-            probed_count: Violating values the DUT answered at all. Zero means nothing
-                could be exercised, so no conclusion is drawn either way.
+            probed_count: Violating values whose outcomes could be classified.
+                Unclassified execution failures provide no enforcement credit.
         """
         if self.enforces_constraints_strictly():
             if accepted_paths:
@@ -1119,11 +1127,16 @@ class IDMBaseTest(BasicCompositionTests):
 
         # Read the original value once: every probe below restores it before the next one
         # runs, so each of them starts from the value read here.
-        original_value = await self.read_single_attribute_check_success(
-            endpoint=attr_info.endpoint_id,
-            cluster=attr_info.cluster_class,
-            attribute=attr_info.attribute
-        )
+        try:
+            original_value = await self.read_single_attribute_check_success(
+                endpoint=attr_info.endpoint_id,
+                cluster=attr_info.cluster_class,
+                attribute=attr_info.attribute
+            )
+        except signals.TestFailure as error:
+            log.warning("Unable to qualify readable baseline for %s.%s: %s",
+                        attr_info.cluster_name, attr_info.attribute_name, error)
+            return ConstraintProbeResult()
 
         # A non-timed write to a timed-write attribute is answered with
         # NEEDS_TIMED_INTERACTION before the value is ever range-checked, which would
@@ -1148,7 +1161,7 @@ class IDMBaseTest(BasicCompositionTests):
             except ChipStackError as error:  # chipstack-ok
                 result.execution_error += 1
                 log.warning("Execution failed writing %s: %s", attribute_path, error)
-                break
+                raise ConstraintProbeExecutionError(error, result) from error
             result_status = write_result[0].Status
 
             # Status is an IntEnum, which formats as a bare number under Python 3.11; log
@@ -1181,7 +1194,7 @@ class IDMBaseTest(BasicCompositionTests):
             except ChipStackError as error:  # chipstack-ok
                 result.execution_error += 1
                 log.warning("Execution failed reading back %s: %s", attribute_path, error)
-                break
+                raise ConstraintProbeExecutionError(error, result) from error
             read_back_failed = isinstance(stored_value, ValueDecodeFailure)
             if result_status != Status.Success and (
                     read_back_failed or (result_status == Status.ConstraintError and stored_value == test_value)):
@@ -1200,7 +1213,7 @@ class IDMBaseTest(BasicCompositionTests):
                 except ChipStackError as error:  # chipstack-ok
                     result.execution_error += 1
                     log.warning("Execution failed restoring %s: %s", attribute_path, error)
-                    break
+                    raise ConstraintProbeExecutionError(error, result) from error
                 if restore_result[0].Status != Status.Success:
                     result.execution_error += 1
                     log.warning("Failed to restore %s to %s: %s", attribute_path, original_value,
@@ -1608,7 +1621,7 @@ class IDMBaseTest(BasicCompositionTests):
             except ChipStackError as error:  # chipstack-ok
                 result.execution_error += 1
                 log.warning("Execution failed invoking %s: %s", info.path_str, error)
-                break
+                raise ConstraintProbeExecutionError(error, result) from error
 
             # Some commands convey their result in a Status field of their response
             # command (e.g. AddGroupResponse.Status, AddSceneResponse.Status) rather

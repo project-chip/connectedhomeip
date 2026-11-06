@@ -53,7 +53,8 @@
 import logging
 
 from mobly import asserts
-from support_modules.idm_support import ATTRIBUTE_CONSTRAINT_DENIED_ATTRIBUTES, IDMBaseTest, WritableAttributeInfo, spec_enum_values
+from support_modules.idm_support import (ATTRIBUTE_CONSTRAINT_DENIED_ATTRIBUTES, ConstraintProbeExecutionError, IDMBaseTest,
+                                         WritableAttributeInfo, spec_enum_values)
 
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
@@ -109,6 +110,8 @@ class TC_IDM_9_1(IDMBaseTest):
         for info in command_field_infos:
             try:
                 result = await self.check_command_constraint(info)
+            except ConstraintProbeExecutionError as error:
+                result = error.result
             except ChipStackError as e:  # chipstack-ok
                 log.warning("Unable to qualify baseline for %s: %s", info.path_str, e)
                 commands_skipped_count += 1
@@ -131,7 +134,7 @@ class TC_IDM_9_1(IDMBaseTest):
 
         log.info("Step 1 complete: Tested %s command fields, skipped %s",
                  commands_tested_count, commands_skipped_count)
-        log.info("Command probes: attempted=%s, answered=%s, CONSTRAINT_ERROR=%s, accepted=%s, "
+        log.info("Command probes: attempted=%s, classified=%s, CONSTRAINT_ERROR=%s, accepted=%s, "
                  "other IM status=%s, execution errors=%s",
                  commands_attempted_count, commands_probed_count, commands_rejected_count,
                  commands_accepted_count, commands_other_error_count, commands_execution_error_count)
@@ -208,6 +211,8 @@ class TC_IDM_9_1(IDMBaseTest):
             # violating value could be built.
             try:
                 result = await self.check_attribute_constraint(attr_info, attr_info.constraints)
+            except ConstraintProbeExecutionError as error:
+                result = error.result
             except ChipStackError as e:  # chipstack-ok
                 log.warning("Unable to qualify baseline for %s.%s: %s", attr_info.cluster_name, attr_info.attribute_name, e)
                 skipped_count += 1
@@ -230,7 +235,7 @@ class TC_IDM_9_1(IDMBaseTest):
                 accepted_attributes.append(f"{attr_info.cluster_name}.{attr_info.attribute_name}")
 
         log.info("Step 2 complete: Tested %s attributes, skipped %s", tested_count, skipped_count)
-        log.info("Writable attribute probes: attempted=%s, answered=%s, CONSTRAINT_ERROR=%s, accepted=%s, "
+        log.info("Writable attribute probes: attempted=%s, classified=%s, CONSTRAINT_ERROR=%s, accepted=%s, "
                  "other IM status=%s, execution errors=%s",
                  attempted_count, probed_count, rejected_count, accepted_count, other_error_count, execution_error_count)
 
