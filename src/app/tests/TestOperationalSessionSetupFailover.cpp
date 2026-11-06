@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
 #include <cstring>
 #include <functional>
 #include <initializer_list>
@@ -324,6 +325,20 @@ protected:
 
     static System::Clock::Timeout FullSigma1Budget() { return CASESession::ComputeSigma1ResponseTimeout(kPeerMrpConfig); }
 
+    // The deadline CASESession arms for the shortened first attempt: the ack windows of its first kTransmissionsBeforeNext
+    // transmissions, on the larger of the peer's intervals.
+    static System::Clock::Timeout ShortenedSigma1Deadline()
+    {
+        const System::Clock::Timeout base =
+            std::max<System::Clock::Timeout>(kPeerMrpConfig.mActiveRetransTimeout, kPeerMrpConfig.mIdleRetransTimeout);
+        System::Clock::Timeout deadline = System::Clock::kZero;
+        for (uint8_t i = 0; i < kTransmissionsBeforeNext; i++)
+        {
+            deadline += ReliableMessageMgr::GetBackoff(base, i, /* computeMaxPossible */ true);
+        }
+        return deadline;
+    }
+
     ScopedNodeId Peer() { return ScopedNodeId(kPeerNodeId, GetBobFabricIndex()); }
 
     // Runs a CASESession initiator directly, outside OperationalSessionSetup.
@@ -380,7 +395,7 @@ TEST_F(TestOperationalSessionSetupFailover, DeadFirstAddressFallsThroughBeforeFu
         ChipLogProgress(Test, "Fell through after %u ms and %u Sigma1 transmissions; full Sigma1 budget %u ms",
                         static_cast<unsigned>((second.firstSigma1Time - first.firstSigma1Time).count()),
                         static_cast<unsigned>(first.sigma1s), static_cast<unsigned>(FullSigma1Budget().count()));
-        EXPECT_LT(second.firstSigma1Time - first.firstSigma1Time, FullSigma1Budget() / 2);
+        EXPECT_LT(second.firstSigma1Time - first.firstSigma1Time, ShortenedSigma1Deadline() + kSettleSlack);
         EXPECT_GE(first.sigma1s, kTransmissionsBeforeNext);
         EXPECT_LT(first.sigma1s, kFullSigma1Transmissions);
     }
@@ -413,7 +428,7 @@ TEST_F(TestOperationalSessionSetupFailover, ResumingDeadFirstAddressFallsThrough
 
         ASSERT_GT(second.sigma1s, 0u);
         EXPECT_EQ(first.sigma1sCarryingMarker, first.sigma1s);
-        EXPECT_LT(second.firstSigma1Time - first.firstSigma1Time, FullSigma1Budget() / 2);
+        EXPECT_LT(second.firstSigma1Time - first.firstSigma1Time, ShortenedSigma1Deadline() + kSettleSlack);
         EXPECT_LT(first.sigma1s, kFullSigma1Transmissions);
     }
     mProbe.mSigma1Marker = ByteSpan();
@@ -438,7 +453,7 @@ TEST_F(TestOperationalSessionSetupFailover, MiddleAddressIsShortenedAndLastKeeps
         EXPECT_LT(first.sigma1s, kFullSigma1Transmissions);
         EXPECT_LT(middle.sigma1s, kFullSigma1Transmissions);
         ASSERT_GT(last.sigma1s, 0u);
-        EXPECT_LT(last.firstSigma1Time - first.firstSigma1Time, FullSigma1Budget());
+        EXPECT_LT(last.firstSigma1Time - first.firstSigma1Time, 2 * ShortenedSigma1Deadline() + kSettleSlack);
         ASSERT_TRUE(mFailureCallbackCalled);
         EXPECT_EQ(mFailure, CHIP_ERROR_TIMEOUT);
         EXPECT_EQ(last.sigma1s, kFullSigma1Transmissions);
@@ -581,7 +596,8 @@ TEST_F(TestOperationalSessionSetupFailover, Sigma1LimitOutsideRetransmitBudgetKe
 
 // The peer is Active when Sigma1 first leaves and Idle by the time Sigma1 is retransmitted, so MRP waits the idle-based
 // interval for the second ack. A deadline built on the Active interval alone would abort the attempt while the peer is
-// still within its retransmission window.
+// still within its retransmission window. It needs a third Sigma1, so at least two retransmissions.
+#if CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS >= 2
 TEST_F(TestOperationalSessionSetupFailover, Sigma1AckDeadlineCoversIdleIntervalAfterPeerGoesIdle)
 {
     // The active threshold ends before the first retransmission, which MRP waits the active interval for.
@@ -602,6 +618,7 @@ TEST_F(TestOperationalSessionSetupFailover, Sigma1AckDeadlineCoversIdleIntervalA
     EXPECT_EQ(responder.mSigma1Received, 1u);
     EXPECT_EQ(peer.sigma1s, 3u);
 }
+#endif // CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS >= 2
 
 TEST_F(TestOperationalSessionSetupFailover, DestroyedCASESessionLeavesNoSigma1Deadline)
 {
