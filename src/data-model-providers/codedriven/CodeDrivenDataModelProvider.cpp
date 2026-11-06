@@ -433,7 +433,8 @@ void CodeDrivenDataModelProvider::NotifyChangedDescriptorPartsListOfAncestors(En
 
         // If currentId is the starting endpoint, or if it is a full-family type ancestor, notify attribute change. Root endpoint is
         // full-family even if its pattern is not set to full-family.
-        if (currentId == parentEndpointId || currentEndpointEntry.compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily ||
+        if (currentId == parentEndpointId ||
+            currentEndpointEntry.compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily ||
             currentId == kRootEndpointId)
         {
             NotifyAttributeChanged({ currentId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id },
