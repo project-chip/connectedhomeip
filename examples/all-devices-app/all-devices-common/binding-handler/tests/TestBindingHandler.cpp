@@ -307,9 +307,9 @@ TEST_F(TestBindingHandlerWithManager, DispatchSimpleCommandToGroupBinding)
 
 // NotifyBoundClusterChanged queues the context for the unicast binding *before* establishing the
 // session. When session establishment then fails synchronously (here: the binding refers to a fabric
-// the device does not know, so the address lookup cannot start), the call returns an error while the
-// pending notification still references the command. Dispatch must not destroy the command in that case.
-TEST_F(TestBindingHandlerWithManager, CommandStaysAliveWhenNotifyFailsAfterQueueing)
+// the device does not know, so the address lookup cannot start), the manager keeps the queued command
+// and reports success, so Dispatch must not destroy the command.
+TEST_F(TestBindingHandlerWithManager, CommandStaysQueuedWhenSessionSetupFails)
 {
     constexpr FabricIndex kUnknownFabricIndex = 200;
     constexpr NodeId kPeerNodeId              = 0x1234;
@@ -324,7 +324,7 @@ TEST_F(TestBindingHandlerWithManager, CommandStaysAliveWhenNotifyFailsAfterQueue
     auto command = MakeTestCommand(destructorCount, &record);
     ASSERT_NE(command, nullptr);
 
-    EXPECT_NE(mHandler.Dispatch(kLocalEndpoint, std::move(command)), CHIP_NO_ERROR);
+    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, std::move(command)), CHIP_NO_ERROR);
 
     // The pending notification still owns the command: it must not have been destroyed.
     EXPECT_EQ(record.count, 0);
@@ -332,6 +332,22 @@ TEST_F(TestBindingHandlerWithManager, CommandStaysAliveWhenNotifyFailsAfterQueue
 
     // Removing the binding drops the last reference; the release handler destroys the command exactly once.
     EXPECT_EQ(mBindingManager.UnicastBindingRemoved(bindingIndex), CHIP_NO_ERROR);
+    EXPECT_EQ(record.count, 0);
+    EXPECT_EQ(destructorCount, 1);
+}
+
+TEST_F(TestBindingHandlerWithManager, CommandIsDestroyedOnceWhenManagerRejectsIt)
+{
+    ASSERT_EQ(mBindingManager.GetBindingTable().Add(
+                  Clusters::Binding::TableEntry::ForGroup(GetAliceFabricIndex(), 0x0106, kLocalEndpoint, kTestClusterId)),
+              CHIP_NO_ERROR);
+
+    // Without a BoundDeviceChangedHandler the manager rejects the notification and does not take the context.
+    mBindingManager.RegisterBoundDeviceChangedHandler(nullptr);
+
+    int destructorCount = 0;
+    DispatchRecord record;
+    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, MakeTestCommand(destructorCount, &record)), CHIP_ERROR_HANDLER_NOT_SET);
     EXPECT_EQ(record.count, 0);
     EXPECT_EQ(destructorCount, 1);
 }
@@ -348,7 +364,8 @@ TEST_F(TestBindingHandlerWithManager, PendingCommandIsReleasedAfterShutdown)
     DispatchRecord record;
     auto command = MakeTestCommand(destructorCount, &record);
     ASSERT_NE(command, nullptr);
-    EXPECT_NE(mHandler.Dispatch(kLocalEndpoint, std::move(command)), CHIP_NO_ERROR);
+    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, std::move(command)), CHIP_NO_ERROR);
+    EXPECT_EQ(destructorCount, 0);
 
     mHandler.Shutdown();
 

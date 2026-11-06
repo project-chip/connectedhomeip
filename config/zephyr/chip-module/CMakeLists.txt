@@ -133,6 +133,7 @@ if(CONFIG_CHIP)
     if(CONFIG_CHIP_OTA_REQUESTOR)
         matter_add_gn_arg_bool("chip_enable_ota_requestor" TRUE)
     endif()
+    include(${CHIP_ROOT}/config/silabs/chip-module/ota.cmake)
 
     matter_add_gn_arg_string("zephyr_ar" ${CMAKE_AR})
     matter_add_gn_arg_string("zephyr_cc" ${CMAKE_C_COMPILER})

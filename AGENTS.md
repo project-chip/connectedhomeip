@@ -195,6 +195,12 @@ You can run commands within the environment using `scripts/run_in_build_env.sh`:
 Alternatively, you can activate the environment in your shell:
 `source scripts/activate.sh`
 
+An additional checkout (e.g. a `git worktree`) can reuse the environment of an
+existing checkout instead of bootstrapping its own:
+`source scripts/activate.sh --environment-root /path/to/other/checkout/.environment`.
+See
+[Sharing an environment between checkouts](docs/guides/BUILDING.md#sharing-an-environment-between-checkouts).
+
 ### Build and Test
 
 -   **List available targets**:
