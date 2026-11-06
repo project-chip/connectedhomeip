@@ -25,6 +25,7 @@
  */
 #include <protocols/secure_channel/CASESession.h>
 
+#include <algorithm>
 #include <atomic>
 #include <inttypes.h>
 #include <memory>
@@ -608,9 +609,13 @@ void CASESession::StartSigma1AckDeadline()
     VerifyOrReturn(mSystemLayer != nullptr && mExchangeCtxt->GetSessionHandle()->AllowsMRP());
 
     // The longest the first transmissions can each wait for their MRP ack, so a slow
-    // but reachable peer is not cut short.
-    const System::Clock::Timeout baseInterval = mExchangeCtxt->GetSessionHandle()->GetMRPBaseTimeout();
-    System::Clock::Timeout deadline           = System::Clock::kZero;
+    // but reachable peer is not cut short. MRP picks the active or idle interval again for every
+    // retransmission, so the peer can be active for Sigma1 and idle for a later one; the larger of the
+    // two keeps the deadline from being shorter than the waits MRP actually makes.
+    const ReliableMessageProtocolConfig & remoteConfig = mExchangeCtxt->GetSessionHandle()->GetRemoteMRPConfig();
+    const System::Clock::Timeout baseInterval =
+        std::max<System::Clock::Timeout>(remoteConfig.mActiveRetransTimeout, remoteConfig.mIdleRetransTimeout);
+    System::Clock::Timeout deadline = System::Clock::kZero;
     for (uint8_t i = 0; i < mSigma1UnackedTransmissionLimit; i++)
     {
         deadline += ReliableMessageMgr::GetBackoff(baseInterval, i, /* computeMaxPossible */ true);

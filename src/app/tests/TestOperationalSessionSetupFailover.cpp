@@ -41,14 +41,17 @@ using namespace chip::System::Clock::Literals;
 
 namespace {
 
-constexpr NodeId kPeerNodeId                  = 0x0000'0000'1234'5678ULL;
-constexpr uint16_t kPeerPort                  = CHIP_PORT;
-constexpr uint8_t kFullSigma1Transmissions    = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1;
-constexpr uint8_t kTransmissionsBeforeNext    = CHIP_CONFIG_CASE_SIGMA1_TRANSMISSIONS_BEFORE_NEXT_ADDRESS;
-constexpr System::Clock::Timeout kSettleSlack = 2_s;
+constexpr NodeId kPeerNodeId                                = 0x0000'0000'1234'5678ULL;
+constexpr uint16_t kPeerPort                                = CHIP_PORT;
+constexpr uint8_t kFullSigma1Transmissions                  = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1;
+[[maybe_unused]] constexpr uint8_t kTransmissionsBeforeNext = CHIP_CONFIG_CASE_SIGMA1_TRANSMISSIONS_BEFORE_NEXT_ADDRESS;
+constexpr System::Clock::Timeout kSettleSlack               = 2_s;
 
-static_assert(kTransmissionsBeforeNext > 0 && kTransmissionsBeforeNext < kFullSigma1Transmissions,
-              "these tests need the shortened first-attempt budget enabled");
+// The shortened first-attempt budget is off when the limit is 0 or not below the full budget; the tests of the
+// shortening itself are compiled only when it is on.
+#define SIGMA1_FIRST_ATTEMPT_SHORTENING_ENABLED                                                                                    \
+    (CHIP_CONFIG_CASE_SIGMA1_TRANSMISSIONS_BEFORE_NEXT_ADDRESS > 0 &&                                                              \
+     CHIP_CONFIG_CASE_SIGMA1_TRANSMISSIONS_BEFORE_NEXT_ADDRESS < CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1)
 
 // Advertised by the peer over DNS-SD. Idle differs from active so a deadline built on the wrong interval shows up.
 const ReliableMessageProtocolConfig kPeerMrpConfig(60_ms32, 20_ms32);
@@ -324,11 +327,16 @@ protected:
     ScopedNodeId Peer() { return ScopedNodeId(kPeerNodeId, GetBobFabricIndex()); }
 
     // Runs a CASESession initiator directly, outside OperationalSessionSetup.
-    void EstablishDirect(CASESession & session, CountingEstablishmentDelegate & delegate, const Transport::PeerAddress & peer)
+    void EstablishDirect(CASESession & session, CountingEstablishmentDelegate & delegate, const Transport::PeerAddress & peer,
+                         const ReliableMessageProtocolConfig & peerMrpConfig = kPeerMrpConfig, bool peerActiveAtStart = false)
     {
         session.SetGroupDataProvider(&mGroupDataProvider);
-        auto unauthenticated = GetSecureSessionManager().CreateUnauthenticatedSession(peer, kPeerMrpConfig);
+        auto unauthenticated = GetSecureSessionManager().CreateUnauthenticatedSession(peer, peerMrpConfig);
         ASSERT_TRUE(unauthenticated.HasValue());
+        if (peerActiveAtStart)
+        {
+            unauthenticated.Value()->AsUnauthenticatedSession()->MarkActiveRx();
+        }
         ExchangeContext * exchange = GetExchangeManager().NewContext(unauthenticated.Value(), &session);
         ASSERT_NE(exchange, nullptr);
         ASSERT_EQ(session.EstablishSession(GetSecureSessionManager(), &GetFabricTable(), Peer(), exchange, nullptr, nullptr,
@@ -352,6 +360,8 @@ protected:
 };
 
 #if CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS >= 2
+
+#if SIGMA1_FIRST_ATTEMPT_SHORTENING_ENABLED
 
 TEST_F(TestOperationalSessionSetupFailover, DeadFirstAddressFallsThroughBeforeFullSigma1Budget)
 {
@@ -438,6 +448,8 @@ TEST_F(TestOperationalSessionSetupFailover, MiddleAddressIsShortenedAndLastKeeps
 
 #endif
 
+#endif // SIGMA1_FIRST_ATTEMPT_SHORTENING_ENABLED
+
 TEST_F(TestOperationalSessionSetupFailover, AcknowledgedFirstAddressKeepsFullSigma1Budget)
 {
     Sigma1Responder responder(Sigma1Responder::Reply::kAckOnly);
@@ -457,6 +469,8 @@ TEST_F(TestOperationalSessionSetupFailover, AcknowledgedFirstAddressKeepsFullSig
         EXPECT_GE(second.firstSigma1Time - first.firstSigma1Time, FullSigma1Budget() * 9 / 10);
     }
 }
+
+#if SIGMA1_FIRST_ATTEMPT_SHORTENING_ENABLED
 
 TEST_F(TestOperationalSessionSetupFailover, FirstAddressAcknowledgingItsLastAllowedTransmissionKeepsFullSigma1Budget)
 {
@@ -478,6 +492,8 @@ TEST_F(TestOperationalSessionSetupFailover, FirstAddressAcknowledgingItsLastAllo
         EXPECT_GE(second.firstSigma1Time - first.firstSigma1Time, FullSigma1Budget() * 9 / 10);
     }
 }
+
+#endif // SIGMA1_FIRST_ATTEMPT_SHORTENING_ENABLED
 
 TEST_F(TestOperationalSessionSetupFailover, BusyFirstAddressFallsThroughAndLastAddressKeepsFullSigma1Budget)
 {
@@ -561,6 +577,30 @@ TEST_F(TestOperationalSessionSetupFailover, Sigma1LimitOutsideRetransmitBudgetKe
         EXPECT_EQ(peer.sigma1s, kFullSigma1Transmissions);
         EXPECT_GE(delegate.mErrorTime - peer.firstSigma1Time, FullSigma1Budget() * 9 / 10);
     }
+}
+
+// The peer is Active when Sigma1 first leaves and Idle by the time Sigma1 is retransmitted, so MRP waits the idle-based
+// interval for the second ack. A deadline built on the Active interval alone would abort the attempt while the peer is
+// still within its retransmission window.
+TEST_F(TestOperationalSessionSetupFailover, Sigma1AckDeadlineCoversIdleIntervalAfterPeerGoesIdle)
+{
+    // The active threshold ends before the first retransmission, which MRP waits the active interval for.
+    const ReliableMessageProtocolConfig peerMrpConfig(400_ms32, 50_ms32, 30_ms16);
+    auto & peer        = mProbe.mPeers[0];
+    peer.sigma1sToLose = 2;
+    Sigma1Responder responder(Sigma1Responder::Reply::kAckOnly);
+    Respond(responder);
+    CountingEstablishmentDelegate delegate;
+    CASESession session;
+    session.SetSigma1UnackedTransmissionLimit(2);
+    EstablishDirect(session, delegate, peer.address, peerMrpConfig, /* peerActiveAtStart */ true);
+
+    // The third transmission, the first the peer hears, goes out after the second idle-based wait.
+    DriveUntil(3 * FullSigma1Budget(), [&] { return delegate.mErrors > 0 || responder.mSigma1Received > 0; });
+
+    EXPECT_EQ(delegate.mErrors, 0u);
+    EXPECT_EQ(responder.mSigma1Received, 1u);
+    EXPECT_EQ(peer.sigma1s, 3u);
 }
 
 TEST_F(TestOperationalSessionSetupFailover, DestroyedCASESessionLeavesNoSigma1Deadline)
