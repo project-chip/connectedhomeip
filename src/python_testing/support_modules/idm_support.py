@@ -224,20 +224,16 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # EffectIdentifierEnum and EffectVariant one of the values in EffectVariantEnum, so
     # both need CONSTRAINT_ERROR.
     (Clusters.Identify.id, Clusters.Identify.Commands.TriggerEffect.command_id),
-    # TODO: Remove once TransferFileDesignator length handling is resolved (SDK fix
-    # or spec clarification): the data model constraint (maxLength 32) is
-    # unconditional, but DiagnosticLogsCluster only enforces it on the BDX path, so
-    # a >32-char designator with RequestedProtocol=ResponsePayload is accepted. The
+    # TODO: Remove once https://github.com/project-chip/connectedhomeip/issues/73072
+    # is resolved (SDK fix or spec clarification): the TransferFileDesignator data
+    # model constraint (maxLength 32) is unconditional, but DiagnosticLogsCluster
+    # only enforces it on the BDX path, so a >32-char designator with
+    # RequestedProtocol=ResponsePayload is accepted. The
     # spec's Effect on Receipt enumerates its status-code exceptions (e.g.
     # INVALID_COMMAND for out-of-range Intent/RequestedProtocol) and contains no
     # carve-out exempting the designator from validation for non-BDX protocols.
     # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/service_device_management/DiagnosticLogsCluster.adoc#514-effect-on-receipt
     (Clusters.DiagnosticLogs.id, Clusters.DiagnosticLogs.Commands.RetrieveLogsRequest.command_id),
-    # TODO: Remove once https://github.com/project-chip/connectedhomeip/issues/74740
-    # is fixed (https://github.com/project-chip/connectedhomeip/pull/74741).
-    # MicrowaveOvenControlCluster checks AddMoreTime's TimeToAdd only against
-    # MaxCookTime and returns SUCCESS for a TimeToAdd of 0, below its min 1 constraint.
-    (Clusters.MicrowaveOvenControl.id, Clusters.MicrowaveOvenControl.Commands.AddMoreTime.command_id),
     # Value-gated: DurationSeconds is only evaluated when TestOperation enables
     # testing; with the harness's default TestOperation the field
     # is ignored and the command returns SUCCESS. Enabling test mode to exercise the
@@ -1498,6 +1494,9 @@ class IDMBaseTest(BasicCompositionTests):
             allowed_nums = self._allowed_numeric_values(constraints)
             if allowed_nums:
                 return next(iter(allowed_nums))
+            if (constraints.max_value is not None and constraints.max_value >= 0
+                    and constraints == Constraints(max_value=constraints.max_value)):
+                return 0
         return None
 
     async def check_command_constraint(self, info: CommandFieldInfo) -> ConstraintProbeResult:

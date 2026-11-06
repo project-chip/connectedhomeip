@@ -23,3 +23,7 @@
 #define GENERATED_CLUSTERS #error "Not a real codegen. This is a temporary include for dynamic-overrides only"
 
 #define ATTRIBUTE_LARGEST (1003)
+
+// The dynamic server's clusters carry no Fixed or Changes Omitted information, so there are no attributes to list.
+#define GENERATED_FIXED_ATTRIBUTES
+#define GENERATED_CHANGES_OMITTED_ATTRIBUTES

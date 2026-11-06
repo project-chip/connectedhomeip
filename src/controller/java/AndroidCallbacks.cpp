@@ -934,7 +934,9 @@ void InvokeCallback::ReportError(const char * message, ChipError::StorageType er
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
-jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralValueObject, CHIP_ERROR & err)
+constexpr size_t kMaxTlvNestingDepth = 32;
+
+static jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralValueObject, CHIP_ERROR & err, size_t depth)
 {
     jobject retValue = nullptr;
 
@@ -997,6 +999,12 @@ jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralVal
         return static_cast<jobject>(valueByteArray);
     }
     case TLV::kTLVType_Array: {
+        if (depth >= kMaxTlvNestingDepth)
+        {
+            err = CHIP_ERROR_RECURSION_DEPTH_LIMIT;
+            ChipLogError(Controller, "TLV nesting depth limit (%zu) exceeded", kMaxTlvNestingDepth);
+            return nullptr;
+        }
         TLV::TLVType containerType;
         err = readerForGeneralValueObject.EnterContainer(containerType);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
@@ -1004,16 +1012,29 @@ jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralVal
         err = chip::JniReferences::GetInstance().CreateArrayList(retValue);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogProgress(Controller, "CreateArrayList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
-        while (readerForGeneralValueObject.Next() == CHIP_NO_ERROR)
+        while ((err = readerForGeneralValueObject.Next()) == CHIP_NO_ERROR)
         {
-            jobject inValue = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err);
-            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
-                                ChipLogProgress(Controller, "Can't parse general value : %" CHIP_ERROR_FORMAT, err.Format()));
+            jobject inValue = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err, depth + 1);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr);
             err = chip::JniReferences::GetInstance().AddToList(retValue, inValue);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                                ChipLogProgress(Controller, "AddToList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
         }
+        VerifyOrReturnValue(
+            err == CHIP_END_OF_TLV, nullptr,
+            ChipLogProgress(Controller, "DecodeGeneralTLVValue container error: %" CHIP_ERROR_FORMAT, err.Format()));
+        err = readerForGeneralValueObject.ExitContainer(containerType);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "ExitContainer fail! : %" CHIP_ERROR_FORMAT, err.Format()));
         return retValue;
     }
     case TLV::kTLVType_List: {
+        if (depth >= kMaxTlvNestingDepth)
+        {
+            err = CHIP_ERROR_RECURSION_DEPTH_LIMIT;
+            ChipLogError(Controller, "TLV nesting depth limit (%zu) exceeded", kMaxTlvNestingDepth);
+            return nullptr;
+        }
         TLV::TLVType containerType;
         err = readerForGeneralValueObject.EnterContainer(containerType);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
@@ -1021,22 +1042,35 @@ jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralVal
         err = chip::JniReferences::GetInstance().CreateArrayList(retValue);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogProgress(Controller, "CreateArrayList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
-        while (readerForGeneralValueObject.Next() == CHIP_NO_ERROR)
+        while ((err = readerForGeneralValueObject.Next()) == CHIP_NO_ERROR)
         {
-            jobject inValue = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err);
-            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
-                                ChipLogProgress(Controller, "Can't parse general value : %" CHIP_ERROR_FORMAT, err.Format()));
+            jobject inValue = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err, depth + 1);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr);
             err = chip::JniReferences::GetInstance().AddToList(retValue, inValue);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                                ChipLogProgress(Controller, "AddToList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
         }
+        VerifyOrReturnValue(
+            err == CHIP_END_OF_TLV, nullptr,
+            ChipLogProgress(Controller, "DecodeGeneralTLVValue container error: %" CHIP_ERROR_FORMAT, err.Format()));
+        err = readerForGeneralValueObject.ExitContainer(containerType);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "ExitContainer fail! : %" CHIP_ERROR_FORMAT, err.Format()));
         return retValue;
     }
     case TLV::kTLVType_Null: {
         return nullptr;
     }
     default:
+        ChipLogProgress(Controller, "Unsupported TLV type: %u", static_cast<unsigned>(readerForGeneralValueObject.GetType()));
         err = CHIP_ERROR_WRONG_TLV_TYPE;
         return nullptr;
     }
+}
+
+jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralValueObject, CHIP_ERROR & err)
+{
+    return DecodeGeneralTLVValue(env, readerForGeneralValueObject, err, 0);
 }
 
 ExtendableInvokeCallback::ExtendableInvokeCallback(jobject wrapperCallback)

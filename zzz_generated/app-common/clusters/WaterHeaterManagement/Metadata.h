@@ -22,8 +22,9 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 namespace HeaterTypes {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(HeaterTypes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(HeaterTypes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace HeaterTypes
 namespace HeatDemand {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(HeatDemand::Id, BitFlags<DataModel::AttributeQualityFlags>(),

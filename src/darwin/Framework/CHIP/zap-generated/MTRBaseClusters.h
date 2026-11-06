@@ -20355,6 +20355,28 @@ typedef NS_ENUM(uint8_t, MTRDataTypeRelativePositionTag) {
     MTRDataTypeRelativePositionTagBehind MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+typedef NS_ENUM(uint8_t, MTRDataTypeSemanticTagNamespaceId) {
+    MTRDataTypeSemanticTagNamespaceIdCompassDirection MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeSemanticTagNamespaceIdCompassLocation MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeSemanticTagNamespaceIdDirection MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeSemanticTagNamespaceIdLevel MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeSemanticTagNamespaceIdLocation MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDataTypeSemanticTagNamespaceIdNumber MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDataTypeSemanticTagNamespaceIdPosition MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDataTypeSemanticTagNamespaceIdElectricalMeasurement MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDataTypeSemanticTagNamespaceIdCommodityTariffChronology MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeSemanticTagNamespaceIdCommodityTariffDirection MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeSemanticTagNamespaceIdLaundry MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeSemanticTagNamespaceIdPowerSource MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeSemanticTagNamespaceIdCommonArea MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeSemanticTagNamespaceIdCommonLandmark MTR_PROVISIONALLY_AVAILABLE = 0x11,
+    MTRDataTypeSemanticTagNamespaceIdRelativePosition MTR_PROVISIONALLY_AVAILABLE = 0x12,
+    MTRDataTypeSemanticTagNamespaceIdClosure MTR_PROVISIONALLY_AVAILABLE = 0x44,
+    MTRDataTypeSemanticTagNamespaceIdClosurePanel MTR_PROVISIONALLY_AVAILABLE = 0x45,
+    MTRDataTypeSemanticTagNamespaceIdClosureWindow MTR_PROVISIONALLY_AVAILABLE = 0x47,
+    MTRDataTypeSemanticTagNamespaceIdClosureCabinet MTR_PROVISIONALLY_AVAILABLE = 0x48,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeStreamUsageEnum) {
     MTRDataTypeStreamUsageEnumInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeStreamUsageEnumRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
