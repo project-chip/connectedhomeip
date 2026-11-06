@@ -8437,7 +8437,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     NSString * deviceTag = [NSString stringWithFormat:@"%p", device];
     NSString * nodeTag = [NSString stringWithFormat:@"node 0x%016llX", (unsigned long long) kDeviceId1];
     NSString * descriptionMarker = @"<MTRDevice_Concrete: ";
-    // The NSString form of MTRClusterPath and MTRAttributePath, which only the debug lines may carry.
+    // The NSString form of MTRClusterPath and MTRAttributePath, which carries the cluster and attribute names.
     NSString * pathObjectMarker = @"<MTRClusterPath endpoint ";
     NSString * attributePathObjectMarker = @"<MTRAttributePath endpoint ";
 
@@ -8493,27 +8493,24 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertEqual(reportedLines.count, 1);
     XCTAssertEqual(summaryLines.count, 1);
 
-    NSString * clusterIDs = [NSString stringWithFormat:@"endpoint 1 cluster 0x%llx", (unsigned long long) MTRClusterIDTypeUnitTestingID];
     for (NSString * line in [[dataVersionLines arrayByAddingObjectsFromArray:reportedLines] arrayByAddingObjectsFromArray:summaryLines]) {
         XCTAssertTrue([line containsString:nodeTag], @"%@", line);
         XCTAssertFalse([line containsString:descriptionMarker], @"%@", line);
-        XCTAssertFalse([line containsString:pathObjectMarker], @"%@", line);
-        XCTAssertFalse([line containsString:attributePathObjectMarker], @"%@", line);
     }
+    // DataVersion and reported-values lines keep the full path, so the cluster and attribute names stay in the log.
+    NSString * clusterPathPrefix = [NSString stringWithFormat:@"%@1 cluster 0x%llx (", pathObjectMarker, (unsigned long long) MTRClusterIDTypeUnitTestingID];
     for (NSString * line in dataVersionLines) {
-        XCTAssertTrue([line containsString:clusterIDs], @"%@", line);
+        XCTAssertTrue([line containsString:clusterPathPrefix], @"%@", line);
         XCTAssertTrue([line hasSuffix:@"to 2"], @"%@", line);
     }
-    NSString * changedAttributeIDs = [NSString stringWithFormat:@"%@ attribute 0x%llx", clusterIDs, (unsigned long long) changedIndex];
-    XCTAssertTrue([reportedLines.firstObject containsString:changedAttributeIDs], @"%@", reportedLines.firstObject);
-
-    // The full path objects are still logged, at debug.
-    NSArray<NSString *> * debugDataVersionLines = linesContaining(detailLines, @"updated DataVersion");
-    NSArray<NSString *> * debugReportedLines = linesContaining(detailLines, @"report from reported values");
-    XCTAssertEqual(debugDataVersionLines.count, attributeCount);
-    XCTAssertTrue([debugDataVersionLines.firstObject containsString:pathObjectMarker], @"%@", debugDataVersionLines.firstObject);
-    XCTAssertEqual(debugReportedLines.count, 1);
-    XCTAssertTrue([debugReportedLines.firstObject containsString:attributePathObjectMarker], @"%@", debugReportedLines.firstObject);
+    NSString * reportedLine = reportedLines.firstObject;
+    NSString * attributePathPrefix = [NSString stringWithFormat:@"%@1 cluster 0x%llx (", attributePathObjectMarker, (unsigned long long) MTRClusterIDTypeUnitTestingID];
+    XCTAssertTrue([reportedLine containsString:attributePathPrefix], @"%@", reportedLine);
+    NSString * changedAttributeID = [NSString stringWithFormat:@") attribute 0x%llx (", (unsigned long long) changedIndex];
+    XCTAssertTrue([reportedLine containsString:changedAttributeID], @"%@", reportedLine);
+    NSString * summaryLine = summaryLines.firstObject;
+    XCTAssertFalse([summaryLine containsString:pathObjectMarker], @"%@", summaryLine);
+    XCTAssertFalse([summaryLine containsString:attributePathObjectMarker], @"%@", summaryLine);
 }
 
 - (void)test049f_SubscriptionAndReadReportsLogCountsNotValuesAtDefault

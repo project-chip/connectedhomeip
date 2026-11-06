@@ -4545,9 +4545,7 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
         }
         _clusterDataToPersist[clusterPath] = clusterData;
 
-        MTR_LOG("node 0x%016llX updated DataVersion for endpoint %u cluster 0x%llx to %llu", _nodeID.unsignedLongLongValue, clusterPath.endpoint.unsignedShortValue,
-            clusterPath.cluster.unsignedLongLongValue, dataVersion.unsignedLongLongValue);
-        MTR_LOG_DEBUG("%@ updated DataVersion for %@ to %@", self, clusterPath, dataVersion);
+        MTR_LOG("node 0x%016llX updated DataVersion for %@ to %@", _nodeID.unsignedLongLongValue, clusterPath, dataVersion);
     }
 }
 
@@ -4905,9 +4903,7 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     // Log each changed path on a separate line, so log line truncation does not
     // hide which attributes actually changed in this report.
     for (MTRAttributePath * path in attributePathsToReport) {
-        MTR_LOG("node 0x%016llX report from reported values endpoint %u cluster 0x%llx attribute 0x%llx", _nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue,
-            path.cluster.unsignedLongLongValue, path.attribute.unsignedLongLongValue);
-        MTR_LOG_DEBUG("%@ report from reported values %@", self, path);
+        MTR_LOG("node 0x%016llX report from reported values %@", _nodeID.unsignedLongLongValue, path);
     }
 
     MTR_LOG("node 0x%016llX report of %lu attributes: %lu values, %lu errors, %lu same as read cache, %lu expected value still present, %lu no data", _nodeID.unsignedLongLongValue,
