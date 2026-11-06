@@ -16,77 +16,26 @@
 
 #pragma once
 
-#include <clusters/shared/Enums.h>
 #include <device/api/Interface.h>
 #include <lib/support/Span.h>
 
 namespace chip::app::SolarPowerTags {
 
-inline constexpr EndpointComposition::SemanticTag kGridConnectionTag[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPowerSourceId, .tag = 0x01 },
-};
-
-inline constexpr EndpointComposition::SemanticTag kInverterTemperatureTag[] = {
-    { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = CommonNamespace::kLocationId,
-      .tag         = static_cast<uint8_t>(Clusters::Globals::LocationTag::kOutdoor) },
-};
-
-inline constexpr EndpointComposition::SemanticTag kParallelPanel1Tag[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 1 },
-};
-inline constexpr EndpointComposition::SemanticTag kParallelPanel2Tag[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 2 },
-};
-inline constexpr EndpointComposition::SemanticTag kParallelPanel3Tag[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 3 },
-};
-inline constexpr EndpointComposition::SemanticTag kParallelPanel4Tag[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 4 },
-};
-
-inline constexpr EndpointComposition::SemanticTag kString1Tag[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 1 },
-};
-inline constexpr EndpointComposition::SemanticTag kString2Tag[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 2 },
-};
-
-// Figure 19: two strings of two panels — string index (Number) plus panel index within the string (Position).
-inline constexpr EndpointComposition::SemanticTag kString1Panel1Tags[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 1 },
-    { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = CommonNamespace::kPositionId,
-      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft) },
-};
-inline constexpr EndpointComposition::SemanticTag kString1Panel2Tags[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 1 },
-    { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = CommonNamespace::kPositionId,
-      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight) },
-};
-inline constexpr EndpointComposition::SemanticTag kString2Panel1Tags[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 2 },
-    { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = CommonNamespace::kPositionId,
-      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft) },
-};
-inline constexpr EndpointComposition::SemanticTag kString2Panel2Tags[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 2 },
-    { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = CommonNamespace::kPositionId,
-      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight) },
-};
-
-inline constexpr EndpointComposition::SemanticTag kPhaseATag[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kElectricalMeasurementId, .tag = 0x01 },
-};
-inline constexpr EndpointComposition::SemanticTag kPhaseBTag[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kElectricalMeasurementId, .tag = 0x02 },
-};
-inline constexpr EndpointComposition::SemanticTag kPhaseCTag[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kElectricalMeasurementId, .tag = 0x03 },
-};
+extern const EndpointComposition::SemanticTag kGridConnectionTag[1];
+extern const EndpointComposition::SemanticTag kInverterTemperatureTag[1];
+extern const EndpointComposition::SemanticTag kParallelPanel1Tag[1];
+extern const EndpointComposition::SemanticTag kParallelPanel2Tag[1];
+extern const EndpointComposition::SemanticTag kParallelPanel3Tag[1];
+extern const EndpointComposition::SemanticTag kParallelPanel4Tag[1];
+extern const EndpointComposition::SemanticTag kString1Tag[1];
+extern const EndpointComposition::SemanticTag kString2Tag[1];
+extern const EndpointComposition::SemanticTag kString1Panel1Tags[2];
+extern const EndpointComposition::SemanticTag kString1Panel2Tags[2];
+extern const EndpointComposition::SemanticTag kString2Panel1Tags[2];
+extern const EndpointComposition::SemanticTag kString2Panel2Tags[2];
+extern const EndpointComposition::SemanticTag kPhaseATag[1];
+extern const EndpointComposition::SemanticTag kPhaseBTag[1];
+extern const EndpointComposition::SemanticTag kPhaseCTag[1];
 
 Span<const EndpointComposition::SemanticTag> ParallelPanelTag(uint8_t panelIndex);
 

@@ -16,9 +16,82 @@
 
 #include <device/types/solar-power/SolarPowerTags.h>
 
-#include <lib/core/CHIPError.h>
+#include <clusters/shared/Enums.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip::app::SolarPowerTags {
+
+namespace {
+
+using NS = Clusters::Globals::SemanticTagNamespaceId;
+
+} // namespace
+
+const EndpointComposition::SemanticTag kGridConnectionTag[1] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kPowerSource), .tag = 0x01 },
+};
+
+const EndpointComposition::SemanticTag kInverterTemperatureTag[1] = {
+    { .mfgCode     = DataModel::NullNullable,
+      .namespaceID = to_underlying(NS::kLocation),
+      .tag         = static_cast<uint8_t>(Clusters::Globals::LocationTag::kOutdoor) },
+};
+
+const EndpointComposition::SemanticTag kParallelPanel1Tag[1] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 1 },
+};
+const EndpointComposition::SemanticTag kParallelPanel2Tag[1] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 2 },
+};
+const EndpointComposition::SemanticTag kParallelPanel3Tag[1] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 3 },
+};
+const EndpointComposition::SemanticTag kParallelPanel4Tag[1] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 4 },
+};
+
+const EndpointComposition::SemanticTag kString1Tag[1] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 1 },
+};
+const EndpointComposition::SemanticTag kString2Tag[1] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 2 },
+};
+
+// Figure 19: two strings of two panels — string index (Number) plus panel index within the string (Position).
+const EndpointComposition::SemanticTag kString1Panel1Tags[2] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 1 },
+    { .mfgCode     = DataModel::NullNullable,
+      .namespaceID = to_underlying(NS::kPosition),
+      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft) },
+};
+const EndpointComposition::SemanticTag kString1Panel2Tags[2] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 1 },
+    { .mfgCode     = DataModel::NullNullable,
+      .namespaceID = to_underlying(NS::kPosition),
+      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight) },
+};
+const EndpointComposition::SemanticTag kString2Panel1Tags[2] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 2 },
+    { .mfgCode     = DataModel::NullNullable,
+      .namespaceID = to_underlying(NS::kPosition),
+      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft) },
+};
+const EndpointComposition::SemanticTag kString2Panel2Tags[2] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 2 },
+    { .mfgCode     = DataModel::NullNullable,
+      .namespaceID = to_underlying(NS::kPosition),
+      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight) },
+};
+
+const EndpointComposition::SemanticTag kPhaseATag[1] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = 0x01 },
+};
+const EndpointComposition::SemanticTag kPhaseBTag[1] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = 0x02 },
+};
+const EndpointComposition::SemanticTag kPhaseCTag[1] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = 0x03 },
+};
 
 Span<const EndpointComposition::SemanticTag> ParallelPanelTag(uint8_t panelIndex)
 {

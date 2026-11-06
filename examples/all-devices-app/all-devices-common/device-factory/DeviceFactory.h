@@ -912,11 +912,13 @@ private:
         {
             RegisterCreator("solar-power", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedSolarPower>(SimulatedSolarPower::Context{
-                    .timerDelegate            = mContext->timerDelegate,
-                    .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
-                    .fabricTable              = mContext->fabricTable,
-                });
+                return MakeDevice<SimulatedSolarPower>(
+                    SimulatedSolarPower::Context{
+                        .timerDelegate            = mContext->timerDelegate,
+                        .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                        .fabricTable              = mContext->fabricTable,
+                    },
+                    SolarPower::Parameters{});
             });
             RegisterCreator("solar-power-four-panels", [this]() {
                 VerifyOrDie(mContext.has_value());

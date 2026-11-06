@@ -53,7 +53,7 @@ public:
     WiredPowerSource & GetGridPowerSource() { return mGridPowerSource; }
 
 protected:
-    SolarPower(const Context & context, Parameters parameters = {});
+    SolarPower(const Context & context, Parameters parameters);
 
     virtual CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
     {

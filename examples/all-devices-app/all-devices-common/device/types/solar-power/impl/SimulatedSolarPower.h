@@ -29,7 +29,7 @@ class SimulatedSolarPower : public SolarPower
 public:
     using Context = SolarPower::Context;
 
-    explicit SimulatedSolarPower(const Context & context, Parameters parameters = {});
+    explicit SimulatedSolarPower(const Context & context, Parameters parameters);
     ~SimulatedSolarPower() override = default;
 
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
