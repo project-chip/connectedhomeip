@@ -338,14 +338,13 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                      'generate_command_field_violations'):
             setattr(self.checker, name, MethodType(getattr(IDMBaseTest, name), self.checker))
 
-    def _info(self, target=0):
-        cluster = Clusters.ColorControl
-        command = cluster.Commands.MoveToHue
+    def _info(self, target=0, cluster=Clusters.ColorControl, command=None):
+        command = command or cluster.Commands.MoveToHue
         xml_cluster = self.xml_clusters[cluster.id]
         fields = xml_cluster.accepted_commands[command.command_id].fields
         return CommandFieldInfo(
             endpoint_id=1, cluster_id=cluster.id, cluster_name=xml_cluster.name,
-            command_id=command.command_id, command_name='MoveToHue', command_class=command,
+            command_id=command.command_id, command_name=command.__name__, command_class=command,
             cluster_class=cluster, field=fields[target], all_fields=dict(fields),
             enum_values_by_field={field_id: spec_enum_values(xml_cluster, field.type_info)
                                   for field_id, field in fields.items()})
@@ -384,6 +383,140 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                 self.assertLessEqual(encoded[sibling], info.all_fields[sibling].constraints.max_value)
                 self.assertIn(encoded[1], info.enum_values_by_field[1])
                 self.assertEqual((result.accepted, result.rejected, result.other_error, result.probed), (1, 0, 0, 1))
+
+    async def test_zero_step_baseline_cannot_credit_or_fail_the_dut(self):
+        commands = [(Clusters.LevelControl, Clusters.LevelControl.Commands.Step)]
+        commands.extend((Clusters.ColorControl, command) for command in (
+            Clusters.ColorControl.Commands.StepHue, Clusters.ColorControl.Commands.StepSaturation,
+            Clusters.ColorControl.Commands.EnhancedStepHue, Clusters.ColorControl.Commands.StepColorTemperature))
+        for cluster, command in commands:
+            for status in (Status.ConstraintError, Status.InvalidCommand, Status.Success):
+                with self.subTest(command=command.__name__, status=status):
+                    self.setUp()
+                    self.checker.default_controller.SendCommand.side_effect = (
+                        None if status == Status.Success else InteractionModelError(status))
+                    xml_cluster = self.xml_clusters[cluster.id]
+                    fields = xml_cluster.accepted_commands[command.command_id].fields
+                    info = replace(self._info(), cluster_id=cluster.id, cluster_class=cluster,
+                                   cluster_name=xml_cluster.name, command_id=command.command_id,
+                                   command_name=command.__name__, command_class=command,
+                                   field=fields[0], all_fields=fields,
+                                   enum_values_by_field={field_id: spec_enum_values(xml_cluster, field.type_info)
+                                                         for field_id, field in fields.items()})
+                    result = await IDMBaseTest.check_command_constraint(self.checker, info)
+                    self.checker.default_controller.SendCommand.assert_not_called()
+                    self.checker.record_accepted_violation.assert_not_called()
+                    self.assertEqual((result.attempted, result.probed, result.rejected,
+                                      result.accepted, result.other_error, result.execution_error), (0, 0, 0, 0, 0, 0))
+
+    async def test_disabled_color_loop_fields_have_no_enforcement_credit(self):
+        for target in (1, 2):
+            with self.subTest(target=target):
+                self.setUp()
+                info = self._info(target, command=Clusters.ColorControl.Commands.ColorLoopSet)
+                result = await IDMBaseTest.check_command_constraint(self.checker, info)
+                self.checker.default_controller.SendCommand.assert_not_called()
+                self.checker.record_accepted_violation.assert_not_called()
+                self.assertEqual((result.attempted, result.probed, result.rejected,
+                                  result.accepted, result.other_error, result.execution_error), (0, 0, 0, 0, 0, 0))
+                self.assertIn('UpdateFlags=0', self.checker.record_warning.call_args.kwargs['problem'])
+                self.assertIn('NOT DEMONSTRATED', self.checker.record_warning.call_args.kwargs['problem'])
+
+    async def test_root_certificate_excluded_before_generation_or_invocation(self):
+        cluster = Clusters.TlsCertificateManagement
+        command = cluster.Commands.ProvisionRootCertificate
+        fields = self.xml_clusters[cluster.id].accepted_commands[command.command_id].fields
+        certificate_id = next(field_id for field_id, field in fields.items() if field.name == 'Certificate')
+        self.checker.generate_command_field_violations = Mock(side_effect=AssertionError('unsafe certificate generated'))
+        self.checker._resolved_command_field_constraints = AsyncMock(side_effect=AssertionError('unsafe baseline read'))
+        self.checker.default_controller.SendCommand.side_effect = ChipStackError(0x0b)
+        result = await IDMBaseTest.check_command_constraint(self.checker, self._info(certificate_id, cluster, command))
+        self.checker.generate_command_field_violations.assert_not_called()
+        self.checker._resolved_command_field_constraints.assert_not_called()
+        self.checker.default_controller.SendCommand.assert_not_called()
+        self.checker.record_accepted_violation.assert_not_called()
+        self.assertEqual((result.attempted, result.probed, result.rejected,
+                          result.accepted, result.other_error, result.execution_error), (0, 0, 0, 0, 0, 0))
+        self.assertIn('credential', self.checker.record_warning.call_args.kwargs['problem'])
+
+    async def test_tc_idm_9_1_baseline_limitations_are_discovered_but_skip(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        for cluster, command in (
+                (Clusters.LevelControl, Clusters.LevelControl.Commands.Step),
+                (Clusters.ColorControl, Clusters.ColorControl.Commands.ColorLoopSet),
+                (Clusters.TlsCertificateManagement, Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificate)):
+            with self.subTest(command=command.__name__):
+                self.setUp()
+                self._prepare_tc_idm_9_1()
+                self.checker.endpoints_tlv[1] = {cluster.id: {
+                    GlobalAttributeIds.FEATURE_MAP_ID: 0xFFFFFFFF,
+                    GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: [command.command_id],
+                    GlobalAttributeIds.ATTRIBUTE_LIST_ID: []}}
+                self.assertTrue(self.checker.discover_constrained_command_fields())
+                with self.assertRaisesRegex(signals.TestSkip, 'No qualified constraint violation'):
+                    await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+                self.checker.default_controller.SendCommand.assert_not_called()
+                self.checker.record_accepted_violation.assert_not_called()
+                self.assertTrue(all('NOT DEMONSTRATED' in call.kwargs['problem']
+                                    for call in self.checker.record_warning.call_args_list))
+
+    async def test_unknown_move_modes_keep_zero_rate_and_strict_wrong_status_failure(self):
+        for command in (Clusters.ColorControl.Commands.MoveHue, Clusters.ColorControl.Commands.MoveSaturation,
+                        Clusters.ColorControl.Commands.EnhancedMoveHue, Clusters.ColorControl.Commands.MoveColorTemperature):
+            with self.subTest(command=command.__name__):
+                self.setUp()
+                self._prepare_tc_idm_9_1()
+                info = self._info(command=command)
+                self.checker.default_controller.SendCommand.side_effect = InteractionModelError(Status.InvalidCommand)
+                result = await IDMBaseTest.check_command_constraint(self.checker, info)
+                self.assertEqual((result.attempted, result.probed, result.rejected, result.other_error), (2, 2, 0, 2))
+                encoded = [TLVReader(call.kwargs['payload'].ToTLV()).get()['Any']
+                           for call in self.checker.default_controller.SendCommand.call_args_list]
+                self.assertEqual([payload[0] for payload in encoded], [2, 4])
+                self.assertTrue(all(payload[1] == 0 for payload in encoded))
+                with self.assertRaisesRegex(signals.TestFailure, 'CONSTRAINT_ERROR'):
+                    self.checker.enforce_constraint_policy('Command field', [], result.rejected, result.probed)
+
+    async def test_remaining_unknown_enums_are_qualified_and_wrong_status_fails(self):
+        for cluster, command, target in (
+                (Clusters.Thermostat, Clusters.Thermostat.Commands.SetpointRaiseLower, 0),
+                (Clusters.ColorControl, Clusters.ColorControl.Commands.MoveToHue, 1),
+                (Clusters.ColorControl, Clusters.ColorControl.Commands.EnhancedMoveToHue, 1)):
+            with self.subTest(command=command.__name__):
+                self.setUp()
+                self._prepare_tc_idm_9_1()
+                self.checker.default_controller.SendCommand.side_effect = InteractionModelError(Status.InvalidCommand)
+                info = self._info(target, cluster, command)
+                result = await IDMBaseTest.check_command_constraint(self.checker, info)
+                self.assertEqual((result.attempted, result.probed, result.rejected, result.other_error), (1, 1, 0, 1))
+                with self.assertRaisesRegex(signals.TestFailure, 'CONSTRAINT_ERROR'):
+                    self.checker.enforce_constraint_policy('Command field', [], result.rejected, result.probed)
+
+    async def test_tc_idm_9_1_qualified_unknown_enums_still_fail_wrong_status(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        commands = [(Clusters.Thermostat, Clusters.Thermostat.Commands.SetpointRaiseLower)]
+        commands.extend((Clusters.ColorControl, command) for command in (
+            Clusters.ColorControl.Commands.MoveHue, Clusters.ColorControl.Commands.MoveSaturation,
+            Clusters.ColorControl.Commands.EnhancedMoveHue, Clusters.ColorControl.Commands.MoveColorTemperature,
+            Clusters.ColorControl.Commands.MoveToHue, Clusters.ColorControl.Commands.EnhancedMoveToHue))
+        for cluster, command in commands:
+            for status in (Status.InvalidCommand, Status.ConstraintError):
+                with self.subTest(command=command.__name__, status=status):
+                    self.setUp()
+                    self._prepare_tc_idm_9_1()
+                    self.checker.endpoints_tlv[1] = {cluster.id: {
+                        GlobalAttributeIds.FEATURE_MAP_ID: 0xFFFFFFFF,
+                        GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: [command.command_id],
+                        GlobalAttributeIds.ATTRIBUTE_LIST_ID: []}}
+                    self.checker.default_controller.SendCommand.side_effect = InteractionModelError(status)
+                    if status == Status.InvalidCommand:
+                        with self.assertRaisesRegex(signals.TestFailure, 'CONSTRAINT_ERROR'):
+                            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+                    else:
+                        await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+                    self.assertGreater(self.checker.default_controller.SendCommand.await_count, 0)
 
     async def test_unusable_required_sibling_never_sends_or_claims_rejection(self):
         for datatype, constraints in (

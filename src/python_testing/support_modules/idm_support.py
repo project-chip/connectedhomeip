@@ -207,12 +207,8 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # kDown, and keeps driving CurrentLevel toward the minimum after the invoke has been
     # answered, leaving later tests looking at a device that is still moving.
     #
-    # Step is deliberately left in, and not for a weaker version of the same reason: it
-    # cannot run at all. StepSize declares no constraint, so no value is generated for it
-    # and it stays at the generated dataclass default of 0, and the spec requires a Step
-    # carrying StepSize 0 to be answered with INVALID_COMMAND before it has any effect.
-    # No conformant implementation reaches the direction logic, so there is no state to
-    # protect and the constraint coverage is worth keeping.
+    # Step remains discoverable, but its zero-StepSize baseline cannot isolate another
+    # field's constraint; COMMAND_CONSTRAINT_BASELINE_LIMITATIONS gives it zero credit.
     #
     # OnOff is not at risk from either: both SetOnOff call sites on these paths are
     # guarded by IsWithOnOffCommand, and MoveWithOnOff/StepWithOnOff carry no fields of
@@ -267,6 +263,24 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # remainder of the session.
     (Clusters.Groupcast.id, Clusters.Groupcast.Commands.JoinGroup.command_id),
 })
+
+COMMAND_CONSTRAINT_BASELINE_LIMITATIONS: dict[tuple[int, int], str] = {
+    **{(cluster.id, command.command_id):
+       "StepSize=0 independently requires INVALID_COMMAND; a nonzero step can actuate a DUT "
+       "that fails to validate the target field, so no safe, independently valid baseline is available"
+       for cluster, command in (
+           (Clusters.LevelControl, Clusters.LevelControl.Commands.Step),
+           (Clusters.ColorControl, Clusters.ColorControl.Commands.StepHue),
+           (Clusters.ColorControl, Clusters.ColorControl.Commands.StepSaturation),
+           (Clusters.ColorControl, Clusters.ColorControl.Commands.EnhancedStepHue),
+           (Clusters.ColorControl, Clusters.ColorControl.Commands.StepColorTemperature),
+    )},
+    (Clusters.ColorControl.id, Clusters.ColorControl.Commands.ColorLoopSet.command_id):
+        "UpdateFlags=0 leaves Action and Direction unprocessed; enabling their bits can start "
+        "or alter a persistent color loop, so no isolated, safely non-state-changing baseline is available",
+    (Clusters.TlsCertificateManagement.id, Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificate.command_id):
+        "TC-IDM-9.1 excludes unsafe credential flows; root-certificate provisioning is not eligible for automatic invocation",
+}
 
 # Individual (cluster_id, attribute_id) pairs to exclude from write constraint fuzzing.
 # Add entries here for writable attributes whose spec-mandated write behavior makes a
@@ -1513,10 +1527,10 @@ class IDMBaseTest(BasicCompositionTests):
 
         Only static constraints are considered; no value can be generated for fields
         whose bounds depend on unresolved attribute references, or whose types are out
-        of scope here (bitmap/struct/list). A None return for an unconstrained
-        field is harmless (its class default cannot violate anything), but for a
-        constrained field it means the default may itself be out of range, so callers
-        must not attribute a CONSTRAINT_ERROR to the field under test.
+        of scope here (bitmap/struct/list). An unbounded field keeps its class default;
+        cluster-specific baseline limitations are checked before invocation. For a
+        constrained field a None return means the default may itself be out of range,
+        so callers must not attribute a CONSTRAINT_ERROR to the field under test.
 
         An enum-typed field is always given a value rather than left at its default: the
         generated dataclass defaults an enum field to 0, which several enums do not
@@ -1566,8 +1580,17 @@ class IDMBaseTest(BasicCompositionTests):
         which applies enforces_constraints_strictly. A result with `attempted == 0` means the field
         could not be tested: no violation could be generated for it, or a constrained
         required sibling could not be given a valid value (which would make a
-        CONSTRAINT_ERROR ambiguous).
+        CONSTRAINT_ERROR ambiguous), or a safe, target-isolating baseline is unavailable.
         """
+        baseline_limitation = COMMAND_CONSTRAINT_BASELINE_LIMITATIONS.get((info.cluster_id, info.command_id))
+        if baseline_limitation is not None:
+            self.record_warning(
+                test_name=self.current_test_info.name,
+                location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                                             command_id=info.command_id),
+                problem=f"NOT DEMONSTRATED: {info.path_str}: {baseline_limitation}; zero enforcement credit")
+            return ConstraintProbeResult()
+
         target_label = self._command_field_label(info.command_class, info.field.value)
         if target_label is None:
             log.warning("Skipping %s: field id %s not present in generated command class",
