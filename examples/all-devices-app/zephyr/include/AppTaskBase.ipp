@@ -96,6 +96,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitCredentials()
 #else
     Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
     DeviceLayer::SetDeviceInstanceInfoProvider(&DeviceLayer::DeviceInstanceInfoProviderMgrImpl());
+    DeviceLayer::SetDeviceInfoProvider(&Self().mDeviceInfoProvider);
     return CHIP_NO_ERROR;
 #endif
 }
