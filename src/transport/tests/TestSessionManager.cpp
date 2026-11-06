@@ -1040,11 +1040,39 @@ TEST_F(TestSessionManager, HangNotificationWithHolderChanges)
     EXPECT_NE(static_cast<bool>(holderA), static_cast<bool>(holderB));
     EXPECT_TRUE(holderC);
 
+    // A holder that grabs the session during a nested walk is notified by neither walk.
+    holderA.Grab(session.Get().Value());
+    holderB.Grab(session.Get().Value());
+    HangRecordingDelegate delegateN;
+    SessionHolderWithDelegate holderN(delegateN);
+    bool nested = false;
+    for (auto * delegate : { &delegateA, &delegateB, &delegateC })
+    {
+        delegate->mHangCount = 0;
+        delegate->mOnHang    = [&] {
+            if (!nested)
+            {
+                nested = true;
+                session->NotifySessionHang();
+            }
+            else if (!holderN)
+            {
+                holderN.Grab(session.Get().Value());
+            }
+        };
+    }
+    session.Get().Value()->NotifySessionHang();
+
+    EXPECT_EQ(delegateA.mHangCount, 2);
+    EXPECT_EQ(delegateB.mHangCount, 2);
+    EXPECT_EQ(delegateC.mHangCount, 2);
+    EXPECT_EQ(delegateN.mHangCount, 0);
+    EXPECT_TRUE(holderN);
+
     // Evicting the session from a hang callback releases every holder, including the ones the hang
     // notification has not reached, and ends the hang notification. SessionHolder::operator-> takes no
     // reference, so only the holders keep the session alive.
-    holderA.Grab(session.Get().Value());
-    holderB.Grab(session.Get().Value());
+    holderN.Release();
     for (auto * delegate : { &delegateA, &delegateB, &delegateC })
     {
         delegate->mHangCount = 0;
