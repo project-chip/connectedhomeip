@@ -38,6 +38,7 @@
 #import "MTRTestControllerDelegate.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
+#import "MTRTestResponseValues.h"
 #import "MTRTestStorage.h"
 
 #import <math.h> // For INFINITY
@@ -92,6 +93,10 @@ static MTRBaseDevice * GetConnectedDevice(void)
     XCTAssertNotNil(mConnectedDevice);
     return mConnectedDevice;
 }
+
+@interface MTRDeviceController (DeviceTests)
+- (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
+@end
 
 @interface MTRDeviceTests : MTRTestCase
 
@@ -1583,7 +1588,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * bogusDeviceTypesWaitExpectation = [self expectationWithDescription:@"bogusDeviceTypes wait should time out"];
     __auto_type * waiter2 = [device waitForAttributeValues:bogusDeviceType timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNotNil(error);
-        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
         XCTAssertEqual(error.code, MTRErrorCodeTimeout);
         [bogusDeviceTypesWaitExpectation fulfill];
     }];
@@ -1625,7 +1630,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                                      queue:queue
                                                 completion:^(NSError * _Nullable error) {
                                                     XCTAssertNotNil(error);
-                                                    XCTAssertEqual(error.domain, MTRErrorDomain);
+                                                    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
                                                     XCTAssertEqual(error.code, MTRErrorCodeTimeout);
                                                     [nonexistentAttributeValueWaitExpectation fulfill];
                                                 }];
@@ -1708,7 +1713,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [onTimeAndBogusDeviceTypeValuesToWaitFor addEntriesFromDictionary:bogusDeviceType];
     __auto_type * waiter6 = [device waitForAttributeValues:onTimeAndBogusDeviceTypeValuesToWaitFor timeout:0.5 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNotNil(error);
-        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
         XCTAssertEqual(error.code, MTRErrorCodeTimeout);
         [waitingForOnTimeValue3Expectation fulfill];
     }];
@@ -1717,7 +1722,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * waitingForOnTimeValue4Expectation = [self expectationWithDescription:@"Waiter should have been canceled"];
     __auto_type * waiter7 = [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
         XCTAssertNotNil(error);
-        XCTAssertEqual(error.domain, MTRErrorDomain);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
         XCTAssertEqual(error.code, MTRErrorCodeCancelled);
         [waitingForOnTimeValue4Expectation fulfill];
     }];
@@ -1729,7 +1734,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         // To force the waiter created here to die quickly.
         [device waitForAttributeValues:onTimeValueToWaitFor timeout:200 queue:queue completion:^(NSError * _Nullable error) {
             XCTAssertNotNil(error);
-            XCTAssertEqual(error.domain, MTRErrorDomain);
+            XCTAssertEqualObjects(error.domain, MTRErrorDomain);
             XCTAssertEqual(error.code, MTRErrorCodeCancelled);
             [waitingForOnTimeValue5Expectation fulfill];
         }];
@@ -4322,39 +4327,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqual([device unitTestNonnullDelegateCount], 1);
 }
 
-- (NSDictionary<NSString *, id> *)_testAttributeResponseValueWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID value:(unsigned int)testValue
-{
-    return @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID],
-        MTRDataKey : @ {
-            MTRDataVersionKey : @(testValue),
-            MTRTypeKey : MTRUnsignedIntegerValueType,
-            MTRValueKey : @(testValue),
-        }
-    };
-}
-
-- (NSDictionary<NSString *, id> *)_testEventResponseValueWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
-{
-    // Pick a large event number, so that in practice these event reports will
-    // all have larger event numbers than anything that might have been observed
-    // before.
-    static uint64_t eventNumber = 0x100000000llu;
-    return @{
-        MTREventPathKey : [MTREventPath eventPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID],
-        MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
-        MTREventTimestampDateKey : [NSDate date],
-        MTREventIsHistoricalKey : @(NO),
-        MTREventPriorityKey : @(MTREventPriorityInfo),
-        MTREventNumberKey : @(eventNumber++),
-        // Empty payload.
-        MTRDataKey : @ {
-            MTRTypeKey : MTRStructureValueType,
-            MTRValueKey : @[],
-        },
-    };
-}
-
 - (void)test038_MTRDeviceMultipleDelegatesInterestedPaths
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -4504,7 +4476,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int endpointID = i;
                 int clusterID = i * 10 + j;
                 int eventID = i * 100 + j * 10 + k;
-                [eventReport addObject:[self _testEventResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) eventID:@(eventID)]];
+                [eventReport addObject:TestEventResponseValue(@(endpointID), @(clusterID), @(eventID))];
             }
         }
     }
@@ -4520,7 +4492,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int clusterID = i * 10 + j;
                 int attributeID = i * 100 + j * 10 + k;
                 int value = attributeID + 10000;
-                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+                [attributeReport addObject:TestAttributeResponseValue(@(endpointID), @(clusterID), @(attributeID), value)];
             }
         }
     }
@@ -4575,7 +4547,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int endpointID = i;
                 int clusterID = i * 10 + j;
                 int eventID = i * 100 + j * 10 + k;
-                [eventReport addObject:[self _testEventResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) eventID:@(eventID)]];
+                [eventReport addObject:TestEventResponseValue(@(endpointID), @(clusterID), @(eventID))];
             }
         }
     }
@@ -4590,7 +4562,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int clusterID = i * 10 + j;
                 int attributeID = i * 100 + j * 10 + k;
                 int value = attributeID + 20000;
-                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+                [attributeReport addObject:TestAttributeResponseValue(@(endpointID), @(clusterID), @(attributeID), value)];
             }
         }
     }
@@ -4647,7 +4619,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int clusterID = i * 10 + j;
                 int attributeID = i * 100 + j * 10 + k;
                 int value = attributeID + 10000;
-                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+                [attributeReport addObject:TestAttributeResponseValue(@(endpointID), @(clusterID), @(attributeID), value)];
             }
         }
     }
@@ -6634,6 +6606,93 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 
     delegate.onReachable = nil;
 }
+
+#ifdef DEBUG
+- (void)test047b_DeviceMayBeReachableDuringCASESetupCreatesOneSubscription
+{
+    // setDelegate: moves the device to Subscribing and starts CASE. Calling _deviceMayBeReachable at that point has to
+    // cancel the in-flight CASE setup before the subscription is re-issued, so that only one ReadClient is created.
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    __auto_type * testKeys = [[MTRTestKeys alloc] init];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
+    params.vendorID = @(kTestVendorId);
+
+    __block MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:nil];
+    XCTAssertNotNil(controller);
+    [self addTeardownBlock:^{
+        [controller shutdown];
+    }];
+
+    [self startCommissionedAppWithName:@"all-clusters"
+                             arguments:@[]
+                            controller:controller
+                               payload:kOnboardingPayload2
+                                nodeID:@(kDeviceId2)];
+
+    // Restart the controller so that it has no session to the node and setDelegate: has to establish CASE.
+    [controller shutdown];
+    controller = [factory createControllerOnExistingFabric:params error:nil];
+    XCTAssertNotNil(controller);
+    MTRDeviceController * restartedController = controller;
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    NSObject * countLock = [[NSObject alloc] init];
+    __block NSUInteger readClientCreatedCount = 0;
+    delegate.onReadClientCreated = ^{
+        @synchronized(countLock) {
+            readClientCreatedCount++;
+        }
+    };
+
+    // onInternalStateTransition is called synchronously on the Matter queue by each internal state change, with the
+    // state being entered, so it sees every transition in order no matter when the delegate queue runs.
+    //
+    // _setupSubscriptionWithReason enters Subscribing and then queues the CASE connect onto the Matter queue. The
+    // _deviceMayBeReachable call is queued here, during that transition, so it runs just before the connect, and the
+    // reset work it queues runs just after it. A CASE completion needs a reply from the node, which cannot have been
+    // queued before the connect ran, so the reset always finds the setup still in flight. The device lock is held
+    // here, and _deviceMayBeReachable takes it, so it cannot be called directly.
+    //
+    // The device goes back through Unsubscribed and Subscribing when the reset re-issues the subscription, so the
+    // flag makes sure _deviceMayBeReachable is called only once.
+    __block BOOL calledDeviceMayBeReachable = NO;
+    XCTestExpectation * deviceMayBeReachableQueued = [self expectationWithDescription:@"_deviceMayBeReachable queued while subscribing"];
+    XCTestExpectation * subscriptionEstablished = [self expectationWithDescription:@"Initial subscription established"];
+    __weak __auto_type weakDevice = device;
+    delegate.onInternalStateTransition = ^(NSUInteger state) {
+        if (state == MTRInternalDeviceStateSubscribing && !calledDeviceMayBeReachable) {
+            calledDeviceMayBeReachable = YES;
+            [restartedController asyncDispatchToMatterQueue:^{
+                [weakDevice _deviceMayBeReachable];
+            } errorHandler:nil];
+            [deviceMayBeReachableQueued fulfill];
+        } else if (state == MTRInternalDeviceStateInitialSubscriptionEstablished) {
+            [subscriptionEstablished fulfill];
+        }
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ deviceMayBeReachableQueued, subscriptionEstablished ] timeout:60 enforceOrder:YES];
+    // Both CASE completions, if there are two, are delivered in one Matter queue turn before the subscription can be
+    // established, and the ReadClient hook hops to the device queue. Draining that queue is therefore enough.
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+
+    delegate.onInternalStateTransition = nil;
+    delegate.onReadClientCreated = nil;
+
+    // If the in-flight setup was not cancelled, both CASE completions create a ReadClient.
+    @synchronized(countLock) {
+        XCTAssertEqual(readClientCreatedCount, 1u);
+    }
+}
+#endif // DEBUG
 
 - (void)test048_MTRDeviceResubscribeOnSubscriptionPool
 {
@@ -8644,30 +8703,6 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 }
 
 @end
-
-@interface MTRInterestedPathsTestClusterPath : MTRClusterPath
-@end
-@implementation MTRInterestedPathsTestClusterPath
-@end
-
-@interface MTRInterestedPathsTestAttributePath : MTRAttributePath
-@end
-@implementation MTRInterestedPathsTestAttributePath
-@end
-
-@interface MTRInterestedPathsTestEventPath : MTREventPath
-@end
-@implementation MTRInterestedPathsTestEventPath
-@end
-
-static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subclass)
-{
-    NSKeyedArchiver * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
-    [archiver setClassName:NSStringFromClass(subclass) forClass:[path class]];
-    [archiver encodeObject:path forKey:NSKeyedArchiveRootObjectKey];
-    [archiver finishEncoding];
-    return [NSKeyedUnarchiver unarchivedObjectOfClass:subclass fromData:archiver.encodedData error:nil];
-}
 
 @interface MTRInterestedPathsTestXPCServer : NSObject <NSXPCListenerDelegate>
 @property (nonatomic, readonly) NSXPCInterface * exportedInterface;

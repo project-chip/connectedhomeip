@@ -40,6 +40,8 @@
 
 #include "CHIPAttCert_test_vectors.h"
 
+#include <crypto/tests/DacValidationExplicitVectors.h>
+
 #include <sstream>
 
 using namespace chip;
@@ -1173,6 +1175,53 @@ TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
     revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
     revocationDelegateImpl.ClearDeviceAttestationRevocationData();
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl_SerialNumberHighBitSet)
+{
+    uint8_t attestationElementsTestVector[]  = { 0 };
+    uint8_t attestationChallengeTestVector[] = { 0 };
+    uint8_t attestationSignatureTestVector[] = { 0 };
+    uint8_t attestationNonceTestVector[]     = { 0 };
+
+    struct TestCase
+    {
+        ByteSpan dac;
+        const char * revokedSerialNumber;
+    };
+
+    // The DACs are issued by TestCerts::sTestCert_PAI_FFF1_8000_Cert. The revocation set entries use the
+    // DCL revocation-set format, where a serial number is the hex encoding of its value.
+    const TestCase testCases[] = {
+        { ByteSpan(kDacSerialHighBit8Bytes), "8EA1B2C3D4E5F607" },
+        { ByteSpan(kDacSerialHighBit20Bytes), "8EA1B2C3D4E5F60718293A4B5C6D7E8F90A1B2C3" },
+    };
+
+    for (const auto & testCase : testCases)
+    {
+        Credentials::DeviceAttestationVerifier::AttestationInfo info(
+            ByteSpan(attestationElementsTestVector), ByteSpan(attestationChallengeTestVector),
+            ByteSpan(attestationSignatureTestVector), TestCerts::sTestCert_PAI_FFF1_8000_Cert, testCase.dac,
+            ByteSpan(attestationNonceTestVector), static_cast<VendorId>(0xFFF1), 0x8000);
+
+        AttestationVerificationResult attestationResult = AttestationVerificationResult::kNotImplemented;
+        Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification>
+            attestationInformationVerificationCallback(OnAttestationInformationVerificationCallback, &attestationResult);
+
+        std::string jsonData = std::string(R"([{
+            "type": "revocation_set",
+            "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+            "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+            "crl_signer_cert": "MIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2MjgxNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7zeO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3CU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGhcX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETETi+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ==",
+            "revoked_serial_numbers": [")") +
+            testCase.revokedSerialNumber + R"("]
+        }])";
+
+        TestDACRevocationDelegateImpl revocationDelegateImpl;
+        EXPECT_SUCCESS(revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData));
+        revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+        EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacRevoked);
+    }
 }
 
 TEST(DeviceAttestationVerifier, GetAttestationResultDescriptionWorks)

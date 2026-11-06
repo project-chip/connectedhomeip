@@ -19,7 +19,10 @@
 #include <CommodityMeteringMain.h>
 #include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
 
+#include <algorithm>
+#include <array>
 #include <cstdint>
+#include <utility>
 
 using namespace chip;
 using namespace chip::app;

@@ -71,6 +71,11 @@ config CHIP_DATA_MODEL_CODEDRIVEN
 	  this when the application registers clusters and endpoints at run time
 	  instead of using the ZAP generated data model.
 
+config CHIP_ENABLE_GROUPCAST
+	bool "Enable groupcast support"
+	help
+	  Enables Groupcast and auxiliary access control support.
+
 if OPENTHREAD
 
 # See config/common/cmake/Kconfig for full definition
