@@ -62,6 +62,7 @@ exclude:
     - "third_party/nlfaultinjection/repo/**/*"
     - "third_party/nlio/repo/**/*"
     - "third_party/mbedtls/repo/**/*"
+    - "third_party/mbedtls/v3/repo/**/*"
     - "examples/common/QRCode/repo/**/*"
     - "examples/common/m5stack-tft/repo/**/*"
     - "third_party/pigweed/repo/**/*"
