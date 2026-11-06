@@ -36,6 +36,40 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${CAMERA_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --int-arg PIXIT.ACE.APPENDPOINT:1
+#       --int-arg PIXIT.ACE.APPDEVTYPEID:0x0142
+#       --string-arg PIXIT.ACE.APPCLUSTER:ZoneManagement
+#       --string-arg PIXIT.ACE.APPATTRIBUTE:MaxZones
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#     tags: [nightly]
+#   run3:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --int-arg PIXIT.ACE.APPENDPOINT:1
+#       --int-arg PIXIT.ACE.APPDEVTYPEID:0x000A
+#       --string-arg PIXIT.ACE.APPCLUSTER:DoorLock
+#       --string-arg PIXIT.ACE.APPATTRIBUTE:LockState
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#     tags: [nightly]
 # === END CI TEST ARGUMENTS ===
 
 import sys
