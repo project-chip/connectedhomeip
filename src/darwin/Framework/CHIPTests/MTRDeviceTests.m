@@ -38,6 +38,7 @@
 #import "MTRTestControllerDelegate.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
+#import "MTRTestResponseValues.h"
 #import "MTRTestStorage.h"
 
 #import <math.h> // For INFINITY
@@ -4326,39 +4327,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqual([device unitTestNonnullDelegateCount], 1);
 }
 
-- (NSDictionary<NSString *, id> *)_testAttributeResponseValueWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID value:(unsigned int)testValue
-{
-    return @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID],
-        MTRDataKey : @ {
-            MTRDataVersionKey : @(testValue),
-            MTRTypeKey : MTRUnsignedIntegerValueType,
-            MTRValueKey : @(testValue),
-        }
-    };
-}
-
-- (NSDictionary<NSString *, id> *)_testEventResponseValueWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
-{
-    // Pick a large event number, so that in practice these event reports will
-    // all have larger event numbers than anything that might have been observed
-    // before.
-    static uint64_t eventNumber = 0x100000000llu;
-    return @{
-        MTREventPathKey : [MTREventPath eventPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID],
-        MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
-        MTREventTimestampDateKey : [NSDate date],
-        MTREventIsHistoricalKey : @(NO),
-        MTREventPriorityKey : @(MTREventPriorityInfo),
-        MTREventNumberKey : @(eventNumber++),
-        // Empty payload.
-        MTRDataKey : @ {
-            MTRTypeKey : MTRStructureValueType,
-            MTRValueKey : @[],
-        },
-    };
-}
-
 - (void)test038_MTRDeviceMultipleDelegatesInterestedPaths
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -4508,7 +4476,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int endpointID = i;
                 int clusterID = i * 10 + j;
                 int eventID = i * 100 + j * 10 + k;
-                [eventReport addObject:[self _testEventResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) eventID:@(eventID)]];
+                [eventReport addObject:TestEventResponseValue(@(endpointID), @(clusterID), @(eventID))];
             }
         }
     }
@@ -4524,7 +4492,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int clusterID = i * 10 + j;
                 int attributeID = i * 100 + j * 10 + k;
                 int value = attributeID + 10000;
-                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+                [attributeReport addObject:TestAttributeResponseValue(@(endpointID), @(clusterID), @(attributeID), value)];
             }
         }
     }
@@ -4579,7 +4547,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int endpointID = i;
                 int clusterID = i * 10 + j;
                 int eventID = i * 100 + j * 10 + k;
-                [eventReport addObject:[self _testEventResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) eventID:@(eventID)]];
+                [eventReport addObject:TestEventResponseValue(@(endpointID), @(clusterID), @(eventID))];
             }
         }
     }
@@ -4594,7 +4562,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int clusterID = i * 10 + j;
                 int attributeID = i * 100 + j * 10 + k;
                 int value = attributeID + 20000;
-                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+                [attributeReport addObject:TestAttributeResponseValue(@(endpointID), @(clusterID), @(attributeID), value)];
             }
         }
     }
@@ -4651,7 +4619,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int clusterID = i * 10 + j;
                 int attributeID = i * 100 + j * 10 + k;
                 int value = attributeID + 10000;
-                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+                [attributeReport addObject:TestAttributeResponseValue(@(endpointID), @(clusterID), @(attributeID), value)];
             }
         }
     }
@@ -8735,30 +8703,6 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 }
 
 @end
-
-@interface MTRInterestedPathsTestClusterPath : MTRClusterPath
-@end
-@implementation MTRInterestedPathsTestClusterPath
-@end
-
-@interface MTRInterestedPathsTestAttributePath : MTRAttributePath
-@end
-@implementation MTRInterestedPathsTestAttributePath
-@end
-
-@interface MTRInterestedPathsTestEventPath : MTREventPath
-@end
-@implementation MTRInterestedPathsTestEventPath
-@end
-
-static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subclass)
-{
-    NSKeyedArchiver * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
-    [archiver setClassName:NSStringFromClass(subclass) forClass:[path class]];
-    [archiver encodeObject:path forKey:NSKeyedArchiveRootObjectKey];
-    [archiver finishEncoding];
-    return [NSKeyedUnarchiver unarchivedObjectOfClass:subclass fromData:archiver.encodedData error:nil];
-}
 
 @interface MTRInterestedPathsTestXPCServer : NSObject <NSXPCListenerDelegate>
 @property (nonatomic, readonly) NSXPCInterface * exportedInterface;

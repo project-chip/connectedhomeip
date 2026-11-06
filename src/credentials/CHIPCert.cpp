@@ -663,9 +663,7 @@ CHIP_ERROR ChipDN::GetCertType(CertType & certType) const
         {
             VerifyOrReturnError(CanCastTo<CASEAuthTag>(rdn[i].mChipVal), CHIP_ERROR_WRONG_CERT_DN);
             CASEAuthTag cat = static_cast<CASEAuthTag>(rdn[i].mChipVal);
-            // Validate CAT has version > 0 and identifier is valid (including reserved 0xFFFF/0xFFFE)
             VerifyOrReturnError(IsValidCASEAuthTag(cat), CHIP_ERROR_WRONG_CERT_DN);
-            VerifyOrReturnError(IsValidCATIdentifier(GetCASEAuthTagIdentifier(cat)), CHIP_ERROR_WRONG_CERT_DN);
             catsPresent = true;
         }
     }
@@ -835,9 +833,7 @@ CHIP_ERROR ChipDN::DecodeFromTLV(TLVReader & reader)
             ReturnErrorOnFailure(reader.Get(chipAttr));
             if (attrOID == chip::ASN1::kOID_AttributeType_MatterCASEAuthTag)
             {
-                // Validate CAT has version > 0 and identifier is valid (including reserved 0xFFFF/0xFFFE)
                 VerifyOrReturnError(IsValidCASEAuthTag(chipAttr), CHIP_ERROR_INVALID_ARGUMENT);
-                VerifyOrReturnError(IsValidCATIdentifier(GetCASEAuthTagIdentifier(chipAttr)), CHIP_ERROR_INVALID_ARGUMENT);
             }
             ReturnErrorOnFailure(AddAttribute(attrOID, chipAttr));
         }
@@ -993,9 +989,7 @@ CHIP_ERROR ChipDN::DecodeFromASN1(ASN1Reader & reader)
                                                                            reader.GetValueLen(), chipAttr) == sizeof(CASEAuthTag),
                                             ASN1_ERROR_INVALID_ENCODING);
 
-                        // Validate CAT has version > 0 and identifier is valid (including reserved 0xFFFF/0xFFFE)
                         VerifyOrReturnError(IsValidCASEAuthTag(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
-                        VerifyOrReturnError(IsValidCATIdentifier(GetCASEAuthTagIdentifier(chipAttr)), CHIP_ERROR_WRONG_CERT_DN);
 
                         ReturnErrorOnFailure(AddAttribute(attrOID, chipAttr));
                     }
