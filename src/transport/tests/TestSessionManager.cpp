@@ -1023,33 +1023,36 @@ TEST_F(TestSessionManager, HangNotificationWithHolderChanges)
     SessionHolderWithDelegate holderB(session.Get().Value(), delegateB);
     SessionHolderWithDelegate holderC(session.Get().Value(), delegateC);
 
-    // A releases B before the notification reaches it, then grabs the session again, which must not
-    // notify A a second time.
+    // Whichever of A and B is notified first releases the other, then grabs the session again, which must
+    // not notify it a second time.
     delegateA.mOnHang = [&] {
         holderB.Release();
         holderA.Grab(session.Get().Value());
     };
+    delegateB.mOnHang = [&] {
+        holderA.Release();
+        holderB.Grab(session.Get().Value());
+    };
     session.Get().Value()->NotifySessionHang();
 
-    EXPECT_EQ(delegateA.mHangCount, 1);
-    EXPECT_EQ(delegateB.mHangCount, 0);
+    EXPECT_EQ(delegateA.mHangCount + delegateB.mHangCount, 1);
     EXPECT_EQ(delegateC.mHangCount, 1);
-    EXPECT_TRUE(holderA);
-    EXPECT_FALSE(holderB);
+    EXPECT_NE(static_cast<bool>(holderA), static_cast<bool>(holderB));
     EXPECT_TRUE(holderC);
 
     // Evicting the session from a hang callback releases every holder, including the ones the hang
     // notification has not reached, and ends the hang notification. SessionHolder::operator-> takes no
     // reference, so only the holders keep the session alive.
+    holderA.Grab(session.Get().Value());
     holderB.Grab(session.Get().Value());
-    delegateA.mHangCount = 0;
-    delegateC.mHangCount = 0;
-    delegateA.mOnHang    = [&] { holderA->AsSecureSession()->MarkForEviction(); };
+    for (auto * delegate : { &delegateA, &delegateB, &delegateC })
+    {
+        delegate->mHangCount = 0;
+        delegate->mOnHang    = [&] { session->AsSecureSession()->MarkForEviction(); };
+    }
     holderC->NotifySessionHang();
 
-    EXPECT_EQ(delegateA.mHangCount, 1);
-    EXPECT_EQ(delegateB.mHangCount, 0);
-    EXPECT_EQ(delegateC.mHangCount, 0);
+    EXPECT_EQ(delegateA.mHangCount + delegateB.mHangCount + delegateC.mHangCount, 1);
     EXPECT_EQ(delegateA.mReleasedCount, 1);
     EXPECT_EQ(delegateB.mReleasedCount, 1);
     EXPECT_EQ(delegateC.mReleasedCount, 1);

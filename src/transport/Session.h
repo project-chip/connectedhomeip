@@ -222,7 +222,7 @@ public:
     {
         assertChipStackLockedByCurrentThread();
         VerifyOrDie(!holder.IsInList());
-        mHolders.PushBack(&holder);
+        mHolders.PushFront(&holder); // In front of any ForEachHolder cursor, so running walks don't visit it.
     }
 
     void RemoveHolder(SessionHolder & holder)
@@ -346,7 +346,7 @@ protected:
     /**
      * Calls `visitor` for each holder that holds this session when the call starts, unless that holder is released
      * before the walk reaches it. The visitor may release or grab any holder; holders that grab this session during
-     * the walk are not visited.
+     * the walk are not visited. The order of the visits is unspecified.
      */
     void ForEachHolder(HolderVisitor visitor, void * context = nullptr);
 
@@ -357,7 +357,7 @@ protected:
     const OutgoingGroupSession * AsConstOutgoingGroupSession() const;
 
 private:
-    // Each running ForEachHolder adds a marker to mHolders. Markers are the only elements that hold no session.
+    // Each running ForEachHolder adds a cursor to mHolders. Cursors are the only elements that hold no session.
     IntrusiveList<SessionHolder> mHolders;
 
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
