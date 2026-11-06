@@ -115,7 +115,7 @@ public:
     size_t mListedCount               = 0;
 
     Inet::InterfaceId mLastAddressInterface;
-    Inet::IPAddressType mLastAddressType = Inet::IPAddressType::kAny;
+    Inet::IPAddressType mLastAddressType = Inet::IPAddressType::kUnknown;
 };
 
 class AcceptAll : public InterfacePredicate
@@ -275,12 +275,13 @@ TEST_F(TestAddressPolicyFiltered, AddressLookupIsDelegatedUnchanged)
 
     // Endpoints only reach this call after passing the predicate, so the
     // filter must not second-guess the addresses of an accepted endpoint.
-    auto addresses = policy.GetIpAddressesForEndpoint(interfaceId, Inet::IPAddressType::kIPv4);
+    // kAny rather than kIPv4, which IPv6-only builds do not define.
+    auto addresses = policy.GetIpAddressesForEndpoint(interfaceId, Inet::IPAddressType::kAny);
 
     EXPECT_TRUE(addresses);
     EXPECT_EQ(underlying.mAddressCalls, 1u);
     EXPECT_TRUE(underlying.mLastAddressInterface == interfaceId);
-    EXPECT_EQ(underlying.mLastAddressType, Inet::IPAddressType::kIPv4);
+    EXPECT_EQ(underlying.mLastAddressType, Inet::IPAddressType::kAny);
 }
 
 } // namespace
