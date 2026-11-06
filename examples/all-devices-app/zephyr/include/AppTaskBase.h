@@ -26,8 +26,8 @@
 #include <device/api/Interface.h>
 #include <device/types/root-node/RootNode.h>
 #include <lib/core/CHIPError.h>
-#include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>
 #include <platform/DefaultTimerDelegate.h>
+#include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
