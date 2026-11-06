@@ -1232,7 +1232,7 @@ TEST_F(TestSessionManager, SessionActivatedAfterDefunct)
     sessionManager.Shutdown();
 }
 
-TEST_F(TestSessionManager, SessionActivatedWhenAHolderReleasesTheNextHolder)
+TEST_F(TestSessionManager, SessionActivatedWhenAHolderReleasesAnotherHolder)
 {
     IPAddress addr;
     IPAddress::FromString("::1", addr);
@@ -1259,38 +1259,63 @@ TEST_F(TestSessionManager, SessionActivatedWhenAHolderReleasesTheNextHolder)
               sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
                                                           CryptoContext::SessionRole::kInitiator));
 
-    class CountingDelegate : public SessionDelegate
+    // The first holder to be notified releases a holder that has not been notified yet. That holder is not notified; the
+    // remaining one is. The test does not depend on the order in which holders are notified.
+    struct Activations
+    {
+        SessionHolderWithDelegate * holders[3] = {};
+        int counts[3]                          = {};
+        int released                           = -1;
+    } activations;
+
+    class ReleasingDelegate : public SessionDelegate
     {
     public:
+        ReleasingDelegate(Activations & activations, int index) : mActivations(activations), mIndex(index) {}
         void OnSessionReleased() override {}
         void OnSessionActivated() override
         {
-            ++mActivatedCount;
-            if (mHolderToRelease != nullptr)
+            ++mActivations.counts[mIndex];
+            // From the highest index down: with holders notified newest first, that is the holder the walk reaches next.
+            for (int i = 2; i >= 0 && mActivations.released < 0; --i)
             {
-                mHolderToRelease->Release();
+                if (i != mIndex && mActivations.counts[i] == 0)
+                {
+                    mActivations.holders[i]->Release();
+                    mActivations.released = i;
+                }
             }
         }
-        SessionHolderWithDelegate * mHolderToRelease = nullptr;
-        int mActivatedCount                          = 0;
-    } first, second, third;
+        Activations & mActivations;
+        int mIndex;
+    } first(activations, 0), second(activations, 1), third(activations, 2);
 
-    // Holders are notified in the order they were added: first, second, third. The first one's
-    // callback releases the second, which the notification loop has not reached yet.
     SessionHolderWithDelegate firstHolder(aliceToBobSession.Get().Value(), first);
     SessionHolderWithDelegate secondHolder(aliceToBobSession.Get().Value(), second);
     SessionHolderWithDelegate thirdHolder(aliceToBobSession.Get().Value(), third);
-    first.mHolderToRelease = &secondHolder;
+    activations.holders[0] = &firstHolder;
+    activations.holders[1] = &secondHolder;
+    activations.holders[2] = &thirdHolder;
 
     SecureSession * session = aliceToBobSession->AsSecureSession();
     session->MarkAsDefunct();
     session->MarkActiveRx();
     EXPECT_TRUE(session->IsActiveSession());
 
-    EXPECT_EQ(first.mActivatedCount, 1);
-    EXPECT_FALSE(secondHolder);
-    EXPECT_EQ(second.mActivatedCount, 0);
-    EXPECT_EQ(third.mActivatedCount, 1);
+    ASSERT_GE(activations.released, 0);
+    for (int i = 0; i < 3; ++i)
+    {
+        if (i == activations.released)
+        {
+            EXPECT_EQ(activations.counts[i], 0);
+            EXPECT_FALSE(*activations.holders[i]);
+        }
+        else
+        {
+            EXPECT_EQ(activations.counts[i], 1);
+            EXPECT_TRUE(*activations.holders[i]);
+        }
+    }
 
     sessionManager.Shutdown();
 }
@@ -1439,7 +1464,7 @@ TEST_F(TestSessionManager, SessionActivatedWhenHoldersGrabTheSessionAgainNotifie
     sessionManager.Shutdown();
 }
 
-TEST_F(TestSessionManager, SessionActivatedWhenTheLastHolderIsReleasedStopsAtTheHolderBeforeIt)
+TEST_F(TestSessionManager, SessionActivatedWhenTheRemainingHoldersAreReleasedAndANewHolderIsAdded)
 {
     IPAddress addr;
     IPAddress::FromString("::1", addr);
@@ -1466,50 +1491,67 @@ TEST_F(TestSessionManager, SessionActivatedWhenTheLastHolderIsReleasedStopsAtThe
               sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
                                                           CryptoContext::SessionRole::kInitiator));
 
-    class CountingDelegate : public SessionDelegate
+    // The first holder to be notified releases every holder that has not been notified yet and adds a new holder. The
+    // walk ends with nothing left to notify, and the new holder is not notified for this activation. The test does not
+    // depend on the order in which holders are notified.
+    struct Activations
+    {
+        SessionHolderWithDelegate * holders[3] = {};
+        int counts[3]                          = {};
+        int lateCount                          = 0;
+        SessionHolderWithDelegate * late       = nullptr;
+        const SessionHolder * session          = nullptr;
+    } activations;
+
+    class ReleasingDelegate : public SessionDelegate
     {
     public:
+        ReleasingDelegate(Activations & activations, int index) : mActivations(activations), mIndex(index) {}
         void OnSessionReleased() override {}
         void OnSessionActivated() override
         {
-            ++mActivatedCount;
-            if (mHolderToRelease != nullptr)
+            if (mIndex < 0)
             {
-                mHolderToRelease->Release();
+                ++mActivations.lateCount;
+                return;
             }
-            if (mHolderToGrab != nullptr)
+            ++mActivations.counts[mIndex];
+            VerifyOrReturn(!*mActivations.late);
+            for (int i = 0; i < 3; ++i)
             {
-                mHolderToGrab->Grab(mSession->Get().Value());
-                mHolderToGrab = nullptr;
+                if (i != mIndex && mActivations.counts[i] == 0)
+                {
+                    mActivations.holders[i]->Release();
+                }
             }
+            mActivations.late->Grab(mActivations.session->Get().Value());
         }
-        SessionHolderWithDelegate * mHolderToRelease = nullptr;
-        SessionHolderWithDelegate * mHolderToGrab    = nullptr;
-        const SessionHolder * mSession               = nullptr;
-        int mActivatedCount                          = 0;
-    } first, second, third, late;
+        Activations & mActivations;
+        int mIndex;
+    } first(activations, 0), second(activations, 1), third(activations, 2), late(activations, -1);
 
-    // first releases third, the last holder, before the loop reaches it, and adds a new holder at the end; second is then
-    // the last holder to notify, and the new holder is not notified for this activation.
     SessionHolderWithDelegate firstHolder(aliceToBobSession.Get().Value(), first);
     SessionHolderWithDelegate secondHolder(aliceToBobSession.Get().Value(), second);
     SessionHolderWithDelegate thirdHolder(aliceToBobSession.Get().Value(), third);
     SessionHolderWithDelegate lateHolder(late);
-    first.mHolderToRelease = &thirdHolder;
-    first.mHolderToGrab    = &lateHolder;
-    first.mSession         = &aliceToBobSession;
+    activations.holders[0] = &firstHolder;
+    activations.holders[1] = &secondHolder;
+    activations.holders[2] = &thirdHolder;
+    activations.late       = &lateHolder;
+    activations.session    = &aliceToBobSession;
 
     SecureSession * session = aliceToBobSession->AsSecureSession();
     session->MarkAsDefunct();
     session->MarkActiveRx();
     EXPECT_TRUE(session->IsActiveSession());
 
-    EXPECT_EQ(first.mActivatedCount, 1);
-    EXPECT_EQ(second.mActivatedCount, 1);
-    EXPECT_EQ(third.mActivatedCount, 0);
-    EXPECT_FALSE(thirdHolder);
+    EXPECT_EQ(activations.counts[0] + activations.counts[1] + activations.counts[2], 1);
+    for (int i = 0; i < 3; ++i)
+    {
+        EXPECT_EQ(static_cast<bool>(*activations.holders[i]), activations.counts[i] == 1);
+    }
     EXPECT_TRUE(lateHolder);
-    EXPECT_EQ(late.mActivatedCount, 0);
+    EXPECT_EQ(activations.lateCount, 0);
 
     sessionManager.Shutdown();
 }
