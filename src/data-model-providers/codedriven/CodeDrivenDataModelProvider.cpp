@@ -294,10 +294,10 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
         }
     }
 
+    auto parentId = registration.endpointEntry.parentId;
+
     NotifyEndpointChanged(registration.endpointEntry.id, DataModel::EndpointChangeType::kAdded);
-    ConcreteAttributePath partsListAttributePath{ registration.endpointEntry.parentId, Clusters::Descriptor::Id,
-                                                  Clusters::Descriptor::Attributes::PartsList::Id };
-    NotifyAttributeChanged(partsListAttributePath, DataModel::AttributeChangeType::kReportable);
+    NotifyChangedDescriptorPartsListOfAncestors(parentId);
 
     return CHIP_NO_ERROR;
 }
@@ -336,21 +336,13 @@ CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId, Cl
         }
     }
 
-    EndpointId parentEndpointId = kInvalidEndpointId;
-    for (auto & registration : mEndpointInterfaceRegistry)
-    {
-        if (registration.GetEndpointEntry().id == endpointId)
-        {
-            parentEndpointId = registration.GetEndpointEntry().parentId;
-        }
-    }
+    auto * registration = GetEndpointInterfaceRegistration(endpointId);
+    EndpointId parentId = registration ? registration->GetEndpointEntry().parentId : kInvalidEndpointId;
 
     ReturnErrorOnFailure(mEndpointInterfaceRegistry.Unregister(endpointId));
 
     NotifyEndpointChanged(endpointId, DataModel::EndpointChangeType::kRemoved);
-    ConcreteAttributePath partsListAttributePath{ parentEndpointId, Clusters::Descriptor::Id,
-                                                  Clusters::Descriptor::Attributes::PartsList::Id };
-    NotifyAttributeChanged(partsListAttributePath, DataModel::AttributeChangeType::kReportable);
+    NotifyChangedDescriptorPartsListOfAncestors(parentId);
 
     return CHIP_NO_ERROR;
 }
@@ -403,5 +395,49 @@ ServerClusterInterface * CodeDrivenDataModelProvider::GetServerClusterInterface(
     return mServerClusterRegistry.Get(clusterPath);
 }
 
+EndpointInterfaceRegistration * CodeDrivenDataModelProvider::GetEndpointInterfaceRegistration(EndpointId endpointId)
+{
+    for (auto & registration : mEndpointInterfaceRegistry)
+    {
+        if (registration.GetEndpointEntry().id == endpointId)
+        {
+            return &registration;
+        }
+    }
+    return nullptr;
+}
+
+void CodeDrivenDataModelProvider::NotifyChangedDescriptorPartsListOfAncestors(EndpointId endpointId)
+{
+    if (endpointId == kInvalidEndpointId)
+    {
+        endpointId = kRootEndpointId;
+    }
+
+    NotifyAttributeChanged({ endpointId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id },
+                           DataModel::AttributeChangeType::kReportable);
+
+    auto * registration = GetEndpointInterfaceRegistration(endpointId);
+    VerifyOrReturn(registration != nullptr);
+
+    do
+    {
+        // Go up the endpoint hierarchy.
+        endpointId = registration->GetEndpointEntry().parentId;
+        if (endpointId == kInvalidEndpointId)
+        {
+            endpointId = kRootEndpointId;
+        }
+
+        registration = GetEndpointInterfaceRegistration(endpointId);
+        VerifyOrReturn(registration != nullptr);
+        if (registration->GetEndpointEntry().compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily || endpointId == kRootEndpointId)
+        {
+            // If full family type ancestor, notify attribute change. Root endpoint is full-family even if its pattern is not set to it.
+            NotifyAttributeChanged({ endpointId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id },
+                                   DataModel::AttributeChangeType::kReportable);
+        }
+    } while (endpointId != kRootEndpointId);
+}
 } // namespace app
 } // namespace chip
