@@ -28,6 +28,17 @@ static _Atomic uint64_t sFreedSharedPathEntries;
 @implementation MTRTestAttributePathSubclass
 @end
 
+// Reports MTRAttributePath from -class, as a subclass may.
+@interface MTRTestClassSpoofingAttributePath : MTRAttributePath
+@end
+
+@implementation MTRTestClassSpoofingAttributePath
+- (Class)class
+{
+    return [MTRAttributePath class];
+}
+@end
+
 @interface MTRClusterPath (TestSharing)
 + (__kindof MTRClusterPath *)_sharedPathForPath:(MTRClusterPath *)path;
 @end
@@ -327,6 +338,76 @@ static void MTRTestWarmUpChurn(NSUInteger calls, NSUInteger * nextAttribute)
     XCTAssertEqual(subclassEntries, 0u);
     XCTAssertIdentical(returned, subclassPath);
     (void) plainPath;
+}
+
+// Builds a spoofing path with -initWithCoder: alone, so decoding's -awakeAfterUsingCoder: never swaps it for a shared path.
+- (MTRTestClassSpoofingAttributePath *)_classSpoofingPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID
+{
+    NSKeyedArchiver * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
+    @autoreleasepool {
+        [[MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID] encodeWithCoder:archiver];
+    }
+    [archiver finishEncoding];
+    NSKeyedUnarchiver * unarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:archiver.encodedData error:nil];
+    MTRTestClassSpoofingAttributePath * path = [[MTRTestClassSpoofingAttributePath alloc] initWithCoder:unarchiver];
+    [unarchiver finishDecoding];
+    return path;
+}
+
+- (void)test029t_PathSubclassOverridingClassIsCachedAndCleanedUp
+{
+    // The cache identifies shared classes with -class, so a subclass that reports MTRAttributePath from -class is
+    // treated as one: it shares with equal plain paths, and its entry goes away with it.
+    Class entryClass = NSClassFromString(@"MTRSharedPathEntry");
+    XCTAssertNotNil(entryClass);
+    if (entryClass == Nil) {
+        return;
+    }
+
+    // An equal plain path is live: the subclass instance is answered with that plain path.
+    MTRAttributePath * plain = [MTRAttributePath attributePathWithEndpointID:@(5) clusterID:@(0xFFF1FC10) attributeID:@(0)];
+    MTRTestClassSpoofingAttributePath * spoofing = [self _classSpoofingPathWithEndpointID:@(5) clusterID:@(0xFFF1FC10) attributeID:@(0)];
+    XCTAssertEqual(object_getClass(spoofing), MTRTestClassSpoofingAttributePath.class);
+    XCTAssertIdentical([MTRClusterPath _sharedPathForPath:spoofing], plain);
+
+    // Decoding such a subclass while an equal plain path is live also gives back the plain path.
+    NSKeyedArchiver * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
+    [archiver setClassName:NSStringFromClass(MTRTestClassSpoofingAttributePath.class) forClass:MTRAttributePath.class];
+    [archiver encodeObject:plain forKey:NSKeyedArchiveRootObjectKey];
+    NSKeyedUnarchiver * unarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:archiver.encodedData error:nil];
+    unarchiver.requiresSecureCoding = NO;
+    XCTAssertIdentical([unarchiver decodeObjectForKey:NSKeyedArchiveRootObjectKey], plain);
+
+    // No equal path is live: the subclass instance becomes the shared entry, and the factory returns it.
+    MTRTestClassSpoofingAttributePath * cached = [self _classSpoofingPathWithEndpointID:@(5) clusterID:@(0xFFF1FC11) attributeID:@(0)];
+    XCTAssertIdentical([MTRClusterPath _sharedPathForPath:cached], cached);
+    XCTAssertIdentical([MTRAttributePath attributePathWithEndpointID:@(5) clusterID:@(0xFFF1FC11) attributeID:@(0)], cached);
+
+    // Releasing that subclass instance frees its entry. Build it and check it in its own pool first, so neither the plain
+    // path its helper creates nor the assertion's autoreleased references are still alive when counting starts.
+    MTRTestClassSpoofingAttributePath * entryOwner;
+    @autoreleasepool {
+        entryOwner = [self _classSpoofingPathWithEndpointID:@(5) clusterID:@(0xFFF1FC12) attributeID:@(0)];
+        XCTAssertIdentical([MTRClusterPath _sharedPathForPath:entryOwner], entryOwner);
+    }
+    SEL deallocSelector = sel_registerName("dealloc");
+    Method deallocMethod = class_getInstanceMethod(entryClass, deallocSelector);
+    IMP previousDealloc = method_getImplementation(deallocMethod);
+    IMP countingDealloc = imp_implementationWithBlock(^(__unsafe_unretained id entry) {
+        atomic_fetch_add(&sFreedSharedPathEntries, 1);
+        ((void (*)(__unsafe_unretained id, SEL)) previousDealloc)(entry, deallocSelector);
+    });
+    if (!class_addMethod(entryClass, deallocSelector, countingDealloc, method_getTypeEncoding(deallocMethod))) {
+        method_setImplementation(deallocMethod, countingDealloc);
+    }
+    atomic_store(&sFreedSharedPathEntries, 0);
+    @autoreleasepool {
+        entryOwner = nil;
+    }
+    uint64_t freed = atomic_load(&sFreedSharedPathEntries);
+    method_setImplementation(class_getInstanceMethod(entryClass, deallocSelector), previousDealloc);
+    imp_removeBlock(countingDealloc);
+    XCTAssertEqual(freed, 1u);
 }
 
 - (void)test029b_SharedPathsAcrossThreads
