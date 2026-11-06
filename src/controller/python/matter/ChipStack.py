@@ -167,6 +167,9 @@ class ChipStack:
         # Initialize the chip stack.
         # mdnsInterfaces restricts minimal mDNS to the named network interfaces.
         mdnsInterfaceNames = [name.encode() for name in (mdnsInterfaces or [])]
+        # Native code would stop at an embedded NUL and match a shorter name.
+        if any(b"\0" in name for name in mdnsInterfaceNames):
+            raise ValueError("mdnsInterfaces must not contain NUL characters")
         res = self._ChipStackLib.pychip_DeviceController_StackInit(
             self._persistentStorage.GetSdkStorageObject(), enableServerInteractions,
             (c_char_p * len(mdnsInterfaceNames))(*mdnsInterfaceNames), len(mdnsInterfaceNames))

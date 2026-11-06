@@ -17,6 +17,7 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <inet/InetInterface.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy_FilteredImpl.h>
 #include <lib/support/CHIPMem.h>
@@ -51,6 +52,29 @@ private:
     size_t mRemaining;
 };
 
+/// Yields the given interfaces in order, all as IPv6.
+class ListedListenIterator : public ListenIterator
+{
+public:
+    ListedListenIterator(const Inet::InterfaceId * ids, size_t count) : mIds(ids), mCount(count) {}
+
+    bool Next(Inet::InterfaceId * id, Inet::IPAddressType * type) override
+    {
+        if (mIndex == mCount)
+        {
+            return false;
+        }
+        *id   = mIds[mIndex++];
+        *type = Inet::IPAddressType::kIPv6;
+        return true;
+    }
+
+private:
+    const Inet::InterfaceId * mIds;
+    size_t mCount;
+    size_t mIndex = 0;
+};
+
 class EmptyAddressIterator : public IpAddressIterator
 {
 public:
@@ -67,12 +91,18 @@ public:
         {
             return Platform::UniquePtr<ListenIterator>();
         }
+        if (mListedCount > 0)
+        {
+            return Platform::UniquePtr<ListenIterator>(Platform::New<ListedListenIterator>(mListed, mListedCount));
+        }
         return Platform::UniquePtr<ListenIterator>(Platform::New<FakeListenIterator>(mYieldCount));
     }
 
-    Platform::UniquePtr<IpAddressIterator> GetIpAddressesForEndpoint(Inet::InterfaceId, Inet::IPAddressType) override
+    Platform::UniquePtr<IpAddressIterator> GetIpAddressesForEndpoint(Inet::InterfaceId id, Inet::IPAddressType type) override
     {
         mAddressCalls++;
+        mLastAddressInterface = id;
+        mLastAddressType      = type;
         return Platform::UniquePtr<IpAddressIterator>(Platform::New<EmptyAddressIterator>());
     }
 
@@ -80,6 +110,12 @@ public:
     size_t mAddressCalls     = 0;
     size_t mYieldCount       = 0;
     bool mReturnNullIterator = false;
+
+    const Inet::InterfaceId * mListed = nullptr;
+    size_t mListedCount               = 0;
+
+    Inet::InterfaceId mLastAddressInterface;
+    Inet::IPAddressType mLastAddressType = Inet::IPAddressType::kAny;
 };
 
 class AcceptAll : public InterfacePredicate
@@ -164,6 +200,43 @@ TEST_F(TestAddressPolicyFiltered, NullInterfacesAreAlwaysKept)
     EXPECT_EQ(CountEndpoints(policy), 3u);
 }
 
+TEST_F(TestAddressPolicyFiltered, OnlyAllowedNamedInterfacesArePassed)
+{
+    // The filter resolves names through the operating system, so this needs
+    // two real interfaces rather than made-up ids.
+    Inet::InterfaceId ids[2];
+    char names[2][Inet::InterfaceId::kMaxIfNameLength];
+    size_t found = 0;
+    for (Inet::InterfaceIterator it; it.HasCurrent() && found < 2; it.Next())
+    {
+        if (it.GetInterfaceName(names[found], sizeof(names[found])) == CHIP_NO_ERROR)
+        {
+            ids[found++] = it.GetInterfaceId();
+        }
+    }
+    if (found < 2)
+    {
+        GTEST_SKIP() << "Needs two network interfaces";
+    }
+
+    FakePolicy underlying;
+    underlying.mListed      = ids;
+    underlying.mListedCount = 2;
+
+    const char * const kNames[] = { names[1] };
+    InterfaceNameAllowList allowList{ Span<const char * const>(kNames) };
+    FilteredAddressPolicy policy(underlying, allowList);
+
+    auto it = policy.GetListenEndpoints();
+    ASSERT_TRUE(it);
+
+    Inet::InterfaceId id;
+    Inet::IPAddressType type;
+    ASSERT_TRUE(it->Next(&id, &type));
+    EXPECT_TRUE(id == ids[1]);
+    EXPECT_FALSE(it->Next(&id, &type));
+}
+
 TEST_F(TestAddressPolicyFiltered, PassesThroughWhenUnderlyingHasNoEndpoints)
 {
     FakePolicy underlying;
@@ -193,12 +266,21 @@ TEST_F(TestAddressPolicyFiltered, AddressLookupIsDelegatedUnchanged)
     RejectAll rejectAll;
     FilteredAddressPolicy policy(underlying, rejectAll);
 
+    Inet::InterfaceIterator interfaces;
+    if (!interfaces.HasCurrent())
+    {
+        GTEST_SKIP() << "Needs a network interface";
+    }
+    Inet::InterfaceId interfaceId = interfaces.GetInterfaceId();
+
     // Endpoints only reach this call after passing the predicate, so the
     // filter must not second-guess the addresses of an accepted endpoint.
-    auto addresses = policy.GetIpAddressesForEndpoint(Inet::InterfaceId::Null(), Inet::IPAddressType::kIPv6);
+    auto addresses = policy.GetIpAddressesForEndpoint(interfaceId, Inet::IPAddressType::kIPv4);
 
     EXPECT_TRUE(addresses);
     EXPECT_EQ(underlying.mAddressCalls, 1u);
+    EXPECT_TRUE(underlying.mLastAddressInterface == interfaceId);
+    EXPECT_EQ(underlying.mLastAddressType, Inet::IPAddressType::kIPv4);
 }
 
 } // namespace

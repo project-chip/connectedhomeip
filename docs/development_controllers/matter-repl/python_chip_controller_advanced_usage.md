@@ -93,12 +93,12 @@ stack = ChipStack(persistentStorage, mdnsInterfaces=["vlan3020"])
 ```
 
 -   Names must match exactly; there is no wildcard matching.
+-   At most eight names can be given.
 -   IPv4 endpoints bound to all interfaces are not affected.
 -   Loopback interfaces stay excluded, as without the filter.
--   If none of the names is present and usable, an error is logged and discovery
-    has no interface to work with.
--   The filter is installed once per process. A later `ChipStack` after a
-    shutdown keeps the original list.
+-   If none of the names is present and usable, an error is logged. Only IPv4
+    endpoints bound to all interfaces remain, if the platform policy provides
+    them.
 -   Builds with platform mDNS (`chip_mdns="platform"`) reject a non-empty list
     with `CHIP_ERROR_NOT_IMPLEMENTED`.
 

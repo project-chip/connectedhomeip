@@ -656,6 +656,18 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
 {
     VerifyOrDie(storageAdapter != nullptr);
 
+    if (mdnsInterfaceCount > 0)
+    {
+#if PYCHIP_USE_MINMDNS
+        // Before any provider is initialized, so a rejected list leaves nothing
+        // behind, and before factory init, which starts the mDNS server.
+        PyReturnErrorOnFailure(ToPyChipError(InstallMdnsInterfaceFilter(mdnsInterfaces, mdnsInterfaceCount)));
+#else
+        ChipLogError(Discovery, "Restricting mDNS interfaces requires minimal mDNS");
+        return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
+#endif
+    }
+
     FactoryInitParams factoryParams;
 
     factoryParams.fabricIndependentStorage = storageAdapter;
@@ -680,17 +692,6 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     // null pointer dereferences.
     static chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
     chip::DeviceLayer::SetCommissionableDataProvider(&TestOnlyCommissionableDataProvider);
-
-    if (mdnsInterfaceCount > 0)
-    {
-#if PYCHIP_USE_MINMDNS
-        // Must precede factory init, which starts the mDNS server listening.
-        PyReturnErrorOnFailure(ToPyChipError(InstallMdnsInterfaceFilter(mdnsInterfaces, mdnsInterfaceCount)));
-#else
-        ChipLogError(Discovery, "Restricting mDNS interfaces requires minimal mDNS");
-        return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
-#endif
-    }
 
     PyReturnErrorOnFailure(ToPyChipError(DeviceControllerFactory::GetInstance().Init(factoryParams)));
 
