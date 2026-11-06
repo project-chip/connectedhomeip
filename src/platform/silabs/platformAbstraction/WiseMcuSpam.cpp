@@ -30,6 +30,12 @@
 
 #endif // SILABS_LOG_ENABLED
 
+<<<<<<< HEAD
+=======
+#define ICACHE_DISABLE
+#define DEBUG_DISABLE
+
+>>>>>>> b186d2d ([Silabs] Remove all PLL Frequency modification in matter layer (#75057))
 // TODO add includes ?
 extern "C" {
 #include "em_core.h"
@@ -84,9 +90,23 @@ namespace {
 uint8_t sButtonStates[SL_SI91x_BUTTON_COUNT] = { 0 };
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
+<<<<<<< HEAD
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 bool btn0_pressed = false;
 #endif /* SL_ICD_ENABLED */
+=======
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && (SL_MATTER_GN_BUILD == 0)
+
+// Keep awake duration in milliseconds
+static constexpr uint32_t kSiWxKeepAwakeDurationMs = 10000;
+
+// CMSIS-RTOS2 one-shot timer: each BTN0 press (re)starts the full kSiWxKeepAwakeDurationMs window.
+static osTimerId_t sSiWxKeepAwakeOsTimer = nullptr;
+static bool sSiWxKeepAwakePs4Active      = false;
+
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && (SL_MATTER_GN_BUILD == 0)
+
+>>>>>>> b186d2d ([Silabs] Remove all PLL Frequency modification in matter layer (#75057))
 } // namespace
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
@@ -94,6 +114,7 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
+<<<<<<< HEAD
     // TODO: Setting the highest priority for SVCall_IRQn to avoid the HardFault issue
     NVIC_SetPriority(SVCall_IRQn, CORE_INTERRUPT_HIGHEST_PRIORITY);
 
@@ -101,6 +122,8 @@ CHIP_ERROR SilabsPlatform::Init(void)
     // Configuration the clock rate
     soc_pll_config();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+=======
+>>>>>>> b186d2d ([Silabs] Remove all PLL Frequency modification in matter layer (#75057))
 
 #if SILABS_LOG_ENABLED
     silabsInitLog();
