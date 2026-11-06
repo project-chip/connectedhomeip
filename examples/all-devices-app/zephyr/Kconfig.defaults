@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 
+
 DT_CHOSEN_IEEE802154 := zephyr,ieee802154
 
 if CHIP
@@ -42,11 +43,9 @@ config CHIP_PERSISTENT_SUBSCRIPTIONS
 
 config CHIP_OTA_REQUESTOR
 	default n
-	imply STREAM_FLASH
-	imply STREAM_FLASH_ERASE
 
 config IMG_MANAGER
-	default y if CHIP_OTA_REQUESTOR
+	default y if CHIP_OTA_BACKEND_MCUBOOT
 
 config STREAM_FLASH
 	default n
@@ -55,7 +54,11 @@ config STREAM_FLASH_ERASE
 	default n
 
 config BOOTLOADER_MCUBOOT
-	default y if CHIP_OTA_REQUESTOR
+	default y if CHIP_OTA_BACKEND_MCUBOOT
+
+config CHIP_OTA_BACKEND_MCUBOOT
+	imply STREAM_FLASH
+	imply STREAM_FLASH_ERASE
 
 config BT
 	default y
@@ -88,22 +91,10 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
 config THREAD_LOCAL_STORAGE
 	default y
 
-config MAIN_STACK_SIZE
-	default 12288
-
 config CHIP_TASK_STACK_SIZE
 	default 10240
 
-config HW_STACK_PROTECTION
-	default y
-
-config ASSERT
-	default y
-
 if NET_L2_OPENTHREAD
-
-config NET_IF_MCAST_IPV6_ADDR_COUNT
-	default 14
 
 config OPENTHREAD_THREAD_STACK_SIZE
 	default 6144
@@ -121,9 +112,6 @@ choice CHIP_CRYPTO
 	default CHIP_CRYPTO_PSA
 endchoice
 
-config MBEDTLS_HEAP_SIZE
-	default 8192
-
 # CHIPCryptoPALPSA.cpp uses mbedtls_md_info_from_type() for SPAKE2+.
 config MBEDTLS_MD_C
 	default y if CHIP_CRYPTO_SPAKE2P_MBEDTLS
@@ -136,14 +124,10 @@ config CHIP_FACTORY_DATA
 	bool "Use provisioned factory data for credentials and commissionable data"
 	default n
 
-config SHELL
-	default y
-
 config CHIP_LIB_SHELL
 	default y
 
 config CHIP_WIFI
-	default y if WIFI
 	imply NET_STATISTICS
 	imply NET_IPV6_ND
 	imply NET_IPV6_NBR_CACHE
@@ -174,25 +158,7 @@ config KERNEL_SHELL
 config SHELL_WILDCARD
 	default n
 
-config SENSOR_SHELL
-    default n
-
-config DEVICE_SHELL
-    default n
-
-config DATE_SHELL
-    default n
-
-config DEVMEM_SHELL
-    default n
-
-config MCUBOOT_SHELL
-    default n
-
 config CLOCK_CONTROL_NRF_SHELL
-    default n
-
-config FLASH_SHELL
     default n
 
 config HWINFO_SHELL
