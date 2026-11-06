@@ -64,13 +64,20 @@ AGGREGATES = {
 
 
 def load_durations(timing_files: tuple[Path, ...], aggregate: str) -> dict[str, float]:
-    """Return test script name -> aggregated duration in seconds."""
+    """Return test script name -> aggregated duration in seconds.
+
+    A script called once per run reports "<script>::<run>" results; their durations in one job add up to the script's.
+    """
     samples: dict[str, list[float]] = {}
     for path in timing_files:
         for run in json.loads(path.read_text())["runs"]:
             for job in run["jobs"]:
+                job_seconds: dict[str, float] = {}
                 for t in job["tests"]:
-                    samples.setdefault(t["name"], []).append(t["duration_seconds"])
+                    script = t["name"].split("::")[0]
+                    job_seconds[script] = job_seconds.get(script, 0.0) + t["duration_seconds"]
+                for script, seconds in job_seconds.items():
+                    samples.setdefault(script, []).append(seconds)
     return {name: AGGREGATES[aggregate](values) for name, values in samples.items()}
 
 
