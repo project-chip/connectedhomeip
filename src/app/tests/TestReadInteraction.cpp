@@ -611,6 +611,7 @@ public:
     void TestSubscribeWildcard();
     void TestSubscriptionReportWithDefunctSession();
     void TestSubscriptionResubscribesAfterSessionHang();
+    void TestSubscriptionHangUsesTimeoutWithDefaultResubscribePolicy();
     void TestSubscriptionIgnoresHangOnOtherSessionToSamePeer();
     void TestSubscriptionWithoutResubscribeFailsOnSessionHang();
     void TestSubscriptionCloseCancelsPendingHangHandling();
@@ -6056,6 +6057,20 @@ public:
     int mNumResubscriptionsNeeded = 0;
 };
 
+class DefaultPolicyResubscribeDelegate : public MockInteractionModelApp
+{
+public:
+    CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
+    {
+        mNumResubscriptionsNeeded++;
+        mLastTerminationCause = aTerminationCause;
+        return apReadClient->DefaultResubscribePolicy(aTerminationCause);
+    }
+
+    int mNumResubscriptionsNeeded    = 0;
+    CHIP_ERROR mLastTerminationCause = CHIP_NO_ERROR;
+};
+
 void DrainHangHandling()
 {
     for (int i = 0; i < 5; i++)
@@ -6115,6 +6130,38 @@ void TestReadInteraction::TestSubscriptionResubscribesAfterSessionHang()
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscriptionHangUsesTimeoutWithDefaultResubscribePolicy)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscriptionHangUsesTimeoutWithDefaultResubscribePolicy)
+void TestReadInteraction::TestSubscriptionHangUsesTimeoutWithDefaultResubscribePolicy()
+{
+    DefaultPolicyResubscribeDelegate delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    PrepareHangTestSubscription(readPrepareParams, new AttributePathParams[1]);
+
+    {
+        app::ReadClient readClient(engine, &GetExchangeManager(), delegate, chip::app::ReadClient::InteractionType::Subscribe);
+        EXPECT_EQ(readClient.SendAutoResubscribeRequest(std::move(readPrepareParams)), CHIP_NO_ERROR);
+        DrainAndServiceIO();
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+
+        // The publisher loses the subscription (as on a restart) without telling the subscriber.
+        engine->ShutdownAllSubscriptionHandlers();
+
+        GetSessionBobToAlice()->NotifySessionHang();
+        DrainHangHandling();
+
+        // The hang reaches the default policy as a liveness timeout.
+        EXPECT_EQ(delegate.mNumResubscriptionsNeeded, 1);
+        EXPECT_EQ(delegate.mLastTerminationCause, CHIP_ERROR_TIMEOUT);
+    }
+    engine->Shutdown();
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscriptionIgnoresHangOnOtherSessionToSamePeer)
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscriptionIgnoresHangOnOtherSessionToSamePeer)
 void TestReadInteraction::TestSubscriptionIgnoresHangOnOtherSessionToSamePeer()
@@ -6141,11 +6188,12 @@ void TestReadInteraction::TestSubscriptionIgnoresHangOnOtherSessionToSamePeer()
         DrainAndServiceIO();
         EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
 
-        // A hang on the subscription's own session triggers a resubscribe.
+        // A hang on the subscription's own session triggers a resubscribe that replaces its handler.
         GetSessionBobToAlice()->NotifySessionHang();
         DrainHangHandling();
         EXPECT_EQ(delegate.mNumResubscriptionsNeeded, 1);
         EXPECT_EQ(delegate.mNumSubscriptionsEstablished, 2);
+        EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
 
         // A hang on another session to the same peer does not.
         engine->ShutdownAllSubscriptionHandlers();
