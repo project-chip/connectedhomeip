@@ -2676,6 +2676,26 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return attr_ret
 
+    async def read_single_attribute_assert_expected(
+            self,
+            endpoint: int,
+            attribute: ClusterObjects.ClusterAttributeDescriptor,
+            assert_func: Callable[..., Any],
+            *assert_args: Any) -> None:
+        """Reads a single attribute and asserts it meets the expectations.
+
+        Args:
+            endpoint: Endpoint on which to read the attribute.
+            attribute: Instantiated attribute descriptor object holding the expected value.
+            assert_func: Assert callable. Called with the read attribute value as the first arg,
+                `attribute.value` as the second arg, and any remaining args unpacked from `*assert_args`.
+            assert_args: Remaining args passed to the assert callable.
+        """
+        val = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=get_cluster_from_attribute(attribute), attribute=type(attribute)
+        )
+        assert_func(val, attribute.value, *assert_args)  # type: ignore[attr-defined]
+
     async def verify_attribute_subscription_value(
             self,
             attribute: type[ClusterObjects.ClusterAttributeDescriptor],
