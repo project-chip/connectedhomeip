@@ -2676,6 +2676,26 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return attr_ret
 
+    async def read_single_attribute_assert_expected(
+            self,
+            endpoint: int,
+            attribute: type[ClusterObjects.ClusterAttributeDescriptor],
+            assert_func: Callable[..., Any],
+            *assert_expectations: Any) -> None:
+        """Reads a single attribute and asserts it meets the expectations.
+
+        Args:
+            endpoint: Endpoint on which to read the attribute.
+            attribute: Full attribute object.
+            assert_func: Assert callable. Called with the first arg passed is attr value read. And the remaining args are unpacked
+                from *assert_expectations.
+            assert_expectations: Remaining args passed to the assert callable.
+        """
+        val = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=get_cluster_from_attribute(attribute), attribute=attribute
+        )
+        assert_func(val, *assert_expectations)
+
     async def verify_attribute_subscription_value(
             self,
             attribute: type[ClusterObjects.ClusterAttributeDescriptor],
@@ -2836,6 +2856,23 @@ class MatterBaseTest(base_test.BaseTestClass):
             attribute.__name__, endpoint_id, read_value,
         )
         return True
+
+    async def read_single_attribute_assert_expected(
+            self,
+            endpoint: int,
+            attribute: type[ClusterObjects.ClusterAttributeDescriptor],
+            assert_func: Callable,
+            *assert_expectations) -> None:
+        """Reads a single attribute and asserts it meets with the expectatins.
+
+        Args:
+            endpoint: Endponit on which to read the attribute.
+            attribute: Full attribute object.
+            assert_func: Assert callable.
+            assert_expectations: Remaining args passed to the assert callable. The first arg passed is attr value read.
+        """
+        val = await self.read_single_attribute_check_success(endpoint, get_cluster_from_attribute(attribute), attribute)
+        assert_func(val, *assert_expectations)
 
     @staticmethod
     def _fabric_filtered_match(read_value: Any, cached_value: Any) -> bool:
