@@ -59,6 +59,9 @@ class CHIPFaultId(IntEnum):
     CASESigma2WrongPeerNodeId = 39
     CASECorruptSigma2ResumeMIC = 40
     CASESigma3WrongFabricId = 41
+    CASESigma2DecryptNoMemory = 42
+    CASESigma3DecryptNoMemory = 43
+    CASEResumeMICDecryptNoMemory = 44
 
 # END-IF-CHANGE-ALSO-CHANGE(/src/lib/support/CHIPFaultInjection.h)
 # IMPORTANT: CHIPFaultId enum above must be kept in sync with the 'Id' enum in src/lib/support/CHIPFaultInjection.h
