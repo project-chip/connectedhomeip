@@ -674,7 +674,7 @@ void ExchangeContext::AbortAllOtherCommunicationOnFabric()
 void ExchangeContext::ExchangeSessionHolder::GrabExpiredSession(const SessionHandle & session)
 {
     VerifyOrDieWithObject(session->AsSecureSession()->IsPendingEviction(), this);
-    GrabUnchecked(session);
+    VerifyOrDieWithObject(GrabUnchecked(session), this);
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
