@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <errno.h>
+#include <functional>
 
 #include <pw_unit_test/framework.h>
 
@@ -972,6 +973,90 @@ TEST_F(TestSessionManager, SessionShiftingTest)
     EXPECT_EQ(bobToAliceSession->AsSecureSession(), session2);
     EXPECT_EQ(aliceToBobSession->AsSecureSession(), session3);
     EXPECT_EQ(newAliceToBobSession->AsSecureSession(), session3);
+
+    sessionManager.Shutdown();
+}
+
+class HangRecordingDelegate : public SessionDelegate
+{
+public:
+    void OnSessionReleased() override { mReleasedCount++; }
+    void OnSessionHang() override
+    {
+        mHangCount++;
+        if (mOnHang)
+        {
+            mOnHang();
+        }
+    }
+
+    std::function<void()> mOnHang;
+    int mHangCount     = 0;
+    int mReleasedCount = 0;
+};
+
+TEST_F(TestSessionManager, HangNotificationWithHolderChanges)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    SessionHolder session;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectCaseSessionWithTestKey(session, 1, 2, 0x11223344ull, 0x12344321ull, 1, peer,
+                                                          CryptoContext::SessionRole::kInitiator));
+
+    HangRecordingDelegate delegateA, delegateB, delegateC;
+    SessionHolderWithDelegate holderA(session.Get().Value(), delegateA);
+    SessionHolderWithDelegate holderB(session.Get().Value(), delegateB);
+    SessionHolderWithDelegate holderC(session.Get().Value(), delegateC);
+
+    // A releases B before the notification reaches it, then grabs the session again, which must not
+    // notify A a second time.
+    delegateA.mOnHang = [&] {
+        holderB.Release();
+        holderA.Grab(session.Get().Value());
+    };
+    session.Get().Value()->NotifySessionHang();
+
+    EXPECT_EQ(delegateA.mHangCount, 1);
+    EXPECT_EQ(delegateB.mHangCount, 0);
+    EXPECT_EQ(delegateC.mHangCount, 1);
+    EXPECT_TRUE(holderA);
+    EXPECT_FALSE(holderB);
+    EXPECT_TRUE(holderC);
+
+    // Evicting the session from a hang callback releases every holder, including the ones the hang
+    // notification has not reached, and ends the hang notification. SessionHolder::operator-> takes no
+    // reference, so only the holders keep the session alive.
+    holderB.Grab(session.Get().Value());
+    delegateA.mHangCount = 0;
+    delegateC.mHangCount = 0;
+    delegateA.mOnHang    = [&] { holderA->AsSecureSession()->MarkForEviction(); };
+    holderC->NotifySessionHang();
+
+    EXPECT_EQ(delegateA.mHangCount, 1);
+    EXPECT_EQ(delegateB.mHangCount, 0);
+    EXPECT_EQ(delegateC.mHangCount, 0);
+    EXPECT_EQ(delegateA.mReleasedCount, 1);
+    EXPECT_EQ(delegateB.mReleasedCount, 1);
+    EXPECT_EQ(delegateC.mReleasedCount, 1);
+    EXPECT_FALSE(session);
+    EXPECT_FALSE(holderA);
+    EXPECT_FALSE(holderB);
+    EXPECT_FALSE(holderC);
 
     sessionManager.Shutdown();
 }

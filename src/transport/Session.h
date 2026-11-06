@@ -322,14 +322,8 @@ public:
 
     void NotifySessionHang()
     {
-        // Holders might remove themselves when notified.
-        auto holder = mHolders.begin();
-        while (holder != mHolders.end())
-        {
-            auto cur = holder;
-            ++holder;
-            cur->OnSessionHang();
-        }
+        SessionHandle session(*this); // A holder may evict this session; keep it alive until the walk is done.
+        ForEachHolder([](SessionHolder & holder, void *) { holder.OnSessionHang(); });
     }
 
     // Return a session id that is usable for logging. This is the local session
@@ -343,11 +337,18 @@ protected:
     void NotifySessionReleased()
     {
         SessionHandle session(*this);
-        while (!mHolders.Empty())
-        {
-            mHolders.begin()->SessionReleased(); // SessionReleased must remove the item from the linked list
-        }
+        // SessionReleased must release the holder.
+        ForEachHolder([](SessionHolder & holder, void *) { holder.SessionReleased(); });
     }
+
+    using HolderVisitor = void (*)(SessionHolder & holder, void * context);
+
+    /**
+     * Calls `visitor` for each holder that holds this session when the call starts, unless that holder is released
+     * before the walk reaches it. The visitor may release or grab any holder; holders that grab this session during
+     * the walk are not visited.
+     */
+    void ForEachHolder(HolderVisitor visitor, void * context = nullptr);
 
     void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
 
@@ -355,9 +356,10 @@ protected:
     const IncomingGroupSession * AsConstIncomingGroupSession() const;
     const OutgoingGroupSession * AsConstOutgoingGroupSession() const;
 
+private:
+    // Each running ForEachHolder adds a marker to mHolders. Markers are the only elements that hold no session.
     IntrusiveList<SessionHolder> mHolders;
 
-private:
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // The underlying TCP connection object over which the session is
