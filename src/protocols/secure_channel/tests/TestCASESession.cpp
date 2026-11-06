@@ -1022,6 +1022,42 @@ TEST_F(TestCASESession, FaultInjectedSigma2DecryptCorruptionSurfacesCaseSpecific
     EXPECT_EQ(delegateResponder.mNumInvalidParamResponse, 1u);
 }
 
+TEST_F(TestCASESession, FaultInjectedSigma2DecryptPassesNonAuthenticationErrorThrough)
+{
+    // An AES-CCM failure that isn't an authentication failure keeps its own code instead of becoming
+    // CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE.
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASESigma2DecryptNoMemory, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateInitiator.mNumSigmaDecryptFailure, 0u);
+    EXPECT_EQ(delegateInitiator.mLastError, CHIP_ERROR_NO_MEMORY);
+}
+
 TEST_F(TestCASESession, FaultInjectedSigma2WrongFabricIdSurfacesCaseSpecificCode)
 {
     TemporarySessionManager sessionManager(*this);
@@ -1194,6 +1230,42 @@ TEST_F(TestCASESession, FaultInjectedSigma3DecryptCorruptionSurfacesCaseSpecific
     EXPECT_EQ(delegateResponder.mNumSigmaDecryptFailure, 1u);
     EXPECT_EQ(delegateResponder.mLastError, CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE);
     EXPECT_EQ(delegateInitiator.mNumInvalidParamResponse, 1u);
+}
+
+TEST_F(TestCASESession, FaultInjectedSigma3DecryptPassesNonAuthenticationErrorThrough)
+{
+    // An AES-CCM failure that isn't an authentication failure keeps its own code instead of becoming
+    // CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE.
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASESigma3DecryptNoMemory, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumSigmaDecryptFailure, 0u);
+    EXPECT_EQ(delegateResponder.mLastError, CHIP_ERROR_NO_MEMORY);
 }
 
 #endif // CHIP_WITH_NLFAULTINJECTION
@@ -2521,6 +2593,59 @@ TEST_F(TestCASESession, FaultInjectedSigma2ResumeMICCorruptionSurfacesCaseSpecif
     EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
     EXPECT_EQ(delegateCommissioner.mNumResumeMicMismatch, 1u);
     EXPECT_EQ(delegateCommissioner.mLastError, CHIP_ERROR_CASE_RESUME_MIC_MISMATCH);
+    EXPECT_EQ(responderStorage.mSaveCount, 0u);
+
+    chip::Platform::Delete(pairingCommissioner);
+    gPairingServer.Shutdown();
+}
+
+TEST_F(TestCASESession, FaultInjectedResumeMICDecryptPassesNonAuthenticationErrorThrough)
+{
+    // An AES-CCM failure in the Sigma2Resume MIC check that isn't an authentication failure keeps its own code
+    // instead of becoming CHIP_ERROR_CASE_RESUME_MIC_MISMATCH.
+    TestCASESecurePairingDelegate delegateCommissioner;
+
+    chip::SessionResumptionStorage::ResumptionIdStorage resumptionId;
+    chip::Crypto::P256ECDHDerivedSecret sharedSecret;
+
+    const FabricInfo * fabricInfo = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
+    ASSERT_NE(fabricInfo, nullptr);
+    ScopedNodeId initiator = fabricInfo->GetScopedNodeIdForNode(Node01_02);
+    ScopedNodeId responder = fabricInfo->GetScopedNodeIdForNode(Node01_01);
+
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()), CHIP_NO_ERROR);
+
+    SessionResumptionTestStorage initiatorStorage(CHIP_NO_ERROR, responder, &resumptionId, &sharedSecret);
+    SessionResumptionTestStorage responderStorage(CHIP_NO_ERROR, initiator, &resumptionId, &sharedSecret);
+
+    // The responder checks the initiator's resume MIC first; skip that check so the fault hits the initiator's
+    // check of the Sigma2Resume MIC.
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASEResumeMICDecryptNoMemory, 1, 1),
+              kFaultInjectionSuccessCode);
+
+    auto * pairingCommissioner = chip::Platform::New<CASESession>();
+    pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           &responderStorage, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner);
+    EXPECT_EQ(pairingCommissioner->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                    ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                    &initiatorStorage, nullptr, &delegateCommissioner,
+                                                    Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumResumeMicMismatch, 0u);
+    EXPECT_EQ(delegateCommissioner.mLastError, CHIP_ERROR_NO_MEMORY);
     EXPECT_EQ(responderStorage.mSaveCount, 0u);
 
     chip::Platform::Delete(pairingCommissioner);

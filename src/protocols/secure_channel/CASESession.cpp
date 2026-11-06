@@ -1534,6 +1534,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
             AES_CCM_decrypt(parsedSigma2.msgR2EncryptedPayload.data(), parsedSigma2.msgR2EncryptedPayload.size(), nullptr, 0,
                             parsedSigma2.msgR2MIC.data(), parsedSigma2.msgR2MIC.size(), sr2k.KeyHandle(), kTBEData2_Nonce,
                             kTBEDataNonceLength, parsedSigma2.msgR2EncryptedPayload.data());
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASESigma2DecryptNoMemory, aesErr = CHIP_ERROR_NO_MEMORY);
         if (aesErr != CHIP_NO_ERROR)
         {
             ChipLogError(SecureChannel, "Sigma2 AES-CCM decrypt failed: %" CHIP_ERROR_FORMAT, aesErr.Format());
@@ -2007,6 +2008,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
         err =
             AES_CCM_decrypt(msgR3EncryptedPayload.data(), msgR3EncryptedPayload.size(), nullptr, 0, msgR3MIC.data(),
                             msgR3MIC.size(), sr3k.KeyHandle(), kTBEData3_Nonce, kTBEDataNonceLength, msgR3EncryptedPayload.data());
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASESigma3DecryptNoMemory, err = CHIP_ERROR_NO_MEMORY);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SecureChannel, "Sigma3 AES-CCM decrypt failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -2313,6 +2315,7 @@ CHIP_ERROR CASESession::ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const
     ReturnErrorOnFailure(ConstructSigmaResumeKey(initiatorRandom, resumptionID, skInfo, nonce, srk));
     CHIP_ERROR err = AES_CCM_decrypt(nullptr, 0, nullptr, 0, resumeMIC.data(), resumeMIC.size(), srk.KeyHandle(), nonce.data(),
                                      nonce.size(), nullptr);
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASEResumeMICDecryptNoMemory, err = CHIP_ERROR_NO_MEMORY);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SecureChannel, "Resume MIC verification failed: %" CHIP_ERROR_FORMAT, err.Format());
