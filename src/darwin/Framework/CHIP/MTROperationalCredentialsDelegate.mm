@@ -202,85 +202,84 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
 
     MTRDeviceController_Concrete * __weak weakController = mWeakController;
     auto * sentinel = [[MTRIssuerCompletionSentinel alloc] initWithReleasedUncalledHandler:^{
-        MTRDeviceController_Concrete * strongController = weakController;
-        if (strongController == nil || !strongController.isRunning) {
-            return;
-        }
-        MTR_LOG_ERROR("%@ operational certificate issuer released its completion without calling it", strongController);
-        this->ExternalNOCChainGenerated(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL], requestID);
+        ExternalNOCChainGenerated(weakController, nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL], requestID,
+            /* releasedUncalled = */ true);
     }];
+    // The block runs on the issuer queue after this returns, so it must not read members of this delegate.
+    id<MTROperationalCertificateIssuer> issuer = mOperationalCertificateIssuer;
     dispatch_async(mOperationalCertificateIssuerQueue, ^{
-        [mOperationalCertificateIssuer
+        [issuer
             issueOperationalCertificateForRequest:csrInfo
                                   attestationInfo:attestationInfo
                                        controller:strongController
                                        completion:^(MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error) {
                                            [sentinel markCalled];
-                                           MTRDeviceController_Concrete * strongController = weakController;
-                                           if (strongController == nil || !strongController.isRunning) {
-                                               // No longer safe to touch "this"
-                                               return;
-                                           }
-                                           this->ExternalNOCChainGenerated(chain, error, requestID);
+                                           ExternalNOCChainGenerated(weakController, chain, error, requestID,
+                                               /* releasedUncalled = */ false);
                                        }];
     });
 
     return CHIP_NO_ERROR;
 }
 
-void MTROperationalCredentialsDelegate::ExternalNOCChainGenerated(
-    MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error, uint64_t requestID)
+void MTROperationalCredentialsDelegate::ExternalNOCChainGenerated(MTRDeviceController_Concrete * _Nullable controller,
+    MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error, uint64_t requestID, bool releasedUncalled)
 {
-    // Dispatch will only happen if the controller is still running, which means we
-    // are safe to touch our members.
-    [mWeakController
-        asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
-            assertChipStackLockedByCurrentThread();
-
-            if (mOnNOCCompletionCallback == nullptr || requestID != mExternalNOCChainRequestID
-                || commissioner->GetCommissioningStage() != Controller::CommissioningStage::kGenerateNOCChain) {
-                // Leave mOnNOCCompletionCallback set: it belongs to the current request, which a stale completion can
-                // arrive in the middle of, and clearing it here would leave that request's commissioning unfinished.
-                MTR_LOG("%@ ignoring a NOC chain completion for a request that is no longer current", mWeakController);
-                return;
-            }
-
-            auto * onCompletion = mOnNOCCompletionCallback;
-            mOnNOCCompletionCallback = nullptr;
-
-            if (mCppCommissioner != commissioner) {
-                // Quite unexpected!
-                return;
-            }
-
-            if (chain == nil) {
-                onCompletion->mCall(onCompletion->mContext, [MTRError errorToCHIPErrorCode:error], ByteSpan(), ByteSpan(),
-                    ByteSpan(), NullOptional, NullOptional);
-                return;
-            }
-
-            auto & commissioningParameters = commissioner->GetCommissioningParameters();
-
-            IdentityProtectionKeySpan ipk = commissioningParameters.GetIpk().ValueOr(GetIPK());
-
-            Optional<NodeId> adminSubject;
-            if (chain.adminSubject != nil) {
-                adminSubject.SetValue(chain.adminSubject.unsignedLongLongValue);
-            } else {
-                adminSubject = commissioningParameters.GetAdminSubject();
-            }
-
-            ByteSpan intermediateCertificate;
-            if (chain.intermediateCertificate != nil) {
-                intermediateCertificate = AsByteSpan(chain.intermediateCertificate);
-            }
-
-            onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, AsByteSpan(chain.operationalCertificate),
-                intermediateCertificate, AsByteSpan(chain.rootCertificate), MakeOptional(ipk), adminSubject);
+    [controller asyncGetOperationalCredentialsDelegateOnMatterQueue:^(
+        MTROperationalCredentialsDelegate * delegate, Controller::DeviceCommissioner * commissioner) {
+        if (releasedUncalled) {
+            MTR_LOG_ERROR("%@ operational certificate issuer released its completion without calling it", controller);
         }
-                             // If we can't run the block, we're torn down and should
-                             // just do nothing.
-                             errorHandler:nil];
+        delegate->HandleExternalNOCChain(commissioner, chain, error, requestID);
+    }];
+}
+
+void MTROperationalCredentialsDelegate::HandleExternalNOCChain(
+    Controller::DeviceCommissioner * commissioner, MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error,
+    uint64_t requestID)
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (mOnNOCCompletionCallback == nullptr || requestID != mExternalNOCChainRequestID
+        || commissioner->GetCommissioningStage() != Controller::CommissioningStage::kGenerateNOCChain) {
+        // Leave mOnNOCCompletionCallback set: it belongs to the current request, which a stale completion can
+        // arrive in the middle of, and clearing it here would leave that request's commissioning unfinished.
+        MTR_LOG("%@ ignoring a NOC chain completion for a request that is no longer current", mWeakController);
+        return;
+    }
+
+    auto * onCompletion = mOnNOCCompletionCallback;
+    mOnNOCCompletionCallback = nullptr;
+
+    if (mCppCommissioner != commissioner) {
+        // Quite unexpected!
+        return;
+    }
+
+    if (chain == nil) {
+        onCompletion->mCall(onCompletion->mContext, [MTRError errorToCHIPErrorCode:error], ByteSpan(), ByteSpan(),
+            ByteSpan(), NullOptional, NullOptional);
+        return;
+    }
+
+    auto & commissioningParameters = commissioner->GetCommissioningParameters();
+
+    IdentityProtectionKeySpan ipk = commissioningParameters.GetIpk().ValueOr(GetIPK());
+
+    Optional<NodeId> adminSubject;
+    if (chain.adminSubject != nil) {
+        adminSubject.SetValue(chain.adminSubject.unsignedLongLongValue);
+    } else {
+        adminSubject = commissioningParameters.GetAdminSubject();
+    }
+
+    ByteSpan intermediateCertificate;
+    if (chain.intermediateCertificate != nil) {
+        intermediateCertificate = AsByteSpan(chain.intermediateCertificate);
+    }
+
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, AsByteSpan(chain.operationalCertificate),
+        intermediateCertificate, AsByteSpan(chain.rootCertificate), MakeOptional(ipk), adminSubject);
 }
 
 CHIP_ERROR MTROperationalCredentialsDelegate::LocalGenerateNOCChain(const chip::ByteSpan & csrElements,

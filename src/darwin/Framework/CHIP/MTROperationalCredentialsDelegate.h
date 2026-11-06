@@ -118,7 +118,12 @@ private:
     // Called asynchronously in response to the MTROperationalCertificateIssuer
     // calling the completion we passed it when asking it to generate a NOC
     // chain.
-    void ExternalNOCChainGenerated(MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error, uint64_t requestID);
+    // Called from the issuer's completion on any queue. Reads no member of a delegate until it is on the Matter queue,
+    // where the controller hands out its current delegate only while it is running.
+    static void ExternalNOCChainGenerated(MTRDeviceController_Concrete * _Nullable controller,
+        MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error, uint64_t requestID, bool releasedUncalled);
+    void HandleExternalNOCChain(chip::Controller::DeviceCommissioner * commissioner, MTROperationalCertificateChain * _Nullable chain,
+        NSError * _Nullable error, uint64_t requestID);
 
     CHIP_ERROR ExternalGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
         const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,

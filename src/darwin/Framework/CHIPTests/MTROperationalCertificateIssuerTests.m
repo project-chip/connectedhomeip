@@ -348,4 +348,67 @@ typedef void (^IssuerCompletion)(MTROperationalCertificateChain * _Nullable info
     [self runCanceledRequestReleasingItsCompletionAfterNextRequest:YES];
 }
 
+- (void)runCompletionDeliveredAfterShutdownCallingIt:(BOOL)callIt
+{
+    // Pins that a completion delivered after the controller shut down touches nothing the shutdown tore down: it is
+    // dropped without reaching the deleted operational credentials delegate. The window can't be forced here; this
+    // runs the late delivery, and an address sanitizer run catches a use of the deleted delegate.
+    XCTAssertTrue([self startAppWithName:@"all-clusters" arguments:@[] payload:kOnboardingPayload]);
+
+    NSMutableArray<IssuerCompletion> * heldCompletions = [NSMutableArray array];
+    XCTestExpectation * requestExpectation = [self expectationWithDescription:@"NOC request"];
+    __auto_type * certificateIssuer = [[OperationalCertificateIssuer alloc] init];
+    certificateIssuer.holdCompletion = ^(IssuerCompletion completion) {
+        [heldCompletions addObject:completion];
+        [requestExpectation fulfill];
+    };
+
+    XCTestExpectation * cancelExpectation = [self expectationWithDescription:@"Commissioning canceled"];
+    __auto_type * deviceControllerDelegate =
+        [[MTROperationalCertificateIssureTestDeviceControllerDelegate alloc] initWithExpectation:cancelExpectation];
+    deviceControllerDelegate.expectedErrorCode = MTRErrorCodeCancelled;
+    XCTestExpectation * commissionStarted = [self expectationWithDescription:@"commissionNodeWithID returned"];
+    deviceControllerDelegate.commissionStartedExpectation = commissionStarted;
+
+    MTRDeviceController * controller = [self startControllerWithIssuer:certificateIssuer delegate:deviceControllerDelegate];
+    [self setUpCommissioningSessionWithController:controller payload:kOnboardingPayload nodeID:kDeviceId];
+    [self waitForExpectations:@[ requestExpectation, commissionStarted ] timeout:kPairingTimeoutInSeconds];
+    deviceControllerDelegate.commissionStartedExpectation = nil;
+    XCTAssertEqual(heldCompletions.count, 1u);
+
+    // Cancel first so the commissioning has a defined end, then shut down while the issuer still holds the completion.
+    NSError * error;
+    XCTAssertTrue([controller cancelCommissioningForNodeID:@(kDeviceId) error:&error]);
+    XCTAssertNil(error);
+    [self waitForExpectations:@[ cancelExpectation ] timeout:kPairingTimeoutInSeconds];
+    [self stopController:controller];
+    NSUInteger completionsAtShutdown = deviceControllerDelegate.commissioningCompleteCount;
+    XCTAssertEqual(completionsAtShutdown, 1u);
+
+    IssuerCompletion completion = heldCompletions.firstObject;
+    [heldCompletions removeAllObjects];
+    if (callIt) {
+        completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeIntegrityCheckFailed userInfo:nil]);
+    }
+    // Releasing the last reference to an uncalled completion runs the issuer-dropped path.
+    completion = nil;
+
+    XCTestExpectation * settled = [self expectationWithDescription:@"Late completion had a chance to run"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [settled fulfill];
+    });
+    [self waitForExpectations:@[ settled ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertEqual(deviceControllerDelegate.commissioningCompleteCount, completionsAtShutdown);
+}
+
+- (void)testCompletionReleasedUncalledAfterShutdownIsDropped
+{
+    [self runCompletionDeliveredAfterShutdownCallingIt:NO];
+}
+
+- (void)testCompletionCalledAfterShutdownIsDropped
+{
+    [self runCompletionDeliveredAfterShutdownCallingIt:YES];
+}
+
 @end
