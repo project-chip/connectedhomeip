@@ -279,22 +279,21 @@ public:
         }
     }
 
-    template <typename TDevice, typename... Args>
-    static DeviceRegistrationEntry MakeDevice(Args &&... args)
+    template <typename TDevice, typename EntryType = DeviceRegistrationEntry, typename... Args>
+    static EntryType MakeDevice(Args &&... args)
     {
         auto dev   = std::make_unique<TDevice>(std::forward<Args>(args)...);
         auto * raw = dev.get();
-        return DeviceRegistrationEntry{ std::move(dev), MakeAfterDeviceRegistrationCallback(raw),
-                                        MakeBeforeDeviceUnregistrationCallback(raw) };
+        return EntryType{ std::move(dev), MakeAfterDeviceRegistrationCallback(raw), MakeBeforeDeviceUnregistrationCallback(raw) };
     }
 
-    template <typename TDevice, typename... Args>
-    static DeviceRegistrationEntry MakeDeviceWithTags(Span<const EndpointComposition::SemanticTag> tags, Args &&... args)
+    template <typename TDevice, typename EntryType = DeviceRegistrationEntry, typename... Args>
+    static EntryType MakeDeviceWithTags(Span<const EndpointComposition::SemanticTag> tags, Args &&... args)
     {
         auto dev   = std::make_unique<TDevice>(std::forward<Args>(args)...);
         auto * raw = dev.get();
-        return DeviceRegistrationEntry{ std::move(dev), MakeAfterDeviceRegistrationCallback(raw),
-                                        MakeBeforeDeviceUnregistrationCallback(raw), tags };
+        return EntryType{ std::move(dev), MakeAfterDeviceRegistrationCallback(raw), MakeBeforeDeviceUnregistrationCallback(raw),
+                          tags };
     }
 
     using DeviceCreator = std::function<DeviceRegistrationEntry(const std::string & nodeLabel)>;
@@ -351,6 +350,22 @@ public:
         return mRegistry.find(deviceTypeArg) != mRegistry.end() || mAliases.find(deviceTypeArg) != mAliases.end();
     }
 
+    DeviceRegistrationEntryOfConcreteType<BridgedNode> CreateBridgedNode(const std::string & nodeLabel = "") const
+    {
+        VerifyOrDie(mContext.has_value());
+        static int sBridgedNodeCount = 0;
+        sBridgedNodeCount++;
+        std::string label = nodeLabel.empty() ? "Bridged Node " + std::to_string(sBridgedNodeCount) : nodeLabel;
+        return MakeDevice<BridgedNode, chip::app::DeviceRegistrationEntryOfConcreteType<BridgedNode>>(
+            mContext->timerDelegate, "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
+    }
+
+    DeviceRegistrationEntryOfConcreteType<Aggregator> CreateAggregator() const
+    {
+        VerifyOrDie(mContext.has_value());
+        return MakeDevice<Aggregator, chip::app::DeviceRegistrationEntryOfConcreteType<Aggregator>>(mContext->timerDelegate);
+    }
+
     DeviceRegistrationEntry Create(const std::string & deviceTypeArg, const std::string & nodeLabel = "") const
     {
         auto aliasIt                      = mAliases.find(deviceTypeArg);
@@ -365,7 +380,7 @@ public:
             AppServer,
             "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.",
             deviceTypeArg.c_str());
-        return DeviceRegistrationEntry{};
+        return DeviceRegistrationEntry{ nullptr, nullptr, nullptr };
     }
 
     std::vector<std::string> SupportedDeviceTypes() const
@@ -391,10 +406,7 @@ private:
         //       factories are usable.
         if constexpr (ALL_DEVICES_ENABLE_AGGREGATOR)
         {
-            RegisterCreator("aggregator", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return MakeDevice<Aggregator>(mContext->timerDelegate);
-            });
+            RegisterCreator("aggregator", [this]() { return DeviceRegistrationEntry(CreateAggregator()); });
         }
         if constexpr (ALL_DEVICES_ENABLE_AIR_PURIFIER)
         {
@@ -506,12 +518,7 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_BRIDGED_NODE)
         {
             RegisterCreator("bridged-node", [this](const std::string & nodeLabel) {
-                VerifyOrDie(mContext.has_value());
-                static int sBridgedNodeCount = 0;
-                sBridgedNodeCount++;
-                std::string label = nodeLabel.empty() ? "Bridged Node " + std::to_string(sBridgedNodeCount) : nodeLabel;
-                return MakeDevice<BridgedNode>(mContext->timerDelegate,
-                                               "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
+                return DeviceRegistrationEntry(CreateBridgedNode(nodeLabel));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_CHIME)
