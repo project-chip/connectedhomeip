@@ -151,6 +151,12 @@ for full details.
 -   Tests in `src/python_testing` and `src/app/tests/suites` which verify
     expected failures should clearly indicate why the failure is expected.
     Include a summary of the relevant specification requirements if possible.
+-   C++ unit tests should include `<lib/support/tests/ExtraPwTestMacros.h>` and
+    use `ASSERT_SUCCESS` / `EXPECT_SUCCESS` for `CHIP_ERROR` results. Guard
+    optional access with `ASSERT_TRUE(x.has_value())` (clang-tidy understands
+    the version from this header) or compare optionals directly. Never use
+    `NOLINT(bugprone-unchecked-optional-access)` in tests. See
+    [docs/testing/unit_testing.md](docs/testing/unit_testing.md#best-practices).
 
 ## Architectural Constraints
 

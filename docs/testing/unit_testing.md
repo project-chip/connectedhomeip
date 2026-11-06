@@ -25,6 +25,7 @@ unit test. Each test function is defined using `TEST(NameOfFunction)`. The set
 of test functions in a given source file is called a "suite".
 
 ```cpp
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 TEST(YourTestFunction1)
@@ -66,6 +67,7 @@ following example demonstrates how to use pw_unit_test to write a unit test that
 uses fixtures and setup/teardown behavior.
 
 ```cpp
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 class YourTestContext : public ::testing::Test
@@ -222,6 +224,22 @@ type alias: `using YourTestContext = Test::AppContext;` instead of defining your
 own text context class.
 
 ## Best practices
+
+-   Include `<lib/support/tests/ExtraPwTestMacros.h>` in every test source.
+    `chip_test_suite` already depends on it, so this adds no dependency. The
+    header provides:
+
+    -   `ASSERT_SUCCESS(expr)` and `EXPECT_SUCCESS(expr)`, shorthand for
+        comparing a `CHIP_ERROR` against `CHIP_NO_ERROR`.
+    -   Versions of `ASSERT_TRUE` / `ASSERT_FALSE` that clang-tidy understands
+        as guards, so `ASSERT_TRUE(value.has_value())` makes a later `*value` or
+        `value->` pass `bugprone-unchecked-optional-access`.
+
+    Don't silence `bugprone-unchecked-optional-access` in tests with `NOLINT` or
+    work around it with helpers like `value_or()`. Assert on `has_value()`
+    first, or compare the optional directly, e.g.
+    `EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success))`. CI
+    rejects these `NOLINT` comments under `tests/` directories.
 
 -   Try to use as specific an assertion as possible. For example use these
 
