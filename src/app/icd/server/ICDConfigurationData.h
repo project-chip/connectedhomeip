@@ -147,6 +147,9 @@ private:
 
     friend class chip::Testing::ICDConfigurationDataTestAccess;
 
+    // To allow set PollingIntervals through RPC
+    friend class chip:rpc::Device;
+
     void SetICDMode(ICDMode mode) { mICDMode = mode; };
     void SetFastPollingInterval(System::Clock::Milliseconds32 fastPollInterval) { mFastPollingInterval = fastPollInterval; };
 
