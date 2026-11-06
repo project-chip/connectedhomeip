@@ -2607,6 +2607,14 @@ endpoint 1 {
   }
 
   server cluster Thermostat {
+    emits event SystemModeChange;
+    emits event LocalTemperatureChange;
+    emits event OccupancyChange;
+    emits event SetpointChange;
+    emits event RunningStateChange;
+    emits event RunningModeChange;
+    emits event ActiveScheduleChange;
+    emits event ActivePresetChange;
     callback attribute localTemperature;
     callback attribute absMinHeatSetpointLimit default = 700;
     callback attribute absMaxHeatSetpointLimit default = 3000;
@@ -2620,10 +2628,15 @@ endpoint 1 {
     callback attribute maxCoolSetpointLimit default = 3200;
     callback attribute controlSequenceOfOperation default = 0x04;
     callback attribute systemMode default = 0x01;
+    callback attribute sensors;
+    callback attribute availableSensorHandles;
+    callback attribute enabledSensorHandles;
+    callback attribute numberOfSensorScheduleTransitions;
+    callback attribute sensorSchedule;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0x3;
+    callback attribute featureMap default = 2563;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
