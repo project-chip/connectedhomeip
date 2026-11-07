@@ -231,13 +231,19 @@ void SetTestEventTrigger_Pausable()
     TEMPORARY_RETURN_IGNORED ConfigureForecast(2);
 }
 
-void SetTestEventTrigger_PausableNextSlot()
+CHIP_ERROR SetTestEventTrigger_PausableNextSlot()
 {
-    // Get the current forecast ad update the active slot number
-    sForecastStruct = GetDEMDelegate()->GetForecast().Value();
+    const auto & currentForecast = GetDEMDelegate()->GetForecast();
+    VerifyOrReturnError(!currentForecast.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+    const auto & forecast = currentForecast.Value();
+    VerifyOrReturnError(!forecast.activeSlotNumber.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(forecast.activeSlotNumber.Value() < forecast.slots.size() && forecast.slots.size() > 1,
+                        CHIP_ERROR_INCORRECT_STATE);
+
+    sForecastStruct = forecast;
     sForecastStruct.activeSlotNumber.SetNonNull(1);
 
-    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
+    return GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_Forecast()
@@ -274,12 +280,19 @@ void SetTestEventTrigger_ForecastAdjustment()
     TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
-void SetTestEventTrigger_ForecastAdjustmentNextSlot()
+CHIP_ERROR SetTestEventTrigger_ForecastAdjustmentNextSlot()
 {
-    sForecastStruct = GetDEMDelegate()->GetForecast().Value();
-    sForecastStruct.activeSlotNumber.SetNonNull(sForecastStruct.activeSlotNumber.Value() + 1);
+    const auto & currentForecast = GetDEMDelegate()->GetForecast();
+    VerifyOrReturnError(!currentForecast.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+    const auto & forecast = currentForecast.Value();
+    VerifyOrReturnError(!forecast.activeSlotNumber.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+    const uint32_t nextSlot = static_cast<uint32_t>(forecast.activeSlotNumber.Value()) + 1;
+    VerifyOrReturnError(nextSlot <= UINT16_MAX && nextSlot < forecast.slots.size(), CHIP_ERROR_INCORRECT_STATE);
 
-    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
+    sForecastStruct = forecast;
+    sForecastStruct.activeSlotNumber.SetNonNull(static_cast<uint16_t>(nextSlot));
+
+    return GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_ConstraintBasedAdjustment()
@@ -409,8 +422,7 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
         break;
     case DeviceEnergyManagementTrigger::kPausableNextSlot:
         ChipLogProgress(Support, "[PausableNextSlot-Test-Event] => Simulate a moving time to the next forecast slot");
-        SetTestEventTrigger_PausableNextSlot();
-        break;
+        return SetTestEventTrigger_PausableNextSlot() == CHIP_NO_ERROR;
     case DeviceEnergyManagementTrigger::kPausableClear:
         ChipLogProgress(Support, "[PausableClear-Test-Event] => Clear the Pausable simulated forecast");
         SetTestEventTrigger_ClearForecast();
@@ -422,8 +434,7 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
         break;
     case DeviceEnergyManagementTrigger::kForecastAdjustmentNextSlot:
         ChipLogProgress(Support, "[ForecastAdjustmentNextSlot-Test-Event] => Simulate moving time to the next forecast slot");
-        SetTestEventTrigger_ForecastAdjustmentNextSlot();
-        break;
+        return SetTestEventTrigger_ForecastAdjustmentNextSlot() == CHIP_NO_ERROR;
     case DeviceEnergyManagementTrigger::kForecastAdjustmentClear:
         ChipLogProgress(Support, "[ForecastAdjustmentClear-Test-Event] => Clear the forecast adjustment");
         SetTestEventTrigger_ClearForecast();
