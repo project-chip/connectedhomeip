@@ -182,7 +182,7 @@ awk 'toupper($1) == "FROM" && $2 ~ /project-chip\// {
     # same DOCKER_BUILD_VERSION when set, and the per-image version files match.
     if docker image inspect "$GHCR_ORG/$ORG/$dep:$VERSION" >/dev/null 2>&1; then
         echo "$me: parent $GHCR_ORG/$ORG/$dep:$VERSION already present"
-    elif docker pull "$GHCR_ORG/$ORG/$dep:$VERSION"; then
+    elif docker pull --platform="$TARGET_PLATFORM_TYPE" "$GHCR_ORG/$ORG/$dep:$VERSION"; then
         echo "$me: pulled parent $GHCR_ORG/$ORG/$dep:$VERSION"
     else
         echo "$me: parent $GHCR_ORG/$ORG/$dep:$VERSION not published, building it"
@@ -198,7 +198,7 @@ if [ "$SKIP_BUILD" = false ]; then
     # cannot fail the run. --no-cache means a rebuild was asked for explicitly.
     if [ "$NO_CACHE" = false ] && docker image inspect "$GHCR_ORG/$ORG/$IMAGE:$VERSION" >/dev/null 2>&1; then
         echo "$me: $GHCR_ORG/$ORG/$IMAGE:$VERSION already present, not rebuilding"
-    elif [ "$NO_CACHE" = false ] && docker pull "$GHCR_ORG/$ORG/$IMAGE:$VERSION"; then
+    elif [ "$NO_CACHE" = false ] && docker pull --platform="$TARGET_PLATFORM_TYPE" "$GHCR_ORG/$ORG/$IMAGE:$VERSION"; then
         echo "$me: $GHCR_ORG/$ORG/$IMAGE:$VERSION already published, not rebuilding"
     else
         # Seed the layer cache from the previous version. Most of what changes
@@ -212,7 +212,7 @@ if [ "$SKIP_BUILD" = false ]; then
         # predecessor to version zero.
         if [[ $VERSION =~ ^[0-9]+$ ]] && ((10#$VERSION > 0)); then
             PREVIOUS="$GHCR_ORG/$ORG/$IMAGE:$((10#$VERSION - 1))"
-            if [ "$NO_CACHE" = false ] && docker pull "$PREVIOUS"; then
+            if [ "$NO_CACHE" = false ] && docker pull --platform="$TARGET_PLATFORM_TYPE" "$PREVIOUS"; then
                 CACHE_ARGS=(--cache-from "$PREVIOUS")
             fi
         fi
