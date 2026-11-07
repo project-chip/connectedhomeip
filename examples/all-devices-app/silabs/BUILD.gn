@@ -195,29 +195,18 @@ silabs_executable("all_devices_app") {
   # into gRequestorCore from OTAConfig.cpp, so the feature and the runtime are
   # gated by the same flag.
   if (chip_enable_ota_requestor) {
-    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:ota" ]
+    deps += [
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:ota",
+      "${chip_root}/src/app/clusters/ota-requestor:default-implementation",
+    ]
   }
 
   if (chip_enable_icd_server) {
     deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:icd" ]
   }
 
-  # examples/platform/silabs/OTAConfig.cpp brings in the OTA requestor runtime.
-  # Pull in exactly the requestor implementation files it needs. The singleton
-  # getters normally defined by src/app/clusters/ota-requestor/CodegenIntegration.cpp
-  # (which we cannot link because it wires the cluster through the codegen
-  # data-model path) are provided by OTAConfig.cpp itself under
-  # SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL.
-  if (chip_enable_ota_requestor) {
-    _ota_requestor_dir = "${chip_root}/src/app/clusters/ota-requestor"
-    sources += [
-      "${_ota_requestor_dir}/BDXDownloader.cpp",
-      "${_ota_requestor_dir}/DefaultOTARequestor.cpp",
-      "${_ota_requestor_dir}/DefaultOTARequestorDriver.cpp",
-      "${_ota_requestor_dir}/DefaultOTARequestorStorage.cpp",
-    ]
-    deps += [ "${_ota_requestor_dir}:ota-requestor" ]
-  }
+  # Singleton getters normally defined by CodegenIntegration.cpp are provided by
+  # OTAConfig.cpp under SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL; see platform comment.
 
   deps += [ "${examples_plat_dir}:efr32-common" ]
 

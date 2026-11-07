@@ -95,8 +95,8 @@ To update or validate this list manually, follow these steps:
 | 49        | Electrical Grid Conditions                                 | 160 (0x00A0)  | No                 | No                  |                                                      |
 | 50        | Electrical Power Measurement                               | 144 (0x0090)  | Yes                | Yes                 |                                                      |
 | 51        | Electrical Protection Alarm                                | 163 (0x00A3)  | No                 | No                  |                                                      |
-| 52        | Energy EVSE                                                | 153 (0x0099)  | Yes                | No                  |                                                      |
-| 53        | Energy EVSE Mode                                           | 157 (0x009D)  | Yes                | No                  | Instance of Mode Base                                |
+| 52        | Energy EVSE                                                | 153 (0x0099)  | Yes                | Yes                 | Energy EVSE                                          |
+| 53        | Energy EVSE Mode                                           | 157 (0x009D)  | Yes                | Yes                 | Energy EVSE, Instance of Mode Base                   |
 | 54        | Energy Preference                                          | 155 (0x009B)  | No                 | No                  |                                                      |
 | 55        | Ethernet Network Diagnostics                               | 55 (0x0037)   | Yes                | No                  |                                                      |
 | 56        | Fan Control                                                | 514 (0x0202)  | Yes                | Yes                 |                                                      |
@@ -203,4 +203,4 @@ To update or validate this list manually, follow these steps:
 | 157       | Window Covering                                            | 258 (0x0102)  | Yes                | Yes                 | window-covering-\*                                   |
 | 158       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                                      |
 | 159       | Smoke Concentration Measurement                            | 1076 (0x0434) | Yes                | Yes                 | Instance of Concentration Measurement                |
-| **Total** | **159**                                                    |               | **109**            | **74**              |                                                      |
+| **Total** | **159**                                                    |               | **109**            | **78**              |                                                      |
