@@ -57,6 +57,7 @@ CIRQUE_TESTS=(
     "SubscriptionResumptionTest"
     "SubscriptionResumptionCapacityTest"
     "SubscriptionResumptionTimeoutTest"
+    "WiFiSwitchNetworkTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"
@@ -126,6 +127,7 @@ function cirquetest_bootstrap() {
     git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
 
     "$REPO_DIR"/integrations/docker/images/stage-2/chip-cirque-device-base/build.sh --build-arg OT_BR_POSIX_CHECKOUT="$OT_BR_POSIX_CHECKOUT"
+    docker build -t mac80211_ap_image -f cirque/resources/Dockerfile.wifiap cirque/resources
 
     __cirquetest_build_ot_lazy
     pip3 install --break-system-packages -r requirements_nogrpc.txt
@@ -153,7 +155,7 @@ function cirquetest_run_test() {
     if [[ "$CLEANUP_DOCKER_FOR_CI" = "1" ]]; then
         echo "Do docker container and network prune"
         # TODO: Filter cirque containers ?
-        if ! grep docker.sock /proc/1/mountinfo; then
+        if ! grep docker.sock /proc/self/mountinfo; then
             docker ps -aq | xargs docker stop >/dev/null 2>&1
         fi
         docker container prune -f >/dev/null 2>&1

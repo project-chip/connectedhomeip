@@ -19,7 +19,7 @@
 set -e
 
 CHIP_ROOT="$(dirname "$0")/../.."
-if [[ -z "${CHIP_ROOT_PATH}" ]]; then
+if [[ -z "$CHIP_ROOT_PATH" ]]; then
     CHIP_ROOT_PATH=""
 fi
 
@@ -42,4 +42,4 @@ echo "Build: Ninja build"
 time ninja -C out/debug all check
 
 echo "Build: Build all-clusters-app which has different configs than some other samples above."
-./scripts/examples/gn_build_example.sh examples/all-clusters-app/linux/ out/debug/standalone chip_inet_config_enable_ipv4=false 'chip_logging_backend="stdio"' 'chip_enable_wifi=false' 'chip_build_tests=false' 'chip_im_force_fabric_quota_check=true'
+./scripts/examples/gn_build_example.sh examples/all-clusters-app/linux/ out/debug/standalone chip_inet_config_enable_ipv4=false 'chip_logging_backend="stdio"' 'chip_enable_wifi=true' 'chip_build_tests=false' 'chip_im_force_fabric_quota_check=true'
