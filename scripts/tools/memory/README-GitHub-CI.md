@@ -135,6 +135,22 @@ corresponding PR artifact(s) so that a future run will not process it again and
 post the same comment. Only PR artifacts are removed, not push (trunk)
 artifacts, since those may be used as a comparison base by many different PRs.
 
+### Fallback artifact discovery
+
+On a repository with a very large artifact history, the repository-level
+artifact listing API can fail (e.g. 500 for every query), leaving the scripts
+with no way to enumerate size artifacts. When that happens, the scripts fall
+back to enumerating completed workflow runs of the size reporting workflows
+(discovered from `.github/workflows`) and listing each run's artifacts.
+Unmatched artifacts and PR commits are then looked up directly by commit with a
+`head_sha` query.
+
+Each workflow run examined costs one API call, and a scan without a time limit
+always restarts from the newest runs, so fallback scans are bounded by the
+`--github-scan-hours` option: only runs created within the given number of hours
+are examined. Set it so that the expected number of API calls per scan fits the
+rate limit of the token used to run the scripts.
+
 ## Using a database
 
 It can be useful to keep a permanent record of build sizes.
