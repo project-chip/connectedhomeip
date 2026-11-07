@@ -577,8 +577,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
         {
             if (stream.snapshotStreamParams.snapshotStreamID == outStreamID && stream.isAllocated)
             {
-                uint16_t origMinWidth  = stream.snapshotStreamParams.minResolution.width;
-                uint16_t origMinHeight = stream.snapshotStreamParams.minResolution.height;
+                const VideoResolutionStruct origMinResolution = stream.snapshotStreamParams.minResolution;
+                const VideoResolutionStruct origMaxResolution = stream.snapshotStreamParams.maxResolution;
 
                 stream.snapshotStreamParams.minResolution.width =
                     std::max(stream.snapshotStreamParams.minResolution.width, allocateArgs.minResolution.width);
@@ -589,12 +589,26 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
                 stream.snapshotStreamParams.maxResolution.height =
                     std::min(stream.snapshotStreamParams.maxResolution.height, allocateArgs.maxResolution.height);
 
-                if ((origMinWidth != stream.snapshotStreamParams.minResolution.width ||
-                     origMinHeight != stream.snapshotStreamParams.minResolution.height) &&
+                if ((origMinResolution.width != stream.snapshotStreamParams.minResolution.width ||
+                     origMinResolution.height != stream.snapshotStreamParams.minResolution.height) &&
                     stream.snapshotContext != nullptr)
                 {
-                    mCameraDeviceHAL->GetCameraHALInterface().StopSnapshotStream(outStreamID);
-                    mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
+                    CameraError stopError  = mCameraDeviceHAL->GetCameraHALInterface().StopSnapshotStream(outStreamID);
+                    CameraError startError = (stopError == CameraError::SUCCESS)
+                        ? mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID)
+                        : stopError;
+                    if (stopError != CameraError::SUCCESS || startError != CameraError::SUCCESS)
+                    {
+                        stream.snapshotStreamParams.minResolution = origMinResolution;
+                        stream.snapshotStreamParams.maxResolution = origMaxResolution;
+                        if (stream.snapshotContext == nullptr &&
+                            mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID) != CameraError::SUCCESS)
+                        {
+                            ChipLogError(Camera, "Failed to restore snapshot stream %u after failed restart", outStreamID);
+                        }
+                        outStreamID = kInvalidStreamID;
+                        return Status::Failure;
+                    }
                 }
                 break;
             }
@@ -892,7 +906,9 @@ CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
         if (it != persistedStreams.end())
         {
             // Found in persisted streams, mark as allocated in HAL
-            halStream.isAllocated = true;
+            halStream.snapshotStreamParams.minResolution = it->minResolution;
+            halStream.snapshotStreamParams.maxResolution = it->maxResolution;
+            halStream.isAllocated                        = true;
 
             ChipLogProgress(Camera, "HAL Snapshot Stream ID %u marked as allocated from persisted state.",
                             halStream.snapshotStreamParams.snapshotStreamID);
