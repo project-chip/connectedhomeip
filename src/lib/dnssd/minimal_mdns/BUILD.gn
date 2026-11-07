@@ -109,6 +109,20 @@ static_library("default_policy") {
   cflags = [ "-Wconversion" ]
 }
 
+static_library("filtered_policy") {
+  sources = [
+    "AddressPolicy_FilteredImpl.cpp",
+    "AddressPolicy_FilteredImpl.h",
+  ]
+
+  public_deps = [
+    ":address_policy",
+    "${chip_root}/src/inet",
+  ]
+
+  cflags = [ "-Wconversion" ]
+}
+
 if (current_os == "linux" && chip_minmdns_default_policy == "libnl") {
   import("${build_root}/config/linux/pkg_config.gni")
 
