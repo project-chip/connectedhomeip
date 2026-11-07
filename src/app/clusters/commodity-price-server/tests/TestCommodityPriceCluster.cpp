@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/commodity-price-server/CommodityPriceCluster.h>
@@ -386,7 +387,6 @@ TEST_F(TestCommodityPriceCluster, SetCurrentPriceGeneratesAPriceChangeEvent)
     ASSERT_TRUE(generatedEvent.has_value());
 
     Events::PriceChange::DecodableType event;
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): checked above
     ASSERT_EQ(generatedEvent->GetEventData(event), CHIP_NO_ERROR);
     ASSERT_FALSE(event.currentPrice.IsNull());
     EXPECT_EQ(event.currentPrice.Value().periodStart, kPeriodStart);
@@ -470,9 +470,9 @@ TEST_F(TestCommodityPriceCluster, SetCurrentPriceWithEmptyOptionalDetails)
     request.details = AllDetails();
 
     auto result = mTester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     const auto & storedPrice = result.response->currentPrice;
     ASSERT_FALSE(storedPrice.IsNull());
     EXPECT_EQ(storedPrice.Value().periodStart, kPeriodStart);
@@ -564,9 +564,9 @@ TEST_F(TestCommodityPriceCluster, SetForecastMixesEmptyAndPopulatedDetails)
     request.details = AllDetails();
 
     auto result = mTester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     auto forecast = result.response->priceForecast.begin();
 
     ASSERT_TRUE(forecast.Next());
@@ -622,9 +622,9 @@ TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestReturnsWhatWasAskedFor)
     request.details = AllDetails();
 
     auto result = mTester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     const auto & currentPrice = result.response->currentPrice;
     ASSERT_FALSE(currentPrice.IsNull());
     EXPECT_EQ(currentPrice.Value().periodStart, kPeriodStart);
@@ -648,9 +648,9 @@ TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestWithoutDetailsStripsThe
 
     // The Details argument defaults to none of the bits being set.
     auto result = mTester.Invoke(Commands::GetDetailedPriceRequest::Type{});
-    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     const auto & currentPrice = result.response->currentPrice;
     ASSERT_FALSE(currentPrice.IsNull());
     EXPECT_EQ(currentPrice.Value().periodStart, kPeriodStart);
@@ -666,9 +666,9 @@ TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestWithDescriptionOnly)
     request.details.Set(CommodityPriceDetailBitmap::kDescription);
 
     auto result = mTester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     const auto & currentPrice = result.response->currentPrice;
     ASSERT_FALSE(currentPrice.IsNull());
     ASSERT_TRUE(currentPrice.Value().description.HasValue());
@@ -682,8 +682,8 @@ TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestWithoutAPrice)
     request.details = AllDetails();
 
     auto result = mTester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
     EXPECT_TRUE(result.response->currentPrice.IsNull());
 }
 
@@ -715,9 +715,9 @@ TEST_F(TestCommodityPriceCluster, GetDetailedForecastRequestReturnsWhatWasAskedF
     request.details = AllDetails();
 
     auto result = mTester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     auto forecast = result.response->priceForecast.begin();
     ASSERT_TRUE(forecast.Next());
     EXPECT_EQ(forecast.GetValue().periodStart, kPeriodStart);
@@ -742,9 +742,9 @@ TEST_F(TestCommodityPriceCluster, GetDetailedForecastRequestWithoutDetailsStrips
     SetDetailedForecast(mCluster);
 
     auto result = mTester.Invoke(Commands::GetDetailedForecastRequest::Type{});
-    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     auto forecast = result.response->priceForecast.begin();
     ASSERT_TRUE(forecast.Next());
     EXPECT_EQ(forecast.GetValue().periodStart, kPeriodStart);
@@ -759,9 +759,9 @@ TEST_F(TestCommodityPriceCluster, GetDetailedForecastRequestWithoutAForecast)
     request.details = AllDetails();
 
     auto result = mTester.Invoke(request);
-    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     auto forecast = result.response->priceForecast.begin();
     EXPECT_FALSE(forecast.Next());
     EXPECT_EQ(forecast.GetStatus(), CHIP_NO_ERROR);
