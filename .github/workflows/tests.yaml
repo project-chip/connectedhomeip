@@ -1318,6 +1318,11 @@ jobs:
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
 
+            - name: Verify Specification XML Generation
+              if: ${{matrix.filter == ''}}
+              run: |
+                  scripts/run_in_python_env.sh out/venv 'PYTHONPATH=src/python_testing/matter_testing_infrastructure python3 -m unittest discover -s scripts/spec_xml -p test_generate_spec_xml.py -v'
+
             - name: Verify Testing Support
               if: ${{matrix.filter == ''}}
               run: |
