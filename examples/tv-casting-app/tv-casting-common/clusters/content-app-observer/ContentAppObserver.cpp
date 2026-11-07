@@ -29,13 +29,13 @@ ContentAppObserverManager::ContentAppObserverManager()
 }
 
 void ContentAppObserverManager::HandleContentAppMessage(chip::app::CommandResponseHelper<ContentAppMessageResponse> & helper,
-                                                        const chip::Optional<chip::CharSpan> & data,
-                                                        const chip::CharSpan & encodingHint)
+                                                        chip::CharSpan data, const chip::Optional<chip::CharSpan> & encodingHint)
 {
     ChipLogProgress(Zcl, "ContentAppObserverManager::HandleContentAppMessage");
 
-    std::string dataString(data.HasValue() ? data.Value().data() : "", data.HasValue() ? data.Value().size() : 0);
-    std::string encodingHintString(encodingHint.data(), encodingHint.size());
+    std::string dataString(data.empty() ? "" : data.data(), data.size());
+    CharSpan hint = encodingHint.ValueOr(CharSpan());
+    std::string encodingHintString(hint.empty() ? "" : hint.data(), hint.size());
 
     ChipLogProgress(Zcl, "ContentAppObserverManager::HandleContentAppMessage TEST CASE hint=%s data=%s ",
                     encodingHintString.c_str(), dataString.c_str());
@@ -43,7 +43,7 @@ void ContentAppObserverManager::HandleContentAppMessage(chip::app::CommandRespon
     ContentAppMessageResponse response;
     // TODO: Insert code here
     response.data         = chip::MakeOptional("exampleData"_span);
-    response.encodingHint = chip::MakeOptional(CharSpan::fromCharString(encodingHintString.c_str()));
+    response.encodingHint = encodingHint;
     response.status       = StatusEnum::kSuccess;
     TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
