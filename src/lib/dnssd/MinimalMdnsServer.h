@@ -19,6 +19,10 @@
 #include <inet/IPPacketInfo.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
 
+#if CHIP_MINMDNS_INTERFACE_MONITOR
+#include <lib/dnssd/minimal_mdns/NetlinkInterfaceMonitor.h>
+#endif
+
 namespace chip {
 namespace Dnssd {
 
@@ -57,6 +61,14 @@ public:
     CHIP_ERROR StartServer(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, uint16_t port);
     void ShutdownServer();
 
+    /// Calls Server().Listen() again on the interfaces available now, keeping the endpoints
+    /// that are open and telling the listen delegate about each one added. On Linux, the
+    /// server does this by itself when the interfaces change. Fails unless it was started.
+    CHIP_ERROR ListenAgain();
+
+    void SetListenDelegate(mdns::Minimal::ServerBase::ListenDelegate * delegate) { mListenDelegate = delegate; }
+    mdns::Minimal::ServerBase::ListenDelegate * GetListenDelegate() const { return mListenDelegate; }
+
     void SetQueryDelegate(MdnsPacketDelegate * delegate) { mQueryDelegate = delegate; }
     void SetResponseDelegate(MdnsPacketDelegate * delegate) { mResponseDelegate = delegate; }
 
@@ -84,6 +96,16 @@ private:
     mdns::Minimal::ServerBase * mReplacementServer = nullptr;
     MdnsPacketDelegate * mQueryDelegate            = nullptr;
     MdnsPacketDelegate * mResponseDelegate         = nullptr;
+
+    mdns::Minimal::ServerBase::ListenDelegate * mListenDelegate                = nullptr;
+    chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * mUdpEndPointManager = nullptr; // set while started
+    uint16_t mPort                                                             = 0;
+
+#if CHIP_MINMDNS_INTERFACE_MONITOR
+    static void HandleInterfacesChanged(void * context);
+
+    mdns::Minimal::NetlinkInterfaceMonitor mInterfaceMonitor;
+#endif
 };
 
 } // namespace Dnssd
