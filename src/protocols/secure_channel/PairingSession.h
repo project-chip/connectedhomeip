@@ -180,7 +180,12 @@ protected:
         VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY,
                             ChipLogError(SecureChannel, "Failed to allocate status report message"));
 
-        CHIP_ERROR err = exchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg));
+        const Messaging::SendFlags sendMessageFlags = (protocolCode == Protocols::SecureChannel::kProtocolCodeSuccess)
+            ? Messaging::SendFlags(Messaging::SendMessageFlags::kNone)
+            : Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck);
+
+        CHIP_ERROR err =
+            exchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg), sendMessageFlags);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SecureChannel, "Failed to send status report message: %" CHIP_ERROR_FORMAT, err.Format());
