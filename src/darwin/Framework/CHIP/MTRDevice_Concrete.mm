@@ -1950,6 +1950,10 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
             std::lock_guard lock(self->_lock);
             if (self->_subscriptionReattemptGeneration != reattemptGeneration) {
                 MTR_LOG("%@ ignoring superseded subscription reattempt timer on the Matter queue", self);
+                // Note: we claim the subscription pool work slot right before resubscriptionBlock, is called.
+                // We already checked the generation during the initial call to resubscriptionBlock, so if it's
+                // changed since then, whatever changed the generation also cleared our subscription pool
+                // work and we don't need to do that here.
                 return;
             }
             [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
