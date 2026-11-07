@@ -379,11 +379,41 @@ void JointFabricAdministratorGlobalInstance::HandleAddICAC(HandlerContext & ctx,
 
     VerifyOrExit(VerifyAddICACDNEncodingRules(commandData) == CHIP_NO_ERROR, status.Emplace(ICACResponseStatusEnum::kInvalidICAC));
 
+    // Certificate chain validated successfully — install the cross-signed ICAC
+    {
+        auto & jointFabricAdministrator = Server::GetInstance().GetJointFabricAdministrator();
+        auto * delegate                 = jointFabricAdministrator.GetDelegate();
+        if (delegate != nullptr)
+        {
+            CHIP_ERROR installErr = delegate->StoreCrossSignedICAC(commandData.ICACValue);
+            if (installErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "JointFabricAdministrator: StoreCrossSignedICAC failed: %" CHIP_ERROR_FORMAT,
+                             installErr.Format());
+                status.Emplace(ICACResponseStatusEnum::kInvalidICAC);
+                goto exit;
+            }
+            ChipLogProgress(Zcl, "JointFabricAdministrator: cross-signed ICAC installed successfully (%u bytes)",
+                            static_cast<unsigned>(commandData.ICACValue.size()));
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "JointFabricAdministrator: no delegate registered, skipping ICAC storage");
+        }
+    }
+
 exit:
     if (status.HasValue())
     {
         Commands::ICACResponse::Type response;
         response.statusCode = status.Value();
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+    if (nonDefaultStatus == Status::Success)
+    {
+        Commands::ICACResponse::Type response;
+        response.statusCode = ICACResponseStatusEnum::kOk;
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
         return;
     }

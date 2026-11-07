@@ -22,6 +22,7 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
+#include <lib/support/Span.h>
 
 #include <optional>
 
@@ -38,6 +39,16 @@ public:
         virtual ~Delegate() {}
 
         virtual CHIP_ERROR GetIcacCsr(MutableByteSpan & icacCsr) { return CHIP_NO_ERROR; }
+
+        /**
+         * Store the cross-signed ICAC certificate received via the AddICAC command.
+         * This certificate was cross-signed by the anchor root CA and can be used
+         * to issue NOCs on the joint fabric.
+         *
+         * @param crossSignedICAC  The DER/TLV-encoded cross-signed ICAC certificate.
+         * @return CHIP_NO_ERROR on success, or an error if storage fails.
+         */
+        virtual CHIP_ERROR StoreCrossSignedICAC(const ByteSpan & crossSignedICAC) { return CHIP_NO_ERROR; }
     };
 
     static JointFabricAdministrator & GetInstance()
