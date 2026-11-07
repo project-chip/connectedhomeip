@@ -603,25 +603,30 @@ void CASESession::AbortPendingEstablish(CHIP_ERROR err)
     NotifySessionEstablishmentError(err, state);
 }
 
+System::Clock::Timeout CASESession::Sigma1AckWindow(uint8_t firstIndex) const
+{
+    // The longest the transmissions can each wait for their MRP ack, so a slow
+    // but reachable peer is not cut short. MRP picks the active or idle interval again for every
+    // retransmission, so the peer can be active for Sigma1 and idle for a later one; the larger of the
+    // two keeps the window from being shorter than the waits MRP actually makes.
+    const ReliableMessageProtocolConfig & remoteConfig = mExchangeCtxt->GetSessionHandle()->GetRemoteMRPConfig();
+    const System::Clock::Timeout baseInterval =
+        std::max<System::Clock::Timeout>(remoteConfig.mActiveRetransTimeout, remoteConfig.mIdleRetransTimeout);
+    System::Clock::Timeout window = System::Clock::kZero;
+    for (uint8_t i = firstIndex; i < mSigma1UnackedTransmissionLimit; i++)
+    {
+        window += ReliableMessageMgr::GetBackoff(baseInterval, i, /* computeMaxPossible */ true);
+    }
+    return window;
+}
+
 void CASESession::StartSigma1AckDeadline()
 {
     VerifyOrReturn(mSigma1UnackedTransmissionLimit > 0 && mSigma1UnackedTransmissionLimit <= CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
     VerifyOrReturn(mSystemLayer != nullptr && mExchangeCtxt->GetSessionHandle()->AllowsMRP());
 
-    // The longest the first transmissions can each wait for their MRP ack, so a slow
-    // but reachable peer is not cut short. MRP picks the active or idle interval again for every
-    // retransmission, so the peer can be active for Sigma1 and idle for a later one; the larger of the
-    // two keeps the deadline from being shorter than the waits MRP actually makes.
-    const ReliableMessageProtocolConfig & remoteConfig = mExchangeCtxt->GetSessionHandle()->GetRemoteMRPConfig();
-    const System::Clock::Timeout baseInterval =
-        std::max<System::Clock::Timeout>(remoteConfig.mActiveRetransTimeout, remoteConfig.mIdleRetransTimeout);
-    System::Clock::Timeout deadline = System::Clock::kZero;
-    for (uint8_t i = 0; i < mSigma1UnackedTransmissionLimit; i++)
-    {
-        deadline += ReliableMessageMgr::GetBackoff(baseInterval, i, /* computeMaxPossible */ true);
-    }
     // Without the timer this attempt keeps the whole MRP budget.
-    CHIP_ERROR err = mSystemLayer->StartTimer(deadline, OnSigma1AckDeadline, this);
+    CHIP_ERROR err = mSystemLayer->StartTimer(Sigma1AckWindow(0), OnSigma1AckDeadline, this);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogError(SecureChannel, "Sigma1 ack deadline not armed: %" CHIP_ERROR_FORMAT, err.Format()));
     mSigma1AckDeadlineArmed = true;
@@ -634,8 +639,26 @@ void CASESession::OnSigma1AckDeadline(System::Layer * systemLayer, void * appSta
     VerifyOrReturn(self->mState == State::kSentSigma1 || self->mState == State::kSentSigma1Resume);
     VerifyOrReturn(self->mExchangeCtxt && self->mExchangeCtxt->IsWaitingForAck());
 
+    // MRP retransmits on its own timer, so a stalled event loop can run this deadline before MRP has sent the
+    // transmissions the limit promises. Wait for the rest instead of abandoning the address early.
+    ReliableMessageContext * rc = self->mExchangeCtxt->GetReliableMessageContext();
+    const uint8_t sent          = rc->GetReliableMessageMgr()->GetTransmissionCount(rc);
+    if (sent > 0 && sent < self->mSigma1UnackedTransmissionLimit)
+    {
+        // Transmission number `sent` is out and waits for its ack: the wait with index sent - 1, which is
+        // still running, then the waits with indexes sent .. limit - 1 for the transmissions still to come.
+        // That is the part of the window Sigma1AckWindow(0) covered from index sent - 1 on.
+        CHIP_ERROR err = systemLayer->StartTimer(self->Sigma1AckWindow(static_cast<uint8_t>(sent - 1)), OnSigma1AckDeadline, self);
+        if (err == CHIP_NO_ERROR)
+        {
+            self->mSigma1AckDeadlineArmed = true;
+            return;
+        }
+        ChipLogError(SecureChannel, "Sigma1 ack deadline not re-armed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
     ChipLogProgress(SecureChannel, "Sigma1 to " ChipLogFormatScopedNodeId " unacknowledged after %u transmissions",
-                    ChipLogValueScopedNodeId(self->GetPeer()), static_cast<unsigned>(self->mSigma1UnackedTransmissionLimit));
+                    ChipLogValueScopedNodeId(self->GetPeer()), static_cast<unsigned>(sent));
     self->AbortPendingEstablish(CHIP_ERROR_TIMEOUT);
 }
 

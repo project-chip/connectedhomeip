@@ -537,6 +537,9 @@ private:
 
     void AbortPendingEstablish(CHIP_ERROR err);
 
+    // The longest MRP can take to send the Sigma1 transmissions from index firstIndex up to the limit (0-based: index i is
+    // the wait after transmission i + 1, i.e. the backoff for sendCount i).
+    System::Clock::Timeout Sigma1AckWindow(uint8_t firstIndex) const;
     void StartSigma1AckDeadline();
     static void OnSigma1AckDeadline(System::Layer * systemLayer, void * appState);
 

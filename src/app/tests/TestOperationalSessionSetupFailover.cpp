@@ -327,6 +327,11 @@ protected:
 
     // The deadline CASESession arms for the shortened first attempt: the ack windows of its first kTransmissionsBeforeNext
     // transmissions, on the larger of the peer's intervals.
+    // Most Sigma1 transmissions a shortened attempt can send. At the upper limit, MRP's last retransmission can go out
+    // before the deadline, so the full count is allowed there.
+    [[maybe_unused]] static constexpr uint8_t kMaxShortenedSigma1Transmissions =
+        (kTransmissionsBeforeNext >= CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS) ? kFullSigma1Transmissions : kFullSigma1Transmissions - 1;
+
     static System::Clock::Timeout ShortenedSigma1Deadline()
     {
         const System::Clock::Timeout base =
@@ -397,7 +402,7 @@ TEST_F(TestOperationalSessionSetupFailover, DeadFirstAddressFallsThroughBeforeFu
                         static_cast<unsigned>(first.sigma1s), static_cast<unsigned>(FullSigma1Budget().count()));
         EXPECT_LT(second.firstSigma1Time - first.firstSigma1Time, ShortenedSigma1Deadline() + kSettleSlack);
         EXPECT_GE(first.sigma1s, kTransmissionsBeforeNext);
-        EXPECT_LT(first.sigma1s, kFullSigma1Transmissions);
+        EXPECT_LE(first.sigma1s, kMaxShortenedSigma1Transmissions);
     }
 }
 
@@ -429,7 +434,7 @@ TEST_F(TestOperationalSessionSetupFailover, ResumingDeadFirstAddressFallsThrough
         ASSERT_GT(second.sigma1s, 0u);
         EXPECT_EQ(first.sigma1sCarryingMarker, first.sigma1s);
         EXPECT_LT(second.firstSigma1Time - first.firstSigma1Time, ShortenedSigma1Deadline() + kSettleSlack);
-        EXPECT_LT(first.sigma1s, kFullSigma1Transmissions);
+        EXPECT_LE(first.sigma1s, kMaxShortenedSigma1Transmissions);
     }
     mProbe.mSigma1Marker = ByteSpan();
 }
@@ -450,8 +455,8 @@ TEST_F(TestOperationalSessionSetupFailover, MiddleAddressIsShortenedAndLastKeeps
 
         DriveUntil(3 * FullSigma1Budget() + kSettleSlack, [&] { return mFailureCallbackCalled; });
 
-        EXPECT_LT(first.sigma1s, kFullSigma1Transmissions);
-        EXPECT_LT(middle.sigma1s, kFullSigma1Transmissions);
+        EXPECT_LE(first.sigma1s, kMaxShortenedSigma1Transmissions);
+        EXPECT_LE(middle.sigma1s, kMaxShortenedSigma1Transmissions);
         ASSERT_GT(last.sigma1s, 0u);
         EXPECT_LT(last.firstSigma1Time - first.firstSigma1Time, 2 * ShortenedSigma1Deadline() + kSettleSlack);
         ASSERT_TRUE(mFailureCallbackCalled);
@@ -619,6 +624,72 @@ TEST_F(TestOperationalSessionSetupFailover, Sigma1AckDeadlineCoversIdleIntervalA
     EXPECT_EQ(peer.sigma1s, 3u);
 }
 #endif // CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS >= 2
+
+// The deadline CASESession arms is wall-clock, but MRP sends the retransmissions from its own timer. When the event loop
+// stalls, the deadline can run before MRP has sent the transmissions the limit promises, and must then wait for them
+// rather than abandon the address.
+//
+// The stall is made by cancelling MRP's retransmit timer (ReliableMessageMgr::StopTimer) once Sigma1 is out and starting it
+// again (ReliableMessageMgr::StartTimer) at a chosen time. The retransmission that fell due meanwhile then goes out late, as
+// it would after a stalled loop, while the CASESession deadline timer is not touched and fires on schedule. The additional
+// MRP backoff is not used for this: it lengthens the deadline and MRP's waits alike.
+#if CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS >= 3
+void ResumeMrpTimer(System::Layer *, void * context)
+{
+    static_cast<ReliableMessageMgr *>(context)->StartTimer();
+}
+
+TEST_F(TestOperationalSessionSetupFailover, Sigma1DeadlineWaitsForLimitTransmissionsWhenLoopStalls)
+{
+    constexpr uint8_t kLimit = 3;
+    // Large enough that the waits below are far apart compared with timer scheduling noise.
+    const ReliableMessageProtocolConfig peerMrpConfig(2000_ms32, 1000_ms32);
+    const System::Clock::Timeout base =
+        std::max<System::Clock::Timeout>(peerMrpConfig.mActiveRetransTimeout, peerMrpConfig.mIdleRetransTimeout);
+    // Longest wait MRP can make after transmission i + 1 (hi), and a lower bound on the shortest (lo): jitter adds at most
+    // 24.9% to it.
+    auto hi = [&](uint8_t i) { return ReliableMessageMgr::GetBackoff(base, i, /* computeMaxPossible */ true); };
+    auto lo = [&](uint8_t i) { return System::Clock::Timeout(hi(i).count() * 1024 / 1279); };
+    // The first deadline: the longest waits of the first kLimit transmissions.
+    const System::Clock::Timeout window      = hi(0) + hi(1) + hi(2);
+    constexpr System::Clock::Timeout kMargin = 400_ms;
+    // With one transmission out when the first deadline runs at `window`, the deadline waits another full `window`. MRP is
+    // restarted so that transmission 3 goes out before that second deadline (its wait is at most hi(1)) and transmission 4,
+    // another lo(1) + lo(2) later at the earliest, only after it.
+    const System::Clock::Timeout resumeAt = 2 * window - hi(1) - kMargin;
+    ASSERT_GT(resumeAt, window + kMargin);
+    ASSERT_GE(lo(1) + lo(2), hi(1) + 2 * kMargin);
+
+    auto & peer    = mProbe.mPeers[0];
+    peer.reachable = false;
+    CountingEstablishmentDelegate delegate;
+    CASESession session;
+    session.SetSigma1UnackedTransmissionLimit(kLimit);
+    EstablishDirect(session, delegate, peer.address, peerMrpConfig);
+    ASSERT_EQ(peer.sigma1s, 1u);
+
+    ReliableMessageMgr * mrp = GetExchangeManager().GetReliableMessageMgr();
+    mrp->StopTimer();
+    const System::Clock::Timeout elapsed = System::SystemClock().GetMonotonicTimestamp() - peer.firstSigma1Time;
+    ASSERT_EQ(GetSystemLayer().StartTimer(resumeAt - elapsed, ResumeMrpTimer, mrp), CHIP_NO_ERROR);
+
+    // Until MRP is restarted nothing retransmits, whatever the CASESession deadline does.
+    DriveUntil(resumeAt - kMargin / 2 - elapsed, [] { return false; });
+    EXPECT_EQ(peer.sigma1s, 1u);
+
+    DriveUntil(4 * window, [&] { return delegate.mErrors > 0; });
+
+    EXPECT_EQ(delegate.mErrors, 1u);
+    EXPECT_EQ(delegate.mLastError, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(peer.sigma1s, kLimit);
+    // The first deadline, with one transmission out, waited again instead of giving up: the attempt ends at the second.
+    // Compared as plain milliseconds so a failure prints readable numbers.
+    const uint64_t endedAfterMs = (delegate.mErrorTime - peer.firstSigma1Time).count();
+    EXPECT_GE(endedAfterMs, static_cast<uint64_t>((2 * window - kMargin).count()));
+    EXPECT_LT(endedAfterMs, static_cast<uint64_t>((2 * window + (hi(2) - hi(0)) / 2).count()));
+    GetSystemLayer().CancelTimer(ResumeMrpTimer, mrp);
+}
+#endif // CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS >= 3
 
 TEST_F(TestOperationalSessionSetupFailover, DestroyedCASESessionLeavesNoSigma1Deadline)
 {
