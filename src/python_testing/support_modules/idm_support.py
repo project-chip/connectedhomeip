@@ -162,7 +162,13 @@ COMMAND_CONSTRAINT_DENIED_CLUSTERS = frozenset({
 # Individual (cluster_id, command_id) pairs to exclude from constraint fuzzing on
 # clusters that are otherwise safe. Add entries here for commands with disruptive
 # side effects or special state requirements.
+COMMAND_CONSTRAINT_BASELINE_EXCLUSIONS: frozenset[tuple[int, int]] = frozenset({
+    (Clusters.GeneralDiagnostics.id, Clusters.GeneralDiagnostics.Commands.TestEventTrigger.command_id),
+    (Clusters.GeneralDiagnostics.id, Clusters.GeneralDiagnostics.Commands.PayloadTestRequest.command_id),
+})
+
 COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
+    *COMMAND_CONSTRAINT_BASELINE_EXCLUSIONS,
     # State-gated: validated only while the device is identifying; per the Groups
     # cluster spec the command is otherwise discarded with SUCCESS, so field
     # constraints cannot be exercised without an Identify precondition.
@@ -1234,6 +1240,9 @@ class IDMBaseTest(BasicCompositionTests):
         lists are excluded, as are fields the cluster does not process given its
         features (see command_field_applies).
 
+        Diagnostic commands without a safe valid baseline remain discoverable for
+        coverage reporting, but check_command_constraint never invokes them.
+
         An enum-typed field counts as constrained even when it declares no
         <constraint> element: an enum bounds its field through the values its
         <dataTypes> definition lists, the same way it bounds an attribute.
@@ -1260,7 +1269,8 @@ class IDMBaseTest(BasicCompositionTests):
                 for command_id in accepted_command_ids:
                     if not is_standard_command_id(command_id):
                         continue
-                    if (cluster_id, command_id) in COMMAND_CONSTRAINT_DENIED_COMMANDS:
+                    if ((cluster_id, command_id) in COMMAND_CONSTRAINT_DENIED_COMMANDS
+                            and (cluster_id, command_id) not in COMMAND_CONSTRAINT_BASELINE_EXCLUSIONS):
                         log.info("Skipping command 0x%04X:0x%02X on EP%s: deny-listed for command constraint fuzzing",
                                  cluster_id, command_id, endpoint_id)
                         continue
@@ -1513,6 +1523,21 @@ class IDMBaseTest(BasicCompositionTests):
         required sibling could not be given a valid value (which would make a
         CONSTRAINT_ERROR ambiguous).
         """
+        if (info.cluster_id in COMMAND_CONSTRAINT_DENIED_CLUSTERS
+                or (info.cluster_id, info.command_id) in COMMAND_CONSTRAINT_DENIED_COMMANDS):
+            reason = ("a generated EnableKey may be rejected independently of the target field; "
+                      "no approved safe baseline and cleanup contract is available"
+                      if (info.cluster_id, info.command_id) in COMMAND_CONSTRAINT_BASELINE_EXCLUSIONS
+                      else "command is excluded from automatic constraint testing")
+            problem = f"{info.path_str}: {reason}; actual constraint enforcement not demonstrated"
+            log.warning(problem)
+            self.record_warning(
+                test_name=self.current_test_info.name,
+                location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                                             command_id=info.command_id),
+                problem=problem)
+            return ConstraintProbeResult()
+
         target_label = self._command_field_label(info.command_class, info.field.value)
         if target_label is None:
             log.warning("Skipping %s: field id %s not present in generated command class",
