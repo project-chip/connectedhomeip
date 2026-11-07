@@ -225,4 +225,59 @@
     [self waitForExpectations:@[ expectation3, expectation2 ] timeout:3]; // NOTE: No particular ordering required
 }
 
+- (void)testCallDoesNotKeepReleasedDelegateAlive
+{
+    MTRDelegateManager<MTRDelegateManagerTestsDelegateImpl *, MTRDelegateManagerTestsDelegateInfo *> * manager = [[MTRDelegateManager alloc] initWithOwner:self];
+
+    dispatch_queue_t queue = dispatch_queue_create("MTRDelegateManagerTests", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    dispatch_semaphore_t queueBlocked = dispatch_semaphore_create(0);
+    dispatch_async(queue, ^{
+        dispatch_semaphore_wait(queueBlocked, DISPATCH_TIME_FOREVER);
+    });
+
+    __auto_type * deallocExpectation = [self expectationWithDescription:@"Delegate deallocated"];
+    __auto_type * deliveredExpectation = [self expectationWithDescription:@"Block ran"];
+    deliveredExpectation.inverted = YES;
+    @autoreleasepool {
+        __auto_type * delegate = [[MTRDelegateManagerTestsDelegateImpl alloc] initWithDeallocExpectation:deallocExpectation];
+        [manager addDelegateInfo:[[MTRDelegateManagerTestsDelegateInfo alloc] initWithDelegate:delegate queue:queue]];
+        [manager callDelegatesWithBlock:^(MTRDelegateManagerTestsDelegateImpl * calledDelegate) {
+            [deliveredExpectation fulfill];
+        }];
+    }
+
+    // The delegate's queue is still blocked, so the call has not been delivered yet.
+    [self waitForExpectations:@[ deallocExpectation ] timeout:2];
+
+    dispatch_semaphore_signal(queueBlocked);
+    [self waitForExpectations:@[ deliveredExpectation ] timeout:1];
+}
+
+- (void)testCallDeliversToDelegateStillAlive
+{
+    MTRDelegateManager<MTRDelegateManagerTestsDelegateImpl *, MTRDelegateManagerTestsDelegateInfo *> * manager = [[MTRDelegateManager alloc] initWithOwner:self];
+
+    dispatch_queue_t queue = dispatch_queue_create("MTRDelegateManagerTests", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    dispatch_semaphore_t queueBlocked = dispatch_semaphore_create(0);
+    dispatch_async(queue, ^{
+        dispatch_semaphore_wait(queueBlocked, DISPATCH_TIME_FOREVER);
+    });
+
+    NSMutableArray<MTRDelegateManagerTestsDelegateImpl *> * owner = [NSMutableArray array];
+    __auto_type * deliveredExpectation = [self expectationWithDescription:@"Block ran"];
+    @autoreleasepool {
+        __auto_type * delegate = [[MTRDelegateManagerTestsDelegateImpl alloc] init];
+        [owner addObject:delegate];
+        [manager addDelegateInfo:[[MTRDelegateManagerTestsDelegateInfo alloc] initWithDelegate:delegate queue:queue]];
+        [manager callDelegatesWithBlock:^(MTRDelegateManagerTestsDelegateImpl * calledDelegate) {
+            XCTAssertEqual(calledDelegate, owner.firstObject);
+            [deliveredExpectation fulfill];
+        }];
+    }
+
+    // The test's own reference is gone, but another owner still holds the delegate when the block runs.
+    dispatch_semaphore_signal(queueBlocked);
+    [self waitForExpectations:@[ deliveredExpectation ] timeout:2];
+    [owner removeAllObjects];
+}
 @end
