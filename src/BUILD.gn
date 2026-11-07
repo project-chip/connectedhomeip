@@ -182,6 +182,7 @@ if (chip_build_tests) {
       "${chip_root}/src/lib/support/verhoeff/tests",
       "${chip_root}/src/messaging/tests",
       "${chip_root}/src/protocols/bdx/tests",
+      "${chip_root}/src/protocols/bdx/tests:messaging-tests",
       "${chip_root}/src/protocols/interaction_model/tests",
       "${chip_root}/src/protocols/secure_channel/tests",
       "${chip_root}/src/protocols/user_directed_commissioning/tests",

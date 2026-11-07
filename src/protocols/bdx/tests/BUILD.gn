@@ -39,6 +39,24 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 }
 
+# Kept apart from libBDXTests because it depends on the messaging test helpers,
+# which do not build for every platform that runs libBDXTests (see
+# src/test_driver/esp32/CMakeLists.txt).
+chip_test_suite("messaging-tests") {
+  output_name = "libBDXMessagingTests"
+
+  test_sources = [ "TestAsyncTransferFacilitator.cpp" ]
+
+  public_deps = [
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/messaging/tests:helpers",
+    "${chip_root}/src/protocols/bdx",
+  ]
+
+  cflags = [ "-Wconversion" ]
+}
+
 if (pw_enable_fuzz_test_targets) {
   chip_pw_fuzz_target("fuzz-bdx-transfer-session-pw") {
     test_source = [ "FuzzBdxTransferSessionPW.cpp" ]
