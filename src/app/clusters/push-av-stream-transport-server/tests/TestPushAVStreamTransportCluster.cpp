@@ -15,8 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <cstdio>
-#include <lib/support/TestPersistentStorageDelegate.h>
 #include <vector>
 
 #include <pw_unit_test/framework.h>
@@ -489,6 +487,11 @@ TEST_F(TestPushAVStreamTransportServerLogic, AllocatePushTransportRejectsEndpoin
 
 TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSupportedFeatureField)
 {
+    struct ScopedShutdown
+    {
+        PushAvStreamTransportServer & server;
+        ~ScopedShutdown() { server.Shutdown(ClusterShutdownType::kClusterShutdown); }
+    };
     class ZoneDelegate : public TestPushAVStreamTransportDelegateImpl
     {
     public:
@@ -522,13 +525,44 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
         {
             return busy ? PushAvStreamTransportStatusEnum::kBusy : PushAvStreamTransportStatusEnum::kIdle;
         }
-        size_t allocations   = 0;
-        size_t modifications = 0;
-        size_t sizeChecks    = 0;
-        size_t idChecks      = 0;
-        size_t streamChecks  = 0;
-        bool busy            = false;
-        bool invalidStream   = false;
+        void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                         Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+        {
+            ++certificateUpdates;
+        }
+        size_t allocations        = 0;
+        size_t modifications      = 0;
+        size_t sizeChecks         = 0;
+        size_t idChecks           = 0;
+        size_t streamChecks       = 0;
+        size_t certificateUpdates = 0;
+        bool busy                 = false;
+        bool invalidStream        = false;
+    };
+    class TLSDelegate : public TestTLSClientManagementDelegate
+    {
+    public:
+        CHIP_ERROR FindProvisionedEndpointByID(EndpointId endpoint, FabricIndex fabric, uint16_t endpointId,
+                                               LoadedEndpointCallback callback) override
+        {
+            ++lookups;
+            return TestTLSClientManagementDelegate::FindProvisionedEndpointByID(endpoint, fabric, endpointId, callback);
+        }
+        ClusterStatusCode ProvisionEndpoint(EndpointId endpoint, FabricIndex fabric,
+                                            const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & request,
+                                            uint16_t & endpointId) override
+        {
+            ++provisions;
+            return TestTLSClientManagementDelegate::ProvisionEndpoint(endpoint, fabric, request, endpointId);
+        }
+        CHIP_ERROR MutateEndpointReferenceCount(EndpointId endpoint, FabricIndex fabric, uint16_t endpointId, int8_t delta) override
+        {
+            ++referenceUpdates;
+            return TestTLSClientManagementDelegate::MutateEndpointReferenceCount(endpoint, fabric, endpointId, delta);
+        }
+        size_t lookups          = 0;
+        size_t provisions       = 0;
+        size_t referenceUpdates = 0;
     };
     class CountingPersistence : public DefaultAttributePersistenceProvider
     {
@@ -575,13 +609,17 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                            ZoneCase::Oversized, ZoneCase::InvalidId, ZoneCase::InvalidTLS, ZoneCase::Busy, ZoneCase::NotFound,
                            ZoneCase::InvalidStream, ZoneCase::TimeControl, ZoneCase::GlobalSensitivity })
                     {
+                        if (zoneCase != ZoneCase::Valid && sensitivity != (feature ? 5 : -1))
+                        {
+                            continue;
+                        }
                         if ((modify && zoneCase == ZoneCase::InvalidTLS) ||
                             (!modify && (zoneCase == ZoneCase::Busy || zoneCase == ZoneCase::NotFound)))
                         {
                             continue;
                         }
                         ZoneDelegate delegate;
-                        TestTLSClientManagementDelegate tlsDelegate;
+                        TLSDelegate tlsDelegate;
                         TestTLSClientManagementDelegateNullClientCertId invalidTlsDelegate;
                         PushAvStreamTransportServer server{ 1,
                                                             feature ? BitFlags<Feature>(Feature::kPerZoneSensitivity)
@@ -593,6 +631,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         ServerClusterContext context{ originalContext.provider, originalContext.storage, persistence,
                                                       originalContext.interactionContext };
                         ASSERT_EQ(server.Startup(context), CHIP_NO_ERROR);
+                        ScopedShutdown shutdown{ server };
                         auto & logic = server.GetLogic();
                         logic.SetDelegate(&delegate);
                         logic.SetTLSClientManagementDelegate(&tlsDelegate);
@@ -648,8 +687,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         delegate.allocations = delegate.modifications = delegate.sizeChecks = delegate.idChecks =
                             delegate.streamChecks                                           = 0;
                         const size_t count                                                  = zoneCase == ZoneCase::NullId
-                                                                             ? 1u
-                                                                             : (zoneCase == ZoneCase::Oversized || zoneCase == ZoneCase::DuplicateMalformed ? 3u : 2u);
+                            ? 1u
+                            : (zoneCase == ZoneCase::Oversized || zoneCase == ZoneCase::DuplicateMalformed ? 3u : 2u);
                         uint8_t buffer[128];
                         TLV::TLVWriter writer;
                         writer.Init(buffer, sizeof(buffer));
@@ -752,16 +791,15 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         size_t sizeChecks   = 0;
                         size_t idChecks     = 0;
                         size_t streamChecks = 0;
-                        if (motion && zoneCase == ZoneCase::MalformedFirst)
+                        if (zoneCase == ZoneCase::MalformedFirst)
                         {
                             expected = Status::InvalidCommand;
                         }
-                        else if (motion && sensitivityStatus != Status::Success)
+                        else if (sensitivityStatus != Status::Success)
                         {
                             expected = sensitivityStatus;
                         }
-                        else if ((motion && malformed) || zoneCase == ZoneCase::TimeControl ||
-                                 zoneCase == ZoneCase::GlobalSensitivity)
+                        else if (malformed || zoneCase == ZoneCase::TimeControl || zoneCase == ZoneCase::GlobalSensitivity)
                         {
                             expected = zoneCase == ZoneCase::GlobalSensitivity && motion && !feature ? Status::ConstraintError
                                                                                                      : Status::InvalidCommand;
@@ -799,10 +837,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                                     expected      = Status::Failure;
                                     clusterStatus = to_underlying(StatusCodeEnum::kInvalidZone);
                                 }
-                                else if (!motion && sensitivityStatus != Status::Success)
-                                {
-                                    expected = sensitivityStatus;
-                                }
                                 else
                                 {
                                     streamChecks = 1;
@@ -815,23 +849,31 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                             }
                         }
                         modification.transportOptions = options;
+                        const size_t tlsLookupsBefore = tlsDelegate.lookups;
+                        const auto directStatus       = logic.ValidateIncomingTransportOptions(options);
+                        const bool invalidInput       = malformed || sensitivityStatus != Status::Success ||
+                            zoneCase == ZoneCase::TimeControl || zoneCase == ZoneCase::GlobalSensitivity;
+                        EXPECT_EQ(directStatus, invalidInput ? expected : Status::Success);
+                        EXPECT_EQ(tlsDelegate.lookups, tlsLookupsBefore);
+                        EXPECT_EQ(tlsDelegate.provisions, 0u);
+                        EXPECT_EQ(tlsDelegate.referenceUpdates, 0u);
+                        EXPECT_EQ(delegate.certificateUpdates, 0u);
                         Testing::MockCommandHandler handler;
                         handler.SetFabricIndex(1);
                         const ConcreteCommandPath path{ 1, PushAvStreamTransport::Id,
                                                         modify ? Commands::ModifyPushTransport::Id
                                                                : Commands::AllocatePushTransport::Id };
-                        const auto result = modify ? logic.HandleModifyPushTransport(handler, path, modification)
-                                                   : logic.HandleAllocatePushTransport(handler, path, allocate);
-                        std::printf(
-                            "AMBIENT_SENSITIVITY_CASE feature=%u trigger=%u modify=%u sensitivity=%d shape=%u expected=%u\n",
-                            static_cast<unsigned>(feature), static_cast<unsigned>(triggerType), static_cast<unsigned>(modify),
-                            sensitivity, static_cast<unsigned>(zoneCase), static_cast<unsigned>(expected));
+                        const auto result  = modify ? logic.HandleModifyPushTransport(handler, path, modification)
+                                                    : logic.HandleAllocatePushTransport(handler, path, allocate);
                         const bool success = expected == Status::Success;
                         if (result.has_value())
                         {
                             EXPECT_EQ(result->GetStatusCode().GetStatus(), expected);
+                            EXPECT_FALSE(handler.HasStatus());
+                            EXPECT_FALSE(handler.HasResponse());
+                            handler.AddStatus(path, result->GetStatusCode());
                         }
-                        else if (modify || !success)
+                        if (modify || !success)
                         {
                             ASSERT_EQ(handler.GetStatuses().size(), 1u);
                             EXPECT_EQ(handler.GetStatuses()[0].status.GetStatus(), expected);
@@ -847,6 +889,13 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         EXPECT_EQ(delegate.allocations, success && !modify ? 1u : 0u);
                         EXPECT_EQ(delegate.modifications, success && modify ? 1u : 0u);
                         EXPECT_EQ(persistence.writes - writesBefore, success ? 1u : 0u);
+                        if (invalidInput)
+                        {
+                            EXPECT_EQ(tlsDelegate.lookups, tlsLookupsBefore);
+                            EXPECT_EQ(tlsDelegate.provisions, 0u);
+                            EXPECT_EQ(tlsDelegate.referenceUpdates, 0u);
+                            EXPECT_EQ(delegate.certificateUpdates, 0u);
+                        }
                         EXPECT_EQ(logic.mCurrentConnections.size(), modify || success ? 1u : 0u);
                         if (modify && !success)
                         {
@@ -1600,7 +1649,13 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestModifyPushTransportMotionZones)
                 Testing::MockCommandHandler handler;
                 handler.SetFabricIndex(1);
                 const ConcreteCommandPath path{ 1, PushAvStreamTransport::Id, Commands::ModifyPushTransport::Id };
-                EXPECT_EQ(logic.HandleModifyPushTransport(handler, path, modify), std::nullopt);
+                const auto result = logic.HandleModifyPushTransport(handler, path, modify);
+                if (result.has_value())
+                {
+                    EXPECT_FALSE(handler.HasStatus());
+                    EXPECT_FALSE(handler.HasResponse());
+                    handler.AddStatus(path, result->GetStatusCode());
+                }
                 ASSERT_EQ(handler.GetStatuses().size(), 1u);
                 EXPECT_EQ(handler.GetStatuses()[0].status.GetStatus(), expected);
                 if (expected == Status::Failure)

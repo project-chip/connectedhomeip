@@ -472,10 +472,6 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         VerifyOrReturnValue(
             triggerOptions.motionZones.HasValue(), Status::InvalidCommand,
             ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Missing motion zones ", mEndpointId));
-    }
-
-    if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
-    {
         if (!triggerOptions.motionZones.Value().IsNull())
         {
             auto & motionZonesList = triggerOptions.motionZones;
@@ -516,7 +512,10 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                 return Status::InvalidCommand;
             }
         }
+    }
 
+    if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
+    {
         VerifyOrReturnValue(triggerOptions.motionTimeControl.HasValue(), Status::InvalidCommand,
                             ChipLogError(Zcl,
                                          "Transport Options verification from command data[ep=%d]: Missing Motion Time Control ",
@@ -880,9 +879,8 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
     return Status::Success;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-PushAvStreamTransportServerLogic::ValidateMotionZones(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                                      const Structs::TransportTriggerOptionsStruct::DecodableType & triggerOptions)
+DataModel::ActionReturnStatus
+PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTriggerOptionsStruct::DecodableType & triggerOptions)
 {
     if ((triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion ||
          triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext) &&
@@ -940,34 +938,10 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(CommandHandler & handler, 
             {
                 auto status = to_underlying(StatusCodeEnum::kInvalidZone);
                 ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid ZoneId", mEndpointId);
-                TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
-                return std::nullopt;
+                return ClusterStatusCode::ClusterSpecificFailure(status);
             }
         }
         VerifyOrReturnValue(iter.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
-
-        if (triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext)
-        {
-            auto sensitivityIter = zones.begin();
-            while (sensitivityIter.Next())
-            {
-                const auto & zone = sensitivityIter.GetValue();
-                if (HasFeature(Feature::kPerZoneSensitivity))
-                {
-                    VerifyOrReturnValue(zone.sensitivity.HasValue(), Status::InvalidCommand,
-                                        ChipLogError(Zcl, "Ambient zone is missing Sensitivity on endpoint %u", mEndpointId));
-                    VerifyOrReturnValue(zone.sensitivity.Value() >= 1 && zone.sensitivity.Value() <= 10, Status::ConstraintError,
-                                        ChipLogError(Zcl, "Ambient zone Sensitivity is out of range on endpoint %u", mEndpointId));
-                }
-                else
-                {
-                    VerifyOrReturnValue(
-                        !zone.sensitivity.HasValue(), Status::InvalidCommand,
-                        ChipLogError(Zcl, "Ambient zone Sensitivity requires PerZoneSensitivity on endpoint %u", mEndpointId));
-                }
-            }
-            VerifyOrReturnValue(sensitivityIter.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
-        }
     }
     return Status::Success;
 }
@@ -1119,7 +1093,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    auto zoneStatus = ValidateMotionZones(handler, commandPath, transportOptions.triggerOptions);
+    auto zoneStatus = ValidateMotionZones(transportOptions.triggerOptions);
     if (zoneStatus != Status::Success)
     {
         return zoneStatus;
@@ -1342,14 +1316,10 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
         return std::nullopt;
     }
 
-    auto zoneStatus = ValidateMotionZones(handler, commandPath, transportOptions.triggerOptions);
+    auto zoneStatus = ValidateMotionZones(transportOptions.triggerOptions);
     if (zoneStatus != Status::Success)
     {
-        if (zoneStatus.has_value())
-        {
-            handler.AddStatus(commandPath, zoneStatus->GetStatusCode());
-        }
-        return std::nullopt;
+        return zoneStatus;
     }
 
     std::shared_ptr<TransportOptionsStorage> transportOptionsPtr{ new (std::nothrow) TransportOptionsStorage(transportOptions) };
