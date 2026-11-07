@@ -263,8 +263,9 @@ file using `--override-binary-path`:
     directory). If not specified, failed test logs are printed directly to
     stdout/stderr.
 -   **`--skip`**: Excludes specific test names or patterns from running.
--   **`--include-nightly`**: Includes slow nightly tests that are skipped by
-    default.
+-   **`--tag`**: Selects runs by tag. `--tag nightly` runs only the nightly
+    runs, which are skipped by default; `--tag skip-<tag>` leaves out the runs
+    with that tag.
 -   **`--keep-going`**: Instructs the runner to continue executing subsequent
     tests even if a previous test in the queue fails.
 -   **`--help`**: View the help dialog for more information.

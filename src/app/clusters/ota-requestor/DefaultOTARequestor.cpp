@@ -311,6 +311,9 @@ void DefaultOTARequestor::OnNotifyUpdateAppliedFailure(void * context, CHIP_ERRO
 
 void DefaultOTARequestor::Reset()
 {
+    mOnConnectedCallback.Cancel();
+    mOnConnectionFailureCallback.Cancel();
+
     mProviderLocation.ClearValue();
     mUpdateToken.reduce_size(0);
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);

@@ -21,6 +21,13 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 SCRIPT_PATH = os.path.join(DEFAULT_CHIP_ROOT, 'scripts')
 
+# Prefer this source tree's packages over editable installs in the venv, which
+# may point at a different source tree. This has to happen before anything
+# imports `matter`, because the controller's `matter` package computes its
+# `__path__` only once.
+for package in ('py_matter_idl', 'py_matter_yamltests'):
+    sys.path.insert(0, os.path.join(SCRIPT_PATH, package))
+
 try:
     import chiptest  # noqa: F401
 except ModuleNotFoundError:
