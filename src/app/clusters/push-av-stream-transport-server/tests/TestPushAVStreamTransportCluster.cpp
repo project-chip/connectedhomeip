@@ -687,8 +687,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         delegate.allocations = delegate.modifications = delegate.sizeChecks = delegate.idChecks =
                             delegate.streamChecks                                           = 0;
                         const size_t count                                                  = zoneCase == ZoneCase::NullId
-                            ? 1u
-                            : (zoneCase == ZoneCase::Oversized || zoneCase == ZoneCase::DuplicateMalformed ? 3u : 2u);
+                                                                             ? 1u
+                                                                             : (zoneCase == ZoneCase::Oversized || zoneCase == ZoneCase::DuplicateMalformed ? 3u : 2u);
                         uint8_t buffer[128];
                         TLV::TLVWriter writer;
                         writer.Init(buffer, sizeof(buffer));
