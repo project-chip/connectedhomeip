@@ -27,7 +27,7 @@ namespace app {
 /**
  * Concrete implementation of OccupancySensor that logs occupancy and hold time transitions.
  */
-class LoggingOccupancySensor : public OccupancySensor, public Clusters::OccupancySensingDelegate
+class LoggingOccupancySensor : public OccupancySensor, public Clusters::OccupancySensingDelegate, public TimerContext
 {
 public:
     LoggingOccupancySensor(TimerDelegate & timerDelegate);
@@ -35,6 +35,9 @@ public:
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    // TimerContext: pushes the example predictions once the cluster has started
+    void TimerFired() override;
 
     // OccupancySensingDelegate
     void OnOccupancyChanged(bool occupied) override;

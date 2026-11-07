@@ -23,8 +23,11 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/OccupancySensing/Attributes.h>
 #include <clusters/OccupancySensing/Metadata.h>
+#include <cstdint>
 #include <cstring>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 
 namespace chip::app::Clusters {
 
@@ -90,6 +93,28 @@ OccupancySensing::OccupancySensorTypeEnum FeaturesToOccupancySensorType(BitFlags
     return mappingTable[maskFromFeatures];
 }
 
+constexpr uint8_t kMaxPredictionConfidence = 100;
+
+bool IsEqual(const Structs::PredictedOccupancyStruct::Type & a, const Structs::PredictedOccupancyStruct::Type & b)
+{
+    return a.startTimestamp == b.startTimestamp && a.endTimestamp == b.endTimestamp && a.occupancy == b.occupancy &&
+        a.confidence == b.confidence;
+}
+
+CHIP_ERROR ValidatePredictions(Span<const Structs::PredictedOccupancyStruct::Type> predictions)
+{
+    for (size_t i = 0; i < predictions.size(); i++)
+    {
+        const auto & prediction = predictions[i];
+
+        VerifyOrReturnError(prediction.endTimestamp > prediction.startTimestamp, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(i == 0 || prediction.startTimestamp > predictions[i - 1].endTimestamp, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(prediction.confidence <= kMaxPredictionConfidence, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(prediction.occupancy.Raw() <= to_underlying(OccupancyBitmap::kOccupied), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    return CHIP_NO_ERROR;
+}
+
 } // namespace
 
 OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
@@ -98,6 +123,26 @@ OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
 {
     SetHoldTimeLimits(config.mHoldTimeLimits);
     mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
+
+    if (IsPredictionEnabled())
+    {
+        // Storage is allocated in Startup(): the platform allocator may not be initialized when a cluster is constructed.
+        mPredictionCapacity = config.mPredictedOccupancyCapacity;
+    }
+}
+
+OccupancySensingCluster::~OccupancySensingCluster()
+{
+    FreePredictions();
+}
+
+void OccupancySensingCluster::FreePredictions()
+{
+    // MemoryFree() requires an initialized allocator even for nullptr, so only call it when something was allocated.
+    VerifyOrReturn(mPredictions != nullptr);
+    Platform::MemoryFree(mPredictions);
+    mPredictions     = nullptr;
+    mPredictionCount = 0;
 }
 
 CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
@@ -107,6 +152,18 @@ CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
     // The spec forbids 0 as a HoldTime value. mHoldTime is zero-initialized for safety, so return error when hold time is
     // supported.
     VerifyOrReturnError(!IsHoldTimeEnabled() || mHoldTime != 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Prediction needs storage: a zero capacity is a configuration error.
+    VerifyOrReturnError(!IsPredictionEnabled() || mPredictionCapacity != 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mPredictionCapacity <= SIZE_MAX / sizeof(Structs::PredictedOccupancyStruct::Type),
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (IsPredictionEnabled() && mPredictions == nullptr)
+    {
+        mPredictions = static_cast<Structs::PredictedOccupancyStruct::Type *>(
+            Platform::MemoryCalloc(mPredictionCapacity, sizeof(Structs::PredictedOccupancyStruct::Type)));
+        VerifyOrReturnError(mPredictions != nullptr, CHIP_ERROR_NO_MEMORY);
+    }
 
     if (IsHoldTimeEnabled())
     {
@@ -130,6 +187,7 @@ void OccupancySensingCluster::Shutdown(ClusterShutdownType shutdownType)
     {
         mHoldTimeDelegate->CancelTimer(this);
     }
+    FreePredictions();
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
@@ -155,6 +213,14 @@ DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataM
         return encoder.Encode(mHoldTime);
     case Attributes::HoldTimeLimits::Id:
         return encoder.Encode(mHoldTimeLimits);
+    case Attributes::PredictedOccupancy::Id:
+        return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
+            for (size_t i = 0; i < mPredictionCount; i++)
+            {
+                ReturnErrorOnFailure(listEncoder.Encode(mPredictions[i]));
+            }
+            return CHIP_NO_ERROR;
+        });
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -192,6 +258,7 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { IsHoldTimeEnabled(), Attributes::HoldTime::kMetadataEntry },
         { IsHoldTimeEnabled(), Attributes::HoldTimeLimits::kMetadataEntry },
+        { IsPredictionEnabled(), Attributes::PredictedOccupancy::kMetadataEntry },
         { IsHoldTimeEnabled() && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPassiveInfrared),
           Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
         { IsHoldTimeEnabled() && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kUltrasonic),
@@ -323,6 +390,36 @@ void OccupancySensingCluster::DoSetOccupancy(bool occupied)
 bool OccupancySensingCluster::IsOccupied() const
 {
     return mOccupancy.Has(OccupancySensing::OccupancyBitmap::kOccupied);
+}
+
+bool OccupancySensingCluster::IsPredictionEnabled() const
+{
+    return mFeatureMap.Has(Feature::kPrediction);
+}
+
+CHIP_ERROR
+OccupancySensingCluster::SetPredictedOccupancy(Span<const Structs::PredictedOccupancyStruct::Type> predictions)
+{
+    VerifyOrReturnError(IsPredictionEnabled(), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mPredictions != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(predictions.size() <= mPredictionCapacity, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorOnFailure(ValidatePredictions(predictions));
+
+    bool changed = predictions.size() != mPredictionCount;
+    for (size_t i = 0; !changed && i < predictions.size(); i++)
+    {
+        changed = !IsEqual(predictions[i], mPredictions[i]);
+    }
+    VerifyOrReturnError(changed, CHIP_NO_ERROR);
+
+    for (size_t i = 0; i < predictions.size(); i++)
+    {
+        mPredictions[i] = predictions[i];
+    }
+    mPredictionCount = predictions.size();
+
+    NotifyAttributeChanged(Attributes::PredictedOccupancy::Id);
+    return CHIP_NO_ERROR;
 }
 
 bool OccupancySensingCluster::IsHoldTimeEnabled() const
