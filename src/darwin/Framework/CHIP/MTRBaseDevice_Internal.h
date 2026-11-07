@@ -239,6 +239,7 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 
 @interface MTRClusterPath ()
 - (instancetype)initWithPath:(const chip::app::ConcreteClusterPath &)path;
++ (__kindof MTRClusterPath *)_sharedPathForPath:(MTRClusterPath *)path;
 @end
 
 @interface MTRAttributePath ()
