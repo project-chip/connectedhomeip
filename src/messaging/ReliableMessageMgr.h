@@ -149,6 +149,19 @@ public:
     CHIP_ERROR SendFromRetransTable(RetransTableEntry * entry);
 
     /**
+     *  Get the number of times the message awaiting an acknowledgment on an exchange has been transmitted so far.
+     *
+     *  This is public so that a session that bounds an exchange by a count of transmissions, rather than by the whole
+     *  retransmission budget, can check how many transmissions MRP has actually made when its own timer fires.
+     *
+     *  @param[in]    rc    A pointer to the ReliableMessageContext of the exchange.
+     *
+     *  @return  The number of transmissions made (the initial send plus retransmissions), or 0 if the exchange has no
+     *           message awaiting an acknowledgment.
+     */
+    uint8_t GetTransmissionCount(ReliableMessageContext * rc) const;
+
+    /**
      *  Clear entries matching a specified ExchangeContext.
      *
      *  @param[in]    rc    A pointer to the ExchangeContext object.

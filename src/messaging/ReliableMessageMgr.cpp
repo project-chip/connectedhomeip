@@ -363,6 +363,20 @@ bool ReliableMessageMgr::CheckAndRemRetransTable(ReliableMessageContext * rc, ui
     return removed;
 }
 
+uint8_t ReliableMessageMgr::GetTransmissionCount(ReliableMessageContext * rc) const
+{
+    uint8_t count = 0;
+    mRetransTable.ForEachActiveObject([&](const RetransTableEntry * entry) {
+        if (entry->ec->GetReliableMessageContext() == rc)
+        {
+            count = static_cast<uint8_t>(entry->sendCount + 1);
+            return Loop::Break;
+        }
+        return Loop::Continue;
+    });
+    return count;
+}
+
 CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 {
     if (!entry->ec->HasSessionHandle())

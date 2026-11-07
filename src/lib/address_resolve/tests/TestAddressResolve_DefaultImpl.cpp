@@ -680,6 +680,41 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, TriesNextRes
     ASSERT_EQ(expectedResult.address, GetAddressWithLowScore(static_cast<uint16_t>(1)));
 }
 
+#if CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS >= 2
+
+TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, HasMoreResultsOnlyWhileAnotherResultIsLeft)
+{
+    chip::Dnssd::Resolver::SetInstance(mockResolver);
+    chip::AddressResolve::Impl::Resolver resolver;
+    ASSERT_EQ(resolver.Init(&mSystemLayer), CHIP_NO_ERROR);
+
+    System::Clock::Internal::RAIIMockClock clock;
+    AddressResolve::NodeLookupHandle handle;
+    handle.SetListener(&mNodeListener);
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+    ASSERT_EQ(resolver.LookupNode(request, handle), CHIP_NO_ERROR);
+
+    ResolveResult first;
+    first.address = GetAddressWithLowScore(static_cast<uint16_t>(1));
+    ResolveResult second;
+    second.address = GetAddressWithLowScore(static_cast<uint16_t>(2));
+    handle.LookupResult(first);
+    handle.LookupResult(second);
+    EXPECT_FALSE(resolver.HasMoreResults(handle));
+
+    ASSERT_EQ(resolver.CancelLookup(handle, chip::AddressResolve::Resolver::FailureCallback::Skip), CHIP_NO_ERROR);
+    EXPECT_TRUE(resolver.HasMoreResults(handle));
+    ASSERT_EQ(resolver.TryNextResult(handle), CHIP_NO_ERROR);
+    EXPECT_TRUE(resolver.HasMoreResults(handle));
+    ASSERT_EQ(resolver.TryNextResult(handle), CHIP_NO_ERROR);
+    EXPECT_FALSE(resolver.HasMoreResults(handle));
+    EXPECT_EQ(resolver.TryNextResult(handle), CHIP_ERROR_NOT_FOUND);
+
+    resolver.Shutdown();
+}
+
+#endif
+
 TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, CancellingLookupCallsOnNodeAddressResolutionFailed)
 {
     chip::Dnssd::Resolver::SetInstance(mockResolver);

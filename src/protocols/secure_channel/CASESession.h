@@ -116,6 +116,14 @@ public:
     void SetGroupDataProvider(Credentials::GroupDataProvider * groupDataProvider) { mGroupDataProvider = groupDataProvider; }
 
     /**
+     * @brief Give up on an MRP-carried Sigma1 with CHIP_ERROR_TIMEOUT if it is still
+     *        unacknowledged when the ack windows of its first `limit` transmissions
+     *        have ended, instead of after the whole MRP retransmission budget. 0 (the
+     *        default) keeps the whole budget. Must be set before EstablishSession.
+     */
+    void SetSigma1UnackedTransmissionLimit(uint8_t limit) { mSigma1UnackedTransmissionLimit = limit; }
+
+    /**
      * @brief
      *   Derive a secure session from the established session. The API will return error if called before session is established.
      *
@@ -530,6 +538,12 @@ private:
 
     void AbortPendingEstablish(CHIP_ERROR err);
 
+    // The longest MRP can take to send the Sigma1 transmissions from index firstIndex up to the limit (0-based: index i is
+    // the wait after transmission i + 1, i.e. the backoff for sendCount i).
+    System::Clock::Timeout Sigma1AckWindow(uint8_t firstIndex) const;
+    void StartSigma1AckDeadline();
+    static void OnSigma1AckDeadline(System::Layer * systemLayer, void * appState);
+
     CHIP_ERROR GetHardcodedTime();
 
     CHIP_ERROR SetEffectiveTime();
@@ -563,6 +577,8 @@ private:
     Crypto::P256ECDHDerivedSecret mSharedSecret;
     Credentials::ValidationContext mValidContext;
     Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
+    uint8_t mSigma1UnackedTransmissionLimit             = 0;
+    bool mSigma1AckDeadlineArmed                        = false;
 
     uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
     uint8_t mIPK[kIPKSize];
