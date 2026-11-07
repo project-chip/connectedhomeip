@@ -101,12 +101,12 @@ class TC_DEM_2_3(MatterTestCommissionedDevice, DEMTestBase):
                      "Value has to be 0x01 (Online)"),
             TestStep("7b", "TH reads from the DUT the OptOutState",
                      "Value has to be 0x00 (NoOptOut)"),
-            TestStep("8", "TH sends command StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime from Forecast, Cause=LocalOptimization",
+            TestStep("8", "TH sends command StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime+1 from Forecast, Cause=LocalOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep("8a", "TH reads from the DUT the ESAState",
                      "Value has to be 0x01 (Online)"),
             TestStep("8b", "TH reads from the DUT the Forecast",
-                     "Value has to include EarliestStartTime=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Local Optimization"),
+                     "Value has to include EarliestStartTime<StartTime, LatestEndTime>EndTime, and ForecastUpdateReason=Local Optimization"),
             TestStep("9", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep("9a", "TH reads from the DUT the ESAState",
@@ -115,25 +115,25 @@ class TC_DEM_2_3(MatterTestCommissionedDevice, DEMTestBase):
                      "Value has to be 0x01 (LocalOptOut)"),
             TestStep("9c", "TH reads from the DUT the Forecast",
                      "Value has to include EarliestStartTime<=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Internal Optimization"),
-            TestStep("10", "TH sends command StartTimeAdjustRequest with RequestedStartTime=StartTime+(LatestEndTime-EndTime) from Forecast, Cause=GridOptimization",
+            TestStep("10", "TH sends command StartTimeAdjustRequest with RequestedStartTime=StartTime+(LatestEndTime-EndTime)-1 from Forecast, Cause=GridOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep("10a", "TH reads from the DUT the ESAState",
                      "Value has to be 0x01 (Online)"),
             TestStep("10b", "TH reads from the DUT the Forecast",
-                     "Value has to include EarliestStartTime<=StartTime, LatestEndTime=EndTime, and ForecastUpdateReason=Grid Optimization"),
+                     "Value has to include EarliestStartTime<StartTime, LatestEndTime>EndTime, and ForecastUpdateReason=Grid Optimization"),
             TestStep("11", "TH sends command CancelRequest",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep("11a", "TH reads from the DUT the ESAState",
                      "Value has to be 0x01 (Online)"),
             TestStep("11b", "TH reads from the DUT the Forecast",
                      "Value has to include EarliestStartTime<=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Internal Optimization"),
-            TestStep("12", "TH sends command StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime-1 from Forecast, Cause=LocalOptimization",
+            TestStep("12", "TH sends command StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime from Forecast, Cause=LocalOptimization",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep("12a", "TH reads from the DUT the ESAState",
                      "Value has to be 0x01 (Online)"),
             TestStep("12b", "TH reads from the DUT the Forecast",
                      "Value has to include StartTime and EndTime unchanged from step 10b"),
-            TestStep("13", "TH sends command StartTimeAdjustRequest with RequestedStartTime=StartTime+(LatestEndTime-EndTime)+1 from Forecast, Cause=LocalOptimization",
+            TestStep("13", "TH sends command StartTimeAdjustRequest with RequestedStartTime=StartTime+(LatestEndTime-EndTime) from Forecast, Cause=LocalOptimization",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep("13a", "TH reads from the DUT the ESAState",
                      "Value has to be 0x01 (Online)"),
@@ -214,7 +214,7 @@ class TC_DEM_2_3(MatterTestCommissionedDevice, DEMTestBase):
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
 
         self.step("8")
-        await self.send_start_time_adjust_request_command(requestedStartTime=forecast.earliestStartTime,
+        await self.send_start_time_adjust_request_command(requestedStartTime=forecast.earliestStartTime + 1,
                                                           cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization)
 
         self.step("8a")
@@ -222,10 +222,10 @@ class TC_DEM_2_3(MatterTestCommissionedDevice, DEMTestBase):
 
         self.step("8b")
         forecast3 = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        asserts.assert_equal(forecast3.earliestStartTime, forecast3.startTime,
-                             f"Expected earliestStartTime {forecast3.earliestStartTime} to be == startTime {forecast3.startTime}")
-        asserts.assert_greater_equal(forecast3.latestEndTime, forecast3.endTime,
-                                     f"Expected latestEndTime {forecast3.latestEndTime} to be >= endTime {forecast3.endTime}")
+        asserts.assert_less(forecast3.earliestStartTime, forecast3.startTime,
+                            f"Expected earliestStartTime {forecast3.earliestStartTime} to be < startTime {forecast3.startTime}")
+        asserts.assert_greater(forecast3.latestEndTime, forecast3.endTime,
+                               f"Expected latestEndTime {forecast3.latestEndTime} to be > endTime {forecast3.endTime}")
         asserts.assert_equal(forecast3.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kLocalOptimization,
                              f"Expected forecastUpdateReason {forecast3.forecastUpdateReason} to be == LocalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kLocalOptimization}")
 
@@ -248,7 +248,7 @@ class TC_DEM_2_3(MatterTestCommissionedDevice, DEMTestBase):
                              f"Expected forecastUpdateReason {forecast4.forecastUpdateReason} to be == InternalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization}")
 
         self.step("10")
-        await self.send_start_time_adjust_request_command(requestedStartTime=forecast4.startTime+forecast4.latestEndTime - forecast4.endTime,
+        await self.send_start_time_adjust_request_command(requestedStartTime=forecast4.startTime+forecast4.latestEndTime - forecast4.endTime - 1,
                                                           cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization)
 
         self.step("10a")
@@ -256,10 +256,10 @@ class TC_DEM_2_3(MatterTestCommissionedDevice, DEMTestBase):
 
         self.step("10b")
         forecast5 = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        asserts.assert_less_equal(forecast5.earliestStartTime, forecast5.startTime,
-                                  f"Expected earliestStartTime {forecast5.earliestStartTime} to be <= startTime {forecast5.startTime}")
-        asserts.assert_equal(forecast5.latestEndTime, forecast5.endTime,
-                             f"Expected latestEndTime {forecast5.latestEndTime} to be == endTime {forecast5.endTime}")
+        asserts.assert_less(forecast5.earliestStartTime, forecast5.startTime,
+                            f"Expected earliestStartTime {forecast5.earliestStartTime} to be < startTime {forecast5.startTime}")
+        asserts.assert_greater(forecast5.latestEndTime, forecast5.endTime,
+                               f"Expected latestEndTime {forecast5.latestEndTime} to be > endTime {forecast5.endTime}")
         asserts.assert_equal(forecast5.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kGridOptimization,
                              f"Expected forecastUpdateReason {forecast5.forecastUpdateReason} to be == GridOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kGridOptimization}")
 
@@ -279,7 +279,7 @@ class TC_DEM_2_3(MatterTestCommissionedDevice, DEMTestBase):
                              f"Expected forecastUpdateReason {forecast6.forecastUpdateReason} to be == InternalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization}")
 
         self.step("12")
-        await self.send_start_time_adjust_request_command(requestedStartTime=forecast6.earliestStartTime - 1,
+        await self.send_start_time_adjust_request_command(requestedStartTime=forecast6.earliestStartTime,
                                                           cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
                                                           expected_status=Status.ConstraintError)
         self.step("12a")
@@ -293,7 +293,7 @@ class TC_DEM_2_3(MatterTestCommissionedDevice, DEMTestBase):
                              f"Expected old endTime {forecast6.endTime} to be == endTime {forecast7.endTime}")
 
         self.step("13")
-        await self.send_start_time_adjust_request_command(requestedStartTime=forecast7.startTime+(forecast7.latestEndTime-forecast7.endTime)+1,
+        await self.send_start_time_adjust_request_command(requestedStartTime=forecast7.startTime+(forecast7.latestEndTime-forecast7.endTime),
                                                           cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
                                                           expected_status=Status.ConstraintError)
         self.step("13a")
