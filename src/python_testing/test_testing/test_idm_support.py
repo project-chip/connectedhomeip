@@ -609,6 +609,8 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         self.checker.record_accepted_violation.assert_not_called()
 
     def _prepare_writable_attribute(self, include_commands=False):
+        from support_modules.idm_support import WritableAttributeInfo
+
         self._prepare_tc_idm_9_1()
         if not include_commands:
             self.checker.endpoints_tlv[1][Clusters.ColorControl.id][GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] = []
@@ -625,6 +627,13 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         self.checker.default_controller.SendCommand.side_effect = InteractionModelError(Status.ConstraintError)
         self.checker.default_controller.WriteAttribute = AsyncMock(
             return_value=[SimpleNamespace(Status=Status.ConstraintError)])
+        xml_cluster = self.checker.xml_clusters[cluster.id]
+        xml_attribute = xml_cluster.attributes[attribute.attribute_id]
+        return WritableAttributeInfo(
+            endpoint_id=2, cluster_id=cluster.id, cluster_name=xml_cluster.name,
+            attribute_id=attribute.attribute_id, attribute_name=xml_attribute.name,
+            attribute=attribute, cluster_class=cluster, datatype=xml_attribute.datatype,
+            constraints=xml_attribute.constraints, enum_values=spec_enum_values(xml_cluster, xml_attribute.datatype))
 
     async def test_tc_idm_9_1_strict_writable_attribute_statuses(self):
         from TC_IDM_9_1 import TC_IDM_9_1
@@ -786,6 +795,67 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(self.checker.record_accepted_violation.call_count, accepted)
                     self.checker.record_warning.assert_not_called()
                     self.checker.default_controller.SendCommand.assert_not_called()
+
+    async def test_attribute_read_status_has_no_stored_value_credit(self):
+        from support_modules.idm_support import ConstraintProbeExecutionError
+
+        for write in (ChipStackError(0x32), Status.ConstraintError, Status.InvalidCommand):
+            for restore in (Status.Success, Status.Failure, ChipStackError(0x0b)):
+                with self.subTest(write=write, restore=restore):
+                    self.setUp()
+                    info = self._prepare_writable_attribute()
+                    self.checker.read_single_attribute_check_success.return_value = 2
+                    read_error = InteractionModelError(Status.ResourceExhausted)
+                    self.checker.read_single_attribute.return_value = Clusters.Attribute.ValueDecodeFailure(None, read_error)
+                    response = write if isinstance(write, Exception) else [SimpleNamespace(Status=write)]
+                    cleanup = restore if isinstance(restore, Exception) else [SimpleNamespace(Status=restore)]
+                    self.checker.default_controller.WriteAttribute.side_effect = [response, cleanup]
+                    with self.assertLogs(level='INFO') as captured, self.assertRaises(ConstraintProbeExecutionError) as raised:
+                        await self.checker.check_attribute_constraint(info, info.constraints)
+                    primary = write if isinstance(write, Exception) else read_error
+                    self.assertIs(raised.exception.__cause__, primary)
+                    self.assertEqual(raised.exception.err, primary.err if isinstance(primary, ChipStackError)
+                                     else 0x500 | int(Status.ResourceExhausted))
+                    result = raised.exception.result
+                    self.assertEqual((result.attempted, result.probed, result.rejected, result.accepted, result.other_error),
+                                     (1, 0, 0, 0, 0))
+                    self.assertEqual(result.execution_error, 1 + int(isinstance(write, Exception))
+                                     + int(restore != Status.Success))
+                    self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, 2)
+                    self.assertEqual(self.checker.default_controller.WriteAttribute.call_args_list[1]
+                                     .kwargs['attributes'][0][1].value, 2)
+                    self.assertTrue(any('Execution failed reading back' in line and str(read_error) in line
+                                        for line in captured.output))
+                    if restore != Status.Success:
+                        self.assertTrue(any('restor' in line and str(restore) in line for line in captured.output))
+                    self.checker.record_accepted_violation.assert_not_called()
+                    self.checker.record_warning.assert_not_called()
+
+    async def test_attribute_payload_decode_failure_retains_acceptance_and_primary_error(self):
+        from support_modules.idm_support import ConstraintProbeExecutionError
+
+        for restore in (Status.Success, Status.Failure, ChipStackError(0x0b)):
+            with self.subTest(restore=restore):
+                self.setUp()
+                info = self._prepare_writable_attribute()
+                self.checker.read_single_attribute_check_success.return_value = 2
+                primary = ChipStackError(0x32)
+                self.checker.read_single_attribute.return_value = Clusters.Attribute.ValueDecodeFailure(
+                    3, ValueError('invalid attribute enum value'))
+                cleanup = restore if isinstance(restore, Exception) else [SimpleNamespace(Status=restore)]
+                self.checker.default_controller.WriteAttribute.side_effect = [primary, cleanup]
+                with self.assertRaises(ConstraintProbeExecutionError) as raised:
+                    await self.checker.check_attribute_constraint(info, info.constraints)
+                self.assertIs(raised.exception.__cause__, primary)
+                result = raised.exception.result
+                self.assertEqual((result.attempted, result.probed, result.rejected, result.accepted, result.other_error),
+                                 (1, 1, 0, 1, 0))
+                self.assertEqual(result.execution_error, 1 + int(restore != Status.Success))
+                self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, 2)
+                self.assertEqual(self.checker.default_controller.WriteAttribute.call_args_list[1]
+                                 .kwargs['attributes'][0][1].value, 2)
+                self.checker.record_accepted_violation.assert_called_once()
+                self.checker.record_warning.assert_not_called()
 
     async def test_tc_idm_9_1_stops_after_first_execution_error(self):
         from TC_IDM_9_1 import TC_IDM_9_1

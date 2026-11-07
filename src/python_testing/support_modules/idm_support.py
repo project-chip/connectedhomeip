@@ -81,10 +81,10 @@ class ConstraintProbeResult:
 
 
 class ConstraintProbeExecutionError(ChipStackError):
-    """A qualified probe failed in transport; retain its partial result."""
+    """A qualified probe failed during execution; retain its partial result."""
 
-    def __init__(self, error: ChipStackError, result: ConstraintProbeResult) -> None:
-        super().__init__(error.err)
+    def __init__(self, error: ChipStackError | InteractionModelError, result: ConstraintProbeResult) -> None:
+        super().__init__(error.err if isinstance(error, ChipStackError) else 0x500 | int(error.status))
         self.result = result
 
 
@@ -1215,6 +1215,8 @@ class IDMBaseTest(BasicCompositionTests):
                 )
                 read_back_failed = isinstance(stored_value, ValueDecodeFailure)
                 restore_needed = read_back_failed or stored_value != original_value
+                if read_back_failed and isinstance(stored_value.Reason, (InteractionModelError, ChipStackError)):
+                    raise stored_value.Reason
                 stored_violation = read_back_failed or stored_value == test_value
                 if result_status != Status.Success and stored_violation:
                     self.record_accepted_violation(
@@ -1233,7 +1235,7 @@ class IDMBaseTest(BasicCompositionTests):
                         problem=(f"{attribute_path} rejected out-of-bounds value {test_value} with "
                                  f"{status_name} instead of CONSTRAINT_ERROR"))
                     result.other_error += 1
-            except ChipStackError as error:  # chipstack-ok
+            except (ChipStackError, InteractionModelError) as error:  # chipstack-ok
                 result.execution_error += 1
                 log.warning("Execution failed reading back %s: %s", attribute_path, error)
                 if execution_failure is None:
