@@ -75,6 +75,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 // Must be called on the Matter queue.
 - (void)_handleResubscriptionNeededWithDelay:(NSNumber *)resubscriptionDelayMs;
 // Must be called on the Matter queue.
+- (void)_handleSubscriptionError:(NSError *)error;
+// Must be called on the Matter queue.
 - (void)nodeMayBeAdvertisingOperational;
 - (void)_handleReportBegin;
 - (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
