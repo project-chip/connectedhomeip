@@ -234,6 +234,13 @@ TEST_F(TestLocalAvAnalysisCluster, TestCommands)
                                               }));
 }
 
+TEST_F(TestLocalAvAnalysisCluster, TestReadClusterRevision)
+{
+    uint16_t clusterRevision = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
+    EXPECT_EQ(clusterRevision, kRevision);
+}
+
 TEST_F(TestLocalAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
 {
     Attributes::SupportedAmbientContexts::TypeInfo::DecodableType aSupportedAmbientContexts;
