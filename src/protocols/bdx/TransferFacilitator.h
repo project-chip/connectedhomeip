@@ -125,6 +125,21 @@ public:
     CHIP_ERROR PrepareForTransfer(System::Layer * layer, TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
                                   uint16_t maxBlockSize, System::Clock::Timeout timeout,
                                   System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
+
+protected:
+    /**
+     * @brief Calculates the safe maximum block size for the current BDX transfer session.
+     *
+     * This function determines the maximum block size by comparing the requested
+     * transfer block size with the maximum application message length supported by
+     * the current session (Exchange Context), returning the smaller of the two.
+     * Specifically, it includes a guard to prevent unsigned integer subtraction
+     * underflow that could occur if the maximum application payload size is smaller
+     * than the BDX data block header size.
+     *
+     * @return uint16_t The calculated maximum BDX data block size.
+     */
+    uint16_t GetMaxBlockSize();
 };
 
 /**

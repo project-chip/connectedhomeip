@@ -655,6 +655,31 @@ inline System::PacketBufferHandle New(size_t aAvailableSize)
 }
 
 /**
+ * Allocates a large packet buffer with space for message headers and footers.
+ * This function is intended for specific use cases like BDX/OTA over TCP that require larger payloads.
+ *
+ *  Fails and returns \c nullptr if no memory is available, or if the size requested is too large.
+ *
+ *  @param[in]  aAvailableSize  Minimum number of octets to for application data.
+ *
+ *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
+ */
+inline System::PacketBufferHandle NewForLarge(size_t aAvailableSize)
+{
+    static_assert(System::PacketBuffer::kLargeBufMaxSize > kMaxFooterSize, "inadequate capacity");
+    if (aAvailableSize > System::PacketBuffer::kLargeBufMaxSize - kMaxFooterSize)
+    {
+        return System::PacketBufferHandle();
+    }
+    auto buffer = System::PacketBufferHandle::New(aAvailableSize + kMaxFooterSize);
+    if (buffer.IsNull() || buffer->MaxDataLength() < aAvailableSize + kMaxFooterSize)
+    {
+        return System::PacketBufferHandle();
+    }
+    return buffer;
+}
+
+/**
  * Allocates a packet buffer with initial contents.
  *
  *  @param[in]  aData           Initial buffer contents.
