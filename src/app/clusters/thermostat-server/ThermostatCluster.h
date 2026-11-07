@@ -398,6 +398,12 @@ public:
         return setpoints;
     }
 
+    Protocols::InteractionModel::Status ApplyActiveSetpoints(chip::Optional<temperature> heat,
+                                                             chip::Optional<temperature> cool) override
+    {
+        return mSetpoints.ApplyActiveSetpoints(heat, cool);
+    }
+
     Protocols::InteractionModel::Status OnAtomicWriteBegin(AttributeId attributeId) override
     {
         if constexpr (kHasPresets)

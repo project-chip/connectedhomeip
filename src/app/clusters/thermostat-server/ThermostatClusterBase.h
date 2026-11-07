@@ -94,6 +94,17 @@ public:
 
     virtual Setpoints GetSetpoints() = 0;
 
+    /**
+     * @brief Apply new heating and/or cooling setpoints to the setpoint range that is currently active based on
+     *        occupancy, and persist them, clamped to the user setpoint limits.
+     *
+     * @param[in] heat The new heating setpoint to apply to the active range, if any.
+     * @param[in] cool The new cooling setpoint to apply to the active range, if any.
+     * @return The status of the operation.
+     */
+    virtual Protocols::InteractionModel::Status ApplyActiveSetpoints(chip::Optional<temperature> heat,
+                                                                     chip::Optional<temperature> cool) = 0;
+
     virtual bool IsOccupied() const { return true; }
     virtual bool IsActiveSetpoint(AttributeId attributeId) const;
     virtual CHIP_ERROR IsPresetHandlePresent(const ByteSpan & presetHandle, bool & present)
