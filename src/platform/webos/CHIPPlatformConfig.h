@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 
 // ==================== Security Adaptations ====================
 
-// If unspecified, assume crypto is fast on Linux
+// If unspecified, assume crypto is fast on webOS
 #ifndef CHIP_CONFIG_SLOW_CRYPTO
 #define CHIP_CONFIG_SLOW_CRYPTO 0
 #endif // CHIP_CONFIG_SLOW_CRYPTO
