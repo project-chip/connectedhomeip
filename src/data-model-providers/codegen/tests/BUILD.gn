@@ -21,6 +21,7 @@ source_set("ember_extra_files") {
     # items and we need a shared IO storage to reduce overhead between
     # data-model access and ember-compatibility (we share the same buffer)
     "${chip_root}/src/app/util/ember-io-storage.cpp",
+    "${chip_root}/src/app/util/generic-callback-stubs.cpp",
     "EmberInvokeOverride.cpp",
     "EmberInvokeOverride.h",
     "EmberReadWriteOverride.cpp",
@@ -54,6 +55,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestCodegenModelViaMocks.cpp",
     "TestEmberAttributeDataBuffer.cpp",
+    "TestExternalAttributeReadCallback.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

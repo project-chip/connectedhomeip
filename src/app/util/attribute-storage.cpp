@@ -659,7 +659,8 @@ bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMe
 // attribute.  This means the resulting string may be truncated.  The length
 // byte(s) in the resulting string will reflect any truncated.
 Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
-                                uint8_t * buffer, uint16_t readLength, bool write)
+                                uint8_t * buffer, uint16_t readLength, bool write,
+                                const chip::Access::SubjectDescriptor * subjectDescriptor)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -737,8 +738,9 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                                     return Status::ResourceExhausted;
                                 }
 
-                                return emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId, am, buffer,
-                                                                            emberAfAttributeSize(am));
+                                return emberAfExternalAttributeReadWithContextCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                       am, buffer, emberAfAttributeSize(am),
+                                                                                       subjectDescriptor);
                             }
 
                             // Internal storage is only supported for fixed endpoints
