@@ -47,7 +47,11 @@ static void OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags aFlags, uint32_t
     }
 
     // 16 chars for compressed fabric id, 16 chars for node id, and the dash.
-    XCTAssertTrue(strlen(aName) == 33);
+    // Other nodes on the network can advertise _matter._tcp instances too; skip
+    // any name that is not in that form instead of failing the test.
+    if (strlen(aName) != 33 || aName[16] != '-') {
+        return;
+    }
 
     NSString * compressedFabricID = [[NSString alloc] initWithBytes:aName length:16 encoding:NSUTF8StringEncoding];
     NSString * nodeID = [[NSString alloc] initWithBytes:aName + 17 length:16 encoding:NSUTF8StringEncoding];
