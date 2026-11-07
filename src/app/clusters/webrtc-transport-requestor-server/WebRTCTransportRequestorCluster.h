@@ -39,6 +39,35 @@ using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandi
 using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
 using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
+/**
+ * A WebRTCSessionStruct that owns the storage for its VideoStreams and AudioStreams lists, so that it stays valid after
+ * the lists it was copied from are gone.
+ */
+class WebRTCSessionStorage : public WebRTCSessionStruct
+{
+public:
+    explicit WebRTCSessionStorage(const WebRTCSessionStruct & session) { Assign(session); }
+    WebRTCSessionStorage(const WebRTCSessionStorage & other) : WebRTCSessionStruct() { Assign(other); }
+
+    WebRTCSessionStorage & operator=(const WebRTCSessionStorage & other)
+    {
+        Assign(other);
+        return *this;
+    }
+
+    WebRTCSessionStorage & operator=(const WebRTCSessionStruct & session)
+    {
+        Assign(session);
+        return *this;
+    }
+
+private:
+    void Assign(const WebRTCSessionStruct & session);
+
+    std::vector<uint16_t> mVideoStreams;
+    std::vector<uint16_t> mAudioStreams;
+};
+
 /** @brief
  *  Defines methods for implementing application-specific logic for the WebRTCTransportRequestor Cluster.
  */
@@ -138,18 +167,65 @@ public:
 
     /**
      * @brief
-     *   Gets the current sessions from the Requestor server.
+     *   Gets a copy of the current sessions from the Requestor server.
+     *
+     * Each returned session owns its VideoStreams and AudioStreams lists, so the copy stays valid when the cluster's
+     * sessions change afterwards.
      */
-    std::vector<WebRTCSessionStruct> GetCurrentSessions() const { return mCurrentSessions; }
+    std::vector<WebRTCSessionStorage> GetCurrentSessions() const { return mCurrentSessions; }
 
     /**
      * @brief
      * Inserts a new session or updates an existing one based on session ID.
      *
+     * The cluster keeps its own copy of the session, including its VideoStreams and AudioStreams lists, so the caller's
+     * lists only need to be valid during this call.
+     *
      * @param session The session data to insert or update.
      * @return kInserted if a new session was added, kUpdated if an existing one was modified.
      */
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
+
+    /**
+     * A session the requestor started with SolicitOffer or ProvideOffer, as given by the request and the provider's
+     * response. The lists only need to be valid during RecordOfferedSession() / MakeOfferedSession().
+     */
+    struct OfferedSession
+    {
+        uint16_t sessionId          = 0;
+        NodeId peerNodeId           = kUndefinedNodeId;
+        FabricIndex fabricIndex     = kUndefinedFabricIndex;
+        EndpointId peerEndpointId   = kInvalidEndpointId;
+        StreamUsageEnum streamUsage = StreamUsageEnum::kUnknownEnumValue;
+
+        // From the request.
+        Optional<DataModel::List<const uint16_t>> requestedVideoStreams;
+        Optional<DataModel::List<const uint16_t>> requestedAudioStreams;
+        Optional<bool> requestedMetadataEnabled;
+        // A ProvideOffer with a non-null WebRTCSessionID.
+        bool isReOffer = false;
+
+        // From the provider's response, which reports stream IDs only when the request used VideoStreamID / AudioStreamID.
+        Optional<DataModel::Nullable<uint16_t>> reportedVideoStreamID;
+        Optional<DataModel::Nullable<uint16_t>> reportedAudioStreamID;
+    };
+
+    /**
+     * @brief Builds the CurrentSessions entry for an offered session.
+     *
+     * As WebRTCSessionStruct defines them, VideoStreams / AudioStreams hold every stream of the session: the requested
+     * list, or else the single stream the provider reported. VideoStreamID / AudioStreamID hold the first entry, or null.
+     * MetadataEnabled is the requested value.
+     */
+    static WebRTCSessionStorage MakeOfferedSession(const OfferedSession & offer);
+
+    /**
+     * @brief Inserts or updates the CurrentSessions entry for an offered session, built by MakeOfferedSession().
+     *
+     * A re-offer of a session that is already in CurrentSessions leaves the entry unchanged: a re-offer only changes the
+     * SDP, since StreamUsage, the streams and MetadataEnabled apply to new sessions only.
+     */
+    void RecordOfferedSession(const OfferedSession & offer);
 
     /**
      * @brief
@@ -164,7 +240,7 @@ public:
 
 private:
     Delegate & mDelegate;
-    std::vector<WebRTCSessionStruct> mCurrentSessions;
+    std::vector<WebRTCSessionStorage> mCurrentSessions;
 
     // Helper functions
     WebRTCSessionStruct * FindSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex);
