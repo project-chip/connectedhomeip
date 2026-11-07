@@ -161,6 +161,13 @@ FEATURE_FOR_O_AND_XXX = '''\
 '''
 
 
+def create_cluster_with_attribute_conformances(conformances: list[str]):
+    attributes = [f'    <attribute id="{i}" name="Attr{i}" type="uint16">{c}</attribute>\n' for i, c in enumerate(conformances)]
+    cluster_environment = jinja2.Environment()
+    cluster_template = cluster_environment.from_string(CLUSTER_TEMPLATE)
+    return cluster_template.render(feature_string='', attribute_string=''.join(attributes), command_string='')
+
+
 def create_cluster_with_o_and_xxx_choice(more: bool):
     xml_str = []
     attr_environment = jinja2.Environment()
@@ -297,6 +304,36 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
         # If the feature is on, all of these scenarios are valid except the empty list
         tests = [([], failure), ([0], no_failure), ([1], no_failure), ([0, 1], no_failure)]
         evaluate_test_scenarios(clusters, tests, 1)
+
+    def test_choice_counts_and_provisional_members(self):
+        def evaluate_test_scenarios(conformances: list[str], tests: list[tuple[list[int], set[str]]]):
+            clusters: dict[int, XmlCluster] = {}
+            cluster_xml = ElementTree.fromstring(create_cluster_with_attribute_conformances(conformances))
+            add_cluster_data_from_xml(cluster_xml, clusters, {}, {}, [])
+            for attribute_list, expected_failure in tests:
+                info = ConformanceAssessmentData(feature_map=0, attribute_list=attribute_list,
+                                                 all_command_list=[], cluster_revision=1)
+                problems = evaluate_attribute_choice_conformance(0, 1, clusters, info)
+                self._evaluate_problems(problems, expected_failure)
+
+        failure = {'a'}
+        no_failure = set()
+
+        # Attr0 = O.a, Attr1 = P, O.a: exactly one, and the provisional element counts
+        tests = [([], failure), ([0], no_failure), ([1], no_failure), ([0, 1], failure)]
+        evaluate_test_scenarios(['<optionalConform choice="a" />',
+                                 '<otherwiseConform><provisionalConform /><optionalConform choice="a" /></otherwiseConform>'],
+                                tests)
+
+        # Attr0 = O.a-, Attr1 = P, O.a-: at most one
+        tests = [([], no_failure), ([0], no_failure), ([1], no_failure), ([0, 1], failure)]
+        evaluate_test_scenarios(['<optionalConform choice="a" max="1" />',
+                                 '<otherwiseConform><provisionalConform /><optionalConform choice="a" max="1" /></otherwiseConform>'],
+                                tests)
+
+        # Attr0, Attr1, Attr2 = O.a2+: at least two
+        tests = [([], failure), ([0], failure), ([0, 1], no_failure), ([0, 1, 2], no_failure)]
+        evaluate_test_scenarios(['<optionalConform choice="a" more="true" min="2" />'] * 3, tests)
 
 
 if __name__ == "__main__":

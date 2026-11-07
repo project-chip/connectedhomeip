@@ -19,6 +19,7 @@
 from collections.abc import Callable
 
 import matter.clusters as Clusters
+from matter.clusters.Attribute import ValueDecodeFailure
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                                evaluate_feature_choice_conformance)
@@ -170,6 +171,15 @@ class DeviceConformanceTests(BasicCompositionTests):
                 is_provisional = cluster_id in provisional_cluster_ids or self.xml_clusters[cluster_id].is_provisional
                 if not allow_provisional_test_event_only_disallowed_for_certification and is_provisional:
                     record_error(location=cluster_location, problem='Provisional cluster found on device')
+                    continue
+
+                unreadable_global_attributes = [attribute_id for attribute_id in GlobalAttributeIds
+                                                if attribute_id not in cluster or isinstance(cluster[attribute_id], ValueDecodeFailure)]
+                for attribute_id in unreadable_global_attributes:
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                    record_error(location=location,
+                                 problem=f'{attribute_id.to_name()} could not be read, so conformance cannot be checked for this cluster')
+                if unreadable_global_attributes:
                     continue
 
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
