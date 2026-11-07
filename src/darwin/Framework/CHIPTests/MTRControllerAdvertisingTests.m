@@ -29,6 +29,23 @@ static const uint16_t kTimeoutInSeconds = 3;
 
 static NSString * NodeIDAsString(NSNumber * nodeID) { return [NSString stringWithFormat:@"%016llX", nodeID.unsignedLongLongValue]; }
 
+// Whether the name has the operational instance name form: 16 uppercase hex
+// digits of compressed fabric id, a dash, and 16 uppercase hex digits of node id.
+static BOOL IsOperationalInstanceName(const char * name)
+{
+    if (strlen(name) != 33) {
+        return NO;
+    }
+    for (size_t i = 0; i < 33; ++i) {
+        char c = name[i];
+        BOOL valid = (i == 16) ? (c == '-') : ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F'));
+        if (!valid) {
+            return NO;
+        }
+    }
+    return YES;
+}
+
 @interface MTRControllerAdvertisingTestsOperationalBrowser : NSObject
 @property NSSet<NSString *> * discoveredNodes;
 
@@ -46,10 +63,9 @@ static void OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags aFlags, uint32_t
         return;
     }
 
-    // 16 chars for compressed fabric id, 16 chars for node id, and the dash.
     // Other nodes on the network can advertise _matter._tcp instances too; skip
-    // any name that is not in that form instead of failing the test.
-    if (strlen(aName) != 33 || aName[16] != '-') {
+    // any name that is not in the operational form instead of failing the test.
+    if (!IsOperationalInstanceName(aName)) {
         return;
     }
 
