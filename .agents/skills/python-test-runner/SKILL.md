@@ -265,7 +265,8 @@ file using `--override-binary-path`:
 -   **`--skip`**: Excludes specific test names or patterns from running.
 -   **`--tag`**: Selects runs by tag. `--tag nightly` runs only the nightly
     runs, which are skipped by default; `--tag skip-<tag>` leaves out the runs
-    with that tag.
+    with that tag, for example `--tag skip-slow` for a quick pass without the
+    slow runs.
 -   **`--keep-going`**: Instructs the runner to continue executing subsequent
     tests even if a previous test in the queue fails.
 -   **`--help`**: View the help dialog for more information.

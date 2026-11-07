@@ -32,6 +32,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     tags: [slow]
+#     duration: 6 seconds
 #   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device closure:1 --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
@@ -47,6 +49,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     tags: [slow]
+#     duration: 6 seconds
 #   run3:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device closure-garage-door:1 --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
@@ -62,6 +66,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     tags: [slow]
+#     duration: 6 seconds
 #   run4:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device closure-gate:1 --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
@@ -77,6 +83,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     tags: [slow]
+#     duration: 6 seconds
 #   run5:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device closure-window:1 --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
@@ -92,6 +100,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     tags: [slow]
+#     duration: 6 seconds
 #   run6:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device closure-barrier:1 --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
@@ -107,6 +117,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     tags: [slow]
+#     duration: 6 seconds
 #   run7:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device closure-cabinet:1 --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
@@ -122,6 +134,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     tags: [slow]
+#     duration: 6 seconds
 # === END CI TEST ARGUMENTS ===
 
 import asyncio

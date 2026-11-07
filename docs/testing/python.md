@@ -954,7 +954,7 @@ for that run, e.g.:
     with `skip-`. See
     [Running a run only in the nightly job](#running-a-run-only-in-the-nightly-job)
     and [Selecting runs by tag](#selecting-runs-by-tag). These tags also change
-    what CI does with the run:
+    what the runners do with the run:
 
     -   `nightly`: moves the run out of PR CI and into the nightly job, for runs
         that are too slow for PR CI, or that use an app PR CI doesn't run the
@@ -966,6 +966,8 @@ for that run, e.g.:
         failure doesn't fail the job. Remove the tag once every issue is fixed.
     -   `openssl-3.5`: moves the run out of PR CI and into the OpenSSL 3.5 job,
         for runs that need an app and controller built with OpenSSL 3.5.
+    -   `slow`: the run takes long, and `duration` says how long. The runners
+        log the duration when the run starts. The tag doesn't move the run.
     -   Example: `[nightly]`
 
 -   `issues`: The GitHub issues that track the problems of a
@@ -978,6 +980,17 @@ for that run, e.g.:
         #     tags: [nightly, needs-followup-fixes]
         #     issues:
         #       - https://github.com/project-chip/connectedhomeip/issues/12345
+        ```
+
+-   `duration`: How long a `slow` run takes, as `<number> seconds` or
+    `<number> minutes`. Required with `slow`, and not allowed without it. The
+    runners only log it; `timeout` sets the time limit.
+
+    -   Example:
+
+        ```python
+        #     tags: [slow]
+        #     duration: 1.5 minutes
         ```
 
 -   `app` may also be a script that starts several applications, for example
@@ -1024,8 +1037,10 @@ select runs with the same `--tag` option:
     run has, such as a misspelled tag.
 -   `run_python_test.py --run` names runs whatever their tags, and can't be
     combined with `--tag`.
--   `execute_python_tests.py` calls each selected run that has tags on its own,
-    and reports it as `<script>::<run>` with its tags and issues.
+-   When a selected run of a script is tagged `nightly`, `openssl-3.5` or
+    `needs-followup-fixes`, `execute_python_tests.py` calls each selected run of
+    the script on its own, and reports it as `<script>::<run>` with its tags and
+    issues. Other tags, such as `slow`, leave the script as one call.
 
 | Selection                      | `--tag` values                     |
 | ------------------------------ | ---------------------------------- |
@@ -1033,6 +1048,8 @@ select runs with the same `--tag` option:
 | Nightly job                    | `nightly`                          |
 | OpenSSL 3.5 job                | `openssl-3.5`                      |
 | PR CI runs with known problems | `needs-followup-fixes`             |
+| PR CI runs except slow runs    | `skip-slow`                        |
+| Slow PR CI runs                | `slow`                             |
 
 # Test Module Guards
 

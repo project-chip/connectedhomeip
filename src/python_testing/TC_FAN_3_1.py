@@ -33,6 +33,8 @@
 #       --timeout 600
 #     factory-reset: true
 #     quiet: true
+#     tags: [slow]
+#     duration: 8 seconds
 #   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --device fan
@@ -48,6 +50,8 @@
 #       --timeout 600
 #     factory-reset: true
 #     quiet: true
+#     tags: [slow]
+#     duration: 8 seconds
 # === END CI TEST ARGUMENTS ===
 
 import logging

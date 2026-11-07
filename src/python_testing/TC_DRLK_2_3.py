@@ -33,6 +33,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     tags: [slow]
+#     duration: 30 seconds
 # === END CI TEST ARGUMENTS ===
 
 from drlk_2_x_common import DRLK_COMMON
