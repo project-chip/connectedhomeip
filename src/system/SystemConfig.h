@@ -851,14 +851,8 @@ struct LwIPEvent;
  * Data transfers over MRP should not be using this size for allocating
  * buffers as they are restricted by the IPv6 MTU.
  *
-<<<<<<< HEAD
- * Except on internal-pool builds (see the note below), this is set to 64000
- * bytes.
-=======
  * Except on pool builds (see the note below), this is set to 64000
- * bytes (spec-defined MAX_TCP_MESSAGE_SIZE) plus 4 bytes for the TCP framing
- * message length prefix (kTCPFramingHeaderSize).
->>>>>>> e9b586f ([System] Limit PacketBuffer allocations to one pbuf on LwIP pool builds (#74980))
+ * bytes.
  *
  * @note When PacketBuffers come from the internal pool or the LwIP standard
  *       pbuf pool, CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES defaults to
