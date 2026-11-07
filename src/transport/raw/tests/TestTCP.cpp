@@ -801,7 +801,7 @@ TEST_F(TestTCP, CheckMaxTCPMessageSizeBoundary)
         err                             = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(head));
         EXPECT_EQ(err, CHIP_ERROR_MESSAGE_TOO_LONG);
         EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 0);
-        EXPECT_TRUE(TestAccess::GetEndpoint(state).IsNull());
+        EXPECT_EQ(TestAccess::GetEndpoint(state), nullptr);
     }
 }
 
