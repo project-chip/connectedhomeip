@@ -17,6 +17,7 @@
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricsScope_Internal.h"
 
 #include <lib/support/FibonacciUtils.h>
 #include <platform/PlatformManager.h>
@@ -26,6 +27,8 @@ using namespace chip::app;
 
 void MTRBaseSubscriptionCallback::OnReportBegin()
 {
+    mReportFlowID = [NSUUID UUID];
+    MTRMetricsScope metricsScope(mReportFlowID);
     mAttributeReports = [NSMutableArray new];
     mEventReports = [NSMutableArray new];
     if (mReportBeginHandler) {
@@ -36,6 +39,7 @@ void MTRBaseSubscriptionCallback::OnReportBegin()
 // Reports attribute and event data if any exists
 void MTRBaseSubscriptionCallback::ReportData()
 {
+    MTRMetricsScope metricsScope(mReportFlowID ?: [MTRMetrics _currentOrNewFlowID]);
     // At data reporting time, nil out scheduled or currently running interimReportBlock
     if (mInterimReportBlock) {
         dispatch_block_cancel(mInterimReportBlock); // no-op when running from mInterimReportBlock
@@ -75,8 +79,22 @@ void MTRBaseSubscriptionCallback::QueueInterimReport()
     dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), mInterimReportBlock);
 }
 
+void MTRBaseSubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
+{
+    MTRMetricsScope metricsScope(mReportFlowID ?: [MTRMetrics _currentOrNewFlowID]);
+    HandleEventData(aEventHeader, apData, apStatus);
+}
+
+void MTRBaseSubscriptionCallback::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
+{
+    MTRMetricsScope metricsScope(mReportFlowID ?: [MTRMetrics _currentOrNewFlowID]);
+    HandleAttributeData(aPath, apData, aStatus);
+}
+
 void MTRBaseSubscriptionCallback::OnReportEnd()
 {
+    MTRMetricsScope metricsScope(mReportFlowID ?: [MTRMetrics _currentOrNewFlowID]);
+    mReportFlowID = nil;
     ReportData();
     if (mReportEndHandler) {
         mReportEndHandler();
@@ -85,6 +103,8 @@ void MTRBaseSubscriptionCallback::OnReportEnd()
 
 void MTRBaseSubscriptionCallback::OnError(CHIP_ERROR aError)
 {
+    MTRMetricsScope metricsScope(mReportFlowID ?: [MTRMetrics _currentOrNewFlowID]);
+    mReportFlowID = nil;
     // If OnError is called after OnReportBegin, we should report the collected data
     ReportData();
     ReportError(aError, /* aCancelSubscription = */ false);

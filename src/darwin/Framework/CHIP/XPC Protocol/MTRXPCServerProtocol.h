@@ -63,6 +63,22 @@ MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathCluster
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathAttributeIDKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathEventIDKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));
 
+/**
+ * A server can tell a client which incoming message caused a report or a reply by adding the
+ * UUIDString of +[MTRMetrics currentFlowID] (an NSString) under:
+ *
+ * - MTRDeviceResponseFlowIDKey: in each response-value dictionary it sends in
+ *   device:receivedAttributeReport:, device:receivedEventReport:, and the completions of
+ *   invokeCommandWithEndpointID: and invokeCommands:.
+ * - MTRErrorFlowIDKey: in the userInfo of an NSError it hands to a completion.
+ *
+ * The client removes the key and runs the delegate callback or completion with that UUID as
+ * +[MTRMetrics currentFlowID].  A value that is not a UUID string is dropped and the callback gets a new
+ * flow ID.
+ */
+MTR_EXTERN NSString * const MTRDeviceResponseFlowIDKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRErrorFlowIDKey MTR_NEWLY_AVAILABLE;
+
 MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @protocol MTRXPCServerProtocol_MTRDevice <NSObject>
 

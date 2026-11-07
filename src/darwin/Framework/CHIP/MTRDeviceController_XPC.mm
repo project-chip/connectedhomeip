@@ -24,6 +24,7 @@
 #import "MTRDevice_XPC_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricsScope_Internal.h"
 #import "MTRUnfairLock.h"
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
@@ -58,6 +59,8 @@ NSString * const MTRDeviceControllerRegistrationInterestedPathEndpointIDKey = @"
 NSString * const MTRDeviceControllerRegistrationInterestedPathClusterIDKey = @"MTRDeviceControllerRegistrationInterestedPathClusterID";
 NSString * const MTRDeviceControllerRegistrationInterestedPathAttributeIDKey = @"MTRDeviceControllerRegistrationInterestedPathAttributeID";
 NSString * const MTRDeviceControllerRegistrationInterestedPathEventIDKey = @"MTRDeviceControllerRegistrationInterestedPathEventID";
+NSString * const MTRDeviceResponseFlowIDKey = @"MTRDeviceResponseFlowID";
+NSString * const MTRErrorFlowIDKey = @"MTRErrorFlowID";
 
 // #define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
@@ -509,6 +512,10 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
         return;
     }
 
+    // The report runs in the server's flow for it; the key is not passed on to delegates.
+    MTRMetricsScope metricsScope([MTRMetrics _flowIDWithString:MTRFlowIDFromResponseValues(attributeReport)]);
+    attributeReport = MTRResponseValuesByRemovingFlowID(attributeReport);
+
     // The values are not logged here: the MTRDevice_Concrete in the process on the other end of
     // this XPC connection logs each one in _getAttributesToReportWithReportedValues.
     MTR_LOG("Received device: %@ receivedAttributeReport: (%p) with %lu attributes, found device: %@", nodeID, attributeReport, static_cast<unsigned long>(attributeReport.count), device);
@@ -525,6 +532,10 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
         MTR_LOG_ERROR("Received device: %@ invalid receivedEventReport: %@, found device: %@", nodeID, eventReport, device);
         return;
     }
+
+    // The report runs in the server's flow for it; the key is not passed on to delegates.
+    MTRMetricsScope metricsScope([MTRMetrics _flowIDWithString:MTRFlowIDFromResponseValues(eventReport)]);
+    eventReport = MTRResponseValuesByRemovingFlowID(eventReport);
 
     // The events are not logged here: the MTRDevice_Concrete in the process on the other end of
     // this XPC connection logs each one in _handleEventReport.

@@ -8477,7 +8477,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 
     XCTAssertEqual(linesMatching(defaultLines, containing(readToken)).count, 0);
     XCTAssertGreaterThan(linesMatching(detailLines, containing(readToken)).count, 0);
-    NSPredicate * readCountLine = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"Read attribute work item \\[[0-9]+\\] result: \\(0x[0-9a-f]+\\) with 1 attributes .*"];
+    NSPredicate * readCountLine = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"(\\[Flow: [0-9A-F-]+\\] )?Read attribute work item \\[[0-9]+\\] result: \\(0x[0-9a-f]+\\) with 1 attributes .*"];
     XCTAssertGreaterThan(linesMatching(defaultLines, readCountLine).count, 0);
 
     [sController removeDevice:device];
@@ -9952,8 +9952,8 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     // MTRXPCValidationTestServer stands in for here.
     XCTAssertEqual([detailSnapshot filteredArrayUsingPredicate:withAttributeToken].count, 0);
     XCTAssertEqual([detailSnapshot filteredArrayUsingPredicate:withEventToken].count, 0);
-    NSPredicate * attributeCountLine = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"Received device: 305414945 receivedAttributeReport: \\(0x[0-9a-f]+\\) with 1 attributes, found device: .*"];
-    NSPredicate * eventCountLine = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"Received device: 305414945 receivedEventReport: \\(0x[0-9a-f]+\\) with 1 events, found device: .*"];
+    NSPredicate * attributeCountLine = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"(\\[Flow: [0-9A-F-]+\\] )?Received device: 305414945 receivedAttributeReport: \\(0x[0-9a-f]+\\) with 1 attributes, found device: .*"];
+    NSPredicate * eventCountLine = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"(\\[Flow: [0-9A-F-]+\\] )?Received device: 305414945 receivedEventReport: \\(0x[0-9a-f]+\\) with 1 events, found device: .*"];
     XCTAssertEqual([defaultSnapshot filteredArrayUsingPredicate:attributeCountLine].count, 1);
     XCTAssertEqual([defaultSnapshot filteredArrayUsingPredicate:eventCountLine].count, 1);
 

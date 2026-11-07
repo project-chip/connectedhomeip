@@ -21,6 +21,7 @@
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
+#import "MTRMetricsScope_Internal.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 
@@ -186,6 +187,10 @@ CommandHandler * _Nullable EnsureValidState(CommandHandler::Handle & handle, con
 void MTROTAProviderDelegateBridge::HandleQueryImage(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const Commands::QueryImage::DecodableType & commandData)
 {
+    // The delegate callback and the completion for this request run in one flow, even if the application calls the
+    // completion later on another queue.
+    NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
+    MTRMetricsScope requestScope(flowID);
     assertChipStackLockedByCurrentThread();
 
     NodeId nodeId;
@@ -211,6 +216,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
         MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error) {
         [controller
             asyncDispatchToMatterQueue:^() {
+                MTRMetricsScope responseScope(flowID);
                 assertChipStackLockedByCurrentThread();
 
                 CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "QueryImage", data, error);
@@ -280,7 +286,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
     };
 
     auto strongDelegate = controller.otaProviderDelegate;
-    dispatch_async(controller.otaProviderDelegateQueue, ^{
+    MTRDispatchCallbackWithFlowID(controller.otaProviderDelegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completion:)]) {
             [strongDelegate handleQueryImageForNodeID:@(nodeId)
                                            controller:controller
@@ -303,6 +309,10 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
 void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::ApplyUpdateRequest::DecodableType & commandData)
 {
+    // The delegate callback and the completion for this request run in one flow, even if the application calls the
+    // completion later on another queue.
+    NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
+    MTRMetricsScope requestScope(flowID);
     assertChipStackLockedByCurrentThread();
 
     NodeId nodeId;
@@ -319,6 +329,7 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
         MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error) {
         [controller
             asyncDispatchToMatterQueue:^() {
+                MTRMetricsScope responseScope(flowID);
                 assertChipStackLockedByCurrentThread();
 
                 CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "ApplyUpdateRequest", data, error);
@@ -340,7 +351,7 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
     ConvertToApplyUpdateRequestParams(commandData, commandParams);
 
     auto strongDelegate = controller.otaProviderDelegate;
-    dispatch_async(controller.otaProviderDelegateQueue, ^{
+    MTRDispatchCallbackWithFlowID(controller.otaProviderDelegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completion:)]) {
             [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
                                                    controller:controller
@@ -364,6 +375,10 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
 void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::NotifyUpdateApplied::DecodableType & commandData)
 {
+    // The delegate callback and the completion for this request run in one flow, even if the application calls the
+    // completion later on another queue.
+    NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
+    MTRMetricsScope requestScope(flowID);
     assertChipStackLockedByCurrentThread();
 
     NodeId nodeId;
@@ -379,6 +394,7 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
     auto completionHandler = ^(NSError * _Nullable error) {
         [controller
             asyncDispatchToMatterQueue:^() {
+                MTRMetricsScope responseScope(flowID);
                 assertChipStackLockedByCurrentThread();
 
                 CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "NotifyUpdateApplied", error);
@@ -396,7 +412,7 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
     ConvertToNotifyUpdateAppliedParams(commandData, commandParams);
 
     auto strongDelegate = controller.otaProviderDelegate;
-    dispatch_async(controller.otaProviderDelegateQueue, ^{
+    MTRDispatchCallbackWithFlowID(controller.otaProviderDelegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completion:)]) {
             [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
                                                     controller:controller
