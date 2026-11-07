@@ -3835,8 +3835,8 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     uint64_t expectedValueID = 0;
     if (useValueAsExpectedValue) {
         // Commit change into expected value cache.  The write may wait in the work queue behind other work, so the
-        // expected value interval does not start here: it starts when the write is sent, in the ready handler below.
-        // Otherwise a write queued for longer than its interval would roll back before it was even sent.
+        // expected value interval does not start here: it starts when the write is sent, once the ready handler below
+        // has a session.  Otherwise a write queued for longer than its interval would roll back before it was sent.
         NSDictionary * newExpectedValueDictionary = @{ MTRAttributePathKey : attributePath, MTRDataKey : value };
         [self _setPendingExpectedValues:@[ newExpectedValueDictionary ] expectedValueID:&expectedValueID];
     }
@@ -3909,19 +3909,28 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             timedWriteTimeout = nil;
         }
 
-        // The write is sent now, so this is when its expected value interval starts; until now the expected value
-        // was pending and could not expire.  If a later write was merged into this work item, the request carries
-        // that write's expected value ID and interval.  This work item's own expected value is started too, in case
-        // the merged write did not set one; it is a no-op when the merged write replaced it.
-        if (useValueAsExpectedValue) {
-            [self _startExpectedValueIntervalForAttributePaths:@[ attributePath ] expectedValueID:expectedValueID expectedValueInterval:expectedValueInterval];
-        }
+        // The expected value interval starts when the request is actually sent, after the session is ready, not
+        // here: getting the session can take longer than the interval.  Until then the expected value stays pending
+        // and cannot expire.  If a later write was merged into this work item, the request carries that write's
+        // expected value ID and interval.  This work item's own expected value is started too, in case the merged
+        // write did not set one; it is a no-op when the merged write replaced it.
         NSNumber * requestExpectedValueID = request[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
         id requestExpectedValueInterval = request[MTRDeviceWriteRequestFieldExpectedValueIntervalIndex];
-        if (requestExpectedValueInterval != [NSNull null] && requestExpectedValueID.unsignedLongLongValue != expectedValueID) {
-            [self _startExpectedValueIntervalForAttributePaths:@[ path ]
-                                               expectedValueID:requestExpectedValueID.unsignedLongLongValue
-                                         expectedValueInterval:requestExpectedValueInterval];
+        dispatch_block_t requestWillBeSent = nil;
+        if (useValueAsExpectedValue || requestExpectedValueInterval != [NSNull null]) {
+            mtr_weakify(self);
+            requestWillBeSent = ^{
+                mtr_strongify(self);
+                VerifyOrReturn(self);
+                if (useValueAsExpectedValue) {
+                    [self _startExpectedValueIntervalForAttributePaths:@[ attributePath ] expectedValueID:expectedValueID expectedValueInterval:expectedValueInterval];
+                }
+                if (requestExpectedValueInterval != [NSNull null] && requestExpectedValueID.unsignedLongLongValue != expectedValueID) {
+                    [self _startExpectedValueIntervalForAttributePaths:@[ path ]
+                                                       expectedValueID:requestExpectedValueID.unsignedLongLongValue
+                                                 expectedValueInterval:requestExpectedValueInterval];
+                }
+            };
         }
 
         mtr_weakify(self);
@@ -3931,6 +3940,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                               attributeID:path.attribute
                                     value:request[MTRDeviceWriteRequestFieldValueIndex]
                         timedWriteTimeout:timedWriteTimeout
+                        requestWillBeSent:requestWillBeSent
                                     queue:self.queue
                                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                    mtr_strongify(self);
@@ -4090,8 +4100,8 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     NSMutableArray<MTRAttributePath *> * attributePaths = nil;
     if (expectedValues) {
         // The command may wait in the work queue behind other work, so the expected value interval does not start
-        // here: it starts when the command is sent, in the ready handler below.  Otherwise a command queued for
-        // longer than its interval would roll back before it was even sent.
+        // here: it starts when the command is sent, once the ready handler below has a session.  Otherwise a command
+        // queued for longer than its interval would roll back before it was even sent.
         [self _setPendingExpectedValues:expectedValues expectedValueID:&expectedValueID];
         attributePaths = [NSMutableArray array];
         for (NSDictionary<NSString *, id> * expectedValue in expectedValues) {
@@ -4133,11 +4143,18 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             // in our queuing and retries.
             timedInvokeTimeout = @([cutoffTime timeIntervalSinceDate:now] * 1000);
         }
+        // The expected value interval starts when the request is actually sent, after the session is ready, not
+        // here: getting the session can take longer than the interval.  Until then the expected values stay pending
+        // and cannot expire.  A retry does not restart the interval.  If the command fails, workDone still removes
+        // them.
+        dispatch_block_t requestWillBeSent = nil;
         if (expectedValues) {
-            // The command is sent now, so this is when its expected value interval starts; until now the expected
-            // values were pending and could not expire.  A retry does not restart the interval.  If the command
-            // fails, workDone still removes them.
-            [self _startExpectedValueIntervalForAttributePaths:attributePaths expectedValueID:expectedValueID expectedValueInterval:expectedValueInterval];
+            mtr_weakify(self);
+            requestWillBeSent = ^{
+                mtr_strongify(self);
+                VerifyOrReturn(self);
+                [self _startExpectedValueIntervalForAttributePaths:attributePaths expectedValueID:expectedValueID expectedValueInterval:expectedValueInterval];
+            };
         }
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         mtr_weakify(self);
@@ -4149,6 +4166,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                       timedInvokeTimeout:timedInvokeTimeout
              serverSideProcessingTimeout:serverSideProcessingTimeout
                                  logCall:NO
+                       requestWillBeSent:requestWillBeSent
                                    queue:self.queue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   mtr_strongify(self);
