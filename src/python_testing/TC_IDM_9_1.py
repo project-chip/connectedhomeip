@@ -159,24 +159,23 @@ class TC_IDM_9_1(IDMBaseTest):
             except ConstraintProbeExecutionError as error:
                 result = error.result
             except ChipStackError as e:  # chipstack-ok
-                log.warning("Unable to qualify baseline for %s: %s", info.path_str, e)
-                commands_skipped_count += 1
-                continue
+                asserts.fail(f"Execution failed qualifying command field baseline for {info.path_str}: {e}")
             commands_attempted_count += result.attempted
             commands_execution_error_count += result.execution_error
             commands_other_error_count += result.other_error
             commands_accepted_count += result.accepted
             if result.execution_error:
                 failed_command_fields.append(info.path_str)
-            if result.probed == 0:
-                if result.attempted == 0:
-                    commands_skipped_count += 1
-                continue
-            commands_tested_count += 1
-            commands_probed_count += result.probed
-            commands_rejected_count += result.rejected
-            if result.accepted:
-                accepted_command_fields.append(info.path_str)
+            if result.probed:
+                commands_tested_count += 1
+                commands_probed_count += result.probed
+                commands_rejected_count += result.rejected
+                if result.accepted:
+                    accepted_command_fields.append(info.path_str)
+            elif result.attempted == 0:
+                commands_skipped_count += 1
+            if result.execution_error:
+                break
 
         log.info("Step 1 complete: Tested %s command fields, skipped %s",
                  commands_tested_count, commands_skipped_count)
@@ -257,9 +256,8 @@ class TC_IDM_9_1(IDMBaseTest):
             except ConstraintProbeExecutionError as error:
                 result = error.result
             except ChipStackError as e:  # chipstack-ok
-                log.warning("Unable to qualify baseline for %s.%s: %s", attr_info.cluster_name, attr_info.attribute_name, e)
-                skipped_count += 1
-                continue
+                asserts.fail(f"Execution failed qualifying writable attribute baseline for "
+                             f"{attr_info.cluster_name}.{attr_info.attribute_name}: {e}")
 
             attempted_count += result.attempted
             execution_error_count += result.execution_error
@@ -267,15 +265,16 @@ class TC_IDM_9_1(IDMBaseTest):
             accepted_count += result.accepted
             if result.execution_error:
                 failed_attributes.append(f"{attr_info.cluster_name}.{attr_info.attribute_name}")
-            if result.probed == 0:
-                if result.attempted == 0:
-                    skipped_count += 1
-                continue
-            tested_count += 1
-            probed_count += result.probed
-            rejected_count += result.rejected
-            if result.accepted:
-                accepted_attributes.append(f"{attr_info.cluster_name}.{attr_info.attribute_name}")
+            if result.probed:
+                tested_count += 1
+                probed_count += result.probed
+                rejected_count += result.rejected
+                if result.accepted:
+                    accepted_attributes.append(f"{attr_info.cluster_name}.{attr_info.attribute_name}")
+            elif result.attempted == 0:
+                skipped_count += 1
+            if result.execution_error:
+                break
 
         log.info("Step 2 complete: Tested %s attributes, skipped %s", tested_count, skipped_count)
         log.info("Writable attribute probes: attempted=%s, classified=%s, CONSTRAINT_ERROR=%s, accepted=%s, "

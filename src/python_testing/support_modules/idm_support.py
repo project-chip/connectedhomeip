@@ -1221,6 +1221,17 @@ class IDMBaseTest(BasicCompositionTests):
                         problem=(f"{attribute_path} stored an out-of-bounds value despite answering {status_name}; "
                                  f"readback={stored_value}"))
                     result.accepted += 1
+                elif result_status == Status.ConstraintError:
+                    log.info("PASS: %s constraint properly enforced (original=%s, rejected=%s)", attribute_path,
+                             original_value, test_value)
+                    result.rejected += 1
+                elif result_status != Status.Success:
+                    self.record_warning(
+                        test_name=self.current_test_info.name,
+                        location=location,
+                        problem=(f"{attribute_path} rejected out-of-bounds value {test_value} with "
+                                 f"{status_name} instead of CONSTRAINT_ERROR"))
+                    result.other_error += 1
             except ChipStackError as error:  # chipstack-ok
                 result.execution_error += 1
                 log.warning("Execution failed reading back %s: %s", attribute_path, error)
@@ -1263,27 +1274,7 @@ class IDMBaseTest(BasicCompositionTests):
                 # guard.
                 continue
 
-            if result_status == Status.ConstraintError:
-                if stored_value != test_value:
-                    log.info("PASS: %s constraint properly enforced (original=%s, rejected=%s)", attribute_path,
-                             original_value, test_value)
-                    result.rejected += 1
-                    continue
-
-                # The DUT reported the write as rejected but stored the violating value
-                # anyway, so the constraint was not enforced regardless of the status it
-                # returned.
-                continue
-
             if result_status != Status.Success:
-                # Rejected, but not with CONSTRAINT_ERROR. The write never took effect, so
-                # the attribute's constraint is neither proven nor disproven by this probe.
-                self.record_warning(
-                    test_name=self.current_test_info.name,
-                    location=location,
-                    problem=(f"{attribute_path} rejected out-of-bounds value {test_value} with "
-                             f"{status_name} instead of CONSTRAINT_ERROR"))
-                result.other_error += 1
                 continue
 
             log.warning("%s got %s (%s) instead of CONSTRAINT_ERROR for value %s; attribute now reads %s",
