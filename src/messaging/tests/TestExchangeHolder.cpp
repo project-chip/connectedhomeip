@@ -801,6 +801,57 @@ TEST_F(TestExchangeHolder, TestExchangeHolder)
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
     }
 }
+class AckNotifySender : public ExchangeDelegate
+{
+public:
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnResponseTimeout(ExchangeContext * ec) override {}
+    void OnAckOutcome(ExchangeContext * ec, CHIP_ERROR aError) override { mOutcomeCount++; }
+
+    uint32_t mOutcomeCount = 0;
+};
+
+TEST_F(TestExchangeHolder, ReleaseAbortsExchangeAwaitingAck)
+{
+    GetLoopback().mNumMessagesToDrop = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
+    ReliableMessageMgr * rm          = GetExchangeManager().GetReliableMessageMgr();
+    AckNotifySender sender;
+
+    {
+        ExchangeHolder holder(sender);
+        holder.Grab(GetExchangeManager().NewContext(GetSessionBobToAlice(), &holder));
+        EXPECT_SUCCESS(
+            holder->SendMessage(MockProtocol::MessageType::kMsg1, MessagePacketBuffer::New(0), SendMessageFlags::kNotifyOnAck));
+        EXPECT_TRUE(holder->IsAckNotificationPending());
+        EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
+    }
+
+    // Dropping the holder must abort the exchange and its retransmissions, without reporting an outcome.
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(sender.mOutcomeCount, 0u);
+
+    GetLoopback().Reset();
+}
+
+TEST_F(TestExchangeHolder, AckOutcomeForwardedThroughHolder)
+{
+    AckNotifySender sender;
+    ExchangeHolder holder(sender);
+    holder.Grab(GetExchangeManager().NewContext(GetSessionBobToAlice(), &holder));
+    EXPECT_SUCCESS(
+        holder->SendMessage(MockProtocol::MessageType::kMsg1, MessagePacketBuffer::New(0), SendMessageFlags::kNotifyOnAck));
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(sender.mOutcomeCount, 1u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 class TCPCallbackRecorder : public ExchangeDelegate
 {

@@ -136,8 +136,15 @@ class AsyncCommandTransaction:
     def handleError(self, status: Status, chipError: PyChipError):
         self._event_loop.call_soon_threadsafe(self._handleError, status, chipError, None)
 
+    def _handleDone(self):
+        if not self._future.done():
+            self._future.set_result(None)
+
     def handleDone(self):
-        ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
+        try:
+            self._event_loop.call_soon_threadsafe(self._handleDone)
+        finally:
+            ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
 
 class AsyncBatchCommandsTransaction:

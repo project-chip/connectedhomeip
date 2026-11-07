@@ -25,6 +25,7 @@
 
 #include <errno.h>
 
+#include <functional>
 #include <pw_unit_test/framework.h>
 
 #include <app/icd/server/ICDServerConfig.h>
@@ -147,6 +148,19 @@ public:
 
     void OnResponseTimeout(ExchangeContext * ec) override { mResponseTimedOut = true; }
 
+    void OnAckOutcome(ExchangeContext * ec, CHIP_ERROR aError) override
+    {
+        mAckOutcome              = aError;
+        mAckReceived             = (aError == CHIP_NO_ERROR);
+        mAckFailed               = !mAckReceived;
+        mSessionDefunctAtOutcome = ec->HasSessionHandle() && ec->GetSessionHandle()->IsSecureSession() &&
+            ec->GetSessionHandle()->AsSecureSession()->IsDefunct();
+        if (mOnAckOutcome)
+        {
+            mOnAckOutcome();
+        }
+    }
+
     void CloseExchangeIfNeeded()
     {
         if (mExchange != nullptr)
@@ -174,7 +188,12 @@ public:
     bool mReceivedPiggybackAck     = false;
     bool mRetainExchange           = false;
     bool mResponseTimedOut         = false;
+    bool mAckReceived              = false;
+    bool mAckFailed                = false;
+    bool mSessionDefunctAtOutcome  = false;
+    CHIP_ERROR mAckOutcome         = CHIP_NO_ERROR;
     ExchangeContext * mExchange    = nullptr;
+    std::function<void()> mOnAckOutcome;
 
 private:
     TestReliableMessageProtocol & mTestReliableMessageProtocol;
@@ -513,6 +532,942 @@ TEST_F(TestReliableMessageProtocol, CheckResendApplicationMessage)
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     exchange->Close();
+}
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAck)
+{
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    EXPECT_FALSE(buffer.IsNull());
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kNotifyOnAck), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(exchange->IsAckNotificationPending());
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 1u);
+
+    DrainAndServiceIO();
+
+    EXPECT_TRUE(mockSender.mAckReceived);
+    EXPECT_FALSE(mockSender.mAckFailed);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    if (!mockSender.mAckReceived)
+    {
+        exchange->Abort();
+    }
+}
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckRetransmissionsExhausted)
+{
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    EXPECT_FALSE(buffer.IsNull());
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+    }));
+
+    auto & loopback               = GetLoopback();
+    loopback.mSentMessageCount    = 0;
+    loopback.mNumMessagesToDrop   = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1;
+    loopback.mDroppedMessageCount = 0;
+
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kNotifyOnAck), CHIP_NO_ERROR);
+    EXPECT_TRUE(exchange->IsAckNotificationPending());
+
+    GetIOContext().DriveIOUntil(5000_ms32, [&] { return mockSender.mAckFailed; });
+    DrainAndServiceIO();
+
+    EXPECT_TRUE(mockSender.mAckFailed);
+    EXPECT_EQ(mockSender.mAckOutcome, CHIP_ERROR_TIMEOUT);
+    EXPECT_FALSE(mockSender.mAckReceived);
+    EXPECT_EQ(loopback.mDroppedMessageCount, static_cast<uint32_t>(CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1));
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    if (!mockSender.mAckFailed)
+    {
+        exchange->Abort();
+    }
+
+    loopback.mNumMessagesToDrop   = 0;
+    loopback.mDroppedMessageCount = 0;
+}
+
+namespace {
+class AbortOtherOnGiveUpDelegate : public MockAppDelegate
+{
+public:
+    using MockAppDelegate::MockAppDelegate;
+
+    void OnAckOutcome(ExchangeContext * ec, CHIP_ERROR aError) override
+    {
+        mAckFailed = true;
+        ec->GetExchangeMgr()->GetReliableMessageMgr()->EnumerateRetransTable([&](auto * entry) {
+            if (&entry->ec.Get() == mOther)
+            {
+                mOtherSendCountAtGiveUp = entry->sendCount;
+            }
+            return Loop::Continue;
+        });
+        if (mOther != nullptr)
+        {
+            mOther->Abort();
+            mOther = nullptr;
+        }
+    }
+
+    ExchangeContext * mOther    = nullptr;
+    int mOtherSendCountAtGiveUp = -1;
+};
+} // namespace
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckGiveUpAbortsOtherExchange)
+{
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
+
+    AbortOtherOnGiveUpDelegate giveUpDelegate(*this);
+    MockAppDelegate otherDelegate(*this);
+    ExchangeContext * giveUp = NewExchangeToAlice(&giveUpDelegate);
+    ASSERT_NE(giveUp, nullptr);
+    ExchangeContext * other = NewExchangeToAlice(&otherDelegate);
+    ASSERT_NE(other, nullptr);
+    giveUpDelegate.mOther = other;
+
+    EXPECT_EQ(giveUp->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                  SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(other->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                 SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+    ASSERT_EQ(rm->TestGetCountRetransTable(), 2);
+
+    // Both entries are due in one pass; the first one walked has used up its retransmissions.
+    ExchangeContext * firstWalked = nullptr;
+    rm->EnumerateRetransTable([&](auto * entry) {
+        firstWalked = &entry->ec.Get();
+        return Loop::Break;
+    });
+    ASSERT_EQ(firstWalked, giveUp);
+    rm->EnumerateRetransTable([&](auto * entry) {
+        entry->nextRetransTime = System::Clock::kZero;
+        if (&entry->ec.Get() == giveUp)
+        {
+            entry->sendCount = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS;
+        }
+        return Loop::Continue;
+    });
+    rm->ExecuteActions();
+
+    // The give-up callback must run after the walk, so the other entry was already retransmitted.
+    EXPECT_TRUE(giveUpDelegate.mAckFailed);
+    EXPECT_FALSE(otherDelegate.mAckFailed);
+    EXPECT_EQ(giveUpDelegate.mOtherSendCountAtGiveUp, 1);
+    EXPECT_EQ(giveUpDelegate.mOther, nullptr);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    if (giveUpDelegate.mOther != nullptr)
+    {
+        other->Abort();
+    }
+    if (!giveUpDelegate.mAckFailed)
+    {
+        giveUp->Abort();
+    }
+
+    loopback.mNumMessagesToDrop   = 0;
+    loopback.mDroppedMessageCount = 0;
+    rm->StartTimer();
+}
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckRetransmitSendFailure)
+{
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+    }));
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = 1;
+
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(exchange->IsAckNotificationPending());
+
+    // The retransmission fails with a non-transient error, which drops the entry from the retrans table.
+    loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+
+    GetIOContext().DriveIOUntil(2000_ms32, [&] { return mockSender.mAckFailed; });
+    DrainAndServiceIO();
+
+    EXPECT_TRUE(mockSender.mAckFailed);
+    EXPECT_EQ(mockSender.mAckOutcome, CHIP_ERROR_BAD_REQUEST);
+    EXPECT_FALSE(mockSender.mAckReceived);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    if (!mockSender.mAckFailed)
+    {
+        exchange->Abort();
+    }
+
+    loopback.Reset();
+}
+
+namespace {
+class ShutdownOnGiveUpDelegate : public MockAppDelegate
+{
+public:
+    using MockAppDelegate::MockAppDelegate;
+
+    void OnAckOutcome(ExchangeContext * ec, CHIP_ERROR aError) override
+    {
+        mAckFailed = true;
+        ec->GetExchangeMgr()->GetReliableMessageMgr()->Shutdown();
+    }
+};
+} // namespace
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckGiveUpShutsDownManager)
+{
+    // A received message whose ack is still owed keeps a timer wakeup due after the shutdown.
+    MockAppDelegate mockReceiver(*this);
+    mockReceiver.mRetainExchange = true;
+    EXPECT_SUCCESS(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver));
+    MockAppDelegate peerSender(*this);
+    ExchangeContext * peerExchange = NewExchangeToAlice(&peerSender);
+    ASSERT_NE(peerExchange, nullptr);
+    EXPECT_SUCCESS(
+        peerExchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD))));
+    DrainAndServiceIO();
+    ASSERT_NE(mockReceiver.mExchange, nullptr);
+    EXPECT_TRUE(mockReceiver.mExchange->GetReliableMessageContext()->IsAckPending());
+
+    ShutdownOnGiveUpDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
+
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+    rm->EnumerateRetransTable([&](auto * entry) {
+        entry->nextRetransTime = System::Clock::kZero;
+        entry->sendCount       = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS;
+        return Loop::Continue;
+    });
+
+    // The give-up delegate shuts the manager down from inside its own timer callback.
+    ReliableMessageMgr::Timeout(&GetSystemLayer(), rm);
+
+    EXPECT_TRUE(mockSender.mAckFailed);
+
+    rm->Init(&GetSystemLayer());
+    mockReceiver.CloseExchangeIfNeeded();
+    DrainAndServiceIO();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest));
+    loopback.Reset();
+}
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckSessionReleased)
+{
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
+
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(exchange->IsAckNotificationPending());
+
+    ExpireSessionBobToAlice();
+
+    EXPECT_TRUE(mockSender.mAckFailed);
+    EXPECT_EQ(mockSender.mAckOutcome, CHIP_ERROR_CONNECTION_ABORTED);
+    EXPECT_FALSE(mockSender.mAckReceived);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    loopback.Reset();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+}
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckShutdown)
+{
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
+
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(exchange->IsAckNotificationPending());
+
+    rm->Shutdown();
+    rm->Init(&GetSystemLayer());
+
+    EXPECT_TRUE(mockSender.mAckFailed);
+    EXPECT_EQ(mockSender.mAckOutcome, CHIP_ERROR_SHUT_DOWN);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    if (!mockSender.mAckFailed)
+    {
+        exchange->Abort();
+    }
+
+    loopback.Reset();
+}
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckShutdownReentered)
+{
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm     = GetExchangeManager().GetReliableMessageMgr();
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+
+    mockSender.mOnAckOutcome = [rm] { rm->Shutdown(); };
+    rm->Shutdown();
+    rm->Init(&GetSystemLayer());
+
+    EXPECT_EQ(mockSender.mAckOutcome, CHIP_ERROR_SHUT_DOWN);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    loopback.Reset();
+}
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckExchangeManagerShutdownReentered)
+{
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+
+    // The exchange is still closing when its delegate shuts the stack down again; the session manager must outlive that.
+    bool sessionManagerKept  = false;
+    mockSender.mOnAckOutcome = [&] {
+        GetExchangeManager().Shutdown();
+        sessionManagerKept = GetExchangeManager().GetSessionManager() != nullptr;
+    };
+    GetExchangeManager().Shutdown();
+    EXPECT_SUCCESS(GetExchangeManager().Init(&GetSecureSessionManager()));
+
+    EXPECT_EQ(mockSender.mAckOutcome, CHIP_ERROR_SHUT_DOWN);
+    EXPECT_TRUE(sessionManagerKept);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    loopback.Reset();
+}
+
+namespace {
+class ResendOnAckFailureDelegate : public MockAppDelegate
+{
+public:
+    using MockAppDelegate::MockAppDelegate;
+
+    void OnAckOutcome(ExchangeContext * ec, CHIP_ERROR aError) override
+    {
+        MockAppDelegate::OnAckOutcome(ec, aError);
+        mResendResult = ec->SendMessage(Echo::MsgType::EchoRequest,
+                                        chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)), SendMessageFlags::kNone);
+    }
+
+    CHIP_ERROR mResendResult = CHIP_NO_ERROR;
+};
+} // namespace
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckShutdownRefusesResend)
+{
+    ResendOnAckFailureDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
+
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+
+    // A delegate that sends again from its failure callback must not leave an entry that no timer will service.
+    rm->Shutdown();
+
+    EXPECT_TRUE(mockSender.mAckFailed);
+    EXPECT_EQ(mockSender.mResendResult, CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    rm->Init(&GetSystemLayer());
+    if (rm->TestGetCountRetransTable() != 0)
+    {
+        rm->ClearRetransTable(exchange);
+    }
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    loopback.Reset();
+}
+
+namespace {
+class KeepExchangeOnAckFailureDelegate : public MockAppDelegate
+{
+public:
+    using MockAppDelegate::MockAppDelegate;
+
+    void OnAckOutcome(ExchangeContext * ec, CHIP_ERROR aError) override
+    {
+        MockAppDelegate::OnAckOutcome(ec, aError);
+        ec->WillSendMessage();
+    }
+};
+} // namespace
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckCauseIsPerMessage)
+{
+    KeepExchangeOnAckFailureDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(
+        ReliableMessageProtocolConfig({ 64_ms32, 64_ms32 }));
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = 1;
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+    loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+    GetIOContext().DriveIOUntil(2000_ms32, [&] { return mockSender.mAckFailed; });
+    EXPECT_EQ(mockSender.mAckOutcome, CHIP_ERROR_BAD_REQUEST);
+
+    // A later message on the same exchange that MRP gives up on reports its own cause, not the earlier one.
+    loopback.Reset();
+    loopback.mNumMessagesToDrop = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
+    mockSender.mAckFailed       = false;
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+    GetIOContext().DriveIOUntil(5000_ms32, [&] { return mockSender.mAckFailed; });
+    EXPECT_TRUE(mockSender.mAckFailed);
+    EXPECT_EQ(mockSender.mAckOutcome, CHIP_ERROR_TIMEOUT);
+
+    exchange->Abort();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    loopback.Reset();
+}
+
+namespace {
+class HangCounter : public SessionDelegate
+{
+public:
+    void OnSessionReleased() override {}
+    void OnSessionHang() override { mHangCount++; }
+    uint32_t mHangCount = 0;
+};
+} // namespace
+
+TEST_F(TestReliableMessageProtocol, CheckRetransmitSendFailureMarksSessionDefunct)
+{
+    // Defunct-marking only applies to CASE sessions.
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateCASESessionBobToAlice());
+    EXPECT_SUCCESS(CreateCASESessionAliceToBob());
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+    auto session = exchange->GetSessionHandle();
+    session->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({ 64_ms32, 64_ms32 }));
+    HangCounter hangCounter;
+    SessionHolderWithDelegate hangProbe(session, hangCounter);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = 1;
+
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(session->AsSecureSession()->IsActiveSession());
+
+    // The retransmission fails with a non-transient error: the session is treated as if MRP had given up.
+    loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+    GetIOContext().DriveIOUntil(2000_ms32, [&] { return mockSender.mAckFailed; });
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockSender.mAckOutcome, CHIP_ERROR_BAD_REQUEST);
+    EXPECT_TRUE(mockSender.mSessionDefunctAtOutcome);
+    EXPECT_TRUE(session->AsSecureSession()->IsDefunct());
+    EXPECT_EQ(hangCounter.mHangCount, 1u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    loopback.Reset();
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+}
+
+namespace {
+class ExpireOnHang : public SessionDelegate
+{
+public:
+    void OnSessionReleased() override {}
+    void OnSessionHang() override { mExpire(); }
+    std::function<void()> mExpire;
+};
+} // namespace
+
+TEST_F(TestReliableMessageProtocol, CheckRetransmitSendFailureSessionReleasedOnHang)
+{
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateCASESessionBobToAlice());
+    EXPECT_SUCCESS(CreateCASESessionAliceToBob());
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+    auto session = exchange->GetSessionHandle();
+    session->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({ 64_ms32, 64_ms32 }));
+
+    // A session holder that drops the session when told it hung, which clears the exchange's retransmissions.
+    ExpireOnHang expireOnHang;
+    expireOnHang.mExpire = [this] { ExpireSessionBobToAlice(); };
+    SessionHolderWithDelegate hangProbe(session, expireOnHang);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = 1;
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+    loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+    GetIOContext().DriveIOUntil(2000_ms32, [&] { return mockSender.mAckFailed; });
+    DrainAndServiceIO();
+
+    EXPECT_TRUE(mockSender.mAckFailed);
+    EXPECT_EQ(mockSender.mAckOutcome, CHIP_ERROR_BAD_REQUEST);
+    EXPECT_EQ(GetExchangeManager().GetReliableMessageMgr()->TestGetCountRetransTable(), 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    loopback.Reset();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+}
+
+TEST_F(TestReliableMessageProtocol, CheckRetransmitSendFailureOnClosedExchange)
+{
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateCASESessionBobToAlice());
+    EXPECT_SUCCESS(CreateCASESessionAliceToBob());
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+    auto session = exchange->GetSessionHandle();
+    session->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({ 64_ms32, 64_ms32 }));
+    HangCounter hangCounter;
+    SessionHolderWithDelegate hangProbe(session, hangCounter);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = 1;
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD))),
+              CHIP_NO_ERROR);
+    // The exchange closed itself after the send; only the retransmission entry keeps it alive now.
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 1u);
+
+    loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+    ReliableMessageMgr * rm    = GetExchangeManager().GetReliableMessageMgr();
+    GetIOContext().DriveIOUntil(1000_ms32, [&] { return rm->TestGetCountRetransTable() == 0; });
+
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    EXPECT_TRUE(session->AsSecureSession()->IsDefunct());
+    EXPECT_EQ(hangCounter.mHangCount, 1u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    loopback.Reset();
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+}
+
+TEST_F(TestReliableMessageProtocol, CheckRetransmitSendFailureHangReleasesOtherEntries)
+{
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateCASESessionBobToAlice());
+    EXPECT_SUCCESS(CreateCASESessionAliceToBob());
+
+    MockAppDelegate firstSender(*this);
+    MockAppDelegate secondSender(*this);
+    ExchangeContext * first  = NewExchangeToAlice(&firstSender);
+    ExchangeContext * second = NewExchangeToAlice(&secondSender);
+    ASSERT_NE(first, nullptr);
+    ASSERT_NE(second, nullptr);
+    auto session = first->GetSessionHandle();
+
+    ExpireOnHang expireOnHang;
+    expireOnHang.mExpire = [this] { ExpireSessionBobToAlice(); };
+    SessionHolderWithDelegate hangProbe(session, expireOnHang);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = 2;
+    for (auto * ec : { first, second })
+    {
+        EXPECT_EQ(ec->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                  SendMessageFlags::kNotifyOnAck),
+                  CHIP_NO_ERROR);
+    }
+
+    // Both retransmissions are due in one walk; the first fails, and the hang it reports releases the session, which clears
+    // the second exchange's entry. That must not happen while the table is being walked.
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    rm->EnumerateRetransTable([&](auto * entry) {
+        entry->nextRetransTime = System::Clock::kZero;
+        return Loop::Continue;
+    });
+    loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+    rm->ExecuteActions();
+
+    EXPECT_EQ(firstSender.mAckOutcome, CHIP_ERROR_BAD_REQUEST);
+    // The first exchange's hang released the session before the second one was reported.
+    EXPECT_EQ(secondSender.mAckOutcome, CHIP_ERROR_CONNECTION_ABORTED);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    loopback.Reset();
+    rm->StartTimer();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+}
+
+TEST_F(TestReliableMessageProtocol, CheckRetransmitSendFailureLeavesResponseTimeoutToMarkSession)
+{
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateCASESessionBobToAlice());
+    EXPECT_SUCCESS(CreateCASESessionAliceToBob());
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+    auto session = exchange->GetSessionHandle();
+    session->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({ 64_ms32, 64_ms32 }));
+    HangCounter hangCounter;
+    SessionHolderWithDelegate hangProbe(session, hangCounter);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = 1;
+    exchange->SetResponseTimeout(2000_ms32);
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kExpectResponse),
+              CHIP_NO_ERROR);
+
+    // A request that expects a response leaves the session to its response timeout, as on an MRP give-up.
+    loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+    ReliableMessageMgr * rm    = GetExchangeManager().GetReliableMessageMgr();
+    GetIOContext().DriveIOUntil(1000_ms32, [&] { return rm->TestGetCountRetransTable() == 0; });
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    EXPECT_FALSE(session->AsSecureSession()->IsDefunct());
+    EXPECT_EQ(hangCounter.mHangCount, 0u);
+
+    GetIOContext().DriveIOUntil(3000_ms32, [&] { return mockSender.mResponseTimedOut; });
+    EXPECT_TRUE(mockSender.mResponseTimedOut);
+    EXPECT_TRUE(session->AsSecureSession()->IsDefunct());
+    EXPECT_EQ(hangCounter.mHangCount, 1u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    loopback.Reset();
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+}
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckSecondSendRefused)
+{
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(exchange->IsAckNotificationPending());
+
+    DrainAndServiceIO();
+
+    EXPECT_TRUE(mockSender.mAckReceived);
+    EXPECT_EQ(mockSender.mAckOutcome, CHIP_NO_ERROR);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckIgnoresOtherAck)
+{
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+
+    uint32_t sentCounter = 0;
+    GetExchangeManager().GetReliableMessageMgr()->EnumerateRetransTable([&](auto * entry) {
+        sentCounter = entry->retainedBuf.GetMessageCounter();
+        return Loop::Continue;
+    });
+
+    PayloadHeader ackHeader;
+    ackHeader.SetMessageType(Protocols::SecureChannel::MsgType::StandaloneAck).SetAckMessageCounter(sentCounter + 1);
+    {
+        ExchangeHandle hold(*exchange);
+        EXPECT_EQ(exchange->HandleMessage(1, ackHeader, MessageFlags(), System::PacketBufferHandle::New(0)), CHIP_NO_ERROR);
+        EXPECT_FALSE(mockSender.mAckReceived);
+        EXPECT_FALSE(mockSender.mAckFailed);
+        EXPECT_TRUE(exchange->IsAckNotificationPending());
+        exchange->Abort();
+    }
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    loopback.Reset();
+}
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckWithoutReliableSend)
+{
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    // No ack will come for a message sent without MRP, so there is nothing to wait for.
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendFlags(SendMessageFlags::kNotifyOnAck).Set(SendMessageFlags::kNoAutoRequestAck)),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    DrainAndServiceIO();
+    EXPECT_FALSE(mockSender.mAckReceived);
+    EXPECT_FALSE(mockSender.mAckFailed);
+}
+
+namespace {
+// Replies to every message on its exchange, so the reply carries the ack.
+class EchoReplier : public UnsolicitedMessageHandler, public ExchangeDelegate
+{
+public:
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
+    {
+        newDelegate = this;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override
+    {
+        return ec->SendMessage(Echo::MsgType::EchoResponse, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)));
+    }
+    void OnResponseTimeout(ExchangeContext * ec) override {}
+};
+
+// Sends a second kNotifyOnAck message from the reply that acks the first.
+class RearmOnReplyDelegate : public MockAppDelegate
+{
+public:
+    using MockAppDelegate::MockAppDelegate;
+
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override
+    {
+        mRearmResult = ec->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                       SendMessageFlags::kNotifyOnAck);
+        mPendingAfterRearm = ec->IsAckNotificationPending();
+        return CHIP_NO_ERROR;
+    }
+    void OnAckOutcome(ExchangeContext * ec, CHIP_ERROR aError) override
+    {
+        MockAppDelegate::OnAckOutcome(ec, aError);
+        mOutcomeCount++;
+    }
+
+    CHIP_ERROR mRearmResult = CHIP_ERROR_INTERNAL;
+    bool mPendingAfterRearm = false;
+    uint32_t mOutcomeCount  = 0;
+};
+} // namespace
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckRearmFromReply)
+{
+    EchoReplier replier;
+    EXPECT_SUCCESS(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &replier));
+
+    RearmOnReplyDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(
+        ReliableMessageProtocolConfig({ 64_ms32, 64_ms32 }));
+
+    // Deliver the request and the reply that acks it; drop the second request so it stays unacked.
+    auto & loopback                            = GetLoopback();
+    loopback.mNumMessagesToAllowBeforeDropping = 2;
+    loopback.mNumMessagesToDrop                = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    // The second message has not been acked, so no outcome may be reported for it yet.
+    EXPECT_EQ(mockSender.mRearmResult, CHIP_NO_ERROR);
+    EXPECT_TRUE(mockSender.mPendingAfterRearm);
+    EXPECT_EQ(mockSender.mOutcomeCount, 0u);
+    EXPECT_TRUE(exchange->IsAckNotificationPending());
+
+    GetIOContext().DriveIOUntil(5000_ms32, [&] { return mockSender.mOutcomeCount > 0; });
+    EXPECT_EQ(mockSender.mOutcomeCount, 1u);
+    EXPECT_EQ(mockSender.mAckOutcome, CHIP_ERROR_TIMEOUT);
+
+    // The replier's response is never acked now; drop its exchange with the session.
+    EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest));
+    loopback.Reset();
+    ExpireSessionAliceToBob();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+}
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckGiveUpMarksSessionDefunct)
+{
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateCASESessionBobToAlice());
+    EXPECT_SUCCESS(CreateCASESessionAliceToBob());
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+    auto session = exchange->GetSessionHandle();
+    session->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({ 64_ms32, 64_ms32 }));
+    HangCounter hangCounter;
+    SessionHolderWithDelegate hangProbe(session, hangCounter);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+    GetIOContext().DriveIOUntil(5000_ms32, [&] { return mockSender.mAckFailed; });
+
+    EXPECT_EQ(mockSender.mAckOutcome, CHIP_ERROR_TIMEOUT);
+    EXPECT_TRUE(mockSender.mSessionDefunctAtOutcome);
+    EXPECT_TRUE(session->AsSecureSession()->IsDefunct());
+    EXPECT_EQ(hangCounter.mHangCount, 1u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    loopback.Reset();
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+}
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckClosedExchangeNotPending)
+{
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    auto & loopback             = GetLoopback();
+    loopback.mNumMessagesToDrop = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD)),
+                                    SendMessageFlags::kNotifyOnAck),
+              CHIP_NO_ERROR);
+
+    // Closing an exchange gives up on its outcome; the retransmission continues without it.
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    {
+        ExchangeHandle hold(*exchange);
+        exchange->Close();
+        EXPECT_FALSE(exchange->IsAckNotificationPending());
+        rm->ClearRetransTable(exchange);
+    }
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_FALSE(mockSender.mAckFailed);
+    loopback.Reset();
+}
+
+TEST_F(TestReliableMessageProtocol, CheckNotifyOnAckWithExpectResponse)
+{
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    EXPECT_FALSE(buffer.IsNull());
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    SendFlags flags(SendMessageFlags::kNotifyOnAck);
+    flags.Set(SendMessageFlags::kExpectResponse);
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), flags), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_FALSE(exchange->IsAckNotificationPending());
+
+    exchange->Close();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestReliableMessageProtocol, CheckCloseExchangeAndResendApplicationMessage)

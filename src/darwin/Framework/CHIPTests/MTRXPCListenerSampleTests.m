@@ -1944,6 +1944,35 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)test017_MTRDeviceSuppressResponseInvoke
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:mDeviceController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRXPCDeviceTestDelegate alloc] init];
+    [device setDelegate:delegate queue:queue];
+
+    // Over XPC this is a regular invoke, so the response comes back.
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Off invoked"];
+    [device invokeCommandWithEndpointID:@1
+                              clusterID:@(MTRClusterIDTypeOnOffID)
+                              commandID:@(MTRCommandIDTypeClusterOnOffCommandOffID)
+                          commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                     timedInvokeTimeout:nil
+                       suppressResponse:YES
+                                  queue:queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 XCTAssertNil(error);
+                                 XCTAssertEqual(values.count, 1);
+                                 XCTAssertEqualObjects(values.firstObject[MTRCommandPathKey],
+                                     [MTRCommandPath commandPathWithEndpointID:@1 clusterID:@(MTRClusterIDTypeOnOffID) commandID:@(MTRCommandIDTypeClusterOnOffCommandOffID)]);
+                                 [expectation fulfill];
+                             }];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
+
 - (void)test900_SubscribeClusterStateCache
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe attributes by cache"];

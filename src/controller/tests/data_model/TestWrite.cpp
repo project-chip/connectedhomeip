@@ -336,6 +336,108 @@ TEST_F(TestWrite, TestAttributeError)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
+TEST_F(TestWrite, TestSuppressedWriteReportsSuccessOnAck)
+{
+    auto sessionHandle      = GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+    Attributes::ListStructOctetString::TypeInfo::Type value;
+    Structs::TestListStructOctet::Type valueBuf[1];
+    value = valueBuf;
+
+    // The server would answer with an attribute error, but a suppressed write gets no response; it succeeds on the ack.
+    ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendAttributeError);
+
+    int doneCount    = 0;
+    auto onSuccessCb = [&](const ConcreteAttributePath & attributePath) {
+        EXPECT_EQ(doneCount, 0);
+        onSuccessCbInvoked = true;
+    };
+    auto onFailureCb = [&onFailureCbInvoked](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
+    };
+    auto onDoneCb = [&doneCount](WriteClient *) { doneCount++; };
+
+    EXPECT_SUCCESS(Controller::WriteAttribute(sessionHandle, kTestEndpointId,
+                                              Attributes::ListStructOctetString::TypeInfo::GetClusterId(),
+                                              Attributes::ListStructOctetString::TypeInfo::GetAttributeId(), value, onSuccessCb,
+                                              onFailureCb, NullOptional, onDoneCb, NullOptional, nullptr,
+                                              /* aSuppressResponse = */ true));
+    EXPECT_FALSE(onSuccessCbInvoked);
+
+    DrainAndServiceIO();
+
+    EXPECT_TRUE(onSuccessCbInvoked);
+    EXPECT_FALSE(onFailureCbInvoked);
+    EXPECT_EQ(doneCount, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestWrite, TestSuppressedGroupWriteReportsNoSuccess)
+{
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+    int doneCount   = 0;
+    auto * callback = Platform::New<Controller::WriteCallback>(
+        [&](const ConcreteAttributePath &) { onSuccessCbInvoked = true; },
+        [&](const ConcreteAttributePath *, CHIP_ERROR) { onFailureCbInvoked = true; }, [&](WriteClient *) { doneCount++; },
+        /* aIsGroupWrite = */ true);
+    ASSERT_NE(callback, nullptr);
+    callback->SetResponseSuppressed(ConcreteAttributePath(kTestEndpointId,
+                                                          Attributes::ListStructOctetString::TypeInfo::GetClusterId(),
+                                                          Attributes::ListStructOctetString::TypeInfo::GetAttributeId()));
+
+    // A group write has no ack to report, so it must not be reported as delivered.
+    callback->GetChunkedCallback()->OnDone(nullptr);
+
+    EXPECT_FALSE(onSuccessCbInvoked);
+    EXPECT_FALSE(onFailureCbInvoked);
+    EXPECT_EQ(doneCount, 1);
+}
+
+TEST_F(TestWrite, TestSuppressedWriteReportsFailureWithoutAck)
+{
+    auto sessionHandle      = GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+    CHIP_ERROR failure = CHIP_NO_ERROR;
+    Attributes::ListStructOctetString::TypeInfo::Type value;
+    Structs::TestListStructOctet::Type valueBuf[1];
+    value = valueBuf;
+
+    sessionHandle->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        System::Clock::Milliseconds32(64),
+        System::Clock::Milliseconds32(64),
+    }));
+    GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
+
+    int doneCount    = 0;
+    auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteAttributePath & attributePath) { onSuccessCbInvoked = true; };
+    auto onFailureCb = [&](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        EXPECT_EQ(doneCount, 0);
+        onFailureCbInvoked = true;
+        failure            = aError;
+    };
+    auto onDoneCb = [&doneCount](WriteClient *) { doneCount++; };
+
+    EXPECT_SUCCESS(Controller::WriteAttribute(sessionHandle, kTestEndpointId,
+                                              Attributes::ListStructOctetString::TypeInfo::GetClusterId(),
+                                              Attributes::ListStructOctetString::TypeInfo::GetAttributeId(), value, onSuccessCb,
+                                              onFailureCb, NullOptional, onDoneCb, NullOptional, nullptr,
+                                              /* aSuppressResponse = */ true));
+
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(5000), [&] { return doneCount > 0; });
+
+    EXPECT_FALSE(onSuccessCbInvoked);
+    EXPECT_TRUE(onFailureCbInvoked);
+    EXPECT_EQ(failure, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(doneCount, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    GetLoopback().Reset();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+}
+
 TEST_F(TestWrite, TestFabricScopedAttributeWithoutFabricIndex)
 {
     auto sessionHandle      = GetSessionBobToAlice();

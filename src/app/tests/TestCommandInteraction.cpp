@@ -354,19 +354,25 @@ public:
         onErrorCalledTimes++;
         mError = aError;
     }
-    void OnDone(chip::app::CommandSender * apCommandSender) override { onFinalCalledTimes++; }
+    void OnDone(chip::app::CommandSender * apCommandSender) override
+    {
+        onErrorCalledTimesAtDone = onErrorCalledTimes;
+        onFinalCalledTimes++;
+    }
 
     void ResetCounter()
     {
-        onResponseCalledTimes = 0;
-        onErrorCalledTimes    = 0;
-        onFinalCalledTimes    = 0;
+        onResponseCalledTimes    = 0;
+        onErrorCalledTimes       = 0;
+        onFinalCalledTimes       = 0;
+        onErrorCalledTimesAtDone = -1;
     }
 
-    int onResponseCalledTimes = 0;
-    int onErrorCalledTimes    = 0;
-    int onFinalCalledTimes    = 0;
-    CHIP_ERROR mError         = CHIP_NO_ERROR;
+    int onResponseCalledTimes    = 0;
+    int onErrorCalledTimes       = 0;
+    int onFinalCalledTimes       = 0;
+    int onErrorCalledTimesAtDone = -1;
+    CHIP_ERROR mError            = CHIP_NO_ERROR;
 } mockCommandSenderDelegate;
 
 class MockCommandSenderExtendableCallback : public CommandSender::ExtendableCallback
@@ -562,6 +568,8 @@ public:
     void TestCommandInvalidMessage4();
     void TestCommandSender_WithSendCommand();
     void TestCommandSender_LargePayloadBufferFitsLargeMessage();
+    void TestCommandSenderSuppressResponseRetransmitSendFailure();
+    void TestCommandSenderSuppressResponseDoneAtSendWithoutMRP();
     void TestCommandSender_WithProcessReceivedMsg();
     void TestCommandSender_ExtendableApiWithProcessReceivedMsg();
     void TestCommandSender_ExtendableApiWithProcessReceivedMsgContainingInvalidCommandRef();
@@ -1780,6 +1788,243 @@ TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseFlow)
 
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseDoneAfterAck)
+{
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ false,
+                                     /* aSuppressResponse = */ true);
+
+    AddInvokeRequestData(&commandSender);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 1u);
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseNoAck)
+{
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ false,
+                                     /* aSuppressResponse = */ true);
+
+    GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        System::Clock::Milliseconds32(64),
+        System::Clock::Milliseconds32(64),
+    }));
+
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
+
+    chip::isCommandDispatched = false;
+    AddInvokeRequestData(&commandSender);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(5000),
+                                [&] { return mockCommandSenderDelegate.onFinalCalledTimes > 0; });
+    DrainAndServiceIO();
+
+    EXPECT_FALSE(chip::isCommandDispatched);
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.mError, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimesAtDone, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    GetLoopback().mNumMessagesToDrop   = 0;
+    GetLoopback().mDroppedMessageCount = 0;
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+}
+
+TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseSessionReleased)
+{
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ false,
+                                     /* aSuppressResponse = */ true);
+
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
+
+    AddInvokeRequestData(&commandSender);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
+
+    ExpireSessionBobToAlice();
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.mError, CHIP_ERROR_CONNECTION_ABORTED);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimesAtDone, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    GetLoopback().mNumMessagesToDrop   = 0;
+    GetLoopback().mDroppedMessageCount = 0;
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderSuppressResponseRetransmitSendFailure)
+{
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ false,
+                                     /* aSuppressResponse = */ true);
+
+    GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        System::Clock::Milliseconds32(64),
+        System::Clock::Milliseconds32(64),
+    }));
+
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
+
+    AddInvokeRequestData(&commandSender);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
+
+    // The retransmission fails with a non-transient error, which drops it from the retrans table.
+    GetLoopback().mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                [&] { return mockCommandSenderDelegate.onFinalCalledTimes > 0; });
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.mError, CHIP_ERROR_BAD_REQUEST);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimesAtDone, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    if (mockCommandSenderDelegate.onFinalCalledTimes == 0 && commandSender.mExchangeCtx)
+    {
+        commandSender.mExchangeCtx->Abort();
+    }
+
+    GetLoopback().Reset();
+}
+
+namespace {
+// A peer that ignores SuppressResponse and answers the request with a StatusResponse.
+class StatusReplyingPeer : public Messaging::UnsolicitedMessageHandler, public Messaging::ExchangeDelegate
+{
+public:
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
+                                            Messaging::ExchangeDelegate *& newDelegate) override
+    {
+        newDelegate = this;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override
+    {
+        return StatusResponse::Send(Protocols::InteractionModel::Status::Failure, ec, /* aExpectResponse = */ false);
+    }
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
+};
+
+// Answers with an InvokeResponse although the request suppressed it.
+class InvokeReplyingPeer : public StatusReplyingPeer
+{
+public:
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override
+    {
+        System::PacketBufferHandle response = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+        TestCommandInteraction::GenerateInvokeResponse(response, kTestCommandIdWithData);
+        return ec->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(response));
+    }
+};
+} // namespace
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderSuppressResponseDoneAtSendWithoutMRP)
+{
+    // A session that does not use MRP (here a TCP peer address) gets no ack, so the request completes when it is sent.
+    auto session = GetSessionBobToAlice()->AsSecureSession();
+    session->SetPeerAddress(Transport::PeerAddress::TCP(GetAliceAddress().GetIPAddress(), GetAliceAddress().GetPort()));
+    ASSERT_FALSE(session->AllowsMRP());
+
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ false,
+                                     /* aSuppressResponse = */ true);
+    AddInvokeRequestData(&commandSender);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    EXPECT_FALSE(commandSender.mExchangeCtx);
+
+    DrainAndServiceIO();
+    session->SetPeerAddress(GetAliceAddress());
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseStatusReplyReportsError)
+{
+    StatusReplyingPeer peer;
+    EXPECT_SUCCESS(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
+        Protocols::InteractionModel::MsgType::InvokeCommandRequest, &peer));
+
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ false,
+                                     /* aSuppressResponse = */ true);
+    AddInvokeRequestData(&commandSender);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    // The reply carries the ack; it must reach the sender, not be dropped as the ack completes the exchange.
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.mError, StatusIB(Protocols::InteractionModel::Status::Failure).ToChipError());
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimesAtDone, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(
+        Protocols::InteractionModel::MsgType::InvokeCommandRequest));
+}
+
+TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseInvokeReplyDoneOnce)
+{
+    InvokeReplyingPeer peer;
+    EXPECT_SUCCESS(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
+        Protocols::InteractionModel::MsgType::InvokeCommandRequest, &peer));
+
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ false,
+                                     /* aSuppressResponse = */ true);
+    AddInvokeRequestData(&commandSender);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(
+        Protocols::InteractionModel::MsgType::InvokeCommandRequest));
 }
 
 TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseSuppressStatusResponse)
