@@ -171,7 +171,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets(
+    const CameraAvSettingsUserLevelManagement::MPTZPresetHelper * excludedPreset)
 {
     VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
     Platform::ScopedMemoryBuffer<uint8_t> presets;
@@ -191,6 +192,11 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
 
     for (const auto & mptzPresets : mMptzPresetHelpers)
     {
+        if (&mptzPresets == excludedPreset)
+        {
+            continue;
+        }
+
         // Get the details to encode from the preset helper
         //
         MPTZPresetStruct::Type presetStruct;
@@ -1174,10 +1180,18 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
         return status;
     }
 
+    it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
+                      [presetToRemove](const CameraAvSettingsUserLevelManagement::MPTZPresetHelper & mptzph) {
+                          return mptzph.GetPresetID() == presetToRemove;
+                      });
+    VerifyOrReturnError(it != mMptzPresetHelpers.end(), Status::Failure,
+                        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Preset list changed while removing preset: %d",
+                                     mEndpointId, presetToRemove));
+
     // Try to persist the updated value first, if that fails we fail the command otherwise the data would be out of sync between
     // in memory and persisted.
 
-    CHIP_ERROR err = StoreMPTZPresets();
+    CHIP_ERROR err = StoreMPTZPresets(&*it);
 
     if (err != CHIP_NO_ERROR)
     {
