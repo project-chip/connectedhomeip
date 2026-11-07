@@ -160,6 +160,7 @@ public:
 
     std::vector<MockEndpoint> endpoints;
     uint16_t nextEndpointID = 1;
+    uint32_t provisionCount = 0;
 
     CHIP_ERROR provisionError = CHIP_NO_ERROR;
     Protocols::InteractionModel::ClusterStatusCode provisionStatus =
@@ -210,6 +211,7 @@ public:
     ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
                       const Commands::ProvisionEndpoint::DecodableType & provisionReq, uint16_t & endpointID) override
     {
+        ++provisionCount;
         if (provisionError != CHIP_NO_ERROR)
         {
             return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRootCertificateNotFound);
@@ -378,6 +380,7 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointSuccess)
     Commands::ProvisionEndpoint::Type request;
     request.hostname = ByteSpan::fromCharSpan("example.com"_span);
     request.caid     = 1;
+    request.port     = 443;
     request.ccdid.SetNull();
 
     auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
@@ -393,12 +396,27 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointSuccess)
     EXPECT_EQ(mMockDelegate.endpoints[0].endpointID, 1);
 }
 
+TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointRejectsZeroPort)
+{
+    Commands::ProvisionEndpoint::Type request;
+    request.hostname = ByteSpan::fromCharSpan("example.com"_span);
+    request.port     = 0;
+    request.caid     = 1;
+    request.ccdid.SetNull();
+
+    auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
+    EXPECT_EQ(mMockDelegate.provisionCount, 0u);
+    ASSERT_TRUE(result.status.has_value() &&
+                result.status->GetStatusCode().GetStatus() == Protocols::InteractionModel::Status::ConstraintError);
+}
+
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointConstraintErrors)
 {
     // Test hostname too short
     Commands::ProvisionEndpoint::Type request;
     request.hostname = ByteSpan::fromCharSpan("abc"_span);
     request.caid     = 1;
+    request.port     = 443;
     request.ccdid.SetNull();
 
     auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
@@ -410,7 +428,7 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointConstraintErrors)
 
     // Test invalid CAID
     request.hostname = ByteSpan::fromCharSpan("example.com"_span);
-    request.caid     = 256; // exceeds kMaxRootCertId
+    request.caid     = 65535; // exceeds kMaxRootCertId
     result           = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
     EXPECT_FALSE(result.IsSuccess());
 }
@@ -420,6 +438,7 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointRootCertNotFound)
     Commands::ProvisionEndpoint::Type request;
     request.hostname = ByteSpan::fromCharSpan("example.com"_span);
     request.caid     = 99; // Not in mock cert table
+    request.port     = 443;
     request.ccdid.SetNull();
 
     auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
@@ -436,6 +455,7 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointClientCertNotFound)
     Commands::ProvisionEndpoint::Type request;
     request.hostname = ByteSpan::fromCharSpan("example.com"_span);
     request.caid     = 1;
+    request.port     = 443;
     request.ccdid.SetNonNull(99); // Not in mock cert table
 
     auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
@@ -448,6 +468,7 @@ TEST_F(TestTLSClientManagementCluster, TestFindEndpointSuccess)
     Commands::ProvisionEndpoint::Type provisionReq;
     provisionReq.hostname = ByteSpan::fromCharSpan("example.com"_span);
     provisionReq.caid     = 1;
+    provisionReq.port     = 443;
     provisionReq.ccdid.SetNull();
 
     auto provisionResult = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(provisionReq);
@@ -506,6 +527,7 @@ TEST_F(TestTLSClientManagementCluster, TestRemoveEndpointSuccess)
     Commands::ProvisionEndpoint::Type provisionReq;
     provisionReq.hostname = ByteSpan::fromCharSpan("example.com"_span);
     provisionReq.caid     = 1;
+    provisionReq.port     = 443;
     provisionReq.ccdid.SetNull();
 
     auto provisionResult = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(provisionReq);
