@@ -48,6 +48,10 @@ constexpr Tracing::MetricKey kMetricSetupWithDiscovered = "dwnfw_setup_with_disc
 // Tracks PASE session during setup of a device
 constexpr Tracing::MetricKey kMetricSetupPASESession = "dwnfw_setup_pase_session";
 
+// The transport (an MTRTransportType value) of the PASE session, when its rendezvous parameters are known. Logged before the end of
+// kMetricSetupPASESession, so it is in the snapshot that OnCommissioningComplete takes.
+constexpr Tracing::MetricKey kMetricSetupPASETransport = "dwnfw_setup_pase_transport";
+
 // Marks the request to prewarm for commissioning
 constexpr Tracing::MetricKey kMetricPreWarmCommissioning = "dwnfw_prewarm_commissioning";
 
@@ -125,6 +129,23 @@ constexpr Tracing::MetricKey kMetricOTATransferLength = METRICS_KEY(ota, transfe
 constexpr Tracing::MetricKey kMetricOTATransferOffset = METRICS_KEY(ota, transfer_offset);
 
 constexpr Tracing::MetricKey kMetricOTATNumBytesProcessed = METRICS_KEY(ota, num_bytes_processed);
+
+// Subscription keys, delivered to MTRDeviceDelegate's device:collectedMetrics: and so part of the client-visible schema: do not
+// rename them.  Suffixes follow the existing keys: _bool for a 0/1 value (as kMetricOTADeviceUsesThread), _ctr for a count (as
+// core_dev_operational_discovery_attempt_ctr) and _ms for milliseconds.
+// case_session_request: from asking for a CASE session until one (new or existing) is provided.
+constexpr Tracing::MetricKey kMetricSubscriptionSetup              = METRICS_KEY(subscription, setup);
+constexpr Tracing::MetricKey kMetricSubscriptionCASESessionRequest = METRICS_KEY(subscription, case_session_request);
+constexpr Tracing::MetricKey kMetricSubscriptionAttemptFailed      = METRICS_KEY(subscription, attempt_failed);
+constexpr Tracing::MetricKey kMetricSubscriptionActive             = METRICS_KEY(subscription, active);
+constexpr Tracing::MetricKey kMetricSubscriptionResubscription     = METRICS_KEY(subscription, resubscription);
+constexpr Tracing::MetricKey kMetricSubscriptionRetryCount         = METRICS_KEY(subscription, retry_ctr);
+constexpr Tracing::MetricKey kMetricSubscriptionRetryDelay         = METRICS_KEY(subscription, retry_delay_ms);
+constexpr Tracing::MetricKey kMetricSubscriptionTransport          = METRICS_KEY(subscription, transport);
+constexpr Tracing::MetricKey kMetricSubscriptionDeviceUsesThread   = METRICS_KEY(subscription, device_uses_thread_bool);
+constexpr Tracing::MetricKey kMetricSubscriptionNetworkFeatures    = METRICS_KEY(subscription, network_features);
+constexpr Tracing::MetricKey kMetricSubscriptionDeviceVendorID     = METRICS_KEY(subscription, device_vendor_id);
+constexpr Tracing::MetricKey kMetricSubscriptionDeviceProductID    = METRICS_KEY(subscription, device_product_id);
 
 } // namespace DarwinFramework
 } // namespace Tracing

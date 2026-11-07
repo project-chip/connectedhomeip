@@ -830,4 +830,34 @@ TEST_F(TestClusterStateCache, TestCache)
                              AttributeInstruction(AttributeInstruction::kAttributeB, 0, AttributeInstruction::kData) });
 }
 
+class ResubscriptionAttemptCountingCallback final : public ClusterStateCache::Callback
+{
+public:
+    void OnDone(ReadClient *) override {}
+    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType,
+                                        const Optional<SessionHandle> & aSession) override
+    {
+        mAttempts[static_cast<size_t>(aSessionType)]++;
+        mLastHadSession = aSession.HasValue();
+    }
+    int mAttempts[3]     = {};
+    bool mLastHadSession = true;
+};
+
+TEST_F(TestClusterStateCache, TestForwardsResubscriptionAttemptStarted)
+{
+    ResubscriptionAttemptCountingCallback callback;
+    ClusterStateCache cache(callback);
+
+    using Type = ReadClient::ResubscriptionSessionType;
+    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(Type::kReuseHeldSession, NullOptional);
+    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(Type::kAttachToExistingSession, NullOptional);
+    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(Type::kEstablishNewSession, NullOptional);
+    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(Type::kEstablishNewSession, NullOptional);
+    EXPECT_EQ(callback.mAttempts[static_cast<size_t>(Type::kReuseHeldSession)], 1);
+    EXPECT_EQ(callback.mAttempts[static_cast<size_t>(Type::kAttachToExistingSession)], 1);
+    EXPECT_EQ(callback.mAttempts[static_cast<size_t>(Type::kEstablishNewSession)], 2);
+    EXPECT_FALSE(callback.mLastHadSession);
+}
+
 } // namespace
