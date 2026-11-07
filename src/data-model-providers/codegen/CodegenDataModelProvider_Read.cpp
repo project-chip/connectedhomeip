@@ -94,6 +94,8 @@ std::optional<CHIP_ERROR> TryReadViaAccessInterface(const DataModel::ReadAttribu
 DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                       AttributeValueEncoder & encoder)
 {
+    VerifyOrReturnError(emberAfFindEndpointType(request.path.mEndpointId) != nullptr, Status::UnsupportedEndpoint);
+
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI " (expanded=%d)",
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId),
