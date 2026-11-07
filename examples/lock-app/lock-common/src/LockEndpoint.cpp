@@ -68,7 +68,7 @@ bool LockEndpoint::Unbolt(const Nullable<chip::FabricIndex> & fabricIdx, const N
     return setLockState(fabricIdx, nodeId, DlLockState::kUnlocked, pin, err, opSource);
 }
 
-bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
+bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
 {
     ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetUser [endpoint=%d,userIndex=%hu]", mEndpointId, userIndex);
 
@@ -195,7 +195,7 @@ bool LockEndpoint::SendLockAlarm(AlarmCodeEnum alarmCode) const
 }
 
 bool LockEndpoint::GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
-                                 EmberAfPluginDoorLockCredentialInfo & credential) const
+                                 EmberAfPluginDoorLockCredentialInfo & credential)
 {
     ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetCredential [endpoint=%d,credentialIndex=%u,credentialType=%u]", mEndpointId,
                     credentialIndex, to_underlying(credentialType));

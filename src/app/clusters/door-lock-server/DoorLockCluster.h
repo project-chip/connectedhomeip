@@ -20,9 +20,11 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/door-lock-server/door-lock-delegate.h>
+#include <app/clusters/door-lock-server/door-lock-types.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/DoorLock/Attributes.h>
+#include <clusters/DoorLock/Commands.h>
 #include <clusters/DoorLock/Enums.h>
 #include <clusters/DoorLock/Events.h>
 #include <clusters/DoorLock/Metadata.h>
@@ -31,6 +33,7 @@
 #include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <array>
 #include <cstdint>
@@ -155,6 +158,8 @@ public:
 
     // ---- ServerClusterInterface implementation --------------------------------
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+
     void Shutdown(ClusterShutdownType shutdownType) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -207,7 +212,23 @@ public:
     }
 
     DlLockState GetLockState() const { return mLockState.ValueOr(DlLockState::kNotFullyLocked); }
+    const DataModel::Nullable<DlLockState> & GetLockStateNullable() const { return mLockState; }
     uint32_t GetAutoRelockTime() const { return mAutoRelockTime; }
+    bool GetRequirePINforRemoteOperation() const { return mRequirePINforRemoteOperation; }
+
+    /// Updates the ActuatorEnabled read-only state (application reported).
+    CHIP_ERROR SetActuatorEnabled(bool actuatorEnabled)
+    {
+        SetAttributeValue(mActuatorEnabled, actuatorEnabled, Attributes::ActuatorEnabled::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    /// Updates the AutoRelockTime attribute without changing any pending relock.
+    CHIP_ERROR SetAutoRelockTime(uint32_t autoRelockTime)
+    {
+        SetAttributeValue(mAutoRelockTime, autoRelockTime, Attributes::AutoRelockTime::Id);
+        return CHIP_NO_ERROR;
+    }
 
 private:
     Delegate & mDelegate;
@@ -272,6 +293,183 @@ private:
 
     using DelegateLockOpHandler = std::optional<OperationErrorEnum> (Delegate::*)(const LockOperationRequest &);
 
+    // ---- User / credential / schedule command handlers --------------------------
+    // Each handler mirrors the ember implementation behavior 1:1 (including
+    // response commands, cluster-specific failure codes and LockUserChange
+    // events); the response is always sent to the CommandHandler here, so the
+    // InvokeCommand dispatch returns std::nullopt after calling them.
+
+    void HandleSetUser(const DataModel::InvokeRequest & request, const Commands::SetUser::DecodableType & commandData,
+                       CommandHandler * handler, const ConcreteCommandPath & path);
+    void HandleGetUser(const DataModel::InvokeRequest & request, uint16_t userIndex, CommandHandler * handler,
+                       const ConcreteCommandPath & path);
+    void HandleClearUser(const DataModel::InvokeRequest & request, uint16_t userIndex, CommandHandler * handler,
+                         const ConcreteCommandPath & path);
+    void HandleSetCredential(const DataModel::InvokeRequest & request, const Commands::SetCredential::DecodableType & commandData,
+                             CommandHandler * handler, const ConcreteCommandPath & path);
+    void HandleGetCredentialStatus(CredentialTypeEnum credentialType, uint16_t credentialIndex, CommandHandler * handler,
+                                   const ConcreteCommandPath & path);
+    void HandleClearCredential(const DataModel::InvokeRequest & request,
+                               const Commands::ClearCredential::DecodableType & commandData, CommandHandler * handler,
+                               const ConcreteCommandPath & path);
+
+    void HandleSetWeekDaySchedule(const DataModel::InvokeRequest & request, uint8_t weekDayIndex, uint16_t userIndex,
+                                  const BitMask<DaysMaskMap> & daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour,
+                                  uint8_t endMinute, CommandHandler * handler, const ConcreteCommandPath & path);
+    void HandleGetWeekDaySchedule(uint8_t weekDayIndex, uint16_t userIndex, CommandHandler * handler,
+                                  const ConcreteCommandPath & path);
+    void HandleClearWeekDaySchedule(const DataModel::InvokeRequest & request, uint8_t weekDayIndex, uint16_t userIndex,
+                                    CommandHandler * handler, const ConcreteCommandPath & path);
+
+    void HandleSetYearDaySchedule(const DataModel::InvokeRequest & request, uint8_t yearDayIndex, uint16_t userIndex,
+                                  uint32_t localStartTime, uint32_t localEndTime, CommandHandler * handler,
+                                  const ConcreteCommandPath & path);
+    void HandleGetYearDaySchedule(uint8_t yearDayIndex, uint16_t userIndex, CommandHandler * handler,
+                                  const ConcreteCommandPath & path);
+    void HandleClearYearDaySchedule(const DataModel::InvokeRequest & request, uint8_t yearDayIndex, uint16_t userIndex,
+                                    CommandHandler * handler, const ConcreteCommandPath & path);
+
+    void HandleSetHolidaySchedule(uint8_t holidayIndex, uint32_t localStartTime, uint32_t localEndTime,
+                                  OperatingModeEnum operatingMode, CommandHandler * handler, const ConcreteCommandPath & path);
+    void HandleGetHolidaySchedule(uint8_t holidayIndex, CommandHandler * handler, const ConcreteCommandPath & path);
+    void HandleClearHolidaySchedule(uint8_t holidayIndex, CommandHandler * handler, const ConcreteCommandPath & path);
+
+    void HandleSetAliroReaderConfig(const ByteSpan & signingKey, const ByteSpan & verificationKey, const ByteSpan & groupIdentifier,
+                                    const Optional<ByteSpan> & groupResolvingKey, CommandHandler * handler,
+                                    const ConcreteCommandPath & path);
+    void HandleClearAliroReaderConfig(CommandHandler * handler, const ConcreteCommandPath & path);
+
+    // ---- Command helpers (ported from the ember implementation) -----------------
+
+    /// True when the user management feature is enabled (also required for
+    /// per-user schedules and user-scoped credentials).
+    bool SupportsUSR() const { return mFeatures.Has(Feature::kUser); }
+    bool SupportsWeekDaySchedules() const { return mFeatures.Has(Feature::kWeekDayAccessSchedules); }
+    bool SupportsYearDaySchedules() const { return mFeatures.Has(Feature::kYearDayAccessSchedules); }
+    bool SupportsHolidaySchedules() const { return mFeatures.Has(Feature::kHolidaySchedules); }
+    bool SupportsPIN() const { return mFeatures.Has(Feature::kPinCredential); }
+    bool SupportsRFID() const { return mFeatures.Has(Feature::kRfidCredential); }
+    bool SupportsFingers() const { return mFeatures.Has(Feature::kFingerCredentials); }
+    bool SupportsFace() const { return mFeatures.Has(Feature::kFaceCredentials); }
+    bool SupportsAliroProvisioning() const { return mFeatures.Has(Feature::kAliroProvisioning); }
+    bool SupportsAliroBLEUWB() const { return mFeatures.Has(Feature::kAliroBLEUWB); }
+
+    bool UserIndexValid(uint16_t userIndex) const;
+    bool UserIndexValid(uint16_t userIndex, uint16_t & maxNumberOfUsers) const;
+    bool UserExists(uint16_t userIndex) const;
+
+    bool CredentialIndexValid(CredentialTypeEnum type, uint16_t credentialIndex, uint16_t & maxNumberOfCredentials) const;
+    chip::app::Clusters::DoorLock::DlStatus CredentialLengthWithinRange(CredentialTypeEnum type,
+                                                                        const ByteSpan & credentialData) const;
+    chip::app::Clusters::DoorLock::DlStatus AliroCredentialDataValid(CredentialTypeEnum type,
+                                                                     const ByteSpan & credentialData) const;
+    bool GetMaxNumberOfCredentials(CredentialTypeEnum credentialType, uint16_t & maxNumberOfCredentials) const;
+    uint16_t NumberOfCredentialsSupportedPerUserValue() const { return mNumberOfCredentialsSupportedPerUser; }
+
+    bool FindOccupiedUserSlot(uint16_t startIndex, uint16_t & userIndex) const;
+    bool FindUnoccupiedUserSlot(uint16_t & userIndex) const;
+    bool FindUnoccupiedUserSlot(uint16_t startIndex, uint16_t & userIndex) const;
+    bool FindOccupiedCredentialSlot(CredentialTypeEnum credentialType, uint16_t startIndex, uint16_t & credentialIndex) const;
+    bool FindUnoccupiedCredentialSlot(CredentialTypeEnum credentialType, uint16_t startIndex, uint16_t & credentialIndex) const;
+    bool FindUserIndexByCredential(CredentialTypeEnum credentialType, uint16_t credentialIndex, uint16_t & userIndex) const;
+    bool FindUserIndexByCredential(CredentialTypeEnum credentialType, ByteSpan credentialData, uint16_t & userIndex,
+                                   uint16_t & credentialIndex, EmberAfPluginDoorLockUserInfo & userInfo) const;
+
+    bool CredentialTypeSupported(CredentialTypeEnum type) const;
+    bool WeekDayIndexValid(uint8_t weekDayIndex) const;
+    bool YearDayIndexValid(uint8_t yearDayIndex) const;
+    bool HolidayIndexValid(uint8_t holidayIndex) const;
+    bool CountOccupiedCredentials(CredentialTypeEnum credentialType, size_t & occupiedCount) const;
+    LockDataTypeEnum CredentialTypeToLockDataType(CredentialTypeEnum credentialType) const;
+    bool IsUserScheduleRestricted(const EmberAfPluginDoorLockUserInfo & user) const;
+
+    chip::Protocols::InteractionModel::ClusterStatusCode
+    CreateUser(FabricIndex creatorFabricIdx, NodeId sourceNodeId, uint16_t userIndex,
+               const DataModel::Nullable<CharSpan> & userName, const DataModel::Nullable<uint32_t> & userUniqueId,
+               const DataModel::Nullable<UserStatusEnum> & userStatus, const DataModel::Nullable<UserTypeEnum> & userType,
+               const DataModel::Nullable<CredentialRuleEnum> & credentialRule,
+               const DataModel::Nullable<CredentialStruct> & credential = DataModel::Nullable<CredentialStruct>());
+    chip::Protocols::InteractionModel::Status ModifyUser(FabricIndex modifierFabricIndex, NodeId sourceNodeId, uint16_t userIndex,
+                                                         const DataModel::Nullable<CharSpan> & userName,
+                                                         const DataModel::Nullable<uint32_t> & userUniqueId,
+                                                         const DataModel::Nullable<UserStatusEnum> & userStatus,
+                                                         const DataModel::Nullable<UserTypeEnum> & userType,
+                                                         const DataModel::Nullable<CredentialRuleEnum> & credentialRule);
+    chip::Protocols::InteractionModel::Status ClearUser(FabricIndex modifierFabricId, NodeId sourceNodeId, uint16_t userIndex,
+                                                        const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status ClearUser(FabricIndex modifierFabricId, NodeId sourceNodeId, uint16_t userIndex,
+                                                        bool sendUserChangeEvent);
+
+    DlStatus CreateNewCredentialAndUser(FabricIndex creatorFabricIdx, NodeId sourceNodeId,
+                                        const DataModel::Nullable<UserStatusEnum> & userStatus,
+                                        const DataModel::Nullable<UserTypeEnum> & userType, const CredentialStruct & credential,
+                                        const ByteSpan & credentialData, uint16_t & createdUserIndex);
+    DlStatus CreateNewCredentialAndAddItToUser(FabricIndex modifierFabricIdx, uint16_t userIndex,
+                                               const CredentialStruct & credential, const ByteSpan & credentialData);
+    DlStatus AddCredentialToUser(FabricIndex modifierFabricIdx, uint16_t userIndex, const CredentialStruct & credential);
+    DlStatus ModifyCredentialForUser(FabricIndex modifierFabricIdx, uint16_t userIndex, const CredentialStruct & credential);
+    DlStatus CreateCredential(FabricIndex creatorFabricIdx, NodeId sourceNodeId, uint16_t credentialIndex,
+                              CredentialTypeEnum credentialType, const EmberAfPluginDoorLockCredentialInfo & existingCredential,
+                              const ByteSpan & credentialData, const DataModel::Nullable<uint16_t> & userIndex,
+                              const DataModel::Nullable<UserStatusEnum> & userStatus,
+                              const DataModel::Nullable<UserTypeEnum> & userType, uint16_t & createdUserIndex);
+    DlStatus ModifyProgrammingPIN(FabricIndex modifierFabricIndex, NodeId sourceNodeId, uint16_t credentialIndex,
+                                  CredentialTypeEnum credentialType, const EmberAfPluginDoorLockCredentialInfo & existingCredential,
+                                  const ByteSpan & credentialData);
+    DlStatus ModifyCredential(FabricIndex modifierFabricIndex, NodeId sourceNodeId, uint16_t credentialIndex,
+                              CredentialTypeEnum credentialType, const EmberAfPluginDoorLockCredentialInfo & existingCredential,
+                              const ByteSpan & credentialData, uint16_t userIndex,
+                              const DataModel::Nullable<UserStatusEnum> & userStatus,
+                              const DataModel::Nullable<UserTypeEnum> & userType);
+
+    chip::Protocols::InteractionModel::Status ClearCredential(FabricIndex modifier, NodeId sourceNodeId,
+                                                              CredentialTypeEnum credentialType, uint16_t credentialIndex,
+                                                              bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status ClearCredentials(FabricIndex modifier, NodeId sourceNodeId);
+    chip::Protocols::InteractionModel::Status ClearCredentials(FabricIndex modifier, NodeId sourceNodeId,
+                                                               CredentialTypeEnum credentialType);
+    bool ClearFabricFromUsers(FabricIndex fabricIndex) const;
+    bool ClearFabricFromCredentials(FabricIndex fabricIndex) const;
+    bool ClearFabricFromCredentials(CredentialTypeEnum credentialType, FabricIndex fabricToRemove) const;
+
+    chip::app::Clusters::DoorLock::DlStatus ClearWeekDaySchedule(uint16_t userIndex, uint8_t weekDayIndex) const;
+    DlStatus ClearWeekDaySchedules(uint16_t userIndex) const;
+    DlStatus ClearSchedules(uint16_t userIndex) const;
+    chip::app::Clusters::DoorLock::DlStatus ClearYearDaySchedule(uint16_t userIndex, uint8_t yearDayIndex) const;
+    DlStatus ClearYearDaySchedules(uint16_t userIndex) const;
+    DlStatus ClearHolidaySchedule(uint8_t holidayIndex) const;
+    DlStatus ClearHolidaySchedules() const;
+
+    void SendRemoteLockUserChange(LockDataTypeEnum dataType, DataOperationTypeEnum operation, NodeId nodeId,
+                                  FabricIndex fabricIndex, uint16_t userIndex, uint16_t dataIndex) const;
+
+    /// Handles a fabric removal: unstamps the fabric from users and credentials
+    /// (so the records survive owned by "no fabric") and notifies the delegate.
+    bool HandleFabricRemoved(FabricIndex fabricIndex);
+
+    /// Loads persistent attribute values from the attribute storage.
+    void LoadPersistentAttributes(ServerClusterContext & context);
+
+    /// Stores LockState into the attribute persistence storage.
+    void StoreLockState() const;
+
+    // ---- Response encoding helpers ------------------------------------------------
+
+    void SendSetCredentialResponse(CommandHandler * handler, const ConcreteCommandPath & path, DlStatus status, uint16_t userIndex,
+                                   uint16_t nextCredentialIndex) const;
+    void SendGetCredentialResponse(CommandHandler * handler, const ConcreteCommandPath & path, CredentialTypeEnum credentialType,
+                                   uint16_t credentialIndex, const DataModel::Nullable<uint16_t> & nextCredentialIndex,
+                                   uint16_t userIndexWithCredential, const EmberAfPluginDoorLockCredentialInfo * credentialInfo,
+                                   bool credentialExists) const;
+    void SendGetWeekDayScheduleResponse(CommandHandler * handler, const ConcreteCommandPath & path, uint8_t weekDayIndex,
+                                        uint16_t userIndex, DlStatus status, DaysMaskMap daysMask, uint8_t startHour,
+                                        uint8_t startMinute, uint8_t endHour, uint8_t endMinute) const;
+    void SendGetYearDayScheduleResponse(CommandHandler * handler, const ConcreteCommandPath & path, uint8_t yearDayIndex,
+                                        uint16_t userIndex, DlStatus status, uint32_t localStartTime, uint32_t localEndTime) const;
+    void SendGetHolidayScheduleResponse(CommandHandler * handler, const ConcreteCommandPath & path, uint8_t holidayIndex,
+                                        DlStatus status, uint32_t localStartTime, uint32_t localEndTime,
+                                        OperatingModeEnum operatingMode) const;
+
     /// Shared implementation of LockDoor/UnlockDoor/UnlockWithTimeout/UnboltDoor:
     /// operating-mode gate, lockout window, credential checks, hardware actuation,
     /// LockOperation/LockOperationError events and auto-relock scheduling.
@@ -292,7 +490,7 @@ private:
     /// Emits any typed cluster event through the interaction model context.
     /// Nothing actionable can be done on failure: GenerateEvent already logs it.
     template <typename T>
-    void SendEvent(const T & event)
+    void SendEvent(const T & event) const
     {
         if (IsStarted())
         {

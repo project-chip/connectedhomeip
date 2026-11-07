@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "door-lock-types.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
@@ -220,6 +221,108 @@ public:
      * @param[in] lockoutEndTimestamp timestamp at which the lockout window ends
      */
     virtual void OnLockoutStarted(chip::System::Clock::Timestamp lockoutEndTimestamp) {}
+
+    // ---- User management ([USR] feature) ---------------------------------------
+
+    /**
+     * @brief Read a user record from the application's user database.
+     *
+     * Must succeed even for unoccupied slots (userStatus == kAvailable), the
+     * slot content is only populated for occupied ones.
+     *
+     * @param[in] userIndex 1-based user index, guaranteed within
+     *            NumberOfTotalUsersSupported
+     * @param[out] user the user record
+     * @retval true if the user index is within the application database
+     */
+    virtual bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) { return false; }
+
+    /**
+     * @brief Create, modify or clear a user record.
+     *
+     * A clear request passes kUndefinedFabricIndex for creator and modifier,
+     * an empty name, 0 uniqueId, kAvailable status, kUnrestrictedUser type,
+     * kSingle credential rule and no credentials.
+     */
+    virtual bool SetUser(uint16_t userIndex, FabricIndex creator, FabricIndex modifier, const CharSpan & userName,
+                         uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum userType, CredentialRuleEnum credentialRule,
+                         const CredentialStruct * credentials, size_t totalCredentials)
+    {
+        return false;
+    }
+
+    // ---- Credential storage ------------------------------------------------------
+
+    /**
+     * @brief Read a credential record. Must succeed even for unoccupied slots;
+     * only populated for occupied ones.
+     *
+     * @param[in] credentialIndex 1-based credential index for PIN/RFID/finger
+     *            kinds; 0 for the Programming PIN.
+     */
+    virtual bool GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
+                               EmberAfPluginDoorLockCredentialInfo & credential)
+    {
+        return false;
+    }
+
+    /**
+     * @brief Create/modify/clear a credential. A status of kAvailable deletes
+     * the credential (credential data may be an empty span then).
+     */
+    virtual bool SetCredential(uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier,
+                               DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                               const ByteSpan & credentialData)
+    {
+        return false;
+    }
+
+    // ---- Capacities and constraints for non-PIN/RFID credential kinds ------------
+
+    virtual bool GetNumberOfFingerprintCredentialsSupported(uint16_t & maxNumberOfCredentials) { return false; }
+    virtual bool GetNumberOfFingerVeinCredentialsSupported(uint16_t & maxNumberOfCredentials) { return false; }
+    virtual bool GetNumberOfFaceCredentialsSupported(uint16_t & maxNumberOfCredentials) { return false; }
+
+    virtual bool GetFingerprintCredentialLengthConstraints(uint8_t & minLen, uint8_t & maxLen) { return false; }
+    virtual bool GetFingerVeinCredentialLengthConstraints(uint8_t & minLen, uint8_t & maxLen) { return false; }
+    virtual bool GetFaceCredentialLengthConstraints(uint8_t & minLen, uint8_t & maxLen) { return false; }
+
+    // ---- Schedules -----------------------------------------------------------------
+
+    virtual DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule)
+    {
+        return DlStatus::kFailure;
+    }
+    virtual DlStatus SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status, DaysMaskMap daysMask,
+                                 uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+    {
+        return DlStatus::kFailure;
+    }
+    virtual DlStatus GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule)
+    {
+        return DlStatus::kFailure;
+    }
+    virtual DlStatus SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status, uint32_t localStartTime,
+                                 uint32_t localEndTime)
+    {
+        return DlStatus::kFailure;
+    }
+    virtual DlStatus GetSchedule(uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule)
+    {
+        return DlStatus::kFailure;
+    }
+    virtual DlStatus SetSchedule(uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
+                                 OperatingModeEnum operatingMode)
+    {
+        return DlStatus::kFailure;
+    }
+
+    /**
+     * @brief Called after the cluster has unstamped the fabric from all users
+     * and credentials of this endpoint, so the application can purge
+     * app-local per-fabric state.
+     */
+    virtual void OnFabricRemoved(FabricIndex fabricIndex) {}
 };
 
 } // namespace DoorLock
