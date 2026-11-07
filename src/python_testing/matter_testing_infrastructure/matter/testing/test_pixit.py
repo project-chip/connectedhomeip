@@ -19,9 +19,10 @@
 
 import unittest
 
-from matter.testing.harness_params import (HarnessParamDefinition, format_declared_parameters_for_failure,
-                                           format_missing_test_parameters, get_harness_param_definitions, harness_params,
-                                           resolve_harness_value, validate_harness_params)
+from matter.testing.harness_params import (HARNESS_PARAM_REGISTRY, HarnessParamDefinition, _format_cli_hint,
+                                           _harness_parser_actions_by_dest, format_declared_parameters_for_failure,
+                                           format_harness_error, format_missing_test_parameters, get_harness_param_definitions,
+                                           harness_params, resolve_harness_value, validate_harness_params)
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.pixit import (_PIXIT_NO_DEFAULT, PixitDefinition, _type_to_arg_flag, format_pixit_error,
                                   format_pixit_type_errors, format_pixit_value_for_dump, get_pixit_definitions, pixit,
@@ -356,6 +357,15 @@ class TestHarnessParamsDecorator(unittest.TestCase):
 
         self.assertIn("not_a_real_param", str(ctx.exception))
 
+    def test_commissionee_ip_not_in_registry(self):
+        with self.assertRaises(ValueError) as ctx:
+
+            @harness_params("commissionee_ip")
+            def dummy(self):
+                pass
+
+        self.assertIn("commissionee_ip", str(ctx.exception))
+
     def test_decorator_attaches_definitions(self):
         @harness_params("discriminator", "passcode", optional=("endpoint",))
         def test_method(self):
@@ -404,6 +414,41 @@ class TestValidateHarnessParams(unittest.TestCase):
         missing, optional = validate_harness_params(defs, cfg)
         self.assertEqual(missing, [])
         self.assertEqual(len(optional), 1)
+
+
+class TestHarnessParamRegistrySync(unittest.TestCase):
+    """Registry argparse dests must exist in matter_test_args_parser()."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._parser_dests = set(_harness_parser_actions_by_dest())
+
+    def test_registry_has_eight_entries(self):
+        self.assertEqual(len(HARNESS_PARAM_REGISTRY), 8)
+        self.assertNotIn("commissionee_ip", HARNESS_PARAM_REGISTRY)
+
+    def test_primary_dests_exist_in_parser(self):
+        for name, spec in HARNESS_PARAM_REGISTRY.items():
+            with self.subTest(name=name):
+                self.assertIn(spec.argparse_dest, self._parser_dests)
+
+    def test_alternate_dests_exist_in_parser(self):
+        for name, spec in HARNESS_PARAM_REGISTRY.items():
+            for alt_dest in spec.alternate_dests:
+                with self.subTest(name=name, alt_dest=alt_dest):
+                    self.assertIn(alt_dest, self._parser_dests)
+
+    def test_format_cli_hint_includes_derived_long_flags(self):
+        for name, spec in HARNESS_PARAM_REGISTRY.items():
+            with self.subTest(name=name):
+                hint = _format_cli_hint(spec)
+                self.assertIn("--", hint)
+
+    def test_format_harness_error_uses_derived_discriminator_flags(self):
+        missing = [HarnessParamDefinition("discriminator", True)]
+        msg = format_harness_error("test_x", missing, [])
+        self.assertIn("--discriminator", msg)
+        self.assertIn("--qr-code", msg)
 
 
 class TestFormatMissingTestParameters(unittest.TestCase):
