@@ -326,8 +326,9 @@ class AppRestartMonitor:
     """Monitors a temporary flag file to handle factory reset and restart requests from the test script.
 
     Runs a background daemon thread that periodically checks for the existence of the restart_flag_file.
-    If the file exists, it triggers a factory reset of the app (and optionally controller config/storage)
-    and restarts the app process, then removes the flag file.
+    If the file holds a known request, it triggers a factory reset of the app (and optionally controller
+    config/storage) and restarts the app process, then removes the flag file. Unknown content is rewritten
+    as "rejected: <content>", which wait_for_restart_flag_file_removal() reports as a test failure.
     """
 
     def __init__(self, restart_flag_file: str):
@@ -352,15 +353,112 @@ class AppRestartMonitor:
             self.stop_event.set()
             self.thread.join(timeout_sec)
 
+    def _claim_flag_file(self, expected_content: str) -> str | None:
+        """Atomically take the current flag file, but only if it still holds expected_content.
+
+        Returns the path of the claimed file, or None if the flag file is gone or holds something else. A different
+        (newer) request is put back at the flag path, unless an even newer one has already replaced it.
+        Between the claim and a put back the flag path is briefly absent, which a waiting test reads as completion.
+        The match is on content only: a second, identical request (e.g. "restart" again) published while the first
+        is acted on matches the claim and is removed as if it had been acted on.
+        """
+        claim = f"{self.restart_flag_file}.claim"
+        try:
+            os.replace(self.restart_flag_file, claim)
+        except FileNotFoundError:
+            return None
+        try:
+            with open(claim, encoding="utf-8", errors="replace") as f:
+                if f.read().strip() == expected_content:
+                    return claim
+        except BaseException:
+            self._restore_claim(claim)
+            raise
+        self._restore_claim(claim)
+        return None
+
+    def _restore_claim(self, claim: str) -> None:
+        try:
+            os.link(claim, self.restart_flag_file)
+        except FileExistsError:
+            # An even newer request was published; keep it and drop the claimed one.
+            os.unlink(claim)
+            return
+        except OSError:
+            # The link failed for another reason. Recreate the request at the flag path only while that path is
+            # still free (O_EXCL), so a request published meanwhile is never overwritten by this older one.
+            self._recreate_claim(claim)
+            return
+        os.unlink(claim)
+
+    def _recreate_claim(self, claim: str) -> None:
+        """Puts a claimed request back at the flag path without ever writing to, or removing, the flag path itself.
+
+        The content is copied into a unique sibling, which is then linked to the flag path. A link never overwrites, so a
+        newer request already at the flag path wins, and a failed write only ever touches the sibling.
+        """
+        copy = f"{claim}.recreate-{uuid.uuid4().hex}"
+        try:
+            with open(claim, "rb") as f:
+                content = f.read()
+            fd = os.open(copy, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o666)
+            with os.fdopen(fd, "wb") as f:
+                f.write(content)
+            os.link(copy, self.restart_flag_file)
+        except FileExistsError:
+            # A newer request is already at the flag path; it supersedes the claimed one.
+            os.unlink(claim)
+        except OSError as e:
+            # Keep the claim rather than lose or overwrite a request; the wait reports a stranded claim.
+            log.error("Could not restore restart request from '%s': %s", claim, e)
+        else:
+            os.unlink(claim)
+        finally:
+            with contextlib.suppress(OSError):
+                os.unlink(copy)
+
+    def _publish_rejection(self, content: str) -> None:
+        rejected_path = f"{self.restart_flag_file}.rejected"
+        published = False
+        try:
+            # O_EXCL never follows a symlink planted at this path; unlinking first removes such a link, not its target.
+            with contextlib.suppress(FileNotFoundError):
+                os.unlink(rejected_path)
+            fd = os.open(rejected_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o666)
+            with os.fdopen(fd, "w", encoding="utf-8", errors="replace") as f:
+                f.write(f"rejected: {content}")
+            # Only replace the flag file if it still holds the unknown content, not a request published since the read.
+            claim = self._claim_flag_file(content)
+            if claim is not None:
+                try:
+                    os.replace(rejected_path, self.restart_flag_file)
+                    published = True
+                except BaseException:
+                    self._restore_claim(claim)
+                    raise
+                os.unlink(claim)
+        except OSError:
+            pass  # Retried on the next poll.
+        finally:
+            if not published:
+                with contextlib.suppress(OSError):
+                    os.unlink(rejected_path)
+
     def _run(self) -> None:
+        unknown_polls, unknown_content = 0, None
         while not self.stop_event.is_set():
             # Try to read the restart flag file
             if not os.path.exists(self.restart_flag_file):
+                unknown_polls = 0
                 self.stop_event.wait(0.5)
                 continue
 
-            with open(self.restart_flag_file) as f:
-                flag_file_content = f.read().strip()
+            try:
+                with open(self.restart_flag_file, encoding="utf-8", errors="replace") as f:
+                    flag_file_content = f.read().strip()
+            except FileNotFoundError:
+                unknown_polls = 0
+                continue
 
             # Determine reset type and remove app/ctrl config and storage
             reset_type = None
@@ -368,7 +466,22 @@ class AppRestartMonitor:
                 reset_type = FactoryResetType.AppAndController
             elif flag_file_content == "factory reset app only":
                 reset_type = FactoryResetType.AppOnly
+            elif flag_file_content != "restart":
+                pending = flag_file_content.startswith("rejected: ") or any(
+                    request.startswith(flag_file_content) for request in ("restart", "factory reset", "factory reset app only"))
+                if pending:
+                    unknown_polls = 0
+                else:
+                    unknown_polls = unknown_polls + 1 if flag_file_content == unknown_content else 1
+                    unknown_content = flag_file_content
+                if unknown_polls == 3:
+                    log.error("Rejecting unknown restart request '%s'", flag_file_content)
+                if unknown_polls >= 3:
+                    self._publish_rejection(flag_file_content)
+                self.stop_event.wait(0.1)
+                continue
 
+            unknown_polls = 0
             if reset_type:
                 factory_reset_config_removal(self.config.app_args, self.config.script_args, reset_type)
 
@@ -380,8 +493,14 @@ class AppRestartMonitor:
                 new_app_manager.start()
                 self.app_manager_ref[0] = new_app_manager
 
-            # Successfully read the flag file, remove to prevent multiple restarts
-            os.unlink(self.restart_flag_file)
+            # Successfully acted on the flag file, remove to prevent multiple restarts. A request published
+            # while the app restarted is put back instead, to be handled by the next iteration.
+            try:
+                claim = self._claim_flag_file(flag_file_content)
+                if claim is not None:
+                    os.unlink(claim)
+            except OSError as e:
+                log.error("Could not remove restart flag file '%s': %s", self.restart_flag_file, e)
             log.info("%s requested by test script", flag_file_content.capitalize())
 
             # Action complete, continue monitoring for additional restart requests
@@ -565,12 +684,14 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
         # Clean up any leftover flag files if they exist - ensure this always executes
         log.info("Cleaning up flag files")
-        if os.path.exists(restart_flag_file):
-            try:
-                os.unlink(restart_flag_file)
-                log.info("Cleaned up flag file: '%s'", restart_flag_file)
-            except Exception as e:
-                log.warning("Failed to clean up flag file '%s': %r", restart_flag_file, e)
+        for path in (restart_flag_file, f"{restart_flag_file}.rejected", f"{restart_flag_file}.claim",
+                     *glob.glob(glob.escape(restart_flag_file) + ".claim.recreate-*")):
+            if os.path.exists(path):
+                try:
+                    os.unlink(path)
+                    log.info("Cleaned up flag file: '%s'", path)
+                except Exception as e:
+                    log.warning("Failed to clean up flag file '%s': %r", path, e)
 
 
 class FactoryResetType(enum.Enum):
