@@ -68,6 +68,8 @@ protected:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
 
+    bool CanHandleOutput() const override;
+
 private:
     /**
      * Called to send a BDX MsgToSend message over the exchange
@@ -110,6 +112,8 @@ private:
 
     BDXTransferProxyDiagnosticLog mTransferProxy;
     bool mIsExchangeClosing = false;
+    // Whether the deferral of output has been logged for the current wait for an ack. Only used to log once per wait.
+    mutable bool mLoggedDeferral = false;
 
     System::Layer * mSystemLayer;
 

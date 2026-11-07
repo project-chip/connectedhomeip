@@ -89,8 +89,21 @@ void TransferFacilitator::PollTimerHandler(chip::System::Layer * systemLayer, vo
 void TransferFacilitator::PollForOutput()
 {
     TransferSession::OutputEvent outEvent;
-    mTransfer.PollOutput(outEvent, System::SystemClock().GetMonotonicTimestamp());
-    HandleTransferSessionOutput(outEvent);
+    const System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+    if (CanHandleOutput())
+    {
+        mTransfer.PollOutput(outEvent, now);
+        HandleTransferSessionOutput(outEvent);
+    }
+    else
+    {
+        // Other output stays pending, but a transfer that has timed out still ends.
+        mTransfer.PollTimeout(outEvent, now);
+        if (outEvent.EventType == TransferSession::OutputEventType::kTransferTimeout)
+        {
+            HandleTransferSessionOutput(outEvent);
+        }
+    }
 
     VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "%s mSystemLayer is null", __FUNCTION__));
     TEMPORARY_RETURN_IGNORED mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
