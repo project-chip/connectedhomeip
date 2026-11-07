@@ -1161,6 +1161,401 @@ TEST_F(TestSessionManager, ReleaseRefusesNewHolders)
     sessionManager.Shutdown();
 }
 
+TEST_F(TestSessionManager, SessionActivatedAfterDefunct)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    NodeId aliceNodeId           = 0x11223344ull;
+    NodeId bobNodeId             = 0x12344321ull;
+    FabricIndex aliceFabricIndex = 1;
+
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    SessionHolder aliceToBobSession;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
+                                                          CryptoContext::SessionRole::kInitiator));
+
+    class ActivationCountingDelegate : public SessionDelegate
+    {
+    public:
+        void OnSessionReleased() override {}
+        void OnSessionActivated() override { ++mActivatedCount; }
+        int mActivatedCount = 0;
+    } delegate;
+
+    SessionHolderWithDelegate watcher(aliceToBobSession.Get().Value(), delegate);
+    SecureSession * session = aliceToBobSession->AsSecureSession();
+
+    class SelfReleasingDelegate : public SessionDelegate
+    {
+    public:
+        void OnSessionReleased() override {}
+        void OnSessionActivated() override
+        {
+            ++mActivatedCount;
+            mHolder->Release();
+        }
+        SessionHolderWithDelegate * mHolder = nullptr;
+        int mActivatedCount                 = 0;
+    } selfReleasingDelegate;
+
+    SessionHolderWithDelegate selfReleasingWatcher(aliceToBobSession.Get().Value(), selfReleasingDelegate);
+    selfReleasingDelegate.mHolder = &selfReleasingWatcher;
+
+    session->MarkActiveRx();
+    EXPECT_EQ(delegate.mActivatedCount, 0);
+
+    session->MarkAsDefunct();
+    EXPECT_TRUE(session->IsDefunct());
+    session->MarkActiveRx();
+    EXPECT_TRUE(session->IsActiveSession());
+    EXPECT_EQ(delegate.mActivatedCount, 1);
+    EXPECT_EQ(selfReleasingDelegate.mActivatedCount, 1);
+    EXPECT_FALSE(selfReleasingWatcher);
+
+    session->MarkActiveRx();
+    EXPECT_EQ(delegate.mActivatedCount, 1);
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, SessionActivatedWhenAHolderReleasesAnotherHolder)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    NodeId aliceNodeId           = 0x11223344ull;
+    NodeId bobNodeId             = 0x12344321ull;
+    FabricIndex aliceFabricIndex = 1;
+
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    SessionHolder aliceToBobSession;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
+                                                          CryptoContext::SessionRole::kInitiator));
+
+    // The first holder to be notified releases a holder that has not been notified yet. That holder is not notified; the
+    // remaining one is. The test does not depend on the order in which holders are notified.
+    struct Activations
+    {
+        SessionHolderWithDelegate * holders[3] = {};
+        int counts[3]                          = {};
+        int released                           = -1;
+    } activations;
+
+    class ReleasingDelegate : public SessionDelegate
+    {
+    public:
+        ReleasingDelegate(Activations & activations, int index) : mActivations(activations), mIndex(index) {}
+        void OnSessionReleased() override {}
+        void OnSessionActivated() override
+        {
+            ++mActivations.counts[mIndex];
+            // From the highest index down: with holders notified newest first, that is the holder the walk reaches next.
+            for (int i = 2; i >= 0 && mActivations.released < 0; --i)
+            {
+                if (i != mIndex && mActivations.counts[i] == 0)
+                {
+                    mActivations.holders[i]->Release();
+                    mActivations.released = i;
+                }
+            }
+        }
+        Activations & mActivations;
+        int mIndex;
+    } first(activations, 0), second(activations, 1), third(activations, 2);
+
+    SessionHolderWithDelegate firstHolder(aliceToBobSession.Get().Value(), first);
+    SessionHolderWithDelegate secondHolder(aliceToBobSession.Get().Value(), second);
+    SessionHolderWithDelegate thirdHolder(aliceToBobSession.Get().Value(), third);
+    activations.holders[0] = &firstHolder;
+    activations.holders[1] = &secondHolder;
+    activations.holders[2] = &thirdHolder;
+
+    SecureSession * session = aliceToBobSession->AsSecureSession();
+    session->MarkAsDefunct();
+    session->MarkActiveRx();
+    EXPECT_TRUE(session->IsActiveSession());
+
+    ASSERT_GE(activations.released, 0);
+    for (int i = 0; i < 3; ++i)
+    {
+        if (i == activations.released)
+        {
+            EXPECT_EQ(activations.counts[i], 0);
+            EXPECT_FALSE(*activations.holders[i]);
+        }
+        else
+        {
+            EXPECT_EQ(activations.counts[i], 1);
+            EXPECT_TRUE(*activations.holders[i]);
+        }
+    }
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, SessionActivatedWhileNotifyingIsNotNotifiedAgain)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    NodeId aliceNodeId           = 0x11223344ull;
+    NodeId bobNodeId             = 0x12344321ull;
+    FabricIndex aliceFabricIndex = 1;
+
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    SessionHolder aliceToBobSession;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
+                                                          CryptoContext::SessionRole::kInitiator));
+    SecureSession * session = aliceToBobSession->AsSecureSession();
+
+    class CountingDelegate : public SessionDelegate
+    {
+    public:
+        void OnSessionReleased() override {}
+        void OnSessionActivated() override
+        {
+            ++mActivatedCount;
+            if (mSessionToBounce != nullptr)
+            {
+                // Make the session defunct and active again from inside the notification, once.
+                SecureSession * session = mSessionToBounce;
+                mSessionToBounce        = nullptr;
+                session->MarkAsDefunct();
+                session->MarkActiveRx();
+            }
+        }
+        SecureSession * mSessionToBounce = nullptr;
+        int mActivatedCount              = 0;
+    } first, second;
+
+    SessionHolderWithDelegate firstHolder(aliceToBobSession.Get().Value(), first);
+    SessionHolderWithDelegate secondHolder(aliceToBobSession.Get().Value(), second);
+    first.mSessionToBounce = session;
+
+    session->MarkAsDefunct();
+    session->MarkActiveRx();
+    EXPECT_TRUE(session->IsActiveSession());
+
+    // Each holder hears about the activation once; the activation made inside the notification is not notified again.
+    EXPECT_EQ(first.mActivatedCount, 1);
+    EXPECT_EQ(second.mActivatedCount, 1);
+
+    // A later activation, once the notification has finished, is notified as usual.
+    session->MarkAsDefunct();
+    session->MarkActiveRx();
+    EXPECT_EQ(first.mActivatedCount, 2);
+    EXPECT_EQ(second.mActivatedCount, 2);
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, SessionActivatedWhenHoldersGrabTheSessionAgainNotifiesEachOnce)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    NodeId aliceNodeId           = 0x11223344ull;
+    NodeId bobNodeId             = 0x12344321ull;
+    FabricIndex aliceFabricIndex = 1;
+
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    SessionHolder aliceToBobSession;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
+                                                          CryptoContext::SessionRole::kInitiator));
+
+    // Grabbing the session again moves a holder to the end of the holder list. With two such holders, a loop that ran to
+    // the end of the list would keep finding one of them behind the other; the cap keeps a broken loop finite.
+    static constexpr int kMaxGrabs = 5;
+    class RegrabbingDelegate : public SessionDelegate
+    {
+    public:
+        void OnSessionReleased() override {}
+        void OnSessionActivated() override
+        {
+            ++mActivatedCount;
+            if (mActivatedCount <= kMaxGrabs)
+            {
+                mHolder->Grab(mHolder->Get().Value());
+            }
+        }
+        SessionHolderWithDelegate * mHolder = nullptr;
+        int mActivatedCount                 = 0;
+    } first, second, third;
+
+    SessionHolderWithDelegate firstHolder(aliceToBobSession.Get().Value(), first);
+    SessionHolderWithDelegate secondHolder(aliceToBobSession.Get().Value(), second);
+    SessionHolderWithDelegate thirdHolder(aliceToBobSession.Get().Value(), third);
+    first.mHolder  = &firstHolder;
+    second.mHolder = &secondHolder;
+    third.mHolder  = &thirdHolder;
+
+    SecureSession * session = aliceToBobSession->AsSecureSession();
+    session->MarkAsDefunct();
+    session->MarkActiveRx();
+    EXPECT_TRUE(session->IsActiveSession());
+
+    EXPECT_EQ(first.mActivatedCount, 1);
+    EXPECT_EQ(second.mActivatedCount, 1);
+    EXPECT_EQ(third.mActivatedCount, 1);
+    EXPECT_TRUE(firstHolder);
+    EXPECT_TRUE(secondHolder);
+    EXPECT_TRUE(thirdHolder);
+
+    // The next activation still reaches every holder once, in their new order.
+    session->MarkAsDefunct();
+    session->MarkActiveRx();
+    EXPECT_EQ(first.mActivatedCount, 2);
+    EXPECT_EQ(second.mActivatedCount, 2);
+    EXPECT_EQ(third.mActivatedCount, 2);
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, SessionActivatedWhenTheRemainingHoldersAreReleasedAndANewHolderIsAdded)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    NodeId aliceNodeId           = 0x11223344ull;
+    NodeId bobNodeId             = 0x12344321ull;
+    FabricIndex aliceFabricIndex = 1;
+
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    SessionHolder aliceToBobSession;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
+                                                          CryptoContext::SessionRole::kInitiator));
+
+    // The first holder to be notified releases every holder that has not been notified yet and adds a new holder. The
+    // walk ends with nothing left to notify, and the new holder is not notified for this activation. The test does not
+    // depend on the order in which holders are notified.
+    struct Activations
+    {
+        SessionHolderWithDelegate * holders[3] = {};
+        int counts[3]                          = {};
+        int lateCount                          = 0;
+        SessionHolderWithDelegate * late       = nullptr;
+        const SessionHolder * session          = nullptr;
+    } activations;
+
+    class ReleasingDelegate : public SessionDelegate
+    {
+    public:
+        ReleasingDelegate(Activations & activations, int index) : mActivations(activations), mIndex(index) {}
+        void OnSessionReleased() override {}
+        void OnSessionActivated() override
+        {
+            if (mIndex < 0)
+            {
+                ++mActivations.lateCount;
+                return;
+            }
+            ++mActivations.counts[mIndex];
+            VerifyOrReturn(!*mActivations.late);
+            for (int i = 0; i < 3; ++i)
+            {
+                if (i != mIndex && mActivations.counts[i] == 0)
+                {
+                    mActivations.holders[i]->Release();
+                }
+            }
+            mActivations.late->Grab(mActivations.session->Get().Value());
+        }
+        Activations & mActivations;
+        int mIndex;
+    } first(activations, 0), second(activations, 1), third(activations, 2), late(activations, -1);
+
+    SessionHolderWithDelegate firstHolder(aliceToBobSession.Get().Value(), first);
+    SessionHolderWithDelegate secondHolder(aliceToBobSession.Get().Value(), second);
+    SessionHolderWithDelegate thirdHolder(aliceToBobSession.Get().Value(), third);
+    SessionHolderWithDelegate lateHolder(late);
+    activations.holders[0] = &firstHolder;
+    activations.holders[1] = &secondHolder;
+    activations.holders[2] = &thirdHolder;
+    activations.late       = &lateHolder;
+    activations.session    = &aliceToBobSession;
+
+    SecureSession * session = aliceToBobSession->AsSecureSession();
+    session->MarkAsDefunct();
+    session->MarkActiveRx();
+    EXPECT_TRUE(session->IsActiveSession());
+
+    EXPECT_EQ(activations.counts[0] + activations.counts[1] + activations.counts[2], 1);
+    for (int i = 0; i < 3; ++i)
+    {
+        EXPECT_EQ(static_cast<bool>(*activations.holders[i]), activations.counts[i] == 1);
+    }
+    EXPECT_TRUE(lateHolder);
+    EXPECT_EQ(activations.lateCount, 0);
+
+    sessionManager.Shutdown();
+}
+
 TEST_F(TestSessionManager, TestFindSecureSessionForNode)
 {
     IPAddress addr;

@@ -46,6 +46,10 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 // Called synchronously on the Matter queue, with the device lock held, for each internal state change.
 @property (atomic, copy, nullable) void (^onInternalStateTransition)(NSUInteger state);
 @property (atomic, nullable) NSNumber * subscriptionMaxIntervalOverride;
+@property (atomic, nullable) NSNumber * resubscriptionDelayOverrideMs;
+@property (atomic, copy, nullable) dispatch_block_t onResubscriptionDelayRequested;
+// When YES, the device ignores operational advertisements, so only other signals can trigger a resubscribe.
+@property (atomic) BOOL ignoreOperationalAdvertisements;
 @property (atomic, copy, nullable) MTRDeviceTestDelegateHandler onUTCTimeSet;
 @property (atomic, copy, nullable) dispatch_block_t onTimeSynchronizationLossDetected;
 @property (atomic) BOOL forceTimeUpdateShortDelayToZero;
