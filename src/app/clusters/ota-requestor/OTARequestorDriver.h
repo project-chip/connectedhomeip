@@ -45,6 +45,7 @@ struct UpdateDescription
 
 enum class UpdateNotFoundReason
 {
+    // The provider cannot serve the requestor right now: a QueryImageResponse with status Busy, or a BDX RESPONDER_BUSY.
     kBusy,
     kNotAvailable,
     kUpToDate,
@@ -92,7 +93,9 @@ public:
     /// Called when the latest query found a software update
     virtual void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) = 0;
 
-    /// Called when the latest query did not find any software update
+    /// Called when the latest query did not lead to a download, with the reason from the QueryImageResponse, and with kBusy
+    /// when the provider answered the download itself with a BDX RESPONDER_BUSY. delay is the minimum wait the provider asked
+    /// for, or zero.
     virtual CHIP_ERROR UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) = 0;
 
     /// Called when the download of a new software image has finished

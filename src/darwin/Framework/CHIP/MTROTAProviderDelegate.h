@@ -118,6 +118,12 @@ NS_ASSUME_NONNULL_BEGIN
  * Notify the delegate when a BDX Session starts for some node.  The controller
  * identifies the fabric the node is on, and the nodeID identifies the node
  * within that fabric.
+ *
+ * offset is the byte offset in the image at which the node asks the transfer
+ * to start, for example to resume an interrupted download.  The data passed to
+ * the completions of handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:
+ * must start at that offset.  A delegate that cannot serve the image from that
+ * offset must pass an error to the completion, which rejects the transfer.
  */
 - (void)handleBDXTransferSessionBeginForNodeID:(NSNumber *)nodeID
                                     controller:(MTRDeviceController *)controller

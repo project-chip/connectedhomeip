@@ -38,6 +38,11 @@ BdxOtaSender::BdxOtaSender()
 
 CHIP_ERROR BdxOtaSender::InitializeTransfer(chip::FabricIndex fabricIndex, chip::NodeId nodeId)
 {
+    if (mInitialized && mRearmed)
+    {
+        // Nothing has used the transfer armed for a requestor restarting its download, so it is stale.
+        Reset();
+    }
     if (mInitialized)
     {
         // Reset stale connection from the Same Node if exists
@@ -62,6 +67,21 @@ CHIP_ERROR BdxOtaSender::InitializeTransfer(chip::FabricIndex fabricIndex, chip:
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR BdxOtaSender::PrepareForTransfer(chip::System::Layer * layer, chip::bdx::TransferRole role,
+                                            chip::BitFlags<chip::bdx::TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
+                                            chip::System::Clock::Timeout timeout, chip::System::Clock::Timeout pollFreq)
+{
+    mParams = { layer, role, xferControlOpts, maxBlockSize, timeout, pollFreq };
+    return Responder::PrepareForTransfer(layer, role, xferControlOpts, maxBlockSize, timeout, pollFreq);
+}
+
+std::streamoff BdxOtaSender::ImageSize(const std::string & path)
+{
+    std::ifstream otaFile(path.c_str(), std::ifstream::in | std::ios::binary | std::ios::ate);
+    VerifyOrReturnValue(otaFile.good(), -1);
+    return otaFile.tellg();
+}
+
 CHIP_ERROR BdxOtaSender::OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
                                            chip::System::PacketBufferHandle && payload)
 {
@@ -78,7 +98,14 @@ CHIP_ERROR BdxOtaSender::OnMessageReceived(chip::Messaging::ExchangeContext * ec
     VerifyOrReturnError(session->GetFabricIndex() == mFabricIndex.Value() && session->GetPeer().GetNodeId() == mNodeId.Value(),
                         CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
 
-    return chip::bdx::TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
+    mRearmed             = false;
+    const CHIP_ERROR err = chip::bdx::TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
+    if (payloadHeader.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
+    {
+        // Handle the requestor's StatusReport now, so that the transfer is armed again before a restarted download arrives.
+        ScheduleImmediatePoll();
+    }
+    return err;
 }
 
 void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
@@ -112,6 +139,12 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             {
                 // After sending the StatusReport, exchange context gets closed so, set mExchangeCtx to null
                 mExchangeCtx = nullptr;
+                if (mRearmAfterStatusReport)
+                {
+                    // The requestor restarts from offset 0 as soon as it has this StatusReport, so arm again now rather than on
+                    // a later poll, which the restarted ReceiveInit could beat.
+                    Reset(/* rearm = */ true);
+                }
             }
         }
         else
@@ -149,6 +182,26 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
                            ChipLogError(BDX, "AbortTransfer failed"));
             return;
+        }
+
+        if (mTransfer.GetStartOffset() > 0)
+        {
+            // A negative size means the image cannot be opened or sized, which must not become a huge unsigned size.
+            const std::streamoff fileSize = ImageSize(entry->second);
+            if (fileSize < 0)
+            {
+                VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
+                               ChipLogError(BDX, "AbortTransfer failed"));
+                return;
+            }
+            if (static_cast<uint64_t>(fileSize) <= mTransfer.GetStartOffset())
+            {
+                VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kStartOffsetNotSupported) == CHIP_NO_ERROR,
+                               ChipLogError(BDX, "AbortTransfer failed"));
+                // The requestor restarts from offset 0 on a new exchange, see kMsgToSend.
+                mRearmAfterStatusReport = true;
+                return;
+            }
         }
 
         break;
@@ -196,13 +249,15 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             return;
         }
 
-        if (seekOffset > static_cast<uint64_t>(std::numeric_limits<std::streamoff>::max()))
+        const uint64_t startOffset = mTransfer.GetStartOffset();
+        const uint64_t maxOffset   = static_cast<uint64_t>(std::numeric_limits<std::streamoff>::max());
+        if (startOffset > maxOffset || seekOffset > maxOffset - startOffset)
         {
             ChipLogError(BDX, "Seek offset too large");
             TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kLengthTooLarge);
             return;
         }
-        otaFile.seekg(static_cast<std::streamoff>(seekOffset));
+        otaFile.seekg(static_cast<std::streamoff>(startOffset + seekOffset));
         otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), bytesToRead);
         if (!(otaFile.good() || otaFile.eof()))
         {
@@ -215,6 +270,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         blockData.Length = static_cast<size_t>(otaFile.gcount());
         blockData.IsEof  = (blockData.Length < blockSize) ||
             (seekOffset + static_cast<uint64_t>(blockData.Length) == mTransfer.GetTransferLength() || (otaFile.peek() == EOF));
+        // Counted from the start offset of the transfer, not from the start of the file, and limited to 32 bits like before.
         mNumBytesSent = static_cast<uint32_t>(seekOffset + blockData.Length);
         otaFile.close();
 
@@ -234,7 +290,9 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         break;
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "Got StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
-        Reset();
+        // The requestor ends a transfer with kBadMessageContents when the data does not start at the requested offset, and
+        // restarts from 0.
+        Reset(/* rearm = */ event.statusData.statusCode == StatusCode::kBadMessageContents);
         break;
     case TransferSession::OutputEventType::kInternalError:
         ChipLogError(BDX, "InternalError");
@@ -257,8 +315,12 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
  * will call HandleTransferSessionOutput() with event TransferSession::OutputEventType::kNone.
  * Since we are ignoring kNone events so, it is okay HandleTransferSessionOutput() being called with event kNone
  */
-void BdxOtaSender::Reset()
+void BdxOtaSender::Reset(bool rearm)
 {
+    const chip::Optional<chip::FabricIndex> fabricIndex = mFabricIndex;
+    const chip::Optional<chip::NodeId> nodeId           = mNodeId;
+    const TransferParams params                         = mParams;
+
     mFabricIndex.ClearValue();
     mNodeId.ClearValue();
     ResetTransfer();
@@ -268,9 +330,25 @@ void BdxOtaSender::Reset()
         mExchangeCtx = nullptr;
     }
 
-    mInitialized  = false;
-    mNumBytesSent = 0;
+    mInitialized            = false;
+    mRearmed                = false;
+    mRearmAfterStatusReport = false;
+    mNumBytesSent           = 0;
     memset(mFileDesignator, 0, chip::bdx::kMaxFileDesignatorLen);
+
+    // A requestor that cannot continue a partial image, or that found the data not starting at its offset, downloads again from 0
+    // on a new exchange without a new QueryImage. Stay armed for it alone: OnMessageReceived() still serves only this node.
+    if (rearm && params.layer != nullptr && fabricIndex.HasValue() && nodeId.HasValue())
+    {
+        if (PrepareForTransfer(params.layer, params.role, params.controlOpts, params.maxBlockSize, params.timeout,
+                               params.pollFreq) == CHIP_NO_ERROR)
+        {
+            mFabricIndex = fabricIndex;
+            mNodeId      = nodeId;
+            mInitialized = true;
+            mRearmed     = true;
+        }
+    }
 }
 
 void BdxOtaSender::AbortTransfer()
