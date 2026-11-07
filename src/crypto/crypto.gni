@@ -30,6 +30,10 @@ declare_args() {
   # Use PSA AEAD single-part implementation. Only used if chip_crypto == "psa"
   chip_crypto_psa_aead_single_part = false
 
+  # Log the source location (file, line, function) of PSA errors. Only used if
+  # chip_crypto == "psa"
+  chip_crypto_psa_log_error_location = false
+
   # Crypto storage: psa, raw, app.
   #   app: includes zero new files and disables the unit tests for the keystore.
   chip_crypto_keystore = ""
