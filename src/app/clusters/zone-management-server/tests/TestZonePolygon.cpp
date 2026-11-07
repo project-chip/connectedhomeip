@@ -138,5 +138,166 @@ TEST_F(TestZonePolygon, TestSelfIntersectingZones)
     EXPECT_TRUE(res);
 }
 
+TEST_F(TestZonePolygon, TestPointInPolygonAndCoordinateScaling)
+{
+    // 1. Coordinate scaling from sensor max (1919, 1079) to 640x480 and 1920x1080
+    const TwoDCartesianVertexStruct maxCartesian{ 1919, 1079 };
+    const std::vector<TwoDCartesianVertexStruct> sensorPolygon = {
+        { 0, 0 },
+        { 1919, 0 },
+        { 1919, 1079 },
+        { 0, 1079 },
+    };
+
+    const auto scaledToVga = ZoneGeometry::ScaleVertices(sensorPolygon, maxCartesian, 640, 480);
+    ASSERT_EQ(scaledToVga.size(), 4u);
+    EXPECT_EQ(scaledToVga[0].x, 0);
+    EXPECT_EQ(scaledToVga[0].y, 0);
+    EXPECT_EQ(scaledToVga[1].x, 639);
+    EXPECT_EQ(scaledToVga[1].y, 0);
+    EXPECT_EQ(scaledToVga[2].x, 639);
+    EXPECT_EQ(scaledToVga[2].y, 479);
+    EXPECT_EQ(scaledToVga[3].x, 0);
+    EXPECT_EQ(scaledToVga[3].y, 479);
+
+    const auto scaledIdentity = ZoneGeometry::ScaleVertices(sensorPolygon, maxCartesian, 1920, 1080);
+    ASSERT_EQ(scaledIdentity.size(), 4u);
+    for (size_t i = 0; i < sensorPolygon.size(); ++i)
+    {
+        EXPECT_EQ(scaledIdentity[i].x, sensorPolygon[i].x);
+        EXPECT_EQ(scaledIdentity[i].y, sensorPolygon[i].y);
+    }
+
+    // Degenerate zero-dimension scaling guard
+    EXPECT_EQ(ZoneGeometry::ScaleVertex({ 100, 100 }, maxCartesian, 0, 480).x, 0);
+    EXPECT_EQ(ZoneGeometry::ScaleVertex({ 100, 100 }, { 0, 0 }, 640, 480).y, 0);
+
+    // 2. 3-vertex triangle point-in-polygon (interior, boundary, exterior)
+    const std::vector<TwoDCartesianVertexStruct> triangle = { { 10, 10 }, { 30, 10 }, { 20, 30 } };
+    EXPECT_TRUE(ZoneGeometry::IsPointInPolygon(triangle, { 20, 15 }));
+    EXPECT_TRUE(ZoneGeometry::IsPointInPolygon(triangle, { 10, 10 })); // vertex
+    EXPECT_TRUE(ZoneGeometry::IsPointInPolygon(triangle, { 20, 10 })); // horizontal edge
+    EXPECT_FALSE(ZoneGeometry::IsPointInPolygon(triangle, { 5, 15 }));
+    EXPECT_FALSE(ZoneGeometry::IsPointInPolygon(triangle, { 20, 35 }));
+
+    // 3. 6-vertex concave L-shaped polygon
+    const std::vector<TwoDCartesianVertexStruct> concaveL = {
+        { 10, 10 }, { 50, 10 }, { 50, 30 }, { 30, 30 }, { 30, 50 }, { 10, 50 },
+    };
+    EXPECT_FALSE(ZoneGeometry::IsZoneSelfIntersecting(concaveL));
+    EXPECT_TRUE(ZoneGeometry::IsPointInPolygon(concaveL, { 20, 20 }));
+    EXPECT_TRUE(ZoneGeometry::IsPointInPolygon(concaveL, { 40, 20 }));
+    EXPECT_TRUE(ZoneGeometry::IsPointInPolygon(concaveL, { 20, 40 }));
+    EXPECT_FALSE(ZoneGeometry::IsPointInPolygon(concaveL, { 40, 40 })); // concave cutout
+
+    // 4. 12-vertex simple polygon (maximum vertex count allowed by Matter spec)
+    const std::vector<TwoDCartesianVertexStruct> dodecagon = {
+        { 20, 5 },  { 30, 5 },  { 40, 10 }, { 45, 20 }, { 45, 30 }, { 40, 40 },
+        { 30, 45 }, { 20, 45 }, { 10, 40 }, { 5, 30 },  { 5, 20 },  { 10, 10 },
+    };
+    EXPECT_FALSE(ZoneGeometry::IsZoneSelfIntersecting(dodecagon));
+    EXPECT_TRUE(ZoneGeometry::IsPointInPolygon(dodecagon, { 25, 25 }));
+    EXPECT_TRUE(ZoneGeometry::IsPointInPolygon(dodecagon, { 10, 25 }));
+    EXPECT_FALSE(ZoneGeometry::IsPointInPolygon(dodecagon, { 2, 2 }));
+    EXPECT_FALSE(ZoneGeometry::IsPointInPolygon(dodecagon, { 48, 48 }));
+}
+
+TEST_F(TestZonePolygon, TestPrivacyMaskingI420NonAxisAlignedAndDownscaled)
+{
+    // 1. Planar ApplyPrivacyMaskI420 with a width not divisible by 8 (37x29), explicit padded strides,
+    //    and a non-axis-aligned slanted polygon checked pixel-by-pixel against IsPointInPolygon.
+    constexpr uint16_t kWidth   = 37;
+    constexpr uint16_t kHeight  = 29;
+    constexpr size_t kYStride   = 45;
+    constexpr size_t kUVHeight  = (kHeight + 1U) / 2U;
+    constexpr size_t kUStride   = 23;
+    constexpr size_t kVStride   = 25;
+    constexpr uint8_t kInitLuma = 200;
+    constexpr uint8_t kInitU    = 190;
+    constexpr uint8_t kInitV    = 210;
+
+    const std::vector<TwoDCartesianVertexStruct> slantedPolygon = {
+        { 5, 3 }, { 29, 7 }, { 33, 21 }, { 19, 17 }, { 8, 25 },
+    };
+    EXPECT_FALSE(ZoneGeometry::IsZoneSelfIntersecting(slantedPolygon));
+
+    std::vector<uint8_t> yPlane(kYStride * kHeight, kInitLuma);
+    std::vector<uint8_t> uPlane(kUStride * kUVHeight, kInitU);
+    std::vector<uint8_t> vPlane(kVStride * kUVHeight, kInitV);
+
+    // Exact scanline fill (padPixels = 0) must match IsPointInPolygon at every pixel (x, y)
+    ZoneGeometry::ApplyPrivacyMaskI420(yPlane.data(), kYStride, uPlane.data(), kUStride, vPlane.data(), kVStride, kWidth, kHeight,
+                                       slantedPolygon, /* padPixels = */ 0);
+
+    for (uint16_t y = 0; y < kHeight; ++y)
+    {
+        for (uint16_t x = 0; x < kWidth; ++x)
+        {
+            const bool inside  = ZoneGeometry::IsPointInPolygon(slantedPolygon, { x, y });
+            const uint8_t want = inside ? 0 : kInitLuma;
+            EXPECT_EQ(yPlane[static_cast<size_t>(y) * kYStride + x], want);
+            if (inside)
+            {
+                EXPECT_EQ(uPlane[static_cast<size_t>(y / 2U) * kUStride + (x / 2U)], 128);
+                EXPECT_EQ(vPlane[static_cast<size_t>(y / 2U) * kVStride + (x / 2U)], 128);
+            }
+        }
+        // Verify stride padding bytes past kWidth remain untouched
+        for (size_t padX = kWidth; padX < kYStride; ++padX)
+        {
+            EXPECT_EQ(yPlane[static_cast<size_t>(y) * kYStride + padX], kInitLuma);
+        }
+    }
+
+    // 2. Conservative downscaled masking (default padPixels = 1):
+    //    Thin slanted zone (100,100)-(700,400)-(700,402)-(100,102) on 1920x1080 scaled to 320x180
+    //    must mask every column it crosses [17..116] and every downscaled sensor point in the zone.
+    constexpr uint16_t kSmallWidth  = 320;
+    constexpr uint16_t kSmallHeight = 180;
+    const TwoDCartesianVertexStruct maxCartesian{ 1919, 1079 };
+    const std::vector<TwoDCartesianVertexStruct> thinSensorZone = {
+        { 100, 100 },
+        { 700, 400 },
+        { 700, 402 },
+        { 100, 102 },
+    };
+    EXPECT_FALSE(ZoneGeometry::IsZoneSelfIntersecting(thinSensorZone));
+
+    const auto scaledThinZone = ZoneGeometry::ScaleVertices(thinSensorZone, maxCartesian, kSmallWidth, kSmallHeight);
+    std::vector<uint8_t> smallY(static_cast<size_t>(kSmallWidth) * kSmallHeight, kInitLuma);
+    std::vector<uint8_t> smallU(static_cast<size_t>(kSmallWidth / 2U) * (kSmallHeight / 2U), kInitU);
+    std::vector<uint8_t> smallV(static_cast<size_t>(kSmallWidth / 2U) * (kSmallHeight / 2U), kInitV);
+
+    ZoneGeometry::ApplyPrivacyMaskI420(smallY.data(), kSmallWidth, smallU.data(), kSmallWidth / 2U, smallV.data(), kSmallWidth / 2U,
+                                       kSmallWidth, kSmallHeight, scaledThinZone);
+
+    for (uint16_t col = 17; col <= 116; ++col)
+    {
+        bool colHasMaskedPixel = false;
+        for (uint16_t row = 0; row < kSmallHeight; ++row)
+        {
+            if (smallY[static_cast<size_t>(row) * kSmallWidth + col] == 0)
+            {
+                colHasMaskedPixel = true;
+                break;
+            }
+        }
+        EXPECT_TRUE(colHasMaskedPixel);
+    }
+
+    for (uint16_t sx = 100; sx <= 700; ++sx)
+    {
+        const uint16_t baseSy = static_cast<uint16_t>(100U + (sx - 100U) / 2U);
+        for (uint16_t sy = baseSy; sy <= baseSy + 2U; ++sy)
+        {
+            if (ZoneGeometry::IsPointInPolygon(thinSensorZone, { sx, sy }))
+            {
+                const auto framePt = ZoneGeometry::ScaleVertex({ sx, sy }, maxCartesian, kSmallWidth, kSmallHeight);
+                EXPECT_EQ(smallY[static_cast<size_t>(framePt.y) * kSmallWidth + framePt.x], 0);
+            }
+        }
+    }
+}
+
 } // namespace app
 } // namespace chip
