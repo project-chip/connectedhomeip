@@ -745,6 +745,48 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                 self.checker.default_controller.SendCommand.assert_not_called()
                 self.checker.record_accepted_violation.assert_not_called()
 
+    async def test_tc_idm_9_1_lost_write_response_restores_changed_or_unknown_state(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        for readback in (3, 1, ChipStackError(0x2f)):
+            for restore in (Status.Success, Status.Failure, ChipStackError(0x0b)):
+                with self.subTest(readback=readback, restore=restore):
+                    self.setUp()
+                    self._prepare_writable_attribute()
+                    self.checker.read_single_attribute_check_success.return_value = 2
+                    primary_failure = ChipStackError(0x32)
+                    if isinstance(readback, Exception):
+                        self.checker.read_single_attribute.side_effect = readback
+                    else:
+                        self.checker.read_single_attribute.return_value = readback
+                    response = restore if isinstance(restore, Exception) else [SimpleNamespace(Status=restore)]
+                    self.checker.default_controller.WriteAttribute.side_effect = [primary_failure, response]
+                    with self.assertLogs(level='INFO') as captured, self.assertRaises(signals.TestFailure):
+                        await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+                    self.assertEqual(self.checker.read_single_attribute.await_count, 1)
+                    self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, 2)
+                    writes = self.checker.default_controller.WriteAttribute.call_args_list
+                    self.assertEqual(writes[1].kwargs['attributes'][0][1].value, 2)
+                    accepted = int(readback == 3)
+                    errors = 1 + int(isinstance(readback, Exception)) + int(restore != Status.Success)
+                    self.assertTrue(any(f'attempted=1, classified={accepted}, CONSTRAINT_ERROR=0, accepted={accepted}, '
+                                        f'other IM or response status=0, execution errors={errors}'
+                                        in line for line in captured.output))
+                    self.assertTrue(any('Execution failed writing' in line and str(primary_failure) in line
+                                        for line in captured.output))
+                    if isinstance(readback, Exception):
+                        self.assertTrue(any('Execution failed reading back' in line and str(readback) in line
+                                            for line in captured.output))
+                    if isinstance(restore, Exception):
+                        self.assertTrue(any('Execution failed restoring' in line and str(restore) in line
+                                            for line in captured.output))
+                    elif restore != Status.Success:
+                        self.assertTrue(any('Failed to restore' in line and str(restore) in line
+                                            for line in captured.output))
+                    self.assertEqual(self.checker.record_accepted_violation.call_count, accepted)
+                    self.checker.record_warning.assert_not_called()
+                    self.checker.default_controller.SendCommand.assert_not_called()
+
     async def test_tc_idm_9_1_stops_after_first_execution_error(self):
         from TC_IDM_9_1 import TC_IDM_9_1
 

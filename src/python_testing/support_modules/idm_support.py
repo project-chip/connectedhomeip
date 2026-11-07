@@ -1166,6 +1166,8 @@ class IDMBaseTest(BasicCompositionTests):
         result = ConstraintProbeResult()
         for test_value in test_values:
             result.attempted += 1
+            execution_failure = None
+            result_status = None
             try:
                 write_result = await self.default_controller.WriteAttribute(
                     nodeId=self.dut_node_id,
@@ -1177,13 +1179,13 @@ class IDMBaseTest(BasicCompositionTests):
             except ChipStackError as error:  # chipstack-ok
                 result.execution_error += 1
                 log.warning("Execution failed writing %s: %s", attribute_path, error)
-                raise ConstraintProbeExecutionError(error, result) from error
+                execution_failure = error
             else:
                 result_status = write_result[0].Status
 
             # Status is an IntEnum, which formats as a bare number under Python 3.11; log
             # the name alongside it so the result reads as SUCCESS rather than as "got 0".
-            status_name = getattr(result_status, 'name', result_status)
+            status_name = getattr(result_status, 'name', result_status if result_status is not None else 'no response')
             if result_status == Status.Success:
                 self.record_accepted_violation(
                     location=location,
@@ -1201,7 +1203,6 @@ class IDMBaseTest(BasicCompositionTests):
             # abandon the probe, so it has to come back as a value this loop can classify
             # instead of as an assertion. Reads that did decode still go through the
             # wildcard-subscription cross-check inside the helper.
-            execution_failure = None
             restore_needed = True
             restore_failed = False
             stored_violation = False
@@ -1225,7 +1226,7 @@ class IDMBaseTest(BasicCompositionTests):
                     log.info("PASS: %s constraint properly enforced (original=%s, rejected=%s)", attribute_path,
                              original_value, test_value)
                     result.rejected += 1
-                elif result_status != Status.Success:
+                elif result_status is not None and result_status != Status.Success:
                     self.record_warning(
                         test_name=self.current_test_info.name,
                         location=location,
@@ -1235,7 +1236,8 @@ class IDMBaseTest(BasicCompositionTests):
             except ChipStackError as error:  # chipstack-ok
                 result.execution_error += 1
                 log.warning("Execution failed reading back %s: %s", attribute_path, error)
-                execution_failure = error
+                if execution_failure is None:
+                    execution_failure = error
             finally:
                 if restore_needed:
                     try:
