@@ -455,6 +455,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
 - (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device;
 - (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device;
+- (void)unitTestSubscriptionReattemptDispatchedForDevice:(MTRDevice *)device;
 @end
 #endif
 
@@ -485,6 +486,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     // _setupSubscriptionWithReason or via the auto-resubscribe behavior
     // of the ReadClient).  Nil if we have had no such failures.
     NSDate * _Nullable _lastSubscriptionFailureTime;
+    // Bumped each time a reattempt is scheduled; a timer whose captured value no longer matches was superseded.
+    NSUInteger _subscriptionReattemptGeneration;
     MTRDeviceConnectivityMonitor * _connectivityMonitor;
 
     // This boolean keeps track of any device configuration changes received in an attribute report.
@@ -1890,6 +1893,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     }
 
     self.reattemptingSubscription = YES;
+    NSUInteger reattemptGeneration = ++_subscriptionReattemptGeneration;
 
     NSTimeInterval secondsToWait;
     if (_lastSubscriptionAttemptWait < MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS) {
@@ -1920,16 +1924,38 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
     // Call _reattemptSubscriptionNowIfNeededWithReason when timer fires - if subscription is
     // in a better state at that time this will be a no-op.
+    BOOL deviceUsesThread = [self _deviceUsesThread];
     mtr_weakify(self);
     auto resubscriptionBlock = ^(MTRAsyncWorkCompletionBlock _Nullable poolWorkCompletion) {
         mtr_strongify(self);
         VerifyOrReturn(self, MTR_LOG_DEBUG("_doHandleSubscriptionReset resubscriptionBlock called with nil MTRDevice"));
+
+        {
+            std::lock_guard lock(self->_lock);
+            if (self->_subscriptionReattemptGeneration != reattemptGeneration) {
+                MTR_LOG("%@ ignoring superseded subscription reattempt timer before dispatch", self);
+                if (deviceUsesThread) {
+                    // The pool ready handler calls this block right after taking the slot on the device
+                    // queue, so the slot is ours or already cleared.
+                    [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
+                }
+                return;
+            }
+        }
 
         [self->_deviceController asyncDispatchToMatterQueue:^{
             mtr_strongify(self);
             VerifyOrReturn(self, MTR_LOG_DEBUG("_doHandleSubscriptionReset resubscriptionBlock asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
             std::lock_guard lock(self->_lock);
+            if (self->_subscriptionReattemptGeneration != reattemptGeneration) {
+                MTR_LOG("%@ ignoring superseded subscription reattempt timer on the Matter queue", self);
+                // Note: we claim the subscription pool work slot right before resubscriptionBlock, is called.
+                // We already checked the generation during the initial call to resubscriptionBlock, so if it's
+                // changed since then, whatever changed the generation also cleared our subscription pool
+                // work and we don't need to do that here.
+                return;
+            }
             [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
         }
             errorHandler:^(NSError * _Nonnull error) {
@@ -1941,10 +1967,18 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                 std::lock_guard lock(self->_lock);
                 [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
             }];
+
+#ifdef DEBUG
+        [self _lockAndCallDelegatesWithBlock:^(id testDelegate) {
+            if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionReattemptDispatchedForDevice:)]) {
+                [testDelegate unitTestSubscriptionReattemptDispatchedForDevice:self];
+            }
+        }];
+#endif
     };
 
     int64_t resubscriptionDelayNs = static_cast<int64_t>(secondsToWait * NSEC_PER_SEC);
-    if ([self _deviceUsesThread]) {
+    if (deviceUsesThread) {
         // For Thread-enabled devices, schedule the _reattemptSubscriptionNowIfNeededWithReason call to run in the subscription pool
         NSString * description = [NSString stringWithFormat:@"MTRDevice resubscription (%p)", self];
         [self _scheduleSubscriptionPoolWork:resubscriptionBlock skipIfResetSince:nil inNanoseconds:resubscriptionDelayNs description:description];
