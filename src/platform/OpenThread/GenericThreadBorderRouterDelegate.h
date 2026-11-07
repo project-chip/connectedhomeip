@@ -47,6 +47,7 @@ public:
     }
 
     CHIP_ERROR Init(AttributeChangeCallback * callback) override;
+    void Shutdown() override;
 
     bool GetPanChangeSupported() override { return true; }
 
@@ -63,8 +64,8 @@ public:
 
     CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override;
 
-    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                          ActivateDatasetCallback * callback) override;
+    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCompleteCallback callback,
+                          void * context) override;
 
     CHIP_ERROR CommitActiveDataset() override;
 
@@ -80,8 +81,10 @@ public:
         TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(name, borderRouterName);
         if (mpAttributeChangeCallback)
         {
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
-                [this]() { mpAttributeChangeCallback->ReportAttributeChanged(Attributes::BorderRouterName::Id); });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                VerifyOrReturn(mpAttributeChangeCallback != nullptr);
+                mpAttributeChangeCallback->ReportAttributeChanged(Attributes::BorderRouterName::Id);
+            });
         }
     }
 
@@ -91,15 +94,17 @@ public:
         {
             // OpenThread doesn't have callback or event for BorderAgentId change, we can only change the BorderAgentId with
             // otBorderAgentSetId(). Please call this function with otBorderAgentSetId().
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
-                [this]() { mpAttributeChangeCallback->ReportAttributeChanged(Attributes::BorderAgentID::Id); });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                VerifyOrReturn(mpAttributeChangeCallback != nullptr);
+                mpAttributeChangeCallback->ReportAttributeChanged(Attributes::BorderAgentID::Id);
+            });
         }
     }
 
 private:
     CHIP_ERROR SaveActiveDatasetConfigured(bool configured);
-    ActivateDatasetCallback * mpActivateDatasetCallback = nullptr;
-    uint32_t mSequenceNum                               = 0;
+    ActivateDatasetCompleteCallback mActivateDatasetCallback = nullptr;
+    void * mActivateDatasetContext                           = nullptr;
     char mThreadBorderRouterName[kBorderRouterNameMaxLength + 1];
     PersistentStorageDelegate * mStorage;
     AttributeChangeCallback * mpAttributeChangeCallback = nullptr;
