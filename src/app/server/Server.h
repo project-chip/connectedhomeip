@@ -674,6 +674,13 @@ private:
                              static_cast<unsigned>(fabricIndex), aclErr.Format());
             }
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+            if (auto * accessRestrictionProvider = Access::GetAccessControl().GetAccessRestrictionProvider())
+            {
+                accessRestrictionProvider->RemoveFabric(fabricIndex);
+            }
+#endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+
             //  Remove ACL extension entry for the given fabricIndex.
             auto & storage = mServer->GetPersistentStorage();
             aclErr = storage.SyncDeleteKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(fabricIndex).KeyName());
