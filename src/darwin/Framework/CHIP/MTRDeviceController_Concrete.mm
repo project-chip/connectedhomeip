@@ -1526,6 +1526,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return count;
 }
 
+- (BOOL)unitTestIsResolvingAddressForNodeID:(NSNumber *)nodeID
+{
+    __block BOOL resolving = NO;
+    [self syncRunOnWorkQueue:^{
+        auto peerId = self->_cppCommissioner->GetPeerScopedId(nodeID.unsignedLongLongValue);
+        resolving = self->_cppCommissioner->CASESessionMgr()->IsResolvingAddress(peerId);
+    } error:nil];
+    return resolving;
+}
+
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {
     std::lock_guard lock(*self.deviceMapLock);
@@ -1981,6 +1991,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         block(self->_cppCommissioner);
     });
+}
+
+- (chip::Controller::DeviceCommissioner * _Nullable)commissionerOnMatterQueue
+{
+    assertChipStackLockedByCurrentThread();
+    return _cppCommissioner;
 }
 
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler

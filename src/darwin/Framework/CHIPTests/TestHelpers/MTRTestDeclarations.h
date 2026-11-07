@@ -56,9 +56,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)syncRunOnWorkQueue:(void (^)(void))block error:(NSError * __autoreleasing *)error;
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
 - (nullable MTRDevice *)_existingDeviceForNodeID:(NSNumber *)nodeID;
+- (void)operationalInstanceAdded:(NSNumber *)nodeID;
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 @property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
+@end
+
+@interface MTRBaseDevice (Test)
+- (void)invalidateCASESession;
 @end
 
 MTR_TESTABLE_DIRECT_MEMBERS
@@ -100,6 +105,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds;
 // Syncs onto the Matter queue: call off that queue, while the controller is running.
 - (NSUInteger)unitTestSessionRequestsWaitingOnConnectivityMonitorCount;
+- (BOOL)unitTestIsResolvingAddressForNodeID:(NSNumber *)nodeID;
 @end
 
 @interface MTRBaseDevice (TestDebug)
@@ -121,6 +127,10 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (BOOL)unitTestShouldDetectTimeSynchronizationLoss;
 - (NSUInteger)unitTestInterestedPathsChangedCount;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
+// Must be called on the Matter queue.
+- (NSUInteger)unitTestResolvingCASESetupKeptCount;
+// Must be called on the Matter queue.
+- (NSUInteger)unitTestCASESetupReleasedForReachabilityCount;
 - (NSUInteger)unitTestEventsReportedSinceLastCheck;
 - (void)unitTestClearClusterData;
 - (MTRInternalDeviceState)_getInternalState;

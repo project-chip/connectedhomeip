@@ -8548,6 +8548,170 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertGreaterThan(values.count, 100);
 }
 
+- (void)_waitForNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller resolvingAddress:(BOOL)resolving
+{
+    NSDate * deadline = [NSDate dateWithTimeIntervalSinceNow:60];
+    while ([controller unitTestIsResolvingAddressForNodeID:nodeID] != resolving) {
+        if ([deadline timeIntervalSinceNow] <= 0) {
+            XCTFail("Timed out waiting for resolvingAddress == %d", resolving);
+            return;
+        }
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+    }
+}
+
+// Starts a subscription to a node whose app has been terminated, so its operational record is gone and the new CASE
+// setup stays in ResolvingAddress until the test restarts the app or the lookup times out.
+- (MTRDevice *)_subscribingDeviceToTerminatedNodeWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller delegate:(MTRDeviceTestDelegate *)delegate
+{
+    // Make the subscription start a new CASE setup instead of reusing the commissioning session.
+    [[MTRBaseDevice deviceWithNodeID:nodeID controller:controller] invalidateCASESession];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:nodeID controller:controller];
+    [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    [self _waitForNodeID:nodeID controller:controller resolvingAddress:YES];
+    return device;
+}
+
+// Delivers an operational advertisement for nodeID and returns how the device's reachability handling treated the node's
+// CASE setup, read in the same Matter queue turn as the notification.
+- (void)_advertiseNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller device:(MTRDevice *)device kept:(NSUInteger *)kept released:(NSUInteger *)released
+{
+    __block NSUInteger keptCount = 0;
+    __block NSUInteger releasedCount = 0;
+    [controller syncRunOnWorkQueue:^{
+        [controller operationalInstanceAdded:nodeID];
+        keptCount = [device unitTestResolvingCASESetupKeptCount];
+        releasedCount = [device unitTestCASESetupReleasedForReachabilityCount];
+    } error:nil];
+    *kept = keptCount;
+    *released = releasedCount;
+}
+
+- (void)test051_OperationalAdvertisementDuringAddressResolution
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+    [app terminate];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    __auto_type * device = [self _subscribingDeviceToTerminatedNodeWithNodeID:@(kDeviceId2) controller:controller delegate:delegate];
+
+    // The setup is spared in the advertisement's own Matter queue turn, not a later one.
+    NSUInteger kept = 0;
+    NSUInteger released = 0;
+    [self _advertiseNodeID:@(kDeviceId2) controller:controller device:device kept:&kept released:&released];
+    XCTAssertEqual(kept, 1u);
+    XCTAssertEqual(released, 0u);
+
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateSubscribing);
+    XCTAssertTrue([controller unitTestIsResolvingAddressForNodeID:@(kDeviceId2)]);
+
+    XCTestExpectation * reachableExpectation = [self expectationWithDescription:@"Device is reachable"];
+    delegate.onReachable = ^{
+        [reachableExpectation fulfill];
+    };
+
+    XCTAssertTrue([self restartApp:app additionalArguments:@[]]);
+
+    [self waitForExpectations:@[ reachableExpectation ] timeout:60];
+}
+
+- (void)test052_OperationalAdvertisementAfterAddressResolution
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+    // A suspended app keeps its operational record published, so the new setup resolves the address and then stalls in
+    // CASE establishment.
+    [app suspend];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    [[MTRBaseDevice deviceWithNodeID:@(kDeviceId2) controller:controller] invalidateCASESession];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    [device setDelegate:delegate queue:dispatch_get_main_queue()];
+
+    // Wait for a subscribing device whose setup is no longer resolving; there is no need to see the brief resolving state.
+    NSDate * deadline = [NSDate dateWithTimeIntervalSinceNow:60];
+    while ([device _getInternalState] != MTRInternalDeviceStateSubscribing || [controller unitTestIsResolvingAddressForNodeID:@(kDeviceId2)]) {
+        if ([deadline timeIntervalSinceNow] <= 0) {
+            XCTFail("Timed out waiting for a subscribing device whose setup has resolved the address");
+            break;
+        }
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+    }
+
+    // The advertisement's own decision releases the setup, in the same Matter queue turn.
+    NSUInteger kept = 0;
+    NSUInteger released = 0;
+    [self _advertiseNodeID:@(kDeviceId2) controller:controller device:device kept:&kept released:&released];
+    XCTAssertEqual(kept, 0u);
+    XCTAssertEqual(released, 1u);
+
+    XCTestExpectation * reachableExpectation = [self expectationWithDescription:@"Device is reachable"];
+    delegate.onReachable = ^{
+        [reachableExpectation fulfill];
+    };
+
+    [app resume];
+
+    [self waitForExpectations:@[ reachableExpectation ] timeout:60];
+}
+
+- (void)test053_OperationalAdvertisementAfterLongAddressResolution
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+    [app terminate];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.resolvingCASESetupKeepSecondsOverride = @(0.5);
+    __auto_type * device = [self _subscribingDeviceToTerminatedNodeWithNodeID:@(kDeviceId2) controller:controller delegate:delegate];
+
+    NSUInteger kept = 0;
+    NSUInteger released = 0;
+    [self _advertiseNodeID:@(kDeviceId2) controller:controller device:device kept:&kept released:&released];
+    XCTAssertEqual(kept, 1u);
+    XCTAssertEqual(released, 0u);
+
+    // A setup still resolving once the keep window has passed is released, as a setup in any other state would be.
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
+    XCTAssertTrue([controller unitTestIsResolvingAddressForNodeID:@(kDeviceId2)]);
+    [self _advertiseNodeID:@(kDeviceId2) controller:controller device:device kept:&kept released:&released];
+    XCTAssertEqual(kept, 1u);
+    XCTAssertEqual(released, 1u);
+    XCTAssertFalse([controller unitTestIsResolvingAddressForNodeID:@(kDeviceId2)]);
+
+    XCTestExpectation * reachableExpectation = [self expectationWithDescription:@"Device is reachable"];
+    delegate.onReachable = ^{
+        [reachableExpectation fulfill];
+    };
+
+    XCTAssertTrue([self restartApp:app additionalArguments:@[]]);
+
+    [self waitForExpectations:@[ reachableExpectation ] timeout:60];
+}
+
 @end
 
 @interface MTRDeviceResubscriptionTimerTests : MTRTestCase

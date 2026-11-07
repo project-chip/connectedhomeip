@@ -216,6 +216,13 @@ NS_ASSUME_NONNULL_BEGIN
                              errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
 
 /**
+ * Returns the DeviceCommissioner, or nullptr if the controller is not running.
+ * Must be called on the Matter queue; the pointer is only valid for the current
+ * Matter queue turn.
+ */
+- (chip::Controller::DeviceCommissioner * _Nullable)commissionerOnMatterQueue;
+
+/**
  * Returns the transport used by the current session with the given device,
  * or `MTRTransportTypeUndefined` if no session is currently active.
  */
