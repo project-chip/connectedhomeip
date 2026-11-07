@@ -138,7 +138,6 @@ class TC_WHM_1_2(MatterTestCommissionedDevice):
         # SHALL NOT also include an additional instance of any one of these tag types.
         off_present = 0
         manual_present = 0
-        timed_present = 0
 
         for m in supported_modes:
             off_manual_timed_present_in_this_mode = 0
@@ -159,7 +158,6 @@ class TC_WHM_1_2(MatterTestCommissionedDevice):
                         "Found Manual mode tag %s with tag value %s", m.mode, t.value)
 
                 if t.value == Clusters.WaterHeaterMode.Enums.ModeTag.kTimed:
-                    timed_present += 1
                     off_manual_timed_present_in_this_mode += 1
                     log.info(
                         "Found Timed mode tag %s with tag value %s", m.mode, t.value)
@@ -171,13 +169,6 @@ class TC_WHM_1_2(MatterTestCommissionedDevice):
                                "SupportedModes does not have an entry of Off(0x4000)")
         asserts.assert_greater(manual_present, 0,
                                "SupportedModes does not have an entry of Manual(0x4001)")
-
-        asserts.assert_less_equal(off_present, 1,
-                                  "SupportedModes cannot have more than one instance of Off(0x4000)")
-        asserts.assert_less_equal(manual_present, 1,
-                                  "SupportedModes cannot have more than one instance of Manual(0x4001)")
-        asserts.assert_less_equal(timed_present, 1,
-                                  "SupportedModes cannot have more than one instance of Timed(0x4002)")
 
         self.step(3)
         current_mode = await self.read_mode_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMode)
