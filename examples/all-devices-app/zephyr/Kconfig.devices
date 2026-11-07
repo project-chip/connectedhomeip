@@ -168,6 +168,9 @@ config ALL_DEVICES_DEVICE_SMOKE_CO_ALARM
 config ALL_DEVICES_DEVICE_SOIL_SENSOR
 	bool "Soil sensor"
 
+config ALL_DEVICES_DEVICE_SOLAR_POWER
+	bool "Solar power"
+
 config ALL_DEVICES_DEVICE_SPEAKER
 	bool "Speaker"
 

@@ -177,6 +177,7 @@ target_sources(app PRIVATE
     src/delegates/ZephyrIdentifyDelegate.cpp
 
     # all-devices-common
+    ${ALL_DEVICES_COMMON_DIR}/providers/AllDevicesExampleDeviceInfoProviderImpl.cpp
     ${ALL_DEVICES_DEVICE_SOURCES}
     ${ALL_DEVICES_CLUSTER_SOURCES}
 )

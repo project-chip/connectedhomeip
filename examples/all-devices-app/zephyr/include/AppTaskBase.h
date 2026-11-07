@@ -27,6 +27,7 @@
 #include <device/types/root-node/RootNode.h>
 #include <lib/core/CHIPError.h>
 #include <platform/DefaultTimerDelegate.h>
+#include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -122,6 +123,7 @@ protected:
     Credentials::GroupDataProviderImpl mGroupDataProvider;
     SimpleTestEventTriggerDelegate mDefaultTestEventTriggerDelegate;
     ZephyrIdentifyDelegate mDefaultIdentifyDelegate;
+    DeviceLayer::AllDevicesExampleDeviceInfoProviderImpl mDeviceInfoProvider;
     DefaultTimerDelegate mTimerDelegate;
     BindingHandler mBindingHandler;
     DefaultAttributePersistenceProvider mAttributePersistenceProvider;

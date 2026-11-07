@@ -87,6 +87,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'robotic-vacuum-cleaner',
     'room-air-conditioner',
     'soil-sensor',
+    'solar-power',
     'speaker',
     'temperature-sensor',
     'thermostat',
