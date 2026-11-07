@@ -32,5 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
                                     error:(nullable NSError *)error;
 - (void)controllerStartingNetworkScan:(MTRDeviceController *)controller;
 - (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error forPayload:(MTRSetupPayload * _Nullable)payload;
+@optional
+// The PASE session to a commissionee that was not being commissioned was released; the commissionee is gone.
+- (void)controller:(MTRDeviceController *)controller commissioneePASESessionLostForNodeID:(NSNumber *)nodeID;
 @end
 NS_ASSUME_NONNULL_END
