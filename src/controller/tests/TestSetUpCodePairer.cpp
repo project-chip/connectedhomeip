@@ -444,6 +444,7 @@ TEST_F(TestSetUpCodePairer, QueuedCandidate_AttemptedAfterPASEFailure)
     EXPECT_TRUE(CommissionerDelegateIsPairer());
     // The failure is held back until that attempt finishes.
     EXPECT_EQ(Access().GetLastPASEError(), CHIP_ERROR_INTEGRITY_CHECK_FAILED);
+    EXPECT_EQ(mDelegate.mStatusUpdates, 0u);
     EXPECT_EQ(mDelegate.mPairingCompletes, 0u);
     EXPECT_NE(Access().GetRemoteId(), kUndefinedNodeId);
 }
