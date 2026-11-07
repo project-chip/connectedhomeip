@@ -184,6 +184,21 @@ CHIP_ERROR AliroDelegate::ClearAliroReaderConfig()
     }
 }
 
+const AliroDelegate::CredentialSlot * AliroDelegate::SlotArrayForType(CredentialTypeEnum type) const
+{
+    switch (type)
+    {
+    case CredentialTypeEnum::kAliroCredentialIssuerKey:
+        return mIssuerKeys;
+    case CredentialTypeEnum::kAliroEvictableEndpointKey:
+        return mEvictableEndpointKeys;
+    case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
+        return mNonEvictableEndpointKeys;
+    default:
+        return nullptr;
+    }
+}
+
 AliroDelegate::CredentialSlot * AliroDelegate::SlotArrayForType(CredentialTypeEnum type)
 {
     switch (type)
@@ -199,9 +214,9 @@ AliroDelegate::CredentialSlot * AliroDelegate::SlotArrayForType(CredentialTypeEn
     }
 }
 
-bool AliroDelegate::GetCredential(uint16_t index, CredentialTypeEnum type, EmberAfPluginDoorLockCredentialInfo & out)
+bool AliroDelegate::GetCredential(uint16_t index, CredentialTypeEnum type, EmberAfPluginDoorLockCredentialInfo & out) const
 {
-    CredentialSlot * slots = SlotArrayForType(type);
+    const CredentialSlot * slots = SlotArrayForType(type);
     VerifyOrReturnValue(slots != nullptr, false);
 
     auto & slot = slots[index];
