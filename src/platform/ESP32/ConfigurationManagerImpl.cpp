@@ -67,6 +67,39 @@ void ConfigurationManagerImpl::TotalOperationalHoursTimerCallback(TimerHandle_t 
     (void) ConfigurationMgrImpl().StoreTotalOperationalHours(++mTotalOperationalHours);
 }
 
+#ifdef CONFIG_NVS_ENCRYPTION
+namespace {
+
+esp_err_t GetNvsSecurityConfig(nvs_sec_cfg_t & cfg)
+{
+    esp_err_t esp_err;
+    const esp_partition_t * key_part = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_NVS_KEYS, NULL);
+#ifndef CONFIG_NVS_SEC_KEY_PROTECT_USING_HMAC
+    // Only the HMAC scheme works without the nvs_keys partition
+    if (key_part == NULL)
+    {
+        ChipLogError(DeviceLayer,
+                     "CONFIG_NVS_ENCRYPTION is enabled, but no partition with subtype nvs_keys found in the partition table.");
+        return ESP_ERR_NOT_FOUND;
+    }
+#endif
+
+    nvs_sec_scheme_t * scheme = nvs_flash_get_default_security_scheme();
+    if (scheme != NULL && scheme->nvs_flash_read_cfg != NULL)
+    {
+        esp_err = nvs_flash_read_security_cfg_v2(scheme, &cfg);
+    }
+    else
+    {
+        // No registered scheme (CONFIG_NVS_SEC_KEY_PROTECT_NONE)
+        esp_err = nvs_flash_read_security_cfg(key_part, &cfg);
+    }
+    return esp_err;
+}
+
+} // namespace
+#endif // CONFIG_NVS_ENCRYPTION
+
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
@@ -76,25 +109,10 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     nvs_sec_cfg_t cfg = {};
     esp_err_t esp_err = ESP_FAIL;
 
-    const esp_partition_t * key_part = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_NVS_KEYS, NULL);
-    if (key_part == NULL)
+    esp_err = GetNvsSecurityConfig(cfg);
+    if (esp_err != ESP_OK)
     {
-        ChipLogError(DeviceLayer,
-                     "CONFIG_NVS_ENCRYPTION is enabled, but no partition with subtype nvs_keys found in the partition table.");
-        err = MapConfigError(esp_err);
-        SuccessOrExit(err);
-    }
-
-    esp_err = nvs_flash_read_security_cfg(key_part, &cfg);
-    if (esp_err == ESP_ERR_NVS_KEYS_NOT_INITIALIZED)
-    {
-        ChipLogError(DeviceLayer, "NVS key partition empty");
-        err = MapConfigError(esp_err);
-        SuccessOrExit(err);
-    }
-    else if (esp_err != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "Failed to read NVS security cfg, err:0x%02x", esp_err);
+        ChipLogError(DeviceLayer, "Failed to get NVS security cfg, err:0x%02x", esp_err);
         err = MapConfigError(esp_err);
         SuccessOrExit(err);
     }
