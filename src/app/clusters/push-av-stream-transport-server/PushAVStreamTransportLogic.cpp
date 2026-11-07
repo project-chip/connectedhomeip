@@ -475,10 +475,6 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         VerifyOrReturnValue(
             triggerOptions.motionZones.HasValue(), Status::InvalidCommand,
             ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Missing motion zones ", mEndpointId));
-    }
-
-    if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
-    {
         if (!triggerOptions.motionZones.Value().IsNull())
         {
             auto & motionZonesList = triggerOptions.motionZones;
@@ -519,7 +515,10 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                 return Status::InvalidCommand;
             }
         }
+    }
 
+    if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
+    {
         VerifyOrReturnValue(triggerOptions.motionTimeControl.HasValue(), Status::InvalidCommand,
                             ChipLogError(Zcl,
                                          "Transport Options verification from command data[ep=%d]: Missing Motion Time Control ",
@@ -883,9 +882,8 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
     return Status::Success;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-PushAvStreamTransportServerLogic::ValidateMotionZones(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                                      const Structs::TransportTriggerOptionsStruct::DecodableType & triggerOptions)
+DataModel::ActionReturnStatus
+PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTriggerOptionsStruct::DecodableType & triggerOptions)
 {
     if ((triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion ||
          triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext) &&
@@ -895,67 +893,70 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(CommandHandler & handler, 
         size_t zoneListSize = 0;
         VerifyOrReturnValue(zones.ComputeSize(&zoneListSize) == CHIP_NO_ERROR, Status::InvalidCommand);
 
-        Platform::ScopedMemoryBuffer<uint16_t> zoneIDsFound;
-        size_t zoneIDsCount = 0;
-        std::set<uint16_t> fallbackZoneIDs;
-        bool useFallback  = false;
-        bool nullFound    = false;
-        auto iterDupCheck = zones.begin();
-        while (iterDupCheck.Next())
+        bool nullFound       = false;
+        bool duplicateNull   = false;
+        uint16_t firstBucket = UINT8_MAX;
+        uint16_t lastBucket  = 0;
+        auto decodeIter      = zones.begin();
+        while (decodeIter.Next())
         {
-            const auto & transportZoneOption = iterDupCheck.GetValue();
-            if (!transportZoneOption.zone.IsNull())
+            const auto & zone = decodeIter.GetValue().zone;
+            if (zone.IsNull())
             {
-                if (zoneIDsCount == 0 && !useFallback)
-                {
-                    if (zoneListSize <= SIZE_MAX / sizeof(uint16_t))
-                    {
-                        zoneIDsFound.Alloc(zoneListSize);
-                    }
-                    useFallback = !zoneIDsFound;
-                }
-                if (useFallback)
-                {
-                    if (!fallbackZoneIDs.insert(transportZoneOption.zone.Value()).second)
-                    {
-                        ChipLogError(
-                            Zcl,
-                            "Transport Options verification from command data[ep=%d]: Duplicate Zone ID (=%d) in Motion Zones. ",
-                            mEndpointId, transportZoneOption.zone.Value());
-                        return Status::AlreadyExists;
-                    }
-                }
-                else
-                {
-                    zoneIDsFound[zoneIDsCount++] = transportZoneOption.zone.Value();
-                }
+                duplicateNull = duplicateNull || nullFound;
+                nullFound     = true;
             }
             else
             {
-                if (nullFound)
-                {
-                    ChipLogError(
-                        Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Null Zone ID in Motion Zones. ",
-                        mEndpointId);
-                    return Status::AlreadyExists;
-                }
-                nullFound = true;
+                const uint16_t bucket = zone.Value() >> 8;
+                firstBucket           = std::min(firstBucket, bucket);
+                lastBucket            = std::max(lastBucket, bucket);
             }
         }
-        if (zoneIDsCount != 0)
+        VerifyOrReturnValue(decodeIter.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
+        VerifyOrReturnValue(!duplicateNull, Status::AlreadyExists);
+
+        if (zoneListSize <= UINT8_MAX)
         {
-            auto * zoneIDsEnd = zoneIDsFound.Get() + zoneIDsCount;
-            std::sort(zoneIDsFound.Get(), zoneIDsEnd);
-            const auto duplicate = std::adjacent_find(zoneIDsFound.Get(), zoneIDsEnd);
-            if (duplicate != zoneIDsEnd)
+            size_t outerIndex = 0;
+            auto outer        = zones.begin();
+            while (outer.Next())
             {
-                ChipLogError(Zcl,
-                             "Transport Options verification from command data[ep=%d]: Duplicate Zone ID (=%d) in Motion Zones. ",
-                             mEndpointId, *duplicate);
-                return Status::AlreadyExists;
+                const auto zone   = outer.GetValue().zone;
+                size_t innerIndex = 0;
+                auto inner        = zones.begin();
+                while (inner.Next())
+                {
+                    if (innerIndex++ >= outerIndex)
+                    {
+                        break;
+                    }
+                    const auto & previousZone = inner.GetValue().zone;
+                    VerifyOrReturnValue(zone.IsNull() || previousZone.IsNull() || zone.Value() != previousZone.Value(),
+                                        Status::AlreadyExists);
+                }
+                ++outerIndex;
             }
         }
-        VerifyOrReturnValue(iterDupCheck.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
+        else
+        {
+            for (uint16_t bucket = firstBucket; bucket <= lastBucket; ++bucket)
+            {
+                uint64_t seen[4] = {};
+                auto bucketIter  = zones.begin();
+                while (bucketIter.Next())
+                {
+                    const auto & zone = bucketIter.GetValue().zone;
+                    if (!zone.IsNull() && (zone.Value() >> 8) == bucket)
+                    {
+                        const uint8_t value = static_cast<uint8_t>(zone.Value());
+                        const uint64_t mask = uint64_t{ 1 } << (value % 64);
+                        VerifyOrReturnValue((seen[value / 64] & mask) == 0, Status::AlreadyExists);
+                        seen[value / 64] |= mask;
+                    }
+                }
+            }
+        }
 
         VerifyOrReturnValue(
             mDelegate->ValidateMotionZoneListSize(zoneListSize), Status::DynamicConstraintError,
@@ -970,34 +971,10 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(CommandHandler & handler, 
             {
                 auto status = to_underlying(StatusCodeEnum::kInvalidZone);
                 ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid ZoneId", mEndpointId);
-                TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
-                return std::nullopt;
+                return ClusterStatusCode::ClusterSpecificFailure(status);
             }
         }
         VerifyOrReturnValue(iter.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
-
-        if (triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext)
-        {
-            auto sensitivityIter = zones.begin();
-            while (sensitivityIter.Next())
-            {
-                const auto & zone = sensitivityIter.GetValue();
-                if (HasFeature(Feature::kPerZoneSensitivity))
-                {
-                    VerifyOrReturnValue(zone.sensitivity.HasValue(), Status::InvalidCommand,
-                                        ChipLogError(Zcl, "Ambient zone is missing Sensitivity on endpoint %u", mEndpointId));
-                    VerifyOrReturnValue(zone.sensitivity.Value() >= 1 && zone.sensitivity.Value() <= 10, Status::ConstraintError,
-                                        ChipLogError(Zcl, "Ambient zone Sensitivity is out of range on endpoint %u", mEndpointId));
-                }
-                else
-                {
-                    VerifyOrReturnValue(
-                        !zone.sensitivity.HasValue(), Status::InvalidCommand,
-                        ChipLogError(Zcl, "Ambient zone Sensitivity requires PerZoneSensitivity on endpoint %u", mEndpointId));
-                }
-            }
-            VerifyOrReturnValue(sensitivityIter.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
-        }
     }
     return Status::Success;
 }
@@ -1149,7 +1126,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    auto zoneStatus = ValidateMotionZones(handler, commandPath, transportOptions.triggerOptions);
+    auto zoneStatus = ValidateMotionZones(transportOptions.triggerOptions);
     if (zoneStatus != Status::Success)
     {
         return zoneStatus;
@@ -1372,14 +1349,10 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
         return std::nullopt;
     }
 
-    auto zoneStatus = ValidateMotionZones(handler, commandPath, transportOptions.triggerOptions);
+    auto zoneStatus = ValidateMotionZones(transportOptions.triggerOptions);
     if (zoneStatus != Status::Success)
     {
-        if (zoneStatus.has_value())
-        {
-            handler.AddStatus(commandPath, zoneStatus->GetStatusCode());
-        }
-        return std::nullopt;
+        return zoneStatus;
     }
 
     std::shared_ptr<TransportOptionsStorage> transportOptionsPtr{ new (std::nothrow) TransportOptionsStorage(transportOptions) };
