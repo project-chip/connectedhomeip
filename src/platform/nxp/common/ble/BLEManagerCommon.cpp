@@ -976,6 +976,12 @@ void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
 
     mDeviceIds.erase(deviceId);
 
+    /* Reset the subscribed flag so that a new subscription from the next
+     * commissioning attempt is not ignored. */
+#if BLE_LAYER_NUM_BLE_ENDPOINTS == 1
+    mDeviceSubscribed = false;
+#endif
+
     ChipDeviceEvent event;
     event.Type                           = DeviceEventType::kCHIPoBLEConnectionClosed;
     event.CHIPoBLEConnectionError.ConId  = deviceId;
