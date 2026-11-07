@@ -23,15 +23,27 @@
 
 #pragma once
 
-#include "keypad-input-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/keypad-input-server/KeypadInputCluster.h>
+#include <app/clusters/keypad-input-server/keypad-input-delegate.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace KeypadInput {
 
+/// Sets the delegate used by the Keypad Input cluster on `endpoint`.
+///
+/// May be called before or after the cluster on `endpoint` is created. The delegate must stay valid
+/// until it is replaced or the cluster on `endpoint` is shut down. Passing nullptr clears the delegate.
+/// Shutting down the cluster clears the delegate, so it must be set again if the cluster is recreated.
+///
+/// On endpoints that belong to a ContentApp (when CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED is set), the
+/// ContentApp delegate takes precedence over the delegate set here.
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
+/// Returns the Keypad Input cluster instance on `endpoint`, or nullptr if there is none.
+KeypadInputCluster * FindClusterOnEndpoint(EndpointId endpoint);
 
 } // namespace KeypadInput
 } // namespace Clusters
