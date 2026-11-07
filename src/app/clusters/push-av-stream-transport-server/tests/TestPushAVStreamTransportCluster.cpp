@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <map>
 #include <vector>
 
 #include <pw_unit_test/framework.h>
@@ -330,8 +331,10 @@ public:
     void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
                      Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
     {
-        // No-op implementation for tests
+        setTLSCertsCalls++;
     }
+
+    int setTLSCertsCalls = 0;
 
     void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override
     {
@@ -394,8 +397,14 @@ public:
     CHIP_ERROR MutateEndpointReferenceCount(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
                                             int8_t delta) override
     {
+        VerifyOrReturnError(endpointID != kUnprovisionedTLSEndpointID, CHIP_ERROR_NOT_FOUND);
+        referenceCounts[endpointID] += delta;
         return CHIP_NO_ERROR;
     }
+
+    static constexpr uint16_t kUnprovisionedTLSEndpointID = 99;
+
+    std::map<uint16_t, int> referenceCounts;
 };
 
 // Yields an endpoint whose ccdid is null. TlsClientManagement stores such an endpoint, since a null ccdid
@@ -412,6 +421,29 @@ public:
         endpoint.ccdid.SetNull();
         return callback(endpoint);
     }
+};
+
+// Reports the ReferenceCount recorded in referenceCounts, as a delegate that persists the count does. The endpoint
+// kNoClientCertTLSEndpointID is provisioned without a client certificate.
+class TestTLSClientManagementDelegateReportingCounts : public TestTLSClientManagementDelegate
+{
+public:
+    CHIP_ERROR FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                           LoadedEndpointCallback callback) override
+    {
+        VerifyOrReturnError(endpointID != kUnprovisionedTLSEndpointID, CHIP_ERROR_NOT_FOUND);
+        TlsClientManagement::Structs::TLSEndpointStruct::DecodableType endpoint;
+        endpoint.endpointID = endpointID;
+        endpoint.caid       = 0;
+        if (endpointID != kNoClientCertTLSEndpointID)
+        {
+            endpoint.ccdid.SetNonNull(1);
+        }
+        endpoint.referenceCount = static_cast<uint8_t>(referenceCounts[endpointID]);
+        return callback(endpoint);
+    }
+
+    static constexpr uint16_t kNoClientCertTLSEndpointID = 98;
 };
 
 class TestPushAVStreamTransportServerLogic : public ::testing::Test
@@ -483,6 +515,252 @@ TEST_F(TestPushAVStreamTransportServerLogic, AllocatePushTransportRejectsEndpoin
     const auto & status = commandHandler.GetStatuses()[0].status;
     ASSERT_TRUE(status.GetClusterSpecificCode().has_value());
     EXPECT_EQ(status.GetClusterSpecificCode().value(), to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, TransportsHoldReferenceOnTLSEndpoint)
+{
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    std::string url       = "https://192.168.1.100:554/stream/";
+    std::string trackName = "video";
+
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kContinuous;
+
+    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptions.videoStreamID.SetValue(1);
+    transportOptions.audioStreamID.SetValue(2);
+    transportOptions.TLSEndpointID    = 1;
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
+
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    Testing::MockCommandHandler allocateHandler;
+    allocateHandler.SetFabricIndex(1);
+    ConcreteCommandPath kAllocatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    Commands::AllocatePushTransport::DecodableType allocateData;
+    allocateData.transportOptions = transportOptions;
+
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(allocateHandler, kAllocatePath, allocateData), std::nullopt);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    uint16_t connectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 1);
+
+    ConcreteCommandPath kModifyPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::ModifyPushTransport::Id };
+
+    // Moving the transport to an unprovisioned TLS endpoint is rejected and keeps the existing reference.
+    {
+        Testing::MockCommandHandler modifyHandler;
+        modifyHandler.SetFabricIndex(1);
+        Commands::ModifyPushTransport::DecodableType modifyData;
+        modifyData.connectionID                   = connectionID;
+        modifyData.transportOptions               = transportOptions;
+        modifyData.transportOptions.TLSEndpointID = TestTLSClientManagementDelegate::kUnprovisionedTLSEndpointID;
+
+        EXPECT_EQ(mServer.GetLogic().HandleModifyPushTransport(modifyHandler, kModifyPath, modifyData), std::nullopt);
+        const auto & status = modifyHandler.GetLastStatus().status;
+        ASSERT_TRUE(status.GetClusterSpecificCode().has_value());
+        EXPECT_EQ(status.GetClusterSpecificCode().value(), to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
+        EXPECT_EQ(mServer.GetLogic().mCurrentConnections[0].GetTransportOptionsPtr()->TLSEndpointID, 1);
+        EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 1);
+    }
+
+    // Moving the transport to another provisioned TLS endpoint moves the reference.
+    {
+        Testing::MockCommandHandler modifyHandler;
+        modifyHandler.SetFabricIndex(1);
+        Commands::ModifyPushTransport::DecodableType modifyData;
+        modifyData.connectionID                   = connectionID;
+        modifyData.transportOptions               = transportOptions;
+        modifyData.transportOptions.TLSEndpointID = 2;
+
+        EXPECT_EQ(mServer.GetLogic().HandleModifyPushTransport(modifyHandler, kModifyPath, modifyData), std::nullopt);
+        EXPECT_TRUE(modifyHandler.GetLastStatus().status.IsSuccess());
+        EXPECT_EQ(mServer.GetLogic().mCurrentConnections[0].GetTransportOptionsPtr()->TLSEndpointID, 2);
+        EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 0);
+        EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[2], 1);
+    }
+
+    Testing::MockCommandHandler deallocateHandler;
+    deallocateHandler.SetFabricIndex(1);
+    ConcreteCommandPath kDeallocatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::DeallocatePushTransport::Id };
+    Commands::DeallocatePushTransport::DecodableType deallocateData;
+    deallocateData.connectionID = connectionID;
+
+    EXPECT_EQ(mServer.GetLogic().HandleDeallocatePushTransport(deallocateHandler, kDeallocatePath, deallocateData), std::nullopt);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[2], 0);
+}
+
+// Options for a continuous CMAF transport that uses tlsEndpointID. The strings are literals, so the options stay valid.
+static TransportOptionsDecodableStruct MakeContinuousTransportOptions(uint16_t tlsEndpointID)
+{
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    cmafContainerOptions.trackName.SetValue(CharSpan::fromCharString("video"));
+
+    ContainerOptionsStruct containerOptions;
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kContinuous;
+
+    TransportOptionsDecodableStruct transportOptions;
+    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptions.videoStreamID.SetValue(1);
+    transportOptions.audioStreamID.SetValue(2);
+    transportOptions.TLSEndpointID    = tlsEndpointID;
+    transportOptions.url              = CharSpan::fromCharString("https://192.168.1.100:554/stream/");
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    return transportOptions;
+}
+
+// Allocates a continuous CMAF transport for fabric 1 that uses tlsEndpointID.
+static void AllocateTransportUsingTLSEndpoint(PushAvStreamTransportServer & server, uint16_t tlsEndpointID)
+{
+    Commands::AllocatePushTransport::DecodableType commandData;
+    commandData.transportOptions = MakeContinuousTransportOptions(tlsEndpointID);
+
+    Testing::MockCommandHandler handler;
+    handler.SetFabricIndex(1);
+    ConcreteCommandPath kAllocatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(handler, kAllocatePath, commandData), std::nullopt);
+    EXPECT_TRUE(handler.HasResponse());
+}
+
+// The two tests below cover upgrading from firmware that did not count push transports in the ReferenceCount of their
+// TLS endpoint. That firmware persisted CurrentConnections, but the TLS endpoints those transports use kept a stored
+// ReferenceCount of 0. The first boot of the upgraded firmware must give the restored transports their references, and
+// later boots must not add them again.
+
+TEST_F(TestPushAVStreamTransportServerLogic, UpgradeFromUncountedFirmware_RestoredTransportsTakeReferences)
+{
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegateReportingCounts tlsClientManagementDelegate;
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    AllocateTransportUsingTLSEndpoint(mServer, 1);
+    AllocateTransportUsingTLSEndpoint(mServer, 1);
+    AllocateTransportUsingTLSEndpoint(mServer, 2);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 3);
+
+    // Recreate the state the earlier firmware left behind: the transports are stored, but their TLS endpoints count no
+    // references.
+    tlsClientManagementDelegate.referenceCounts.clear();
+
+    // First boot of the upgraded firmware: CurrentConnections is loaded from storage.
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 3);
+
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 2);
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[2], 1);
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, UpgradeFromUncountedFirmware_LaterBootsKeepReferenceCounts)
+{
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegateReportingCounts tlsClientManagementDelegate;
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    AllocateTransportUsingTLSEndpoint(mServer, 1);
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 1);
+
+    // Once the counts are correct, booting again (including attaching the TLS delegate again) adds nothing.
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 1);
+
+    // Counts are only raised: references beyond this cluster's transports, held by other users of the endpoint, are kept.
+    tlsClientManagementDelegate.referenceCounts[1] = 3;
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 3);
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, ModifyPushTransportChecksTLSEndpointAndReloadsCertificates)
+{
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegateReportingCounts tlsClientManagementDelegate;
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    AllocateTransportUsingTLSEndpoint(mServer, 1);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    uint16_t connectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
+    EXPECT_EQ(mockDelegate.setTLSCertsCalls, 1);
+
+    ConcreteCommandPath kModifyPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::ModifyPushTransport::Id };
+    constexpr uint16_t kNoClientCertEndpoint = TestTLSClientManagementDelegateReportingCounts::kNoClientCertTLSEndpointID;
+
+    // A TLS endpoint without a client certificate is rejected, as AllocatePushTransport rejects it, and nothing changes.
+    {
+        Testing::MockCommandHandler modifyHandler;
+        modifyHandler.SetFabricIndex(1);
+        Commands::ModifyPushTransport::DecodableType modifyData;
+        modifyData.connectionID     = connectionID;
+        modifyData.transportOptions = MakeContinuousTransportOptions(kNoClientCertEndpoint);
+
+        EXPECT_EQ(mServer.GetLogic().HandleModifyPushTransport(modifyHandler, kModifyPath, modifyData), std::nullopt);
+        const auto & status = modifyHandler.GetLastStatus().status;
+        ASSERT_TRUE(status.GetClusterSpecificCode().has_value());
+        EXPECT_EQ(status.GetClusterSpecificCode().value(), to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
+        EXPECT_EQ(mServer.GetLogic().mCurrentConnections[0].GetTransportOptionsPtr()->TLSEndpointID, 1);
+        EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 1);
+        EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[kNoClientCertEndpoint], 0);
+    }
+
+    // A valid TLS endpoint's certificates are passed to the delegate again, so the transport uses the new endpoint's.
+    {
+        Testing::MockCommandHandler modifyHandler;
+        modifyHandler.SetFabricIndex(1);
+        Commands::ModifyPushTransport::DecodableType modifyData;
+        modifyData.connectionID     = connectionID;
+        modifyData.transportOptions = MakeContinuousTransportOptions(2);
+
+        EXPECT_EQ(mServer.GetLogic().HandleModifyPushTransport(modifyHandler, kModifyPath, modifyData), std::nullopt);
+        EXPECT_TRUE(modifyHandler.GetLastStatus().status.IsSuccess());
+        EXPECT_EQ(mockDelegate.setTLSCertsCalls, 2);
+        EXPECT_EQ(mServer.GetLogic().mCurrentConnections[0].GetTransportOptionsPtr()->TLSEndpointID, 2);
+    }
 }
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)

@@ -292,6 +292,9 @@ public:
     /**
      * @brief Sets TLS certificates for secure push transport connections.
      *
+     * Called with the certificates of the transport's TLS endpoint before AllocatePushTransport() and before
+     * ModifyPushTransport(), so the transport uses the certificates of the endpoint it is (re)configured with.
+     *
      * @param clientCertEntry Reference to buffered client certificate entry
      * @param rootCertEntry Reference to buffered root certificate entry
      */

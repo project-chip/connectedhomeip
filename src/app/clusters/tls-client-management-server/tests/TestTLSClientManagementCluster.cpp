@@ -531,6 +531,15 @@ TEST_F(TestTLSClientManagementCluster, TestRemoveEndpointSuccess)
     EXPECT_EQ(mMockDelegate.endpoints.size(), 0u);
 }
 
+TEST_F(TestTLSClientManagementCluster, TestDelegateReportsProvisionedEndpointsChange)
+{
+    // Changes made through the delegate outside this cluster's commands, such as a ReferenceCount update by Push AV
+    // Stream Transport, are reported through the delegate.
+    mClusterTester.GetDirtyList().clear();
+    mMockDelegate.NotifyProvisionedEndpointsChanged();
+    EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::ProvisionedEndpoints::Id));
+}
+
 TEST_F(TestTLSClientManagementCluster, TestRemoveEndpointNotFound)
 {
     Commands::RemoveEndpoint::Type request;

@@ -300,8 +300,9 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
 
         uint16_t nextId;
         ReturnValueOnFailure(GetEndpointId(fabric, nextId), ClusterStatusCode(Status::ResourceExhausted));
-        endpointStruct.endpointID = nextId;
-        endpointID                = endpointStruct.endpointID;
+        endpointStruct.endpointID     = nextId;
+        endpointStruct.referenceCount = 0;
+        endpointID                    = endpointStruct.endpointID;
     }
     // Updating existing value
     else
@@ -312,12 +313,11 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
         endpointID = provisionReq.endpointID.Value();
     }
 
-    auto & endpointStruct         = endpoint.mEndpoint;
-    endpointStruct.hostname       = provisionReq.hostname;
-    endpointStruct.port           = provisionReq.port;
-    endpointStruct.caid           = provisionReq.caid;
-    endpointStruct.ccdid          = provisionReq.ccdid;
-    endpointStruct.referenceCount = 0;
+    auto & endpointStruct   = endpoint.mEndpoint;
+    endpointStruct.hostname = provisionReq.hostname;
+    endpointStruct.port     = provisionReq.port;
+    endpointStruct.caid     = provisionReq.caid;
+    endpointStruct.ccdid    = provisionReq.ccdid;
     endpointStruct.SetFabricIndex(fabric);
 
     TlsEndpointId localId(endpointID);
