@@ -51,9 +51,7 @@ public:
     {
         OccupancySensingCluster::Config config(endpointId);
 
-        // No features enabled (defaults to PIR). If the app needs other features, it MUST instantiate and configure the cluster
-        // directly instead of relying on CodegenIntegration.
-        config.WithFeatures(BitFlags<Feature>(0u));
+        config.WithFeatures(BitFlags<Feature>(featureMap));
 
         // If the optional HoldTime attribute is enabled, enable the HoldTime logic.
         // The delay attributes are required if the corresponding sensor feature is present.
@@ -99,7 +97,7 @@ void MatterOccupancySensingClusterInitCallback(EndpointId endpointId)
             .clusterId                 = OccupancySensing::Id,
             .fixedClusterInstanceCount = kOccupancySensingFixedClusterCount,
             .maxClusterInstanceCount   = kOccupancySensingMaxClusterCount,
-            .fetchFeatureMap           = false,
+            .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
@@ -135,6 +133,15 @@ OccupancySensingCluster * FindClusterOnEndpoint(EndpointId endpointId)
         integrationDelegate);
 
     return static_cast<OccupancySensingCluster *>(occupancySensing);
+}
+
+void SetDefaultDelegate(EndpointId endpointId, OccupancySensingDelegate * delegate)
+{
+    auto * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster != nullptr)
+    {
+        cluster->SetDelegate(delegate);
+    }
 }
 
 } // namespace chip::app::Clusters::OccupancySensing

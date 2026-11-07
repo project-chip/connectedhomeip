@@ -155,6 +155,34 @@ DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataM
         return encoder.Encode(mHoldTime);
     case Attributes::HoldTimeLimits::Id:
         return encoder.Encode(mHoldTimeLimits);
+    case Attributes::PredictedOccupancy::Id: {
+        VerifyOrReturnError(IsPredictionEnabled(), Protocols::InteractionModel::Status::UnsupportedAttribute);
+        auto * delegate = mDelegate;
+        if (delegate == nullptr)
+        {
+            return encoder.EncodeEmptyList();
+        }
+        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
+            uint32_t previousEndTimestamp = 0;
+            for (size_t i = 0; true; i++)
+            {
+                OccupancySensing::Structs::PredictedOccupancyStruct::Type prediction;
+                CHIP_ERROR err = delegate->GetPredictedOccupancyAtIndex(i, prediction);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                VerifyOrReturnError(prediction.endTimestamp > prediction.startTimestamp, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError((i == 0) || (prediction.startTimestamp > previousEndTimestamp), CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(prediction.confidence <= 100, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(prediction.occupancy.Raw() <= 1, CHIP_ERROR_INVALID_ARGUMENT);
+
+                ReturnErrorOnFailure(enc.Encode(prediction));
+                previousEndTimestamp = prediction.endTimestamp;
+            }
+        });
+    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -192,6 +220,7 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { IsHoldTimeEnabled(), Attributes::HoldTime::kMetadataEntry },
         { IsHoldTimeEnabled(), Attributes::HoldTimeLimits::kMetadataEntry },
+        { IsPredictionEnabled(), Attributes::PredictedOccupancy::kMetadataEntry },
         { IsHoldTimeEnabled() && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPassiveInfrared),
           Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
         { IsHoldTimeEnabled() && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kUltrasonic),
@@ -359,6 +388,16 @@ uint16_t OccupancySensingCluster::GetHoldTime() const
 const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & OccupancySensingCluster::GetHoldTimeLimits() const
 {
     return mHoldTimeLimits;
+}
+
+bool OccupancySensingCluster::IsPredictionEnabled() const
+{
+    return mFeatureMap.Has(Feature::kPrediction);
+}
+
+void OccupancySensingCluster::NotifyPredictedOccupancyChanged()
+{
+    NotifyAttributeChanged(Attributes::PredictedOccupancy::Id);
 }
 
 BitFlags<OccupancySensing::Feature> OccupancySensingCluster::GetFeatureMap() const
