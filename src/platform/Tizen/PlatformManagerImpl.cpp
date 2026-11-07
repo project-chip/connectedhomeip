@@ -57,7 +57,7 @@ namespace {
 
 struct GLibMatterContextInvokeData
 {
-    LambdaBridge bridge;
+    PlatformManagerImpl::GLibMatterContextInvocation * mInvocation = nullptr;
     // Sync primitives to wait for the function to be executed
     std::mutex mDoneMutex;
     std::condition_variable mDoneCond;
@@ -145,9 +145,9 @@ void PlatformManagerImpl::_Shutdown()
     mGLibMainLoop = nullptr;
 }
 
-void PlatformManagerImpl::_GLibMatterContextInvokeSync(LambdaBridge && bridge)
+void PlatformManagerImpl::_GLibMatterContextInvokeSync(GLibMatterContextInvocation & invocation)
 {
-    GLibMatterContextInvokeData invokeData{ std::move(bridge) };
+    GLibMatterContextInvokeData invokeData{ &invocation };
 
     g_main_context_invoke_full(
         g_main_loop_get_context(mGLibMainLoop), G_PRIORITY_HIGH_IDLE,
@@ -155,7 +155,7 @@ void PlatformManagerImpl::_GLibMatterContextInvokeSync(LambdaBridge && bridge)
             auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
             VerifyOrExit(g_main_context_get_thread_default() != nullptr,
                          ChipLogError(DeviceLayer, "GLib thread default main context is not set"));
-            data->bridge();
+            data->mInvocation->Invoke();
         exit:
             data->mDoneMutex.lock();
             data->mDone = true;
