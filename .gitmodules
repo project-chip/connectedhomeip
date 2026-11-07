@@ -10,7 +10,7 @@
 	path = third_party/mbedtls/repo
 	url = https://github.com/ARMmbed/mbedtls.git
 	branch = mbedtls-2.28
-	excluded-platforms = esp32
+	platforms = ameba,cc13xx_26xx,cc32xx,infineon,nxp,rw61x,stm32
 [submodule "qrcode"]
 	path = examples/common/QRCode/repo
 	url = https://github.com/nayuki/QR-Code-generator.git
@@ -346,3 +346,8 @@
 	path = third_party/ot-ns/repo
 	url = https://github.com/openthread/ot-ns.git
 	platforms = linux
+[submodule "mbedtls-v3"]
+	path = third_party/mbedtls/v3/repo
+	url = https://github.com/Mbed-TLS/mbedtls.git
+	branch = mbedtls-3.6
+	platforms = linux,android,darwin,tizen,webos,nuttx,unit_tests
