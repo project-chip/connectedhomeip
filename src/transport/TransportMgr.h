@@ -58,6 +58,11 @@ public:
     virtual void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
                                    Transport::MessageTransportContext * ctxt = nullptr) = 0;
 
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    /// See Transport::RawTransportDelegate::HandlePortUnreachable.
+    virtual void OnPortUnreachable(const Transport::PeerAddress & peer, ByteSpan quotedPayload) {}
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     /**
      * @brief
