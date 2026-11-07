@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -44,5 +44,5 @@
 #define INET_CONFIG_NUM_UDP_ENDPOINTS 32
 #endif // INET_CONFIG_NUM_UDP_ENDPOINTS
 
-// On linux platform, we have sys/socket.h, so HAVE_SO_BINDTODEVICE should be set to 1
+// On webOS platform, we have sys/socket.h, so HAVE_SO_BINDTODEVICE should be set to 1
 #define HAVE_SO_BINDTODEVICE 1
