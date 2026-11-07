@@ -382,15 +382,10 @@ CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, Active
         {
             return CHIP_ERROR_NO_MEMORY;
         }
-<<<<<<< HEAD
-        CHIP_ERROR err = state->mReceived->Read(message->Start(), messageSize);
-        state->mReceived.Consume(messageSize);
-=======
         // Read() checks only the source length, so check here that the buffer can hold the message.
         VerifyOrReturnError(message->AvailableDataLength() >= messageSize, CHIP_ERROR_MESSAGE_TOO_LONG);
-        CHIP_ERROR err = state.mReceived->Read(message->Start(), messageSize);
-        state.mReceived.Consume(messageSize);
->>>>>>> f682fd8 ([System] Default the large PacketBuffer size to the pool buffer capacity on pool builds (#74880))
+        CHIP_ERROR err = state->mReceived->Read(message->Start(), messageSize);
+        state->mReceived.Consume(messageSize);
         ReturnErrorOnFailure(err);
         message->SetDataLength(messageSize);
     }

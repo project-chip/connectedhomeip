@@ -827,15 +827,9 @@ struct LwIPEvent;
  * Individual systems may override this size based on their requirements.
  * Data transfers over MRP should not be using this size for allocating
  * buffers as they are restricted by the IPv6 MTU.
-<<<<<<< HEAD
- */
-#ifndef CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES
-#define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES (64000)
-=======
  *
  * Except on internal-pool builds (see the note below), this is set to 64000
- * bytes (spec-defined MAX_TCP_MESSAGE_SIZE) plus 4 bytes for the TCP framing
- * message length prefix (kTCPFramingHeaderSize).
+ * bytes.
  *
  * @note When PacketBuffers come from the internal pool,
  *       CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES defaults to
@@ -848,7 +842,6 @@ struct LwIPEvent;
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE > 0
 #define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
 #else
-#define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES (64000 + 4)
->>>>>>> f682fd8 ([System] Default the large PacketBuffer size to the pool buffer capacity on pool builds (#74880))
+#define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES (64000)
 #endif
 #endif
