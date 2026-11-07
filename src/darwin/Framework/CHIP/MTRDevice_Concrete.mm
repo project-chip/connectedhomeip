@@ -3355,7 +3355,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
                                    // _getAttributesToReportWithReportedValues logs each attribute.
                                    MTR_LOG("%@ got attribute report (%p) with %lu attributes", self, value, static_cast<unsigned long>(value.count));
-                                   dispatch_async(self.queue, ^{
+                                   MTRDispatchCallbackWithFlowID(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription attribute report async to device queue called back with nil MTRDevice"));
 
@@ -3377,7 +3377,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
                                    // _handleEventReport logs each event.
                                    MTR_LOG("%@ got event report (%p) with %lu events", self, value, static_cast<unsigned long>(value.count));
-                                   dispatch_async(self.queue, ^{
+                                   MTRDispatchCallbackWithFlowID(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription event report async to device queue called back with nil MTRDevice"));
 
@@ -3424,7 +3424,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                                    [self _changeState:MTRDeviceStateReachable];
 
                                    // Then async work that shouldn't be performed on the matter queue
-                                   dispatch_async(self.queue, ^{
+                                   MTRDispatchCallbackWithFlowID(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription established async to device queue called back with nil MTRDevice"));
 
@@ -3472,7 +3472,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription report end called back with nil MTRDevice"));
 
                                    MTR_LOG("%@ got report end", self);
-                                   dispatch_async(self.queue, ^{
+                                   MTRDispatchCallbackWithFlowID(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription report end async to device queue called back with nil MTRDevice"));
 

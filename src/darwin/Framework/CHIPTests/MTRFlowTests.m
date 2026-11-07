@@ -1624,6 +1624,50 @@ static BOOL OnMatterQueue(void)
     }
 }
 
+// Item 1, MTRDevice: every delegate callback caused by the priming report of an MTRDevice subscription (its
+// attributes, events, configuration change and cache-primed) runs in the one flow of that report, across the hops
+// from the Matter queue to the device queue.
+- (void)test008_MTRDeviceSubscriptionReportCallbacksShareOneFlow
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kFlowWireNodeID) controller:sFlowWireController];
+    __auto_type * delegate = [[MTRFlowSubscribingDelegate alloc] init];
+    [device addDelegate:delegate queue:dispatch_queue_create("flow-test-device-report-delegate", DISPATCH_QUEUE_SERIAL)];
+    XCTestExpectation * primed = [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary * bindings) {
+        return [delegate recordsNamed:kCachePrimed].count >= 1;
+    }]
+                                           evaluatedWithObject:delegate
+                                                       handler:nil];
+    [self waitForExpectations:@[ primed ] timeout:kFlowWireTimeoutInSeconds];
+    [sFlowWireController removeDevice:device];
+
+    // The callbacks of the priming report: the attribute, event and configuration reports up to and including cache-primed.
+    NSMutableArray<NSDictionary *> * report = [NSMutableArray array];
+    NSUInteger attributeCount = 0;
+    NSUInteger eventCount = 0;
+    for (NSDictionary * record in delegate.records) {
+        NSString * name = record[kRecordName];
+        if ([name isEqualToString:kAttributeReport]) {
+            attributeCount += [record[kRecordPayload] count];
+        } else if ([name isEqualToString:kEventReport]) {
+            eventCount += [record[kRecordPayload] count];
+        } else if (![name isEqualToString:kConfigurationChanged] && ![name isEqualToString:kCachePrimed]) {
+            continue;
+        }
+        [report addObject:record];
+        if ([name isEqualToString:kCachePrimed]) {
+            break;
+        }
+    }
+    XCTAssertGreaterThan(attributeCount, 1, @"wanted a priming report with several attributes: %@", report);
+    XCTAssertGreaterThan(eventCount, 0, @"wanted a priming report with an event: %@", report);
+    XCTAssertGreaterThan(report.count, 2, @"%@", report);
+    id flow = report.firstObject[kRecordFlow];
+    XCTAssertTrue([flow isKindOfClass:NSUUID.class], @"%@", flow);
+    for (NSDictionary * record in report) {
+        XCTAssertEqualObjects(record[kRecordFlow], flow, @"%@", record[kRecordName]);
+    }
+}
+
 @end
 
 #pragma mark - OTA provider completions
