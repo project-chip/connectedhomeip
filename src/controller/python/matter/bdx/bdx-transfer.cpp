@@ -60,8 +60,19 @@ CHIP_ERROR BdxTransfer::AcceptAndSendData(const ByteSpan & data_to_send)
 {
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
     mAwaitingAccept = false;
+
+    // The data is sent from the start offset the receiver requested. An offset past the end cannot be served.
+    const uint64_t startOffset = mTransfer.GetStartOffset();
+    if (startOffset > data_to_send.size())
+    {
+        // The transfer completes with this error once the rejection is sent.
+        mRejected    = true;
+        mRejectError = CHIP_ERROR_INVALID_ARGUMENT;
+        return mTransfer.RejectTransfer(StatusCode::kStartOffsetNotSupported);
+    }
     mData.assign(data_to_send.begin(), data_to_send.end());
-    mDataCount = data_to_send.size();
+    mDataCount            = data_to_send.size();
+    mDataTransferredCount = static_cast<size_t>(startOffset);
 
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode  = TransferControlFlags::kReceiverDrive;
@@ -121,7 +132,7 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
         else if (mRejected && event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
         {
             // A rejected session emits no further event; end it here so the transfer is released.
-            EndSession(CHIP_NO_ERROR);
+            EndSession(mRejectError);
         }
         break;
     case TransferSession::OutputEventType::kAckEOFReceived:
