@@ -3381,3 +3381,5 @@ endpoint 1 {
     handle command UpdateMotionZoneOptions;
   }
 }
+
+
