@@ -20,6 +20,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/SetUpCodePairer.h>
+#include <controller/tests/DeviceCommissionerTestAccess.h>
 #include <controller/tests/SetUpCodePairerTestAccess.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
@@ -109,6 +110,10 @@ public:
 
     void TearDown() override
     {
+        if (mCommissionerAllowsPASE)
+        {
+            Testing::DeviceCommissionerTestAccess(mCommissioner.get()).ReleaseAllCommissioneeDevices();
+        }
         mAccess.reset();
         mPairer.reset();
         mCommissioner.reset();
@@ -146,6 +151,23 @@ protected:
         Access().CallOnPairingComplete(error);
     }
 
+    // Lets the commissioner start a PASE attempt: with kPaseOnly the pairer calls EstablishPASEConnection(), and
+    // the commissioner finds a commissionee for the same node id and peer address (NFC candidates resolve to the
+    // default UDP address) whose session setup is in progress, and returns CHIP_NO_ERROR.  The commissioner is not
+    // initialized in this fixture, so without this every attempt is rejected synchronously.  Call this after the
+    // first attempt was started; ReleaseCommissioneeDevices() must run before the test ends.
+    void AllowPASEAttempts()
+    {
+        Testing::DeviceCommissionerTestAccess access(mCommissioner.get());
+        access.MarkInitialized();
+        access.AddPASESetupInProgressDevice(1, Transport::PeerAddress::UDP(Inet::IPAddress::Any));
+        Access().SetConnectionType(SetupCodePairerBehaviour::kPaseOnly);
+        mCommissionerAllowsPASE = true;
+    }
+
+    // The pairer registers itself as the commissioner's pairing delegate for as long as it waits for PASE.
+    bool CommissionerDelegateIsPairer() const { return mCommissioner->GetPairingDelegate() == mPairer.get(); }
+
     RecordingPairingDelegate mDelegate;
 
 private:
@@ -153,6 +175,7 @@ private:
     std::unique_ptr<DeviceCommissioner> mCommissioner;
     std::unique_ptr<SetUpCodePairer> mPairer;
     std::unique_ptr<PairerAccess> mAccess;
+    bool mCommissionerAllowsPASE = false;
 };
 
 // When the discovery timeout fires while a PASE attempt is in progress,
@@ -399,12 +422,13 @@ TEST_F(TestSetUpCodePairer, NFCPASEFailure_KeepsDNSSDWhileCandidatesQueued)
     EXPECT_TRUE(Access().GetWaitingForDiscovery(PairerAccess::kIPTransport));
 }
 
-// A failed PASE attempt must start the next queued candidate.  mLastPASEAttemptWasOverNFC is only set
-// when ConnectToDiscoveredDevice starts an attempt, so it tells an attempt apart from a dropped
-// candidate (both empty the queue and both leave DNS-SD running).
+// A failed PASE attempt must start the next queued candidate, and that attempt must still be in progress
+// afterwards.  Without a commissioner that accepts the attempt, a dropped candidate looks the same as an
+// attempted one (both empty the queue and both leave DNS-SD running), so the commissioner accepts it here.
 TEST_F(TestSetUpCodePairer, QueuedCandidate_AttemptedAfterPASEFailure)
 {
     StartPASEAttempt(Transport::PeerAddress::UDP(Inet::IPAddress::Any, 5540));
+    AllowPASEAttempts();
     SetUpCodePairerParameters queued;
     queued.SetPeerAddress(Transport::PeerAddress::NFC(0x5678));
     Access().PushDiscoveredParameters(queued);
@@ -413,8 +437,12 @@ TEST_F(TestSetUpCodePairer, QueuedCandidate_AttemptedAfterPASEFailure)
 
     FailPASE(CHIP_ERROR_INTEGRITY_CHECK_FAILED);
 
+    // The queued NFC candidate was taken off the queue and its attempt was accepted, so we are waiting on it.
     EXPECT_TRUE(Access().GetLastPASEAttemptWasOverNFC());
     EXPECT_EQ(Access().GetDiscoveredParametersCount(), 0u);
+    EXPECT_TRUE(Access().GetWaitingForPASE());
+    EXPECT_TRUE(CommissionerDelegateIsPairer());
+    // The failure is held back until that attempt finishes.
     EXPECT_EQ(Access().GetLastPASEError(), CHIP_ERROR_INTEGRITY_CHECK_FAILED);
     EXPECT_EQ(mDelegate.mPairingCompletes, 0u);
     EXPECT_NE(Access().GetRemoteId(), kUndefinedNodeId);

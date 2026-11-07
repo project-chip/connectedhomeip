@@ -51,6 +51,8 @@ public:
         mPairer->mCurrentPASEParameters.SetValue(params);
     }
 
+    void SetConnectionType(Controller::SetupCodePairerBehaviour type) { mPairer->mConnectionType = type; }
+
     void ExpectPASEEstablishment() { mPairer->ExpectPASEEstablishment(); }
 
     void NotifyCommissionableDeviceDiscovered(const Dnssd::CommonResolutionData & resolutionData,
