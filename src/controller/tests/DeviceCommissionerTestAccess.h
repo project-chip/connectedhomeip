@@ -106,6 +106,23 @@ public:
 
     void CancelCommissioningInteractions() { mCommissioner->CancelCommissioningInteractions(); }
 
+    // Lets a commissioner that was never Init()ed accept EstablishPASEConnection for a peer that already has a PASE
+    // session setup in progress, so that call returns CHIP_NO_ERROR without any transport or system state.
+    // Pair with AddPASESetupInProgressDevice() and ReleaseAllCommissioneeDevices().
+    void MarkInitialized() { mCommissioner->mState = Controller::DeviceCommissioner::State::Initialized; }
+
+    // Adds a commissionee for (remoteDeviceId, peerAddress) that reports a session setup in progress.
+    CommissioneeDeviceProxy * AddPASESetupInProgressDevice(NodeId remoteDeviceId, const Transport::PeerAddress & peerAddress)
+    {
+        auto * device = mCommissioner->mCommissioneeDevicePool.CreateObject();
+        VerifyOrDie(device != nullptr);
+        device->Init(ControllerDeviceInitParams{}, remoteDeviceId, peerAddress);
+        return device;
+    }
+
+    // Releases the pool directly: ReleaseCommissioneeDevice() needs the system state a bare commissioner lacks.
+    void ReleaseAllCommissioneeDevices() { mCommissioner->mCommissioneeDevicePool.ReleaseAll(); }
+
     static void OnICDManagementRegisterClientResponse(
         Controller::DeviceCommissioner * commissioner,
         const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
