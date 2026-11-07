@@ -25,7 +25,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/bdx/BdxMessages.h>
-#include <system/SystemClock.h> /* TODO:(#12520) remove */
+#include <system/SystemClock.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -81,8 +81,8 @@ bool BDXDownloader::HasTransferTimedOut()
 void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle msg)
 {
     VerifyOrReturn(mState == State::kInProgress, ChipLogError(BDX, "Can't accept messages, no transfer in progress"));
-    CHIP_ERROR err =
-        mBdxTransfer.HandleMessageReceived(payloadHeader, std::move(msg), /* TODO:(#12520) */ chip::System::Clock::Seconds16(0));
+    // No clock is supplied to TransferSession; see PollTransferSession().
+    CHIP_ERROR err = mBdxTransfer.HandleMessageReceived(payloadHeader, std::move(msg), chip::System::Clock::kZero);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(BDX, "unable to handle message: %" CHIP_ERROR_FORMAT, err.Format());
@@ -104,8 +104,7 @@ CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::Transfe
 
     // Must call StartTransfer() here to store the the pointer data contained in bdxInitData in the TransferSession object.
     // Otherwise it could be freed before we can use it.
-    ReturnErrorOnFailure(mBdxTransfer.StartTransfer(chip::bdx::TransferRole::kReceiver, bdxInitData,
-                                                    /* TODO:(#12520) */ chip::System::Clock::Seconds16(30)));
+    ReturnErrorOnFailure(mBdxTransfer.StartTransfer(chip::bdx::TransferRole::kReceiver, bdxInitData, mTimeout));
 
     return CHIP_NO_ERROR;
 }
@@ -230,7 +229,10 @@ void BDXDownloader::PollTransferSession()
     // allow that?
     do
     {
-        mBdxTransfer.PollOutput(outEvent, /* TODO:(#12520) */ chip::System::Clock::Seconds16(0));
+        // The transfer timeout is enforced by the response timeout on the BDX exchange and by the progress timer, not by
+        // TransferSession, so it is never given the current time. TransferSession is only polled when something happens, so
+        // with a real clock it would not notice a silent provider, and would instead time this device's own work between blocks.
+        mBdxTransfer.PollOutput(outEvent, chip::System::Clock::kZero);
         CHIP_ERROR err = HandleBdxEvent(outEvent);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "HandleBDXEvent: %" CHIP_ERROR_FORMAT, err.Format()));
     } while (outEvent.EventType != TransferSession::OutputEventType::kNone);

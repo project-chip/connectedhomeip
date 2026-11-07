@@ -134,6 +134,8 @@ public:
                     OTARequestorAttributes & attributes, DefaultOTARequestorEventGenerator & eventGenerator);
 
 private:
+    friend class TestDefaultOTARequestorDownload;
+
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
 
@@ -177,13 +179,15 @@ private:
                 return CHIP_NO_ERROR;
             }
 
-            mDownloader->OnMessageReceived(payloadHeader, std::move(payload));
-
-            // For a receiver using BDX Protocol, all received messages will require a response except for a StatusReport
+            // For a receiver using BDX Protocol, all received messages will require a response except for a StatusReport.
+            // Say so before the downloader handles the message: it may send the response right away, and a will-send flag
+            // set after that send would keep the exchange open with nothing left to send, so it would never close.
             if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
             {
                 ec->WillSendMessage();
             }
+
+            mDownloader->OnMessageReceived(payloadHeader, std::move(payload));
 
             return CHIP_NO_ERROR;
         }
