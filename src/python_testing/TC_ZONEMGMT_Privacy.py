@@ -35,12 +35,27 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import contextlib
+import datetime
+import http.server
+import ipaddress
 import logging
+import os
+import random
+import ssl
 import subprocess
+import tempfile
+import threading
+import time
 from dataclasses import dataclass
 
+from cryptography import x509
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
 from mobly import asserts
+from TC_TLS_Utils import TLSUtils
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -57,6 +72,271 @@ class _RGBFrame:
     data: bytes
     width: int
     height: int
+
+
+class _LocalCMAFIngestServer:
+    """Lightweight in-process TLS HTTPS server to capture CMAF H.264 video uploads from PushAVStreamTransport."""
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._init_bytes: bytes | None = None
+        self._m4s_segments: list[bytes] = []
+        self._tmpdir = tempfile.TemporaryDirectory(prefix="tc_zonemgmt_privacy_tls_")
+
+        self._server_ca_key, self._server_ca_cert = self._make_root_ca("TC_ZONEMGMT_Privacy Server Root")
+        self._device_ca_key, self._device_ca_cert = self._make_root_ca("TC_ZONEMGMT_Privacy Device Root")
+        server_leaf_key, server_leaf_cert = self._make_server_cert()
+
+        server_cert_path = os.path.join(self._tmpdir.name, "server.pem")
+        server_key_path = os.path.join(self._tmpdir.name, "server.key")
+        device_ca_path = os.path.join(self._tmpdir.name, "device_ca.pem")
+
+        with open(server_cert_path, "wb") as f:
+            f.write(server_leaf_cert.public_bytes(serialization.Encoding.PEM))
+            f.write(b"\n")
+            f.write(self._server_ca_cert.public_bytes(serialization.Encoding.PEM))
+        with open(server_key_path, "wb") as f:
+            f.write(
+                server_leaf_key.private_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PrivateFormat.TraditionalOpenSSL,
+                    encryption_algorithm=serialization.NoEncryption(),
+                )
+            )
+        with open(device_ca_path, "wb") as f:
+            f.write(self._device_ca_cert.public_bytes(serialization.Encoding.PEM))
+
+        parent = self
+
+        class _Handler(http.server.BaseHTTPRequestHandler):
+            protocol_version = "HTTP/1.1"
+
+            def log_message(self, fmt: str, *args) -> None:
+                log.debug("CMAFIngestServer: " + fmt, *args)
+
+            def do_PUT(self) -> None:
+                length = int(self.headers.get("Content-Length", "0"))
+                body = self.rfile.read(length) if length > 0 else b""
+                parent._record_upload(self.path, body)
+                self.send_response(201)
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+
+        self._httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
+        ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ssl_ctx.load_cert_chain(certfile=server_cert_path, keyfile=server_key_path)
+        ssl_ctx.load_verify_locations(cafile=device_ca_path)
+        ssl_ctx.verify_mode = ssl.CERT_OPTIONAL
+        self._httpd.socket = ssl_ctx.wrap_socket(self._httpd.socket, server_side=True)
+        self.port: int = self._httpd.server_address[1]
+        self._thread = threading.Thread(target=self._httpd.serve_forever, daemon=True)
+        self._thread.start()
+
+    @staticmethod
+    def _make_root_ca(common_name: str):
+        key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        now = datetime.datetime.now(datetime.UTC)
+        subject = x509.Name(
+            [
+                x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CSA"),
+                x509.NameAttribute(NameOID.COMMON_NAME, common_name),
+            ]
+        )
+        cert = (
+            x509.CertificateBuilder()
+            .subject_name(subject)
+            .issuer_name(subject)
+            .public_key(key.public_key())
+            .serial_number(x509.random_serial_number())
+            .not_valid_before(now - datetime.timedelta(minutes=5))
+            .not_valid_after(now + datetime.timedelta(days=365))
+            .add_extension(x509.BasicConstraints(ca=True, path_length=0), critical=True)
+            .add_extension(
+                x509.KeyUsage(
+                    digital_signature=True,
+                    content_commitment=False,
+                    key_encipherment=False,
+                    data_encipherment=False,
+                    key_agreement=False,
+                    key_cert_sign=True,
+                    crl_sign=True,
+                    encipher_only=False,
+                    decipher_only=False,
+                ),
+                critical=True,
+            )
+            .add_extension(x509.SubjectKeyIdentifier.from_public_key(key.public_key()), critical=False)
+            .sign(key, hashes.SHA256())
+        )
+        return key, cert
+
+    def _make_server_cert(self):
+        key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        now = datetime.datetime.now(datetime.UTC)
+        subject = x509.Name(
+            [
+                x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CSA"),
+                x509.NameAttribute(NameOID.COMMON_NAME, "127.0.0.1"),
+            ]
+        )
+        ski = self._server_ca_cert.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value
+        cert = (
+            x509.CertificateBuilder()
+            .subject_name(subject)
+            .issuer_name(self._server_ca_cert.subject)
+            .public_key(key.public_key())
+            .serial_number(x509.random_serial_number())
+            .not_valid_before(now - datetime.timedelta(minutes=5))
+            .not_valid_after(now + datetime.timedelta(days=1))
+            .add_extension(x509.BasicConstraints(ca=False, path_length=None), critical=False)
+            .add_extension(
+                x509.KeyUsage(
+                    digital_signature=True,
+                    content_commitment=False,
+                    key_encipherment=True,
+                    data_encipherment=False,
+                    key_agreement=False,
+                    key_cert_sign=False,
+                    crl_sign=False,
+                    encipher_only=False,
+                    decipher_only=False,
+                ),
+                critical=True,
+            )
+            .add_extension(x509.ExtendedKeyUsage([ExtendedKeyUsageOID.SERVER_AUTH]), critical=False)
+            .add_extension(x509.SubjectKeyIdentifier.from_public_key(key.public_key()), critical=False)
+            .add_extension(x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(ski), critical=False)
+            .add_extension(
+                x509.SubjectAlternativeName(
+                    [x509.DNSName("localhost"), x509.IPAddress(ipaddress.ip_address("127.0.0.1"))]
+                ),
+                critical=False,
+            )
+            .sign(self._server_ca_key, hashes.SHA256())
+        )
+        return key, cert
+
+    def get_server_root_der(self) -> bytes:
+        return self._server_ca_cert.public_bytes(serialization.Encoding.DER)
+
+    def sign_device_csr(self, csr_der: bytes) -> bytes:
+        csr = x509.load_der_x509_csr(csr_der)
+        now = datetime.datetime.now(datetime.UTC)
+        subject = x509.Name(
+            [
+                x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CSA"),
+                x509.NameAttribute(NameOID.COMMON_NAME, "DUT"),
+            ]
+        )
+        ski = self._device_ca_cert.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value
+        cert = (
+            x509.CertificateBuilder()
+            .subject_name(subject)
+            .issuer_name(self._device_ca_cert.subject)
+            .public_key(csr.public_key())
+            .serial_number(x509.random_serial_number())
+            .not_valid_before(now - datetime.timedelta(minutes=5))
+            .not_valid_after(now + datetime.timedelta(days=1))
+            .add_extension(x509.BasicConstraints(ca=False, path_length=None), critical=False)
+            .add_extension(
+                x509.KeyUsage(
+                    digital_signature=True,
+                    content_commitment=False,
+                    key_encipherment=True,
+                    data_encipherment=False,
+                    key_agreement=False,
+                    key_cert_sign=False,
+                    crl_sign=False,
+                    encipher_only=False,
+                    decipher_only=False,
+                ),
+                critical=True,
+            )
+            .add_extension(x509.ExtendedKeyUsage([ExtendedKeyUsageOID.CLIENT_AUTH]), critical=False)
+            .add_extension(x509.SubjectKeyIdentifier.from_public_key(csr.public_key()), critical=False)
+            .add_extension(x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(ski), critical=False)
+            .sign(self._device_ca_key, hashes.SHA256())
+        )
+        return cert.public_bytes(serialization.Encoding.DER)
+
+    def _record_upload(self, path: str, body: bytes) -> None:
+        if not body:
+            return
+        with self._lock:
+            if path.endswith(".init") or path.endswith(".mp4"):
+                self._init_bytes = body
+            elif path.endswith(".m4s"):
+                self._m4s_segments.append(body)
+
+    def reset_segments(self) -> None:
+        with self._lock:
+            self._init_bytes = None
+            self._m4s_segments.clear()
+
+    def get_first_cmaf_segment(self) -> bytes | None:
+        with self._lock:
+            if self._init_bytes is None or not self._m4s_segments:
+                return None
+            return self._init_bytes + self._m4s_segments[0]
+
+    def close(self) -> None:
+        with contextlib.suppress(Exception):
+            self._httpd.shutdown()
+            self._httpd.server_close()
+            self._thread.join(timeout=2.0)
+        with contextlib.suppress(Exception):
+            self._tmpdir.cleanup()
+
+
+def _decode_cmaf_h264_to_rgb(cmaf_bytes: bytes, expected_width: int, expected_height: int) -> _RGBFrame:
+    """Decode the last H.264 frame of a CMAF (init + m4s) segment into raw RGB24 bytes."""
+    frame_len = expected_width * expected_height * 3
+
+    with tempfile.NamedTemporaryFile(suffix=".mp4") as tmp_mp4:
+        tmp_mp4.write(cmaf_bytes)
+        tmp_mp4.flush()
+
+        with contextlib.suppress(FileNotFoundError, subprocess.CalledProcessError):
+            proc = subprocess.run(
+                [
+                    "ffmpeg",
+                    "-v",
+                    "error",
+                    "-i",
+                    tmp_mp4.name,
+                    "-f",
+                    "rawvideo",
+                    "-pix_fmt",
+                    "rgb24",
+                    "pipe:1",
+                ],
+                capture_output=True,
+                check=True,
+            )
+            if len(proc.stdout) >= frame_len and len(proc.stdout) % frame_len == 0:
+                return _RGBFrame(data=proc.stdout[-frame_len:], width=expected_width, height=expected_height)
+
+        proc = subprocess.run(
+            [
+                "gst-launch-1.0",
+                "-q",
+                "filesrc",
+                f"location={tmp_mp4.name}",
+                "!",
+                "decodebin",
+                "!",
+                "videoconvert",
+                "!",
+                f"video/x-raw,format=RGB,width={expected_width},height={expected_height}",
+                "!",
+                "fdsink",
+            ],
+            capture_output=True,
+            check=True,
+        )
+        asserts.assert_greater_equal(len(proc.stdout), frame_len, "Decoded H.264 RGB24 output shorter than one frame")
+        asserts.assert_equal(len(proc.stdout) % frame_len, 0, "Decoded H.264 RGB24 byte length is not a whole number of frames")
+        return _RGBFrame(data=proc.stdout[-frame_len:], width=expected_width, height=expected_height)
 
 
 def _decode_jpeg_to_rgb(jpeg_bytes: bytes, expected_width: int, expected_height: int) -> _RGBFrame:
@@ -163,13 +443,13 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
             ),
             TestStep(
                 "6",
-                "Create a second concave L-shaped Privacy Zone over Region A, capture a snapshot, and inspect decoded pixels.",
-                "Both L-shape arms in Region A and Region B are black (R, G, B <= 8), while the concave cutout in Region A and control Region C remain non-black.",
+                "Create a second concave L-shaped Privacy Zone over Region A, capture a snapshot (and a live H.264 video segment if PushAV is supported), and inspect decoded pixels.",
+                "Both L-shape arms in Region A and Region B are black, while the concave cutout in Region A and control Region C remain non-black in both snapshot and H.264 video frames.",
             ),
             TestStep(
                 "7",
-                "Remove all Privacy Zones via RemoveZone, capture a snapshot, and verify unmasked restoration.",
-                "Pixels in Regions A, B, and C are restored to non-black.",
+                "Remove all Privacy Zones via RemoveZone, capture a snapshot (and a live H.264 video segment if PushAV is supported), and verify unmasked restoration.",
+                "Pixels in Regions A, B, and C are restored to non-black in both snapshot and H.264 video frames.",
             ),
         ]
 
@@ -251,6 +531,96 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
         asserts.assert_equal(response.resolution.width, resolution.width, "Snapshot width mismatch")
         asserts.assert_equal(response.resolution.height, resolution.height, "Snapshot height mismatch")
         return _decode_jpeg_to_rgb(response.data, resolution.width, resolution.height)
+
+    async def _capture_and_decode_pushav_video_rgb(
+        self,
+        endpoint: int,
+        stream_usage,
+        video_stream_id: int,
+        tls_endpoint_id: int,
+        cmaf_server: _LocalCMAFIngestServer,
+        vid_w: int,
+        vid_h: int,
+    ) -> _RGBFrame:
+        pavst_cluster = Clusters.PushAvStreamTransport
+        # Allow x264enc's lookahead (~40 frames at 30 fps) plus PreRollBuffer's 1s minKeyframeIntervalMs window to advance
+        # past the privacy zone update before registering a fresh PushAV transport sink.
+        await asyncio.sleep(2.6)
+        cmaf_server.reset_segments()
+
+        alloc_push_resp = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=pavst_cluster.Commands.AllocatePushTransport(
+                transportOptions={
+                    "streamUsage": stream_usage,
+                    "videoStreamID": video_stream_id,
+                    "TLSEndpointID": tls_endpoint_id,
+                    "url": f"https://127.0.0.1:{cmaf_server.port}/streams/1/",
+                    "triggerOptions": {
+                        "triggerType": pavst_cluster.Enums.TransportTriggerTypeEnum.kCommand,
+                        "maxPreRollLen": 0,
+                    },
+                    "ingestMethod": pavst_cluster.Enums.IngestMethodsEnum.kCMAFIngest,
+                    "containerOptions": {
+                        "containerType": pavst_cluster.Enums.ContainerFormatEnum.kCmaf,
+                        "CMAFContainerOptions": {
+                            "CMAFInterface": pavst_cluster.Enums.CMAFInterfaceEnum.kInterface1,
+                            "chunkDuration": 500,
+                            "segmentDuration": 1000,
+                            "sessionGroup": 1,
+                            "trackName": "media",
+                        },
+                    },
+                    "expiryTime": 150,
+                }
+            ),
+        )
+        connection_id = alloc_push_resp.transportConfiguration.connectionID
+
+        try:
+            await self.send_single_cmd(
+                endpoint=endpoint,
+                cmd=pavst_cluster.Commands.SetTransportStatus(
+                    connectionID=connection_id,
+                    transportStatus=pavst_cluster.Enums.TransportStatusEnum.kActive,
+                ),
+            )
+            await self.send_single_cmd(
+                endpoint=endpoint,
+                cmd=pavst_cluster.Commands.ManuallyTriggerTransport(
+                    connectionID=connection_id,
+                    activationReason=pavst_cluster.Enums.TriggerActivationReasonEnum.kUserInitiated,
+                    timeControl={
+                        "initialDuration": 2,
+                        "augmentationDuration": 1,
+                        "maxDuration": 5,
+                        "blindDuration": 0,
+                    },
+                ),
+            )
+            deadline = time.monotonic() + 10.0
+            cmaf_bytes = None
+            while time.monotonic() < deadline:
+                cmaf_bytes = cmaf_server.get_first_cmaf_segment()
+                if cmaf_bytes is not None:
+                    break
+                await asyncio.sleep(0.1)
+            asserts.assert_is_not_none(cmaf_bytes, "Timed out waiting for CMAF H.264 video upload from PushAVStreamTransport")
+            return _decode_cmaf_h264_to_rgb(cmaf_bytes, vid_w, vid_h)
+        finally:
+            with contextlib.suppress(InteractionModelError):
+                await self.send_single_cmd(
+                    endpoint=endpoint,
+                    cmd=pavst_cluster.Commands.SetTransportStatus(
+                        connectionID=connection_id,
+                        transportStatus=pavst_cluster.Enums.TransportStatusEnum.kInactive,
+                    ),
+                )
+            with contextlib.suppress(InteractionModelError):
+                await self.send_single_cmd(
+                    endpoint=endpoint,
+                    cmd=pavst_cluster.Commands.DeallocatePushTransport(connectionID=connection_id),
+                )
 
     @run_if_endpoint_matches(
         lambda wildcard, endpoint: has_cluster(Clusters.ZoneManagement)(wildcard, endpoint)
@@ -351,51 +721,6 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
         snap_h = selected_cap.resolution.height
         log.info("Allocated snapshot stream ID %d at resolution %dx%d", stream_id, snap_w, snap_h)
 
-        video_stream_id = None
-        if video_supported:
-            stream_usages = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.StreamUsagePriorities
-            )
-            rate_distortion_points = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.RateDistortionTradeOffPoints
-            )
-            min_viewport_res = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.MinViewportResolution
-            )
-            sensor_params = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.VideoSensorParams
-            )
-            asserts.assert_greater(len(stream_usages), 0, "StreamUsagePriorities must not be empty when Video is supported")
-            asserts.assert_greater(
-                len(rate_distortion_points), 0, "RateDistortionTradeOffPoints must not be empty when Video is supported"
-            )
-            video_alloc_args = {
-                "streamUsage": stream_usages[0],
-                "videoCodec": rate_distortion_points[0].codec,
-                "minFrameRate": min(30, sensor_params.maxFPS),
-                "maxFrameRate": sensor_params.maxFPS,
-                "minResolution": min_viewport_res,
-                "maxResolution": avsm_cluster.Structs.VideoResolutionStruct(
-                    width=sensor_params.sensorWidth,
-                    height=sensor_params.sensorHeight,
-                ),
-                "minBitRate": rate_distortion_points[0].minBitRate,
-                "maxBitRate": rate_distortion_points[0].minBitRate,
-                "keyFrameInterval": 4000,
-            }
-            if watermark_supported:
-                video_alloc_args["watermarkEnabled"] = False
-            if osd_supported:
-                video_alloc_args["OSDEnabled"] = False
-            video_resp = await self.send_single_cmd(
-                endpoint=endpoint, cmd=avsm_commands.VideoStreamAllocate(**video_alloc_args)
-            )
-            video_stream_id = video_resp.videoStreamID
-            asserts.assert_is_not_none(video_stream_id, "Failed to allocate video stream")
-            log.info("Allocated video stream ID %d to exercise live video encoder privacy mask probe", video_stream_id)
-        else:
-            log.info("DUT does not support Video (VDO) feature; skipping video stream allocation")
-
         # Define test regions in pixel coordinates (for 640x480 or scaled proportionally for other resolutions)
         # Region A: top-left quadrant [80..260, 80..260] (for 640x480)
         # Region B: bottom-right quadrant [360..540, 200..380] (for 640x480)
@@ -408,9 +733,121 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
         cx1, cy1 = int(round(540 * snap_w / 640)), int(round(140 * snap_h / 480))
         inset = max(8, int(round(12 * snap_w / 640)))
 
+        video_stream_id = None
+        selected_video_usage = None
+        vid_w = snap_w
+        vid_h = snap_h
+        cmaf_server = None
+        tls_utils = None
+        tls_caid = None
+        tls_ccdid = None
+        tls_endpoint_id = None
         created_zone_ids = []
 
         try:
+            if video_supported:
+                stream_usages = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.StreamUsagePriorities
+                )
+                rate_distortion_points = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.RateDistortionTradeOffPoints
+                )
+                min_viewport_res = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.MinViewportResolution
+                )
+                sensor_params = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.VideoSensorParams
+                )
+                asserts.assert_greater(len(stream_usages), 0, "StreamUsagePriorities must not be empty when Video is supported")
+                asserts.assert_greater(
+                    len(rate_distortion_points), 0, "RateDistortionTradeOffPoints must not be empty when Video is supported"
+                )
+                selected_video_usage = stream_usages[0]
+                target_video_min_res = (
+                    selected_cap.resolution
+                    if (
+                        min_viewport_res.width <= snap_w <= sensor_params.sensorWidth
+                        and min_viewport_res.height <= snap_h <= sensor_params.sensorHeight
+                    )
+                    else min_viewport_res
+                )
+                video_alloc_args = {
+                    "streamUsage": selected_video_usage,
+                    "videoCodec": rate_distortion_points[0].codec,
+                    "minFrameRate": min(30, sensor_params.maxFPS),
+                    "maxFrameRate": sensor_params.maxFPS,
+                    "minResolution": target_video_min_res,
+                    "maxResolution": avsm_cluster.Structs.VideoResolutionStruct(
+                        width=sensor_params.sensorWidth,
+                        height=sensor_params.sensorHeight,
+                    ),
+                    "minBitRate": rate_distortion_points[0].minBitRate,
+                    "maxBitRate": rate_distortion_points[0].minBitRate,
+                    "keyFrameInterval": 1000,
+                }
+                if watermark_supported:
+                    video_alloc_args["watermarkEnabled"] = False
+                if osd_supported:
+                    video_alloc_args["OSDEnabled"] = False
+                video_resp = await self.send_single_cmd(
+                    endpoint=endpoint, cmd=avsm_commands.VideoStreamAllocate(**video_alloc_args)
+                )
+                video_stream_id = video_resp.videoStreamID
+                asserts.assert_is_not_none(video_stream_id, "Failed to allocate video stream")
+                allocated_video_streams = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.AllocatedVideoStreams
+                )
+                allocated_video = next((s for s in allocated_video_streams if s.videoStreamID == video_stream_id), None)
+                asserts.assert_is_not_none(allocated_video, f"Video stream {video_stream_id} missing from AllocatedVideoStreams")
+                vid_w = allocated_video.minResolution.width
+                vid_h = allocated_video.minResolution.height
+                log.info("Allocated video stream ID %d at resolution %dx%d", video_stream_id, vid_w, vid_h)
+
+                ep_servers = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.ServerList
+                )
+                ep0_servers = await self.read_single_attribute_check_success(
+                    endpoint=0, cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.ServerList
+                )
+                pavst_supported = (
+                    Clusters.PushAvStreamTransport.id in ep_servers
+                    and Clusters.TlsCertificateManagement.id in ep0_servers
+                    and Clusters.TlsClientManagement.id in ep0_servers
+                )
+                if pavst_supported:
+                    pavst_cluster = Clusters.PushAvStreamTransport
+                    existing_conns = await self.read_single_attribute_check_success(
+                        endpoint=endpoint, cluster=pavst_cluster, attribute=pavst_cluster.Attributes.CurrentConnections
+                    )
+                    for conn in existing_conns:
+                        with contextlib.suppress(InteractionModelError):
+                            await self.send_single_cmd(
+                                endpoint=endpoint,
+                                cmd=pavst_cluster.Commands.DeallocatePushTransport(connectionID=conn.connectionID),
+                            )
+
+                    cmaf_server = _LocalCMAFIngestServer()
+                    tls_utils = TLSUtils(self, endpoint=0)
+                    prc_res = await tls_utils.send_provision_root_command(certificate=cmaf_server.get_server_root_der())
+                    tls_caid = prc_res.caid
+                    csr_res = await tls_utils.send_csr_command(nonce=random.randbytes(32))
+                    tls_ccdid = csr_res.ccdid
+                    await tls_utils.send_provision_client_command(
+                        certificate=cmaf_server.sign_device_csr(csr_res.csr), ccdid=tls_ccdid
+                    )
+                    tls_ep_res = await tls_utils.send_provision_tls_endpoint_command(
+                        hostname=b"127.0.0.1",
+                        port=cmaf_server.port,
+                        caid=tls_caid,
+                        ccdid=tls_ccdid,
+                    )
+                    tls_endpoint_id = tls_ep_res.endpointID
+                    log.info("Provisioned PushAV TLS endpoint ID=%d on https://127.0.0.1:%d/", tls_endpoint_id, cmaf_server.port)
+                else:
+                    log.info("DUT does not expose PushAVStreamTransport + TLS clusters; skipping CMAF video decode check")
+            else:
+                log.info("DUT does not support Video (VDO) feature; skipping video stream allocation")
+
             self.step("2")
             baseline_rgb = await self._capture_and_decode_rgb(endpoint, stream_id, selected_cap.resolution)
             self._assert_region_is_non_black(baseline_rgb, ax0 + inset, ay0 + inset, ax1 - inset, ay1 - inset, "Baseline Region A")
@@ -687,6 +1124,41 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                     f"Expected active video stream {video_stream_id} in AllocatedVideoStreams while privacy zones are active",
                 )
 
+            if tls_endpoint_id is not None and cmaf_server is not None and video_stream_id is not None:
+                vax0, vay0 = int(round(80 * vid_w / 640)), int(round(80 * vid_h / 480))
+                vax1, vay1 = int(round(260 * vid_w / 640)), int(round(260 * vid_h / 480))
+                vbx0, vby0 = int(round(360 * vid_w / 640)), int(round(200 * vid_h / 480))
+                vbx1, vby1 = int(round(540 * vid_w / 640)), int(round(380 * vid_h / 480))
+                vcx0, vcy0 = int(round(360 * vid_w / 640)), int(round(40 * vid_h / 480))
+                vcx1, vcy1 = int(round(540 * vid_w / 640)), int(round(140 * vid_h / 480))
+                vamid_x = (vax0 + vax1) // 2
+                vamid_y = (vay0 + vay1) // 2
+                vinset = max(8, int(round(12 * vid_w / 640)))
+
+                video_multi_rgb = await self._capture_and_decode_pushav_video_rgb(
+                    endpoint, selected_video_usage, video_stream_id, tls_endpoint_id, cmaf_server, vid_w, vid_h
+                )
+                self._assert_region_is_black(
+                    video_multi_rgb, vax0 + vinset, vay0 + vinset, vamid_x - vinset, vay1 - vinset, "H.264 Video L-shape Vertical Arm"
+                )
+                self._assert_region_is_black(
+                    video_multi_rgb,
+                    vax0 + vinset,
+                    vay0 + vinset,
+                    vax1 - vinset,
+                    vamid_y - vinset,
+                    "H.264 Video L-shape Horizontal Arm",
+                )
+                self._assert_region_is_non_black(
+                    video_multi_rgb, vamid_x + vinset, vamid_y + vinset, vax1 - vinset, vay1 - vinset, "H.264 Video L-shape Cutout"
+                )
+                self._assert_region_is_black(
+                    video_multi_rgb, vbx0 + vinset, vby0 + vinset, vbx1 - vinset, vby1 - vinset, "H.264 Video Masked Region B"
+                )
+                self._assert_region_is_non_black(
+                    video_multi_rgb, vcx0 + vinset, vcy0 + vinset, vcx1 - vinset, vcy1 - vinset, "H.264 Video Control Region C"
+                )
+
             self.step("7")
             for zid in list(created_zone_ids):
                 await self.send_single_cmd(endpoint=endpoint, cmd=zm_commands.RemoveZone(zoneID=zid))
@@ -702,10 +1174,59 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
             self._assert_region_is_non_black(
                 restored_rgb, cx0 + inset, cy0 + inset, cx1 - inset, cy1 - inset, "Control Region C after RemoveZone"
             )
+
+            if tls_endpoint_id is not None and cmaf_server is not None and video_stream_id is not None:
+                vax0, vay0 = int(round(80 * vid_w / 640)), int(round(80 * vid_h / 480))
+                vax1, vay1 = int(round(260 * vid_w / 640)), int(round(260 * vid_h / 480))
+                vbx0, vby0 = int(round(360 * vid_w / 640)), int(round(200 * vid_h / 480))
+                vbx1, vby1 = int(round(540 * vid_w / 640)), int(round(380 * vid_h / 480))
+                vcx0, vcy0 = int(round(360 * vid_w / 640)), int(round(40 * vid_h / 480))
+                vcx1, vcy1 = int(round(540 * vid_w / 640)), int(round(140 * vid_h / 480))
+                vinset = max(8, int(round(12 * vid_w / 640)))
+
+                video_restored_rgb = await self._capture_and_decode_pushav_video_rgb(
+                    endpoint, selected_video_usage, video_stream_id, tls_endpoint_id, cmaf_server, vid_w, vid_h
+                )
+                self._assert_region_is_non_black(
+                    video_restored_rgb,
+                    vax0 + vinset,
+                    vay0 + vinset,
+                    vax1 - vinset,
+                    vay1 - vinset,
+                    "H.264 Video Restored Region A after RemoveZone",
+                )
+                self._assert_region_is_non_black(
+                    video_restored_rgb,
+                    vbx0 + vinset,
+                    vby0 + vinset,
+                    vbx1 - vinset,
+                    vby1 - vinset,
+                    "H.264 Video Restored Region B after RemoveZone",
+                )
+                self._assert_region_is_non_black(
+                    video_restored_rgb,
+                    vcx0 + vinset,
+                    vcy0 + vinset,
+                    vcx1 - vinset,
+                    vcy1 - vinset,
+                    "H.264 Video Control Region C after RemoveZone",
+                )
         finally:
             for zid in list(created_zone_ids):
                 with contextlib.suppress(InteractionModelError):
                     await self.send_single_cmd(endpoint=endpoint, cmd=zm_commands.RemoveZone(zoneID=zid))
+            if tls_utils is not None:
+                if tls_endpoint_id is not None:
+                    with contextlib.suppress(Exception):
+                        await tls_utils.send_remove_tls_endpoint_command(endpoint_id=tls_endpoint_id)
+                if tls_ccdid is not None:
+                    with contextlib.suppress(Exception):
+                        await tls_utils.send_remove_client_command(ccdid=tls_ccdid)
+                if tls_caid is not None:
+                    with contextlib.suppress(Exception):
+                        await tls_utils.send_remove_root_command(caid=tls_caid)
+            if cmaf_server is not None:
+                cmaf_server.close()
             if video_stream_id is not None:
                 with contextlib.suppress(InteractionModelError):
                     await self.send_single_cmd(

@@ -355,7 +355,9 @@ public:
 
     CameraError ClearPrivacyZones() override;
 
-    bool ApplyPrivacyMaskToI420Buffer(GstPad * pad, GstBuffer * buffer);
+    bool ApplyPrivacyMaskToI420Buffer(GstPad * pad, GstBuffer * buffer, uint64_t * outGeneration = nullptr);
+
+    uint64_t GetPrivacyZoneGeneration() const;
 
     bool GetCameraSupportsPerZoneDetect() override { return true; }
     bool IsValidAnalysisZone(uint16_t zoneId) override;
@@ -464,8 +466,9 @@ private:
     // Audio playback pipeline specific members
     GstElement * mAudioPlaybackPipeline = nullptr;
 
-    std::mutex mPrivacyZonesMutex;
+    mutable std::mutex mPrivacyZonesMutex;
     std::map<uint16_t, chip::app::Clusters::ZoneManagement::TwoDCartesianZoneStorage> mPrivacyZones;
+    uint64_t mPrivacyZoneGeneration = 0;
 };
 
 } // namespace Camera

@@ -249,6 +249,38 @@ TEST_F(TestZonePolygon, TestPrivacyMaskingI420NonAxisAlignedAndDownscaled)
         }
     }
 
+    // Chroma samples whose 2x2 luma block contains a masked pixel are 128; untouched blocks and stride padding keep kInitU/kInitV.
+    constexpr size_t kUVWidth = (kWidth + 1U) / 2U;
+    for (size_t cy = 0; cy < kUVHeight; ++cy)
+    {
+        for (size_t cx = 0; cx < kUVWidth; ++cx)
+        {
+            bool blockMasked = false;
+            for (size_t dy = 0; dy < 2U; ++dy)
+            {
+                for (size_t dx = 0; dx < 2U; ++dx)
+                {
+                    const size_t x = 2U * cx + dx;
+                    const size_t y = 2U * cy + dy;
+                    if (x < kWidth && y < kHeight && yPlane[y * kYStride + x] == 0)
+                    {
+                        blockMasked = true;
+                    }
+                }
+            }
+            EXPECT_EQ(uPlane[cy * kUStride + cx], blockMasked ? 128 : kInitU);
+            EXPECT_EQ(vPlane[cy * kVStride + cx], blockMasked ? 128 : kInitV);
+        }
+        for (size_t padCx = kUVWidth; padCx < kUStride; ++padCx)
+        {
+            EXPECT_EQ(uPlane[cy * kUStride + padCx], kInitU);
+        }
+        for (size_t padCx = kUVWidth; padCx < kVStride; ++padCx)
+        {
+            EXPECT_EQ(vPlane[cy * kVStride + padCx], kInitV);
+        }
+    }
+
     // 2. Conservative downscaled masking (default padPixels = 1):
     //    Thin slanted zone (100,100)-(700,400)-(700,402)-(100,102) on 1920x1080 scaled to 320x180
     //    must mask every column it crosses [17..116] and every downscaled sensor point in the zone.
@@ -283,6 +315,38 @@ TEST_F(TestZonePolygon, TestPrivacyMaskingI420NonAxisAlignedAndDownscaled)
             }
         }
         EXPECT_TRUE(colHasMaskedPixel);
+    }
+
+    // Pixels outside the 1-px dilated bounding box (x in [16..117], y in [16..68]) keep their initial luma.
+    for (uint16_t row = 0; row < kSmallHeight; ++row)
+    {
+        for (uint16_t col = 0; col < kSmallWidth; ++col)
+        {
+            if (col < 16U || col >= 118U || row < 16U || row >= 69U)
+            {
+                EXPECT_EQ(smallY[static_cast<size_t>(row) * kSmallWidth + col], kInitLuma);
+            }
+        }
+    }
+
+    for (size_t cy = 0; cy < kSmallHeight / 2U; ++cy)
+    {
+        for (size_t cx = 0; cx < kSmallWidth / 2U; ++cx)
+        {
+            bool blockMasked = false;
+            for (size_t dy = 0; dy < 2U; ++dy)
+            {
+                for (size_t dx = 0; dx < 2U; ++dx)
+                {
+                    if (smallY[(2U * cy + dy) * kSmallWidth + (2U * cx + dx)] == 0)
+                    {
+                        blockMasked = true;
+                    }
+                }
+            }
+            EXPECT_EQ(smallU[cy * (kSmallWidth / 2U) + cx], blockMasked ? 128 : kInitU);
+            EXPECT_EQ(smallV[cy * (kSmallWidth / 2U) + cx], blockMasked ? 128 : kInitV);
+        }
     }
 
     for (uint16_t sx = 100; sx <= 700; ++sx)

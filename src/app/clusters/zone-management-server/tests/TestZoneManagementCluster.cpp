@@ -742,7 +742,8 @@ TEST_F(TestZoneManagementCluster, UpdateZoneToFocusWithoutFocusZonesFeatureRejec
     ASSERT_EQ(clusterWithoutFocus.GetZones().front().twoDCartZoneStorage.Value().use, ZoneUseEnum::kMotion);
     clusterWithoutFocus.Shutdown(ClusterShutdownType::kClusterShutdown);
 
-    // With Feature::kFocusZones enabled, updating a non-triggered zone to kFocus succeeds
+    // With Feature::kFocusZones enabled, updating a triggered Motion zone to kFocus is rejected with InvalidInState,
+    // and succeeds once the trigger is removed.
     mDelegate = MockDelegate();
     auto clusterWithFocus =
         CreateCluster(BitFlags<Feature>(Feature::kUserDefined, Feature::kTwoDimensionalCartesianZone, Feature::kFocusZones));
@@ -750,6 +751,25 @@ TEST_F(TestZoneManagementCluster, UpdateZoneToFocusWithoutFocusZonesFeatureRejec
     ASSERT_EQ(clusterWithFocus.Startup(testerWithFocus.GetServerClusterContext()), CHIP_NO_ERROR);
 
     ASSERT_TRUE(testerWithFocus.Invoke(MakeCreateZoneRequest("Motion Zone", createVertices)).IsSuccess());
+
+    Commands::CreateOrUpdateTrigger::Type triggerReq;
+    triggerReq.trigger.zoneID               = zoneId;
+    triggerReq.trigger.initialDuration      = 5;
+    triggerReq.trigger.augmentationDuration = 2;
+    triggerReq.trigger.maxDuration          = 10;
+    triggerReq.trigger.blindDuration        = 1;
+    triggerReq.trigger.sensitivity          = NullOptional;
+    ASSERT_TRUE(testerWithFocus.Invoke(triggerReq).IsSuccess());
+
+    auto triggeredFocusUpdateResult = testerWithFocus.Invoke(updateToFocusReq);
+    ASSERT_EQ(triggeredFocusUpdateResult.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidInState));
+    ASSERT_EQ(clusterWithFocus.GetZones().front().twoDCartZoneStorage.Value().use, ZoneUseEnum::kMotion);
+
+    Commands::RemoveTrigger::Type removeTriggerReq;
+    removeTriggerReq.zoneID = zoneId;
+    ASSERT_TRUE(testerWithFocus.Invoke(removeTriggerReq).IsSuccess());
+
     ASSERT_TRUE(testerWithFocus.Invoke(updateToFocusReq).IsSuccess());
     ASSERT_EQ(clusterWithFocus.GetZones().front().twoDCartZoneStorage.Value().use, ZoneUseEnum::kFocus);
 }
