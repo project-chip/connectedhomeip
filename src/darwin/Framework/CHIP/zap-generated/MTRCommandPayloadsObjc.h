@@ -20,6 +20,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MTRUserInvokeToken;
+
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRIdentifyClusterIdentifyParams : NSObject <NSCopying>
 
@@ -48,6 +50,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -80,6 +94,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -112,6 +138,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 @interface MTRGroupsClusterAddGroupParams (Deprecated)
@@ -188,6 +226,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 @interface MTRGroupsClusterViewGroupParams (Deprecated)
@@ -266,6 +316,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -332,6 +394,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 @interface MTRGroupsClusterRemoveGroupParams (Deprecated)
@@ -406,6 +480,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -438,6 +524,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 @interface MTRGroupsClusterAddGroupIfIdentifyingParams (Deprecated)
@@ -471,6 +569,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -499,6 +609,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -527,6 +649,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -559,6 +693,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 @interface MTROnOffClusterOffWithEffectParams (Deprecated)
@@ -592,6 +738,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -626,6 +784,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -662,6 +832,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -698,6 +880,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -736,6 +930,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -768,6 +974,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -804,6 +1022,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -840,6 +1070,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -878,6 +1120,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -910,6 +1164,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -940,6 +1206,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -970,6 +1248,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -1021,6 +1311,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1055,6 +1357,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1087,6 +1401,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1121,6 +1447,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1153,6 +1491,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1185,6 +1535,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1219,6 +1581,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1251,6 +1625,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1283,6 +1669,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1317,6 +1715,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1349,6 +1759,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1383,6 +1805,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("This command has been removed", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -1411,6 +1845,18 @@ MTR_DEPRECATED("This command has been removed", ios(16.1, 16.4), macos(13.0, 13.
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -1455,6 +1901,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -1495,6 +1953,18 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageParams",
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 @interface MTROTASoftwareUpdateProviderClusterQueryImageParams (Deprecated)
@@ -1617,6 +2087,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -1649,6 +2131,18 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateRequest
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -1740,6 +2234,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -1772,6 +2278,18 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterNotifyUpdateApplie
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -1810,6 +2328,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -1844,6 +2374,18 @@ MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOTAProvid
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 @interface MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams (Deprecated)
@@ -1883,6 +2425,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1953,6 +2507,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2017,6 +2583,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2085,6 +2663,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2136,6 +2726,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2216,6 +2818,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2248,6 +2862,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2280,6 +2906,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2354,6 +2992,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2426,6 +3076,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2458,6 +3120,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2513,6 +3187,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2592,6 +3278,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -2620,6 +3318,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -2675,6 +3385,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -2722,6 +3444,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2750,6 +3484,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2778,6 +3524,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2806,6 +3564,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2))
@@ -2840,6 +3610,18 @@ MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2874,6 +3656,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -2904,6 +3698,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -2934,6 +3740,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -2983,6 +3801,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -3013,6 +3843,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -3045,6 +3887,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3083,6 +3937,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 @interface MTRAdministratorCommissioningClusterOpenCommissioningWindowParams (Deprecated)
@@ -3118,6 +3984,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3146,6 +4024,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3176,6 +4066,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3253,6 +4155,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3323,6 +4237,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3397,6 +4323,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3429,6 +4367,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3497,6 +4447,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3527,6 +4489,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3557,6 +4531,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 @interface MTROperationalCredentialsClusterAddTrustedRootCertificateParams (Deprecated)
@@ -3596,6 +4582,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -3628,6 +4626,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -3681,6 +4691,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3711,6 +4733,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3775,6 +4809,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3803,6 +4849,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -3875,6 +4933,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -3926,6 +4996,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -3956,6 +5038,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4003,6 +5097,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4031,6 +5137,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4080,6 +5198,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4131,6 +5261,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4161,6 +5303,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4191,6 +5345,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4242,6 +5408,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4272,6 +5450,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4323,6 +5513,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
@@ -4353,6 +5555,18 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
@@ -4404,6 +5618,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
@@ -4434,6 +5660,18 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
@@ -4485,6 +5723,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4517,6 +5767,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4547,6 +5809,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4598,6 +5872,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
@@ -4626,6 +5912,18 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4656,6 +5954,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4686,6 +5996,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4724,6 +6046,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -4754,6 +6088,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
@@ -4782,6 +6128,18 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
@@ -4810,6 +6168,18 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
@@ -4838,6 +6208,18 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
@@ -4866,6 +6248,18 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
@@ -4913,6 +6307,18 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
@@ -4941,6 +6347,18 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
@@ -4988,6 +6406,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5026,6 +6456,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5081,6 +6523,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5142,6 +6596,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5195,6 +6661,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5248,6 +6726,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5305,6 +6795,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5335,6 +6837,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5398,6 +6912,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5451,6 +6977,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5502,6 +7040,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5544,6 +7094,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5576,6 +7138,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5631,6 +7205,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5663,6 +7249,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5695,6 +7293,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
@@ -5723,6 +7333,18 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
@@ -5751,6 +7373,18 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5779,6 +7413,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
@@ -5809,6 +7455,18 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
@@ -5839,6 +7497,18 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
@@ -5871,6 +7541,18 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
@@ -5899,6 +7581,18 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -5929,6 +7623,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -5957,6 +7663,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5987,6 +7705,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -6036,6 +7766,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -6101,6 +7843,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6131,6 +7885,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6165,6 +7931,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6193,6 +7971,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6225,6 +8015,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6257,6 +8059,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6285,6 +8099,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6319,6 +8145,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6351,6 +8189,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6379,6 +8229,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -6415,6 +8277,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -6443,6 +8317,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6490,6 +8376,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6524,6 +8422,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -6556,6 +8466,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6584,6 +8506,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6614,6 +8548,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6642,6 +8588,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6670,6 +8628,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6700,6 +8670,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6751,6 +8733,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6781,6 +8775,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6832,6 +8838,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6862,6 +8880,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -6913,6 +8943,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -6943,6 +8985,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -6973,6 +9027,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -7021,6 +9087,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -7051,6 +9129,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7081,6 +9171,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7111,6 +9213,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7143,6 +9257,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7185,6 +9311,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7217,6 +9355,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7297,6 +9447,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7333,6 +9495,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7365,6 +9539,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7439,6 +9625,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7475,6 +9673,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7505,6 +9715,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7577,6 +9799,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7619,6 +9853,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 @interface MTRDoorLockClusterSetUserParams (Deprecated)
@@ -7654,6 +9900,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7741,6 +9999,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7781,6 +10051,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7849,6 +10131,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -7923,6 +10217,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -7953,6 +10259,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -7989,6 +10307,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -8017,6 +10347,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -8045,6 +10387,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -8073,6 +10427,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -8101,6 +10467,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -8131,6 +10509,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -8161,6 +10551,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -8191,6 +10593,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -8221,6 +10635,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -8249,6 +10675,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -8283,6 +10721,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -8311,6 +10761,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -8345,6 +10807,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -8379,6 +10853,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -8413,6 +10899,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -8447,6 +10945,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -8481,6 +10991,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -8511,6 +11033,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -8562,6 +11096,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -8615,6 +11161,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -8691,6 +11249,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -8723,6 +11293,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -8770,6 +11352,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -8800,6 +11394,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -8830,6 +11436,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -8864,6 +11482,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -8894,6 +11524,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -8951,6 +11593,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
@@ -8985,6 +11639,18 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -9025,6 +11691,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9063,6 +11741,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9099,6 +11789,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9137,6 +11839,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9173,6 +11887,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9209,6 +11935,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9247,6 +11985,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9285,6 +12035,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9323,6 +12085,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9359,6 +12133,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9397,6 +12183,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9433,6 +12231,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 @interface MTRColorControlClusterMoveToColorTemperatureParams (Deprecated)
@@ -9476,6 +12286,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9512,6 +12334,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9550,6 +12384,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9588,6 +12434,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9630,6 +12488,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9662,6 +12532,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9702,6 +12584,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -9744,6 +12638,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -9780,6 +12686,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -9808,6 +12726,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -9852,6 +12782,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -9901,6 +12843,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -9931,6 +12885,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -9982,6 +12948,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -10018,6 +12996,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -10067,6 +13057,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -10095,6 +13097,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -10142,6 +13156,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -10189,6 +13215,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -10217,6 +13255,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -10268,6 +13318,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -10298,6 +13360,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -10328,6 +13402,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -10358,6 +13444,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -10388,6 +13486,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -10449,6 +13559,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -10498,6 +13620,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -10530,6 +13664,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -10585,6 +13731,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -10617,6 +13775,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -10651,6 +13821,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -10702,6 +13884,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -10770,6 +13964,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -10800,6 +14006,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -10842,6 +14060,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -10899,6 +14129,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -10935,6 +14177,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -10967,6 +14221,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11031,6 +14297,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11059,6 +14337,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -11087,6 +14377,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRMediaPlaybackClusterStopParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -11115,6 +14417,18 @@ MTR_DEPRECATED("Please use MTRMediaPlaybackClusterStopParams", ios(16.1, 16.4), 
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11143,6 +14457,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11171,6 +14497,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11199,6 +14537,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11229,6 +14579,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11259,6 +14621,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11289,6 +14663,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11319,6 +14705,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11385,6 +14783,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -11417,6 +14827,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -11447,6 +14869,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -11475,6 +14909,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11505,6 +14951,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11533,6 +14991,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11561,6 +15031,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11593,6 +15075,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11621,6 +15115,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11651,6 +15157,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11727,6 +15245,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11773,6 +15303,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -11860,6 +15402,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -11911,6 +15465,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11941,6 +15507,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -11973,6 +15551,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -12005,6 +15595,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -12035,6 +15637,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -12065,6 +15679,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -12131,6 +15757,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -12199,6 +15837,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -12229,6 +15879,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12257,6 +15919,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12316,6 +15990,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12344,6 +16030,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12391,6 +16089,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12419,6 +16129,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12451,6 +16173,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12481,6 +16215,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12509,6 +16255,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12537,6 +16295,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12567,6 +16337,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12597,6 +16379,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12627,6 +16421,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12657,6 +16463,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12687,6 +16505,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12717,6 +16547,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12747,6 +16589,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12777,6 +16631,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -12809,6 +16675,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -12868,6 +16746,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12919,6 +16809,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12953,6 +16855,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -12983,6 +16897,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13042,6 +16968,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13070,6 +17008,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13098,6 +17048,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13126,6 +17088,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13158,6 +17132,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13192,6 +17178,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13224,6 +17222,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13258,6 +17268,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13313,6 +17335,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13343,6 +17377,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13373,6 +17419,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13403,6 +17461,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13443,6 +17513,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13492,6 +17574,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13542,6 +17636,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13595,6 +17701,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13625,6 +17743,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13667,6 +17797,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13720,6 +17862,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13750,6 +17904,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13780,6 +17946,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13812,6 +17990,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13869,6 +18059,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13903,6 +18105,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13933,6 +18147,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13965,6 +18191,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -13995,6 +18233,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14027,6 +18277,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14063,6 +18325,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14111,6 +18385,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14188,6 +18474,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14243,6 +18541,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14275,6 +18585,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14307,6 +18629,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14343,6 +18677,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14375,6 +18721,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14407,6 +18765,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14439,6 +18809,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14469,6 +18851,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14518,6 +18912,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14550,6 +18956,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14582,6 +19000,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14618,6 +19048,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14648,6 +19090,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14701,6 +19155,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14731,6 +19197,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14761,6 +19239,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14791,6 +19281,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14821,6 +19323,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14874,6 +19388,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14904,6 +19430,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14934,6 +19472,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -14964,6 +19514,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15017,6 +19579,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15072,6 +19646,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -15104,6 +19690,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
@@ -15161,6 +19759,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15191,6 +19801,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15221,6 +19843,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15261,6 +19895,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15301,6 +19947,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15331,6 +19989,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15367,6 +20037,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15401,6 +20083,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15431,6 +20125,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15463,6 +20169,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15493,6 +20211,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15525,6 +20255,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15555,6 +20297,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15589,6 +20343,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15623,6 +20389,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15657,6 +20435,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15691,6 +20481,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15725,6 +20527,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15757,6 +20571,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15789,6 +20615,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15817,6 +20655,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15868,6 +20718,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15925,6 +20787,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -15953,6 +20827,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16000,6 +20886,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16030,6 +20928,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16062,6 +20972,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16111,6 +21033,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16160,6 +21094,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16209,6 +21155,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16241,6 +21199,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16298,6 +21268,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16328,6 +21310,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16377,6 +21371,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16426,6 +21432,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16464,6 +21482,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16513,6 +21543,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -16562,6 +21604,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -16590,6 +21644,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -16618,6 +21684,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestParams", ios(16.1, 16.4), ma
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -16701,6 +21779,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNotHandledParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -16729,6 +21819,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNotHandledParams", ios(16.1,
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -16812,6 +21914,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -16840,6 +21954,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificParams", ios(16.1, 1
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -16923,6 +22049,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestUnknownCommandParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -16951,6 +22089,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestUnknownCommandParams", ios(1
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -17058,6 +22208,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -17090,6 +22252,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsParams", ios(16.
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -17175,6 +22349,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -17205,6 +22391,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentRequestParams"
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -17304,6 +22502,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -17344,6 +22554,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentRequestPa
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -17441,6 +22663,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -17471,6 +22705,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArgumentRequestParams"
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -17664,6 +22910,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -17694,6 +22952,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructArgumentRequestP
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -17779,6 +23049,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListStructArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -17809,6 +23091,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListStructArgumentRequestPar
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -17894,6 +23188,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -17924,6 +23230,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UArgumentRequestPara
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -18009,6 +23327,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructListArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -18039,6 +23369,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructListArgumentRequ
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -18124,6 +23466,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -18154,6 +23508,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListNestedStructListArgument
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -18203,6 +23569,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -18233,6 +23611,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseRequestParam
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -18284,6 +23674,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -18316,6 +23718,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsRequestParams", ios(16.
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -18367,6 +23781,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -18397,6 +23823,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalRequestParam
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -18449,6 +23887,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -18501,6 +23951,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalReque
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -18531,6 +23993,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructEchoRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -18561,6 +24035,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructEchoRequestParams", 
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -18589,6 +24075,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTimedInvokeRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -18617,6 +24115,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTimedInvokeRequestParams", ios(1
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -18647,6 +24157,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -18677,6 +24199,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleOptionalArgumentReques
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -18711,6 +24245,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -18745,6 +24291,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventRequestParams",
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -18775,6 +24333,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -18805,6 +24375,18 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventReq
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -18839,6 +24421,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -18873,6 +24467,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -18903,6 +24509,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -18935,6 +24553,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -18963,6 +24593,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -18993,6 +24635,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -19042,6 +24696,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -19093,6 +24759,18 @@ MTR_PROVISIONALLY_AVAILABLE
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 NS_ASSUME_NONNULL_END
