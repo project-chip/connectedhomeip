@@ -18,8 +18,6 @@
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
 
-// Archives as NSKeyedArchiver does, but writes a replacement value for one key, so that key is encoded once,
-// and leaves out one BOOL key, as archives written before that key existed do.
 // Archives like NSKeyedArchiver, but writes replacementValue in place of the object for replacedKey,
 // to simulate an archive that was corrupted after it was written.
 @interface MTRSetupPayloadReplacingArchiver : NSKeyedArchiver
