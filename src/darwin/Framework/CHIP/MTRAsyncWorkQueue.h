@@ -242,9 +242,10 @@ MTR_TESTABLE
 /// Cancels and removes all work items.
 - (void)invalidate;
 
-/// Called by a running work item right before it sends anything.  Marks the item as sent and calls `send`.
+/// Called by a running work item right before it sends anything.  Marks the item as sent and calls `send`, and
+/// returns YES.  Returns NO without calling `send` if the item was cancelled (cancelWorkItemIfUnsent:) first.
 /// Must be called at most once per item.
-- (void)workItem:(MTRAsyncWorkItem<ContextType> *)workItem readyToSend:(dispatch_block_t)send;
+- (BOOL)workItem:(MTRAsyncWorkItem<ContextType> *)workItem readyToSend:(dispatch_block_t)send;
 
 /// Cancels and removes the work item if it has not sent anything yet: it is still queued, or it is running but
 /// has not called workItem:readyToSend:.  Its readyHandler then never runs (or, if running, its completion

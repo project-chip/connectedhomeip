@@ -1820,8 +1820,10 @@ private:
                 invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds, true /*isFirstMessageOnExchange*/));
             }
             // The session is ready and the invoke request goes out now.
-            if (requestWillBeSent) {
-                (void) requestWillBeSent();
+            // A nil requestWillBeSent means send.  NO means the caller cancelled the command before it was sent:
+            // send nothing.  The caller has already been told, and ignores the error this returns.
+            if (requestWillBeSent && !requestWillBeSent()) {
+                return CHIP_ERROR_CANCELLED;
             }
             ReturnErrorOnFailure(commandSender->SendCommandRequest(session, invokeTimeout));
 #ifdef DEBUG
