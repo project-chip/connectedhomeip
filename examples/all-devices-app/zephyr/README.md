@@ -133,8 +133,8 @@ Flash with:
 west flash -d out/esp32-zephyr-c6-all-devices --esp-device /dev/ttyUSB0
 ```
 
-The monitor reads the build configuration from the current directory, so run
-it from inside the build directory:
+The monitor reads the build configuration from the current directory, so run it
+from inside the build directory:
 
 ```shell
 cd out/esp32-zephyr-c6-all-devices
