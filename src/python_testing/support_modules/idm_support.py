@@ -27,7 +27,7 @@ import time
 from dataclasses import dataclass
 from typing import Any, get_args
 
-from mobly import asserts
+from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -1217,7 +1217,7 @@ class IDMBaseTest(BasicCompositionTests):
                 restore_needed = read_back_failed or stored_value != original_value
                 if read_back_failed and isinstance(stored_value.Reason, (InteractionModelError, ChipStackError)):
                     raise stored_value.Reason
-                stored_violation = read_back_failed or stored_value == test_value
+                stored_violation = read_back_failed or (stored_value == test_value and stored_value != original_value)
                 if result_status != Status.Success and stored_violation:
                     self.record_accepted_violation(
                         location=location,
@@ -1263,6 +1263,29 @@ class IDMBaseTest(BasicCompositionTests):
                             restore_failed = True
                             log.warning("Failed to restore %s to %s: %s", attribute_path, original_value,
                                         restore_result[0].Status)
+                        else:
+                            try:
+                                restored_value = await self.read_single_attribute_check_success(
+                                    endpoint=attr_info.endpoint_id,
+                                    cluster=attr_info.cluster_class,
+                                    attribute=attr_info.attribute,
+                                    assert_on_error=False
+                                )
+                            except (ChipStackError, InteractionModelError) as error:
+                                result.execution_error += 1
+                                log.warning("Execution failed verifying restoration of %s: %s", attribute_path, error)
+                                if execution_failure is None:
+                                    execution_failure = error
+                            except signals.TestFailure as error:
+                                result.execution_error += 1
+                                restore_failed = True
+                                log.warning("Failed to verify restoration of %s: %s", attribute_path, error)
+                            else:
+                                if restored_value != original_value:
+                                    result.execution_error += 1
+                                    restore_failed = True
+                                    log.warning("Failed to verify restoration of %s to %s: observed %s",
+                                                attribute_path, original_value, restored_value)
             if execution_failure is not None:
                 raise ConstraintProbeExecutionError(execution_failure, result) from execution_failure
             if restore_failed:

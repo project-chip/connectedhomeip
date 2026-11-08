@@ -468,6 +468,7 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                                      f"NOT DEMONSTRATED: {info.path_str}: {reason}; zero enforcement credit")
 
     async def test_unknown_move_modes_keep_zero_rate_and_strict_wrong_status_failure(self):
+        """Unknown MoveMode requires CONSTRAINT_ERROR; Rate=0's exception applies only to valid Up/Down modes."""
         for command in (Clusters.ColorControl.Commands.MoveHue, Clusters.ColorControl.Commands.MoveSaturation,
                         Clusters.ColorControl.Commands.EnhancedMoveHue, Clusters.ColorControl.Commands.MoveColorTemperature):
             with self.subTest(command=command.__name__):
@@ -485,6 +486,7 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                     self.checker.enforce_constraint_policy('Command field', [], result.rejected, result.probed)
 
     async def test_remaining_unknown_enums_are_qualified_and_wrong_status_fails(self):
+        """Undefined enum probes require CONSTRAINT_ERROR; another IM status is not enforcement evidence."""
         for cluster, command, target in (
                 (Clusters.Thermostat, Clusters.Thermostat.Commands.SetpointRaiseLower, 0),
                 (Clusters.ColorControl, Clusters.ColorControl.Commands.MoveToHue, 1),
@@ -634,6 +636,67 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
             attribute_id=attribute.attribute_id, attribute_name=xml_attribute.name,
             attribute=attribute, cluster_class=cluster, datatype=xml_attribute.datatype,
             constraints=xml_attribute.constraints, enum_values=spec_enum_values(xml_cluster, xml_attribute.datatype))
+
+    async def test_rejected_write_does_not_accept_unchanged_violating_baseline(self):
+        """An already-stored invalid baseline does not prove that a rejected write changed DUT state."""
+        info = self._prepare_writable_attribute()
+        self.checker.read_single_attribute_check_success.return_value = 3
+        self.checker.read_single_attribute.return_value = 3
+        self.checker.generate_constraint_violations = Mock(return_value=[3])
+        result = await self.checker.check_attribute_constraint(info, info.constraints)
+        self.assertEqual((result.attempted, result.rejected, result.accepted, result.other_error, result.execution_error),
+                         (1, 1, 0, 0, 0))
+        self.checker.record_accepted_violation.assert_not_called()
+        self.checker.default_controller.WriteAttribute.assert_awaited_once()
+        self.checker.read_single_attribute.assert_awaited_once()
+
+    async def test_restoration_verification_preserves_results_and_stops_further_probes(self):
+        """A successful restore response is not proof of restored state; failed verification stops further writes."""
+        from support_modules.idm_support import ConstraintProbeExecutionError
+
+        for write in (Status.ConstraintError, Status.InvalidCommand, Status.Success, ChipStackError(0x32)):
+            for confirmation in (1, None, ChipStackError(0x2f), InteractionModelError(Status.ResourceExhausted),
+                                 signals.TestFailure('restoration cache mismatch')):
+                with self.subTest(write=write, confirmation=confirmation):
+                    self.setUp()
+                    info = self._prepare_writable_attribute()
+                    self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
+                    self.checker.read_single_attribute.return_value = 1
+
+                    async def checked_read(**kwargs):
+                        if self.checker.read_single_attribute_check_success.await_count == 1:
+                            return 2
+                        if isinstance(confirmation, Exception):
+                            raise confirmation
+                        return confirmation
+
+                    async def write_response(**kwargs):
+                        if kwargs['attributes'][0][1].value == 2:
+                            return [SimpleNamespace(Status=Status.Success)]
+                        if isinstance(write, Exception):
+                            raise write
+                        return [SimpleNamespace(Status=write)]
+
+                    self.checker.read_single_attribute_check_success.side_effect = checked_read
+                    self.checker.default_controller.WriteAttribute.side_effect = write_response
+                    primary = write if isinstance(write, ChipStackError) else confirmation
+                    if isinstance(primary, (ChipStackError, InteractionModelError)):
+                        with self.assertRaises(ConstraintProbeExecutionError) as raised:
+                            await self.checker.check_attribute_constraint(info, info.constraints)
+                        self.assertIs(raised.exception.__cause__, primary)
+                        result = raised.exception.result
+                    else:
+                        result = await self.checker.check_attribute_constraint(info, info.constraints)
+                    self.assertEqual((result.attempted, result.rejected, result.accepted, result.other_error,
+                                      result.execution_error),
+                                     (1, int(write == Status.ConstraintError), int(write == Status.Success),
+                                      int(write == Status.InvalidCommand), 1 + int(isinstance(write, ChipStackError))))
+                    self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, 2)
+                    self.assertEqual(self.checker.read_single_attribute_check_success.await_count, 2)
+                    self.checker.read_single_attribute.assert_awaited_once()
+                    self.assertEqual(self.checker.record_accepted_violation.call_count, int(write == Status.Success))
+                    self.assertEqual(self.checker.default_controller.WriteAttribute.call_args_list[1].kwargs[
+                        'attributes'][0][1].value, 2)
 
     async def test_tc_idm_9_1_strict_writable_attribute_statuses(self):
         from TC_IDM_9_1 import TC_IDM_9_1
@@ -929,7 +992,8 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(self.checker.default_controller.SendCommand.await_count, 1)
                     self.checker.default_controller.WriteAttribute.assert_not_called()
                 else:
-                    self.assertEqual(self.checker.read_single_attribute_check_success.await_count, 1)
+                    self.assertEqual(self.checker.read_single_attribute_check_success.await_count,
+                                     2 if operation == 'readback' else 1)
                     self.assertEqual(self.checker.default_controller.WriteAttribute.await_count,
                                      1 if operation == 'write' else 2)
                     self.checker.default_controller.SendCommand.assert_not_called()
