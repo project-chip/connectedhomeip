@@ -8560,12 +8560,16 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     __block os_unfair_lock linesLock = OS_UNFAIR_LOCK_INIT;
     NSMutableArray<NSString *> * errorLines = [NSMutableArray array];
     NSMutableArray<NSString *> * otherLines = [NSMutableArray array];
+    NSMutableArray<NSString *> * detailLines = [NSMutableArray array];
     MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
         if (![message containsString:deviceTag]) {
             return;
         }
         os_unfair_lock_lock(&linesLock);
         [(type == MTRLogTypeError ? errorLines : otherLines) addObject:message];
+        if (type == MTRLogTypeDetail) {
+            [detailLines addObject:message];
+        }
         os_unfair_lock_unlock(&linesLock);
     });
     [self addTeardownBlock:^{
@@ -8591,6 +8595,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
         os_unfair_lock_lock(&linesLock);
         [errorLines removeAllObjects];
         [otherLines removeAllObjects];
+        [detailLines removeAllObjects];
         os_unfair_lock_unlock(&linesLock);
         deliveredErrors = 0;
     };
@@ -8606,7 +8611,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     };
     void (^expectLevel)(NSString *, NSUInteger, NSUInteger) = ^(NSString * step, NSUInteger errorLevel, NSUInteger detailLevel) {
         XCTAssertEqual(count(errorLines, errorLineTag), errorLevel, @"%@: error-level lines", step);
-        XCTAssertEqual(count(otherLines, errorLineTag), detailLevel, @"%@: detail-level lines", step);
+        XCTAssertEqual(count(detailLines, errorLineTag), detailLevel, @"%@: detail-level lines", step);
         XCTAssertEqual(deliveredErrors, 1, @"%@: the error is still delivered to the delegate", step);
     };
 
@@ -8633,7 +8638,10 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     inject([self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeFailure], YES);
     expectLevel(@"changed error code", 1, 0);
 
+    // A data value ends the episode; check the record directly, since the value it caches makes the next error purge
+    // something and log at error level whether or not the record was cleared.
     inject([self _attributeValueReportForPath:path value:5], YES);
+    XCTAssertFalse([device unitTestHasLastLoggedErrorForPath:path], @"a data value clears the path's error record");
     clearLines();
     inject([self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeFailure], YES);
     expectLevel(@"after a data value", 1, 0);
