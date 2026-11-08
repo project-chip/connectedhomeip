@@ -254,9 +254,9 @@ TEST_F(TestPushAVStreamTransportStorage, TestMotionZonesStorageOwnershipAndRound
                 for (size_t index = 0; index < zones.size(); ++index)
                 {
                     ASSERT_FALSE(zones[index].zone.IsNull());
-                    EXPECT_EQ(zones[index].zone.Value(), index + 1);
+                    EXPECT_EQ(zones[index].zone.Value(), 2 - index);
                     ASSERT_TRUE(zones[index].sensitivity.HasValue());
-                    EXPECT_EQ(zones[index].sensitivity.Value(), 5 * (index + 1));
+                    EXPECT_EQ(zones[index].sensitivity.Value(), 5 * (2 - index));
                 }
             };
 
@@ -271,7 +271,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestMotionZonesStorageOwnershipAndRound
                 ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerType), CHIP_NO_ERROR);
                 if (zonesCase == ZonesCase::Populated)
                 {
-                    for (uint16_t zoneId = 1; zoneId <= 2; ++zoneId)
+                    for (uint16_t zoneId = 2; zoneId > 0; --zoneId)
                     {
                         Structs::TransportZoneOptionsStruct::Type zone;
                         zone.zone.SetNonNull(zoneId);

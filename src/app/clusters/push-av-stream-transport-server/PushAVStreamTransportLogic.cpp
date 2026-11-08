@@ -56,41 +56,36 @@ namespace {
 
 bool HasDuplicateLargeMotionZoneIds(
     const DataModel::DecodableList<chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::DecodableType> &
-        zones)
+        zones,
+    uint32_t zoneGroups)
 {
-    std::array<uint16_t, 256> zoneIds{};
-    auto windowIter = zones.begin();
-    while (true)
+    std::array<uint32_t, 128> zoneBits{};
+    for (uint16_t group = 0; group < 16; ++group)
     {
-        size_t count = 0;
-        while (count < zoneIds.size() && windowIter.Next())
+        if ((zoneGroups & (uint32_t{ 1 } << group)) == 0)
         {
-            const auto & zone = windowIter.GetValue().zone;
-            if (!zone.IsNull())
+            continue;
+        }
+        zoneBits.fill(0);
+        auto iter = zones.begin();
+        while (iter.Next())
+        {
+            const auto & zone = iter.GetValue().zone;
+            if (zone.IsNull() || (zone.Value() >> 12) != group)
             {
-                zoneIds[count++] = zone.Value();
+                continue;
             }
-        }
-        if (count == 0)
-        {
-            return false;
-        }
-        auto end = zoneIds.begin() + count;
-        std::sort(zoneIds.begin(), end);
-        if (std::adjacent_find(zoneIds.begin(), end) != end)
-        {
-            return true;
-        }
-        auto suffixIter = windowIter;
-        while (suffixIter.Next())
-        {
-            const auto & zone = suffixIter.GetValue().zone;
-            if (!zone.IsNull() && std::binary_search(zoneIds.begin(), end, zone.Value()))
+            const uint16_t zoneId = zone.Value();
+            auto & word           = zoneBits[(zoneId & 0x0fff) >> 5];
+            const uint32_t bit    = uint32_t{ 1 } << (zoneId & 31);
+            if ((word & bit) != 0)
             {
                 return true;
             }
+            word |= bit;
         }
     }
+    return false;
 }
 
 } // namespace
@@ -940,8 +935,9 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTr
         bool nullFound     = false;
         bool duplicateNull = false;
         std::array<uint16_t, 256> zoneIds{};
-        size_t zoneIdCount = 0;
-        auto decodeIter    = zones.begin();
+        size_t zoneIdCount  = 0;
+        uint32_t zoneGroups = 0;
+        auto decodeIter     = zones.begin();
         while (decodeIter.Next())
         {
             const auto & zone = decodeIter.GetValue().zone;
@@ -957,6 +953,7 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTr
                     zoneIds[zoneIdCount] = zone.Value();
                 }
                 ++zoneIdCount;
+                zoneGroups |= uint32_t{ 1 } << (zone.Value() >> 12);
             }
         }
         VerifyOrReturnValue(decodeIter.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
@@ -970,7 +967,7 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTr
         }
         else
         {
-            VerifyOrReturnValue(!HasDuplicateLargeMotionZoneIds(zones), Status::AlreadyExists);
+            VerifyOrReturnValue(!HasDuplicateLargeMotionZoneIds(zones, zoneGroups), Status::AlreadyExists);
         }
 
         VerifyOrReturnValue(
