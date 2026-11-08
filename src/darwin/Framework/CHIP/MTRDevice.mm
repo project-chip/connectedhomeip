@@ -535,6 +535,37 @@ MTR_DIRECT_MEMBERS
                             completion:completion];
 }
 
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
+                      commandFields:(id)commandFields
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
+                    userInvokeToken:(MTRUserInvokeToken * _Nullable)userInvokeToken
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion
+{
+    if (![commandFields isKindOfClass:NSDictionary.class] || ![MTRStructureValueType isEqual:((NSDictionary *) commandFields)[MTRTypeKey]]) {
+        MTR_LOG_ERROR("%@ invokeCommandWithEndpointID passed a commandFields (%@) that is not a structure-typed data-value NSDictionary object",
+            self, commandFields);
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+        return;
+    }
+
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                        expectedValues:expectedValues
+                 expectedValueInterval:expectedValueInterval
+                    timedInvokeTimeout:timeout
+           serverSideProcessingTimeout:nil
+                       userInvokeToken:userInvokeToken
+                                 queue:queue
+                            completion:completion];
+}
+
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                            commandID:(NSNumber *)commandID
@@ -547,6 +578,32 @@ MTR_DIRECT_MEMBERS
                           completion:(MTRDeviceResponseHandler)completion
 {
     MTR_ABSTRACT_METHOD();
+}
+
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(MTRDeviceDataValueDictionary)commandFields
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                     userInvokeToken:(MTRUserInvokeToken * _Nullable)userInvokeToken
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
+    // A device with no implementation of user commands (an XPC device) drops the token: the command is queued in
+    // order, and the token's cancel returns NO.
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                        expectedValues:expectedValues
+                 expectedValueInterval:expectedValueInterval
+                    timedInvokeTimeout:timeout
+           serverSideProcessingTimeout:serverSideProcessingTimeout
+                                 queue:queue
+                            completion:completion];
 }
 
 - (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
@@ -589,6 +646,12 @@ MTR_DIRECT_MEMBERS
         completion(response, error);
     };
 
+    // Generated command params carry the caller's MTRUserInvokeToken, if any.
+    MTRUserInvokeToken * userInvokeToken = nil;
+    if ([commandPayload respondsToSelector:@selector(userInvokeToken)]) {
+        userInvokeToken = MTR_SAFE_CAST([commandPayload valueForKey:@"userInvokeToken"], MTRUserInvokeToken);
+    }
+
     [self _invokeCommandWithEndpointID:endpointID
                              clusterID:clusterID
                              commandID:commandID
@@ -597,6 +660,7 @@ MTR_DIRECT_MEMBERS
                  expectedValueInterval:expectedValueInterval
                     timedInvokeTimeout:timeout
            serverSideProcessingTimeout:serverSideProcessingTimeout
+                       userInvokeToken:userInvokeToken
                                  queue:queue
                             completion:responseHandler];
 }

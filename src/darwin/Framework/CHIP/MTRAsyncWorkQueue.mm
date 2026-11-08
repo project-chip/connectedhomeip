@@ -439,6 +439,16 @@ struct ContextSnapshot {
     return _items.count;
 }
 
+- (void)workItem:(MTRAsyncWorkItem *)workItem readyToSend:(dispatch_block_t)send
+{
+    send();
+}
+
+- (BOOL)cancelWorkItemIfUnsent:(MTRAsyncWorkItem *)workItem
+{
+    return NO;
+}
+
 @end
 
 NS_ASSUME_NONNULL_END

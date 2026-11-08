@@ -119,6 +119,23 @@ MTR_DIRECT_MEMBERS
                                     queue:(dispatch_queue_t)queue
                                completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion;
 
+/**
+ * The internal invoke every MTRDevice invoke goes through, with the caller's MTRUserInvokeToken (nil for a
+ * command that is not a user command).  The base implementation drops the token and calls the method without
+ * one, which is what an XPC device does; MTRDevice_Concrete implements it.
+ */
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(MTRDeviceDataValueDictionary)commandFields
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                     userInvokeToken:(MTRUserInvokeToken * _Nullable)userInvokeToken
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion;
+
 // Queue used for various internal bookkeeping work.
 @property (nonatomic) dispatch_queue_t queue;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;

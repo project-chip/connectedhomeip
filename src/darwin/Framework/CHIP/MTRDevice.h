@@ -21,6 +21,7 @@
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRCommandWithRequiredResponse.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRUserInvokeToken.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -311,6 +312,24 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Like the above, for a user command: one a person is waiting on.
+ *
+ * With a userInvokeToken, the command is queued ahead of reads that have not sent anything yet, its wait in the
+ * queue is bounded by the token's timeout, and the token can cancel it while it is still queued.  See
+ * MTRUserInvokeToken.  With a nil userInvokeToken this is the same as the method above.
+ */
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
+                      commandFields:(id)commandFields
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
+                    userInvokeToken:(MTRUserInvokeToken * _Nullable)userInvokeToken
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Invoke one or more groups of commands.

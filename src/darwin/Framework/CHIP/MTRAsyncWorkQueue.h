@@ -166,6 +166,14 @@ MTR_TESTABLE
 - (void)setDuplicateTypeID:(NSUInteger)opaqueDuplicateTypeID
                    handler:(MTRAsyncWorkDuplicateCheckHandler)duplicateCheckHandler;
 
+/// A user command: queued ahead of items that track their send and have not sent anything yet, and allowed to
+/// start beside them.  Set before the item is enqueued.
+@property (nonatomic) BOOL jumpsUnsentWork;
+
+/// The item reports, through -[MTRAsyncWorkQueue workItem:readyToSend:], when it is about to send something.
+/// Until then it is "not yet sent", which counts as queued, not running.  Set before the item is enqueued.
+@property (nonatomic) BOOL tracksSend;
+
 @end
 
 /// A serial one-at-a-time queue for performing asynchronous work items.
@@ -233,6 +241,16 @@ MTR_TESTABLE
 
 /// Cancels and removes all work items.
 - (void)invalidate;
+
+/// Called by a running work item right before it sends anything.  Marks the item as sent and calls `send`.
+/// Must be called at most once per item.
+- (void)workItem:(MTRAsyncWorkItem<ContextType> *)workItem readyToSend:(dispatch_block_t)send;
+
+/// Cancels and removes the work item if it has not sent anything yet: it is still queued, or it is running but
+/// has not called workItem:readyToSend:.  Its readyHandler then never runs (or, if running, its completion
+/// returns NO) and its cancelHandler is called.  Returns NO, and changes nothing, if the item has sent or is no
+/// longer in the queue.
+- (BOOL)cancelWorkItemIfUnsent:(MTRAsyncWorkItem<ContextType> *)workItem;
 @end
 
 NS_ASSUME_NONNULL_END

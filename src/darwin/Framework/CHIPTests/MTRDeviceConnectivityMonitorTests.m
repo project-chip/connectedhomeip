@@ -1644,4 +1644,93 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
 #endif
 }
 
+#pragma mark - User commands ahead of reads waiting for a session
+
+- (void)test054_UserInvokeStartsWhileReadWaitsForSession
+{
+#ifdef DEBUG
+    // A read that is still waiting for its session has sent nothing, so a user command queued behind it starts
+    // too: both session requests reach the pool.
+    MTRDeviceController * controller = [self controllerWithShortMonitorWait];
+    __block MTRAsyncWorkCompletionBlock releasePoolSlot;
+    MTRAsyncWorkItem * poolSlotHolder = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_main_queue()];
+    [poolSlotHolder setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        releasePoolSlot = completion;
+    }];
+    [controller.concurrentSubscriptionPool enqueueWorkItem:poolSlotHolder description:@"hold the only subscription pool slot"];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"subscription pool slot held"]);
+
+    MTRDevice * device = [self deviceWithNodeID:@(0x1054) controller:controller usesThread:YES];
+    MTRAttributeRequestPath * readPath = [self descriptorPartsListPath];
+    [device readAttributeWithEndpointID:readPath.endpoint clusterID:readPath.cluster attributeID:readPath.attribute params:nil];
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(MTRClusterIDTypeOnOffID)
+                              commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)
+                          commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                     timedInvokeTimeout:nil
+                        userInvokeToken:[[MTRUserInvokeToken alloc] initWithTimeout:nil]
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) { }];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount >= 3); }
+                          timeout:kMonitorWaitSeconds + kPromptSeconds
+                      description:@"the read's and the user command's session requests both wait in the pool"]);
+    if (releasePoolSlot) {
+        releasePoolSlot(MTRAsyncWorkComplete);
+    }
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test055_JumperInPhase1DoesNotHoldReadWithSession
+{
+#ifdef DEBUG
+    // A user command still waiting for its session does not hold back a read that already has one.  The command
+    // needs a large-payload session and the existing one is MRP, so it waits on its monitor.
+    const uint32_t kCameraAVStreamManagementClusterID = 0x0551;
+    const uint32_t kCaptureSnapshotCommandID = 0x0C;
+    NSNumber * peerNodeID = @(0x1055);
+    MTRDeviceController * controller = [self controllerWithLongMonitorWaitAndSessionToThreadPeer:peerNodeID];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kMonitorWaitEndingInTestSeconds];
+    MTRDevice * device = [MTRDevice deviceWithNodeID:peerNodeID controller:controller];
+    MTRAttributeRequestPath * readPath = [self descriptorPartsListPath];
+    __block BOOL readReported = NO;
+    MTRDeviceTestDelegate * reportDelegate = [[MTRDeviceTestDelegate alloc] init];
+    reportDelegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * value in data) {
+            MTRAttributePath * path = value[MTRAttributePathKey];
+            if ([path.cluster isEqual:readPath.cluster] && [path.attribute isEqual:readPath.attribute]) {
+                readReported = YES;
+            }
+        }
+    };
+    [device addDelegate:reportDelegate queue:dispatch_get_main_queue()];
+
+    // Both get to the Matter queue in one turn: the read first, then the command beside it.
+    dispatch_semaphore_t matterQueueBlocker = dispatch_semaphore_create(0);
+    [controller asyncDispatchToMatterQueue:^{
+        dispatch_semaphore_wait(matterQueueBlocker, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kPromptSeconds * NSEC_PER_SEC)));
+    } errorHandler:nil];
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    [device readAttributeWithEndpointID:readPath.endpoint clusterID:readPath.cluster attributeID:readPath.attribute params:nil];
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(kCameraAVStreamManagementClusterID)
+                              commandID:@(kCaptureSnapshotCommandID)
+                          commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                     timedInvokeTimeout:nil
+                        userInvokeToken:[[MTRUserInvokeToken alloc] initWithTimeout:nil]
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) { }];
+    dispatch_semaphore_signal(matterQueueBlocker);
+    XCTAssertTrue([self waitUntil:^{ return readReported; } timeout:kPromptSeconds description:@"the read sent on its session while the command waits on DNS-SD"]);
+    [self waitForMonitorWaitToEndWithMonitorCount:countBefore];
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
 @end
