@@ -893,11 +893,11 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTr
         size_t zoneListSize = 0;
         VerifyOrReturnValue(zones.ComputeSize(&zoneListSize) == CHIP_NO_ERROR, Status::InvalidCommand);
 
-        bool nullFound       = false;
-        bool duplicateNull   = false;
-        uint16_t firstBucket = UINT8_MAX;
-        uint16_t lastBucket  = 0;
-        auto decodeIter      = zones.begin();
+        bool nullFound               = false;
+        bool duplicateNull           = false;
+        uint64_t seenBuckets[4]      = {};
+        uint64_t candidateBuckets[4] = {};
+        auto decodeIter              = zones.begin();
         while (decodeIter.Next())
         {
             const auto & zone = decodeIter.GetValue().zone;
@@ -909,51 +909,31 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTr
             else
             {
                 const uint16_t bucket = zone.Value() >> 8;
-                firstBucket           = std::min(firstBucket, bucket);
-                lastBucket            = std::max(lastBucket, bucket);
+                const uint64_t mask   = uint64_t{ 1 } << (bucket % 64);
+                candidateBuckets[bucket / 64] |= seenBuckets[bucket / 64] & mask;
+                seenBuckets[bucket / 64] |= mask;
             }
         }
         VerifyOrReturnValue(decodeIter.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
         VerifyOrReturnValue(!duplicateNull, Status::AlreadyExists);
 
-        if (zoneListSize <= UINT8_MAX)
+        for (uint16_t bucket = 0; bucket <= UINT8_MAX; ++bucket)
         {
-            size_t outerIndex = 0;
-            auto outer        = zones.begin();
-            while (outer.Next())
+            if ((candidateBuckets[bucket / 64] & (uint64_t{ 1 } << (bucket % 64))) == 0)
             {
-                const auto zone   = outer.GetValue().zone;
-                size_t innerIndex = 0;
-                auto inner        = zones.begin();
-                while (inner.Next())
-                {
-                    if (innerIndex++ >= outerIndex)
-                    {
-                        break;
-                    }
-                    const auto & previousZone = inner.GetValue().zone;
-                    VerifyOrReturnValue(zone.IsNull() || previousZone.IsNull() || zone.Value() != previousZone.Value(),
-                                        Status::AlreadyExists);
-                }
-                ++outerIndex;
+                continue;
             }
-        }
-        else
-        {
-            for (uint16_t bucket = firstBucket; bucket <= lastBucket; ++bucket)
+            uint64_t seenValues[4] = {};
+            auto bucketIter        = zones.begin();
+            while (bucketIter.Next())
             {
-                uint64_t seen[4] = {};
-                auto bucketIter  = zones.begin();
-                while (bucketIter.Next())
+                const auto & zone = bucketIter.GetValue().zone;
+                if (!zone.IsNull() && (zone.Value() >> 8) == bucket)
                 {
-                    const auto & zone = bucketIter.GetValue().zone;
-                    if (!zone.IsNull() && (zone.Value() >> 8) == bucket)
-                    {
-                        const uint8_t value = static_cast<uint8_t>(zone.Value());
-                        const uint64_t mask = uint64_t{ 1 } << (value % 64);
-                        VerifyOrReturnValue((seen[value / 64] & mask) == 0, Status::AlreadyExists);
-                        seen[value / 64] |= mask;
-                    }
+                    const uint8_t value = static_cast<uint8_t>(zone.Value());
+                    const uint64_t mask = uint64_t{ 1 } << (value % 64);
+                    VerifyOrReturnValue((seenValues[value / 64] & mask) == 0, Status::AlreadyExists);
+                    seenValues[value / 64] |= mask;
                 }
             }
         }
