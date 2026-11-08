@@ -78,6 +78,14 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
 - (nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)getStoredClusterDataForNodeID:(NSNumber *)nodeID;
 - (nullable MTRDeviceClusterData *)getStoredClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 - (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID;
+/**
+ * Stores the cluster data and, if not nil, the device data for the node (see
+ * storeDeviceData below) in a single write when the storage delegate supports
+ * bulk stores.  If clusterData is empty, only the device data is stored.
+ * deviceData is used async without copying, so callers must pass an immutable
+ * snapshot.
+ */
+- (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData deviceData:(NSDictionary<NSString *, id> * _Nullable)deviceData forNodeID:(NSNumber *)nodeID;
 - (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID;
 - (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
 - (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
