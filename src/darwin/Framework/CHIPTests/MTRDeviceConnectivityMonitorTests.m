@@ -1603,4 +1603,45 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
 #endif
 }
 
+#pragma mark - Session that appears while a request waits on its monitor
+
+- (void)test053_ExistingSessionUsedWhenMonitorReports
+{
+#ifdef DEBUG
+    // A session to the node that appears while a request waits on its connectivity monitor is used when the monitor
+    // reports, as it already is when the wait times out, instead of queueing a new session attempt in the pool.
+    NSNumber * peerNodeID = @(0x1053);
+    MTRDeviceController * peer;
+    MTRDeviceController * controller = [self controllerWithControllerPeer:peerNodeID peer:&peer];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kLongMonitorWaitSeconds];
+    __block MTRAsyncWorkCompletionBlock releasePoolSlot;
+    MTRAsyncWorkItem * poolSlotHolder = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_main_queue()];
+    [poolSlotHolder setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        releasePoolSlot = completion;
+    }];
+    [controller.concurrentSubscriptionPool enqueueWorkItem:poolSlotHolder description:@"hold the only subscription pool slot"];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"subscription pool slot held"]);
+
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    NSMutableArray * invokeCompletions = [NSMutableArray array];
+    [self startThreadSessionRequestOnController:controller nodeID:peerNodeID invokeCompletions:invokeCompletions];
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore + 1, @"no session yet, so the request waits on DNS-SD");
+
+    // The session appears during the wait, set up by the peer; then the node is advertised and the monitor reports.
+    [self establishSessionFromController:peer toNode:@(peerNodeID.unsignedLongLongValue + 1)];
+    XCTAssertEqual(invokeCompletions.count, 0);
+    NSString * instanceName = [NSString stringWithFormat:@"%016llX-%016llX", controller.compressedFabricID.unsignedLongLongValue, peerNodeID.unsignedLongLongValue];
+    DNSServiceRef advertiser = [self advertiseInstance:instanceName port:kControllerPeerPort];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (invokeCompletions.count > 0); }
+                          timeout:kPromptSeconds + kPromptSeconds
+                      description:@"invoke answered on the session that appeared, without waiting for a subscription pool slot"]);
+    DNSServiceRefDeallocate(advertiser);
+    if (releasePoolSlot) {
+        releasePoolSlot(MTRAsyncWorkComplete);
+    }
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
 @end
