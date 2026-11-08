@@ -29,7 +29,7 @@ from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
 from types import MethodType, SimpleNamespace
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, Mock, patch
 
 from mobly import signals
 
@@ -637,6 +637,40 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
             attribute=attribute, cluster_class=cluster, datatype=xml_attribute.datatype,
             constraints=xml_attribute.constraints, enum_values=spec_enum_values(xml_cluster, xml_attribute.datatype))
 
+    async def test_cancelled_applied_write_restores_baseline_and_propagates_cancellation(self):
+        """An applied write cancelled before its reply must restore state without suppressing cancellation."""
+        import asyncio
+
+        info = self._prepare_writable_attribute()
+        storage = {'value': 2}
+        applied = asyncio.Event()
+        self.checker.read_single_attribute_check_success = AsyncMock(return_value=2)
+        self.checker.read_single_attribute = AsyncMock(side_effect=lambda **kwargs: storage['value'])
+        self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
+
+        async def write_attribute(**kwargs):
+            value = kwargs['attributes'][0][1].value
+            storage['value'] = value
+            if value == 3:
+                applied.set()
+                await asyncio.Future()
+            return [SimpleNamespace(Status=Status.Success)]
+
+        self.checker.default_controller.WriteAttribute = AsyncMock(side_effect=write_attribute)
+        task = asyncio.create_task(self.checker.check_attribute_constraint(info, info.constraints))
+        try:
+            await asyncio.wait_for(applied.wait(), 5)
+        finally:
+            task.cancel('lost initial write reply')
+        with self.assertRaises(asyncio.CancelledError) as raised:
+            await task
+        self.assertEqual(str(raised.exception), 'lost initial write reply')
+        self.assertEqual(storage['value'], 2)
+        writes = self.checker.default_controller.WriteAttribute.call_args_list
+        self.assertEqual([call.kwargs['attributes'][0][1].value for call in writes], [3, 2])
+        self.assertEqual(self.checker.read_single_attribute.await_count, 1)
+        self.checker.record_accepted_violation.assert_called_once()
+
     async def test_rejected_write_does_not_accept_unchanged_violating_baseline(self):
         """An already-stored invalid baseline does not prove that a rejected write changed DUT state."""
         info = self._prepare_writable_attribute()
@@ -1058,6 +1092,43 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(any('Command constraint coverage NOT DEMONSTRATED' in line for line in captured.output))
         self.assertIn('across command and writable attribute probes',
                       TC_IDM_9_1.steps_TC_IDM_9_1(self.checker)[1].expectation)
+
+    async def test_tc_idm_9_1_unsupported_optional_write_has_no_probe_credit(self):
+        """An unsupported optional write is not eligible for constraint enforcement."""
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        for response in ([SimpleNamespace(Status=Status.UnsupportedWrite)], InteractionModelError(Status.UnsupportedWrite)):
+            with self.subTest(response=type(response).__name__):
+                info = self._prepare_writable_attribute()
+                xml_attribute = self.checker.xml_clusters[info.cluster_id].attributes[info.attribute_id]
+                self.checker.default_controller.WriteAttribute.side_effect = [response]
+                with patch.object(xml_attribute, 'write_optional', True), self.assertLogs('TC_IDM_9_1', level='INFO') as captured:
+                    try:
+                        await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+                    except signals.TestSkip:
+                        pass
+                    else:
+                        self.fail('No optional write was qualified, so this scope must be unsupported')
+                self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, 1)
+                self.assertEqual(self.checker.default_controller.WriteAttribute.call_args.kwargs['attributes'][0][1].value, 0)
+                self.checker.read_single_attribute.assert_not_called()
+                self.checker.record_accepted_violation.assert_not_called()
+                self.assertTrue(any('Writable attribute probes: attempted=0, classified=0, CONSTRAINT_ERROR=0' in line
+                                    for line in captured.output))
+
+    async def test_tc_idm_9_1_supported_optional_write_keeps_strict_probe(self):
+        """A qualified optional write must still reject its violation with CONSTRAINT_ERROR."""
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        info = self._prepare_writable_attribute()
+        xml_attribute = self.checker.xml_clusters[info.cluster_id].attributes[info.attribute_id]
+        self.checker.default_controller.WriteAttribute.side_effect = [
+            [SimpleNamespace(Status=Status.Success)], [SimpleNamespace(Status=Status.ConstraintError)]]
+        with patch.object(xml_attribute, 'write_optional', True):
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        writes = self.checker.default_controller.WriteAttribute.call_args_list
+        self.assertEqual([call.kwargs['attributes'][0][1].value for call in writes], [0, 3])
+        self.checker.record_accepted_violation.assert_not_called()
 
     async def test_tc_idm_9_1_baseline_subscription_mismatch_is_not_skipped(self):
         from TC_IDM_9_1 import TC_IDM_9_1

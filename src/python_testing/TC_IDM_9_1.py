@@ -234,6 +234,7 @@ class TC_IDM_9_1(IDMBaseTest):
                             cluster_class=cluster_class,
                             datatype=xml_attr.datatype,
                             constraints=xml_attr.constraints,
+                            write_optional=xml_attr.write_optional,
                             enum_values=spec_enum_values(xml_cluster, xml_attr.datatype),
                         ))
 

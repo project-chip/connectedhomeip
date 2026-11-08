@@ -109,6 +109,7 @@ class WritableAttributeInfo:
     # bounds its attribute without a <constraint> element, so these are carried
     # separately from constraints. See spec_enum_values.
     enum_values: frozenset[int] = frozenset()
+    write_optional: bool = False
 
 
 @dataclass
@@ -1164,6 +1165,22 @@ class IDMBaseTest(BasicCompositionTests):
                                          attribute_id=attr_info.attribute_id)
 
         result = ConstraintProbeResult()
+        if attr_info.write_optional:
+            try:
+                baseline_write = await self.default_controller.WriteAttribute(
+                    nodeId=self.dut_node_id,
+                    attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))],
+                    timedRequestTimeoutMs=timed_request_timeout_ms)
+            except InteractionModelError as error:
+                baseline_status = error.status
+            else:
+                baseline_status = baseline_write[0].Status
+            if baseline_status == Status.UnsupportedWrite:
+                log.warning('Optional write constraint coverage NOT DEMONSTRATED for %s: unsupported write', attribute_path)
+                return result
+            if baseline_status != Status.Success:
+                log.warning('Execution failed qualifying optional write baseline for %s: %s', attribute_path, baseline_status)
+                return ConstraintProbeResult(execution_error=1)
         for test_value in test_values:
             result.attempted += 1
             execution_failure = None
@@ -1174,6 +1191,10 @@ class IDMBaseTest(BasicCompositionTests):
                     attributes=[(attr_info.endpoint_id, attr_info.attribute(test_value))],
                     timedRequestTimeoutMs=timed_request_timeout_ms
                 )
+            except asyncio.CancelledError as error:
+                result.execution_error += 1
+                execution_failure = error
+                log.warning('Write cancelled for %s; checking and restoring the baseline', attribute_path)
             except InteractionModelError as error:
                 result_status = error.status
             except ChipStackError as error:  # chipstack-ok
@@ -1286,6 +1307,8 @@ class IDMBaseTest(BasicCompositionTests):
                                     restore_failed = True
                                     log.warning("Failed to verify restoration of %s to %s: observed %s",
                                                 attribute_path, original_value, restored_value)
+            if isinstance(execution_failure, asyncio.CancelledError):
+                raise execution_failure
             if execution_failure is not None:
                 raise ConstraintProbeExecutionError(execution_failure, result) from execution_failure
             if restore_failed:
