@@ -8646,6 +8646,15 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     } ],
         YES);
     expectLevel(@"changed error domain", 1, 0);
+
+    // The record now holds the new domain, so the same error again is a repeat.
+    clearLines();
+    inject(@[ @{
+        MTRAttributePathKey : path,
+        MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:MTRInteractionErrorCodeFailure userInfo:nil],
+    } ],
+        YES);
+    expectLevel(@"repeat after changed error domain", 0, 1);
     XCTAssertTrue([device unitTestHasLastLoggedErrorForPath:path], @"the path has an error record before the data value");
 
     // A data value ends the episode; check the record directly, since the value it caches makes the next error purge
