@@ -1427,13 +1427,13 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestModifyPushTransportMotionZones)
         Status ModifyPushTransport(uint16_t connectionId, const TransportOptionsStorage options) override
         {
             ++modifications;
-            lastModification = options;
+            lastModification = std::make_unique<TransportOptionsStorage>(options);
             return TestPushAVStreamTransportDelegateImpl::ModifyPushTransport(connectionId, options);
         }
         Status ValidateZoneId(uint16_t zoneId) override { return zoneId <= 3 ? Status::Success : Status::Failure; }
         bool ValidateMotionZoneListSize(size_t size) override { return size <= 2; }
         size_t modifications = 0;
-        std::optional<TransportOptionsStorage> lastModification;
+        std::unique_ptr<TransportOptionsStorage> lastModification;
     };
     class CountingPersistence : public DefaultAttributePersistenceProvider
     {
@@ -1668,8 +1668,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestModifyPushTransportMotionZones)
                 }
                 const bool success = expected == Status::Success;
                 EXPECT_EQ(delegate.modifications, success ? 1u : 0u);
-                EXPECT_EQ(delegate.lastModification.has_value(), success);
-                if (success && delegate.lastModification.has_value())
+                EXPECT_EQ(delegate.lastModification != nullptr, success);
+                if (success && delegate.lastModification != nullptr)
                 {
                     const auto & received = delegate.lastModification->triggerOptions;
                     EXPECT_EQ(received.triggerType, triggerType);
@@ -1694,10 +1694,10 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestModifyPushTransportMotionZones)
                 EXPECT_EQ(persistence.writes - writesBefore, success ? 1u : 0u);
                 if (expected == Status::Failure)
                 {
-                    TransportOptionsStorage dispatchOptions(modify.transportOptions);
+                    auto dispatchOptions = std::make_unique<TransportOptionsStorage>(modify.transportOptions);
                     Commands::ModifyPushTransport::Type dispatchRequest;
                     dispatchRequest.connectionID     = connectionId;
-                    dispatchRequest.transportOptions = dispatchOptions;
+                    dispatchRequest.transportOptions = *dispatchOptions;
                     tester.GetCommandHandler().SetFabricIndex(1);
                     const auto dispatched = tester.Invoke(dispatchRequest);
                     ASSERT_TRUE(dispatched.GetStatusCode().has_value());
@@ -1956,6 +1956,14 @@ TEST_F(TestPushAVStreamTransportServerLogic, LegacyAmbientZonesReloadAsExplicitA
     EXPECT_TRUE(restored.triggerOptions.motionZones.Value().IsNull());
     EXPECT_EQ(restored.triggerOptions.triggerType, TransportTriggerTypeEnum::kAmbientContext);
     EXPECT_TRUE(restored.url.data_equal(options.url));
+    ASSERT_NE(logic.mCurrentConnections[0].GetTransportOptionsPtr(), nullptr);
+    auto copied = std::make_unique<TransportOptionsStorage>(*logic.mCurrentConnections[0].GetTransportOptionsPtr());
+    ASSERT_TRUE(copied->triggerOptions.motionZones.HasValue());
+    EXPECT_TRUE(copied->triggerOptions.motionZones.Value().IsNull());
+    auto assigned = std::make_unique<TransportOptionsStorage>();
+    *assigned     = *logic.mCurrentConnections[0].GetTransportOptionsPtr();
+    ASSERT_TRUE(assigned->triggerOptions.motionZones.HasValue());
+    EXPECT_TRUE(assigned->triggerOptions.motionZones.Value().IsNull());
 
     Testing::MockCommandHandler findHandler;
     findHandler.SetFabricIndex(1);

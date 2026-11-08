@@ -2138,15 +2138,15 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
         std::shared_ptr<TransportOptionsStorage> transportOptionsStorage;
         if (decodedTransportConfig.transportOptions.HasValue())
         {
+            auto & trigger = decodedTransportConfig.transportOptions.Value().triggerOptions;
+            if (trigger.triggerType == TransportTriggerTypeEnum::kAmbientContext && !trigger.motionZones.HasValue())
+            {
+                trigger.motionZones.Emplace().SetNull();
+            }
             transportOptionsStorage = std::make_shared<TransportOptionsStorage>(decodedTransportConfig.transportOptions.Value());
             if (!transportOptionsStorage)
             {
                 return CHIP_ERROR_NO_MEMORY;
-            }
-            auto & trigger = transportOptionsStorage->triggerOptions;
-            if (trigger.triggerType == TransportTriggerTypeEnum::kAmbientContext && !trigger.motionZones.HasValue())
-            {
-                trigger.motionZones.Emplace().SetNull();
             }
         }
 
