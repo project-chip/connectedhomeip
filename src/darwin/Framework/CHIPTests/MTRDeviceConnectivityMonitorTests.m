@@ -1692,12 +1692,14 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
     const uint32_t kCameraAVStreamManagementClusterID = 0x0551;
     const uint32_t kCaptureSnapshotCommandID = 0x0C;
     NSNumber * peerNodeID = @(0x1055);
-    MTRDeviceController * controller = [self controllerWithLongMonitorWaitAndSessionToThreadPeer:peerNodeID];
+    MTRDeviceController * controller = [self controllerWithSessionToControllerPeer:peerNodeID];
     [controller unitTestSetConnectivityMonitorWaitSeconds:kMonitorWaitEndingInTestSeconds];
-    MTRDevice * device = [MTRDevice deviceWithNodeID:peerNodeID controller:controller];
+    // One delegate only: it skips subscription setup and reports the node as Thread, so the read is a read-through
+    // on the existing session.  The test hooks ask only the first delegate, so a second one would decide them.
+    MTRDevice * device = [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
+    MTRDeviceTestDelegate * reportDelegate = _deviceDelegates.lastObject;
     MTRAttributeRequestPath * readPath = [self descriptorPartsListPath];
     __block BOOL readReported = NO;
-    MTRDeviceTestDelegate * reportDelegate = [[MTRDeviceTestDelegate alloc] init];
     reportDelegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
         for (NSDictionary<NSString *, id> * value in data) {
             MTRAttributePath * path = value[MTRAttributePathKey];
@@ -1706,7 +1708,6 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
             }
         }
     };
-    [device addDelegate:reportDelegate queue:dispatch_get_main_queue()];
 
     // Both get to the Matter queue in one turn: the read first, then the command beside it.
     dispatch_semaphore_t matterQueueBlocker = dispatch_semaphore_create(0);
