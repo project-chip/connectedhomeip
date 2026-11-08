@@ -1644,6 +1644,27 @@ TEST_F(TestSystemPacketBuffer, CheckNumPacketBufsStatistic)
 
     EXPECT_EQ(static_cast<int>(inUse[kSystemLayer_NumPacketBufs]), baseline);
 }
+
+TEST_F(TestSystemPacketBuffer, CheckNumPacketBufsHighWatermark)
+{
+    using chip::System::Stats::kSystemLayer_NumPacketBufs;
+    const chip::System::Stats::count_t * const watermarks = chip::System::Stats::GetHighWatermarks();
+    const int baseline                                    = chip::System::Stats::GetResourcesInUse()[kSystemLayer_NumPacketBufs];
+    SYSTEM_STATS_RESET_HIGH_WATER_MARK_FOR_TESTING(kSystemLayer_NumPacketBufs);
+
+    {
+        PacketBufferHandle first = PacketBufferHandle::New(0, 0);
+        ASSERT_FALSE(first.IsNull());
+        {
+            PacketBufferHandle second = PacketBufferHandle::New(0, 0);
+            ASSERT_FALSE(second.IsNull());
+            EXPECT_EQ(static_cast<int>(watermarks[kSystemLayer_NumPacketBufs]), baseline + 2);
+        }
+        EXPECT_EQ(static_cast<int>(watermarks[kSystemLayer_NumPacketBufs]), baseline + 2);
+    }
+
+    EXPECT_EQ(static_cast<int>(watermarks[kSystemLayer_NumPacketBufs]), baseline + 2);
+}
 #endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && CHIP heap or pool PacketBuffers
 
 TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleCloneData)
