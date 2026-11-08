@@ -1414,7 +1414,8 @@ Status ColorControlServer::moveToHueAndSaturation(EndpointId endpoint, uint16_t 
  * @param[in] isEnhanced If True, function was called by EnhancedMoveHue command and rate is a uint16 value. If False function
  * was called by MoveHue command and rate is a uint8 value.
  * @return Status::Success when successful,
- *         Status::InvalidCommand when Rate is 0 or an unknown moveMode is provided
+ *         Status::InvalidCommand when Rate is 0 for a non-stop move
+ *         Status::ConstraintError when an unknown moveMode is provided
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state,
  */
 Status ColorControlServer::moveHueCommand(EndpointId endpoint, HueMoveMode moveMode, uint16_t rate,
@@ -1425,7 +1426,7 @@ Status ColorControlServer::moveHueCommand(EndpointId endpoint, HueMoveMode moveM
 
     // check moveMode and rate before any operation is done on the transition states
     // rate value is ignored if the MoveMode is stop
-    VerifyOrReturnValue(moveMode != HueMoveMode::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(moveMode != HueMoveMode::kUnknownEnumValue, Status::ConstraintError);
     VerifyOrReturnValue((rate != 0 || moveMode == HueMoveMode::kStop), Status::InvalidCommand);
 
     uint16_t epIndex                                  = getEndpointIndex(endpoint);
@@ -1524,7 +1525,7 @@ Status ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, D
     VerifyOrReturnValue((isEnhanced || hue <= MAX_HUE_VALUE), Status::ConstraintError);
     VerifyOrReturnValue(transitionTime <= kMaxTransitionTime, Status::ConstraintError);
 
-    VerifyOrReturnValue(moveDirection != DirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(moveDirection != DirectionEnum::kUnknownEnumValue, Status::ConstraintError);
 
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
     VerifyOrReturnValue(colorHueTransitionState != nullptr, Status::UnsupportedEndpoint);
@@ -1573,7 +1574,7 @@ Status ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, D
     case DirectionEnum::kDown:
         break;
     case DirectionEnum::kUnknownEnumValue:
-        return Status::InvalidCommand;
+        return Status::ConstraintError;
         /* No default case, so if a new direction value gets added we will just fail
            to compile until we handle it correctly.  */
     }
@@ -1747,7 +1748,8 @@ Status ColorControlServer::stepHueCommand(EndpointId endpoint, HueStepMode stepM
  * @param endpoint EndpointId of the recipient Color control cluster.
  * @param commandData Struct containing the parameters of the command.
  * @return Status::Success when successful,
- *         Status::InvalidCommand when a rate of 0 for a non-stop move or an unknown SaturationMoveMode is provided
+ *         Status::InvalidCommand when a rate of 0 for a non-stop move is provided
+ *         Status::ConstraintError when an unknown SaturationMoveMode is provided
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state.
  */
 Status ColorControlServer::moveSaturationCommand(EndpointId endpoint, const Commands::MoveSaturation::DecodableType & commandData)
@@ -1755,7 +1757,7 @@ Status ColorControlServer::moveSaturationCommand(EndpointId endpoint, const Comm
     MATTER_TRACE_SCOPE("moveSaturation", "ColorControl");
     // check moveMode and rate before any operation is done on the transition states
     // rate value is ignored if the MoveMode is stop
-    VerifyOrReturnValue(commandData.moveMode != SaturationMoveMode::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(commandData.moveMode != SaturationMoveMode::kUnknownEnumValue, Status::ConstraintError);
     VerifyOrReturnValue(commandData.rate != 0 || commandData.moveMode == SaturationMoveMode::kStop, Status::InvalidCommand);
 
     uint16_t epIndex                                         = getEndpointIndex(endpoint);
@@ -2672,7 +2674,8 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
  * @param endpoint EndpointId of the recipient Color control cluster.
  * @param commandData Struct containing the parameters of the command.
  * @return Status::Success when successful,
- *         Status::InvalidCommand when a rate of 0 for a non-stop move or an unknown HueMoveMode is provided
+ *         Status::InvalidCommand when a rate of 0 for a non-stop move is provided
+ *         Status::ConstraintError when an unknown HueMoveMode is provided
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a color temp transition state.
  *         Status::ConstraintError when a command parameter is outside its defined value range.
  */
@@ -2685,7 +2688,7 @@ Status ColorControlServer::moveColorTempCommand(EndpointId endpoint,
 
     // check moveMode and rate before any operation is done on the transition states
     // rate value is ignored if the MoveMode is stop
-    VerifyOrReturnValue(commandData.moveMode != HueMoveMode::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(commandData.moveMode != HueMoveMode::kUnknownEnumValue, Status::ConstraintError);
     VerifyOrReturnValue((commandData.rate != 0 || commandData.moveMode == HueMoveMode::kStop), Status::InvalidCommand);
 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);

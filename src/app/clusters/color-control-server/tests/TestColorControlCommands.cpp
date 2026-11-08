@@ -188,7 +188,7 @@ TEST_F(TestColorControlCommands, MoveToHue)
     EXPECT_EQ(c.EnhancedHue(), static_cast<uint16_t>(100 << 8)); // CurrentHue == 100
 
     // Unknown direction rejected.
-    EXPECT_EQ(c.MoveToHue(100, DirectionEnum::kUnknownEnumValue, 10, false), Status::InvalidCommand);
+    EXPECT_EQ(c.MoveToHue(100, DirectionEnum::kUnknownEnumValue, 10, false), Status::ConstraintError);
 }
 
 TEST_F(TestColorControlCommands, EnhancedMoveToHue)
@@ -247,10 +247,111 @@ TEST_F(TestColorControlCommands, MoveHueRateThenStop)
 
     // An undefined MoveMode must not be treated as Down: it is rejected before any transition starts,
     // so the hue axis stays frozen rather than beginning an indefinite move.
-    EXPECT_EQ(c.MoveHue(MoveModeEnum::kUnknownEnumValue, 10, /*isEnhanced=*/false), Status::InvalidCommand);
-    EXPECT_EQ(c.MoveHue(MoveModeEnum::kUnknownEnumValue, 10, /*isEnhanced=*/true), Status::InvalidCommand);
+    EXPECT_EQ(c.MoveHue(MoveModeEnum::kUnknownEnumValue, 10, /*isEnhanced=*/false), Status::ConstraintError);
+    EXPECT_EQ(c.MoveHue(MoveModeEnum::kUnknownEnumValue, 10, /*isEnhanced=*/true), Status::ConstraintError);
     Tick(1000);
     EXPECT_EQ(c.EnhancedHue(), frozen);
+}
+
+TEST_F(TestColorControlCommands, RawMoveModesPreserveIndependentRateValidation)
+{
+    struct RawMoveRequest
+    {
+        using ResponseType = DataModel::NullObjectType;
+        uint8_t mode;
+        uint16_t rate;
+        bool colorTemperature;
+
+        CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+        {
+            TLV::TLVType outer;
+            ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(0), mode));
+            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), rate));
+            if (colorTemperature)
+            {
+                ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), uint16_t(0)));
+                ReturnErrorOnFailure(writer.Put(TLV::ContextTag(3), uint16_t(0)));
+            }
+            return writer.EndContainer(outer);
+        }
+    };
+    for (const CommandId command :
+         { Commands::MoveHue::Id, Commands::MoveSaturation::Id, Commands::EnhancedMoveHue::Id, Commands::MoveColorTemperature::Id })
+    {
+        for (const uint8_t mode : { uint8_t(0), uint8_t(1), uint8_t(2), uint8_t(3), uint8_t(4) })
+        {
+            for (const uint16_t rate : { uint16_t(0), uint16_t(1) })
+            {
+                const bool colorTemperature = command == Commands::MoveColorTemperature::Id;
+                auto config =
+                    colorTemperature ? CtConfig() : (command == Commands::EnhancedMoveHue::Id ? EnhancedConfig() : HsConfig());
+                ColorControlCluster cluster(kEp, config);
+                Testing::ClusterTester tester(cluster);
+                const auto beforeMode = cluster.GetEnhancedColorMode();
+                const auto beforeHue  = cluster.EnhancedHue();
+                const auto beforeSat  = cluster.Saturation();
+                const auto beforeTemp = cluster.ColorTempMireds();
+                RawMoveRequest request{ mode, rate, colorTemperature };
+                auto result = tester.Invoke(command, request);
+                ASSERT_TRUE(result.status.has_value());
+                const Status expected = mode == 2 || mode == 4
+                    ? Status::ConstraintError
+                    : (mode != 0 && rate == 0 ? Status::InvalidCommand : Status::Success);
+                EXPECT_EQ(result.GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(expected));
+                if (expected != Status::Success)
+                {
+                    Tick(1000);
+                    EXPECT_EQ(cluster.GetEnhancedColorMode(), beforeMode);
+                    EXPECT_EQ(cluster.EnhancedHue(), beforeHue);
+                    EXPECT_EQ(cluster.Saturation(), beforeSat);
+                    EXPECT_EQ(cluster.ColorTempMireds(), beforeTemp);
+                }
+            }
+        }
+    }
+}
+
+TEST_F(TestColorControlCommands, RawHueDirectionsRejectReservedValuesWithoutSideEffects)
+{
+    struct RawDirectionRequest : Commands::MoveToHue::Type
+    {
+        uint8_t rawDirection;
+
+        CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+        {
+            TLV::TLVType outer;
+            ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(0), hue));
+            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), rawDirection));
+            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), transitionTime));
+            return writer.EndContainer(outer);
+        }
+    };
+    for (const CommandId command : { Commands::MoveToHue::Id, Commands::EnhancedMoveToHue::Id })
+    {
+        for (const uint8_t direction : { uint8_t(0), uint8_t(1), uint8_t(2), uint8_t(3), uint8_t(4), uint8_t(0x99) })
+        {
+            ColorControlCluster cluster(kEp, command == Commands::EnhancedMoveToHue::Id ? EnhancedConfig() : HsConfig());
+            Testing::ClusterTester tester(cluster);
+            const auto beforeHue = cluster.EnhancedHue();
+            const auto beforeSat = cluster.Saturation();
+            RawDirectionRequest request;
+            request.rawDirection   = direction;
+            request.hue            = 100;
+            request.transitionTime = 10;
+            auto result            = tester.Invoke(command, request);
+            ASSERT_TRUE(result.status.has_value());
+            EXPECT_EQ(result.GetStatusCode(),
+                      Protocols::InteractionModel::ClusterStatusCode(direction > 3 ? Status::ConstraintError : Status::Success));
+            if (direction > 3)
+            {
+                Tick(1000);
+                EXPECT_EQ(cluster.EnhancedHue(), beforeHue);
+                EXPECT_EQ(cluster.Saturation(), beforeSat);
+            }
+        }
+    }
 }
 
 // The Stop rows of MoveHue (§3.2.8.5.4) and MoveSaturation (§3.2.8.8.4) both stop "any ongoing hue

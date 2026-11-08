@@ -141,7 +141,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeComm
             }
             break;
         default:
-            return Status::InvalidCommand;
+            return Status::ConstraintError;
         }
 
         if (!heat.HasValue() && !cool.HasValue())
