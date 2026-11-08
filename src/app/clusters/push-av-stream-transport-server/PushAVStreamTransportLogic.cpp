@@ -2154,6 +2154,28 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(reader.EnterContainer(arrayType));
 
+    TLV::TLVReader validationReader = reader;
+    while ((err = validationReader.Next()) == CHIP_NO_ERROR)
+    {
+        Structs::TransportConfigurationStruct::DecodableType decoded;
+        ReturnErrorOnFailure(decoded.Decode(validationReader));
+        if (decoded.transportOptions.HasValue())
+        {
+            const auto & zones = decoded.transportOptions.Value().triggerOptions.motionZones;
+            if (zones.HasValue() && !zones.Value().IsNull())
+            {
+                auto zoneIter = zones.Value().Value().begin();
+                while (zoneIter.Next())
+                {
+                }
+                ReturnErrorOnFailure(zoneIter.GetStatus());
+            }
+        }
+    }
+    VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
+    ReturnErrorOnFailure(validationReader.ExitContainer(arrayType));
+    ReturnErrorOnFailure(validationReader.VerifyEndOfContainer());
+
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         // Decode into a temporary DecodableType first.
@@ -2168,6 +2190,11 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
             if (!transportOptionsStorage)
             {
                 return CHIP_ERROR_NO_MEMORY;
+            }
+            auto & trigger = transportOptionsStorage->triggerOptions;
+            if (trigger.triggerType == TransportTriggerTypeEnum::kAmbientContext && !trigger.motionZones.HasValue())
+            {
+                trigger.motionZones.Emplace().SetNull();
             }
         }
 

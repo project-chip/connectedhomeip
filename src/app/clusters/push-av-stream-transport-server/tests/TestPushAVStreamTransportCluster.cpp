@@ -1793,11 +1793,13 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestModifyPushTransportMotionZones)
         Status ModifyPushTransport(uint16_t connectionId, const TransportOptionsStorage options) override
         {
             ++modifications;
+            lastModification = options;
             return TestPushAVStreamTransportDelegateImpl::ModifyPushTransport(connectionId, options);
         }
         Status ValidateZoneId(uint16_t zoneId) override { return zoneId <= 3 ? Status::Success : Status::Failure; }
         bool ValidateMotionZoneListSize(size_t size) override { return size <= 2; }
         size_t modifications = 0;
+        std::optional<TransportOptionsStorage> lastModification;
     };
     class CountingPersistence : public DefaultAttributePersistenceProvider
     {
@@ -2015,6 +2017,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestModifyPushTransportMotionZones)
                 Testing::MockCommandHandler handler;
                 handler.SetFabricIndex(1);
                 const ConcreteCommandPath path{ 1, PushAvStreamTransport::Id, Commands::ModifyPushTransport::Id };
+                delegate.lastModification.reset();
                 const auto result = logic.HandleModifyPushTransport(handler, path, modify);
                 if (result.has_value())
                 {
@@ -2031,7 +2034,45 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestModifyPushTransportMotionZones)
                 }
                 const bool success = expected == Status::Success;
                 EXPECT_EQ(delegate.modifications, success ? 1u : 0u);
+                EXPECT_EQ(delegate.lastModification.has_value(), success);
+                if (success && delegate.lastModification.has_value())
+                {
+                    const auto & received = delegate.lastModification->triggerOptions;
+                    EXPECT_EQ(received.triggerType, triggerType);
+                    ASSERT_EQ(received.motionZones.HasValue(), acceptsZones);
+                    if (acceptsZones)
+                    {
+                        ASSERT_EQ(received.motionZones.Value().IsNull(), zonesCase == ZonesCase::Null);
+                        if (zonesCase != ZonesCase::Null)
+                        {
+                            const auto & receivedZones = received.motionZones.Value().Value();
+                            ASSERT_EQ(receivedZones.size(), zonesCase == ZonesCase::Valid ? 2u : 0u);
+                            for (size_t zoneIndex = 0; zoneIndex < receivedZones.size(); ++zoneIndex)
+                            {
+                                ASSERT_FALSE(receivedZones[zoneIndex].zone.IsNull());
+                                EXPECT_EQ(receivedZones[zoneIndex].zone.Value(), zoneIndex + 1);
+                                EXPECT_EQ(receivedZones[zoneIndex].sensitivity.HasValue(),
+                                          features.Has(Feature::kPerZoneSensitivity));
+                            }
+                        }
+                    }
+                }
                 EXPECT_EQ(persistence.writes - writesBefore, success ? 1u : 0u);
+                if (expected == Status::Failure)
+                {
+                    TransportOptionsStorage dispatchOptions(modify.transportOptions);
+                    Commands::ModifyPushTransport::Type dispatchRequest;
+                    dispatchRequest.connectionID     = connectionId;
+                    dispatchRequest.transportOptions = dispatchOptions;
+                    tester.GetCommandHandler().SetFabricIndex(1);
+                    const auto dispatched = tester.Invoke(dispatchRequest);
+                    ASSERT_TRUE(dispatched.GetStatusCode().has_value());
+                    EXPECT_EQ(dispatched.GetStatusCode()->GetStatus(), Status::Failure);
+                    EXPECT_EQ(dispatched.GetStatusCode()->GetClusterSpecificCode(), to_underlying(StatusCodeEnum::kInvalidZone));
+                    EXPECT_FALSE(tester.GetCommandHandler().HasResponse());
+                    EXPECT_EQ(delegate.modifications, 0u);
+                    EXPECT_EQ(persistence.writes, writesBefore);
+                }
                 ASSERT_EQ(logic.mCurrentConnections.size(), 1u);
                 EXPECT_EQ(logic.mCurrentConnections[0].connectionID, connectionId);
                 EXPECT_EQ(logic.mCurrentConnections[0].GetTransportOptionsPtr() == originalStorage, !success);
@@ -2141,6 +2182,171 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestModifyPushTransportMotionZones)
         }
         server.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotPublishDecodedPrefix)
+{
+    TestPushAVStreamTransportDelegateImpl delegate;
+    mServer.GetLogic().SetDelegate(&delegate);
+    DefaultAttributePersistenceProvider persistence;
+    ASSERT_EQ(persistence.Init(&mClusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
+    for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext })
+    {
+        uint8_t buffer[1024];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType arrayType;
+        TLV::TLVType configType;
+        TLV::TLVType optionsType;
+        TLV::TLVType triggerContainer;
+        TLV::TLVType zonesType;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, configType), CHIP_NO_ERROR);
+        ASSERT_EQ(
+            writer.Put(TLV::ContextTag(to_underlying(Structs::TransportConfigurationStruct::Fields::kConnectionID)), uint16_t{ 1 }),
+            CHIP_NO_ERROR);
+        ASSERT_EQ(DataModel::Encode(writer,
+                                    TLV::ContextTag(to_underlying(Structs::TransportConfigurationStruct::Fields::kTransportStatus)),
+                                    TransportStatusEnum::kInactive),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(254), FabricIndex{ 1 }), CHIP_NO_ERROR);
+        ASSERT_EQ(
+            writer.StartContainer(TLV::ContextTag(to_underlying(Structs::TransportConfigurationStruct::Fields::kTransportOptions)),
+                                  TLV::kTLVType_Structure, optionsType),
+            CHIP_NO_ERROR);
+        ASSERT_EQ(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Structs::TransportOptionsStruct::Fields::kStreamUsage)),
+                                    StreamUsageEnum::kAnalysis),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(
+            writer.Put(TLV::ContextTag(to_underlying(Structs::TransportOptionsStruct::Fields::kTLSEndpointID)), uint16_t{ 1 }),
+            CHIP_NO_ERROR);
+        ASSERT_EQ(writer.PutString(TLV::ContextTag(to_underlying(Structs::TransportOptionsStruct::Fields::kUrl)),
+                                   "https://example.com/stream/"),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(writer.StartContainer(TLV::ContextTag(to_underlying(Structs::TransportOptionsStruct::Fields::kTriggerOptions)),
+                                        TLV::kTLVType_Structure, triggerContainer),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(DataModel::Encode(writer,
+                                    TLV::ContextTag(to_underlying(Structs::TransportTriggerOptionsStruct::Fields::kTriggerType)),
+                                    triggerType),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(
+            writer.StartContainer(TLV::ContextTag(to_underlying(Structs::TransportTriggerOptionsStruct::Fields::kMotionZones)),
+                                  TLV::kTLVType_Array, zonesType),
+            CHIP_NO_ERROR);
+        Structs::TransportZoneOptionsStruct::Type zone;
+        zone.zone.SetNonNull(1);
+        zone.sensitivity.SetValue(5);
+        ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), zone), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::AnonymousTag(), true), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(zonesType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(triggerContainer), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(optionsType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(configType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        TLV::TLVType decodedArray;
+        ASSERT_EQ(reader.EnterContainer(decodedArray), CHIP_NO_ERROR);
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        Structs::TransportConfigurationStruct::DecodableType decoded;
+        ASSERT_EQ(decoded.Decode(reader), CHIP_NO_ERROR);
+        ASSERT_TRUE(decoded.transportOptions.HasValue());
+        const auto & zones = decoded.transportOptions.Value().triggerOptions.motionZones.Value().Value();
+        auto iter          = zones.begin();
+        ASSERT_TRUE(iter.Next());
+        ASSERT_FALSE(iter.Next());
+        ASSERT_NE(iter.GetStatus(), CHIP_NO_ERROR);
+
+        const ConcreteAttributePath path{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
+        ASSERT_EQ(persistence.WriteValue(path, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+        ASSERT_EQ(mServer.GetLogic().Init(persistence), CHIP_NO_ERROR);
+        EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+    }
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, LegacyAmbientZonesReloadAsExplicitAllZones)
+{
+    class RestoredConnectionDelegate : public TestPushAVStreamTransportDelegateImpl
+    {
+    public:
+        Status ModifyPushTransport(uint16_t connectionId, const TransportOptionsStorage options) override
+        {
+            ++modifications;
+            return Status::Success;
+        }
+        size_t modifications = 0;
+    } delegate;
+    TestTLSClientManagementDelegate tlsDelegate;
+    auto & logic = mServer.GetLogic();
+    logic.SetDelegate(&delegate);
+    logic.SetTLSClientManagementDelegate(&tlsDelegate);
+    DefaultAttributePersistenceProvider persistence;
+    ASSERT_EQ(persistence.Init(&mClusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
+    Structs::TransportOptionsStruct::Type options;
+    options.streamUsage = StreamUsageEnum::kAnalysis;
+    options.videoStreamID.SetValue(1);
+    options.TLSEndpointID              = 1;
+    options.url                        = "https://example.com/original/"_span;
+    options.triggerOptions.triggerType = TransportTriggerTypeEnum::kAmbientContext;
+    options.triggerOptions.maxPreRollLen.SetValue(0);
+    options.containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    Structs::CMAFContainerOptionsStruct::Type cmaf;
+    cmaf.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+    cmaf.segmentDuration = 1000;
+    cmaf.chunkDuration   = 500;
+    options.containerOptions.CMAFContainerOptions.SetValue(cmaf);
+    Structs::TransportConfigurationStruct::Type config;
+    config.connectionID    = 1;
+    config.transportStatus = TransportStatusEnum::kInactive;
+    config.fabricIndex     = 1;
+    config.transportOptions.SetValue(options);
+    uint8_t buffer[1024];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+    ASSERT_EQ(config.EncodeForRead(writer, TLV::AnonymousTag(), config.GetFabricIndex()), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+    const ConcreteAttributePath persistencePath{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
+    ASSERT_EQ(persistence.WriteValue(persistencePath, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    ASSERT_EQ(logic.Init(persistence), CHIP_NO_ERROR);
+    ASSERT_EQ(logic.mCurrentConnections.size(), 1u);
+    ASSERT_TRUE(logic.mCurrentConnections[0].transportOptions.HasValue());
+    const auto & restored = logic.mCurrentConnections[0].transportOptions.Value();
+    ASSERT_TRUE(restored.triggerOptions.motionZones.HasValue());
+    EXPECT_TRUE(restored.triggerOptions.motionZones.Value().IsNull());
+    EXPECT_EQ(restored.triggerOptions.triggerType, TransportTriggerTypeEnum::kAmbientContext);
+    EXPECT_TRUE(restored.url.data_equal(options.url));
+
+    Testing::MockCommandHandler findHandler;
+    findHandler.SetFabricIndex(1);
+    Commands::FindTransport::DecodableType find;
+    find.connectionID.SetNonNull(1);
+    const ConcreteCommandPath findPath{ 1, PushAvStreamTransport::Id, Commands::FindTransport::Id };
+    EXPECT_EQ(logic.HandleFindTransport(findHandler, findPath, find), std::nullopt);
+    Commands::FindTransportResponse::DecodableType found;
+    ASSERT_EQ(findHandler.DecodeResponse(found), CHIP_NO_ERROR);
+    auto iter = found.transportConfigurations.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_TRUE(iter.GetValue().transportOptions.HasValue());
+    Commands::ModifyPushTransport::DecodableType modify;
+    modify.connectionID         = 1;
+    modify.transportOptions     = iter.GetValue().transportOptions.Value();
+    modify.transportOptions.url = "https://example.com/modified/"_span;
+    Testing::MockCommandHandler modifyHandler;
+    modifyHandler.SetFabricIndex(1);
+    const ConcreteCommandPath modifyPath{ 1, PushAvStreamTransport::Id, Commands::ModifyPushTransport::Id };
+    const auto result = logic.HandleModifyPushTransport(modifyHandler, modifyPath, modify);
+    EXPECT_EQ(result, std::nullopt);
+    ASSERT_TRUE(modifyHandler.HasStatus());
+    EXPECT_EQ(modifyHandler.GetLastStatus().status.GetStatus(), Status::Success);
+    EXPECT_EQ(delegate.modifications, 1u);
+    EXPECT_TRUE(logic.mCurrentConnections[0].transportOptions.Value().url.data_equal(modify.transportOptions.url));
 }
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestValidateIncomingTransportOptions_StreamCountConstraint)
