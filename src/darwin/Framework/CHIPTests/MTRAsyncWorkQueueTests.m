@@ -837,6 +837,54 @@
     readCompletion(MTRAsyncWorkComplete);
 }
 
+- (void)testOnlyOneSendTrackingJumperAboveWidth
+{
+    // The cap on user commands above the width holds even for user commands that also track their send: while one
+    // runs beside work that has sent nothing, a second waits for it, although everything running is still unsent.
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    dispatch_semaphore_t readRunning = dispatch_semaphore_create(0);
+    __block MTRAsyncWorkCompletionBlock readCompletion;
+    MTRAsyncWorkItem * read = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    read.tracksSend = YES;
+    read.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        readCompletion = completion;
+        dispatch_semaphore_signal(readRunning);
+    };
+    [workQueue enqueueWorkItem:read description:@"unsent read R"];
+    XCTAssertEqual(dispatch_semaphore_wait(readRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+
+    // Semaphores, not expectations: a jumper that never starts must not fulfill anything after the test returns.
+    os_unfair_lock lock = OS_UNFAIR_LOCK_INIT;
+    os_unfair_lock * lockPtr = &lock;
+    __block int started = 0;
+    dispatch_semaphore_t jumperStarted = dispatch_semaphore_create(0);
+    dispatch_semaphore_t j1Release = dispatch_semaphore_create(0);
+    for (int i = 0; i < 2; i++) {
+        MTRAsyncWorkItem * jumper = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        jumper.jumpsUnsentWork = YES;
+        jumper.tracksSend = YES; // and it never calls workItem:readyToSend:, so it stays unsent
+        jumper.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+            os_unfair_lock_lock(lockPtr);
+            BOOL first = (++started == 1);
+            os_unfair_lock_unlock(lockPtr);
+            dispatch_semaphore_signal(jumperStarted);
+            if (first) {
+                dispatch_semaphore_wait(j1Release, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+            }
+            completion(MTRAsyncWorkComplete);
+        };
+        [workQueue enqueueWorkItem:jumper descriptionWithFormat:@"send-tracking jumper J%d", i + 1];
+    }
+    XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"one jumper runs above width");
+    XCTAssertNotEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5 * NSEC_PER_SEC))), 0, @"a second send-tracking jumper does not start while the first runs");
+    dispatch_semaphore_signal(j1Release);
+    XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"the second jumper runs once the first completes");
+    os_unfair_lock_lock(lockPtr);
+    XCTAssertEqual(started, 2);
+    os_unfair_lock_unlock(lockPtr);
+    readCompletion(MTRAsyncWorkComplete);
+}
+
 - (void)testReadSendAfterJumperSendReturns
 {
     MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
