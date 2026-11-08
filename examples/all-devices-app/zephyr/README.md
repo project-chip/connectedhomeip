@@ -127,11 +127,18 @@ west build -p always -b esp32c3_devkitm \
 `esp32-zephyr-c6devkitc-all-devices` and `esp32-zephyr-c3devkitm-all-devices`
 (set `ESP32_ZEPHYR_BASE` and `ESP32_ZEPHYR_VENV`, see the lighting example).
 
-Flash and monitor with:
+Flash with:
 
 ```shell
 west flash -d out/esp32-zephyr-c6-all-devices --esp-device /dev/ttyUSB0
-west espressif monitor -p /dev/ttyUSB0 -e out/esp32-zephyr-c6-all-devices/zephyr/zephyr.elf
+```
+
+The monitor reads the build configuration from the current directory, so run
+it from inside the build directory:
+
+```shell
+cd out/esp32-zephyr-c6-all-devices
+west espressif monitor -p /dev/ttyUSB0
 ```
 
 As in the lighting example, the ESP32 default profile has no shell;
