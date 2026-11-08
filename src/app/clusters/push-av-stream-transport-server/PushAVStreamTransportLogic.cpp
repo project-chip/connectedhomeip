@@ -30,6 +30,7 @@
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/util/util.h>
+#include <array>
 #include <assert.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -50,6 +51,49 @@ using namespace chip::app::Clusters::PushAvStreamTransport::Structs;
 using namespace chip::app::Clusters::PushAvStreamTransport::Attributes;
 using namespace Protocols::InteractionModel;
 using chip::Protocols::InteractionModel::Status;
+
+namespace {
+
+bool HasDuplicateLargeMotionZoneIds(
+    const DataModel::DecodableList<chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::DecodableType> &
+        zones)
+{
+    std::array<uint16_t, 256> zoneIds{};
+    auto windowIter = zones.begin();
+    while (true)
+    {
+        size_t count = 0;
+        while (count < zoneIds.size() && windowIter.Next())
+        {
+            const auto & zone = windowIter.GetValue().zone;
+            if (!zone.IsNull())
+            {
+                zoneIds[count++] = zone.Value();
+            }
+        }
+        if (count == 0)
+        {
+            return false;
+        }
+        auto end = zoneIds.begin() + count;
+        std::sort(zoneIds.begin(), end);
+        if (std::adjacent_find(zoneIds.begin(), end) != end)
+        {
+            return true;
+        }
+        auto suffixIter = windowIter;
+        while (suffixIter.Next())
+        {
+            const auto & zone = suffixIter.GetValue().zone;
+            if (!zone.IsNull() && std::binary_search(zoneIds.begin(), end, zone.Value()))
+            {
+                return true;
+            }
+        }
+    }
+}
+
+} // namespace
 
 namespace chip {
 namespace app {
@@ -893,11 +937,11 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTr
         size_t zoneListSize = 0;
         VerifyOrReturnValue(zones.ComputeSize(&zoneListSize) == CHIP_NO_ERROR, Status::InvalidCommand);
 
-        bool nullFound               = false;
-        bool duplicateNull           = false;
-        uint64_t seenBuckets[4]      = {};
-        uint64_t candidateBuckets[4] = {};
-        auto decodeIter              = zones.begin();
+        bool nullFound     = false;
+        bool duplicateNull = false;
+        std::array<uint16_t, 256> zoneIds{};
+        size_t zoneIdCount = 0;
+        auto decodeIter    = zones.begin();
         while (decodeIter.Next())
         {
             const auto & zone = decodeIter.GetValue().zone;
@@ -908,34 +952,25 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTr
             }
             else
             {
-                const uint16_t bucket = zone.Value() >> 8;
-                const uint64_t mask   = uint64_t{ 1 } << (bucket % 64);
-                candidateBuckets[bucket / 64] |= seenBuckets[bucket / 64] & mask;
-                seenBuckets[bucket / 64] |= mask;
+                if (zoneIdCount < zoneIds.size())
+                {
+                    zoneIds[zoneIdCount] = zone.Value();
+                }
+                ++zoneIdCount;
             }
         }
         VerifyOrReturnValue(decodeIter.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
         VerifyOrReturnValue(!duplicateNull, Status::AlreadyExists);
 
-        for (uint16_t bucket = 0; bucket <= UINT8_MAX; ++bucket)
+        if (zoneIdCount <= zoneIds.size())
         {
-            if ((candidateBuckets[bucket / 64] & (uint64_t{ 1 } << (bucket % 64))) == 0)
-            {
-                continue;
-            }
-            uint64_t seenValues[4] = {};
-            auto bucketIter        = zones.begin();
-            while (bucketIter.Next())
-            {
-                const auto & zone = bucketIter.GetValue().zone;
-                if (!zone.IsNull() && (zone.Value() >> 8) == bucket)
-                {
-                    const uint8_t value = static_cast<uint8_t>(zone.Value());
-                    const uint64_t mask = uint64_t{ 1 } << (value % 64);
-                    VerifyOrReturnValue((seenValues[value / 64] & mask) == 0, Status::AlreadyExists);
-                    seenValues[value / 64] |= mask;
-                }
-            }
+            auto end = zoneIds.begin() + zoneIdCount;
+            std::sort(zoneIds.begin(), end);
+            VerifyOrReturnValue(std::adjacent_find(zoneIds.begin(), end) == end, Status::AlreadyExists);
+        }
+        else
+        {
+            VerifyOrReturnValue(!HasDuplicateLargeMotionZoneIds(zones), Status::AlreadyExists);
         }
 
         VerifyOrReturnValue(

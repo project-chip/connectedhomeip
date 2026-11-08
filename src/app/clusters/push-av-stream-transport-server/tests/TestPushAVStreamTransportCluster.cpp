@@ -588,6 +588,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
         Invalid,
         HighIds,
         SpreadIds,
+        PairedBuckets,
+        PairedBucketDuplicate,
         MalformedFirst,
         MalformedAfterUnique,
         DuplicateBeforeMalformed,
@@ -600,13 +602,14 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
         {
             for (const bool modify : { false, true })
             {
-                for (const size_t count : { 2u, 3u, 128u, 254u, 255u, 256u, 257u })
+                for (const size_t count : { 2u, 3u, 128u, 254u, 255u, 256u, 257u, 512u, 513u })
                 {
                     for (const auto zonesCase :
                          { ZonesCase::Omitted, ZonesCase::Null, ZonesCase::Empty, ZonesCase::Unique, ZonesCase::Duplicate,
                            ZonesCase::NonadjacentDuplicate, ZonesCase::DuplicateNull, ZonesCase::SingleNull, ZonesCase::Invalid,
-                           ZonesCase::HighIds, ZonesCase::SpreadIds, ZonesCase::MalformedFirst, ZonesCase::MalformedAfterUnique,
-                           ZonesCase::DuplicateBeforeMalformed, ZonesCase::Truncated })
+                           ZonesCase::HighIds, ZonesCase::SpreadIds, ZonesCase::PairedBuckets, ZonesCase::PairedBucketDuplicate,
+                           ZonesCase::MalformedFirst, ZonesCase::MalformedAfterUnique, ZonesCase::DuplicateBeforeMalformed,
+                           ZonesCase::Truncated })
                     {
                         ZoneDelegate delegate;
                         TestTLSClientManagementDelegate tlsDelegate;
@@ -646,7 +649,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
                         options.containerOptions.containerType = ContainerFormatEnum::kCmaf;
                         options.containerOptions.CMAFContainerOptions.SetValue(cmaf);
 
-                        uint8_t tlvBuffer[4096];
+                        uint8_t tlvBuffer[8192];
                         TLV::TLVWriter writer;
                         writer.Init(tlvBuffer, sizeof(tlvBuffer));
                         TLV::TLVType arrayType;
@@ -682,10 +685,14 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
                             }
                             else if (zonesCase == ZonesCase::SpreadIds)
                             {
-                                zoneId = static_cast<uint16_t>(zoneIndex * 257);
-                                if (zoneId == UINT16_MAX)
+                                zoneId = static_cast<uint16_t>((zoneIndex % 256) * 256 + zoneIndex / 256);
+                            }
+                            else if (zonesCase == ZonesCase::PairedBuckets || zonesCase == ZonesCase::PairedBucketDuplicate)
+                            {
+                                zoneId = static_cast<uint16_t>((zoneIndex / 2 % 256) * 256 + (zoneIndex / 512) * 2 + zoneIndex % 2);
+                                if (zonesCase == ZonesCase::PairedBucketDuplicate && zoneIndex == zoneCount - 1)
                                 {
-                                    --zoneId;
+                                    zoneId = 0;
                                 }
                             }
                             else if (zonesCase == ZonesCase::Invalid && zoneIndex == 0)
@@ -737,7 +744,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
                         }
 
                         const bool duplicate = zonesCase == ZonesCase::Duplicate || zonesCase == ZonesCase::NonadjacentDuplicate ||
-                            zonesCase == ZonesCase::DuplicateNull;
+                            zonesCase == ZonesCase::DuplicateNull || zonesCase == ZonesCase::PairedBucketDuplicate;
                         const bool rejectedBeforeZones =
                             zonesCase == ZonesCase::Omitted || malformed || zonesCase == ZonesCase::Truncated;
                         const bool reachesSize      = !rejectedBeforeZones && zonesCase != ZonesCase::Null && !duplicate;
@@ -772,12 +779,13 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
                         const auto result  = modify ? server.GetLogic().HandleModifyPushTransport(handler, path, modifyData)
                                                     : server.GetLogic().HandleAllocatePushTransport(handler, path, commandData);
                         const auto elapsed = System::SystemClock().GetMonotonicMicroseconds64() - started;
-                        if (!perZoneSensitivity && !modify && triggerType == TransportTriggerTypeEnum::kMotion && count >= 254 &&
-                            (zonesCase == ZonesCase::Unique || zonesCase == ZonesCase::SpreadIds))
+                        if (!perZoneSensitivity && !modify && triggerType == TransportTriggerTypeEnum::kMotion &&
+                            ((count >= 254 && (zonesCase == ZonesCase::Unique || zonesCase == ZonesCase::SpreadIds)) ||
+                             zonesCase == ZonesCase::PairedBuckets))
                         {
-                            ChipLogProgress(Zcl, "MotionZoneTiming count=%u spread=%u elapsed_us=%" PRIu64,
+                            ChipLogProgress(Zcl, "MotionZoneTiming count=%u spread=%u paired=%u elapsed_us=%" PRIu64,
                                             static_cast<unsigned>(count), static_cast<unsigned>(zonesCase == ZonesCase::SpreadIds),
-                                            elapsed.count());
+                                            static_cast<unsigned>(zonesCase == ZonesCase::PairedBuckets), elapsed.count());
                         }
                         if (result.has_value())
                         {
