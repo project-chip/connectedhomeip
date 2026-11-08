@@ -111,11 +111,7 @@ class Esp32ZephyrBuilder(Builder):
         build_flags = " -- " + " ".join(flags) if flags else ""
 
         cmd = self.get_cmd_prefixes()
-        cmd += 'west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}'.format(
-            outdir=shlex.quote(self.output_dir),
-            board=self.board.ZephyrBoardName(),
-            sourcedir=shlex.quote(os.path.join(self.root, self.app.ExampleDirectory())),
-            build_flags=build_flags)
+        cmd += f'west build --cmake-only -d {shlex.quote(self.output_dir)} -b {self.board.ZephyrBoardName()} {shlex.quote(os.path.join(self.root, self.app.ExampleDirectory()))}{build_flags}'
 
         self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 

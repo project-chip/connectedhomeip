@@ -94,17 +94,15 @@ integration.
 | `esp32c3_devkitm`                | ESP32-C3 | Wi-Fi (2.4 GHz), BLE setup           |
 
 Board overlays live in `boards/espressif/`, SoC configuration in `socs/`; the
-values follow the ESP32 Zephyr lighting example.
-The On/Off light drives GPIO2 on the ESP32-C6 and GPIO3 on the ESP32-C3
-(`led0` alias); connect an external LED. The BOOT button (`sw0`, GPIO9) is the
-factory reset button.
+values follow the ESP32 Zephyr lighting example. The On/Off light drives GPIO2
+on the ESP32-C6 and GPIO3 on the ESP32-C3 (`led0` alias); connect an external
+LED. The BOOT button (`sw0`, GPIO9) is the factory reset button.
 
 Set up the Zephyr v4.5.0 west workspace, Python venv and `hal_espressif` blobs
 as described in the
-[ESP32 Zephyr lighting example](../../lighting-app/esp32_zephyr/README.md).
-The workspace does not need a manifest entry for Matter: pass this repository
-as an extra Zephyr module instead. Build without sysbuild (Simple Boot, no
-MCUboot):
+[ESP32 Zephyr lighting example](../../lighting-app/esp32_zephyr/README.md). The
+workspace does not need a manifest entry for Matter: pass this repository as an
+extra Zephyr module instead. Build without sysbuild (Simple Boot, no MCUboot):
 
 ```shell
 source "$CHIP/scripts/activate.sh"
