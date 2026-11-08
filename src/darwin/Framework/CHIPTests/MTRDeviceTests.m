@@ -8638,10 +8638,27 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     inject([self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeFailure], YES);
     expectLevel(@"changed error code", 1, 0);
 
+    // The same code in another domain is a different error.
+    clearLines();
+    inject(@[ @{
+        MTRAttributePathKey : path,
+        MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:MTRInteractionErrorCodeFailure userInfo:nil],
+    } ],
+        YES);
+    expectLevel(@"changed error domain", 1, 0);
+    XCTAssertTrue([device unitTestHasLastLoggedErrorForPath:path], @"the path has an error record before the data value");
+
     // A data value ends the episode; check the record directly, since the value it caches makes the next error purge
     // something and log at error level whether or not the record was cleared.
     inject([self _attributeValueReportForPath:path value:5], YES);
     XCTAssertFalse([device unitTestHasLastLoggedErrorForPath:path], @"a data value clears the path's error record");
+
+    // A data value ends only its own path's episode.
+    clearLines();
+    inject([self _attributeErrorReportForPath:otherPath code:MTRInteractionErrorCodeUnsupportedAttribute], YES);
+    XCTAssertEqual(count(errorLines, otherErrorLineTag), 0, @"another path's repeat after a data value: error-level lines");
+    XCTAssertEqual(count(detailLines, otherErrorLineTag), 1, @"another path's repeat after a data value: detail-level lines");
+
     clearLines();
     inject([self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeFailure], YES);
     expectLevel(@"after a data value", 1, 0);
