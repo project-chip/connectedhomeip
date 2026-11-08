@@ -1055,6 +1055,9 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         self.checker.record_accepted_violation.assert_not_called()
         self.assertTrue(any('Command probes: attempted=0, classified=0, CONSTRAINT_ERROR=0' in line for line in captured.output))
         self.assertTrue(any('Writable attribute probes: attempted=1, classified=1, CONSTRAINT_ERROR=1' in line for line in captured.output))
+        self.assertTrue(any('Command constraint coverage NOT DEMONSTRATED' in line for line in captured.output))
+        self.assertIn('across command and writable attribute probes',
+                      TC_IDM_9_1.steps_TC_IDM_9_1(self.checker)[1].expectation)
 
     async def test_tc_idm_9_1_baseline_subscription_mismatch_is_not_skipped(self):
         from TC_IDM_9_1 import TC_IDM_9_1

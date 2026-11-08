@@ -122,7 +122,7 @@ class TC_IDM_9_1(IDMBaseTest):
         return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "For each accepted command of every standard server cluster on every endpoint of the DUT, identify the command fields with spec-defined constraints (min/max value, min/max length, exact length, count), taking the bounds of an enum-typed field from the values its enum defines rather than from a constraint on the field, and excluding commands that are unsafe to invoke automatically (commissioning, credentials, networking, OTA and access-control flows). For every such field, send Invoke Request messages to the DUT from the TH with that field set to a value violating each testable constraint bound and all other fields set to in-range values. Skip bounds that the field's own data type already enforces.",
-                     "Verify on the TH that a DUT reporting SpecificationVersion 1.7 or later rejects every violating Invoke Request with a CONSTRAINT_ERROR Status Code. A DUT reporting an earlier version, or not reporting SpecificationVersion at all, need only reject at least one. In both cases verify that at least one constraint violation was exercised."),
+                     "Verify on the TH that a DUT reporting SpecificationVersion 1.7 or later rejects every violating Invoke Request with a CONSTRAINT_ERROR Status Code. A DUT reporting an earlier version, or not reporting SpecificationVersion at all, need only reject at least one. If no command violation was exercised, report command coverage as NOT DEMONSTRATED. Verify at least one exercised constraint violation across command and writable attribute probes after Step 2."),
             TestStep(2, "Read every attribute that is writable with bounds from all the clusters from all the endpoints, taking the bounds of an enum-typed attribute from the values its enum defines rather than from a constraint on the attribute. For every writable attribute read, set the data field to an out of bounds value in the Write Request message to the DUT from the TH.",
                      "Verify on the TH that a DUT reporting SpecificationVersion 1.7 or later sends a Status Response Action with a CONSTRAINT_ERROR Status Code for every such write. A DUT reporting an earlier version, or not reporting SpecificationVersion at all, need only do so for at least one."),
         ]
@@ -191,6 +191,9 @@ class TC_IDM_9_1(IDMBaseTest):
                                        rejected_count=commands_rejected_count, probed_count=commands_probed_count)
         asserts.assert_false(failed_command_fields,
                              f"Execution failed for command field probe(s): {', '.join(failed_command_fields)}")
+        if commands_attempted_count == 0:
+            log.warning("Command constraint coverage NOT DEMONSTRATED: no qualified command violation was exercised; "
+                        "minimum coverage is evaluated across command and writable attribute probes after Step 2")
 
         # Step 2: Test all writable attributes with constraints
         self.step(2)
