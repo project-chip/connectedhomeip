@@ -967,8 +967,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                            ZoneCase::Oversized, ZoneCase::InvalidId, ZoneCase::InvalidTLS, ZoneCase::Busy, ZoneCase::NotFound,
                            ZoneCase::InvalidStream, ZoneCase::TimeControl, ZoneCase::GlobalSensitivity })
                     {
-                        if (zoneCase != ZoneCase::Valid && zoneCase != ZoneCase::Mixed &&
-                            sensitivity != (feature ? 5 : -1))
+                        if (zoneCase != ZoneCase::Valid && zoneCase != ZoneCase::Mixed && sensitivity != (feature ? 5 : -1))
                         {
                             continue;
                         }
