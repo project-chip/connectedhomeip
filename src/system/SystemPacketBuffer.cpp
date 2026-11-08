@@ -645,6 +645,10 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     // checked to fit in a size_t.
     const size_t lBlockSize = static_cast<size_t>(sumOfSizes);
     lPacket                 = reinterpret_cast<PacketBuffer *>(chip::Platform::MemoryAlloc(lBlockSize));
+    if (lPacket != nullptr)
+    {
+        SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
+    }
 
 #else
 #error "Unimplemented PacketBuffer storage case"
@@ -655,8 +659,6 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
         ChipLogError(chipSystemLayer, "PacketBuffer: pool EMPTY.");
         return PacketBufferHandle();
     }
-
-    SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
 
     lPacket->payload = lPacket->ReserveStart() + aReservedSize;
     lPacket->len = lPacket->tot_len = 0;
