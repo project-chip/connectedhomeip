@@ -33,10 +33,40 @@ typedef NS_ENUM(NSInteger, MTRAsyncWorkItemState) {
     MTRAsyncWorkItemRetryCountBase = MTRAsyncWorkItemRunning, // values >= MTRAsyncWorkItemRunning encode retryCount
 };
 
+// State managed by the work queue, protected by the queue lock once the item is enqueued.
+@interface MTRAsyncWorkItem ()
+- (BOOL)sent;
+- (void)setSent:(BOOL)sent;
+- (BOOL)countedAboveWidth;
+- (void)setCountedAboveWidth:(BOOL)countedAboveWidth;
+@end
+
 MTR_DIRECT_MEMBERS
 @implementation MTRAsyncWorkItem {
     dispatch_queue_t _queue;
     MTRAsyncWorkItemState _state; // protected by queue lock once enqueued
+    BOOL _sent; // workItem:readyToSend: was called: something has been, or is being, sent
+    BOOL _countedAboveWidth; // running as the one user command allowed above the queue's width
+}
+
+- (BOOL)sent
+{
+    return _sent;
+}
+
+- (void)setSent:(BOOL)sent
+{
+    _sent = sent;
+}
+
+- (BOOL)countedAboveWidth
+{
+    return _countedAboveWidth;
+}
+
+- (void)setCountedAboveWidth:(BOOL)countedAboveWidth
+{
+    _countedAboveWidth = countedAboveWidth;
 }
 
 #pragma mark Configuration by the client
@@ -80,6 +110,23 @@ MTR_DIRECT_MEMBERS
     [self assertMutable];
     _duplicateTypeID = opaqueDuplicateTypeID;
     _duplicateCheckHandler = duplicateCheckHandler;
+}
+
+- (void)setJumpsUnsentWork:(BOOL)jumpsUnsentWork
+{
+    [self assertMutable];
+    _jumpsUnsentWork = jumpsUnsentWork;
+}
+
+- (void)setTracksSend:(BOOL)tracksSend
+{
+    [self assertMutable];
+    _tracksSend = tracksSend;
+}
+
+- (BOOL)isStarted
+{
+    return _state >= MTRAsyncWorkItemRunning;
 }
 
 - (void)assertMutable
@@ -199,6 +246,14 @@ MTR_DIRECT_MEMBERS
     NSMutableArray<MTRAsyncWorkItem *> * _items;
     NSUInteger _runningWorkItemCount;
     NSUInteger _width;
+    // A user command (jumpsUnsentWork) may run beside running items that have sent nothing yet, above _width.  At
+    // most one does: a second one waits for a normal slot, so user commands do not become a second, unbounded
+    // queue.  Running items are always _items[0 ..< _runningWorkItemCount + _runningJumperCount].
+    NSUInteger _runningJumperCount;
+    // Number of user commands inside their own send block (workItem:readyToSend:).  A read's send waits only
+    // while this is non-zero, and only on another thread: in MTRDevice both run on the Matter queue.
+    NSUInteger _jumpersSending;
+    NSCondition * _jumperSendDone;
 }
 
 // A helper struct that facilitates access to _context while
@@ -228,6 +283,7 @@ struct ContextSnapshot {
         _context = context;
         _items = [NSMutableArray array];
         _width = width;
+        _jumperSendDone = [[NSCondition alloc] init];
     }
     return self;
 }
@@ -262,7 +318,23 @@ struct ContextSnapshot {
 
     std::lock_guard lock(_lock);
     [item markEnqueued];
-    [_items addObject:item];
+    if (item.jumpsUnsentWork) {
+        // A user command goes ahead of queued reads that have not started: not yet sent is queued, not running.
+        // It stays behind running items, behind anything that is not such a read (including earlier user
+        // commands, so they keep their order), and behind reads that have started; those finish first.
+        NSUInteger insertionIndex = _items.count;
+        NSUInteger firstQueuedIndex = [self _runningCount];
+        while (insertionIndex > firstQueuedIndex) {
+            MTRAsyncWorkItem * previous = _items[insertionIndex - 1];
+            if (!previous.tracksSend || previous.jumpsUnsentWork || previous.isStarted) {
+                break;
+            }
+            insertionIndex--;
+        }
+        [_items insertObject:item atIndex:insertionIndex];
+    } else {
+        [_items addObject:item];
+    }
 
     if (description) {
         // Logging the description once is enough because other log messages
@@ -285,6 +357,48 @@ struct ContextSnapshot {
         [item cancel];
     }
     [_items removeAllObjects];
+    // Every running item is gone, so is every slot, including one held by a user command above the width.
+    _runningWorkItemCount = 0;
+    _runningJumperCount = 0;
+}
+
+- (NSUInteger)_runningCount
+{
+    os_unfair_lock_assert_owner(&_lock);
+    return _runningWorkItemCount + _runningJumperCount;
+}
+
+// Frees the running slot of `workItem`, which is running.
+- (void)_releaseRunningSlotOfWorkItem:(MTRAsyncWorkItem *)workItem
+{
+    os_unfair_lock_assert_owner(&_lock);
+    if (workItem.countedAboveWidth) {
+        workItem.countedAboveWidth = NO;
+        if (_runningJumperCount == 0) {
+            NSAssert(NO, @"running user command count should be positive");
+            return;
+        }
+        _runningJumperCount--;
+    } else {
+        if (_runningWorkItemCount == 0) {
+            NSAssert(NO, @"running work item count should be positive");
+            return;
+        }
+        _runningWorkItemCount--;
+    }
+}
+
+- (BOOL)_runningItemsHaveAllNotSentWithContext
+{
+    os_unfair_lock_assert_owner(&_lock);
+    NSUInteger runningCount = [self _runningCount];
+    for (NSUInteger i = 0; i < runningCount; i++) {
+        MTRAsyncWorkItem * item = _items[i];
+        if (!item.tracksSend || item.sent) {
+            return NO;
+        }
+    }
+    return YES;
 }
 
 - (void)_postProcessWorkItem:(MTRAsyncWorkItem *)workItem
@@ -295,7 +409,8 @@ struct ContextSnapshot {
 
     BOOL foundWorkItem = NO;
     NSUInteger indexOfWorkItem = 0;
-    for (NSUInteger i = 0; i < _width; i++) {
+    NSUInteger runningCount = [self _runningCount];
+    for (NSUInteger i = 0; i < runningCount && i < _items.count; i++) {
         if (_items[i] == workItem) {
             foundWorkItem = YES;
             indexOfWorkItem = i;
@@ -318,13 +433,8 @@ struct ContextSnapshot {
     [_items removeObjectAtIndex:indexOfWorkItem];
     MTR_LOG("MTRAsyncWorkQueue<%@, items count: %lu> completed work item [%llu]", context.description, static_cast<unsigned long>(_items.count), workItem.uniqueID);
 
-    // sanity check running work item count is positive
-    if (_runningWorkItemCount == 0) {
-        NSAssert(NO, @"running work item count should be positive");
-        return;
-    }
-
-    _runningWorkItemCount--;
+    // Completion frees the slot, also when the item's send failed after workItem:readyToSend:.
+    [self _releaseRunningSlotOfWorkItem:workItem];
     [self _callNextReadyWorkItemWithContext:context];
 }
 
@@ -359,18 +469,32 @@ struct ContextSnapshot {
     }
 
     // sanity check consistent counts
-    if (_items.count < _runningWorkItemCount) {
+    if (_items.count < [self _runningCount]) {
         NSAssert(NO, @"work item count is less than running work item count");
         return;
     }
 
-    // can't run more work items if already running at max concurrent width
+    // At max concurrent width, the one exception is a user command beside running items that have all sent
+    // nothing yet (not yet sent is queued, not running).  It runs above the width, at most one at a time.
     if (_runningWorkItemCount == _width) {
+        NSUInteger nextIndex = [self _runningCount];
+        if (_runningJumperCount == 0 && _items.count > nextIndex && _items[nextIndex].jumpsUnsentWork && [self _runningItemsHaveAllNotSentWithContext]) {
+            if (!context.reference) {
+                MTR_LOG_ERROR("MTRAsyncWorkQueue<%@> context has been lost, dropping queued work items", (id) nil);
+                [_items removeAllObjects];
+                return;
+            }
+            MTRAsyncWorkItem * jumper = _items[nextIndex];
+            jumper.countedAboveWidth = YES;
+            _runningJumperCount++;
+            MTR_LOG("MTRAsyncWorkQueue<%@> starting user command work item [%llu] beside work that has sent nothing yet", context.description, jumper.uniqueID);
+            [self _callWorkItem:jumper withContext:context];
+        }
         return;
     }
 
     // no more items to run
-    if (_items.count == _runningWorkItemCount) {
+    if (_items.count == [self _runningCount]) {
         return; // nothing to run
     }
 
@@ -380,15 +504,15 @@ struct ContextSnapshot {
         return;
     }
 
-    NSUInteger nextWorkItemToRunIndex = _runningWorkItemCount;
+    NSUInteger nextWorkItemToRunIndex = [self _runningCount];
     MTRAsyncWorkItem * workItem = _items[nextWorkItemToRunIndex];
     _runningWorkItemCount++;
 
     // Check if batching is possible or needed.
     auto batchingHandler = workItem.batchingHandler;
     if (batchingHandler) {
-        while (_items.count > _runningWorkItemCount) {
-            NSUInteger nextWorkItemIndex = _runningWorkItemCount;
+        while (_items.count > [self _runningCount]) {
+            NSUInteger nextWorkItemIndex = [self _runningCount];
             MTRAsyncWorkItem * nextWorkItem = _items[nextWorkItemIndex];
             if (!nextWorkItem.batchingHandler || nextWorkItem.batchingID != workItem.batchingID) {
                 goto done; // next item is not eligible to merge with this one
@@ -412,6 +536,11 @@ struct ContextSnapshot {
     }
 
     [self _callWorkItem:workItem withContext:context];
+
+    // If that filled the width with work that has sent nothing, a queued user command may now start beside it.
+    if (_runningWorkItemCount == _width && _runningJumperCount == 0) {
+        [self _callNextReadyWorkItemWithContext:context];
+    }
 }
 
 - (BOOL)hasDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID workItemData:(id)opaqueWorkItemData
@@ -439,14 +568,64 @@ struct ContextSnapshot {
     return _items.count;
 }
 
-- (void)workItem:(MTRAsyncWorkItem *)workItem readyToSend:(dispatch_block_t)send
+- (BOOL)workItem:(MTRAsyncWorkItem *)workItem readyToSend:(dispatch_block_t)send
 {
+    BOOL isJumper = workItem.jumpsUnsentWork;
+    if (isJumper) {
+        {
+            std::lock_guard lock(_lock);
+            if (workItem.isComplete) {
+                return NO; // cancelled before it could send
+            }
+            workItem.sent = YES;
+        }
+        [_jumperSendDone lock];
+        _jumpersSending++;
+        [_jumperSendDone unlock];
+        send();
+        [_jumperSendDone lock];
+        _jumpersSending--;
+        [_jumperSendDone broadcast];
+        [_jumperSendDone unlock];
+        return YES;
+    }
+
+    // Any other item sends at once, unless a user command is inside its own send block on another thread right now;
+    // then it sends as soon as that block returns.  A user command still getting its session never holds it back.
+    [_jumperSendDone lock];
+    while (_jumpersSending > 0) {
+        [_jumperSendDone wait];
+    }
+    [_jumperSendDone unlock];
+    {
+        std::lock_guard lock(_lock);
+        if (workItem.isComplete) {
+            return NO; // cancelled before it could send
+        }
+        workItem.sent = YES;
+    }
     send();
+    return YES;
 }
 
 - (BOOL)cancelWorkItemIfUnsent:(MTRAsyncWorkItem *)workItem
 {
-    return NO;
+    ContextSnapshot context(self); // outside of lock
+    std::lock_guard lock(_lock);
+    NSUInteger index = [_items indexOfObjectIdenticalTo:workItem];
+    if (index == NSNotFound || workItem.sent || workItem.isComplete) {
+        return NO;
+    }
+    BOOL running = (index < [self _runningCount]);
+    if (running) {
+        [self _releaseRunningSlotOfWorkItem:workItem];
+    }
+    [_items removeObjectAtIndex:index];
+    MTR_LOG("MTRAsyncWorkQueue<%@, items count: %lu> cancelled work item [%llu] before it sent anything", context.description, static_cast<unsigned long>(_items.count), workItem.uniqueID);
+    // Marks it complete: its readyHandler will not run, and if it is running its completion returns NO.
+    [workItem cancel];
+    [self _callNextReadyWorkItemWithContext:context];
+    return YES;
 }
 
 @end

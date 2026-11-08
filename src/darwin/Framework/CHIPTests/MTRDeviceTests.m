@@ -9473,6 +9473,44 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     [self _waitForEvents:events count:2 timeout:(3 * kTimeoutInSeconds)];
 }
 
+- (void)test074_ReadThroughThatSentFinishesBeforeLaterUserInvoke
+{
+    // A read-through that has sent its request is running, not queued: a user command queued while it is in flight
+    // waits for it.  This exercises the read-through's request-will-be-sent callback, which marks the read as sent.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    NSMutableArray<NSString *> * events = [NSMutableArray array];
+    [self _recordReadOfUserInvokeReadPathOnDelegate:delegate events:events];
+
+    // Hold the Matter queue so the read-through gets its session and sends in one turn when released, and the
+    // user command is queued behind a read that has by then sent.
+    dispatch_block_t releaseSession = [self _holdMatterQueue];
+    [self _queueReadThroughOfUserInvokeReadPathOnDevice:device];
+    [self _waitForDeviceQueue:device];
+    releaseSession();
+    // Let the read's send happen before the user command is queued.
+    __block BOOL matterQueueTurned = NO;
+    [sController asyncDispatchToMatterQueue:^{
+        matterQueueTurned = YES;
+    } errorHandler:nil];
+    XCTNSPredicateExpectation * turned = [[XCTNSPredicateExpectation alloc] initWithPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable object, NSDictionary * _Nullable bindings) {
+        return matterQueueTurned;
+    }]
+                                                                                       object:nil];
+    [self waitForExpectations:@[ turned ] timeout:kTimeoutInSeconds];
+
+    [self _userInvokeUnitTestingTestOnDevice:device expectedValue:nil token:[[MTRUserInvokeToken alloc] initWithTimeout:nil] completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        @synchronized(events) {
+            [events addObject:@"invoke"];
+        }
+    }];
+    [self _waitForEvents:events count:2 timeout:(3 * kTimeoutInSeconds)];
+    @synchronized(events) {
+        XCTAssertEqualObjects(events, (@[ @"read", @"invoke" ]));
+    }
+}
+
 @end
 
 @interface MTRDeviceResubscriptionTimerTests : MTRTestCase

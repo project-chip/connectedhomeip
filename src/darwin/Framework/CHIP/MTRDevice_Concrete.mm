@@ -42,6 +42,7 @@
 #import "MTRMetricsCollector.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
+#import "MTRUserInvokeToken_Internal.h"
 #import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 #import "zap-generated/MTRCommandPayloads_Private.h"
@@ -3714,6 +3715,10 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
         NSNumber * nodeID = [self nodeID];
+        // The read reports when it is about to send.  Until then, including while it waits for a session, it has
+        // sent nothing: not yet sent is queued, not running, so a user command may go ahead of it.
+        workItem.tracksSend = YES;
+        MTRAsyncWorkItem * __weak weakWorkItem = workItem; // the queue owns the item
 
         [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:^(id opaqueDataCurrent, id opaqueDataNext) {
             mtr_hide(self); // don't capture self accidentally
@@ -3766,34 +3771,44 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             readParams.filterByFabric = NO;
 
             MTRBaseDevice * baseDevice = [self newBaseDevice];
+            MTRAsyncWorkQueue * workQueue = self.asyncWorkQueue;
             mtr_weakify(self);
             [baseDevice
                 readAttributePaths:readRequests
-                        eventPaths:nil
-                            params:readParams
+                eventPaths:nil
+                params:readParams
                 includeDataVersion:YES
-                             queue:self.queue
-                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                            mtr_strongify(self);
-                            VerifyOrReturn(self, MTR_LOG_DEBUG("readAttributeWithEndpointID base device completion called back with nil MTRDevice"));
-                            if (values) {
-                                // Since the format is the same data-value dictionary, this looks like an
-                                // attribute report.  _getAttributesToReportWithReportedValues logs each attribute.
-                                MTR_LOG("Read attribute work item [%llu] result: (%p) with %lu attributes  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, static_cast<unsigned long>(values.count), nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                [self _handleAttributeReport:values fromSubscription:NO];
-                            }
+                requestWillBeSent:^BOOL {
+                    // A read is never cancelled: it always sends.  Reporting the send marks it as running, so user
+                    // commands queued after this no longer go ahead of it.
+                    MTRAsyncWorkItem * item = weakWorkItem;
+                    if (item) {
+                        [workQueue workItem:item readyToSend:^ { }];
+                    }
+                    return YES;
+                }
+                queue:self.queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    mtr_strongify(self);
+                    VerifyOrReturn(self, MTR_LOG_DEBUG("readAttributeWithEndpointID base device completion called back with nil MTRDevice"));
+                    if (values) {
+                        // Since the format is the same data-value dictionary, this looks like an
+                        // attribute report.  _getAttributesToReportWithReportedValues logs each attribute.
+                        MTR_LOG("Read attribute work item [%llu] result: (%p) with %lu attributes  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, static_cast<unsigned long>(values.count), nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                        [self _handleAttributeReport:values fromSubscription:NO];
+                    }
 
-                            // TODO: better retry logic
-                            if (error && (retryCount < 2)) {
-                                MTR_LOG_ERROR("Read attribute work item [%llu] failed (will retry): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                completion(MTRAsyncWorkNeedsRetry);
-                            } else {
-                                if (error) {
-                                    MTR_LOG("Read attribute work item [%llu] failed (giving up): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                }
-                                completion(MTRAsyncWorkComplete);
-                            }
-                        }];
+                    // TODO: better retry logic
+                    if (error && (retryCount < 2)) {
+                        MTR_LOG_ERROR("Read attribute work item [%llu] failed (will retry): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                        completion(MTRAsyncWorkNeedsRetry);
+                    } else {
+                        if (error) {
+                            MTR_LOG("Read attribute work item [%llu] failed (giving up): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                        }
+                        completion(MTRAsyncWorkComplete);
+                    }
+                }];
         }];
         [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"read %@ 0x%llx (%@) 0x%llx (%@)",
                                                   endpointID,
@@ -4088,6 +4103,59 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                        expectedValues:expectedValues
+                 expectedValueInterval:expectedValueInterval
+                    timedInvokeTimeout:timeout
+           serverSideProcessingTimeout:serverSideProcessingTimeout
+                       userInvokeToken:nil
+                                 queue:queue
+                            completion:completion];
+}
+
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(MTRDeviceDataValueDictionary)commandFields
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                     userInvokeToken:(MTRUserInvokeToken * _Nullable)userInvokeToken
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
+    if (userInvokeToken) {
+        // A user command whose caller allows it less than one session attempt would only be queued to fail, so
+        // refuse it now.  The bound is the one used for a single CASE attempt; no separate constant.
+        NSNumber * userTimeoutMs = userInvokeToken.timeoutMs;
+        if (userTimeoutMs != nil && userTimeoutMs.doubleValue < MTRUserInvokeMinimumTimeoutMs()) {
+            MTR_LOG_ERROR("%@ user command timeout %@ ms is shorter than one session attempt (%u ms); not queued", self, userTimeoutMs, MTRUserInvokeMinimumTimeoutMs());
+            dispatch_async(queue, ^{
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+            });
+            return;
+        }
+        if (userInvokeToken.cancelledBeforeUse) {
+            dispatch_async(queue, ^{
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]);
+            });
+            return;
+        }
+        // The caller hears about a user command exactly once: from its result, from a cancel while it has sent
+        // nothing, or from its timeout running out while it has sent nothing.  Whichever comes first wins.
+        auto completedOnce = std::make_shared<std::atomic<bool>>(false);
+        MTRDeviceResponseHandler callerCompletion = completion;
+        completion = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            if (!completedOnce->exchange(true)) {
+                callerCompletion(values, error);
+            }
+        };
+    }
+
     if (!expectedValueInterval || ([expectedValueInterval compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
@@ -4121,6 +4189,14 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     }
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
     uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
+    MTRAsyncWorkItem * __weak weakWorkItem = workItem; // the queue owns the item
+    // Set by the caller-timeout timer before it cancels the item, so the cancel is reported as a timeout.
+    auto cancelledByTimeout = std::make_shared<std::atomic<bool>>(false);
+    if (userInvokeToken) {
+        // A user command goes ahead of queued reads that have sent nothing yet, including reads waiting for a
+        // session: not yet sent is queued, not running.  Reads that have sent finish first.
+        workItem.jumpsUnsentWork = YES;
+    }
     // The command operation will install a duplicate check handler, to return NO for "isDuplicate". Since a command operation may
     // change values, only read requests after this should be considered for duplicate requests.
     [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
@@ -4158,14 +4234,24 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         // and cannot expire.  A retry does not restart the interval.  If the command fails, workDone still removes
         // them.
         MTRRequestWillBeSentHandler requestWillBeSent = nil;
-        if (expectedValues) {
+        if (expectedValues || userInvokeToken) {
             mtr_weakify(self);
+            MTRAsyncWorkQueue * workQueue = self.asyncWorkQueue;
             requestWillBeSent = ^BOOL {
                 mtr_strongify(self);
-                if (!self) {
-                    return YES;
+                __block BOOL send = YES;
+                if (userInvokeToken && weakWorkItem) {
+                    // A user command that has sent nothing can be cancelled up to here: if it was, send nothing.
+                    // Its caller has already been completed by the cancel.  From here on it is sent and completes.
+                    send = [workQueue workItem:weakWorkItem readyToSend:^ { }];
                 }
-                [self _startExpectedValueIntervalForAttributePaths:attributePaths expectedValueID:expectedValueID expectedValueInterval:expectedValueInterval];
+                if (!send) {
+                    MTR_LOG("Invoke work item [%llu] was cancelled before it was sent", workItemID);
+                    return NO;
+                }
+                if (self && expectedValues) {
+                    [self _startExpectedValueIntervalForAttributePaths:attributePaths expectedValueID:expectedValueID expectedValueInterval:expectedValueInterval];
+                }
                 return YES;
             };
         }
@@ -4197,47 +4283,54 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                   workDone(values, error);
                               }];
     }];
-    if (expectedValues) {
-        // The work queue cancels its work items only when the device is invalidated.  A command dropped that way
-        // before it was sent still has pending expected values, which would never expire, so remove them.  Removal
-        // only touches expected values that still carry this ID; a command already in flight loses its expected
-        // values too, as the device is going away.
+    if (expectedValues || userInvokeToken) {
+        // The work queue cancels its work items when the device is invalidated, and a user command's token or
+        // timeout cancels it while it has sent nothing.  A command dropped either way before it was sent still has
+        // pending expected values, which would never expire, so remove them.  Removal only touches expected values
+        // that still carry this ID; a command already in flight loses its expected values too only when the device
+        // is going away.  A user command's caller is told it was cancelled; the timeout reports itself.
         mtr_weakify(self);
         [workItem setCancelHandler:^{
             mtr_strongify(self);
-            VerifyOrReturn(self);
-            [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
+            if (self && expectedValues) {
+                [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
+            }
+            if (userInvokeToken) {
+                NSError * error = cancelledByTimeout->load() ? [MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT] : [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED];
+                dispatch_async(queue, ^{
+                    completion(nil, error);
+                });
+            }
         }];
+    }
+    if (userInvokeToken) {
+        if (![userInvokeToken attachToWorkItem:workItem queue:_asyncWorkQueue]) {
+            MTR_LOG_ERROR("%@ user command token was already used for another invoke; it cannot cancel this one", self);
+        }
+        NSNumber * userTimeoutMs = userInvokeToken.timeoutMs;
+        if (userTimeoutMs != nil) {
+            // The caller's timeout bounds the command's wait in the queue: if it has sent nothing by then, it fails
+            // with a timeout and is never sent.  No constant of our own on this path.
+            MTRAsyncWorkQueue * workQueue = _asyncWorkQueue;
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (userTimeoutMs.doubleValue * NSEC_PER_MSEC)), self.queue, ^{
+                MTRAsyncWorkItem * item = weakWorkItem;
+                if (!item) {
+                    return;
+                }
+                cancelledByTimeout->store(true);
+                if ([workQueue cancelWorkItemIfUnsent:item]) {
+                    MTR_LOG("Invoke work item [%llu] timed out after %@ ms in the queue before it was sent", workItemID, userTimeoutMs);
+                } else {
+                    cancelledByTimeout->store(false); // already sent: it completes as usual
+                }
+            });
+        }
     }
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"invoke %@ 0x%llx (%@) 0x%llx (%@): %@",
                                               endpointID,
                                               clusterID.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue)),
                                               commandID.unsignedLongLongValue, MTRRequestCommandNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue), static_cast<MTRCommandIDType>(commandID.unsignedLongLongValue)),
                                               commandFields];
-}
-
-- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
-                           clusterID:(NSNumber *)clusterID
-                           commandID:(NSNumber *)commandID
-                       commandFields:(MTRDeviceDataValueDictionary)commandFields
-                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
-         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
-                     userInvokeToken:(MTRUserInvokeToken * _Nullable)userInvokeToken
-                               queue:(dispatch_queue_t)queue
-                          completion:(MTRDeviceResponseHandler)completion
-{
-    [self _invokeCommandWithEndpointID:endpointID
-                             clusterID:clusterID
-                             commandID:commandID
-                         commandFields:commandFields
-                        expectedValues:expectedValues
-                 expectedValueInterval:expectedValueInterval
-                    timedInvokeTimeout:timeout
-           serverSideProcessingTimeout:serverSideProcessingTimeout
-                                 queue:queue
-                            completion:completion];
 }
 
 - (BOOL)_invokeResponse:(MTRDeviceResponseValueDictionary)response matchesRequiredResponse:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> *)requiredResponse
