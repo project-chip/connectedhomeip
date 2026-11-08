@@ -1261,6 +1261,11 @@ class IDMBaseTest(BasicCompositionTests):
                 log.warning("Execution failed reading back %s: %s", attribute_path, error)
                 if execution_failure is None:
                     execution_failure = error
+            except signals.TestFailure as error:
+                if not isinstance(execution_failure, asyncio.CancelledError):
+                    raise
+                result.execution_error += 1
+                log.warning("Cancelled write readback assertion failed for %s: %s", attribute_path, error)
             finally:
                 if restore_needed:
                     try:

@@ -637,6 +637,40 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
             attribute=attribute, cluster_class=cluster, datatype=xml_attribute.datatype,
             constraints=xml_attribute.constraints, enum_values=spec_enum_values(xml_cluster, xml_attribute.datatype))
 
+    async def test_cancelled_write_readback_assertion_preserves_cancellation(self):
+        """Cleanup assertions must not replace cancellation of an applied write."""
+        import asyncio
+
+        info = self._prepare_writable_attribute()
+        storage = {'value': 2}
+        applied = asyncio.Event()
+        self.checker.read_single_attribute_check_success = AsyncMock(return_value=2)
+        self.checker.read_single_attribute = AsyncMock(side_effect=signals.TestFailure('readback assertion failed'))
+        self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
+
+        async def write_attribute(**kwargs):
+            value = kwargs['attributes'][0][1].value
+            storage['value'] = value
+            if value == 3:
+                applied.set()
+                await asyncio.Future()
+            return [SimpleNamespace(Status=Status.Success)]
+
+        self.checker.default_controller.WriteAttribute = AsyncMock(side_effect=write_attribute)
+        task = asyncio.create_task(self.checker.check_attribute_constraint(info, info.constraints))
+        try:
+            await asyncio.wait_for(applied.wait(), 5)
+        finally:
+            task.cancel('lost initial write reply')
+        with self.assertRaises(asyncio.CancelledError) as raised:
+            await task
+        self.assertEqual(str(raised.exception), 'lost initial write reply')
+        self.assertEqual(storage['value'], 2)
+        writes = self.checker.default_controller.WriteAttribute.call_args_list
+        self.assertEqual([call.kwargs['attributes'][0][1].value for call in writes], [3, 2])
+        self.assertEqual(self.checker.read_single_attribute.await_count, 1)
+        self.checker.record_accepted_violation.assert_not_called()
+
     async def test_cancelled_applied_write_restores_baseline_and_propagates_cancellation(self):
         """An applied write cancelled before its reply must restore state without suppressing cancellation."""
         import asyncio
