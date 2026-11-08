@@ -99,8 +99,8 @@
 import logging
 
 from mobly import asserts
-from support_modules.idm_support import (ATTRIBUTE_CONSTRAINT_DENIED_ATTRIBUTES, ConstraintProbeExecutionError, IDMBaseTest,
-                                         WritableAttributeInfo, spec_enum_values)
+from support_modules.idm_support import (ATTRIBUTE_CONSTRAINT_DENIED_ATTRIBUTES, ConstraintProbeExecutionError,
+                                         ConstraintProbeResult, IDMBaseTest, WritableAttributeInfo, spec_enum_values)
 
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
@@ -154,25 +154,28 @@ class TC_IDM_9_1(IDMBaseTest):
         failed_command_fields = []
 
         for info in command_field_infos:
+            baseline_failure = None
             try:
                 result = await self.check_command_constraint(info)
             except ConstraintProbeExecutionError as error:
                 result = error.result
             except ChipStackError as e:  # chipstack-ok
-                asserts.fail(f"Execution failed qualifying command field baseline for {info.path_str}: {e}")
+                baseline_failure = f"Execution failed qualifying command field baseline for {info.path_str}: {e}"
+                log.warning("%s", baseline_failure)
+                result = ConstraintProbeResult(execution_error=1)
             commands_attempted_count += result.attempted
             commands_execution_error_count += result.execution_error
             commands_other_error_count += result.other_error
             commands_accepted_count += result.accepted
             if result.execution_error:
-                failed_command_fields.append(info.path_str)
+                failed_command_fields.append(baseline_failure or info.path_str)
             if result.probed:
                 commands_tested_count += 1
                 commands_probed_count += result.probed
                 commands_rejected_count += result.rejected
                 if result.accepted:
                     accepted_command_fields.append(info.path_str)
-            elif result.attempted == 0:
+            elif result.attempted == 0 and not result.execution_error:
                 commands_skipped_count += 1
             if result.execution_error:
                 break
@@ -251,27 +254,30 @@ class TC_IDM_9_1(IDMBaseTest):
             # values come from their enum definition rather than from a <constraint>
             # element. It reports probed == 0, without contacting the DUT, when no
             # violating value could be built.
+            baseline_failure = None
             try:
                 result = await self.check_attribute_constraint(attr_info, attr_info.constraints)
             except ConstraintProbeExecutionError as error:
                 result = error.result
             except ChipStackError as e:  # chipstack-ok
-                asserts.fail(f"Execution failed qualifying writable attribute baseline for "
-                             f"{attr_info.cluster_name}.{attr_info.attribute_name}: {e}")
+                baseline_failure = (f"Execution failed qualifying writable attribute baseline for "
+                                    f"{attr_info.cluster_name}.{attr_info.attribute_name}: {e}")
+                log.warning("%s", baseline_failure)
+                result = ConstraintProbeResult(execution_error=1)
 
             attempted_count += result.attempted
             execution_error_count += result.execution_error
             other_error_count += result.other_error
             accepted_count += result.accepted
             if result.execution_error:
-                failed_attributes.append(f"{attr_info.cluster_name}.{attr_info.attribute_name}")
+                failed_attributes.append(baseline_failure or f"{attr_info.cluster_name}.{attr_info.attribute_name}")
             if result.probed:
                 tested_count += 1
                 probed_count += result.probed
                 rejected_count += result.rejected
                 if result.accepted:
                     accepted_attributes.append(f"{attr_info.cluster_name}.{attr_info.attribute_name}")
-            elif result.attempted == 0:
+            elif result.attempted == 0 and not result.execution_error:
                 skipped_count += 1
             if result.execution_error:
                 break
