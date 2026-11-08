@@ -264,6 +264,7 @@ static NSUInteger HashPath(NSNumber * _Nullable endpoint, NSNumber * _Nullable c
 
 #ifdef DEBUG
 static std::atomic<uint64_t> sBatchInvokeRequestMessageCount { 0 };
+static std::atomic<uint64_t> sSingleInvokeSendCount { 0 };
 static std::atomic<uint16_t> sMaxPathsPerInvokeOverride { 0 };
 #endif
 
@@ -1116,6 +1117,17 @@ private:
                      queue:(dispatch_queue_t)queue
                 completion:(MTRDeviceResponseHandler)completion
 {
+    [self readAttributePaths:attributePaths eventPaths:eventPaths params:params includeDataVersion:includeDataVersion requestWillBeSent:nil queue:queue completion:completion];
+}
+
+- (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                    params:(MTRReadParams * _Nullable)params
+        includeDataVersion:(BOOL)includeDataVersion
+         requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                     queue:(dispatch_queue_t)queue
+                completion:(MTRDeviceResponseHandler)completion
+{
     // NOTE: Do not log the read here.  This is called ether from
     // readAttributePaths:eventPaths:params:queue:completion: or MTRDevice, both
     // of which already log, and we want to be able to tell the two codepaths apart.
@@ -1248,6 +1260,10 @@ private:
                 engine, &exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
             VerifyOrReturnError(readClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
+            if (requestWillBeSent) {
+                // Reads always send; the return value is for invokes.
+                (void) requestWillBeSent();
+            }
             err = readClient->SendRequest(readParams);
 
             if (err != CHIP_NO_ERROR) {
@@ -1297,7 +1313,7 @@ private:
                           attributeID:(NSNumber *)attributeID
                                 value:(id)value
                     timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
-                    requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
+                    requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
                                 queue:(dispatch_queue_t)queue
                            completion:(MTRDeviceResponseHandler)completion
 {
@@ -1306,7 +1322,8 @@ private:
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
             // The session is ready and the write request goes out from here.
             if (requestWillBeSent) {
-                requestWillBeSent();
+                // Writes always send; the return value is for invokes.
+                (void) requestWillBeSent();
             }
 
             // Controller::WriteAttribute guarantees that there will be exactly one call to either the success callback or the
@@ -1715,7 +1732,7 @@ private:
                   timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
          serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
                              logCall:(BOOL)logCall
-                   requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
+                   requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
@@ -1804,9 +1821,12 @@ private:
             }
             // The session is ready and the invoke request goes out now.
             if (requestWillBeSent) {
-                requestWillBeSent();
+                (void) requestWillBeSent();
             }
             ReturnErrorOnFailure(commandSender->SendCommandRequest(session, invokeTimeout));
+#ifdef DEBUG
+            sSingleInvokeSendCount.fetch_add(1, std::memory_order_relaxed);
+#endif
 
             decoder.release();
             commandSender.release();
@@ -2686,6 +2706,16 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 + (NSUInteger)unitTestInvokeRequestMessageCount
 {
     return static_cast<NSUInteger>(sBatchInvokeRequestMessageCount.load(std::memory_order_relaxed));
+}
+
++ (void)unitTestResetSingleInvokeSendCount
+{
+    sSingleInvokeSendCount.store(0, std::memory_order_relaxed);
+}
+
++ (NSUInteger)unitTestSingleInvokeSendCount
+{
+    return static_cast<NSUInteger>(sSingleInvokeSendCount.load(std::memory_order_relaxed));
 }
 
 + (void)unitTestSetMaxPathsPerInvokeOverride:(uint16_t)maxPathsPerInvoke

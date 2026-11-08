@@ -9137,6 +9137,342 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(cachedValue));
 }
 
+#pragma mark - User commands ahead of queued reads
+
+// A read of an attribute the device has not cached, so that a read-through is queued (no subscription is set up).
+- (MTRAttributePath *)_userInvokeReadPath
+{
+    return [MTRAttributePath attributePathWithEndpointID:@(1)
+                                               clusterID:@(MTRClusterIDTypeUnitTestingID)
+                                             attributeID:@(MTRAttributeIDTypeClusterUnitTestingAttributeInt16uID)];
+}
+
+// Records "read" in `events` when the read-through for _userInvokeReadPath reports.
+- (void)_recordReadOfUserInvokeReadPathOnDelegate:(MTRDeviceTestDelegate *)delegate events:(NSMutableArray<NSString *> *)events
+{
+    MTRAttributePath * path = [self _userInvokeReadPath];
+    delegate.forceAttributeReportsIfMatchingCache = YES;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * value in data) {
+            if ([value[MTRAttributePathKey] isEqual:path]) {
+                @synchronized(events) {
+                    [events addObject:@"read"];
+                }
+            }
+        }
+    };
+}
+
+- (void)_queueReadThroughOfUserInvokeReadPathOnDevice:(MTRDevice *)device
+{
+    MTRAttributePath * path = [self _userInvokeReadPath];
+    [device readAttributeWithEndpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute params:nil];
+}
+
+- (void)_waitForEvents:(NSMutableArray<NSString *> *)events count:(NSUInteger)count timeout:(NSTimeInterval)timeout
+{
+    XCTNSPredicateExpectation * done = [[XCTNSPredicateExpectation alloc] initWithPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable object, NSDictionary * _Nullable bindings) {
+        @synchronized(events) {
+            return events.count >= count;
+        }
+    }]
+                                                                                     object:nil];
+    // The callers check `events` afterwards, so a timeout shows up there as a missing or out-of-order event.
+    (void) [XCTWaiter waitForExpectations:@[ done ] timeout:timeout];
+}
+
+- (void)_userInvokeUnitTestingTestOnDevice:(MTRDevice *)device
+                             expectedValue:(NSNumber * _Nullable)expectedValue
+                                     token:(MTRUserInvokeToken * _Nullable)token
+                                completion:(MTRDeviceResponseHandler)completion
+{
+    NSArray * expectedValues = nil;
+    if (expectedValue) {
+        expectedValues = @[ @{ MTRAttributePathKey : [self _expectedValueTestPath], MTRDataKey : [self _expectedValueTestDataValue:expectedValue.unsignedIntValue] } ];
+    }
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(MTRClusterIDTypeUnitTestingID)
+                              commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestID)
+                          commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                         expectedValues:expectedValues
+                  expectedValueInterval:expectedValues ? @(60000) : nil
+                     timedInvokeTimeout:nil
+                        userInvokeToken:token
+                                  queue:dispatch_get_main_queue()
+                             completion:completion];
+}
+
+- (void)test064_UserInvokeSentBeforeQueuedRead
+{
+    // A user command queued behind a read that has sent nothing is sent first.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    NSMutableArray<NSString *> * events = [NSMutableArray array];
+    [self _recordReadOfUserInvokeReadPathOnDelegate:delegate events:events];
+
+    HoldDeviceWorkQueue(device, 1);
+    [self _queueReadThroughOfUserInvokeReadPathOnDevice:device];
+    [self _userInvokeUnitTestingTestOnDevice:device expectedValue:nil token:[[MTRUserInvokeToken alloc] initWithTimeout:nil] completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        @synchronized(events) {
+            [events addObject:@"invoke"];
+        }
+    }];
+    [self _waitForEvents:events count:2 timeout:(3 * kTimeoutInSeconds)];
+    @synchronized(events) {
+        XCTAssertEqualObjects(events, (@[ @"invoke", @"read" ]));
+    }
+}
+
+- (void)test065_CancelledQueuedInvokeNeverSends
+{
+    // A user command cancelled while still queued completes once, with a cancelled error, is never sent, and leaves
+    // no expected value behind.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    [MTRBaseDevice unitTestResetSingleInvokeSendCount];
+    NSMutableArray<NSError *> * errors = [NSMutableArray array];
+    MTRUserInvokeToken * token = [[MTRUserInvokeToken alloc] initWithTimeout:nil];
+
+    NSMutableArray<NSDate *> * releaseTimes = HoldDeviceWorkQueue(device, 1);
+    [self _userInvokeUnitTestingTestOnDevice:device expectedValue:@(9) token:token completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        [errors addObject:error ?: (NSError *) NSNull.null];
+    }];
+    XCTAssertTrue([token cancel]);
+    [self _waitForHoldRelease:releaseTimes];
+    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Nothing more arrives"];
+    settle.inverted = YES;
+    [self waitForExpectations:@[ settle ] timeout:1];
+
+    XCTAssertEqual(errors.count, 1);
+    XCTAssertEqual(errors.firstObject.code, MTRErrorCodeCancelled);
+    XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0);
+    [self _waitForDeviceQueue:device];
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:[self _expectedValueTestPath]][MTRValueKey], @(kExpectedValueTestCachedValue));
+}
+
+- (void)test066_CancelAfterSendStillCompletes
+{
+    // A user command already sent is not cancelled: it completes as usual.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    MTRUserInvokeToken * token = [[MTRUserInvokeToken alloc] initWithTimeout:nil];
+    XCTestExpectation * invokeDone = [[XCTestExpectation alloc] initWithDescription:@"Invoke done"];
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(MTRClusterIDTypeUnitTestingID)
+                              commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestBatchHelperRequestID)
+                          commandFields:@{
+                              MTRTypeKey : MTRStructureValueType,
+                              MTRValueKey : @[
+                                  @{ MTRContextTagKey : @(0), MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(1000) } },
+                                  @{ MTRContextTagKey : @(1), MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(1) } },
+                                  @{ MTRContextTagKey : @(2), MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @('a') } },
+                              ]
+                          }
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                     timedInvokeTimeout:nil
+                        userInvokeToken:token
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 XCTAssertNil(error);
+                                 [invokeDone fulfill];
+                             }];
+    // The accessory sleeps 1 s before answering, so the command is in flight here.
+    XCTestExpectation * inFlight = [[XCTestExpectation alloc] initWithDescription:@"In flight"];
+    inFlight.inverted = YES;
+    [self waitForExpectations:@[ inFlight ] timeout:0.5];
+    XCTAssertFalse([token cancel]);
+    [self waitForExpectations:@[ invokeDone ] timeout:(3 * kTimeoutInSeconds)];
+}
+
+- (void)test067_CancelWhileWaitingForSessionCompletesOnce
+{
+    // A user command cancelled while it waits for its session is never sent, and its caller hears about it exactly
+    // once: the session arriving later does not complete it a second time.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    [MTRBaseDevice unitTestResetSingleInvokeSendCount];
+    NSMutableArray<NSError *> * errors = [NSMutableArray array];
+    MTRUserInvokeToken * token = [[MTRUserInvokeToken alloc] initWithTimeout:nil];
+
+    dispatch_block_t releaseSession = [self _holdMatterQueue];
+    [self _userInvokeUnitTestingTestOnDevice:device expectedValue:nil token:token completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        [errors addObject:error ?: (NSError *) NSNull.null];
+    }];
+    // The work item has started and is waiting for its session.
+    [self _waitForDeviceQueue:device];
+    XCTAssertTrue([token cancel]);
+    releaseSession();
+    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Nothing more arrives"];
+    settle.inverted = YES;
+    [self waitForExpectations:@[ settle ] timeout:2];
+
+    XCTAssertEqual(errors.count, 1);
+    XCTAssertEqual(errors.firstObject.code, MTRErrorCodeCancelled);
+    XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0);
+}
+
+- (void)test068_QueuedInvokeFailsAtCallerTimeout
+{
+    // A user command still queued when its caller's timeout elapses fails then with a timeout error, and is never
+    // sent.  The minimum is lowered so the test need not wait for one whole session attempt.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    [MTRDevice unitTestSetUserInvokeMinimumTimeoutOverrideMs:500];
+    [self addTeardownBlock:^{
+        [MTRDevice unitTestSetUserInvokeMinimumTimeoutOverrideMs:0];
+    }];
+    [MTRBaseDevice unitTestResetSingleInvokeSendCount];
+    NSMutableArray<NSDate *> * releaseTimes = HoldDeviceWorkQueue(device, 3);
+    __block NSDate * failedAt;
+    __block NSError * failure;
+    XCTestExpectation * invokeDone = [[XCTestExpectation alloc] initWithDescription:@"Invoke done"];
+    [self _userInvokeUnitTestingTestOnDevice:device expectedValue:nil token:[[MTRUserInvokeToken alloc] initWithTimeout:@(1000)] completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        failedAt = [NSDate now];
+        failure = error;
+        [invokeDone fulfill];
+    }];
+    [self waitForExpectations:@[ invokeDone ] timeout:(3 * kTimeoutInSeconds)];
+    NSDate * releaseTime = [self _waitForHoldRelease:releaseTimes];
+    XCTAssertEqual(failure.code, MTRErrorCodeTimeout);
+    XCTAssertLessThan([failedAt timeIntervalSinceDate:releaseTime], 0, @"failed while still queued");
+    XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0);
+}
+
+- (void)test069_TimeoutBelowOneSessionAttemptRefused
+{
+    // A caller timeout shorter than one session attempt is refused up front instead of being queued to fail.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    XCTAssertGreaterThan([MTRDevice unitTestUserInvokeMinimumTimeoutMs], 1000);
+    NSUInteger itemsBefore = device.asyncWorkQueue.itemCount;
+    __block NSError * failure;
+    XCTestExpectation * invokeDone = [[XCTestExpectation alloc] initWithDescription:@"Invoke done"];
+    [self _userInvokeUnitTestingTestOnDevice:device expectedValue:nil token:[[MTRUserInvokeToken alloc] initWithTimeout:@(1000)] completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        failure = error;
+        [invokeDone fulfill];
+    }];
+    XCTAssertEqual(device.asyncWorkQueue.itemCount, itemsBefore);
+    [self waitForExpectations:@[ invokeDone ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual(failure.code, MTRErrorCodeInvalidArgument);
+}
+
+- (void)test070_CopiedParamsShareToken
+{
+    // A command made with a copy of its params object is cancelled through the original's token: copies share it.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    MTRUnitTestingClusterTestParams * params = [[MTRUnitTestingClusterTestParams alloc] init];
+    params.userInvokeToken = [[MTRUserInvokeToken alloc] initWithTimeout:nil];
+    MTRUnitTestingClusterTestParams * copied = [params copy];
+    XCTAssertIdentical(copied.userInvokeToken, params.userInvokeToken);
+
+    __auto_type * cluster = [[MTRClusterUnitTesting alloc] initWithDevice:device endpointID:@(1) queue:dispatch_get_main_queue()];
+    NSMutableArray<NSError *> * errors = [NSMutableArray array];
+    NSMutableArray<NSDate *> * releaseTimes = HoldDeviceWorkQueue(device, 1);
+    [cluster testWithParams:copied expectedValues:nil expectedValueInterval:nil completion:^(NSError * _Nullable error) {
+        [errors addObject:error ?: (NSError *) NSNull.null];
+    }];
+    XCTAssertTrue([params.userInvokeToken cancel]);
+    [self _waitForHoldRelease:releaseTimes];
+    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Nothing more arrives"];
+    settle.inverted = YES;
+    [self waitForExpectations:@[ settle ] timeout:1];
+    XCTAssertEqual(errors.count, 1);
+    XCTAssertEqual(errors.firstObject.code, MTRErrorCodeCancelled);
+}
+
+- (void)test071_InvokeWithoutTokenStaysInOrder
+{
+    // A command with no token is queued in order, as before: behind the read queued ahead of it.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    NSMutableArray<NSString *> * events = [NSMutableArray array];
+    [self _recordReadOfUserInvokeReadPathOnDelegate:delegate events:events];
+
+    HoldDeviceWorkQueue(device, 1);
+    [self _queueReadThroughOfUserInvokeReadPathOnDevice:device];
+    [self _userInvokeUnitTestingTestOnDevice:device expectedValue:nil token:nil completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        @synchronized(events) {
+            [events addObject:@"invoke"];
+        }
+    }];
+    [self _waitForEvents:events count:2 timeout:(3 * kTimeoutInSeconds)];
+    @synchronized(events) {
+        XCTAssertEqualObjects(events, (@[ @"read", @"invoke" ]));
+    }
+}
+
+- (void)test072_ReadSendsWhenUserInvokeAheadOfItIsCancelled
+{
+    // A read's send is never cancelled: a cancelled user command ahead of it does not stop the read.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    NSMutableArray<NSString *> * events = [NSMutableArray array];
+    [self _recordReadOfUserInvokeReadPathOnDelegate:delegate events:events];
+    MTRUserInvokeToken * token = [[MTRUserInvokeToken alloc] initWithTimeout:nil];
+
+    HoldDeviceWorkQueue(device, 1);
+    [self _queueReadThroughOfUserInvokeReadPathOnDevice:device];
+    [self _userInvokeUnitTestingTestOnDevice:device expectedValue:nil token:token completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        @synchronized(events) {
+            [events addObject:@"invoke"];
+        }
+    }];
+    [token cancel];
+    [self _waitForEvents:events count:2 timeout:(3 * kTimeoutInSeconds)];
+    @synchronized(events) {
+        XCTAssertTrue([events containsObject:@"read"]);
+    }
+}
+
+- (void)test073_ReadNotHeldByUserInvokeSendingAlongsideIt
+{
+    // A read and a user command that both get their session in the same Matter queue turn both send: the read does
+    // not wait for the command's response.  The accessory takes 2 s to answer the command.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    NSMutableArray<NSString *> * events = [NSMutableArray array];
+    [self _recordReadOfUserInvokeReadPathOnDelegate:delegate events:events];
+
+    dispatch_block_t releaseSession = [self _holdMatterQueue];
+    [self _queueReadThroughOfUserInvokeReadPathOnDevice:device];
+    [self _waitForDeviceQueue:device];
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(MTRClusterIDTypeUnitTestingID)
+                              commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestBatchHelperRequestID)
+                          commandFields:@{
+                              MTRTypeKey : MTRStructureValueType,
+                              MTRValueKey : @[
+                                  @{ MTRContextTagKey : @(0), MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(2000) } },
+                                  @{ MTRContextTagKey : @(1), MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(1) } },
+                                  @{ MTRContextTagKey : @(2), MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @('a') } },
+                              ]
+                          }
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                     timedInvokeTimeout:nil
+                        userInvokeToken:[[MTRUserInvokeToken alloc] initWithTimeout:nil]
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 @synchronized(events) {
+                                     [events addObject:@"invoke"];
+                                 }
+                             }];
+    [self _waitForDeviceQueue:device];
+    NSDate * releaseTime = [NSDate now];
+    releaseSession();
+    [self _waitForEvents:events count:1 timeout:(3 * kTimeoutInSeconds)];
+    NSDate * firstEventTime = [NSDate now];
+    @synchronized(events) {
+        XCTAssertEqualObjects(events.firstObject, @"read");
+    }
+    XCTAssertLessThan([firstEventTime timeIntervalSinceDate:releaseTime], 1.5, @"the read did not wait for the command's 2 s response");
+    [self _waitForEvents:events count:2 timeout:(3 * kTimeoutInSeconds)];
+}
+
 @end
 
 @interface MTRDeviceResubscriptionTimerTests : MTRTestCase

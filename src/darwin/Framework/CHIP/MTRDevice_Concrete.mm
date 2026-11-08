@@ -57,6 +57,7 @@
 #import <app/InteractionModelEngine.h>
 #import <platform/LockTracker.h>
 #import <platform/PlatformManager.h>
+#import <protocols/secure_channel/CASESession.h>
 
 #pragma mark - TimeSynchronization configuration
 
@@ -778,6 +779,22 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     dispatch_sync(self.queue, block);
 }
 #endif
+
+// The shortest caller timeout a user command accepts: one session attempt, the bound OperationalSessionSetup uses
+// for one CASE attempt (CASESession::ComputeSigma1ResponseTimeout with the default MRP config).
+static std::atomic<uint32_t> sUserInvokeMinimumTimeoutOverrideMs { 0 };
+
+static uint32_t MTRUserInvokeMinimumTimeoutMs()
+{
+#ifdef DEBUG
+    uint32_t overrideMs = sUserInvokeMinimumTimeoutOverrideMs.load(std::memory_order_relaxed);
+    if (overrideMs) {
+        return overrideMs;
+    }
+#endif
+    auto timeout = chip::CASESession::ComputeSigma1ResponseTimeout(chip::GetDefaultMRPConfig());
+    return static_cast<uint32_t>(std::chrono::duration_cast<chip::System::Clock::Milliseconds32>(timeout).count());
+}
 
 #pragma mark - Time Synchronization
 
@@ -3902,12 +3919,14 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         // write did not set one; it is a no-op when the merged write replaced it.
         NSNumber * requestExpectedValueID = request[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
         id requestExpectedValueInterval = request[MTRDeviceWriteRequestFieldExpectedValueIntervalIndex];
-        dispatch_block_t requestWillBeSent = nil;
+        MTRRequestWillBeSentHandler requestWillBeSent = nil;
         if (useValueAsExpectedValue || requestExpectedValueInterval != [NSNull null]) {
             mtr_weakify(self);
-            requestWillBeSent = ^{
+            requestWillBeSent = ^BOOL {
                 mtr_strongify(self);
-                VerifyOrReturn(self);
+                if (!self) {
+                    return YES;
+                }
                 if (useValueAsExpectedValue) {
                     [self _startExpectedValueIntervalForAttributePaths:@[ attributePath ] expectedValueID:expectedValueID expectedValueInterval:expectedValueInterval];
                 }
@@ -3916,6 +3935,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                                        expectedValueID:requestExpectedValueID.unsignedLongLongValue
                                                  expectedValueInterval:requestExpectedValueInterval];
                 }
+                return YES;
             };
         }
 
@@ -4137,13 +4157,16 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         // here: getting the session can take longer than the interval.  Until then the expected values stay pending
         // and cannot expire.  A retry does not restart the interval.  If the command fails, workDone still removes
         // them.
-        dispatch_block_t requestWillBeSent = nil;
+        MTRRequestWillBeSentHandler requestWillBeSent = nil;
         if (expectedValues) {
             mtr_weakify(self);
-            requestWillBeSent = ^{
+            requestWillBeSent = ^BOOL {
                 mtr_strongify(self);
-                VerifyOrReturn(self);
+                if (!self) {
+                    return YES;
+                }
                 [self _startExpectedValueIntervalForAttributePaths:attributePaths expectedValueID:expectedValueID expectedValueInterval:expectedValueInterval];
+                return YES;
             };
         }
         MTRBaseDevice * baseDevice = [self newBaseDevice];
@@ -4191,6 +4214,30 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                               clusterID.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue)),
                                               commandID.unsignedLongLongValue, MTRRequestCommandNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue), static_cast<MTRCommandIDType>(commandID.unsignedLongLongValue)),
                                               commandFields];
+}
+
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(MTRDeviceDataValueDictionary)commandFields
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                     userInvokeToken:(MTRUserInvokeToken * _Nullable)userInvokeToken
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                        expectedValues:expectedValues
+                 expectedValueInterval:expectedValueInterval
+                    timedInvokeTimeout:timeout
+           serverSideProcessingTimeout:serverSideProcessingTimeout
+                                 queue:queue
+                            completion:completion];
 }
 
 - (BOOL)_invokeResponse:(MTRDeviceResponseValueDictionary)response matchesRequiredResponse:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> *)requiredResponse
@@ -5765,6 +5812,22 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
 }
 
 @end
+
+#ifdef DEBUG
+@implementation MTRDevice (UserInvokeTestHooks)
+
++ (uint32_t)unitTestUserInvokeMinimumTimeoutMs
+{
+    return MTRUserInvokeMinimumTimeoutMs();
+}
+
++ (void)unitTestSetUserInvokeMinimumTimeoutOverrideMs:(uint32_t)overrideMs
+{
+    sUserInvokeMinimumTimeoutOverrideMs.store(overrideMs, std::memory_order_relaxed);
+}
+
+@end
+#endif
 
 #pragma mark - SubscriptionCallback
 namespace {
