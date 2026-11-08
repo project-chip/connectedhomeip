@@ -771,6 +771,16 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 {
     dispatch_sync(self.queue, block);
 }
+
+- (BOOL)unitTestHasLastLoggedErrorForPath:(MTRAttributePath *)path
+{
+    __block BOOL hasRecord = NO;
+    dispatch_sync(self.queue, ^{
+        std::lock_guard lock(self->_lock);
+        hasRecord = self->_lastLoggedErrorForPath[path] != nil;
+    });
+    return hasRecord;
+}
 #endif
 
 #pragma mark - Time Synchronization

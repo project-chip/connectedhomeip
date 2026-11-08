@@ -143,6 +143,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
 - (NSUInteger)unitTestAttributeCount;
 - (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block;
+// Whether an error is recorded as last logged for the path; syncs onto the device queue.
+- (BOOL)unitTestHasLastLoggedErrorForPath:(MTRAttributePath *)path;
 @end
 #endif
 
