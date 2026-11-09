@@ -46,6 +46,17 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 // Called synchronously on the Matter queue, with the device lock held, for each internal state change.
 @property (atomic, copy, nullable) void (^onInternalStateTransition)(NSUInteger state);
 @property (atomic, nullable) NSNumber * subscriptionMaxIntervalOverride;
+@property (atomic, nullable) NSNumber * resubscriptionDelayOverrideMs;
+// Replaces the backoff MTRDevice waits before reattempting a subscription that failed to set up.
+@property (atomic, nullable) NSNumber * subscriptionResetDelayOverrideMs;
+// Called once the subscription's session request has been queued on the Matter queue.
+@property (atomic, copy, nullable) dispatch_block_t onSubscriptionSessionRequestStarted;
+// When set, called when the subscription's session request fails; its result replaces the request's retry delay, in
+// seconds, as a server-provided busy delay would.
+@property (atomic, copy, nullable) NSNumber * _Nullable (^onSessionRequestFailedRetryDelay)(void);
+@property (atomic, copy, nullable) dispatch_block_t onResubscriptionDelayRequested;
+// When YES, the device ignores operational advertisements, so only other signals can trigger a resubscribe.
+@property (atomic) BOOL ignoreOperationalAdvertisements;
 @property (atomic, copy, nullable) MTRDeviceTestDelegateHandler onUTCTimeSet;
 @property (atomic, copy, nullable) dispatch_block_t onTimeSynchronizationLossDetected;
 @property (atomic) BOOL forceTimeUpdateShortDelayToZero;

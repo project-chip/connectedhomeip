@@ -246,6 +246,7 @@ public:
         if (mState == State::kDefunct)
         {
             MoveToState(State::kActive);
+            NotifySessionRecovered();
         }
     }
 

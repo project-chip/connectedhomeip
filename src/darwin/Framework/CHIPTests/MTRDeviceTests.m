@@ -50,6 +50,9 @@ static const uint64_t kDeviceId1 = 0x12344321;
 static const uint64_t kDeviceId2 = 0x12344322;
 static NSString * kOnboardingPayload1 = @"MT:-24J0AFN00KA0648G00";
 static NSString * kOnboardingPayload2 = @"MT:-24J0AFN00L10648G00";
+#ifdef DEBUG
+static const NSTimeInterval kMaxRecoveryAfterNodeReturnsSeconds = 15;
+#endif
 static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
 
@@ -8547,6 +8550,191 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     // Conservatively assume all-clusters-app has more than 100 attributes ready by MTRDevice by subscription establishment time (last count 1308)
     XCTAssertGreaterThan(values.count, 100);
 }
+
+#ifdef DEBUG
+// test051 needs the resubscription delay override, which MTRDevice only honours in DEBUG builds.
+- (NSTimeInterval)_secondsUntilReachableAfterLongResubscriptionDelay:(MTRDevice *)device nodeReturn:(dispatch_block_t)nodeReturn
+{
+    dispatch_queue_t queue = dispatch_queue_create("reattempt-test.delegate", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.resubscriptionDelayOverrideMs = @(300 * 1000);
+    // The resumed node may also be seen advertising again; ignore that, so recovery has to come from the session.
+    delegate.ignoreOperationalAdvertisements = YES;
+
+    XCTestExpectation * resubscriptionScheduled = [self expectationWithDescription:@"Resubscription scheduled"];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onResubscriptionDelayRequested = ^{
+        weakDelegate.onResubscriptionDelayRequested = nil;
+        weakDelegate.resubscriptionDelayOverrideMs = nil;
+        [resubscriptionScheduled fulfill];
+    };
+
+    XCTestExpectation * reachable = [self expectationWithDescription:@"Reachable after the node returns"];
+    __block NSDate * reachableAt = nil;
+    delegate.onReachable = ^{
+        if (reachableAt == nil) {
+            reachableAt = [NSDate now];
+            [reachable fulfill];
+        }
+    };
+
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ resubscriptionScheduled ] timeout:120];
+
+    NSDate * returnedAt = [NSDate now];
+    nodeReturn();
+    [self waitForExpectations:@[ reachable ] timeout:60];
+
+    __block NSTimeInterval recovery = 0;
+    dispatch_sync(queue, ^{
+        recovery = [reachableAt timeIntervalSinceDate:returnedAt];
+    });
+    return recovery;
+}
+
+- (void)test051_ReattemptWhenSilentNodeResumesWithRecordStillPublished
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+
+    // Unlike terminate, SIGSTOP leaves the operational advertisement published.
+    XCTAssertTrue([app suspend]);
+    __block BOOL resumed = NO;
+    [self addTeardownBlock:^{
+        if (!resumed) {
+            [app resume];
+        }
+    }];
+
+    // The first subscribe reuses the commissioning session, so its timeout takes the ReadClient retry path.
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    NSTimeInterval recovery = [self _secondsUntilReachableAfterLongResubscriptionDelay:device nodeReturn:^{
+        resumed = [app resume];
+        XCTAssertTrue(resumed);
+    }];
+    XCTAssertLessThan(recovery, kMaxRecoveryAfterNodeReturnsSeconds);
+}
+
+// Subscribes, then holds a new CASE attempt open against the suspended server and delivers a message on the previous, defunct
+// session while that attempt is outstanding.  A failed setup's backoff is held at 300 s.  Returns the seconds from that
+// attempt failing to the next subscription setup starting.
+- (NSTimeInterval)_secondsUntilNextSetupAfterSessionRecoversDuringSetupWithFailedRequestRetryDelay:(NSNumber * _Nullable)failedRequestRetryDelay
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+    __block BOOL suspended = NO;
+    [self addTeardownBlock:^{
+        if (suspended) {
+            [app resume];
+        }
+    }];
+
+    dispatch_queue_t queue = dispatch_queue_create("recovery-during-setup-test.delegate", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    // Recovery has to come from the watched session, not from the node being seen advertising.
+    delegate.ignoreOperationalAdvertisements = YES;
+
+    XCTestExpectation * subscribed = [self expectationWithDescription:@"Subscription established"];
+    delegate.onReportEnd = ^{
+        [subscribed fulfill];
+    };
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ subscribed ] timeout:60];
+    delegate.onReportEnd = nil;
+
+    // With the node suspended and the subscription's session defunct, a new subscription needs a new CASE session, and its
+    // Sigma1 goes unanswered.
+    XCTAssertTrue([app suspend]);
+    suspended = YES;
+    XCTestExpectation * defunct = [self expectationWithDescription:@"Watched session marked defunct"];
+    __block BOOL markedDefunct = NO;
+    [controller asyncDispatchToMatterQueue:^{
+        markedDefunct = [device unitTestMarkWatchedSessionDefunct];
+        [defunct fulfill];
+    } errorHandler:nil];
+    [self waitForExpectations:@[ defunct ] timeout:10];
+    XCTAssertTrue(markedDefunct);
+
+    __block NSDate * requestFailedAt = nil;
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onSessionRequestFailedRetryDelay = ^NSNumber * {
+        weakDelegate.onSessionRequestFailedRetryDelay = nil;
+        requestFailedAt = [NSDate now];
+        return failedRequestRetryDelay;
+    };
+
+    XCTestExpectation * requestStarted = [self expectationWithDescription:@"Session request started"];
+    delegate.onSubscriptionSessionRequestStarted = ^{
+        weakDelegate.onSubscriptionSessionRequestStarted = nil;
+        // If this setup fails, the next attempt would otherwise wait this long.
+        weakDelegate.subscriptionResetDelayOverrideMs = @(300 * 1000);
+        [requestStarted fulfill];
+    };
+    [device unitTestResetSubscription];
+    [self waitForExpectations:@[ requestStarted ] timeout:60];
+
+    // The old session hears from the node while that CASE attempt is outstanding.  The session request is already queued on
+    // the Matter queue, so it runs first and finds no usable session.
+    XCTestExpectation * received = [self expectationWithDescription:@"Watched session received a message"];
+    __block BOOL receivedOnWatchedSession = NO;
+    [controller asyncDispatchToMatterQueue:^{
+        receivedOnWatchedSession = [device unitTestReceiveOnWatchedSession];
+        [received fulfill];
+    } errorHandler:nil];
+    [self waitForExpectations:@[ received ] timeout:10];
+    XCTAssertTrue(receivedOnWatchedSession);
+
+    XCTestExpectation * nextSetupStarted = [self expectationWithDescription:@"Next subscription setup started"];
+    __block NSDate * nextSetupStartedAt = nil;
+    delegate.onSubscriptionSetupStarted = ^{
+        weakDelegate.onSubscriptionSetupStarted = nil;
+        nextSetupStartedAt = [NSDate now];
+        [nextSetupStarted fulfill];
+    };
+    [self waitForExpectations:@[ nextSetupStarted ] timeout:120];
+
+    __block NSTimeInterval untilNextSetup = 0;
+    dispatch_sync(queue, ^{
+        XCTAssertNotNil(requestFailedAt);
+        untilNextSetup = [nextSetupStartedAt timeIntervalSinceDate:requestFailedAt];
+    });
+
+    XCTAssertTrue([app resume]);
+    suspended = NO;
+    return untilNextSetup;
+}
+
+- (void)test052_ReattemptWithoutBackoffWhenSessionRecoversDuringSubscriptionSetup
+{
+    // The CASE attempt fails with no server-provided delay; the next setup starts without the 300 s backoff.
+    NSTimeInterval untilNextSetup = [self _secondsUntilNextSetupAfterSessionRecoversDuringSetupWithFailedRequestRetryDelay:nil];
+    XCTAssertLessThan(untilNextSetup, 10);
+}
+
+- (void)test053_HonorServerDelayWhenSessionRecoversDuringSubscriptionSetup
+{
+    // The CASE attempt fails with a server-provided busy delay; the next setup waits for it, but not for the 300 s backoff.
+    NSTimeInterval untilNextSetup = [self _secondsUntilNextSetupAfterSessionRecoversDuringSetupWithFailedRequestRetryDelay:@(20)];
+    XCTAssertGreaterThanOrEqual(untilNextSetup, 19);
+    XCTAssertLessThan(untilNextSetup, 60);
+}
+#endif // DEBUG
 
 @end
 
