@@ -2205,6 +2205,10 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
             ++deallocationCalls;
             if (activeConnection == connectionId)
             {
+                if (deallocationBusy)
+                {
+                    return Status::Busy;
+                }
                 activeConnection = 0;
                 return Status::Success;
             }
@@ -2215,6 +2219,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
         bool restoreBeforeFailure   = false;
         uint16_t activeConnection   = 0;
         size_t deallocationCalls    = 0;
+        bool deallocationBusy       = false;
     } delegate;
     mServer.GetLogic().SetDelegate(&delegate);
     DefaultAttributePersistenceProvider persistence;
@@ -2363,8 +2368,11 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
         MissingOptions,
         VideoStreams,
         AudioStreams,
+        OversizedVideoStreams,
+        OversizedAudioStreams,
     };
-    for (const auto field : { MalformedField::MissingOptions, MalformedField::VideoStreams, MalformedField::AudioStreams })
+    for (const auto field : { MalformedField::MissingOptions, MalformedField::VideoStreams, MalformedField::AudioStreams,
+                              MalformedField::OversizedVideoStreams, MalformedField::OversizedAudioStreams })
     {
         delegate.restorations = 0;
         uint8_t buffer[1024];
@@ -2390,22 +2398,30 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
                           TLV::ContextTag(to_underlying(Structs::TransportConfigurationStruct::Fields::kTransportOptions)),
                           TLV::kTLVType_Structure, optionsType),
                       CHIP_NO_ERROR);
-            const auto streamsField = field == MalformedField::VideoStreams
-                ? Structs::TransportOptionsStruct::Fields::kVideoStreams
-                : Structs::TransportOptionsStruct::Fields::kAudioStreams;
+            const bool video     = field == MalformedField::VideoStreams || field == MalformedField::OversizedVideoStreams;
+            const bool oversized = field == MalformedField::OversizedVideoStreams || field == MalformedField::OversizedAudioStreams;
+            const auto streamsField = video ? Structs::TransportOptionsStruct::Fields::kVideoStreams
+                                            : Structs::TransportOptionsStruct::Fields::kAudioStreams;
             ASSERT_EQ(writer.StartContainer(TLV::ContextTag(to_underlying(streamsField)), TLV::kTLVType_Array, streamsType),
                       CHIP_NO_ERROR);
-            if (field == MalformedField::VideoStreams)
+            const size_t streamCount = oversized ? (video ? kMaxVideoStreams : kMaxAudioStreams) + 1 : 1;
+            for (size_t streamIndex = 0; streamIndex < streamCount; ++streamIndex)
             {
-                Structs::VideoStreamStruct::Type stream{};
-                ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), stream), CHIP_NO_ERROR);
+                if (video)
+                {
+                    Structs::VideoStreamStruct::Type stream{};
+                    ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), stream), CHIP_NO_ERROR);
+                }
+                else
+                {
+                    Structs::AudioStreamStruct::Type stream{};
+                    ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), stream), CHIP_NO_ERROR);
+                }
             }
-            else
+            if (!oversized)
             {
-                Structs::AudioStreamStruct::Type stream{};
-                ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), stream), CHIP_NO_ERROR);
+                ASSERT_EQ(writer.Put(TLV::AnonymousTag(), true), CHIP_NO_ERROR);
             }
-            ASSERT_EQ(writer.Put(TLV::AnonymousTag(), true), CHIP_NO_ERROR);
             ASSERT_EQ(writer.EndContainer(streamsType), CHIP_NO_ERROR);
             ASSERT_EQ(writer.EndContainer(optionsType), CHIP_NO_ERROR);
         }
@@ -2429,15 +2445,31 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
         else
         {
             ASSERT_TRUE(decoded.transportOptions.HasValue());
-            const auto checkStreamError = [&expectedError](const auto & streams) {
+            const bool video     = field == MalformedField::VideoStreams || field == MalformedField::OversizedVideoStreams;
+            const bool oversized = field == MalformedField::OversizedVideoStreams || field == MalformedField::OversizedAudioStreams;
+            const auto checkStreamError = [&expectedError, video, oversized](const auto & streams) {
                 ASSERT_TRUE(streams.HasValue());
                 auto iter = streams.Value().begin();
-                ASSERT_TRUE(iter.Next());
-                ASSERT_FALSE(iter.Next());
-                ASSERT_NE(iter.GetStatus(), CHIP_NO_ERROR);
-                expectedError = iter.GetStatus();
+                if (oversized)
+                {
+                    size_t count = 0;
+                    while (iter.Next())
+                    {
+                        ++count;
+                    }
+                    ASSERT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+                    EXPECT_EQ(count, (video ? kMaxVideoStreams : kMaxAudioStreams) + 1);
+                    expectedError = CHIP_ERROR_BUFFER_TOO_SMALL;
+                }
+                else
+                {
+                    ASSERT_TRUE(iter.Next());
+                    ASSERT_FALSE(iter.Next());
+                    ASSERT_NE(iter.GetStatus(), CHIP_NO_ERROR);
+                    expectedError = iter.GetStatus();
+                }
             };
-            if (field == MalformedField::VideoStreams)
+            if (video)
             {
                 checkStreamError(decoded.transportOptions.Value().videoStreams);
             }
@@ -2470,6 +2502,12 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
     cmaf.segmentDuration = 1000;
     cmaf.chunkDuration   = 500;
     options.containerOptions.CMAFContainerOptions.SetValue(cmaf);
+    std::vector<Structs::VideoStreamStruct::Type> maximumVideoStreams(kMaxVideoStreams);
+    std::vector<Structs::AudioStreamStruct::Type> maximumAudioStreams(kMaxAudioStreams);
+    options.videoStreams.SetValue(
+        DataModel::List<const Structs::VideoStreamStruct::Type>(maximumVideoStreams.data(), maximumVideoStreams.size()));
+    options.audioStreams.SetValue(
+        DataModel::List<const Structs::AudioStreamStruct::Type>(maximumAudioStreams.data(), maximumAudioStreams.size()));
     uint8_t restoredBuffer[1024];
     TLV::TLVWriter restoredWriter;
     restoredWriter.Init(restoredBuffer);
@@ -2500,11 +2538,52 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
     MutableByteSpan retainedRestoration(restoredBuffer);
     ASSERT_EQ(persistence.ReadValue(restoredPath, retainedRestoration), CHIP_NO_ERROR);
     EXPECT_TRUE(retainedRestoration.data_equal(ByteSpan(savedRestoration.data(), savedRestoration.size())));
-    delegate.restoreBeforeFailure = false;
-    delegate.restorationError     = CHIP_NO_ERROR;
+    delegate.deallocationBusy  = true;
+    delegate.deallocationCalls = 0;
+    EXPECT_EQ(mServer.Init(), CHIP_ERROR_INTERNAL);
+    EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+    EXPECT_EQ(delegate.activeConnection, 1u);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), 1u);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.front().connectionID, 1u);
+    EXPECT_EQ(delegate.deallocationCalls, 2u);
+    delegate.restoreBeforeFailure      = false;
+    delegate.restorationError          = CHIP_NO_ERROR;
+    const auto restorationsBeforeRetry = delegate.restorations;
+    EXPECT_EQ(mServer.Init(), CHIP_ERROR_BUSY);
+    EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+    EXPECT_EQ(delegate.restorations, restorationsBeforeRetry);
+    EXPECT_EQ(delegate.activeConnection, 1u);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), 1u);
+    retainedRestoration = MutableByteSpan(restoredBuffer);
+    ASSERT_EQ(persistence.ReadValue(restoredPath, retainedRestoration), CHIP_NO_ERROR);
+    EXPECT_TRUE(retainedRestoration.data_equal(ByteSpan(savedRestoration.data(), savedRestoration.size())));
+    delegate.deallocationBusy = false;
     ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
     EXPECT_TRUE(mServer.GetLogic().IsInitialized());
+    EXPECT_EQ(delegate.activeConnection, 0u);
+    EXPECT_EQ(delegate.deallocationCalls, 4u);
     EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), 2u);
+    const auto restoredOptions = mServer.GetLogic().mCurrentConnections.front().GetTransportOptionsPtr();
+    ASSERT_NE(restoredOptions, nullptr);
+    ASSERT_TRUE(restoredOptions->videoStreams.HasValue());
+    EXPECT_EQ(restoredOptions->videoStreams.Value().size(), kMaxVideoStreams);
+    ASSERT_TRUE(restoredOptions->audioStreams.HasValue());
+    EXPECT_EQ(restoredOptions->audioStreams.Value().size(), kMaxAudioStreams);
+    delegate.activeConnection  = 1;
+    delegate.deallocationCalls = 0;
+    restoredWriter.Init(restoredBuffer);
+    ASSERT_EQ(restoredWriter.Put(TLV::AnonymousTag(), true), CHIP_NO_ERROR);
+    ASSERT_EQ(restoredWriter.Finalize(), CHIP_NO_ERROR);
+    const std::vector<uint8_t> corruptReload(restoredBuffer, restoredBuffer + restoredWriter.GetLengthWritten());
+    ASSERT_EQ(persistence.WriteValue(restoredPath, ByteSpan(corruptReload.data(), corruptReload.size())), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Init(), CHIP_ERROR_WRONG_TLV_TYPE);
+    EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+    EXPECT_EQ(delegate.activeConnection, 0u);
+    EXPECT_EQ(delegate.deallocationCalls, 2u);
+    EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+    retainedRestoration = MutableByteSpan(restoredBuffer);
+    ASSERT_EQ(persistence.ReadValue(restoredPath, retainedRestoration), CHIP_NO_ERROR);
+    EXPECT_TRUE(retainedRestoration.data_equal(ByteSpan(corruptReload.data(), corruptReload.size())));
     mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 

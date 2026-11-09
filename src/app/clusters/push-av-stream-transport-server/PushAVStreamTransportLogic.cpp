@@ -137,6 +137,11 @@ CHIP_ERROR PushAvStreamTransportServerLogic::Init(AttributePersistenceProvider &
 {
     VerifyOrDie(mCluster != nullptr);
 
+    if (!mCurrentConnections.empty())
+    {
+        mAttributeStorage = nullptr;
+        ReturnErrorOnFailure(CleanupFailedRestoration());
+    }
     mAttributeStorage = &attributeStorage;
     CHIP_ERROR err    = LoadPersistentAttributes();
     if (err != CHIP_NO_ERROR)
@@ -252,6 +257,26 @@ void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connec
     mTimerContexts.erase(it, mTimerContexts.end());
 }
 
+CHIP_ERROR PushAvStreamTransportServerLogic::CleanupFailedRestoration()
+{
+    auto connection = mCurrentConnections.begin();
+    while (connection != mCurrentConnections.end())
+    {
+        const auto status = mDelegate->DeallocatePushTransport(connection->connectionID);
+        if (status == Status::Success || status == Status::NotFound)
+        {
+            connection = mCurrentConnections.erase(connection);
+        }
+        else
+        {
+            ChipLogError(Zcl, "Failed to roll back restored connection %u: status %u", connection->connectionID,
+                         to_underlying(status));
+            ++connection;
+        }
+    }
+    return mCurrentConnections.empty() ? CHIP_NO_ERROR : CHIP_ERROR_BUSY;
+}
+
 CHIP_ERROR PushAvStreamTransportServerLogic::LoadPersistentAttributes()
 {
     // Load currentConnections
@@ -261,16 +286,7 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadPersistentAttributes()
     CHIP_ERROR err = mDelegate->PersistentAttributesLoadedCallback();
     if (err != CHIP_NO_ERROR)
     {
-        for (const auto & connection : mCurrentConnections)
-        {
-            const auto status = mDelegate->DeallocatePushTransport(connection.connectionID);
-            if (status != Status::Success && status != Status::NotFound)
-            {
-                ChipLogError(Zcl, "Failed to roll back restored connection %u: status %u", connection.connectionID,
-                             to_underlying(status));
-            }
-        }
-        mCurrentConnections.clear();
+        LogErrorOnFailure(CleanupFailedRestoration());
     }
     return err;
 }
@@ -2176,19 +2192,22 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
         ReturnErrorOnFailure(decoded.Decode(validationReader));
         VerifyOrReturnError(decoded.transportOptions.HasValue(), CHIP_ERROR_MISSING_TLV_ELEMENT);
         const auto & options       = decoded.transportOptions.Value();
-        const auto validateStreams = [](const auto & streams) -> CHIP_ERROR {
+        const auto validateStreams = [](const auto & streams, size_t capacity) -> CHIP_ERROR {
             if (streams.HasValue())
             {
-                auto iter = streams.Value().begin();
+                auto iter    = streams.Value().begin();
+                size_t count = 0;
                 while (iter.Next())
                 {
+                    ++count;
                 }
                 ReturnErrorOnFailure(iter.GetStatus());
+                VerifyOrReturnError(count <= capacity, CHIP_ERROR_BUFFER_TOO_SMALL);
             }
             return CHIP_NO_ERROR;
         };
-        ReturnErrorOnFailure(validateStreams(options.videoStreams));
-        ReturnErrorOnFailure(validateStreams(options.audioStreams));
+        ReturnErrorOnFailure(validateStreams(options.videoStreams, kMaxVideoStreams));
+        ReturnErrorOnFailure(validateStreams(options.audioStreams, kMaxAudioStreams));
         const auto & zones = options.triggerOptions.motionZones;
         if (zones.HasValue() && !zones.Value().IsNull())
         {

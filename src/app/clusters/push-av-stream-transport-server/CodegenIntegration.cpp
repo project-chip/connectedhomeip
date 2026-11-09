@@ -132,7 +132,12 @@ void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate
     if (PushAvStreamTransportServer * cluster = FindClusterOnEndpoint(endpointId); cluster != nullptr)
     {
         cluster->SetDelegate(delegate);
-        TEMPORARY_RETURN_IGNORED cluster->Init();
+        const CHIP_ERROR err = cluster->Init();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Push AV Stream Transport initialization failed on endpoint %u: %" CHIP_ERROR_FORMAT,
+                         endpointId, err.Format());
+        }
     }
 }
 

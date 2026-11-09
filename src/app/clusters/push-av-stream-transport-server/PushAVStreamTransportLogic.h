@@ -174,6 +174,7 @@ private:
      * Helper function that loads all the persistent attributes from the KVS.
      */
     CHIP_ERROR LoadPersistentAttributes();
+    CHIP_ERROR CleanupFailedRestoration();
 
     // Helpers to store and load CurrentConnections list
     CHIP_ERROR StoreCurrentConnections();
