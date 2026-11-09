@@ -2062,6 +2062,13 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
             }
             return Status::NotFound;
         }
+        Status ValidateZoneId(uint16_t zoneId) override
+        {
+            ++zoneIdChecks;
+            return zonesAvailable ? TestPushAVStreamTransportDelegateImpl::ValidateZoneId(zoneId) : Status::Failure;
+        }
+        bool zonesAvailable = true;
+        size_t zoneIdChecks = 0;
         bool ValidateMotionZoneListSize(size_t zoneCount) override { return !enforceZoneCapacity || zoneCount <= 2; }
         size_t restorations         = 0;
         CHIP_ERROR restorationError = CHIP_NO_ERROR;
@@ -2441,6 +2448,84 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
         ASSERT_EQ(persistence.ReadValue(restoredPath, retainedInvalid), CHIP_NO_ERROR);
         EXPECT_TRUE(retainedInvalid.data_equal(ByteSpan(invalidBytes.data(), invalidBytes.size())));
     }
+    delegate.zonesAvailable = false;
+    for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext })
+    {
+        Structs::TransportZoneOptionsStruct::Type restartZones[2];
+        restartZones[0].zone.SetNonNull(1);
+        restartZones[1].zone.SetNonNull(2);
+        restartZones[0].sensitivity.SetValue(5);
+        restartZones[1].sensitivity.SetValue(5);
+        auto restartOptions                       = options;
+        restartOptions.triggerOptions.triggerType = triggerType;
+        restartOptions.triggerOptions.motionZones.SetValue(
+            DataModel::MakeNullable(DataModel::List<const Structs::TransportZoneOptionsStruct::Type>(restartZones)));
+        Structs::TransportConfigurationStruct::Type restartConfig;
+        restartConfig.connectionID    = 7;
+        restartConfig.transportStatus = TransportStatusEnum::kInactive;
+        restartConfig.fabricIndex     = 1;
+        restartConfig.transportOptions.SetValue(restartOptions);
+        restoredWriter.Init(restoredBuffer);
+        ASSERT_EQ(restoredWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, restoredArray), CHIP_NO_ERROR);
+        ASSERT_EQ(restartConfig.EncodeForRead(restoredWriter, TLV::AnonymousTag(), restartConfig.GetFabricIndex()), CHIP_NO_ERROR);
+        ASSERT_EQ(restoredWriter.EndContainer(restoredArray), CHIP_NO_ERROR);
+        ASSERT_EQ(restoredWriter.Finalize(), CHIP_NO_ERROR);
+        const std::vector<uint8_t> restartBytes(restoredBuffer, restoredBuffer + restoredWriter.GetLengthWritten());
+        ASSERT_EQ(persistence.WriteValue(restoredPath, ByteSpan(restartBytes.data(), restartBytes.size())), CHIP_NO_ERROR);
+        delegate.zoneIdChecks = 0;
+        delegate.restorations = 0;
+        ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
+        EXPECT_TRUE(mServer.GetLogic().IsInitialized());
+        EXPECT_EQ(delegate.restorations, 1u);
+        EXPECT_EQ(delegate.zoneIdChecks, 0u);
+        ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), 1u);
+        const auto restored = mServer.GetLogic().mCurrentConnections.front().GetTransportOptionsPtr();
+        ASSERT_NE(restored, nullptr);
+        ASSERT_TRUE(restored->triggerOptions.motionZones.HasValue());
+        ASSERT_FALSE(restored->triggerOptions.motionZones.Value().IsNull());
+        EXPECT_EQ(restored->triggerOptions.motionZones.Value().Value().size(), 2u);
+        uint8_t restartReadBuffer[1024];
+        MutableByteSpan restartRead(restartReadBuffer);
+        ASSERT_EQ(persistence.ReadValue(restoredPath, restartRead), CHIP_NO_ERROR);
+        EXPECT_TRUE(restartRead.data_equal(ByteSpan(restartBytes.data(), restartBytes.size())));
+        uint8_t zoneBuffer[64];
+        TLV::TLVWriter zoneWriter;
+        zoneWriter.Init(zoneBuffer);
+        ASSERT_EQ(DataModel::Encode(zoneWriter, TLV::AnonymousTag(),
+                                    DataModel::List<const Structs::TransportZoneOptionsStruct::Type>(restartZones)),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(zoneWriter.Finalize(), CHIP_NO_ERROR);
+        TLV::TLVReader zoneReader;
+        zoneReader.Init(zoneBuffer, zoneWriter.GetLengthWritten());
+        ASSERT_EQ(zoneReader.Next(), CHIP_NO_ERROR);
+        DataModel::DecodableList<TransportZoneOptionsDecodableStruct> decodedZones;
+        ASSERT_EQ(decodedZones.Decode(zoneReader), CHIP_NO_ERROR);
+        Commands::UpdateMotionZoneOptions::DecodableType update;
+        update.connectionID = 7;
+        update.motionZones.SetValue(DataModel::MakeNullable(decodedZones));
+        Testing::MockCommandHandler commandHandler;
+        commandHandler.SetFabricIndex(1);
+        const ConcreteCommandPath commandPath{ 1, PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        EXPECT_EQ(mServer.GetLogic().HandleUpdateMotionZoneOptions(commandHandler, commandPath, update), std::nullopt);
+        ASSERT_EQ(commandHandler.GetStatuses().size(), 1u);
+        EXPECT_EQ(commandHandler.GetLastStatus().status.GetStatus(), Status::Failure);
+        EXPECT_EQ(commandHandler.GetLastStatus().status.GetClusterSpecificCode(), to_underlying(StatusCodeEnum::kInvalidZone));
+        EXPECT_EQ(delegate.zoneIdChecks, 1u);
+        EXPECT_EQ(mServer.GetLogic().mCurrentConnections.front().GetTransportOptionsPtr(), restored);
+        restartRead = MutableByteSpan(restartReadBuffer);
+        ASSERT_EQ(persistence.ReadValue(restoredPath, restartRead), CHIP_NO_ERROR);
+        EXPECT_TRUE(restartRead.data_equal(ByteSpan(restartBytes.data(), restartBytes.size())));
+        mServer.GetLogic().Shutdown();
+    }
+    delegate.zonesAvailable = true;
+    restoredWriter.Init(restoredBuffer);
+    ASSERT_EQ(restoredWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, restoredArray), CHIP_NO_ERROR);
+    ASSERT_EQ(restoredWriter.EndContainer(restoredArray), CHIP_NO_ERROR);
+    ASSERT_EQ(restoredWriter.Finalize(), CHIP_NO_ERROR);
+    ASSERT_EQ(persistence.WriteValue(restoredPath, ByteSpan(restoredBuffer, restoredWriter.GetLengthWritten())), CHIP_NO_ERROR);
+    ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
+    mServer.GetLogic().Shutdown();
+    delegate.deallocationCalls   = 0;
     delegate.enforceZoneCapacity = false;
     ASSERT_EQ(persistence.WriteValue(restoredPath, ByteSpan(savedRestoration.data(), savedRestoration.size())), CHIP_NO_ERROR);
     delegate.restorations         = 0;

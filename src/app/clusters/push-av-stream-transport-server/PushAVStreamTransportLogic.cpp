@@ -957,7 +957,8 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
 }
 
 DataModel::ActionReturnStatus
-PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTriggerOptionsStruct::DecodableType & triggerOptions)
+PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTriggerOptionsStruct::DecodableType & triggerOptions,
+                                                      bool validateZoneIds)
 {
     if ((triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion ||
          triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext) &&
@@ -1010,7 +1011,7 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTr
         while (iter.Next())
         {
             const auto & transportZoneOption = iter.GetValue();
-            if (!transportZoneOption.zone.IsNull() &&
+            if (validateZoneIds && !transportZoneOption.zone.IsNull() &&
                 mDelegate->ValidateZoneId(transportZoneOption.zone.Value()) != Status::Success)
             {
                 auto status = to_underlying(StatusCodeEnum::kInvalidZone);
@@ -2146,7 +2147,7 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
             ReturnErrorOnFailure(zoneIter.GetStatus());
             VerifyOrReturnError(sensitivityStatus == Status::Success, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(mDelegate->ValidateMotionZoneListSize(zoneCount), CHIP_ERROR_INVALID_ARGUMENT);
-            VerifyOrReturnError(ValidateMotionZones(options.triggerOptions).IsSuccess(), CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(ValidateMotionZones(options.triggerOptions, false).IsSuccess(), CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
     VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);

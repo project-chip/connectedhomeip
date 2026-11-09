@@ -181,7 +181,8 @@ private:
     bool IsNullDelegateWithLogging(EndpointId endpointIdForLogging);
 
     DataModel::ActionReturnStatus
-    ValidateMotionZones(const PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::DecodableType & triggerOptions);
+    ValidateMotionZones(const PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::DecodableType & triggerOptions,
+                        bool validateZoneIds = true);
 
     /**
      * Helper function that loads all the persistent attributes from the KVS.
