@@ -439,7 +439,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     }
 
     // Only a commissioning that is waiting after PASE has an idle commissionee to lose.
-    if ([_controller commissioneeReleasedWhileWaitingAfterPASE:self]) {
+    if ([_controller commissioneeReleasedWhileWaitingAfterPASE:self error:error]) {
         [self _dispatchCommissioningError:error];
     }
 }

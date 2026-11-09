@@ -46,8 +46,20 @@ NS_ASSUME_NONNULL_BEGIN
 // This is currently only true if isInternallyCreated, and is readwrite because
 // MTRDeviceController_Concrete helps maintain this state.
 //
-// Set on the client queue when PASE is established; MTRDeviceController_Concrete
-// reads and clears it on the Matter queue.
+// Accessed from several queues, so the property is atomic:
+// - set to YES on the delegate queue, just before the delegate is told PASE is
+//   established (MTRCommissioningOperation);
+// - cleared on the Matter queue when commissioning resumes
+//   (MTRDeviceController_Concrete commissionNodeWithID:...);
+// - read and cleared on the commissioning queue when the commissionee is
+//   released while waiting (commissioneeReleasedWhileWaitingAfterPASE:);
+// - read on the caller's thread by _cancelCommissioning: to decide whether to
+//   free the controller of the commissioning after a successful cancel.
+// Atomicity makes each access safe; no caller needs the value to stay the same
+// between its read and a later action, because the commissioning queue clears it
+// only once, and _commissioningDone: does nothing for a commissioning that is no
+// longer current, so a cancel racing with a release finishes the commissioning
+// exactly once.
 @property (atomic, readwrite, assign) BOOL isWaitingAfterPASEEstablished;
 
 @end

@@ -94,6 +94,9 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 using namespace chip::Tracing::DarwinFramework;
 
 @interface MTRDeviceController_Concrete ()
+#ifdef DEBUG
+    <MTRDeviceControllerCommissioningTestHooks>
+#endif
 
 // MTRDeviceController ivar internal access
 
@@ -2315,13 +2318,18 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // Just wait for commissionNodeWithID: to be called on us.
 }
 
-- (BOOL)commissioneeReleasedWhileWaitingAfterPASE:(MTRCommissioningOperation *)commissioning
+- (BOOL)commissioneeReleasedWhileWaitingAfterPASE:(MTRCommissioningOperation *)commissioning error:(NSError *)error
 {
     if (!commissioning.isWaitingAfterPASEEstablished) {
         return NO;
     }
 
-    MTR_LOG_ERROR("%@ commissionee for %@ was released while waiting for commissionNodeWithID:", self, commissioning);
+    // A cancel by the client is not an error.
+    if ([MTRError errorToCHIPErrorCode:error] == CHIP_ERROR_CANCELLED) {
+        MTR_LOG("%@ commissionee for %@ was released (cancelled) while waiting for commissionNodeWithID:", self, commissioning);
+    } else {
+        MTR_LOG_ERROR("%@ commissionee for %@ was released while waiting for commissionNodeWithID: %@", self, commissioning, error);
+    }
     commissioning.isWaitingAfterPASEEstablished = NO;
     [self _commissioningDone:commissioning];
     return YES;

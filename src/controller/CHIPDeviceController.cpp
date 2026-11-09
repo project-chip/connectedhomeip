@@ -681,8 +681,9 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
 
     // Release the commissionee device after we have nulled out our pointers,
     // because that can call back in to us with error notifications as the
-    // session is released. A commissionee released here is not a lost session,
-    // so stop it reporting its own release to us.
+    // session is released. Stop the proxy reporting that release back to us
+    // (OnCommissioneeSessionReleased): we are releasing it already, and callers
+    // that need to tell the pairing delegate do so themselves.
     device->SetSessionReleaseDelegate(nullptr);
     mCommissioneeDevicePool.ReleaseObject(device);
 }
@@ -703,7 +704,7 @@ void DeviceCommissioner::OnCommissioneeSessionReleased(CommissioneeDeviceProxy &
     VerifyOrReturn(&device != mDeviceInPASEEstablishment && &device != mDeviceBeingCommissioned);
 
     // The proxy does not touch itself after calling us, so it can be released here.
-    NodeId deviceId = device.GetTemporaryCommissioningId();
+    NodeId deviceId = device.GetDeviceId();
     ChipLogProgress(Controller, "PASE session to commissionee 0x" ChipLogFormatX64 " was released; releasing it",
                     ChipLogValueX64(deviceId));
     ReleaseCommissioneeDevice(&device);
@@ -920,7 +921,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         // already) or something has gone strange. Delete the old device, try
         // again.
         ChipLogError(Controller, "Found unconnected device, removing");
-        NodeId currentId = current->GetTemporaryCommissioningId();
+        NodeId currentId = current->GetDeviceId();
         bool wasIdle     = current != mDeviceInPASEEstablishment && current != mDeviceBeingCommissioned;
         ReleaseCommissioneeDevice(current);
         if (wasIdle && mPairingDelegate != nullptr)
@@ -1265,12 +1266,12 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     }
     else
     {
-        // A commissionee that is not in PASE establishment is idle, and its owner is told it is gone.
-        bool wasIdle = device != mDeviceInPASEEstablishment;
+        bool wasIdle    = device != mDeviceInPASEEstablishment;
+        NodeId deviceId = device->GetDeviceId();
         ReleaseCommissioneeDevice(device);
         if (wasIdle && mPairingDelegate != nullptr)
         {
-            mPairingDelegate->OnCommissioneeReleased(remoteDeviceId, CHIP_ERROR_CANCELLED);
+            mPairingDelegate->OnCommissioneeReleased(deviceId, CHIP_ERROR_CANCELLED);
         }
     }
     return CHIP_NO_ERROR;

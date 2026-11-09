@@ -226,7 +226,7 @@ public:
     std::unique_ptr<State> state;
 };
 
-// 1: the end of the Idle state when the PASE session is released.
+// the end of the Idle state when the PASE session is released.
 TEST_F(TestCommissioneeSessionLoss, ReleasesIdleCommissioneeSynchronouslyWhenPASESessionIsReleased)
 {
     Testing::DeviceCommissionerTestAccess access(&state->commissioner);
@@ -255,7 +255,7 @@ TEST_F(TestCommissioneeSessionLoss, ReleasesIdleCommissioneeSynchronouslyWhenPAS
     EXPECT_EQ(Delegate().released.size(), 1u);
 }
 
-// 2: StopPairing on an idle commissionee ends the Idle state with CHIP_ERROR_CANCELLED.
+// StopPairing on an idle commissionee ends the Idle state with CHIP_ERROR_CANCELLED.
 TEST_F(TestCommissioneeSessionLoss, StopPairingOnIdleCommissioneeReportsCancelled)
 {
     Testing::DeviceCommissionerTestAccess access(&state->commissioner);
@@ -271,7 +271,7 @@ TEST_F(TestCommissioneeSessionLoss, StopPairingOnIdleCommissioneeReportsCancelle
     EXPECT_TRUE(Delegate().commissioningCompletes.empty());
 }
 
-// 3: EstablishPASEConnection for another node ID at the address of an idle commissionee replaces it.
+// EstablishPASEConnection for another node ID at the address of an idle commissionee replaces it.
 TEST_F(TestCommissioneeSessionLoss, EstablishPASEConnectionReplacingIdleCommissioneeReportsIt)
 {
     Testing::DeviceCommissionerTestAccess access(&state->commissioner);
@@ -291,7 +291,7 @@ TEST_F(TestCommissioneeSessionLoss, EstablishPASEConnectionReplacingIdleCommissi
     EXPECT_EQ(Delegate().pairingCompletes.size(), 1u);
 }
 
-// 4: a commissionee being commissioned is neither released nor reported when its session goes away, because
+// a commissionee being commissioned is neither released nor reported when its session goes away, because
 // AutoCommissioner would be left with a dangling proxy.
 TEST_F(TestCommissioneeSessionLoss, CommissioneeBeingCommissionedIsNotReleasedWhenItsSessionIsReleased)
 {
@@ -310,7 +310,7 @@ TEST_F(TestCommissioneeSessionLoss, CommissioneeBeingCommissionedIsNotReleasedWh
     access.SetDeviceBeingCommissioned(nullptr);
 }
 
-// 5: a commissionee in PASE establishment ends with OnPairingComplete, not with this callback.
+// a commissionee in PASE establishment ends with OnPairingComplete, not with this callback.
 TEST_F(TestCommissioneeSessionLoss, CommissioneeInPASEEstablishmentIsNotReported)
 {
     Testing::DeviceCommissionerTestAccess access(&state->commissioner);
@@ -327,7 +327,7 @@ TEST_F(TestCommissioneeSessionLoss, CommissioneeInPASEEstablishmentIsNotReported
     EXPECT_TRUE(Delegate().released.empty());
 }
 
-// 5b: StopPairing in a direct PASE handshake is not an idle release either; only the idle case of its else-branch reports.
+// StopPairing in a direct PASE handshake is not an idle release either; only the idle case of its else-branch reports.
 TEST_F(TestCommissioneeSessionLoss, StopPairingDuringPASEEstablishmentIsNotReported)
 {
     Testing::DeviceCommissionerTestAccess access(&state->commissioner);
@@ -339,7 +339,7 @@ TEST_F(TestCommissioneeSessionLoss, StopPairingDuringPASEEstablishmentIsNotRepor
     EXPECT_TRUE(Delegate().released.empty());
 }
 
-// 6: a defunct PASE session that is then released ends the Idle state like any other release.
+// a defunct PASE session that is then released ends the Idle state like any other release.
 TEST_F(TestCommissioneeSessionLoss, DefunctThenReleasedIsReportedOnce)
 {
     Testing::DeviceCommissionerTestAccess access(&state->commissioner);
@@ -363,7 +363,7 @@ TEST_F(TestCommissioneeSessionLoss, DefunctThenReleasedIsReportedOnce)
     EXPECT_EQ(Delegate().released.size(), 1u);
 }
 
-// 7: Shutdown() releases idle commissionees without reporting them.
+// Shutdown() releases idle commissionees without reporting them.
 TEST_F(TestCommissioneeSessionLoss, ShutdownDoesNotReportIdleCommissionee)
 {
     Testing::DeviceCommissionerTestAccess access(&state->commissioner);
@@ -375,7 +375,7 @@ TEST_F(TestCommissioneeSessionLoss, ShutdownDoesNotReportIdleCommissionee)
     EXPECT_TRUE(Delegate().released.empty());
 }
 
-// 8: the second idle window. A failure at or after network setup keeps the PASE session for a retry (the real
+// the second idle window. A failure at or after network setup keeps the PASE session for a retry (the real
 // CleanupCommissioning decides that); when that session is released later, the callback must still fire.
 TEST_F(TestCommissioneeSessionLoss, CommissioneeKeptAfterFailedCommissioningIsReportedWhenSessionIsReleased)
 {
@@ -402,11 +402,13 @@ TEST_F(TestCommissioneeSessionLoss, CommissioneeKeptAfterFailedCommissioningIsRe
     EXPECT_EQ(access.FindCommissioneeDevice(kNodeA), nullptr);
     ASSERT_EQ(Delegate().released.size(), 1u);
     EXPECT_EQ(Delegate().released[0].deviceId, kNodeA);
+    // The same ID OnCommissioningComplete reported for this commissionee.
+    EXPECT_EQ(Delegate().released[0].deviceId, Delegate().commissioningCompletes[0].deviceId);
     EXPECT_EQ(Delegate().released[0].reason, kSessionReleasedReason);
     EXPECT_EQ(Delegate().commissioningCompletes.size(), 1u);
 }
 
-// 8b: CleanupCommissioning releases the proxy after mDeviceBeingCommissioned is cleared; that release is the end of
+// CleanupCommissioning releases the proxy after mDeviceBeingCommissioned is cleared; that release is the end of
 // commissioning (OnCommissioningComplete), not of the Idle state, so it must not be reported.
 TEST_F(TestCommissioneeSessionLoss, SuccessfulCommissioningCleanupDoesNotReportRelease)
 {
@@ -423,7 +425,7 @@ TEST_F(TestCommissioneeSessionLoss, SuccessfulCommissioningCleanupDoesNotReportR
     EXPECT_TRUE(Delegate().released.empty());
 }
 
-// 9: while a setup-code PASE attempt for B is running, SetUpCodePairer is the pairing delegate and has to pass the release
+// while a setup-code PASE attempt for B is running, SetUpCodePairer is the pairing delegate and has to pass the release
 // of idle commissionee A on to the real delegate, without disturbing B's attempt.
 TEST_F(TestCommissioneeSessionLoss, SetUpCodePairerForwardsReleaseOfIdleCommissioneeDuringAnotherAttempt)
 {
@@ -465,7 +467,7 @@ TEST_F(TestCommissioneeSessionLoss, SetUpCodePairerForwardsReleaseOfIdleCommissi
     EXPECT_TRUE(Delegate().commissioningCompletes.empty());
 }
 
-// 10: several idle commissionees released together are each reported once.
+// several idle commissionees released together are each reported once.
 TEST_F(TestCommissioneeSessionLoss, TwoIdleCommissioneesReleasedTogetherAreEachReportedOnce)
 {
     Testing::DeviceCommissionerTestAccess access(&state->commissioner);
@@ -484,7 +486,7 @@ TEST_F(TestCommissioneeSessionLoss, TwoIdleCommissioneesReleasedTogetherAreEachR
     EXPECT_EQ(Delegate().released.size(), 2u);
 }
 
-// 11: once released, an idle commissionee is gone: StopPairing finds nothing and does not report it a second time.
+// once released, an idle commissionee is gone: StopPairing finds nothing and does not report it a second time.
 TEST_F(TestCommissioneeSessionLoss, StopPairingAfterReleaseFindsNothingAndReportsNothingMore)
 {
     ASSERT_NE(PairIdle(kNodeA, kPortA, 0x1001), nullptr);
@@ -495,7 +497,7 @@ TEST_F(TestCommissioneeSessionLoss, StopPairingAfterReleaseFindsNothingAndReport
     EXPECT_EQ(Delegate().released.size(), 1u);
 }
 
-// 12: regression guard. A commissionee whose PASE session is still live stays idle in the pool.
+// regression guard. A commissionee whose PASE session is still live stays idle in the pool.
 TEST_F(TestCommissioneeSessionLoss, CommissioneeWithLivePASESessionIsKept)
 {
     Testing::DeviceCommissionerTestAccess access(&state->commissioner);

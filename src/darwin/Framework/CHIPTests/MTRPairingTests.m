@@ -18,7 +18,6 @@
 #import <Matter/Matter.h>
 
 #import "MTRDefines_Internal.h"
-#import "MTRDeviceController_Concrete_Test.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRSecureCodingTestHelpers.h"
 #import "MTRTestCase+ServerAppRunner.h"
@@ -1154,7 +1153,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
         }
     });
 
-    [(MTRDeviceController_Concrete *) sController unitTestExpirePASESessions];
+    [sController unitTestExpirePASESessions];
 
     [self waitForExpectations:@[ expectation1 ] timeout:kPairingTimeoutInSeconds];
     MTRSetLogCallback(0, nil);
@@ -1222,7 +1221,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     XCTAssertFalse([sController cancelCommissioningForNodeID:@(nodeID + 1) error:&error]);
     XCTAssertNotNil(error);
 
-    [(MTRDeviceController_Concrete *) sController unitTestExpirePASESessions];
+    [sController unitTestExpirePASESessions];
 
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
     [self _assertConnectionClosedFailure:controllerDelegate];
@@ -1273,7 +1272,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     __auto_type nodeID = ++sDeviceId;
     __auto_type * controllerDelegate1 = [self _pausedCommissioningForPayload:kOnboardingPayload1 nodeID:nodeID expectation:expectation1 queue:callbackQueue];
 
-    [(MTRDeviceController_Concrete *) sController unitTestExpirePASESessions];
+    [sController unitTestExpirePASESessions];
     [sController cancelCommissioningForNodeID:@(nodeID) error:nil];
 
     [self waitForExpectations:@[ expectation1 ] timeout:kPairingTimeoutInSeconds];
@@ -1344,7 +1343,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     XCTAssertNil(error);
     [self waitForExpectations:@[ pausedExpectation2 ] timeout:kPairingTimeoutInSeconds];
 
-    [(MTRDeviceController_Concrete *) sController unitTestExpirePASESessions];
+    [sController unitTestExpirePASESessions];
 
     [self waitForExpectations:@[ expectation2 ] timeout:kPairingTimeoutInSeconds];
     NSError * failure = controllerDelegate.commissioningCompleteError;
@@ -1365,7 +1364,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     NSError * error;
     XCTAssertTrue([sController commissionNodeWithID:@(nodeID) commissioningParams:[[MTRCommissioningParameters alloc] init] error:&error]);
     XCTAssertNil(error);
-    XCTAssertTrue([(MTRDeviceController_Concrete *) sController unitTestNotifyCommissioneePASESessionLost]);
+    XCTAssertTrue([sController unitTestNotifyCommissioneePASESessionLost]);
 
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
     XCTAssertNil(controllerDelegate.commissioningCompleteError);

@@ -257,9 +257,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Notification that the commissionee of a commissioning has been released. Returns YES, after freeing the controller of the
- * commissioning, if it was waiting after PASE (the caller then reports the error); returns NO if it was not.
+ * commissioning, if it was waiting after PASE (the caller then reports the error); returns NO if it was not. The error is
+ * the reason the commissionee was released, used for logging.
  */
-- (BOOL)commissioneeReleasedWhileWaitingAfterPASE:(MTRCommissioningOperation *)commissioning;
+- (BOOL)commissioneeReleasedWhileWaitingAfterPASE:(MTRCommissioningOperation *)commissioning error:(NSError *)error;
 
 /**
  * Notification that a commissioning operation is done.

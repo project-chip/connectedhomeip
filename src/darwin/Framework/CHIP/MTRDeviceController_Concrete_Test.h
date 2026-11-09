@@ -16,24 +16,12 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRDeviceController.h"
-
-#ifdef __cplusplus
-// Implementation side: the class extension below is checked by the compiler against MTRDeviceController_Concrete.mm, which
-// imports this header.
-#import "MTRDeviceController_Concrete.h"
-#else
-// Test side (Objective-C files cannot import MTRDeviceController_Concrete.h, which pulls in C++): just enough of the primary
-// interface for the class extension below to attach to.
-@interface MTRDeviceController_Concrete : MTRDeviceController
-@end
-#endif
-
 NS_ASSUME_NONNULL_BEGIN
 
 #ifdef DEBUG
-// Commissioning test hooks. Call them off the Matter queue, while the controller is running.
-@interface MTRDeviceController_Concrete ()
+// Commissioning test hooks. MTRDeviceController_Concrete adopts this protocol, so the compiler checks that the
+// implementations match these declarations. Call them off the Matter queue, while the controller is running.
+@protocol MTRDeviceControllerCommissioningTestHooks
 - (void)unitTestExpirePASESessions;
 // Delivers a release of the current commissioning's commissionee to the controller delegate bridge, as the commissioner
 // would (OnCommissioneeReleased). Returns NO if there is no current commissioning.
