@@ -103,6 +103,18 @@ static MTRBaseDevice * GetConnectedDevice(void)
 - (nullable NSDictionary<NSString *, id> *)_attributeValueDictionaryForAttributePath:(MTRAttributePath *)attributePath;
 @end
 
+// A token whose cancelledBeforeUse always reads NO, as if a -cancel came after an invoke checked it.  Once cancelled,
+// it stands for a cancel that lands between that check and the token being tied to the invoke's work item.
+@interface MTRUserInvokeTokenCancelledAfterCheck : MTRUserInvokeToken
+@end
+
+@implementation MTRUserInvokeTokenCancelledAfterCheck
+- (BOOL)cancelledBeforeUse
+{
+    return NO;
+}
+@end
+
 // Enqueues a work item that holds the device's work queue for `seconds`, so that work enqueued after it stays
 // queued until then.  The returned array gets one entry, the time the hold ended, just before the queue moves on.
 static NSMutableArray<NSDate *> * HoldDeviceWorkQueue(MTRDevice * device, NSTimeInterval seconds)
@@ -9601,6 +9613,36 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     }
 }
 
+- (void)test076_TokenCancelledBeforeItIsTiedToTheInvokeNeverSends
+{
+    // A token cancelled after the invoke checked it, but before the token is tied to the invoke's work item, still
+    // cancels the invoke: its cancel returned YES, so the invoke completes once with a cancelled error, is never
+    // sent or queued, and leaves no expected value behind.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    [MTRBaseDevice unitTestResetSingleInvokeSendCount];
+    NSUInteger itemsBefore = device.asyncWorkQueue.itemCount;
+    MTRUserInvokeToken * token = [[MTRUserInvokeTokenCancelledAfterCheck alloc] initWithTimeout:nil];
+    XCTAssertTrue([token cancel]);
+
+    NSMutableArray<NSString *> * results = [NSMutableArray array];
+    XCTestExpectation * invokeDone = [[XCTestExpectation alloc] initWithDescription:@"Invoke done"];
+    [self _userInvokeUnitTestingTestOnDevice:device expectedValue:@(9) token:token completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        [results addObject:error ? [NSString stringWithFormat:@"%@ %ld", error.domain, (long) error.code] : @"success"];
+        [invokeDone fulfill];
+    }];
+    XCTAssertEqual(device.asyncWorkQueue.itemCount, itemsBefore);
+    [self waitForExpectations:@[ invokeDone ] timeout:(3 * kTimeoutInSeconds)];
+    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Nothing more arrives"];
+    settle.inverted = YES;
+    [self waitForExpectations:@[ settle ] timeout:1];
+
+    XCTAssertEqualObjects(results, (@[ [NSString stringWithFormat:@"%@ %ld", MTRErrorDomain, (long) MTRErrorCodeCancelled] ]));
+    XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0);
+    [self _waitForDeviceQueue:device];
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:[self _expectedValueTestPath]][MTRValueKey], @(kExpectedValueTestCachedValue));
+}
+
 @end
 
 @interface MTRDeviceResubscriptionTimerTests : MTRTestCase
@@ -10553,6 +10595,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
 @property (atomic, strong, nullable) NSURL * downloadLogReplyURL;
 @property (atomic, strong, nullable) NSError * downloadLogReplyError;
 @property (atomic, strong, nullable) NSXPCConnection * clientConnection;
+@property (atomic) NSUInteger invokeCount;
 @end
 
 @implementation MTRXPCValidationTestServer
@@ -10573,6 +10616,9 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     SEL readAttributePaths = @selector(deviceController:nodeID:readAttributePaths:withReply:);
     NSSet * readClasses = [[exportedInterface classesForSelector:readAttributePaths argumentIndex:2 ofReply:NO] setByAddingObject:[MTRAttributeRequestPath class]];
     [exportedInterface setClasses:readClasses forSelector:readAttributePaths argumentIndex:2 ofReply:NO];
+    SEL invoke = @selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:);
+    NSSet * commandFieldsClasses = [NSSet setWithObjects:[NSDictionary class], [NSArray class], [NSString class], [NSNumber class], [NSData class], nil];
+    [exportedInterface setClasses:commandFieldsClasses forSelector:invoke argumentIndex:5 ofReply:NO];
 
     newConnection.exportedInterface = exportedInterface;
     newConnection.exportedObject = self;
@@ -10604,6 +10650,14 @@ static const unsigned kExpectedValueTestCachedValue = 3;
 - (oneway void)deviceController:(NSUUID *)controller getNodesWithStoredDataWithReply:(void (^)(NSArray<NSNumber *> *))reply
 {
     reply(self.nodesWithStoredDataReply);
+}
+
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID invokeCommandWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID commandFields:(id)commandFields expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval timedInvokeTimeout:(NSNumber * _Nullable)timeout serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout completion:(MTRDeviceResponseHandler)completion
+{
+    @synchronized(self) {
+        self.invokeCount += 1;
+    }
+    completion(@[ @{ MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:endpointID clusterID:clusterID commandID:commandID] } ], nil);
 }
 
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID downloadLogOfType:(MTRDiagnosticLogType)type timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
@@ -11217,6 +11271,67 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqualObjects(receivedEventReports, @[ eventReport ]);
 
     [device removeDelegate:delegate];
+    [controller shutdown];
+}
+
+- (void)_invokeOnXPCDevice:(MTRDevice *)device token:(MTRUserInvokeToken *)token results:(NSMutableArray<NSString *> *)results done:(XCTestExpectation *)done
+{
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(MTRClusterIDTypeUnitTestingID)
+                              commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestID)
+                          commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                     timedInvokeTimeout:nil
+                        userInvokeToken:token
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 [results addObject:error ? [NSString stringWithFormat:@"%@ %ld", error.domain, (long) error.code] : @"success"];
+                                 [done fulfill];
+                             }];
+}
+
+- (void)test015_UserInvokeTokenOnXPCDeviceCannotCancelOnceInvoked
+{
+    // An XPC device sends a user command with no queue to cancel it from, so once the command is made its token's
+    // cancel returns NO, and the command goes ahead.
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    MTRUserInvokeToken * token = [[MTRUserInvokeToken alloc] initWithTimeout:nil];
+    NSMutableArray<NSString *> * results = [NSMutableArray array];
+    XCTestExpectation * invokeDone = [self expectationWithDescription:@"Invoke done"];
+
+    [self _invokeOnXPCDevice:device token:token results:results done:invokeDone];
+    XCTAssertFalse([token cancel], @"an XPC device's user command cannot be cancelled once it is made");
+    [self waitForExpectations:@[ invokeDone ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqualObjects(results, @[ @"success" ]);
+    XCTAssertEqual(server.invokeCount, 1u);
+    [controller shutdown];
+}
+
+- (void)test016_UserInvokeTokenCancelledBeforeXPCInvokeNeverSends
+{
+    // A token cancelled before its command is made returned YES ("never sent"), so an XPC device does not send the
+    // command: it completes once, with a cancelled error.
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    MTRUserInvokeToken * token = [[MTRUserInvokeToken alloc] initWithTimeout:nil];
+    XCTAssertTrue([token cancel]);
+    NSMutableArray<NSString *> * results = [NSMutableArray array];
+    XCTestExpectation * invokeDone = [self expectationWithDescription:@"Invoke done"];
+
+    [self _invokeOnXPCDevice:device token:token results:results done:invokeDone];
+    [self waitForExpectations:@[ invokeDone ] timeout:kTimeoutInSeconds];
+    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Nothing more arrives"];
+    settle.inverted = YES;
+    [self waitForExpectations:@[ settle ] timeout:1];
+
+    XCTAssertEqualObjects(results, (@[ [NSString stringWithFormat:@"%@ %ld", MTRErrorDomain, (long) MTRErrorCodeCancelled] ]));
+    XCTAssertEqual(server.invokeCount, 0u);
+    XCTAssertFalse([token cancel]);
     [controller shutdown];
 }
 
