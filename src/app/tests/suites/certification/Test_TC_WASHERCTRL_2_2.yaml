@@ -88,17 +88,65 @@ tests:
           value: NumberOfRinsesValue
 
     - label:
-          "Step 6: TH writes an unsupported NumberOfRinses attribute to DUT
+          "Step 6a: TH writes an unsupported NumberOfRinses attribute to DUT
           while DUT is not in a valid state."
-      PICS: WASHERCTRL.S.A0002
-      runIf: "not all(value in supportedRinses for value in (0, 1, 2, 3))"
+      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      runIf: >-
+          0 not in supportedRinses and (unsupportedNumberOfRinsesValue == 0 or
+          unsupportedNumberOfRinsesValue in supportedRinses or
+          unsupportedNumberOfRinsesValue not in (0, 1, 2, 3))
       command: "writeAttribute"
       attribute: "NumberOfRinses"
       arguments:
-          value: >-
-              unsupportedNumberOfRinsesValue if unsupportedNumberOfRinsesValue
-              not in supportedRinses else next((value for value in (0, 1, 2, 3)
-              if value not in supportedRinses), 0)
+          value: 0
+      response:
+          error: INVALID_IN_STATE
+
+    - label:
+          "Step 6b: TH writes an unsupported NumberOfRinses attribute to DUT
+          while DUT is not in a valid state."
+      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      runIf: >-
+          1 not in supportedRinses and (unsupportedNumberOfRinsesValue == 1 or
+          ((unsupportedNumberOfRinsesValue in supportedRinses or
+          unsupportedNumberOfRinsesValue not in (0, 1, 2, 3)) and 0 in
+          supportedRinses))
+      command: "writeAttribute"
+      attribute: "NumberOfRinses"
+      arguments:
+          value: 1
+      response:
+          error: INVALID_IN_STATE
+
+    - label:
+          "Step 6c: TH writes an unsupported NumberOfRinses attribute to DUT
+          while DUT is not in a valid state."
+      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      runIf: >-
+          2 not in supportedRinses and (unsupportedNumberOfRinsesValue == 2 or
+          ((unsupportedNumberOfRinsesValue in supportedRinses or
+          unsupportedNumberOfRinsesValue not in (0, 1, 2, 3)) and all(value in
+          supportedRinses for value in (0, 1))))
+      command: "writeAttribute"
+      attribute: "NumberOfRinses"
+      arguments:
+          value: 2
+      response:
+          error: INVALID_IN_STATE
+
+    - label:
+          "Step 6d: TH writes an unsupported NumberOfRinses attribute to DUT
+          while DUT is not in a valid state."
+      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      runIf: >-
+          3 not in supportedRinses and (unsupportedNumberOfRinsesValue == 3 or
+          ((unsupportedNumberOfRinsesValue in supportedRinses or
+          unsupportedNumberOfRinsesValue not in (0, 1, 2, 3)) and all(value in
+          supportedRinses for value in (0, 1, 2))))
+      command: "writeAttribute"
+      attribute: "NumberOfRinses"
+      arguments:
+          value: 3
       response:
           error: INVALID_IN_STATE
 
