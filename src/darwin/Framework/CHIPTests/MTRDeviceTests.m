@@ -9568,7 +9568,8 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     __block BOOL userCommandStarted = NO;
     __block BOOL readReportedBeforeUserCommandStarted = NO;
     dispatch_semaphore_t userCommandRan = dispatch_semaphore_create(0);
-    MTRAsyncWorkItem * userCommand = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    // On the device queue, so that _waitForDeviceQueue: below also waits for its ready handler if the queue starts it.
+    MTRAsyncWorkItem * userCommand = [[MTRAsyncWorkItem alloc] initWithQueue:device.queue];
     userCommand.jumpsUnsentWork = YES;
     userCommand.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
         @synchronized(events) {
@@ -9579,7 +9580,8 @@ static const unsigned kExpectedValueTestCachedValue = 3;
         dispatch_semaphore_signal(userCommandRan);
     };
     [device.asyncWorkQueue enqueueWorkItem:userCommand description:@"user command behind a read-through that has sent"];
-    // Anything the queue dispatches for it on the device queue has run by now.
+    // If the queue started the user command, it dispatched its ready handler onto the device queue during the
+    // enqueue above, so that handler has run by the time this returns.
     [self _waitForDeviceQueue:device];
 
     BOOL startedWhileReadInFlight;
