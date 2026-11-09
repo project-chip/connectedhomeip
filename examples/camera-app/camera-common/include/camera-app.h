@@ -42,7 +42,7 @@ public:
     CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface * cameraDevice);
 
     // Initialize all the camera device clusters.
-    void InitCameraDeviceClusters();
+    CHIP_ERROR InitCameraDeviceClusters();
 
     // Shutdown all the camera device clusters
     void ShutdownCameraDeviceClusters();
@@ -71,6 +71,6 @@ private:
     CHIP_ERROR InitializeCameraAVStreamMgmt();
 };
 
-void CameraAppInit(CameraDeviceInterface * cameraDevice);
+CHIP_ERROR CameraAppInit(CameraDeviceInterface * cameraDevice);
 
 void CameraAppShutdown();
