@@ -279,37 +279,10 @@ not_automated:
     - name: TC_AVANALYTestBase.py
       reason: Shared helper methods for AV Analysis tests, not a standalone test
 
-# Tests requiring specific builds or runtime environments. CI configures
-# these separately; `local.py python-tests` skips them.
+# Tests requiring a specific runtime environment. CI configures these
+# separately; `local.py python-tests` skips them. Runs that need a specific
+# build use a tag instead, such as openssl-3.5.
 dedicated_runner:
-    - name: TC_DA_1_10.py
-      reason:
-          Requires an app and controller built with OpenSSL 3.5. Run in the
-          openssl_3_5_tests CI job with the development DAC-provider fixtures.
-    - name: TC_DA_1_12.py
-      reason:
-          Requires an app and controller built with OpenSSL 3.5. Run in the
-          openssl_3_5_tests CI job with the development DAC-provider fixtures.
-    - name: TC_OPCREDS_3_9.py
-      reason:
-          Requires an app and controller built with OpenSSL 3.5. Run in the
-          openssl_3_5_tests CI job with the development DAC-provider fixtures.
-    - name: TC_NETIM_1_1.py
-      reason:
-          Requires an app to be built with OpenSSL 3.5. Run in the
-          openssl_3_5_tests CI job against network-manager-app.
-    - name: TC_NETIM_1_2.py
-      reason:
-          Requires an app to be built with OpenSSL 3.5. Run in the
-          openssl_3_5_tests CI job against network-manager-app.
-    - name: TC_NETIM_1_3.py
-      reason:
-          Requires an app to be built with OpenSSL 3.5. Run in the
-          openssl_3_5_tests CI job against network-manager-app.
-    - name: TC_NETIM_1_4.py
-      reason:
-          Requires an app to be built with OpenSSL 3.5. Run in the
-          openssl_3_5_tests CI job against network-manager-app.
     - name: TC_COMPRO_2_1.py
       reason:
           Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
@@ -382,13 +355,8 @@ slow_tests:
     - { name: TC_JFADMIN_1_4.py, duration: 1.5 minutes }
     - { name: TC_JFADMIN_2_1.py, duration: 30 seconds }
     - { name: TC_JFADMIN_2_2.py, duration: 30 seconds }
-# These tests run only in .github/workflows/nightly.yaml, not in PR CI. Each ${VAR} in their
-# CI arguments needs a build step and a /tmp/test_env.yaml entry in nightly.yaml.
-# BEGIN-IF-CHANGE-ALSO-CHANGE(.github/workflows/nightly.yaml)
-nightly:
     - { name: TC_SU_2_2.py, duration: 35 minutes }
     - { name: TC_SU_2_4.py, duration: 10 minutes }
     - { name: TC_SU_2_5.py, duration: 20 minutes }
     - { name: TC_CC_2_2.py, duration: 2.5 minutes }
     - { name: TC_BRBINFO_4_1.py, duration: 5 minutes }
-# END-IF-CHANGE-ALSO-CHANGE(.github/workflows/nightly.yaml)
