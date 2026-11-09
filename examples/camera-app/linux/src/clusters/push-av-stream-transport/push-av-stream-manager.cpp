@@ -654,17 +654,20 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
                 {
                     ChipLogError(Zcl, "Failed to re-allocate transport for connection ID: %u, status: %u", connectionID,
                                  to_underlying(status));
+                    return CHIP_ERROR_INCORRECT_STATE;
                 }
             }
             else
             {
                 ChipLogError(Zcl, "TransportOptionsPtr is null for connection ID: %u", connectionID);
+                return CHIP_ERROR_INCORRECT_STATE;
             }
         }
     }
     else
     {
         ChipLogError(Zcl, "PushAvStreamTransportServer is null!");
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     return CHIP_NO_ERROR;
