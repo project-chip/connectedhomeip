@@ -236,9 +236,9 @@ CHIP_ERROR CommissionerDeclaration::ReadPayload(uint8_t * udcPayload, size_t pay
             err, ChipLogError(AppServer, "CommissionerDeclaration::ReadPayload read error %" CHIP_ERROR_FORMAT, err.Format()));
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err,
-                        ChipLogError(AppServer, "CommissionerDeclaration::ReadPayload exiting early error %" CHIP_ERROR_FORMAT,
-                                     err.Format()));
+    VerifyOrReturnError(
+        err == CHIP_END_OF_TLV, err,
+        ChipLogError(AppServer, "CommissionerDeclaration::ReadPayload exiting early error %" CHIP_ERROR_FORMAT, err.Format()));
     ReturnErrorOnFailure(reader.ExitContainer(outerContainerType));
 
     ChipLogProgress(AppServer, "UDC TLV parse complete");
