@@ -35,10 +35,6 @@ CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip
         return CHIP_ERROR_NO_MEMORY;
     }
     ::chip::Encoding::LittleEndian::PacketBufferWriter bbuf(std::move(packetBufHandle), msgDataSize);
-    if (bbuf.IsNull())
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
     msgStruct.WriteToBuffer(bbuf);
     msgBuf = bbuf.Finalize();
     if (msgBuf.IsNull())
