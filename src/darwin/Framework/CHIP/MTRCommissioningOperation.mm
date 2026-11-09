@@ -432,12 +432,16 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     });
 }
 
-- (void)controller:(MTRDeviceController *)controller commissioneePASESessionLostForNodeID:(NSNumber *)nodeID
+- (void)controller:(MTRDeviceController *)controller commissioneeReleasedForNodeID:(NSNumber *)nodeID error:(NSError *)error
 {
     if (![nodeID isEqual:_commissioningID]) {
         return;
     }
-    [_controller commissioneePASESessionLost:self];
+
+    // Only a commissioning that is waiting after PASE has an idle commissionee to lose.
+    if ([_controller commissioneeReleasedWhileWaitingAfterPASE:self]) {
+        [self _dispatchCommissioningError:error];
+    }
 }
 
 - (void)controllerStartingNetworkScan:(MTRDeviceController *)controller

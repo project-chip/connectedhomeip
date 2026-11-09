@@ -1163,9 +1163,8 @@ private:
     CommissioneeDeviceProxy * CreateCommissioneeDevice();
 
     // CommissioneeDeviceProxy::SessionReleaseDelegate: a commissionee that is idle (neither in PASE establishment nor being
-    // commissioned) and loses its session is released, and the pairing delegate's OnPASESessionLost is called.
+    // commissioned) and loses its session is released, and the pairing delegate's OnCommissioneeReleased is called.
     void OnCommissioneeSessionReleased(CommissioneeDeviceProxy & device) override;
-    static void ReleaseCommissioneesWithLostSessions(System::Layer *, void * context);
 
     bool ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                    Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,

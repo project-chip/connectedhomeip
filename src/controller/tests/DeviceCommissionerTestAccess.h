@@ -74,21 +74,16 @@ public:
 
     void FailPASE(CHIP_ERROR error) { mCommissioner->OnSessionEstablishmentError(error); }
 
-    // Puts a commissionee in the pool as the one in PASE establishment, the state EstablishPASEConnection leaves it in.
-    CommissioneeDeviceProxy * StartPASEEstablishment(NodeId deviceId, const Transport::PeerAddress & peerAddress)
-    {
-        auto * device = mCommissioner->CreateCommissioneeDevice();
-        VerifyOrReturnValue(device != nullptr, nullptr);
-        device->Init(mCommissioner->GetControllerDeviceInitParams(), deviceId, peerAddress);
-        mCommissioner->mDeviceInPASEEstablishment = device;
-        return device;
-    }
-
     void CompletePASE(const SessionHandle & session) { mCommissioner->OnSessionEstablished(session); }
 
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId deviceId) { return mCommissioner->FindCommissioneeDevice(deviceId); }
 
     SessionManager * GetSessionManager() { return mCommissioner->SessionMgr(); }
+
+    void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const Controller::CompletionStatus & completionStatus)
+    {
+        mCommissioner->CleanupCommissioning(proxy, nodeId, completionStatus);
+    }
 
 #if CONFIG_NETWORK_LAYER_BLE
     BLE_CONNECTION_OBJECT GetPASEConnectionObject() const
