@@ -40,8 +40,8 @@ import tabulate
 import yaml
 
 with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-    from matter.testing.metadata import (SLOW_TAG, TAG_OPTION_HELP, TagFilter, extract_runs_args, parse_duration,
-                                         runs_in_pull_requests, unused_tag_values)
+    from matter.testing.metadata import (SLOW_TAG, TAG_OPTION_HELP, TagFilter, extract_runs_args, runs_in_pull_requests,
+                                         unused_tag_values)
     from matter.testing.tasks import SubprocessKind
 
 
@@ -57,13 +57,6 @@ def _get_runs_from_script(path: str) -> dict[str, dict]:
     except Exception as e:
         log.warning("Failed to parse metadata from '%s': %r", path, e)
         return {}
-
-
-def _format_duration(seconds: float) -> str:
-    """Return seconds as '<n> seconds', or as '<n> minutes' from 2 minutes up."""
-    if seconds >= 120:
-        return f"{round(seconds / 60, 2):g} minutes"
-    return f"{round(seconds):d} seconds"
 
 
 def _get_app_from_run(run_config: dict) -> str:
@@ -1112,11 +1105,11 @@ def python_tests(
 
             # Without --run or --tag, run_python_test.py executes the runs PR CI runs.
             default_runs = [name for name, run_config in runs.items() if runs_in_pull_requests(run_config['tags'])]
-            slow_seconds = sum(parse_duration(runs[name]['duration']) for name in selected_runs if SLOW_TAG in runs[name]['tags'])
-            to_run.append((script, [] if selected_runs == default_runs else selected_runs, slow_seconds))
+            has_slow_runs = any(SLOW_TAG in runs[name]['tags'] for name in selected_runs)
+            to_run.append((script, [] if selected_runs == default_runs else selected_runs, has_slow_runs))
 
         with alive_progress.alive_bar(len(to_run), title="Running tests") as bar:
-            for script, run_names, slow_seconds in to_run:
+            for script, run_names, has_slow_runs in to_run:
                 bar.text(script)
                 cmd = [
                     "scripts/run_in_python_env.sh",
@@ -1130,12 +1123,8 @@ def python_tests(
                     continue
 
                 base_name = os.path.basename(script)
-                if slow_seconds:
-                    log.warning(
-                        "SLOW test '%s' is executing (expect to take around %s). Be patient...",
-                        base_name,
-                        _format_duration(slow_seconds),
-                    )
+                if has_slow_runs:
+                    log.warning("SLOW test '%s' is executing. Be patient...", base_name)
 
                 tstart = time.time()
                 result = subprocess.run(cmd, capture_output=True)
@@ -1173,7 +1162,7 @@ def python_tests(
                 )
                 execution_times.append(time_info)
 
-                if time_info.duration_sec > 20 and not slow_seconds:
+                if time_info.duration_sec > 20 and not has_slow_runs:
                     log.warning("'%s' finished in %0.2f seconds", time_info.script, time_info.duration_sec)
                 bar()
     finally:

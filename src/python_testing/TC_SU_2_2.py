@@ -46,8 +46,8 @@
 #       --timeout 3100
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 35 minutes.
 #     tags: [nightly, slow]
-#     duration: 35 minutes
 # === END CI TEST ARGUMENTS ===
 
 import asyncio

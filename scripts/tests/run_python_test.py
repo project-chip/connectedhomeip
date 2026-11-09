@@ -319,7 +319,7 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
     for run in runs:
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
         if SLOW_TAG in run.tags:
-            log.warning("SLOW run '%s' is executing (expect to take around %s). Be patient...", run.run, run.duration)
+            log.warning("SLOW run '%s' is executing. Be patient...", run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
                   run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
                   ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric)

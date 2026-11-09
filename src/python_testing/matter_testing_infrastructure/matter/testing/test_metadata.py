@@ -18,8 +18,8 @@ import tempfile
 import unittest
 
 from metadata import (NEEDS_FOLLOWUP_FIXES_TAG, NIGHTLY_TAG, OPENSSL_3_5_TAG, SLOW_TAG, Metadata, MetadataReader, RunArgumentsError,
-                      TagFilter, extract_runs_args, failure_fails_job, is_valid_tag_name, parse_duration, reported_per_run,
-                      runs_in_pull_requests, script_runs_in_pull_requests, unused_tag_values)
+                      TagFilter, extract_runs_args, failure_fails_job, is_valid_tag_name, reported_per_run, runs_in_pull_requests,
+                      script_runs_in_pull_requests, unused_tag_values)
 
 
 class TestMetadataReader(unittest.TestCase):
@@ -99,8 +99,8 @@ class TestMetadataReader(unittest.TestCase):
     #     tags: [openssl-3.5]
     #   run6:
     #     app: ${CHIP_LOCK_APP}
+    #     # Takes about 2 minutes.
     #     tags: [slow]
-    #     duration: 2 minutes
     # === END CI TEST ARGUMENTS ===
     '''
 
@@ -122,8 +122,6 @@ class TestMetadataReader(unittest.TestCase):
         self.assertEqual(runs["run4"].issues, ["https://github.com/project-chip/connectedhomeip/issues/3"])
         self.assertEqual(runs["run5"].tags, [OPENSSL_3_5_TAG])
         self.assertEqual(runs["run6"].tags, [SLOW_TAG])
-        self.assertEqual(runs["run6"].duration, "2 minutes")
-        self.assertEqual([name for name, run in runs.items() if run.duration is not None], ["run6"])
 
         self.assertEqual([name for name, run in runs.items() if runs_in_pull_requests(run.tags)], ["run1", "run3", "run6"])
         self.assertEqual([name for name, run in runs.items() if failure_fails_job(run.tags)],
@@ -137,15 +135,6 @@ class TestMetadataReader(unittest.TestCase):
         for tags in [[], [SLOW_TAG], ["any-tag"], ["any-tag", SLOW_TAG]]:
             with self.subTest(tags=tags):
                 self.assertFalse(reported_per_run(tags))
-
-    def test_parse_duration(self):
-        cases = {"30 seconds": 30, "1 second": 1, "1 minute": 60, "1.25 minutes": 75, "35 minutes": 2100}
-        for duration, seconds in cases.items():
-            with self.subTest(duration=duration):
-                self.assertEqual(parse_duration(duration), seconds)
-        for duration in ["35", "35 mins", "35 Minutes", "35  minutes", " 35 minutes", ".5 minutes", "1 hour", "fast"]:
-            with self.subTest(duration=duration), self.assertRaisesRegex(ValueError, "duration must be"):
-                parse_duration(duration)
 
     def test_tag_filter(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -193,7 +182,7 @@ class TestMetadataReader(unittest.TestCase):
         self.assertEqual(unused_tag_values(values, {"nightly", "slow"}), ["nightyl", "skip-nigthly"])
         self.assertEqual(unused_tag_values([], set()), [])
 
-    def test_invalid_tags_issues_and_duration(self):
+    def test_invalid_tags_and_issues(self):
         issue = "https://github.com/project-chip/connectedhomeip/issues/1"
         cases = {
             "tags: nightly": "tags must be a list",
@@ -206,14 +195,6 @@ class TestMetadataReader(unittest.TestCase):
             f"tags: [needs-followup-fixes]\n#     issues: [{issue}/]": "issues must be GitHub issue URLs",
             f"issues: [{issue}]": "only used with the needs-followup-fixes tag",
             f"tags: [nightly]\n#     issues: [{issue}]": "only used with the needs-followup-fixes tag",
-            "tags: [slow]": "slow needs duration",
-            "tags: [nightly, slow]": "slow needs duration",
-            "duration: 2 minutes": "duration is only used with the slow tag",
-            "tags: [nightly]\n#     duration: 2 minutes": "duration is only used with the slow tag",
-            "tags: [slow]\n#     duration: 35": "duration must be",
-            "tags: [slow]\n#     duration: 35 mins": "duration must be",
-            "tags: [slow]\n#     duration: 1 hour": "duration must be",
-            "tags: [slow]\n#     duration: [2 minutes]": "duration must be",
         }
         with tempfile.TemporaryDirectory() as temp_dir:
             for block_lines, expected_error in cases.items():
@@ -276,7 +257,7 @@ class TestMetadataReader(unittest.TestCase):
             "only a nightly needs-followup-fixes run":
                 (one_run_file_content("tags: [nightly, needs-followup-fixes]", f"issues: [{issue}]"), False, True),
             "only an openssl-3.5 run": (one_run_file_content("tags: [openssl-3.5]"), False, False),
-            "only a slow run": (one_run_file_content("tags: [slow]", "duration: 2 minutes"), True, False),
+            "only a slow run": (one_run_file_content("tags: [slow]"), True, False),
             "only a run with a tag that only selects": (one_run_file_content("tags: [any-tag]"), True, False),
             "no CI test arguments": ("# A support module with no CI test arguments\n", True, False),
         }

@@ -20,8 +20,8 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --tests test_TC_ACE_2_1
+#     # Takes about 3.75 minutes.
 #     tags: [slow]
-#     duration: 3.75 minutes
 #   run2:
 #     app: ${ALL_CLUSTERS_APP}
 #     factory-reset: true
@@ -35,8 +35,8 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --tests test_TC_ACE_2_2
+#     # Takes about 3.75 minutes.
 #     tags: [slow]
-#     duration: 3.75 minutes
 #   run3:
 #     app: ${ALL_CLUSTERS_APP}
 #     factory-reset: true
@@ -51,8 +51,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --bool-arg ci_only_linux_skip_ota_cluster_disallowed_for_certification:True
 #       --tests test_TC_ACE_2_3
+#     # Takes about 3.75 minutes.
 #     tags: [slow]
-#     duration: 3.75 minutes
 #   run4:
 #     app: ${ALL_CLUSTERS_APP}
 #     factory-reset: true
@@ -66,8 +66,8 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --tests test_TC_ACE_2_4
+#     # Takes about 3.75 minutes.
 #     tags: [slow]
-#     duration: 3.75 minutes
 # === END CI TEST ARGUMENTS ===
 
 import logging

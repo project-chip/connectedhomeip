@@ -32,8 +32,8 @@
 #       --debug
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run2: # tests PASE connection using manual code (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
@@ -42,8 +42,8 @@
 #       --manual-code 10054912339
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run3: # tests PASE connection using QR code (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
@@ -52,8 +52,8 @@
 #       --qr-code MT:-24J0Q1212-10648G00
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run4: # tests PASE connection using discriminator and passcode (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
@@ -63,8 +63,8 @@
 #       --passcode 20202021
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run5: # Tests CASE connection using manual code (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
@@ -74,8 +74,8 @@
 #       --commissioning-method on-network
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run6: # Tests CASE connection using QR code (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
@@ -85,8 +85,8 @@
 #       --commissioning-method on-network
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run7: # Tests CASE connection using manual discriminator and passcode (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
@@ -97,8 +97,8 @@
 #       --commissioning-method on-network
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run8: # Tests reusing storage from run7 (i.e. factory-reset=false)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
@@ -106,16 +106,16 @@
 #       --storage-path admin_storage.json
 #     factory-reset: false
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run9: # Test using the generated attribute wildcard file from previous run
 #     script-args:
 #       --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: false
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run10: # Tests against energy-management-app
 #     app: ${EVSE_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -127,8 +127,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run11: # Tests against lit-icd app
 #     app: ${LIT_ICD_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -140,8 +140,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run12: # Tests against microwave-oven app
 #     app: ${CHIP_MICROWAVE_OVEN_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -153,8 +153,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run13: # Tests against chip-rvc app
 #     app: ${CHIP_RVC_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -166,8 +166,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run14: # Tests against network-management-app
 #     app: ${NETWORK_MANAGEMENT_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -179,8 +179,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run15: # Tests against lighting-app-data-mode-no-unique-id
 #     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -192,8 +192,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run16: # Tests against all-devices-app - default (contactsensor)
 #     app: ${ALL_DEVICES_APP}
 #     app-args: >
@@ -207,8 +207,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run17: # Tests against all-devices-app - on/off light
 #     app: ${ALL_DEVICES_APP}
 #     app-args: >
@@ -224,8 +224,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run18: # Tests against all-devices-app - wildcard (all leaf devices)
 #     app: ${ALL_DEVICES_APP}
 #     app-args: >
@@ -241,8 +241,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run19: # Tests against all-devices-app - bridged wildcard (all leaf devices bridged)
 #     app: ${ALL_DEVICES_APP}
 #     app-args: >
@@ -259,8 +259,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 #   run20: # Tests against electrical-protection-app
 #     app: ${ELECTRICAL_PROTECTION_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -272,8 +272,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 27 seconds.
 #     tags: [slow]
-#     duration: 27 seconds
 # === END CI TEST ARGUMENTS ===
 
 import logging

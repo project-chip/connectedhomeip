@@ -35,8 +35,8 @@
 #       --app-pipe /tmp/opstate_2_6_fifo
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 35 seconds.
 #     tags: [slow]
-#     duration: 35 seconds
 # === END CI TEST ARGUMENTS ===
 
 

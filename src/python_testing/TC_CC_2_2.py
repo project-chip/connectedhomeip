@@ -36,8 +36,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 1.25 minutes.
 #     tags: [nightly, slow]
-#     duration: 1.25 minutes
 #   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device extended-color-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -52,8 +52,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 1.25 minutes.
 #     tags: [nightly, slow]
-#     duration: 1.25 minutes
 # === END CI TEST ARGUMENTS ===
 
 import asyncio

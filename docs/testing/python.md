@@ -966,8 +966,15 @@ for that run, e.g.:
         failure doesn't fail the job. Remove the tag once every issue is fixed.
     -   `openssl-3.5`: moves the run out of PR CI and into the OpenSSL 3.5 job,
         for runs that need an app and controller built with OpenSSL 3.5.
-    -   `slow`: the run takes long, and `duration` says how long. The runners
-        log the duration when the run starts. The tag doesn't move the run.
+    -   `slow`: the run takes long. The runners log a note when the run starts.
+        The tag doesn't move the run. A comment above the tag can record how
+        long the run takes:
+
+        ```python
+        #     # Takes about 1.5 minutes.
+        #     tags: [slow]
+        ```
+
     -   Example: `[nightly]`
 
 -   `issues`: The GitHub issues that track the problems of a
@@ -980,17 +987,6 @@ for that run, e.g.:
         #     tags: [nightly, needs-followup-fixes]
         #     issues:
         #       - https://github.com/project-chip/connectedhomeip/issues/12345
-        ```
-
--   `duration`: How long a `slow` run takes, as `<number> seconds` or
-    `<number> minutes`. Required with `slow`, and not allowed without it. The
-    runners only log it; `timeout` sets the time limit.
-
-    -   Example:
-
-        ```python
-        #     tags: [slow]
-        #     duration: 1.5 minutes
         ```
 
 -   `app` may also be a script that starts several applications, for example

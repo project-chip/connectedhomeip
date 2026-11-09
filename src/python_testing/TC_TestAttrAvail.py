@@ -32,8 +32,8 @@
 #       --endpoint 1
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 10 seconds.
 #     tags: [slow]
-#     duration: 10 seconds
 #   run2:
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --passcode 20202021 --KVS kvs1
@@ -45,8 +45,8 @@
 #       --commissioning-method on-network
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 10 seconds.
 #     tags: [slow]
-#     duration: 10 seconds
 #   run3:
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
@@ -57,8 +57,8 @@
 #       --passcode 20202021
 #     factory-reset: false
 #     quiet: true
+#     # Takes about 10 seconds.
 #     tags: [slow]
-#     duration: 10 seconds
 # === END CI TEST ARGUMENTS ===
 
 # Run 1: Tests PASE connection using manual code

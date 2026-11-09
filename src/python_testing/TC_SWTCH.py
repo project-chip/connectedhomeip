@@ -37,8 +37,8 @@
 #       --app-pipe /tmp/switch_2_2_fifo
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 20 seconds.
 #     tags: [slow]
-#     duration: 20 seconds
 #   run2:
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_fifo
@@ -57,8 +57,8 @@
 #       --app-pipe /tmp/switch_fifo
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 20 seconds.
 #     tags: [slow]
-#     duration: 20 seconds
 #   run3:
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_fifo
@@ -77,8 +77,8 @@
 #       --app-pipe /tmp/switch_fifo
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 20 seconds.
 #     tags: [slow]
-#     duration: 20 seconds
 # === END CI TEST ARGUMENTS ===
 #
 # These tests run on every endpoint regardless of whether a switch is present because they are set up to auto-select.

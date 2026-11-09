@@ -32,8 +32,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 25 seconds.
 #     tags: [slow]
-#     duration: 25 seconds
 # === END CI TEST ARGUMENTS ===
 
 import asyncio

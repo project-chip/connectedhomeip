@@ -34,7 +34,7 @@ NIGHTLY_TAG = "nightly"
 NEEDS_FOLLOWUP_FIXES_TAG = "needs-followup-fixes"
 # The run needs an app and controller built with OpenSSL 3.5, so it runs only in the OpenSSL 3.5 job.
 OPENSSL_3_5_TAG = "openssl-3.5"
-# The run takes long, so the runners log its `duration:` when it starts. The tag doesn't change where the run runs.
+# The run takes long, so the runners log a note when it starts. The tag doesn't change where the run runs.
 SLOW_TAG = "slow"
 
 # A --tag value with this prefix leaves out the runs that have the tag, so no tag name may start with it.
@@ -117,21 +117,6 @@ def unused_tag_values(values: Iterable[str], used_tags: set[str]) -> list[str]:
 
 _ISSUE_URL = re.compile(r"https://github\.com/[\w.-]+/[\w.-]+/issues/\d+")
 
-_DURATION = re.compile(r"(\d+(?:\.\d+)?) (second|minute)s?")
-_SECONDS_PER_DURATION_UNIT = {"second": 1, "minute": 60}
-_DURATION_FORMAT = "'<number> seconds' or '<number> minutes', such as '30 seconds' or '1.5 minutes'"
-
-
-def parse_duration(duration: str) -> float:
-    """Return the seconds of a run's `duration:`, such as '30 seconds', '1 minute' or '1.25 minutes'.
-
-    Raises ValueError for any other format.
-    """
-    match = _DURATION.fullmatch(duration)
-    if not match:
-        raise ValueError(f"duration must be {_DURATION_FORMAT}, got {duration!r}")
-    return float(match[1]) * _SECONDS_PER_DURATION_UNIT[match[2]]
-
 
 class RunArgumentsError(ValueError):
     """A run block's CI test arguments are not valid."""
@@ -154,7 +139,6 @@ class Metadata:
     pre_existing_fabric: bool = False
     tags: list[str] = field(default_factory=list)
     issues: list[str] = field(default_factory=list)
-    duration: str | None = None
 
 
 def runs_in_pull_requests(tags: list[str]) -> bool:
@@ -194,8 +178,8 @@ class NamedStringIO(StringIO):
         self.name = name
 
 
-def _validate_tags_issues_and_duration(py_script_path: str, run: str, args: dict[str, Any]) -> None:
-    """Check a block's `tags`, `issues` and `duration`, and set them in `args` (empty lists and None when absent)."""
+def _validate_tags_and_issues(py_script_path: str, run: str, args: dict[str, Any]) -> None:
+    """Check a block's `tags` and `issues`, and set both in `args` (empty lists when absent)."""
 
     def error(message: str) -> RunArgumentsError:
         return RunArgumentsError(f"{py_script_path}: run '{run}': {message}")
@@ -219,26 +203,16 @@ def _validate_tags_issues_and_duration(py_script_path: str, run: str, args: dict
     if issues and NEEDS_FOLLOWUP_FIXES_TAG not in tags:
         raise error(f"issues is only used with the {NEEDS_FOLLOWUP_FIXES_TAG} tag")
 
-    duration = args.get("duration")
-    if SLOW_TAG in tags and duration is None:
-        raise error(f"{SLOW_TAG} needs duration: how long the run takes, {_DURATION_FORMAT}")
-    if duration is not None and SLOW_TAG not in tags:
-        raise error(f"duration is only used with the {SLOW_TAG} tag")
-    if duration is not None and not (isinstance(duration, str) and _DURATION.fullmatch(duration)):
-        raise error(f"duration must be {_DURATION_FORMAT}, got {duration!r}")
-
     args["tags"] = tags
     args["issues"] = issues
-    args["duration"] = duration
 
 
 def extract_runs_args(py_script_path: str) -> dict[str, dict[str, Any]]:
     """Extract the run arguments from the CI test arguments blocks.
 
     A script without a CI test arguments block has no runs. Every run gets `tags` and `issues`
-    lists and a `duration` (None without the slow tag). Raises RunArgumentsError when
-    `test-runner-runs` or a run is empty or not a mapping, or when a run's tags, issues or
-    duration are not valid.
+    lists. Raises RunArgumentsError when `test-runner-runs` or a run is empty or not a mapping, or
+    when a run's tags or issues are not valid.
     """
 
     found_ci_args_section = False
@@ -278,7 +252,7 @@ def extract_runs_args(py_script_path: str) -> dict[str, dict[str, Any]]:
                 runs_arg_lines[run] = {}
                 runs_arg_lines[run]['run'] = run
                 runs_arg_lines[run].update(args)
-                _validate_tags_issues_and_duration(py_script_path, run, runs_arg_lines[run])
+                _validate_tags_and_issues(py_script_path, run, runs_arg_lines[run])
         except yaml.YAMLError as e:
             LOGGER.error("Failed to parse CI arguments YAML: %s", e)
 
@@ -344,7 +318,7 @@ class MetadataReader:
          the script file.
 
         Raises RunArgumentsError when `test-runner-runs` or a run is empty or not a mapping, or
-        when a run's tags, issues or duration are not valid.
+        when a run's tags or issues are not valid.
         """
         runs_metadata: list[Metadata] = []
         runs_args = extract_runs_args(py_script_path)
@@ -365,7 +339,6 @@ class MetadataReader:
                 pre_existing_fabric=str(attr.get("pre-existing-fabric", False)).lower() == 'true',
                 tags=attr["tags"],
                 issues=attr["issues"],
-                duration=attr["duration"],
             ))
 
         return runs_metadata
