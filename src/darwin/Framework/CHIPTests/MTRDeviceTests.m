@@ -8785,7 +8785,8 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 
     __block NSDate * requestFailedAt = nil;
     __weak __auto_type weakDelegate = delegate;
-    delegate.onSessionRequestFailedRetryDelay = ^NSNumber * {
+    delegate.onSessionRequestFailedRetryDelay = ^NSNumber *
+    {
         weakDelegate.onSessionRequestFailedRetryDelay = nil;
         requestFailedAt = [NSDate now];
         return failedRequestRetryDelay;
