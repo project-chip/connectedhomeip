@@ -2214,12 +2214,14 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
             }
             return Status::NotFound;
         }
+        bool ValidateMotionZoneListSize(size_t zoneCount) override { return !enforceZoneCapacity || zoneCount <= 2; }
         size_t restorations         = 0;
         CHIP_ERROR restorationError = CHIP_NO_ERROR;
         bool restoreBeforeFailure   = false;
         uint16_t activeConnection   = 0;
         size_t deallocationCalls    = 0;
         bool deallocationBusy       = false;
+        bool enforceZoneCapacity    = false;
     } delegate;
     mServer.GetLogic().SetDelegate(&delegate);
     DefaultAttributePersistenceProvider persistence;
@@ -2526,6 +2528,54 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
     ASSERT_EQ(restoredWriter.Finalize(), CHIP_NO_ERROR);
     const ConcreteAttributePath restoredPath{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
     const std::vector<uint8_t> savedRestoration(restoredBuffer, restoredBuffer + restoredWriter.GetLengthWritten());
+    enum class InvalidZoneCase
+    {
+        ZeroSensitivity,
+        ExcessiveSensitivity,
+        DuplicateZones,
+        OversizedZones,
+    };
+    delegate.enforceZoneCapacity = true;
+    for (const auto invalidCase : { InvalidZoneCase::ZeroSensitivity, InvalidZoneCase::ExcessiveSensitivity,
+                                    InvalidZoneCase::DuplicateZones, InvalidZoneCase::OversizedZones })
+    {
+        std::vector<Structs::TransportZoneOptionsStruct::Type> zones(invalidCase == InvalidZoneCase::OversizedZones ? 3u : 2u);
+        for (size_t index = 0; index < zones.size(); ++index)
+        {
+            zones[index].zone.SetNonNull(invalidCase == InvalidZoneCase::DuplicateZones ? uint16_t{ 1 }
+                                                                                        : static_cast<uint16_t>(index + 1));
+            zones[index].sensitivity.SetValue(5);
+        }
+        if (invalidCase == InvalidZoneCase::ZeroSensitivity || invalidCase == InvalidZoneCase::ExcessiveSensitivity)
+        {
+            zones.back().sensitivity.SetValue(invalidCase == InvalidZoneCase::ZeroSensitivity ? uint8_t{ 0 } : uint8_t{ 255 });
+        }
+        auto invalidOptions                       = options;
+        invalidOptions.triggerOptions.triggerType = TransportTriggerTypeEnum::kAmbientContext;
+        invalidOptions.triggerOptions.motionZones.SetValue(
+            DataModel::MakeNullable(DataModel::List<const Structs::TransportZoneOptionsStruct::Type>(zones.data(), zones.size())));
+        Structs::TransportConfigurationStruct::Type invalidConfig;
+        invalidConfig.connectionID    = 7;
+        invalidConfig.transportStatus = TransportStatusEnum::kInactive;
+        invalidConfig.fabricIndex     = 1;
+        invalidConfig.transportOptions.SetValue(invalidOptions);
+        restoredWriter.Init(restoredBuffer);
+        ASSERT_EQ(restoredWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, restoredArray), CHIP_NO_ERROR);
+        ASSERT_EQ(invalidConfig.EncodeForRead(restoredWriter, TLV::AnonymousTag(), invalidConfig.GetFabricIndex()), CHIP_NO_ERROR);
+        ASSERT_EQ(restoredWriter.EndContainer(restoredArray), CHIP_NO_ERROR);
+        ASSERT_EQ(restoredWriter.Finalize(), CHIP_NO_ERROR);
+        const std::vector<uint8_t> invalidBytes(restoredBuffer, restoredBuffer + restoredWriter.GetLengthWritten());
+        ASSERT_EQ(persistence.WriteValue(restoredPath, ByteSpan(invalidBytes.data(), invalidBytes.size())), CHIP_NO_ERROR);
+        delegate.restorations = 0;
+        EXPECT_EQ(mServer.Init(), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+        EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+        EXPECT_EQ(delegate.restorations, 0u);
+        MutableByteSpan retainedInvalid(restoredBuffer);
+        ASSERT_EQ(persistence.ReadValue(restoredPath, retainedInvalid), CHIP_NO_ERROR);
+        EXPECT_TRUE(retainedInvalid.data_equal(ByteSpan(invalidBytes.data(), invalidBytes.size())));
+    }
+    delegate.enforceZoneCapacity = false;
     ASSERT_EQ(persistence.WriteValue(restoredPath, ByteSpan(savedRestoration.data(), savedRestoration.size())), CHIP_NO_ERROR);
     delegate.restorations         = 0;
     delegate.restoreBeforeFailure = true;
@@ -2546,8 +2596,10 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
     ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), 1u);
     EXPECT_EQ(mServer.GetLogic().mCurrentConnections.front().connectionID, 1u);
     EXPECT_EQ(delegate.deallocationCalls, 2u);
-    delegate.restoreBeforeFailure      = false;
-    delegate.restorationError          = CHIP_NO_ERROR;
+    delegate.restoreBeforeFailure = false;
+    delegate.restorationError     = CHIP_NO_ERROR;
+    TestPushAVStreamTransportDelegateImpl replacementDelegate;
+    mServer.GetLogic().SetDelegate(&replacementDelegate);
     const auto restorationsBeforeRetry = delegate.restorations;
     EXPECT_EQ(mServer.Init(), CHIP_ERROR_BUSY);
     EXPECT_FALSE(mServer.GetLogic().IsInitialized());
@@ -2557,6 +2609,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
     retainedRestoration = MutableByteSpan(restoredBuffer);
     ASSERT_EQ(persistence.ReadValue(restoredPath, retainedRestoration), CHIP_NO_ERROR);
     EXPECT_TRUE(retainedRestoration.data_equal(ByteSpan(savedRestoration.data(), savedRestoration.size())));
+    mServer.GetLogic().SetDelegate(&delegate);
     delegate.deallocationBusy = false;
     ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
     EXPECT_TRUE(mServer.GetLogic().IsInitialized());
@@ -2569,6 +2622,14 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
     EXPECT_EQ(restoredOptions->videoStreams.Value().size(), kMaxVideoStreams);
     ASSERT_TRUE(restoredOptions->audioStreams.HasValue());
     EXPECT_EQ(restoredOptions->audioStreams.Value().size(), kMaxAudioStreams);
+    using TimerContext         = PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallbackContext;
+    auto timerContext          = std::make_shared<TimerContext>();
+    timerContext->instance     = &mServer.GetLogic();
+    timerContext->connectionID = 1;
+    const std::weak_ptr<TimerContext> retainedTimerContext = timerContext;
+    mServer.GetLogic().mTimerContexts.push_back(timerContext);
+    timerContext.reset();
+    ASSERT_FALSE(retainedTimerContext.expired());
     delegate.activeConnection  = 1;
     delegate.deallocationCalls = 0;
     restoredWriter.Init(restoredBuffer);
@@ -2576,11 +2637,20 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
     ASSERT_EQ(restoredWriter.Finalize(), CHIP_NO_ERROR);
     const std::vector<uint8_t> corruptReload(restoredBuffer, restoredBuffer + restoredWriter.GetLengthWritten());
     ASSERT_EQ(persistence.WriteValue(restoredPath, ByteSpan(corruptReload.data(), corruptReload.size())), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Init(), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mServer.GetLogic().IsInitialized());
+    EXPECT_EQ(delegate.activeConnection, 1u);
+    EXPECT_EQ(delegate.deallocationCalls, 0u);
+    EXPECT_FALSE(mServer.GetLogic().mTimerContexts.empty());
+    EXPECT_FALSE(retainedTimerContext.expired());
+    mServer.GetLogic().Shutdown();
     EXPECT_EQ(mServer.Init(), CHIP_ERROR_WRONG_TLV_TYPE);
     EXPECT_FALSE(mServer.GetLogic().IsInitialized());
     EXPECT_EQ(delegate.activeConnection, 0u);
     EXPECT_EQ(delegate.deallocationCalls, 2u);
     EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+    EXPECT_TRUE(mServer.GetLogic().mTimerContexts.empty());
+    EXPECT_TRUE(retainedTimerContext.expired());
     retainedRestoration = MutableByteSpan(restoredBuffer);
     ASSERT_EQ(persistence.ReadValue(restoredPath, retainedRestoration), CHIP_NO_ERROR);
     EXPECT_TRUE(retainedRestoration.data_equal(ByteSpan(corruptReload.data(), corruptReload.size())));

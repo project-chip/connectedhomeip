@@ -139,6 +139,7 @@ CHIP_ERROR PushAvStreamTransportServerLogic::Init(AttributePersistenceProvider &
 
     if (!mCurrentConnections.empty())
     {
+        VerifyOrReturnError(!IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         mAttributeStorage = nullptr;
         ReturnErrorOnFailure(CleanupFailedRestoration());
     }
@@ -265,6 +266,7 @@ CHIP_ERROR PushAvStreamTransportServerLogic::CleanupFailedRestoration()
         const auto status = mDelegate->DeallocatePushTransport(connection->connectionID);
         if (status == Status::Success || status == Status::NotFound)
         {
+            RemoveTimerAppState(connection->connectionID);
             connection = mCurrentConnections.erase(connection);
         }
         else
@@ -459,6 +461,24 @@ CHIP_ERROR PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_
     return err;
 }
 
+Status
+PushAvStreamTransportServerLogic::ValidateZoneSensitivity(const Structs::TransportZoneOptionsStruct::DecodableType & zone) const
+{
+    if (mFeatures.Has(Feature::kPerZoneSensitivity))
+    {
+        VerifyOrReturnValue(zone.sensitivity.HasValue(), Status::InvalidCommand,
+                            ChipLogError(Zcl, "Transport zone missing sensitivity on endpoint %u", mEndpointId));
+        VerifyOrReturnValue(zone.sensitivity.Value() >= 1 && zone.sensitivity.Value() <= 10, Status::ConstraintError,
+                            ChipLogError(Zcl, "Transport zone sensitivity out of range on endpoint %u", mEndpointId));
+    }
+    else
+    {
+        VerifyOrReturnValue(!zone.sensitivity.HasValue(), Status::InvalidCommand,
+                            ChipLogError(Zcl, "Transport zone sensitivity is not supported on endpoint %u", mEndpointId));
+    }
+    return Status::Success;
+}
+
 Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
     const Structs::TransportOptionsStruct::DecodableType & transportOptions)
 {
@@ -554,30 +574,8 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
 
             while (iter.Next())
             {
-                auto & transportZoneOption = iter.GetValue();
-
-                if (mFeatures.Has(Feature::kPerZoneSensitivity))
-                {
-                    VerifyOrReturnValue(
-                        transportZoneOption.sensitivity.HasValue(), Status::InvalidCommand,
-                        ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Missing Zone Sensitivity ",
-                                     mEndpointId));
-
-                    VerifyOrReturnValue(
-                        transportZoneOption.sensitivity.Value() >= 1 && transportZoneOption.sensitivity.Value() <= 10,
-                        Status::ConstraintError,
-                        ChipLogError(Zcl,
-                                     "Transport Options verification from command data[ep=%d]: Zone Sensitivity Constraint Error",
-                                     mEndpointId));
-                }
-                else
-                {
-                    VerifyOrReturnValue(!transportZoneOption.sensitivity.HasValue(), Status::InvalidCommand,
-                                        ChipLogError(Zcl,
-                                                     "Transport Options verification from command data[ep=%d]: Found Zone "
-                                                     "Sensitivity which is not expected.",
-                                                     mEndpointId));
-                }
+                const auto status = ValidateZoneSensitivity(iter.GetValue());
+                VerifyOrReturnValue(status == Status::Success, status);
             }
 
             if (iter.GetStatus() != CHIP_NO_ERROR)
@@ -2211,11 +2209,21 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
         const auto & zones = options.triggerOptions.motionZones;
         if (zones.HasValue() && !zones.Value().IsNull())
         {
-            auto zoneIter = zones.Value().Value().begin();
+            auto zoneIter          = zones.Value().Value().begin();
+            size_t zoneCount       = 0;
+            auto sensitivityStatus = Status::Success;
             while (zoneIter.Next())
             {
+                ++zoneCount;
+                if (sensitivityStatus == Status::Success)
+                {
+                    sensitivityStatus = ValidateZoneSensitivity(zoneIter.GetValue());
+                }
             }
             ReturnErrorOnFailure(zoneIter.GetStatus());
+            VerifyOrReturnError(sensitivityStatus == Status::Success, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(mDelegate->ValidateMotionZoneListSize(zoneCount), CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(ValidateMotionZones(options.triggerOptions).IsSuccess(), CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
     VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);

@@ -38,6 +38,11 @@ public:
 
     void SetDelegate(PushAvStreamTransportDelegate * delegate)
     {
+        if (mDelegate != nullptr && mDelegate != delegate && !mCurrentConnections.empty())
+        {
+            ChipLogError(Zcl, "Cannot replace Push AV delegate while it owns connections on endpoint %u", mEndpointId);
+            return;
+        }
         mDelegate = delegate;
         if (mDelegate == nullptr)
         {
@@ -175,6 +180,8 @@ private:
      */
     CHIP_ERROR LoadPersistentAttributes();
     CHIP_ERROR CleanupFailedRestoration();
+    Protocols::InteractionModel::Status
+    ValidateZoneSensitivity(const PushAvStreamTransport::Structs::TransportZoneOptionsStruct::DecodableType & zone) const;
 
     // Helpers to store and load CurrentConnections list
     CHIP_ERROR StoreCurrentConnections();
