@@ -135,7 +135,8 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 
 /**
  * Like the above, but also calls requestWillBeSent, if not nil, on the Matter queue once a session is ready, right
- * before the invoke request is sent.  It is not called if no session could be had.  For use from MTRDevice only.
+ * before the invoke request is sent.  It is not called if the invoke never gets to that point (e.g.
+ * can't establish a session).
  */
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
@@ -247,7 +248,8 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 
 /**
  * Like the above, but also calls requestWillBeSent, if not nil, on the Matter queue once a session is ready, right
- * before the write request is sent.  It is not called if no session could be had.  For use from MTRDevice only.
+ * before the write request is sent.  It is not called if the write never gets to that point (e.g.
+ * can't establish a session).
  */
 - (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
                             clusterID:(NSNumber *)clusterID

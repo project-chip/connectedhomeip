@@ -1304,8 +1304,7 @@ private:
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-            // The session is ready and the write request goes out from here.  The caller starts the expected value
-            // interval now: the interval starts when the request is actually sent, after the session is ready.
+            // The session is ready and the write request goes out from here.
             if (requestWillBeSent) {
                 requestWillBeSent();
             }
@@ -1803,8 +1802,7 @@ private:
                 auto serverTimeoutInSeconds = System::Clock::Seconds16(serverSideProcessingTimeout.unsignedShortValue);
                 invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds, true /*isFirstMessageOnExchange*/));
             }
-            // The session is ready and the invoke request goes out now.  The caller starts the expected value interval
-            // here: the interval starts when the request is actually sent, after the session is ready.
+            // The session is ready and the invoke request goes out now.
             if (requestWillBeSent) {
                 requestWillBeSent();
             }
