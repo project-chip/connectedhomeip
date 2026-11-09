@@ -3471,7 +3471,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                                            if ([testDelegate respondsToSelector:@selector(unitTestRetryDelayOverrideForFailedSessionRequest:)]) {
                                                NSNumber * retryDelayOverride = [testDelegate unitTestRetryDelayOverrideForFailedSessionRequest:self];
                                                if (retryDelayOverride != nil) {
-                                                   resetRetryDelay = retryDelayOverride;
+                                                   // A negative override clears the request's retry delay.
+                                                   resetRetryDelay = (retryDelayOverride.doubleValue < 0) ? nil : retryDelayOverride;
                                                }
                                            }
                                        }];
@@ -5671,6 +5672,9 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     // Ensure that any pre-existing resubscribe attempts we control don't try to
     // do anything.
     _reattemptingSubscription = NO;
+
+    // A recovery seen before the suspension says nothing about the node by the time we resume.
+    self.sessionRecoveredDuringSubscriptionSetup = NO;
 }
 
 - (void)controllerResumed

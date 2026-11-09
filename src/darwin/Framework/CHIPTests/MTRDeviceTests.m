@@ -8735,6 +8735,129 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertGreaterThanOrEqual(untilNextSetup, 19);
     XCTAssertLessThan(untilNextSetup, 60);
 }
+
+- (void)test054_RecoveryBeforeControllerSuspendDoesNotSkipBackoffAfterResume
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+    __block BOOL suspended = NO;
+    __block BOOL controllerSuspended = NO;
+    [self addTeardownBlock:^{
+        if (controllerSuspended) {
+            [controller resume];
+        }
+        if (suspended) {
+            [app resume];
+        }
+    }];
+
+    dispatch_queue_t queue = dispatch_queue_create("recovery-before-suspend-test.delegate", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.ignoreOperationalAdvertisements = YES;
+
+    XCTestExpectation * subscribed = [self expectationWithDescription:@"Subscription established"];
+    delegate.onReportEnd = ^{
+        [subscribed fulfill];
+    };
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ subscribed ] timeout:60];
+    delegate.onReportEnd = nil;
+
+    XCTAssertTrue([app suspend]);
+    suspended = YES;
+    XCTestExpectation * defunct = [self expectationWithDescription:@"Watched session marked defunct"];
+    __block BOOL markedDefunct = NO;
+    [controller asyncDispatchToMatterQueue:^{
+        markedDefunct = [device unitTestMarkWatchedSessionDefunct];
+        [defunct fulfill];
+    } errorHandler:nil];
+    [self waitForExpectations:@[ defunct ] timeout:10];
+    XCTAssertTrue(markedDefunct);
+
+    __weak __auto_type weakDelegate = delegate;
+    XCTestExpectation * requestStarted = [self expectationWithDescription:@"Session request started"];
+    delegate.onSubscriptionSessionRequestStarted = ^{
+        weakDelegate.onSubscriptionSessionRequestStarted = nil;
+        [requestStarted fulfill];
+    };
+    [device unitTestResetSubscription];
+    [self waitForExpectations:@[ requestStarted ] timeout:60];
+
+    // The old session recovers during that setup, so MTRDevice records it.
+    XCTestExpectation * received = [self expectationWithDescription:@"Watched session received a message"];
+    __block BOOL receivedOnWatchedSession = NO;
+    [controller asyncDispatchToMatterQueue:^{
+        receivedOnWatchedSession = [device unitTestReceiveOnWatchedSession];
+        [received fulfill];
+    } errorHandler:nil];
+    [self waitForExpectations:@[ received ] timeout:10];
+    XCTAssertTrue(receivedOnWatchedSession);
+
+    // The recovery is handled in a later Matter queue turn; wait for it, so MTRDevice has recorded it.  The node is still
+    // suspended, so mark the session defunct again: a setup after the resume then needs a new CASE session, which fails.
+    XCTestExpectation * recoveryHandled = [self expectationWithDescription:@"Recovery handled"];
+    __block BOOL markedDefunctAgain = NO;
+    [controller asyncDispatchToMatterQueue:^{
+        markedDefunctAgain = [device unitTestMarkWatchedSessionDefunct];
+        [recoveryHandled fulfill];
+    } errorHandler:nil];
+    [self waitForExpectations:@[ recoveryHandled ] timeout:10];
+    XCTAssertTrue(markedDefunctAgain);
+
+    // The controller suspends before that setup completes, and its CASE attempt fails while suspended.
+    XCTestExpectation * suspendedRequestFailed = [self expectationWithDescription:@"Session request failed while suspended"];
+    delegate.onSessionRequestFailedRetryDelay = ^NSNumber *
+    {
+        weakDelegate.onSessionRequestFailedRetryDelay = nil;
+        [suspendedRequestFailed fulfill];
+        return nil;
+    };
+    [controller suspend];
+    controllerSuspended = YES;
+    [self waitForExpectations:@[ suspendedRequestFailed ] timeout:120];
+
+    // The resume starts a new setup.
+    delegate.subscriptionResetDelayOverrideMs = @(300 * 1000);
+    XCTestExpectation * resumedRequestStarted = [self expectationWithDescription:@"Session request started after resume"];
+    delegate.onSubscriptionSessionRequestStarted = ^{
+        weakDelegate.onSubscriptionSessionRequestStarted = nil;
+        [resumedRequestStarted fulfill];
+    };
+    [controller resume];
+    controllerSuspended = NO;
+    [self waitForExpectations:@[ resumedRequestStarted ] timeout:60];
+
+    // The node is still suspended, so that setup fails.  The recovery seen before the suspension must not make the next
+    // attempt skip the backoff.
+    XCTestExpectation * resumedRequestFailed = [self expectationWithDescription:@"Session request failed after resume"];
+    delegate.onSessionRequestFailedRetryDelay = ^NSNumber *
+    {
+        weakDelegate.onSessionRequestFailedRetryDelay = nil;
+        [resumedRequestFailed fulfill];
+        return nil;
+    };
+    [self waitForExpectations:@[ resumedRequestFailed ] timeout:120];
+
+    XCTestExpectation * noImmediateSetup = [self expectationWithDescription:@"No subscription setup before the backoff"];
+    noImmediateSetup.inverted = YES;
+    delegate.onSubscriptionSetupStarted = ^{
+        [noImmediateSetup fulfill];
+    };
+    [self waitForExpectations:@[ noImmediateSetup ] timeout:45];
+    delegate.onSubscriptionSetupStarted = nil;
+
+    XCTAssertTrue([app resume]);
+    suspended = NO;
+}
 #endif // DEBUG
 
 @end
