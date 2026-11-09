@@ -1672,7 +1672,7 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
                      timedInvokeTimeout:nil
                         userInvokeToken:[[MTRUserInvokeToken alloc] initWithTimeout:nil]
                                   queue:dispatch_get_main_queue()
-                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) { }];
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {}];
     XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount >= 3); }
                           timeout:kMonitorWaitSeconds + kPromptSeconds
                       description:@"the read's and the user command's session requests both wait in the pool"]);
@@ -1725,7 +1725,7 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
                      timedInvokeTimeout:nil
                         userInvokeToken:[[MTRUserInvokeToken alloc] initWithTimeout:nil]
                                   queue:dispatch_get_main_queue()
-                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) { }];
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {}];
     dispatch_semaphore_signal(matterQueueBlocker);
     XCTAssertTrue([self waitUntil:^{ return readReported; } timeout:kPromptSeconds description:@"the read sent on its session while the command waits on DNS-SD"]);
     [self waitForMonitorWaitToEndWithMonitorCount:countBefore];

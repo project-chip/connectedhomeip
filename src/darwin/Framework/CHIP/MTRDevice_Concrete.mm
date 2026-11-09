@@ -3783,7 +3783,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                     // commands queued after this no longer go ahead of it.
                     MTRAsyncWorkItem * item = weakWorkItem;
                     if (item) {
-                        [workQueue workItem:item readyToSend:^ { }];
+                        [workQueue workItem:item readyToSend:^ {}];
                     }
                     return YES;
                 }
@@ -4243,7 +4243,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                 if (userInvokeToken && weakWorkItem) {
                     // A user command that has sent nothing can be cancelled up to here: if it was, send nothing.
                     // Its caller has already been completed by the cancel.  From here on it is sent and completes.
-                    send = [workQueue workItem:weakWorkItem readyToSend:^ { }];
+                    send = [workQueue workItem:weakWorkItem readyToSend:^ {}];
                 }
                 if (!send) {
                     MTR_LOG("Invoke work item [%llu] was cancelled before it was sent", workItemID);

@@ -701,7 +701,7 @@
             [order addObject:name];
         }
         if (sendNow) {
-            [workQueue workItem:weakItem readyToSend:^ { }];
+            [workQueue workItem:weakItem readyToSend:^ {}];
         }
         completion(MTRAsyncWorkComplete);
     };
@@ -1017,7 +1017,7 @@
     read.tracksSend = YES;
     MTRAsyncWorkItem * __weak weakRead = read;
     read.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
-        [workQueue workItem:weakRead readyToSend:^ { }];
+        [workQueue workItem:weakRead readyToSend:^ {}];
         dispatch_semaphore_signal(readSent);
         dispatch_semaphore_wait(readRelease, DISPATCH_TIME_FOREVER);
         @synchronized(order) {
@@ -1075,7 +1075,7 @@
     item.jumpsUnsentWork = YES;
     MTRAsyncWorkItem * __weak weakItem = item;
     item.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
-        [workQueue workItem:weakItem readyToSend:^ { }];
+        [workQueue workItem:weakItem readyToSend:^ {}];
         dispatch_semaphore_signal(sent);
         dispatch_semaphore_wait(release, DISPATCH_TIME_FOREVER);
         XCTAssertTrue(completion(MTRAsyncWorkComplete));
@@ -1143,7 +1143,7 @@
     failing.jumpsUnsentWork = YES;
     MTRAsyncWorkItem * __weak weakFailing = failing;
     failing.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
-        [workQueue workItem:weakFailing readyToSend:^ { }];
+        [workQueue workItem:weakFailing readyToSend:^ {}];
         @synchronized(order) {
             [order addObject:@"J1 send failed"];
         }
