@@ -29,6 +29,18 @@ static const uint16_t kPairingTimeoutInSeconds = 30;
 // distinct ports.
 static const uint16_t kMinDiscriminator = 1111;
 
+// Every discriminator handed out by the random payload helper or used to start an app in this process.  The port is
+// derived from the discriminator, so two apps that share one also share a port, and the second cannot advertise.
+// Callers hold @synchronized(MTRTestCase.class) while using the set.
+static NSMutableSet<NSNumber *> * UsedDiscriminators(void)
+{
+    static NSMutableSet<NSNumber *> * sUsedDiscriminators;
+    if (sUsedDiscriminators == nil) {
+        sUsedDiscriminators = [NSMutableSet set];
+    }
+    return sUsedDiscriminators;
+}
+
 #if HAVE_NSTASK
 static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 
@@ -87,6 +99,9 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 
     NSNumber * discriminator = parsedPayload.discriminator;
     XCTAssertGreaterThanOrEqual(discriminator.unsignedShortValue, kMinDiscriminator);
+    @synchronized(MTRTestCase.class) {
+        [UsedDiscriminators() addObject:discriminator];
+    }
 
     NSNumber * passcode = parsedPayload.setupPasscode;
 
@@ -237,8 +252,18 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
     // least as big as kMinDiscriminator.  The distribution here is not exactly
     // uniform, because (1<<12)-kMinDiscriminator is not a power of 2, but
     // probably OK.
+    //
+    // Draw without replacement within the process, so that two apps never get the same discriminator and port.
     __auto_type discriminatorRange = (1 << 12) - kMinDiscriminator;
-    NSNumber * discriminator = @(kMinDiscriminator + arc4random() % discriminatorRange);
+    NSNumber * discriminator;
+    @synchronized(MTRTestCase.class) {
+        __auto_type * used = UsedDiscriminators();
+        XCTAssertLessThan(used.count, (NSUInteger) discriminatorRange);
+        do {
+            discriminator = @(kMinDiscriminator + arc4random() % discriminatorRange);
+        } while ([used containsObject:discriminator]);
+        [used addObject:discriminator];
+    }
 
     __auto_type * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:passcode discriminator:discriminator];
     XCTAssertNotNil(payload);
