@@ -9511,6 +9511,89 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     }
 }
 
+// Blocks the controller's Matter queue until the returned block is called.  `reached` is signalled from inside the
+// blocking block, so once it is signalled every block queued on the Matter queue before this one has run.
+- (dispatch_block_t)_holdMatterQueueSignalling:(dispatch_semaphore_t)reached
+{
+    dispatch_semaphore_t matterQueueBlocker = dispatch_semaphore_create(0);
+    __block BOOL released = NO;
+    [self addTeardownBlock:^{
+        if (!released) {
+            dispatch_semaphore_signal(matterQueueBlocker);
+        }
+    }];
+    [sController asyncDispatchToMatterQueue:^{
+        dispatch_semaphore_signal(reached);
+        dispatch_semaphore_wait(matterQueueBlocker, DISPATCH_TIME_FOREVER);
+    } errorHandler:nil];
+    return ^{
+        released = YES;
+        dispatch_semaphore_signal(matterQueueBlocker);
+    };
+}
+
+- (void)test075_UserCommandWaitsForReadThroughThatHasSent
+{
+    // A read-through that has sent its request is running, not queued: while it is in flight a user command does
+    // not start beside it, and starts only once the read completes.
+    //
+    // The read gets its existing session and sends in one Matter queue block.  Two holds on that serial queue keep
+    // the read sent but unanswered: hold1, then the read's session block, then hold2.  Releasing hold1 runs the
+    // read's block (session, request-will-be-sent, send) and stops at hold2, ahead of the read's response.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    NSMutableArray<NSString *> * events = [NSMutableArray array];
+    [self _recordReadOfUserInvokeReadPathOnDelegate:delegate events:events];
+
+    dispatch_semaphore_t hold1Reached = dispatch_semaphore_create(0);
+    dispatch_block_t releaseHold1 = [self _holdMatterQueueSignalling:hold1Reached];
+    XCTAssertEqual(dispatch_semaphore_wait(hold1Reached, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kTimeoutInSeconds * NSEC_PER_SEC))), 0, @"Matter queue held");
+    [self _queueReadThroughOfUserInvokeReadPathOnDevice:device];
+    // The read work item has run its ready handler, so its session block is queued behind hold1.
+    [self _waitForDeviceQueue:device];
+
+    dispatch_semaphore_t hold2Reached = dispatch_semaphore_create(0);
+    dispatch_block_t releaseHold2 = [self _holdMatterQueueSignalling:hold2Reached];
+    releaseHold1();
+
+    // Precondition: the read has sent and is in flight, not completed.
+    XCTAssertEqual(dispatch_semaphore_wait(hold2Reached, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kTimeoutInSeconds * NSEC_PER_SEC))), 0,
+        @"the read's session and send block ran ahead of hold2");
+    XCTAssertEqual(device.asyncWorkQueue.itemCount, 1u, @"the read is still in the work queue");
+    @synchronized(events) {
+        XCTAssertEqual(events.count, 0u, @"the read has not completed");
+    }
+
+    // A user command on the device's own work queue, recording when it starts.
+    __block BOOL userCommandStarted = NO;
+    __block BOOL readReportedBeforeUserCommandStarted = NO;
+    dispatch_semaphore_t userCommandRan = dispatch_semaphore_create(0);
+    MTRAsyncWorkItem * userCommand = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    userCommand.jumpsUnsentWork = YES;
+    userCommand.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        @synchronized(events) {
+            userCommandStarted = YES;
+            readReportedBeforeUserCommandStarted = [events containsObject:@"read"];
+        }
+        completion(MTRAsyncWorkComplete);
+        dispatch_semaphore_signal(userCommandRan);
+    };
+    [device.asyncWorkQueue enqueueWorkItem:userCommand description:@"user command behind a read-through that has sent"];
+    // Anything the queue dispatches for it on the device queue has run by now.
+    [self _waitForDeviceQueue:device];
+
+    BOOL startedWhileReadInFlight;
+    @synchronized(events) {
+        startedWhileReadInFlight = userCommandStarted;
+    }
+    XCTAssertFalse(startedWhileReadInFlight, @"a user command does not start beside a read-through that has sent");
+
+    releaseHold2();
+    XCTAssertEqual(dispatch_semaphore_wait(userCommandRan, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (3 * kTimeoutInSeconds * NSEC_PER_SEC))), 0,
+        @"the user command runs once the read completes");
+    XCTAssertTrue(readReportedBeforeUserCommandStarted, @"the user command starts only after the read completes");
+}
+
 @end
 
 @interface MTRDeviceResubscriptionTimerTests : MTRTestCase
