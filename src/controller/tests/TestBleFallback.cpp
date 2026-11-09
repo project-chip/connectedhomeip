@@ -6,7 +6,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
-#include <crypto/RawKeySessionKeystore.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -682,7 +682,7 @@ public:
     {
         TestPersistentStorageDelegate storage;
         Credentials::PersistentStorageOpCertStore certificates;
-        Crypto::RawKeySessionKeystore keys;
+        Crypto::DefaultSessionKeystore keys;
         Credentials::GroupDataProviderImpl groups;
         FallbackCredentials credentials;
         FallbackBle ble;

@@ -40,7 +40,12 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-/** Lazily instantiates [ChipDeviceController] and holds a reference to it. */
+/**
+ * Lazily instantiates [ChipDeviceController] and holds a reference to it.
+ *
+ * Not covered by JVM unit tests: creating the controller or platform calls
+ * [ChipDeviceController.loadJni], which needs the native CHIP library. Exercise it on a device.
+ */
 object ChipClient {
   private const val TAG = "ChipClient"
   private lateinit var chipDeviceController: ChipDeviceController
@@ -53,6 +58,7 @@ object ChipClient {
   // Check-ins arrive on the Matter thread; several screens may listen at once.
   private val icdCheckInCallbacks = CopyOnWriteArraySet<ICDCheckInCallback>()
 
+  @Synchronized
   fun getDeviceController(context: Context): ChipDeviceController {
     getAndroidChipPlatform(context)
 
@@ -94,6 +100,7 @@ object ChipClient {
     return chipDeviceController
   }
 
+  @Synchronized
   fun getAndroidChipPlatform(context: Context?): AndroidChipPlatform {
     if (!this::androidPlatform.isInitialized && context != null) {
       // force ChipDeviceController load jni
@@ -127,21 +134,30 @@ object ChipClient {
     icdCheckInCallbacks.remove(callback)
   }
 
+  @Synchronized
   fun startDnssd(context: Context) {
     if (!this::chipDeviceController.isInitialized) {
       getDeviceController(context)
-    } else if (!dnssdStarted) {
-      chipDeviceController.startDnssd()
-      dnssdStarted = true
+    } else {
+      ensureDnssdStarted(chipDeviceController)
     }
   }
 
+  @Synchronized
   fun stopDnssd(context: Context) {
     if (!this::chipDeviceController.isInitialized) {
       getDeviceController(context)
     }
     chipDeviceController.stopDnssd()
     dnssdStarted = false
+  }
+
+  @Synchronized
+  private fun ensureDnssdStarted(controller: ChipDeviceController) {
+    if (!dnssdStarted) {
+      controller.startDnssd()
+      dnssdStarted = true
+    }
   }
 
   /**
@@ -157,22 +173,23 @@ object ChipClient {
     // worse than the memory leak that was introduced.
     return suspendCancellableCoroutine { continuation ->
       val controller = getDeviceController(context)
-      if (!dnssdStarted) {
-        controller.startDnssd()
-        dnssdStarted = true
-      }
+      ensureDnssdStarted(controller)
       controller.getConnectedDevicePointer(
         nodeId,
         object : GetConnectedDeviceCallback {
           override fun onDeviceConnected(devicePointer: Long) {
             Log.d(TAG, "Got connected device pointer")
-            continuation.resume(devicePointer)
+            if (continuation.isActive) {
+              continuation.resume(devicePointer)
+            }
           }
 
           override fun onConnectionFailure(nodeId: Long, error: Exception) {
             val errorMessage = "Unable to get connected device with nodeId $nodeId"
             Log.e(TAG, errorMessage, error)
-            continuation.resumeWithException(IllegalStateException(errorMessage))
+            if (continuation.isActive) {
+              continuation.resumeWithException(IllegalStateException(errorMessage))
+            }
           }
         },
       )

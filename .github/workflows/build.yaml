@@ -73,7 +73,7 @@ jobs:
                 platform: linux unit_tests
             - name: Initialize CodeQL
               if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+              uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
               with:
                   languages: "cpp"
                   queries: security-extended, security-and-quality
@@ -147,7 +147,7 @@ jobs:
             # scope, letting the pins bump together and stay consistent (see lint.yml check).
             - name: Perform CodeQL Analysis
               if: ${{ inputs.run-codeql }}
-              uses: github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+              uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
               with:
                   category: "/language:cpp"
                   upload: False
@@ -167,7 +167,7 @@ jobs:
                   output: "sarif-results/cpp.sarif"
             - name: Upload SARIF
               if: ${{ inputs.run-codeql }}
-              uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+              uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
               with:
                   sarif_file: "sarif-results/cpp.sarif"
             - name: Upload loc as a Build Artifact
@@ -237,7 +237,7 @@ jobs:
             # deactivate until a better workaround is found
             # - name: Initialize CodeQL
             #   if: ${{ inputs.run-codeql  }}
-            #   uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+            #   uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
             #   with:
             #       languages: "cpp"
             - name: Setup and Build Simulated Device
@@ -273,15 +273,21 @@ jobs:
                   LSAN_OPTIONS: detect_leaks=1
               run: |
                   for BUILD_TYPE in asan tsan ubsan; do
+                      TEST_LIBRARY_PATH=
                       case $BUILD_TYPE in
                           "asan") GN_ARGS='is_clang=true is_asan=true';;
-                          "tsan") GN_ARGS='is_clang=true is_tsan=true chip_enable_wifi=false';;
+                          "tsan")
+                              GN_ARGS='is_clang=true is_tsan=true chip_enable_wifi=false'
+                              # The system glib is not TSAN-instrumented, which causes false positives;
+                              # use the TSAN-instrumented glib provided by the chip-build image.
+                              TEST_LIBRARY_PATH="$LD_LIBRARY_PATH_TSAN"
+                              ;;
                           "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
                       esac
 
                       rm -rf ./out/sanitizers
                       BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --add-export-compile-commands=*
-                      BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
+                      LD_LIBRARY_PATH="$TEST_LIBRARY_PATH" BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                   done
             - name: Generate tests with sanitizers (for tidy)
               if: github.event.pull_request.number != null
@@ -516,7 +522,7 @@ jobs:
             #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
             # - name: Initialize CodeQL
             #   if: ${{ inputs.run-codeql  }}
-            #   uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+            #   uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
             #   with:
             #       languages: "cpp"
 

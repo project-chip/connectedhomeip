@@ -23,21 +23,28 @@ namespace Attributes {
 
 namespace ThreadMetrics {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(ThreadMetrics::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(ThreadMetrics::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kChangesOmitted),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ThreadMetrics
 namespace CurrentHeapFree {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentHeapFree::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(CurrentHeapFree::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace CurrentHeapFree
 namespace CurrentHeapUsed {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentHeapUsed::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(CurrentHeapUsed::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace CurrentHeapUsed
 namespace CurrentHeapHighWatermark {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentHeapHighWatermark::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(CurrentHeapHighWatermark::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace CurrentHeapHighWatermark
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 

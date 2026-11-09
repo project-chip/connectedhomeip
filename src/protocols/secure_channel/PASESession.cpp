@@ -432,6 +432,8 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamRequestTags::kHasPBKDFParameters)));
     SuccessOrExit(err = tlvReader.Get(hasPBKDFParameters));
 
+    // Session parameters that the PBKDFParamRequest omits take their defaults, not the values of a previous handshake.
+    SetRemoteSessionParameters(SessionParameters());
     err = ReadSessionParamsIfPresent(AsTlvContextTag(PBKDFParamRequestTags::kInitiatorSessionParams), tlvReader);
 
     // Future-proofing: CHIP_NO_ERROR will be returned by Next() within ReadSessionParamsIfPresent() if we have additional

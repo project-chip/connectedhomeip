@@ -33,6 +33,7 @@ if (chip_build_tests) {
     cflags = [ "-Wconversion" ]
 
     public_deps = [
+      "${chip_root}/examples/all-devices-app/all-devices-common/bridged-device-manager/oob-accessors",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger:logging",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor:increasing",

@@ -40,8 +40,7 @@ namespace {
 constexpr uint64_t epochJanFirst2000 = 946695600; // Monday, January 1, 2000 12:00 AM
 constexpr uint64_t epochJanFirst2001 = 978318000; // Monday, January 1, 2001 12:00 AM
 
-// clang-tidy (bugprone-unchecked-optional-access) does not treat ASSERT_TRUE(has_value()) as a
-// guard, so chain comparisons go through this explicit check.
+// The generated DeviceAttestationChainProfile (CryptoProfileChainStruct::Type) has no operator==.
 bool ChainEquals(const std::optional<Credentials::DeviceAttestationChainProfile> & actual,
                  const std::optional<Credentials::DeviceAttestationChainProfile> & expected)
 {
@@ -448,7 +447,7 @@ const std::vector<StageTransition> kStagePairs = {
     // Only linear transitions are tested here;
     // Branching cases (like kReadCommissioningInfo, kConfigureTCAcknowledgments, etc.) are tested separately
     { kSecurePairing, kReadCommissioningInfo },
-    { kArmFailsafe, kConfigRegulatory },
+    { kArmFailSafe, kConfigRegulatory },
     { kConfigRegulatory, kConfigureTCAcknowledgments },
     { kConfigureDefaultNTP, kSendPAICertificateRequest },
     { kSendPAICertificateRequest, kSendDACCertificateRequest },
@@ -522,7 +521,7 @@ TEST_F(AutoCommissionerTest, NextStageReadCommissioningInfo)
     privateConfigCommissioner.SetBreadcrumb(0);
     CommissioningStage nextStage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kReadCommissioningInfo, err);
 
-    EXPECT_EQ(nextStage, kArmFailsafe);
+    EXPECT_EQ(nextStage, kArmFailSafe);
 
     // if breadcrumb > 0, the stage changes to kSendNOC; subsequent stages progress accordingly.
     privateConfigCommissioner.SetBreadcrumb(1);
