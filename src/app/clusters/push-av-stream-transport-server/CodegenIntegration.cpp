@@ -130,7 +130,7 @@ CHIP_ERROR SetDelegateAndInit(EndpointId endpointId, PushAvStreamTransportDelega
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     PushAvStreamTransportServer * cluster = FindClusterOnEndpoint(endpointId);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
-    ReturnErrorOnFailure(cluster->GetLogic().TrySetDelegate(delegate));
+    ReturnErrorOnFailure(cluster->TrySetDelegate(delegate));
     return cluster->Init();
 }
 

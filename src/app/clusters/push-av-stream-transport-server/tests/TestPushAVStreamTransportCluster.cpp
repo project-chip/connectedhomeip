@@ -2039,8 +2039,15 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
     class RestoredConnectionDelegate : public TestPushAVStreamTransportDelegateImpl
     {
     public:
+        void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override { associatedServer = server; }
+        PushAvStreamTransportServer * associatedServer = nullptr;
+        bool requireAssociation                        = false;
         CHIP_ERROR PersistentAttributesLoadedCallback() override
         {
+            if (requireAssociation && associatedServer == nullptr)
+            {
+                return CHIP_ERROR_INCORRECT_STATE;
+            }
             ++restorations;
             if (restoreBeforeFailure)
             {
@@ -2554,6 +2561,12 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
     EXPECT_EQ(mServer.GetLogic().TrySetDelegate(&replacementDelegate), CHIP_ERROR_BUSY);
     EXPECT_EQ(mServer.GetLogic().TrySetDelegate(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(mServer.GetLogic().TrySetDelegate(&delegate), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.associatedServer, nullptr);
+    EXPECT_EQ(mServer.TrySetDelegate(&replacementDelegate), CHIP_ERROR_BUSY);
+    EXPECT_EQ(mServer.TrySetDelegate(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    delegate.requireAssociation = true;
+    EXPECT_EQ(mServer.TrySetDelegate(&delegate), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.associatedServer, &mServer);
     const auto restorationsBeforeRetry = delegate.restorations;
     EXPECT_EQ(mServer.Init(), CHIP_ERROR_BUSY);
     EXPECT_FALSE(mServer.GetLogic().IsInitialized());
