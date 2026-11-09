@@ -314,9 +314,13 @@ TEST_F(TestColorControlCommands, RawMoveModesPreserveIndependentRateValidation)
 
 TEST_F(TestColorControlCommands, RawHueDirectionsRejectReservedValuesWithoutSideEffects)
 {
-    struct RawDirectionRequest : Commands::MoveToHue::Type
+    struct RawDirectionRequest
     {
+        using ResponseType = Commands::MoveToHue::Type::ResponseType;
+
         uint8_t rawDirection;
+        uint8_t hue;
+        uint16_t transitionTime;
 
         CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
         {

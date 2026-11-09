@@ -80,6 +80,8 @@ void ThermostatSetpointsBase::GenerateSetpointEvent(AttributeId attributeId, tem
     case UnoccupiedCoolingSetpoint::Id:
         mCluster.GenerateSetpointChangeEvent(SystemModeEnum::kCool, BitMask<OccupancyBitmap>(), MakeOptional(oldTemp), newTemp);
         break;
+    default:
+        break;
     }
 }
 

@@ -360,9 +360,12 @@ TEST_F(ThermostatTestFixture, TestSetpointRaiseLowerCommand)
     EXPECT_EQ(mHeatingDelegate.mOccupiedHeatingSetpoint, 2000);
     EXPECT_EQ(mCoolingDelegate.mOccupiedCoolingSetpoint, 2850);
 
-    struct RawModeRequest : Commands::SetpointRaiseLower::Type
+    struct RawModeRequest
     {
+        using ResponseType = Commands::SetpointRaiseLower::Type::ResponseType;
+
         uint8_t rawMode = 0;
+        int8_t amount;
 
         CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
         {
@@ -380,7 +383,7 @@ TEST_F(ThermostatTestFixture, TestSetpointRaiseLowerCommand)
             RawModeRequest raw;
             raw.rawMode = mode;
             raw.amount  = amount;
-            result      = tester.Invoke(raw);
+            result      = tester.Invoke(Commands::SetpointRaiseLower::Id, raw);
             ASSERT_TRUE(result.status.has_value());
             EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
             EXPECT_EQ(mHeatingDelegate.mOccupiedHeatingSetpoint, 2000);
