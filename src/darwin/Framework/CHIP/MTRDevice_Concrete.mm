@@ -3937,27 +3937,32 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                            NSNumber * expectedValueID = request[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
                                            [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID.unsignedLongLongValue];
                                        }
+                                       // A later write merged into this work item carries its own expected value.
+                                       // Remove that too, whether or not this work item set one.
+                                       if (requestExpectedValueInterval != [NSNull null]) {
+                                           [self removeExpectedValueForAttributePath:path expectedValueID:requestExpectedValueID.unsignedLongLongValue];
+                                       }
                                    }
                                    completion(MTRAsyncWorkComplete);
                                }];
     }];
-    if (useValueAsExpectedValue) {
-        // The work queue cancels its work items only when the device is invalidated.  A write dropped that way before
-        // it was sent still has a pending expected value, which would never expire, so remove it, and that of a write
-        // merged into this one.  Removal only touches expected values that still carry these IDs; a write already in
-        // flight loses its expected value too, as the device is going away.
-        mtr_weakify(self);
-        [workItem setCancelHandler:^{
-            mtr_strongify(self);
-            VerifyOrReturn(self);
+    // The work queue cancels its work items only when the device is invalidated.  A write dropped that way before
+    // it was sent still has a pending expected value, which would never expire, so remove it, and that of a write
+    // merged into this one, even if this write did not set one.  Removal only touches expected values that still
+    // carry these IDs; a write already in flight loses its expected value too, as the device is going away.
+    mtr_weakify(self);
+    [workItem setCancelHandler:^{
+        mtr_strongify(self);
+        VerifyOrReturn(self);
+        if (useValueAsExpectedValue) {
             [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
-            auto * request = writeRequests[0];
-            if (request[MTRDeviceWriteRequestFieldExpectedValueIntervalIndex] != [NSNull null]) {
-                [self removeExpectedValueForAttributePath:request[MTRDeviceWriteRequestFieldPathIndex]
-                                          expectedValueID:[request[MTRDeviceWriteRequestFieldExpectedValueIDIndex] unsignedLongLongValue]];
-            }
-        }];
-    }
+        }
+        auto * request = writeRequests[0];
+        if (request[MTRDeviceWriteRequestFieldExpectedValueIntervalIndex] != [NSNull null]) {
+            [self removeExpectedValueForAttributePath:request[MTRDeviceWriteRequestFieldPathIndex]
+                                      expectedValueID:[request[MTRDeviceWriteRequestFieldExpectedValueIDIndex] unsignedLongLongValue]];
+        }
+    }];
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ 0x%llx (%@) 0x%llx (%@): %@",
                                               endpointID,
                                               clusterID.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue)),
