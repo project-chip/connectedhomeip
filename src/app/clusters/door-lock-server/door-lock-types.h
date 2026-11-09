@@ -94,7 +94,7 @@ struct CredentialInfo
 #if DOOR_LOCK_USE_LOCAL_BUFFER
     MutableByteSpan credentialData; /**< Credential data bytes. */
 #else
-    ByteSpan credentialData; /**< Credential data bytes. */
+    ByteSpan credentialData;                  /**< Credential data bytes. */
 #endif
     DlAssetSource creationSource;
     FabricIndex createdBy; /**< Index of the fabric that created the user. */

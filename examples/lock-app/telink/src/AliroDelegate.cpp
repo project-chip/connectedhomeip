@@ -220,8 +220,8 @@ bool AliroDelegate::GetAliroCredential(uint16_t index, CredentialTypeEnum type, 
     return true;
 }
 
-bool AliroDelegate::SetAliroCredential(uint16_t index, chip::FabricIndex creator, chip::FabricIndex modifier, DlCredentialStatus status,
-                                  CredentialTypeEnum type, const chip::ByteSpan & data)
+bool AliroDelegate::SetAliroCredential(uint16_t index, chip::FabricIndex creator, chip::FabricIndex modifier,
+                                       DlCredentialStatus status, CredentialTypeEnum type, const chip::ByteSpan & data)
 {
     CredentialSlot * slots = SlotArrayForType(type);
     VerifyOrReturnValue(slots != nullptr, false);

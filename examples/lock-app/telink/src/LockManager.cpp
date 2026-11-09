@@ -752,7 +752,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     if (AliroDelegate::IsAliroCredentialType(credentialType))
     {
         return AliroDelegate::GetInstance().SetAliroCredential(credentialIndex, creator, modifier, credentialStatus, credentialType,
-                                                          credentialData);
+                                                               credentialData);
     }
 
     size_t outLen;

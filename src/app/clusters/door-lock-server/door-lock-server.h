@@ -80,6 +80,11 @@ typedef bool (*RemoteLockOpHandler)(chip::EndpointId endpointId, const Nullable<
                                     OperationErrorEnum & err);
 
 // Legacy aliases kept for source compatibility with existing applications.
+using EmberAfPluginDoorLockUserInfo        = chip::app::Clusters::DoorLock::UserInfo;
+using EmberAfPluginDoorLockCredentialInfo  = chip::app::Clusters::DoorLock::CredentialInfo;
+using EmberAfPluginDoorLockWeekDaySchedule = chip::app::Clusters::DoorLock::WeekDaySchedule;
+using EmberAfPluginDoorLockYearDaySchedule = chip::app::Clusters::DoorLock::YearDaySchedule;
+using EmberAfPluginDoorLockHolidaySchedule = chip::app::Clusters::DoorLock::HolidaySchedule;
 constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE    = chip::app::Clusters::DoorLock::kDoorLockMaxUsernameSize;
 constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE = chip::app::Clusters::DoorLock::kDoorLockUsernameBufferSize;
 using chip::app::Clusters::DoorLock::DlAssetSource;
