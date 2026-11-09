@@ -23,42 +23,39 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include "app_entry.h"
-#include "app_bsp.h"
 #include "GenericSwitchManager.h"
-
+#include "app_bsp.h"
+#include "app_entry.h"
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/stm32/stm32wba/FactoryDataProvider.h>
-
-
 
 class AppTask
 {
 
 public:
-	    CHIP_ERROR StartAppTask();
-	    CHIP_ERROR Init();
-	    static void AppTaskMain(void * pvParameter);
-	    void PostEvent(const AppEvent * event);
-	    void UpdateClusterState();
-	    CHIP_ERROR InitMatter(void);
-	    static void ButtonEventHandler(ButtonDesc_t *Button);
+    CHIP_ERROR StartAppTask();
+    CHIP_ERROR Init();
+    static void AppTaskMain(void * pvParameter);
+    void PostEvent(const AppEvent * event);
+    void UpdateClusterState();
+    CHIP_ERROR InitMatter(void);
+    static void ButtonEventHandler(ButtonDesc_t * Button);
 
 protected:
-	    TaskHandle_t mAppTask      = NULL;
+    TaskHandle_t mAppTask = NULL;
 
 private:
     friend AppTask & GetAppTask(void);
-       void CancelTimer(void);
-       void DispatchEvent(AppEvent * event);
-       static void FunctionHandler(AppEvent * aEvent);
-      
-       static void TimerEventHandler(TimerHandle_t xTimer);
-       static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-       static void UpdateLCD(void);
-       static void UpdateNvmEventHandler(AppEvent * aEvent);
-       static void UpdateGenericSwitchEventHandler(AppEvent * aEvent);
+    void CancelTimer(void);
+    void DispatchEvent(AppEvent * event);
+    static void FunctionHandler(AppEvent * aEvent);
+
+    static void TimerEventHandler(TimerHandle_t xTimer);
+    static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    static void UpdateLCD(void);
+    static void UpdateNvmEventHandler(AppEvent * aEvent);
+    static void UpdateGenericSwitchEventHandler(AppEvent * aEvent);
 
     enum Function_t
     {
@@ -69,8 +66,8 @@ private:
         kFunction_FactoryReset   = 3,
         kFunction_ShortRelease   = 4,
         kFunction_LongRelease    = 5,
-		kFunction_LongPress      = 6,
-		kFunction_InitialPress   = 7,
+        kFunction_LongPress      = 6,
+        kFunction_InitialPress   = 7,
 
         kFunction_Invalid
     } Function;
@@ -86,6 +83,5 @@ inline AppTask & GetAppTask(void)
 {
     return AppTask::sAppTask;
 }
-
 
 #endif // APP_TASK_H

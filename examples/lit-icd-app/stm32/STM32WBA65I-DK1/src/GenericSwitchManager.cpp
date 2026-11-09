@@ -37,13 +37,12 @@ using namespace chip::app::Clusters;
 
 GenericSwitchManager GenericSwitchManager::sSwitch;
 
-
 /**
  * @brief Function that triggers a generic switch OnInitialPress event
  */
 void GenericSwitchManager::GenericSwitchOnInitialPress()
 {
-	CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
 
     data->endpoint = mGenericSwitchEndpoint;
@@ -54,7 +53,7 @@ void GenericSwitchManager::GenericSwitchOnInitialPress()
 
 void GenericSwitchManager::GenericSwitchOnLongPress()
 {
-	CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
 
     data->endpoint = mGenericSwitchEndpoint;
@@ -68,7 +67,7 @@ void GenericSwitchManager::GenericSwitchOnLongPress()
  */
 void GenericSwitchManager::GenericSwitchOnShortRelease()
 {
-	CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
 
     data->endpoint = mGenericSwitchEndpoint;
@@ -82,7 +81,7 @@ void GenericSwitchManager::GenericSwitchOnShortRelease()
  */
 void GenericSwitchManager::GenericSwitchOnLongRelease()
 {
-	CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
 
     data->endpoint = mGenericSwitchEndpoint;
@@ -91,15 +90,12 @@ void GenericSwitchManager::GenericSwitchOnLongRelease()
     err = DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
-
 void GenericSwitchManager::GenericSwitchWorkerFunction(intptr_t context)
 {
 
-	CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     GenericSwitchEventData * data = reinterpret_cast<GenericSwitchEventData *>(context);
-    LOG_ERROR_APP("P5 Worker: event=%lu endpoint=%u\n",
-                  (unsigned long) data->event,
-                  (unsigned int) data->endpoint);
+    LOG_ERROR_APP("P5 Worker: event=%lu endpoint=%u\n", (unsigned long) data->event, (unsigned int) data->endpoint);
 
     switch (data->event)
     {
@@ -114,14 +110,14 @@ void GenericSwitchManager::GenericSwitchWorkerFunction(intptr_t context)
         break;
     }
     case Switch::Events::LongPress::Id: {
-		uint8_t currentPosition = 1;
+        uint8_t currentPosition = 1;
 
-		if (auto * switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint))
-		{
-			switchCluster->OnLongPress(currentPosition);
-		}
-		break;
-	}
+        if (auto * switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint))
+        {
+            switchCluster->OnLongPress(currentPosition);
+        }
+        break;
+    }
     case Switch::Events::ShortRelease::Id: {
         uint8_t previousPosition = 1;
         uint8_t currentPosition  = 0;

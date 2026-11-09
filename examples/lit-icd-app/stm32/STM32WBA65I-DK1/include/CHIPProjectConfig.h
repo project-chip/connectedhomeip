@@ -56,9 +56,8 @@
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8004
 
-
 /* define Device type based on the application */
-#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 0x000F //Generic Switch Type
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 0x000F // Generic Switch Type
 
 /**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
@@ -191,8 +190,7 @@
  *
  * Enable ICD management
  */
-#define CHIP_CONFIG_ENABLE_ICD_SERVER 1  //set to 1 for GenericSwitch-App
+#define CHIP_CONFIG_ENABLE_ICD_SERVER 1 // set to 1 for GenericSwitch-App
 #define CHIP_DEVICE_CONFIG_ENABLE_SED 1 // to enable SED feature
-
 
 #endif /* CHIPPROJECTCONFIG_H */

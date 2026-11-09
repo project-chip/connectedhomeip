@@ -40,15 +40,15 @@ and discriminator above must match the values configured in the firmware.
 
 ### LIT ICD
 
-- The Thread interface is configured as a Sleepy End Device.
-- ICD Management is enabled. The device supports the ICD client-management and
-  stay-active interactions exposed by the Matter ICD Management cluster.
-- The application uses the configured ICD slow-poll interval of 300 seconds,
-  fast-poll interval of 200 milliseconds, idle duration of 450 seconds, and
-  active duration of 2 seconds.
-- On first boot, the device opens a BLE commissioning window. After
-  commissioning, it reconnects to its saved Thread network and retains its
-  fabric and network data in non-volatile storage.
+-   The Thread interface is configured as a Sleepy End Device.
+-   ICD Management is enabled. The device supports the ICD client-management and
+    stay-active interactions exposed by the Matter ICD Management cluster.
+-   The application uses the configured ICD slow-poll interval of 300 seconds,
+    fast-poll interval of 200 milliseconds, idle duration of 450 seconds, and
+    active duration of 2 seconds.
+-   On first boot, the device opens a BLE commissioning window. After
+    commissioning, it reconnects to its saved Thread network and retains its
+    fabric and network data in non-volatile storage.
 
 The ICD Management cluster is separate from the Switch cluster: ICD behavior
 controls how the device sleeps and becomes reachable, while Generic Switch

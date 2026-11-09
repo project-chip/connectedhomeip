@@ -26,7 +26,6 @@
 class GenericSwitchManager
 {
 public:
-
     struct GenericSwitchEventData
     {
         chip::EndpointId endpoint;
