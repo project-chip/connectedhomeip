@@ -2401,7 +2401,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myAttributeId = @300;
     NSDictionary * myValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @654321 };
     MTRAttributePath * myPath = [MTRAttributePath attributePathWithEndpointID:myEndpointId clusterID:myClusterId attributeID:myAttributeId];
-    const NSTimeInterval expectedValueInterval = 1;
+    // Long enough that the presence check right after the proxy call can't race the expiry, even on a slow
+    // (sanitizer) run; the absence check below waits for twice this.
+    const NSTimeInterval expectedValueInterval = 5;
 
     XCTestExpectation * callExpectation = [[XCTestExpectation alloc] initWithDescription:@"XPC write received"];
 
@@ -2452,7 +2454,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSDictionary * myExpectedValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @7 };
     MTRAttributePath * myPath = [MTRAttributePath attributePathWithEndpointID:myEndpointId clusterID:myClusterId attributeID:myAttributeId];
     NSArray * myResults = @[ @{ MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:myEndpointId clusterID:myClusterId commandID:myCommandId] } ];
-    const NSTimeInterval expectedValueInterval = 1;
+    // Long enough that the presence check right after the proxy call can't race the expiry, even on a slow
+    // (sanitizer) run; the absence check below waits for twice this.
+    const NSTimeInterval expectedValueInterval = 5;
 
     XCTestExpectation * callExpectation = [[XCTestExpectation alloc] initWithDescription:@"XPC invoke received"];
     XCTestExpectation * responseExpectation = [[XCTestExpectation alloc] initWithDescription:@"Invoke response received"];
