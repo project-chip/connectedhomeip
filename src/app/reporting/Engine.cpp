@@ -1267,7 +1267,7 @@ void Engine::OnAttributeChanged(const ConcreteAttributePath & path, DataModel::A
     }
 }
 
-void Engine::OnEndpointChanged(EndpointId endpointId, DataModel::EndpointChangeType type)
+void Engine::OnEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, DataModel::EndpointChangeType type)
 {
     CHIP_ERROR err = SetDirty(AttributePathParams(endpointId));
     if (err != CHIP_NO_ERROR)

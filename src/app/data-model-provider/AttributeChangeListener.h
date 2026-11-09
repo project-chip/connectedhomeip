@@ -89,7 +89,7 @@ public:
 
     /// Called when an endpoint's structure or composition changes
     /// (e.g., clusters added/removed, or for bridged device changes).
-    virtual void OnEndpointChanged(EndpointId endpointId, EndpointChangeType type) {}
+    virtual void OnEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, EndpointChangeType type) {}
 
     AttributeChangeListener * GetNextAttributeChangeListener() const { return mNextAttributeChange; }
     void SetNextAttributeChangeListener(AttributeChangeListener * next) { mNextAttributeChange = next; }
