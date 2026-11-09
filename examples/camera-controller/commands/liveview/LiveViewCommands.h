@@ -63,5 +63,5 @@ public:
 
 private:
     chip::NodeId mPeerNodeId = chip::kUndefinedNodeId;
-    uint16_t mVideoStreamID  = 0;
+    chip::Optional<uint16_t> mVideoStreamID;
 };
