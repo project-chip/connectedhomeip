@@ -9566,15 +9566,18 @@ static const unsigned kExpectedValueTestCachedValue = 3;
 
     // A user command on the device's own work queue, recording when it starts.
     __block BOOL userCommandStarted = NO;
-    __block BOOL readReportedBeforeUserCommandStarted = NO;
+    // The work queue removes a completed item before it starts the next one, under its lock, so the item count seen
+    // from the user command's ready handler is 1 only if the read completed first.
+    __block NSUInteger itemCountWhenUserCommandStarted = 0;
     dispatch_semaphore_t userCommandRan = dispatch_semaphore_create(0);
     // On the device queue, so that _waitForDeviceQueue: below also waits for its ready handler if the queue starts it.
     MTRAsyncWorkItem * userCommand = [[MTRAsyncWorkItem alloc] initWithQueue:device.queue];
     userCommand.jumpsUnsentWork = YES;
     userCommand.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        NSUInteger itemCount = device.asyncWorkQueue.itemCount;
         @synchronized(events) {
             userCommandStarted = YES;
-            readReportedBeforeUserCommandStarted = [events containsObject:@"read"];
+            itemCountWhenUserCommandStarted = itemCount;
         }
         completion(MTRAsyncWorkComplete);
         dispatch_semaphore_signal(userCommandRan);
@@ -9593,7 +9596,9 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     releaseHold2();
     XCTAssertEqual(dispatch_semaphore_wait(userCommandRan, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (3 * kTimeoutInSeconds * NSEC_PER_SEC))), 0,
         @"the user command runs once the read completes");
-    XCTAssertTrue(readReportedBeforeUserCommandStarted, @"the user command starts only after the read completes");
+    @synchronized(events) {
+        XCTAssertEqual(itemCountWhenUserCommandStarted, 1u, @"the user command starts only after the read completes");
+    }
 }
 
 @end
