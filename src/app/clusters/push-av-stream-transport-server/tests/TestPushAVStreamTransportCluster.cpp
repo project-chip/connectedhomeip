@@ -649,9 +649,11 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
                         options.containerOptions.containerType = ContainerFormatEnum::kCmaf;
                         options.containerOptions.CMAFContainerOptions.SetValue(cmaf);
 
-                        uint8_t tlvBuffer[8192];
+                        constexpr size_t kTlvBufferSize = 8192;
+                        Platform::ScopedMemoryBuffer<uint8_t> tlvBuffer;
+                        ASSERT_TRUE(tlvBuffer.Alloc(kTlvBufferSize));
                         TLV::TLVWriter writer;
-                        writer.Init(tlvBuffer, sizeof(tlvBuffer));
+                        writer.Init(tlvBuffer.Get(), kTlvBufferSize);
                         TLV::TLVType arrayType;
                         ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
                         const size_t zoneCount = zonesCase == ZonesCase::Empty ? 0u : count;
@@ -721,7 +723,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
                         ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
                         ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
                         TLV::TLVReader reader;
-                        reader.Init(tlvBuffer, writer.GetLengthWritten() - (zonesCase == ZonesCase::Truncated ? 3 : 0));
+                        reader.Init(tlvBuffer.Get(), writer.GetLengthWritten() - (zonesCase == ZonesCase::Truncated ? 3 : 0));
                         ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
                         DataModel::DecodableList<TransportZoneOptionsDecodableStruct> zones;
                         if (zonesCase == ZonesCase::Truncated)
@@ -842,7 +844,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
                         if (expectedStatus == Status::Success &&
                             (zonesCase == ZonesCase::Unique || zonesCase == ZonesCase::HighIds))
                         {
-                            CheckMotionZonePersistence(server, MutableByteSpan(tlvBuffer), expectedIds);
+                            CheckMotionZonePersistence(server, MutableByteSpan(tlvBuffer.Get(), kTlvBufferSize), expectedIds);
                         }
                     }
                 }

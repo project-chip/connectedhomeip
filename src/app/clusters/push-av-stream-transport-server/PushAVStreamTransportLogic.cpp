@@ -961,9 +961,9 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTr
 
         if (zoneIdCount <= zoneIds.size())
         {
-            auto end = zoneIds.begin() + zoneIdCount;
-            std::sort(zoneIds.begin(), end);
-            VerifyOrReturnValue(std::adjacent_find(zoneIds.begin(), end) == end, Status::AlreadyExists);
+            auto end = zoneIds.data() + zoneIdCount;
+            std::sort(zoneIds.data(), end);
+            VerifyOrReturnValue(std::adjacent_find(zoneIds.data(), end) == end, Status::AlreadyExists);
         }
         else
         {
