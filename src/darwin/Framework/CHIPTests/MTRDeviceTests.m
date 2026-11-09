@@ -9214,7 +9214,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
                              completion:completion];
 }
 
-- (void)test064_UserInvokeSentBeforeQueuedRead
+- (void)test065_UserInvokeSentBeforeQueuedRead
 {
     // A user command queued behind a read that has sent nothing is sent first.
     MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
@@ -9236,7 +9236,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     }
 }
 
-- (void)test065_CancelledQueuedInvokeNeverSends
+- (void)test066_CancelledQueuedInvokeNeverSends
 {
     // A user command cancelled while still queued completes once, with a cancelled error, is never sent, and leaves
     // no expected value behind.
@@ -9263,7 +9263,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:[self _expectedValueTestPath]][MTRValueKey], @(kExpectedValueTestCachedValue));
 }
 
-- (void)test066_CancelAfterSendStillCompletes
+- (void)test067_CancelAfterSendStillCompletes
 {
     // A user command already sent is not cancelled: it completes as usual.
     MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
@@ -9298,7 +9298,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     [self waitForExpectations:@[ invokeDone ] timeout:(3 * kTimeoutInSeconds)];
 }
 
-- (void)test067_CancelWhileWaitingForSessionCompletesOnce
+- (void)test068_CancelWhileWaitingForSessionCompletesOnce
 {
     // A user command cancelled while it waits for its session is never sent, and its caller hears about it exactly
     // once: the session arriving later does not complete it a second time.
@@ -9325,7 +9325,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0);
 }
 
-- (void)test068_QueuedInvokeFailsAtCallerTimeout
+- (void)test069_QueuedInvokeFailsAtCallerTimeout
 {
     // A user command still queued when its caller's timeout elapses fails then with a timeout error, and is never
     // sent.  The minimum is lowered so the test need not wait for one whole session attempt.
@@ -9352,7 +9352,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0);
 }
 
-- (void)test069_TimeoutBelowOneSessionAttemptRefused
+- (void)test070_TimeoutBelowOneSessionAttemptRefused
 {
     // A caller timeout shorter than one session attempt is refused up front instead of being queued to fail.
     MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
@@ -9370,7 +9370,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqual(failure.code, MTRErrorCodeInvalidArgument);
 }
 
-- (void)test070_CopiedParamsShareToken
+- (void)test071_CopiedParamsShareToken
 {
     // A command made with a copy of its params object is cancelled through the original's token: copies share it.
     MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
@@ -9395,7 +9395,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqual(errors.firstObject.code, MTRErrorCodeCancelled);
 }
 
-- (void)test071_InvokeWithoutTokenStaysInOrder
+- (void)test072_InvokeWithoutTokenStaysInOrder
 {
     // A command with no token is queued in order, as before: behind the read queued ahead of it.
     MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
@@ -9417,7 +9417,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     }
 }
 
-- (void)test072_ReadSendsWhenUserInvokeAheadOfItIsCancelled
+- (void)test073_ReadSendsWhenUserInvokeAheadOfItIsCancelled
 {
     // A read's send is never cancelled: a cancelled user command ahead of it does not stop the read.
     MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
@@ -9440,7 +9440,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     }
 }
 
-- (void)test073_ReadNotHeldByUserInvokeSendingAlongsideIt
+- (void)test074_ReadNotHeldByUserInvokeSendingAlongsideIt
 {
     // A read and a user command that both get their session in the same Matter queue turn both send: the read does
     // not wait for the command's response.  The accessory takes 2 s to answer the command.
@@ -9485,7 +9485,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     [self _waitForEvents:events count:2 timeout:(3 * kTimeoutInSeconds)];
 }
 
-- (void)test074_ReadThroughThatSentFinishesBeforeLaterUserInvoke
+- (void)test075_ReadThroughThatSentFinishesBeforeLaterUserInvoke
 {
     // A read-through that has sent its request is running, not queued: a user command queued while it is in flight
     // waits for it.  This exercises the read-through's request-will-be-sent callback, which marks the read as sent.
@@ -9544,7 +9544,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     };
 }
 
-- (void)test075_UserCommandWaitsForReadThroughThatHasSent
+- (void)test076_UserCommandWaitsForReadThroughThatHasSent
 {
     // A read-through that has sent its request is running, not queued: while it is in flight a user command does
     // not start beside it, and starts only once the read completes.
@@ -9613,7 +9613,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     }
 }
 
-- (void)test076_TokenCancelledBeforeItIsTiedToTheInvokeNeverSends
+- (void)test077_TokenCancelledBeforeItIsTiedToTheInvokeNeverSends
 {
     // A token cancelled after the invoke checked it, but before the token is tied to the invoke's work item, still
     // cancels the invoke: its cancel returned YES, so the invoke completes once with a cancelled error, is never
