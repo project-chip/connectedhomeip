@@ -97,7 +97,7 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
         // to mark end of commissioning request.
         // Since OnPairingComplete(failure_code) might not be invoked in all cases, use this opportunity to inform of failed commissioning
         // and default the error to timeout since that is best guess in this layer.
-        if (status == chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed && [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
+        if (status == chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed && ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)] || [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:context:)])) {
             OnCommissioningComplete(mDeviceNodeId, CHIP_ERROR_TIMEOUT);
         }
     }
@@ -194,7 +194,8 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
         MTR_LOG("%@ Device commissioning complete with metrics %@", strongController, metrics);
 
         if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)] ||
-            [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
+            [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)] ||
+            [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:context:)]) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
                 NSNumber * nodeID = nil;
@@ -202,8 +203,10 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
                     nodeID = @(nodeId);
                 }
 
-                // If the client implements the metrics delegate, prefer that over others
-                if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
+                // If the client implements the context delegate, prefer that over others
+                if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:context:)]) {
+                    [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID metrics:metrics context:@ {}];
+                } else if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
                     [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID metrics:metrics];
                 } else {
                     [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];
