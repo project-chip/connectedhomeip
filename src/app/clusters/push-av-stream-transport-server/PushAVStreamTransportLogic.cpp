@@ -95,6 +95,43 @@ namespace Clusters {
 
 namespace Internal {
 
+class RequiredZoneFieldReader : public DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>
+{
+public:
+    explicit RequiredZoneFieldReader(const DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> & zones) :
+        DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>(zones)
+    {}
+
+    CHIP_ERROR Validate() const
+    {
+        if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
+        {
+            return CHIP_NO_ERROR;
+        }
+        TLV::TLVReader reader;
+        reader.Init(mReader);
+        CHIP_ERROR status;
+        while ((status = reader.Next()) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+            TLV::TLVType containerType;
+            ReturnErrorOnFailure(reader.EnterContainer(containerType));
+            bool zonePresent = false;
+            while ((status = reader.Next()) == CHIP_NO_ERROR)
+            {
+                if (reader.GetTag() == TLV::ContextTag(to_underlying(Structs::TransportZoneOptionsStruct::Fields::kZone)))
+                {
+                    zonePresent = true;
+                }
+            }
+            VerifyOrReturnError(status == CHIP_END_OF_TLV, status);
+            ReturnErrorOnFailure(reader.ExitContainer(containerType));
+            VerifyOrReturnError(zonePresent, CHIP_ERROR_MISSING_TLV_ELEMENT);
+        }
+        return status == CHIP_END_OF_TLV ? CHIP_NO_ERROR : status;
+    }
+};
+
 std::string extractTextRange(const UriTextRangeA & range)
 {
     if (range.first == nullptr || range.afterLast == nullptr || range.first >= range.afterLast)
@@ -556,6 +593,14 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                                      mEndpointId, static_cast<uint32_t>(transportOptions.url.size())));
 
     auto & triggerOptions = transportOptions.triggerOptions;
+    if ((triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion ||
+         triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext) &&
+        triggerOptions.motionZones.HasValue() && !triggerOptions.motionZones.Value().IsNull())
+    {
+        VerifyOrReturnValue(Internal::RequiredZoneFieldReader(triggerOptions.motionZones.Value().Value()).Validate() ==
+                                CHIP_NO_ERROR,
+                            Status::InvalidCommand);
+    }
 
     VerifyOrReturnValue(
         triggerOptions.triggerType != TransportTriggerTypeEnum::kUnknownEnumValue, Status::ConstraintError,
@@ -2209,6 +2254,7 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
         const auto & zones = options.triggerOptions.motionZones;
         if (zones.HasValue() && !zones.Value().IsNull())
         {
+            ReturnErrorOnFailure(Internal::RequiredZoneFieldReader(zones.Value().Value()).Validate());
             auto zoneIter          = zones.Value().Value().begin();
             size_t zoneCount       = 0;
             auto sensitivityStatus = Status::Success;

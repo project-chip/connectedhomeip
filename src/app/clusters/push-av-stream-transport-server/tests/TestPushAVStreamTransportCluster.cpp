@@ -950,6 +950,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
         Duplicate,
         DuplicateNull,
         MalformedFirst,
+        MissingZone,
         MalformedTail,
         DuplicateMalformed,
         Truncated,
@@ -974,8 +975,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                     for (const auto zoneCase :
                          { ZoneCase::Valid, ZoneCase::Mixed, ZoneCase::NullId, ZoneCase::Duplicate, ZoneCase::DuplicateNull,
                            ZoneCase::MalformedFirst, ZoneCase::MalformedTail, ZoneCase::DuplicateMalformed, ZoneCase::Truncated,
-                           ZoneCase::Oversized, ZoneCase::InvalidId, ZoneCase::InvalidTLS, ZoneCase::Busy, ZoneCase::NotFound,
-                           ZoneCase::InvalidStream, ZoneCase::TimeControl, ZoneCase::GlobalSensitivity })
+                           ZoneCase::MissingZone, ZoneCase::Oversized, ZoneCase::InvalidId, ZoneCase::InvalidTLS, ZoneCase::Busy,
+                           ZoneCase::NotFound, ZoneCase::InvalidStream, ZoneCase::TimeControl, ZoneCase::GlobalSensitivity })
                     {
                         if (zoneCase != ZoneCase::Valid && zoneCase != ZoneCase::Mixed && sensitivity != (feature ? 5 : -1))
                         {
@@ -1064,6 +1065,21 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
                         for (size_t index = 0; index < count; ++index)
                         {
+                            if (zoneCase == ZoneCase::MissingZone && index == 0)
+                            {
+                                TLV::TLVType structType;
+                                ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType),
+                                          CHIP_NO_ERROR);
+                                if (feature)
+                                {
+                                    ASSERT_EQ(writer.Put(TLV::ContextTag(to_underlying(
+                                                             Structs::TransportZoneOptionsStruct::Fields::kSensitivity)),
+                                                         static_cast<uint8_t>(5)),
+                                              CHIP_NO_ERROR);
+                                }
+                                ASSERT_EQ(writer.EndContainer(structType), CHIP_NO_ERROR);
+                                continue;
+                            }
                             if ((zoneCase == ZoneCase::MalformedFirst && index == 0) ||
                                 ((zoneCase == ZoneCase::MalformedTail || zoneCase == ZoneCase::DuplicateMalformed) &&
                                  index == count - 1))
@@ -1159,7 +1175,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         size_t sizeChecks   = 0;
                         size_t idChecks     = 0;
                         size_t streamChecks = 0;
-                        if (zoneCase == ZoneCase::MalformedFirst)
+                        if (zoneCase == ZoneCase::MalformedFirst || zoneCase == ZoneCase::MissingZone)
                         {
                             expected = Status::InvalidCommand;
                         }
@@ -1220,7 +1236,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSuppo
                         const size_t tlsLookupsBefore = tlsDelegate.lookups;
                         const auto directStatus       = logic.ValidateIncomingTransportOptions(options);
                         const bool invalidInput       = malformed || sensitivityStatus != Status::Success ||
-                            zoneCase == ZoneCase::TimeControl || zoneCase == ZoneCase::GlobalSensitivity;
+                            zoneCase == ZoneCase::TimeControl || zoneCase == ZoneCase::GlobalSensitivity ||
+                            zoneCase == ZoneCase::MissingZone;
                         EXPECT_EQ(directStatus, invalidInput ? expected : Status::Success);
                         EXPECT_EQ(tlsDelegate.lookups, tlsLookupsBefore);
                         EXPECT_EQ(tlsDelegate.provisions, 0u);
@@ -2230,9 +2247,11 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
     ServerClusterContext context{ originalContext.provider, originalContext.storage, persistence,
                                   originalContext.interactionContext };
     ASSERT_EQ(mServer.Startup(context), CHIP_NO_ERROR);
-    for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext })
+    for (const auto scenario : { 0, 1, 2, 3 })
     {
-        delegate.restorations = 0;
+        const auto triggerType = scenario < 2 ? TransportTriggerTypeEnum::kMotion : TransportTriggerTypeEnum::kAmbientContext;
+        const bool missingZone = scenario % 2 != 0;
+        delegate.restorations  = 0;
         uint8_t buffer[1024];
         TLV::TLVWriter writer;
         writer.Init(buffer);
@@ -2279,7 +2298,19 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
         zone.zone.SetNonNull(1);
         zone.sensitivity.SetValue(5);
         ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), zone), CHIP_NO_ERROR);
-        ASSERT_EQ(writer.Put(TLV::AnonymousTag(), true), CHIP_NO_ERROR);
+        if (missingZone)
+        {
+            TLV::TLVType missingZoneType;
+            ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, missingZoneType), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.Put(TLV::ContextTag(to_underlying(Structs::TransportZoneOptionsStruct::Fields::kSensitivity)),
+                                 static_cast<uint8_t>(5)),
+                      CHIP_NO_ERROR);
+            ASSERT_EQ(writer.EndContainer(missingZoneType), CHIP_NO_ERROR);
+        }
+        else
+        {
+            ASSERT_EQ(writer.Put(TLV::AnonymousTag(), true), CHIP_NO_ERROR);
+        }
         ASSERT_EQ(writer.EndContainer(zonesType), CHIP_NO_ERROR);
         ASSERT_EQ(writer.EndContainer(triggerContainer), CHIP_NO_ERROR);
         ASSERT_EQ(writer.EndContainer(optionsType), CHIP_NO_ERROR);
@@ -2299,13 +2330,17 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
         const auto & zones = decoded.transportOptions.Value().triggerOptions.motionZones.Value().Value();
         auto iter          = zones.begin();
         ASSERT_TRUE(iter.Next());
+        if (missingZone)
+        {
+            ASSERT_TRUE(iter.Next());
+        }
         ASSERT_FALSE(iter.Next());
-        ASSERT_NE(iter.GetStatus(), CHIP_NO_ERROR);
+        EXPECT_EQ(iter.GetStatus() == CHIP_NO_ERROR, missingZone);
 
         const ConcreteAttributePath path{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
         const std::vector<uint8_t> persisted(buffer, buffer + writer.GetLengthWritten());
         ASSERT_EQ(persistence.WriteValue(path, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
-        EXPECT_EQ(mServer.Init(), iter.GetStatus());
+        EXPECT_EQ(mServer.Init(), missingZone ? CHIP_ERROR_MISSING_TLV_ELEMENT : iter.GetStatus());
         EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
         EXPECT_EQ(delegate.restorations, 0u);
         EXPECT_FALSE(mServer.GetLogic().IsInitialized());
