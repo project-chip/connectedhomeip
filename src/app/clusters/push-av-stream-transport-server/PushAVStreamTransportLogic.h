@@ -36,6 +36,14 @@ public:
     PushAvStreamTransportServerLogic(EndpointId aEndpoint, BitFlags<PushAvStreamTransport::Feature> aFeatures);
     ~PushAvStreamTransportServerLogic();
 
+    CHIP_ERROR TrySetDelegate(PushAvStreamTransportDelegate * delegate)
+    {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mDelegate == nullptr || mDelegate == delegate || mCurrentConnections.empty(), CHIP_ERROR_BUSY);
+        SetDelegate(delegate);
+        return CHIP_NO_ERROR;
+    }
+
     void SetDelegate(PushAvStreamTransportDelegate * delegate)
     {
         if (mDelegate != nullptr && mDelegate != delegate && !mCurrentConnections.empty())

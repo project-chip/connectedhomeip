@@ -2466,6 +2466,9 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
     delegate.restorationError     = CHIP_NO_ERROR;
     TestPushAVStreamTransportDelegateImpl replacementDelegate;
     mServer.GetLogic().SetDelegate(&replacementDelegate);
+    EXPECT_EQ(mServer.GetLogic().TrySetDelegate(&replacementDelegate), CHIP_ERROR_BUSY);
+    EXPECT_EQ(mServer.GetLogic().TrySetDelegate(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(mServer.GetLogic().TrySetDelegate(&delegate), CHIP_NO_ERROR);
     const auto restorationsBeforeRetry = delegate.restorations;
     EXPECT_EQ(mServer.Init(), CHIP_ERROR_BUSY);
     EXPECT_FALSE(mServer.GetLogic().IsInitialized());
