@@ -1820,12 +1820,23 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestModifyPushTransportMotionZones)
 
 TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotPublishDecodedPrefix)
 {
-    TestPushAVStreamTransportDelegateImpl delegate;
+    class RestoredConnectionDelegate : public TestPushAVStreamTransportDelegateImpl
+    {
+    public:
+        CHIP_ERROR PersistentAttributesLoadedCallback() override
+        {
+            ++restorations;
+            return restorationError;
+        }
+        size_t restorations         = 0;
+        CHIP_ERROR restorationError = CHIP_NO_ERROR;
+    } delegate;
     mServer.GetLogic().SetDelegate(&delegate);
     DefaultAttributePersistenceProvider persistence;
     ASSERT_EQ(persistence.Init(&mClusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
     for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext })
     {
+        delegate.restorations = 0;
         uint8_t buffer[1024];
         TLV::TLVWriter writer;
         writer.Init(buffer);
@@ -1896,9 +1907,66 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
         ASSERT_NE(iter.GetStatus(), CHIP_NO_ERROR);
 
         const ConcreteAttributePath path{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
+        const std::vector<uint8_t> persisted(buffer, buffer + writer.GetLengthWritten());
+        ASSERT_EQ(persistence.WriteValue(path, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+        EXPECT_EQ(mServer.GetLogic().Init(persistence), iter.GetStatus());
+        EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+        EXPECT_EQ(delegate.restorations, 0u);
+        EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+        DataModel::DecodableList<Structs::TransportConfigurationStruct::DecodableType> currentConnections;
+        EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentConnections::Id, currentConnections).GetStatusCode().GetStatus(),
+                  Status::Failure);
+
+        uint8_t commandBuffer[64];
+        TLV::TLVWriter commandWriter;
+        commandWriter.Init(commandBuffer);
+        Commands::DeallocatePushTransport::Type deallocate;
+        deallocate.connectionID = 1;
+        ASSERT_EQ(DataModel::Encode(commandWriter, TLV::AnonymousTag(), deallocate), CHIP_NO_ERROR);
+        ASSERT_EQ(commandWriter.Finalize(), CHIP_NO_ERROR);
+        TLV::TLVReader commandReader;
+        commandReader.Init(commandBuffer, commandWriter.GetLengthWritten());
+        ASSERT_EQ(commandReader.Next(), CHIP_NO_ERROR);
+        const ConcreteCommandPath commandPath{ 1, PushAvStreamTransport::Id, Commands::DeallocatePushTransport::Id };
+        Access::SubjectDescriptor subject;
+        subject.fabricIndex = 1;
+        const DataModel::InvokeRequest request(commandPath, subject);
+        Testing::MockCommandHandler handler;
+        const auto result = mServer.InvokeCommand(request, commandReader, &handler);
+        ASSERT_TRUE(result.has_value());
+        EXPECT_EQ(result->GetStatusCode().GetStatus(), Status::Failure);
+        EXPECT_FALSE(handler.HasStatus());
+        EXPECT_FALSE(handler.HasResponse());
+
+        MutableByteSpan retained(buffer);
+        ASSERT_EQ(persistence.ReadValue(path, retained), CHIP_NO_ERROR);
+        EXPECT_TRUE(retained.data_equal(ByteSpan(persisted.data(), persisted.size())));
+
+        writer.Init(buffer);
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
         ASSERT_EQ(persistence.WriteValue(path, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
         ASSERT_EQ(mServer.GetLogic().Init(persistence), CHIP_NO_ERROR);
+        EXPECT_TRUE(mServer.GetLogic().IsInitialized());
+        EXPECT_EQ(delegate.restorations, 1u);
         EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+        EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentConnections::Id, currentConnections), CHIP_NO_ERROR);
+
+        commandReader.Init(commandBuffer, commandWriter.GetLengthWritten());
+        ASSERT_EQ(commandReader.Next(), CHIP_NO_ERROR);
+        Testing::MockCommandHandler recoveredHandler;
+        EXPECT_EQ(mServer.InvokeCommand(request, commandReader, &recoveredHandler), std::nullopt);
+        ASSERT_TRUE(recoveredHandler.HasStatus());
+        EXPECT_EQ(recoveredHandler.GetLastStatus().status.GetStatus(), Status::NotFound);
+
+        delegate.restorationError = CHIP_ERROR_INTERNAL;
+        EXPECT_EQ(mServer.GetLogic().Init(persistence), CHIP_ERROR_INTERNAL);
+        EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+        delegate.restorationError = CHIP_NO_ERROR;
+        EXPECT_EQ(mServer.GetLogic().Init(persistence), CHIP_NO_ERROR);
+        EXPECT_TRUE(mServer.GetLogic().IsInitialized());
+        EXPECT_EQ(delegate.restorations, 3u);
     }
 }
 

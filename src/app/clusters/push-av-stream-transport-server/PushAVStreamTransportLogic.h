@@ -106,6 +106,8 @@ public:
      */
     CHIP_ERROR Init(AttributePersistenceProvider & attributeStorage);
 
+    bool IsInitialized() const { return mAttributeStorage != nullptr; }
+
     void Shutdown();
 
     bool HasFeature(PushAvStreamTransport::Feature feature) const;
@@ -171,7 +173,7 @@ private:
     /**
      * Helper function that loads all the persistent attributes from the KVS.
      */
-    void LoadPersistentAttributes();
+    CHIP_ERROR LoadPersistentAttributes();
 
     // Helpers to store and load CurrentConnections list
     CHIP_ERROR StoreCurrentConnections();
