@@ -1,1 +1,1 @@
-218 : [Telink] Update Docker image(Zephyr update)
+219 : [CI] Publish chip-build and chip-build-minimal as multi-arch (amd64 + arm64) images
