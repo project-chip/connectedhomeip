@@ -191,8 +191,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * @param value       A data-value NSDictionary object as described in
  *                    MTRDeviceResponseHandler.
  *
- * @param expectedValueInterval  maximum interval in milliseconds during which reads of the attribute will return the value being
- * written. This value must be within [1, UINT32_MAX], and will be clamped to this range.
+ * @param expectedValueInterval  interval in milliseconds during which reads of the attribute will return the value being
+ * written, counted from when the write request is sent to the device.  While the write is still waiting to be sent (for
+ * example behind other work for the device, or for a session), reads also return the value being written.  If the write
+ * fails, the expected value is removed.  This value must be within [1, UINT32_MAX], and will be clamped to this range.
  *
  * TODO: document that -readAttribute... will return the expected value for the [endpoint,cluster,attribute] until one of the
  * following:
@@ -262,11 +264,16 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *                       The expectedValues and expectedValueInterval arguments need to be both
  *                       nil or both non-nil, or both will be both ignored.
  *
- * @param expectedValueInterval  maximum interval in milliseconds during which reads of the
- *                               attributes that had expected values provided will return the
- *                               expected values. If the value is less than 1, both this value and
- *                               expectedValues will be ignored. If this value is greater than
- *                               UINT32_MAX, it will be clamped to UINT32_MAX.
+ * @param expectedValueInterval  interval in milliseconds during which reads of the attributes
+ *                               that had expected values provided will return the expected
+ *                               values, counted from when the invoke request is sent to the
+ *                               device.  While the invoke is still waiting to be sent (for
+ *                               example behind other work for the device, or for a session),
+ *                               reads also return the expected values.  If the invoke fails,
+ *                               the expected values are removed.  If the value is less than 1,
+ *                               both this value and expectedValues will be ignored.  If this
+ *                               value is greater than UINT32_MAX, it will be clamped to
+ *                               UINT32_MAX.
  *
  * @param completion  response handler will receive either values or error.  A
  *                    path-specific error status from the command invocation
