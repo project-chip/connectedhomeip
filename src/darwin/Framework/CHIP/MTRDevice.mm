@@ -34,6 +34,7 @@
 #import "MTRMetricsCollector.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
+#import "MTRUserInvokeToken_Internal.h"
 #import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 #import "zap-generated/MTRCommandPayloads_Private.h"
@@ -592,8 +593,25 @@ MTR_DIRECT_MEMBERS
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
-    // A device with no implementation of user commands (an XPC device) drops the token: the command is queued in
-    // order, and the token's cancel returns NO.
+    // A device with no implementation of user commands (an XPC device) sends the command in order, with no queue
+    // to cancel it from.  The token is marked used, so its cancel returns NO from now on.  A token already
+    // cancelled returned YES ("never sent"), so its command is not sent.
+    if (userInvokeToken) {
+        switch ([userInvokeToken markUsedWithoutWorkItem]) {
+        case MTRUserInvokeTokenUseCancelledBeforeUse: {
+            MTR_LOG("%@ user command was cancelled before it was made; not sent", self);
+            dispatch_async(queue, ^{
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]);
+            });
+            return;
+        }
+        case MTRUserInvokeTokenUseAlreadyUsed:
+            MTR_LOG_ERROR("%@ user command token was already used for another invoke", self);
+            break;
+        case MTRUserInvokeTokenUseTied:
+            break;
+        }
+    }
     [self _invokeCommandWithEndpointID:endpointID
                              clusterID:clusterID
                              commandID:commandID

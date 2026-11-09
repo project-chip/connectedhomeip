@@ -4304,8 +4304,24 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         }];
     }
     if (userInvokeToken) {
-        if (![userInvokeToken attachToWorkItem:workItem queue:_asyncWorkQueue]) {
+        switch ([userInvokeToken attachToWorkItem:workItem queue:_asyncWorkQueue]) {
+        case MTRUserInvokeTokenUseCancelledBeforeUse: {
+            // Cancelled after the check above: its cancel returned YES, so do not queue it.  Like the check above,
+            // complete the caller with a cancelled error, and remove the expected values set since.
+            MTR_LOG("%@ user command was cancelled before it was queued; not sent", self);
+            if (expectedValues) {
+                [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
+            }
+            dispatch_async(queue, ^{
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]);
+            });
+            return;
+        }
+        case MTRUserInvokeTokenUseAlreadyUsed:
             MTR_LOG_ERROR("%@ user command token was already used for another invoke; it cannot cancel this one", self);
+            break;
+        case MTRUserInvokeTokenUseTied:
+            break;
         }
         NSNumber * userTimeoutMs = userInvokeToken.timeoutMs;
         if (userTimeoutMs != nil) {

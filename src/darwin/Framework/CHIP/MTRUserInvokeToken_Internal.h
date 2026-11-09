@@ -20,11 +20,24 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, MTRUserInvokeTokenUse) {
+    /// The token is now tied to this invoke.
+    MTRUserInvokeTokenUseTied,
+    /// The token was already tied to another invoke; it cannot cancel this one.
+    MTRUserInvokeTokenUseAlreadyUsed,
+    /// The token was cancelled before it was used: its cancel returned YES, so this invoke must not be sent.
+    MTRUserInvokeTokenUseCancelledBeforeUse,
+};
+
 @interface MTRUserInvokeToken ()
 
-/// Ties the token to the queued work item of its invoke.  Returns NO, and ties nothing, if the token is already
-/// tied to an invoke or was cancelled before it was used; a cancelled token's invoke is never queued.
-- (BOOL)attachToWorkItem:(MTRAsyncWorkItem *)workItem queue:(MTRAsyncWorkQueue *)queue;
+/// Ties the token to the queued work item of its invoke, so its cancel can cancel that item while it is unsent.
+/// Ties nothing unless it returns MTRUserInvokeTokenUseTied.
+- (MTRUserInvokeTokenUse)attachToWorkItem:(MTRAsyncWorkItem *)workItem queue:(MTRAsyncWorkQueue *)queue;
+
+/// Ties the token to an invoke that has no work item to cancel, so from now on its cancel returns NO.  Ties nothing
+/// unless it returns MTRUserInvokeTokenUseTied.
+- (MTRUserInvokeTokenUse)markUsedWithoutWorkItem;
 
 /// YES once -cancel was called before the token was tied to an invoke.
 @property (nonatomic, readonly) BOOL cancelledBeforeUse;

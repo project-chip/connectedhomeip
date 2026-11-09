@@ -37,16 +37,34 @@
     return self;
 }
 
-- (BOOL)attachToWorkItem:(MTRAsyncWorkItem *)workItem queue:(MTRAsyncWorkQueue *)queue
+// Must be called with _lock held.
+- (MTRUserInvokeTokenUse)_useIfUnused
 {
-    std::lock_guard lock(_lock);
-    if (_used || _cancelledBeforeUse) {
-        return NO;
+    if (_cancelledBeforeUse) {
+        return MTRUserInvokeTokenUseCancelledBeforeUse;
+    }
+    if (_used) {
+        return MTRUserInvokeTokenUseAlreadyUsed;
     }
     _used = YES;
-    _workItem = workItem;
-    _queue = queue;
-    return YES;
+    return MTRUserInvokeTokenUseTied;
+}
+
+- (MTRUserInvokeTokenUse)attachToWorkItem:(MTRAsyncWorkItem *)workItem queue:(MTRAsyncWorkQueue *)queue
+{
+    std::lock_guard lock(_lock);
+    MTRUserInvokeTokenUse use = [self _useIfUnused];
+    if (use == MTRUserInvokeTokenUseTied) {
+        _workItem = workItem;
+        _queue = queue;
+    }
+    return use;
+}
+
+- (MTRUserInvokeTokenUse)markUsedWithoutWorkItem
+{
+    std::lock_guard lock(_lock);
+    return [self _useIfUnused];
 }
 
 - (BOOL)cancelledBeforeUse

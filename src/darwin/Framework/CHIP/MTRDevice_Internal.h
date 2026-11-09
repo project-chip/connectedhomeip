@@ -121,8 +121,9 @@ MTR_DIRECT_MEMBERS
 
 /**
  * The internal invoke every MTRDevice invoke goes through, with the caller's MTRUserInvokeToken (nil for a
- * command that is not a user command).  The base implementation drops the token and calls the method without
- * one, which is what an XPC device does; MTRDevice_Concrete implements it.
+ * command that is not a user command).  The base implementation, which is what an XPC device uses, marks the
+ * token used and calls the method without one; a token cancelled before that completes the command with a
+ * cancelled error instead of sending it.  MTRDevice_Concrete implements it.
  */
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
