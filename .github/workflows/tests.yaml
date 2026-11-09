@@ -1337,6 +1337,11 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_10.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_12.py'
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/test_TC_DD_1_11.py'
+<<<<<<< HEAD
+=======
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_matter_base_test_teardown.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_proxr_reflector.py'
+>>>>>>> 4e7ab21 ([Proximiti Ranging]Test script fix for TC_PROX_2_3 and 2_4 (#75149))
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDecorators.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestAttributeSubscriptionLiveness.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDeviceRequirementMarkers.py'
