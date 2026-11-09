@@ -17,8 +17,9 @@
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
 
+#import "MTRDeviceController_Test.h"
+#import "MTRDevice_Test.h"
 #import "MTRTestCase.h"
-#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 

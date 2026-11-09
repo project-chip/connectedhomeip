@@ -35,6 +35,7 @@
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_Concrete_Test.h"
+#import "MTRDeviceController_Test.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTREndpointInfo_Internal.h"
@@ -93,7 +94,8 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 using namespace chip::Tracing::DarwinFramework;
 
-@interface MTRDeviceController_Concrete ()
+// Conformance to the test-only declarations in MTRDeviceController_Test.h, so the compiler checks them against this file.
+@interface MTRDeviceController_Concrete () <MTRDeviceControllerConcreteTestMethods>
 
 // MTRDeviceController ivar internal access
 

@@ -19,11 +19,11 @@
 
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceController_Concrete_Test.h"
+#import "MTRDeviceController_Test.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRSecureCodingTestHelpers.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
-#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 

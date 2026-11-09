@@ -24,19 +24,21 @@
 #import <Matter/MTRClusterStateCacheContainer.h>
 #import <Matter/Matter.h>
 
+#import "MTRBaseDevice_Test.h"
 #import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRDeviceClusterData.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceController_Test.h"
 #import "MTRDeviceDataValidation.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
+#import "MTRDevice_Test.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRSecureCodingTestHelpers.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestControllerDelegate.h"
-#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestResponseValues.h"
 #import "MTRTestStorage.h"
