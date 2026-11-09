@@ -46,7 +46,7 @@ static_assert(kKeypadInputMaxClusterCount < kEmberInvalidEndpointIndex, "KeypadI
 
 /// Delegate given to each KeypadInputCluster instance.
 ///
-/// Applications set their delegate through SetDefaultDelegate (before or after the cluster is created),
+/// Applications set their delegate through SetDefaultDelegate after the cluster is created,
 /// and ContentApp endpoints are registered with ContentAppPlatform only after the cluster is created.
 /// The application delegate is therefore resolved on every call:
 ///
@@ -123,6 +123,10 @@ ClusterWithDelegate gClusters[kKeypadInputMaxClusterCount];
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
+    explicit IntegrationDelegate(MatterClusterShutdownType shutdownType = MatterClusterShutdownType::kClusterShutdown) :
+        mShutdownType(shutdownType)
+    {}
+
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
@@ -141,8 +145,15 @@ public:
     void ReleaseRegistration(unsigned clusterInstanceIndex) override
     {
         gClusters[clusterInstanceIndex].server.Destroy();
-        gClusters[clusterInstanceIndex].integrationDelegateWrapper.SetWrapped(nullptr);
+        // A permanently removed dynamic endpoint frees its slot for reuse by a different endpoint.
+        if (mShutdownType == MatterClusterShutdownType::kPermanentRemove)
+        {
+            gClusters[clusterInstanceIndex].integrationDelegateWrapper.SetWrapped(nullptr);
+        }
     }
+
+private:
+    const MatterClusterShutdownType mShutdownType;
 };
 
 } // namespace
@@ -165,7 +176,7 @@ void MatterKeypadInputClusterInitCallback(EndpointId endpointId)
 
 void MatterKeypadInputClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    IntegrationDelegate integrationDelegate;
+    IntegrationDelegate integrationDelegate(shutdownType);
 
     CodegenClusterIntegration::UnregisterServer(
         {
@@ -186,8 +197,8 @@ namespace app {
 namespace Clusters {
 namespace KeypadInput {
 
-// The endpoint is resolved to its cluster slot through ember metadata instead of FindClusterOnEndpoint
-// so that the delegate can be set whether or not the cluster has been created yet.
+// The delegate is stored next to the cluster slot instead of in the cluster, so the slot is resolved
+// through ember metadata. The delegate survives the cluster being destroyed and created again.
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t index =

@@ -27,18 +27,20 @@ constant.
 ## ZAP applications
 
 Set the delegate with `SetDefaultDelegate()` from `CodegenIntegration.h` (also
-available through the legacy `keypad-input-server.h` include). The call may be
-made before or after the cluster on the endpoint is created, for example from
-`emberAfKeypadInputClusterInitCallback()`:
+available through the legacy `keypad-input-server.h` include). The endpoint must
+already be enabled, otherwise the call is ignored. The cluster is created when
+the endpoint is enabled, so `emberAfKeypadInputClusterInitCallback()` is a valid
+place for the call:
 
 ```cpp
 #include <app/clusters/keypad-input-server/keypad-input-server.h>
 
-void emberAfKeypadInputClusterInitCallback(chip::EndpointId endpoint)
-{
-    chip::app::Clusters::KeypadInput::SetDefaultDelegate(endpoint, &gKeypadInputManager);
-}
+chip::app::Clusters::KeypadInput::SetDefaultDelegate(endpoint, &gKeypadInputManager);
 ```
+
+The delegate is kept while the endpoint is disabled and enabled again, and is
+cleared when the endpoint is permanently removed. The delegate must stay valid
+until it is replaced or the endpoint is permanently removed.
 
 The delegate for an endpoint is resolved on every request, in this order:
 
