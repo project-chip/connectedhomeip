@@ -43,6 +43,7 @@ exclude = [
     "scripts/py_matter_yamltests/build",
     "scripts/py_matter_idl/build",
     "src/python_testing/matter_testing_infrastructure/build",
+    "integrations/mobly/build",
     # Submodules
     "examples/common/QRCode/repo",
     "examples/common/m5stack-tft/repo",
