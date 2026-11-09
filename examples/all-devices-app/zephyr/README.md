@@ -133,6 +133,11 @@ Flash with:
 west flash -d out/esp32-zephyr-c6-all-devices --esp-device /dev/ttyUSB0
 ```
 
+`west flash` runs the build first, which always regenerates the Matter GN
+project even when nothing changed. Pass `--no-rebuild`, or turn the rebuild off
+for the whole workspace with `west config flash.rebuild false`, to flash the
+existing image only.
+
 The monitor reads the build configuration from the current directory, so run it
 from inside the build directory:
 
