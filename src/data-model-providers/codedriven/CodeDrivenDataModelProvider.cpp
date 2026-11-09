@@ -18,8 +18,6 @@
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/ServerClusterInterface.h>
-#include <clusters/Descriptor/Attributes.h>
-#include <clusters/Descriptor/ClusterId.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
@@ -294,10 +292,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
         }
     }
 
-    auto parentId = registration.endpointEntry.parentId;
-
     NotifyEndpointChanged(registration.endpointEntry.id, DataModel::EndpointChangeType::kAdded);
-    NotifyChangedDescriptorPartsListOfAncestors(parentId);
 
     return CHIP_NO_ERROR;
 }
@@ -336,13 +331,9 @@ CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId, Cl
         }
     }
 
-    auto * registration = GetEndpointInterfaceRegistration(endpointId);
-    EndpointId parentId = registration ? registration->GetEndpointEntry().parentId : kInvalidEndpointId;
-
     ReturnErrorOnFailure(mEndpointInterfaceRegistry.Unregister(endpointId));
 
     NotifyEndpointChanged(endpointId, DataModel::EndpointChangeType::kRemoved);
-    NotifyChangedDescriptorPartsListOfAncestors(parentId);
 
     return CHIP_NO_ERROR;
 }
@@ -395,59 +386,5 @@ ServerClusterInterface * CodeDrivenDataModelProvider::GetServerClusterInterface(
     return mServerClusterRegistry.Get(clusterPath);
 }
 
-EndpointInterfaceRegistration * CodeDrivenDataModelProvider::GetEndpointInterfaceRegistration(EndpointId endpointId)
-{
-    for (auto & registration : mEndpointInterfaceRegistry)
-    {
-        if (registration.GetEndpointEntry().id == endpointId)
-        {
-            return &registration;
-        }
-    }
-    return nullptr;
-}
-
-void CodeDrivenDataModelProvider::NotifyChangedDescriptorPartsListOfAncestors(EndpointId parentEndpointId)
-{
-    EndpointId currentId = parentEndpointId;
-    while (true)
-    {
-        if (currentId == kInvalidEndpointId)
-        {
-            currentId = kRootEndpointId;
-        }
-
-        auto * registration = GetEndpointInterfaceRegistration(currentId);
-        if (registration == nullptr)
-        {
-            // This should not happen, but if it is for some reason, just notify the root endpoint and return, because if currentId
-            // is not registered, as it should have been a parent endpoint of some other endpoint, that other endpoint is now
-            // parentless, so it is implicitely a child of the root endpoint.
-            NotifyAttributeChanged({ kRootEndpointId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id },
-                                   DataModel::AttributeChangeType::kReportable);
-            return;
-        }
-
-        // Get entry before notifying the change, in case that callback will change something in the endpoint registry.
-        auto currentEndpointEntry = registration->GetEndpointEntry();
-
-        // If currentId is the starting endpoint, or if it is a full-family type ancestor, notify attribute change. Root endpoint is
-        // full-family even if its pattern is not set to full-family.
-        if (currentId == parentEndpointId ||
-            currentEndpointEntry.compositionPattern == DataModel::EndpointCompositionPattern::kFullFamily ||
-            currentId == kRootEndpointId)
-        {
-            NotifyAttributeChanged({ currentId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id },
-                                   DataModel::AttributeChangeType::kReportable);
-        }
-
-        if (currentId == kRootEndpointId)
-        {
-            break;
-        }
-
-        currentId = currentEndpointEntry.parentId;
-    }
-}
 } // namespace app
 } // namespace chip

@@ -843,15 +843,10 @@ TEST_F(TestCodeDrivenDataModelProvider, NotifyAttributeChanged)
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     mProvider.NotifyAttributeChanged({ 1, 10, 1 }, AttributeChangeType::kReportable);
-
-    // 2 attribute changes instead of 1, because the parent's descriptor's PartsList attribute is changed when adding the endpoint.
-    ASSERT_EQ(mChangeListener.mDirtyList.size(), 2u);
-    EXPECT_EQ(mChangeListener.mDirtyList[0].mEndpointId, 0u);
-    EXPECT_EQ(mChangeListener.mDirtyList[0].mClusterId, Clusters::Descriptor::Id);
-    EXPECT_EQ(mChangeListener.mDirtyList[0].mAttributeId, Clusters::Descriptor::Attributes::PartsList::Id);
-    EXPECT_EQ(mChangeListener.mDirtyList[1].mEndpointId, 1u);
-    EXPECT_EQ(mChangeListener.mDirtyList[1].mClusterId, 10u);
-    EXPECT_EQ(mChangeListener.mDirtyList[1].mAttributeId, 1u);
+    ASSERT_EQ(mChangeListener.mDirtyList.size(), 1u);
+    EXPECT_EQ(mChangeListener.mDirtyList[0].mEndpointId, 1u);
+    EXPECT_EQ(mChangeListener.mDirtyList[0].mClusterId, 10u);
+    EXPECT_EQ(mChangeListener.mDirtyList[0].mAttributeId, 1u);
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, Shutdown)
@@ -1254,76 +1249,4 @@ TEST_F(TestCodeDrivenDataModelProvider, AddEndpointSucceedsAndNotifiesWhenCluste
 
     EXPECT_EQ(mProvider.RemoveCluster(&failingCluster), CHIP_NO_ERROR);
     EXPECT_EQ(mProvider.RemoveCluster(&succeedingCluster), CHIP_NO_ERROR);
-}
-
-TEST_F(TestCodeDrivenDataModelProvider, AddAndRemoveEndpontsNotifyPartsListAttributeChanges)
-{
-    constexpr auto kDescriptorId = Clusters::Descriptor::Id;
-    constexpr auto kPartsListId  = Clusters::Descriptor::Attributes::PartsList::Id;
-
-    auto rootEndpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
-    mEndpointStorage.push_back(std::move(rootEndpoint));
-    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
-        *mEndpointStorage.back(), EndpointEntry{ kRootEndpointId, kInvalidEndpointId, EndpointCompositionPattern::kTree }));
-    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
-
-    auto endpoint1 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
-    mEndpointStorage.push_back(std::move(endpoint1));
-    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
-        *mEndpointStorage.back(), EndpointEntry{ 1, kInvalidEndpointId, EndpointCompositionPattern::kFullFamily }));
-    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
-
-    auto endpoint2 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
-    mEndpointStorage.push_back(std::move(endpoint2));
-    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
-        *mEndpointStorage.back(), EndpointEntry{ 2, 1, EndpointCompositionPattern::kTree }));
-    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
-
-    auto endpoint3 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
-    mEndpointStorage.push_back(std::move(endpoint3));
-    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
-        *mEndpointStorage.back(), EndpointEntry{ 3, 2, EndpointCompositionPattern::kTree }));
-    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
-
-    /// Reset the listener to capture only notifications from the call below.
-    mChangeListener.mDirtyList.clear();
-    mChangeListener.mEndpointChanges.clear();
-
-    auto finalEndpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
-    mEndpointStorage.push_back(std::move(finalEndpoint));
-    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
-        *mEndpointStorage.back(), EndpointEntry{ 4, 3, EndpointCompositionPattern::kTree }));
-    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
-
-    EXPECT_EQ(mChangeListener.mEndpointChanges.size(), 1u);
-    EXPECT_EQ(mChangeListener.mDirtyList.size(), 3u);
-
-    // Expecting 3 `PartsList` attribute change notifications, one for root endpoint, because it is implicitely full-family even if
-    // it is given the tree composition type, one for the endpoint with id 1 which is explicitely full-family, and one for the
-    // endpoint 3, because it is the immediate parent of the endpoint 4.
-    EXPECT_TRUE(std::find(mChangeListener.mDirtyList.begin(), mChangeListener.mDirtyList.end(),
-                          ConcreteAttributePath{ kRootEndpointId, kDescriptorId, kPartsListId }) !=
-                mChangeListener.mDirtyList.end());
-    EXPECT_TRUE(std::find(mChangeListener.mDirtyList.begin(), mChangeListener.mDirtyList.end(),
-                          ConcreteAttributePath{ 1, kDescriptorId, kPartsListId }) != mChangeListener.mDirtyList.end());
-    EXPECT_TRUE(std::find(mChangeListener.mDirtyList.begin(), mChangeListener.mDirtyList.end(),
-                          ConcreteAttributePath{ 3, kDescriptorId, kPartsListId }) != mChangeListener.mDirtyList.end());
-
-    // reset the listener
-    mChangeListener.mDirtyList.clear();
-    mChangeListener.mEndpointChanges.clear();
-
-    EXPECT_SUCCESS(mProvider.RemoveEndpoint(4));
-
-    // Same expectations as above.
-    EXPECT_EQ(mChangeListener.mEndpointChanges.size(), 1u);
-    EXPECT_EQ(mChangeListener.mDirtyList.size(), 3u);
-
-    EXPECT_TRUE(std::find(mChangeListener.mDirtyList.begin(), mChangeListener.mDirtyList.end(),
-                          ConcreteAttributePath{ kRootEndpointId, kDescriptorId, kPartsListId }) !=
-                mChangeListener.mDirtyList.end());
-    EXPECT_TRUE(std::find(mChangeListener.mDirtyList.begin(), mChangeListener.mDirtyList.end(),
-                          ConcreteAttributePath{ 1, kDescriptorId, kPartsListId }) != mChangeListener.mDirtyList.end());
-    EXPECT_TRUE(std::find(mChangeListener.mDirtyList.begin(), mChangeListener.mDirtyList.end(),
-                          ConcreteAttributePath{ 3, kDescriptorId, kPartsListId }) != mChangeListener.mDirtyList.end());
 }

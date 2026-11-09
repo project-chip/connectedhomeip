@@ -205,15 +205,8 @@ private:
     /// Return the interface registered for the given endpoint ID or nullptr if one does not exist
     EndpointInterface * GetEndpointInterface(EndpointId endpointId);
 
-    /// Return the interface registration for the given endpoint ID or nullptr if one does not exist
-    EndpointInterfaceRegistration * GetEndpointInterfaceRegistration(EndpointId endpointId);
-
     /// Return the interface registered for the given cluster path or nullptr if one does not exist
     ServerClusterInterface * GetServerClusterInterface(const ConcreteClusterPath & path);
-
-    /// Notify `PartsList` attribute of the `Descriptor` cluster of the given endpoint and its ancestors if they have a full-family
-    /// composition. The `parentEndpointId` input is meant to be the parent of an endpoint that was changed (added or removed)
-    void NotifyChangedDescriptorPartsListOfAncestors(EndpointId parentEndpointId);
 };
 
 } // namespace app
