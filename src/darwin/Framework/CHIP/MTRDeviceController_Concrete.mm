@@ -34,7 +34,7 @@
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Concrete.h"
-#import "MTRDeviceController_Test.h"
+#import "MTRDeviceController_Concrete_Test.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTREndpointInfo_Internal.h"
@@ -92,11 +92,6 @@ typedef id (^SyncWorkQueueBlockWithReturnValue)(void);
 typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 using namespace chip::Tracing::DarwinFramework;
-
-#ifdef DEBUG
-@interface MTRDeviceController_Concrete () <MTRDeviceControllerCommissioningTestHooks>
-@end
-#endif
 
 @interface MTRDeviceController_Concrete ()
 
@@ -1375,50 +1370,19 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (BOOL)_cancelCommissioning:(MTRCommissioningOperation *)commissioning forNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
-    return [self _cancelCommissioning:commissioning forNodeID:nodeID completionError:CHIP_ERROR_CANCELLED onlyIfWaitingAfterPASE:NO error:error];
-}
-
-- (BOOL)_cancelCommissioning:(MTRCommissioningOperation *)commissioning
-                   forNodeID:(NSNumber *)nodeID
-             completionError:(CHIP_ERROR)completionError
-      onlyIfWaitingAfterPASE:(BOOL)onlyIfWaitingAfterPASE
-                       error:(NSError * __autoreleasing *)error
-{
-    __block BOOL notifiedCompletion = NO;
+    BOOL isWaitingAfterPASEEstablished = commissioning.isWaitingAfterPASEEstablished;
     auto block = ^BOOL {
-        BOOL isWaitingAfterPASEEstablished = commissioning.isWaitingAfterPASEEstablished;
-        if (onlyIfWaitingAfterPASE && !isWaitingAfterPASEEstablished) {
-            return NO;
-        }
         self->_operationalCredentialsDelegate->ResetDeviceID();
         auto errorCode = self->_cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
         // Emit metric on status of cancel
         MATTER_LOG_METRIC(kMetricCancelCommissioning, errorCode);
-        BOOL ok = ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorStopPairing error:error];
-        // A commissioning waiting after PASE has nothing running on the C++ side, so StopPairing produces no
-        // notification for it, and StopPairing can only fail here if the commissioner is shut down or the
-        // commissionee is gone; either way the commissioning cannot continue. End it whenever it is the one being
-        // cancelled. The node ID has to match: callers pass the ID they want cancelled, not the current one.
-        if (isWaitingAfterPASEEstablished && [nodeID isEqual:commissioning.commissioningID]) {
-            // If we are not actually in the middle of either PASE establishment
-            // or active commissioning on the C++ side, there will be no
-            // notifications when we StopPairing.  Provide the
-            // OnCommissioningComplete notification ourselves.
-            MTR_LOG("%@ Notifying commissioning complete manually because %@ is being canceled while waiting after PASE establishment",
-                self, commissioning);
-            commissioning.isWaitingAfterPASEEstablished = NO;
-            notifiedCompletion = YES;
-            self->_deviceControllerDelegateBridge->OnCommissioningComplete(nodeID.unsignedLongLongValue, completionError);
-            if (error) {
-                *error = nil;
-            }
-            return YES;
-        }
-        return ok;
+        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorStopPairing error:error];
     };
 
     BOOL ok = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
-    if (notifiedCompletion) {
+    if (ok && isWaitingAfterPASEEstablished && [nodeID isEqual:commissioning.commissioningID]) {
+        // StopPairing has released the commissionee, which ends the commissioning. Free the controller now so a new
+        // commissioning can be started as soon as this returns.
         [self _commissioningDone:commissioning];
     }
     return ok;
@@ -1560,26 +1524,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     } error:nil];
 }
 
-- (void)unitTestMarkPASESessionDefunctForNodeID:(NSNumber *)nodeID
-{
-    [self syncRunOnWorkQueue:^{
-        chip::CommissioneeDeviceProxy * proxy;
-        if (self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &proxy) == CHIP_NO_ERROR) {
-            auto session = proxy->GetSecureSession();
-            if (session.HasValue()) {
-                session.Value()->AsSecureSession()->MarkAsDefunct();
-            }
-        }
-    } error:nil];
-}
-
 - (BOOL)unitTestNotifyCommissioneePASESessionLost
 {
     MTRCommissioningOperation * commissioning = self.currentCommissioning;
     if (!commissioning) {
         return NO;
     }
-    [self commissioneePASESessionLost:commissioning];
+    NSNumber * nodeID = commissioning.commissioningID;
+    [self syncRunOnWorkQueue:^{
+        self->_deviceControllerDelegateBridge->OnCommissioneeReleased(nodeID.unsignedLongLongValue, CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY);
+    } error:nil];
     dispatch_sync(_commissioningQueue, ^ {});
     return YES;
 }
@@ -2361,28 +2315,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // Just wait for commissionNodeWithID: to be called on us.
 }
 
-- (void)commissioneePASESessionLost:(MTRCommissioningOperation *)commissioning
+- (BOOL)commissioneeReleasedWhileWaitingAfterPASE:(MTRCommissioningOperation *)commissioning
 {
-    mtr_weakify(self);
-    dispatch_async(_commissioningQueue, ^{
-        mtr_strongify(self);
-        [self _commissioneeSessionReleasedForCommissioning:commissioning];
-    });
-}
-
-- (void)_commissioneeSessionReleasedForCommissioning:(MTRCommissioningOperation *)commissioning
-{
-    if (commissioning != self.currentCommissioning) {
-        return;
+    if (!commissioning.isWaitingAfterPASEEstablished) {
+        return NO;
     }
 
-    if ([self _cancelCommissioning:commissioning
-                         forNodeID:commissioning.commissioningID
-                   completionError:CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY
-            onlyIfWaitingAfterPASE:YES
-                             error:nil]) {
-        MTR_LOG_ERROR("%@ PASE session for %@ went away while waiting for commissionNodeWithID:", self, commissioning);
-    }
+    MTR_LOG_ERROR("%@ commissionee for %@ was released while waiting for commissionNodeWithID:", self, commissioning);
+    commissioning.isWaitingAfterPASEEstablished = NO;
+    [self _commissioningDone:commissioning];
+    return YES;
 }
 
 - (void)commissioning:(MTRCommissioningOperation *)commissioning

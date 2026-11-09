@@ -63,7 +63,9 @@ public:
     class SessionReleaseDelegate
     {
     public:
-        virtual ~SessionReleaseDelegate()                                            = default;
+        virtual ~SessionReleaseDelegate() = default;
+
+        // The delegate may release (destroy) the proxy, so the proxy touches no member after calling this.
         virtual void OnCommissioneeSessionReleased(CommissioneeDeviceProxy & device) = 0;
     };
 
