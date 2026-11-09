@@ -51,8 +51,8 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, nullable) NSNumber * subscriptionResetDelayOverrideMs;
 // Called once the subscription's session request has been queued on the Matter queue.
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionSessionRequestStarted;
-// When set, called when the subscription's session request fails; its result replaces the request's retry delay, in
-// seconds, as a server-provided busy delay would.
+// When set, called when the subscription's session request fails.  A nonnegative result replaces the request's retry
+// delay, in seconds, as a server-provided busy delay would; a negative result clears it; nil leaves it as it is.
 @property (atomic, copy, nullable) NSNumber * _Nullable (^onSessionRequestFailedRetryDelay)(void);
 @property (atomic, copy, nullable) dispatch_block_t onResubscriptionDelayRequested;
 // When YES, the device ignores operational advertisements, so only other signals can trigger a resubscribe.
