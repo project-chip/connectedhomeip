@@ -258,7 +258,12 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
     NSNumber * discriminator;
     @synchronized(MTRTestCase.class) {
         __auto_type * used = UsedDiscriminators();
-        XCTAssertLessThan(used.count, (NSUInteger) discriminatorRange);
+        if (used.count >= (NSUInteger) discriminatorRange) {
+            // Every discriminator is taken, so a draw could never find a free one.  XCTest continues after a failed
+            // assertion by default, so fail and return rather than loop.
+            XCTFail("All %lu test discriminators are in use in this process", (unsigned long) discriminatorRange);
+            return nil;
+        }
         do {
             discriminator = @(kMinDiscriminator + arc4random() % discriminatorRange);
         } while ([used containsObject:discriminator]);
