@@ -63,6 +63,11 @@ public:
 
     void SetCluster(EndpointId endpointId, uint32_t defaultFeatureMap)
     {
+        // A dynamic endpoint slot may be reused by a different endpoint, which must not get the previous delegate.
+        if (endpointId != mEndpointId)
+        {
+            mWrapped = nullptr;
+        }
         mEndpointId        = endpointId;
         mDefaultFeatureMap = defaultFeatureMap;
     }
