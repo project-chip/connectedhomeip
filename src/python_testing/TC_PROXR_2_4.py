@@ -30,9 +30,7 @@
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --endpoint 1
-#       --int-arg dut_r_discriminator:3841 dut_r_passcode:20202021 dut_r_endpoint:1
-#       --string-arg th_reflector_app_path:${ALL_DEVICES_APP} dut_r_commissioning_method:on-network
-#       --bool-arg simulate_mounting:true
+#       --string-arg th_reflector_app_path:${ALL_DEVICES_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -95,30 +93,15 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
         # quiet windows after each stop; the 90 s default is not enough.
         return 600
 
-    @property
-    def dut_r_discriminator(self) -> int:
-        return self.user_params.get("dut_r_discriminator", 3841)
-
-    @property
-    def dut_r_passcode(self) -> int:
-        return self.user_params.get("dut_r_passcode", 20202021)
-
-    @property
-    def dut_r_endpoint(self) -> int:
-        return self.user_params.get("dut_r_endpoint", 1)
-
-    @property
-    def dut_r_commissioning_method(self) -> str:
-        return self.user_params.get("dut_r_commissioning_method", "on-network")
-
     def setup_class(self):
         super().setup_class()
-        self.is_ci = self.matter_test_config.global_test_params.get('simulate_mounting', False)
         self.setup_reflector_device()
 
     def teardown_class(self):
-        self.teardown_reflector_device()
-        super().teardown_class()
+        try:
+            self.teardown_reflector_device()
+        finally:
+            super().teardown_class()
 
     def desc_TC_PROXR_2_4(self) -> str:
         return "[TC-PROXR-2.4] Periodic Proximity Ranging Functionality (DUT as Server)"
