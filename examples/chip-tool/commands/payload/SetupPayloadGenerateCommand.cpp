@@ -184,7 +184,7 @@ CHIP_ERROR SetupPayloadGenerateQRCodeCommand::PopulatePayloadTLVFromBytes(SetupP
             return CHIP_ERROR_WRONG_TLV_TYPE;
         }
 
-        // Vendor tag.  We support strings and signed integers.
+        // Vendor tag.  We support strings and integers.
         if (reader.GetType() == TLV::kTLVType_UTF8String)
         {
             CharSpan data;
@@ -195,7 +195,15 @@ CHIP_ERROR SetupPayloadGenerateQRCodeCommand::PopulatePayloadTLVFromBytes(SetupP
 
         if (reader.GetType() == TLV::kTLVType_SignedInteger)
         {
-            int32_t value;
+            int64_t value;
+            ReturnErrorOnFailure(reader.Get(value));
+            ReturnErrorOnFailure(payload.addOptionalVendorData(tagNum, value));
+            continue;
+        }
+
+        if (reader.GetType() == TLV::kTLVType_UnsignedInteger)
+        {
+            uint64_t value;
             ReturnErrorOnFailure(reader.Get(value));
             ReturnErrorOnFailure(payload.addOptionalVendorData(tagNum, value));
             continue;

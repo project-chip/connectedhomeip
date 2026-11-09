@@ -58,11 +58,9 @@ void YieldSetupPayloadAttributes(const SetupPayload & payload, AttributeVisitor 
 
     for (const OptionalQRCodeInfo & info : payload.getAllOptionalVendorData())
     {
-        if (info.type == optionalQRCodeInfoTypeString)
-            vendorAttrVisitor(info.tag, info.data.c_str());
-
-        if (info.type == optionalQRCodeInfoTypeInt32)
-            vendorAttrVisitor(info.tag, std::to_string(info.int32).c_str());
+        info.visitValue([&](const std::string & v) { vendorAttrVisitor(info.tag, v.c_str()); },
+                        [&](int64_t v) { vendorAttrVisitor(info.tag, std::to_string(v).c_str()); },
+                        [&](uint64_t v) { vendorAttrVisitor(info.tag, std::to_string(v).c_str()); });
     }
 }
 

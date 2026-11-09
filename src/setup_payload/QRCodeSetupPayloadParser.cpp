@@ -23,6 +23,7 @@
 
 #include "QRCodeSetupPayloadParser.h"
 #include "Base38Decode.h"
+#include "SetupPayload.h"
 
 #include <algorithm>
 #include <string.h>
@@ -77,111 +78,6 @@ static CHIP_ERROR openTLVContainer(TLV::ContiguousBufferTLVReader & reader, TLV:
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR retrieveOptionalInfoString(TLV::ContiguousBufferTLVReader & reader, OptionalQRCodeInfo & info)
-{
-    Span<const char> data;
-    ReturnErrorOnFailure(reader.GetStringView(data));
-
-    info.type = optionalQRCodeInfoTypeString;
-    info.data = std::string(data.data(), data.size());
-
-    return CHIP_NO_ERROR;
-}
-
-static CHIP_ERROR retrieveOptionalInfoInt32(TLV::TLVReader & reader, OptionalQRCodeInfo & info)
-{
-    int32_t value;
-    ReturnErrorOnFailure(reader.Get(value));
-
-    info.type  = optionalQRCodeInfoTypeInt32;
-    info.int32 = value;
-
-    return CHIP_NO_ERROR;
-}
-
-static CHIP_ERROR retrieveOptionalInfoInt64(TLV::TLVReader & reader, OptionalQRCodeInfoExtension & info)
-{
-    int64_t value;
-    ReturnErrorOnFailure(reader.Get(value));
-
-    info.type  = optionalQRCodeInfoTypeInt64;
-    info.int64 = value;
-
-    return CHIP_NO_ERROR;
-}
-
-static CHIP_ERROR retrieveOptionalInfoUInt32(TLV::TLVReader & reader, OptionalQRCodeInfoExtension & info)
-{
-    uint32_t value;
-    ReturnErrorOnFailure(reader.Get(value));
-
-    info.type   = optionalQRCodeInfoTypeUInt32;
-    info.uint32 = value;
-
-    return CHIP_NO_ERROR;
-}
-
-static CHIP_ERROR retrieveOptionalInfoUInt64(TLV::TLVReader & reader, OptionalQRCodeInfoExtension & info)
-{
-    uint64_t value;
-    ReturnErrorOnFailure(reader.Get(value));
-
-    info.type   = optionalQRCodeInfoTypeUInt64;
-    info.uint64 = value;
-
-    return CHIP_NO_ERROR;
-}
-
-static CHIP_ERROR retrieveOptionalInfo(TLV::ContiguousBufferTLVReader & reader, OptionalQRCodeInfo & info,
-                                       optionalQRCodeInfoType type)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (type == optionalQRCodeInfoTypeString)
-    {
-        err = retrieveOptionalInfoString(reader, info);
-    }
-    else if (type == optionalQRCodeInfoTypeInt32)
-    {
-        err = retrieveOptionalInfoInt32(reader, info);
-    }
-    else
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    return err;
-}
-
-static CHIP_ERROR retrieveOptionalInfo(TLV::ContiguousBufferTLVReader & reader, OptionalQRCodeInfoExtension & info,
-                                       optionalQRCodeInfoType type)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (type == optionalQRCodeInfoTypeString || type == optionalQRCodeInfoTypeInt32)
-    {
-        err = retrieveOptionalInfo(reader, static_cast<OptionalQRCodeInfo &>(info), type);
-    }
-    else if (type == optionalQRCodeInfoTypeInt64)
-    {
-        err = retrieveOptionalInfoInt64(reader, info);
-    }
-    else if (type == optionalQRCodeInfoTypeUInt32)
-    {
-        err = retrieveOptionalInfoUInt32(reader, info);
-    }
-    else if (type == optionalQRCodeInfoTypeUInt64)
-    {
-        err = retrieveOptionalInfoUInt64(reader, info);
-    }
-    else
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    return err;
-}
-
 CHIP_ERROR QRCodeSetupPayloadParser::retrieveOptionalInfos(SetupPayload & outPayload, TLV::ContiguousBufferTLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -198,31 +94,36 @@ CHIP_ERROR QRCodeSetupPayloadParser::retrieveOptionalInfos(SetupPayload & outPay
         VerifyOrReturnError(TLV::IsContextTag(tag), CHIP_ERROR_INVALID_TLV_TAG);
         const uint8_t tagNumber = static_cast<uint8_t>(TLV::TagNumFromTag(tag));
 
-        optionalQRCodeInfoType elemType = optionalQRCodeInfoTypeUnknown;
+        std::optional<OptionalQRCodeInfo> info;
         if (type == TLV::kTLVType_UTF8String)
         {
-            elemType = optionalQRCodeInfoTypeString;
+            Span<const char> data;
+            ReturnErrorOnFailure(reader.GetStringView(data));
+
+            info.emplace(tagNumber, std::string(data.data(), data.size()));
         }
-        if (type == TLV::kTLVType_SignedInteger || type == TLV::kTLVType_UnsignedInteger)
+        else if (type == TLV::kTLVType_SignedInteger)
         {
-            elemType = outPayload.getNumericTypeFor(tagNumber);
+            int64_t value;
+            ReturnErrorOnFailure(reader.Get(value));
+
+            info.emplace(tagNumber, value);
+        }
+        else if (type == TLV::kTLVType_UnsignedInteger)
+        {
+            uint64_t value;
+            ReturnErrorOnFailure(reader.Get(value));
+
+            info.emplace(tagNumber, value);
         }
 
         if (SetupPayload::IsCommonTag(tagNumber))
         {
-            OptionalQRCodeInfoExtension info;
-            info.tag = tagNumber;
-            ReturnErrorOnFailure(retrieveOptionalInfo(reader, info, elemType));
-
-            ReturnErrorOnFailure(outPayload.addOptionalExtensionData(info));
+            ReturnErrorOnFailure(outPayload.addOptionalExtensionData(info.value()));
         }
         else
         {
-            OptionalQRCodeInfo info;
-            info.tag = tagNumber;
-            ReturnErrorOnFailure(retrieveOptionalInfo(reader, info, elemType));
-
-            ReturnErrorOnFailure(outPayload.addOptionalVendorData(info));
+            ReturnErrorOnFailure(outPayload.addOptionalVendorData(info.value()));
         }
         err = reader.Next();
     }
