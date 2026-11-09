@@ -399,6 +399,8 @@ CHIP_ERROR CameraApp::InitCameraDeviceClusters()
 
     CreateAndInitializeCameraAVStreamMgmt();
 
+    ReturnErrorOnFailure(mZoneMgmtServerPtr->Init());
+
     // Only init PushAV once AVSM is init
     ReturnErrorOnFailure(
         Clusters::PushAvStreamTransport::SetDelegateAndInit(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate())));
@@ -416,7 +418,6 @@ CHIP_ERROR CameraApp::InitCameraDeviceClusters()
 
     TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().Init();
 
-    TEMPORARY_RETURN_IGNORED mZoneMgmtServerPtr->Init();
     return CHIP_NO_ERROR;
 }
 
