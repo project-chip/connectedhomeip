@@ -386,7 +386,7 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
     }
 }
 
-void CameraApp::InitCameraDeviceClusters()
+CHIP_ERROR CameraApp::InitCameraDeviceClusters()
 {
     // Initialize Cluster Servers
     mWebRTCTransportProviderServer.Create(mEndpoint, mCameraDevice->GetWebRTCProviderDelegate());
@@ -400,7 +400,8 @@ void CameraApp::InitCameraDeviceClusters()
     CreateAndInitializeCameraAVStreamMgmt();
 
     // Only init PushAV once AVSM is init
-    Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
+    ReturnErrorOnFailure(
+        Clusters::PushAvStreamTransport::SetDelegateAndInit(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate())));
 
     Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(mEndpoint,
                                                                     &Clusters::TlsClientManagementCommandDelegate::GetInstance());
@@ -416,6 +417,7 @@ void CameraApp::InitCameraDeviceClusters()
     TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().Init();
 
     TEMPORARY_RETURN_IGNORED mZoneMgmtServerPtr->Init();
+    return CHIP_NO_ERROR;
 }
 
 void CameraApp::ShutdownCameraDeviceClusters()
@@ -463,12 +465,18 @@ static constexpr EndpointId kCameraEndpointId = 1;
 
 Platform::UniquePtr<CameraApp> gCameraApp;
 
-void CameraAppInit(CameraDeviceInterface * cameraDevice)
+CHIP_ERROR CameraAppInit(CameraDeviceInterface * cameraDevice)
 {
-    gCameraApp = Platform::MakeUnique<CameraApp>(kCameraEndpointId, cameraDevice);
-    gCameraApp.get()->InitCameraDeviceClusters();
+    gCameraApp           = Platform::MakeUnique<CameraApp>(kCameraEndpointId, cameraDevice);
+    const CHIP_ERROR err = gCameraApp.get()->InitCameraDeviceClusters();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Camera cluster initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
 
     ChipLogDetail(Camera, "CameraAppInit: Initialized Camera clusters");
+    return CHIP_NO_ERROR;
 }
 
 void CameraAppShutdown()
