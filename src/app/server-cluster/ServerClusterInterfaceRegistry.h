@@ -39,7 +39,7 @@ struct ServerClusterRegistration
     ServerClusterInterface * const serverClusterInterface;
 
     /// Managed by the registry. Null while the registration is not part of a registry.
-    /// The list is terminated by a sentinel rather than null, so a registration can tell
+    /// The list is terminated by `EndOfList()` rather than null, so a registration can tell
     /// whether it is registered without accessing the registry.
     ServerClusterRegistration * next;
 
@@ -52,17 +52,24 @@ struct ServerClusterRegistration
     ServerClusterRegistration(const ServerClusterRegistration & other)             = delete;
     ServerClusterRegistration & operator=(const ServerClusterRegistration & other) = delete;
 
-    /// Returns true if this registration is currently part of a registry.
+    /// Returns true if this registration is part of a registry.
     ///
-    /// Unlike calling into the registry, this remains safe to call after the registry
-    /// has been destroyed, which unregisters all its entries.
+    /// A registration must be unregistered before it is destroyed, to avoid leaving the registry with
+    /// a dangling pointer. When the registration may outlive the registry (e.g. due to the unspecified
+    /// order of static destruction), the call to `Unregister()` must be guarded, because the registry
+    /// may already be gone. `IsRegistered()` provides that guard without accessing the registry: a
+    /// registry clears all its entries when it is destroyed, so this returns false afterwards.
     bool IsRegistered() const { return next != nullptr; }
 
-private:
-    friend class ServerClusterInterfaceRegistry;
+    /// The value of `next` for the last registration in a registry's list.
+    /// Its `serverClusterInterface` is null.
+    static constexpr const ServerClusterRegistration * EndOfList() { return &kEndOfList; }
 
+private:
     // Used only for the end-of-list sentinel.
     constexpr ServerClusterRegistration() : serverClusterInterface(nullptr), next(nullptr) {}
+
+    static const ServerClusterRegistration kEndOfList;
 };
 
 /// It is very typical to join together a registration and a Server
@@ -234,7 +241,11 @@ public:
     ServerClusterInstances AllServerClusterInstances();
 
 protected:
-    static constexpr ServerClusterRegistration * EndOfList() { return const_cast<ServerClusterRegistration *>(&kEndOfList); }
+    static constexpr ServerClusterRegistration * EndOfList()
+    {
+        // The list stores the sentinel in non-const `next` pointers, but never writes through it.
+        return const_cast<ServerClusterRegistration *>(ServerClusterRegistration::EndOfList());
+    }
 
     ServerClusterRegistration * mRegistrations = EndOfList();
 
@@ -244,9 +255,6 @@ protected:
 
     // Managing context for this registry
     std::optional<ServerClusterContext> mContext;
-
-private:
-    static const ServerClusterRegistration kEndOfList;
 };
 
 } // namespace app

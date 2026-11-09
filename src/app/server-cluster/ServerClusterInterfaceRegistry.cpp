@@ -27,7 +27,7 @@
 namespace chip {
 namespace app {
 
-const ServerClusterRegistration ServerClusterInterfaceRegistry::kEndOfList{};
+const ServerClusterRegistration ServerClusterRegistration::kEndOfList{};
 
 ServerClusterInterfaceRegistry::~ServerClusterInterfaceRegistry()
 {
