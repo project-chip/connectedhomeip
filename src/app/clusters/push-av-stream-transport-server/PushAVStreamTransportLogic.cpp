@@ -57,16 +57,15 @@ namespace {
 bool HasDuplicateLargeMotionZoneIds(
     const DataModel::DecodableList<chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::DecodableType> &
         zones,
-    uint32_t zoneGroups)
+    uint32_t zoneGroups, Span<uint16_t> zoneBits)
 {
-    std::array<uint32_t, 128> zoneBits{};
     for (uint16_t group = 0; group < 16; ++group)
     {
         if ((zoneGroups & (uint32_t{ 1 } << group)) == 0)
         {
             continue;
         }
-        zoneBits.fill(0);
+        std::fill(zoneBits.begin(), zoneBits.end(), 0);
         auto iter = zones.begin();
         while (iter.Next())
         {
@@ -76,8 +75,8 @@ bool HasDuplicateLargeMotionZoneIds(
                 continue;
             }
             const uint16_t zoneId = zone.Value();
-            auto & word           = zoneBits[(zoneId & 0x0fff) >> 5];
-            const uint32_t bit    = uint32_t{ 1 } << (zoneId & 31);
+            auto & word           = zoneBits[(zoneId & 0x0fff) >> 4];
+            const uint16_t bit    = static_cast<uint16_t>(uint16_t{ 1 } << (zoneId & 15));
             if ((word & bit) != 0)
             {
                 return true;
@@ -967,7 +966,8 @@ PushAvStreamTransportServerLogic::ValidateMotionZones(const Structs::TransportTr
         }
         else
         {
-            VerifyOrReturnValue(!HasDuplicateLargeMotionZoneIds(zones, zoneGroups), Status::AlreadyExists);
+            VerifyOrReturnValue(!HasDuplicateLargeMotionZoneIds(zones, zoneGroups, Span<uint16_t>(zoneIds.data(), zoneIds.size())),
+                                Status::AlreadyExists);
         }
 
         VerifyOrReturnValue(
