@@ -138,8 +138,12 @@ CHIP_ERROR PushAvStreamTransportServerLogic::Init(AttributePersistenceProvider &
     VerifyOrDie(mCluster != nullptr);
 
     mAttributeStorage = &attributeStorage;
-    LoadPersistentAttributes();
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err    = LoadPersistentAttributes();
+    if (err != CHIP_NO_ERROR)
+    {
+        mAttributeStorage = nullptr;
+    }
+    return err;
 }
 
 void PushAvStreamTransportServerLogic::Shutdown()
@@ -248,13 +252,13 @@ void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connec
     mTimerContexts.erase(it, mTimerContexts.end());
 }
 
-void PushAvStreamTransportServerLogic::LoadPersistentAttributes()
+CHIP_ERROR PushAvStreamTransportServerLogic::LoadPersistentAttributes()
 {
     // Load currentConnections
-    LogErrorOnFailure(LoadCurrentConnections());
+    ReturnErrorOnFailure(LoadCurrentConnections());
 
     // Signal delegate that all persistent configuration attributes have been loaded.
-    TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
+    return mDelegate->PersistentAttributesLoadedCallback();
 }
 
 TransportConfigurationStorage * PushAvStreamTransportServerLogic::FindStreamTransportConnection(const uint16_t connectionID)
