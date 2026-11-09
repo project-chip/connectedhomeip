@@ -110,6 +110,9 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 // nullable because technically _deviceController is nullable.
 @property (nonatomic, readonly, nullable) MTRDeviceController_Concrete * _concreteController;
 
+// Called on the Matter queue when the session the subscription last used recovers.
+- (void)_handleSessionToNodeRecovered;
+
 @end
 
 typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
@@ -134,6 +137,8 @@ using namespace chip::Protocols::InteractionModel;
 using namespace chip::Tracing::DarwinFramework;
 
 typedef void (^FirstReportHandler)(void);
+
+@class MTRDeviceMatterCPPObjectsHolder;
 
 namespace {
 
@@ -167,27 +172,16 @@ private:
     uint32_t mResubscriptionNumRetries = 0;
 };
 
+// Tells its holder when the watched session recovers. The holder owns it, so the back-pointer does not retain.
 class SessionRecoveryWatcher final : public SessionDelegate {
 public:
-    bool Watch(const SessionHandle & session, dispatch_block_t onRecovered)
-    {
-        mOnRecovered = onRecovered;
-        return mSession.Grab(session);
-    }
+    void SetHolder(MTRDeviceMatterCPPObjectsHolder * holder) { mHolder = holder; }
 
-    void Stop()
-    {
-        mSession.Release();
-        mOnRecovered = nil;
-    }
+    bool Watch(const SessionHandle & session) { return mSession.Grab(session); }
+    void Stop() { mSession.Release(); }
 
     void OnSessionReleased() override {}
-    void OnSessionRecovered() override
-    {
-        if (mOnRecovered) {
-            mOnRecovered();
-        }
-    }
+    void OnSessionRecovered() override;
 
 #ifdef DEBUG
     Transport::SecureSession * WatchedSecureSession()
@@ -198,7 +192,7 @@ public:
 #endif
 
 private:
-    dispatch_block_t mOnRecovered;
+    __unsafe_unretained MTRDeviceMatterCPPObjectsHolder * mHolder = nil;
     SessionHolderWithDelegate mSession { *this };
 };
 
@@ -208,11 +202,14 @@ private:
 
 // Class to hold C++ objects that can only be manipulated on the Matter queue
 @interface MTRDeviceMatterCPPObjectsHolder : NSObject
+- (instancetype)initWithDevice:(MTRDevice_Concrete *)device;
 @property (nonatomic, readonly) ReadClient * readClient;
 @property (nonatomic, readonly) SubscriptionCallback * subscriptionCallback; // valid when and only when readClient is valid
 - (void)setReadClient:(ReadClient * _Nullable)readClient subscriptionCallback:(SubscriptionCallback * _Nullable)subscriptionCallback;
 - (void)clearReadClientAndDeleteSubscriptionCallback;
-- (void)watchSessionForRecovery:(const SessionHandle &)session handler:(dispatch_block_t)handler;
+- (void)watchSessionForRecovery:(const SessionHandle &)session;
+// Called by the watcher on the Matter queue when the watched session recovers.
+- (void)_sessionRecovered;
 // Tears down the subscription objects and stops watching the session.
 - (void)invalidate;
 #ifdef DEBUG
@@ -221,7 +218,16 @@ private:
 @end
 
 @implementation MTRDeviceMatterCPPObjectsHolder {
+    __weak MTRDevice_Concrete * _device;
     SessionRecoveryWatcher _sessionRecoveryWatcher;
+}
+- (instancetype)initWithDevice:(MTRDevice_Concrete *)device
+{
+    if (self = [super init]) {
+        _device = device;
+        _sessionRecoveryWatcher.SetHolder(self);
+    }
+    return self;
 }
 @synthesize readClient = _readClient;
 @synthesize subscriptionCallback = _subscriptionCallback;
@@ -271,14 +277,21 @@ private:
         }
     }
 }
-- (void)watchSessionForRecovery:(const SessionHandle &)session handler:(dispatch_block_t)handler
+- (void)watchSessionForRecovery:(const SessionHandle &)session
 {
     assertChipStackLockedByCurrentThread();
     @synchronized(self) {
-        if (!_sessionRecoveryWatcher.Watch(session, handler)) {
+        if (!_sessionRecoveryWatcher.Watch(session)) {
             MTR_LOG_ERROR("%@: could not watch session %u for recovery", self, session->SessionIdForLogging());
         }
     }
+}
+- (void)_sessionRecovered
+{
+    assertChipStackLockedByCurrentThread();
+    MTRDevice_Concrete * device = _device;
+    VerifyOrReturn(device, MTR_LOG_DEBUG("MTRDeviceMatterCPPObjectsHolder session recovered with nil MTRDevice"));
+    [device _handleSessionToNodeRecovered];
 }
 - (void)invalidate
 {
@@ -298,6 +311,8 @@ private:
 }
 #endif
 @end
+
+void SessionRecoveryWatcher::OnSessionRecovered() { [mHolder _sessionRecovered]; }
 
 #pragma mark - MTRDevice
 
@@ -671,7 +686,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         _persistedClusters = [NSMutableSet set];
         _highestObservedEventNumber = nil;
         _highestObservedEventNumberNeedsPersisting = NO;
-        _matterCPPObjectsHolder = [[MTRDeviceMatterCPPObjectsHolder alloc] init];
+        _matterCPPObjectsHolder = [[MTRDeviceMatterCPPObjectsHolder alloc] initWithDevice:self];
         _throttlingDeviceBecameActiveCallbacks = NO;
 
         // If there is a data store, make sure we have an observer to monitor system clock changes, so
@@ -2641,19 +2656,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         return;
     }
 
-    mtr_weakify(self);
-    [self.matterCPPObjectsHolder watchSessionForRecovery:session handler:^{
-        mtr_strongify(self);
-        VerifyOrReturn(self, MTR_LOG_DEBUG("_handleCASESessionEstablished session recovery called back with nil MTRDevice"));
-
-        [self->_deviceController asyncDispatchToMatterQueue:^{
-            mtr_strongify(self);
-            VerifyOrReturn(self, MTR_LOG_DEBUG("_handleCASESessionEstablished session recovery asyncDispatchToMatterQueue called back with nil MTRDevice"));
-
-            [self _handleSessionToNodeRecovered];
-        }
-                                               errorHandler:nil];
-    }];
+    [self.matterCPPObjectsHolder watchSessionForRecovery:session];
 
     auto ipAddress = peerAddress.GetIPAddress();
     char buf[Inet::IPAddress::kMaxStringLength];
