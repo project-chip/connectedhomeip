@@ -258,7 +258,21 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadPersistentAttributes()
     ReturnErrorOnFailure(LoadCurrentConnections());
 
     // Signal delegate that all persistent configuration attributes have been loaded.
-    return mDelegate->PersistentAttributesLoadedCallback();
+    CHIP_ERROR err = mDelegate->PersistentAttributesLoadedCallback();
+    if (err != CHIP_NO_ERROR)
+    {
+        for (const auto & connection : mCurrentConnections)
+        {
+            const auto status = mDelegate->DeallocatePushTransport(connection.connectionID);
+            if (status != Status::Success && status != Status::NotFound)
+            {
+                ChipLogError(Zcl, "Failed to roll back restored connection %u: status %u", connection.connectionID,
+                             to_underlying(status));
+            }
+        }
+        mCurrentConnections.clear();
+    }
+    return err;
 }
 
 TransportConfigurationStorage * PushAvStreamTransportServerLogic::FindStreamTransportConnection(const uint16_t connectionID)
@@ -2160,17 +2174,29 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
     {
         Structs::TransportConfigurationStruct::DecodableType decoded;
         ReturnErrorOnFailure(decoded.Decode(validationReader));
-        if (decoded.transportOptions.HasValue())
-        {
-            const auto & zones = decoded.transportOptions.Value().triggerOptions.motionZones;
-            if (zones.HasValue() && !zones.Value().IsNull())
+        VerifyOrReturnError(decoded.transportOptions.HasValue(), CHIP_ERROR_MISSING_TLV_ELEMENT);
+        const auto & options       = decoded.transportOptions.Value();
+        const auto validateStreams = [](const auto & streams) -> CHIP_ERROR {
+            if (streams.HasValue())
             {
-                auto zoneIter = zones.Value().Value().begin();
-                while (zoneIter.Next())
+                auto iter = streams.Value().begin();
+                while (iter.Next())
                 {
                 }
-                ReturnErrorOnFailure(zoneIter.GetStatus());
+                ReturnErrorOnFailure(iter.GetStatus());
             }
+            return CHIP_NO_ERROR;
+        };
+        ReturnErrorOnFailure(validateStreams(options.videoStreams));
+        ReturnErrorOnFailure(validateStreams(options.audioStreams));
+        const auto & zones = options.triggerOptions.motionZones;
+        if (zones.HasValue() && !zones.Value().IsNull())
+        {
+            auto zoneIter = zones.Value().Value().begin();
+            while (zoneIter.Next())
+            {
+            }
+            ReturnErrorOnFailure(zoneIter.GetStatus());
         }
     }
     VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);

@@ -2194,14 +2194,35 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
         CHIP_ERROR PersistentAttributesLoadedCallback() override
         {
             ++restorations;
+            if (restoreBeforeFailure)
+            {
+                activeConnection = 1;
+            }
             return restorationError;
+        }
+        Status DeallocatePushTransport(const uint16_t connectionId) override
+        {
+            ++deallocationCalls;
+            if (activeConnection == connectionId)
+            {
+                activeConnection = 0;
+                return Status::Success;
+            }
+            return Status::NotFound;
         }
         size_t restorations         = 0;
         CHIP_ERROR restorationError = CHIP_NO_ERROR;
+        bool restoreBeforeFailure   = false;
+        uint16_t activeConnection   = 0;
+        size_t deallocationCalls    = 0;
     } delegate;
     mServer.GetLogic().SetDelegate(&delegate);
     DefaultAttributePersistenceProvider persistence;
     ASSERT_EQ(persistence.Init(&mClusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
+    auto & originalContext = mClusterTester.GetServerClusterContext();
+    ServerClusterContext context{ originalContext.provider, originalContext.storage, persistence,
+                                  originalContext.interactionContext };
+    ASSERT_EQ(mServer.Startup(context), CHIP_NO_ERROR);
     for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext })
     {
         delegate.restorations = 0;
@@ -2277,7 +2298,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
         const ConcreteAttributePath path{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
         const std::vector<uint8_t> persisted(buffer, buffer + writer.GetLengthWritten());
         ASSERT_EQ(persistence.WriteValue(path, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
-        EXPECT_EQ(mServer.GetLogic().Init(persistence), iter.GetStatus());
+        EXPECT_EQ(mServer.Init(), iter.GetStatus());
         EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
         EXPECT_EQ(delegate.restorations, 0u);
         EXPECT_FALSE(mServer.GetLogic().IsInitialized());
@@ -2315,7 +2336,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
         ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
         ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
         ASSERT_EQ(persistence.WriteValue(path, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
-        ASSERT_EQ(mServer.GetLogic().Init(persistence), CHIP_NO_ERROR);
+        ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
         EXPECT_TRUE(mServer.GetLogic().IsInitialized());
         EXPECT_EQ(delegate.restorations, 1u);
         EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
@@ -2329,13 +2350,162 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
         EXPECT_EQ(recoveredHandler.GetLastStatus().status.GetStatus(), Status::NotFound);
 
         delegate.restorationError = CHIP_ERROR_INTERNAL;
-        EXPECT_EQ(mServer.GetLogic().Init(persistence), CHIP_ERROR_INTERNAL);
+        EXPECT_EQ(mServer.Init(), CHIP_ERROR_INTERNAL);
         EXPECT_FALSE(mServer.GetLogic().IsInitialized());
         delegate.restorationError = CHIP_NO_ERROR;
-        EXPECT_EQ(mServer.GetLogic().Init(persistence), CHIP_NO_ERROR);
+        EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
         EXPECT_TRUE(mServer.GetLogic().IsInitialized());
         EXPECT_EQ(delegate.restorations, 3u);
     }
+
+    enum class MalformedField
+    {
+        MissingOptions,
+        VideoStreams,
+        AudioStreams,
+    };
+    for (const auto field : { MalformedField::MissingOptions, MalformedField::VideoStreams, MalformedField::AudioStreams })
+    {
+        delegate.restorations = 0;
+        uint8_t buffer[1024];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType arrayType;
+        TLV::TLVType configType;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, configType), CHIP_NO_ERROR);
+        ASSERT_EQ(
+            writer.Put(TLV::ContextTag(to_underlying(Structs::TransportConfigurationStruct::Fields::kConnectionID)), uint16_t{ 1 }),
+            CHIP_NO_ERROR);
+        ASSERT_EQ(DataModel::Encode(writer,
+                                    TLV::ContextTag(to_underlying(Structs::TransportConfigurationStruct::Fields::kTransportStatus)),
+                                    TransportStatusEnum::kInactive),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(254), FabricIndex{ 1 }), CHIP_NO_ERROR);
+        if (field != MalformedField::MissingOptions)
+        {
+            TLV::TLVType optionsType;
+            TLV::TLVType streamsType;
+            ASSERT_EQ(writer.StartContainer(
+                          TLV::ContextTag(to_underlying(Structs::TransportConfigurationStruct::Fields::kTransportOptions)),
+                          TLV::kTLVType_Structure, optionsType),
+                      CHIP_NO_ERROR);
+            const auto streamsField = field == MalformedField::VideoStreams
+                ? Structs::TransportOptionsStruct::Fields::kVideoStreams
+                : Structs::TransportOptionsStruct::Fields::kAudioStreams;
+            ASSERT_EQ(writer.StartContainer(TLV::ContextTag(to_underlying(streamsField)), TLV::kTLVType_Array, streamsType),
+                      CHIP_NO_ERROR);
+            if (field == MalformedField::VideoStreams)
+            {
+                Structs::VideoStreamStruct::Type stream{};
+                ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), stream), CHIP_NO_ERROR);
+            }
+            else
+            {
+                Structs::AudioStreamStruct::Type stream{};
+                ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), stream), CHIP_NO_ERROR);
+            }
+            ASSERT_EQ(writer.Put(TLV::AnonymousTag(), true), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.EndContainer(streamsType), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.EndContainer(optionsType), CHIP_NO_ERROR);
+        }
+        ASSERT_EQ(writer.EndContainer(configType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        TLV::TLVType decodedArray;
+        ASSERT_EQ(reader.EnterContainer(decodedArray), CHIP_NO_ERROR);
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        Structs::TransportConfigurationStruct::DecodableType decoded;
+        ASSERT_EQ(decoded.Decode(reader), CHIP_NO_ERROR);
+        CHIP_ERROR expectedError = CHIP_ERROR_MISSING_TLV_ELEMENT;
+        if (field == MalformedField::MissingOptions)
+        {
+            ASSERT_FALSE(decoded.transportOptions.HasValue());
+        }
+        else
+        {
+            ASSERT_TRUE(decoded.transportOptions.HasValue());
+            const auto checkStreamError = [&expectedError](const auto & streams) {
+                ASSERT_TRUE(streams.HasValue());
+                auto iter = streams.Value().begin();
+                ASSERT_TRUE(iter.Next());
+                ASSERT_FALSE(iter.Next());
+                ASSERT_NE(iter.GetStatus(), CHIP_NO_ERROR);
+                expectedError = iter.GetStatus();
+            };
+            if (field == MalformedField::VideoStreams)
+            {
+                checkStreamError(decoded.transportOptions.Value().videoStreams);
+            }
+            else
+            {
+                checkStreamError(decoded.transportOptions.Value().audioStreams);
+            }
+        }
+
+        const ConcreteAttributePath path{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
+        const std::vector<uint8_t> persisted(buffer, buffer + writer.GetLengthWritten());
+        ASSERT_EQ(persistence.WriteValue(path, ByteSpan(persisted.data(), persisted.size())), CHIP_NO_ERROR);
+        EXPECT_EQ(mServer.Init(), expectedError);
+        EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+        EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+        EXPECT_EQ(delegate.restorations, 0u);
+        MutableByteSpan retained(buffer);
+        ASSERT_EQ(persistence.ReadValue(path, retained), CHIP_NO_ERROR);
+        EXPECT_TRUE(retained.data_equal(ByteSpan(persisted.data(), persisted.size())));
+    }
+
+    Structs::TransportOptionsStruct::Type options;
+    options.streamUsage                    = StreamUsageEnum::kAnalysis;
+    options.TLSEndpointID                  = 1;
+    options.url                            = "https://example.com/stream/"_span;
+    options.triggerOptions.triggerType     = TransportTriggerTypeEnum::kContinuous;
+    options.containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    Structs::CMAFContainerOptionsStruct::Type cmaf;
+    cmaf.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+    cmaf.segmentDuration = 1000;
+    cmaf.chunkDuration   = 500;
+    options.containerOptions.CMAFContainerOptions.SetValue(cmaf);
+    uint8_t restoredBuffer[1024];
+    TLV::TLVWriter restoredWriter;
+    restoredWriter.Init(restoredBuffer);
+    TLV::TLVType restoredArray;
+    ASSERT_EQ(restoredWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, restoredArray), CHIP_NO_ERROR);
+    for (const uint16_t connectionId : { uint16_t{ 1 }, uint16_t{ 2 } })
+    {
+        Structs::TransportConfigurationStruct::Type config;
+        config.connectionID    = connectionId;
+        config.transportStatus = TransportStatusEnum::kInactive;
+        config.fabricIndex     = 1;
+        config.transportOptions.SetValue(options);
+        ASSERT_EQ(config.EncodeForRead(restoredWriter, TLV::AnonymousTag(), config.GetFabricIndex()), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(restoredWriter.EndContainer(restoredArray), CHIP_NO_ERROR);
+    ASSERT_EQ(restoredWriter.Finalize(), CHIP_NO_ERROR);
+    const ConcreteAttributePath restoredPath{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
+    const std::vector<uint8_t> savedRestoration(restoredBuffer, restoredBuffer + restoredWriter.GetLengthWritten());
+    ASSERT_EQ(persistence.WriteValue(restoredPath, ByteSpan(savedRestoration.data(), savedRestoration.size())), CHIP_NO_ERROR);
+    delegate.restorations         = 0;
+    delegate.restoreBeforeFailure = true;
+    delegate.restorationError     = CHIP_ERROR_INTERNAL;
+    EXPECT_EQ(mServer.Init(), CHIP_ERROR_INTERNAL);
+    EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+    EXPECT_EQ(delegate.activeConnection, 0u);
+    EXPECT_EQ(delegate.deallocationCalls, 2u);
+    EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+    MutableByteSpan retainedRestoration(restoredBuffer);
+    ASSERT_EQ(persistence.ReadValue(restoredPath, retainedRestoration), CHIP_NO_ERROR);
+    EXPECT_TRUE(retainedRestoration.data_equal(ByteSpan(savedRestoration.data(), savedRestoration.size())));
+    delegate.restoreBeforeFailure = false;
+    delegate.restorationError     = CHIP_NO_ERROR;
+    ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
+    EXPECT_TRUE(mServer.GetLogic().IsInitialized());
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), 2u);
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestPushAVStreamTransportServerLogic, LegacyAmbientZonesReloadAsExplicitAllZones)
