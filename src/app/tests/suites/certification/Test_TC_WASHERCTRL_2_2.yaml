@@ -56,6 +56,7 @@ tests:
       command: "readAttribute"
       attribute: "SupportedRinses"
       response:
+          saveAs: supportedRinses
           constraints:
               type: list
               maxLength: 4
@@ -90,10 +91,14 @@ tests:
           "Step 6: TH writes an unsupported NumberOfRinses attribute to DUT
           while DUT is not in a valid state."
       PICS: WASHERCTRL.S.A0002
+      runIf: "not all(value in supportedRinses for value in (0, 1, 2, 3))"
       command: "writeAttribute"
       attribute: "NumberOfRinses"
       arguments:
-          value: unsupportedNumberOfRinsesValue
+          value: >-
+              unsupportedNumberOfRinsesValue if unsupportedNumberOfRinsesValue
+              not in supportedRinses else next((value for value in (0, 1, 2, 3)
+              if value not in supportedRinses), 0)
       response:
           error: INVALID_IN_STATE
 
