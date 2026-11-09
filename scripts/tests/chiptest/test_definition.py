@@ -13,7 +13,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import contextlib
 import logging
+import os
 import shlex
 import shutil
 import subprocess
@@ -106,11 +108,33 @@ class App:
             return True
         return False
 
+    def _threadSimulationNodeIds(self) -> list[int]:
+        node_ids: list[int] = []
+        args = list(self.subproc.args)
+        i = 0
+        while i < len(args):
+            val = None
+            if args[i] == "--thread-arg" and i + 1 < len(args):
+                val = args[i + 1]
+                i += 2
+            elif args[i].startswith("--thread-arg="):
+                val = args[i].split("=", 1)[1]
+                i += 1
+            else:
+                i += 1
+            if val is not None and not val.startswith("-"):
+                with contextlib.suppress(ValueError):
+                    node_ids.append(int(val))
+        return node_ids
+
     def factoryReset(self) -> bool:
         wasRunning = (not self.killed) and self.stop()
 
         for path in self.kvsPathSet | PERSISTENT_CONFIG_PATHS:
             Path(path).unlink(missing_ok=True)
+        offset = os.environ.get('PORT_OFFSET', '0')
+        for node_id in self._threadSimulationNodeIds():
+            Path(f'/tmp/openthread-simulation/{offset}_{node_id}.flash').unlink(missing_ok=True)
 
         if wasRunning:
             return self.start()

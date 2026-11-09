@@ -41,34 +41,10 @@ _DEVICE_LIST = [file[:-4]
                 for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap") and file != 'template.zap']
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
 _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
+_MERGED_DEVICE_NAME = "merged_device"
 _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "noip_rootnode_dimmablelight_bCwGYSDpoe",  # Broken.
     "rootnode_genericswitch_2dfff6e516",  # not actively developed,
-]
-# Reduced set of devices for Linux presubmit CI that provides 100% coverage
-# of all C++ cluster implementations and preprocessor branches under examples/chef/common.
-_REDUCED_LINUX_CI_DEVICES = [
-    "multi_column_switch",
-    "rootnode_airpurifier_airqualitysensor_temperaturesensor_humiditysensor_thermostat_56de3d5f45",
-    "rootnode_castingvideoplayer_contentapp_34699714e7",
-    "rootnode_chime_9991598b3f",
-    "rootnode_contactsensor_lightsensor_occupancysensor_temperaturesensor_pressuresensor_flowsensor_humiditysensor_airqualitysensor_powersource_367e7cea91",
-    "rootnode_dishwasher_cc105034fe",
-    "rootnode_doorlock_aNKYAreMXE",
-    "rootnode_heatpump_87ivjRAECh",
-    "rootnode_laundrydryer_01796fe396",
-    "rootnode_laundrywasher_fb10d238c8",
-    "rootnode_microwaveoven_37420684d3",
-    "rootnode_modeselect_6860d3a65a",
-    "rootnode_oven_temperaturecontrolledcabinet_cooktop_cooksurface_738dd18832",
-    "rootnode_pump_5f904818cc",
-    "rootnode_rainsensor_a7aa5d7738",
-    "rootnode_refrigerator_temperaturecontrolledcabinet_temperaturecontrolledcabinet_ffdb696680",
-    "rootnode_roboticvacuumcleaner_1807ff0c49",
-    "rootnode_smokecoalarm_686fe0dcb8",
-    "rootnode_waterheater_21bd13d651",
-    "rootnode_watervalve_6bb39f1f67",
-    "rootnode_windowcovering_RLCxaGi9Yx",
 ]
 # Pattern to filter (based on device-name) devices that need ICD support.
 _ICD_DEVICE_PATTERN = "^icd_"
@@ -410,13 +386,9 @@ def main() -> int:
                             "Uses specified target from -t. Chef exits after completion."),
                       dest="ci", action="store_true")
     parser.add_option("", "--ci_linux",
-                      help=("Builds all non-excluded Chef Examples on Linux for postsubmit CI. "
-                            "Devices are built without -c for faster compilation."),
+                      help=("Builds all non-excluded Chef Examples on Linux for CI. "
+                            "Devices are merged into a single binary for faster compilation."),
                       dest="ci_linux", action="store_true")
-    parser.add_option("", "--ci_linux_reduced",
-                      help=("Builds a reduced set of Chef Examples on Linux for presubmit CI. "
-                            "Devices are built without -c for faster compilation."),
-                      dest="ci_linux_reduced", action="store_true")
     parser.add_option("", "--cpu_type",
                       help="CPU type to compile for. Linux only.",
                       choices=["arm64", "arm", "x64"])
@@ -455,22 +427,48 @@ def main() -> int:
     # CI Linux
     #
 
-    if options.ci_linux or options.ci_linux_reduced:
-        target_devices = (
-            _REDUCED_LINUX_CI_DEVICES
-            if options.ci_linux_reduced
-            else list(set(_DEVICE_LIST) - set(_EXCLUDE_DEVICE_FROM_LINUX_CI))
+    if options.ci_linux:
+        target_devices = sorted(
+            set(_DEVICE_LIST) - set(_EXCLUDE_DEVICE_FROM_LINUX_CI)
         )
+        zap_files = []
         for device_name in target_devices:
             if device_name not in _DEVICE_LIST:
                 flush_print(
                     f"{device_name} in Linux CI list but not {_DEVICE_FOLDER}!")
                 exit(1)
+            zap_files.append(os.path.join(_DEVICE_FOLDER, f"{device_name}.zap"))
+
+        merged_zap_path = os.path.join(
+            _DEVICE_FOLDER, f"{_MERGED_DEVICE_NAME}.zap"
+        )
+        merged_matter_path = os.path.join(
+            _DEVICE_FOLDER, f"{_MERGED_DEVICE_NAME}.matter"
+        )
+        merged_meta_path = os.path.join(
+            _DEVICE_FOLDER, f"{_MERGED_DEVICE_NAME}_meta.yaml"
+        )
+        try:
+            flush_print(
+                f"Merging {len(target_devices)} Chef devices into {_MERGED_DEVICE_NAME}",
+                with_border=True,
+            )
+            zap_file_parser.merge_zap_files(zap_files, merged_zap_path)
+            shell.run_cmd(f"source {_REPO_BASE_PATH}/scripts/activate.sh")
+            shell.run_cmd(
+                f"{_REPO_BASE_PATH}/scripts/tools/zap/generate.py {merged_zap_path}"
+            )
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
-            command = f"./chef.py -br -d {device_name} -t linux"
+            command = f"./chef.py -br -d {_MERGED_DEVICE_NAME} -t linux"
+            if any(re.search(_ICD_DEVICE_PATTERN, d) for d in target_devices):
+                command += " -I"
             flush_print(f"Building {command}", with_border=True)
             shell.run_cmd(command)
-            bundle("linux", device_name)
+            bundle("linux", _MERGED_DEVICE_NAME)
+        finally:
+            for path in (merged_zap_path, merged_matter_path, merged_meta_path):
+                if os.path.exists(path):
+                    os.remove(path)
         exit(0)
 
     #

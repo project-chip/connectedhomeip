@@ -78,9 +78,9 @@ build_tl5218x_retention_lzma_v2/zephyr/matter.ota          -> OTA upgrade
 **Prerequisite:** copy Zigbee firmware
 
 ```bash
-cp <zigbee_fw>.bin ${ZEPHYR_BASE}/TL323X_FW/ZB/Zigbee-SampleDemo.bin
+cp <zigbee_fw>.bin ${ZEPHYR_BASE}/TL521X_FW/ZB/Zigbee-SampleDemo.bin
 e.g.
-cp ${ZEPHYR_BASE}/TL323X_FW/ZB/sampleSwitch_tl323x_log.bin ${ZEPHYR_BASE}/TL323X_FW/ZB/Zigbee-SampleDemo.bin
+cp ${ZEPHYR_BASE}/TL521X_FW/ZB/sampleSwitch_tl521x_log.bin ${ZEPHYR_BASE}/TL521X_FW/ZB/Zigbee-SampleDemo.bin
 ```
 
 **Note:** This dual-mode configuration is for 2MB flash only. LZMA compression

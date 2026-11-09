@@ -32,7 +32,6 @@ class Efr32App(Enum):
     LIGHT = auto()
     LOCK = auto()
     SWITCH = auto()
-    WINDOW_COVERING = auto()
     THERMOSTAT = auto()
     PUMP = auto()
     UNIT_TEST = auto()
@@ -52,8 +51,6 @@ class Efr32App(Enum):
             return 'lock-app'
         if self == Efr32App.SWITCH:
             return 'light-switch-app'
-        if self == Efr32App.WINDOW_COVERING:
-            return 'window-app'
         if self == Efr32App.THERMOSTAT:
             return 'thermostat'
         if self == Efr32App.PUMP:
@@ -79,8 +76,6 @@ class Efr32App(Enum):
             return 'matter-silabs-lock-example'
         if self == Efr32App.SWITCH:
             return 'matter-silabs-light-switch-example'
-        if self == Efr32App.WINDOW_COVERING:
-            return 'matter-silabs-window-example'
         if self == Efr32App.THERMOSTAT:
             return 'matter-silabs-thermostat-example'
         if self == Efr32App.PUMP:
@@ -108,8 +103,6 @@ class Efr32App(Enum):
             return 'lock_app.flashbundle.txt'
         if self == Efr32App.SWITCH:
             return 'light_switch_app.flashbundle.txt'
-        if self == Efr32App.WINDOW_COVERING:
-            return 'window_app.flashbundle.txt'
         if self == Efr32App.THERMOSTAT:
             return 'thermostat_app.flashbundle.txt'
         if self == Efr32App.PUMP:

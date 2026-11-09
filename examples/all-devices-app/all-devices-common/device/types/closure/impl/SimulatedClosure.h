@@ -16,6 +16,10 @@
 
 #pragma once
 
+#include <memory>
+#include <optional>
+#include <vector>
+
 #include <app/TestEventTriggerDelegate.h>
 #include <device/types/closure-panel/impl/SimulatedClosurePanel.h>
 #include <device/types/closure/Closure.h>

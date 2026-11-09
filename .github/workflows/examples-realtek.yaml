@@ -105,7 +105,6 @@ jobs:
                       --target realtek-rtl8777g-all-clusters \
                       --target realtek-rtl8777g-ota-requestor \
                       --target realtek-rtl8777g-thermostat \
-                      --target realtek-rtl8777g-window \
                     build \
                   "
             - name: Notify Slack on Failure
