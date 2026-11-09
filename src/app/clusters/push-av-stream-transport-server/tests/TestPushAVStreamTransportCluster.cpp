@@ -1447,9 +1447,15 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestModifyPushTransportMotionZones)
             lastModification = std::make_unique<TransportOptionsStorage>(options);
             return TestPushAVStreamTransportDelegateImpl::ModifyPushTransport(connectionId, options);
         }
+        Status UpdateMotionZoneOptions(uint16_t connectionId, const TransportOptionsStorage & options) override
+        {
+            ++updates;
+            return TestPushAVStreamTransportDelegateImpl::UpdateMotionZoneOptions(connectionId, options);
+        }
         Status ValidateZoneId(uint16_t zoneId) override { return zoneId <= 3 ? Status::Success : Status::Failure; }
         bool ValidateMotionZoneListSize(size_t size) override { return size <= 2; }
         size_t modifications = 0;
+        size_t updates       = 0;
         std::unique_ptr<TransportOptionsStorage> lastModification;
     };
     class CountingPersistence : public DefaultAttributePersistenceProvider
@@ -1821,6 +1827,199 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestModifyPushTransportMotionZones)
                     }
                     EXPECT_FALSE(foundIter.Next());
                     EXPECT_EQ(foundIter.GetStatus(), CHIP_NO_ERROR);
+                }
+                if (zonesCase == ZonesCase::Valid &&
+                    (triggerType == TransportTriggerTypeEnum::kMotion || triggerType == TransportTriggerTypeEnum::kAmbientContext))
+                {
+                    enum class UpdateCase
+                    {
+                        Valid,
+                        Null,
+                        Empty,
+                        NullZone,
+                        MissingZone,
+                        DuplicateOversized,
+                        InvalidId,
+                        GlobalSensitivity,
+                        SensitivityLow,
+                        SensitivityHigh,
+                        SensitivityMissing,
+                        SensitivityUnexpected,
+                        Malformed,
+                        Truncated,
+                        DuplicateNull,
+                        DuplicateMalformed,
+                        Oversized,
+                        InvalidGlobalSensitivity
+                    };
+                    for (const auto updateCase :
+                         { UpdateCase::Valid, UpdateCase::Null, UpdateCase::Empty, UpdateCase::NullZone, UpdateCase::MissingZone,
+                           UpdateCase::DuplicateOversized, UpdateCase::InvalidId, UpdateCase::GlobalSensitivity,
+                           UpdateCase::SensitivityLow, UpdateCase::SensitivityHigh, UpdateCase::SensitivityMissing,
+                           UpdateCase::SensitivityUnexpected, UpdateCase::Malformed, UpdateCase::Truncated,
+                           UpdateCase::DuplicateNull, UpdateCase::DuplicateMalformed, UpdateCase::Oversized,
+                           UpdateCase::InvalidGlobalSensitivity })
+                    {
+                        const auto beforeOptions = logic.mCurrentConnections[0].GetTransportOptionsPtr();
+                        uint8_t updateBeforeBuffer[1024];
+                        MutableByteSpan updateBefore(updateBeforeBuffer);
+                        ASSERT_EQ(persistence.ReadValue(persistencePath, updateBefore), CHIP_NO_ERROR);
+                        const auto updateWritesBefore = persistence.writes;
+                        const auto updatesBefore      = delegate.updates;
+                        uint8_t updateBuffer[128];
+                        TLV::TLVWriter updateWriter;
+                        updateWriter.Init(updateBuffer);
+                        TLV::TLVType updateArray;
+                        ASSERT_EQ(updateWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, updateArray),
+                                  CHIP_NO_ERROR);
+                        const bool duplicateLarge =
+                            updateCase == UpdateCase::DuplicateOversized || updateCase == UpdateCase::DuplicateMalformed;
+                        const size_t updateCount = updateCase == UpdateCase::Empty    ? 0u
+                            : (duplicateLarge || updateCase == UpdateCase::Oversized) ? 3u
+                            : updateCase == UpdateCase::NullZone                      ? 1u
+                                                                                      : 2u;
+                        for (size_t index = 0; index < updateCount; ++index)
+                        {
+                            if ((updateCase == UpdateCase::Malformed || updateCase == UpdateCase::DuplicateMalformed) &&
+                                index == updateCount - 1)
+                            {
+                                TLV::TLVType malformedZone;
+                                ASSERT_EQ(updateWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, malformedZone),
+                                          CHIP_NO_ERROR);
+                                ASSERT_EQ(
+                                    updateWriter.Put(
+                                        TLV::ContextTag(to_underlying(Structs::TransportZoneOptionsStruct::Fields::kZone)), true),
+                                    CHIP_NO_ERROR);
+                                ASSERT_EQ(updateWriter.EndContainer(malformedZone), CHIP_NO_ERROR);
+                                continue;
+                            }
+                            if (updateCase == UpdateCase::MissingZone && index == updateCount - 1)
+                            {
+                                TLV::TLVType missingZone;
+                                ASSERT_EQ(updateWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, missingZone),
+                                          CHIP_NO_ERROR);
+                                if (features.Has(Feature::kPerZoneSensitivity))
+                                {
+                                    ASSERT_EQ(updateWriter.Put(TLV::ContextTag(to_underlying(
+                                                                   Structs::TransportZoneOptionsStruct::Fields::kSensitivity)),
+                                                               uint8_t{ 5 }),
+                                              CHIP_NO_ERROR);
+                                }
+                                ASSERT_EQ(updateWriter.EndContainer(missingZone), CHIP_NO_ERROR);
+                                continue;
+                            }
+                            Structs::TransportZoneOptionsStruct::Type updateZone;
+                            updateZone.zone.SetNonNull(duplicateLarge ? uint16_t{ 1 }
+                                                           : updateCase == UpdateCase::InvalidId && index == 0
+                                                           ? uint16_t{ 129 }
+                                                           : static_cast<uint16_t>(index + 1));
+                            if (updateCase == UpdateCase::NullZone || updateCase == UpdateCase::DuplicateNull)
+                            {
+                                updateZone.zone.SetNull();
+                            }
+                            if (features.Has(Feature::kPerZoneSensitivity) || updateCase == UpdateCase::SensitivityLow ||
+                                updateCase == UpdateCase::SensitivityHigh || updateCase == UpdateCase::SensitivityUnexpected)
+                            {
+                                updateZone.sensitivity.SetValue(updateCase == UpdateCase::SensitivityLow        ? 0
+                                                                    : updateCase == UpdateCase::SensitivityHigh ? 11
+                                                                                                                : 5);
+                            }
+                            if (updateCase == UpdateCase::SensitivityMissing)
+                            {
+                                updateZone.sensitivity.ClearValue();
+                            }
+                            ASSERT_EQ(DataModel::Encode(updateWriter, TLV::AnonymousTag(), updateZone), CHIP_NO_ERROR);
+                        }
+                        ASSERT_EQ(updateWriter.EndContainer(updateArray), CHIP_NO_ERROR);
+                        ASSERT_EQ(updateWriter.Finalize(), CHIP_NO_ERROR);
+                        TLV::TLVReader updateReader;
+                        updateReader.Init(updateBuffer,
+                                          updateWriter.GetLengthWritten() - (updateCase == UpdateCase::Truncated ? 3u : 0u));
+                        ASSERT_EQ(updateReader.Next(), CHIP_NO_ERROR);
+                        DataModel::DecodableList<TransportZoneOptionsDecodableStruct> updatedZones;
+                        if (updateCase == UpdateCase::Truncated)
+                        {
+                            TLV::TLVType truncatedArray;
+                            ASSERT_EQ(updateReader.EnterContainer(truncatedArray), CHIP_NO_ERROR);
+                            updatedZones.SetReader(updateReader);
+                        }
+                        else
+                        {
+                            ASSERT_EQ(updatedZones.Decode(updateReader), CHIP_NO_ERROR);
+                        }
+                        Commands::UpdateMotionZoneOptions::DecodableType update;
+                        update.connectionID = connectionId;
+                        update.motionZones.SetValue(DataModel::MakeNullable(updatedZones));
+                        if (updateCase == UpdateCase::Null)
+                        {
+                            update.motionZones.SetValue(DataModel::NullNullable);
+                        }
+                        const bool globalSensitivity =
+                            updateCase == UpdateCase::GlobalSensitivity || updateCase == UpdateCase::InvalidGlobalSensitivity;
+                        if (globalSensitivity)
+                        {
+                            update.motionSensitivity.SetValue(DataModel::MakeNullable(
+                                static_cast<uint8_t>(updateCase == UpdateCase::InvalidGlobalSensitivity ? 0 : 7)));
+                        }
+                        Status updateExpected = Status::Success;
+                        if (globalSensitivity &&
+                            (triggerType != TransportTriggerTypeEnum::kMotion || features.Has(Feature::kPerZoneSensitivity)))
+                        {
+                            updateExpected = Status::InvalidCommand;
+                        }
+                        else if (updateCase == UpdateCase::InvalidGlobalSensitivity)
+                        {
+                            updateExpected = Status::ConstraintError;
+                        }
+                        else if (updateCase == UpdateCase::MissingZone || updateCase == UpdateCase::Malformed ||
+                                 updateCase == UpdateCase::DuplicateMalformed || updateCase == UpdateCase::Truncated ||
+                                 (updateCase == UpdateCase::SensitivityMissing && features.Has(Feature::kPerZoneSensitivity)) ||
+                                 ((updateCase == UpdateCase::SensitivityLow || updateCase == UpdateCase::SensitivityHigh ||
+                                   updateCase == UpdateCase::SensitivityUnexpected) &&
+                                  !features.Has(Feature::kPerZoneSensitivity)))
+                        {
+                            updateExpected = Status::InvalidCommand;
+                        }
+                        else if (updateCase == UpdateCase::SensitivityLow || updateCase == UpdateCase::SensitivityHigh)
+                        {
+                            updateExpected = Status::ConstraintError;
+                        }
+                        else if (updateCase == UpdateCase::DuplicateOversized || updateCase == UpdateCase::DuplicateNull)
+                        {
+                            updateExpected = Status::AlreadyExists;
+                        }
+                        else if (updateCase == UpdateCase::Oversized)
+                        {
+                            updateExpected = Status::DynamicConstraintError;
+                        }
+                        else if (updateCase == UpdateCase::InvalidId)
+                        {
+                            updateExpected = Status::Failure;
+                        }
+                        Testing::MockCommandHandler updateHandler;
+                        updateHandler.SetFabricIndex(1);
+                        const ConcreteCommandPath updatePath{ 1, PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+                        EXPECT_EQ(logic.HandleUpdateMotionZoneOptions(updateHandler, updatePath, update), std::nullopt);
+                        ASSERT_EQ(updateHandler.GetStatuses().size(), 1u);
+                        EXPECT_EQ(updateHandler.GetLastStatus().status.GetStatus(), updateExpected);
+                        if (updateCase == UpdateCase::InvalidId)
+                        {
+                            EXPECT_EQ(updateHandler.GetLastStatus().status.GetClusterSpecificCode(),
+                                      to_underlying(StatusCodeEnum::kInvalidZone));
+                        }
+                        const bool updateSuccess = updateExpected == Status::Success;
+                        EXPECT_EQ(delegate.updates - updatesBefore, updateSuccess ? 1u : 0u);
+                        EXPECT_EQ(persistence.writes - updateWritesBefore, updateSuccess ? 1u : 0u);
+                        EXPECT_FALSE(updateHandler.HasResponse());
+                        if (!updateSuccess)
+                        {
+                            EXPECT_EQ(logic.mCurrentConnections[0].GetTransportOptionsPtr(), beforeOptions);
+                            uint8_t updateAfterBuffer[1024];
+                            MutableByteSpan updateAfter(updateAfterBuffer);
+                            ASSERT_EQ(persistence.ReadValue(persistencePath, updateAfter), CHIP_NO_ERROR);
+                            EXPECT_TRUE(updateBefore.data_equal(updateAfter));
+                        }
+                    }
                 }
                 Commands::DeallocatePushTransport::DecodableType deallocate;
                 deallocate.connectionID = connectionId;

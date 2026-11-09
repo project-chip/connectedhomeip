@@ -1724,9 +1724,10 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         return std::nullopt;
     }
 
-    if (transportOptionsPtr->triggerOptions.triggerType != TransportTriggerTypeEnum::kMotion)
+    const auto triggerType = transportOptionsPtr->triggerOptions.triggerType;
+    if (triggerType != TransportTriggerTypeEnum::kMotion && triggerType != TransportTriggerTypeEnum::kAmbientContext)
     {
-        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Transport trigger type is not Motion", mEndpointId);
+        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Transport trigger type does not use zones", mEndpointId);
         handler.AddStatus(commandPath, Status::InvalidCommand);
         return std::nullopt;
     }
@@ -1734,10 +1735,10 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
     // Validate MotionSensitivity
     if (commandData.motionSensitivity.HasValue())
     {
-        if (mFeatures.Has(Feature::kPerZoneSensitivity))
+        if (triggerType != TransportTriggerTypeEnum::kMotion || mFeatures.Has(Feature::kPerZoneSensitivity))
         {
             ChipLogError(Zcl,
-                         "HandleUpdateMotionZoneOptions[ep=%d]: MotionSensitivity cannot be set when PerZoneSensitivity is enabled",
+                         "HandleUpdateMotionZoneOptions[ep=%d]: MotionSensitivity does not apply to this transport or feature set",
                          mEndpointId);
             handler.AddStatus(commandPath, Status::InvalidCommand);
             return std::nullopt;
@@ -1759,113 +1760,34 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
     // Validate MotionZones
     if (commandData.motionZones.HasValue() && !commandData.motionZones.Value().IsNull())
     {
-        size_t zoneListSize = 0;
-        auto iterCount      = commandData.motionZones.Value().Value().begin();
-        while (iterCount.Next())
-        {
-            zoneListSize++;
-        }
-
-        if (iterCount.GetStatus() != CHIP_NO_ERROR)
+        const auto & zones = commandData.motionZones.Value().Value();
+        if (Internal::RequiredZoneFieldReader(zones).Validate() != CHIP_NO_ERROR)
         {
             handler.AddStatus(commandPath, Status::InvalidCommand);
             return std::nullopt;
         }
-
-        bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
-        if (!isValidZoneSize)
+        auto zoneIterator = zones.begin();
+        while (zoneIterator.Next())
         {
-            ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Invalid Motion Zone Size (%u)", mEndpointId,
-                         static_cast<unsigned>(zoneListSize));
-            handler.AddStatus(commandPath, Status::DynamicConstraintError);
-            return std::nullopt;
-        }
-
-        std::set<uint16_t> zoneIDsFound;
-        bool nullFound = false;
-
-        auto iterDup = commandData.motionZones.Value().Value().begin();
-        while (iterDup.Next())
-        {
-            auto & zoneOpt = iterDup.GetValue();
-
-            if (!zoneOpt.zone.IsNull())
+            const auto sensitivityStatus = ValidateZoneSensitivity(zoneIterator.GetValue());
+            if (sensitivityStatus != Status::Success)
             {
-                uint16_t zoneID = zoneOpt.zone.Value();
-                if (zoneIDsFound.count(zoneID) != 0)
-                {
-                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Duplicate Zone ID (=%u) in Motion Zones", mEndpointId,
-                                 zoneID);
-                    handler.AddStatus(commandPath, Status::AlreadyExists);
-                    return std::nullopt;
-                }
-                zoneIDsFound.emplace(zoneID);
-            }
-            else
-            {
-                if (nullFound)
-                {
-                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Duplicate Null Zone ID in Motion Zones", mEndpointId);
-                    handler.AddStatus(commandPath, Status::AlreadyExists);
-                    return std::nullopt;
-                }
-                nullFound = true;
-            }
-
-            if (mFeatures.Has(Feature::kPerZoneSensitivity))
-            {
-                if (!zoneOpt.sensitivity.HasValue())
-                {
-                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Missing Zone Sensitivity", mEndpointId);
-                    handler.AddStatus(commandPath, Status::InvalidCommand);
-                    return std::nullopt;
-                }
-
-                uint8_t sens = zoneOpt.sensitivity.Value();
-                if (sens < 1 || sens > 10)
-                {
-                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Zone sensitivity out of range: %u", mEndpointId, sens);
-                    handler.AddStatus(commandPath, Status::ConstraintError);
-                    return std::nullopt;
-                }
-            }
-            else if (zoneOpt.sensitivity.HasValue())
-            {
-                ChipLogError(Zcl,
-                             "HandleUpdateMotionZoneOptions[ep=%d]: Zone sensitivity provided without PerZoneSensitivity feature",
-                             mEndpointId);
-                handler.AddStatus(commandPath, Status::InvalidCommand);
+                handler.AddStatus(commandPath, sensitivityStatus);
                 return std::nullopt;
             }
         }
-
-        if (iterDup.GetStatus() != CHIP_NO_ERROR)
+        if (zoneIterator.GetStatus() != CHIP_NO_ERROR)
         {
             handler.AddStatus(commandPath, Status::InvalidCommand);
             return std::nullopt;
         }
-
-        auto iterZones = commandData.motionZones.Value().Value().begin();
-        while (iterZones.Next())
+        Structs::TransportTriggerOptionsStruct::DecodableType zoneOptions;
+        zoneOptions.triggerType = triggerType;
+        zoneOptions.motionZones = commandData.motionZones;
+        const auto zoneStatus   = ValidateMotionZones(zoneOptions);
+        if (zoneStatus != Status::Success)
         {
-            auto & zoneOpt = iterZones.GetValue();
-            if (!zoneOpt.zone.IsNull())
-            {
-                Status zoneIdStatus = mDelegate->ValidateZoneId(zoneOpt.zone.Value());
-                if (zoneIdStatus != Status::Success)
-                {
-                    auto status = to_underlying(StatusCodeEnum::kInvalidZone);
-                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Invalid ZoneId (%u)", mEndpointId,
-                                 zoneOpt.zone.Value());
-                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
-                    return std::nullopt;
-                }
-            }
-        }
-
-        if (iterZones.GetStatus() != CHIP_NO_ERROR)
-        {
-            handler.AddStatus(commandPath, Status::InvalidCommand);
+            handler.AddStatus(commandPath, zoneStatus.GetStatusCode());
             return std::nullopt;
         }
     }
