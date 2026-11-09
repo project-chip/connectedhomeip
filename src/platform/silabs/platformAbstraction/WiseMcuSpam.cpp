@@ -97,7 +97,8 @@ static bool sSiWxKeepAwakePs4Active      = false;
 
 <<<<<<< HEAD
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
-int soc_pll_config(void)
+    int
+    soc_pll_config(void)
 {
     int32_t status = RSI_OK;
 
