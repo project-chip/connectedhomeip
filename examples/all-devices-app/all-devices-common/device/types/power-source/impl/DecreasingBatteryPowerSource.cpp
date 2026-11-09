@@ -16,9 +16,22 @@
  */
 #include "DecreasingBatteryPowerSource.h"
 
+#include <algorithm>
+
 namespace chip::app {
 
+namespace {
+
 constexpr System::Clock::Seconds16 kDecreaseBatteryLevelInterval = System::Clock::Seconds16(1);
+
+// BatPercentRemaining is a doubled percentage: 200 == 100%.
+constexpr uint8_t kFullBatteryLevelHalfPercent = 200;
+constexpr uint8_t kBatteryLevelStepHalfPercent = 5;
+
+constexpr uint32_t kFullVoltageMv  = 3000;
+constexpr uint32_t kEmptyVoltageMv = 2000;
+
+} // namespace
 
 DecreasingBatteryPowerSource::DecreasingBatteryPowerSource(TimerDelegate & timerDelegate) :
     BatteryPowerSource("Decreasing Battery Power Source"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable,
@@ -34,14 +47,21 @@ CHIP_ERROR DecreasingBatteryPowerSource::Register(EndpointId endpoint, CodeDrive
                                                   EndpointComposition composition)
 {
     ReturnErrorOnFailure(BatteryPowerSource::Register(endpoint, provider, composition));
-    // Kick off the timer loop to decrease battery level every few seconds
-    return mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval);
+
+    CHIP_ERROR err = mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval);
+    if (err != CHIP_NO_ERROR)
+    {
+        BatteryPowerSource::Unregister(provider);
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 void DecreasingBatteryPowerSource::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    BatteryPowerSource::Unregister(provider);
     mTimerDelegate.CancelTimer(this);
+    BatteryPowerSource::Unregister(provider);
 }
 
 void DecreasingBatteryPowerSource::TimerFired()
@@ -51,39 +71,29 @@ void DecreasingBatteryPowerSource::TimerFired()
 
     if (batteryLevel.IsNull())
     {
-        batteryLevel.SetNonNull(200); // 100% (doubled percentage)
+        batteryLevel.SetNonNull(kFullBatteryLevelHalfPercent);
     }
     else if (batteryLevel.Value() > 0)
     {
-        batteryLevel.SetNonNull(batteryLevel.Value() - 5); // decrease by 2.5%
+        const uint8_t level = batteryLevel.Value();
+        batteryLevel.SetNonNull(static_cast<uint8_t>(level - std::min(level, kBatteryLevelStepHalfPercent)));
     }
     else
     {
-        batteryLevel.SetNull(); // set to null when it reaches 0%
+        batteryLevel.SetNull();
     }
 
     LogErrorOnFailure(batteryCluster.SetBatPercentRemaining(batteryLevel));
 
-    // Also drop the battery voltage linearly with the remaining percentage so
-    // commissioners that periodically read attributes can display a voltage reading.
-    constexpr uint32_t kFullVoltageMv  = 3000;
-    constexpr uint32_t kEmptyVoltageMv = 2000;
     DataModel::Nullable<uint32_t> batteryVoltage;
-    if (batteryLevel.IsNull())
+    if (!batteryLevel.IsNull())
     {
-        batteryVoltage.SetNull();
-    }
-    else
-    {
-        // batteryLevel is a doubled percentage in the range [0, 200].
-        const uint32_t percent = batteryLevel.Value();
-        const uint32_t voltage = kEmptyVoltageMv + ((kFullVoltageMv - kEmptyVoltageMv) * percent) / 200;
-        batteryVoltage.SetNonNull(voltage);
+        const uint32_t level = batteryLevel.Value();
+        batteryVoltage.SetNonNull(kEmptyVoltageMv + ((kFullVoltageMv - kEmptyVoltageMv) * level) / kFullBatteryLevelHalfPercent);
     }
     batteryCluster.SetBatVoltage(batteryVoltage);
 
-    // Restart the timer to continue decreasing the battery level
-    SuccessOrDie(mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval));
+    LogErrorOnFailure(mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval));
 }
 
 } // namespace chip::app
