@@ -231,12 +231,12 @@ public:
      * Must succeed even for unoccupied slots (userStatus == kAvailable), the
      * slot content is only populated for occupied ones.
      *
-     * @param[in] userIndex 1-based user index, guaranteed within
-     *            NumberOfTotalUsersSupported
+     * @param[in] userOneBaseIndex 1-based user index (spec index 0 is invalid),
+     *            guaranteed within NumberOfTotalUsersSupported
      * @param[out] user the user record
      * @retval true if the user index is within the application database
      */
-    virtual bool GetUser(uint16_t userIndex, UserInfo & user) const { return false; }
+    virtual bool GetUser(uint16_t userOneBaseIndex, UserInfo & user) const { return false; }
 
     /**
      * @brief Create, modify or clear a user record.
@@ -244,8 +244,10 @@ public:
      * A clear request passes kUndefinedFabricIndex for creator and modifier,
      * an empty name, 0 uniqueId, kAvailable status, kUnrestrictedUser type,
      * kSingle credential rule and no credentials.
+     *
+     * @param[in] userOneBaseIndex 1-based user index (spec index 0 is invalid).
      */
-    virtual bool SetUser(uint16_t userIndex, FabricIndex creator, FabricIndex modifier, const CharSpan & userName,
+    virtual bool SetUser(uint16_t userOneBaseIndex, FabricIndex creator, FabricIndex modifier, const CharSpan & userName,
                          uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum userType, CredentialRuleEnum credentialRule,
                          const CredentialStruct * credentials, size_t totalCredentials)
     {
@@ -258,8 +260,8 @@ public:
      * @brief Read a credential record. Must succeed even for unoccupied slots;
      * only populated for occupied ones.
      *
-     * @param[in] credentialIndex 1-based credential index for PIN/RFID/finger
-     *            kinds; 0 for the Programming PIN.
+     * @param[in] credentialIndex 1-based for all credential types except
+     *            kProgrammingPIN, which uses 0.
      */
     virtual bool GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType, CredentialInfo & credential) const
     {
@@ -278,26 +280,90 @@ public:
     }
 
     // ---- Schedules -----------------------------------------------------------------
+    //
+    // All schedule and user index arguments in this section are 1-based
+    // (spec index 0 is invalid). GetSchedule must return DlStatus::kNotFound
+    // when the requested slot is not occupied, and SetSchedule clears the
+    // slot when called with DlScheduleStatus::kAvailable.
 
-    virtual DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, WeekDaySchedule & schedule)
+    /**
+     * @brief Access the Week Day schedule in the schedules database.
+     *
+     * @param[in] weekDayIndex 1-based index of the week day schedule to access.
+     *            Guaranteed within NumberOfWeekDaySchedulesSupportedPerUser.
+     * @param[in] userOneBaseIndex 1-based index of the user to get the week day
+     *            schedule for. Guaranteed within NumberOfTotalUsersSupported.
+     * @param[out] schedule Resulting week day schedule.
+     *
+     * @retval DlStatus::kSuccess if schedule was retrieved successfully
+     * @retval DlStatus::kNotFound if the schedule or user does not exist
+     * @retval DlStatus::kFailure in case of any other failure
+     */
+    virtual DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userOneBaseIndex, WeekDaySchedule & schedule) const
     {
         return DlStatus::kFailure;
     }
-    virtual DlStatus SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status, DaysMaskMap daysMask,
+
+    /**
+     * @brief Set the Week Day schedule in the schedules database.
+     *
+     * @param[in] weekDayIndex 1-based index of the week day schedule to set.
+     * @param[in] userOneBaseIndex 1-based index of the user.
+     * @param[in] status kAvailable clears the slot; kOccupied sets it.
+     */
+    virtual DlStatus SetSchedule(uint8_t weekDayIndex, uint16_t userOneBaseIndex, DlScheduleStatus status, DaysMaskMap daysMask,
                                  uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
     {
         return DlStatus::kFailure;
     }
-    virtual DlStatus GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, YearDaySchedule & schedule)
+
+    /**
+     * @brief Access the Year Day schedule in the schedules database.
+     *
+     * @param[in] yearDayIndex 1-based index of the year day schedule to access.
+     *            Guaranteed within NumberOfYearDaySchedulesSupportedPerUser.
+     * @param[in] userOneBaseIndex 1-based index of the user.
+     * @param[out] schedule Resulting year day schedule.
+     *
+     * @retval DlStatus::kSuccess / kNotFound / kFailure, same semantics as the
+     *         week day schedule getter.
+     */
+    virtual DlStatus GetSchedule(uint8_t yearDayIndex, uint16_t userOneBaseIndex, YearDaySchedule & schedule) const
     {
         return DlStatus::kFailure;
     }
-    virtual DlStatus SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status, uint32_t localStartTime,
+
+    /**
+     * @brief Set the Year Day schedule in the schedules database.
+     *
+     * @param[in] yearDayIndex 1-based index of the year day schedule to set.
+     * @param[in] userOneBaseIndex 1-based index of the user.
+     * @param[in] status kAvailable clears the slot; kOccupied sets it.
+     */
+    virtual DlStatus SetSchedule(uint8_t yearDayIndex, uint16_t userOneBaseIndex, DlScheduleStatus status, uint32_t localStartTime,
                                  uint32_t localEndTime)
     {
         return DlStatus::kFailure;
     }
-    virtual DlStatus GetSchedule(uint8_t holidayIndex, HolidaySchedule & schedule) { return DlStatus::kFailure; }
+
+    /**
+     * @brief Access the Holiday schedule in the schedules database.
+     *
+     * @param[in] holidayIndex 1-based index of the holiday schedule to access.
+     *            Guaranteed within NumberOfHolidaySchedulesSupported.
+     * @param[out] schedule Resulting holiday schedule.
+     *
+     * @retval DlStatus::kSuccess / kNotFound / kFailure, same semantics as the
+     *         week day schedule getter.
+     */
+    virtual DlStatus GetSchedule(uint8_t holidayIndex, HolidaySchedule & schedule) const { return DlStatus::kFailure; }
+
+    /**
+     * @brief Set the Holiday schedule in the schedules database.
+     *
+     * @param[in] holidayIndex 1-based index of the holiday schedule to set.
+     * @param[in] status kAvailable clears the slot; kOccupied sets it.
+     */
     virtual DlStatus SetSchedule(uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
                                  OperatingModeEnum operatingMode)
     {

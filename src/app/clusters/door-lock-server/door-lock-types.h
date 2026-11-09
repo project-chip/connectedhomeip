@@ -25,6 +25,11 @@
 
 #include <algorithm>
 
+// TODO: The local-buffer build variant couples these library data types to the
+// CHIPProjectConfig.h compile arguments of a single application, which means
+// every such build has its own struct layout. This is inherited from the
+// legacy design; revisit so buffered and unbuffered variants can be separated
+// from the "single libCHIP for everyone" types.
 /**
  * Structs can be built to only use local (stack / member) buffers instead of
  * external ones; in that configuration the spans inside the structs re-bind on
@@ -34,16 +39,11 @@
 #define DOOR_LOCK_USE_LOCAL_BUFFER 0
 #endif
 
-// Local-buffer sizes, only used when DOOR_LOCK_USE_LOCAL_BUFFER is enabled;
+// Local-buffer sizes, required when DOOR_LOCK_USE_LOCAL_BUFFER is enabled;
 // applications providing their own local buffer configuration (e.g. the silabs
-// lock app) define these in their CHIPProjectConfig.h.
-#ifndef DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH
-#define DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH 20
-#endif
-
-#ifndef DOOR_LOCK_USER_CREDENTIALS_BUFFER_LENGTH
-#define DOOR_LOCK_USER_CREDENTIALS_BUFFER_LENGTH 5
-#endif
+// lock app) define these in their CHIPProjectConfig.h. No defaults on purpose:
+// a build that forgets to size its buffers fails at compile time instead of
+// aborting at the copy that overflows.
 
 namespace chip {
 namespace app {
@@ -51,9 +51,9 @@ namespace Clusters {
 namespace DoorLock {
 
 /// Maximum size of the user name (in characters).
-inline constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE = 10;
+inline constexpr size_t kDoorLockMaxUsernameSize = 10;
 /// Maximum size of the user name string (in bytes).
-inline constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE = DOOR_LOCK_MAX_USER_NAME_SIZE + 1;
+inline constexpr size_t kDoorLockUsernameBufferSize = kDoorLockMaxUsernameSize + 1;
 
 using CredentialStruct = Structs::CredentialStruct::Type;
 
@@ -94,7 +94,7 @@ struct CredentialInfo
 #if DOOR_LOCK_USE_LOCAL_BUFFER
     MutableByteSpan credentialData; /**< Credential data bytes. */
 #else
-    ByteSpan credentialData;                  /**< Credential data bytes. */
+    ByteSpan credentialData; /**< Credential data bytes. */
 #endif
     DlAssetSource creationSource;
     FabricIndex createdBy; /**< Index of the fabric that created the user. */
@@ -155,7 +155,7 @@ struct UserInfo
     FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
 
 #if DOOR_LOCK_USE_LOCAL_BUFFER
-    char nameBuffer[DOOR_LOCK_MAX_USER_NAME_SIZE];
+    char nameBuffer[kDoorLockMaxUsernameSize];
     CredentialStruct credentialsBuffer[DOOR_LOCK_USER_CREDENTIALS_BUFFER_LENGTH];
     UserInfo()
     {

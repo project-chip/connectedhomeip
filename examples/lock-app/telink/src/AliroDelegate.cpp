@@ -184,21 +184,6 @@ CHIP_ERROR AliroDelegate::ClearAliroReaderConfig()
     }
 }
 
-const AliroDelegate::CredentialSlot * AliroDelegate::SlotArrayForType(CredentialTypeEnum type) const
-{
-    switch (type)
-    {
-    case CredentialTypeEnum::kAliroCredentialIssuerKey:
-        return mIssuerKeys;
-    case CredentialTypeEnum::kAliroEvictableEndpointKey:
-        return mEvictableEndpointKeys;
-    case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
-        return mNonEvictableEndpointKeys;
-    default:
-        return nullptr;
-    }
-}
-
 AliroDelegate::CredentialSlot * AliroDelegate::SlotArrayForType(CredentialTypeEnum type)
 {
     switch (type)
@@ -214,7 +199,7 @@ AliroDelegate::CredentialSlot * AliroDelegate::SlotArrayForType(CredentialTypeEn
     }
 }
 
-bool AliroDelegate::GetCredential(uint16_t index, CredentialTypeEnum type, EmberAfPluginDoorLockCredentialInfo & out) const
+bool AliroDelegate::GetAliroCredential(uint16_t index, CredentialTypeEnum type, EmberAfPluginDoorLockCredentialInfo & out)
 {
     const CredentialSlot * slots = SlotArrayForType(type);
     VerifyOrReturnValue(slots != nullptr, false);
@@ -229,13 +214,13 @@ bool AliroDelegate::GetCredential(uint16_t index, CredentialTypeEnum type, Ember
     out.modificationSource = DlAssetSource::kMatterIM;
     out.credentialData     = chip::ByteSpan{ slot.data, slot.dataSize };
 
-    ChipLogProgress(Zcl, "AliroDelegate::GetCredential [type=%u,index=%u,status=%d]", to_underlying(type), index,
+    ChipLogProgress(Zcl, "AliroDelegate::GetAliroCredential [type=%u,index=%u,status=%d]", to_underlying(type), index,
                     (int) slot.status);
 
     return true;
 }
 
-bool AliroDelegate::SetCredential(uint16_t index, chip::FabricIndex creator, chip::FabricIndex modifier, DlCredentialStatus status,
+bool AliroDelegate::SetAliroCredential(uint16_t index, chip::FabricIndex creator, chip::FabricIndex modifier, DlCredentialStatus status,
                                   CredentialTypeEnum type, const chip::ByteSpan & data)
 {
     CredentialSlot * slots = SlotArrayForType(type);
@@ -260,7 +245,7 @@ bool AliroDelegate::SetCredential(uint16_t index, chip::FabricIndex creator, chi
     slot.createdBy      = creator;
     slot.lastModifiedBy = modifier;
 
-    ChipLogProgress(Zcl, "AliroDelegate::SetCredential [type=%u,index=%u,dataSize=%u]", to_underlying(type), index,
+    ChipLogProgress(Zcl, "AliroDelegate::SetAliroCredential [type=%u,index=%u,dataSize=%u]", to_underlying(type), index,
                     static_cast<unsigned int>(data.size()));
 
     return true;
