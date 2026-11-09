@@ -204,6 +204,16 @@
         android:textColor="@color/centerTextSecondary"
         android:visibility="gone" />
 
+    <!-- Last Check-in Text -->
+    <TextView
+        android:id="@+id/lastCheckInText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textSize="11sp"
+        android:textColor="@color/centerTextSecondary"
+        android:visibility="gone" />
+
     <!-- Aliases Display -->
     <TextView
         android:id="@+id/aliasesText"

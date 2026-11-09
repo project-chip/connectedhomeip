@@ -38,6 +38,16 @@ def download_and_extract_zip(url, dest_dir, *member_names):
                 zip_file.extract(member, dest_dir)
 
 
+def cipd_package_tag(cipd_json_file, package_path):
+    with open(cipd_json_file) as fh:
+        for pkg in json.load(fh).get('packages', ()):
+            if pkg.get('path') == package_path:
+                if tags := pkg.get('tags', ()):
+                    print(tags[0])
+                    return
+    fail(f"Unable to find tag for CIPD package '{package_path}' in {cipd_json_file}")
+
+
 def process_project_args(gn_args_json_file, *params):
     processor = ProjectArgProcessor(gn_args_json_file)
     processor.process_env()
