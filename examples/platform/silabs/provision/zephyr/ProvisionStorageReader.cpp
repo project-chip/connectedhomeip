@@ -230,7 +230,7 @@ CHIP_ERROR ProvisionStorageReader::DecryptUsingOtaTlvEncryptionKey(MutableByteSp
 CHIP_ERROR ProvisionStorageReader::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
     uint8_t key[TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
-    size_t keyLength                                      = 0;
+    size_t keyLength                                        = 0;
     VerifyOrReturnError(keySpan.size() >= sizeof(key), CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorOnFailure(
         ZephyrConfig::ReadConfigValueBin(ZephyrStorage::kConfigKeyTestEventTriggerKey, key, sizeof(key), keyLength));
