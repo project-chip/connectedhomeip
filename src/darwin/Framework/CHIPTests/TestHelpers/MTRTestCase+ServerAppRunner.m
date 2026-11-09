@@ -206,6 +206,10 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 - (nullable MTRTestCaseServerApp *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments controller:(MTRDeviceController *)controller nodeID:(NSNumber *)nodeID
 {
     NSString * payloadString = [self.class _payloadWithRandomDiscriminatorAndPasscode];
+    if (payloadString == nil) {
+        // The helper has already failed the test; starting an app with no payload would throw.
+        return nil;
+    }
     return [self startCommissionedAppWithName:name arguments:arguments controller:controller payload:payloadString nodeID:nodeID];
 }
 
@@ -224,6 +228,10 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 + (MTRDeviceController *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments nodeID:(NSNumber *)nodeID
 {
     NSString * payloadString = [self _payloadWithRandomDiscriminatorAndPasscode];
+    if (payloadString == nil) {
+        // The helper has already failed the test; starting an app with no payload would throw.
+        return nil;
+    }
     return [self startCommissionedAppWithName:name arguments:arguments payload:payloadString nodeID:nodeID];
 }
 
