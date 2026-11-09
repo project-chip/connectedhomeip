@@ -704,21 +704,23 @@ TEST_F(TestUdcMessages, TestUDCCommissionerDeclarationWrongFieldType)
     ASSERT_EQ(writer.EndContainer(envelopeType), CHIP_NO_ERROR);
     ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    CommissionerDeclaration cd;
-    EXPECT_NE(cd.ReadPayload(payload, writer.GetLengthWritten()), CHIP_NO_ERROR);
+    CommissionerDeclaration cdOut;
+    EXPECT_NE(cdOut.ReadPayload(payload, writer.GetLengthWritten()), CHIP_NO_ERROR);
 }
 
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclarationTruncatedPayload)
 {
-    CommissionerDeclaration id;
-    id.SetNeedsPasscode(true);
-    id.SetPasscodeLength(8);
+    uint8_t payload[64];
+    TLV::TLVWriter writer;
+    writer.Init(payload);
 
-    uint8_t payload[500];
-    uint32_t length = id.WritePayload(payload, sizeof(payload));
-    ASSERT_GT(length, 2u);
+    TLV::TLVType envelopeType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, envelopeType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.PutBoolean(TLV::ContextTag(kTestCdNeedsPasscodeTag), true), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(envelopeType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    // Drop the end-of-container marker and the last element's value.
-    CommissionerDeclaration cd;
-    EXPECT_NE(cd.ReadPayload(payload, length - 2), CHIP_NO_ERROR);
+    // Drop the end-of-container marker.
+    CommissionerDeclaration cdOut;
+    EXPECT_NE(cdOut.ReadPayload(payload, writer.GetLengthWritten() - 1), CHIP_NO_ERROR);
 }
