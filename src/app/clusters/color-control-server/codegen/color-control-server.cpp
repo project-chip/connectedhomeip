@@ -1509,12 +1509,10 @@ Status ColorControlServer::moveHueCommand(EndpointId endpoint, HueMoveMode moveM
  * @param[in] transitionTime
  * @param[in] optionsMask
  * @param[in] optionsOverride
- * @param[in] isEnhanced If True, function was called by EnhancedMoveHue command and rate is a uint16 value. If False function
- * was called by MoveHue command and rate is a uint8 value.
+ * @param[in] isEnhanced If true, invoked by EnhancedMoveToHue; otherwise by MoveToHue.
  * @return Status::Success when successful,
- *         Status::InvalidCommand when Rate is 0 or an unknown moveDirection is provided
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state,
- *         Status::ConstraintError when the other parameters are outside their defined value range.
+ *         Status::ConstraintError when moveDirection or another parameter is outside its defined value range.
  */
 Status ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, DirectionEnum moveDirection, uint16_t transitionTime,
                                             BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride,

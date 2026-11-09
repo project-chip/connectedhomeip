@@ -97,7 +97,8 @@ tests:
       response:
           error: INVALID_IN_STATE
 
-    - label: "Step 7: TH reads NumberOfRinses unchanged after the rejected write"
+    - label:
+          "Step 7: TH reads NumberOfRinses unchanged after the rejected write"
       PICS: WASHERCTRL.S.A0002
       command: "readAttribute"
       attribute: "NumberOfRinses"
@@ -113,7 +114,8 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "Step 9: TH reads NumberOfRinses unchanged after the undefined write"
+    - label:
+          "Step 9: TH reads NumberOfRinses unchanged after the undefined write"
       PICS: WASHERCTRL.S.A0002
       command: "readAttribute"
       attribute: "NumberOfRinses"
