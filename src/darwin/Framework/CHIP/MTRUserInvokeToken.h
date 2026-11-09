@@ -46,8 +46,10 @@ MTR_PROVISIONALLY_AVAILABLE
  * Cancels the invoke if it has not been sent yet.  A cancelled invoke completes with MTRErrorCodeCancelled and is
  * never sent.
  *
- * Returns YES if the invoke was still queued and will never be sent.  Returns NO if it was already sent or
- * finished, and for an XPC device.  An invoke already sent completes as usual.
+ * Returns YES if the invoke was still queued and will never be sent, or if the token has not been passed to an
+ * invoke yet: an invoke given a token cancelled that way completes with MTRErrorCodeCancelled and is never sent, on
+ * any device.  Returns NO if the invoke was already sent or finished, and for an XPC device once the invoke was
+ * made.  An invoke already sent completes as usual.
  */
 - (BOOL)cancel;
 
