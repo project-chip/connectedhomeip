@@ -96,6 +96,10 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
 
+#if CHIP_MEMORY_SANITIZER_ENABLED
+#include <sanitizer/msan_interface.h>
+#endif
+
 namespace chip {
 namespace Callback {
 
@@ -188,8 +192,18 @@ public:
      *
      * This is called automatically by Cancel() after the CancelFn has been invoked, but can also
      * be called manually as part of removing the cancelable from a data structure.
+     *
+     * The resulting values of mPrev and mNext are unspecified; no code may test or dereference them.
+     * MSAN builds mark them as uninitialized so that any such use is reported.
      */
-    void Invalidate() { mPrev = mNext = nullptr; }
+    void Invalidate()
+    {
+        mPrev = mNext = nullptr;
+#if CHIP_MEMORY_SANITIZER_ENABLED
+        __msan_allocated_memory(&mPrev, sizeof(mPrev));
+        __msan_allocated_memory(&mNext, sizeof(mNext));
+#endif
+    }
 
     // Not copyable
     Cancelable(const Cancelable &)             = delete;
