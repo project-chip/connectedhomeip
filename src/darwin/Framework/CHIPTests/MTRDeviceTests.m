@@ -9082,6 +9082,61 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(reportedValue));
 }
 
+- (void)test064_MergedWriteFailureRemovesExpectedValueWhenFirstSkipped
+{
+    // A write that sets an expected value and is merged into an earlier queued write that did not set one loses its
+    // expected value when the merged write fails.  The accessory rejects both writes: the attribute only accepts
+    // values in [20, 100].
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    MTRAttributePath * path = [MTRAttributePath attributePathWithEndpointID:@(1)
+                                                                  clusterID:@(MTRClusterIDTypeUnitTestingID)
+                                                                attributeID:@(MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt8uID)];
+    const unsigned cachedValue = 70;
+    const unsigned firstValue = 0;
+    const unsigned expectedValue = 5;
+
+    XCTestExpectation * cached = [[XCTestExpectation alloc] initWithDescription:@"Cached value injected"];
+    delegate.onReportEnd = ^{
+        [cached fulfill];
+    };
+    [device unitTestInjectAttributeReport:@[ TestAttributeResponseValue(path.endpoint, path.cluster, path.attribute, cachedValue) ]
+                         fromSubscription:YES];
+    [self waitForExpectations:@[ cached ] timeout:kTimeoutInSeconds];
+    delegate.onReportEnd = nil;
+
+    NSMutableArray<NSDate *> * releaseTimes = HoldDeviceWorkQueue(device, 1);
+    delegate.skipExpectedValuesForWrite = YES;
+    [device writeAttributeWithEndpointID:path.endpoint
+                               clusterID:path.cluster
+                             attributeID:path.attribute
+                                   value:[self _expectedValueTestDataValue:firstValue]
+                   expectedValueInterval:@(60000)
+                       timedWriteTimeout:nil];
+    delegate.skipExpectedValuesForWrite = NO;
+    [device writeAttributeWithEndpointID:path.endpoint
+                               clusterID:path.cluster
+                             attributeID:path.attribute
+                                   value:[self _expectedValueTestDataValue:expectedValue]
+                   expectedValueInterval:@(60000)
+                       timedWriteTimeout:nil];
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(expectedValue));
+
+    // The work queue runs one item at a time, so this one runs once the write has completed, failure handling
+    // included.
+    XCTestExpectation * writeDone = [[XCTestExpectation alloc] initWithDescription:@"Write completed"];
+    MTRAsyncWorkItem * afterWrite = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    [afterWrite setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
+        [writeDone fulfill];
+        workCompletion(MTRAsyncWorkComplete);
+    }];
+    [device.asyncWorkQueue enqueueWorkItem:afterWrite description:@"After the write"];
+    [self waitForExpectations:@[ writeDone ] timeout:(3 * kTimeoutInSeconds)];
+    XCTAssertNotNil([self _waitForHoldRelease:releaseTimes]);
+
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(cachedValue));
+}
+
 @end
 
 @interface MTRDeviceResubscriptionTimerTests : MTRTestCase
