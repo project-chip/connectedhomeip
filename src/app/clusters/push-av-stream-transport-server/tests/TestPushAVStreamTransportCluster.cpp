@@ -2091,6 +2091,17 @@ TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotP
     auto & originalContext = mClusterTester.GetServerClusterContext();
     ServerClusterContext context{ originalContext.provider, originalContext.storage, persistence,
                                   originalContext.interactionContext };
+    PushAvStreamTransportServer unboundServer(1, BitFlags<Feature>());
+    ASSERT_EQ(unboundServer.Startup(context), CHIP_NO_ERROR);
+    EXPECT_EQ(unboundServer.Init(), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_FALSE(unboundServer.GetLogic().IsInitialized());
+    EXPECT_TRUE(unboundServer.GetLogic().mCurrentConnections.empty());
+    ASSERT_EQ(unboundServer.TrySetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(unboundServer.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.restorations, 1u);
+    unboundServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    delegate.associatedServer = nullptr;
+    delegate.restorations     = 0;
     ASSERT_EQ(mServer.Startup(context), CHIP_NO_ERROR);
     for (const auto scenario : { 0, 1, 2, 3 })
     {

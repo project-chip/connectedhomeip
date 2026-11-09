@@ -132,6 +132,7 @@ PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic() {}
 CHIP_ERROR PushAvStreamTransportServerLogic::Init(AttributePersistenceProvider & attributeStorage)
 {
     VerifyOrDie(mCluster != nullptr);
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     if (!mCurrentConnections.empty())
     {
