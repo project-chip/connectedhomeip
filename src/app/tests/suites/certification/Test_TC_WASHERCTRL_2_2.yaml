@@ -27,6 +27,9 @@ config:
         defaultValue: 1
     unsupportedNumberOfRinsesValue:
         type: enum8
+        defaultValue: 3
+    undefinedNumberOfRinsesValue:
+        type: enum8
         defaultValue: 4
 
 tests:
@@ -93,3 +96,26 @@ tests:
           value: unsupportedNumberOfRinsesValue
       response:
           error: INVALID_IN_STATE
+
+    - label: "Step 7: TH reads NumberOfRinses unchanged after the rejected write"
+      PICS: WASHERCTRL.S.A0002
+      command: "readAttribute"
+      attribute: "NumberOfRinses"
+      response:
+          value: NumberOfRinsesValue
+
+    - label: "Step 8: TH writes an undefined NumberOfRinses enum value"
+      PICS: WASHERCTRL.S.A0002
+      command: "writeAttribute"
+      attribute: "NumberOfRinses"
+      arguments:
+          value: undefinedNumberOfRinsesValue
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Step 9: TH reads NumberOfRinses unchanged after the undefined write"
+      PICS: WASHERCTRL.S.A0002
+      command: "readAttribute"
+      attribute: "NumberOfRinses"
+      response:
+          value: NumberOfRinsesValue

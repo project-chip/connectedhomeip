@@ -373,9 +373,9 @@ TEST_F(ThermostatTestFixture, TestSetpointRaiseLowerCommand)
             return writer.EndContainer(outer);
         }
     };
-    for (const uint8_t mode : { 3, 0x99 })
+    for (const uint8_t mode : { uint8_t{ 3 }, uint8_t{ 0x99 } })
     {
-        for (const int8_t amount : { 0, 10 })
+        for (const int8_t amount : { int8_t{ 0 }, int8_t{ 10 } })
         {
             RawModeRequest raw;
             raw.rawMode = mode;
