@@ -179,7 +179,7 @@ macro(matter_build target)
 
     if (ARG_LIB_MBEDTLS)
         target_include_directories(${target} INTERFACE
-            ${CHIP_ROOT}/third_party/mbedtls/v3/repo/include
+            ${CHIP_ROOT}/third_party/mbedtls/repo/include
         )
     endif()
 

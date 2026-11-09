@@ -20,6 +20,3 @@ matter_enable_tracing_support = true
 # Include to define nxp_crypto_impl
 import("${chip_root}/src/platform/nxp/crypto/se05x/args.gni")
 nxp_platform = "linux"
-
-# Stays on the Mbed TLS 2.28 tree until SE05x moves to 3.x (#75198).
-mbedtls_use_v2 = true

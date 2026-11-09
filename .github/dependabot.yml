@@ -33,7 +33,6 @@ updates:
     allow:
       - dependency-name: "third_party/pigweed/repo"
       - dependency-name: "third_party/mbedtls/repo"
-      - dependency-name: "third_party/mbedtls/v3/repo"
       - dependency-name: "third_party/openthread/repo"
 
       - dependency-name: "third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo"

@@ -15,28 +15,17 @@
 declare_args() {
   # Use a different target, such as a prebuilt MbedTLS.
   mbedtls_target = ""
-
-  # Build the default target from the Mbed TLS 2.28 tree (./repo) instead of
-  # 3.6 (./v3/repo), for builds that have not moved to 3.x yet.
-  mbedtls_use_v2 = false
 }
 
 if (mbedtls_target != "") {
   group("mbedtls") {
     public_deps = [ mbedtls_target ]
   }
-} else if (mbedtls_use_v2) {
-  import("mbedtls.gni")
-
-  mbedtls_target("mbedtls") {
-  }
 } else {
   import("mbedtls3.gni")
 
-  # Default (host) Mbed TLS: 3.6 LTS. Platform SDK targets that still build the
-  # 2.28 tree in ./repo use mbedtls.gni directly.
   mbedtls3_target("mbedtls") {
-    mbedtls_root = "v3/repo"
+    mbedtls_root = "repo"
 
     # Files added after 3.6.4 (the version mbedtls3.gni lists).
     sources = [
