@@ -35,7 +35,7 @@ public:
                                  System::PacketBufferHandle && payload) override;
 
     // We never expect responses to our StatusReport; this is only here because
-    // ExchangeDelegate requires subclasses to implenent it.
+    // ExchangeDelegate requires subclasses to implement it.
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
