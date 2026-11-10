@@ -1021,8 +1021,9 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable, MatterCluste
             emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
         }
 
-        CodegenDataModelProvider::Instance().NotifyEndpointChanged(
-            endpoint, emberAfParentEndpointFromIndex(index), enable ? DataModel::EndpointChangeType::kAdded : DataModel::EndpointChangeType::kRemoved);
+        CodegenDataModelProvider::Instance().NotifyEndpointChanged(endpoint, emberAfParentEndpointFromIndex(index),
+                                                                   enable ? DataModel::EndpointChangeType::kAdded
+                                                                          : DataModel::EndpointChangeType::kRemoved);
     }
 
     emberMetadataStructureGeneration++;
