@@ -20,8 +20,8 @@
 #include <credentials/FabricTable.h>
 #include <device/api/Interface.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
-#include <device/types/solar-power/PanelElectricalSensor.h>
 #include <device/types/power-source/WiredPowerSource.h>
+#include <device/types/solar-power/PanelElectricalSensor.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
