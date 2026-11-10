@@ -103,7 +103,8 @@ public:
     CHIP_ERROR CommitOpKeypairForFabric(FabricIndex) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     void RevertPendingKeypair() override {}
-    CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message, P256ECDSASignature & outSignature) const override
+    CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
+                                 P256ECDSASignature & outSignature) const override
     {
         VerifyOrReturnError(mKeypair != nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(fabricIndex == mFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -192,9 +193,9 @@ CHIP_ERROR InitCredentials()
     {
         P256SerializedKeypair opKey;
         ReturnErrorOnFailure(SerializeKeypair(sTestCert_Node01_02_PublicKey, sTestCert_Node01_02_PrivateKey, opKey));
-        ReturnErrorOnFailure(gInitiatorFabrics.AddNewFabricForTest(ByteSpan(sTestCert_Root01_Chip), ByteSpan{},
-                                                                   ByteSpan(sTestCert_Node01_02_Chip),
-                                                                   ByteSpan(opKey.ConstBytes(), opKey.Length()), &gInitiatorFabricIndex));
+        ReturnErrorOnFailure(
+            gInitiatorFabrics.AddNewFabricForTest(ByteSpan(sTestCert_Root01_Chip), ByteSpan{}, ByteSpan(sTestCert_Node01_02_Chip),
+                                                  ByteSpan(opKey.ConstBytes(), opKey.Length()), &gInitiatorFabricIndex));
     }
     const FabricInfo * initiatorFabric = gInitiatorFabrics.FindFabricWithIndex(gInitiatorFabricIndex);
     VerifyOrReturnError(initiatorFabric != nullptr, CHIP_ERROR_INTERNAL);
@@ -273,9 +274,9 @@ TEST_F(TestOperationalSessionSetupPhase, PhaseFollowsTheHandshake)
     auto & loopback                            = GetLoopback();
     loopback.mNumMessagesToAllowBeforeDropping = 2;
     loopback.mNumMessagesToDrop                = 1;
-    ASSERT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
-                                                                            &responder),
-              CHIP_NO_ERROR);
+    ASSERT_EQ(
+        GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1, &responder),
+        CHIP_NO_ERROR);
     ASSERT_EQ(responder.PrepareForSessionEstablishment(GetSecureSessionManager(), &gResponderFabrics, nullptr, nullptr,
                                                        &responderDelegate, ScopedNodeId(), NullOptional),
               CHIP_NO_ERROR);
@@ -303,9 +304,8 @@ TEST_F(TestOperationalSessionSetupPhase, PhaseFollowsTheHandshake)
     AddressResolve::ResolveResult result;
     result.address         = GetBobAddress();
     result.mrpRemoteConfig = GetDefaultMRPConfig();
-    setup->OnNodeAddressResolved(PeerId(gInitiatorFabrics.FindFabricWithIndex(gInitiatorFabricIndex)->GetCompressedFabricId(),
-                                        kResponderNodeId),
-                                 result);
+    setup->OnNodeAddressResolved(
+        PeerId(gInitiatorFabrics.FindFabricWithIndex(gInitiatorFabricIndex)->GetCompressedFabricId(), kResponderNodeId), result);
 
     // Sigma1 is out and the responder has not answered yet.
     ASSERT_NE(CASEClientOf(*setup), nullptr);
@@ -356,9 +356,8 @@ TEST_F(TestOperationalSessionSetupPhase, PhaseWhileWaitingForRetry)
     AddressResolve::ResolveResult result;
     result.address         = GetBobAddress();
     result.mrpRemoteConfig = GetDefaultMRPConfig();
-    setup->OnNodeAddressResolved(PeerId(gInitiatorFabrics.FindFabricWithIndex(gInitiatorFabricIndex)->GetCompressedFabricId(),
-                                        kResponderNodeId),
-                                 result);
+    setup->OnNodeAddressResolved(
+        PeerId(gInitiatorFabrics.FindFabricWithIndex(gInitiatorFabricIndex)->GetCompressedFabricId(), kResponderNodeId), result);
     ASSERT_NE(CASEClientOf(*setup), nullptr);
     ASSERT_EQ(CASEClientOf(*setup)->GetCASESessionState(), CASESession::State::kSentSigma1);
 
