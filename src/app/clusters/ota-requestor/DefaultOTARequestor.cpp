@@ -643,6 +643,12 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
         mBdxMessenger.Reset();
         break;
     case OTADownloader::State::kIdle:
+        if (reason == OTAChangeReasonEnum::kDelayByProvider)
+        {
+            // The provider answered the download with RESPONDER_BUSY. The driver schedules the same retry as for a Busy
+            // QueryImageResponse; the Idle transition below still generates the DownloadError event.
+            TEMPORARY_RETURN_IGNORED mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kBusy, System::Clock::kZero);
+        }
         if (reason != OTAChangeReasonEnum::kSuccess)
         {
             RecordErrorUpdateState(CHIP_ERROR_CONNECTION_ABORTED, reason);
