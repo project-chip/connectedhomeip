@@ -43,6 +43,7 @@
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
 #include <device/types/doorbell/Doorbell.h>
+#include <device/types/electrical-energy-tariff/impl/SimulatedElectricalEnergyTariff.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/extended-color-light/impl/LoggingExtendedColorLight.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
@@ -957,6 +958,13 @@ private:
                 });
             });
             RegisterAlias("thread-border-router", "thread-border-router-simulated");
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_ENERGY_TARIFF)
+        {
+            RegisterCreator("electrical-energy-tariff", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedElectricalEnergyTariff>();
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
         {

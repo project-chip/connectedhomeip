@@ -119,6 +119,10 @@ _available_devices = [
     "DOORBELL",
   ],
   [
+    "electrical-energy-tariff",
+    "ELECTRICAL_ENERGY_TARIFF",
+  ],
+  [
     "electrical-sensor",
     "ELECTRICAL_SENSOR",
   ],

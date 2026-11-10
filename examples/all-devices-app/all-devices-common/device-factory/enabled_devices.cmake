@@ -62,6 +62,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/Dishwasher.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/impl/EmulatedDishwasher.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/doorbell/Doorbell.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-energy-tariff/ElectricalEnergyTariff.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-energy-tariff/impl/SimulatedElectricalEnergyTariff.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/ElectricalSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/impl/SimulatedElectricalSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/impl/FakeReadings.cpp"
@@ -207,6 +209,7 @@ foreach(_key
         dimmable-plug-in-unit
         dishwasher
         doorbell
+        electrical-energy-tariff
         electrical-sensor
         extended-color-light
         extractor-hood
