@@ -1038,12 +1038,11 @@ def python_tests(
     with open("src/python_testing/test_metadata.yaml") as f:
         metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
-    nightly_tests = {item["name"] for item in metadata["nightly"]}
     dedicated_runner_tests = {item["name"]: item["reason"] for item in metadata["dedicated_runner"]}
 
     # NOTE: for slow tests. we add logs to not get impatient
     slow_test_duration = {
-        item["name"]: item["duration"] for item in metadata["slow_tests"] + metadata["nightly"]
+        item["name"]: item["duration"] for item in metadata["slow_tests"]
     }
 
     if not os.path.isdir("src/python_testing"):
@@ -1053,8 +1052,6 @@ def python_tests(
     skipped_dedicated_runner = []
     for file in glob.glob(os.path.join("src/python_testing/", "*.py")):
         if os.path.basename(file) in excluded_patterns:
-            continue
-        if not include_nightly and os.path.basename(file) in nightly_tests:
             continue
         if os.path.basename(file) in dedicated_runner_tests:
             skipped_dedicated_runner.append(os.path.basename(file))

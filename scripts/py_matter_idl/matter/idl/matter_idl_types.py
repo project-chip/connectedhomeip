@@ -70,6 +70,8 @@ class AttributeQuality(enum.Flag):
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
     TIMED_WRITE = enum.auto()
+    FIXED = enum.auto()
+    CHANGES_OMITTED = enum.auto()
 
 
 class AttributeStorage(enum.Enum):

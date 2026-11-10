@@ -1044,10 +1044,11 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
     ChipLogDetail(SecureChannel, "Peer (Initiator) assigned session ID %d", parsedSigma1.initiatorSessionId);
     SetPeerSessionId(parsedSigma1.initiatorSessionId);
 
-    // Set the Session parameters provided in the Sigma1 message
+    // A Sigma1 without the session parameters struct leaves the remote session parameters at their defaults,
+    // not at the values of a previous handshake.
+    SetRemoteSessionParameters(parsedSigma1.initiatorSessionParams);
     if (parsedSigma1.initiatorSessionParamStructPresent)
     {
-        SetRemoteSessionParameters(parsedSigma1.initiatorSessionParams);
         mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(GetRemoteSessionParameters());
     }
 

@@ -90,14 +90,14 @@ function main() { # ...
     PROJECT_ARGS=()
     while [[ $# -gt 0 ]]; do
         case "$1" in
-        --help) usage 0 ;;
-        --build-env-dir=*) BUILD_ENV_DIR="${1#*=}" ;;
-        --project=*) PROJECT="${1#*=}" ;;
-        +([A-Z_])=*) export "$1" ;;
-        *)
-            [[ -n "$PROJECT" ]] || fail "Invalid argument: '$1'"
-            PROJECT_ARGS+=("$1")
-            ;;
+            --help) usage 0 ;;
+            --build-env-dir=*) BUILD_ENV_DIR="${1#*=}" ;;
+            --project=*) PROJECT="${1#*=}" ;;
+            +([A-Z_])=*) export "$1" ;;
+            *)
+                [[ -n "$PROJECT" ]] || fail "Invalid argument: '$1'"
+                PROJECT_ARGS+=("$1")
+                ;;
         esac
         shift
     done
@@ -317,12 +317,12 @@ function download_zap() {
     read -r version <"${CHIP_ROOT}/scripts/setup/zap.version"
     local platform="$(uname -sm)" flavor
     case "$platform" in
-    Linux\ x86_64) flavor=linux-x64 ;;
-    Linux\ arm64) flavor=linux-arm64 ;;
-    Linux\ aarch64) flavor=linux-arm64 ;;
-    Darwin\ x86_64) flavor=mac-x64 ;;
-    Darwin\ arm64) flavor=mac-arm64 ;;
-    *) fail "Unable to determine zap flavor for $platform" ;;
+        Linux\ x86_64) flavor=linux-x64 ;;
+        Linux\ arm64) flavor=linux-arm64 ;;
+        Linux\ aarch64) flavor=linux-arm64 ;;
+        Darwin\ x86_64) flavor=mac-x64 ;;
+        Darwin\ arm64) flavor=mac-arm64 ;;
+        *) fail "Unable to determine zap flavor for $platform" ;;
     esac
     local url="https://github.com/project-chip/zap/releases/download/${version}/zap-${flavor}.zip"
 

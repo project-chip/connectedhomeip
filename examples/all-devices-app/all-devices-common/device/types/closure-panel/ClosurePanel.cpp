@@ -15,6 +15,7 @@
  */
 
 #include "ClosurePanel.h"
+#include <clusters/shared/Enums.h>
 #include <devices/Types.h>
 
 namespace {
@@ -24,8 +25,9 @@ CHIP_ERROR ValidateClosurePanelTagList(chip::Span<const chip::app::EndpointCompo
     size_t panelTagCount = 0;
     for (auto & tag : tags)
     {
-        VerifyOrReturnError(tag.namespaceID != chip::app::CommonNamespace::kClosureId, CHIP_ERROR_INVALID_ARGUMENT);
-        if (tag.namespaceID == chip::app::CommonNamespace::kClosurePanelId)
+        VerifyOrReturnError(tag.namespaceID != chip::to_underlying(chip::app::Clusters::Globals::SemanticTagNamespaceId::kClosure),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+        if (tag.namespaceID == chip::to_underlying(chip::app::Clusters::Globals::SemanticTagNamespaceId::kClosurePanel))
         {
             ++panelTagCount;
         }

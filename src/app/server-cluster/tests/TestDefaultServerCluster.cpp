@@ -120,6 +120,8 @@ TEST(TestDefaultServerCluster, AttributesDefault)
     for (size_t i = 0; i < 5; i++)
     {
         ASSERT_EQ(data[i].HasFlags(AttributeQualityFlags::kListAttribute), (i >= 2));
+        // The specification gives every global attribute the Fixed quality.
+        ASSERT_TRUE(data[i].HasFlags(AttributeQualityFlags::kFixed));
         ASSERT_EQ(data[i].GetReadPrivilege(), Access::Privilege::kView);
         ASSERT_FALSE(data[i].GetWritePrivilege().has_value());
     }

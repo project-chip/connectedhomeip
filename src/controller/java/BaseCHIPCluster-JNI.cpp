@@ -9,10 +9,20 @@
 
 #define CHIP_TLV_WRITER_BUFFER_SIZE 1024
 
+namespace {
+constexpr size_t kMaxTlvNestingDepth = 32;
+} // namespace
+
 jobject decodeValueFromTLV(JNIEnv * env, chip::TLV::TLVReader * data);
+static jobject decodeValueFromTLV(JNIEnv * env, chip::TLV::TLVReader * data, size_t depth);
 static CHIP_ERROR encodeTLVFromValue(JNIEnv * env, jobject jObject, chip::TLV::TLVWriter & writer, chip::TLV::Tag tag);
 
 jobject decodeValueFromTLV(JNIEnv * env, chip::TLV::TLVReader * data)
+{
+    return decodeValueFromTLV(env, data, 0);
+}
+
+static jobject decodeValueFromTLV(JNIEnv * env, chip::TLV::TLVReader * data, size_t depth)
 {
     chip::TLV::TLVType dataTLVType = data->GetType();
     switch (dataTLVType)
@@ -92,6 +102,9 @@ jobject decodeValueFromTLV(JNIEnv * env, chip::TLV::TLVReader * data)
     }
     case chip::TLV::kTLVType_Structure:
     case chip::TLV::kTLVType_Array: {
+        VerifyOrReturnValue(depth < kMaxTlvNestingDepth, nullptr,
+                            ChipLogError(Controller, "Error: TLV nesting depth limit (%zu) exceeded", kMaxTlvNestingDepth));
+
         chip::TLV::TLVType tlvType;
         CHIP_ERROR err = data->EnterContainer(tlvType);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
@@ -105,10 +118,8 @@ jobject decodeValueFromTLV(JNIEnv * env, chip::TLV::TLVReader * data)
         while ((err = data->Next()) == CHIP_NO_ERROR)
         {
             chip::TLV::Tag tag = data->GetTag();
-            jobject value      = decodeValueFromTLV(env, data);
-            VerifyOrReturnValue(
-                value != nullptr, nullptr,
-                ChipLogError(Controller, "Error when decoding TLV container of type : %" CHIP_ERROR_FORMAT, err.Format()));
+            jobject value      = decodeValueFromTLV(env, data, depth + 1);
+            VerifyOrReturnValue(value != nullptr, nullptr);
 
             jobject jValue = nullptr;
             if (dataTLVType == chip::TLV::kTLVType_Structure)

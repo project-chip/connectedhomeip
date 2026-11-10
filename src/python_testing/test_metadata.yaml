@@ -133,8 +133,6 @@ not_automated:
       reason: Shared code for TC_SEPR, not a standalone test
     - name: TC_SETRF_TestBase.py
       reason: Shared code for TC_SETRF, not a standalone test
-    - name: TC_SUTestBase.py
-      reason: Shared code for TC_SU, not a standalone test
     - name: TC_COMMTR_TestBase.py
       reason: Shared code for TC_COMMTR, not a standalone test
     - name: TC_MTRIDTestBase.py
@@ -386,7 +384,6 @@ slow_tests:
     - { name: TC_JFADMIN_1_4.py, duration: 1.5 minutes }
     - { name: TC_JFADMIN_2_1.py, duration: 30 seconds }
     - { name: TC_JFADMIN_2_2.py, duration: 30 seconds }
-nightly:
     - { name: TC_SU_2_2.py, duration: 35 minutes }
     - { name: TC_SU_2_4.py, duration: 10 minutes }
     - { name: TC_SU_2_5.py, duration: 20 minutes }

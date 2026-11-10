@@ -23,6 +23,7 @@ import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import AsyncReadTransaction
@@ -65,22 +66,6 @@ _MAX_ZIP_TOTAL_BYTES = 50 * 1024 * 1024  # 50 MiB
 _ARCHIVE_METADATA_ENTRIES = frozenset({
     '__MACOSX', '.DS_Store', 'Thumbs.db', 'desktop.ini',
 })
-
-
-def _find_endpoint_subdir(root_dir: str, endpoint: int) -> str | None:
-    """
-    Find the subdirectory under root_dir whose name resolves to `endpoint`.
-    Tolerates common conventions: endpoint0, Endpoint_0, EP0, ep 0, 0, etc.
-    Case-insensitive. Returns None if no match.
-    """
-    for name in os.listdir(root_dir):
-        full = os.path.join(root_dir, name)
-        if not os.path.isdir(full):
-            continue
-        match = _ENDPOINT_DIR_PATTERN.match(name)
-        if match and int(match.group(1)) == endpoint:
-            return full
-    return None
 
 
 def _safe_extract_zip(zip_path: str, dest: str) -> None:
@@ -145,26 +130,6 @@ def _pics_root_within(extract_dir: str) -> str:
     return extract_dir
 
 
-def _read_pics_from_directory(path: str, endpoint: int | None) -> dict[str, bool]:
-    """
-    Load PICS XML files from a directory tree. See `read_pics_from_file`
-    for the loading rules; this is the shared implementation used both for
-    directory paths and for the temporary directory an archive is
-    extracted into.
-    """
-    pics_dict: dict[str, bool] = {}
-    for filename in glob.glob(f'{path}/*.xml'):
-        with open(filename) as f:
-            pics_dict.update(parse_pics_xml(f.read()))
-    if endpoint is not None:
-        ep_dir = _find_endpoint_subdir(path, endpoint)
-        if ep_dir is not None:
-            for filename in glob.glob(f'{ep_dir}/*.xml'):
-                with open(filename) as f:
-                    pics_dict.update(parse_pics_xml(f.read()))
-    return pics_dict
-
-
 def event_pics_str(pics_base: str, eid: int) -> str:
     return f'{pics_base}.S.E{eid:02x}'
 
@@ -211,7 +176,15 @@ def parse_pics(lines: list[str]) -> dict[str, bool]:
     return pics
 
 
-def parse_pics_xml(contents: str) -> dict[str, bool]:
+def parse_pics_xml(contents: str, endpoint: int = 0) -> dict[int, dict[str, bool]]:
+    """
+    Parse a single PICSGenerator XML file into an endpoint-keyed PICS tree of
+    the form {endpoint: {pics_code: supported}}.
+
+    The endpoint is not encoded in the XML itself - in a PICSGenerator tree it
+    comes from the directory layout - so it is supplied by the caller. Device-
+    wide files such as Base.xml use endpoint 0 (the default).
+    """
     pics: dict[str, bool] = {}
     mytree = ET.fromstring(contents)
     for pi in mytree.iter('picsItem'):
@@ -233,45 +206,81 @@ def parse_pics_xml(contents: str) -> dict[str, bool]:
             raise ValueError(f"PICS XML item 'support' element missing text: {ET.tostring(pi, encoding='unicode')}")
 
         pics[name] = int(json.loads(support.lower())) == 1
-    return pics
+    return {endpoint: pics}
 
 
-def read_pics_from_file(path: str, endpoint: int | None = None) -> dict[str, bool]:
+def read_pics_from_file(path: str, default_endpoint: int = 0) -> dict[int, dict[str, bool]]:
     """
-    Reads PICS from one of three source types, auto-detected from `path`:
-      * a CI-format text file (one KEY=0|1 per line),
-      * a directory of PICS XML files, or
-      * a zip archive of PICS XML files.
+    Reads PICS into an endpoint-keyed tree of the form
+    {endpoint: {pics_code: supported}}, preserving the PICSGenerator
+    endpoint layout.
 
-    For directory and zip inputs, top-level *.xml files are always loaded
-    (device-wide codes like MCORE.*). If `endpoint` is supplied, the matching
-    per-endpoint subdirectory's *.xml files are loaded too. Common naming
-    conventions are accepted: `endpoint0`, `Endpoint_0`, `EP0`, `ep 0`, `0`,
-    etc. (case-insensitive). Other endpoint subdirs are skipped so
-    per-endpoint test checks don't see foreign clusters.
+    `path` is a CI-format text file, a directory of PICS XML files, or a zip
+    archive of such a directory. A zip archive is read as the directory it
+    contains. The XML files may sit at the archive root or inside a single
+    enclosing directory (as OS "compress folder" tools produce). Archive
+    entries whose paths would resolve outside the extraction directory are
+    refused.
 
-    Zip archives may store the XML files at the archive root or nested
-    inside a single enclosing directory (as OS "compress folder" tools
-    produce); both layouts are handled. Archive entries whose paths would
-    resolve outside the extraction directory are refused.
+    Inputs come in two shapes:
+
+    * Endpoint-structured: a PICSGenerator directory tree with per-endpoint
+      subdirectories. Top-level *.xml files hold device-wide codes (e.g.
+      Base.xml with the MCORE.* codes) and are placed under endpoint 0. Each
+      subdirectory's *.xml files are placed under that endpoint. Common subdir
+      naming conventions are accepted: endpoint0, Endpoint_0, EP0, ep 0, 0,
+      etc. (case-insensitive). default_endpoint is not used for these.
+    * A single unlabelled slice: a CI-format text file (key=0/1 lines), or a
+      directory of *.xml files with no endpoint subdirectories. Nothing in the
+      input says which endpoint the codes describe, so they are all placed
+      under default_endpoint - the endpoint under test, supplied by the caller.
+      There is only one slice, so attributing it to the endpoint being checked
+      cannot pull in codes belonging to some other endpoint.
+
+    Args:
+        path: A PICS file, a PICSGenerator directory, or a zip archive of one.
+        default_endpoint: Endpoint to attribute an unlabelled slice to.
     """
-    abs_path = os.path.abspath(path)
+    root = Path(path)
 
-    # Directory check comes first: a directory whose name happens to end in
-    # `.zip` is still a directory, not an archive.
-    if os.path.isdir(abs_path):
-        return _read_pics_from_directory(abs_path, endpoint)
-
-    # Zip archives: extract into a temp dir and reuse the directory reader.
-    # Extraction (instead of streaming from the zip) keeps the "single
-    # enclosing folder" and endpoint-subdir logic in one place.
-    if os.path.isfile(abs_path) and zipfile.is_zipfile(abs_path):
+    if root.is_file() and zipfile.is_zipfile(root):
         with tempfile.TemporaryDirectory() as tmp_dir:
-            _safe_extract_zip(abs_path, tmp_dir)
-            return _read_pics_from_directory(_pics_root_within(tmp_dir), endpoint)
+            _safe_extract_zip(path, tmp_dir)
+            return read_pics_from_file(_pics_root_within(tmp_dir), default_endpoint)
 
-    with open(path) as f:
-        return parse_pics(f.readlines())
+    pics_tree: dict[int, dict[str, bool]] = {}
+
+    def _merge(file_tree: dict[int, dict[str, bool]]) -> None:
+        for endpoint, codes in file_tree.items():
+            pics_tree.setdefault(endpoint, {}).update(codes)
+
+    if root.is_dir():
+        endpoint_dirs = {child: int(match.group(1))
+                         for child in sorted(root.iterdir())
+                         if child.is_dir() and (match := _ENDPOINT_DIR_PATTERN.match(child.name))}
+
+        # With endpoint subdirs present the tree is labelled, so top-level files
+        # are the device-wide slice -> endpoint 0. Without them the whole
+        # directory is one unlabelled slice for the endpoint under test.
+        top_level_endpoint = 0 if endpoint_dirs else default_endpoint
+        for xml_file in root.glob('*.xml'):
+            _merge(parse_pics_xml(xml_file.read_text(encoding='utf-8'), endpoint=top_level_endpoint))
+
+        for endpoint_dir, endpoint in endpoint_dirs.items():
+            for xml_file in endpoint_dir.glob('*.xml'):
+                _merge(parse_pics_xml(xml_file.read_text(encoding='utf-8'), endpoint=endpoint))
+
+        unlabelled = not endpoint_dirs
+    else:
+        _merge({default_endpoint: parse_pics(root.read_text(encoding='utf-8').splitlines())})
+        unlabelled = True
+
+    if unlabelled:
+        # Nothing in the input says which endpoint these codes describe, so the
+        # association comes purely from the caller and is worth stating.
+        LOGGER.info("PICS input %s has no endpoint structure: attributing its %d codes to endpoint %d",
+                    root, len(pics_tree.get(default_endpoint, {})), default_endpoint)
+    return pics_tree
 
 
 @dataclass
@@ -284,11 +293,11 @@ class BasePicsFacts:
     them against the supplied PICS file.
 
     The MCORE.COM.* transport-related PICS (WIFI / THR / ETH / WIRELESS and
-    the WIFI_2P4GHZ / WIFI_5GHZ band marks) are intentionally not derived
-    here: the band PICS indicate Public Action Frame support on the
-    corresponding band, which is not protocol-observable from a wildcard
-    read. PICSGenerator continues to derive transport bits locally until
-    the test-plans cleanup PRs land.
+    the WIFI_2P4GHZ / WIFI_5GHZ band marks) are intentionally not derived here,
+    the band PICS are about Public Action
+    Frame support on the corresponding band, which is not protocol-
+    observable from a wildcard read. PICSGenerator continues to derive
+    transport bits locally until the test-plans cleanup PRs land.
     """
     is_commissionee: bool = False
     is_server: bool = False
