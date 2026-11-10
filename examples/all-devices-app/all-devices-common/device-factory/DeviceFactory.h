@@ -34,6 +34,7 @@
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
+#include <device/types/closure-controller/ClosureController.h>
 #include <device/types/closure/impl/ClosureVariants.h>
 #include <device/types/closure/impl/SimulatedClosure.h>
 #include <device/types/color-temperature-light/impl/LoggingColorTemperatureLight.h>
@@ -545,6 +546,18 @@ private:
             }
             RegisterAlias("closure", "closure-simulated");
             RegisterAlias("closure-no-ps-no-sp", "closure-no-ps-no-sp-simulated");
+        }
+        if constexpr (ALL_DEVICES_ENABLE_CLOSURE_CONTROLLER)
+        {
+            RegisterCreator("closure-controller", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<ClosureController>(ClosureController::Config{
+                    .bindingTable    = mContext->bindingTable,
+                    .bindingManager  = mContext->bindingManager,
+                    .platformManager = mContext->platformManager,
+                    .bindingHandler  = mContext->bindingHandler,
+                });
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
         {
