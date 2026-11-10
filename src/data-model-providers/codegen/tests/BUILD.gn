@@ -51,6 +51,8 @@ source_set("mock_model") {
 chip_test_suite("tests") {
   output_name = "libCodegenDataModelProviderTests"
 
+  sources = [ "EmptyDataModelHandler.cpp" ]
+
   test_sources = [
     "TestCodegenModelViaMocks.cpp",
     "TestCodegenRegisteredServerCluster.cpp",
