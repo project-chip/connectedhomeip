@@ -34,15 +34,9 @@ config CHIP_ENABLE_PAIRING_AUTOSTART
 config CHIP_DATA_MODEL_CODEDRIVEN
 	default y
 
-<<<<<<< HEAD
-=======
 config CHIP_ENABLE_GROUPCAST
 	default y
 
-config CHIP_PERSISTENT_SUBSCRIPTIONS
-	default y
-
->>>>>>> 8744414 ([all-devices-app] [Zephyr] Fix Groupcast and propagate Binding initialization errors (#75120))
 config CHIP_OTA_REQUESTOR
 	default n
 
