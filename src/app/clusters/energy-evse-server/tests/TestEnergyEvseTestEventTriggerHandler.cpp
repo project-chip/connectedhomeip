@@ -52,8 +52,8 @@ TEST(EnergyEvseTestEventTriggerHandler, InstanceModeFiltersByEndpoint)
     EXPECT_TRUE(gInstanceHandlerCalled);
 
     gInstanceHandlerCalled = false;
-    EXPECT_EQ(handler.HandleEventTrigger(EventTriggerForEndpoint(static_cast<EndpointId>(kEndpoint + 1),
-                                                                 EnergyEvseTrigger::kEVPluggedIn)),
+    EXPECT_EQ(handler.HandleEventTrigger(
+                  EventTriggerForEndpoint(static_cast<EndpointId>(kEndpoint + 1), EnergyEvseTrigger::kEVPluggedIn)),
               CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_FALSE(gInstanceHandlerCalled);
 
@@ -65,7 +65,8 @@ TEST(EnergyEvseTestEventTriggerHandler, InstanceModeFiltersByEndpoint)
 TEST(EnergyEvseTestEventTriggerHandler, GetEndpointIdFromEventTrigger)
 {
     constexpr EndpointId kEndpoint = 42;
-    const uint64_t encoded = EventTriggerForEndpoint(kEndpoint, EnergyEvseTrigger::kBasicFunctionality);
+    const uint64_t encoded         = EventTriggerForEndpoint(kEndpoint, EnergyEvseTrigger::kBasicFunctionality);
     EXPECT_EQ(GetEndpointIdFromEventTrigger(encoded), kEndpoint);
-    EXPECT_EQ(GetEndpointIdFromEventTrigger(static_cast<uint64_t>(EnergyEvseTrigger::kBasicFunctionality)), static_cast<EndpointId>(0));
+    EXPECT_EQ(GetEndpointIdFromEventTrigger(static_cast<uint64_t>(EnergyEvseTrigger::kBasicFunctionality)),
+              static_cast<EndpointId>(0));
 }

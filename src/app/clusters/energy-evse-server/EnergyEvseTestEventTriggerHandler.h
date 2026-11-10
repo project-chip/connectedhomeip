@@ -129,7 +129,7 @@ public:
     }
 
 private:
-    EndpointId mMatchingEndpoint                             = 0;
+    EndpointId mMatchingEndpoint                               = 0;
     EnergyEvseInstanceTestEventTriggerHandler mInstanceHandler = nullptr;
 };
 
