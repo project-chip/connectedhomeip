@@ -204,7 +204,10 @@ CHIP_ERROR DescriptorCluster::Startup(ServerClusterContext & context)
 
 void DescriptorCluster::Shutdown(ClusterShutdownType type)
 {
-    mContext->provider.UnregisterAttributeChangeListener(*this);
+    if (mContext != nullptr)
+    {
+        mContext->provider.UnregisterAttributeChangeListener(*this);
+    }
     DefaultServerCluster::Shutdown(type);
 }
 
