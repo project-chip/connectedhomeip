@@ -52,7 +52,7 @@ const DataModel::EndpointEntry * GetEndpointEntry(EndpointId endpointId, Span<co
 }
 
 /// Figures out if `childId` is a descendant of `parentId` given some specific endpoint entries
-bool IsDescendantOf(const DataModel::EndpointEntry * __restrict__ childEndpoint, const EndpointId parentId,
+bool IsDescendantOf(const DataModel::EndpointEntry * childEndpoint, const EndpointId parentId,
                     Span<const DataModel::EndpointEntry> allEndpoints)
 {
     // NOTE: this is not very efficient as we loop through all endpoints for each parent search
@@ -281,6 +281,7 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
     }
 }
 
+// Using parentEndpoint instead of the endpoint that was added or removed, because in case of removal, the endpoint's entry will already be unregistered.
 void DescriptorCluster::OnEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, DataModel::EndpointChangeType type)
 {
     if (endpointId == kRootEndpointId)
@@ -293,40 +294,21 @@ void DescriptorCluster::OnEndpointChanged(EndpointId endpointId, EndpointId pare
         parentEndpointId = kRootEndpointId;
     }
 
-    // Do some validation
-    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsList;
-    LogErrorOnFailure(mContext->provider.Endpoints(endpointsList));
-    auto endpoints = endpointsList.TakeBuffer();
-
-    auto * endpointEntry = GetEndpointEntry(endpointId, endpoints);
-    auto * parentEntry   = GetEndpointEntry(parentEndpointId, endpoints);
-    auto * ourEntry      = GetEndpointEntry(mPath.mEndpointId, endpoints);
-
-    if (parentEntry == nullptr || ourEntry == nullptr)
-    {
-        LogErrorOnFailure(CHIP_ERROR_INCORRECT_STATE);
-        return;
-    }
-
-    if (type == DataModel::EndpointChangeType::kAdded && endpointEntry == nullptr)
-    {
-        // Notified before registering, not good.
-        LogErrorOnFailure(CHIP_ERROR_INCORRECT_STATE);
-        return;
-    }
-
-    if (type == DataModel::EndpointChangeType::kRemoved && endpointEntry != nullptr)
-    {
-        // Notified before unregistering, not good either.
-        LogErrorOnFailure(CHIP_ERROR_INCORRECT_STATE);
-        return;
-    }
-
     if (mPath.mEndpointId == parentEndpointId)
     {
         NotifyAttributeChanged(PartsList::Id);
         return;
     }
+
+    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsList;
+    LogErrorOnFailure(mContext->provider.Endpoints(endpointsList));
+    auto endpoints = endpointsList.TakeBuffer();
+
+    auto * parentEntry   = GetEndpointEntry(parentEndpointId, endpoints);
+    auto * ourEntry      = GetEndpointEntry(mPath.mEndpointId, endpoints);
+
+    // Can't get the information about the endpoint tree to determine if this parts list attribute was changed.
+    VerifyOrReturn(parentEntry != nullptr && ourEntry != nullptr);
 
     if (ourEntry->compositionPattern == DataModel::EndpointCompositionPattern::kTree)
     {

@@ -126,7 +126,7 @@ public:
     void RegisterAttributeChangeListener(AttributeChangeListener & listener);
     void UnregisterAttributeChangeListener(AttributeChangeListener & listener);
     void NotifyAttributeChanged(const ConcreteAttributePath & path, AttributeChangeType type);
-    void NotifyEndpointChanged(EndpointId endpointId, EndpointChangeType type);
+    void NotifyEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, EndpointChangeType type);
 
 private:
     /// Represents an active iteration over the listener list.

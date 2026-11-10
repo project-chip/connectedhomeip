@@ -1038,7 +1038,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable, MatterCluste
         }
 
         CodegenDataModelProvider::Instance().NotifyEndpointChanged(
-            endpoint, enable ? DataModel::EndpointChangeType::kAdded : DataModel::EndpointChangeType::kRemoved);
+            endpoint, parentEndpointId, enable ? DataModel::EndpointChangeType::kAdded : DataModel::EndpointChangeType::kRemoved);
         emberAfAttributeChanged(/* endpoint = */ 0, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id);
     }
 
