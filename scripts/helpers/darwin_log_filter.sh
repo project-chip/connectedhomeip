@@ -33,69 +33,61 @@ fi
 # Test output is not always valid UTF-8.
 export LC_ALL=C
 exec awk -f /dev/fd/3 3<<'EOF'
+    # Each rule below matches a header line, prints it and starts a block
+    # of up to N following lines. A block ends at the next header, at its
+    # end pattern (exclusive) or after N lines, so it never hides a header.
     function emit(line) { print line; fflush() }
+    function block_start(lines, end, show) { block_lines = lines; block_end = end; block_show = show }
 
-    # Sanitizer reports run from the header line to the SUMMARY line.
-    # Only the first few are printed in full.
-    report_lines > 0 {
-        if (reports <= 10 && report_lines <= 200) { emit($0) }
-        report_lines++
-        if ($0 ~ /^SUMMARY: / || report_lines > 1000) { report_lines = 0 }
-        next
-    }
-
-    # GN errors run up to a line of underscores. A missing submodule
-    # produces one per file, so only the first few are printed in full.
-    gn_lines > 0 {
-        if ($0 ~ /^(___|\+ |[a-z-]+: )/ || gn_lines > 12) {
-            gn_lines = 0
-        } else {
-            if (gn_errors <= 3) { emit($0) }
-            gn_lines++
-            next
-        }
-    }
+    # Only the first few sanitizer reports are printed in full.
     /^==[0-9]+==ERROR: |^WARNING: ThreadSanitizer: / {
         reports++
-        report_lines = 1
         emit(reports <= 10 ? $0 : $0 " (report omitted)")
+        block_start(200, "", reports <= 10)
         next
     }
 
-    # Indented lines after a summary header (failing tests, failed build
-    # commands), or source context after a compiler error.
-    indented && /^\t/ { emit($0); next }
-    { indented = 0 }
-    context > 0 { emit($0); context--; next }
-
-    /^(Testing failed|Failing tests|The following build commands failed):$/ {
-        emit($0); indented = 1; next
-    }
-
-    # path:line: error: -[Class test] : message           (XCTest)
-    # path:line:col: error: message, then source and caret (compilers)
-    /^[^ \t:]+:[0-9]+: (fatal )?error: / { emit($0); next }
-    /^[^ \t:]+:[0-9]+:[0-9]+: (fatal )?error: / { emit($0); context = 2; next }
-    /^[^ \t:]+:[0-9]+:[0-9]+: runtime error: / { emit($0); next }
+    # A missing submodule produces one GN error per file, so only the first
+    # few are printed in full.
     /^ERROR at / {
         gn_errors++
-        gn_lines = 1
         if (gn_errors <= 3) { emit($0) }
+        block_start(12, "^(___|\\+ )", gn_errors <= 3)
         next
     }
 
-    /^(ld|clang|clang\+\+|swift-frontend|xcodebuild|ninja): (fatal )?error/ { emit($0); next }
-    /^FAILED: |^ninja: build stopped/ { emit($0); next }
+    # path:line:col: error: message, followed by source line and caret
+    /^[^ \t:]+:[0-9]+:[0-9]+: (fatal )?error: / { emit($0); block_start(2, "", 1); next }
 
-    /^Test Suite '.*' started at / { emit($0); next }
-    /^Test Suite '.*' failed at / { emit($0); executed = 1; next }
-    /^Test Suite '(All tests|Selected tests|MatterTests\.xctest)' passed at / { emit($0); executed = 1; next }
-    executed && /^\t Executed / { emit($0); executed = 0; next }
-    /^Test Case '.*' failed / { emit($0); next }
-    /^Restarting after unexpected exit/ { emit($0); next }
-    /^Process [0-9]+: [1-9][0-9]* leaks? for / { emit($0); next }
+    # Followed by indented lines (failing tests, failed build commands, or
+    # the "Executed N tests" line of a test suite).
+    /^(Testing failed|Failing tests|The following build commands failed):$/ ||
+    /^Test Suite '.*' failed at / ||
+    /^Test Suite '(All tests|Selected tests|MatterTests\.xctest)' passed at / {
+        emit($0); block_start(100, "^([^\t]|$)", 1); next
+    }
 
-    /^\*\* .* \*\*$|^\([0-9]+ failures?\)$/ { emit($0); next }
+    /^[^ \t:]+:[0-9]+: (fatal )?error: / ||          # XCTest: path:line: error: -[Class test] : message
+    /^[^ \t:]+:[0-9]+:[0-9]+: runtime error: / ||    # UBSan
+    /^SUMMARY: / ||
+    /^(ld|clang|clang\+\+|swift-frontend|xcodebuild|ninja): (fatal )?error/ ||
+    /^FAILED: |^ninja: build stopped/ ||
+    /^Test Suite '.*' started at / ||
+    /^Test Case '.*' failed / ||
+    /^Restarting after unexpected exit/ ||
+    /^Process [0-9]+: [1-9][0-9]* leaks? for / ||
+    /^\*\* .* \*\*$|^\([0-9]+ failures?\)$/ {
+        emit($0); block_start(0); next
+    }
+
+    block_lines > 0 {
+        if (block_end != "" && $0 ~ block_end) {
+            block_lines = 0
+        } else {
+            if (block_show) { emit($0) }
+            block_lines--
+        }
+    }
 
     END {
         if (gn_errors > 3) { emit("(" gn_errors - 3 " more GN errors omitted)") }
