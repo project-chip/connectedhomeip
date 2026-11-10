@@ -328,6 +328,8 @@ TEST_F(TestZonePolygon, TestPrivacyMaskingI420NonAxisAlignedAndDownscaled)
             }
         }
     }
+    EXPECT_EQ(smallY[20U * kSmallWidth + 110U], kInitLuma);
+    EXPECT_EQ(smallY[65U * kSmallWidth + 20U], kInitLuma);
 
     for (size_t cy = 0; cy < kSmallHeight / 2U; ++cy)
     {

@@ -75,10 +75,12 @@ struct AudioAppSinkContext
 constexpr int kBallAnimationPattern       = 18;
 constexpr guint kTestVideoBackgroundColor = 0xFF808080u;
 
-struct SnapshotPrivacyProbeContext
+struct EncoderPrivacyProbeContext
 {
-    CameraDevice * device = nullptr;
+    CameraDevice * device      = nullptr;
+    bool forceKeyframeOnChange = false;
     std::atomic<uint64_t> lastAppliedGen{ 0 };
+    std::atomic<uint64_t> prevSeenGen{ 0 };
 };
 
 GQuark GetPrivacyGenQuark()
@@ -101,35 +103,9 @@ void LogPrivacyMaskFailureOnce()
     }
 }
 
-GstPadProbeReturn OnPrivacyMaskBufferProbe(GstPad * pad, GstPadProbeInfo * info, gpointer user_data)
+GstPadProbeReturn OnEncoderPrivacySinkProbe(GstPad * pad, GstPadProbeInfo * info, gpointer user_data)
 {
-    auto * device = static_cast<CameraDevice *>(user_data);
-    if (device == nullptr)
-    {
-        return GST_PAD_PROBE_OK;
-    }
-
-    GstBuffer * buffer = GST_PAD_PROBE_INFO_BUFFER(info);
-    if (buffer == nullptr)
-    {
-        return GST_PAD_PROBE_OK;
-    }
-
-    buffer                        = gst_buffer_make_writable(buffer);
-    GST_PAD_PROBE_INFO_DATA(info) = buffer;
-
-    if (!device->ApplyPrivacyMaskToI420Buffer(pad, buffer))
-    {
-        LogPrivacyMaskFailureOnce();
-        return GST_PAD_PROBE_DROP;
-    }
-
-    return GST_PAD_PROBE_OK;
-}
-
-GstPadProbeReturn OnSnapshotPrivacySinkProbe(GstPad * pad, GstPadProbeInfo * info, gpointer user_data)
-{
-    auto * holder = static_cast<std::shared_ptr<SnapshotPrivacyProbeContext> *>(user_data);
+    auto * holder = static_cast<std::shared_ptr<EncoderPrivacyProbeContext> *>(user_data);
     if (holder == nullptr || *holder == nullptr || (*holder)->device == nullptr)
     {
         return GST_PAD_PROBE_OK;
@@ -151,45 +127,60 @@ GstPadProbeReturn OnSnapshotPrivacySinkProbe(GstPad * pad, GstPadProbeInfo * inf
         return GST_PAD_PROBE_DROP;
     }
 
+    const uint64_t prevGen = (*holder)->prevSeenGen.exchange(appliedGen, std::memory_order_acq_rel);
     (*holder)->lastAppliedGen.store(appliedGen, std::memory_order_release);
+
+    if ((*holder)->forceKeyframeOnChange && appliedGen != prevGen)
+    {
+        GstEvent * forceKeyUnit =
+            gst_video_event_new_downstream_force_key_unit(GST_CLOCK_TIME_NONE, GST_CLOCK_TIME_NONE, GST_CLOCK_TIME_NONE, TRUE, 0);
+        if (forceKeyUnit != nullptr)
+        {
+            gst_pad_send_event(pad, forceKeyUnit);
+        }
+    }
+
     return GST_PAD_PROBE_OK;
 }
 
-GstPadProbeReturn OnSnapshotPrivacySrcProbe(GstPad * pad, GstPadProbeInfo * info, gpointer user_data)
+GstPadProbeReturn OnEncoderPrivacySrcProbe(GstPad * pad, GstPadProbeInfo * info, gpointer user_data)
 {
-    auto * holder      = static_cast<std::shared_ptr<SnapshotPrivacyProbeContext> *>(user_data);
+    auto * holder      = static_cast<std::shared_ptr<EncoderPrivacyProbeContext> *>(user_data);
     GstBuffer * buffer = GST_PAD_PROBE_INFO_BUFFER(info);
     if (holder != nullptr && *holder != nullptr && buffer != nullptr)
     {
-        const uint64_t gen = (*holder)->lastAppliedGen.load(std::memory_order_acquire);
+        buffer                        = gst_buffer_make_writable(buffer);
+        GST_PAD_PROBE_INFO_DATA(info) = buffer;
+        const uint64_t gen            = (*holder)->lastAppliedGen.load(std::memory_order_acquire);
         gst_mini_object_set_qdata(GST_MINI_OBJECT_CAST(buffer), GetPrivacyGenQuark(), new uint64_t(gen), DestroyUint64QData);
     }
     return GST_PAD_PROBE_OK;
 }
 
-void DestroySnapshotProbeHolder(gpointer data)
+void DestroyEncoderProbeHolder(gpointer data)
 {
-    delete static_cast<std::shared_ptr<SnapshotPrivacyProbeContext> *>(data);
+    delete static_cast<std::shared_ptr<EncoderPrivacyProbeContext> *>(data);
 }
 
-void AttachSnapshotPrivacyMaskProbes(GstElement * jpegenc, CameraDevice * device)
+void AttachEncoderPrivacyMaskProbes(GstElement * encoder, CameraDevice * device, bool forceKeyframeOnChange)
 {
-    if (jpegenc == nullptr || device == nullptr)
+    if (encoder == nullptr || device == nullptr)
     {
         return;
     }
 
-    GstPad * sinkPad = gst_element_get_static_pad(jpegenc, "sink");
-    GstPad * srcPad  = gst_element_get_static_pad(jpegenc, "src");
+    GstPad * sinkPad = gst_element_get_static_pad(encoder, "sink");
+    GstPad * srcPad  = gst_element_get_static_pad(encoder, "src");
     if (sinkPad != nullptr && srcPad != nullptr)
     {
-        auto sharedCtx    = std::make_shared<SnapshotPrivacyProbeContext>();
-        sharedCtx->device = device;
+        auto sharedCtx                   = std::make_shared<EncoderPrivacyProbeContext>();
+        sharedCtx->device                = device;
+        sharedCtx->forceKeyframeOnChange = forceKeyframeOnChange;
 
-        gst_pad_add_probe(sinkPad, GST_PAD_PROBE_TYPE_BUFFER, OnSnapshotPrivacySinkProbe,
-                          new std::shared_ptr<SnapshotPrivacyProbeContext>(sharedCtx), DestroySnapshotProbeHolder);
-        gst_pad_add_probe(srcPad, GST_PAD_PROBE_TYPE_BUFFER, OnSnapshotPrivacySrcProbe,
-                          new std::shared_ptr<SnapshotPrivacyProbeContext>(sharedCtx), DestroySnapshotProbeHolder);
+        gst_pad_add_probe(sinkPad, GST_PAD_PROBE_TYPE_BUFFER, OnEncoderPrivacySinkProbe,
+                          new std::shared_ptr<EncoderPrivacyProbeContext>(sharedCtx), DestroyEncoderProbeHolder);
+        gst_pad_add_probe(srcPad, GST_PAD_PROBE_TYPE_BUFFER, OnEncoderPrivacySrcProbe,
+                          new std::shared_ptr<EncoderPrivacyProbeContext>(sharedCtx), DestroyEncoderProbeHolder);
     }
     if (sinkPad != nullptr)
     {
@@ -198,21 +189,6 @@ void AttachSnapshotPrivacyMaskProbes(GstElement * jpegenc, CameraDevice * device
     if (srcPad != nullptr)
     {
         gst_object_unref(srcPad);
-    }
-}
-
-void AttachPrivacyMaskProbe(GstElement * element, const gchar * padName, CameraDevice * device)
-{
-    if (element == nullptr || device == nullptr)
-    {
-        return;
-    }
-
-    GstPad * pad = gst_element_get_static_pad(element, padName);
-    if (pad != nullptr)
-    {
-        gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, OnPrivacyMaskBufferProbe, device, nullptr);
-        gst_object_unref(pad);
     }
 }
 
@@ -234,6 +210,14 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
     {
         gst_sample_unref(sample);
         return GST_FLOW_ERROR;
+    }
+
+    const auto * bufferGen =
+        static_cast<const uint64_t *>(gst_mini_object_get_qdata(GST_MINI_OBJECT_CAST(buffer), GetPrivacyGenQuark()));
+    if (bufferGen == nullptr || *bufferGen < self->GetPrivacyZoneGeneration())
+    {
+        gst_sample_unref(sample);
+        return GST_FLOW_OK;
     }
 
     GstMapInfo map;
@@ -264,6 +248,10 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
             // The PreRollBuffer will distribute to ALL transports registered for this videoStreamID
             // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
             self->GetMediaController().DistributeVideo(reinterpret_cast<const uint8_t *>(map.data), map.size, videoStreamID, ts);
+            if (*bufferGen < self->GetPrivacyZoneGeneration())
+            {
+                self->GetMediaController().ClearVideoPreRollBuffer();
+            }
         }
         else
         {
@@ -511,10 +499,8 @@ GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, C
     g_object_set(source, "device", config.device.c_str(), "do-timestamp", TRUE, nullptr);
 
     GstCaps * srcCaps = gst_caps_new_empty();
-    gst_caps_append_structure(
-        srcCaps, gst_structure_new("video/x-raw", "width", G_TYPE_INT, config.width, "height", G_TYPE_INT, config.height, nullptr));
-    gst_caps_append_structure(
-        srcCaps, gst_structure_new("image/jpeg", "width", G_TYPE_INT, config.width, "height", G_TYPE_INT, config.height, nullptr));
+    gst_caps_append_structure(srcCaps, gst_structure_new_empty("video/x-raw"));
+    gst_caps_append_structure(srcCaps, gst_structure_new_empty("image/jpeg"));
     g_object_set(source_caps, "caps", srcCaps, nullptr);
     gst_caps_unref(srcCaps);
 
@@ -834,7 +820,7 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
         GstElement * jpegenc = gst_bin_get_by_name(GST_BIN(pipeline), "jpegenc");
         if (jpegenc != nullptr)
         {
-            AttachSnapshotPrivacyMaskProbes(jpegenc, this);
+            AttachEncoderPrivacyMaskProbes(jpegenc, this, /* forceKeyframeOnChange = */ false);
             gst_object_unref(jpegenc);
         }
     }
@@ -902,8 +888,8 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     g_object_set(capsfilter2, "caps", caps2, nullptr);
     gst_caps_unref(caps2);
 
-    // Configure encoder for low‑latency and force IDR at start
-    g_object_set(x264enc, "tune", 0, "speed-preset", 1, "key-int-max", framerate * 1, "insert-vui", TRUE, nullptr);
+    // Configure encoder for low-latency (0x4 = zerolatency) and force IDR at start
+    g_object_set(x264enc, "tune", 0x00000004, "speed-preset", 1, "key-int-max", framerate * 1, "insert-vui", TRUE, nullptr);
 
     // Configure appsink for receiving H.264 buffers data
     g_object_set(appsink, "emit-signals", TRUE, nullptr);
@@ -922,7 +908,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
         return nullptr;
     }
 
-    AttachPrivacyMaskProbe(x264enc, "sink", this);
+    AttachEncoderPrivacyMaskProbes(x264enc, this, /* forceKeyframeOnChange = */ true);
 
     return pipeline;
 }
@@ -2117,25 +2103,34 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
 
 CameraError CameraDevice::SetPrivacyZone(uint16_t zoneId, const TwoDCartesianZoneStorage & zone)
 {
-    std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
-    mPrivacyZones[zoneId] = zone;
-    ++mPrivacyZoneGeneration;
+    {
+        std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
+        mPrivacyZones[zoneId] = zone;
+        ++mPrivacyZoneGeneration;
+    }
+    mMediaController.ClearVideoPreRollBuffer();
     return CameraError::SUCCESS;
 }
 
 CameraError CameraDevice::RemovePrivacyZone(uint16_t zoneId)
 {
-    std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
-    mPrivacyZones.erase(zoneId);
-    ++mPrivacyZoneGeneration;
+    {
+        std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
+        mPrivacyZones.erase(zoneId);
+        ++mPrivacyZoneGeneration;
+    }
+    mMediaController.ClearVideoPreRollBuffer();
     return CameraError::SUCCESS;
 }
 
 CameraError CameraDevice::ClearPrivacyZones()
 {
-    std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
-    mPrivacyZones.clear();
-    ++mPrivacyZoneGeneration;
+    {
+        std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
+        mPrivacyZones.clear();
+        ++mPrivacyZoneGeneration;
+    }
+    mMediaController.ClearVideoPreRollBuffer();
     return CameraError::SUCCESS;
 }
 

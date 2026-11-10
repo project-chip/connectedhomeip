@@ -44,7 +44,9 @@ import logging
 import os
 import random
 import ssl
+import struct
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -77,7 +79,8 @@ class _RGBFrame:
 class _LocalCMAFIngestServer:
     """Lightweight in-process TLS HTTPS server to capture CMAF H.264 video uploads from PushAVStreamTransport."""
 
-    def __init__(self) -> None:
+    def __init__(self, host_ip: str = "127.0.0.1") -> None:
+        self.host_ip = host_ip
         self._lock = threading.Lock()
         self._init_bytes: bytes | None = None
         self._m4s_segments: list[bytes] = []
@@ -112,17 +115,34 @@ class _LocalCMAFIngestServer:
             protocol_version = "HTTP/1.1"
 
             def log_message(self, fmt: str, *args) -> None:
-                log.debug("CMAFIngestServer: " + fmt, *args)
+                msg = fmt % args if args else fmt
+                log.debug("CMAFIngestServer: %s", msg)
 
             def do_PUT(self) -> None:
-                length = int(self.headers.get("Content-Length", "0"))
-                body = self.rfile.read(length) if length > 0 else b""
+                transfer_encoding = self.headers.get("Transfer-Encoding", "").lower()
+                if "chunked" in transfer_encoding:
+                    chunks: list[bytes] = []
+                    while True:
+                        chunk_header = self.rfile.readline().strip()
+                        if not chunk_header:
+                            break
+                        chunk_size = int(chunk_header.split(b";", 1)[0], 16)
+                        if chunk_size == 0:
+                            while self.rfile.readline().strip():
+                                pass
+                            break
+                        chunks.append(self.rfile.read(chunk_size))
+                        self.rfile.read(2)
+                    body = b"".join(chunks)
+                else:
+                    length = int(self.headers.get("Content-Length", "0"))
+                    body = self.rfile.read(length) if length > 0 else b""
                 parent._record_upload(self.path, body)
                 self.send_response(201)
                 self.send_header("Content-Length", "0")
                 self.end_headers()
 
-        self._httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
+        self._httpd = http.server.ThreadingHTTPServer((self.host_ip, 0), _Handler)
         ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         ssl_ctx.load_cert_chain(certfile=server_cert_path, keyfile=server_key_path)
         ssl_ctx.load_verify_locations(cafile=device_ca_path)
@@ -176,9 +196,15 @@ class _LocalCMAFIngestServer:
         subject = x509.Name(
             [
                 x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CSA"),
-                x509.NameAttribute(NameOID.COMMON_NAME, "127.0.0.1"),
+                x509.NameAttribute(NameOID.COMMON_NAME, self.host_ip),
             ]
         )
+        san_entries: list[x509.GeneralName] = [x509.DNSName("localhost")]
+        try:
+            san_entries.append(x509.IPAddress(ipaddress.ip_address(self.host_ip)))
+        except ValueError:
+            if self.host_ip != "localhost":
+                san_entries.append(x509.DNSName(self.host_ip))
         ski = self._server_ca_cert.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value
         cert = (
             x509.CertificateBuilder()
@@ -207,9 +233,7 @@ class _LocalCMAFIngestServer:
             .add_extension(x509.SubjectKeyIdentifier.from_public_key(key.public_key()), critical=False)
             .add_extension(x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(ski), critical=False)
             .add_extension(
-                x509.SubjectAlternativeName(
-                    [x509.DNSName("localhost"), x509.IPAddress(ipaddress.ip_address("127.0.0.1"))]
-                ),
+                x509.SubjectAlternativeName(san_entries),
                 critical=False,
             )
             .sign(self._server_ca_key, hashes.SHA256())
@@ -288,13 +312,55 @@ class _LocalCMAFIngestServer:
             self._tmpdir.cleanup()
 
 
-def _decode_cmaf_h264_to_rgb(cmaf_bytes: bytes, expected_width: int, expected_height: int) -> _RGBFrame:
-    """Decode the last H.264 frame of a CMAF (init + m4s) segment into raw RGB24 bytes."""
-    frame_len = expected_width * expected_height * 3
+def _extract_cmaf_dimensions(cmaf_bytes: bytes, fallback_width: int, fallback_height: int) -> tuple[int, int]:
+    """Extract encoded track dimensions from the ISO BMFF tkhd box in CMAF init bytes."""
+    idx = cmaf_bytes.find(b"tkhd")
+    if idx >= 4:
+        box_start = idx - 4
+        box_size = struct.unpack(">I", cmaf_bytes[box_start:idx])[0]
+        box_end = box_start + box_size
+        if box_size in (92, 104) and box_end <= len(cmaf_bytes):
+            w_fixed, h_fixed = struct.unpack(">II", cmaf_bytes[box_end - 8 : box_end])
+            w = w_fixed >> 16
+            h = h_fixed >> 16
+            if w > 0 and h > 0:
+                return w, h
+    return fallback_width, fallback_height
+
+
+def _decode_cmaf_h264_to_rgb_frames(cmaf_bytes: bytes, fallback_width: int, fallback_height: int) -> list[_RGBFrame]:
+    """Decode all H.264 frames of a CMAF (init + m4s) segment into raw RGB24 _RGBFrame objects."""
+    width, height = _extract_cmaf_dimensions(cmaf_bytes, fallback_width, fallback_height)
 
     with tempfile.NamedTemporaryFile(suffix=".mp4") as tmp_mp4:
         tmp_mp4.write(cmaf_bytes)
         tmp_mp4.flush()
+
+        with contextlib.suppress(FileNotFoundError, subprocess.CalledProcessError, ValueError):
+            probe = subprocess.run(
+                [
+                    "ffprobe",
+                    "-v",
+                    "error",
+                    "-select_streams",
+                    "v:0",
+                    "-show_entries",
+                    "stream=width,height",
+                    "-of",
+                    "csv=p=0:s=x",
+                    tmp_mp4.name,
+                ],
+                capture_output=True,
+                check=True,
+                text=True,
+            )
+            dims = probe.stdout.strip().splitlines()
+            if dims and "x" in dims[0]:
+                pw, ph = (int(v) for v in dims[0].split("x", 1))
+                if pw > 0 and ph > 0:
+                    width, height = pw, ph
+
+        frame_len = width * height * 3
 
         with contextlib.suppress(FileNotFoundError, subprocess.CalledProcessError):
             proc = subprocess.run(
@@ -304,6 +370,8 @@ def _decode_cmaf_h264_to_rgb(cmaf_bytes: bytes, expected_width: int, expected_he
                     "error",
                     "-i",
                     tmp_mp4.name,
+                    "-vf",
+                    f"scale={width}:{height}",
                     "-f",
                     "rawvideo",
                     "-pix_fmt",
@@ -314,7 +382,10 @@ def _decode_cmaf_h264_to_rgb(cmaf_bytes: bytes, expected_width: int, expected_he
                 check=True,
             )
             if len(proc.stdout) >= frame_len and len(proc.stdout) % frame_len == 0:
-                return _RGBFrame(data=proc.stdout[-frame_len:], width=expected_width, height=expected_height)
+                return [
+                    _RGBFrame(data=proc.stdout[offset : offset + frame_len], width=width, height=height)
+                    for offset in range(0, len(proc.stdout), frame_len)
+                ]
 
         proc = subprocess.run(
             [
@@ -327,16 +398,33 @@ def _decode_cmaf_h264_to_rgb(cmaf_bytes: bytes, expected_width: int, expected_he
                 "!",
                 "videoconvert",
                 "!",
-                f"video/x-raw,format=RGB,width={expected_width},height={expected_height}",
+                "videoscale",
+                "!",
+                f"video/x-raw,format=RGB,width={width},height={height}",
                 "!",
                 "fdsink",
             ],
             capture_output=True,
             check=True,
         )
-        asserts.assert_greater_equal(len(proc.stdout), frame_len, "Decoded H.264 RGB24 output shorter than one frame")
-        asserts.assert_equal(len(proc.stdout) % frame_len, 0, "Decoded H.264 RGB24 byte length is not a whole number of frames")
-        return _RGBFrame(data=proc.stdout[-frame_len:], width=expected_width, height=expected_height)
+        raw_out = proc.stdout
+        row_bytes = width * 3
+        padded_stride = (row_bytes + 3) & ~3
+        padded_frame_len = padded_stride * height
+        if padded_stride != row_bytes and len(raw_out) >= padded_frame_len and len(raw_out) % padded_frame_len == 0:
+            frames: list[_RGBFrame] = []
+            for offset in range(0, len(raw_out), padded_frame_len):
+                chunk = raw_out[offset : offset + padded_frame_len]
+                unpadded = b"".join(chunk[r * padded_stride : r * padded_stride + row_bytes] for r in range(height))
+                frames.append(_RGBFrame(data=unpadded, width=width, height=height))
+            return frames
+
+        asserts.assert_greater_equal(len(raw_out), frame_len, "Decoded H.264 RGB24 output shorter than one frame")
+        asserts.assert_equal(len(raw_out) % frame_len, 0, "Decoded H.264 RGB24 byte length is not a whole number of frames")
+        return [
+            _RGBFrame(data=raw_out[offset : offset + frame_len], width=width, height=height)
+            for offset in range(0, len(raw_out), frame_len)
+        ]
 
 
 def _decode_jpeg_to_rgb(jpeg_bytes: bytes, expected_width: int, expected_height: int) -> _RGBFrame:
@@ -541,11 +629,8 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
         cmaf_server: _LocalCMAFIngestServer,
         vid_w: int,
         vid_h: int,
-    ) -> _RGBFrame:
+    ) -> list[_RGBFrame]:
         pavst_cluster = Clusters.PushAvStreamTransport
-        # Allow x264enc's lookahead (~40 frames at 30 fps) plus PreRollBuffer's 1s minKeyframeIntervalMs window to advance
-        # past the privacy zone update before registering a fresh PushAV transport sink.
-        await asyncio.sleep(2.6)
         cmaf_server.reset_segments()
 
         alloc_push_resp = await self.send_single_cmd(
@@ -555,7 +640,7 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                     "streamUsage": stream_usage,
                     "videoStreamID": video_stream_id,
                     "TLSEndpointID": tls_endpoint_id,
-                    "url": f"https://127.0.0.1:{cmaf_server.port}/streams/1/",
+                    "url": f"https://{cmaf_server.host_ip}:{cmaf_server.port}/streams/1/",
                     "triggerOptions": {
                         "triggerType": pavst_cluster.Enums.TransportTriggerTypeEnum.kCommand,
                         "maxPreRollLen": 0,
@@ -606,7 +691,9 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                     break
                 await asyncio.sleep(0.1)
             asserts.assert_is_not_none(cmaf_bytes, "Timed out waiting for CMAF H.264 video upload from PushAVStreamTransport")
-            return _decode_cmaf_h264_to_rgb(cmaf_bytes, vid_w, vid_h)
+            frames = _decode_cmaf_h264_to_rgb_frames(cmaf_bytes, vid_w, vid_h)
+            asserts.assert_greater(len(frames), 0, "Decoded CMAF segment contained zero H.264 frames")
+            return frames
         finally:
             with contextlib.suppress(InteractionModelError):
                 await self.send_single_cmd(
@@ -763,17 +850,30 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                     len(rate_distortion_points), 0, "RateDistortionTradeOffPoints must not be empty when Video is supported"
                 )
                 selected_video_usage = stream_usages[0]
-                target_video_min_res = (
-                    selected_cap.resolution
+                compatible_rd_points = [
+                    p
+                    for p in rate_distortion_points
                     if (
-                        min_viewport_res.width <= snap_w <= sensor_params.sensorWidth
-                        and min_viewport_res.height <= snap_h <= sensor_params.sensorHeight
+                        min_viewport_res.width <= p.resolution.width <= sensor_params.sensorWidth
+                        and min_viewport_res.height <= p.resolution.height <= sensor_params.sensorHeight
                     )
+                ]
+                selected_rd_point = next(
+                    (
+                        p
+                        for p in compatible_rd_points
+                        if p.resolution.width == snap_w and p.resolution.height == snap_h
+                    ),
+                    compatible_rd_points[0] if compatible_rd_points else rate_distortion_points[0],
+                )
+                target_video_min_res = (
+                    selected_rd_point.resolution
+                    if compatible_rd_points
                     else min_viewport_res
                 )
                 video_alloc_args = {
                     "streamUsage": selected_video_usage,
-                    "videoCodec": rate_distortion_points[0].codec,
+                    "videoCodec": selected_rd_point.codec,
                     "minFrameRate": min(30, sensor_params.maxFPS),
                     "maxFrameRate": sensor_params.maxFPS,
                     "minResolution": target_video_min_res,
@@ -781,8 +881,8 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                         width=sensor_params.sensorWidth,
                         height=sensor_params.sensorHeight,
                     ),
-                    "minBitRate": rate_distortion_points[0].minBitRate,
-                    "maxBitRate": rate_distortion_points[0].minBitRate,
+                    "minBitRate": selected_rd_point.minBitRate,
+                    "maxBitRate": selected_rd_point.minBitRate,
                     "keyFrameInterval": 1000,
                 }
                 if watermark_supported:
@@ -826,7 +926,8 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                                 cmd=pavst_cluster.Commands.DeallocatePushTransport(connectionID=conn.connectionID),
                             )
 
-                    cmaf_server = _LocalCMAFIngestServer()
+                    host_ip = self.user_params.get("host_ip", None) or "127.0.0.1"
+                    cmaf_server = _LocalCMAFIngestServer(host_ip=host_ip)
                     tls_utils = TLSUtils(self, endpoint=0)
                     prc_res = await tls_utils.send_provision_root_command(certificate=cmaf_server.get_server_root_der())
                     tls_caid = prc_res.caid
@@ -836,13 +937,18 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                         certificate=cmaf_server.sign_device_csr(csr_res.csr), ccdid=tls_ccdid
                     )
                     tls_ep_res = await tls_utils.send_provision_tls_endpoint_command(
-                        hostname=b"127.0.0.1",
+                        hostname=cmaf_server.host_ip.encode("utf-8"),
                         port=cmaf_server.port,
                         caid=tls_caid,
                         ccdid=tls_ccdid,
                     )
                     tls_endpoint_id = tls_ep_res.endpointID
-                    log.info("Provisioned PushAV TLS endpoint ID=%d on https://127.0.0.1:%d/", tls_endpoint_id, cmaf_server.port)
+                    log.info(
+                        "Provisioned PushAV TLS endpoint ID=%d on https://%s:%d/",
+                        tls_endpoint_id,
+                        cmaf_server.host_ip,
+                        cmaf_server.port,
+                    )
                 else:
                     log.info("DUT does not expose PushAVStreamTransport + TLS clusters; skipping CMAF video decode check")
             else:
@@ -1125,39 +1231,62 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                 )
 
             if tls_endpoint_id is not None and cmaf_server is not None and video_stream_id is not None:
-                vax0, vay0 = int(round(80 * vid_w / 640)), int(round(80 * vid_h / 480))
-                vax1, vay1 = int(round(260 * vid_w / 640)), int(round(260 * vid_h / 480))
-                vbx0, vby0 = int(round(360 * vid_w / 640)), int(round(200 * vid_h / 480))
-                vbx1, vby1 = int(round(540 * vid_w / 640)), int(round(380 * vid_h / 480))
-                vcx0, vcy0 = int(round(360 * vid_w / 640)), int(round(40 * vid_h / 480))
-                vcx1, vcy1 = int(round(540 * vid_w / 640)), int(round(140 * vid_h / 480))
-                vamid_x = (vax0 + vax1) // 2
-                vamid_y = (vay0 + vay1) // 2
-                vinset = max(8, int(round(12 * vid_w / 640)))
-
-                video_multi_rgb = await self._capture_and_decode_pushav_video_rgb(
+                video_multi_frames = await self._capture_and_decode_pushav_video_rgb(
                     endpoint, selected_video_usage, video_stream_id, tls_endpoint_id, cmaf_server, vid_w, vid_h
                 )
-                self._assert_region_is_black(
-                    video_multi_rgb, vax0 + vinset, vay0 + vinset, vamid_x - vinset, vay1 - vinset, "H.264 Video L-shape Vertical Arm"
-                )
-                self._assert_region_is_black(
-                    video_multi_rgb,
-                    vax0 + vinset,
-                    vay0 + vinset,
-                    vax1 - vinset,
-                    vamid_y - vinset,
-                    "H.264 Video L-shape Horizontal Arm",
-                )
-                self._assert_region_is_non_black(
-                    video_multi_rgb, vamid_x + vinset, vamid_y + vinset, vax1 - vinset, vay1 - vinset, "H.264 Video L-shape Cutout"
-                )
-                self._assert_region_is_black(
-                    video_multi_rgb, vbx0 + vinset, vby0 + vinset, vbx1 - vinset, vby1 - vinset, "H.264 Video Masked Region B"
-                )
-                self._assert_region_is_non_black(
-                    video_multi_rgb, vcx0 + vinset, vcy0 + vinset, vcx1 - vinset, vcy1 - vinset, "H.264 Video Control Region C"
-                )
+                for frame_idx, video_multi_rgb in enumerate(video_multi_frames):
+                    f_w, f_h = video_multi_rgb.width, video_multi_rgb.height
+                    vax0, vay0 = int(round(80 * f_w / 640)), int(round(80 * f_h / 480))
+                    vax1, vay1 = int(round(260 * f_w / 640)), int(round(260 * f_h / 480))
+                    vbx0, vby0 = int(round(360 * f_w / 640)), int(round(200 * f_h / 480))
+                    vbx1, vby1 = int(round(540 * f_w / 640)), int(round(380 * f_h / 480))
+                    vcx0, vcy0 = int(round(360 * f_w / 640)), int(round(40 * f_h / 480))
+                    vcx1, vcy1 = int(round(540 * f_w / 640)), int(round(140 * f_h / 480))
+                    vamid_x = (vax0 + vax1) // 2
+                    vamid_y = (vay0 + vay1) // 2
+                    vinset_x = max(2, min(int(round(12 * f_w / 640)), max(2, (vamid_x - vax0) // 3)))
+                    vinset_y = max(2, min(int(round(12 * f_h / 480)), max(2, (vamid_y - vay0) // 3)))
+
+                    self._assert_region_is_black(
+                        video_multi_rgb,
+                        vax0 + vinset_x,
+                        vay0 + vinset_y,
+                        vamid_x - vinset_x,
+                        vay1 - vinset_y,
+                        f"H.264 Video frame[{frame_idx}] L-shape Vertical Arm",
+                    )
+                    self._assert_region_is_black(
+                        video_multi_rgb,
+                        vax0 + vinset_x,
+                        vay0 + vinset_y,
+                        vax1 - vinset_x,
+                        vamid_y - vinset_y,
+                        f"H.264 Video frame[{frame_idx}] L-shape Horizontal Arm",
+                    )
+                    self._assert_region_is_non_black(
+                        video_multi_rgb,
+                        vamid_x + vinset_x,
+                        vamid_y + vinset_y,
+                        vax1 - vinset_x,
+                        vay1 - vinset_y,
+                        f"H.264 Video frame[{frame_idx}] L-shape Cutout",
+                    )
+                    self._assert_region_is_black(
+                        video_multi_rgb,
+                        vbx0 + vinset_x,
+                        vby0 + vinset_y,
+                        vbx1 - vinset_x,
+                        vby1 - vinset_y,
+                        f"H.264 Video frame[{frame_idx}] Masked Region B",
+                    )
+                    self._assert_region_is_non_black(
+                        video_multi_rgb,
+                        vcx0 + vinset_x,
+                        vcy0 + vinset_y,
+                        vcx1 - vinset_x,
+                        vcy1 - vinset_y,
+                        f"H.264 Video frame[{frame_idx}] Control Region C",
+                    )
 
             self.step("7")
             for zid in list(created_zone_ids):
@@ -1176,55 +1305,67 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
             )
 
             if tls_endpoint_id is not None and cmaf_server is not None and video_stream_id is not None:
-                vax0, vay0 = int(round(80 * vid_w / 640)), int(round(80 * vid_h / 480))
-                vax1, vay1 = int(round(260 * vid_w / 640)), int(round(260 * vid_h / 480))
-                vbx0, vby0 = int(round(360 * vid_w / 640)), int(round(200 * vid_h / 480))
-                vbx1, vby1 = int(round(540 * vid_w / 640)), int(round(380 * vid_h / 480))
-                vcx0, vcy0 = int(round(360 * vid_w / 640)), int(round(40 * vid_h / 480))
-                vcx1, vcy1 = int(round(540 * vid_w / 640)), int(round(140 * vid_h / 480))
-                vinset = max(8, int(round(12 * vid_w / 640)))
-
-                video_restored_rgb = await self._capture_and_decode_pushav_video_rgb(
+                video_restored_frames = await self._capture_and_decode_pushav_video_rgb(
                     endpoint, selected_video_usage, video_stream_id, tls_endpoint_id, cmaf_server, vid_w, vid_h
                 )
-                self._assert_region_is_non_black(
-                    video_restored_rgb,
-                    vax0 + vinset,
-                    vay0 + vinset,
-                    vax1 - vinset,
-                    vay1 - vinset,
-                    "H.264 Video Restored Region A after RemoveZone",
-                )
-                self._assert_region_is_non_black(
-                    video_restored_rgb,
-                    vbx0 + vinset,
-                    vby0 + vinset,
-                    vbx1 - vinset,
-                    vby1 - vinset,
-                    "H.264 Video Restored Region B after RemoveZone",
-                )
-                self._assert_region_is_non_black(
-                    video_restored_rgb,
-                    vcx0 + vinset,
-                    vcy0 + vinset,
-                    vcx1 - vinset,
-                    vcy1 - vinset,
-                    "H.264 Video Control Region C after RemoveZone",
-                )
+                for frame_idx, video_restored_rgb in enumerate(video_restored_frames):
+                    f_w, f_h = video_restored_rgb.width, video_restored_rgb.height
+                    vax0, vay0 = int(round(80 * f_w / 640)), int(round(80 * f_h / 480))
+                    vax1, vay1 = int(round(260 * f_w / 640)), int(round(260 * f_h / 480))
+                    vbx0, vby0 = int(round(360 * f_w / 640)), int(round(200 * f_h / 480))
+                    vbx1, vby1 = int(round(540 * f_w / 640)), int(round(380 * f_h / 480))
+                    vcx0, vcy0 = int(round(360 * f_w / 640)), int(round(40 * f_h / 480))
+                    vcx1, vcy1 = int(round(540 * f_w / 640)), int(round(140 * f_h / 480))
+                    vamid_x = (vax0 + vax1) // 2
+                    vamid_y = (vay0 + vay1) // 2
+                    vinset_x = max(2, min(int(round(12 * f_w / 640)), max(2, (vamid_x - vax0) // 3)))
+                    vinset_y = max(2, min(int(round(12 * f_h / 480)), max(2, (vamid_y - vay0) // 3)))
+
+                    self._assert_region_is_non_black(
+                        video_restored_rgb,
+                        vax0 + vinset_x,
+                        vay0 + vinset_y,
+                        vax1 - vinset_x,
+                        vay1 - vinset_y,
+                        f"H.264 Video frame[{frame_idx}] Restored Region A after RemoveZone",
+                    )
+                    self._assert_region_is_non_black(
+                        video_restored_rgb,
+                        vbx0 + vinset_x,
+                        vby0 + vinset_y,
+                        vbx1 - vinset_x,
+                        vby1 - vinset_y,
+                        f"H.264 Video frame[{frame_idx}] Restored Region B after RemoveZone",
+                    )
+                    self._assert_region_is_non_black(
+                        video_restored_rgb,
+                        vcx0 + vinset_x,
+                        vcy0 + vinset_y,
+                        vcx1 - vinset_x,
+                        vcy1 - vinset_y,
+                        f"H.264 Video frame[{frame_idx}] Control Region C after RemoveZone",
+                    )
         finally:
+            tls_cleanup_errors: list[Exception] = []
             for zid in list(created_zone_ids):
                 with contextlib.suppress(InteractionModelError):
                     await self.send_single_cmd(endpoint=endpoint, cmd=zm_commands.RemoveZone(zoneID=zid))
             if tls_utils is not None:
                 if tls_endpoint_id is not None:
-                    with contextlib.suppress(Exception):
+                    try:
                         await tls_utils.send_remove_tls_endpoint_command(endpoint_id=tls_endpoint_id)
+                    except InteractionModelError as err:
+                        tls_cleanup_errors.append(err)
                 if tls_ccdid is not None:
-                    with contextlib.suppress(Exception):
+                    try:
                         await tls_utils.send_remove_client_command(ccdid=tls_ccdid)
+                    except InteractionModelError as err:
+                        tls_cleanup_errors.append(err)
                 if tls_caid is not None:
-                    with contextlib.suppress(Exception):
+                    try:
                         await tls_utils.send_remove_root_command(caid=tls_caid)
+                    except InteractionModelError as err:
+                        tls_cleanup_errors.append(err)
             if cmaf_server is not None:
                 cmaf_server.close()
             if video_stream_id is not None:
@@ -1239,6 +1380,8 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                         endpoint=endpoint,
                         cmd=avsm_commands.SnapshotStreamDeallocate(snapshotStreamID=stream_id),
                     )
+            if tls_cleanup_errors and sys.exc_info()[0] is None:
+                raise tls_cleanup_errors[0]
 
 
 if __name__ == "__main__":
