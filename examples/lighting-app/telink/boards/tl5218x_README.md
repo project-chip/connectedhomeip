@@ -78,9 +78,9 @@ build_tl5218x_2m_flash_lzma_v2/zephyr/matter.ota          -> OTA upgrade
 **Prerequisite:** copy Zigbee firmware
 
 ```bash
-cp <zigbee_fw>.bin ${ZEPHYR_BASE}/TL323X_FW/ZB/Zigbee-SampleDemo.bin
+cp <zigbee_fw>.bin ${ZEPHYR_BASE}/TL521X_FW/ZB/Zigbee-SampleDemo.bin
 e.g.
-cp ${ZEPHYR_BASE}/TL323X_FW/ZB/dual_matter_sampleLight_bleAdv_tl323x.bin ${ZEPHYR_BASE}/TL323X_FW/ZB/Zigbee-SampleDemo.bin
+cp ${ZEPHYR_BASE}/TL521X_FW/ZB/zigbee_bleAdv_sampleLight_tl521x.bin ${ZEPHYR_BASE}/TL521X_FW/ZB/Zigbee-SampleDemo.bin
 ```
 
 **Kconfig:** boards/tl5218x_4m_flash_dual_mode_ota.conf (explicitly specified)

@@ -63,10 +63,22 @@ public:
     void SendNotifyUpdateApplied();
 };
 
+// When gBDXSkipAfterFirstBlock is set, sends a BlockQueryWithSkip instead of the second BlockQuery of each download,
+// so tests can check how an OTA provider handles skips.
+class SkipTestBDXDownloader : public BDXDownloader
+{
+public:
+    CHIP_ERROR BeginPrepareDownload() override;
+    CHIP_ERROR FetchNextData() override;
+
+private:
+    bool mSkipPending = false;
+};
+
 DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
 CustomOTARequestorDriver gRequestorUser;
-BDXDownloader gDownloader;
+SkipTestBDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
 static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
@@ -85,6 +97,9 @@ constexpr uint16_t kSkipExecImageFile          = 's';
 constexpr uint16_t kOptionLargePayload         = 'l';
 constexpr size_t kMaxFilePathSize              = 256;
 
+// Options without a short form.
+constexpr uint16_t kOptionBDXSkipAfterFirstBlock = 0x1000;
+
 uint32_t gPeriodicQueryTimeoutSec = 0;
 uint32_t gWatchdogTimeoutSec      = 0;
 chip::Optional<bool> gRequestorCanConsent;
@@ -93,6 +108,8 @@ bool gAutoApplyImage                            = false;
 bool gSendNotifyUpdateApplied                   = true;
 bool gSkipExecImageFile                         = false;
 static std::optional<uint16_t> gMaxBDXBlockSize = std::nullopt;
+
+static std::optional<uint32_t> gBDXSkipAfterFirstBlock = std::nullopt;
 
 OptionDef cmdLineOptionsDef[] = {
     { "autoApplyImage", chip::ArgParser::kNoArgument, kOptionAutoApplyImage },
@@ -105,6 +122,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "skipExecImageFile", chip::ArgParser::kNoArgument, kSkipExecImageFile },
     { "maxBDXBlockSize", chip::ArgParser::kArgumentRequired, kOptionMaxBDXBlockSize },
     { "largePayload", chip::ArgParser::kNoArgument, kOptionLargePayload },
+    { "bdxSkipAfterFirstBlock", chip::ArgParser::kArgumentRequired, kOptionBDXSkipAfterFirstBlock },
     {},
 };
 
@@ -145,6 +163,10 @@ OptionSet cmdLineOptions = {
     "  -l, --largePayload\n"
     "       If supplied, enables support for large payloads.\n"
     "       If a session is not open, it establishes a session using TCP to allow large data transmission.\n"
+    "  --bdxSkipAfterFirstBlock <number of bytes>\n"
+    "       For testing OTA providers. After the first block of each download, send a BDX BlockQueryWithSkip\n"
+    "       that skips the given number of bytes, instead of a BlockQuery. The skipped bytes are missing from\n"
+    "       the downloaded image, so the image must not be applied.\n"
 };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
@@ -191,6 +213,22 @@ void CustomOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
         // All member variables will be implicitly reset upon loading into the new image.
         DefaultOTARequestorDriver::UpdateConfirmed(delay);
     }
+}
+
+CHIP_ERROR SkipTestBDXDownloader::BeginPrepareDownload()
+{
+    mSkipPending = gBDXSkipAfterFirstBlock.has_value();
+    return BDXDownloader::BeginPrepareDownload();
+}
+
+CHIP_ERROR SkipTestBDXDownloader::FetchNextData()
+{
+    if (mSkipPending)
+    {
+        mSkipPending = false;
+        return SkipData(*gBDXSkipAfterFirstBlock);
+    }
+    return BDXDownloader::FetchNextData();
 }
 
 void CustomOTARequestorDriver::AppliedNotifyUpdateTimer(System::Layer * systemLayer, void * appState)
@@ -320,6 +358,18 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionLargePayload: {
         gRequestorCore.SetLargePayload(true);
         break;
+    case kOptionBDXSkipAfterFirstBlock: {
+        uint32_t skip;
+        if (!ParseInt(aValue, skip))
+        {
+            PrintArgError("%s: ERROR: Invalid bdxSkipAfterFirstBlock parameter: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            gBDXSkipAfterFirstBlock = skip;
+        }
+        break;
     }
     default:
         ChipLogError(SoftwareUpdate, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -327,45 +377,45 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         break;
     }
 
-    return (retval);
-}
-
-void ApplicationInit()
-{
-    // Initialize all OTA download components
-    InitOTARequestor();
-}
-
-void ApplicationShutdown() {}
-
-int main(int argc, char * argv[])
-{
-    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions, MakeOptional(kNetworkCommissioningEndpointSecondary)) == 0);
-    ChipLinuxAppMainLoop();
-
-    // If the event loop had been stopped due to an update being applied, boot into the new image
-    if (gRequestorCore.GetCurrentUpdateState() == OTAUpdateStateEnum::kApplying)
-    {
-        if (kMaxFilePathSize <= strlen(kImageExecPath))
-        {
-            ChipLogError(SoftwareUpdate, "Buffer too small for the new image file path: %s", kImageExecPath);
-            return -1;
-        }
-
-        // Set the boot reason to SoftwareUpdateCompleted since the OTA requestor is going to boot into the new image after applying
-        // the firmware update.
-        CHIP_ERROR err = ConfigurationMgr().StoreBootReason(to_underlying(BootReasonEnum::kSoftwareUpdateCompleted));
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(SoftwareUpdate, "Failed to store boot reason - SoftwareUpdateCompleted");
-        }
-
-        std::string imageExecPath(kImageExecPath);
-        argv[0] = imageExecPath.data();
-        execv(argv[0], argv);
-
-        // If successfully executing the new image, execv should not return
-        ChipLogError(SoftwareUpdate, "The OTA image is invalid");
+        return (retval);
     }
-    return 0;
-}
+
+    void ApplicationInit()
+    {
+        // Initialize all OTA download components
+        InitOTARequestor();
+    }
+
+    void ApplicationShutdown() {}
+
+    int main(int argc, char * argv[])
+    {
+        VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions, MakeOptional(kNetworkCommissioningEndpointSecondary)) == 0);
+        ChipLinuxAppMainLoop();
+
+        // If the event loop had been stopped due to an update being applied, boot into the new image
+        if (gRequestorCore.GetCurrentUpdateState() == OTAUpdateStateEnum::kApplying)
+        {
+            if (kMaxFilePathSize <= strlen(kImageExecPath))
+            {
+                ChipLogError(SoftwareUpdate, "Buffer too small for the new image file path: %s", kImageExecPath);
+                return -1;
+            }
+
+            // Set the boot reason to SoftwareUpdateCompleted since the OTA requestor is going to boot into the new image after
+            // applying the firmware update.
+            CHIP_ERROR err = ConfigurationMgr().StoreBootReason(to_underlying(BootReasonEnum::kSoftwareUpdateCompleted));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(SoftwareUpdate, "Failed to store boot reason - SoftwareUpdateCompleted");
+            }
+
+            std::string imageExecPath(kImageExecPath);
+            argv[0] = imageExecPath.data();
+            execv(argv[0], argv);
+
+            // If successfully executing the new image, execv should not return
+            ChipLogError(SoftwareUpdate, "The OTA image is invalid");
+        }
+        return 0;
+    }

@@ -170,6 +170,9 @@ class TC_ACS_3_3(MatterTestCommissionedDevice):
                 "AmbientContextType": [{"TypeId": namespaceID1, "TagId": tag1}, {"TypeId": namespaceID2, "TagId": tag2}, {"TypeId": namespaceID3, "TagId": tag3}]
             })
             await asyncio.sleep(ci_wait_time)
+        else:
+            self.wait_for_user_input(
+                prompt_msg="Input DUT supporting AmbientContextTypeSupported attribute values (ex. SetAmbientContextSupport function execution), and Press ENTER after done.")
 
         self.step("2", "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test. Subscription min interval = 0 and max interval = 30 seconds.")
         attribute_list = await self.read_single_attribute_check_success(
@@ -496,19 +499,11 @@ class TC_ACS_3_3(MatterTestCommissionedDevice):
             # trigger the counting sensing event
             if self.is_ci:
                 self.write_to_app_pipe({
-                    "Name": "AddAmbientContextDetect",
-                    "EndpointId": endpoint,
-                    "AmbientContextType": [{"TypeId": namespaceID2, "TagId": tag2}]
-                })
-                # Add delay to make sure it's done
-                await asyncio.sleep(ci_wait_time)
-
-                self.write_to_app_pipe({
                     "Name": "SetObjectCount",
                     "EndpointId": endpoint,
                     "ObjectCount": 2
                 })
-                # Add 1 second delay to make sure it's done
+                # Add time delay to make sure it's done
                 await asyncio.sleep(ci_wait_time)
             else:
                 self.wait_for_user_input(
