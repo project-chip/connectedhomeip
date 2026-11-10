@@ -18,9 +18,9 @@
 
 #include <DeviceInstances.h>
 
-#include <PosixDeviceFactory.h>
+#include <bridged-device-manager/oob-accessors/AddBridgedDeviceOOBAccessor.h>
+#include <bridged-device-manager/oob-accessors/RemoveBridgedDeviceOOBAccessor.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
@@ -76,23 +76,26 @@ DeviceInstances::DeviceInstances(const Context & context) :
             .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
-        []([[maybe_unused]] bool enableWiFi, [[maybe_unused]] bool emulateWiFi) {
+        []([[maybe_unused]] bool enableWiFi, [[maybe_unused]] bool emulateWiFi, [[maybe_unused]] bool enableThread) {
             BitFlags<AppRootNode::EnabledFeatures> features;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
             features.Set(AppRootNode::EnabledFeatures::kWiFi, enableWiFi);
             features.Set(AppRootNode::EnabledFeatures::kEmulatedWiFi, emulateWiFi);
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+            features.Set(AppRootNode::EnabledFeatures::kThread, enableThread);
+#endif
             return features;
-        }(mContext.enableWiFi, mContext.emulateWiFi))
+        }(mContext.enableWiFi, mContext.emulateWiFi, mContext.enableThread))
 {}
 
 CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> & deviceEntries)
 {
     ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
 
-    DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds(deviceEntries));
-    endpointIdAllocator.ForceNext(kRootEndpointId);
-    ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
+    mEndpointIdAllocator.emplace(GetReservedEndpointIds(deviceEntries));
+    mEndpointIdAllocator->ForceNext(kRootEndpointId);
+    ReturnErrorOnFailure(mRootNode.RootDevice().Register(*mEndpointIdAllocator, mDataModelProvider));
 
     PosixDeviceFactory::GetInstance().Init(PosixDeviceFactory::Context{
         .groupDataProvider        = mContext.groupDataProvider,
@@ -120,11 +123,21 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
                         entry.parentId);
         if (entry.endpoint != kInvalidEndpointId)
         {
-            endpointIdAllocator.ForceNext(entry.endpoint);
+            mEndpointIdAllocator->ForceNext(entry.endpoint);
         }
         ReturnErrorOnFailure(
-            created.Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
+            created.Register(*mEndpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
         mConstructedDevices.push_back(std::move(created));
+    }
+
+    mBridgedDeviceManager.emplace(PosixDeviceFactory::GetInstance(), mDataModelProvider, *mEndpointIdAllocator);
+
+    {
+        auto scopedDependency = OOBAccessorRegistry::Instance().WithDependency(&*mBridgedDeviceManager);
+        ReturnErrorOnFailure(
+            OOBAccessorRegistry::Instance().Register(std::make_unique<AddBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
+        ReturnErrorOnFailure(
+            OOBAccessorRegistry::Instance().Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
     }
 
     return CHIP_NO_ERROR;
@@ -132,6 +145,12 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
 
 void DeviceInstances::Shutdown()
 {
+    if (mBridgedDeviceManager.has_value())
+    {
+        OOBAccessorRegistry::Instance().Unregister(&*mBridgedDeviceManager);
+        mBridgedDeviceManager.reset();
+    }
+    mEndpointIdAllocator.reset();
     for (auto & device : mConstructedDevices)
     {
         device.Unregister(mDataModelProvider);

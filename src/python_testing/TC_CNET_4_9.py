@@ -24,6 +24,7 @@
 #     app: ${ALL_DEVICES_APP}
 #     factory-reset: true
 #     quiet: true
+#     tags: [ble-wifi]
 #     app-ready-pattern: "APP STATUS: Starting event loop"
 #     app-args: --discriminator 3840 --KVS /tmp/cnet_4_9_kvs --ble-controller 0 --wifi --interface-id -1
 #     script-args: >

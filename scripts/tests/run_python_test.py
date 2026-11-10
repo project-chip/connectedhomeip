@@ -43,7 +43,7 @@ from colorama import Fore, Style
 
 from matter.testing.commissioning_types import CommissioningMethod
 from matter.testing.defaults import TestingDefaults
-from matter.testing.metadata import Metadata, MetadataReader
+from matter.testing.metadata import TAG_OPTION_HELP, Metadata, MetadataReader, RunArgumentsError, TagFilter, extract_runs_args
 from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
 
@@ -276,7 +276,9 @@ def linux_ble_wifi_environment() -> typing.Generator[tuple[tuple[str, ...], tupl
 @click.option("--quiet/--no-quiet", default=None,
               help="Do not print output from passing tests. Use this flag in CI to keep GitHub log size manageable.")
 @click.option("--load-from-env", default=None, help="YAML file that contains values for environment variables.")
-@click.option("--run", type=str, multiple=True, help="Run only the specified test run(s).")
+@click.option("--run", type=str, multiple=True, help="Run only the specified test run(s), whatever their tags.")
+@click.option("--tag", "tags", type=str, multiple=True,
+              help=f"{TAG_OPTION_HELP} Can't be combined with --run.")
 @click.option("--ip-packet-capture/--no-ip-packet-capture", is_flag=True, default=False, help="Enable IP packet capture.")
 @click.option("--ip-packet-capture-dir", type=click.Path(file_okay=False, writable=True, path_type=pathlib.Path),
               default=pathlib.Path.cwd() / "out/ip_packet_captures", help="Storage for capture files.")
@@ -291,13 +293,23 @@ def linux_ble_wifi_environment() -> typing.Generator[tuple[tuple[str, ...], tupl
                    "the same path.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
-         script_gdb: bool, quiet: bool, load_from_env: str | None, run: tuple[str, ...], ip_packet_capture: bool,
-         ip_packet_capture_dir: pathlib.Path, app_filter: str | None, pre_existing_fabric: bool,
+         script_gdb: bool, quiet: bool, load_from_env: str | None, run: tuple[str, ...], tags: tuple[str, ...],
+         ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path, app_filter: str | None, pre_existing_fabric: bool,
          summary_file: pathlib.Path | None, internal_inside_unshare: bool) -> None:
     """Run the configured Matter Python test."""
+    if run and tags:
+        raise click.BadOptionUsage("tags", "--run and --tag can't be combined: --run names the runs whatever their tags.")
+    try:
+        tag_filter = TagFilter.parse(tags)
+    except ValueError as e:
+        raise click.BadParameter(str(e), param_hint="--tag")
+
     if load_from_env:
         reader = MetadataReader(load_from_env)
-        runs = reader.parse_script(script)
+        try:
+            runs = reader.parse_script(script)
+        except RunArgumentsError as e:
+            raise click.ClickException(str(e))
     else:
         runs = [
             Metadata(
@@ -321,12 +333,24 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
     if run:
         # Filter runs based on the command line arguments
         runs = [r for r in runs if r.run in run]
+    else:
+        for r in runs:
+            if not tag_filter.matches(r.tags):
+                log.info("Skipping run '%s' (tags: %s), it doesn't match '%s'; select it with --run %s",
+                         r.run, ", ".join(r.tags), tag_filter, r.run)
+        runs = [r for r in runs if tag_filter.matches(r.tags)]
 
     if app_filter:
         allowed_apps = [s.strip() for s in app_filter.split(',')]
-        # app name in metadata is like "${APP_NAME}"
         allowed_apps_with_format = [f"${{{app}}}" for app in allowed_apps]
-        runs = [r for r in runs if r.app in allowed_apps_with_format]
+        # Match the app as the script names it ("${APP_NAME}"), since parse_script() replaces the name with its path.
+        script_apps = {name: args.get("app", "") for name, args in extract_runs_args(script).items()}
+        runs = [r for r in runs if script_apps.get(r.run) in allowed_apps_with_format]
+
+    if not runs:
+        raise click.ClickException(
+            f"No runs left to execute in '{script}' after --run, --tag and --app-filter. "
+            "Name a run with --run to execute it whatever its tags.")
 
     # Override runs Metadata with the command line options
     for run in runs:

@@ -271,6 +271,8 @@
 		51D10D2E2808E2CA00E8CA3D /* MTRTestStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 51D10D2D2808E2CA00E8CA3D /* MTRTestStorage.m */; };
 		51D9CB0B2BA37DCE0049D6DB /* MTRDSTOffsetTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51D9CB0A2BA37DCE0049D6DB /* MTRDSTOffsetTests.m */; };
 		C0DE0136770254000000A002 /* MTRDeviceReadThroughTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0136770254000000A001 /* MTRDeviceReadThroughTests.m */; };
+		C0DE0136770254000000B002 /* MTRDeviceReportFilterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0136770254000000B001 /* MTRDeviceReportFilterTests.m */; };
+		C0DE0136770254000000C002 /* MTRTestResponseValues.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0136770254000000C001 /* MTRTestResponseValues.m */; };
 		51DA8F422E7B4236008B7A65 /* MTRNetworkInterfaceInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51DA8F402E7B4236008B7A65 /* MTRNetworkInterfaceInfo.mm */; };
 		51DA8F432E7B4236008B7A65 /* MTRNetworkInterfaceInfo_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 51DA8F412E7B4236008B7A65 /* MTRNetworkInterfaceInfo_Internal.h */; };
 		51DA8F442E7B4236008B7A65 /* MTRNetworkInterfaceInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 51DA8F3F2E7B4236008B7A65 /* MTRNetworkInterfaceInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -928,6 +930,9 @@
 		51D10D2D2808E2CA00E8CA3D /* MTRTestStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestStorage.m; sourceTree = "<group>"; };
 		51D9CB0A2BA37DCE0049D6DB /* MTRDSTOffsetTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRDSTOffsetTests.m; sourceTree = "<group>"; };
 		C0DE0136770254000000A001 /* MTRDeviceReadThroughTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceReadThroughTests.m; sourceTree = "<group>"; };
+		C0DE0136770254000000B001 /* MTRDeviceReportFilterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceReportFilterTests.m; sourceTree = "<group>"; };
+		C0DE0136770254000000C001 /* MTRTestResponseValues.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestResponseValues.m; sourceTree = "<group>"; };
+		C0DE0136770254000000C003 /* MTRTestResponseValues.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestResponseValues.h; sourceTree = "<group>"; };
 		51DA8F3F2E7B4236008B7A65 /* MTRNetworkInterfaceInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRNetworkInterfaceInfo.h; sourceTree = "<group>"; };
 		51DA8F402E7B4236008B7A65 /* MTRNetworkInterfaceInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRNetworkInterfaceInfo.mm; sourceTree = "<group>"; };
 		51DA8F412E7B4236008B7A65 /* MTRNetworkInterfaceInfo_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRNetworkInterfaceInfo_Internal.h; sourceTree = "<group>"; };
@@ -1675,6 +1680,8 @@
 				3DF5219D2D62C3E5008F8E52 /* MTRMockCB.m */,
 				510B18F02E315731000F9181 /* MTRSecureCodingTestHelpers.h */,
 				510B18F12E315731000F9181 /* MTRSecureCodingTestHelpers.m */,
+				C0DE0136770254000000C003 /* MTRTestResponseValues.h */,
+				C0DE0136770254000000C001 /* MTRTestResponseValues.m */,
 			);
 			path = TestHelpers;
 			sourceTree = "<group>";
@@ -2050,6 +2057,7 @@
 				511FAD1C2DA82E5900E75D18 /* MTRDiagnosticLogDownloadTests.m */,
 				51D9CB0A2BA37DCE0049D6DB /* MTRDSTOffsetTests.m */,
 				C0DE0136770254000000A001 /* MTRDeviceReadThroughTests.m */,
+				C0DE0136770254000000B001 /* MTRDeviceReportFilterTests.m */,
 				3D9F2FCF2D11FE90003CA2BB /* MTREndpointInfoTests.m */,
 				3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */,
 				51578AE82D0B9B1D001716FF /* MTRErrorMappingTests.m */,
@@ -2954,6 +2962,8 @@
 				51E95DF82A78110900A434F0 /* MTRPerControllerStorageTests.m in Sources */,
 				51D9CB0B2BA37DCE0049D6DB /* MTRDSTOffsetTests.m in Sources */,
 				C0DE0136770254000000A002 /* MTRDeviceReadThroughTests.m in Sources */,
+				C0DE0136770254000000B002 /* MTRDeviceReportFilterTests.m in Sources */,
+				C0DE0136770254000000C002 /* MTRTestResponseValues.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

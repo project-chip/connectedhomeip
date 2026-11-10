@@ -50,6 +50,8 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, copy, nullable) dispatch_block_t onTimeSynchronizationLossDetected;
 @property (atomic) BOOL forceTimeUpdateShortDelayToZero;
 @property (atomic, nullable) NSNumber * timeSynchronizationLossDetectionCadenceOverride;
+// Called after a subscription reattempt timer has handed its work to the Matter queue.
+@property (atomic, copy, nullable) dispatch_block_t onSubscriptionReattemptDispatched;
 @end
 
 @interface MTRDeviceTestDelegateWithSubscriptionSetupOverride : MTRDeviceTestDelegate
