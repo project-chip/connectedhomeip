@@ -44,6 +44,7 @@ from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
+from matter.exceptions import ChipStackError
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body, pics
 from matter.testing.runner import default_matter_test_main
@@ -65,6 +66,9 @@ UNPRIVILEGED_CLUSTER = Clusters.BasicInformation
 # Offset added to the largest observed event number to build an EventMin no event can satisfy.
 EVENT_MIN_BEYOND_LATEST = 1000
 
+# ChipStackError code for a Status Response with INVALID_ACTION (IM global status 0x80).
+INVALID_ACTION_ERROR_CODE = 0x580
+
 
 class TC_IDM_6_2(IDMBaseTest):
     """Events subscribe interaction from TH to DUT. [{DUT_Server}]"""
@@ -82,6 +86,18 @@ class TC_IDM_6_2(IDMBaseTest):
     @property
     def default_timeout(self) -> int:
         return 600
+
+    async def assert_event_subscribe_invalid_action(self, ctrl: ChipDeviceController, events: list) -> None:
+        """Require the DUT to reject a subscribe to `events` with INVALID_ACTION.
+
+        Spec (Incoming Read Request and Subscribe Request Action Processing): every path the
+        subscriber cannot read is discarded. With no error-free path left, EventRequests are
+        empty, and a subscribe with empty requests gets a Status Response with INVALID_ACTION.
+        """
+        with asserts.assert_raises(ChipStackError, "DUT accepted a subscribe whose event paths are all unreadable; expected INVALID_ACTION") as cm:
+            await self.priming_report_events(ctrl, events)
+        asserts.assert_equal(cm.exception.err, INVALID_ACTION_ERROR_CODE,
+                             "Expected INVALID_ACTION: every requested event path is unreadable, so EventRequests are empty")
 
     @pics("MCORE.IDM.S")
     @async_test_body
@@ -181,13 +197,8 @@ class TC_IDM_6_2(IDMBaseTest):
 
         self.step(9, "Activate Event subscription from TH to DUT with no change in event triggering attribute values before maximum interval.",
                   expectation="Verify TH receives Report Data Message every maximum interval or possibly more frequently to keep the subscription alive.")
-        async with self.event_subscription(
-            th,
-            [(endpoint, EVENT, False)],
-            event=EVENT,
-            min_interval_sec=0,
-            max_interval_sec=self.keepalive_max_interval_sec,
-        ) as (_handler, sub):
+        async with self.event_subscription_without_handler(
+                th, [(endpoint, EVENT, False)], max_interval_sec=self.keepalive_max_interval_sec) as sub:
             await assert_subscription_heartbeat_received(
                 sub, self.negotiated_max_interval_sec(sub), buffer_s=mrp_timeout_sec)
 
@@ -230,13 +241,8 @@ class TC_IDM_6_2(IDMBaseTest):
                   "MaxInterval - the final maximum interval for the subscription in seconds (uint16 type).")
         # ReadEvent returns only after the stack has acked the priming report with
         # StatusResponse(Success) and the DUT has sent SubscribeResponse.
-        async with self.event_subscription(
-            th,
-            [(endpoint, EVENT, False)],
-            event=EVENT,
-            min_interval_sec=0,
-            max_interval_sec=self.max_interval_ceiling_sec,
-        ) as (_handler, sub):
+        async with self.event_subscription_without_handler(
+                th, [(endpoint, EVENT, False)], max_interval_sec=self.max_interval_ceiling_sec) as sub:
             asserts.assert_true(self.successful_event_reports(sub.GetEvents(), EVENT),
                                 "Priming report did not include the subscribed event")
             asserts.assert_true(self.is_valid_uint32_value(sub.subscriptionId),
@@ -261,8 +267,8 @@ class TC_IDM_6_2(IDMBaseTest):
         # https://github.com/project-chip/connectedhomeip/issues/23990
         self.mark_current_step_skipped()
 
-        self.step(14, "TH sends Subscribe Request Message to DUT with EventRequests set to path which requires a privilege that is not granted for the cluster in the path.",
-                  expectation="Verify TH receives Report Data Message for the event with EventStatusIB generated with the UNSUPPORTED_ACCESS Status Code 0x7E.")
+        self.step("14a", "TH sends Subscribe Request Message to DUT with EventRequests set only to an event path that TH does not have the privilege to read.",
+                  expectation="Verify DUT responds with a Status Response Message with the INVALID_ACTION Status Code 0x80 and does not establish the subscription.")
         cr2_ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
@@ -271,35 +277,26 @@ class TC_IDM_6_2(IDMBaseTest):
         )
         try:
             await self.add_ace_to_dut_acl(th, cr2_ace, dut_acl_original)
-            # A subscribe whose only path is inaccessible is rejected with InvalidAction
-            # before any EventStatusIB. BasicInformation is readable at view, so the
-            # subscription is accepted and AccessControlEntryChanged comes back as
-            # UnsupportedAccess.
-            async with self.event_subscription(
-                cr2,
-                [(endpoint, EVENT, False), (endpoint, UNPRIVILEGED_CLUSTER, False)],
-                event=EVENT,
-                min_interval_sec=0,
-                max_interval_sec=self.max_interval_ceiling_sec,
-            ) as (_handler, sub):
-                self.assert_event_status(sub.GetEvents(), Status.UnsupportedAccess)
+            await self.assert_event_subscribe_invalid_action(cr2, [(endpoint, EVENT, False)])
 
-            self.step(15, "TH sends Subscribe Request Message to DUT with EventRequests set to Wildcard path where reading an event in the path requires a privilege that is not granted for the cluster in the path.",
-                      expectation="Verify TH receives Report Data Message with no entry for that event in EventReports list.")
-            async with self.event_subscription(
-                cr2,
-                ['*'],
-                cluster=EVENT_CLUSTER,
-                min_interval_sec=0,
-                max_interval_sec=self.max_interval_ceiling_sec,
-            ) as (_handler, sub):
-                reports = sub.GetEvents()
-                asserts.assert_equal(
-                    self.successful_event_reports(reports, EVENT), [],
-                    "Wildcard report included AccessControlEntryChanged, which CR2 cannot read")
-                asserts.assert_true(
-                    self.successful_event_reports(reports),
-                    "Wildcard report had no events CR2 is allowed to read")
+            self.step("14b", "TH sends Subscribe Request Message to DUT with EventRequests set to the event path from step 14a and an event path that TH has the privilege to read.",
+                      expectation="Verify the subscription is established and TH receives Report Data Message with an EventStatusIB for the step 14a event with the UNSUPPORTED_ACCESS Status Code 0x7E.")
+            priming = await self.priming_report_events(cr2, [(endpoint, EVENT, False), (endpoint, UNPRIVILEGED_CLUSTER, False)])
+            self.assert_event_status(priming, Status.UnsupportedAccess)
+
+            self.step("15a", "TH sends Subscribe Request Message to DUT with EventRequests set only to a Wildcard event path where TH does not have the privilege to read any event in the path.",
+                      expectation="Verify DUT responds with a Status Response Message with the INVALID_ACTION Status Code 0x80 and does not establish the subscription.")
+            await self.assert_event_subscribe_invalid_action(cr2, [EVENT_CLUSTER])
+
+            self.step("15b", "TH sends Subscribe Request Message to DUT with EventRequests set to a Wildcard event path that includes events TH has the privilege to read and an event TH does not have the privilege to read.",
+                      expectation="Verify the subscription is established and TH receives Report Data Message with no entry in the EventReports list for the event TH does not have the privilege to read.")
+            priming = await self.priming_report_events(cr2, ['*'])
+            asserts.assert_equal(
+                self.successful_event_reports(priming, EVENT), [],
+                "Wildcard report included AccessControlEntryChanged, which CR2 cannot read")
+            asserts.assert_true(
+                self.successful_event_reports(priming),
+                "Wildcard report had no events CR2 is allowed to read")
         finally:
             try:
                 await self.write_dut_acl(th, dut_acl_original)
@@ -343,17 +340,11 @@ class TC_IDM_6_2(IDMBaseTest):
                   "Verify that the subsequent ReportData actions as part of the subscription include the latest EventNo associated with each node generating new events.")
         event_numbers = await self.read_event_numbers(th, endpoint, EVENT)
         latest = event_numbers[-1]
-        async with self.event_subscription(
-            th,
-            [(endpoint, EVENT, False)],
-            event=EVENT,
-            min_interval_sec=0,
-            max_interval_sec=self.max_interval_ceiling_sec,
-            event_number_filter=latest + EVENT_MIN_BEYOND_LATEST,
-        ) as (_handler, sub):
-            asserts.assert_equal(
-                self.successful_event_reports(sub.GetEvents()), [],
-                "EventMin past every stored event still returned event data")
+        priming = await self.priming_report_events(
+            th, [(endpoint, EVENT, False)], event_number_filter=latest + EVENT_MIN_BEYOND_LATEST)
+        asserts.assert_equal(
+            self.successful_event_reports(priming), [],
+            "EventMin past every stored event still returned event data")
         # EventMin just above the log is empty now, and the next generated event clears it.
         async with self.event_subscription(
             th,

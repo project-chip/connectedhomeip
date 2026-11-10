@@ -2673,14 +2673,7 @@ class IDMBaseTest(BasicCompositionTests):
     async def subscribe_event_path(self, ctrl: ChipDeviceCtrl, path: EventSubscribePath, event, cluster,
                                    seen_ids: set[int]) -> None:
         """Subscribe to one TC-IDM-6.2 path shape and record its SubscriptionId."""
-        async with self.event_subscription(
-            ctrl,
-            path.events,
-            cluster=cluster,
-            event=event,
-            min_interval_sec=0,
-            max_interval_sec=3,
-        ) as (_handler, sub):
+        async with self.event_subscription_without_handler(ctrl, path.events, max_interval_sec=3) as sub:
             self.verify_event_subscription(sub, path, event, cluster)
             asserts.assert_not_in(sub.subscriptionId, seen_ids, f"SubscriptionId 0x{sub.subscriptionId:08x} was reused")
             seen_ids.add(sub.subscriptionId)
@@ -2741,7 +2734,30 @@ class IDMBaseTest(BasicCompositionTests):
             handler = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         else:
             handler = EventSubscriptionHandler(expected_cluster=cluster)
-        sub = await ctrl.ReadEvent(
+        sub = await self.subscribe_events(
+            ctrl,
+            events,
+            min_interval_sec=min_interval_sec,
+            max_interval_sec=max_interval_sec,
+            keep_subscriptions=keep_subscriptions,
+            event_number_filter=event_number_filter,
+        )
+        sub.SetEventUpdateCallback(handler)
+        handler._subscription = sub
+        return handler, sub
+
+    async def subscribe_events(
+        self,
+        ctrl: ChipDeviceCtrl,
+        events: list,
+        *,
+        min_interval_sec: int = 0,
+        max_interval_sec: int = 5,
+        keep_subscriptions: bool = False,
+        event_number_filter: int | None = None,
+    ) -> SubscriptionTransaction:
+        """Subscribe to `events` without fabric filtering or auto-resubscribe. The caller shuts it down."""
+        return await ctrl.ReadEvent(
             nodeId=self.dut_node_id,
             events=events,
             eventNumberFilter=event_number_filter,
@@ -2750,9 +2766,24 @@ class IDMBaseTest(BasicCompositionTests):
             keepSubscriptions=keep_subscriptions,
             autoResubscribe=False,
         )
-        sub.SetEventUpdateCallback(handler)
-        handler._subscription = sub
-        return handler, sub
+
+    @contextlib.asynccontextmanager
+    async def event_subscription_without_handler(self, ctrl: ChipDeviceCtrl, events: list, **kwargs):
+        """subscribe_events() plus Shutdown() when the block exits.
+
+        For checks on the SubscriptionTransaction itself. Later reports are not
+        queued; use event_subscription() to wait for them.
+        """
+        sub = await self.subscribe_events(ctrl, events, **kwargs)
+        try:
+            yield sub
+        finally:
+            sub.Shutdown()
+
+    async def priming_report_events(self, ctrl: ChipDeviceCtrl, events: list, **kwargs) -> list[EventReadResult]:
+        """Subscribe to `events`, end the subscription, and return the events of its priming report."""
+        async with self.event_subscription_without_handler(ctrl, events, **kwargs) as sub:
+            return list(sub.GetEvents())
 
     @contextlib.contextmanager
     def retain_client_subscription(self, sub: SubscriptionTransaction):
