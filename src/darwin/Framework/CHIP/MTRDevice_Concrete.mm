@@ -456,32 +456,17 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device;
 - (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device;
 - (void)unitTestSubscriptionReattemptDispatchedForDevice:(MTRDevice *)device;
-- (NSNumber *)unitTestResolvingCASESetupKeepSecondsOverrideForDevice:(MTRDevice *)device;
-- (void)unitTestResolvingCASESetupKeptForDevice:(MTRDevice *)device;
 - (void)unitTestCASESetupReleasedForReachabilityForDevice:(MTRDevice *)device;
 @end
 #endif
-
-// How long after first sparing a CASE setup that is resolving the node's address a reachability signal keeps sparing it.
-// A resolve that a fresh advertisement answers finishes well within this (the address resolver's own minimum lookup window
-// is CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS, 200 ms by default). A setup still resolving after this is most likely
-// waiting on a DNS-SD query that has already ended, which the address resolver only gives up on after
-// CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS (45 s by default); releasing it then restarts the lookup, as for any other
-// stalled setup.
-static constexpr NSTimeInterval kResolvingCASESetupMaxKeepSeconds = 5;
 
 @implementation MTRDevice_Concrete {
 #ifdef DEBUG
     NSUInteger _unitTestAttributesReportedSinceLastCheck;
     NSUInteger _unitTestEventsReportedSinceLastCheck;
-    // Reachability-signal decisions about the node's CASE setup; only accessed on the Matter queue.
-    NSUInteger _unitTestResolvingCASESetupKeptCount;
+    // CASE setups released by a reachability signal; only accessed on the Matter queue.
     NSUInteger _unitTestCASESetupReleasedForReachabilityCount;
 #endif
-
-    // When a reachability signal first spared a CASE setup that was resolving the node's address; nil when none is being
-    // spared. Only accessed on the Matter queue.
-    NSDate * _Nullable _resolvingCASESetupKeptSince;
 
     // _deviceCachePrimed is true if we have the data that comes from an initial
     // subscription priming report (whether it came from storage or from our
@@ -1274,54 +1259,6 @@ static constexpr NSTimeInterval kResolvingCASESetupMaxKeepSeconds = 5;
 // Trigger a resubscribe as needed.  nodeLikelyReachable should be YES if we
 // have reason to suspect the node is now reachable, NO if we have no idea
 // whether it might be.
-// Returns whether a reachability signal should leave the CASE setup for peerId in place because it is still resolving the
-// node's address. Must be called on the Matter queue.
-- (BOOL)_shouldKeepResolvingCASESetupForPeer:(const chip::ScopedNodeId &)peerId sessionManager:(chip::CASESessionManager *)caseSessionMgr
-{
-    assertChipStackLockedByCurrentThread();
-
-    auto setupPhase = caseSessionMgr->GetSessionSetupPhase(peerId);
-    if (!setupPhase.HasValue() || setupPhase.Value() != chip::OperationalSessionSetup::SetupPhase::kResolvingAddress) {
-        _resolvingCASESetupKeptSince = nil;
-        return NO;
-    }
-
-    NSTimeInterval maxKeepSeconds = kResolvingCASESetupMaxKeepSeconds;
-#ifdef DEBUG
-    __block NSNumber * maxKeepOverride = nil;
-    {
-        std::lock_guard lock(_lock);
-        [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
-            if ([testDelegate respondsToSelector:@selector(unitTestResolvingCASESetupKeepSecondsOverrideForDevice:)]) {
-                maxKeepOverride = [testDelegate unitTestResolvingCASESetupKeepSecondsOverrideForDevice:self];
-            }
-        }];
-    }
-    if (maxKeepOverride != nil) {
-        maxKeepSeconds = maxKeepOverride.doubleValue;
-    }
-#endif
-
-    NSDate * now = [NSDate now];
-    if (_resolvingCASESetupKeptSince == nil) {
-        _resolvingCASESetupKeptSince = now;
-    } else if ([now timeIntervalSinceDate:_resolvingCASESetupKeptSince] >= maxKeepSeconds) {
-        MTR_LOG("%@ CASE setup has been resolving the node's address for over %.1f s after a reachability signal; releasing it", self, maxKeepSeconds);
-        _resolvingCASESetupKeptSince = nil;
-        return NO;
-    }
-
-#ifdef DEBUG
-    _unitTestResolvingCASESetupKeptCount++;
-    [self _lockAndCallDelegatesWithBlock:^(id testDelegate) {
-        if ([testDelegate respondsToSelector:@selector(unitTestResolvingCASESetupKeptForDevice:)]) {
-            [testDelegate unitTestResolvingCASESetupKeptForDevice:self];
-        }
-    }];
-#endif
-    return YES;
-}
-
 - (void)_triggerResubscribeWithReason:(NSString *)reason nodeLikelyReachable:(BOOL)nodeLikelyReachable poolWorkCompletion:(MTRAsyncWorkCompletionBlock _Nullable)poolWorkCompletion
 {
     MTR_LOG("%@ _triggerResubscribeWithReason called with reason %@, nodeLikelyReachable: %@", self, reason, MTR_YES_NO(nodeLikelyReachable));
@@ -1376,15 +1313,21 @@ static constexpr NSTimeInterval kResolvingCASESetupMaxKeepSeconds = 5;
         [self _setLastSubscriptionAttemptWait:0];
         os_unfair_lock_unlock(&self->_lock);
 
-        // Decide in this Matter queue turn: a DNS-SD answer queued behind this notification could otherwise move a
-        // resolving setup to connecting first, and the setup would then be released just after it got its address.
+        // Decide in this Matter queue turn, on the setup's phase as of this notification. A setup whose Sigma1 is unanswered
+        // may have sent it to a stale address that this signal supersedes, and a setup waiting to retry would otherwise sit out
+        // its backoff; both are released. A setup still resolving the address, or one whose handshake has moved past Sigma1,
+        // is left to finish.
         auto * commissioner = [self._concreteController commissionerOnMatterQueue];
         if (commissioner != nullptr) {
             auto caseSessionMgr = commissioner->CASESessionMgr();
             VerifyOrDie(caseSessionMgr != nullptr);
             auto peerId = commissioner->GetPeerScopedId(_nodeID.unsignedLongLongValue);
-            if ([self _shouldKeepResolvingCASESetupForPeer:peerId sessionManager:caseSessionMgr]) {
-                MTR_LOG("%@ not interrupting CASE setup that is still resolving the node's address", self);
+            auto setupPhase = caseSessionMgr->GetSessionSetupPhase(peerId);
+            bool releaseSetup = setupPhase.HasValue()
+                && (setupPhase.Value() == OperationalSessionSetup::SetupPhase::kAwaitingSigma2
+                    || setupPhase.Value() == OperationalSessionSetup::SetupPhase::kWaitingForRetry);
+            if (!releaseSetup) {
+                MTR_LOG("%@ not interrupting CASE setup that is resolving the node's address or past Sigma1", self);
             } else {
                 caseSessionMgr->ReleaseSession(peerId);
 #ifdef DEBUG
@@ -1547,11 +1490,6 @@ static constexpr NSTimeInterval kResolvingCASESetupMaxKeepSeconds = 5;
     }
     if (lastState != state) {
         MTR_LOG("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
-
-        if (state != MTRInternalDeviceStateSubscribing) {
-            // The keep window covers one subscription attempt's CASE setup.
-            _resolvingCASESetupKeptSince = nil;
-        }
 
         /* BEGIN DRAGONS: This is a huge hack for a specific use case, do not rename, remove or modify behavior here */
         // TODO: This should only be called for thread devices
@@ -3665,12 +3603,6 @@ static constexpr NSTimeInterval kResolvingCASESetupMaxKeepSeconds = 5;
     NSUInteger eventsReportedSinceLastCheck = _unitTestEventsReportedSinceLastCheck;
     _unitTestEventsReportedSinceLastCheck = 0;
     return eventsReportedSinceLastCheck;
-}
-
-- (NSUInteger)unitTestResolvingCASESetupKeptCount
-{
-    assertChipStackLockedByCurrentThread();
-    return _unitTestResolvingCASESetupKeptCount;
 }
 
 - (NSUInteger)unitTestCASESetupReleasedForReachabilityCount

@@ -96,6 +96,15 @@ MTR_TESTABLE_DIRECT_MEMBERS
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 @end
 
+// Mirrors OperationalSessionSetup::SetupPhase for tests compiled as Objective-C; MTRDeviceController_Concrete checks the values match.
+typedef NS_ENUM(NSInteger, MTRTestSessionSetupPhase) {
+    MTRTestSessionSetupPhaseNone = -1,
+    MTRTestSessionSetupPhaseResolvingAddress = 0,
+    MTRTestSessionSetupPhaseAwaitingSigma2 = 1,
+    MTRTestSessionSetupPhaseWaitingForRetry = 2,
+    MTRTestSessionSetupPhaseOther = 3,
+};
+
 #pragma mark - Declarations for items compiled only for DEBUG configuration
 
 #ifdef DEBUG
@@ -106,6 +115,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 // Syncs onto the Matter queue: call off that queue, while the controller is running.
 - (NSUInteger)unitTestSessionRequestsWaitingOnConnectivityMonitorCount;
 - (BOOL)unitTestIsResolvingAddressForNodeID:(NSNumber *)nodeID;
+// Must be called on the Matter queue.  The node's CASE setup phase, as an MTRTestSessionSetupPhase.
+- (NSInteger)unitTestSessionSetupPhaseForNodeID:(NSNumber *)nodeID;
 @end
 
 @interface MTRBaseDevice (TestDebug)
@@ -128,7 +139,6 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (NSUInteger)unitTestInterestedPathsChangedCount;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
 // Must be called on the Matter queue.
-- (NSUInteger)unitTestResolvingCASESetupKeptCount;
 // Must be called on the Matter queue.
 - (NSUInteger)unitTestCASESetupReleasedForReachabilityCount;
 - (NSUInteger)unitTestEventsReportedSinceLastCheck;

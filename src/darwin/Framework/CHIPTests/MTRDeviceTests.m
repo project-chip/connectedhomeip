@@ -8573,18 +8573,18 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     return device;
 }
 
-// Delivers an operational advertisement for nodeID and returns how the device's reachability handling treated the node's
-// CASE setup, read in the same Matter queue turn as the notification.
-- (void)_advertiseNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller device:(MTRDevice *)device kept:(NSUInteger *)kept released:(NSUInteger *)released
+// Delivers an operational advertisement for nodeID, in one Matter queue turn: reads the node's CASE setup phase just before the
+// notification and how many setups the device's reachability handling has released just after it.
+- (void)_advertiseNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller device:(MTRDevice *)device phase:(NSInteger *)phase released:(NSUInteger *)released
 {
-    __block NSUInteger keptCount = 0;
+    __block NSInteger phaseAtAdvertisement = -1;
     __block NSUInteger releasedCount = 0;
     [controller syncRunOnWorkQueue:^{
+        phaseAtAdvertisement = [controller unitTestSessionSetupPhaseForNodeID:nodeID];
         [controller operationalInstanceAdded:nodeID];
-        keptCount = [device unitTestResolvingCASESetupKeptCount];
         releasedCount = [device unitTestCASESetupReleasedForReachabilityCount];
     } error:nil];
-    *kept = keptCount;
+    *phase = phaseAtAdvertisement;
     *released = releasedCount;
 }
 
@@ -8604,11 +8604,11 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
     __auto_type * device = [self _subscribingDeviceToTerminatedNodeWithNodeID:@(kDeviceId2) controller:controller delegate:delegate];
 
-    // The setup is spared in the advertisement's own Matter queue turn, not a later one.
-    NSUInteger kept = 0;
+    // A setup still resolving the node's address is left in place, decided in the advertisement's own Matter queue turn.
+    NSInteger phase = -1;
     NSUInteger released = 0;
-    [self _advertiseNodeID:@(kDeviceId2) controller:controller device:device kept:&kept released:&released];
-    XCTAssertEqual(kept, 1u);
+    [self _advertiseNodeID:@(kDeviceId2) controller:controller device:device phase:&phase released:&released];
+    XCTAssertEqual(phase, MTRTestSessionSetupPhaseResolvingAddress);
     XCTAssertEqual(released, 0u);
 
     XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateSubscribing);
@@ -8654,11 +8654,12 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
         [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
     }
 
-    // The advertisement's own decision releases the setup, in the same Matter queue turn.
-    NSUInteger kept = 0;
+    // The setup has sent Sigma1 to the frozen app and has had no answer; the advertisement releases it in the same Matter queue
+    // turn.
+    NSInteger phase = -1;
     NSUInteger released = 0;
-    [self _advertiseNodeID:@(kDeviceId2) controller:controller device:device kept:&kept released:&released];
-    XCTAssertEqual(kept, 0u);
+    [self _advertiseNodeID:@(kDeviceId2) controller:controller device:device phase:&phase released:&released];
+    XCTAssertEqual(phase, MTRTestSessionSetupPhaseAwaitingSigma2);
     XCTAssertEqual(released, 1u);
 
     XCTestExpectation * reachableExpectation = [self expectationWithDescription:@"Device is reachable"];
@@ -8667,47 +8668,6 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     };
 
     [app resume];
-
-    [self waitForExpectations:@[ reachableExpectation ] timeout:60];
-}
-
-- (void)test053_OperationalAdvertisementAfterLongAddressResolution
-{
-    MTRDeviceController * controller = [self createControllerOnTestFabric];
-    XCTAssertNotNil(controller);
-
-    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
-                                                          arguments:@[]
-                                                         controller:controller
-                                                            payload:kOnboardingPayload2
-                                                             nodeID:@(kDeviceId2)];
-    XCTAssertNotNil(app);
-    [app terminate];
-
-    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
-    delegate.resolvingCASESetupKeepSecondsOverride = @(0.5);
-    __auto_type * device = [self _subscribingDeviceToTerminatedNodeWithNodeID:@(kDeviceId2) controller:controller delegate:delegate];
-
-    NSUInteger kept = 0;
-    NSUInteger released = 0;
-    [self _advertiseNodeID:@(kDeviceId2) controller:controller device:device kept:&kept released:&released];
-    XCTAssertEqual(kept, 1u);
-    XCTAssertEqual(released, 0u);
-
-    // A setup still resolving once the keep window has passed is released, as a setup in any other state would be.
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
-    XCTAssertTrue([controller unitTestIsResolvingAddressForNodeID:@(kDeviceId2)]);
-    [self _advertiseNodeID:@(kDeviceId2) controller:controller device:device kept:&kept released:&released];
-    XCTAssertEqual(kept, 1u);
-    XCTAssertEqual(released, 1u);
-    XCTAssertFalse([controller unitTestIsResolvingAddressForNodeID:@(kDeviceId2)]);
-
-    XCTestExpectation * reachableExpectation = [self expectationWithDescription:@"Device is reachable"];
-    delegate.onReachable = ^{
-        [reachableExpectation fulfill];
-    };
-
-    XCTAssertTrue([self restartApp:app additionalArguments:@[]]);
 
     [self waitForExpectations:@[ reachableExpectation ] timeout:60];
 }

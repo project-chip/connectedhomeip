@@ -1526,15 +1526,27 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return count;
 }
 
+// The test declarations mirror these values for tests compiled as Objective-C.
+static_assert(static_cast<NSInteger>(chip::OperationalSessionSetup::SetupPhase::kResolvingAddress) == 0);
+static_assert(static_cast<NSInteger>(chip::OperationalSessionSetup::SetupPhase::kAwaitingSigma2) == 1);
+static_assert(static_cast<NSInteger>(chip::OperationalSessionSetup::SetupPhase::kWaitingForRetry) == 2);
+static_assert(static_cast<NSInteger>(chip::OperationalSessionSetup::SetupPhase::kOther) == 3);
+
+- (NSInteger)unitTestSessionSetupPhaseForNodeID:(NSNumber *)nodeID
+{
+    assertChipStackLockedByCurrentThread();
+    auto peerId = _cppCommissioner->GetPeerScopedId(nodeID.unsignedLongLongValue);
+    auto phase = _cppCommissioner->CASESessionMgr()->GetSessionSetupPhase(peerId);
+    return phase.HasValue() ? static_cast<NSInteger>(phase.Value()) : -1;
+}
+
 - (BOOL)unitTestIsResolvingAddressForNodeID:(NSNumber *)nodeID
 {
-    __block BOOL resolving = NO;
+    __block NSInteger phase = -1;
     [self syncRunOnWorkQueue:^{
-        auto peerId = self->_cppCommissioner->GetPeerScopedId(nodeID.unsignedLongLongValue);
-        auto phase = self->_cppCommissioner->CASESessionMgr()->GetSessionSetupPhase(peerId);
-        resolving = phase.HasValue() && phase.Value() == chip::OperationalSessionSetup::SetupPhase::kResolvingAddress;
+        phase = [self unitTestSessionSetupPhaseForNodeID:nodeID];
     } error:nil];
-    return resolving;
+    return phase == static_cast<NSInteger>(chip::OperationalSessionSetup::SetupPhase::kResolvingAddress);
 }
 
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
