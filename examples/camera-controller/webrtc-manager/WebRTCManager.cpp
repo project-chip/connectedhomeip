@@ -150,7 +150,7 @@ CHIP_ERROR WebRTCManager::HandleOffer(const WebRTCSessionStruct & session, const
     mPendingSdpContext.sessionId = session.id;
     mPendingSdpContext.state     = LocalSdpState::PendingAnswer;
 
-    mPeerConnection->setRemoteDescription(rtc::Description{ args.sdp, "offer" });
+    SetRemoteDescription(rtc::Description{ args.sdp, "offer" });
     mPeerConnection->setLocalDescription();
 
     return CHIP_NO_ERROR;
@@ -170,8 +170,7 @@ CHIP_ERROR WebRTCManager::HandleAnswer(const WebRTCSessionStruct & session, cons
 
     VerifyOrReturnError(mPendingSdpContext.state == LocalSdpState::Idle, CHIP_ERROR_INCORRECT_STATE);
 
-    rtc::Description answerDesc(sdp, rtc::Description::Type::Answer);
-    mPeerConnection->setRemoteDescription(answerDesc);
+    SetRemoteDescription(rtc::Description(sdp, rtc::Description::Type::Answer));
 
     // Schedule ProvideICECandidates() to run in a subsequent event loop iteration.
     // Since the transport is TCP, this guarantees that the StatusResponse for the Answer command
@@ -203,24 +202,44 @@ CHIP_ERROR WebRTCManager::HandleICECandidates(const WebRTCSessionStruct & sessio
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    const bool hasRemoteDescription = mPeerConnection->remoteDescription().has_value();
+
     for (const auto & candidate : candidates)
     {
-        ChipLogProgress(Camera, "Applying candidate: %s",
-                        std::string(candidate.candidate.begin(), candidate.candidate.end()).c_str());
-        if (candidate.SDPMid.IsNull())
+        std::string candidateString(candidate.candidate.begin(), candidate.candidate.end());
+        rtc::Candidate remoteCandidate = candidate.SDPMid.IsNull()
+            ? rtc::Candidate(candidateString)
+            : rtc::Candidate(candidateString, std::string(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end()));
+
+        if (!hasRemoteDescription)
         {
-            mPeerConnection->addRemoteCandidate(
-                rtc::Candidate(std::string(candidate.candidate.begin(), candidate.candidate.end())));
+            ChipLogProgress(Camera, "Holding candidate until a remote description is set: %s", candidateString.c_str());
+            mHeldRemoteCandidates.push_back(std::move(remoteCandidate));
+            continue;
         }
-        else
-        {
-            mPeerConnection->addRemoteCandidate(
-                rtc::Candidate(std::string(candidate.candidate.begin(), candidate.candidate.end()),
-                               std::string(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end())));
-        }
+
+        ChipLogProgress(Camera, "Applying candidate: %s", candidateString.c_str());
+        mPeerConnection->addRemoteCandidate(std::move(remoteCandidate));
     }
 
     return CHIP_NO_ERROR;
+}
+
+void WebRTCManager::SetRemoteDescription(const rtc::Description & description)
+{
+    mPeerConnection->setRemoteDescription(description);
+
+    std::vector<rtc::Candidate> heldCandidates;
+    heldCandidates.swap(mHeldRemoteCandidates);
+    if (!heldCandidates.empty())
+    {
+        ChipLogProgress(Camera, "Applying %zu remote candidate(s) held until the remote description was set",
+                        heldCandidates.size());
+    }
+    for (auto & candidate : heldCandidates)
+    {
+        mPeerConnection->addRemoteCandidate(std::move(candidate));
+    }
 }
 
 void WebRTCManager::CloseRTPSockets()
@@ -262,6 +281,7 @@ void WebRTCManager::Disconnect()
     mCurrentVideoStreamId = 0;
     mPendingSdpContext.Reset();
     mLocalCandidates.clear();
+    mHeldRemoteCandidates.clear();
 }
 
 CHIP_ERROR WebRTCManager::Connect(Controller::DeviceCommissioner & commissioner, NodeId nodeId, EndpointId endpointId)

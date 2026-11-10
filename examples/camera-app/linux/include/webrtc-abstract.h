@@ -79,12 +79,15 @@ class WebRTCPeerConnection
 public:
     virtual ~WebRTCPeerConnection() = default;
 
+    // AddRemoteCandidate() holds a candidate that arrives before a remote description is set, and
+    // SetRemoteDescription() applies the held candidates in arrival order.
     virtual void SetCallbacks(OnLocalDescriptionCallback onLocalDescription, OnICECandidateCallback onICECandidate,
                               OnConnectionStateCallback onConnectionState, OnTrackCallback onTrack)              = 0;
     virtual void Close()                                                                                         = 0;
     virtual void CreateOffer()                                                                                   = 0;
     virtual void CreateAnswer()                                                                                  = 0;
     virtual void SetRemoteDescription(const std::string & sdp, SDPType type)                                     = 0;
+    virtual bool HasRemoteDescription()                                                                          = 0;
     virtual void AddRemoteCandidate(const std::string & candidate, const std::string & mid)                      = 0;
     virtual std::shared_ptr<WebRTCTrack> AddTrack(MediaType mediaType, const std::string & mid, int payloadType) = 0;
     virtual int GetPayloadType(const std::string & sdp, SDPType type, const std::string & codec) { return -1; };
