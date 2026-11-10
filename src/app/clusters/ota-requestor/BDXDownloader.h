@@ -78,6 +78,7 @@ public:
     // OTADownloader Overrides
     CHIP_ERROR BeginPrepareDownload() override;
     CHIP_ERROR OnPreparedForDownload(CHIP_ERROR status) override;
+    CHIP_ERROR OnFinalized(CHIP_ERROR status) override;
     void OnDownloadTimeout() override;
     // BDX does not provide a mechanism for the driver of a transfer to gracefully end the exchange, so it will abort the transfer
     // instead.
@@ -112,6 +113,7 @@ public:
     //   StatusReport START_OFFSET_N/S      kept                discarded             0, restarted in the same attempt
     //   other failure, local abort         kept                discarded             0
     //   BlockAckEOF sent                   cleared             complete image        0
+    //   processor reports a failed check   cleared             discarded             0
     //   EndDownload() with none running    cleared             discarded             0
     //   EndDownload() while preparing      cleared             discarded             0, the queued prepare is stale
     void SetImageIdentity(uint32_t softwareVersion, const ScopedNodeId & provider);
@@ -129,6 +131,8 @@ private:
     CHIP_ERROR HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent);
     void SetState(State state, app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason);
     void Reset();
+    // Reports the download complete once BlockAckEOF was sent and, if the processor reports it, the image passed its checks.
+    void CompleteIfFinalized();
     uint64_t ChooseStartOffset();
     void DiscardPartialImage();
     std::optional<ImageIdentity> ComputeImageIdentity(ByteSpan fileDesignator) const;
@@ -154,6 +158,10 @@ private:
     bool mCheckFirstBlock = false;
     // Set once the processor was asked to finalize the image, after the EOF block.
     bool mFinalized = false;
+    // Set once BlockAckEOF was sent.
+    bool mBlockAckEOFSent = false;
+    // Set once the processor reported that the finalized image passed its checks.
+    bool mFinalizeSucceeded = false;
 };
 
 } // namespace chip

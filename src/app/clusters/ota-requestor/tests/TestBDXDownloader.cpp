@@ -64,7 +64,12 @@ public:
     {
         return Queue([this, offset] { RunPrepare(offset > 0 && mSuspended && mFile.size() == offset, offset); });
     }
-    CHIP_ERROR Finalize() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Finalize() override
+    {
+        mFinalizeCount++;
+        return CHIP_NO_ERROR;
+    }
+    bool ReportsFinalizeResult() const override { return mReportsFinalizeResult; }
     CHIP_ERROR Apply() override { return CHIP_NO_ERROR; }
     CHIP_ERROR Abort() override
     {
@@ -101,6 +106,8 @@ public:
     }
 
     uint32_t mAbortCount        = 0;
+    uint32_t mFinalizeCount     = 0;
+    bool mReportsFinalizeResult = false;
     uint32_t mProcessBlockCount = 0;
     uint64_t mBytesReceived     = 0;
     bool mSuspended             = false;
@@ -165,6 +172,7 @@ public:
         mState  = state;
         mReason = reason;
         mIdleCount += (state == OTADownloader::State::kIdle) ? 1 : 0;
+        mCompleteCount += (state == OTADownloader::State::kComplete) ? 1 : 0;
     }
     void OnUpdateProgressChanged(app::DataModel::Nullable<uint8_t> percent) override {}
     void OnDownloadRestartRequested() override { mRestartCount++; }
@@ -172,6 +180,7 @@ public:
     OTADownloader::State mState = OTADownloader::State::kIdle;
     OTAChangeReasonEnum mReason = OTAChangeReasonEnum::kUnknown;
     uint32_t mIdleCount         = 0;
+    uint32_t mCompleteCount     = 0;
     uint32_t mRestartCount      = 0;
 };
 
@@ -753,6 +762,94 @@ TEST_F(TestBDXDownloader, FailureBeforeAbortCompletesStartsAnew)
 
     ASSERT_EQ(mRequestedOffsets.size(), 3u);
     ExpectFileIsServedImage();
+}
+
+// A processor that checks the finalized image reports a failure before the download is reported complete, so the requestor never
+// asks the provider to apply an image that failed the check.
+TEST_F(TestBDXDownloader, FailedFinalizeCheckEndsDownloadAsFailedBeforeComplete)
+{
+    mProcessor.mReportsFinalizeResult = true;
+    StartDownload(kUnlimited);
+    ASSERT_EQ(mProcessor.mFinalizeCount, 1u);
+    ASSERT_EQ(mProcessor.mBytesReceived, kImageSize);
+    EXPECT_EQ(mStateDelegate.mCompleteCount, 0u);
+
+    const uint32_t abortsBefore = mProcessor.mAbortCount;
+    EXPECT_EQ(mDownloader.OnFinalized(CHIP_ERROR_INTEGRITY_CHECK_FAILED), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mStateDelegate.mCompleteCount, 0u);
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kIdle);
+    EXPECT_EQ(mStateDelegate.mReason, OTAChangeReasonEnum::kFailure);
+    EXPECT_EQ(mProcessor.mAbortCount, abortsBefore + 1);
+    EXPECT_EQ(mProcessor.GetResumeOffset(), 0u);
+}
+
+TEST_F(TestBDXDownloader, PassedFinalizeCheckCompletesTheDownload)
+{
+    mProcessor.mReportsFinalizeResult = true;
+    StartDownload(kUnlimited);
+    ASSERT_EQ(mStateDelegate.mCompleteCount, 0u);
+
+    EXPECT_EQ(mDownloader.OnFinalized(CHIP_NO_ERROR), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mStateDelegate.mCompleteCount, 1u);
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kComplete);
+    ExpectFileIsServedImage();
+}
+
+// A result reported before BlockAckEOF is sent, e.g. by a processor that checks the image inside Finalize(), completes the
+// download once BlockAckEOF is sent.
+TEST_F(TestBDXDownloader, FinalizeResultBeforeBlockAckEOFCompletesAfterIt)
+{
+    mProcessor.mReportsFinalizeResult = true;
+    mMessenger.mFailBlockAckEOF       = true;
+    StartDownload(kUnlimited);
+    ASSERT_EQ(mProcessor.mFinalizeCount, 1u);
+
+    EXPECT_EQ(mDownloader.OnFinalized(CHIP_NO_ERROR), CHIP_NO_ERROR);
+    EXPECT_EQ(mStateDelegate.mCompleteCount, 0u);
+    EXPECT_EQ(mDownloader.GetState(), OTADownloader::State::kInProgress);
+}
+
+// A result from an attempt that already ended, e.g. a finalize still queued when the transfer timed out, must not complete or fail
+// the next attempt.
+TEST_F(TestBDXDownloader, FinalizeResultAfterTimeoutIsRejected)
+{
+    mProcessor.mReportsFinalizeResult = true;
+    mMessenger.mFailBlockAckEOF       = true;
+    StartDownload(kUnlimited);
+    ASSERT_EQ(mProcessor.mFinalizeCount, 1u);
+    mDownloader.OnDownloadTimeout();
+    ASSERT_EQ(mStateDelegate.mState, OTADownloader::State::kIdle);
+
+    EXPECT_EQ(mDownloader.OnFinalized(CHIP_NO_ERROR), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(mStateDelegate.mCompleteCount, 0u);
+}
+
+TEST_F(TestBDXDownloader, StaleFinalizeResultDuringTheNextTransferIsRejected)
+{
+    mProcessor.mReportsFinalizeResult = true;
+    mMessenger.mFailBlockAckEOF       = true;
+    StartDownload(kUnlimited);
+    mDownloader.OnDownloadTimeout();
+    mMessenger.mFailBlockAckEOF = false;
+
+    // The next attempt is in progress and has not received its EOF block.
+    StartDownload(3);
+    ASSERT_EQ(mDownloader.GetState(), OTADownloader::State::kInProgress);
+    const uint32_t idleBefore = mStateDelegate.mIdleCount;
+
+    EXPECT_EQ(mDownloader.OnFinalized(CHIP_ERROR_INTEGRITY_CHECK_FAILED), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(mDownloader.GetState(), OTADownloader::State::kInProgress);
+    EXPECT_EQ(mStateDelegate.mIdleCount, idleBefore);
+    EXPECT_EQ(mStateDelegate.mCompleteCount, 0u);
+}
+
+TEST_F(TestBDXDownloader, FinalizeResultWithoutADownloadIsRejected)
+{
+    mProcessor.mReportsFinalizeResult = true;
+    EXPECT_EQ(mDownloader.OnFinalized(CHIP_NO_ERROR), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(mStateDelegate.mCompleteCount, 0u);
 }
 
 // A processor written before PrepareDownloadFrom() existed: it cannot continue a partial image, so it must not be asked to.

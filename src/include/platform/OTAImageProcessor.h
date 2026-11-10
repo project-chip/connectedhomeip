@@ -59,6 +59,14 @@ public:
     virtual CHIP_ERROR Finalize() = 0;
 
     /**
+     * Whether the processor reports the result of Finalize() by calling OTADownloader::OnFinalized() once the image is finalized.
+     * When true, the downloader reports the download complete only after a successful result, so an image that fails the
+     * processor's checks ends the download as failed before the requestor asks the provider to apply it. The default is false: the
+     * download is complete when the transfer is, and an image that fails the checks is only found by Apply().
+     */
+    virtual bool ReportsFinalizeResult() const { return false; }
+
+    /**
      * Called when the OTA image should be applied.
      */
     virtual CHIP_ERROR Apply() = 0;
