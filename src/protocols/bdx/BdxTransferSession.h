@@ -64,7 +64,6 @@ public:
         TransferControlFlags ControlMode;
 
         uint16_t MaxBlockSize = 0;
-        uint64_t StartOffset  = 0; ///< Not used for SendAccept message
         uint64_t Length       = 0; ///< Not used for SendAccept message
 
         // Additional metadata (optional, TLV format)
@@ -222,6 +221,9 @@ public:
     /**
      * @brief
      *   Indicate that all transfer parameters are acceptable and prepare a SendAccept or ReceiveAccept message (depending on role).
+     *
+     *   Accepting a transfer accepts the start offset proposed in the Init message. A responder that cannot use the proposed
+     *   start offset should call RejectTransfer(StatusCode::kStartOffsetNotSupported) instead.
      *
      * @param acceptData Data used to populate an Accept message (some fields may differ from the original Init message)
      *
