@@ -25,6 +25,7 @@ chip_test_suite("tests") {
     "TestBdxMessages.cpp",
     "TestBdxTransferSession.cpp",
     "TestBdxUri.cpp",
+    "TestBusyResponder.cpp",
     "TestTransferDiagnosticLog.cpp",
     "TestTransferFacilitator.cpp",
   ]
@@ -33,7 +34,9 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/protocols/bdx",
+    "${chip_root}/src/transport/raw/tests:helpers",
   ]
 
   # The ESP32 test driver cannot run tests that use the messaging test helpers;
