@@ -211,7 +211,8 @@ public:
         class Iterator
         {
         public:
-            Iterator(ServerClusterRegistration * registration) : mRegistration(registration) {}
+            Iterator(ServerClusterRegistration * registration) : mRegistration(registration != nullptr ? registration : EndOfList())
+            {}
 
             Iterator & operator++()
             {

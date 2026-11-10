@@ -37,11 +37,12 @@ public:
         class Iterator
         {
         public:
-            Iterator(ServerClusterRegistration * interface, EndpointId endpoint) : mEndpointId(endpoint), mRegistration(interface)
+            Iterator(ServerClusterRegistration * interface, EndpointId endpoint) :
+                mEndpointId(endpoint), mRegistration(interface != nullptr ? interface : EndOfList())
             {
                 if (mRegistration != EndOfList())
                 {
-                    mSpan = interface->serverClusterInterface->GetPaths();
+                    mSpan = mRegistration->serverClusterInterface->GetPaths();
                 }
                 AdvanceUntilMatchingEndpoint();
             }
