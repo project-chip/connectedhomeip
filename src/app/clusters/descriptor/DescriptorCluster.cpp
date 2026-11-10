@@ -135,22 +135,6 @@ CHIP_ERROR ReadPartsAttribute(DataModel::Provider & provider, EndpointId endpoin
         });
     }
 
-    // find the given endpoint
-    unsigned idx = 0;
-    while (idx < endpoints.size())
-    {
-        if (endpoints[idx].id == endpoint)
-        {
-            break;
-        }
-        idx++;
-    }
-    if (idx >= endpoints.size())
-    {
-        // not found
-        return CHIP_ERROR_NOT_FOUND;
-    }
-
     auto * endpointInfo = GetEndpointEntry(endpoint, endpoints);
     VerifyOrReturnError(endpointInfo != nullptr, CHIP_ERROR_NOT_FOUND);
 
