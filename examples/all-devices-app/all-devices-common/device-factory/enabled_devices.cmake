@@ -49,6 +49,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/Closure.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/ClosureVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/SimulatedClosure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure-controller/ClosureController.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/ClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/impl/SimulatedClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/color-temperature-light/ColorTemperatureLight.cpp"
@@ -198,6 +199,7 @@ foreach(_key
         bridged-node
         chime
         closure
+        closure-controller
         color-temperature-light
         commissioning-proxy
         contact-sensor
