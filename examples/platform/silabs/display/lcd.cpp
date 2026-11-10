@@ -25,7 +25,7 @@
 =======
 #include <app/util/config.h>
 #include <lib/support/CodeUtils.h>
->>>>>>> e1a8b6d ([Silabs] Add EFR32 Time Synchronization support (Auto-merged by platform-bot) (#75064))
+    >>>>>>> e1a8b6d ([Silabs] Add EFR32 Time Synchronization support (Auto-merged by platform-bot) (#75064))
 #include <platform/PlatformError.h>
 
 #if !SLI_SI91X_MCU_INTERFACE &&                                                                                                    \
@@ -63,7 +63,7 @@
 #define SL_BOARD_ENABLE_DISPLAY_PIN 0
 
 #ifdef QR_CODE_ENABLED
-static uint8_t qrCode[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
+    static uint8_t qrCode[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
 static uint8_t workBuffer[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
 #endif // QR_CODE_ENABLED
 

@@ -92,7 +92,7 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include "provision/ProvisionChannel.h"
 #include "provision/ProvisionCrypto.h"
 #include "provision/ProvisionStorageWriter.h"
->>>>>>> e1a8b6d ([Silabs] Add EFR32 Time Synchronization support (Auto-merged by platform-bot) (#75064))
+    >>>>>>> e1a8b6d ([Silabs] Add EFR32 Time Synchronization support (Auto-merged by platform-bot) (#75064))
 #include <headers/ProvisionManager.h>
 #include <platform/DefaultTimerDelegate.h>
 
@@ -126,11 +126,11 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #endif
-/**********************************************************
- * Defines
- *********************************************************/
+    /**********************************************************
+     * Defines
+     *********************************************************/
 
-using namespace ::chip;
+    using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
