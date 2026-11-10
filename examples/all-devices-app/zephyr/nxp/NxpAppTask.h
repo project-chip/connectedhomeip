@@ -18,6 +18,8 @@
 #pragma once
 
 #include "AppFactoryData.h"
+#include <lib/support/CodeUtils.h>
+#include <platform/DeviceInfoProvider.h>
 
 namespace chip::app::AllDevices {
 
@@ -27,7 +29,12 @@ class NxpAppTask : public AppTaskBase<Derived>
 public:
     // Registers the NXP factory data providers when CONFIG_CHIP_FACTORY_DATA=y,
     // otherwise the example DAC and device instance info providers.
-    CHIP_ERROR InitCredentials() { return chip::NXP::App::AppFactoryData_PostMatterStackInit(); }
+    CHIP_ERROR InitCredentials()
+    {
+        ReturnErrorOnFailure(chip::NXP::App::AppFactoryData_PostMatterStackInit());
+        DeviceLayer::SetDeviceInfoProvider(&Self().mDeviceInfoProvider);
+        return CHIP_NO_ERROR;
+    }
 };
 
 class AppTask final : public NxpAppTask<AppTask>

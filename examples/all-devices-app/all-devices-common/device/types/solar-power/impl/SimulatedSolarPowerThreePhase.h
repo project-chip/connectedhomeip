@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
+#include <device/types/solar-power/PanelElectricalSensor.h>
 #include <device/types/solar-power/impl/SimulatedSolarPower.h>
 
 namespace chip::app {
@@ -38,9 +38,9 @@ protected:
 private:
     static constexpr size_t kPhaseCount = 3;
 
-    SimulatedElectricalSensor mPhaseA;
-    SimulatedElectricalSensor mPhaseB;
-    SimulatedElectricalSensor mPhaseC;
+    PanelElectricalSensor mPhaseA;
+    PanelElectricalSensor mPhaseB;
+    PanelElectricalSensor mPhaseC;
 };
 
 } // namespace chip::app

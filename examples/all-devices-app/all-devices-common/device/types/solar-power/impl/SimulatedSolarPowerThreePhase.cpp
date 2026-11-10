@@ -33,17 +33,17 @@ EndpointComposition ChildComposition(EndpointId parent, Span<const EndpointCompo
 
 SimulatedSolarPowerThreePhase::SimulatedSolarPowerThreePhase(const Context & context) :
     SimulatedSolarPower(context, Parameters{ .outputSensorRole = SimulatedElectricalSensor::Role::kAcPolyphaseOutput }),
-    mPhaseA(context.timerDelegate, context.testEventTriggerDelegate, Span(SolarPowerTags::kPhaseATag),
+    mPhaseA(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable, Span(SolarPowerTags::kPhaseATag),
             SimulatedElectricalSensor::Role::kGrid),
-    mPhaseB(context.timerDelegate, context.testEventTriggerDelegate, Span(SolarPowerTags::kPhaseBTag),
+    mPhaseB(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable, Span(SolarPowerTags::kPhaseBTag),
             SimulatedElectricalSensor::Role::kGrid),
-    mPhaseC(context.timerDelegate, context.testEventTriggerDelegate, Span(SolarPowerTags::kPhaseCTag),
+    mPhaseC(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable, Span(SolarPowerTags::kPhaseCTag),
             SimulatedElectricalSensor::Role::kGrid)
 {}
 
 SimulatedElectricalSensor & SimulatedSolarPowerThreePhase::GetPhaseSensor(size_t index)
 {
-    SimulatedElectricalSensor * sensors[] = { &mPhaseA, &mPhaseB, &mPhaseC };
+    PanelElectricalSensor * sensors[] = { &mPhaseA, &mPhaseB, &mPhaseC };
     VerifyOrDie(index < kPhaseCount);
     return *sensors[index];
 }

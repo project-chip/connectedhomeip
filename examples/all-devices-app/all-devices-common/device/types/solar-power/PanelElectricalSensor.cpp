@@ -23,9 +23,8 @@ namespace chip::app {
 
 PanelElectricalSensor::PanelElectricalSensor(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate,
                                              FabricTable & fabricTable,
-                                             Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList) :
-    SimulatedElectricalSensor(timerDelegate, testEventTriggerDelegate, tagList, Role::kBattery),
-    mFabricTable(fabricTable)
+                                             Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList, Role role) :
+    SimulatedElectricalSensor(timerDelegate, testEventTriggerDelegate, tagList, role), mFabricTable(fabricTable)
 {}
 
 CHIP_ERROR PanelElectricalSensor::RegisterAdditionalServerClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)

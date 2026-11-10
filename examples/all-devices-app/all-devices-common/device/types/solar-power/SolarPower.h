@@ -20,6 +20,7 @@
 #include <credentials/FabricTable.h>
 #include <device/api/Interface.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
+#include <device/types/solar-power/PanelElectricalSensor.h>
 #include <device/types/power-source/WiredPowerSource.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -78,7 +79,7 @@ private:
     Context mContext;
     EndpointId mEndpointId = kInvalidEndpointId;
 
-    SimulatedElectricalSensor mOutputElectricalSensor;
+    PanelElectricalSensor mOutputElectricalSensor;
     WiredPowerSource mGridPowerSource;
 };
 

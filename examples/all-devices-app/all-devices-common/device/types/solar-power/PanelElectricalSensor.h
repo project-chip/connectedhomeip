@@ -24,12 +24,13 @@
 
 namespace chip::app {
 
-/// Electrical Sensor child endpoint for a solar panel group or string, with User Label cluster.
+/// Electrical Sensor composed under Solar Power (0x0017), with mandatory User Label cluster.
 class PanelElectricalSensor : public SimulatedElectricalSensor
 {
 public:
     PanelElectricalSensor(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate,
-                          FabricTable & fabricTable, Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList);
+                          FabricTable & fabricTable, Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList,
+                          Role role = Role::kBattery);
 
     Clusters::UserLabelCluster & UserLabelCluster() { return mUserLabelCluster.Cluster(); }
 
