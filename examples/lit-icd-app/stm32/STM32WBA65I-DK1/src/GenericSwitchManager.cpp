@@ -42,24 +42,30 @@ GenericSwitchManager GenericSwitchManager::sSwitch;
  */
 void GenericSwitchManager::GenericSwitchOnInitialPress()
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
     GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
-
+    VerifyOrReturn (data != nullptr);
+    
     data->endpoint = mGenericSwitchEndpoint;
     data->event    = Switch::Events::InitialPress::Id;
 
-    err = DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    if (DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data)) != CHIP_NO_ERROR)
+    {
+        Platform::Delete(data);
+    }
 }
 
 void GenericSwitchManager::GenericSwitchOnLongPress()
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
     GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
-
+    VerifyOrReturn (data != nullptr);
+    
     data->endpoint = mGenericSwitchEndpoint;
     data->event    = Switch::Events::LongPress::Id;
 
-    err = DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    if (DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data)) != CHIP_NO_ERROR)
+    {
+        Platform::Delete(data);
+    }
 }
 
 /**
@@ -67,13 +73,16 @@ void GenericSwitchManager::GenericSwitchOnLongPress()
  */
 void GenericSwitchManager::GenericSwitchOnShortRelease()
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
     GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
-
+    VerifyOrReturn (data != nullptr);
+    
     data->endpoint = mGenericSwitchEndpoint;
     data->event    = Switch::Events::ShortRelease::Id;
 
-    err = DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    if (DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data)) != CHIP_NO_ERROR)
+    {
+        Platform::Delete(data);
+    }
 }
 
 /**
@@ -81,13 +90,16 @@ void GenericSwitchManager::GenericSwitchOnShortRelease()
  */
 void GenericSwitchManager::GenericSwitchOnLongRelease()
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
     GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
-
+    VerifyOrReturn (data != nullptr);
+    
     data->endpoint = mGenericSwitchEndpoint;
     data->event    = Switch::Events::LongRelease::Id;
 
-    err = DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    if (DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data)) != CHIP_NO_ERROR)
+    {
+        Platform::Delete(data);
+    }
 }
 
 void GenericSwitchManager::GenericSwitchWorkerFunction(intptr_t context)
