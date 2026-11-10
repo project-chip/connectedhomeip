@@ -305,18 +305,18 @@ void DescriptorCluster::OnEndpointChanged(EndpointId endpointId, EndpointId pare
     auto endpoints = endpointsList.TakeBuffer();
 
     auto * parentEntry   = GetEndpointEntry(parentEndpointId, endpoints);
-    auto * ourEntry      = GetEndpointEntry(mPath.mEndpointId, endpoints);
+    auto * mEntry      = GetEndpointEntry(mPath.mEndpointId, endpoints);
 
     // Can't get the information about the endpoint tree to determine if this parts list attribute was changed.
-    VerifyOrReturn(parentEntry != nullptr && ourEntry != nullptr);
+    VerifyOrReturn(parentEntry != nullptr && mEntry != nullptr);
 
-    if (ourEntry->compositionPattern == DataModel::EndpointCompositionPattern::kTree)
+    if (mEntry->compositionPattern == DataModel::EndpointCompositionPattern::kTree)
     {
         // Our composition pattern is tree, but the endpoint is not our child (checked above)
         return;
     }
 
-    if (IsDescendantOf(parentEntry, mPath.mEndpointId, endpoints))
+    if (mPath.mEndpointId == kRootEndpointId || IsDescendantOf(parentEntry, mPath.mEndpointId, endpoints))
     {
         // Our composition pattern is full-family, and the parent endpoind and hence the changed endpoint too are our descendants.
         // So our parts list is changed.
