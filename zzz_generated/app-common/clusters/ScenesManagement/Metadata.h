@@ -22,8 +22,9 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 namespace SceneTableSize {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SceneTableSize::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SceneTableSize::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace SceneTableSize
 namespace FabricSceneInfo {
 inline constexpr DataModel::AttributeEntry

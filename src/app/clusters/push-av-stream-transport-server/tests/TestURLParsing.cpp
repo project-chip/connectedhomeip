@@ -22,8 +22,6 @@
 #include <uriparser/Uri.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
@@ -145,13 +143,12 @@ public:
         CHIP_ERROR err = chip::Platform::MemoryInit();
         assert(err == CHIP_NO_ERROR);
 
-        ASSERT_EQ(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
-        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
+        ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
     void TearDown() override
     {
-        app::SetSafeAttributePersistenceProvider(nullptr);
+        mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
         chip::Platform::MemoryShutdown();
     }
 
@@ -239,7 +236,6 @@ public:
 protected:
     PushAvStreamTransportServer mServer;
     chip::Testing::ClusterTester mClusterTester;
-    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
 
 TEST_F(TestUriExtractionHelpers, ExtractTextRange_ValidRange)

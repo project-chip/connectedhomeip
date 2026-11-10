@@ -1060,12 +1060,22 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 
 - (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID
 {
+    [self storeClusterData:clusterData deviceData:nil forNodeID:nodeID];
+}
+
+- (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData deviceData:(NSDictionary<NSString *, id> * _Nullable)deviceData forNodeID:(NSNumber *)nodeID
+{
     if (!nodeID) {
         MTR_LOG_ERROR("%s: unexpected nil input", __func__);
         return;
     }
 
     if (!clusterData.count) {
+        if (deviceData) {
+            // No cluster data, so store the device data on its own.
+            [self storeDeviceData:deviceData forNodeID:nodeID];
+            return;
+        }
         MTR_LOG_ERROR("%s: nothing to store", __func__);
         return;
     }
@@ -1076,6 +1086,16 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         NSMutableDictionary<NSString *, id<NSSecureCoding>> * bulkValuesToStore = nil;
         if ([self->_storageDelegate respondsToSelector:@selector(controller:storeValues:securityLevel:sharingType:)]) {
             bulkValuesToStore = [NSMutableDictionary dictionary];
+        }
+
+        if (deviceData) {
+            NSString * deviceDataKey = [self _deviceDataKeyForNodeID:nodeID];
+            if (bulkValuesToStore) {
+                bulkValuesToStore[deviceDataKey] = deviceData;
+            } else {
+                // Ignore store failures, as storeDeviceData does, since they are not actionable for us here.
+                [self _storeAttributeCacheValue:deviceData forKey:deviceDataKey];
+            }
         }
 
         // A map of endpoint => list of clusters modified for that endpoint so cluster indexes can be updated later
@@ -1196,6 +1216,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         }
 
         if (bulkValuesToStore) {
+            // The device data, if any, is part of this one write, so it fails together with the cluster data.
             BOOL storeFailed = ![self _bulkStoreAttributeCacheValues:bulkValuesToStore];
             if (storeFailed) {
                 storeFailures++;

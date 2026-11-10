@@ -153,6 +153,10 @@ public:
      * Error message returned by the invoked Trust Verification stage.
      */
     TrustVerificationError mError = TrustVerificationError::kInternalError;
+    /**
+     * Length of the root public key reported in the Fabrics attribute read.
+     */
+    size_t mRootPublicKeyLength = Crypto::kP256_PublicKey_Length;
 
 protected:
     void OnTrustVerificationComplete(TrustVerificationError error) override { mError = error; }
@@ -218,7 +222,7 @@ protected:
         ReturnErrorOnFailure(
             writer.Put(TLV::ContextTag(static_cast<uint8_t>(
                            Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kRootPublicKey)),
-                       ByteSpan(kDummyRootKey, sizeof(kDummyRootKey))));
+                       ByteSpan(kDummyRootKey, mRootPublicKeyLength)));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(static_cast<uint8_t>(
                                             Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kVendorID)),
                                         static_cast<uint16_t>(0x1234)));
@@ -372,6 +376,7 @@ protected:
     void TestReadCommissionerAdminFabricIndexError();
     void TestValidateAdministratorIdsMatch();
     void TestReadAdminFabricsPopulatesCommissionerInfo();
+    void TestReadAdminFabricsRejectsInvalidRootPublicKeyLength();
     void TestReadAdminCertsPopulatesCommissionerRcac();
     void TestReadAdminNOCsPopulatesCommissionerCerts();
     void TestPerformVendorIdVerificationCompletesOnceOnReadFailure();
@@ -574,6 +579,36 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminFabricsPopulatesCommission
     for (size_t idx = 0; idx < Crypto::kP256_PublicKey_Length; ++idx)
     {
         EXPECT_EQ(commissionee.mInfo.rootPublicKey.Get()[idx], static_cast<uint8_t>(idx + 1));
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminFabricsRejectsInvalidRootPublicKeyLength)
+{
+    // A commissioner root public key that is not a P-256 public key length must be rejected
+    // and must not be stored.
+    for (size_t keyLength : { size_t{ 0 }, size_t{ 1 }, Crypto::kP256_PublicKey_Length - 1 })
+    {
+        FakeCommandHandler commandHandler;
+        CommandHandler::Handle handle(&commandHandler);
+        Messaging::ExchangeContext * exchangeCtx = NewExchangeToBob(nullptr, false);
+        commandHandler.SetExchangeContext(exchangeCtx);
+
+        SingleStageJCMCommissionee commissionee(handle, EndpointId{ 78 }, [](CHIP_ERROR) {});
+        commissionee.mInfo.adminFabricIndex = FabricIndex{ 1 };
+        commissionee.mRootPublicKeyLength   = keyLength;
+
+        bool callbackCalled      = false;
+        CHIP_ERROR callbackError = CHIP_NO_ERROR;
+
+        CHIP_ERROR readError = commissionee.ReadAdminFabrics([&](CHIP_ERROR err) {
+            callbackCalled = true;
+            callbackError  = err;
+        });
+
+        EXPECT_EQ(readError, CHIP_NO_ERROR);
+        EXPECT_TRUE(callbackCalled);
+        EXPECT_EQ(callbackError, CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(commissionee.mInfo.rootPublicKey.AllocatedSize(), 0u);
     }
 }
 

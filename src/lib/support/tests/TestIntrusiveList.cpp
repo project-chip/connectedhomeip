@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 
+#include <array>
 #include <ctime>
+#include <iterator>
 #include <list>
 
 #include <pw_unit_test/framework.h>
@@ -65,7 +67,7 @@ TEST_F(TestIntrusiveList, TestIntrusiveListRandom)
 
     for (auto & n : node)
     {
-        switch (std::rand() % 5)
+        switch (std::rand() % 6)
         {
         case 0: // PushFront
             l1.PushFront(&n);
@@ -91,6 +93,18 @@ TEST_F(TestIntrusiveList, TestIntrusiveListRandom)
             op([&](auto & l1p, auto & l2p) {
                 l1.Remove(&*l1p);
                 l2.erase(l2p);
+            });
+            break;
+        case 5: // SwapWithNext
+            op([&](auto & l1p, auto & l2p) {
+                auto l2next = std::next(l2p);
+                if (l2next != l2.end())
+                {
+                    ListNode * swapped = &*l1p;
+                    l1.SwapWithNext(l1p);
+                    EXPECT_EQ(&*l1p, swapped);
+                    std::iter_swap(l2p, l2next);
+                }
             });
             break;
         default:
@@ -183,6 +197,30 @@ TEST_F(TestIntrusiveList, TestReplaceNode)
     EXPECT_FALSE(list.Contains(&a));
     EXPECT_TRUE(list.Contains(&b));
     list.Remove(&b);
+}
+
+TEST_F(TestIntrusiveList, TestSwapWithNext)
+{
+    ListNode a, b, c;
+    IntrusiveList<ListNode> list;
+    list.PushBack(&a);
+    list.PushBack(&b);
+    list.PushBack(&c);
+
+    auto pos = list.begin();
+    list.SwapWithNext(pos);
+    EXPECT_EQ(&*pos, &a);
+    list.SwapWithNext(pos);
+    EXPECT_EQ(&*pos, &a);
+
+    std::array<ListNode *, 3> expected{ &b, &c, &a };
+    EXPECT_TRUE(std::equal(list.begin(), list.end(), expected.begin(), expected.end(),
+                           [](const ListNode & p1, const ListNode * p2) { return &p1 == p2; }));
+    EXPECT_EQ(&*--list.end(), &a);
+
+    list.Remove(&a);
+    list.Remove(&b);
+    list.Remove(&c);
 }
 
 TEST_F(TestIntrusiveList, TestMoveList)
