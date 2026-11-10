@@ -21,11 +21,8 @@
 
 #include "demo-ui.h"
 #include "lcd.h"
-<<<<<<< HEAD
-=======
 #include <app/util/config.h>
 #include <lib/support/CodeUtils.h>
->>>>>>> e1a8b6d ([Silabs] Add EFR32 Time Synchronization support (Auto-merged by platform-bot) (#75064))
 #include <platform/PlatformError.h>
 
 #if !SLI_SI91X_MCU_INTERFACE &&                                                                                                    \

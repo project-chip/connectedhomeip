@@ -67,9 +67,6 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <app/util/config.h>
 #include <data-model-providers/codegen/Instance.h>
 #endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
-<<<<<<< HEAD
-=======
-
 #if defined(MATTER_DM_PLUGIN_TIME_SYNCHRONIZATION_SERVER)
 #include "SilabsTimeSyncDelegate.h"
 #endif
@@ -84,7 +81,7 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include "provision/ProvisionChannel.h"
 #include "provision/ProvisionCrypto.h"
 #include "provision/ProvisionStorageWriter.h"
->>>>>>> e1a8b6d ([Silabs] Add EFR32 Time Synchronization support (Auto-merged by platform-bot) (#75064))
+
 #include <headers/ProvisionManager.h>
 #include <platform/DefaultTimerDelegate.h>
 
