@@ -1185,7 +1185,7 @@ static BOOL sStackInitRan = NO;
     [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
 }
 
-- (void)test003c_BDXBlockQueryCompletionRunsInTheFlowOfItsCallback
+- (void)test003d_BDXBlockQueryCompletionRunsInTheFlowOfItsCallback
 {
     // The begin, block query and end callbacks run in a flow.  The application completes the begin and the block query
     // later, from another queue, and the framework handles each completion in the flow of its callback.
@@ -1277,7 +1277,7 @@ static BOOL sStackInitRan = NO;
     }
 }
 
-- (void)test003d_BDXTransferBeginCompletionRunsInTheFlowOfItsCallback
+- (void)test003e_BDXTransferBeginCompletionRunsInTheFlowOfItsCallback
 {
     // The application completes the begin callback with an error, from another queue.  The framework reads the
     // error on the Matter queue, inside the completion, and that runs in the flow of the callback.
@@ -1340,7 +1340,7 @@ static BOOL sStackInitRan = NO;
 
 // Part C, item 1: the lines the framework and the SDK log for a request or a transfer reach the log callback
 // with the flow of that request or transfer in front.
-- (void)test003e_LogCallbackLinesCarryTheFlowOfTheirRequestOrTransfer
+- (void)test003f_LogCallbackLinesCarryTheFlowOfTheirRequestOrTransfer
 {
     __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
     __auto_type * device = [runner commissionWithNodeID:@(kDeviceId1)];
