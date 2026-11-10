@@ -332,7 +332,7 @@ if(stm32_app == "lit-icd-app") {
   if (chip_enable_ota_requestor) {
       INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Appli_TrustZone/NonSecure/Core/Inc"]
   } else {
-      INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Lighting-app/Core/Inc"]
+      INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Lighting-App/Core/Inc"]
   }
 }
 
