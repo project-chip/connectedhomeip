@@ -1022,8 +1022,8 @@ select runs with the same `--tag` option:
 -   `--tag <tag>` keeps only the runs with the tag, and `--tag skip-<tag>`
     leaves them out. With several `--tag` values, a run must match each one.
 -   Runs tagged `ble-wifi`, `nightly` or `openssl-3.5` are left out unless a
-    `--tag` value names the tag. Without `--tag`, the runners select the runs
-    PR CI runs.
+    `--tag` value names the tag. Without `--tag`, the runners select the runs PR
+    CI runs.
 -   `execute_python_tests.py` and `local.py` reject a `--tag` value whose tag no
     run has, such as a misspelled tag.
 -   `run_python_test.py --run` names runs whatever their tags, and can't be
@@ -1031,13 +1031,13 @@ select runs with the same `--tag` option:
 -   `execute_python_tests.py` calls each selected run that has tags on its own,
     and reports it as `<script>::<run>` with its tags and issues.
 
-| Selection                      | `--tag` values                                       |
-| ------------------------------ | ---------------------------------------------------- |
+| Selection                      | `--tag` values                                      |
+| ------------------------------ | --------------------------------------------------- |
 | PR CI (the default)            | `skip-ble-wifi`, `skip-nightly`, `skip-openssl-3.5` |
-| Nightly job                    | `nightly`                                            |
-| OpenSSL 3.5 job                | `openssl-3.5`                                        |
-| BLE-WiFi step                  | `ble-wifi`                                           |
-| PR CI runs with known problems | `needs-followup-fixes`                               |
+| Nightly job                    | `nightly`                                           |
+| OpenSSL 3.5 job                | `openssl-3.5`                                       |
+| BLE-WiFi step                  | `ble-wifi`                                          |
+| PR CI runs with known problems | `needs-followup-fixes`                              |
 
 ### Running the BLE-WiFi tests
 

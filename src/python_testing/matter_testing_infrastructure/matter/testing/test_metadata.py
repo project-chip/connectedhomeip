@@ -18,8 +18,8 @@ import tempfile
 import unittest
 
 from metadata import (BLE_WIFI_TAG, NEEDS_FOLLOWUP_FIXES_TAG, NIGHTLY_TAG, OPENSSL_3_5_TAG, Metadata, MetadataReader,
-                      RunArgumentsError, TagFilter, extract_runs_args, failure_fails_job, is_valid_tag_name,
-                      runs_in_pull_requests, script_runs_in_pull_requests, unused_tag_values)
+                      RunArgumentsError, TagFilter, extract_runs_args, failure_fails_job, is_valid_tag_name, runs_in_pull_requests,
+                      script_runs_in_pull_requests, unused_tag_values)
 
 
 class TestMetadataReader(unittest.TestCase):
