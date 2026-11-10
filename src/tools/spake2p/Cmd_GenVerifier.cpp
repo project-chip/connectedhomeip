@@ -176,8 +176,7 @@ static uint32_t GetNextPinCode()
         {
             pinCodeStr = pinCodeStr.substr(0, 8);
         }
-        pinCode = static_cast<uint32_t>(atoi(pinCodeStr.c_str()));
-        if (!chip::SetupPayload::IsValidSetupPIN(pinCode))
+        if (!ParseInt(pinCodeStr.c_str(), pinCode) || !chip::SetupPayload::IsValidSetupPIN(pinCode))
         {
             std::cerr << "The line " << pinCodeStr << " in PIN codes file is invalid, using a random PIN code.\n";
             pinCode = chip::kSetupPINCodeUndefinedValue;

@@ -104,6 +104,9 @@ private:
         mSubscriptions CHIP_GUARDED_BY(mSubscriptionsMutex);
 };
 
+// Extract the HCI ID from an adapter object path, e.g. 0 from "/org/bluez/hci0".
+bool ParseAdapterObjectPath(const char * aPath, unsigned int & aAdapterId);
+
 // Helper function to convert glib error returned by bluez_*_call_*() functions to CHIP_ERROR.
 CHIP_ERROR BluezCallToChipError(const GError * aError);
 
