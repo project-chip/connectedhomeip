@@ -551,7 +551,16 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinishe
     {
         TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
             VerifyOrReturn(mpConnectCallback != nullptr);
-            mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+            if (IsAttachedToCommissionedNetwork())
+            {
+                mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+            }
+            else
+            {
+                // Became Leader of its own partition: no existing network was found.
+                mpConnectCallback->OnResult(NetworkCommissioning::Status::kNetworkNotFound, CharSpan(),
+                                            static_cast<int32_t>(OT_ERROR_DETACHED));
+            }
             mpConnectCallback = nullptr;
         });
     }
@@ -945,6 +954,41 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoL
     return otIp6IsEnabled(mOTInst);
 }
 
+/**
+ * Returns true only when the device is part of an existing Thread network.
+ *
+ * A router-eligible device (FTD) that cannot find a parent forms its own partition and
+ * becomes Leader. That role is "attached" from OpenThread's point of view, but the device
+ * is alone and not connected to the network it was asked to join, so it must not be
+ * reported as a successful connection.
+ */
+template <class ImplClass>
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsAttachedToCommissionedNetwork()
+{
+    VerifyOrReturnValue(mOTInst, false);
+    bool attached = false;
+
+    Impl()->LockThreadStack();
+    otDeviceRole role = otThreadGetDeviceRole(mOTInst);
+
+    if (role == OT_DEVICE_ROLE_CHILD || role == OT_DEVICE_ROLE_ROUTER)
+    {
+        attached = true;
+    }
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    else if (role == OT_DEVICE_ROLE_LEADER)
+    {
+        // A Leader with no neighbors formed its own single-node partition.
+        otNeighborInfoIterator iter = OT_NEIGHBOR_INFO_ITERATOR_INIT;
+        otNeighborInfo neighborInfo;
+        attached = (otThreadGetNextNeighborInfo(mOTInst, &iter, &neighborInfo) == OT_ERROR_NONE);
+    }
+#endif
+    Impl()->UnlockThreadStack();
+
+    return attached;
+}
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
@@ -1239,7 +1283,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_UpdateNetworkStatus()
     // If we don't have a valid dataset, we are not attempting to connect the network.
 
     // We have already connected to the network, thus return success.
-    if (ThreadStackMgrImpl().IsThreadAttached())
+    // A self-formed single-node partition (FTD Leader without neighbors) does not count.
+    if (IsAttachedToCommissionedNetwork())
     {
         mpStatusChangeCallback->OnNetworkingStatusChange(NetworkCommissioning::Status::kSuccess, MakeOptional(extpanid),
                                                          NullOptional);
