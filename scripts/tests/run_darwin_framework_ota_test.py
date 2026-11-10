@@ -113,7 +113,7 @@ def main(context):
     type=int,
     default=None,
     help='If set, the requestor sends a BDX BlockQueryWithSkip that skips this many bytes after the first block, '
-    'and the test checks that the download is missing exactly those bytes.')
+    'and the test checks that the requestor rejects the download, which is missing those bytes.')
 @click.pass_context
 def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ota_image_file, ota_destination_file,
             ota_candidate_file, bdx_skip_after_first_block):
@@ -197,21 +197,20 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         darwin_tool.sendCommand("otasoftwareupdateapp set-reply-params --status 0")
         darwin_tool.sendCommand(f"otasoftwareupdaterequestor announce-otaprovider {commissionerNodeId} 0 0 0 {TEST_NODE_ID} 0")
 
-        # Now wait for the OTA download to finish.
-        requestor_app.waitForMessage(f"OTA image downloaded to {ota_destination_file}")
-
-        # Make sure the right thing was downloaded.
         if bdx_skip_after_first_block is None:
+            # Now wait for the OTA download to finish, and make sure the right thing was downloaded.
+            requestor_app.waitForMessage(f"OTA image downloaded to {ota_destination_file}")
             apps_register.compare_files(ota_data_file, ota_destination_file)
         else:
-            # The requestor removes the image header from the start of the first block, then writes everything it
-            # receives, so the skipped bytes are missing from the download.
-            raw_data = Path(ota_data_file).read_bytes()
-            header_size = len(Path(ota_image_file).read_bytes()) - len(raw_data)
-            skip_start = TEST_BDX_BLOCK_SIZE - header_size
-            expected_data = raw_data[:skip_start] + raw_data[skip_start + bdx_skip_after_first_block:]
-            if Path(ota_destination_file).read_bytes() != expected_data:
-                raise RuntimeError(f'{ota_destination_file} does not match {ota_data_file} with the skipped bytes removed')
+            # The skipped bytes are missing from the download, so the image does not match the payload size and digest
+            # in its header. The requestor ends the download as failed and discards the image instead of asking to apply it.
+            requestor_app.waitForMessage("Downloaded image failed its checks")
+            deadline = time.monotonic() + 10
+            while Path(ota_destination_file).exists() and time.monotonic() < deadline:
+                time.sleep(0.1)
+            if Path(ota_destination_file).exists():
+                raise RuntimeError(f'{ota_destination_file} was kept after the download failed its checks')
+            log.warning("The requestor rejected the download that is missing the skipped bytes and discarded it")
 
     except Exception:
         log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
