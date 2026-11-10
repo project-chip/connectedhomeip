@@ -415,9 +415,9 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
     if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
     {
         // Real time isn't sync'd - check again in 30 seconds
-        ReturnValueAndLogOnFailure(
-            StartEnableDeadlineTimer(System::Clock::Seconds32(kPeriodicCheckIntervalRealTimeClockNotSynced_sec)), Status::Failure,
-            AppServer, "Failed to start EVSE check timer");
+        VerifyOrReturnValue(StartEnableDeadlineTimer(System::Clock::Seconds32(kPeriodicCheckIntervalRealTimeClockNotSynced_sec)) ==
+                                Status::Success,
+                            Status::Failure, ChipLogError(AppServer, "Failed to start EVSE check timer"));
         return Status::Success;
     }
 
@@ -431,8 +431,8 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
         // Timer hasn't expired yet - schedule future check
         uint32_t delta = enabledUntilTime.Value() - matterEpochSeconds;
         ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %lu seconds", static_cast<unsigned long>(delta));
-        ReturnValueAndLogOnFailure(StartEnableDeadlineTimer(System::Clock::Seconds32(delta)), Status::Failure, AppServer,
-                                   "Failed to start EVSE check timer");
+        VerifyOrReturnValue(StartEnableDeadlineTimer(System::Clock::Seconds32(delta)) == Status::Success, Status::Failure,
+                            ChipLogError(AppServer, "Failed to start EVSE check timer"));
         return Status::Success;
     }
 
