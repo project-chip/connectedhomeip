@@ -69,3 +69,28 @@ source_set("jfa-manager-base") {
     "${chip_root}/src/lib",
   ]
 }
+
+# Shared, OS-agnostic Joint Fabric Administrator pigweed RPC server.
+#
+# RpcServer.cpp holds all the RPC logic; the wait/signal mechanism for the ICAC
+# CSR response is the only platform-specific part and is delegated to the
+# JFAResponseSignal.h shim. Each platform depends on this source set and links
+# its own shim implementation.
+source_set("jfa-rpc-server") {
+  sources = [
+    "include/JFAResponseSignal.h",
+    "src/RpcServer.cpp",
+  ]
+
+  public_configs = [ ":config" ]
+
+  include_dirs = [ "${chip_root}/examples/common" ]
+
+  public_deps = [
+    ":jfa-manager-base",
+    "${chip_root}/examples/common/pigweed:joint_fabric_service.nanopb_rpc",
+    "${chip_root}/examples/common/pigweed:rpc_services",
+    "${chip_root}/src/app",
+    "${chip_root}/src/lib",
+  ]
+}
