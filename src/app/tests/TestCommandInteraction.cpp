@@ -597,12 +597,12 @@ public:
         kData,
     };
 
-    // Adds a status or data response for one path and a status for a second path on a handler whose response
-    // buffer fits aAppMessageLen bytes of application payload, finalizes, and returns the number of responses queued for sending.
+    // Adds aFirst for one path, then a status for a second path, with room for aAppMessageLen bytes of payload.
+    // Returns the number of responses queued for sending.
     static size_t AddTwoResponsesAndCount(size_t aAppMessageLen, FirstResponse aFirst);
 
-    // Sends one invoke with two commands that each answer with a status to a handler whose response buffer fits
-    // aAppMessageLen bytes of application payload, and returns the number of responses queued for sending.
+    // Like AddTwoResponsesAndCount, but sends a two-command InvokeRequest through OnInvokeCommandRequest;
+    // each command answers with a status.
     size_t InvokeTwoCommandsAndCountResponses(size_t aAppMessageLen);
 
     /**
