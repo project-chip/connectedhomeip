@@ -135,8 +135,8 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         """Sets the remote ICE candidates for the WebRTC peer connection.
 
         Candidates received before a remote description is set are held, and set_remote_description()
-        applies them. libdatachannel aborts the process on a remote candidate without a remote description,
-        and a DUT using trickle ICE can send candidates before the test sets the remote offer or answer.
+        applies them. libdatachannel rejects a remote candidate without a remote description, and a DUT
+        using trickle ICE can send candidates before the test sets the remote offer or answer.
 
         Args:
             remote_candidates (list[IceCandidate]): A list of remote ICE candidates to be set.
@@ -153,17 +153,22 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
             self.add_ice_candidate(candidate.candidate, candidate.sdpMid or "video")
 
     def set_remote_description(self, sdp: str, type_: str) -> None:
-        """Sets the remote SDP, then applies the remote ICE candidates held until now.
+        """Sets the remote SDP, then applies the held remote ICE candidates in arrival order.
+
+        Candidates that arrive while held ones are being applied are held too, so a later candidate never
+        reaches libdatachannel ahead of an earlier one.
 
         Args:
             sdp (str): The remote SDP.
             type_ (str): The SDP type, "offer" or "answer".
         """
         super().set_remote_description(sdp, type_)
-        with self._remote_candidates_lock:
-            self._remote_description_set = True
-            held_candidates, self._held_remote_candidates = self._held_remote_candidates, []
-        if held_candidates:
+        while True:
+            with self._remote_candidates_lock:
+                held_candidates, self._held_remote_candidates = self._held_remote_candidates, []
+                if not held_candidates:
+                    self._remote_description_set = True
+                    return
             LOGGER.debug("Applying %d remote ICE candidates held until the remote description was set", len(held_candidates))
             self._add_remote_ice_candidates(held_candidates)
 

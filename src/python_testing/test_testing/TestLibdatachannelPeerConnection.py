@@ -40,7 +40,7 @@ CANDIDATE_1 = IceCandidate(candidate="candidate:1 1 UDP 2122317823 192.168.1.10 
 CANDIDATE_2 = IceCandidate(candidate="candidate:2 1 UDP 2122317823 192.168.1.10 50002 typ host", sdpMid="audio")
 CANDIDATE_3 = IceCandidate(candidate="candidate:3 1 UDP 2122317823 192.168.1.10 50004 typ host", sdpMid=None)
 
-# Runs in a child process: libdatachannel aborts the process on a remote candidate without a remote description.
+# Runs in a child process, so a native abort fails only this test.
 _REAL_NATIVE_SCRIPT = """
 import asyncio
 import sys
@@ -133,16 +133,17 @@ class TestRemoteIceCandidates(unittest.TestCase):
             mock.call.set_remote_description(OFFER_SDP, "offer"), native_add(CANDIDATE_1), native_add(CANDIDATE_2),
         ])
 
-    def test_candidate_received_while_held_candidates_are_applied_is_applied(self):
+    def test_candidate_received_while_held_candidates_are_applied_is_applied_after_them(self):
         def deliver_once(*_):
             if self.native.add_ice_candidate.call_count == 1:
-                self.deliver_from_another_thread([CANDIDATE_2])
+                self.deliver_from_another_thread([CANDIDATE_3])
 
         self.native.add_ice_candidate.side_effect = deliver_once
-        self.peer.on_remote_ice_candidates(1, [CANDIDATE_1])
+        self.peer.on_remote_ice_candidates(1, [CANDIDATE_1, CANDIDATE_2])
         self.peer.set_remote_offer(OFFER_SDP)
         self.assertEqual(self.native.mock_calls, [
-            mock.call.set_remote_description(OFFER_SDP, "offer"), native_add(CANDIDATE_1), native_add(CANDIDATE_2),
+            mock.call.set_remote_description(OFFER_SDP, "offer"),
+            native_add(CANDIDATE_1), native_add(CANDIDATE_2), native_add(CANDIDATE_3),
         ])
 
 
