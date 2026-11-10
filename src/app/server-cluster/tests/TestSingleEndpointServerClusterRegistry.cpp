@@ -197,6 +197,7 @@ TEST_F(TestSingleEndpointServerClusterRegistry, BasicTest)
 TEST_F(TestSingleEndpointServerClusterRegistry, StressTest)
 {
     // make the test repeatable
+    // NOLINTNEXTLINE(bugprone-random-generator-seed)
     srand(1234);
 
     std::vector<FakeServerClusterInterface> items;
