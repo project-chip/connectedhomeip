@@ -76,12 +76,6 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <app/static-cluster-config/TimeSynchronization.h>
 #endif
 
-#include "provision/ProvisionStorageReader.h"
-#if SL_MATTER_PROVISION_CHANNEL_ENABLED
-#include "provision/ProvisionChannel.h"
-#include "provision/ProvisionCrypto.h"
-#include "provision/ProvisionStorageWriter.h"
-
 #include <headers/ProvisionManager.h>
 #include <platform/DefaultTimerDelegate.h>
 
