@@ -987,8 +987,9 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
         mEndpoint.CancelConnect();
         return CHIP_ERROR_BUSY;
     }
+
     // If in discovery mode, stop scan.
-    else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
+    if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
     {
         DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
         CHIP_ERROR error = mDeviceScanner.StopScan();
