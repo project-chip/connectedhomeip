@@ -540,7 +540,8 @@ template <typename EventType>
 CHIP_ERROR GenerateClusterEvent(ServerClusterContext * context, const ConcreteClusterPath & path, const EventType & event)
 {
     VerifyOrReturnError(context != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return context->interactionContext.eventsGenerator.GenerateEvent(event, path.mEndpointId).value_or(CHIP_ERROR_INTERNAL);
+    return context->interactionContext.eventsGenerator.GenerateEvent(event, path.mEndpointId).has_value() ? CHIP_NO_ERROR
+                                                                                                          : CHIP_ERROR_INTERNAL;
 }
 } // namespace
 
