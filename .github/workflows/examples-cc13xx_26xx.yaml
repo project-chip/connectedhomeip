@@ -39,7 +39,7 @@ jobs:
             BUILD_TYPE: gn_cc13xx_26xx
 
         runs-on: ubuntu-latest
-        # Disabled until this platform moves to Mbed TLS 3.x: https://github.com/project-chip/connectedhomeip/issues/75198
+        # Disabled until this platform moves to Mbed TLS 3.x: https://github.com/project-chip/connectedhomeip/issues/75278
         if: false && github.actor != 'restyled-io[bot]'
 
         container:
