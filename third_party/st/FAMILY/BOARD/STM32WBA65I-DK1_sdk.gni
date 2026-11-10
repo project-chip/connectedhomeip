@@ -103,7 +103,7 @@ if(stm32_app == "lit-icd-app") {
                         "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/oemirot/Secure_nsclib"
                        ]
   } else {
-      INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Lighting-app/Core/Inc"]
+      INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Lighting-App/Core/Inc"]
   }
 }
 
