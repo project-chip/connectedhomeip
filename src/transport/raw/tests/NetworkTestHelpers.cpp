@@ -60,7 +60,7 @@ void IOContext::DriveIO()
     ServiceEvents(kSleepTimeMilliseconds);
 }
 
-void IOContext::DriveIOUntil(System::Clock::Timeout maxWait, std::function<bool(void)> completionFunction)
+void IOContext::DriveIOUntil(System::Clock::Timeout maxWait, std::function<bool()> completionFunction)
 {
     System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
 
