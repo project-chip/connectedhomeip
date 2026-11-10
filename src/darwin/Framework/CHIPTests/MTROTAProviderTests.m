@@ -1091,7 +1091,10 @@ static BOOL sStackInitRan = NO;
                                                   applyUpdateAction:MTROTASoftwareUpdateProviderApplyUpdateActionDiscontinue
                                          bytesToSkipAfterFirstBlock:bytesToSkip
                                                            testcase:self];
-    // The downloaded image is missing the skipped bytes, so it must not be applied.
+    // The downloaded image is missing the skipped bytes, so it fails the requestor's check of its payload size and digest:
+    // the requestor ends the download as failed and never asks to apply it.  The provider still sees the transfer end
+    // normally, since the check runs after BlockAckEOF.
+    checker.applyUpdateRequestExpectation.inverted = YES;
     checker.notifyUpdateAppliedExpectation.inverted = YES;
 
     XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
@@ -1099,10 +1102,11 @@ static BOOL sStackInitRan = NO;
     [self waitForExpectations:@[ checker.queryExpectation, checker.bdxBeginExpectation, checker.bdxQueryExpectation ]
                       timeout:(kTimeoutWithUpdateInSeconds) enforceOrder:YES];
 
-    [self waitForExpectations:@[ checker.bdxEndExpectation, checker.applyUpdateRequestExpectation, announceResponseExpectation ]
-                      timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ checker.bdxEndExpectation, announceResponseExpectation ] timeout:kTimeoutInSeconds];
 
-    [self waitForExpectations:@[ checker.notifyUpdateAppliedExpectation ] timeout:kTimeoutInSeconds];
+    // Both are inverted: waiting fails the test if the requestor asks to apply the image or reports it applied.
+    [self waitForExpectations:@[ checker.applyUpdateRequestExpectation, checker.notifyUpdateAppliedExpectation ]
+                      timeout:kTimeoutInSeconds];
 }
 
 - (void)test004b_DoBDXTransferWithBlockQueryWithSkip
