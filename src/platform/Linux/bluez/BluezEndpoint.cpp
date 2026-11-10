@@ -335,8 +335,14 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
                    ChipLogError(DeviceLayer, "FAIL: Connection already tracked: conn=%p device=%s path=%s", conn,
                                 conn->GetPeerAddress(), objectPath));
 
-    auto * origin            = static_cast<GVariant *>(g_object_get_data(G_OBJECT(&aDevice), "chip-connect-request-id"));
-    const uint64_t requestId = origin != nullptr ? g_variant_get_uint64(origin) : 0;
+    uint64_t requestId = 0;
+    if (objectPath != nullptr &&
+        g_dbus_proxy_get_connection(reinterpret_cast<GDBusProxy *>(&aDevice)) == mPendingConnectConnection &&
+        g_strcmp0(objectPath, mPendingConnectPath.get()) == 0)
+    {
+        requestId = mPendingConnectRequestId;
+        ClearPendingConnect();
+    }
 
     conn = chip::Platform::New<BluezConnection>(aDevice);
     VerifyOrExit(conn != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -619,6 +625,7 @@ void BluezEndpoint::Shutdown()
     // the middle of being processed when the cleanup function is called.
     TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezEndpoint * self) {
+            self->ClearPendingConnect();
             self->mAdapter.reset();
             self->mRoot.reset();
             self->mService.reset();
@@ -636,11 +643,31 @@ void BluezEndpoint::Shutdown()
 
 // ConnectDevice callbacks
 
+void BluezEndpoint::ClearPendingConnect()
+{
+    mPendingConnectConnection = nullptr;
+    mPendingConnectPath.reset();
+    mPendingConnectRequestId = 0;
+}
+
 CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice, GCancellable * cancellable, uint64_t requestId)
 {
-    g_object_set_data_full(
-        G_OBJECT(&aDevice), "chip-connect-request-id", g_variant_ref_sink(g_variant_new_uint64(requestId)),
-        +[](void * value) { g_variant_unref(static_cast<GVariant *>(value)); });
+    // Store the pending connect target on BluezEndpoint rather than as GObject user data on aDevice:
+    // the BluezDevice1 proxy passed to HandleNewDevice() can be a different GObject instance than the
+    // one passed to Connect() (observed in Cirque when InterfacesAdded is re-emitted while GATT objects
+    // are exported), which drops per-proxy GObject data before HandleNewDevice() runs.
+    const char * objectPath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(&aDevice));
+    if (requestId != 0 && objectPath != nullptr)
+    {
+        mPendingConnectConnection = g_dbus_proxy_get_connection(reinterpret_cast<GDBusProxy *>(&aDevice));
+        mPendingConnectPath.reset(g_strdup(objectPath));
+        mPendingConnectRequestId = requestId;
+    }
+    else
+    {
+        ClearPendingConnect();
+    }
+
     // Due to radio interferences or Wi-Fi coexistence, sometimes the BLE connection may not be
     // established (e.g. Connection Indication Packet is missed by BLE peripheral). In such case,
     // BlueZ returns "Software caused connection abort error", and we should make a connection retry.
@@ -665,6 +692,7 @@ CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice, GCancellable
         bluez_device1_call_disconnect_sync(&aDevice, nullptr, nullptr);
     }
 
+    ClearPendingConnect();
     return CHIP_ERROR_INTERNAL;
 }
 
@@ -738,6 +766,9 @@ CHIP_ERROR BluezEndpoint::ScheduleConnect(BluezDevice1 & aDevice, uint64_t reque
 
 void BluezEndpoint::CancelConnect()
 {
+    // Keep the pending-connect slot intact: if Connect() completed before cancellation took effect,
+    // HandleNewDevice() reports this request's ID; BLEManagerImpl accepts it only while still in
+    // kConnecting with a matching mScanRequestId, and otherwise closes the connection.
     if (mConnectCancellable)
     {
         g_cancellable_cancel(mConnectCancellable.get());

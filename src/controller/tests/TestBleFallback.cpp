@@ -89,6 +89,29 @@ public:
         }
         return manager.mEndpoint;
     }
+    static CHIP_ERROR ConnectDeviceOnGLib(BLEManagerImpl & manager, BluezDevice1 & device)
+    {
+        GAutoPtr<GCancellable> cancellable;
+        uint64_t requestId;
+        {
+            StackLock lock;
+            VerifyOrReturnError(manager.mEndpoint.mConnectCancellable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+            cancellable.reset(G_CANCELLABLE(g_object_ref(manager.mEndpoint.mConnectCancellable.get())));
+            requestId = manager.mScanRequestId.load();
+        }
+        struct
+        {
+            BluezEndpoint * endpoint;
+            BluezDevice1 * device;
+            GCancellable * cancellable;
+            uint64_t requestId;
+        } params{ &manager.mEndpoint, &device, cancellable.get(), requestId };
+        return PlatformMgrImpl().GLibMatterContextInvokeSync(
+            +[](decltype(params) * call) {
+                return call->endpoint->ConnectDeviceImpl(*call->device, call->cancellable, call->requestId);
+            },
+            &params);
+    }
     static void RestorePeripheral(BLEManagerImpl & manager) { manager.mIsCentral = false; }
     static GCancellable * ConnectCancellable(BluezEndpoint & endpoint) { return endpoint.mConnectCancellable.get(); }
     static BluezEndpoint & InstallGatt(BLEManagerImpl & manager, GDBusObjectManager * objects)
@@ -221,12 +244,20 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
     std::atomic<unsigned> scanStops{ 0 };
     guint discoveryFilter       = 0;
     bool disconnectChangesState = true;
+    std::atomic<bool> forwardPropertyChanges{ true };
+    std::atomic<bool> failConnect{ false };
     std::thread serviceThread;
     GMainLoop * serviceLoop = nullptr;
     bool ready              = false;
     bool observedConnected  = true;
     bool observedResolved   = false;
     size_t connections      = 0;
+
+    enum class FreshProxyEvent
+    {
+        kAdded,
+        kPropertyChanged,
+    };
 
     ~PrivateBluezGattPeer()
     {
@@ -279,7 +310,10 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
                                    const gchar * const * invalidated, PrivateBluezGattPeer * owner) {
                         if (BLUEZ_IS_DEVICE1(interface))
                         {
-                            owner->endpoint->OnDevicePropertyChanged(*BLUEZ_DEVICE1(interface), changed, invalidated);
+                            if (owner->forwardPropertyChanges.load())
+                            {
+                                owner->endpoint->OnDevicePropertyChanged(*BLUEZ_DEVICE1(interface), changed, invalidated);
+                            }
                             std::lock_guard<std::mutex> lock(owner->mutex);
                             owner->observedConnected = bluez_device1_get_connected(owner->proxy.get());
                             owner->observedResolved  = bluez_device1_get_services_resolved(owner->proxy.get());
@@ -291,6 +325,36 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
                 return CHIP_NO_ERROR;
             },
             this);
+    }
+
+    CHIP_ERROR DeliverFreshProxyEvent(FreshProxyEvent event)
+    {
+        struct
+        {
+            PrivateBluezGattPeer * peer;
+            FreshProxyEvent event;
+        } params{ this, event };
+        return DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSync(
+            +[](decltype(params) * call) {
+                GAutoPtr<GError> error;
+                GAutoPtr<BluezDevice1> recreated(bluez_device1_proxy_new_sync(call->peer->client.get(), G_DBUS_PROXY_FLAGS_NONE,
+                                                                              nullptr, kDevicePath, nullptr, &error.GetReceiver()));
+                VerifyOrReturnError(recreated != nullptr, CHIP_ERROR_INTERNAL);
+                EXPECT_NE(recreated.get(), call->peer->proxy.get());
+                if (call->event == FreshProxyEvent::kAdded)
+                {
+                    call->peer->endpoint->OnDeviceAdded(*recreated);
+                }
+                else
+                {
+                    call->peer->endpoint->OnDevicePropertyChanged(*recreated, nullptr, nullptr);
+                }
+                std::lock_guard<std::mutex> lock(call->peer->mutex);
+                call->peer->connections = call->peer->endpoint->GetNumConnections();
+                call->peer->connected.notify_one();
+                return CHIP_NO_ERROR;
+            },
+            &params);
     }
 
     bool WaitState(bool isConnected, bool resolved, size_t count)
@@ -385,6 +449,12 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
                              G_CALLBACK(+[](BluezDevice1 * deviceProxy, GDBusMethodInvocation * invocation,
                                             PrivateBluezGattPeer * owner) -> gboolean {
                                  ++owner->connects;
+                                 if (owner->failConnect.load())
+                                 {
+                                     g_dbus_method_invocation_return_dbus_error(invocation, "org.bluez.Error.Failed",
+                                                                                "Injected Connect failure");
+                                     return TRUE;
+                                 }
                                  bluez_device1_complete_connect(deviceProxy, invocation);
                                  return TRUE;
                              }),
@@ -1655,6 +1725,123 @@ TEST_F(TestBleFallback, LinuxFactoryShutdownWithQueuedCancelledCompletion)
     EXPECT_EQ(layer->NewBleConnectionByDiscriminator(SetupDiscriminator(), &newCallbacks, nullptr, onError), CHIP_NO_ERROR);
     EXPECT_EQ(layer->CancelBleIncompleteConnection(&newCallbacks), CHIP_NO_ERROR);
     BLEManagerImplTestAccess::RestorePeripheral(BLEMgrImpl());
+}
+
+TEST_F(TestBleFallback, LinuxRecreatedDeviceProxyPreservesConnectRequestId)
+{
+    using namespace DeviceLayer;
+    using namespace DeviceLayer::Internal;
+    PrivateBluezGattPeer peer;
+    peer.forwardPropertyChanges.store(false);
+    ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
+    ASSERT_EQ(peer.Attach(), CHIP_NO_ERROR);
+    ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
+    auto & layer = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
+    BluezConnectionResult result;
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &result, result.Success, result.Error), CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl(), peer.proxy.get());
+
+    ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(true, true, 0));
+    ASSERT_EQ(peer.DeliverFreshProxyEvent(PrivateBluezGattPeer::FreshProxyEvent::kAdded), CHIP_NO_ERROR);
+    peer.DrainEvents();
+
+    EXPECT_EQ(result.successes, 1u);
+    EXPECT_EQ(result.errors, 0u);
+    EXPECT_NE(result.connection, nullptr);
+    EXPECT_EQ(peer.disconnects.load(), 0u);
+}
+
+TEST_F(TestBleFallback, LinuxQueuedDisconnectedPropertyChangeDoesNotDropPendingRequestId)
+{
+    using namespace DeviceLayer;
+    using namespace DeviceLayer::Internal;
+    PrivateBluezGattPeer peer;
+    peer.forwardPropertyChanges.store(false);
+    ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
+    ASSERT_EQ(peer.Attach(), CHIP_NO_ERROR);
+    ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
+    auto & layer = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
+    BluezConnectionResult result;
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &result, result.Success, result.Error), CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl(), peer.proxy.get());
+
+    // Simulate a queued PropertiesChanged(Connected=false) signal from discovery cleanup or ConnectDeviceImpl's
+    // Disconnect() retry loop arriving before ServicesResolved=true on a recreated BluezDevice1 proxy.
+    ASSERT_EQ(peer.SetState(false, false), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(false, false, 0));
+    ASSERT_EQ(peer.DeliverFreshProxyEvent(PrivateBluezGattPeer::FreshProxyEvent::kPropertyChanged), CHIP_NO_ERROR);
+
+    ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(true, true, 0));
+    ASSERT_EQ(peer.DeliverFreshProxyEvent(PrivateBluezGattPeer::FreshProxyEvent::kAdded), CHIP_NO_ERROR);
+    peer.DrainEvents();
+
+    EXPECT_EQ(result.successes, 1u);
+    EXPECT_EQ(result.errors, 0u);
+    EXPECT_NE(result.connection, nullptr);
+    EXPECT_EQ(peer.disconnects.load(), 0u);
+}
+
+TEST_F(TestBleFallback, LinuxFailedConnectClearsPendingRequestId)
+{
+    using namespace DeviceLayer;
+    using namespace DeviceLayer::Internal;
+    PrivateBluezGattPeer peer;
+    peer.forwardPropertyChanges.store(false);
+    peer.failConnect.store(true);
+    ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
+    ASSERT_EQ(peer.Attach(), CHIP_NO_ERROR);
+    ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
+    auto & layer = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
+
+    BluezConnectionResult failedAttempt;
+    ASSERT_EQ(
+        layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &failedAttempt, failedAttempt.Success, failedAttempt.Error),
+        CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    EXPECT_EQ(BLEManagerImplTestAccess::ConnectDeviceOnGLib(BLEMgrImpl(), *peer.proxy), CHIP_ERROR_INTERNAL);
+    EXPECT_EQ(peer.disconnects.load(), 4u);
+
+    // While BLEManagerImpl is still kConnecting for the same request ID and before any new ConnectDeviceImpl
+    // overwrites the slot, a connected+resolved fresh-proxy event on that path must report requestId = 0 and be
+    // rejected and closed rather than reusing the failed attempt's request ID.
+    ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(true, true, 0));
+    ASSERT_EQ(peer.DeliverFreshProxyEvent(PrivateBluezGattPeer::FreshProxyEvent::kAdded), CHIP_NO_ERROR);
+    peer.DrainEvents();
+
+    EXPECT_EQ(failedAttempt.successes, 0u);
+    EXPECT_EQ(failedAttempt.errors, 0u);
+    EXPECT_EQ(failedAttempt.connection, nullptr);
+    EXPECT_TRUE(BLEManagerImplTestAccess::IsConnecting(BLEMgrImpl()));
+    EXPECT_TRUE(peer.WaitDisconnects(5));
+    ASSERT_EQ(peer.DeliverFreshProxyEvent(PrivateBluezGattPeer::FreshProxyEvent::kPropertyChanged), CHIP_NO_ERROR);
+
+    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL);
+    peer.DrainEvents();
+    ASSERT_EQ(failedAttempt.errors, 1u);
+    ASSERT_EQ(failedAttempt.successes, 0u);
+
+    PrivateBluezGattPeer nextPeer;
+    nextPeer.forwardPropertyChanges.store(false);
+    ASSERT_EQ(nextPeer.Start(), CHIP_NO_ERROR);
+    ASSERT_EQ(nextPeer.Attach(), CHIP_NO_ERROR);
+
+    BluezConnectionResult nextAttempt;
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &nextAttempt, nextAttempt.Success, nextAttempt.Error),
+              CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl(), nextPeer.proxy.get());
+
+    ASSERT_EQ(nextPeer.SetState(true, true), CHIP_NO_ERROR);
+    ASSERT_TRUE(nextPeer.WaitState(true, true, 0));
+    ASSERT_EQ(nextPeer.DeliverFreshProxyEvent(PrivateBluezGattPeer::FreshProxyEvent::kAdded), CHIP_NO_ERROR);
+    nextPeer.DrainEvents();
+
+    EXPECT_EQ(nextAttempt.successes, 1u);
+    EXPECT_EQ(nextAttempt.errors, 0u);
+    EXPECT_NE(nextAttempt.connection, nullptr);
+    EXPECT_EQ(nextPeer.disconnects.load(), 0u);
 }
 
 } // namespace

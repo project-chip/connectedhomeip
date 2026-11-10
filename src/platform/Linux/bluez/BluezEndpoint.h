@@ -124,6 +124,7 @@ private:
     CHIP_ERROR RegisterGattApplicationImpl();
 
     CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice, GCancellable * cancellable, uint64_t requestId);
+    void ClearPendingConnect();
 
     BluezObjectManager & mObjectManager;
     GAutoPtr<BluezAdapter1> mAdapter;
@@ -150,8 +151,14 @@ private:
         BluezConnection * mConnection;
         uint64_t mPendingTicket;
     };
+
+    // Accessed exclusively on the GLib Matter context thread (mConnMap through mPendingConnectRequestId).
     std::unordered_map<std::string, ConnectionEntry> mConnMap;
-    uint64_t mNextPendingTicket = 0;
+    uint64_t mNextPendingTicket                       = 0;
+    const GDBusConnection * mPendingConnectConnection = nullptr;
+    GCharPtr mPendingConnectPath;
+    uint64_t mPendingConnectRequestId = 0;
+
     GAutoPtr<GCancellable> mConnectCancellable;
     GCharPtr mPeerDevicePath;
 
