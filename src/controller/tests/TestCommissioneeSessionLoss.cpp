@@ -62,6 +62,44 @@ class NoNOCCredentials : public OperationalCredentialsDelegate
     }
 };
 
+// Stands in for the AutoCommissioner's operational proxy, which is what mDeviceBeingCommissioned points at during
+// kICDSendStayActive, kSendComplete and kCleanup: a different object with the commissionee's node ID.
+class StubOperationalProxy : public DeviceProxy
+{
+public:
+    explicit StubOperationalProxy(NodeId deviceId) : mDeviceId(deviceId) {}
+    void Disconnect() override {}
+    NodeId GetDeviceId() const override { return mDeviceId; }
+    Messaging::ExchangeManager * GetExchangeManager() const override { return nullptr; }
+    Optional<SessionHandle> GetSecureSession() const override { return NullOptional; }
+
+protected:
+    bool IsSecureConnected() const override { return false; }
+
+private:
+    NodeId mDeviceId;
+};
+
+// Puts the commissioner in an operational stage with the stub as the device being commissioned, and undoes that on scope
+// exit even when an assertion fails.
+class OperationalStageScope
+{
+public:
+    OperationalStageScope(Testing::DeviceCommissionerTestAccess & access, DeviceProxy & proxy) : mAccess(access)
+    {
+        mAccess.SetCommissioningStage(CommissioningStage::kICDSendStayActive);
+        mAccess.SetDeviceBeingCommissioned(&proxy);
+    }
+    ~OperationalStageScope()
+    {
+        mAccess.SetDeviceBeingCommissioned(nullptr);
+        mAccess.SetCommissioningStage(CommissioningStage::kSecurePairing);
+    }
+
+private:
+    Testing::DeviceCommissionerTestAccess & mAccess;
+};
+
 class RecordingPairingDelegate : public DevicePairingDelegate
 {
 public:
@@ -507,6 +545,116 @@ TEST_F(TestCommissioneeSessionLoss, CommissioneeWithLivePASESessionIsKept)
 
     EXPECT_NE(access.FindCommissioneeDevice(kNodeA), nullptr);
     EXPECT_TRUE(Delegate().released.empty());
+}
+
+// Finding 1. During kICDSendStayActive the AutoCommissioner hands the commissioner its operational proxy, so
+// mDeviceBeingCommissioned is not the commissionee. Its session being released must still not release or report it.
+TEST_F(TestCommissioneeSessionLoss, CommissioneeIsNotReleasedWhenSessionReleasedDuringOperationalStage)
+{
+    Testing::DeviceCommissionerTestAccess access(&state->commissioner);
+    auto * device = PairIdle(kNodeA, kPortA, 0x1001);
+    ASSERT_NE(device, nullptr);
+    StubOperationalProxy operational(kNodeA);
+    OperationalStageScope scope(access, operational);
+
+    access.GetSessionManager()->ExpireAllPASESessions();
+    DrainEvents();
+
+    EXPECT_EQ(access.FindCommissioneeDevice(kNodeA), device);
+    EXPECT_TRUE(Delegate().released.empty());
+    EXPECT_TRUE(Delegate().commissioningCompletes.empty());
+}
+
+// Finding 1, StopPairing site: while commissioning is in an operational stage, StopPairing cancels the commissioning
+// rather than treating the commissionee as idle.
+TEST_F(TestCommissioneeSessionLoss, StopPairingDuringOperationalStageDoesNotReleaseOrReportCommissionee)
+{
+    Testing::DeviceCommissionerTestAccess access(&state->commissioner);
+    auto * device = PairIdle(kNodeA, kPortA, 0x1001);
+    ASSERT_NE(device, nullptr);
+    StubOperationalProxy operational(kNodeA);
+    OperationalStageScope scope(access, operational);
+
+    EXPECT_EQ(state->commissioner.StopPairing(kNodeA), CHIP_NO_ERROR);
+
+    EXPECT_EQ(access.FindCommissioneeDevice(kNodeA), device);
+    EXPECT_TRUE(Delegate().released.empty());
+}
+
+// Finding 1, replace-path site: the replaced commissionee is not idle, so it is not reported.
+TEST_F(TestCommissioneeSessionLoss, EstablishPASEReplacingCommissioneeInOperationalStageDoesNotReportIt)
+{
+    Testing::DeviceCommissionerTestAccess access(&state->commissioner);
+    ASSERT_NE(PairIdle(kNodeA, kPortA, 0x1001), nullptr);
+    StubOperationalProxy operational(kNodeA);
+    OperationalStageScope scope(access, operational);
+
+    ASSERT_EQ(StartPASE(kNodeC, kPortA), CHIP_NO_ERROR);
+
+    EXPECT_EQ(access.FindCommissioneeDevice(kNodeA), nullptr);
+    EXPECT_TRUE(Delegate().released.empty());
+    auto * replacement = access.FindCommissioneeDevice(kNodeC);
+    ASSERT_NE(replacement, nullptr);
+    EXPECT_TRUE(replacement->IsSessionSetupInProgress());
+}
+
+// Finding 1, over-broad-fix guard: commissioning another node does not protect an idle commissionee.
+TEST_F(TestCommissioneeSessionLoss, IdleCommissioneeIsReleasedWhileADifferentNodeIsBeingCommissioned)
+{
+    Testing::DeviceCommissionerTestAccess access(&state->commissioner);
+    ASSERT_NE(PairIdle(kNodeA, kPortA, 0x1001), nullptr);
+    StubOperationalProxy operational(kNodeB);
+    OperationalStageScope scope(access, operational);
+
+    access.GetSessionManager()->ExpireAllPASESessions();
+
+    EXPECT_EQ(access.FindCommissioneeDevice(kNodeA), nullptr);
+    ASSERT_EQ(Delegate().released.size(), 1u);
+    EXPECT_EQ(Delegate().released[0].deviceId, kNodeA);
+    EXPECT_EQ(Delegate().released[0].reason, kSessionReleasedReason);
+}
+
+// Finding 2. A delegate that starts another PASE attempt from OnCommissioneeReleased must not have it overwritten by
+// the call that triggered the callback.
+TEST_F(TestCommissioneeSessionLoss, EstablishPASEReplaceIsRejectedWhenReleaseCallbackStartsAnotherPASE)
+{
+    Testing::DeviceCommissionerTestAccess access(&state->commissioner);
+    ASSERT_NE(PairIdle(kNodeA, kPortA, 0x1001), nullptr);
+    CHIP_ERROR innerErr   = CHIP_ERROR_INTERNAL;
+    Delegate().onReleased = [&](NodeId, CHIP_ERROR) { innerErr = StartPASE(kNodeB, kPortB); };
+
+    CHIP_ERROR outerErr = StartPASE(kNodeC, kPortA);
+
+    EXPECT_EQ(innerErr, CHIP_NO_ERROR);
+    EXPECT_EQ(outerErr, CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(access.FindCommissioneeDevice(kNodeC), nullptr);
+    auto * inner = access.FindCommissioneeDevice(kNodeB);
+    ASSERT_NE(inner, nullptr);
+    EXPECT_TRUE(inner->IsSessionSetupInProgress());
+    EXPECT_EQ(access.GetDeviceInPASEEstablishment(), inner);
+    ASSERT_EQ(Delegate().released.size(), 1u);
+    EXPECT_EQ(Delegate().released[0].deviceId, kNodeA);
+    EXPECT_EQ(Delegate().released[0].reason, CHIP_ERROR_CONNECTION_ABORTED);
+}
+
+// Finding 4. CloseSession's MarkForEviction reaches OnCommissioneeSessionReleased, which destroys the idle proxy, so
+// CloseSession must not touch the proxy afterwards. A plain build passes by luck; the proof is the AddressSanitizer
+// build (heap-backed pool). Keep this the last test: ASan stops the process at the first report.
+TEST_F(TestCommissioneeSessionLoss, CloseSessionOnIdleCommissioneeReleasesItWithoutTouchingFreedProxy)
+{
+    Testing::DeviceCommissionerTestAccess access(&state->commissioner);
+    auto * device = PairIdle(kNodeA, kPortA, 0x1001);
+    ASSERT_NE(device, nullptr);
+    bool releasedInsideClose = false;
+    Delegate().onReleased    = [&](NodeId, CHIP_ERROR) { releasedInsideClose = access.FindCommissioneeDevice(kNodeA) == nullptr; };
+
+    device->CloseSession();
+
+    EXPECT_TRUE(releasedInsideClose);
+    EXPECT_EQ(access.FindCommissioneeDevice(kNodeA), nullptr);
+    ASSERT_EQ(Delegate().released.size(), 1u);
+    EXPECT_EQ(Delegate().released[0].deviceId, kNodeA);
+    EXPECT_EQ(Delegate().released[0].reason, kSessionReleasedReason);
 }
 
 } // namespace

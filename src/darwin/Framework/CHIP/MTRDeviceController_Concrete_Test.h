@@ -26,6 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Delivers a release of the current commissioning's commissionee to the controller delegate bridge, as the commissioner
 // would (OnCommissioneeReleased). Returns NO if there is no current commissioning.
 - (BOOL)unitTestNotifyCommissioneePASESessionLost;
+// Blocks the commissioning queue (up to 60 seconds) until the semaphore is signaled, so a test can control which work
+// queued on it runs first.
+- (void)unitTestHoldCommissioningQueueUntil:(dispatch_semaphore_t)semaphore;
 @end
 #endif
 

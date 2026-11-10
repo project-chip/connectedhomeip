@@ -1379,6 +1379,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         auto errorCode = self->_cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
         // Emit metric on status of cancel
         MATTER_LOG_METRIC(kMetricCancelCommissioning, errorCode);
+        if (errorCode == CHIP_NO_ERROR && isWaitingAfterPASEEstablished && [nodeID isEqual:commissioning.commissioningID]) {
+            // StopPairing reported the release, which reaches the commissioning on the commissioning queue after this
+            // returns. Take its metrics now, before a new commissioning can reset the shared collector.
+            MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, CHIP_ERROR_CANCELLED);
+            commissioning.cancelMetrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCommissioning:YES];
+        }
         return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorStopPairing error:error];
     };
 
@@ -1525,6 +1531,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     [self syncRunOnWorkQueue:^{
         self->_cppCommissioner->SessionMgr()->ExpireAllPASESessions();
     } error:nil];
+}
+
+- (void)unitTestHoldCommissioningQueueUntil:(dispatch_semaphore_t)semaphore
+{
+    dispatch_async(_commissioningQueue, ^{
+        dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 60 * NSEC_PER_SEC));
+    });
 }
 
 - (BOOL)unitTestNotifyCommissioneePASESessionLost

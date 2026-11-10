@@ -698,10 +698,18 @@ CommissioneeDeviceProxy * DeviceCommissioner::CreateCommissioneeDevice()
     return device;
 }
 
+bool DeviceCommissioner::IsBeingCommissioned(const CommissioneeDeviceProxy & device) const
+{
+    // For kICDSendStayActive, kSendComplete and kCleanup the AutoCommissioner passes its operational proxy rather than the
+    // commissionee, so a pointer comparison is not enough: that proxy has the commissionee's node ID.
+    return mDeviceBeingCommissioned != nullptr &&
+        (mDeviceBeingCommissioned == &device || mDeviceBeingCommissioned->GetDeviceId() == device.GetDeviceId());
+}
+
 void DeviceCommissioner::OnCommissioneeSessionReleased(CommissioneeDeviceProxy & device)
 {
     // A commissionee in PASE establishment or being commissioned has its own failure path.
-    VerifyOrReturn(&device != mDeviceInPASEEstablishment && &device != mDeviceBeingCommissioned);
+    VerifyOrReturn(&device != mDeviceInPASEEstablishment && !IsBeingCommissioned(device));
 
     // The proxy does not touch itself after calling us, so it can be released here.
     NodeId deviceId = device.GetDeviceId();
@@ -922,11 +930,13 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         // again.
         ChipLogError(Controller, "Found unconnected device, removing");
         NodeId currentId = current->GetDeviceId();
-        bool wasIdle     = current != mDeviceInPASEEstablishment && current != mDeviceBeingCommissioned;
+        bool wasIdle     = current != mDeviceInPASEEstablishment && !IsBeingCommissioned(*current);
         ReleaseCommissioneeDevice(current);
         if (wasIdle && mPairingDelegate != nullptr)
         {
             mPairingDelegate->OnCommissioneeReleased(currentId, CHIP_ERROR_CONNECTION_ABORTED);
+            // The delegate may have started another PASE attempt; do not overwrite it.
+            VerifyOrExit(mDeviceInPASEEstablishment == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         }
     }
 
@@ -1259,7 +1269,7 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
-    if (mDeviceBeingCommissioned == device)
+    if (IsBeingCommissioned(*device))
     {
         CancelCommissioningInteractions();
         CommissioningStageComplete(CHIP_ERROR_CANCELLED);

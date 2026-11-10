@@ -70,6 +70,8 @@ public:
 
     void SetDeviceBeingCommissioned(DeviceProxy * device) { mCommissioner->mDeviceBeingCommissioned = device; }
 
+    CommissioneeDeviceProxy * GetDeviceInPASEEstablishment() { return mCommissioner->mDeviceInPASEEstablishment; }
+
     Controller::SetUpCodePairer & GetSetUpCodePairer() { return mCommissioner->mSetUpCodePairer; }
 
     void FailPASE(CHIP_ERROR error) { mCommissioner->OnSessionEstablishmentError(error); }
