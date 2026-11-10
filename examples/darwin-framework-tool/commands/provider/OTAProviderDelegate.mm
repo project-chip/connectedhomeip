@@ -129,7 +129,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
     }
 
     NSError * seekError = nil;
-    [handle seekToOffset:[offset unsignedLongValue] error:&seekError];
+    [handle seekToOffset:[offset unsignedLongLongValue] error:&seekError];
     if (seekError != nil) {
         auto errorString = [NSString stringWithFormat:@"Error seeking file (%@) to offset %@", fileDesignator, offset];
         auto error = [[NSError alloc] initWithDomain:@"OTAProviderDomain"
@@ -173,11 +173,26 @@ constexpr uint8_t kUpdateTokenLen = 32;
                     bytesToSkip:(NSNumber * _Nonnull)bytesToSkip
                      completion:(void (^)(NSData * _Nullable data, BOOL isEOF))completion
 {
-    NSLog(@"BDX Query received blockSize: %@, blockIndex: %@", blockSize, blockIndex);
+    NSLog(@"BDX Query received blockSize: %@, blockIndex: %@, bytesToSkip: %@", blockSize, blockIndex, bytesToSkip);
+
+    // A skip moves the read position for the rest of the transfer, so it is added to the stored offset.  The add
+    // saturates so that a skip past the end of the file cannot wrap around to an offset inside it.
+    uint64_t fileOffset = [_mFileOffset unsignedLongLongValue];
+    uint64_t skip = [bytesToSkip unsignedLongLongValue];
+    fileOffset = (skip > UINT64_MAX - fileOffset) ? UINT64_MAX : fileOffset + skip;
+    _mFileOffset = @(fileOffset);
+
+    // Every block before this one was blockSize bytes long.
+    uint64_t blockSizeValue = [blockSize unsignedLongLongValue];
+    uint64_t blockStart = blockSizeValue * [blockIndex unsignedLongLongValue];
+    uint64_t endOffset = [_mFileEndOffset unsignedLongLongValue];
+    if (fileOffset >= endOffset || blockStart >= endOffset - fileOffset) {
+        completion([NSData data], YES);
+        return;
+    }
 
     NSError * error = nil;
-    auto offset = [_mFileOffset unsignedLongValue] + [bytesToSkip unsignedLongLongValue]
-        + ([blockSize unsignedLongValue] * [blockIndex unsignedLongValue]);
+    uint64_t offset = fileOffset + blockStart;
     [_mFileHandle seekToOffset:offset error:&error];
     if (error != nil) {
         NSLog(@"Error seeking to offset %@", @(offset));
@@ -192,7 +207,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
         return;
     }
 
-    BOOL isEOF = offset + [blockSize unsignedLongValue] >= [_mFileEndOffset unsignedLongLongValue];
+    BOOL isEOF = offset + blockSizeValue >= endOffset;
     completion(data, isEOF);
 }
 
