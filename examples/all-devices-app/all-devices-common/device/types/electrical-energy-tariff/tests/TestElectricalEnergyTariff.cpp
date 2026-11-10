@@ -19,15 +19,18 @@
 #include <device/types/electrical-energy-tariff/impl/SimulatedElectricalEnergyTariff.h>
 #include <pw_unit_test/framework.h>
 
+#include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/CommodityPrice/Attributes.h>
 #include <clusters/CommodityPrice/ClusterId.h>
+#include <clusters/Descriptor/Attributes.h>
 #include <clusters/Descriptor/ClusterId.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/Types.h>
 
 #include <algorithm>
+#include <memory>
 #include <vector>
 
 using namespace chip;
@@ -38,6 +41,51 @@ using chip::Testing::ClusterTester;
 namespace {
 
 constexpr EndpointId kEndpointId = 1;
+
+using SemanticTag = EndpointComposition::SemanticTag;
+
+const SemanticTag kTariffTags[] = {
+    {
+        .mfgCode     = DataModel::NullNullable,
+        .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kCommodityTariffChronology),
+        .tag         = ElectricalEnergyTariff::kCommodityTariffChronologyCurrentTag,
+    },
+    {
+        .mfgCode     = DataModel::NullNullable,
+        .namespaceID = ElectricalEnergyTariff::kCommodityTariffCommodityNamespaceId,
+        .tag         = ElectricalEnergyTariff::kCommodityTariffCommodityElectricalEnergyTag,
+    },
+};
+
+const SemanticTag kOverrideTags[] = {
+    {
+        .mfgCode     = DataModel::NullNullable,
+        .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+        .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+    },
+};
+
+struct DecodedTag
+{
+    bool mfgCodeIsNull;
+    uint8_t namespaceID;
+    uint8_t tag;
+
+    bool operator==(const DecodedTag & other) const
+    {
+        return mfgCodeIsNull == other.mfgCodeIsNull && namespaceID == other.namespaceID && tag == other.tag;
+    }
+};
+
+std::vector<DecodedTag> ExpectedTags(Span<const SemanticTag> tags)
+{
+    std::vector<DecodedTag> result;
+    for (const auto & tag : tags)
+    {
+        result.push_back({ tag.mfgCode.IsNull(), tag.namespaceID, tag.tag });
+    }
+    return result;
+}
 
 class ElectricalEnergyTariffTestFixture : public ::testing::Test
 {
@@ -79,6 +127,43 @@ protected:
         EXPECT_EQ(mProvider.Endpoints(builder), CHIP_NO_ERROR);
         return builder.TakeBuffer().empty();
     }
+
+    bool HasDescriptorTagListAttribute(EndpointId endpoint)
+    {
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
+        EXPECT_EQ(mProvider.Attributes(ConcreteClusterPath(endpoint, Clusters::Descriptor::Id), builder), CHIP_NO_ERROR);
+        const auto attributes = builder.TakeBuffer();
+        return std::any_of(attributes.begin(), attributes.end(),
+                           [](const auto & entry) { return entry.attributeId == Clusters::Descriptor::Attributes::TagList::Id; });
+    }
+
+    std::vector<DecodedTag> ReadDescriptorTagList(EndpointId endpoint)
+    {
+        std::vector<DecodedTag> result;
+
+        Testing::ReadOperation operation(endpoint, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::TagList::Id);
+        std::unique_ptr<AttributeValueEncoder> encoder = operation.StartEncoding();
+        EXPECT_NE(encoder, nullptr);
+        VerifyOrReturnValue(encoder != nullptr, result);
+        EXPECT_EQ(mProvider.ReadAttribute(operation.GetRequest(), *encoder).GetUnderlyingError(), CHIP_NO_ERROR);
+        EXPECT_EQ(operation.FinishEncoding(), CHIP_NO_ERROR);
+
+        std::vector<Testing::DecodedAttributeData> attributeData;
+        EXPECT_EQ(operation.GetEncodedIBs().Decode(attributeData), CHIP_NO_ERROR);
+        EXPECT_EQ(attributeData.size(), 1u);
+        VerifyOrReturnValue(attributeData.size() == 1u, result);
+
+        Clusters::Descriptor::Attributes::TagList::TypeInfo::DecodableType tagList;
+        EXPECT_EQ(DataModel::Decode(attributeData[0].dataReader, tagList), CHIP_NO_ERROR);
+        auto iterator = tagList.begin();
+        while (iterator.Next())
+        {
+            const auto & tag = iterator.GetValue();
+            result.push_back({ tag.mfgCode.IsNull(), tag.namespaceID, tag.tag });
+        }
+        EXPECT_EQ(iterator.GetStatus(), CHIP_NO_ERROR);
+        return result;
+    }
 };
 
 class FailingOptionalClusterElectricalEnergyTariff : public ElectricalEnergyTariff
@@ -102,10 +187,35 @@ TEST_F(ElectricalEnergyTariffTestFixture, GenericTypeRegistersOnlyDescriptor)
 
     EXPECT_EQ(GetServerClusterIds(kEndpointId), std::vector<ClusterId>{ Clusters::Descriptor::Id });
     ExpectElectricalEnergyTariffDeviceType(kEndpointId);
+    EXPECT_FALSE(HasDescriptorTagListAttribute(kEndpointId));
 
     device.Unregister(mProvider);
     EXPECT_EQ(device.GetEndpointId(), kInvalidEndpointId);
     EXPECT_TRUE(HasNoEndpoints());
+}
+
+TEST_F(ElectricalEnergyTariffTestFixture, DescriptorReportsDefaultTagList)
+{
+    SimulatedElectricalEnergyTariff device{ Span(kTariffTags) };
+    ASSERT_EQ(device.Register(kEndpointId, mProvider), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(HasDescriptorTagListAttribute(kEndpointId));
+    EXPECT_EQ(ReadDescriptorTagList(kEndpointId), ExpectedTags(Span(kTariffTags)));
+
+    device.Unregister(mProvider);
+}
+
+TEST_F(ElectricalEnergyTariffTestFixture, CompositionTagListOverridesDefault)
+{
+    SimulatedElectricalEnergyTariff device{ Span(kTariffTags) };
+    ASSERT_EQ(
+        device.Register(kEndpointId, mProvider,
+                        EndpointComposition(kInvalidEndpointId, DataModel::EndpointCompositionPattern::kTree, Span(kOverrideTags))),
+        CHIP_NO_ERROR);
+
+    EXPECT_EQ(ReadDescriptorTagList(kEndpointId), ExpectedTags(Span(kOverrideTags)));
+
+    device.Unregister(mProvider);
 }
 
 TEST_F(ElectricalEnergyTariffTestFixture, RejectsRepeatedRegistrationAndAllowsReuse)

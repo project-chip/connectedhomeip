@@ -39,7 +39,9 @@ public:
     /// Price per kWh in units of 10^-kCurrencyDecimalPoints of the currency.
     static constexpr int64_t kPricePerKWh = 25;
 
-    SimulatedElectricalEnergyTariff()           = default;
+    explicit SimulatedElectricalEnergyTariff(Span<const EndpointComposition::SemanticTag> tagList = {}) :
+        ElectricalEnergyTariff(tagList)
+    {}
     ~SimulatedElectricalEnergyTariff() override = default;
 
     Clusters::CommodityPrice::CommodityPriceCluster & CommodityPriceCluster();

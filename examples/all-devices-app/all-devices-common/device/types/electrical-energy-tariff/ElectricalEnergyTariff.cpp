@@ -21,8 +21,8 @@
 
 namespace chip::app {
 
-ElectricalEnergyTariff::ElectricalEnergyTariff() :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kElectricalEnergyTariff, 1))
+ElectricalEnergyTariff::ElectricalEnergyTariff(Span<const EndpointComposition::SemanticTag> tagList) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kElectricalEnergyTariff, 1)), mTagList(tagList)
 {}
 
 CHIP_ERROR ElectricalEnergyTariff::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -31,6 +31,10 @@ CHIP_ERROR ElectricalEnergyTariff::Register(EndpointId endpoint, CodeDrivenDataM
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
 
+    if (composition.tagList.empty())
+    {
+        composition.tagList = mTagList;
+    }
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
     ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
