@@ -2377,7 +2377,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         PICS, and for codes the generator does not produce: non device-element codes,
         event codes, and codes for clusters missing from the data model.
         """
-        if not getattr(self.matter_test_config, 'use_device_pics', True):
+        if not self.matter_test_config.use_device_pics:
             return None
         device_pics = self.pseudo_pics.get(self.dut_node_id)
         if device_pics is None:
@@ -2405,9 +2405,10 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def _log_pics_override(self, key: str, endpoint: int, file_value: bool, device_value: bool) -> None:
         """Log, once per code and endpoint, that the DUT's value replaced a different PICS-file value."""
-        logged = getattr(self, '_logged_pics_overrides', None)
+        logged: set[tuple[str, int]] | None = getattr(self, '_logged_pics_overrides', None)
         if logged is None:
-            logged = self._logged_pics_overrides = set()
+            logged = set()
+            self._logged_pics_overrides = logged
         if (key, endpoint) in logged:
             return
         logged.add((key, endpoint))
