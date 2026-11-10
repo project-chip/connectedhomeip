@@ -271,6 +271,11 @@ public:
     {
     public:
         /**
+         * Explicitly narrows an OwnedOrNull, which must have a value.
+         */
+        explicit Owned(OwnedOrNull && other) : Owned(other.Take()) {}
+
+        /**
          * Transfers ownership of the Cancelable out of the token. Valid only if the token has not
          * been consumed.
          */
@@ -351,6 +356,8 @@ public:
         mCall(mContext, std::forward<Args>(args)...);
     }
 
+    class OwnedOrNull;
+
     /**
      * Implicitly accepts a Callback (or pointer to one) and takes ownership of it.
      *
@@ -371,6 +378,11 @@ public:
         Owned(Callback & callback) : Cancelable::Owned(callback.Cancel()) {}
         Owned(Callback * callback) : Cancelable::Owned((callback != nullptr) ? callback->Cancel() : nullptr) {}
         Owned(std::nullptr_t) = delete;
+
+        /**
+         * Explicitly narrows an OwnedOrNull, which must have a value.
+         */
+        explicit Owned(Callback::OwnedOrNull && other) : Cancelable::Owned(std::move(other)) {}
 
         /**
          * Takes the callback out of the token and invokes it, for a callee that completes an

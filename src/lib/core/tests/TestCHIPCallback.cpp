@@ -316,6 +316,13 @@ static_assert(std::is_convertible_v<Callback<>::Owned, Cancelable::OwnedOrNull>,
 static_assert(!std::is_convertible_v<Callback<>::Owned &, Cancelable::OwnedOrNull &>, "Owned must not slice");
 static_assert(!std::is_convertible_v<Cancelable::Owned &, Cancelable::OwnedOrNull &>, "Owned must not slice");
 
+// Narrowing an OwnedOrNull back to an Owned aborts on null, so it has to be explicit.
+static_assert(std::is_constructible_v<Cancelable::Owned, Cancelable::OwnedOrNull>, "OwnedOrNull narrows to Owned");
+static_assert(!std::is_convertible_v<Cancelable::OwnedOrNull, Cancelable::Owned>, "narrowing is explicit");
+static_assert(std::is_constructible_v<Callback<>::Owned, Callback<>::OwnedOrNull>, "OwnedOrNull narrows to Owned");
+static_assert(!std::is_convertible_v<Callback<>::OwnedOrNull, Callback<>::Owned>, "narrowing is explicit");
+static_assert(!std::is_constructible_v<Callback<>::Owned, Cancelable::OwnedOrNull>, "narrowing keeps the signature");
+
 /**
  * A registrar in the shape CHIPCallback.h recommends for new APIs: it accepts callbacks by value
  * as Owned / OwnedOrNull tokens rather than as plain pointers.
@@ -521,6 +528,24 @@ TEST_F(TestCHIPCallback, OwnedOrNullInvokesTheCallbackDirectly)
     EXPECT_EQ(n, 1);
     EXPECT_FALSE(cb.IsRegistered());
     EXPECT_TRUE(acceptor.IsEmpty());
+}
+
+// A callee that has checked HasValue() can narrow an OwnedOrNull to an Owned, consuming the source.
+TEST_F(TestCHIPCallback, OwnedOrNullNarrowsToOwned)
+{
+    int n = 0;
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+
+    Callback<>::OwnedOrNull optional(cb);
+    Callback<>::Owned owned(std::move(optional));
+    EXPECT_FALSE(optional.HasValue()); // NOLINT(bugprone-use-after-move)
+    EXPECT_EQ(Callback<>::FromCancelable(owned.Take()), &cb);
+
+    Cancelable::OwnedOrNull agnosticOptional(Callback<>::Owned{ cb });
+    Cancelable::Owned agnostic(std::move(agnosticOptional));
+    EXPECT_FALSE(agnosticOptional.HasValue()); // NOLINT(bugprone-use-after-move)
+    EXPECT_EQ(Callback<>::FromCancelable(agnostic.Take()), &cb);
+    EXPECT_EQ(n, 0);
 }
 
 // Invoke() forwards its arguments to the callback, so a callee completing synchronously reports an
