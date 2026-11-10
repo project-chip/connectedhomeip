@@ -31,6 +31,7 @@
 #include <messaging/tests/MessagingContext.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/CASESession.h>
+#include <transport/raw/MessageHeader.h>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -129,6 +130,49 @@ class NoopPairingDelegate : public SessionEstablishmentDelegate
 public:
     void OnSessionEstablishmentError(CHIP_ERROR, SessionEstablishmentStage) override {}
     void OnSessionEstablished(const SessionHandle &) override {}
+};
+
+// Drops every CASE Sigma3 the loopback sends, whatever acknowledgements go out around the handshake messages.
+class DropSigma3Delegate : public Testing::LoopbackTransportDelegate
+{
+public:
+    explicit DropSigma3Delegate(Testing::LoopbackTransport & loopback) : mLoopback(loopback)
+    {
+        mLoopback.SetLoopbackTransportDelegate(this);
+    }
+    ~DropSigma3Delegate() override
+    {
+        mLoopback.SetLoopbackTransportDelegate(nullptr);
+        mLoopback.mNumMessagesToDrop = 0;
+    }
+
+    void WillSendMessage(const PeerAddress &, const System::PacketBufferHandle & message) override
+    {
+        PacketHeader packetHeader;
+        uint16_t packetHeaderSize = 0;
+        if (packetHeader.Decode(message->Start(), message->DataLength(), &packetHeaderSize) != CHIP_NO_ERROR)
+        {
+            return;
+        }
+        PayloadHeader payloadHeader;
+        uint16_t payloadHeaderSize = 0;
+        if (payloadHeader.Decode(message->Start() + packetHeaderSize, message->DataLength() - packetHeaderSize,
+                                 &payloadHeaderSize) != CHIP_NO_ERROR)
+        {
+            return;
+        }
+        if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma3))
+        {
+            ++mSigma3Count;
+            mLoopback.mNumMessagesToAllowBeforeDropping = 0;
+            mLoopback.mNumMessagesToDrop                = 1;
+        }
+    }
+
+    uint32_t mSigma3Count = 0;
+
+private:
+    Testing::LoopbackTransport & mLoopback;
 };
 
 constexpr NodeId kResponderNodeId = 0xDEDEDEDE00010001;
@@ -267,13 +311,13 @@ TEST_F(TestOperationalSessionSetupPhase, PhaseFollowsTheHandshake)
     ASSERT_EQ(AddressResolve::Resolver::Instance().Init(&GetSystemLayer()), CHIP_NO_ERROR);
 
     // The responder answers Sigma1 with Sigma2; the loopback then drops the initiator's Sigma3, so the initiator waits in
-    // kSentSigma3.
+    // kSentSigma3. Whether Sigma1's acknowledgement goes out on its own or with Sigma2 differs by platform, so the drop is by
+    // message type rather than by count.
     CASESession responder;
     NoopPairingDelegate responderDelegate;
     responder.SetGroupDataProvider(&gResponderGroupDataProvider);
-    auto & loopback                            = GetLoopback();
-    loopback.mNumMessagesToAllowBeforeDropping = 2;
-    loopback.mNumMessagesToDrop                = 1;
+    auto & loopback = GetLoopback();
+    DropSigma3Delegate dropSigma3(loopback);
     ASSERT_EQ(
         GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1, &responder),
         CHIP_NO_ERROR);
@@ -318,9 +362,8 @@ TEST_F(TestOperationalSessionSetupPhase, PhaseFollowsTheHandshake)
     ASSERT_EQ(CASEClientOf(*setup)->GetCASESessionState(), CASESession::State::kSentSigma3);
     EXPECT_EQ(setup->GetSetupPhase(), OperationalSessionSetup::SetupPhase::kOther);
 
-    EXPECT_EQ(loopback.mDroppedMessageCount, 1u);
-    loopback.mNumMessagesToAllowBeforeDropping = 0;
-    loopback.mNumMessagesToDrop                = 0;
+    EXPECT_GE(dropSigma3.mSigma3Count, 1u);
+    EXPECT_EQ(loopback.mDroppedMessageCount, dropSigma3.mSigma3Count);
     EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1));
     Platform::Delete(setup);
     GetExchangeManager().CloseAllContextsForDelegate(nullptr);
