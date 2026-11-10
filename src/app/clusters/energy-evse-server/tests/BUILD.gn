@@ -27,6 +27,7 @@ chip_test_suite("tests") {
   ]
 
   sources = [
+    "EnergyEvseTestEventTriggerHandlerStub.cpp",
     "MockEvseDelegate.cpp",
     "MockEvseDelegate.h",
   ]
