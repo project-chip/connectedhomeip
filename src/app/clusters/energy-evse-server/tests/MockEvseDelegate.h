@@ -51,32 +51,6 @@ public:
     Protocols::InteractionModel::Status ClearTargets() override;
 
     // ------------------------------------------------------------------
-    // Attribute change callbacks (from Delegate interface) - empty implementations for mock
-    void OnStateChanged(StateEnum newValue) override {}
-    void OnSupplyStateChanged(SupplyStateEnum newValue) override {}
-    void OnFaultStateChanged(FaultStateEnum newValue) override {}
-    void OnChargingEnabledUntilChanged(DataModel::Nullable<uint32_t> newValue) override {}
-    void OnDischargingEnabledUntilChanged(DataModel::Nullable<uint32_t> newValue) override {}
-    void OnCircuitCapacityChanged(int64_t newValue) override {}
-    void OnMinimumChargeCurrentChanged(int64_t newValue) override {}
-    void OnMaximumChargeCurrentChanged(int64_t newValue) override {}
-    void OnMaximumDischargeCurrentChanged(int64_t newValue) override {}
-    void OnUserMaximumChargeCurrentChanged(int64_t newValue) override {}
-    void OnRandomizationDelayWindowChanged(uint32_t newValue) override {}
-    void OnNextChargeStartTimeChanged(DataModel::Nullable<uint32_t> newValue) override {}
-    void OnNextChargeTargetTimeChanged(DataModel::Nullable<uint32_t> newValue) override {}
-    void OnNextChargeRequiredEnergyChanged(DataModel::Nullable<int64_t> newValue) override {}
-    void OnNextChargeTargetSoCChanged(DataModel::Nullable<Percent> newValue) override {}
-    void OnApproximateEVEfficiencyChanged(DataModel::Nullable<uint16_t> newValue) override {}
-    void OnStateOfChargeChanged(DataModel::Nullable<Percent> newValue) override {}
-    void OnBatteryCapacityChanged(DataModel::Nullable<int64_t> newValue) override {}
-    void OnVehicleIDChanged(DataModel::Nullable<CharSpan> newValue) override {}
-    void OnSessionIDChanged(DataModel::Nullable<uint32_t> newValue) override {}
-    void OnSessionDurationChanged(DataModel::Nullable<uint32_t> newValue) override {}
-    void OnSessionEnergyChargedChanged(DataModel::Nullable<int64_t> newValue) override {}
-    void OnSessionEnergyDischargedChanged(DataModel::Nullable<int64_t> newValue) override {}
-
-    // ------------------------------------------------------------------
     // Test helper getters (for verifying targets state)
     size_t GetTotalTargetsCount() const { return mTotalTargetsCount; }
     uint8_t GetDaysWithTargets() const { return mDaysWithTargets; }
