@@ -197,6 +197,8 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_INCORRECT_STATE);
         return;
     }
+    // Begin() starts a new hash context without releasing one from an earlier download, so release it first.
+    imageProcessor->mPayloadHash.Clear();
     if (imageProcessor->mPayloadHash.Begin() != CHIP_NO_ERROR)
     {
         TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_INTERNAL);
@@ -300,6 +302,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     {
         imageProcessor->mOfs.close();
         imageProcessor->mPayloadVerified = !imageProcessor->mOfs.fail() && imageProcessor->VerifyPayload();
+        imageProcessor->mPayloadHash.Clear();
         TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
         if (!imageProcessor->mPayloadVerified)
         {
@@ -351,6 +354,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     }
 
     imageProcessor->StopHashingPartialImage();
+    imageProcessor->mPayloadHash.Clear();
     imageProcessor->mOfs.close();
     unlink(imageProcessor->mImageFile);
     imageProcessor->mSuspended          = false;
@@ -370,6 +374,7 @@ void OTAImageProcessorImpl::HandleSuspend(intptr_t context)
     // A close() that fails to write buffered data leaves the file shorter than the bytes received, so GetResumeOffset() and the
     // prepare that resumes find it is not intact.
     imageProcessor->StopHashingPartialImage();
+    imageProcessor->mPayloadHash.Clear();
     imageProcessor->mOfs.close();
     imageProcessor->mSuspended = imageProcessor->mPayloadDigestLength > 0;
     if (!imageProcessor->mSuspended)
