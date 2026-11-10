@@ -61,7 +61,7 @@ class TC_BOOLCFG_6_1(MatterTestCommissionedDevice):
 
     def steps_TC_BOOLCFG_6_1(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH", is_commissioning=True),
+            TestStep("1", "Commission DUT to TH"),
             TestStep("2a", "TH reads FeatureMap attribute.", "DUT replies with FeatureMap attribute."),
             TestStep("2b", "TH reads AttributeList attribute.", "DUT replies with AttributeList attribute."),
             TestStep("3", "If FAULTEV feature is not supported, "

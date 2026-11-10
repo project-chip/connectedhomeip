@@ -43,6 +43,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #include <openthread/dns_client.h>
+#include <platform/OpenThread/OpenThreadTxtEntries.h>
 #endif
 
 #include <app/icd/server/ICDServerConfig.h>
@@ -235,6 +236,14 @@ private:
             otDnsTxtEntry mTxtEntries[kTxtMaxNumber];
 
             bool IsUsed() const { return mService.mInstanceName != nullptr; }
+
+            // The slot stays occupied until the SRP server acknowledges the removal.
+            bool IsPendingRemoval() const
+            {
+                return (mService.mState == OT_SRP_CLIENT_ITEM_STATE_TO_REMOVE) ||
+                    (mService.mState == OT_SRP_CLIENT_ITEM_STATE_REMOVING);
+            }
+
             bool Matches(const char * instanceName, const char * name) const;
             bool Matches(const char * instanceName, const char * name, uint16_t port, const Span<const char * const> & subTypes,
                          const Span<const Dnssd::TextEntry> & txtEntries) const;
@@ -277,11 +286,7 @@ private:
     DnsBrowseCallback mDnsBrowseCallback;
     DnsResolveCallback mDnsResolveCallback;
 
-    struct DnsServiceTxtEntries
-    {
-        uint8_t mBuffer[kTotalDnsServiceTxtBufferSize];
-        Dnssd::TextEntry mTxtEntries[kMaxDnsServiceTxtEntriesNumber];
-    };
+    using DnsServiceTxtEntries = OpenThreadTxtEntries<kMaxDnsServiceTxtEntriesNumber, kTotalDnsServiceTxtBufferSize>;
 
     struct DnsResult
     {

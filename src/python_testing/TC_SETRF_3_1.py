@@ -75,7 +75,7 @@ class TC_SETRF_3_1(MatterTestCommissionedDevice, CommodityTariffTestBaseHelper):
 
         return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     "DUT is commissioned to TH.", is_commissioning=True),
+                     "DUT is commissioned to TH."),
             TestStep("2", "Set up a subscription to the Commodity Tariff cluster attributes: MinIntervalFloor: 0, MaxIntervalCeiling: 10",
                      "Subscription successfully established."),
             TestStep("3", "TH reads from the DUT the TariffInfo attribute.", """

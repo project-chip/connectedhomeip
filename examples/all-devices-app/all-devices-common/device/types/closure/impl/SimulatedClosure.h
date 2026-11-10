@@ -16,6 +16,10 @@
 
 #pragma once
 
+#include <memory>
+#include <optional>
+#include <vector>
+
 #include <app/TestEventTriggerDelegate.h>
 #include <device/types/closure-panel/impl/SimulatedClosurePanel.h>
 #include <device/types/closure/Closure.h>
@@ -59,11 +63,6 @@ public:
         Closure::Config closure;
         std::vector<PanelList> panels;
     };
-
-    /// The closure exposed by `--device closure`: a door that positions, latches and moves at a
-    /// selectable speed, composed of a translating lift panel, a flow-modulating panel and a
-    /// latching rotating panel. The semantic tags it references have static storage duration.
-    static Config ThreePanelDoorClosureConfig();
 
     SimulatedClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Config config,
                      Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,

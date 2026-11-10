@@ -18,6 +18,7 @@
 
 #include "DeviceOperationsScreen.h"
 #include "DeviceDisplay.h"
+#include "Ui.h"
 
 #include <app/server/Server.h>
 #include <esp_log.h>
@@ -91,7 +92,7 @@ void OnResetButtonClicked(lv_event_t * event)
     lv_obj_add_event_cb(cancelBtn, OnCancelClicked, LV_EVENT_CLICKED, nullptr);
 
     lv_obj_t * resetBtn = lv_msgbox_add_footer_button(sActiveModal, "Reset Now");
-    lv_obj_set_style_bg_color(resetBtn, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(resetBtn, Ui::Danger(), LV_PART_MAIN);
     lv_obj_add_event_cb(resetBtn, OnConfirmResetClicked, LV_EVENT_CLICKED, nullptr);
 }
 
@@ -99,31 +100,15 @@ void OnResetButtonClicked(lv_event_t * event)
 
 void ShowDeviceOperations(lv_obj_t * parent)
 {
-    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_all(parent, 12, LV_PART_MAIN);
-    lv_obj_set_style_pad_row(parent, 12, LV_PART_MAIN);
-    lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    Ui::LayoutColumn(parent);
 
-    lv_obj_t * restartBtn = lv_button_create(parent);
-    lv_obj_set_width(restartBtn, LV_PCT(85));
-    lv_obj_set_height(restartBtn, 42);
-    lv_obj_t * restartLabel = lv_label_create(restartBtn);
-    lv_label_set_text_static(restartLabel, "Restart Device");
-    lv_obj_center(restartLabel);
-    lv_obj_add_event_cb(restartBtn, OnRestartButtonClicked, LV_EVENT_CLICKED, nullptr);
+    Ui::CreateTile(parent, LV_SYMBOL_REFRESH, Ui::Accent(), "Restart Device", "Reboot, keeping all settings",
+                   OnRestartButtonClicked);
+    Ui::CreateTile(parent, LV_SYMBOL_TRASH, Ui::Danger(), "Factory Reset", "Erase fabrics, credentials and settings",
+                   OnResetButtonClicked);
 
-    lv_obj_t * info = lv_label_create(parent);
-    lv_label_set_text_static(info, "Factory reset erases all fabrics and credentials.");
-    lv_obj_set_width(info, LV_PCT(90));
+    lv_obj_t * info = Ui::CreateCaption(parent, "A factory reset leaves the device uncommissioned and reboots it.");
+    lv_obj_set_width(info, LV_PCT(92));
+    lv_label_set_long_mode(info, LV_LABEL_LONG_WRAP);
     lv_obj_set_style_text_align(info, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-    lv_obj_set_style_text_color(info, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
-
-    lv_obj_t * resetBtn = lv_button_create(parent);
-    lv_obj_set_width(resetBtn, LV_PCT(85));
-    lv_obj_set_height(resetBtn, 42);
-    lv_obj_set_style_bg_color(resetBtn, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
-    lv_obj_t * resetLabel = lv_label_create(resetBtn);
-    lv_label_set_text_static(resetLabel, "Factory Reset Device");
-    lv_obj_center(resetLabel);
-    lv_obj_add_event_cb(resetBtn, OnResetButtonClicked, LV_EVENT_CLICKED, nullptr);
 }

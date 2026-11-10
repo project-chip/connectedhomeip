@@ -19,7 +19,9 @@
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
+#include <clusters/Identify/Commands.h>
 #include <clusters/Identify/Ids.h>
+#include <clusters/OnOff/Commands.h>
 #include <clusters/OnOff/Ids.h>
 #include <devices/Types.h>
 #include <platform/PlatformManager.h>
@@ -32,10 +34,8 @@ namespace {
 const ClusterId kClientClusters[] = { OnOff::Id, Identify::Id };
 } // namespace
 
-OnOffLightSwitch::OnOffLightSwitch(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager,
-                                   Clusters::Binding::Table & bindingTable, Clusters::Binding::Manager & bindingManager) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLightSwitch, 1)),
-    mTimerDelegate(timerDelegate), mPlatformManager(platformManager), mBindingTable(bindingTable), mBindingManager(bindingManager)
+OnOffLightSwitch::OnOffLightSwitch(const Config & config) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLightSwitch, 1)), mConfig(config)
 {}
 
 CHIP_ERROR OnOffLightSwitch::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -46,14 +46,14 @@ CHIP_ERROR OnOffLightSwitch::Register(chip::EndpointId endpoint, CodeDrivenDataM
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mConfig.timerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mBindingCluster.Create(
         BindingCluster::Context{
-            .bindingTable    = mBindingTable,
-            .bindingManager  = mBindingManager,
-            .platformManager = mPlatformManager,
+            .bindingTable    = mConfig.bindingTable,
+            .bindingManager  = mConfig.bindingManager,
+            .platformManager = mConfig.platformManager,
         },
         endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mBindingCluster.Registration()));
@@ -81,6 +81,42 @@ void OnOffLightSwitch::Unregister(CodeDrivenDataModelProvider & provider)
 CHIP_ERROR OnOffLightSwitch::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
 {
     return out.ReferenceExisting(Span<const ClusterId>(kClientClusters));
+}
+
+template <typename CommandType>
+CHIP_ERROR OnOffLightSwitch::SendCommand(const CommandType & command)
+{
+    VerifyOrReturnError(mEndpointId != kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    return mConfig.bindingHandler.DispatchSimple(mEndpointId, command);
+}
+
+CHIP_ERROR OnOffLightSwitch::SendOn()
+{
+    return SendCommand(OnOff::Commands::On::Type{});
+}
+
+CHIP_ERROR OnOffLightSwitch::SendOff()
+{
+    return SendCommand(OnOff::Commands::Off::Type{});
+}
+
+CHIP_ERROR OnOffLightSwitch::SendToggle()
+{
+    return SendCommand(OnOff::Commands::Toggle::Type{});
+}
+
+CHIP_ERROR OnOffLightSwitch::SendIdentify(uint16_t identifyTimeSeconds)
+{
+    return SendCommand(Identify::Commands::Identify::Type{ .identifyTime = identifyTimeSeconds });
+}
+
+CHIP_ERROR OnOffLightSwitch::SendTriggerEffect(Identify::EffectIdentifierEnum effectIdentifier,
+                                               Identify::EffectVariantEnum effectVariant)
+{
+    return SendCommand(Identify::Commands::TriggerEffect::Type{
+        .effectIdentifier = effectIdentifier,
+        .effectVariant    = effectVariant,
+    });
 }
 
 } // namespace chip::app

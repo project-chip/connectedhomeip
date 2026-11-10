@@ -56,6 +56,30 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#   run4:
+#     app: ${ALL_DEVICES_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#   run5:
+#     app: ${ALL_DEVICES_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --qr-code MT:-24J0KQS02-10648G00
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -66,13 +90,14 @@ from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_txt_record_present, assert_valid_cm_key,
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
-                                          assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
-                                          assert_valid_long_discriminator_subtype, assert_valid_ph_key,
+                                          assert_valid_icd_key, assert_valid_long_discriminator_subtype, assert_valid_ph_key,
                                           assert_valid_ph_pi_relationship, assert_valid_pi_key, assert_valid_ri_key,
                                           assert_valid_sai_key, assert_valid_sat_key, assert_valid_short_discriminator_subtype,
                                           assert_valid_sii_key, assert_valid_t_key, assert_valid_vendor_subtype,
                                           assert_valid_vp_key)
 from mdns_discovery.utils.network import is_dut_tcp_supported
+from mdns_discovery.utils.support import (SUBTYPE_BROWSE_TIMEOUT_SEC, TCP_PICS_STR, DiscoverySupport, get_single_ptr_instance_name,
+                                          get_verify_srv_record, verify_aaaa_records)
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -92,17 +117,7 @@ Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#341-tc-sc-41-commissionable-node-discovery-dut_commissionee
 '''
 
-TCP_PICS_STR = "MCORE.SC.S.TCP"
 ROOT_NODE_ENDPOINT_ID = 0
-
-# Timeout for a single subtype PTR browse:
-#   - Browses that get an answer end early via MdnsDiscovery's discovery-silence
-#     monitor; the full 5s is only paid by candidates that never answer.
-#   - Sized so an unanswered browse still spans the initial mDNS query plus two
-#     retransmissions (RFC 6762 §5.2: queries at ~0/1/3s) before the subtype is
-#     treated as not advertised.
-#   - Candidates browse concurrently, so a verification pass pays one 5s window total.
-SUBTYPE_BROWSE_TIMEOUT_SEC = 5
 
 
 class SetupCodeType(enum.IntEnum):
@@ -111,14 +126,14 @@ class SetupCodeType(enum.IntEnum):
     NONE_SUPLIED = 2
 
 
-class TC_SC_4_1(MatterTestCommissionedDevice):
+class TC_SC_4_1(DiscoverySupport, MatterTestCommissionedDevice):
     # Cached by get_exposed_device_types() so its per-endpoint Descriptor
     # reads run once per test instead of once per verification pass
     _exposed_device_types: set[int] | None = None
 
     def steps_TC_SC_4_1(self):
         return [
-            TestStep("precondition", "DUT is commissioned on the same fabric as TH.", is_commissioning=True),
+            TestStep("precondition", "DUT is commissioned on the same fabric as TH."),
 
             # DUT DETAILS
             #
@@ -248,30 +263,6 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
                         section of the Test Plan for the list of verifications to be performed"""),
         ]
 
-    async def get_descriptor_server_list(self):
-        return await self.read_single_attribute_check_success(
-            endpoint=ROOT_NODE_ENDPOINT_ID,
-            dev_ctrl=self.default_controller,
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.ServerList
-        )
-
-    async def get_active_mode_threshold_ms(self):
-        return await self.read_single_attribute_check_success(
-            endpoint=ROOT_NODE_ENDPOINT_ID,
-            dev_ctrl=self.default_controller,
-            cluster=Clusters.IcdManagement,
-            attribute=Clusters.IcdManagement.Attributes.ActiveModeThreshold
-        )
-
-    async def get_icd_feature_map(self):
-        return await self.read_single_attribute_check_success(
-            endpoint=ROOT_NODE_ENDPOINT_ID,
-            dev_ctrl=self.default_controller,
-            cluster=Clusters.IcdManagement,
-            attribute=Clusters.IcdManagement.Attributes.FeatureMap
-        )
-
     async def get_exposed_device_types(self) -> set[int]:
         """Returns the union of device types the DUT exposes across all endpoints
         (Descriptor cluster DeviceTypeList), memoized for the test run. The Primary
@@ -293,14 +284,6 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
                 device_types.update(entry.deviceType for entry in device_type_list)
             self._exposed_device_types = device_types
         return self._exposed_device_types
-
-    def get_dut_instance_name(self, log_result: bool = False) -> str:
-        node_id = self.dut_node_id
-        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
-        instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
-        if log_result:
-            log.info("\n\n\tDUT Instance Name: %s\n", instance_name)
-        return instance_name
 
     def get_discriminator_subtype(self, is_obcw: bool = False) -> tuple[str, str] | None:
         # TH constructs the Discriminator Subtype using the DUT's Long or Short Discriminator
@@ -331,23 +314,6 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
 
         return None
 
-    async def _get_verify_discriminator_subtype_ptr_instance_name(self, discriminator_subtype: str, must_be_present: bool = True) -> str | None:
-
-        # TH performs a PTR record query against the Discriminator Subtype
-        ptr_records = await MdnsDiscovery().get_ptr_records(
-            service_types=[discriminator_subtype],
-            log_output=True
-        )
-
-        if must_be_present or ptr_records:
-            # Verify that there is one, and only one, Discriminator Subtype PTR record
-            asserts.assert_equal(len(ptr_records), 1,
-                                 f"There must only be one Long or Short Discriminator Subtype ({discriminator_subtype}) PTR record, found {len(ptr_records)}.")
-
-            return ptr_records[0].instance_name
-
-        return None
-
     async def _verify_discriminator_subtype_advertisements(self, discriminator: str, discriminator_subtype: str, discriminator_ptr_instance_name: str, is_long_discriminator: bool) -> None:
         # Determine discriminator type (Long or Short) to verify
         assert_valid_discriminator_subtype = (
@@ -367,18 +333,11 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
             short_discriminator = (int(discriminator) >> 8) & 0x0F
             short_discriminator_subtype = f"_S{short_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
 
-            # Performs PTR record query
-            ptr_records = await MdnsDiscovery().get_ptr_records(
-                service_types=[short_discriminator_subtype],
-                log_output=True
-            )
-
             # Verify that there is one, and only one, Short Discriminator subtype PTR record
-            asserts.assert_equal(len(ptr_records), 1, "There must only be one 'Short Discriminator Subtype' PTR record.")
-            short_discriminator_ptr = ptr_records[0]
+            short_discriminator_ptr_instance_name = await get_single_ptr_instance_name(short_discriminator_subtype)
 
             # Verify that the Short and Long Discriminator Subtype PTR record's instance names are equal
-            asserts.assert_equal(short_discriminator_ptr.instance_name, discriminator_ptr_instance_name,
+            asserts.assert_equal(short_discriminator_ptr_instance_name, discriminator_ptr_instance_name,
                                  "Short and Long Discriminator Subtype PTR record's instance names must be equal.")
 
     async def _verify_commissionable_subtypes(self, discriminator: str, discriminator_subtype: str, discriminator_ptr_instance_name: str, is_long_discriminator: bool, extended_discovery: bool = False) -> None:
@@ -401,18 +360,12 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
         else:
             # When NOT in Extended Discovery Mode, verify that the _CM subtype is present
             # TH performs a PTR record query against the 'In Commissioning Mode Subtype'
-            ptr_records = await MdnsDiscovery().get_ptr_records(
-                service_types=[cm_subtype],
-                log_output=True
-            )
-
-            # Verify that there is one, and only one, 'In Commissioning Mode Subtype' PTR record
-            asserts.assert_equal(len(ptr_records), 1, "There must only be one 'In Commissioning Mode Subtype' subtype PTR record.")
-            cm_ptr = ptr_records[0]
+            # and verifies that there is one, and only one, such PTR record
+            cm_ptr_instance_name = await get_single_ptr_instance_name(cm_subtype)
 
             # Verify that the 'In Commissioning Mode Subtype' PTR record's instance name
             # is equal to the Discriminator Subtype PTR record's instance name
-            asserts.assert_equal(cm_ptr.instance_name, discriminator_ptr_instance_name,
+            asserts.assert_equal(cm_ptr_instance_name, discriminator_ptr_instance_name,
                                  "'In Commissioning Mode Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** VENDOR SUBTYPE ***
@@ -501,19 +454,7 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
     async def _get_verify_srv_record(self, long_discriminator_ptr_instance_name: str) -> str:
         # TH performs a 'Commissionable Service' SRV record query
         # against 'long_discriminator_subtype_ptr_instance_name'
-        srv_record = await MdnsDiscovery().get_srv_record(
-            service_name=f"{long_discriminator_ptr_instance_name}.{MdnsServiceType.COMMISSIONABLE.value}",
-            service_type=MdnsServiceType.COMMISSIONABLE.value,
-            log_output=True
-        )
-
-        # Verify SRV record is returned
-        asserts.assert_true(srv_record is not None, "SRV record was not returned")
-
-        # Verify that the SRV record's instance name is equal
-        # to 'long_discriminator_subtype_ptr_instance_name'
-        asserts.assert_equal(srv_record.instance_name, long_discriminator_ptr_instance_name,
-                             "SRV record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+        srv_record = await get_verify_srv_record(long_discriminator_ptr_instance_name, MdnsServiceType.COMMISSIONABLE.value)
 
         # Verify that the DUT's SRV record's instance name is a 64-bit randomly
         # selected ID expressed as a sixteen-char hex string with capital letters
@@ -522,10 +463,6 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
         # Verify that the DUT's SRV record's service type
         # is '_matterc._udp' and service domain '.local.'
         assert_is_commissionable_type(srv_record.service_type)
-
-        # Verify that the target hostname is derived from the 48bit or 64bit MAC
-        # address expressed as a twelve or sixteen capital letter hex string
-        assert_valid_hostname(srv_record.hostname)
 
         return srv_record.hostname
 
@@ -728,19 +665,6 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
         # Verify the relationship between PH and PI keys
         assert_valid_ph_pi_relationship(txt_record.txt)
 
-    @staticmethod
-    async def _verify_aaaa_records(srv_hostname: str) -> None:
-        # TH performs a AAAA record query against the target 'hostname'
-        # listed in the 'Commissionable Service' SRV record
-        quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_hostname, log_output=True)
-
-        # Verify that at least 1 AAAA record is returned for each IPv6 a address
-        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{srv_hostname}'")
-
-        # Verify that each AAAA record contains a valid IPv6 address
-        ipv6_addresses = [f"{r.address}%{r.interface}" for r in quada_records]
-        assert_valid_ipv6_addresses(ipv6_addresses)
-
     async def close_commissioning_window(self) -> None:
         revoke_cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await self.default_controller.SendCommand(nodeId=self.dut_node_id,
@@ -860,7 +784,7 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
             # *** STEP 12 ***
             # Get the Discriminator Subtype (Long or Short) PTR record's instance name
             self.step(12)
-            discriminator_ptr_instance_name = await self._get_verify_discriminator_subtype_ptr_instance_name(discriminator_subtype)
+            discriminator_ptr_instance_name = await get_single_ptr_instance_name(discriminator_subtype)
 
             # *** STEP 13 ***
             # Verify commissionable subtype advertisements
@@ -880,7 +804,7 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
             # *** STEP 16 ***
             # Verify AAAA records
             self.step(16)
-            await self._verify_aaaa_records(srv_hostname)
+            await verify_aaaa_records(srv_hostname)
 
             # *** STEP 17 ***
             # Close commissioning window
@@ -909,7 +833,7 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
         # *** STEP 20 ***
         # Get the 'Long Discriminator Subtype' PTR record's instance name
         self.step(20)
-        long_discriminator_ptr_instance_name = await self._get_verify_discriminator_subtype_ptr_instance_name(long_discriminator_subtype)
+        long_discriminator_ptr_instance_name = await get_single_ptr_instance_name(long_discriminator_subtype)
 
         # *** STEP 21 ***
         # Verify commissionable subtype advertisements
@@ -929,7 +853,7 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
         # *** STEP 24 ***
         # Verify AAAA records
         self.step(24)
-        await self._verify_aaaa_records(srv_hostname)
+        await verify_aaaa_records(srv_hostname)
 
         # *** STEP 25 ***
         # Close commissioning window
@@ -940,7 +864,7 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
         # Check if DUT Extended Discovery mode is active
         self.step(26)
         # Get the 'Long Discriminator Subtype' PTR record's instance name
-        long_discriminator_ptr_instance_name = await self._get_verify_discriminator_subtype_ptr_instance_name(long_discriminator_subtype, must_be_present=False)
+        long_discriminator_ptr_instance_name = await get_single_ptr_instance_name(long_discriminator_subtype, must_be_present=False)
 
         # If the DUT's 'Long Discriminator Subtype' PTR record's instance name is present, Extended Discovery mode is active
         extended_discovery_mode = long_discriminator_ptr_instance_name is not None
@@ -965,7 +889,7 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
             # *** STEP 30 ***
             # Verify AAAA records
             self.step(30)
-            await self._verify_aaaa_records(srv_hostname)
+            await verify_aaaa_records(srv_hostname)
         else:
             log.info("Skipping Extended Discovery mode advertisements verification steps.")
             self.mark_step_range_skipped(27, 30)

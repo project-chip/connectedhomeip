@@ -174,11 +174,12 @@ public:
     /**
      * @brief   Send message text on TCP connection.
      *
-     * @param[out]  data    Message text to send.
-     * @param[out]  push    If \c true, then send immediately, otherwise queue.
+     * @param[in]   data    Message text to send.
+     * @param[in]   push    If \c true, then send immediately, otherwise queue.
      *
-     * @retval  CHIP_NO_ERROR           success: address and port extracted.
+     * @retval  CHIP_NO_ERROR           success: data queued or sent.
      * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
+     * @retval  other                   send failed; the endpoint was closed with this error.
      */
     CHIP_ERROR Send(chip::System::PacketBufferHandle && data, bool push = true);
 

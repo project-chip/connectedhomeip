@@ -154,7 +154,7 @@ class TC_ESALM_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_ESALM_2_2(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH"),
             TestStep(2, "TH reads from the DUT the FeatureMap attribute.",
                      "Verify that the DUT response contains a uint32 value. Store the value as FeatureMap."),
         ]

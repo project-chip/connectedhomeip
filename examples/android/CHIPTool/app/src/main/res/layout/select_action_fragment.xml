@@ -16,6 +16,14 @@
             android:text="@string/scan_qr_code_btn_text" />
 
         <Button
+            android:id="@+id/deviceManagementBtn"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/center_entry_btn" />
+
+        <Button
             android:id="@+id/provisionWiFiCredentialsBtn"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
@@ -151,6 +159,6 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/mode_select_btn_text" />
-    </LinearLayout>
 
+    </LinearLayout>
 </ScrollView>

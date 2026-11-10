@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/clusters/alarm-base-server/AlarmBaseCluster.h>
 
 #include <clusters/ElectricalProtectionAlarm/Attributes.h>
 #include <clusters/ElectricalProtectionAlarm/Enums.h>
@@ -37,7 +37,7 @@ namespace chip::app::Clusters::ElectricalProtectionAlarm {
 /// The alarm State is driven by the device's own fault detection; for the example app and
 /// conformance testing it is driven through the ActivateAlarms/DeactivateAlarms/ClearAllAlarms
 /// mutators (wired to a General Diagnostics test-event-trigger).
-class ElectricalProtectionAlarmCluster : public DefaultServerCluster
+class ElectricalProtectionAlarmCluster : public AlarmBaseCluster
 {
 public:
     using Feature      = ElectricalProtectionAlarm::Feature;
@@ -48,7 +48,7 @@ public:
     {
         chip::BitMask<Feature> featureMap;
         // Supported must contain exactly the AlarmBitmap bits whose gating feature is set; Mask is
-        // the set of enabled alarms (defaults to Supported); State is the initially-active set.
+        // the set of enabled alarms; State is the initially-active set.
         ElectricalProtectionAlarm::Attributes::Supported::TypeInfo::Type supported;
         ElectricalProtectionAlarm::Attributes::Mask::TypeInfo::Type mask;
         ElectricalProtectionAlarm::Attributes::State::TypeInfo::Type state;
@@ -77,18 +77,16 @@ public:
     /// Clear all active alarms (State -> 0).
     CHIP_ERROR ClearAllAlarms();
 
-    AlarmBitmask GetState() const { return mState; }
-    AlarmBitmask GetMask() const { return mMask; }
-    AlarmBitmask GetSupported() const { return mSupported; }
+    AlarmBitmask GetState() const { return AlarmBitmask(AlarmBaseCluster::GetState().Raw()); }
+    AlarmBitmask GetMask() const { return AlarmBitmask(AlarmBaseCluster::GetMask().Raw()); }
+    AlarmBitmask GetSupported() const { return AlarmBitmask(AlarmBaseCluster::GetSupported().Raw()); }
+    chip::BitMask<Feature> GetFeatures() const { return mFeatureMap; }
 
 private:
-    /// Set State to newState (restricted to Supported bits), emitting Notify + a State report on change.
-    CHIP_ERROR SetState(AlarmBitmask newState);
+    void SendNotifyEvent(AlarmBase::AlarmMap becameActive, AlarmBase::AlarmMap becameInactive, AlarmBase::AlarmMap newState,
+                         AlarmBase::AlarmMap mask) override;
 
     const chip::BitMask<Feature> mFeatureMap;
-    ElectricalProtectionAlarm::Attributes::Mask::TypeInfo::Type mMask;
-    ElectricalProtectionAlarm::Attributes::State::TypeInfo::Type mState;
-    ElectricalProtectionAlarm::Attributes::Supported::TypeInfo::Type mSupported;
     ElectricalProtectionAlarm::Attributes::ArcCause::TypeInfo::Type mArcCause;
     ElectricalProtectionAlarm::Attributes::OverLoadRating::TypeInfo::Type mOverLoadRating;
     ElectricalProtectionAlarm::Attributes::OverVoltageRating::TypeInfo::Type mOverVoltageRating;

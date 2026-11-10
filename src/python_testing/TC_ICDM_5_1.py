@@ -132,7 +132,7 @@ class TC_ICDM_5_1(MatterTestCommissionedDevice):
 
     def steps_TC_ICDM_5_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads from the DUT the RegisteredClients attribute"),
             TestStep("2a", "TH reads from the DUT the OperatingMode attribute."),
             TestStep("2b", "Verify that the ICD DNS-SD TXT key is present."),

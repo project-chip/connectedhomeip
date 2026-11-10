@@ -190,17 +190,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         packetHeader.SetSecureSessionControlMsg(true);
     }
 
-    if (sessionHandle->AllowsLargePayload())
-    {
-        uint32_t maxPayload = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
-        size_t remoteLimit  = (maxPayload > 0) ? static_cast<size_t>(maxPayload) : kLegacyDefaultMaxLargeAppMessageLen;
-        size_t limit        = std::min(remoteLimit, kMaxLargeAppMessageLen);
-        VerifyOrReturnError(message->TotalLength() <= limit, CHIP_ERROR_MESSAGE_TOO_LONG);
-    }
-    else
-    {
-        VerifyOrReturnError(message->TotalLength() <= kMaxAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
-    }
+    VerifyOrReturnError(message->TotalLength() <= sessionHandle->GetMaxAppMessageLen(), CHIP_ERROR_MESSAGE_TOO_LONG);
 
 #if CHIP_PROGRESS_LOGGING
     NodeId destination;
@@ -327,6 +317,16 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         if (session == nullptr)
         {
             return CHIP_ERROR_NOT_CONNECTED;
+        }
+
+        if (sessionHandle->AllowsLargePayload())
+        {
+            // GetMaxAppMessageLen() returning 0 still admits an empty payload, whose headers and MIC can exceed
+            // the peer's limit, so check the whole encoded message.
+            uint32_t peerMaxMessageSize = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+            size_t encodedSize =
+                packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength() + kMaxTagLen;
+            VerifyOrReturnError(peerMaxMessageSize == 0 || encodedSize <= peerMaxMessageSize, CHIP_ERROR_MESSAGE_TOO_LONG);
         }
 
         MessageCounter & counter = session->GetSessionMessageCounter().GetLocalMessageCounter();
@@ -966,22 +966,14 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    // Associate the secure session with the connection, if not done already.
     if (peerAddress.GetTransportType() == Transport::Type::kTcp)
     {
         auto sessionConn = secureSession->GetTCPConnection();
-        if (sessionConn.IsNull())
+        if (!sessionConn.IsNull() && sessionConn != ctxt->conn)
         {
-            secureSession->SetTCPConnection(ctxt->conn);
-        }
-        else
-        {
-            if (sessionConn != ctxt->conn)
-            {
-                ChipLogError(Inet, "Unicast data received over TCP connection %p instead of %p. Dropping it!",
-                             static_cast<const void *>(ctxt->conn), static_cast<const void *>(sessionConn));
-                return;
-            }
+            ChipLogError(Inet, "Unicast data received over TCP connection %p instead of %p. Dropping it!",
+                         static_cast<const void *>(ctxt->conn), static_cast<const void *>(sessionConn));
+            return;
         }
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -1075,6 +1067,15 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         {
             secureSession->SetPeerAddress(mutablePeerAddress);
         }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        // Associate the session with the TCP connection only AFTER the message authenticates, so that
+        // unvalidated messages cannot alter the transport settings of legitimate sessions.
+        if (peerAddress.GetTransportType() == Transport::Type::kTcp && secureSession->GetTCPConnection().IsNull())
+        {
+            secureSession->SetTCPConnection(ctxt->conn);
+        }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     }
 
     if (mCB != nullptr)

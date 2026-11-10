@@ -41,10 +41,20 @@ void ZoneManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
 Protocols::InteractionModel::Status ZoneManager::CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
                                                                          uint16_t & outZoneID)
 {
+    return CreateTwoDCartesianZone(zone, NullOptional, NullOptional, outZoneID);
+}
+
+Protocols::InteractionModel::Status ZoneManager::CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
+                                                                         const Optional<NodeId> & nodeId,
+                                                                         const Optional<EndpointId> & endpointId,
+                                                                         uint16_t & outZoneID)
+{
     TwoDCartZone twoDCartZone;
-    outZoneID           = GetNewZoneId();
-    twoDCartZone.zoneId = outZoneID;
-    twoDCartZone.zone   = zone;
+    outZoneID               = GetNewZoneId();
+    twoDCartZone.zoneId     = outZoneID;
+    twoDCartZone.zone       = zone;
+    twoDCartZone.nodeId     = nodeId;
+    twoDCartZone.endpointId = endpointId;
 
     mTwoDCartZones.push_back(twoDCartZone);
 
@@ -52,6 +62,13 @@ Protocols::InteractionModel::Status ZoneManager::CreateTwoDCartesianZone(const T
 }
 
 Protocols::InteractionModel::Status ZoneManager::UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone)
+{
+    return UpdateTwoDCartesianZone(zoneID, zone, NullOptional, NullOptional);
+}
+
+Protocols::InteractionModel::Status ZoneManager::UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone,
+                                                                         const Optional<NodeId> & nodeId,
+                                                                         const Optional<EndpointId> & endpointId)
 {
     // Find an iterator to the item with the matching ID
     auto it = std::find_if(mTwoDCartZones.begin(), mTwoDCartZones.end(),
@@ -61,9 +78,11 @@ Protocols::InteractionModel::Status ZoneManager::UpdateTwoDCartesianZone(uint16_
     if (it != mTwoDCartZones.end())
     {
         TwoDCartZone twoDCartZone;
-        twoDCartZone.zoneId = zoneID;
-        twoDCartZone.zone   = zone;
-        *it                 = twoDCartZone; // Replace the found item with the newItem
+        twoDCartZone.zoneId     = zoneID;
+        twoDCartZone.zone       = zone;
+        twoDCartZone.nodeId     = nodeId;
+        twoDCartZone.endpointId = endpointId;
+        *it                     = twoDCartZone; // Replace the found item with the newItem
 
         return Status::Success; // Indicate success
     }
@@ -86,10 +105,8 @@ Protocols::InteractionModel::Status ZoneManager::CreateTrigger(const ZoneTrigger
     {
         return Status::Success;
     }
-    else
-    {
-        return Status::Failure;
-    }
+
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status ZoneManager::UpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger)
@@ -98,10 +115,8 @@ Protocols::InteractionModel::Status ZoneManager::UpdateTrigger(const ZoneTrigger
     {
         return Status::Success;
     }
-    else
-    {
-        return Status::Failure;
-    }
+
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status ZoneManager::RemoveTrigger(uint16_t zoneID)
@@ -110,10 +125,8 @@ Protocols::InteractionModel::Status ZoneManager::RemoveTrigger(uint16_t zoneID)
     {
         return Status::Success;
     }
-    else
-    {
-        return Status::Failure;
-    }
+
+    return Status::Failure;
 }
 
 bool ZoneManager::IsValidAnalysisZone(uint16_t zoneId)
@@ -133,6 +146,13 @@ bool ZoneManager::IsValidAnalysisZone(uint16_t zoneId)
 CHIP_ERROR ZoneManager::LoadZones(std::vector<ZoneInformationStorage> & aZones)
 {
     aZones.clear();
+    for (const auto & storedZone : mTwoDCartZones)
+    {
+        ZoneInformationStorage zoneInfo;
+        zoneInfo.Set(storedZone.zoneId, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(storedZone.zone),
+                     storedZone.nodeId, storedZone.endpointId);
+        aZones.push_back(zoneInfo);
+    }
 
     return CHIP_NO_ERROR;
 }

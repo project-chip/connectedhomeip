@@ -26,8 +26,10 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 
+#include <cerrno>
 #include <functional>
 #include <limits>
+#include <vector>
 
 namespace chip {
 namespace app {

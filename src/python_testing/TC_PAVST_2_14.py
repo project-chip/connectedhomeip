@@ -96,7 +96,7 @@ class TC_PAVST_2_14(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
     def steps_TC_PAVST_2_14(self) -> list[TestStep]:
         """Test steps definition."""
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(1, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                      "Verify the number of PushAV Connections in the list is 0. If not 0, issue DeAllocatePushAVTransport with each ConnectionID to remove any connections."),
             TestStep(2, "If no video streams are allocated, TH sends a VideoStreamAllocate command. Otherwise the first allocated video stream is used.",

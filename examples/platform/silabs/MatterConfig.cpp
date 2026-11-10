@@ -64,9 +64,28 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 
 #include <app/InteractionModelEngine.h>
 #if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+#include <app/util/config.h>
 #include <data-model-providers/codegen/Instance.h>
 #endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+
+#if defined(MATTER_DM_PLUGIN_TIME_SYNCHRONIZATION_SERVER)
+#include "SilabsTimeSyncDelegate.h"
+#endif
+
+#if defined(SL_MATTER_ENABLE_CODEGEN_TIME_SYNC)
+#include <app/clusters/time-synchronization-server/CodegenIntegration.h>
+#include <app/static-cluster-config/TimeSynchronization.h>
+#endif
+
+#include "provision/ProvisionStorageReader.h"
+#if SL_MATTER_PROVISION_CHANNEL_ENABLED
+#include "provision/ProvisionChannel.h"
+#include "provision/ProvisionCrypto.h"
+#include "provision/ProvisionStorageWriter.h"
 #include <headers/ProvisionManager.h>
+#elif defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+#include "provision/ProvisionStorageWriter.h"
+#endif
 #include <platform/DefaultTimerDelegate.h>
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
@@ -187,6 +206,17 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 
 namespace {
 
+#if defined(SL_MATTER_ENABLE_CODEGEN_TIME_SYNC)
+namespace TimeSync = Clusters::TimeSynchronization;
+
+static_assert(TimeSync::StaticApplicationConfig::kFixedClusterConfig.empty() ||
+                  !TimeSync::StaticApplicationConfig::kFixedClusterConfig[0].featureMap.Has(TimeSync::Feature::kTimeSyncClient) ||
+                  TIME_SYNC_ENABLE_TSC_FEATURE,
+              "TimeSyncClient requires time_sync_enable_tsc_feature=true");
+
+SilabsTimeSyncDelegate sTimeSyncDelegate;
+#endif
+
 constexpr uint32_t kMainTaskStackSize = (1024 * 5);
 // Task is dynamically allocated with max priority. This task gets deleted once the inits are completed.
 constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
@@ -204,11 +234,6 @@ void ApplicationStart(void * unused)
     CHIP_ERROR err = SilabsMatterConfig::InitMatter(BLE_DEV_NAME);
     if (err != CHIP_NO_ERROR)
         appError(err);
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(&Provision::Manager::GetInstance().GetStorage());
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     err = AppTask::GetAppTask().StartAppTask();
     if (err != CHIP_NO_ERROR)
@@ -281,6 +306,25 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SL_WIFI
 
+    // The reader owns its singleton instance because Matter stores these
+    // provider pointers for the lifetime of the application. It requires no
+    // Provision Core initialization and exposes no write capability.
+    auto & provisionStorageReader = Provision::ProvisionStorageReader::GetInstance();
+#if SL_MATTER_PROVISION_CHANNEL_ENABLED
+    auto & provisionManager       = Provision::Manager::GetInstance();
+    auto & provisionStorageWriter = Provision::ProvisionStorageWriter::GetInstance();
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
+    ReturnErrorOnFailure(provisionStorageWriter.Initialize());
+#endif
+    provisionManager.SetStorageBackend(provisionStorageReader, &provisionStorageWriter);
+    provisionManager.SetCryptoProvider(Provision::ProvisionCrypto::GetInstance());
+    provisionManager.SetChannel(Provision::ProvisionChannel::GetInstance());
+    provisionManager.SetResetHandler([]() { GetPlatform().SoftwareReset(); });
+    ReturnErrorOnFailure(provisionManager.Init(false /*provisionByDefault*/));
+#elif defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+    ReturnErrorOnFailure(Provision::ProvisionStorageWriter::GetInstance().Initialize());
+#endif
+
     err = PlatformMgr().InitChipStack();
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to Init Chip Stack: %" CHIP_ERROR_FORMAT, err.Format()));
@@ -289,13 +333,10 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to Set BLE Device Name: %" CHIP_ERROR_FORMAT, err.Format()));
 #endif
-    // Provision Manager
-    Provision::Manager & provision = Provision::Manager::GetInstance();
-    ReturnErrorOnFailure(provision.Init());
-    SetDeviceInstanceInfoProvider(&provision.GetStorage());
-    SetCommissionableDataProvider(&provision.GetStorage());
-    SetDeviceAttestationCredentialsProvider(&provision.GetStorage());
-    ChipLogProgress(DeviceLayer, "Provision mode %s", provision.IsProvisionRequired() ? "ENABLED" : "disabled");
+
+    SetDeviceInstanceInfoProvider(&provisionStorageReader);
+    SetCommissionableDataProvider(&provisionStorageReader);
+    SetDeviceAttestationCredentialsProvider(&provisionStorageReader);
 
     // Create initParams with SDK example defaults here
     // TODO: replace with our own init param to avoid double allocation in examples
@@ -336,8 +377,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate;
-    TEMPORARY_RETURN_IGNORED sTestEventTriggerDelegate.Init(&provision.GetStorage());
-
+    TEMPORARY_RETURN_IGNORED sTestEventTriggerDelegate.Init(&provisionStorageReader);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
@@ -375,6 +415,11 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // This is needed by localization configuration cluster so we set it before the initialization
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+#if defined(SL_MATTER_ENABLE_CODEGEN_TIME_SYNC)
+    // Directly constructed clusters receive this delegate through their startup configuration instead.
+    Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
+#endif
 
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);

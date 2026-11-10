@@ -22,4 +22,9 @@ check_system_includes = true
 
 default_args = {
   import("//args.gni")
+
+  # Imported here rather than in args.gni, because args.gni is also imported
+  # into the toolchain_args of //config/standalone/toolchain:lit_icd, where
+  # the OpenThread args are unused and fail `gn gen --fail-on-unused-args`.
+  import("${chip_root}/examples/platform/linux/openthread.gni")
 }

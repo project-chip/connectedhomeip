@@ -47,7 +47,7 @@ class Test_TC_FLABEL_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_FLABEL_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH"),
             TestStep(2, "TH reads LabelList from the DUT", "Read is successful"),
             TestStep(3, "TH tries to write LabelList attribute", "Write fails with UNSUPPORTED_WRITE"),
             TestStep(4, "Verify LabelList hasn't changed", "LabelList matches initial read")

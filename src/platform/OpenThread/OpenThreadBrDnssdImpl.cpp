@@ -22,11 +22,11 @@
 #include <inet/InetInterface.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/FixedBufferAllocator.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+#include <platform/OpenThread/OpenThreadTxtEntries.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 
 #include <openthread/mdns.h>
@@ -73,11 +73,7 @@ enum NameType : uint8_t
     kNameTypeService,
 };
 
-struct DnsServiceTxtEntries
-{
-    uint8_t mBuffer[kTotalMdnsServiceTxtBufferSize];
-    Dnssd::TextEntry mTxtEntries[kMaxMdnsServiceTxtEntriesNumber];
-};
+using DnsServiceTxtEntries = OpenThreadTxtEntries<kMaxMdnsServiceTxtEntriesNumber, kTotalMdnsServiceTxtBufferSize>;
 
 struct mDnsQueryCtx : public IntrusiveListNodeBase<>
 {
@@ -748,35 +744,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
 
     // Extract TXT record SRP service
     txtStringPtr = otSrpServerServiceGetTxtData(service, &txtDataLen);
-    if (txtDataLen != 0)
-    {
-        otDnsTxtEntryIterator iterator;
-        otDnsInitTxtEntryIterator(&iterator, txtStringPtr, txtDataLen);
-
-        otDnsTxtEntry txtEntry;
-        chip::FixedBufferAllocator alloc(serviceTxtEntries.mBuffer);
-
-        uint8_t entryIndex = 0;
-        while ((otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE) && entryIndex < 64)
-        {
-            if (txtEntry.mKey == nullptr || txtEntry.mValue == nullptr)
-                continue;
-
-            serviceTxtEntries.mTxtEntries[entryIndex].mKey      = alloc.Clone(txtEntry.mKey);
-            serviceTxtEntries.mTxtEntries[entryIndex].mData     = alloc.Clone(txtEntry.mValue, txtEntry.mValueLength);
-            serviceTxtEntries.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
-            entryIndex++;
-        }
-
-        VerifyOrReturnError(!alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
-        mdnsService.mTextEntrySize = entryIndex;
-    }
-    else
-    {
-        mdnsService.mTextEntrySize = 0;
-    }
+    ReturnErrorOnFailure(serviceTxtEntries.Parse(ByteSpan(txtStringPtr, txtDataLen), mdnsService));
 
     mdnsService.mSubTypes    = nullptr;
     mdnsService.mSubTypeSize = 0;
@@ -910,41 +878,12 @@ static void OtTxtCallback(otInstance * aInstance, const otMdnsTxtResult * aResul
     pResolveContext = GetResolveElement(aResult->mServiceInstance, kNameTypeInstance);
     VerifyOrReturn(pResolveContext != nullptr);
 
-    // Check if TXT record was included in the response.
-    if (aResult->mTxtDataLength != 0)
+    CHIP_ERROR err = pResolveContext->mServiceTxtEntry.Parse(ByteSpan(aResult->mTxtData, aResult->mTxtDataLength),
+                                                             pResolveContext->mMdnsService);
+    if (err != CHIP_NO_ERROR)
     {
-        otDnsTxtEntryIterator iterator;
-        otDnsInitTxtEntryIterator(&iterator, aResult->mTxtData, aResult->mTxtDataLength);
-
-        otDnsTxtEntry txtEntry;
-        chip::FixedBufferAllocator alloc(pResolveContext->mServiceTxtEntry.mBuffer);
-
-        uint8_t entryIndex = 0;
-        while ((otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE) && entryIndex < 64)
-        {
-            if (txtEntry.mKey == nullptr || txtEntry.mValue == nullptr)
-                continue;
-
-            pResolveContext->mServiceTxtEntry.mTxtEntries[entryIndex].mKey  = alloc.Clone(txtEntry.mKey);
-            pResolveContext->mServiceTxtEntry.mTxtEntries[entryIndex].mData = alloc.Clone(txtEntry.mValue, txtEntry.mValueLength);
-            pResolveContext->mServiceTxtEntry.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
-            entryIndex++;
-        }
-
-        if (alloc.AnyAllocFailed())
-        {
-            bSendDispatch           = false;
-            pResolveContext->mError = CHIP_ERROR_NO_MEMORY;
-        }
-        else
-        {
-            pResolveContext->mMdnsService.mTextEntries   = pResolveContext->mServiceTxtEntry.mTxtEntries;
-            pResolveContext->mMdnsService.mTextEntrySize = entryIndex;
-        }
-    }
-    else
-    {
-        pResolveContext->mMdnsService.mTextEntrySize = 0;
+        bSendDispatch           = false;
+        pResolveContext->mError = err;
     }
 
     if (bSendDispatch)

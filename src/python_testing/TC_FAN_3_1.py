@@ -89,7 +89,7 @@ class TC_FAN_3_1(MatterTestCommissionedDevice):
         return "[TC-FAN-3.1] Mandatory functionality with DUT as Server"
 
     def steps_TC_FAN_3_1(self):
-        return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
+        return [TestStep(1, "[FC] Commissioning already done."),
                 TestStep(2, "[FC] TH reads the FanModeSequence attribute from the DUT. This attribute specifies the available fan modes.",
                          "Verify that the DUT response contains a FanModeSequenceEnum and store."),
                 TestStep(3, "[FC] TH checks the DUT for support of the MultiSpeed feature.",

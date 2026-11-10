@@ -70,12 +70,12 @@ The following markers are used in this document (matches the ID master list):
 |96            |0x0060    |Operational State                                         |OPSTATE        |   |   |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |97            |0x0061    |RVC Operational State                                     |RVCOPSTATE     |   |   |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |98            |0x0062    |Scenes Management                                         |S              |   |   |   |P  |P  |P    |C    |C  |C    |C  |C    |C  |
-|99            |0x0063    |Thermostat Mode                                           |TSTATM         |   |   |   |   |   |     |     |   |     |   |     |C  |
+|99            |0x0063    |Thermostat Mode                                           |TSTATM         |   |   |   |   |   |     |     |   |     |   |     |P  |
 |100           |0x0064    |Temperature Alarm                                         |TEMPALM        |   |   |   |   |   |     |     |   |     |P  |P    |P  |
 |101           |0x0065    |Groupcast                                                 |GC             |   |   |   |   |   |     |     |   |     |P  |C    |C  |
 |113           |0x0071    |HEPA Filter Monitoring                                    |HEPAFREMON     |   |   |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |114           |0x0072    |Activated Carbon Filter Monitoring                        |ACFREMON       |   |   |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
-|121           |0x0079    |Water Tank Level Monitoring                               |REPM           |   |   |   |   |C  |C    |C    |C  |C    |C  |C    |C  |
+|121           |0x0079    |Water Tank Level Monitoring                               |WTLREPMON      |   |   |   |   |C  |C    |C    |C  |C    |C  |C    |C  |
 |128           |0x0080    |Boolean State Configuration                               |BOOLCFG        |   |   |   |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |129           |0x0081    |Valve Configuration and Control                           |VALCC          |   |   |   |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |144           |0x0090    |Electrical Power Measurement                              |EPM            |   |   |   |C  |C  |C    |C    |C  |C    |C  |C    |C  |
@@ -128,7 +128,7 @@ The following markers are used in this document (matches the ID master list):
 |1073          |0x0431    |Ambient Context Sensing                                   |ACS            |   |   |   |   |   |     |     |   |     |P  |P    |P  |
 |1074          |0x0432    |Ambient Sensing Union                                     |ASU            |   |   |   |   |   |     |     |   |     |   |     |P  |
 |1075          |0x0433    |Proximity Ranging                                         |PROXR          |   |   |   |   |   |     |     |   |     |   |     |P  |
-|1076          |0x0434    |Smoke Concentration Measurement                           |CONC           |   |   |   |   |   |     |     |   |     |   |     |P  |
+|1076          |0x0434    |Smoke Concentration Measurement                           |SMOKECONC      |   |   |   |   |   |     |     |   |     |   |     |P  |
 |1104          |0x0450    |Network Identity Management                               |NETIM          |   |   |   |   |   |     |     |   |     |   |     |P  |
 |1105          |0x0451    |Wi-Fi Network Management                                  |WIFINM         |   |   |   |   |C  |C    |C    |C  |C    |C  |C    |C  |
 |1106          |0x0452    |Thread Border Router Management                           |TBRM           |   |   |   |   |C  |C    |C    |C  |C    |C  |C    |C  |

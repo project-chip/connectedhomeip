@@ -5,6 +5,10 @@
 # And some specific generated files
 src/controller/python/matter/clusters/CHIPClusters.py linguist-generated
 src/controller/python/matter/clusters/Objects.py linguist-generated
+# GN files generated from the FuzzTest and Abseil Bazel builds (see third_party/fuzztest/BUILD.gn)
+third_party/fuzztest/fuzztest/BUILD.gn linguist-generated
+third_party/fuzztest/common/BUILD.gn linguist-generated
+third_party/abseil-cpp/absl/**/BUILD.gn linguist-generated
 # Let bat file use CRLF linebreak
 **/*.bat eol=input
 # Mark Matter operational certificate/key files as binary

@@ -1435,7 +1435,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     // remove the possible existing entry from anywhere in the list
     for (typename SrpClient::Service & service : mSrpClient.mServices)
     {
-        if (service.Matches(aInstanceName, aName, aPort, aSubTypes, aTxtEntries))
+        // This method can be called while a previous removal of the same service is still in
+        // progress, that is, already requested from OpenThread but not yet acknowledged by the
+        // SRP server. Such an entry remains in the array and matches, yet OpenThread will go on
+        // to unregister the service, so reporting success here would leave the device
+        // unadvertised with nothing to retry. Fall through instead and register it from scratch.
+        if (service.Matches(aInstanceName, aName, aPort, aSubTypes, aTxtEntries) && !service.IsPendingRemoval())
         {
             // Re-adding existing service without any changes
             service.mIsInvalid = false;
@@ -1738,34 +1743,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
         mdnsService.mAddress     = std::make_optional(ToIPAddress(serviceInfo.mHostAddress));
     }
 
-    // Check if TXT record was included in DNS response.
-    if (serviceInfo.mTxtDataSize != 0)
-    {
-        otDnsTxtEntryIterator iterator;
-        otDnsInitTxtEntryIterator(&iterator, serviceInfo.mTxtData, serviceInfo.mTxtDataSize);
-
-        otDnsTxtEntry txtEntry;
-        FixedBufferAllocator alloc(serviceTxtEntries.mBuffer);
-
-        uint8_t entryIndex = 0;
-        while ((otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE) && entryIndex < kMaxDnsServiceTxtEntriesNumber)
-        {
-            if (txtEntry.mKey == nullptr || txtEntry.mValue == nullptr)
-                continue;
-
-            serviceTxtEntries.mTxtEntries[entryIndex].mKey      = alloc.Clone(txtEntry.mKey);
-            serviceTxtEntries.mTxtEntries[entryIndex].mData     = alloc.Clone(txtEntry.mValue, txtEntry.mValueLength);
-            serviceTxtEntries.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
-            entryIndex++;
-        }
-
-        VerifyOrReturnError(!alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
-        mdnsService.mTextEntrySize = entryIndex;
-    }
-
-    return CHIP_NO_ERROR;
+    return serviceTxtEntries.Parse(ByteSpan(serviceInfo.mTxtData, serviceInfo.mTxtDataSize), mdnsService);
 }
 
 template <class ImplClass>

@@ -57,7 +57,7 @@ class TC_GC_2_3(MatterTestCommissionedDevice):
 
     def steps_TC_GC_2_3(self):
         return [
-            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
             TestStep("1c", "TH subscribes to Membership attribute with min interval 0s and max interval 30s"),
             TestStep("1d", "Join Group G1 generating a new Key with KeySetID K1 using JoinGroup"),

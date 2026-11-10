@@ -119,6 +119,9 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * If NO, the read/subscribe is not fabric-filtered and will see all
  * non-fabric-sensitive data for the given attribute path.
+ *
+ * Not all read paths pay attention to this property. Read paths that ignore it
+ * document that.
  */
 @property (nonatomic, assign, getter=shouldFilterByFabric)
     BOOL filterByFabric MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));

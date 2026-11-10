@@ -89,6 +89,9 @@ declare_args() {
   # Factory Provision storage
   use_provision_flash_storage = wifi_soc
 
+  # Enable the factory provisioning channel (BLE) used to write provision data
+  sl_use_provision_channel = false
+
   # Enable TestEventTrigger in GeneralDiagnostics cluster
   sl_enable_test_event_trigger = false
 
@@ -101,6 +104,8 @@ declare_args() {
 
   # Use/Enable a sl_watchdog_manager features to catch software hangs
   sl_config_watchdog_manager_enable = false
+
+  sl_enable_battery_monitoring = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -526,6 +531,10 @@ template("efr32_sdk") {
       defines += [ "SL_MATTER_RGB_LED_ENABLED=1" ]
     }
 
+    if (sl_enable_battery_monitoring) {
+      defines += [ "SL_MATTER_BATTERY_MONITOR=1" ]
+    }
+
     if (use_wstk_buttons) {
       _include_dirs +=
           [ "${efr32_sdk_root}/platform_core/platform/driver/button/inc" ]
@@ -642,6 +651,12 @@ template("efr32_sdk") {
       defines += [ "SL_MATTER_PROVISION_FLASH=0" ]
     }
 
+    if (sl_use_provision_channel) {
+      defines += [ "SL_MATTER_PROVISION_CHANNEL_ENABLED=1" ]
+    } else {
+      defines += [ "SL_MATTER_PROVISION_CHANNEL_ENABLED=0" ]
+    }
+
     if (defined(invoker.chip_enable_thread) && invoker.chip_enable_thread) {
       defines += [ "SL_OT_ENABLE=1" ]
     }
@@ -670,11 +685,12 @@ template("efr32_sdk") {
         ]
       }
 
-      if (wifi_ncp_module) {
-        defines += [
-          "USE_BYPASS_CLOCK=1",
-          "SL_SI91X_ACX_MODULE=1",
-        ]
+      if (wifi_ncp_module_bypass_clk) {
+        defines += [ "USE_BYPASS_CLOCK=1" ]
+      }
+
+      if (wifi_ncp_module_acx) {
+        defines += [ "SL_SI91X_ACX_MODULE=1" ]
       }
 
       if (use_SiWx917) {
@@ -1030,6 +1046,11 @@ template("efr32_sdk") {
       } else {
         sources += [ "${silabs_gen_folder}/autogen/sl_simple_led_instances.c" ]
       }
+    }
+
+    if (sl_enable_battery_monitoring) {
+      sources +=
+          [ "${efr32_sdk_root}/platform_core/platform/emlib/src/em_iadc.c" ]
     }
 
     # SPI is only used for Wifi

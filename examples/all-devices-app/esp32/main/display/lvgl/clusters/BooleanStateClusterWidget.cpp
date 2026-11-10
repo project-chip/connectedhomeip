@@ -53,7 +53,7 @@ lv_obj_t * CreateBooleanStateClusterWidget(lv_obj_t * parent, Clusters::BooleanS
 {
     lv_obj_t * card = lv_obj_create(parent);
     lv_obj_set_width(card, LV_PCT(100));
-    lv_obj_set_height(card, 48);
+    lv_obj_set_height(card, LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(card, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(card, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_pad_hor(card, 10, LV_PART_MAIN);

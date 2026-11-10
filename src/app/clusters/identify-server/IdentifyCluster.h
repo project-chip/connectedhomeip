@@ -117,6 +117,8 @@ public:
     /**
      * @brief Implementation of ServerClusterInterface methods.
      */
+
+    void Shutdown(ClusterShutdownType type) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,

@@ -17,8 +17,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -53,7 +53,7 @@ class TC_CGEN_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_CGEN_2_1(self):
         return [
-            TestStep("1", "DUT commissioned and preconditions", is_commissioning=True),
+            TestStep("1", "DUT commissioned and preconditions"),
             TestStep("2", "TH reads the Breadcrumb attribute"),
             TestStep("3", "TH writes Breadcrumb = 1"),
             TestStep("4", "TH reads Breadcrumb again and verifies = 1"),

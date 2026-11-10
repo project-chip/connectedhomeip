@@ -19,6 +19,7 @@ package matter.controller
 
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ChipDeviceControllerException
+import chip.devicecontroller.CommissionParameters
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -55,7 +56,14 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
     pinCode: Long,
   ) {
     this.nodeId = nodeId
-    deviceController.pairDeviceWithAddress(nodeId, address, port, discriminator, pinCode, null)
+    deviceController.pairDeviceWithAddress(
+      nodeId,
+      address,
+      port,
+      discriminator,
+      pinCode,
+      CommissionParameters.Builder().build()
+    )
   }
 
   override fun unpairDevice(nodeId: Long) {

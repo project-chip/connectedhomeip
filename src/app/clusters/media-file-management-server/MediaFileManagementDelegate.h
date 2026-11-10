@@ -90,7 +90,7 @@ public:
      */
     virtual Protocols::InteractionModel::Status
     HandleRequestSharedFiles(ScopedNodeId peer, const CharSpan & clientName, uint16_t requestID,
-                             const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes) = 0;
+                             const Optional<DataModel::DecodableList<CharSpan>> & supportedMimeTypes) = 0;
 
     /**
      * Handle the GetSharedFile command (MediaSharing feature). Populate

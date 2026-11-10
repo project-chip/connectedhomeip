@@ -17,7 +17,6 @@
 
 #include "DeviceCallbacks.h"
 #include "esp_log.h"
-#include "esp_spi_flash.h"
 #include "esp_spiffs.h"
 #include "nvs_flash.h"
 #include <app/server/Server.h>
@@ -34,6 +33,12 @@
 #include <ota-provider-common/BdxOtaSender.h>
 #include <ota-provider-common/OTAProviderExample.h>
 #include <shell_extension/launch.h>
+
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+#include "esp_spi_flash.h"
+#else
+#include "esp_flash.h"
+#endif
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>

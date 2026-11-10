@@ -15,6 +15,7 @@
  */
 
 #include "ClosurePanel.h"
+#include <clusters/shared/Enums.h>
 #include <devices/Types.h>
 
 namespace {
@@ -24,8 +25,9 @@ CHIP_ERROR ValidateClosurePanelTagList(chip::Span<const chip::app::EndpointCompo
     size_t panelTagCount = 0;
     for (auto & tag : tags)
     {
-        VerifyOrReturnError(tag.namespaceID != chip::app::CommonNamespace::kClosureId, CHIP_ERROR_INVALID_ARGUMENT);
-        if (tag.namespaceID == chip::app::CommonNamespace::kClosurePanelId)
+        VerifyOrReturnError(tag.namespaceID != chip::to_underlying(chip::app::Clusters::Globals::SemanticTagNamespaceId::kClosure),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+        if (tag.namespaceID == chip::to_underlying(chip::app::Clusters::Globals::SemanticTagNamespaceId::kClosurePanel))
         {
             ++panelTagCount;
         }
@@ -110,6 +112,13 @@ CHIP_ERROR ClosurePanel::Register(EndpointId endpoint, CodeDrivenDataModelProvid
             VerifyOrReturnError(modulation->type != Clusters::ClosureDimension::ModulationTypeEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
             dimensionConfig.WithModulation(modulation->type);
+        }
+        if (positioning.unit.has_value())
+        {
+            // Unit is a mandatory attribute once UN is enabled, same as the motion parameters above.
+            VerifyOrReturnError(positioning.unit->unit != Clusters::ClosureDimension::ClosureUnitEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
+            dimensionConfig.WithUnit(positioning.unit->unit, positioning.unit->range);
         }
     }
 

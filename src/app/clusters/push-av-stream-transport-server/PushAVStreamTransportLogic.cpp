@@ -22,12 +22,10 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
 #include <app/data-model/WrappedStructEncoder.h>
 #include <app/persistence/AttributePersistenceProvider.h>
-#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/util/util.h>
@@ -94,10 +92,11 @@ PushAvStreamTransportServerLogic::PushAvStreamTransportServerLogic(EndpointId aE
 
 PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic() {}
 
-CHIP_ERROR PushAvStreamTransportServerLogic::Init()
+CHIP_ERROR PushAvStreamTransportServerLogic::Init(AttributePersistenceProvider & attributeStorage)
 {
     VerifyOrDie(mCluster != nullptr);
 
+    mAttributeStorage = &attributeStorage;
     LoadPersistentAttributes();
     return CHIP_NO_ERROR;
 }
@@ -108,6 +107,7 @@ void PushAvStreamTransportServerLogic::Shutdown()
     {
         DeviceLayer::SystemLayer().CancelTimer(PushAVStreamTransportDeallocateCallback, static_cast<void *>(timerContext.get()));
     }
+    mAttributeStorage = nullptr;
 }
 
 bool PushAvStreamTransportServerLogic::HasFeature(Feature feature) const
@@ -924,6 +924,13 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         CHIP_ERROR tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
             kRootEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID,
             [&](auto & TLSEndpoint) -> CHIP_ERROR {
+                // The spec requires a push transport's TLS endpoint to carry a non-null ccdid; a null one means no
+                // client certificate is associated with the endpoint, which the caller reports as an invalid TLS endpoint.
+                VerifyOrReturnError(!TLSEndpoint.ccdid.IsNull(), CHIP_ERROR_INVALID_ARGUMENT,
+                                    ChipLogError(Zcl,
+                                                 "HandleAllocatePushTransport[ep=%d]: TLS endpoint %u has no client certificate",
+                                                 mEndpointId, commandData.transportOptions.TLSEndpointID));
+
                 // Use heap allocation for large certificate buffers to reduce stack usage
                 auto rootCertBuffer   = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
                 auto clientCertBuffer = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();
@@ -2025,6 +2032,8 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connect
 
 CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()
 {
+    VerifyOrReturnError(mAttributeStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     Platform::ScopedMemoryBuffer<uint8_t> currentConns;
     MutableByteSpan bufferSpan;
     size_t maxBufferSize = static_cast<size_t>(kMaxCurrentConnectionsSerializedSize);
@@ -2051,7 +2060,7 @@ CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()
     bufferSpan.reduce_size(writer.GetLengthWritten());
 
     auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
-    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan));
+    ReturnErrorOnFailure(mAttributeStorage->WriteValue(path, bufferSpan));
 
     ChipLogProgress(Zcl, "Saved %u CurrentConnections", static_cast<unsigned int>(mCurrentConnections.size()));
     return CHIP_NO_ERROR;
@@ -2074,7 +2083,7 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
 
     auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
 
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan);
+    CHIP_ERROR err = mAttributeStorage->ReadValue(path, bufferSpan);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         ChipLogProgress(Zcl, "No persisted CurrentConnections found.");

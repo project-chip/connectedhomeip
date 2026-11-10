@@ -28,6 +28,14 @@
 namespace chip {
 namespace Credentials {
 
+/**
+ * Check a DER certificate's subject key and both signature AlgorithmIdentifiers against the requested profiles.
+ * This does not authenticate the certificate; normal attestation chain verification is still required.
+ * Algorithm mismatches return CHIP_ERROR_FAILED_DEVICE_ATTESTATION. Malformed DER returns a parsing error.
+ */
+CHIP_ERROR ValidateAttestationCertificateProfile(ByteSpan certificate, DeviceAttestationCertProfile subjectProfile,
+                                                 DeviceAttestationCertProfile issuerProfile);
+
 enum class AttestationVerificationResult : uint16_t
 {
     kSuccess = 0,

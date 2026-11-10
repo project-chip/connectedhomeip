@@ -79,6 +79,14 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #endif
 
+#if MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/window-covering-server/CodegenIntegration.h>
+#endif
+
+#if MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "thermostat/CodegenIntegration.h"
+#endif
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -97,6 +105,57 @@ public:
                         ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         switch (path.mClusterId)
         {
+#if MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        case WindowCovering::Id: {
+            auto * cluster = WindowCovering::FindClusterOnEndpoint(path.mEndpointId);
+            if (cluster == nullptr)
+            {
+                return ::pw::Status::Internal();
+            }
+            switch (path.mAttributeId)
+            {
+            case WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id: {
+                DataModel::Nullable<Percent100ths> value;
+                if (decoder.Decode(value) != CHIP_NO_ERROR)
+                {
+                    return ::pw::Status::Internal();
+                }
+                cluster->SetTargetPositionLiftPercent100ths(value);
+                return ::pw::OkStatus();
+            }
+            case WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id: {
+                DataModel::Nullable<Percent100ths> value;
+                if (decoder.Decode(value) != CHIP_NO_ERROR)
+                {
+                    return ::pw::Status::Internal();
+                }
+                cluster->SetCurrentPositionLiftPercent100ths(value);
+                return ::pw::OkStatus();
+            }
+            case WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id: {
+                DataModel::Nullable<Percent100ths> value;
+                if (decoder.Decode(value) != CHIP_NO_ERROR)
+                {
+                    return ::pw::Status::Internal();
+                }
+                cluster->SetTargetPositionTiltPercent100ths(value);
+                return ::pw::OkStatus();
+            }
+            case WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id: {
+                DataModel::Nullable<Percent100ths> value;
+                if (decoder.Decode(value) != CHIP_NO_ERROR)
+                {
+                    return ::pw::Status::Internal();
+                }
+                cluster->SetCurrentPositionTiltPercent100ths(value);
+                return ::pw::OkStatus();
+            }
+            default:
+                break;
+            }
+            break;
+        }
+#endif
 #if MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         case TemperatureMeasurement::Id:
             switch (path.mAttributeId)
@@ -597,6 +656,69 @@ public:
             break;
         }
 #endif // MATTER_DM_CONCENTRATION_MEASUREMENT_WANTED
+#if MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        case Thermostat::Id: {
+            auto * cluster = Thermostat::Chef::FindClusterOnEndpoint(path.mEndpointId);
+            if (cluster == nullptr)
+            {
+                return ::pw::Status::Internal();
+            }
+            switch (path.mAttributeId)
+            {
+            case Thermostat::Attributes::LocalTemperature::Id: {
+                DataModel::Nullable<int16_t> value;
+                if (decoder.Decode(value) != CHIP_NO_ERROR)
+                {
+                    return ::pw::Status::Internal();
+                }
+                if (cluster->SetLocalTemperature(value) != Protocols::InteractionModel::Status::Success)
+                {
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            case Thermostat::Attributes::Occupancy::Id: {
+                BitMask<Thermostat::OccupancyBitmap> value;
+                if (decoder.Decode(value) != CHIP_NO_ERROR)
+                {
+                    return ::pw::Status::Internal();
+                }
+                if (Thermostat::Chef::SetOccupancy(path.mEndpointId, value) != Protocols::InteractionModel::Status::Success)
+                {
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            case Thermostat::Attributes::ThermostatRunningMode::Id: {
+                Thermostat::ThermostatRunningModeEnum value;
+                if (decoder.Decode(value) != CHIP_NO_ERROR)
+                {
+                    return ::pw::Status::Internal();
+                }
+                if (cluster->SetRunningMode(value) != Protocols::InteractionModel::Status::Success)
+                {
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            case Thermostat::Attributes::ThermostatRunningState::Id: {
+                BitMask<Thermostat::RelayStateBitmap> value;
+                if (decoder.Decode(value) != CHIP_NO_ERROR)
+                {
+                    return ::pw::Status::Internal();
+                }
+                if (cluster->SetRunningState(value) != Protocols::InteractionModel::Status::Success)
+                {
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            default:
+                break;
+            }
+            break;
+        }
+#endif // MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         }
         return std::nullopt;
     }

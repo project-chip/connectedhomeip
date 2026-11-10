@@ -56,7 +56,7 @@ class TC_ZONEMGMT_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_ZONEMGMT_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads MaxUserDefinedZones attribute.",
                      "If DUT supports UserDefined feature, verify that the DUT response contains a value greater than or equal to 5."),
             TestStep(3, "TH reads MaxZones attribute.",

@@ -246,7 +246,7 @@ class TC_EPALM_2_1(MatterTestCommissionedDevice):
         endpoint = self.get_endpoint()
         attributes = cluster.Attributes
 
-        self.step(1, "Commission DUT to TH (already done)", is_commissioning=True)
+        self.step(1, "Commission DUT to TH (already done)")
 
         self.step(2, "TH reads the FeatureMap attribute",
                   expectation="DUT responds with a map32 value.")

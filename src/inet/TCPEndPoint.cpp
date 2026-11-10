@@ -105,7 +105,12 @@ CHIP_ERROR TCPEndPoint::Send(System::PacketBufferHandle && data, bool push)
         mSendQueue->AddToEnd(std::move(data));
     }
 
-    ReturnErrorOnFailure(SendQueuedImpl(queueWasEmpty));
+    CHIP_ERROR err = SendQueuedImpl(queueWasEmpty);
+    if (err != CHIP_NO_ERROR)
+    {
+        DoClose(err, false);
+        return err;
+    }
 
     if (push)
     {

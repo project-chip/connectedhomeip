@@ -16,27 +16,55 @@
 
 #include "ElectricalProtectionAlarmCluster.h"
 
+#include <app/MessageDef/StatusIB.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <clusters/ElectricalProtectionAlarm/Metadata.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip::app::Clusters::ElectricalProtectionAlarm {
 
 using namespace ElectricalProtectionAlarm::Attributes;
 
+namespace {
+
+AlarmBase::Delegate & GetDefaultDelegate()
+{
+    static AlarmBase::Delegate delegate;
+    return delegate;
+}
+
+AlarmBaseCluster::Config MakeAlarmBaseConfig(const ElectricalProtectionAlarmCluster::StartupConfiguration & config)
+{
+    return {
+        .delegate                    = GetDefaultDelegate(),
+        .feature                     = {},
+        .supported                   = AlarmBase::AlarmMap(config.supported.Raw()),
+        .latch                       = {},
+        .supportsModifyEnabledAlarms = false,
+    };
+}
+
+CHIP_ERROR ToChipError(Protocols::InteractionModel::Status status)
+{
+    return StatusIB(status).ToChipError();
+}
+
+} // namespace
+
 ElectricalProtectionAlarmCluster::ElectricalProtectionAlarmCluster(EndpointId endpointId, const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, ElectricalProtectionAlarm::Id }), mFeatureMap(config.featureMap), mMask(config.mask),
-    mState(config.state), mSupported(config.supported), mArcCause(config.arcCause), mOverLoadRating(config.overLoadRating),
+    AlarmBaseCluster(endpointId, { ElectricalProtectionAlarm::Id, ElectricalProtectionAlarm::kRevision },
+                     MakeAlarmBaseConfig(config)),
+    mFeatureMap(config.featureMap), mArcCause(config.arcCause), mOverLoadRating(config.overLoadRating),
     mOverVoltageRating(config.overVoltageRating), mSurgeProtectionRating(config.surgeProtectionRating),
     mShortCircuitRating(config.shortCircuitRating), mResidualCurrentRating(config.residualCurrentRating),
     mArcFaultRating(config.arcFaultRating)
 {
-    // Hold the same invariant SetState() enforces, that State only ever carries bits which are both
-    // supported and unmasked. Without this an alarm the device cannot raise would read as active
-    // from the first read, and would then appear in the inactive field of the first Notify event
-    // despite never having legitimately been active. Applied in the body rather than the
-    // initialiser list because mSupported is declared after mState.
-    mState.SetRaw(static_cast<uint32_t>(mState.Raw() & mSupported.Raw() & mMask.Raw()));
+    const AlarmBitmask mask = config.mask & config.supported;
+    VerifyOrDie(AlarmBaseCluster::SetMask(AlarmBase::AlarmMap(mask.Raw())) == Protocols::InteractionModel::Status::Success);
+
+    const AlarmBitmask state = config.state & mask;
+    VerifyOrDie(SetStateIgnoringLatch(AlarmBase::AlarmMap(state.Raw())) == Protocols::InteractionModel::Status::Success);
 }
 
 DataModel::ActionReturnStatus ElectricalProtectionAlarmCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -44,12 +72,6 @@ DataModel::ActionReturnStatus ElectricalProtectionAlarmCluster::ReadAttribute(co
 {
     switch (request.path.mAttributeId)
     {
-    case Mask::Id:
-        return encoder.Encode(mMask);
-    case State::Id:
-        return encoder.Encode(mState);
-    case Supported::Id:
-        return encoder.Encode(mSupported);
     case ArcCause::Id:
         return encoder.Encode(mArcCause);
     case OverLoadRating::Id:
@@ -64,12 +86,10 @@ DataModel::ActionReturnStatus ElectricalProtectionAlarmCluster::ReadAttribute(co
         return encoder.Encode(mResidualCurrentRating);
     case ArcFaultRating::Id:
         return encoder.Encode(mArcFaultRating);
-    case ClusterRevision::Id:
-        return encoder.Encode(ElectricalProtectionAlarm::kRevision);
     case FeatureMap::Id:
         return encoder.Encode(mFeatureMap);
     default:
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+        return AlarmBaseCluster::ReadAttribute(request, encoder);
     }
 }
 
@@ -93,46 +113,33 @@ CHIP_ERROR ElectricalProtectionAlarmCluster::Attributes(const ConcreteClusterPat
 
 CHIP_ERROR ElectricalProtectionAlarmCluster::ActivateAlarms(AlarmBitmask alarms)
 {
-    AlarmBitmask newState;
-    newState.SetRaw(static_cast<uint32_t>(mState.Raw() | alarms.Raw()));
-    return SetState(newState);
+    AlarmBitmask newState = GetState().Set(alarms) & GetSupported() & GetMask();
+    return ToChipError(AlarmBaseCluster::SetState(AlarmBase::AlarmMap(newState.Raw())));
 }
 
 CHIP_ERROR ElectricalProtectionAlarmCluster::DeactivateAlarms(AlarmBitmask alarms)
 {
-    AlarmBitmask newState;
-    newState.SetRaw(static_cast<uint32_t>(mState.Raw() & ~alarms.Raw()));
-    return SetState(newState);
+    AlarmBitmask newState = GetState().Clear(alarms);
+    return ToChipError(AlarmBaseCluster::SetState(AlarmBase::AlarmMap(newState.Raw())));
 }
 
 CHIP_ERROR ElectricalProtectionAlarmCluster::ClearAllAlarms()
 {
-    return SetState(AlarmBitmask{});
+    return ToChipError(AlarmBaseCluster::SetState(AlarmBase::AlarmMap{}));
 }
 
-CHIP_ERROR ElectricalProtectionAlarmCluster::SetState(AlarmBitmask newState)
+void ElectricalProtectionAlarmCluster::SendNotifyEvent(AlarmBase::AlarmMap becameActive, AlarmBase::AlarmMap becameInactive,
+                                                       AlarmBase::AlarmMap newState, AlarmBase::AlarmMap mask)
 {
-    // An alarm can only be active if its bit is both supported and enabled by the mask; the Alarm
-    // Base cluster requires State to reflect the Mask, so a masked-out (disabled) alarm stays inactive.
-    const AlarmBitmask effectiveState = (newState & mSupported & mMask);
-    const AlarmBitmask oldState       = mState;
+    VerifyOrReturn(mContext != nullptr);
 
-    if (!SetAttributeValue(mState, effectiveState, State::Id))
-    {
-        return CHIP_NO_ERROR; // no transition: no report, no event
-    }
-
-    if (mContext != nullptr)
-    {
-        ElectricalProtectionAlarm::Events::Notify::Type event;
-        event.active   = AlarmBitmask(effectiveState).Clear(oldState);
-        event.inactive = AlarmBitmask(oldState).Clear(effectiveState);
-        event.state    = effectiveState;
-        event.mask     = mMask;
-        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-    }
-
-    return CHIP_NO_ERROR;
+    ElectricalProtectionAlarm::Events::Notify::Type event{
+        .active   = AlarmBitmask(becameActive.Raw()),
+        .inactive = AlarmBitmask(becameInactive.Raw()),
+        .state    = AlarmBitmask(newState.Raw()),
+        .mask     = AlarmBitmask(mask.Raw()),
+    };
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 } // namespace chip::app::Clusters::ElectricalProtectionAlarm

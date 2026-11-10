@@ -15,12 +15,14 @@
  *    limitations under the License.
  */
 
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <stdio.h>
 
 namespace {
 
-constexpr size_t kMaxLogMessageLength = 256;
+constexpr size_t kMaxLogMessageLength = CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE;
+static_assert(kMaxLogMessageLength > 16, "Log message max size is too small");
 
 using PythonLogCallback = void (*)(uint8_t category, const char * module, const char * message);
 
@@ -32,11 +34,10 @@ void ENFORCE_FORMAT(3, 0) NativeLoggingCallback(const char * module, uint8_t cat
     {
         return;
     }
-    char buffer[kMaxLogMessageLength];
-    vsnprintf(buffer, sizeof(buffer), msg, args);
-    buffer[sizeof(buffer) - 1] = 0;
+    chip::StringBuilder<kMaxLogMessageLength> formatter;
+    formatter.AddFormatV(msg, args).AddMarkerIfOverflow();
 
-    sPythonLogCallback(category, module, buffer);
+    sPythonLogCallback(category, module, formatter.c_str());
 }
 
 } // namespace

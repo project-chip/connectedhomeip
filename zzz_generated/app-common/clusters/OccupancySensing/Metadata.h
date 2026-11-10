@@ -26,21 +26,24 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Occupancy::Id, BitFlag
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Occupancy
 namespace OccupancySensorType {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(OccupancySensorType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(OccupancySensorType::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace OccupancySensorType
 namespace OccupancySensorTypeBitmap {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(OccupancySensorTypeBitmap::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(OccupancySensorTypeBitmap::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace OccupancySensorTypeBitmap
 namespace HoldTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(HoldTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace HoldTime
 namespace HoldTimeLimits {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(HoldTimeLimits::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(HoldTimeLimits::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace HoldTimeLimits
 namespace PredictedOccupancy {
 inline constexpr DataModel::AttributeEntry

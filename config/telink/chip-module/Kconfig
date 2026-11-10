@@ -84,9 +84,11 @@ config CHIP_DFU_OVER_BT_SMP
 	select MCUMGR_MGMT_NOTIFICATION_HOOKS
 	select MCUMGR_GRP_IMG_UPLOAD_CHECK_HOOK
 	select MCUMGR_GRP_IMG_STATUS_HOOKS
+	default y if BOARD_TL3228X || BOARD_TL3228X_RETENTION
 	default y if BOARD_TL3238X || BOARD_TL3238X_RETENTION
 	default y if BOARD_TLSR9528A || BOARD_TLSR9528A_RETENTION
 	default n
+	depends on !CHIP_WIFI
 	help
 	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
 	  the set of options related to that feature.
@@ -230,6 +232,61 @@ config CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
 	  Automatically enable BLE advertising after commissioning and on reboot
 	  when the device is already commissioned.
 
+	  Note: this option keeps the BLE stack initialized, so it is suitable
+	  for line-powered (CONFIG_PM=n) devices that only need to stop
+	  advertising after commissioning but keep BLE available on demand.
+	  Battery-powered SED/ICD devices should prefer
+	  CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING instead, as BLE_IDLE keeps
+	  the BLE/802.15.4 RF time-sharing running and therefore consumes more
+	  power.
+
+config CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING
+	bool "Fully disable BLE after Thread commissioning in concurrent mode"
+	depends on CHIP_CONCURRENT_MODE && !CHIP_CONCURRENT_BLE_IDLE
+	default n
+	help
+	  After Matter commissioning completes (and on reboot of an already
+	  commissioned device), stop the BLE/802.15.4 time-sharing insert task,
+	  call bt_disable() and hand the RF permanently to 802.15.4 so the
+	  SED/ICD can reach its lowest power state. This is one-way: BLE cannot
+	  be re-enabled without a reboot (factory reset followed by reboot is
+	  the standard way to re-commission), unless
+	  CHIP_CONCURRENT_BLE_RESUME_AFTER_COMMISSIONING is enabled.
+
+	  Requires CONFIG_PM=y: the teardown relies on the hal_telink
+	  tlx_bt_802154_dual_mode_suspend()/resume() helpers, which are currently
+	  only built under CONFIG_PM. For line-powered (CONFIG_PM=n) devices that
+	  only need to stop advertising after commissioning but keep BLE
+	  resumable, use CHIP_CONCURRENT_BLE_IDLE instead.
+
+	  Currently validated on TL721X only. Other Telink SoCs (e.g. TL321X,
+	  TL322X, TL323X, TL521X) are not yet tested.
+
+config CHIP_CONCURRENT_BLE_RESUME_AFTER_COMMISSIONING
+	bool "Resume BLE on demand after the post-commissioning teardown"
+	depends on CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING
+	default n
+	help
+	  When enabled, the post-commissioning BLE teardown becomes
+	  reversible: a button press (the existing Start BLE advertising
+	  button) restores the BLE/802.15.4 RF time-sharing, re-initializes
+	  the BLE stack and starts a connectable advertisement, so a
+	  commissioned device remains attached to the Thread network while
+	  BLE becomes available again e.g. as an OTA transport. Matter
+	  commissioning data is untouched. The application is responsible
+	  for stopping BLE again when done (the teardown sequence is
+	  available to be re-armed).
+
+	  Requires CONFIG_PM=y (inherited from
+	  CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING).
+
+	  Currently validated on TL721X only (inherited from
+	  CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING). Other Telink SoCs
+	  (e.g. TL321X, TL322X, TL323X, TL521X) are not yet tested.
+
+	  Also requires a hal_telink revision providing
+	  tlx_bt_802154_dual_mode_resume() (run "west update hal_telink").
+
 config SHELL_BACKEND_SERIAL_RX_RING_BUFFER_SIZE
 	default 255 if SHELL_BACKEND_SERIAL
 
@@ -243,6 +300,7 @@ config CHIP_ENABLE_POWER_ON_FACTORY_RESET
 
 config CHIP_TASK_STACK_SIZE
 	int
+	default 7352 if PM && SOC_RISCV_TELINK_TL323X
 	default 6328 if PM && !SOC_RISCV_TELINK_W91
 	default 8448
 
@@ -252,6 +310,7 @@ config CHIP_USE_MARS_SENSOR
 	default n
 
 config CHIP_PERSISTENT_SUBSCRIPTIONS
+	default y if BOARD_TL3228X || BOARD_TL3228X_RETENTION
 	default y if BOARD_TL3238X || BOARD_TL3238X_RETENTION
 	default y if BOARD_TLSR9528A || BOARD_TLSR9528A_RETENTION
 	default n
@@ -302,7 +361,7 @@ config TFLM_FEATURE
 
 choice CHIP_LAST_FABRIC_REMOVED_ACTION
 	prompt "An action to perform after removing the last fabric"
-	default CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY
+	default CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
 
 	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
 	bool "After removing the last fabric erase NVS and reboot"
@@ -346,3 +405,17 @@ config CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY
 	  After removing the last fabric the device will wait for the defined time and then perform
 	  an action chosen by the CHIP_LAST_FABRIC_REMOVED_ACTION option. This schedule will allow for
 	  avoiding race conditions before the device removes non-volatile data.
+
+config EXPOSE_CHIP_ID_VIA_BLE
+	bool "Enable CHIP-ID via ble"
+	depends on BT
+    default n
+
+config DEFERRED_ATTR_STORAGE
+	bool "Defer the storage time of attributes"
+	default n
+
+config SECURE_PROGRAMMING
+	bool "Enable reading DAC and keys from the DAC partition"
+	depends on CHIP_FACTORY_DATA
+	default n

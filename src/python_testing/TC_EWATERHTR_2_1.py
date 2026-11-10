@@ -67,8 +67,7 @@ class TC_EWATERHTR_2_1(MatterTestCommissionedDevice, EWATERHTRBase):
 
     def steps_TC_EWATERHTR_2_1(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep("2", "TH reads from the DUT the FeatureMap attribute.",
                      "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap."),
             TestStep("3", "TH reads from the DUT the HeaterTypes attribute.",

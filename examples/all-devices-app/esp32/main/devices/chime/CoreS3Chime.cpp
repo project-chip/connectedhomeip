@@ -24,12 +24,8 @@
 #include "sdkconfig.h"
 
 #include <algorithm>
-#include <atomic>
-#include <cmath>
-#include <cstring>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <iterator>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <utility>
@@ -89,15 +85,7 @@ namespace {
 // for 16-bit audio that contradicts its own frame setting.
 
 // Required by the amplifier, see above.
-constexpr uint32_t kSampleRateHz = 48000;
-constexpr float kPi              = 3.14159265358979323846f;
-constexpr size_t kChunkSamples   = 256;
-
-// Sine lookup table sized so that the top bits of a 32-bit phase accumulator index it
-// directly. 256 entries keep the table at 1 KB while staying well below the noise floor
-// of a chime.
-constexpr size_t kSineTableSize    = 256;
-constexpr uint32_t kSineTableShift = 24;
+constexpr uint32_t kSampleRateHz = TonePlayingChime::kSampleRateHz;
 
 constexpr uint8_t kAw88298Address = 0x36;
 constexpr uint8_t kAw9523Address  = 0x58;
@@ -116,31 +104,6 @@ constexpr uint8_t kSy7088BoostEnable = 0x80;
 // enabled by the M5Unified board setup that the factory firmware uses.
 constexpr uint8_t kAxp2101LdoEnable         = 0x90;
 constexpr uint8_t kAxp2101AmplifierRailBits = 0x34;
-
-// Synthesis parameters for one chime. A chime with both frequencies equal is a single
-// note; otherwise the second note starts halfway through.
-struct ChimeTone
-{
-    float firstFrequencyHz;
-    float secondFrequencyHz;
-    float durationSec;
-    bool pulse;
-};
-
-// Chime ID is the index into both tables; keep them in sync.
-const Chime::Sound kCoreS3Sounds[] = {
-    { 0, "Ding Dong"_span },
-    { 1, "Ring Ring"_span },
-    { 2, "Alert Beep"_span },
-};
-
-constexpr ChimeTone kCoreS3Tones[] = {
-    { 880.0f, 660.0f, 1.0f, false },  // Ding Dong: two notes
-    { 1000.0f, 1000.0f, 1.0f, true }, // Ring Ring: pulsed single note
-    { 440.0f, 440.0f, 0.5f, false },  // Alert Beep: short single note
-};
-
-static_assert(std::size(kCoreS3Tones) == std::size(kCoreS3Sounds));
 
 // A device attached to the internal I2C bus, detached again when it goes out of scope.
 // Register accesses go through this object so that bring-up code can return early without
@@ -395,27 +358,19 @@ bool WaitForAmplifierLock(const ScopedI2cDevice & amplifier)
     return false;
 }
 
-// Phase is a 32-bit fraction of a full cycle, so one sample advances by
-// frequency / sampleRate of 2^32.
-uint32_t FrequencyToPhaseIncrement(float frequency)
-{
-    constexpr float kPhaseRange = 4294967296.0f;
-    return static_cast<uint32_t>((frequency * kPhaseRange) / static_cast<float>(kSampleRateHz));
-}
-
-// Owns the output path: the I2S channel, the oscillator table, the buffer staged for the
-// I2S driver and the claim that keeps two chimes from overlapping. Hardware bring-up is
-// deferred to the first chime, so a device that never chimes never powers the amplifier.
-class ChimePlayer
+// Owns the output path: the amplifier bring-up and the I2S channel the tones are written
+// to. Hardware bring-up is deferred to the first chime, so a device that never chimes never
+// powers the amplifier.
+class CoreS3AudioSink : public ChimeAudioSink
 {
 public:
-    static ChimePlayer & Instance()
+    static CoreS3AudioSink & Instance()
     {
-        static ChimePlayer player;
-        return player;
+        static CoreS3AudioSink sink;
+        return sink;
     }
 
-    bool EnsureInitialized()
+    bool EnsureInitialized() override
     {
         if (mTxChannel != nullptr)
         {
@@ -461,102 +416,21 @@ public:
         return true;
     }
 
-    // The output path has a single I2S channel and one staging buffer, so a second chime
-    // cannot run alongside the first. Claimed on the CHIP thread, released by the playback
-    // task when it finishes.
-    bool ClaimPlayback()
+    bool Write(const int16_t * samples, size_t byteCount) override
     {
-        bool expected = false;
-        return mPlaybackActive.compare_exchange_strong(expected, true, std::memory_order_acq_rel);
-    }
-
-    void ReleasePlayback() { mPlaybackActive.store(false, std::memory_order_release); }
-
-    void Play(uint8_t chimeID)
-    {
-        if (chimeID >= std::size(kCoreS3Tones))
-        {
-            return;
-        }
-        const ChimeTone & tone = kCoreS3Tones[chimeID];
-
-        EnsureSineTable();
-
-        const uint32_t totalSamples = static_cast<uint32_t>(tone.durationSec * kSampleRateHz);
-
-        // A two-tone chime switches to the second note halfway through; a single-tone chime
-        // never reaches the boundary.
-        const uint32_t noteBoundary       = (tone.firstFrequencyHz != tone.secondFrequencyHz) ? (totalSamples / 2) : totalSamples;
-        const uint32_t pulsePeriodSamples = kSampleRateHz / 20;
-
-        // exp(-4t) sampled at the output rate is a constant ratio between consecutive
-        // samples, so the envelope costs one multiply per sample rather than a call to expf.
-        const float envelopeDecay = std::exp(-4.0f / static_cast<float>(kSampleRateHz));
-
-        uint32_t phase          = 0;
-        uint32_t phaseIncrement = FrequencyToPhaseIncrement(tone.firstFrequencyHz);
-        float envelope          = 1.0f;
-        uint32_t produced       = 0;
-
-        while (produced < totalSamples)
-        {
-            uint32_t count = totalSamples - produced;
-            if (count > kChunkSamples)
-            {
-                count = kChunkSamples;
-            }
-
-            for (uint32_t i = 0; i < count; ++i)
-            {
-                const uint32_t index = produced + i;
-                if (index == noteBoundary)
-                {
-                    phaseIncrement = FrequencyToPhaseIncrement(tone.secondFrequencyHz);
-                    phase          = 0;
-                    envelope       = 1.0f;
-                }
-
-                // Unsigned overflow wraps the phase, so multiplying it yields the harmonics.
-                float sample = 0.6f * SineAt(phase) + 0.3f * SineAt(phase * 2) + 0.1f * SineAt(phase * 3);
-                sample *= envelope;
-
-                if (tone.pulse && (((index / pulsePeriodSamples) & 1) != 0))
-                {
-                    sample = 0.0f;
-                }
-
-                const int16_t value     = static_cast<int16_t>(sample * 28000.0f);
-                mChunkBuffer[2 * i]     = value;
-                mChunkBuffer[2 * i + 1] = value;
-
-                phase += phaseIncrement;
-                envelope *= envelopeDecay;
-            }
-
-            const size_t chunkBytes = count * 2 * sizeof(int16_t);
-            size_t written          = 0;
-            esp_err_t err           = i2s_channel_write(mTxChannel, mChunkBuffer, chunkBytes, &written, 1000);
-            if (err != ESP_OK || written != chunkBytes)
-            {
-                ChipLogError(DeviceLayer, "CoreS3Chime: I2S write failed (%s, %u/%u bytes), aborting tone", esp_err_to_name(err),
-                             static_cast<unsigned>(written), static_cast<unsigned>(chunkBytes));
-                return;
-            }
-            produced += count;
-        }
-
-        // Flush a silent tail so the amplifier does not hold the last sample.
-        std::memset(mChunkBuffer, 0, sizeof(mChunkBuffer));
         size_t written = 0;
-        esp_err_t err  = i2s_channel_write(mTxChannel, mChunkBuffer, sizeof(mChunkBuffer), &written, 1000);
-        if (err != ESP_OK)
+        esp_err_t err  = i2s_channel_write(mTxChannel, samples, byteCount, &written, 1000);
+        if (err != ESP_OK || written != byteCount)
         {
-            ChipLogError(DeviceLayer, "CoreS3Chime: I2S silence write failed: %s", esp_err_to_name(err));
+            ChipLogError(DeviceLayer, "CoreS3Chime: I2S write failed (%s, %u/%u bytes)", esp_err_to_name(err),
+                         static_cast<unsigned>(written), static_cast<unsigned>(byteCount));
+            return false;
         }
+        return true;
     }
 
 private:
-    ChimePlayer() = default;
+    CoreS3AudioSink() = default;
 
     bool InitializeI2sTxChannel()
     {
@@ -599,79 +473,11 @@ private:
         return true;
     }
 
-    void EnsureSineTable()
-    {
-        if (mSineTableInitialized)
-        {
-            return;
-        }
-
-        for (size_t i = 0; i < kSineTableSize; ++i)
-        {
-            mSineTable[i] = std::sin((2.0f * kPi * static_cast<float>(i)) / static_cast<float>(kSineTableSize));
-        }
-        mSineTableInitialized = true;
-    }
-
-    float SineAt(uint32_t phase) const { return mSineTable[phase >> kSineTableShift]; }
-
     i2s_chan_handle_t mTxChannel = nullptr;
-    std::atomic<bool> mPlaybackActive{ false };
-
-    // Written only by the playback task. Members rather than locals because that task runs
-    // on a small stack.
-    bool mSineTableInitialized = false;
-    float mSineTable[kSineTableSize];
-    int16_t mChunkBuffer[kChunkSamples * 2];
 };
-
-void ChimePlaybackTask(void * arg)
-{
-    ChimePlayer::Instance().Play(static_cast<uint8_t>(reinterpret_cast<uintptr_t>(arg)));
-    ChimePlayer::Instance().ReleasePlayback();
-    vTaskDelete(nullptr);
-}
 
 } // namespace
 
-CoreS3Chime::CoreS3Chime(TimerDelegate & timerDelegate) : Chime(timerDelegate, Span<const Sound>(kCoreS3Sounds)) {}
-
-Protocols::InteractionModel::Status CoreS3Chime::PlayChimeSound(uint8_t chimeID)
-{
-    auto status = Chime::PlayChimeSound(chimeID);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        return status;
-    }
-
-    ChimePlayer & player = ChimePlayer::Instance();
-    if (!player.EnsureInitialized())
-    {
-        return Protocols::InteractionModel::Status::Failure;
-    }
-
-    // Refuse an overlapping chime rather than queueing a task that would sit idle for the
-    // length of the current sound.
-    //
-    // This deviates from TC-CHIME-2.4 step 7, which sends three PlayChimeSound commands back to
-    // back and expects Success for each, with overlapping audio simply dropped. Restarting or
-    // queueing playback is deliberately not implemented: the overlap window is short and a single
-    // I2S channel cannot mix two tones.
-    if (!player.ClaimPlayback())
-    {
-        return Protocols::InteractionModel::Status::Busy;
-    }
-
-    // Priority 2 sits above the CHIP event loop (priority 1) so playback is not delayed by
-    // Matter processing, but below the display task so it cannot stall the UI.
-    if (xTaskCreate(ChimePlaybackTask, "chime_play", 4096, reinterpret_cast<void *>(static_cast<uintptr_t>(chimeID)), 2, nullptr) !=
-        pdPASS)
-    {
-        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to start the playback task");
-        player.ReleasePlayback();
-        return Protocols::InteractionModel::Status::Failure;
-    }
-    return Protocols::InteractionModel::Status::Success;
-}
+CoreS3Chime::CoreS3Chime(TimerDelegate & timerDelegate) : TonePlayingChime(timerDelegate, CoreS3AudioSink::Instance()) {}
 
 } // namespace chip::app

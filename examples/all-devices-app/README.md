@@ -35,9 +35,12 @@ The [`docs/`](docs/) directory contains documentation for this application:
 -   **[How to Add a New Simulated Device](docs/adding_new_device.md)**:
     Instructions for implementing Matter devices, binding code-driven clusters,
     and updating build configurations.
--   **[Custom Product Baseline Guide](docs/custom_product_baseline.md)**: Guide
-    on transitioning from this simulator baseline to a custom product
-    application.
+-   **[Writing a Code-Driven Application](docs/writing_code_driven_app.md)**:
+    Guide on using `all-devices-app` as a baseline for a standalone product
+    application, with build-system and platform-specific guides:
+    -   [Silicon Labs (GN)](docs/writing_code_driven_app_silabs.md)
+    -   [POSIX (GN)](docs/writing_code_driven_app_posix.md)
+    -   [ESP32 (CMake)](docs/writing_code_driven_app_esp32.md)
 
 ## Architecture and File Structure
 
@@ -46,13 +49,13 @@ implementations:
 
 -   **`all-devices-common/`**: Contains platform-agnostic code, including:
     -   Core cluster logic and device interfaces.
-    -   Base device implementations.
+    -   Base device implementations (`device/types/`).
     -   The **`DeviceFactory`** (in
         `all-devices-common/device-factory/DeviceFactory.h`), which enables
         runtime registration and creation of supported device types.
--   **`esp32/`, `posix/`**: Contain platform-specific implementations (with
-    `posix/` containing `linux/` and `darwin/` subdirectories), entry points,
-    and build configurations.
+-   **`esp32/`, `posix/`, `silabs/`, `telink/`**: Contain platform-specific
+    implementations (with `posix/` containing `linux/` and `darwin/`
+    subdirectories), entry points, and build configurations.
     -   For example, `posix/include/DeviceFactoryPlatformOverride.h` registers
         platform-specific overrides for devices at build-time.
 
@@ -68,55 +71,88 @@ The application supports the following device types (specified via the
 -   `air-purifier`
 -   `air-quality-sensor`
 -   `air-quality-sensor-full`
+-   `air-quality-sensor-full-simulated`
+-   `air-quality-sensor-simulated`
 -   `ambient-context-sensor`
+-   `battery-storage-simulated`
 -   `bridged-node`
 -   `chime`
+-   `closure-barrier`
+-   `closure-cabinet`
+-   `closure-door`
+-   `closure-garage-door`
+-   `closure-gate`
+-   `closure-no-ps-no-sp-simulated`
+-   `closure-simulated`
+-   `closure-window`
 -   `commissioning-proxy`
 -   `contact-sensor`
 -   `cooktop`
 -   `device-energy-management`
 -   `dimmable-light`
 -   `dimmable-plug-in-unit`
--   `dishwasher`
--   `electrical-sensor`
+-   `dishwasher-simulated`
+-   `doorbell`
+-   `electrical-sensor-simulated`
 -   `extractor-hood`
 -   `fan`
 -   `fan-no-onoff`
 -   `flow-sensor`
+-   `flow-sensor-simulated`
 -   `generic-switch`
 -   `humidity-conditioner`
 -   `humidity-sensor`
--   `laundry-dryer`
--   `laundry-washer`
+-   `humidity-sensor-simulated`
+-   `irrigation-system`
+-   `laundry-dryer-simulated`
+-   `laundry-washer-simulated`
 -   `light-sensor`
--   `microwave-oven`
+-   `light-sensor-simulated`
+-   `microwave-oven-simulated`
 -   `mode-select`
 -   `mounted-dimmable-load-control`
 -   `mounted-on-off-control`
--   `network-infrastructure-manager`
+-   `network-infrastructure-manager-simulated`
 -   `occupancy-sensor`
 -   `on-off-light`
 -   `on-off-light-switch`
 -   `on-off-plug-in-unit`
+-   `on-off-plug-with-sensors`
 -   `oven`
 -   `oven-2`
 -   `power-source`
+-   `power-source-simulated`
 -   `pressure-sensor`
+-   `pressure-sensor-simulated`
 -   `proximity-ranger`
 -   `rain-sensor`
 -   `refrigerator`
 -   `refrigerator-2`
--   `robotic-vacuum-cleaner`
+-   `robotic-vacuum-cleaner-simulated`
 -   `room-air-conditioner`
 -   `room-air-conditioner-with-sensors`
 -   `smoke-co-alarm`
 -   `soil-sensor`
+-   `soil-sensor-simulated`
 -   `speaker`
 -   `temperature-sensor`
--   `thread-border-router`
+-   `temperature-sensor-simulated`
+-   `thermostat`
+-   `thread-border-router-simulated`
 -   `water-freeze-detector`
+-   `water-heater`
 -   `water-leak-detector`
 -   `water-valve`
+-   `window-covering`
+-   `window-covering-awning`
+-   `window-covering-curtain`
+-   `window-covering-pergola`
+-   `window-covering-shutter`
+-   `window-covering-simulated`
+
+> [!NOTE] Legacy unadorned names (e.g., `battery-storage`, `closure`,
+> `dishwasher`, `robotic-vacuum-cleaner`, etc.) are retained as aliases pointing
+> to their simulated variants for backwards compatibility.
 
 You can run the application with `--help` to see the list of valid device types.
 
@@ -127,7 +163,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <aggregator|air-purifier|air-quality-sensor|air-quality-sensor-full|ambient-context-sensor|bridged-node|chime|commissioning-proxy|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|electrical-sensor|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-conditioner|humidity-sensor|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mode-select|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|oven-2|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|refrigerator-2|robotic-vacuum-cleaner|room-air-conditioner|room-air-conditioner-with-sensors|smoke-co-alarm|soil-sensor|speaker|temperature-sensor|thread-border-router|water-freeze-detector|water-leak-detector|water-valve>
+  --device <aggregator|air-purifier|...|*>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1
@@ -166,6 +202,9 @@ rm -rf /tmp/chip_*
 
 # Run a chime on endpoint 1, a speaker on endpoint 2 (child of endpoint 1), and a dimmable light on endpoint 3
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device chime:1 --device speaker:2,parent=1 --device dimmable-light:3
+
+# Battery Storage (composite): parent on endpoint 1 plus five child endpoints (DEM, grid/battery electrical-sensor, grid/battery power-source)
+./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device battery-storage:1
 ```
 
 ## Bridging Support: Bridged Modifier (`,bridged`)
@@ -304,7 +343,7 @@ BLE and so omits the proxy:
 ```bash
 # From the root of your checkout, on the host:
 docker run -it --user "$(id -u):$(id -g)" -v "$PWD":"$PWD" -w "$PWD" \
-    ghcr.io/project-chip/chip-build-crosscompile:200 /bin/bash
+    ghcr.io/project-chip/chip-build-crosscompile:215 /bin/bash
 
 # Then, inside the container:
 ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-devices-boringssl-clang build"

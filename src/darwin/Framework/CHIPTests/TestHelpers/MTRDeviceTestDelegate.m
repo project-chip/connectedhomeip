@@ -144,6 +144,34 @@
     }
 }
 
+- (void)unitTestSubscriptionSetupStartedForDevice:(MTRDevice *)device
+{
+    if (self.onSubscriptionSetupStarted != nil) {
+        self.onSubscriptionSetupStarted();
+    }
+}
+
+- (void)unitTestReadClientCreatedForDevice:(MTRDevice *)device
+{
+    if (self.onReadClientCreated != nil) {
+        self.onReadClientCreated();
+    }
+}
+
+- (void)unitTestInternalStateChangedForDevice:(MTRDevice *)device state:(NSUInteger)state
+{
+    if (self.onInternalStateTransition != nil) {
+        self.onInternalStateTransition(state);
+    }
+}
+
+- (void)unitTestSubscriptionReattemptDispatchedForDevice:(MTRDevice *)device
+{
+    if (self.onSubscriptionReattemptDispatched != nil) {
+        self.onSubscriptionReattemptDispatched();
+    }
+}
+
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error
 {
     if (self.onUTCTimeSet != nil) {
@@ -156,9 +184,9 @@
     return self.forceTimeUpdateShortDelayToZero;
 }
 
-- (BOOL)unitTestTimeSynchronizationLossDetectionCadenceIsZero:(MTRDevice *)device
+- (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device
 {
-    return self.forceTimeSynchronizationLossDetectionCadenceToZero;
+    return self.timeSynchronizationLossDetectionCadenceOverride;
 }
 
 - (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device
