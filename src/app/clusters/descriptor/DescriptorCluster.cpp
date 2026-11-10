@@ -281,7 +281,8 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
     }
 }
 
-// Using parentEndpoint instead of the endpoint that was added or removed, because in case of removal, the endpoint's entry will already be unregistered.
+// Using parentEndpoint instead of the endpoint that was added or removed, because in case of removal, the endpoint's entry will
+// already be unregistered.
 void DescriptorCluster::OnEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, DataModel::EndpointChangeType type)
 {
     if (endpointId == kRootEndpointId)
@@ -304,7 +305,7 @@ void DescriptorCluster::OnEndpointChanged(EndpointId endpointId, EndpointId pare
     LogErrorOnFailure(mContext->provider.Endpoints(endpointsList));
     auto endpoints = endpointsList.TakeBuffer();
 
-    auto * parentEntry   = GetEndpointEntry(parentEndpointId, endpoints);
+    auto * parentEntry = GetEndpointEntry(parentEndpointId, endpoints);
     auto * mEntry      = GetEndpointEntry(mPath.mEndpointId, endpoints);
 
     // Can't get the information about the endpoint tree to determine if this parts list attribute was changed.

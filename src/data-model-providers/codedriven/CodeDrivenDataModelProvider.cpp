@@ -292,7 +292,8 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
         }
     }
 
-    NotifyEndpointChanged(registration.endpointEntry.id, registration.endpointEntry.parentId, DataModel::EndpointChangeType::kAdded);
+    NotifyEndpointChanged(registration.endpointEntry.id, registration.endpointEntry.parentId,
+                          DataModel::EndpointChangeType::kAdded);
 
     return CHIP_NO_ERROR;
 }
