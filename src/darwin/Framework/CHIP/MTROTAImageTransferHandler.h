@@ -75,6 +75,11 @@ private:
 
     bool mNeedToCallTransferSessionEnd = false;
 
+    // The MTRBDXErrorDomain error, if any, that the delegate rejected the transfer with.  When set,
+    // this is the error passed to handleBDXTransferSessionEnd, instead of creating an NSError from
+    // the CHIP_ERROR that ended the transfer.
+    NSError * _Nullable mBDXRejectionError = nil;
+
     bool mIsPeerNodeAKnownThreadDevice = NO;
 
     chip::System::Clock::Milliseconds32 mBDXThrottleIntervalForThreadDevices;
