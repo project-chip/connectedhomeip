@@ -241,7 +241,35 @@ public:
 
     bool IsForAddressUpdate() const { return mPerformingAddressUpdate; }
 
-    bool IsResolvingAddress() const { return mState == State::ResolvingAddress; }
+    // Where a session setup is, for callers deciding whether to release it.  Values may be added.
+    enum class SetupPhase : uint8_t
+    {
+        kResolvingAddress, // Looking up the peer's address.
+        kAwaitingSigma2,   // Sent Sigma1 or Sigma1 with resumption, and has had no response yet.
+        kWaitingForRetry,  // Waiting to start another attempt after a failed one.
+        kOther,            // Any other point in the setup.
+    };
+
+    SetupPhase GetSetupPhase() const
+    {
+        if (mState == State::ResolvingAddress)
+        {
+            return SetupPhase::kResolvingAddress;
+        }
+        if (mState == State::WaitingForRetry)
+        {
+            return SetupPhase::kWaitingForRetry;
+        }
+        if (mState == State::Connecting && mCASEClient != nullptr)
+        {
+            auto caseState = mCASEClient->GetCASESessionState();
+            if (caseState == CASESession::State::kSentSigma1 || caseState == CASESession::State::kSentSigma1Resume)
+            {
+                return SetupPhase::kAwaitingSigma2;
+            }
+        }
+        return SetupPhase::kOther;
+    }
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished(const SessionHandle & session) override;
@@ -295,6 +323,8 @@ public:
 #endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
 private:
+    friend class TestOperationalSessionSetupPhase;
+
     enum class State : uint8_t
     {
         Uninitialized,    // Error state: OperationalSessionSetup is useless

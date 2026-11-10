@@ -209,10 +209,11 @@ Optional<SessionHandle> CASESessionManager::FindExistingSession(const ScopedNode
         peerId, MakeOptional(Transport::SecureSession::Type::kCASE), transportPayloadCapability);
 }
 
-bool CASESessionManager::IsResolvingAddress(const ScopedNodeId & peerId) const
+Optional<OperationalSessionSetup::SetupPhase> CASESessionManager::GetSessionSetupPhase(const ScopedNodeId & peerId) const
 {
     auto * session = FindExistingSessionSetup(peerId);
-    return session != nullptr && session->IsResolvingAddress();
+    VerifyOrReturnValue(session != nullptr, NullOptional);
+    return MakeOptional(session->GetSetupPhase());
 }
 
 void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)

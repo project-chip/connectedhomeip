@@ -74,6 +74,9 @@ public:
                                 const Transport::PeerAddress & peerAddress, const ReliableMessageProtocolConfig & remoteMRPConfig,
                                 SessionEstablishmentDelegate * delegate);
 
+    // The state of the CASE handshake this client is running.
+    CASESession::State GetCASESessionState() const { return mCASESession.GetState(); }
+
 private:
     CASESession mCASESession;
 };

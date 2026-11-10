@@ -174,8 +174,8 @@ public:
 
     void ReleaseAllSessions();
 
-    // True if the session setup for peerId (not an address-update one) is resolving its address.
-    bool IsResolvingAddress(const ScopedNodeId & peerId) const;
+    // The phase of the session setup for peerId (not an address-update one), if there is one.
+    Optional<OperationalSessionSetup::SetupPhase> GetSessionSetupPhase(const ScopedNodeId & peerId) const;
 
     /**
      * This API returns the address for the given node ID.

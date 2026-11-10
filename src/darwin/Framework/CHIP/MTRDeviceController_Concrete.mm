@@ -1531,7 +1531,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     __block BOOL resolving = NO;
     [self syncRunOnWorkQueue:^{
         auto peerId = self->_cppCommissioner->GetPeerScopedId(nodeID.unsignedLongLongValue);
-        resolving = self->_cppCommissioner->CASESessionMgr()->IsResolvingAddress(peerId);
+        auto phase = self->_cppCommissioner->CASESessionMgr()->GetSessionSetupPhase(peerId);
+        resolving = phase.HasValue() && phase.Value() == chip::OperationalSessionSetup::SetupPhase::kResolvingAddress;
     } error:nil];
     return resolving;
 }

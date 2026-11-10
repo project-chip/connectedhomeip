@@ -1280,7 +1280,8 @@ static constexpr NSTimeInterval kResolvingCASESetupMaxKeepSeconds = 5;
 {
     assertChipStackLockedByCurrentThread();
 
-    if (!caseSessionMgr->IsResolvingAddress(peerId)) {
+    auto setupPhase = caseSessionMgr->GetSessionSetupPhase(peerId);
+    if (!setupPhase.HasValue() || setupPhase.Value() != chip::OperationalSessionSetup::SetupPhase::kResolvingAddress) {
         _resolvingCASESetupKeptSince = nil;
         return NO;
     }
