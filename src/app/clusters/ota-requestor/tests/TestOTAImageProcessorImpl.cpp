@@ -68,9 +68,15 @@ public:
     void OnDownloadTimeout() override {}
     void EndDownload(CHIP_ERROR reason) override { mEndReasons.push_back(reason); }
     CHIP_ERROR FetchNextData() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR OnFinalized(CHIP_ERROR status) override
+    {
+        mFinalizeResults.push_back(status);
+        return CHIP_NO_ERROR;
+    }
 
     CHIP_ERROR mPrepareStatus = CHIP_ERROR_INTERNAL;
     std::vector<CHIP_ERROR> mEndReasons;
+    std::vector<CHIP_ERROR> mFinalizeResults;
 };
 
 class TestOTAImageProcessorImpl : public ::testing::Test
@@ -118,8 +124,13 @@ public:
     // Prepares to download from `offset`, the offset a downloader requested from the provider.
     void Prepare(uint64_t offset = 0)
     {
+        mDownloader.mPrepareStatus = CHIP_ERROR_INTERNAL;
         ASSERT_EQ(mProcessor.PrepareDownloadFrom(offset), CHIP_NO_ERROR);
-        Drain();
+        // A resumed prepare hashes the partial image over several work items; each Drain() runs the items queued so far.
+        for (int i = 0; i < 64 && mDownloader.mPrepareStatus == CHIP_ERROR_INTERNAL; i++)
+        {
+            Drain();
+        }
         ASSERT_EQ(mDownloader.mPrepareStatus, CHIP_NO_ERROR);
     }
 
@@ -169,6 +180,57 @@ TEST_F(TestOTAImageProcessorImpl, CompleteImageIsApplied)
     EXPECT_TRUE(mDownloader.mEndReasons.empty());
     EXPECT_EQ(FileContents(), std::vector<uint8_t>(mImage.begin() + sizeof(kHeader), mImage.end()));
     EXPECT_EQ(mProcessor.Apply(), CHIP_NO_ERROR);
+}
+
+// Finalize() reports the result of its check to the downloader, so a corrupt image ends the download as failed before the
+// requestor asks the provider to apply it, instead of being found by Apply() after the provider's DelayedActionTime.
+TEST_F(TestOTAImageProcessorImpl, ImageFailingTheDigestIsReportedAtFinalize)
+{
+    mImage[kImageSize - 1] ^= 0xff;
+    Prepare();
+    Serve(0);
+    Complete();
+
+    ASSERT_EQ(mDownloader.mFinalizeResults.size(), 1u);
+    EXPECT_EQ(mDownloader.mFinalizeResults[0], CHIP_ERROR_INTEGRITY_CHECK_FAILED);
+}
+
+TEST_F(TestOTAImageProcessorImpl, VerifiedImageIsReportedAtFinalize)
+{
+    EXPECT_TRUE(mProcessor.ReportsFinalizeResult());
+    Prepare();
+    Serve(0);
+    Complete();
+
+    ASSERT_EQ(mDownloader.mFinalizeResults.size(), 1u);
+    EXPECT_EQ(mDownloader.mFinalizeResults[0], CHIP_NO_ERROR);
+}
+
+// The partial image of a resumed download is hashed in work items of its own, a chunk each, rather than in the prepare's work item,
+// so a large partial image does not hold the event loop for its whole length. Work items run in the order they are scheduled, so
+// an item scheduled right after the prepare runs before the hashing does.
+TEST_F(TestOTAImageProcessorImpl, ResumedPartialImageIsHashedInItsOwnWorkItems)
+{
+    Prepare();
+    Serve(0, 4);
+    Suspend();
+    ASSERT_EQ(mProcessor.GetResumeOffset(), 4 * kBlockSize);
+
+    mDownloader.mPrepareStatus = CHIP_ERROR_INTERNAL;
+    ASSERT_EQ(mProcessor.PrepareDownloadFrom(mProcessor.GetResumeOffset()), CHIP_NO_ERROR);
+    static CHIP_ERROR sStatusAfterPrepareItem;
+    sStatusAfterPrepareItem = CHIP_NO_ERROR;
+    ASSERT_EQ(DeviceLayer::PlatformMgr().ScheduleWork(
+                  [](intptr_t arg) { sStatusAfterPrepareItem = reinterpret_cast<FakeDownloader *>(arg)->mPrepareStatus; },
+                  reinterpret_cast<intptr_t>(&mDownloader)),
+              CHIP_NO_ERROR);
+    for (int i = 0; i < 64 && mDownloader.mPrepareStatus == CHIP_ERROR_INTERNAL; i++)
+    {
+        Drain();
+    }
+
+    EXPECT_EQ(sStatusAfterPrepareItem, CHIP_ERROR_INTERNAL);
+    EXPECT_EQ(mDownloader.mPrepareStatus, CHIP_NO_ERROR);
 }
 
 TEST_F(TestOTAImageProcessorImpl, FinalizeTwiceKeepsTheVerifiedResult)

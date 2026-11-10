@@ -103,11 +103,13 @@ void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader,
 CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData,
                                        System::Clock::Timeout timeout)
 {
-    mTimeout          = timeout;
-    mState            = State::kIdle;
-    mRestartFromStart = false;
-    mFinalized        = false;
-    mCheckFirstBlock  = false;
+    mTimeout           = timeout;
+    mState             = State::kIdle;
+    mRestartFromStart  = false;
+    mFinalized         = false;
+    mBlockAckEOFSent   = false;
+    mFinalizeSucceeded = false;
+    mCheckFirstBlock   = false;
     mBdxTransfer.Reset();
 
     VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
@@ -226,6 +228,42 @@ CHIP_ERROR BDXDownloader::OnPreparedForDownload(CHIP_ERROR status)
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BDXDownloader::OnFinalized(CHIP_ERROR status)
+{
+    VerifyOrReturnError(mState == State::kInProgress && mFinalized && mImageProcessor != nullptr &&
+                            mImageProcessor->ReportsFinalizeResult(),
+                        CHIP_ERROR_INCORRECT_STATE);
+
+    if (status == CHIP_NO_ERROR)
+    {
+        mFinalizeSucceeded = true;
+        CompleteIfFinalized();
+        return CHIP_NO_ERROR;
+    }
+
+    // The image failed the processor's checks, e.g. its digest does not match its header. End the download as failed, which
+    // discards the image, before the requestor is told it is downloaded and asks the provider to apply it.
+    ChipLogError(BDX, "Downloaded image failed its checks: %" CHIP_ERROR_FORMAT, status.Format());
+    Reset();
+    mBdxTransfer.Reset();
+    mResumeIdentity.reset();
+    SetState(State::kIdle, OTAChangeReasonEnum::kFailure);
+    LogErrorOnFailure(mImageProcessor->Abort());
+    return CHIP_NO_ERROR;
+}
+
+void BDXDownloader::CompleteIfFinalized()
+{
+    VerifyOrReturn(mState == State::kInProgress && mBlockAckEOFSent);
+    VerifyOrReturn(mFinalizeSucceeded || mImageProcessor == nullptr || !mImageProcessor->ReportsFinalizeResult());
+
+    Reset();
+    // A complete image is not a partial one, so a later EndDownload() leaves it alone. The next SetBDXParams() sets
+    // mRequestedOffset again, and the processor reports no resume offset, which clears mAttemptsWithoutProgress.
+    mResumeIdentity.reset();
+    SetState(State::kComplete, OTAChangeReasonEnum::kSuccess);
 }
 
 CHIP_ERROR BDXDownloader::FetchNextData()
@@ -381,13 +419,11 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
         ReturnErrorOnFailure(mMsgDelegate->SendMessage(outEvent));
         if (outEvent.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF))
         {
-            Reset();
-            // A complete image is not a partial one, so a later EndDownload() leaves it alone. The next SetBDXParams() sets
-            // mRequestedOffset again, and the processor reports no resume offset, which clears mAttemptsWithoutProgress.
-            mResumeIdentity.reset();
-
-            // BDX transfer is not complete until BlockAckEOF has been sent
-            SetState(State::kComplete, OTAChangeReasonEnum::kSuccess);
+            // BDX transfer is not complete until BlockAckEOF has been sent. A processor that reports the result of Finalize() may
+            // not have done so yet; the download then completes when it reports success. Until then the timeout keeps running, so
+            // a result that never arrives ends the download like a stalled transfer.
+            mBlockAckEOFSent = true;
+            CompleteIfFinalized();
         }
         break;
     }
@@ -417,8 +453,9 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
         if (outEvent.blockdata.IsEof)
         {
             TEMPORARY_RETURN_IGNORED mBdxTransfer.PrepareBlockAck();
-            ReturnErrorOnFailure(mImageProcessor->Finalize());
+            // Set before Finalize(), which may report its result to OnFinalized() before it returns.
             mFinalized = true;
+            ReturnErrorOnFailure(mImageProcessor->Finalize());
         }
 
         break;
