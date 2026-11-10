@@ -19,13 +19,14 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <lib/core/DataModelTypes.h>
 
 /**
  * @brief User handler for handling the test event trigger
  *
  * @note If TestEventTrigger is enabled, it needs to be implemented in the app
  *
- * @param eventTrigger Event trigger to handle
+ * @param eventTrigger Event trigger to handle (endpoint bits cleared)
  *
  * @retval true on success
  * @retval false if error happened
@@ -81,17 +82,44 @@ enum class EnergyEvseTrigger : uint64_t
     kEVSETriggerRFID = 0x0099000000000050,
 };
 
+/// Endpoint id is encoded in bits 32-47 of the TestEventTrigger payload (see TestEventTriggerHandler).
+inline EndpointId GetEndpointIdFromEventTrigger(uint64_t eventTrigger)
+{
+    constexpr uint64_t kEndpointMask = 0x0000FFFF00000000;
+    return static_cast<EndpointId>((eventTrigger & kEndpointMask) >> 32);
+}
+
+using EnergyEvseInstanceTestEventTriggerHandler = bool (*)(uint64_t eventTrigger);
+
 class EnergyEvseTestEventTriggerHandler : public TestEventTriggerHandler
 {
 public:
+    /** Legacy global path: dispatches to HandleEnergyEvseTestEventTrigger(). */
     explicit EnergyEvseTestEventTriggerHandler() {}
 
-    /** This function must return True if the eventTrigger is recognised and handled
-     *  It must return False to allow a higher level TestEvent handler to check other
-     *  clusters that may handle it.
-     */
+    /** Per-endpoint path: accepts triggers for endpoint 0 (unscoped) or matchingEndpoint only. */
+    EnergyEvseTestEventTriggerHandler(EndpointId matchingEndpoint, EnergyEvseInstanceTestEventTriggerHandler handler) :
+        mMatchingEndpoint(matchingEndpoint), mInstanceHandler(handler)
+    {}
+
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
     {
+        if (mInstanceHandler != nullptr)
+        {
+            EndpointId triggerEndpoint = GetEndpointIdFromEventTrigger(eventTrigger);
+            if (triggerEndpoint != 0 && triggerEndpoint != mMatchingEndpoint)
+            {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+
+            eventTrigger = clearEndpointInEventTrigger(eventTrigger);
+            if (mInstanceHandler(eventTrigger))
+            {
+                return CHIP_NO_ERROR;
+            }
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
         eventTrigger = clearEndpointInEventTrigger(eventTrigger);
         if (HandleEnergyEvseTestEventTrigger(eventTrigger))
         {
@@ -99,6 +127,10 @@ public:
         }
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+private:
+    EndpointId mMatchingEndpoint                             = 0;
+    EnergyEvseInstanceTestEventTriggerHandler mInstanceHandler = nullptr;
 };
 
 } // namespace chip

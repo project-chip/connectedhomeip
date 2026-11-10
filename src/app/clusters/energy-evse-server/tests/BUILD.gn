@@ -21,7 +21,10 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "TestEnergyEvseCluster"
 
-  test_sources = [ "TestEnergyEvseCluster.cpp" ]
+  test_sources = [
+    "TestEnergyEvseCluster.cpp",
+    "TestEnergyEvseTestEventTriggerHandler.cpp",
+  ]
 
   sources = [
     "MockEvseDelegate.cpp",
