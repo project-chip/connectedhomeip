@@ -358,6 +358,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionLargePayload: {
         gRequestorCore.SetLargePayload(true);
         break;
+    }
     case kOptionBDXSkipAfterFirstBlock: {
         uint32_t skip;
         if (!ParseInt(aValue, skip))
@@ -377,45 +378,45 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         break;
     }
 
-        return (retval);
-    }
+    return (retval);
+}
 
-    void ApplicationInit()
+void ApplicationInit()
+{
+    // Initialize all OTA download components
+    InitOTARequestor();
+}
+
+void ApplicationShutdown() {}
+
+int main(int argc, char * argv[])
+{
+    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions, MakeOptional(kNetworkCommissioningEndpointSecondary)) == 0);
+    ChipLinuxAppMainLoop();
+
+    // If the event loop had been stopped due to an update being applied, boot into the new image
+    if (gRequestorCore.GetCurrentUpdateState() == OTAUpdateStateEnum::kApplying)
     {
-        // Initialize all OTA download components
-        InitOTARequestor();
-    }
-
-    void ApplicationShutdown() {}
-
-    int main(int argc, char * argv[])
-    {
-        VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions, MakeOptional(kNetworkCommissioningEndpointSecondary)) == 0);
-        ChipLinuxAppMainLoop();
-
-        // If the event loop had been stopped due to an update being applied, boot into the new image
-        if (gRequestorCore.GetCurrentUpdateState() == OTAUpdateStateEnum::kApplying)
+        if (kMaxFilePathSize <= strlen(kImageExecPath))
         {
-            if (kMaxFilePathSize <= strlen(kImageExecPath))
-            {
-                ChipLogError(SoftwareUpdate, "Buffer too small for the new image file path: %s", kImageExecPath);
-                return -1;
-            }
-
-            // Set the boot reason to SoftwareUpdateCompleted since the OTA requestor is going to boot into the new image after
-            // applying the firmware update.
-            CHIP_ERROR err = ConfigurationMgr().StoreBootReason(to_underlying(BootReasonEnum::kSoftwareUpdateCompleted));
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(SoftwareUpdate, "Failed to store boot reason - SoftwareUpdateCompleted");
-            }
-
-            std::string imageExecPath(kImageExecPath);
-            argv[0] = imageExecPath.data();
-            execv(argv[0], argv);
-
-            // If successfully executing the new image, execv should not return
-            ChipLogError(SoftwareUpdate, "The OTA image is invalid");
+            ChipLogError(SoftwareUpdate, "Buffer too small for the new image file path: %s", kImageExecPath);
+            return -1;
         }
-        return 0;
+
+        // Set the boot reason to SoftwareUpdateCompleted since the OTA requestor is going to boot into the new image after
+        // applying the firmware update.
+        CHIP_ERROR err = ConfigurationMgr().StoreBootReason(to_underlying(BootReasonEnum::kSoftwareUpdateCompleted));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SoftwareUpdate, "Failed to store boot reason - SoftwareUpdateCompleted");
+        }
+
+        std::string imageExecPath(kImageExecPath);
+        argv[0] = imageExecPath.data();
+        execv(argv[0], argv);
+
+        // If successfully executing the new image, execv should not return
+        ChipLogError(SoftwareUpdate, "The OTA image is invalid");
     }
+    return 0;
+}
