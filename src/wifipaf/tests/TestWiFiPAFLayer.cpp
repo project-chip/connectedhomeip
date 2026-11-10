@@ -553,10 +553,9 @@ TEST_F(TestWiFiPAFLayer, ShutdownClosesStalledEndpoints)
     EXPECT_EQ(EpGetWiFiPafLayer(), nullptr);
 }
 
-// kSystemLayer_NumPacketBufs only exists as a single counter when packet buffers are not the
-// custom-pool LWIP configuration (which splits the counter per pool via lwippools.h), so guard
-// these counter-based checks the same way SystemStats.h declares the entry.
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !(CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL)
+// kSystemLayer_NumPacketBufs counts every PacketBuffer only for the CHIP heap and pool backends.
+// On LwIP the value is set from lwIP's pbuf pool statistics, or does not exist with custom pools.
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && (CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL)
 // ClearAll() must release any PacketBufferHandle the endpoint still owns. Park one in a handle
 // member, then check ClearAll() returns it to the pool.
 TEST_F(TestWiFiPAFLayer, ClearAllReleasesOwnedBuffer)
@@ -628,7 +627,7 @@ TEST_F(TestWiFiPAFLayer, SubscriberNonFatalCloseReleasesPendingAck)
 
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
 }
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !(custom-pool LWIP)
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && CHIP heap or pool PacketBuffers
 
 // FlushPendingAcks() exists so a pending ack can be forced out before the radio is
 // occupied by Wi-Fi association. Letting the send-ack timer deliver it instead would

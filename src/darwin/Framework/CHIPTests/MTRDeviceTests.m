@@ -38,6 +38,7 @@
 #import "MTRTestControllerDelegate.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
+#import "MTRTestResponseValues.h"
 #import "MTRTestStorage.h"
 
 #import <math.h> // For INFINITY
@@ -4326,39 +4327,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqual([device unitTestNonnullDelegateCount], 1);
 }
 
-- (NSDictionary<NSString *, id> *)_testAttributeResponseValueWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID value:(unsigned int)testValue
-{
-    return @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID],
-        MTRDataKey : @ {
-            MTRDataVersionKey : @(testValue),
-            MTRTypeKey : MTRUnsignedIntegerValueType,
-            MTRValueKey : @(testValue),
-        }
-    };
-}
-
-- (NSDictionary<NSString *, id> *)_testEventResponseValueWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
-{
-    // Pick a large event number, so that in practice these event reports will
-    // all have larger event numbers than anything that might have been observed
-    // before.
-    static uint64_t eventNumber = 0x100000000llu;
-    return @{
-        MTREventPathKey : [MTREventPath eventPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID],
-        MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
-        MTREventTimestampDateKey : [NSDate date],
-        MTREventIsHistoricalKey : @(NO),
-        MTREventPriorityKey : @(MTREventPriorityInfo),
-        MTREventNumberKey : @(eventNumber++),
-        // Empty payload.
-        MTRDataKey : @ {
-            MTRTypeKey : MTRStructureValueType,
-            MTRValueKey : @[],
-        },
-    };
-}
-
 - (void)test038_MTRDeviceMultipleDelegatesInterestedPaths
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -4508,7 +4476,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int endpointID = i;
                 int clusterID = i * 10 + j;
                 int eventID = i * 100 + j * 10 + k;
-                [eventReport addObject:[self _testEventResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) eventID:@(eventID)]];
+                [eventReport addObject:TestEventResponseValue(@(endpointID), @(clusterID), @(eventID))];
             }
         }
     }
@@ -4524,7 +4492,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int clusterID = i * 10 + j;
                 int attributeID = i * 100 + j * 10 + k;
                 int value = attributeID + 10000;
-                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+                [attributeReport addObject:TestAttributeResponseValue(@(endpointID), @(clusterID), @(attributeID), value)];
             }
         }
     }
@@ -4579,7 +4547,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int endpointID = i;
                 int clusterID = i * 10 + j;
                 int eventID = i * 100 + j * 10 + k;
-                [eventReport addObject:[self _testEventResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) eventID:@(eventID)]];
+                [eventReport addObject:TestEventResponseValue(@(endpointID), @(clusterID), @(eventID))];
             }
         }
     }
@@ -4594,7 +4562,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int clusterID = i * 10 + j;
                 int attributeID = i * 100 + j * 10 + k;
                 int value = attributeID + 20000;
-                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+                [attributeReport addObject:TestAttributeResponseValue(@(endpointID), @(clusterID), @(attributeID), value)];
             }
         }
     }
@@ -4651,7 +4619,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int clusterID = i * 10 + j;
                 int attributeID = i * 100 + j * 10 + k;
                 int value = attributeID + 10000;
-                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+                [attributeReport addObject:TestAttributeResponseValue(@(endpointID), @(clusterID), @(attributeID), value)];
             }
         }
     }
@@ -8582,6 +8550,157 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 
 @end
 
+@interface MTRDeviceResubscriptionTimerTests : MTRTestCase
+@end
+
+@implementation MTRDeviceResubscriptionTimerTests
+
+- (void)_checkSupersededResubscriptionTimersWithThread:(BOOL)thread
+                                 subscriptionPoolWidth:(NSInteger)poolWidth
+                                blockingMatterQueueFor:(NSTimeInterval)blockSeconds
+                               supersedingWhileBlocked:(BOOL)supersedeWhileBlocked
+{
+    [[NSUserDefaults standardUserDefaults] setInteger:poolWidth forKey:kDefaultSubscriptionPoolSizeOverrideKey];
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kDefaultSubscriptionPoolSizeOverrideKey];
+    XCTAssertNotNil(controller);
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(0x12344399) controller:controller];
+    dispatch_queue_t queue = dispatch_queue_create("superseded-resubscription-timer", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    delegate.pretendThreadEnabled = thread;
+
+    XCTestExpectation * subscribingExpectation = [self expectationWithDescription:@"Reattempt started a subscription"];
+    // Called synchronously right after the device enters the subscribing state, so the time isn't delayed by delegate delivery.
+    __block NSDate * subscribingTime = nil;
+    delegate.onSubscriptionSetupStarted = ^{
+        if (subscribingTime == nil) {
+            subscribingTime = [NSDate now];
+            [subscribingExpectation fulfill];
+        }
+    };
+
+    dispatch_semaphore_t reattemptDispatched = dispatch_semaphore_create(0);
+    delegate.onSubscriptionReattemptDispatched = ^{
+        dispatch_semaphore_signal(reattemptDispatched);
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    __block NSDate * finalResetTime = nil;
+    // When superseding while the Matter queue is blocked, the first reset happens inside the blocking block below, so its
+    // timer can't run its Matter-queue block before the queue is blocked.
+    for (int i = 0; i < (supersedeWhileBlocked ? 0 : 3); i++) {
+        [controller syncRunOnWorkQueue:^{
+            device.reattemptingSubscription = NO;
+            finalResetTime = [NSDate now];
+            [device _handleSubscriptionReset:nil];
+        } error:nil];
+    }
+    if (blockSeconds > 0 || supersedeWhileBlocked) {
+        [controller syncRunOnWorkQueue:^{
+            if (supersedeWhileBlocked) {
+                device.reattemptingSubscription = NO;
+                [device _handleSubscriptionReset:nil];
+            }
+            [NSThread sleepForTimeInterval:blockSeconds];
+            if (supersedeWhileBlocked) {
+                // Supersede only once the timer has queued its Matter-queue block, so the on-queue check is what rejects it.
+                XCTAssertEqual(dispatch_semaphore_wait(reattemptDispatched, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC)), 0);
+                device.reattemptingSubscription = NO;
+                finalResetTime = [NSDate now];
+                [device _handleSubscriptionReset:nil];
+            }
+        } error:nil];
+    }
+
+    [self waitForExpectations:@[ subscribingExpectation ] timeout:15];
+    NSTimeInterval expectedReattemptSeconds = supersedeWhileBlocked ? 2 : 4;
+    XCTAssertGreaterThanOrEqual([subscribingTime timeIntervalSinceDate:finalResetTime], expectedReattemptSeconds - 0.5);
+
+    [device removeDelegate:delegate];
+    [controller syncRunOnWorkQueue:^{
+    } error:nil];
+    [controller removeDevice:device];
+}
+
+- (void)test001_SupersededResubscriptionTimerDoesNotFireEarly
+{
+    [self _checkSupersededResubscriptionTimersWithThread:NO subscriptionPoolWidth:1 blockingMatterQueueFor:0 supersedingWhileBlocked:NO];
+}
+
+- (void)test002_SupersededResubscriptionTimerDoesNotFireEarlyInSubscriptionPool
+{
+    [self _checkSupersededResubscriptionTimersWithThread:YES subscriptionPoolWidth:1 blockingMatterQueueFor:0 supersedingWhileBlocked:NO];
+}
+
+- (void)test003_SupersededResubscriptionTimerDoesNotStallSubscriptionPool
+{
+    [self _checkSupersededResubscriptionTimersWithThread:YES subscriptionPoolWidth:2 blockingMatterQueueFor:5.0 supersedingWhileBlocked:NO];
+}
+
+- (void)test004_SupersededResubscriptionTimerAfterDispatchDoesNotFireEarly
+{
+    [self _checkSupersededResubscriptionTimersWithThread:NO subscriptionPoolWidth:1 blockingMatterQueueFor:0 supersedingWhileBlocked:YES];
+}
+
+- (void)test005_SupersededResubscriptionTimerAfterDispatchDoesNotFireEarlyInSubscriptionPool
+{
+    [self _checkSupersededResubscriptionTimersWithThread:YES subscriptionPoolWidth:1 blockingMatterQueueFor:0 supersedingWhileBlocked:YES];
+}
+
+- (void)test006_SupersededResubscriptionTimersReleaseOnlyTheirOwnPoolSlot
+{
+    // Pins the owner-checked slot release in the superseded branch; no behaviour change.
+    // Once the surviving reattempt holds the pool slot, the superseded timers that ran
+    // must leave exactly that one item in the pool: none stranded, and the survivor's not released.
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:kDefaultSubscriptionPoolSizeOverrideKey];
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kDefaultSubscriptionPoolSizeOverrideKey];
+    XCTAssertNotNil(controller);
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(0x12344399) controller:controller];
+    dispatch_queue_t queue = dispatch_queue_create("superseded-resubscription-pool-slot", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscribingExpectation = [self expectationWithDescription:@"Surviving reattempt started a subscription"];
+    delegate.onInternalStateChanged = ^{
+        if ([device _getInternalState] == MTRInternalDeviceStateSubscribing) {
+            [subscribingExpectation fulfill];
+        }
+    };
+    subscribingExpectation.assertForOverFulfill = NO;
+
+    [device setDelegate:delegate queue:queue];
+    NSUInteger baselinePoolItemCount = controller.concurrentSubscriptionPool.itemCount;
+
+    for (int i = 0; i < 3; i++) {
+        [controller syncRunOnWorkQueue:^{
+            device.reattemptingSubscription = NO;
+            [device _handleSubscriptionReset:nil];
+        } error:nil];
+    }
+    [self waitForExpectations:@[ subscribingExpectation ] timeout:15];
+
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    [controller syncRunOnWorkQueue:^{
+    } error:nil];
+    // skipSetupSubscription leaves the survivor holding its slot.
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1);
+
+    [device removeDelegate:delegate];
+    [controller syncRunOnWorkQueue:^{
+    } error:nil];
+    [controller removeDevice:device];
+}
+
+@end
+
 @interface MTRDeviceEncoderTests : XCTestCase
 @end
 
@@ -8735,30 +8854,6 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 }
 
 @end
-
-@interface MTRInterestedPathsTestClusterPath : MTRClusterPath
-@end
-@implementation MTRInterestedPathsTestClusterPath
-@end
-
-@interface MTRInterestedPathsTestAttributePath : MTRAttributePath
-@end
-@implementation MTRInterestedPathsTestAttributePath
-@end
-
-@interface MTRInterestedPathsTestEventPath : MTREventPath
-@end
-@implementation MTRInterestedPathsTestEventPath
-@end
-
-static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subclass)
-{
-    NSKeyedArchiver * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
-    [archiver setClassName:NSStringFromClass(subclass) forClass:[path class]];
-    [archiver encodeObject:path forKey:NSKeyedArchiveRootObjectKey];
-    [archiver finishEncoding];
-    return [NSKeyedUnarchiver unarchivedObjectOfClass:subclass fromData:archiver.encodedData error:nil];
-}
 
 @interface MTRInterestedPathsTestXPCServer : NSObject <NSXPCListenerDelegate>
 @property (nonatomic, readonly) NSXPCInterface * exportedInterface;

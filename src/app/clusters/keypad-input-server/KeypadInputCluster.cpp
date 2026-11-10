@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,193 +14,76 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/****************************************************************************
- * @file
- * @brief Routines for the Keypad Input plugin, the
- *server implementation of the Keypad Input cluster.
- *******************************************************************************
- ******************************************************************************/
 
-#include <app/clusters/keypad-input-server/CodegenIntegration.h>
-#include <app/clusters/keypad-input-server/keypad-input-delegate.h>
+#include <app/clusters/keypad-input-server/KeypadInputCluster.h>
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/data-model/Encode.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/config.h>
-#include <platform/CHIPDeviceConfig.h>
+#include <app/CommandResponseHelper.h>
+#include <app/data-model/Decode.h>
+#include <clusters/KeypadInput/Attributes.h>
+#include <clusters/KeypadInput/Commands.h>
+#include <clusters/KeypadInput/Ids.h>
+#include <clusters/KeypadInput/Metadata.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-#include <app/app-platform/ContentAppPlatform.h> // nogncheck
+namespace chip::app::Clusters {
 
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace KeypadInput;
+using Protocols::InteractionModel::Status;
 
-using namespace chip;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::KeypadInput;
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-using namespace chip::AppPlatform;
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-using chip::Protocols::InteractionModel::Status;
+KeypadInputCluster::KeypadInputCluster(EndpointId endpointId, KeypadInput::Delegate & delegate) :
+    DefaultServerCluster({ endpointId, KeypadInput::Id }), mDelegate(delegate)
+{}
 
-static constexpr size_t kKeypadInputDelegateTableSize =
-    MATTER_DM_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-static_assert(kKeypadInputDelegateTableSize < kEmberInvalidEndpointIndex, "KeypadInput Delegate table size error");
-
-// -----------------------------------------------------------------------------
-// Delegate Implementation
-
-using chip::app::Clusters::KeypadInput::Delegate;
-
-namespace {
-
-Delegate * gDelegateTable[kKeypadInputDelegateTableSize] = { nullptr };
-
-Delegate * GetDelegate(EndpointId endpoint)
+DataModel::ActionReturnStatus KeypadInputCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                AttributeValueEncoder & encoder)
 {
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
-    if (app != nullptr)
+    switch (request.path.mAttributeId)
     {
-        ChipLogProgress(Zcl, "KeypadInput returning ContentApp delegate for endpoint:%u", endpoint);
-        return app->GetKeypadInputDelegate();
+    case Attributes::ClusterRevision::Id:
+        return encoder.Encode(KeypadInput::kRevision);
+    case Attributes::FeatureMap::Id:
+        return encoder.Encode(mDelegate.GetFeatureMap(mPath.mEndpointId));
+    default:
+        return Status::UnsupportedAttribute;
     }
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ChipLogProgress(Zcl, "KeypadInput NOT returning ContentApp delegate for endpoint:%u", endpoint);
-
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, KeypadInput::Id, MATTER_DM_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kKeypadInputDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
-bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
+std::optional<DataModel::ActionReturnStatus> KeypadInputCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                               TLV::TLVReader & input_arguments,
+                                                                               CommandHandler * handler)
 {
-    if (delegate == nullptr)
+    switch (request.path.mCommandId)
     {
-        ChipLogProgress(Zcl, "Keypad Input has no delegate set for endpoint:%u", endpoint);
-        return true;
-    }
-    return false;
-}
-} // namespace
+    case Commands::SendKey::Id: {
+        Commands::SendKey::DecodableType data;
+        ReturnErrorOnFailure(DataModel::Decode(input_arguments, data));
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace KeypadInput {
-
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
-{
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, KeypadInput::Id, MATTER_DM_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
-    // if endpoint is found
-    if (ep < kKeypadInputDelegateTableSize)
-    {
-        gDelegateTable[ep] = delegate;
+        CommandResponseHelper<Commands::SendKeyResponse::Type> responder(handler, request.path);
+        mDelegate.HandleSendKey(responder, data.keyCode);
+        if (responder.HasSentResponse())
+        {
+            return std::nullopt;
+        }
+        ChipLogError(Zcl, "KeypadInput: SendKey on endpoint %u was not answered by the delegate",
+                     static_cast<unsigned>(mPath.mEndpointId));
+        return Status::Failure;
     }
-    else
-    {
+    default:
+        return Status::UnsupportedCommand;
     }
 }
 
-bool Delegate::HasFeature(EndpointId endpoint, Feature feature)
+CHIP_ERROR KeypadInputCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    uint32_t featureMap = GetFeatureMap(endpoint);
-    return (featureMap & chip::to_underlying(feature));
+    static constexpr DataModel::AcceptedCommandEntry kCommands[] = { Commands::SendKey::kMetadataEntry };
+    return builder.ReferenceExisting(Span(kCommands));
 }
 
-} // namespace KeypadInput
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-// -----------------------------------------------------------------------------
-// Attribute Accessor Implementation
-
-namespace {
-
-class KeypadInputAttrAccess : public app::AttributeAccessInterface
+CHIP_ERROR KeypadInputCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
-public:
-    KeypadInputAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), KeypadInput::Id) {}
-
-    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
-
-private:
-    CHIP_ERROR ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
-};
-
-KeypadInputAttrAccess gKeypadInputAttrAccess;
-
-CHIP_ERROR KeypadInputAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
-{
-    EndpointId endpoint = aPath.mEndpointId;
-    Delegate * delegate = GetDelegate(endpoint);
-
-    if (isDelegateNull(delegate, endpoint))
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    switch (aPath.mAttributeId)
-    {
-    case app::Clusters::KeypadInput::Attributes::FeatureMap::Id: {
-        return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
-    }
-
-    default: {
-        break;
-    }
-    }
-
-    return CHIP_NO_ERROR;
+    static constexpr CommandId kCommands[] = { Commands::SendKeyResponse::Id };
+    return builder.ReferenceExisting(Span(kCommands));
 }
 
-CHIP_ERROR KeypadInputAttrAccess::ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
-                                                           Delegate * delegate)
-{
-    uint32_t featureFlag = delegate->GetFeatureMap(endpoint);
-    return aEncoder.Encode(featureFlag);
-}
-
-} // anonymous namespace
-
-// -----------------------------------------------------------------------------
-// Matter Framework Callbacks Implementation
-
-bool emberAfKeypadInputClusterSendKeyCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                              const Commands::SendKey::DecodableType & commandData)
-{
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    EndpointId endpoint = commandPath.mEndpointId;
-    auto & keyCode      = commandData.keyCode;
-    app::CommandResponseHelper<Commands::SendKeyResponse::Type> responder(command, commandPath);
-
-    Delegate * delegate = GetDelegate(endpoint);
-    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
-    {
-        delegate->HandleSendKey(responder, keyCode);
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "emberAfKeypadInputClusterSendKeyCallback error: %s", err.AsString());
-        command->AddStatus(commandPath, Status::Failure);
-    }
-    return true;
-}
-
-void MatterKeypadInputPluginServerInitCallback()
-{
-    app::AttributeAccessInterfaceRegistry::Instance().Register(&gKeypadInputAttrAccess);
-}
-
-void MatterKeypadInputPluginServerShutdownCallback()
-{
-    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gKeypadInputAttrAccess);
-}
+} // namespace chip::app::Clusters

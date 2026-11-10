@@ -32,6 +32,17 @@ Source files for these tools are located at `scripts/tools`.
 
 ```
 
+### PR triage tools
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+../scripts/tools/pr_triage/README
+../scripts/tools/pr_triage/CLI
+
+```
+
 ### NXP tools
 
 ```{toctree}

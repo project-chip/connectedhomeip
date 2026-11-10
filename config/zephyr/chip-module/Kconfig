@@ -21,6 +21,7 @@ rsource "Kconfig.bt"
 endif # CHIP
 
 rsource "../../nxp/chip-module/Kconfig"
+rsource "../../silabs/chip-module/Kconfig"
 
 config CHIP_ZEPHYR_USE_POSIX_DEFAULT_SOURCE
     bool "Use _DEFAULT_SOURCE macro for POSIX API"

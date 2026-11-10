@@ -118,6 +118,14 @@ NS_ASSUME_NONNULL_BEGIN
  * Notify the delegate when a BDX Session starts for some node.  The controller
  * identifies the fabric the node is on, and the nodeID identifies the node
  * within that fabric.
+ *
+ * The offset is the start offset (STARTOFS) from the node's BDX ReceiveInit
+ * message, passed through unchanged: the byte offset in the OTA image at which the
+ * transfer starts.
+ *
+ * If completion is passed a non-nil error, the transfer will be rejected. A
+ * delegate that cannot provide data starting at offset must pass a non-nil
+ * error.
  */
 - (void)handleBDXTransferSessionBeginForNodeID:(NSNumber *)nodeID
                                     controller:(MTRDeviceController *)controller
@@ -156,9 +164,25 @@ NS_ASSUME_NONNULL_BEGIN
  * The controller identifies the fabric the node is on, and the nodeID
  * identifies the node within that fabric.
  *
+ * blockSize, blockIndex and bytesToSkip are the BDX values for this query,
+ * passed through unchanged. blockSize is the maximum block size negotiated for
+ * the transfer. blockIndex is the block counter of the query: 0 for the first
+ * query of every transfer incrementing by 1 for each query thereafter. The
+ * delegate is called once for each blockIndex. bytesToSkip is the BytesToSkip
+ * value of a BlockQueryWithSkip message, or 0 for a BlockQuery. bytesToSkip
+ * counts only the skip requested by this query, and need not be a multiple of
+ * blockSize.
+ *
+ * A skip moves the position in the file forward for the rest of the transfer,
+ * not just for this block. The data for this block starts at the transfer's
+ * offset, plus the length of all the data already sent in the transfer, plus
+ * every bytesToSkip received in the transfer, including this one.
+ *
  * The data passed to the completion must be of size blockSize, unless it's the
  * last block of data.  In that case, it may be smaller than blockSize, and
- * isEOF must be set to YES.
+ * isEOF must be set to YES. If the start of the data being requested is at or
+ * past the end of the OTA image, which a skip can cause, the completion must be
+ * passed empty data and isEOF set to YES.
  */
 - (void)handleBDXQueryForNodeID:(NSNumber *)nodeID
                      controller:(MTRDeviceController *)controller
