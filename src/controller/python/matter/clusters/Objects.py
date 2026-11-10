@@ -210,106 +210,6 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3
 
-        class AreaTypeTag(MatterIntEnum):
-            kAisle = 0x00
-            kAttic = 0x01
-            kBackDoor = 0x02
-            kBackYard = 0x03
-            kBalcony = 0x04
-            kBallroom = 0x05
-            kBathroom = 0x06
-            kBedroom = 0x07
-            kBorder = 0x08
-            kBoxroom = 0x09
-            kBreakfastRoom = 0x0A
-            kCarport = 0x0B
-            kCellar = 0x0C
-            kCloakroom = 0x0D
-            kCloset = 0x0E
-            kConservatory = 0x0F
-            kCorridor = 0x10
-            kCraftRoom = 0x11
-            kCupboard = 0x12
-            kDeck = 0x13
-            kDen = 0x14
-            kDining = 0x15
-            kDrawingRoom = 0x16
-            kDressingRoom = 0x17
-            kDriveway = 0x18
-            kElevator = 0x19
-            kEnsuite = 0x1A
-            kEntrance = 0x1B
-            kEntryway = 0x1C
-            kFamilyRoom = 0x1D
-            kFoyer = 0x1E
-            kFrontDoor = 0x1F
-            kFrontYard = 0x20
-            kGameRoom = 0x21
-            kGarage = 0x22
-            kGarageDoor = 0x23
-            kGarden = 0x24
-            kGardenDoor = 0x25
-            kGuestBathroom = 0x26
-            kGuestBedroom = 0x27
-            kGuestRoom = 0x29
-            kGym = 0x2A
-            kHallway = 0x2B
-            kHearthRoom = 0x2C
-            kKidsRoom = 0x2D
-            kKidsBedroom = 0x2E
-            kKitchen = 0x2F
-            kLaundryRoom = 0x31
-            kLawn = 0x32
-            kLibrary = 0x33
-            kLivingRoom = 0x34
-            kLounge = 0x35
-            kMediaTvRoom = 0x36
-            kMudRoom = 0x37
-            kMusicRoom = 0x38
-            kNursery = 0x39
-            kOffice = 0x3A
-            kOutdoorKitchen = 0x3B
-            kOutside = 0x3C
-            kPantry = 0x3D
-            kParkingLot = 0x3E
-            kParlor = 0x3F
-            kPatio = 0x40
-            kPlayRoom = 0x41
-            kPoolRoom = 0x42
-            kPorch = 0x43
-            kPrimaryBathroom = 0x44
-            kPrimaryBedroom = 0x45
-            kRamp = 0x46
-            kReceptionRoom = 0x47
-            kRecreationRoom = 0x48
-            kRoof = 0x4A
-            kSauna = 0x4B
-            kScullery = 0x4C
-            kSewingRoom = 0x4D
-            kShed = 0x4E
-            kSideDoor = 0x4F
-            kSideYard = 0x50
-            kSittingRoom = 0x51
-            kSnug = 0x52
-            kSpa = 0x53
-            kStaircase = 0x54
-            kSteamRoom = 0x55
-            kStorageRoom = 0x56
-            kStudio = 0x57
-            kStudy = 0x58
-            kSunRoom = 0x59
-            kSwimmingPool = 0x5A
-            kTerrace = 0x5B
-            kUtilityRoom = 0x5C
-            kWard = 0x5D
-            kWorkshop = 0x5E
-            kToilet = 0x5F
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 40
-
         class AtomicRequestTypeEnum(MatterIntEnum):
             kBeginWrite = 0x00
             kCommitWrite = 0x01
@@ -413,17 +313,107 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2
 
-        class CommonClosureTag(MatterIntEnum):
-            kOpening = 0x00
-            kClosing = 0x01
-            kStop = 0x02
+        class CommonAreaTag(MatterIntEnum):
+            kAisle = 0x00
+            kAttic = 0x01
+            kBackDoor = 0x02
+            kBackYard = 0x03
+            kBalcony = 0x04
+            kBallroom = 0x05
+            kBathroom = 0x06
+            kBedroom = 0x07
+            kBorder = 0x08
+            kBoxroom = 0x09
+            kBreakfastRoom = 0x0A
+            kCarport = 0x0B
+            kCellar = 0x0C
+            kCloakroom = 0x0D
+            kCloset = 0x0E
+            kConservatory = 0x0F
+            kCorridor = 0x10
+            kCraftRoom = 0x11
+            kCupboard = 0x12
+            kDeck = 0x13
+            kDen = 0x14
+            kDining = 0x15
+            kDrawingRoom = 0x16
+            kDressingRoom = 0x17
+            kDriveway = 0x18
+            kElevator = 0x19
+            kEnsuite = 0x1A
+            kEntrance = 0x1B
+            kEntryway = 0x1C
+            kFamilyRoom = 0x1D
+            kFoyer = 0x1E
+            kFrontDoor = 0x1F
+            kFrontYard = 0x20
+            kGameRoom = 0x21
+            kGarage = 0x22
+            kGarageDoor = 0x23
+            kGarden = 0x24
+            kGardenDoor = 0x25
+            kGuestBathroom = 0x26
+            kGuestBedroom = 0x27
+            kGuestRoom = 0x29
+            kGym = 0x2A
+            kHallway = 0x2B
+            kHearthRoom = 0x2C
+            kKidsRoom = 0x2D
+            kKidsBedroom = 0x2E
+            kKitchen = 0x2F
+            kLaundryRoom = 0x31
+            kLawn = 0x32
+            kLibrary = 0x33
+            kLivingRoom = 0x34
+            kLounge = 0x35
+            kMediaTvRoom = 0x36
+            kMudRoom = 0x37
+            kMusicRoom = 0x38
+            kNursery = 0x39
+            kOffice = 0x3A
+            kOutdoorKitchen = 0x3B
+            kOutside = 0x3C
+            kPantry = 0x3D
+            kParkingLot = 0x3E
+            kParlor = 0x3F
+            kPatio = 0x40
+            kPlayRoom = 0x41
+            kPoolRoom = 0x42
+            kPorch = 0x43
+            kPrimaryBathroom = 0x44
+            kPrimaryBedroom = 0x45
+            kRamp = 0x46
+            kReceptionRoom = 0x47
+            kRecreationRoom = 0x48
+            kRoof = 0x4A
+            kSauna = 0x4B
+            kScullery = 0x4C
+            kSewingRoom = 0x4D
+            kShed = 0x4E
+            kSideDoor = 0x4F
+            kSideYard = 0x50
+            kSittingRoom = 0x51
+            kSnug = 0x52
+            kSpa = 0x53
+            kStaircase = 0x54
+            kSteamRoom = 0x55
+            kStorageRoom = 0x56
+            kStudio = 0x57
+            kStudy = 0x58
+            kSunRoom = 0x59
+            kSwimmingPool = 0x5A
+            kTerrace = 0x5B
+            kUtilityRoom = 0x5C
+            kWard = 0x5D
+            kWorkshop = 0x5E
+            kToilet = 0x5F
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3
+            kUnknownEnumValue = 40
 
-        class CompassDirectionTag(MatterIntEnum):
+        class CommonCompassDirectionTag(MatterIntEnum):
             kNorthward = 0x00
             kNorthEastward = 0x01
             kEastward = 0x02
@@ -438,7 +428,7 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8
 
-        class CompassLocationTag(MatterIntEnum):
+        class CommonCompassLocationTag(MatterIntEnum):
             kNorth = 0x00
             kNorthEast = 0x01
             kEast = 0x02
@@ -453,7 +443,7 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8
 
-        class DirectionTag(MatterIntEnum):
+        class CommonDirectionTag(MatterIntEnum):
             kUpward = 0x00
             kDownward = 0x01
             kLeftward = 0x02
@@ -465,6 +455,152 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6
+
+        class CommonLandmarkTag(MatterIntEnum):
+            kAirConditioner = 0x00
+            kAirPurifier = 0x01
+            kBackDoor = 0x02
+            kBarStool = 0x03
+            kBathMat = 0x04
+            kBathtub = 0x05
+            kBed = 0x06
+            kBookshelf = 0x07
+            kChair = 0x08
+            kChristmasTree = 0x09
+            kCoatRack = 0x0A
+            kCoffeeTable = 0x0B
+            kCookingRange = 0x0C
+            kCouch = 0x0D
+            kCountertop = 0x0E
+            kCradle = 0x0F
+            kCrib = 0x10
+            kDesk = 0x11
+            kDiningTable = 0x12
+            kDishwasher = 0x13
+            kDoor = 0x14
+            kDresser = 0x15
+            kLaundryDryer = 0x16
+            kFan = 0x17
+            kFireplace = 0x18
+            kFreezer = 0x19
+            kFrontDoor = 0x1A
+            kHighChair = 0x1B
+            kKitchenIsland = 0x1C
+            kLamp = 0x1D
+            kLitterBox = 0x1E
+            kMirror = 0x1F
+            kNightstand = 0x20
+            kOven = 0x21
+            kPetBed = 0x22
+            kPetBowl = 0x23
+            kPetCrate = 0x24
+            kRefrigerator = 0x25
+            kScratchingPost = 0x26
+            kShoeRack = 0x27
+            kShower = 0x28
+            kSideDoor = 0x29
+            kSink = 0x2A
+            kSofa = 0x2B
+            kStove = 0x2C
+            kTable = 0x2D
+            kToilet = 0x2E
+            kTrashCan = 0x2F
+            kLaundryWasher = 0x30
+            kWindow = 0x31
+            kWineCooler = 0x32
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 51
+
+        class CommonLevelTag(MatterIntEnum):
+            kLow = 0x00
+            kMedium = 0x01
+            kHigh = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+        class CommonLocationTag(MatterIntEnum):
+            kIndoor = 0x00
+            kOutdoor = 0x01
+            kInside = 0x02
+            kOutside = 0x03
+            kZone = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 5
+
+        class CommonNumberTag(MatterIntEnum):
+            kZero = 0x00
+            kOne = 0x01
+            kTwo = 0x02
+            kThree = 0x03
+            kFour = 0x04
+            kFive = 0x05
+            kSix = 0x06
+            kSeven = 0x07
+            kEight = 0x08
+            kNine = 0x09
+            kTen = 0x0A
+            kEleven = 0x0B
+            kTwelve = 0x0C
+            kThirteen = 0x0D
+            kFourteen = 0x0E
+            kFifteen = 0x0F
+            kSixteen = 0x10
+            kSeventeen = 0x11
+            kEighteen = 0x12
+            kNineteen = 0x13
+            kTwenty = 0x14
+            kTwentyOne = 0x15
+            kTwentyTwo = 0x16
+            kTwentyThree = 0x17
+            kTwentyFour = 0x18
+            kTwentyFive = 0x19
+            kTwentySix = 0x1A
+            kTwentySeven = 0x1B
+            kTwentyEight = 0x1C
+            kTwentyNine = 0x1D
+            kThirty = 0x1E
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 31
+
+        class CommonPositionTag(MatterIntEnum):
+            kLeft = 0x00
+            kRight = 0x01
+            kTop = 0x02
+            kBottom = 0x03
+            kMiddle = 0x04
+            kRow = 0x05
+            kColumn = 0x06
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 7
+
+        class CommonRelativePositionTag(MatterIntEnum):
+            kUnder = 0x00
+            kNextTo = 0x01
+            kAround = 0x02
+            kOn = 0x03
+            kAbove = 0x04
+            kFrontOf = 0x05
+            kBehind = 0x06
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 7
 
         class ElectricalDistributionFormFactorTag(MatterIntEnum):
             kMiniature = 0x00
@@ -564,64 +700,6 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 22
 
-        class LandmarkTag(MatterIntEnum):
-            kAirConditioner = 0x00
-            kAirPurifier = 0x01
-            kBackDoor = 0x02
-            kBarStool = 0x03
-            kBathMat = 0x04
-            kBathtub = 0x05
-            kBed = 0x06
-            kBookshelf = 0x07
-            kChair = 0x08
-            kChristmasTree = 0x09
-            kCoatRack = 0x0A
-            kCoffeeTable = 0x0B
-            kCookingRange = 0x0C
-            kCouch = 0x0D
-            kCountertop = 0x0E
-            kCradle = 0x0F
-            kCrib = 0x10
-            kDesk = 0x11
-            kDiningTable = 0x12
-            kDishwasher = 0x13
-            kDoor = 0x14
-            kDresser = 0x15
-            kLaundryDryer = 0x16
-            kFan = 0x17
-            kFireplace = 0x18
-            kFreezer = 0x19
-            kFrontDoor = 0x1A
-            kHighChair = 0x1B
-            kKitchenIsland = 0x1C
-            kLamp = 0x1D
-            kLitterBox = 0x1E
-            kMirror = 0x1F
-            kNightstand = 0x20
-            kOven = 0x21
-            kPetBed = 0x22
-            kPetBowl = 0x23
-            kPetCrate = 0x24
-            kRefrigerator = 0x25
-            kScratchingPost = 0x26
-            kShoeRack = 0x27
-            kShower = 0x28
-            kSideDoor = 0x29
-            kSink = 0x2A
-            kSofa = 0x2B
-            kStove = 0x2C
-            kTable = 0x2D
-            kToilet = 0x2E
-            kTrashCan = 0x2F
-            kLaundryWasher = 0x30
-            kWindow = 0x31
-            kWineCooler = 0x32
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 51
-
         class LaundryTag(MatterIntEnum):
             kNormal = 0x00
             kLightDry = 0x01
@@ -632,28 +710,6 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4
-
-        class LevelTag(MatterIntEnum):
-            kLow = 0x00
-            kMedium = 0x01
-            kHigh = 0x02
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3
-
-        class LocationTag(MatterIntEnum):
-            kIndoor = 0x00
-            kOutdoor = 0x01
-            kInside = 0x02
-            kOutside = 0x03
-            kZone = 0x04
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5
 
         class MeasurementTypeEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -689,58 +745,6 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2
 
-        class NumberTag(MatterIntEnum):
-            kZero = 0x00
-            kOne = 0x01
-            kTwo = 0x02
-            kThree = 0x03
-            kFour = 0x04
-            kFive = 0x05
-            kSix = 0x06
-            kSeven = 0x07
-            kEight = 0x08
-            kNine = 0x09
-            kTen = 0x0A
-            kEleven = 0x0B
-            kTwelve = 0x0C
-            kThirteen = 0x0D
-            kFourteen = 0x0E
-            kFifteen = 0x0F
-            kSixteen = 0x10
-            kSeventeen = 0x11
-            kEighteen = 0x12
-            kNineteen = 0x13
-            kTwenty = 0x14
-            kTwentyOne = 0x15
-            kTwentyTwo = 0x16
-            kTwentyThree = 0x17
-            kTwentyFour = 0x18
-            kTwentyFive = 0x19
-            kTwentySix = 0x1A
-            kTwentySeven = 0x1B
-            kTwentyEight = 0x1C
-            kTwentyNine = 0x1D
-            kThirty = 0x1E
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 31
-
-        class PositionTag(MatterIntEnum):
-            kLeft = 0x00
-            kRight = 0x01
-            kTop = 0x02
-            kBottom = 0x03
-            kMiddle = 0x04
-            kRow = 0x05
-            kColumn = 0x06
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7
-
         class PowerSourceTag(MatterIntEnum):
             kUnknown = 0x00
             kGrid = 0x01
@@ -772,20 +776,6 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2
 
-        class RelativePositionTag(MatterIntEnum):
-            kUnder = 0x00
-            kNextTo = 0x01
-            kAround = 0x02
-            kOn = 0x03
-            kAbove = 0x04
-            kFrontOf = 0x05
-            kBehind = 0x06
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7
-
         class RoomAirConditionerTag(MatterIntEnum):
             kEvaporator = 0x00
             kCondenser = 0x01
@@ -795,23 +785,22 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2
 
-        class SemanticTagNamespaceId(MatterIntEnum):
-            kCommonClosure = 0x01
-            kCompassDirection = 0x02
-            kCompassLocation = 0x03
-            kDirection = 0x04
-            kLevel = 0x05
-            kLocation = 0x06
-            kNumber = 0x07
-            kPosition = 0x08
+        class SemanticTagNamespaceID(MatterIntEnum):
+            kCommonCompassDirection = 0x02
+            kCommonCompassLocation = 0x03
+            kCommonDirection = 0x04
+            kCommonLevel = 0x05
+            kCommonLocation = 0x06
+            kCommonNumber = 0x07
+            kCommonPosition = 0x08
             kElectricalMeasurement = 0x0A
             kCommodityTariffChronology = 0x0B
             kCommodityTariffCommodity = 0x0D
             kLaundry = 0x0E
             kPowerSource = 0x0F
-            kAreaType = 0x10
-            kLandmark = 0x11
-            kRelativePosition = 0x12
+            kCommonArea = 0x10
+            kCommonLandmark = 0x11
+            kCommonRelativePosition = 0x12
             kCommodityTariffFlow = 0x13
             kRefrigerator = 0x41
             kRoomAirConditioner = 0x42
@@ -1065,12 +1054,12 @@ class Globals:
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="locationName", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="floorNumber", Tag=1, Type=typing.Union[Nullable, int]),
-                        ClusterObjectFieldDescriptor(Label="areaType", Tag=2, Type=typing.Union[Nullable, Globals.Enums.AreaTypeTag]),
+                        ClusterObjectFieldDescriptor(Label="areaType", Tag=2, Type=typing.Union[Nullable, Globals.Enums.CommonAreaTag]),
                     ])
 
             locationName: 'str' = ""
             floorNumber: 'typing.Union[Nullable, int]' = NullValue
-            areaType: 'typing.Union[Nullable, Globals.Enums.AreaTypeTag]' = NullValue
+            areaType: 'typing.Union[Nullable, Globals.Enums.CommonAreaTag]' = NullValue
 
         @dataclass
         class PowerThresholdStruct(ClusterObject):
@@ -33839,12 +33828,12 @@ class ServiceArea(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="landmarkTag", Tag=0, Type=Globals.Enums.LandmarkTag),
-                        ClusterObjectFieldDescriptor(Label="relativePositionTag", Tag=1, Type=typing.Union[Nullable, Globals.Enums.RelativePositionTag]),
+                        ClusterObjectFieldDescriptor(Label="landmarkTag", Tag=0, Type=Globals.Enums.CommonLandmarkTag),
+                        ClusterObjectFieldDescriptor(Label="relativePositionTag", Tag=1, Type=typing.Union[Nullable, Globals.Enums.CommonRelativePositionTag]),
                     ])
 
-            landmarkTag: 'Globals.Enums.LandmarkTag' = 0
-            relativePositionTag: 'typing.Union[Nullable, Globals.Enums.RelativePositionTag]' = NullValue
+            landmarkTag: 'Globals.Enums.CommonLandmarkTag' = 0
+            relativePositionTag: 'typing.Union[Nullable, Globals.Enums.CommonRelativePositionTag]' = NullValue
 
         @dataclass
         class AreaInfoStruct(ClusterObject):

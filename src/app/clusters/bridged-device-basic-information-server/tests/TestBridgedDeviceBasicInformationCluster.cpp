@@ -1146,7 +1146,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationWriteRead)
     Globals::Structs::LocationDescriptorStruct::Type testLocation;
     testLocation.locationName = "Living Room"_span;
     testLocation.floorNumber.SetNonNull(1);
-    testLocation.areaType.SetNonNull(Globals::AreaTypeTag::kLivingRoom);
+    testLocation.areaType.SetNonNull(Globals::CommonAreaTag::kLivingRoom);
 
     // Write the location
     EXPECT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, testLocation), CHIP_NO_ERROR);

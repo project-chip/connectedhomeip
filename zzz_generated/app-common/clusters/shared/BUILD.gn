@@ -5,6 +5,7 @@ source_set("enums") {
     "Enums.h",
     "EnumsCheck.h",
   ]
+  public_deps = [ "${chip_root}/src/app/common:compat-global-enum-names" ]
 }
 
 source_set("headers") {

@@ -29,12 +29,12 @@ using EsaType    = Clusters::DeviceEnergyManagement::ESATypeEnum;
 // Battery Storage rev 2 component tags use the Power Source namespace (Grid / Battery).
 const EndpointComposition::SemanticTag kGridComponentTag[] = {
     { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPowerSource),
+      .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceID::kPowerSource),
       .tag         = 0x01 },
 };
 const EndpointComposition::SemanticTag kBatteryComponentTag[] = {
     { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPowerSource),
+      .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceID::kPowerSource),
       .tag         = 0x03 },
 };
 

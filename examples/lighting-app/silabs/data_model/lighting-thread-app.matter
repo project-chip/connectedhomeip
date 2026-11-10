@@ -7,7 +7,70 @@ enum AlarmSeverityTag : enum8 {
   kMinor = 2;
 }
 
-enum AreaTypeTag : enum8 {
+enum AtomicRequestTypeEnum : enum8 {
+  kBeginWrite = 0;
+  kCommitWrite = 1;
+  kRollbackWrite = 2;
+}
+
+enum CertificationTypeEnum : enum8 {
+  kDeviceAttestationPKI = 0;
+  kOperationalPKI = 1;
+  kVIDSignerPKI = 2;
+}
+
+enum ClosureCabinetTag : enum8 {
+  kCabinetDoor = 0;
+  kDrawer = 1;
+  kFlap = 2;
+}
+
+enum ClosureCoveringTag : enum8 {
+  kBlind = 0;
+  kAwning = 1;
+  kShutter = 2;
+  kVenetian = 3;
+  kCurtain = 4;
+}
+
+enum ClosurePanelTag : enum8 {
+  kLift = 0;
+  kTilt = 1;
+  kSliding = 2;
+  kRotate = 3;
+}
+
+enum ClosureTag : enum8 {
+  kCovering = 0;
+  kWindow = 1;
+  kBarrier = 2;
+  kCabinet = 3;
+  kGate = 4;
+  kGarageDoor = 5;
+  kDoor = 6;
+}
+
+enum ClosureWindowTag : enum8 {
+  kRoof = 0;
+  kFacade = 1;
+}
+
+enum CommodityTariffChronologyTag : enum8 {
+  kCurrent = 0;
+  kPrevious = 1;
+  kUpcoming = 2;
+}
+
+enum CommodityTariffCommodityTag : enum8 {
+  kElectricalEnergy = 0;
+}
+
+enum CommodityTariffFlowTag : enum8 {
+  kImport = 0;
+  kExport = 1;
+}
+
+enum CommonAreaTag : enum8 {
   kAisle = 0;
   kAttic = 1;
   kBackDoor = 2;
@@ -103,76 +166,7 @@ enum AreaTypeTag : enum8 {
   kToilet = 95;
 }
 
-enum AtomicRequestTypeEnum : enum8 {
-  kBeginWrite = 0;
-  kCommitWrite = 1;
-  kRollbackWrite = 2;
-}
-
-enum CertificationTypeEnum : enum8 {
-  kDeviceAttestationPKI = 0;
-  kOperationalPKI = 1;
-  kVIDSignerPKI = 2;
-}
-
-enum ClosureCabinetTag : enum8 {
-  kCabinetDoor = 0;
-  kDrawer = 1;
-  kFlap = 2;
-}
-
-enum ClosureCoveringTag : enum8 {
-  kBlind = 0;
-  kAwning = 1;
-  kShutter = 2;
-  kVenetian = 3;
-  kCurtain = 4;
-}
-
-enum ClosurePanelTag : enum8 {
-  kLift = 0;
-  kTilt = 1;
-  kSliding = 2;
-  kRotate = 3;
-}
-
-enum ClosureTag : enum8 {
-  kCovering = 0;
-  kWindow = 1;
-  kBarrier = 2;
-  kCabinet = 3;
-  kGate = 4;
-  kGarageDoor = 5;
-  kDoor = 6;
-}
-
-enum ClosureWindowTag : enum8 {
-  kRoof = 0;
-  kFacade = 1;
-}
-
-enum CommodityTariffChronologyTag : enum8 {
-  kCurrent = 0;
-  kPrevious = 1;
-  kUpcoming = 2;
-}
-
-enum CommodityTariffCommodityTag : enum8 {
-  kElectricalEnergy = 0;
-}
-
-enum CommodityTariffFlowTag : enum8 {
-  kImport = 0;
-  kExport = 1;
-}
-
-enum CommonClosureTag : enum8 {
-  kOpening = 0;
-  kClosing = 1;
-  kStop = 2;
-}
-
-enum CompassDirectionTag : enum8 {
+enum CommonCompassDirectionTag : enum8 {
   kNorthward = 0;
   kNorthEastward = 1;
   kEastward = 2;
@@ -183,7 +177,7 @@ enum CompassDirectionTag : enum8 {
   kNorthWestward = 7;
 }
 
-enum CompassLocationTag : enum8 {
+enum CommonCompassLocationTag : enum8 {
   kNorth = 0;
   kNorthEast = 1;
   kEast = 2;
@@ -194,13 +188,135 @@ enum CompassLocationTag : enum8 {
   kNorthWest = 7;
 }
 
-enum DirectionTag : enum8 {
+enum CommonDirectionTag : enum8 {
   kUpward = 0;
   kDownward = 1;
   kLeftward = 2;
   kRightward = 3;
   kForward = 4;
   kBackward = 5;
+}
+
+enum CommonLandmarkTag : enum8 {
+  kAirConditioner = 0;
+  kAirPurifier = 1;
+  kBackDoor = 2;
+  kBarStool = 3;
+  kBathMat = 4;
+  kBathtub = 5;
+  kBed = 6;
+  kBookshelf = 7;
+  kChair = 8;
+  kChristmasTree = 9;
+  kCoatRack = 10;
+  kCoffeeTable = 11;
+  kCookingRange = 12;
+  kCouch = 13;
+  kCountertop = 14;
+  kCradle = 15;
+  kCrib = 16;
+  kDesk = 17;
+  kDiningTable = 18;
+  kDishwasher = 19;
+  kDoor = 20;
+  kDresser = 21;
+  kLaundryDryer = 22;
+  kFan = 23;
+  kFireplace = 24;
+  kFreezer = 25;
+  kFrontDoor = 26;
+  kHighChair = 27;
+  kKitchenIsland = 28;
+  kLamp = 29;
+  kLitterBox = 30;
+  kMirror = 31;
+  kNightstand = 32;
+  kOven = 33;
+  kPetBed = 34;
+  kPetBowl = 35;
+  kPetCrate = 36;
+  kRefrigerator = 37;
+  kScratchingPost = 38;
+  kShoeRack = 39;
+  kShower = 40;
+  kSideDoor = 41;
+  kSink = 42;
+  kSofa = 43;
+  kStove = 44;
+  kTable = 45;
+  kToilet = 46;
+  kTrashCan = 47;
+  kLaundryWasher = 48;
+  kWindow = 49;
+  kWineCooler = 50;
+}
+
+enum CommonLevelTag : enum8 {
+  kLow = 0;
+  kMedium = 1;
+  kHigh = 2;
+}
+
+enum CommonLocationTag : enum8 {
+  kIndoor = 0;
+  kOutdoor = 1;
+  kInside = 2;
+  kOutside = 3;
+  kZone = 4;
+}
+
+enum CommonNumberTag : enum8 {
+  kZero = 0;
+  kOne = 1;
+  kTwo = 2;
+  kThree = 3;
+  kFour = 4;
+  kFive = 5;
+  kSix = 6;
+  kSeven = 7;
+  kEight = 8;
+  kNine = 9;
+  kTen = 10;
+  kEleven = 11;
+  kTwelve = 12;
+  kThirteen = 13;
+  kFourteen = 14;
+  kFifteen = 15;
+  kSixteen = 16;
+  kSeventeen = 17;
+  kEighteen = 18;
+  kNineteen = 19;
+  kTwenty = 20;
+  kTwentyOne = 21;
+  kTwentyTwo = 22;
+  kTwentyThree = 23;
+  kTwentyFour = 24;
+  kTwentyFive = 25;
+  kTwentySix = 26;
+  kTwentySeven = 27;
+  kTwentyEight = 28;
+  kTwentyNine = 29;
+  kThirty = 30;
+}
+
+enum CommonPositionTag : enum8 {
+  kLeft = 0;
+  kRight = 1;
+  kTop = 2;
+  kBottom = 3;
+  kMiddle = 4;
+  kRow = 5;
+  kColumn = 6;
+}
+
+enum CommonRelativePositionTag : enum8 {
+  kUnder = 0;
+  kNextTo = 1;
+  kAround = 2;
+  kOn = 3;
+  kAbove = 4;
+  kFrontOf = 5;
+  kBehind = 6;
 }
 
 enum ElectricalDistributionFormFactorTag : enum8 {
@@ -277,79 +393,11 @@ enum IdentifiedSoundTag : enum8 {
   kPersonTalking = 21;
 }
 
-enum LandmarkTag : enum8 {
-  kAirConditioner = 0;
-  kAirPurifier = 1;
-  kBackDoor = 2;
-  kBarStool = 3;
-  kBathMat = 4;
-  kBathtub = 5;
-  kBed = 6;
-  kBookshelf = 7;
-  kChair = 8;
-  kChristmasTree = 9;
-  kCoatRack = 10;
-  kCoffeeTable = 11;
-  kCookingRange = 12;
-  kCouch = 13;
-  kCountertop = 14;
-  kCradle = 15;
-  kCrib = 16;
-  kDesk = 17;
-  kDiningTable = 18;
-  kDishwasher = 19;
-  kDoor = 20;
-  kDresser = 21;
-  kLaundryDryer = 22;
-  kFan = 23;
-  kFireplace = 24;
-  kFreezer = 25;
-  kFrontDoor = 26;
-  kHighChair = 27;
-  kKitchenIsland = 28;
-  kLamp = 29;
-  kLitterBox = 30;
-  kMirror = 31;
-  kNightstand = 32;
-  kOven = 33;
-  kPetBed = 34;
-  kPetBowl = 35;
-  kPetCrate = 36;
-  kRefrigerator = 37;
-  kScratchingPost = 38;
-  kShoeRack = 39;
-  kShower = 40;
-  kSideDoor = 41;
-  kSink = 42;
-  kSofa = 43;
-  kStove = 44;
-  kTable = 45;
-  kToilet = 46;
-  kTrashCan = 47;
-  kLaundryWasher = 48;
-  kWindow = 49;
-  kWineCooler = 50;
-}
-
 enum LaundryTag : enum8 {
   kNormal = 0;
   kLightDry = 1;
   kExtraDry = 2;
   kNoDry = 3;
-}
-
-enum LevelTag : enum8 {
-  kLow = 0;
-  kMedium = 1;
-  kHigh = 2;
-}
-
-enum LocationTag : enum8 {
-  kIndoor = 0;
-  kOutdoor = 1;
-  kInside = 2;
-  kOutside = 3;
-  kZone = 4;
 }
 
 enum MeasurementTypeEnum : enum16 {
@@ -378,50 +426,6 @@ enum MediumType : enum8 {
   kWater = 1;
 }
 
-enum NumberTag : enum8 {
-  kZero = 0;
-  kOne = 1;
-  kTwo = 2;
-  kThree = 3;
-  kFour = 4;
-  kFive = 5;
-  kSix = 6;
-  kSeven = 7;
-  kEight = 8;
-  kNine = 9;
-  kTen = 10;
-  kEleven = 11;
-  kTwelve = 12;
-  kThirteen = 13;
-  kFourteen = 14;
-  kFifteen = 15;
-  kSixteen = 16;
-  kSeventeen = 17;
-  kEighteen = 18;
-  kNineteen = 19;
-  kTwenty = 20;
-  kTwentyOne = 21;
-  kTwentyTwo = 22;
-  kTwentyThree = 23;
-  kTwentyFour = 24;
-  kTwentyFive = 25;
-  kTwentySix = 26;
-  kTwentySeven = 27;
-  kTwentyEight = 28;
-  kTwentyNine = 29;
-  kThirty = 30;
-}
-
-enum PositionTag : enum8 {
-  kLeft = 0;
-  kRight = 1;
-  kTop = 2;
-  kBottom = 3;
-  kMiddle = 4;
-  kRow = 5;
-  kColumn = 6;
-}
-
 enum PowerSourceTag : enum8 {
   kUnknown = 0;
   kGrid = 1;
@@ -441,38 +445,27 @@ enum RefrigeratorTag : enum8 {
   kFreezer = 1;
 }
 
-enum RelativePositionTag : enum8 {
-  kUnder = 0;
-  kNextTo = 1;
-  kAround = 2;
-  kOn = 3;
-  kAbove = 4;
-  kFrontOf = 5;
-  kBehind = 6;
-}
-
 enum RoomAirConditionerTag : enum8 {
   kEvaporator = 0;
   kCondenser = 1;
 }
 
-enum SemanticTagNamespaceId : enum8 {
-  kCommonClosure = 1;
-  kCompassDirection = 2;
-  kCompassLocation = 3;
-  kDirection = 4;
-  kLevel = 5;
-  kLocation = 6;
-  kNumber = 7;
-  kPosition = 8;
+enum SemanticTagNamespaceID : enum8 {
+  kCommonCompassDirection = 2;
+  kCommonCompassLocation = 3;
+  kCommonDirection = 4;
+  kCommonLevel = 5;
+  kCommonLocation = 6;
+  kCommonNumber = 7;
+  kCommonPosition = 8;
   kElectricalMeasurement = 10;
   kCommodityTariffChronology = 11;
   kCommodityTariffCommodity = 13;
   kLaundry = 14;
   kPowerSource = 15;
-  kAreaType = 16;
-  kLandmark = 17;
-  kRelativePosition = 18;
+  kCommonArea = 16;
+  kCommonLandmark = 17;
+  kCommonRelativePosition = 18;
   kCommodityTariffFlow = 19;
   kRefrigerator = 65;
   kRoomAirConditioner = 66;
@@ -616,7 +609,7 @@ struct ICEServerStruct {
 struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
-  nullable AreaTypeTag areaType = 2;
+  nullable CommonAreaTag areaType = 2;
 }
 
 struct PowerThresholdStruct {

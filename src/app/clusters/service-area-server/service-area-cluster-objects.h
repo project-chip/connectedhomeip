@@ -111,7 +111,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      * @param[in] areaType The type of the area.
      */
     AreaStructureWrapper & SetLocationInfo(const CharSpan & locationName, const DataModel::Nullable<int16_t> & floorNumber,
-                                           const DataModel::Nullable<Globals::AreaTypeTag> & areaType)
+                                           const DataModel::Nullable<Globals::CommonAreaTag> & areaType)
     {
         areaInfo.locationInfo.SetNonNull();
 
@@ -152,8 +152,8 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      * @param[in] landmarkTag The landmark tag.
      * @param[in] relativePositionTag The relative position tag.
      */
-    AreaStructureWrapper & SetLandmarkInfo(const Globals::LandmarkTag & landmarkTag,
-                                           const DataModel::Nullable<Globals::RelativePositionTag> & relativePositionTag)
+    AreaStructureWrapper & SetLandmarkInfo(const Globals::CommonLandmarkTag & landmarkTag,
+                                           const DataModel::Nullable<Globals::CommonRelativePositionTag> & relativePositionTag)
     {
         areaInfo.landmarkInfo.SetNonNull();
         areaInfo.landmarkInfo.Value().landmarkTag         = landmarkTag;

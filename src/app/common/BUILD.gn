@@ -81,6 +81,11 @@ static_library("cluster-objects") {
   public_configs = [ ":includes" ]
 }
 
+# Included only from the generated clusters/shared/Enums.h.
+source_set("compat-global-enum-names") {
+  sources = [ "CompatGlobalEnumNames.h" ]
+}
+
 source_set("enums") {
   sources = [
     "${chip_app_zap_dir}/app-common/zap-generated/cluster-enums-check.h",
