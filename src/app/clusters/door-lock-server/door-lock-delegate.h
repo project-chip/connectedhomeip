@@ -289,7 +289,7 @@ public:
     /**
      * @brief Access the Week Day schedule in the schedules database.
      *
-     * @param[in] weekDayIndex 1-based index of the week day schedule to access.
+     * @param[in] weekDayOneBaseIndex 1-based index of the week day schedule to access.
      *            Guaranteed within NumberOfWeekDaySchedulesSupportedPerUser.
      * @param[in] userOneBaseIndex 1-based index of the user to get the week day
      *            schedule for. Guaranteed within NumberOfTotalUsersSupported.
@@ -299,7 +299,7 @@ public:
      * @retval DlStatus::kNotFound if the schedule or user does not exist
      * @retval DlStatus::kFailure in case of any other failure
      */
-    virtual DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userOneBaseIndex, WeekDaySchedule & schedule) const
+    virtual DlStatus GetSchedule(uint8_t weekDayOneBaseIndex, uint16_t userOneBaseIndex, WeekDaySchedule & schedule) const
     {
         return DlStatus::kFailure;
     }
@@ -307,12 +307,12 @@ public:
     /**
      * @brief Set the Week Day schedule in the schedules database.
      *
-     * @param[in] weekDayIndex 1-based index of the week day schedule to set.
+     * @param[in] weekDayOneBaseIndex 1-based index of the week day schedule to set.
      * @param[in] userOneBaseIndex 1-based index of the user.
      * @param[in] status kAvailable clears the slot; kOccupied sets it.
      */
-    virtual DlStatus SetSchedule(uint8_t weekDayIndex, uint16_t userOneBaseIndex, DlScheduleStatus status, DaysMaskMap daysMask,
-                                 uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+    virtual DlStatus SetSchedule(uint8_t weekDayOneBaseIndex, uint16_t userOneBaseIndex, DlScheduleStatus status,
+                                 DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
     {
         return DlStatus::kFailure;
     }
@@ -320,7 +320,7 @@ public:
     /**
      * @brief Access the Year Day schedule in the schedules database.
      *
-     * @param[in] yearDayIndex 1-based index of the year day schedule to access.
+     * @param[in] yearDayOneBaseIndex 1-based index of the year day schedule to access.
      *            Guaranteed within NumberOfYearDaySchedulesSupportedPerUser.
      * @param[in] userOneBaseIndex 1-based index of the user.
      * @param[out] schedule Resulting year day schedule.
@@ -328,7 +328,7 @@ public:
      * @retval DlStatus::kSuccess / kNotFound / kFailure, same semantics as the
      *         week day schedule getter.
      */
-    virtual DlStatus GetSchedule(uint8_t yearDayIndex, uint16_t userOneBaseIndex, YearDaySchedule & schedule) const
+    virtual DlStatus GetSchedule(uint8_t yearDayOneBaseIndex, uint16_t userOneBaseIndex, YearDaySchedule & schedule) const
     {
         return DlStatus::kFailure;
     }
@@ -336,12 +336,12 @@ public:
     /**
      * @brief Set the Year Day schedule in the schedules database.
      *
-     * @param[in] yearDayIndex 1-based index of the year day schedule to set.
+     * @param[in] yearDayOneBaseIndex 1-based index of the year day schedule to set.
      * @param[in] userOneBaseIndex 1-based index of the user.
      * @param[in] status kAvailable clears the slot; kOccupied sets it.
      */
-    virtual DlStatus SetSchedule(uint8_t yearDayIndex, uint16_t userOneBaseIndex, DlScheduleStatus status, uint32_t localStartTime,
-                                 uint32_t localEndTime)
+    virtual DlStatus SetSchedule(uint8_t yearDayOneBaseIndex, uint16_t userOneBaseIndex, DlScheduleStatus status,
+                                 uint32_t localStartTime, uint32_t localEndTime)
     {
         return DlStatus::kFailure;
     }
@@ -349,23 +349,23 @@ public:
     /**
      * @brief Access the Holiday schedule in the schedules database.
      *
-     * @param[in] holidayIndex 1-based index of the holiday schedule to access.
+     * @param[in] holidayOneBaseIndex 1-based index of the holiday schedule to access.
      *            Guaranteed within NumberOfHolidaySchedulesSupported.
      * @param[out] schedule Resulting holiday schedule.
      *
      * @retval DlStatus::kSuccess / kNotFound / kFailure, same semantics as the
      *         week day schedule getter.
      */
-    virtual DlStatus GetSchedule(uint8_t holidayIndex, HolidaySchedule & schedule) const { return DlStatus::kFailure; }
+    virtual DlStatus GetSchedule(uint8_t holidayOneBaseIndex, HolidaySchedule & schedule) const { return DlStatus::kFailure; }
 
     /**
      * @brief Set the Holiday schedule in the schedules database.
      *
-     * @param[in] holidayIndex 1-based index of the holiday schedule to set.
+     * @param[in] holidayOneBaseIndex 1-based index of the holiday schedule to set.
      * @param[in] status kAvailable clears the slot; kOccupied sets it.
      */
-    virtual DlStatus SetSchedule(uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
-                                 OperatingModeEnum operatingMode)
+    virtual DlStatus SetSchedule(uint8_t holidayOneBaseIndex, DlScheduleStatus status, uint32_t localStartTime,
+                                 uint32_t localEndTime, OperatingModeEnum operatingMode)
     {
         return DlStatus::kFailure;
     }
