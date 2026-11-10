@@ -23,6 +23,7 @@
 #include <EvseTargetsConfig.h>
 #include <app/clusters/energy-evse-server/CodegenIntegration.h>
 #include <app/clusters/energy-evse-server/EnergyEvseCluster.h>
+#include <lib/support/TimerDelegate.h>
 
 #include <app/util/config.h>
 #include <cstring>
@@ -113,7 +114,11 @@ private:
 class EnergyEvseDelegate : public EnergyEvse::Delegate
 {
 public:
-    EnergyEvseDelegate(EvseTargetsDelegate & aDelegate) : EnergyEvse::Delegate() { mEvseTargetsDelegate = &aDelegate; }
+    EnergyEvseDelegate(EvseTargetsDelegate & aDelegate, TimerDelegate & timerDelegate) :
+        EnergyEvse::Delegate(), mTimerDelegate(timerDelegate), mEnableDeadlineTimerContext(*this)
+    {
+        mEvseTargetsDelegate = &aDelegate;
+    }
     ~EnergyEvseDelegate() { CancelActiveTimers(); }
 
     EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
@@ -354,13 +359,20 @@ private:
     Status ComputeMaxChargeCurrentLimit();
     Status ComputeMaxDischargeCurrentLimit();
 
-    /**
-     * @brief This checks if the charging or discharging needs to be disabled
-     *
-     * @params pointer to SystemLayer
-     * @params pointer to EnergyEvseDelegate
-     */
-    static void EvseCheckTimerExpiry(System::Layer * systemLayer, void * delegate);
+    class EnableDeadlineTimerContext : public chip::TimerContext
+    {
+    public:
+        explicit EnableDeadlineTimerContext(EnergyEvseDelegate & delegate) : mDelegate(delegate) {}
+        void TimerFired() override;
+
+    private:
+        EnergyEvseDelegate & mDelegate;
+    };
+
+    Status StartEnableDeadlineTimer(System::Clock::Timeout timeout);
+
+    TimerDelegate & mTimerDelegate;
+    EnableDeadlineTimerContext mEnableDeadlineTimerContext;
 
     /* Instance pointer for accessing cluster */
     Instance * mInstance = nullptr;

@@ -399,12 +399,14 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
         break;
     default:
         // In all other states the EVSE is disabled, no timer needed
+        mTimerDelegate.CancelTimer(&mEnableDeadlineTimerContext);
         return Status::Success;
     }
 
     if (enabledUntilTime.IsNull())
     {
         ChipLogDetail(AppServer, "EVSE is enabled indefinitely, no timer needed");
+        mTimerDelegate.CancelTimer(&mEnableDeadlineTimerContext);
         return Status::Success;
     }
 
@@ -414,9 +416,8 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
     {
         // Real time isn't sync'd - check again in 30 seconds
         ReturnValueAndLogOnFailure(
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kPeriodicCheckIntervalRealTimeClockNotSynced_sec),
-                                                  EvseCheckTimerExpiry, this),
-            Status::Failure, AppServer, "Failed to start EVSE check timer");
+            StartEnableDeadlineTimer(System::Clock::Seconds32(kPeriodicCheckIntervalRealTimeClockNotSynced_sec)), Status::Failure,
+            AppServer, "Failed to start EVSE check timer");
         return Status::Success;
     }
 
@@ -430,9 +431,8 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
         // Timer hasn't expired yet - schedule future check
         uint32_t delta = enabledUntilTime.Value() - matterEpochSeconds;
         ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %lu seconds", static_cast<unsigned long>(delta));
-        ReturnValueAndLogOnFailure(
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(delta), EvseCheckTimerExpiry, this), Status::Failure,
-            AppServer, "Failed to start EVSE check timer");
+        ReturnValueAndLogOnFailure(StartEnableDeadlineTimer(System::Clock::Seconds32(delta)), Status::Failure, AppServer,
+                                   "Failed to start EVSE check timer");
         return Status::Success;
     }
 
@@ -475,18 +475,23 @@ Status EnergyEvseDelegate::ScheduleDeadlineCheckOrDisable()
 
 void EnergyEvseDelegate::CancelActiveTimers()
 {
-    // Cancel the EVSE check timer if it is active
-    DeviceLayer::SystemLayer().CancelTimer(EvseCheckTimerExpiry, this);
+    mTimerDelegate.CancelTimer(&mEnableDeadlineTimerContext);
 }
 
-void EnergyEvseDelegate::EvseCheckTimerExpiry(System::Layer * systemLayer, void * delegate)
+Status EnergyEvseDelegate::StartEnableDeadlineTimer(System::Clock::Timeout timeout)
 {
-    EnergyEvseDelegate * dg = reinterpret_cast<EnergyEvseDelegate *>(delegate);
+    mTimerDelegate.CancelTimer(&mEnableDeadlineTimerContext);
+    ReturnValueAndLogOnFailure(mTimerDelegate.StartTimer(&mEnableDeadlineTimerContext, timeout), Status::Failure, AppServer,
+                               "Failed to start EVSE check timer");
+    return Status::Success;
+}
 
-    if (dg->ScheduleCheckOnEnabledTimeout() != Status::Success)
+void EnergyEvseDelegate::EnableDeadlineTimerContext::TimerFired()
+{
+    if (mDelegate.ScheduleCheckOnEnabledTimeout() != Status::Success)
     {
         ChipLogError(AppServer, "EVSE: unable to reschedule enable deadline check, disabling");
-        dg->Disable();
+        mDelegate.Disable();
     }
 }
 
