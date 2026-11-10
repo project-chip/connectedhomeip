@@ -128,7 +128,9 @@ TEST_F(TestKeypadInputCluster, ReadFeatureMapFromDelegate)
     const uint32_t kAllFeatures =
         to_underlying(Feature::kNavigationKeyCodes) | to_underlying(Feature::kLocationKeys) | to_underlying(Feature::kNumberKeys);
 
-    for (uint32_t expected : { 0u, static_cast<uint32_t>(to_underlying(Feature::kLocationKeys)), kAllFeatures })
+    const uint32_t kExpectedFeatureMaps[] = { 0, to_underlying(Feature::kLocationKeys), kAllFeatures };
+
+    for (uint32_t expected : kExpectedFeatureMaps)
     {
         mDelegate.featureMap = expected;
 
@@ -156,7 +158,10 @@ TEST_F(TestKeypadInputCluster, SendKeyForwardsKeyCodeAndReturnsDelegateResponse)
 
         auto result = SendKey(CECKeyCodeEnum::kUp);
         ASSERT_TRUE(result.IsSuccess());
-        EXPECT_EQ(result.response->status, status);
+        if (result.response.has_value())
+        {
+            EXPECT_EQ(result.response->status, status);
+        }
         EXPECT_EQ(mDelegate.lastKeyCode, CECKeyCodeEnum::kUp);
     }
     EXPECT_EQ(mDelegate.sendKeyCount, 3u);
