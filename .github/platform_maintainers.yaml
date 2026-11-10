@@ -66,13 +66,16 @@ esp32:
 telink:
   maintainers:
     - s07641069
-    - interfer
+    - serhiiSalamakha
+    - andriy-bilynskyy
+    - damien0x0023
   paths:
     - "src/platform/telink/**"
     - "examples/platform/telink/**"
     - "examples/**/telink/**"
     - "config/telink/**"
     - "scripts/tools/telink/**"
+    - "docs/platforms/telink/**"
 
 realtek:
   maintainers:

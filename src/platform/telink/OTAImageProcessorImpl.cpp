@@ -195,10 +195,13 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
             else
             {
                 DeviceLayer::SystemLayer().CancelTimer(ResumeWatchdogHandler, this);
-                CHIP_ERROR err = mDownloader->FetchNextData();
-                if (err != CHIP_NO_ERROR)
+                if (mDownloader->GetState() == OTADownloader::State::kInProgress)
                 {
-                    ChipLogError(SoftwareUpdate, "OTA fetch err: %" CHIP_ERROR_FORMAT, err.Format());
+                    CHIP_ERROR err = mDownloader->FetchNextData();
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(SoftwareUpdate, "OTA fetch err: %" CHIP_ERROR_FORMAT, err.Format());
+                    }
                 }
             }
         }
