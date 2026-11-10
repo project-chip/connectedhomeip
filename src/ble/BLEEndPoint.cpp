@@ -101,6 +101,11 @@ CHIP_ERROR BLEEndPoint::StartConnect()
         CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION - CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION + 1;
     static_assert(numVersions <= NUM_SUPPORTED_PROTOCOL_VERSIONS, "Incompatibly protocol versions");
 
+    // Pin the endpoint slot across StartConnect() in case SendWrite() releases the stack lock and a
+    // callback closes the endpoint before SendWrite() returns. Every path below must exit via 'exit:'
+    // so Release() runs.
+    AddRef();
+
     // Ensure we're in the correct state.
     VerifyOrExit(mState == kState_Ready, err = CHIP_ERROR_INCORRECT_STATE);
     mState = kState_Connecting;
@@ -129,24 +134,27 @@ CHIP_ERROR BLEEndPoint::StartConnect()
     err = StartConnectTimer();
     SuccessOrExit(err);
 
+    // Free request buffer on write confirmation. Stash a reference to it in mSendQueue, which we don't use anyway
+    // until the connection has been set up, BEFORE calling SendWrite() because platforms that drop the CHIP stack
+    // lock inside SendWriteRequest() (e.g. Android) may deliver HandleWriteConfirmation() before SendWrite() returns.
+    QueueTx(buf.Retain(), kType_Data);
+
     // Send BLE transport capabilities request to peripheral via GATT write.
-    // Add reference to message fragment for duration of platform's GATT write attempt. CHIP retains partial
-    // ownership of message fragment's packet buffer, since this is the same buffer as that of the whole message, just
-    // with a fragmenter-modified payload offset and data length, by a Retain() on the handle when calling this function.
-    err = SendWrite(buf.Retain());
+    // Transfer the remaining local reference to SendWrite(); if SendWrite() fails synchronously without an already-completed
+    // callback close, DoClose() -> FinalizeClose() frees the queued mSendQueue reference below.
+    err = SendWrite(std::move(buf));
     SuccessOrExit(err);
 
-    // Free request buffer on write confirmation. Stash a reference to it in mSendQueue, which we don't use anyway
-    // until the connection has been set up.
-    QueueTx(std::move(buf), kType_Data);
-
 exit:
-    // If we failed to initiate the connection, close the end point.
-    if (err != CHIP_NO_ERROR)
+    // If we failed to initiate the connection (and a re-entrant callback inside SendWrite() hasn't already closed
+    // the end point), close the end point, which also clears any capabilities request queued in mSendQueue.
+    if (err != CHIP_NO_ERROR && mState != kState_Closed)
     {
         StopConnectTimer();
         DoClose(kBleCloseFlag_AbortTransmission, err);
     }
+
+    Release();
 
     return err;
 }

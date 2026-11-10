@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <cstring>
 #include <type_traits>
 #include <utility>
 
@@ -13,14 +14,16 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <ble/BleApplicationDelegate.h>
+#include <ble/BleError.h>
 #include <ble/BleLayer.h>
 #include <ble/BleLayerDelegate.h>
 #include <ble/BlePlatformDelegate.h>
 
 namespace { // === test‑only constants ===
-constexpr uint16_t kBleTestMtu           = 247;
-constexpr uint16_t kBleTestFragmentSize  = 100;
-constexpr uint16_t kBleTestScratchBufLen = 16;
+constexpr uint16_t kBleTestMtu                     = 247;
+constexpr uint16_t kBleTestFragmentSize            = 100;
+constexpr uint16_t kBleTestScratchBufLen           = 16;
+constexpr size_t kBtpStartFragmentWithAckHeaderLen = 5; // flags (1) + piggybacked ack (1) + seq (1) + length (2)
 } // namespace
 
 namespace chip {
@@ -90,7 +93,12 @@ public:
         bool ok = mBleLayer.HandleWriteConfirmation(mPendingConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID);
         VerifyOrReturnError(ok, CHIP_ERROR_INTERNAL);
 
-        ok = mBleLayer.HandleSubscribeComplete(mPendingConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID);
+        return FinishCentralHandshakeAfterWriteConfirmation(ep);
+    }
+
+    CHIP_ERROR FinishCentralHandshakeAfterWriteConfirmation(BLEEndPoint * ep)
+    {
+        bool ok = mBleLayer.HandleSubscribeComplete(mPendingConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID);
         VerifyOrReturnError(ok, CHIP_ERROR_INTERNAL);
 
         BleTransportCapabilitiesResponseMessage resp;
@@ -113,7 +121,7 @@ protected:
         mLastEndPoint   = endPoint;
         mLastConnectErr = err;
         mConnectCompleteCalls++;
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(err, mExpectedConnectErr);
     }
     void OnEndPointMessageReceived(BLEEndPoint * endPoint, System::PacketBufferHandle && msg) override {}
     void OnEndPointConnectionClosed(BLEEndPoint * endPoint, CHIP_ERROR err) override
@@ -132,19 +140,71 @@ protected:
     uint16_t GetMTU(BLE_CONNECTION_OBJECT) const override { return kBleTestMtu; }
     CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *) override
     {
-        return CHIP_NO_ERROR;
+        CHIP_ERROR err    = mNextSubscribeErr;
+        mNextSubscribeErr = CHIP_NO_ERROR;
+        mSubscribeCalls++;
+        return err;
     }
     CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *) override
     {
+        mUnsubscribeCalls++;
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT) override
+    {
+        mCloseConnectionCalls++;
+        return CHIP_NO_ERROR;
+    }
     CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID *, const ChipBleUUID *,
                                 System::PacketBufferHandle buf) override
     {
-        mPendingConnObj = connObj;
-        mLastWriteBuf   = buf.Retain();
-        return CHIP_NO_ERROR;
+        mPendingConnObj      = connObj;
+        CHIP_ERROR result    = mNextWriteRequestErr;
+        mNextWriteRequestErr = CHIP_NO_ERROR;
+        if (mConfirmNextWriteBeforeReturn)
+        {
+            // Deliver the GATT write confirmation before SendWriteRequest() returns, as happens on platforms that
+            // release the stack lock while sending (e.g. Android BLEManagerImpl). StartConnect() moved its local
+            // handle into SendWrite(), so `buf` becomes sole owner once HandleHandshakeConfirmationReceived()
+            // frees the queued capabilities reference from mSendQueue and starts characteristic subscription.
+            mConfirmNextWriteBeforeReturn = false;
+            (void) mBleLayer.HandleWriteConfirmation(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID);
+            mWriteBufSoleOwnerAfterConfirm = buf.HasSoleOwnership();
+            mSubscribeCallsDuringWrite     = mSubscribeCalls;
+            if (mPinnedEndPointDuringWrite != nullptr)
+            {
+                BLEEndPoint * pinned                              = mPinnedEndPointDuringWrite;
+                mPinnedEndPointDuringWrite                        = nullptr;
+                BLEEndPoint * extras[BLE_LAYER_NUM_BLE_ENDPOINTS] = {};
+                size_t allocated                                  = 0;
+                while (allocated < BLE_LAYER_NUM_BLE_ENDPOINTS)
+                {
+                    BLEEndPoint * candidate = nullptr;
+                    CHIP_ERROR allocErr     = mBleLayer.NewBleEndPoint(&candidate, NextConnectionObject(), kBleRole_Central,
+                                                                       /* autoClose */ false);
+                    if (allocErr == CHIP_ERROR_ENDPOINT_POOL_FULL)
+                    {
+                        break;
+                    }
+                    EXPECT_EQ(allocErr, CHIP_NO_ERROR);
+                    EXPECT_NE(candidate, nullptr);
+                    EXPECT_NE(candidate, pinned);
+                    if (candidate == pinned)
+                    {
+                        mPinnedSlotReusedDuringWrite = true;
+                    }
+                    extras[allocated++] = candidate;
+                }
+                mPoolAllocationsDuringWrite   = allocated;
+                mPoolAllocationRanDuringWrite = true;
+                for (size_t i = 0; i < allocated; ++i)
+                {
+                    extras[i]->Abort();
+                }
+            }
+        }
+        mLastWriteBuf = buf.Retain();
+        return result;
     }
     CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID *, const ChipBleUUID *,
                               System::PacketBufferHandle) override
@@ -152,26 +212,52 @@ protected:
         mPendingConnObj = connObj;
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR mLastConnectErr = CHIP_NO_ERROR;
-    CHIP_ERROR mLastCloseErr   = CHIP_NO_ERROR;
+    CHIP_ERROR mLastConnectErr      = CHIP_NO_ERROR;
+    CHIP_ERROR mLastCloseErr        = CHIP_NO_ERROR;
+    CHIP_ERROR mExpectedConnectErr  = CHIP_NO_ERROR;
+    CHIP_ERROR mNextWriteRequestErr = CHIP_NO_ERROR;
+    CHIP_ERROR mNextSubscribeErr    = CHIP_NO_ERROR;
     void ResetCounters()
     {
-        mConnectCompleteCalls  = 0;
-        mConnectionClosedCalls = 0;
-        mLastEndPoint          = nullptr;
-        mLastWriteBuf          = nullptr;
-        mPendingConnObj        = BLE_CONNECTION_UNINITIALIZED;
-        mLastConnectErr        = CHIP_NO_ERROR;
-        mLastCloseErr          = CHIP_NO_ERROR;
+        mConnectCompleteCalls          = 0;
+        mConnectionClosedCalls         = 0;
+        mCloseConnectionCalls          = 0;
+        mSubscribeCalls                = 0;
+        mSubscribeCallsDuringWrite     = 0;
+        mUnsubscribeCalls              = 0;
+        mLastEndPoint                  = nullptr;
+        mPinnedEndPointDuringWrite     = nullptr;
+        mLastWriteBuf                  = nullptr;
+        mPendingConnObj                = BLE_CONNECTION_UNINITIALIZED;
+        mLastConnectErr                = CHIP_NO_ERROR;
+        mLastCloseErr                  = CHIP_NO_ERROR;
+        mExpectedConnectErr            = CHIP_NO_ERROR;
+        mNextWriteRequestErr           = CHIP_NO_ERROR;
+        mNextSubscribeErr              = CHIP_NO_ERROR;
+        mConfirmNextWriteBeforeReturn  = false;
+        mWriteBufSoleOwnerAfterConfirm = false;
+        mPinnedSlotReusedDuringWrite   = false;
+        mPoolAllocationRanDuringWrite  = false;
+        mPoolAllocationsDuringWrite    = 0;
     }
 
     // Fixture state
     BleLayer mBleLayer;
-    BLEEndPoint * mLastEndPoint = nullptr;                                // last endpoint delivered via delegate
+    BLEEndPoint * mLastEndPoint              = nullptr;                   // last endpoint delivered via delegate
+    BLEEndPoint * mPinnedEndPointDuringWrite = nullptr;                   // endpoint whose pool slot must stay pinned in SendWrite
     System::PacketBufferHandle mLastWriteBuf;                             // last buffer captured from a Write request
     BLE_CONNECTION_OBJECT mPendingConnObj = BLE_CONNECTION_UNINITIALIZED; // last connObj used in a platform callback
     int mConnectCompleteCalls             = 0;
     int mConnectionClosedCalls            = 0;
+    int mCloseConnectionCalls             = 0;
+    int mSubscribeCalls                   = 0;
+    int mSubscribeCallsDuringWrite        = 0;
+    int mUnsubscribeCalls                 = 0;
+    bool mConfirmNextWriteBeforeReturn    = false; // confirm the next write from inside SendWriteRequest()
+    bool mWriteBufSoleOwnerAfterConfirm   = false; // mSendQueue ref was freed inside HandleWriteConfirmation()
+    bool mPinnedSlotReusedDuringWrite     = false; // true if NewBleEndPoint() handed out the pinned slot mid-write
+    bool mPoolAllocationRanDuringWrite    = false; // true if pool allocation probe ran inside SendWriteRequest()
+    size_t mPoolAllocationsDuringWrite    = 0;     // free pool slots allocated while endpoint remained pinned
 };
 
 /* ==================== Test Cases ==================== */
@@ -213,6 +299,152 @@ TEST_F(TestBleEndPoint, CloseFiresConnectionClosedCallback)
     ASSERT_EQ(CompleteCentralHandshake(ep), CHIP_NO_ERROR);
     ep->Close();
     EXPECT_EQ(mConnectionClosedCalls, 1);
+}
+
+// The capabilities request write may be confirmed before StartConnect() returns (Android releases the stack lock
+// while sending the write). The handshake must free the capabilities request from mSendQueue inside SendWriteRequest()
+// so the first post-connect Send() transmits the application payload rather than re-sending the capabilities request.
+TEST_F(TestBleEndPoint, StartConnectHandlesWriteConfirmationBeforeSendWriteReturns)
+{
+    BLEEndPoint * ep = CreateCentralEndPoint();
+    ASSERT_NE(ep, nullptr);
+
+    mConfirmNextWriteBeforeReturn = true;
+    ASSERT_EQ(ep->StartConnect(), CHIP_NO_ERROR);
+    EXPECT_TRUE(mWriteBufSoleOwnerAfterConfirm);
+    EXPECT_EQ(mSubscribeCallsDuringWrite, 1);
+    EXPECT_EQ(mSubscribeCalls, 1);
+
+    ASSERT_EQ(FinishCentralHandshakeAfterWriteConfirmation(ep), CHIP_NO_ERROR);
+    EXPECT_EQ(mConnectCompleteCalls, 1);
+    EXPECT_EQ(mConnectionClosedCalls, 0);
+
+    constexpr uint8_t kAppPayload[] = { 0xde, 0xad, 0xbe, 0xef };
+    mLastWriteBuf                   = nullptr;
+    ASSERT_EQ(ep->Send(System::PacketBufferHandle::NewWithData(kAppPayload, sizeof(kAppPayload))), CHIP_NO_ERROR);
+    ASSERT_FALSE(mLastWriteBuf.IsNull());
+    ASSERT_EQ(mLastWriteBuf->DataLength(), kBtpStartFragmentWithAckHeaderLen + sizeof(kAppPayload));
+    EXPECT_EQ(std::memcmp(mLastWriteBuf->Start() + kBtpStartFragmentWithAckHeaderLen, kAppPayload, sizeof(kAppPayload)), 0);
+
+    ep->Abort();
+}
+
+// If SendWrite() fails synchronously after QueueTx() stashed the capabilities request in mSendQueue, StartConnect()
+// must close the endpoint (clearing mSendQueue), notify connect failure once, close the BLE connection, and release
+// the endpoint pool slot.
+TEST_F(TestBleEndPoint, StartConnectHandlesSynchronousSendWriteFailure)
+{
+    BLEEndPoint * ep = CreateCentralEndPoint();
+    ASSERT_NE(ep, nullptr);
+
+    mNextWriteRequestErr = BLE_ERROR_GATT_WRITE_FAILED;
+    mExpectedConnectErr  = BLE_ERROR_GATT_WRITE_FAILED;
+    EXPECT_EQ(ep->StartConnect(), BLE_ERROR_GATT_WRITE_FAILED);
+    // DoClose() -> FinalizeClose() freed the mSendQueue reference, leaving mLastWriteBuf as sole owner.
+    ASSERT_FALSE(mLastWriteBuf.IsNull());
+    EXPECT_TRUE(mLastWriteBuf.HasSoleOwnership());
+    EXPECT_EQ(mConnectCompleteCalls, 1);
+    EXPECT_EQ(mLastConnectErr, BLE_ERROR_GATT_WRITE_FAILED);
+    EXPECT_EQ(mConnectionClosedCalls, 0);
+    EXPECT_EQ(mCloseConnectionCalls, 1);
+    EXPECT_EQ(mSubscribeCalls, 0);
+
+    // Confirm the failed endpoint slot was returned to the pool by exhausting all pool slots cleanly.
+    BLEEndPoint * poolEndpoints[BLE_LAYER_NUM_BLE_ENDPOINTS] = {};
+    for (auto & slot : poolEndpoints)
+    {
+        slot = CreateCentralEndPoint();
+        ASSERT_NE(slot, nullptr);
+    }
+    for (auto * slot : poolEndpoints)
+    {
+        slot->Abort();
+    }
+}
+
+// Even if a platform delivers an early write confirmation (including one whose subscribe step fails and closes the
+// endpoint re-entrantly) before SendWriteRequest() returns, StartConnect() must keep the pool slot pinned until it
+// unwinds, avoid double-closing, and return the slot cleanly afterwards.
+TEST_F(TestBleEndPoint, StartConnectHandlesWriteConfirmationThenSendWriteFailure)
+{
+    {
+        BLEEndPoint * ep = CreateCentralEndPoint();
+        ASSERT_NE(ep, nullptr);
+
+        mConfirmNextWriteBeforeReturn = true;
+        mNextWriteRequestErr          = BLE_ERROR_GATT_WRITE_FAILED;
+        mExpectedConnectErr           = BLE_ERROR_GATT_WRITE_FAILED;
+        EXPECT_EQ(ep->StartConnect(), BLE_ERROR_GATT_WRITE_FAILED);
+        EXPECT_TRUE(mWriteBufSoleOwnerAfterConfirm);
+        EXPECT_EQ(mSubscribeCallsDuringWrite, 1);
+        EXPECT_EQ(mSubscribeCalls, 1);
+        EXPECT_EQ(mConnectCompleteCalls, 1);
+        EXPECT_EQ(mLastConnectErr, BLE_ERROR_GATT_WRITE_FAILED);
+        EXPECT_EQ(mUnsubscribeCalls, 1);
+        ASSERT_TRUE(mBleLayer.HandleUnsubscribeComplete(mPendingConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID));
+        EXPECT_EQ(mCloseConnectionCalls, 1);
+    }
+
+    ResetCounters();
+    {
+        BLEEndPoint * ep = CreateCentralEndPoint();
+        ASSERT_NE(ep, nullptr);
+
+        mConfirmNextWriteBeforeReturn = true;
+        mPinnedEndPointDuringWrite    = ep;
+        mNextSubscribeErr             = BLE_ERROR_GATT_SUBSCRIBE_FAILED;
+        mNextWriteRequestErr          = BLE_ERROR_GATT_WRITE_FAILED;
+        mExpectedConnectErr           = BLE_ERROR_GATT_SUBSCRIBE_FAILED;
+        EXPECT_EQ(ep->StartConnect(), BLE_ERROR_GATT_WRITE_FAILED);
+        EXPECT_TRUE(mWriteBufSoleOwnerAfterConfirm);
+        EXPECT_TRUE(mPoolAllocationRanDuringWrite);
+        EXPECT_FALSE(mPinnedSlotReusedDuringWrite);
+        EXPECT_EQ(mPoolAllocationsDuringWrite, static_cast<size_t>(BLE_LAYER_NUM_BLE_ENDPOINTS - 1));
+        EXPECT_EQ(mSubscribeCallsDuringWrite, 1);
+        EXPECT_EQ(mSubscribeCalls, 1);
+        EXPECT_EQ(mUnsubscribeCalls, 0);
+        EXPECT_EQ(mConnectCompleteCalls, 1);
+        EXPECT_EQ(mLastConnectErr, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
+        EXPECT_EQ(mCloseConnectionCalls, 1);
+    }
+
+    ResetCounters();
+    {
+        // When SendWriteRequest() itself succeeds (CHIP_NO_ERROR) after a re-entrant callback closed and freed the
+        // endpoint (as on Android when the GATT write was submitted before the stack lock was re-acquired),
+        // StartConnect() returns CHIP_NO_ERROR for the synchronous write submission while OnEndPointConnectComplete
+        // has already reported the connect failure once and the slot stays pinned until StartConnect() returns.
+        BLEEndPoint * ep = CreateCentralEndPoint();
+        ASSERT_NE(ep, nullptr);
+
+        mConfirmNextWriteBeforeReturn = true;
+        mPinnedEndPointDuringWrite    = ep;
+        mNextSubscribeErr             = BLE_ERROR_GATT_SUBSCRIBE_FAILED;
+        mNextWriteRequestErr          = CHIP_NO_ERROR;
+        mExpectedConnectErr           = BLE_ERROR_GATT_SUBSCRIBE_FAILED;
+        EXPECT_EQ(ep->StartConnect(), CHIP_NO_ERROR);
+        EXPECT_TRUE(mWriteBufSoleOwnerAfterConfirm);
+        EXPECT_TRUE(mPoolAllocationRanDuringWrite);
+        EXPECT_FALSE(mPinnedSlotReusedDuringWrite);
+        EXPECT_EQ(mPoolAllocationsDuringWrite, static_cast<size_t>(BLE_LAYER_NUM_BLE_ENDPOINTS - 1));
+        EXPECT_EQ(mSubscribeCallsDuringWrite, 1);
+        EXPECT_EQ(mSubscribeCalls, 1);
+        EXPECT_EQ(mUnsubscribeCalls, 0);
+        EXPECT_EQ(mConnectCompleteCalls, 1);
+        EXPECT_EQ(mLastConnectErr, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
+        EXPECT_EQ(mCloseConnectionCalls, 1);
+    }
+
+    BLEEndPoint * poolEndpoints[BLE_LAYER_NUM_BLE_ENDPOINTS] = {};
+    for (auto & slot : poolEndpoints)
+    {
+        slot = CreateCentralEndPoint();
+        ASSERT_NE(slot, nullptr);
+    }
+    for (auto * slot : poolEndpoints)
+    {
+        slot->Abort();
+    }
 }
 
 } // namespace Ble
