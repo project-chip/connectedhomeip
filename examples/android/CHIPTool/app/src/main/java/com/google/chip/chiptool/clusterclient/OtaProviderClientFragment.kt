@@ -1367,7 +1367,7 @@ class OtaProviderClientFragment : Fragment() {
             }
           announcedNodeId ?: 0L
         }
-      Log.d(TAG, "ResolvedNodeId : $resolvedNodeId")
+
       if (resolvedNodeId != 0L) {
         deviceInputStreams.remove(resolvedNodeId)?.closeQuietly()
         deviceStatusMap[resolvedNodeId]?.apply {
