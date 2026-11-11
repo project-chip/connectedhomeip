@@ -40,6 +40,8 @@ public:
     LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate, const SmokeCoAlarm::Config & config);
     ~LoggingOnlySmokeCoAlarm() override;
 
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
+
     // SmokeCoAlarmDelegate
     void OnSelfTestRequested() override;
     void OnSmokeSensitivityLevelChanged(Clusters::SmokeCoAlarm::SensitivityEnum newLevel) override;

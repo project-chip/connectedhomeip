@@ -64,8 +64,13 @@ CHIP_ERROR SimulatedNetworkInfrastructureManager::Register(chip::EndpointId endp
 {
     ReturnErrorOnFailure(NetworkInfrastructureManager::Register(endpoint, provider, composition));
 
-    ReturnErrorOnFailure(
-        SetWiFiNetworkCredentials(ByteSpan::fromCharSpan("MatterAP"_span), ByteSpan::fromCharSpan("Setec Astronomy"_span)));
+    CHIP_ERROR err =
+        SetWiFiNetworkCredentials(ByteSpan::fromCharSpan("MatterAP"_span), ByteSpan::fromCharSpan("Setec Astronomy"_span));
+    if (err != CHIP_NO_ERROR)
+    {
+        Unregister(provider);
+        return err;
+    }
 
     return CHIP_NO_ERROR;
 }

@@ -35,13 +35,19 @@ CHIP_ERROR DecreasingBatteryPowerSource::Register(EndpointId endpoint, CodeDrive
 {
     ReturnErrorOnFailure(BatteryPowerSource::Register(endpoint, provider, composition));
     // Kick off the timer loop to decrease battery level every few seconds
-    return mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval);
+    CHIP_ERROR err = mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval);
+    if (err != CHIP_NO_ERROR)
+    {
+        BatteryPowerSource::Unregister(provider);
+        return err;
+    }
+    return CHIP_NO_ERROR;
 }
 
 void DecreasingBatteryPowerSource::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    BatteryPowerSource::Unregister(provider);
     mTimerDelegate.CancelTimer(this);
+    BatteryPowerSource::Unregister(provider);
 }
 
 void DecreasingBatteryPowerSource::TimerFired()
@@ -55,7 +61,8 @@ void DecreasingBatteryPowerSource::TimerFired()
     }
     else if (batteryLevel.Value() > 0)
     {
-        batteryLevel.SetNonNull(batteryLevel.Value() - 5); // decrease by 2.5%
+        constexpr uint8_t kLevelStep = 5; // 2.5%
+        batteryLevel.SetNonNull(batteryLevel.Value() > kLevelStep ? static_cast<uint8_t>(batteryLevel.Value() - kLevelStep) : 0);
     }
     else
     {

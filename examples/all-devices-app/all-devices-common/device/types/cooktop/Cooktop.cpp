@@ -17,6 +17,7 @@
 #include "Cooktop.h"
 
 #include <devices/Types.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip::app {
 
@@ -24,12 +25,15 @@ namespace chip::app {
 
 CookSurfacePart::CookSurfacePart(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & onOffDelegate,
                                  Clusters::IdentifyDelegate & identifyDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCookSurface, 1)),
-    mTimerDelegate(timerDelegate), mOnOffDelegate(onOffDelegate), mIdentifyDelegate(identifyDelegate)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCookSurface, 1)), mTimerDelegate(timerDelegate),
+    mOnOffDelegate(onOffDelegate), mIdentifyDelegate(identifyDelegate)
 {}
 
 CHIP_ERROR CookSurfacePart::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
@@ -43,7 +47,10 @@ CHIP_ERROR CookSurfacePart::Register(EndpointId endpoint, CodeDrivenDataModelPro
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void CookSurfacePart::Unregister(CodeDrivenDataModelProvider & provider)
