@@ -180,6 +180,9 @@ public:
     /// This remains safe to call after the codegen data model provider has been destroyed during
     /// static destruction, because the provider unregisters all clusters when it is destroyed.
     void Unregister() { CodegenRegisteredServerClusterBase::Unregister(this->Registration()); }
+
+    /// Returns true if the cluster is registered with the codegen data model provider.
+    bool IsRegistered() const { return this->Registration().IsRegistered(); }
 };
 
 } // namespace chip::app
