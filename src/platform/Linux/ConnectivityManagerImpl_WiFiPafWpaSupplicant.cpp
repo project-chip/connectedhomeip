@@ -46,6 +46,19 @@ namespace DeviceLayer {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 static const char srv_name[] = "_matterc._udp";
+
+// Parses a MAC address in the "aa:bb:cc:dd:ee:ff" form used by wpa_supplicant.
+static bool ParseMacAddress(const char * str, uint8_t (&addr)[kMACAddressLength])
+{
+    VerifyOrReturnValue(strlen(str) == kMACAddressLength * 3 - 1, false);
+    for (size_t i = 0; i < kMACAddressLength; i++)
+    {
+        VerifyOrReturnValue(i == 0 || str[i * 3 - 1] == ':', false);
+        VerifyOrReturnValue(Encoding::HexToBytes(&str[i * 3], 2, &addr[i], 1) == 1, false);
+    }
+    return true;
+}
+
 /*
     NAN-USD Service Protocol Type: ref: Table 58 of Wi-Fi Aware Specificaiton
 */
@@ -187,8 +200,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
-    VerifyOrReturn(sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2],
-                          &peer_addr[3], &peer_addr[4], &peer_addr[5]) == 6,
+    VerifyOrReturn(ParseMacAddress(addr_str, peer_addr),
                    ChipLogError(DeviceLayer, "WiFi-PAF: OnDiscoveryResult: malformed peer_addr '%s'", addr_str));
 
     value = g_variant_lookup_value(discov_info, "srv_proto_type", G_VARIANT_TYPE_UINT32);
@@ -303,8 +315,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
-    VerifyOrReturn(sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2],
-                          &peer_addr[3], &peer_addr[4], &peer_addr[5]) == 6,
+    VerifyOrReturn(ParseMacAddress(addr_str, peer_addr),
                    ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied: malformed peer_addr '%s'", addr_str));
 
     value = g_variant_lookup_value(reply_info, "srv_proto_type", G_VARIANT_TYPE_UINT32);
@@ -395,8 +406,7 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
-    VerifyOrReturn(sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &RxInfo.peer_addr[0], &RxInfo.peer_addr[1],
-                          &RxInfo.peer_addr[2], &RxInfo.peer_addr[3], &RxInfo.peer_addr[4], &RxInfo.peer_addr[5]) == 6,
+    VerifyOrReturn(ParseMacAddress(addr_str, RxInfo.peer_addr),
                    ChipLogError(DeviceLayer, "WiFi-PAF: OnNanReceive: malformed peer_addr '%s'", addr_str));
 
     // Read the rx_data
@@ -778,8 +788,7 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
-    VerifyOrReturn(sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2],
-                          &peer_addr[3], &peer_addr[4], &peer_addr[5]) == 6,
+    VerifyOrReturn(ParseMacAddress(addr_str, peer_addr),
                    ChipLogError(DeviceLayer, "WiFi-PAF: ScanDiscoveryResult: malformed peer_addr '%s'", addr_str));
     value = g_variant_lookup_value(discov_info, "srv_proto_type", G_VARIANT_TYPE_UINT32);
     dataValue.reset(value);

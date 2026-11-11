@@ -1099,7 +1099,7 @@ cluster NetworkCommissioning = 49 {
     kWPAPersonal = 0x4 [spec_name = "WPA-PERSONAL"];
     kWPA2Personal = 0x8 [spec_name = "WPA2-PERSONAL"];
     kWPA3Personal = 0x10 [spec_name = "WPA3-PERSONAL"];
-    kWPA3MatterPDC = 0x20 [spec_name = "WPA3-Matter-PDC"];
+    kIEEE8021X = 0x20 [spec_name = "IEEE8021X"];
   }
 
   struct NetworkInfoStruct {
@@ -3038,8 +3038,8 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 7;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 7;
+    callback attribute clusterRevision;
 
     handle command SendKey;
   }
@@ -3173,8 +3173,8 @@ endpoint 2 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 7;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 7;
+    callback attribute clusterRevision;
 
     handle command SendKey;
   }

@@ -23,6 +23,7 @@
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/DoorLock/Attributes.h>
+#include <clusters/DoorLock/Commands.h>
 #include <clusters/DoorLock/Enums.h>
 #include <clusters/DoorLock/Events.h>
 #include <clusters/DoorLock/Metadata.h>
