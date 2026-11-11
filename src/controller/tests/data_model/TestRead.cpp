@@ -1786,6 +1786,13 @@ TEST_F(TestRead, TestSubscribeAttributeTimeout)
 
 TEST_F(TestRead, TestReadHandler_MultipleSubscriptions)
 {
+    // Serves more subscriptions than the read handler pool holds (needs heap-backed object pools) and holds more
+    // PacketBuffers at once than a typical PacketBuffer pool provides.
+    if (!CHIP_SYSTEM_CONFIG_POOL_USE_HEAP || CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE > 0)
+    {
+        GTEST_SKIP();
+    }
+
     auto sessionHandle                       = GetSessionBobToAlice();
     uint32_t numSuccessCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
@@ -3065,6 +3072,13 @@ void TestRead::MultipleReadHelper(size_t aReadCount)
 
 TEST_F(TestRead, TestReadHandler_MultipleSubscriptionsWithDataVersionFilter)
 {
+    // Serves more subscriptions than the read handler pool holds (needs heap-backed object pools) and holds more
+    // PacketBuffers at once than a typical PacketBuffer pool provides.
+    if (!CHIP_SYSTEM_CONFIG_POOL_USE_HEAP || CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE > 0)
+    {
+        GTEST_SKIP();
+    }
+
     auto sessionHandle                       = GetSessionBobToAlice();
     uint32_t numSuccessCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
@@ -3482,6 +3496,12 @@ TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
 
 TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
 {
+    // Holds more timers and PacketBuffers at once than typical fixed-size pools provide.
+    if (!CHIP_SYSTEM_CONFIG_POOL_USE_HEAP || CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE > 0)
+    {
+        GTEST_SKIP();
+    }
+
     // Note: We cannot use DrainAndServiceIO() since the perpetual read will make DrainAndServiceIO never return.
     CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
@@ -4829,6 +4849,13 @@ TEST_F(TestRead, TestReadHandler_TwoParallelReadsSecondTooManyPaths)
 
 TEST_F(TestRead, TestReadHandler_MultipleSubscriptions_OnFabricRemoved)
 {
+    // Serves more subscriptions than the read handler pool holds (needs heap-backed object pools) and holds more
+    // PacketBuffers at once than a typical PacketBuffer pool provides.
+    if (!CHIP_SYSTEM_CONFIG_POOL_USE_HEAP || CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE > 0)
+    {
+        GTEST_SKIP();
+    }
+
     auto sessionHandle                       = GetSessionBobToAlice();
     uint32_t numSuccessCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
