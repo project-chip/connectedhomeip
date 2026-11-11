@@ -24,11 +24,14 @@ source_set("closure-controller") {
     "${chip_root}/examples/all-devices-app/all-devices-common/binding-handler",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/src/app/clusters/bindings",
-    "${chip_root}/src/controller:interactions",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/zzz_generated/app-common/clusters/ClosureControl",
+    "${chip_root}/zzz_generated/app-common/clusters/ClosureDimension",
+    "${chip_root}/zzz_generated/app-common/clusters/Identify",
     "${chip_root}/zzz_generated/app-common/clusters/shared:enums",
-    "${chip_root}/zzz_generated/app-common/devices",
   ]
+
+  deps = [ "${chip_root}/zzz_generated/app-common/devices" ]
 }

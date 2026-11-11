@@ -552,10 +552,12 @@ private:
             RegisterCreator("closure-controller", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<ClosureController>(ClosureController::Config{
-                    .bindingTable    = mContext->bindingTable,
-                    .bindingManager  = mContext->bindingManager,
-                    .platformManager = mContext->platformManager,
-                    .bindingHandler  = mContext->bindingHandler,
+                    .bindingTable               = mContext->bindingTable,
+                    .bindingManager             = mContext->bindingManager,
+                    .platformManager            = mContext->platformManager,
+                    .bindingHandler             = mContext->bindingHandler,
+                    .withIdentifyClient         = true,
+                    .withClosureDimensionClient = true,
                 });
             });
         }

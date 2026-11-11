@@ -17,74 +17,16 @@
 
 #include "ClosureController.h"
 
-#include <clusters/ClosureControl/Commands.h>
 #include <clusters/ClosureControl/Ids.h>
-#include <controller/InvokeInteraction.h>
+#include <clusters/ClosureDimension/Ids.h>
+#include <clusters/Identify/Ids.h>
 #include <devices/Types.h>
-#include <lib/core/Optional.h>
-#include <lib/support/CHIPMem.h>
 
-#include <variant>
+#include <utility>
 
 using namespace chip::app::Clusters;
 
 namespace chip::app {
-
-namespace {
-const ClusterId kClientClusters[] = { ClosureControl::Id };
-
-constexpr uint16_t kTimedInvokeTimeoutMs = 10000;
-
-void OnSuccess(const ConcreteCommandPath & path, const StatusIB & status, const DataModel::NullObjectType &)
-{
-    ChipLogProgress(AppServer, "Closure Control command 0x%" PRIx32 " succeeded on endpoint %u", path.mCommandId, path.mEndpointId);
-}
-
-void OnFailure(CHIP_ERROR error)
-{
-    ChipLogError(AppServer, "Closure Control command failed: %" CHIP_ERROR_FORMAT, error.Format());
-}
-
-class MoveToBindingCommand : public BindingCommand
-{
-public:
-    explicit MoveToBindingCommand(const ClosureControl::Commands::MoveTo::Type & command) : mCommand(command) {}
-
-    ClusterId GetClusterId() const override { return ClosureControl::Id; }
-
-    void Dispatch(const BindingTarget & target) override
-    {
-        const auto * unicast = std::get_if<UnicastBindingTarget>(&target);
-        VerifyOrReturn(unicast != nullptr, ChipLogError(AppServer, "MoveTo requires a timed invoke; group binding skipped"));
-
-        LogErrorOnFailure(Controller::InvokeCommandRequest(&unicast->exchangeManager, unicast->session, unicast->endpoint, mCommand,
-                                                           OnSuccess, OnFailure, kTimedInvokeTimeoutMs));
-    }
-
-private:
-    ClosureControl::Commands::MoveTo::Type mCommand;
-};
-
-class CalibrateBindingCommand : public BindingCommand
-{
-public:
-    explicit CalibrateBindingCommand(const ClosureControl::Commands::Calibrate::Type & command) : mCommand(command) {}
-
-    ClusterId GetClusterId() const override { return ClosureControl::Id; }
-
-    void Dispatch(const BindingTarget & target) override
-    {
-        const auto * unicast = std::get_if<UnicastBindingTarget>(&target);
-        VerifyOrReturn(unicast != nullptr, ChipLogError(AppServer, "Calibrate requires a timed invoke; group binding skipped"));
-
-        LogErrorOnFailure(Controller::InvokeCommandRequest(&unicast->exchangeManager, unicast->session, unicast->endpoint, mCommand,
-                                                           OnSuccess, OnFailure, kTimedInvokeTimeoutMs));
-    }
-
-private:
-    ClosureControl::Commands::Calibrate::Type mCommand;
-};
-} // namespace
 
 ClosureController::ClosureController(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kClosureController, 1)), mConfig(config)
@@ -123,45 +65,40 @@ void ClosureController::Unregister(CodeDrivenDataModelProvider & provider)
 
 CHIP_ERROR ClosureController::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
 {
-    return out.ReferenceExisting(Span<const ClusterId>(kClientClusters));
+    ReturnErrorOnFailure(out.EnsureAppendCapacity(3));
+    ReturnErrorOnFailure(out.Append(ClosureControl::Id));
+    if (mConfig.withIdentifyClient)
+    {
+        ReturnErrorOnFailure(out.Append(Identify::Id));
+    }
+    if (mConfig.withClosureDimensionClient)
+    {
+        ReturnErrorOnFailure(out.Append(ClosureDimension::Id));
+    }
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClosureController::SendMoveTo(const MoveToArgs & args)
+CHIP_ERROR ClosureController::Dispatch(Platform::UniquePtr<BindingCommand> command)
 {
     VerifyOrReturnError(mEndpointId != kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-    Platform::UniquePtr<BindingCommand> command(Platform::New<MoveToBindingCommand>(ClosureControl::Commands::MoveTo::Type{
-        .position = FromStdOptional(args.position),
-        .latch    = FromStdOptional(args.latch),
-        .speed    = FromStdOptional(args.speed),
-    }));
-    VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(command != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsEnabledClientCluster(command->GetClusterId()), CHIP_ERROR_INVALID_ARGUMENT);
     return mConfig.bindingHandler.Dispatch(mEndpointId, std::move(command));
 }
 
-CHIP_ERROR ClosureController::SendGroupedMoveTo(const MoveToArgs & args)
+bool ClosureController::IsEnabledClientCluster(ClusterId clusterId) const
 {
-    VerifyOrReturnError(mEndpointId != kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-    return mConfig.bindingHandler.DispatchSimple(mEndpointId,
-                                                 ClosureControl::Commands::GroupedMoveTo::Type{
-                                                     .position = FromStdOptional(args.position),
-                                                     .latch    = FromStdOptional(args.latch),
-                                                     .speed    = FromStdOptional(args.speed),
-                                                 });
-}
-
-CHIP_ERROR ClosureController::SendStop()
-{
-    VerifyOrReturnError(mEndpointId != kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-    return mConfig.bindingHandler.DispatchSimple(mEndpointId, ClosureControl::Commands::Stop::Type{});
-}
-
-CHIP_ERROR ClosureController::SendCalibrate()
-{
-    VerifyOrReturnError(mEndpointId != kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-    Platform::UniquePtr<BindingCommand> command(
-        Platform::New<CalibrateBindingCommand>(ClosureControl::Commands::Calibrate::Type{}));
-    VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
-    return mConfig.bindingHandler.Dispatch(mEndpointId, std::move(command));
+    switch (clusterId)
+    {
+    case ClosureControl::Id:
+        return true;
+    case Identify::Id:
+        return mConfig.withIdentifyClient;
+    case ClosureDimension::Id:
+        return mConfig.withClosureDimensionClient;
+    default:
+        return false;
+    }
 }
 
 } // namespace chip::app
