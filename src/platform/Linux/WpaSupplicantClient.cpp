@@ -46,7 +46,8 @@ BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> GetWiFiSecurit
 {
     using Security = app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
     BitFlags<Security> result;
-    auto decode = [&result](GVariant * properties, bool isRsn) {
+    bool hasKeyMgmt = false;
+    auto decode     = [&result, &hasKeyMgmt](GVariant * properties, bool isRsn) {
         if (properties == nullptr || !g_variant_is_of_type(properties, G_VARIANT_TYPE_VARDICT))
         {
             return;
@@ -59,6 +60,7 @@ BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> GetWiFiSecurit
         GBorrowedStrvPtr values(g_variant_get_strv(keyMgmt.get(), nullptr));
         for (const gchar ** entry = values.get(); entry != nullptr && *entry != nullptr; ++entry)
         {
+            hasKeyMgmt          = true;
             const gchar * value = *entry;
             if (g_ascii_strcasecmp(value, "wpa-eap") == 0 || g_ascii_strcasecmp(value, "wpa-eap-sha256") == 0 ||
                 g_ascii_strcasecmp(value, "wpa-eap-suite-b") == 0 || g_ascii_strcasecmp(value, "wpa-eap-suite-b-192") == 0 ||
@@ -82,7 +84,7 @@ BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> GetWiFiSecurit
     };
     decode(wpa, false);
     decode(rsn, true);
-    if (!result.HasAny())
+    if (!hasKeyMgmt)
     {
         result.Set(Security::kUnencrypted);
     }
@@ -838,8 +840,8 @@ void WpaSupplicantClient::Start()
 
     mWpaSupplicant = GDBusWpaSupplicant{};
 
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](WpaSupplicantClient * self) { return self->StartOnGLib(); }, this);
+    CHIP_ERROR err =
+        PlatformMgrImpl().GLibMatterContextInvokeSync(+[](WpaSupplicantClient * self) { return self->StartOnGLib(); }, this);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start WiFi management"));
 }
 

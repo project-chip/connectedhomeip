@@ -128,11 +128,11 @@ TEST(TestWiFiSecurity, NonFtEap)
 
 TEST(TestWiFiSecurity, FtOnlyAndUnknownAkmDoNotAdvertiseEap)
 {
-    for (const auto * keyMgmt : { "wpa-ft-eap", "wpa-ft-eap-sha384", "unknown-akm" })
+    for (const auto * keyMgmt : { "wpa-ft-eap", "wpa-ft-eap-sha384", "ft-sae", "ft-sae-ext-key", "unknown-akm" })
     {
         auto properties = SecurityProperties({ keyMgmt });
-        EXPECT_EQ(Internal::GetWiFiSecurity(properties.get(), nullptr).Raw(), 0x01);
-        EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, properties.get()).Raw(), 0x01);
+        EXPECT_EQ(Internal::GetWiFiSecurity(properties.get(), nullptr).Raw(), 0x00);
+        EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, properties.get()).Raw(), 0x00);
         auto mixed = SecurityProperties({ keyMgmt, "wpa-psk" });
         EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, mixed.get()).Raw(), 0x08);
     }
@@ -144,7 +144,7 @@ TEST(TestWiFiSecurity, PersonalAndMixedSecurityUseIndependentInputs)
     EXPECT_EQ(Internal::GetWiFiSecurity(psk.get(), nullptr).Raw(), 0x04);
     auto none = SecurityProperties({ "wpa-none" });
     EXPECT_EQ(Internal::GetWiFiSecurity(none.get(), nullptr).Raw(), 0x04);
-    EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, none.get()).Raw(), 0x01);
+    EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, none.get()).Raw(), 0x00);
     auto personal = SecurityProperties({ "wpa-psk", "wpa-psk-sha256", "wpa-ft-psk", "sae" });
     EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, personal.get()).Raw(), 0x18);
     auto extended = SecurityProperties({ "sae-ext-key" });
