@@ -32,7 +32,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 6 seconds.
+#     # Takes about 40 seconds.
 #     tags: [slow]
 #   run2:
 #     app: ${ALL_DEVICES_APP}
@@ -49,7 +49,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 6 seconds.
+#     # Takes about 21 seconds.
 #     tags: [slow]
 #   run3:
 #     app: ${ALL_DEVICES_APP}
@@ -66,7 +66,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 6 seconds.
+#     # Takes about 18 seconds.
 #     tags: [slow]
 #   run4:
 #     app: ${ALL_DEVICES_APP}
@@ -83,7 +83,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 6 seconds.
+#     # Takes about 18 seconds.
 #     tags: [slow]
 #   run5:
 #     app: ${ALL_DEVICES_APP}
@@ -100,7 +100,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 6 seconds.
+#     # Takes about 16 seconds.
 #     tags: [slow]
 #   run6:
 #     app: ${ALL_DEVICES_APP}
@@ -117,7 +117,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 6 seconds.
+#     # Takes about 14 seconds.
 #     tags: [slow]
 #   run7:
 #     app: ${ALL_DEVICES_APP}
@@ -134,7 +134,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 6 seconds.
+#     # Takes about 14 seconds.
 #     tags: [slow]
 # === END CI TEST ARGUMENTS ===
 

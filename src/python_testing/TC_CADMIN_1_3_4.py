@@ -30,7 +30,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 2 minutes.
+#     # Takes about 3.4 minutes.
 #     tags: [slow]
 #   run2:
 #     app: ${ALL_CLUSTERS_APP}
@@ -45,7 +45,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: false
 #     quiet: true
-#     # Takes about 2 minutes.
+#     # Takes about 12 seconds.
 #     tags: [slow]
 # === END CI TEST ARGUMENTS ===
 

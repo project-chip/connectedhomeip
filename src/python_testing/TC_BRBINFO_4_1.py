@@ -37,7 +37,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 2.5 minutes.
+#     # Takes about 2.3 minutes.
 #     tags: [nightly, slow]
 #   run2:
 #     app: ${FABRIC_SYNC_APP}
@@ -56,7 +56,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 2.5 minutes.
+#     # Takes about 2.3 minutes.
 #     tags: [nightly, slow]
 # === END CI TEST ARGUMENTS ===
 

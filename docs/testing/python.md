@@ -966,9 +966,9 @@ for that run, e.g.:
         failure doesn't fail the job. Remove the tag once every issue is fixed.
     -   `openssl-3.5`: moves the run out of PR CI and into the OpenSSL 3.5 job,
         for runs that need an app and controller built with OpenSSL 3.5.
-    -   `slow`: the run takes long. The runners log a note when the run starts.
-        The tag doesn't move the run. A comment above the tag can record how
-        long the run takes:
+    -   `slow`: the run takes more than about 10 seconds. The runners log a note
+        when the run starts. The tag doesn't move the run. A comment above the
+        tag can record how long the run takes:
 
         ```python
         #     # Takes about 1.5 minutes.

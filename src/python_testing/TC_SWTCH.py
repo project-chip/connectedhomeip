@@ -37,7 +37,7 @@
 #       --app-pipe /tmp/switch_2_2_fifo
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 20 seconds.
+#     # Takes about 12 seconds.
 #     tags: [slow]
 #   run2:
 #     app: ${ALL_CLUSTERS_APP}
@@ -57,7 +57,7 @@
 #       --app-pipe /tmp/switch_fifo
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 20 seconds.
+#     # Takes about 46 seconds.
 #     tags: [slow]
 #   run3:
 #     app: ${ALL_CLUSTERS_APP}
@@ -77,7 +77,7 @@
 #       --app-pipe /tmp/switch_fifo
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 20 seconds.
+#     # Takes about 35 seconds.
 #     tags: [slow]
 # === END CI TEST ARGUMENTS ===
 #

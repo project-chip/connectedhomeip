@@ -36,7 +36,7 @@
 #       --enable-spec-errata-ci-only-disallowed-for-certification
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 1.5 minutes.
+#     # Takes about 19 seconds.
 #     tags: [slow]
 #   run2:
 #     app: ${ALL_DEVICES_APP}
@@ -52,7 +52,7 @@
 #       --enable-spec-errata-ci-only-disallowed-for-certification
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 1.5 minutes.
+#     # Takes about 48 seconds.
 #     tags: [slow]
 #   run3:
 #     app: ${CAMERA_APP}
@@ -68,8 +68,7 @@
 #       --enable-spec-errata-ci-only-disallowed-for-certification
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 10 seconds.
-#     tags: [nightly, slow]
+#     tags: [nightly]
 #   run4:
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -84,8 +83,7 @@
 #       --enable-spec-errata-ci-only-disallowed-for-certification
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 10 seconds.
-#     tags: [nightly, slow]
+#     tags: [nightly]
 # === END CI TEST ARGUMENTS ===
 
 import asyncio

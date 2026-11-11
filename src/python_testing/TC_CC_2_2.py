@@ -36,7 +36,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 1.25 minutes.
+#     # Takes about 2.5 minutes.
 #     tags: [nightly, slow]
 #   run2:
 #     app: ${ALL_DEVICES_APP}
@@ -52,7 +52,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 1.25 minutes.
+#     # Takes about 2.5 minutes.
 #     tags: [nightly, slow]
 # === END CI TEST ARGUMENTS ===
 

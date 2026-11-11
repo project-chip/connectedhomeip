@@ -33,7 +33,7 @@
 #       --timeout 600
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 8 seconds.
+#     # Takes about 14 seconds.
 #     tags: [slow]
 #   run2:
 #     app: ${ALL_DEVICES_APP}
@@ -50,7 +50,7 @@
 #       --timeout 600
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 8 seconds.
+#     # Takes about 11 seconds.
 #     tags: [slow]
 # === END CI TEST ARGUMENTS ===
 

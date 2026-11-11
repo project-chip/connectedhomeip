@@ -35,7 +35,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     # Takes about 3 minutes.
+#     # Takes about 3.2 minutes.
 #     tags: [slow]
 # === END CI TEST ARGUMENTS ===
 
