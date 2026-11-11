@@ -123,9 +123,22 @@ NS_ASSUME_NONNULL_BEGIN
  * message, passed through unchanged: the byte offset in the OTA image at which the
  * transfer starts.
  *
- * If completion is passed a non-nil error, the transfer will be rejected. A
- * delegate that cannot provide data starting at offset must pass a non-nil
- * error.
+ * To reject the transfer with a specific BDX status, pass completion an error
+ * in MTRBDXErrorDomain:
+ *
+ * - MTRBDXErrorCodeStartOffsetNotSupported if the delegate cannot provide data
+ *   starting at offset.
+ * - MTRBDXErrorCodeFileDesignatorUnknown if the delegate has no OTA image for
+ *   fileDesignator.
+ * - MTRBDXErrorCodeResponderBusy if the delegate cannot handle the transfer
+ *   right now.  The Matter specification says the requestor SHOULD then wait
+ *   at least 60 seconds before it tries again.
+ *
+ * Any other error also rejects the transfer, with an unspecified BDX status.
+ *
+ * When the transfer is rejected with an error in MTRBDXErrorDomain, that same
+ * NSError is the error passed to
+ * handleBDXTransferSessionEndForNodeID:controller:metrics:error:.
  */
 - (void)handleBDXTransferSessionBeginForNodeID:(NSNumber *)nodeID
                                     controller:(MTRDeviceController *)controller

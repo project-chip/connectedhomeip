@@ -7852,8 +7852,8 @@
                   # New feature for HRAP not finalized as of Matter 1.4 (Fall 2024)
                   - PerDeviceCredentials
               WiFiSecurityBitmap:
-                  # New bit for HRAP not finalized as of Matter 1.4 (Fall 2024)
-                  - WPA3MatterPDC
+                  # New bit for HRAP / PDC, still provisional as of Matter 1.7 (Fall 2026)
+                  - IEEE8021X
           ContentLauncher:
               SupportedProtocolsBitmap:
                   # Not present in Matter 1.4 (Fall 2024)
