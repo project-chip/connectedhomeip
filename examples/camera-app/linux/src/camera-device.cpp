@@ -243,15 +243,10 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
         int64_t ts = self->mVideoStreamPtsOffsetMs[videoStreamID] + (rawPts / 1000000);
         if (ts >= self->mVideoStreamPtsOffsetMs[videoStreamID])
         {
-
-            // Forward raw H.264 encoded frames to media controller with timestamp
-            // The PreRollBuffer will distribute to ALL transports registered for this videoStreamID
-            // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
-            self->GetMediaController().DistributeVideo(reinterpret_cast<const uint8_t *>(map.data), map.size, videoStreamID, ts);
-            if (*bufferGen < self->GetPrivacyZoneGeneration())
-            {
-                self->GetMediaController().ClearVideoPreRollBuffer();
-            }
+            // Forward raw H.264 encoded frames to media controller with timestamp,
+            // serialized with privacy zone generation updates and pre-roll buffer clearing.
+            self->DistributeVideoIfCurrentGeneration(reinterpret_cast<const uint8_t *>(map.data), map.size, videoStreamID, ts,
+                                                     *bufferGen);
         }
         else
         {
@@ -2103,33 +2098,27 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
 
 CameraError CameraDevice::SetPrivacyZone(uint16_t zoneId, const TwoDCartesianZoneStorage & zone)
 {
-    {
-        std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
-        mPrivacyZones[zoneId] = zone;
-        ++mPrivacyZoneGeneration;
-    }
+    std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
+    mPrivacyZones[zoneId] = zone;
+    ++mPrivacyZoneGeneration;
     mMediaController.ClearVideoPreRollBuffer();
     return CameraError::SUCCESS;
 }
 
 CameraError CameraDevice::RemovePrivacyZone(uint16_t zoneId)
 {
-    {
-        std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
-        mPrivacyZones.erase(zoneId);
-        ++mPrivacyZoneGeneration;
-    }
+    std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
+    mPrivacyZones.erase(zoneId);
+    ++mPrivacyZoneGeneration;
     mMediaController.ClearVideoPreRollBuffer();
     return CameraError::SUCCESS;
 }
 
 CameraError CameraDevice::ClearPrivacyZones()
 {
-    {
-        std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
-        mPrivacyZones.clear();
-        ++mPrivacyZoneGeneration;
-    }
+    std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
+    mPrivacyZones.clear();
+    ++mPrivacyZoneGeneration;
     mMediaController.ClearVideoPreRollBuffer();
     return CameraError::SUCCESS;
 }
@@ -2138,6 +2127,17 @@ uint64_t CameraDevice::GetPrivacyZoneGeneration() const
 {
     std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
     return mPrivacyZoneGeneration;
+}
+
+void CameraDevice::DistributeVideoIfCurrentGeneration(const uint8_t * data, size_t size, uint16_t videoStreamID, int64_t timestamp,
+                                                      uint64_t bufferGen)
+{
+    std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
+    if (bufferGen < mPrivacyZoneGeneration)
+    {
+        return;
+    }
+    mMediaController.DistributeVideo(data, size, videoStreamID, timestamp);
 }
 
 bool CameraDevice::ApplyPrivacyMaskToI420Buffer(GstPad * pad, GstBuffer * buffer, uint64_t * outGeneration)

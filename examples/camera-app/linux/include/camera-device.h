@@ -359,6 +359,9 @@ public:
 
     uint64_t GetPrivacyZoneGeneration() const;
 
+    void DistributeVideoIfCurrentGeneration(const uint8_t * data, size_t size, uint16_t videoStreamID, int64_t timestamp,
+                                            uint64_t bufferGen);
+
     bool GetCameraSupportsPerZoneDetect() override { return true; }
     bool IsValidAnalysisZone(uint16_t zoneId) override;
 

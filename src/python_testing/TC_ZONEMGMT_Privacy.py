@@ -50,6 +50,7 @@ import sys
 import tempfile
 import threading
 import time
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 
 from cryptography import x509
@@ -629,6 +630,7 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
         cmaf_server: _LocalCMAFIngestServer,
         vid_w: int,
         vid_h: int,
+        on_active_stream: Callable[[], Awaitable[None]] | None = None,
     ) -> list[_RGBFrame]:
         pavst_cluster = Clusters.PushAvStreamTransport
         cmaf_server.reset_segments()
@@ -643,7 +645,7 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                     "url": f"https://{cmaf_server.host_ip}:{cmaf_server.port}/streams/1/",
                     "triggerOptions": {
                         "triggerType": pavst_cluster.Enums.TransportTriggerTypeEnum.kCommand,
-                        "maxPreRollLen": 0,
+                        "maxPreRollLen": 1000,
                     },
                     "ingestMethod": pavst_cluster.Enums.IngestMethodsEnum.kCMAFIngest,
                     "containerOptions": {
@@ -670,6 +672,12 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                     transportStatus=pavst_cluster.Enums.TransportStatusEnum.kActive,
                 ),
             )
+            if on_active_stream is not None:
+                # Allow live pre-update H.264 frames to populate the active transport's pre-roll buffer
+                # before mutating privacy zones during active streaming.
+                await asyncio.sleep(0.25)
+                await on_active_stream()
+                cmaf_server.reset_segments()
             await self.send_single_cmd(
                 endpoint=endpoint,
                 cmd=pavst_cluster.Commands.ManuallyTriggerTransport(
@@ -1231,8 +1239,45 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                 )
 
             if tls_endpoint_id is not None and cmaf_server is not None and video_stream_id is not None:
+                # Set the L-shaped zone to Motion first, activate the PushAV transport so pre-roll frames
+                # accumulate while Region A is unmasked, and then update the zone back to Privacy during
+                # active streaming to verify no pre-update frames leak into the captured CMAF segment.
+                await self.send_single_cmd(
+                    endpoint=endpoint,
+                    cmd=zm_commands.UpdateTwoDCartesianZone(
+                        zoneID=privacy_zone_2_id,
+                        zone=zm_cluster.Structs.TwoDCartesianZoneStruct(
+                            name="MotionConcaveL",
+                            use=zm_enums.ZoneUseEnum.kMotion,
+                            vertices=concave_l_vertices,
+                            color="#00FF00",
+                        ),
+                    ),
+                )
+
+                async def _enable_l_privacy_during_active_stream() -> None:
+                    await self.send_single_cmd(
+                        endpoint=endpoint,
+                        cmd=zm_commands.UpdateTwoDCartesianZone(
+                            zoneID=privacy_zone_2_id,
+                            zone=zm_cluster.Structs.TwoDCartesianZoneStruct(
+                                name="PrivacyConcaveL",
+                                use=zm_enums.ZoneUseEnum.kPrivacy,
+                                vertices=concave_l_vertices,
+                                color="#000000",
+                            ),
+                        ),
+                    )
+
                 video_multi_frames = await self._capture_and_decode_pushav_video_rgb(
-                    endpoint, selected_video_usage, video_stream_id, tls_endpoint_id, cmaf_server, vid_w, vid_h
+                    endpoint,
+                    selected_video_usage,
+                    video_stream_id,
+                    tls_endpoint_id,
+                    cmaf_server,
+                    vid_w,
+                    vid_h,
+                    on_active_stream=_enable_l_privacy_during_active_stream,
                 )
                 for frame_idx, video_multi_rgb in enumerate(video_multi_frames):
                     f_w, f_h = video_multi_rgb.width, video_multi_rgb.height
@@ -1289,24 +1334,22 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                     )
 
             self.step("7")
-            for zid in list(created_zone_ids):
-                await self.send_single_cmd(endpoint=endpoint, cmd=zm_commands.RemoveZone(zoneID=zid))
-                created_zone_ids.remove(zid)
 
-            restored_rgb = await self._capture_and_decode_rgb(endpoint, stream_id, selected_cap.resolution)
-            self._assert_region_is_non_black(
-                restored_rgb, ax0 + inset, ay0 + inset, ax1 - inset, ay1 - inset, "Restored Region A after RemoveZone"
-            )
-            self._assert_region_is_non_black(
-                restored_rgb, bx0 + inset, by0 + inset, bx1 - inset, by1 - inset, "Restored Region B after RemoveZone"
-            )
-            self._assert_region_is_non_black(
-                restored_rgb, cx0 + inset, cy0 + inset, cx1 - inset, cy1 - inset, "Control Region C after RemoveZone"
-            )
+            async def _remove_all_privacy_zones() -> None:
+                for zid in list(created_zone_ids):
+                    await self.send_single_cmd(endpoint=endpoint, cmd=zm_commands.RemoveZone(zoneID=zid))
+                    created_zone_ids.remove(zid)
 
             if tls_endpoint_id is not None and cmaf_server is not None and video_stream_id is not None:
                 video_restored_frames = await self._capture_and_decode_pushav_video_rgb(
-                    endpoint, selected_video_usage, video_stream_id, tls_endpoint_id, cmaf_server, vid_w, vid_h
+                    endpoint,
+                    selected_video_usage,
+                    video_stream_id,
+                    tls_endpoint_id,
+                    cmaf_server,
+                    vid_w,
+                    vid_h,
+                    on_active_stream=_remove_all_privacy_zones,
                 )
                 for frame_idx, video_restored_rgb in enumerate(video_restored_frames):
                     f_w, f_h = video_restored_rgb.width, video_restored_rgb.height
@@ -1345,6 +1388,19 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                         vcy1 - vinset_y,
                         f"H.264 Video frame[{frame_idx}] Control Region C after RemoveZone",
                     )
+            else:
+                await _remove_all_privacy_zones()
+
+            restored_rgb = await self._capture_and_decode_rgb(endpoint, stream_id, selected_cap.resolution)
+            self._assert_region_is_non_black(
+                restored_rgb, ax0 + inset, ay0 + inset, ax1 - inset, ay1 - inset, "Restored Region A after RemoveZone"
+            )
+            self._assert_region_is_non_black(
+                restored_rgb, bx0 + inset, by0 + inset, bx1 - inset, by1 - inset, "Restored Region B after RemoveZone"
+            )
+            self._assert_region_is_non_black(
+                restored_rgb, cx0 + inset, cy0 + inset, cx1 - inset, cy1 - inset, "Control Region C after RemoveZone"
+            )
         finally:
             tls_cleanup_errors: list[Exception] = []
             for zid in list(created_zone_ids):
