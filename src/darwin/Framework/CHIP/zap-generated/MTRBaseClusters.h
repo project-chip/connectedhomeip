@@ -20389,6 +20389,16 @@ typedef NS_ENUM(uint8_t, MTRDataTypeSemanticTagNamespaceId) {
     MTRDataTypeSemanticTagNamespaceIdClosureCabinet MTR_PROVISIONALLY_AVAILABLE = 0x48,
 } MTR_PROVISIONALLY_AVAILABLE;
 
+typedef NS_ENUM(uint8_t, MTRDataTypeServerAttributionContextInformation) {
+    MTRDataTypeServerAttributionContextInformationServerAutomationRule MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeServerAttributionContextInformationServerSchedule MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRDataTypeServerAttributionContextInformationServerTimer MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeServerAttributionContextInformationSecurityEvent MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeServerAttributionContextInformationDemandResponseEvent MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeServerAttributionContextInformationPhysicalInteraction MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeServerAttributionContextInformationExternalProtocol MTR_PROVISIONALLY_AVAILABLE = 0x11,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeStreamUsageEnum) {
     MTRDataTypeStreamUsageEnumInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeStreamUsageEnumRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,

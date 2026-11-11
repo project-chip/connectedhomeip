@@ -491,6 +491,23 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::SemanticTagNam
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ServerAttributionContextInformation val)
+{
+    using EnumType = Globals::ServerAttributionContextInformation;
+    switch (val)
+    {
+    case EnumType::kServerAutomationRule:
+    case EnumType::kServerSchedule:
+    case EnumType::kServerTimer:
+    case EnumType::kSecurityEvent:
+    case EnumType::kDemandResponseEvent:
+    case EnumType::kPhysicalInteraction:
+    case EnumType::kExternalProtocol:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::SoftwareVersionCertificationStatusEnum val)
 {
     using EnumType = Globals::SoftwareVersionCertificationStatusEnum;

@@ -501,6 +501,23 @@ enum class SemanticTagNamespaceId : uint8_t
     kUnknownEnumValue = 0,
 };
 
+// Enum for ServerAttributionContextInformation
+enum class ServerAttributionContextInformation : uint8_t
+{
+    kServerAutomationRule = 0x0B,
+    kServerSchedule       = 0x0C,
+    kServerTimer          = 0x0D,
+    kSecurityEvent        = 0x0E,
+    kDemandResponseEvent  = 0x0F,
+    kPhysicalInteraction  = 0x10,
+    kExternalProtocol     = 0x11,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
 // Enum for SoftwareVersionCertificationStatusEnum
 enum class SoftwareVersionCertificationStatusEnum : uint8_t
 {

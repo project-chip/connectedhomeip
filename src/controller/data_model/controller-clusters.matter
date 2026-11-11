@@ -261,6 +261,16 @@ enum SemanticTagNamespaceId : enum8 {
   kClosureCabinet = 72;
 }
 
+enum ServerAttributionContextInformation : enum8 {
+  kServerAutomationRule = 11;
+  kServerSchedule = 12;
+  kServerTimer = 13;
+  kSecurityEvent = 14;
+  kDemandResponseEvent = 15;
+  kPhysicalInteraction = 16;
+  kExternalProtocol = 17;
+}
+
 enum SoftwareVersionCertificationStatusEnum : enum8 {
   kDevTest = 0;
   kProvisional = 1;
@@ -14120,3 +14130,4 @@ internal cluster TestHiddenManufacturerSpecific = 4294048801 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
