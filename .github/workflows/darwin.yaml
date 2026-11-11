@@ -122,11 +122,14 @@ jobs:
 
                   export TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1
                   echo "Showing filtered output only. The full output will be in darwin-tests.log in the log artifact."
+                  status=0
                   xcodebuild test -target "Matter" -scheme "Matter Framework Tests" \
                   -resultBundlePath /tmp/darwin/framework-tests/TestResults.xcresult \
                   -sdk macosx ${{ matrix.options.arguments }} \
                   GCC_PREPROCESSOR_DEFINITIONS='${inherited} ${{ matrix.options.defines }}' \
-                  2>&1 | tee /tmp/darwin/framework-tests/darwin-tests.log | ../../../scripts/helpers/darwin_log_filter.sh
+                  2>&1 | tee /tmp/darwin/framework-tests/darwin-tests.log | ../../../scripts/helpers/darwin_log_filter.sh || status=$?
+                  ../../../scripts/helpers/darwin_test_summary.sh /tmp/darwin/framework-tests/TestResults.xcresult || true
+                  exit $status
             - name: Generate Summary
               if: always()
               working-directory: /tmp
