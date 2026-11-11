@@ -320,7 +320,7 @@ def _extract_cmaf_dimensions(cmaf_bytes: bytes, fallback_width: int, fallback_he
         box_size = struct.unpack(">I", cmaf_bytes[box_start:idx])[0]
         box_end = box_start + box_size
         if box_size in (92, 104) and box_end <= len(cmaf_bytes):
-            w_fixed, h_fixed = struct.unpack(">II", cmaf_bytes[box_end - 8 : box_end])
+            w_fixed, h_fixed = struct.unpack(">II", cmaf_bytes[box_end - 8: box_end])
             w = w_fixed >> 16
             h = h_fixed >> 16
             if w > 0 and h > 0:
@@ -383,7 +383,7 @@ def _decode_cmaf_h264_to_rgb_frames(cmaf_bytes: bytes, fallback_width: int, fall
             )
             if len(proc.stdout) >= frame_len and len(proc.stdout) % frame_len == 0:
                 return [
-                    _RGBFrame(data=proc.stdout[offset : offset + frame_len], width=width, height=height)
+                    _RGBFrame(data=proc.stdout[offset: offset + frame_len], width=width, height=height)
                     for offset in range(0, len(proc.stdout), frame_len)
                 ]
 
@@ -414,15 +414,15 @@ def _decode_cmaf_h264_to_rgb_frames(cmaf_bytes: bytes, fallback_width: int, fall
         if padded_stride != row_bytes and len(raw_out) >= padded_frame_len and len(raw_out) % padded_frame_len == 0:
             frames: list[_RGBFrame] = []
             for offset in range(0, len(raw_out), padded_frame_len):
-                chunk = raw_out[offset : offset + padded_frame_len]
-                unpadded = b"".join(chunk[r * padded_stride : r * padded_stride + row_bytes] for r in range(height))
+                chunk = raw_out[offset: offset + padded_frame_len]
+                unpadded = b"".join(chunk[r * padded_stride: r * padded_stride + row_bytes] for r in range(height))
                 frames.append(_RGBFrame(data=unpadded, width=width, height=height))
             return frames
 
         asserts.assert_greater_equal(len(raw_out), frame_len, "Decoded H.264 RGB24 output shorter than one frame")
         asserts.assert_equal(len(raw_out) % frame_len, 0, "Decoded H.264 RGB24 byte length is not a whole number of frames")
         return [
-            _RGBFrame(data=raw_out[offset : offset + frame_len], width=width, height=height)
+            _RGBFrame(data=raw_out[offset: offset + frame_len], width=width, height=height)
             for offset in range(0, len(raw_out), frame_len)
         ]
 
