@@ -155,16 +155,17 @@ protected:
     static void Unregister(ServerClusterRegistration & registration);
 };
 
-/// A `RegisteredServerCluster` for clusters created by the application, which is registered
-/// with the codegen data model provider via `Register()` and unregistered when destroyed.
+/// A cluster created by the application, together with its registration with the codegen data
+/// model provider. The cluster is registered via `Register()` and unregistered when destroyed.
 ///
 /// This is for clusters whose lifetime the application manages, as opposed to clusters created
 /// via `CodegenClusterIntegration::RegisterServer` from ember callbacks.
 template <typename SERVER_CLUSTER>
-class CodegenRegisteredServerCluster : public RegisteredServerCluster<SERVER_CLUSTER>, private CodegenRegisteredServerClusterBase
+class CodegenRegisteredServerCluster : private RegisteredServerCluster<SERVER_CLUSTER>, private CodegenRegisteredServerClusterBase
 {
 public:
     using RegisteredServerCluster<SERVER_CLUSTER>::RegisteredServerCluster;
+    using RegisteredServerCluster<SERVER_CLUSTER>::Cluster;
     ~CodegenRegisteredServerCluster() { Unregister(); }
 
     /// Registers the cluster with the codegen data model provider.

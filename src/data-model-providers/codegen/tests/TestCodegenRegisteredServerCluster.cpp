@@ -100,7 +100,6 @@ TEST_F(TestCodegenRegisteredServerCluster, RegisterAndDestroy)
         cluster = &registered.Cluster();
 
         EXPECT_SUCCESS(registered.Register());
-        EXPECT_TRUE(registered.Registration().IsRegistered());
         EXPECT_EQ(Registry().Get({ kMockEndpoint1, kServerClusterId }), cluster);
         EXPECT_EQ(registered.Cluster().mStartupCount, 1);
         EXPECT_EQ(registered.Cluster().mShutdownCount, 0);
@@ -115,7 +114,6 @@ TEST_F(TestCodegenRegisteredServerCluster, ExplicitUnregister)
 
     EXPECT_SUCCESS(registered.Register());
     registered.Unregister();
-    EXPECT_FALSE(registered.Registration().IsRegistered());
     EXPECT_EQ(Registry().Get({ kMockEndpoint1, kServerClusterId }), nullptr);
     EXPECT_EQ(registered.Cluster().mShutdownCount, 1);
 
@@ -157,12 +155,12 @@ TEST_F(TestCodegenRegisteredServerCluster, RegisterRequiresEmberServerCluster)
 
     CodegenRegisteredServerCluster<CountingCluster> missingCluster(MockClusterId(2));
     EXPECT_EQ(missingCluster.Register(), CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_FALSE(missingCluster.Registration().IsRegistered());
+    EXPECT_EQ(Registry().Get({ kMockEndpoint1, MockClusterId(2) }), nullptr);
     EXPECT_EQ(missingCluster.Cluster().mStartupCount, 0);
 
     CodegenRegisteredServerCluster<CountingCluster> missingEndpoint(kServerClusterId, kMockEndpoint2);
     EXPECT_EQ(missingEndpoint.Register(), CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_FALSE(missingEndpoint.Registration().IsRegistered());
+    EXPECT_EQ(Registry().Get({ kMockEndpoint2, kServerClusterId }), nullptr);
 }
 
 TEST_F(TestCodegenRegisteredServerCluster, RegisterTwice)
