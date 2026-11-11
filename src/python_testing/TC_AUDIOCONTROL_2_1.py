@@ -67,7 +67,7 @@ class TC_AUDIOCONTROL_2_1(MatterTestCommissionedDevice, AUDIOCONTROLTestBase):
 
     def steps_TC_AUDIOCONTROL_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads SoftMuted attribute.", "DUT replies with a bool value."),
             TestStep(3, "TH reads PhysicallyMuted attribute.", "DUT replies with a bool value."),
             TestStep(4, "TH reads Volume attribute.",

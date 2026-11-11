@@ -5097,7 +5097,6 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
         value.paaSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.PAASupportedProfiles.Raw()];
         value.paiSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.PAISupportedProfiles.Raw()];
         value.dacSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.DACSupportedProfiles.Raw()];
-        value.cdSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.CDSupportedProfiles.Raw()];
         return value;
     }
     default: {
@@ -14696,8 +14695,8 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
         }
         return value;
     }
-    case Attributes::Mode::Id: {
-        using TypeInfo = Attributes::Mode::TypeInfo;
+    case Attributes::HumidistatMode::Id: {
+        using TypeInfo = Attributes::HumidistatMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -14707,8 +14706,8 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
-    case Attributes::SystemState::Id: {
-        using TypeInfo = Attributes::SystemState::TypeInfo;
+    case Attributes::HumidistatSystemState::Id: {
+        using TypeInfo = Attributes::HumidistatSystemState::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -20980,8 +20979,8 @@ static id _Nullable DecodeAttributeValueForMediaFileManagementCluster(AttributeI
                     *aError = err;
                     return nil;
                 }
-                newElement_0.imageUri = AsString(entry_0.imageUri);
-                if (newElement_0.imageUri == nil) {
+                newElement_0.imageURI = AsString(entry_0.imageURI);
+                if (newElement_0.imageURI == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     *aError = err;
                     return nil;

@@ -462,18 +462,30 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositi
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ServerAttributionContextInformation val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::SemanticTagNamespaceId val)
 {
-    using EnumType = Globals::ServerAttributionContextInformation;
+    using EnumType = Globals::SemanticTagNamespaceId;
     switch (val)
     {
-    case EnumType::kServerAutomationRule:
-    case EnumType::kServerSchedule:
-    case EnumType::kServerTimer:
-    case EnumType::kSecurityEvent:
-    case EnumType::kDemandResponseEvent:
-    case EnumType::kPhysicalInteraction:
-    case EnumType::kExternalProtocol:
+    case EnumType::kCompassDirection:
+    case EnumType::kCompassLocation:
+    case EnumType::kDirection:
+    case EnumType::kLevel:
+    case EnumType::kLocation:
+    case EnumType::kNumber:
+    case EnumType::kPosition:
+    case EnumType::kElectricalMeasurement:
+    case EnumType::kCommodityTariffChronology:
+    case EnumType::kCommodityTariffDirection:
+    case EnumType::kLaundry:
+    case EnumType::kPowerSource:
+    case EnumType::kCommonArea:
+    case EnumType::kCommonLandmark:
+    case EnumType::kRelativePosition:
+    case EnumType::kClosure:
+    case EnumType::kClosurePanel:
+    case EnumType::kClosureWindow:
+    case EnumType::kClosureCabinet:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

@@ -36,7 +36,7 @@ public:
                         AttributeValuePairValidator::AttributeValuePairType & value) override
     {
         VerifyOrReturnError(clusterPath.mClusterId == Clusters::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(value.attributeID == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(value.attributeID == Attributes::OnOff::Id, CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
         return CHIP_NO_ERROR;
     }
 };

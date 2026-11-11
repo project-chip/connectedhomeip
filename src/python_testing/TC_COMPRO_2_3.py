@@ -131,7 +131,7 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
 
     def steps_TC_COMPRO_2_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH"),
             TestStep(2, "Ensure ED is NOT commissionable"),
             TestStep(3, "TH reads Transport attribute",
                      "Store as valid_transports"),
@@ -466,6 +466,7 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
         defined_transports = [
             int(cp.Bitmaps.CapabilitiesBitmap.kBle),
             int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF),
+            int(cp.Bitmaps.CapabilitiesBitmap.kNtl),
         ]
         unsupported_transport = next(
             (b for b in defined_transports if not (valid_transports & b)), None)

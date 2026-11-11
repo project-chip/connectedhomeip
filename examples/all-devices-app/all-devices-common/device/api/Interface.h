@@ -20,49 +20,29 @@
 #include <app/clusters/descriptor/DescriptorCluster.h>
 #include <app/util/basic-types.h>
 #include <clusters/Descriptor/Structs.h>
+#include <clusters/shared/Enums.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
 #include <device/api/allocator/EndpointIdAllocator.h>
 #include <lib/support/Span.h>
 
-#include <cstdint>
-
 namespace chip::app {
-
-// Constants for semantic tags. Defined in "Matter Standard Namespaces"
-//
-// TODO: Generate standard namespace ID constants from spec and place them in libCHIP.
-//       We need:
-//          - namespace id generation
-//          - tag value generation
-//       Specification describes these in `src/namespaces`
-namespace CommonNamespace {
-
-constexpr uint16_t kCompassDirectionId          = 0x02;
-constexpr uint16_t kCompassLocationId           = 0x03;
-constexpr uint16_t kDirectionId                 = 0x04;
-constexpr uint16_t kLevelId                     = 0x05;
-constexpr uint16_t kLocationId                  = 0x06; // Clusters::Globals::LocationTag
-constexpr uint16_t kNumberId                    = 0x07;
-constexpr uint16_t kPositionId                  = 0x08; // Clusters::Globals::PositionTag
-constexpr uint16_t kElectricalMeasurementId     = 0x0A;
-constexpr uint16_t kCommodityTariffChronologyId = 0x0B;
-constexpr uint16_t kCommodityTariffDirectionId  = 0x0D;
-constexpr uint16_t kLaundryId                   = 0x0E;
-constexpr uint16_t kPowerSourceId               = 0x0F;
-constexpr uint16_t kCommonAreaId                = 0x10; // Clusters::Globals::AreaTypeTag
-constexpr uint16_t kCommonLandmarkId            = 0x11; // Clusters::Globals::LandmarkTag
-constexpr uint16_t kRelativePositionId          = 0x12; // Clusters::Globals::RelativePositionTag
-constexpr uint16_t kClosureId                   = 0x44; // Clusters::Globals::ClosureTag
-constexpr uint16_t kClosurePanelId              = 0x45; // Clusters::Globals::ClosurePanelTag
-
-} // namespace CommonNamespace
 
 /// Structural configuration for registering an endpoint within a node hierarchy.
 ///
 /// Encapsulates parent-child relationship, family composition pattern, and static semantic tags.
 struct EndpointComposition
 {
+    /// Namespace IDs (`Clusters::Globals::SemanticTagNamespaceId`) and tag values (e.g. `Clusters::Globals::ClosureTag`)
+    /// are generated from semantic-tag-namespace-enums.xml into <clusters/shared/Enums.h>.
+    /// To add a missing namespace ID or tag, edit that XML and run:
+    ///     ./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'
+    //
+    // TODO: semantic-tag-namespace-enums.xml is maintained by hand. Generate it from the spec instead.
+    //       We need:
+    //          - namespace id generation
+    //          - tag value generation
+    //       Specification describes these in `src/namespaces`
     using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
 
     EndpointId parentId                           = kInvalidEndpointId;

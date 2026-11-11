@@ -152,6 +152,8 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * interestedPathsForEvents may contain either MTRClusterPath or MTREventPath to specify interested clusters and events, or NSNumber for endpoints.
  *
+ * Every field of an interested path is matched: an MTRClusterPath matches reports for that cluster on that endpoint only, and an MTRAttributePath or MTREventPath matches reports for exactly that endpoint, cluster and attribute or event. An NSNumber matches every report on that endpoint.
+ *
  * For both interested paths arguments, if nil is specified, then no filter will be applied.
  *
  * Calling addDelegate: again with the same delegate object will update the interested paths for attributes and events for this delegate.
@@ -170,6 +172,8 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * for the attribute, whether because the device does not implement it or
  * because the subscription priming read has not yet gotten to this attribute,
  * nil will be returned.
+ *
+ * The returned value is not fabric-filtered, and params.filterByFabric is ignored.
  *
  * TODO: Need to fully document that this returns "the system's best guess" of attribute values.
  *

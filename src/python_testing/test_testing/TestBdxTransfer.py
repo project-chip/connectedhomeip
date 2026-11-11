@@ -92,6 +92,15 @@ class TestBdxTransfer(MatterTestCommissionedDevice):
                     TestStep(base + 8, "Verify the obtained data."),
                 ])
             base += 8
+        # Rejecting a transfer: the DUT must answer Denied and the controller must release the transfer
+        # so that a following BDX request can start a new one.
+        steps.extend([
+            TestStep(base + 1, "Generate a diagnostic log file large enough to be sent via BDX."),
+            TestStep(base + 2, "Set up the system to receive a BDX transfer and request the logs via BDX."),
+            TestStep(base + 3, "Reject the transfer with a failure StatusReport."),
+            TestStep(base + 4, "Check the command's response is Denied."),
+            TestStep(base + 5, "Request the logs via BDX again and verify a new transfer is initiated, then accept it."),
+        ])
         return steps
 
     @async_test_body
@@ -191,6 +200,56 @@ class TestBdxTransfer(MatterTestCommissionedDevice):
                 bdx_future.cancel()
 
             # Clean up the temporary log file used in this iteration.
+            with contextlib.suppress(FileNotFoundError):
+                os.remove(filename)
+
+        await self._test_rejected_transfer(base_step=len(self._intents) * 8)
+
+    async def _request_logs_via_bdx(self, intent, file_designator: str):
+        """Arms a BDX receive and sends RetrieveLogsRequest(BDX); returns (bdx_future, command_task)."""
+        bdx_future: asyncio.futures.Future = self.default_controller.TestOnlyPrepareToReceiveBdxData()
+        command = Clusters.DiagnosticLogs.Commands.RetrieveLogsRequest(
+            intent=intent,
+            requestedProtocol=Clusters.DiagnosticLogs.Enums.TransferProtocolEnum.kBdx,
+            transferFileDesignator=file_designator
+        )
+        command_task = asyncio.create_task(self.default_controller.SendCommand(
+            self.dut_node_id, 0, command, responseType=Clusters.DiagnosticLogs.Commands.RetrieveLogsResponse))
+        done, _ = await asyncio.wait([command_task, bdx_future], return_when=asyncio.FIRST_COMPLETED)
+        asserts.assert_true(bdx_future in done, "BDX transfer didn't start")
+        return bdx_future.result(), command_task
+
+    async def _test_rejected_transfer(self, base_step: int):
+        intent, filename, filesize = self._intents[0]
+        asserts.assert_true(TestBdxTransfer._expect_bdx(filesize), "The first intent must be a BDX one")
+
+        self.step(base_step + 1)
+        expected_data = random.randbytes(filesize)
+        with open(filename, "wb") as diagnostic_file:
+            diagnostic_file.write(expected_data)
+        try:
+            self.step(base_step + 2)
+            bdx_transfer, command_task = await self._request_logs_via_bdx(intent, "rejected")
+
+            self.step(base_step + 3)
+            await bdx_transfer.reject()
+
+            self.step(base_step + 4)
+            command_response = await command_task
+            asserts.assert_equal(command_response.status, Clusters.DiagnosticLogs.Enums.StatusEnum.kDenied,
+                                 "Rejected transfer must be answered with Denied")
+            # Give the DUT time to process the StatusReport and close its side of the transfer.
+            await asyncio.sleep(0.5)
+
+            self.step(base_step + 5)
+            bdx_transfer, command_task = await self._request_logs_via_bdx(intent, "accepted")
+            data = await bdx_transfer.accept_and_receive_data()
+            asserts.assert_equal(data, expected_data, "Transferred data doesn't match")
+            command_response = await command_task
+            asserts.assert_equal(command_response.status, Clusters.DiagnosticLogs.Enums.StatusEnum.kSuccess,
+                                 "Invalid command response")
+            await asyncio.sleep(0.1)
+        finally:
             with contextlib.suppress(FileNotFoundError):
                 os.remove(filename)
 

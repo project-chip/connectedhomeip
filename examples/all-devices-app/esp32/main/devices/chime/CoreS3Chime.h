@@ -18,21 +18,19 @@
 
 #pragma once
 
-#include <device/types/chime/Chime.h>
+#include "TonePlayingChime.h"
 
 namespace chip::app {
 
 /**
  * Hardware-backed Chime implementation for M5Stack CoreS3.
- * Synthesizes multi-harmonic chime tones through the onboard AW88298 I2S speaker amplifier.
+ * Plays the TonePlayingChime tones through the onboard AW88298 I2S speaker amplifier.
  */
-class CoreS3Chime : public Chime
+class CoreS3Chime : public TonePlayingChime
 {
 public:
     explicit CoreS3Chime(TimerDelegate & timerDelegate);
     ~CoreS3Chime() override = default;
-
-    Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
 };
 
 } // namespace chip::app

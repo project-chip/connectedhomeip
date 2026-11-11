@@ -212,7 +212,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     CertificateChainTypeEnum certificateType = static_cast<CertificateChainTypeEnum>(0);
-    Optional<AttestationCryptoProfileEnum> cryptoProfile;
+    Optional<Structs::CryptoProfileChainStruct::Type> cryptoProfile;
     Optional<uint16_t> segmentID;
     Optional<uint16_t> maxSegmentSize;
 
@@ -231,7 +231,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     CertificateChainTypeEnum certificateType = static_cast<CertificateChainTypeEnum>(0);
-    Optional<AttestationCryptoProfileEnum> cryptoProfile;
+    Optional<Structs::CryptoProfileChainStruct::DecodableType> cryptoProfile;
     Optional<uint16_t> segmentID;
     Optional<uint16_t> maxSegmentSize;
 

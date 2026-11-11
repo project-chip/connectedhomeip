@@ -239,14 +239,26 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
-enum ServerAttributionContextInformation : enum8 {
-  kServerAutomationRule = 11;
-  kServerSchedule = 12;
-  kServerTimer = 13;
-  kSecurityEvent = 14;
-  kDemandResponseEvent = 15;
-  kPhysicalInteraction = 16;
-  kExternalProtocol = 17;
+enum SemanticTagNamespaceId : enum8 {
+  kCompassDirection = 2;
+  kCompassLocation = 3;
+  kDirection = 4;
+  kLevel = 5;
+  kLocation = 6;
+  kNumber = 7;
+  kPosition = 8;
+  kElectricalMeasurement = 10;
+  kCommodityTariffChronology = 11;
+  kCommodityTariffDirection = 13;
+  kLaundry = 14;
+  kPowerSource = 15;
+  kCommonArea = 16;
+  kCommonLandmark = 17;
+  kRelativePosition = 18;
+  kClosure = 68;
+  kClosurePanel = 69;
+  kClosureWindow = 71;
+  kClosureCabinet = 72;
 }
 
 enum SoftwareVersionCertificationStatusEnum : enum8 {
@@ -261,14 +273,6 @@ enum StreamUsageEnum : enum8 {
   kRecording = 1;
   kAnalysis = 2;
   kLiveView = 3;
-}
-
-enum SuppliedAttributionContextInformation : enum8 {
-  kDefaultClientAction = 0;
-  kUserInteraction = 1;
-  kClientAutomationRule = 2;
-  kClientSchedule = 3;
-  kClientTimer = 4;
 }
 
 enum TariffPriceTypeEnum : enum8 {
@@ -318,34 +322,6 @@ bitmap TestGlobalBitmap : bitmap32 {
   kSecondBit = 0x2;
 }
 
-struct SFrameKeyStruct {
-  octet_string<8> kid = 0;
-  octet_string<128> baseKey = 1;
-}
-
-struct SFrameStruct {
-  int16u audioCipherSuite = 0;
-  int16u videoCipherSuite = 1;
-  SFrameKeyStruct senderKey = 2;
-  SFrameKeyStruct receiveKeys[] = 3;
-  int8u ratchetBits = 4;
-  optional int8u ratchetTime = 5;
-}
-
-fabric_scoped struct WebRTCSessionStruct {
-  int16u id = 0;
-  node_id peerNodeID = 1;
-  endpoint_no peerEndpointID = 2;
-  StreamUsageEnum streamUsage = 3;
-  optional nullable int16u videoStreamID = 4;
-  optional nullable int16u audioStreamID = 5;
-  boolean metadataEnabled = 6;
-  optional int16u videoStreams[] = 7;
-  optional int16u audioStreams[] = 8;
-  optional nullable SFrameStruct SFrameConfig = 9;
-  fabric_idx fabricIndex = 254;
-}
-
 struct CurrencyStruct {
   int16u currency = 0;
   int8u decimalPoints = 1;
@@ -380,16 +356,6 @@ struct AtomicAttributeStatusStruct {
   status statusCode = 1;
 }
 
-struct AttributionData {
-  enum8 contextInformation = 0;
-  optional int32u sourceContext = 1;
-  optional node_id nodeID = 2;
-  optional group_id groupID = 3;
-  optional systime_ms systemTimeStamp = 4;
-  optional posix_ms epochTimeStamp = 5;
-  nullable fabric_idx fabricIndex = 6;
-}
-
 struct ICECandidateStruct {
   char_string candidate = 0;
   nullable char_string SDPMid = 1;
@@ -422,12 +388,6 @@ struct SemanticTagStruct {
   optional nullable char_string<64> label = 3;
 }
 
-fabric_scoped struct SuppliedAttributionData {
-  enum8 contextInformation = 0;
-  optional int32u sourceContext = 1;
-  fabric_idx fabricIndex = 254;
-}
-
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -439,6 +399,19 @@ struct ViewportStruct {
   int16u y1 = 1;
   int16u x2 = 2;
   int16u y2 = 3;
+}
+
+fabric_scoped struct WebRTCSessionStruct {
+  int16u id = 0;
+  node_id peerNodeID = 1;
+  endpoint_no peerEndpointID = 2;
+  StreamUsageEnum streamUsage = 3;
+  nullable int16u videoStreamID = 4;
+  nullable int16u audioStreamID = 5;
+  boolean metadataEnabled = 6;
+  optional int16u videoStreams[] = 7;
+  optional int16u audioStreams[] = 8;
+  fabric_idx fabricIndex = 254;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -503,12 +476,12 @@ cluster Descriptor = 29 {
     int16u revision = 1;
   }
 
-  readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
-  readonly attribute cluster_id serverList[] = 1;
-  readonly attribute cluster_id clientList[] = 2;
+  readonly fixed attribute DeviceTypeStruct deviceTypeList[] = 0;
+  readonly fixed attribute cluster_id serverList[] = 1;
+  readonly fixed attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
-  readonly attribute optional SemanticTagStruct tagList[] = 4;
-  readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly fixed attribute optional SemanticTagStruct tagList[] = 4;
+  readonly fixed attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -646,12 +619,12 @@ cluster AccessControl = 31 {
 
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
   attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
-  readonly attribute int16u subjectsPerAccessControlEntry = 2;
-  readonly attribute int16u targetsPerAccessControlEntry = 3;
-  readonly attribute int16u accessControlEntriesPerFabric = 4;
-  readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
+  readonly fixed attribute int16u subjectsPerAccessControlEntry = 2;
+  readonly fixed attribute int16u targetsPerAccessControlEntry = 3;
+  readonly fixed attribute int16u accessControlEntriesPerFabric = 4;
+  readonly fixed attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
-  provisional readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
+  provisional readonly changes_omitted attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -738,29 +711,29 @@ cluster BasicInformation = 40 {
     boolean reachableNewValue = 0;
   }
 
-  readonly attribute int16u dataModelRevision = 0;
-  readonly attribute char_string<32> vendorName = 1;
-  readonly attribute vendor_id vendorID = 2;
-  readonly attribute char_string<32> productName = 3;
-  readonly attribute int16u productID = 4;
+  readonly fixed attribute int16u dataModelRevision = 0;
+  readonly fixed attribute char_string<32> vendorName = 1;
+  readonly fixed attribute vendor_id vendorID = 2;
+  readonly fixed attribute char_string<32> productName = 3;
+  readonly fixed attribute int16u productID = 4;
   attribute access(write: manage) char_string<32> nodeLabel = 5;
   attribute access(write: administer) char_string<2> location = 6;
-  readonly attribute int16u hardwareVersion = 7;
-  readonly attribute char_string<64> hardwareVersionString = 8;
-  readonly attribute int32u softwareVersion = 9;
-  readonly attribute char_string<64> softwareVersionString = 10;
-  readonly attribute optional char_string<16> manufacturingDate = 11;
-  readonly attribute optional char_string<32> partNumber = 12;
-  readonly attribute optional long_char_string<256> productURL = 13;
-  readonly attribute optional char_string<64> productLabel = 14;
-  readonly attribute optional char_string<32> serialNumber = 15;
+  readonly fixed attribute int16u hardwareVersion = 7;
+  readonly fixed attribute char_string<64> hardwareVersionString = 8;
+  readonly fixed attribute int32u softwareVersion = 9;
+  readonly fixed attribute char_string<64> softwareVersionString = 10;
+  readonly fixed attribute optional char_string<16> manufacturingDate = 11;
+  readonly fixed attribute optional char_string<32> partNumber = 12;
+  readonly fixed attribute optional long_char_string<256> productURL = 13;
+  readonly fixed attribute optional char_string<64> productLabel = 14;
+  readonly fixed attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
-  readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
-  readonly attribute optional ProductAppearanceStruct productAppearance = 20;
-  readonly attribute optional int32u specificationVersion = 21;
-  readonly attribute optional int16u maxPathsPerInvoke = 22;
+  readonly fixed attribute optional char_string<32> uniqueID = 18;
+  readonly fixed attribute CapabilityMinimaStruct capabilityMinima = 19;
+  readonly fixed attribute optional ProductAppearanceStruct productAppearance = 20;
+  readonly fixed attribute optional int32u specificationVersion = 21;
+  readonly fixed attribute optional int16u maxPathsPerInvoke = 22;
   provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
   readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -993,34 +966,34 @@ cluster PowerSource = 47 {
 
   readonly attribute PowerSourceStatusEnum status = 0;
   readonly attribute int8u order = 1;
-  readonly attribute char_string<60> description = 2;
-  readonly attribute optional nullable int32u wiredAssessedInputVoltage = 3;
-  readonly attribute optional nullable int16u wiredAssessedInputFrequency = 4;
-  readonly attribute optional WiredCurrentTypeEnum wiredCurrentType = 5;
-  readonly attribute optional nullable int32u wiredAssessedCurrent = 6;
-  readonly attribute optional int32u wiredNominalVoltage = 7;
-  readonly attribute optional int32u wiredMaximumCurrent = 8;
+  readonly fixed attribute char_string<60> description = 2;
+  readonly changes_omitted attribute optional nullable int32u wiredAssessedInputVoltage = 3;
+  readonly changes_omitted attribute optional nullable int16u wiredAssessedInputFrequency = 4;
+  readonly fixed attribute optional WiredCurrentTypeEnum wiredCurrentType = 5;
+  readonly changes_omitted attribute optional nullable int32u wiredAssessedCurrent = 6;
+  readonly fixed attribute optional int32u wiredNominalVoltage = 7;
+  readonly fixed attribute optional int32u wiredMaximumCurrent = 8;
   readonly attribute optional boolean wiredPresent = 9;
   readonly attribute optional WiredFaultEnum activeWiredFaults[] = 10;
-  readonly attribute optional nullable int32u batVoltage = 11;
+  readonly changes_omitted attribute optional nullable int32u batVoltage = 11;
   readonly attribute optional nullable int8u batPercentRemaining = 12;
   readonly attribute optional nullable int32u batTimeRemaining = 13;
   readonly attribute optional BatChargeLevelEnum batChargeLevel = 14;
   readonly attribute optional boolean batReplacementNeeded = 15;
-  readonly attribute optional BatReplaceabilityEnum batReplaceability = 16;
+  readonly fixed attribute optional BatReplaceabilityEnum batReplaceability = 16;
   readonly attribute optional boolean batPresent = 17;
   readonly attribute optional BatFaultEnum activeBatFaults[] = 18;
-  readonly attribute optional char_string<60> batReplacementDescription = 19;
-  readonly attribute optional BatCommonDesignationEnum batCommonDesignation = 20;
-  readonly attribute optional char_string<20> batANSIDesignation = 21;
-  readonly attribute optional char_string<20> batIECDesignation = 22;
-  readonly attribute optional BatApprovedChemistryEnum batApprovedChemistry = 23;
-  readonly attribute optional int32u batCapacity = 24;
-  readonly attribute optional int8u batQuantity = 25;
+  readonly fixed attribute optional char_string<60> batReplacementDescription = 19;
+  readonly fixed attribute optional BatCommonDesignationEnum batCommonDesignation = 20;
+  readonly fixed attribute optional char_string<20> batANSIDesignation = 21;
+  readonly fixed attribute optional char_string<20> batIECDesignation = 22;
+  readonly fixed attribute optional BatApprovedChemistryEnum batApprovedChemistry = 23;
+  readonly fixed attribute optional int32u batCapacity = 24;
+  readonly fixed attribute optional int8u batQuantity = 25;
   readonly attribute optional BatChargeStateEnum batChargeState = 26;
   readonly attribute optional nullable int32u batTimeToFullCharge = 27;
   readonly attribute optional boolean batFunctionalWhileCharging = 28;
-  readonly attribute optional nullable int32u batChargingCurrent = 29;
+  readonly changes_omitted attribute optional nullable int32u batChargingCurrent = 29;
   readonly attribute optional BatChargeFaultEnum activeBatChargeFaults[] = 30;
   readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1068,18 +1041,18 @@ cluster GeneralCommissioning = 48 {
   }
 
   attribute access(write: administer) int64u breadcrumb = 0;
-  readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
+  readonly fixed attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
-  readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
-  readonly attribute boolean supportsConcurrentConnection = 4;
-  provisional readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
-  provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
-  provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
-  provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
+  readonly fixed attribute RegulatoryLocationTypeEnum locationCapability = 3;
+  readonly fixed attribute boolean supportsConcurrentConnection = 4;
+  readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
+  readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
+  readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
+  readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
-  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
+  readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1127,7 +1100,7 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
   /** This command is used to indicate that the commissioning process is complete. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node. */
+  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
@@ -1211,17 +1184,17 @@ cluster NetworkCommissioning = 49 {
     int8s rssi = 5;
   }
 
-  readonly attribute access(read: administer) int8u maxNetworks = 0;
+  readonly fixed attribute access(read: administer) int8u maxNetworks = 0;
   readonly attribute access(read: administer) NetworkInfoStruct networks[] = 1;
-  readonly attribute optional int8u scanMaxTimeSeconds = 2;
-  readonly attribute optional int8u connectMaxTimeSeconds = 3;
+  readonly fixed attribute optional int8u scanMaxTimeSeconds = 2;
+  readonly fixed attribute optional int8u connectMaxTimeSeconds = 3;
   attribute access(write: administer) boolean interfaceEnabled = 4;
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  readonly attribute optional int16u threadVersion = 10;
+  readonly fixed attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  readonly fixed attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  readonly fixed attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1453,14 +1426,14 @@ cluster GeneralDiagnostics = 51 {
 
   readonly attribute NetworkInterface networkInterfaces[] = 0;
   readonly attribute int16u rebootCount = 1;
-  readonly attribute optional int64u upTime = 2;
-  readonly attribute optional int32u totalOperationalHours = 3;
+  readonly changes_omitted attribute optional int64u upTime = 2;
+  readonly changes_omitted attribute optional int32u totalOperationalHours = 3;
   readonly attribute optional BootReasonEnum bootReason = 4;
   readonly attribute optional HardwareFaultEnum activeHardwareFaults[] = 5;
   readonly attribute optional RadioFaultEnum activeRadioFaults[] = 6;
   readonly attribute optional NetworkFaultEnum activeNetworkFaults[] = 7;
   readonly attribute boolean testEventTriggersEnabled = 8;
-  readonly attribute optional DeviceLoadStruct deviceLoadStatus = 10;
+  readonly changes_omitted attribute optional DeviceLoadStruct deviceLoadStatus = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1517,10 +1490,10 @@ cluster SoftwareDiagnostics = 52 {
     optional long_octet_string faultRecording = 2;
   }
 
-  readonly attribute optional ThreadMetricsStruct threadMetrics[] = 0;
-  readonly attribute optional int64u currentHeapFree = 1;
-  readonly attribute optional int64u currentHeapUsed = 2;
-  readonly attribute optional int64u currentHeapHighWatermark = 3;
+  readonly changes_omitted attribute optional ThreadMetricsStruct threadMetrics[] = 0;
+  readonly changes_omitted attribute optional int64u currentHeapFree = 1;
+  readonly changes_omitted attribute optional int64u currentHeapUsed = 2;
+  readonly changes_omitted attribute optional int64u currentHeapHighWatermark = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1618,6 +1591,12 @@ cluster OperationalCredentials = 62 {
     kPQCDeviceAttestation = 0x1;
   }
 
+  struct CryptoProfileChainStruct {
+    AttestationCryptoProfileEnum PAACrypto = 0;
+    AttestationCryptoProfileEnum PAICrypto = 1;
+    AttestationCryptoProfileEnum DACCrypto = 2;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -1639,16 +1618,15 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
     AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
-    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
   }
 
-  readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
+  readonly changes_omitted attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
-  readonly attribute int8u supportedFabrics = 2;
+  readonly fixed attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
-  readonly attribute octet_string trustedRootCertificates[] = 4;
+  readonly changes_omitted attribute octet_string trustedRootCertificates[] = 4;
   readonly attribute int8u currentFabricIndex = 5;
-  provisional readonly attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
+  provisional readonly changes_omitted attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1666,7 +1644,7 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
-    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional CryptoProfileChainStruct cryptoProfile = 1;
     optional int16u segmentID = 2;
     optional int16u maxSegmentSize = 3;
   }
@@ -1795,10 +1773,10 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime2 = 7;
   }
 
-  attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
+  changes_omitted attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
-  readonly attribute int16u maxGroupsPerFabric = 2;
-  readonly attribute int16u maxGroupKeysPerFabric = 3;
+  readonly fixed attribute int16u maxGroupsPerFabric = 2;
+  readonly fixed attribute int16u maxGroupKeysPerFabric = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1894,10 +1872,10 @@ cluster IlluminanceMeasurement = 1024 {
   }
 
   readonly attribute nullable int16u measuredValue = 0;
-  readonly attribute nullable int16u minMeasuredValue = 1;
-  readonly attribute nullable int16u maxMeasuredValue = 2;
-  readonly attribute optional int16u tolerance = 3;
-  readonly attribute optional nullable LightSensorTypeEnum lightSensorType = 4;
+  readonly fixed attribute nullable int16u minMeasuredValue = 1;
+  readonly fixed attribute nullable int16u maxMeasuredValue = 2;
+  readonly fixed attribute optional int16u tolerance = 3;
+  readonly fixed attribute optional nullable LightSensorTypeEnum lightSensorType = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1910,9 +1888,9 @@ cluster TemperatureMeasurement = 1026 {
   revision 6;
 
   readonly attribute nullable temperature measuredValue = 0;
-  readonly attribute nullable temperature minMeasuredValue = 1;
-  readonly attribute nullable temperature maxMeasuredValue = 2;
-  readonly attribute optional int16u tolerance = 3;
+  readonly fixed attribute nullable temperature minMeasuredValue = 1;
+  readonly fixed attribute nullable temperature maxMeasuredValue = 2;
+  readonly fixed attribute optional int16u tolerance = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1929,14 +1907,14 @@ cluster PressureMeasurement = 1027 {
   }
 
   readonly attribute nullable int16s measuredValue = 0;
-  readonly attribute nullable int16s minMeasuredValue = 1;
-  readonly attribute nullable int16s maxMeasuredValue = 2;
-  readonly attribute optional int16u tolerance = 3;
+  readonly fixed attribute nullable int16s minMeasuredValue = 1;
+  readonly fixed attribute nullable int16s maxMeasuredValue = 2;
+  readonly fixed attribute optional int16u tolerance = 3;
   readonly attribute optional nullable int16s scaledValue = 16;
-  readonly attribute optional nullable int16s minScaledValue = 17;
-  readonly attribute optional nullable int16s maxScaledValue = 18;
-  readonly attribute optional int16u scaledTolerance = 19;
-  readonly attribute optional int8s scale = 20;
+  readonly fixed attribute optional nullable int16s minScaledValue = 17;
+  readonly fixed attribute optional nullable int16s maxScaledValue = 18;
+  readonly fixed attribute optional int16u scaledTolerance = 19;
+  readonly fixed attribute optional int8s scale = 20;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1949,9 +1927,9 @@ cluster FlowMeasurement = 1028 {
   revision 5;
 
   readonly attribute nullable int16u measuredValue = 0;
-  readonly attribute nullable int16u minMeasuredValue = 1;
-  readonly attribute nullable int16u maxMeasuredValue = 2;
-  readonly attribute optional int16u tolerance = 3;
+  readonly fixed attribute nullable int16u minMeasuredValue = 1;
+  readonly fixed attribute nullable int16u maxMeasuredValue = 2;
+  readonly fixed attribute optional int16u tolerance = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2026,10 +2004,10 @@ cluster OccupancySensing = 1030 {
   }
 
   readonly attribute OccupancyBitmap occupancy = 0;
-  readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
-  readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
+  readonly fixed attribute OccupancySensorTypeEnum occupancySensorType = 1;
+  readonly fixed attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
   attribute access(write: manage) optional int16u holdTime = 3;
-  readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 4;
+  readonly fixed attribute optional HoldTimeLimitsStruct holdTimeLimits = 4;
   provisional readonly attribute optional PredictedOccupancyStruct predictedOccupancy[] = 5;
   attribute access(write: manage) optional int16u PIROccupiedToUnoccupiedDelay = 16;
   attribute access(write: manage) optional int16u PIRUnoccupiedToOccupiedDelay = 17;
@@ -2088,15 +2066,15 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   }
 
   readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
+  readonly fixed attribute optional nullable single minMeasuredValue = 1;
+  readonly fixed attribute optional nullable single maxMeasuredValue = 2;
   readonly attribute optional nullable single peakMeasuredValue = 3;
   readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
   readonly attribute optional nullable single averageMeasuredValue = 5;
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  readonly fixed attribute optional single uncertainty = 7;
+  readonly fixed attribute optional MeasurementUnitEnum measurementUnit = 8;
+  readonly fixed attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2146,15 +2124,15 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   }
 
   readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
+  readonly fixed attribute optional nullable single minMeasuredValue = 1;
+  readonly fixed attribute optional nullable single maxMeasuredValue = 2;
   readonly attribute optional nullable single peakMeasuredValue = 3;
   readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
   readonly attribute optional nullable single averageMeasuredValue = 5;
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  readonly fixed attribute optional single uncertainty = 7;
+  readonly fixed attribute optional MeasurementUnitEnum measurementUnit = 8;
+  readonly fixed attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2204,15 +2182,15 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   }
 
   readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
+  readonly fixed attribute optional nullable single minMeasuredValue = 1;
+  readonly fixed attribute optional nullable single maxMeasuredValue = 2;
   readonly attribute optional nullable single peakMeasuredValue = 3;
   readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
   readonly attribute optional nullable single averageMeasuredValue = 5;
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  readonly fixed attribute optional single uncertainty = 7;
+  readonly fixed attribute optional MeasurementUnitEnum measurementUnit = 8;
+  readonly fixed attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2262,15 +2240,15 @@ cluster OzoneConcentrationMeasurement = 1045 {
   }
 
   readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
+  readonly fixed attribute optional nullable single minMeasuredValue = 1;
+  readonly fixed attribute optional nullable single maxMeasuredValue = 2;
   readonly attribute optional nullable single peakMeasuredValue = 3;
   readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
   readonly attribute optional nullable single averageMeasuredValue = 5;
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  readonly fixed attribute optional single uncertainty = 7;
+  readonly fixed attribute optional MeasurementUnitEnum measurementUnit = 8;
+  readonly fixed attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2320,15 +2298,15 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   }
 
   readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
+  readonly fixed attribute optional nullable single minMeasuredValue = 1;
+  readonly fixed attribute optional nullable single maxMeasuredValue = 2;
   readonly attribute optional nullable single peakMeasuredValue = 3;
   readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
   readonly attribute optional nullable single averageMeasuredValue = 5;
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  readonly fixed attribute optional single uncertainty = 7;
+  readonly fixed attribute optional MeasurementUnitEnum measurementUnit = 8;
+  readonly fixed attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2378,15 +2356,15 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   }
 
   readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
+  readonly fixed attribute optional nullable single minMeasuredValue = 1;
+  readonly fixed attribute optional nullable single maxMeasuredValue = 2;
   readonly attribute optional nullable single peakMeasuredValue = 3;
   readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
   readonly attribute optional nullable single averageMeasuredValue = 5;
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  readonly fixed attribute optional single uncertainty = 7;
+  readonly fixed attribute optional MeasurementUnitEnum measurementUnit = 8;
+  readonly fixed attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2436,15 +2414,15 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   }
 
   readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
+  readonly fixed attribute optional nullable single minMeasuredValue = 1;
+  readonly fixed attribute optional nullable single maxMeasuredValue = 2;
   readonly attribute optional nullable single peakMeasuredValue = 3;
   readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
   readonly attribute optional nullable single averageMeasuredValue = 5;
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  readonly fixed attribute optional single uncertainty = 7;
+  readonly fixed attribute optional MeasurementUnitEnum measurementUnit = 8;
+  readonly fixed attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2494,15 +2472,15 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   }
 
   readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
+  readonly fixed attribute optional nullable single minMeasuredValue = 1;
+  readonly fixed attribute optional nullable single maxMeasuredValue = 2;
   readonly attribute optional nullable single peakMeasuredValue = 3;
   readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
   readonly attribute optional nullable single averageMeasuredValue = 5;
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  readonly fixed attribute optional single uncertainty = 7;
+  readonly fixed attribute optional MeasurementUnitEnum measurementUnit = 8;
+  readonly fixed attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2552,15 +2530,15 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   }
 
   readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
+  readonly fixed attribute optional nullable single minMeasuredValue = 1;
+  readonly fixed attribute optional nullable single maxMeasuredValue = 2;
   readonly attribute optional nullable single peakMeasuredValue = 3;
   readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
   readonly attribute optional nullable single averageMeasuredValue = 5;
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  readonly fixed attribute optional single uncertainty = 7;
+  readonly fixed attribute optional MeasurementUnitEnum measurementUnit = 8;
+  readonly fixed attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2610,15 +2588,15 @@ cluster RadonConcentrationMeasurement = 1071 {
   }
 
   readonly attribute optional nullable single measuredValue = 0;
-  readonly attribute optional nullable single minMeasuredValue = 1;
-  readonly attribute optional nullable single maxMeasuredValue = 2;
+  readonly fixed attribute optional nullable single minMeasuredValue = 1;
+  readonly fixed attribute optional nullable single maxMeasuredValue = 2;
   readonly attribute optional nullable single peakMeasuredValue = 3;
   readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
   readonly attribute optional nullable single averageMeasuredValue = 5;
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
-  readonly attribute optional single uncertainty = 7;
-  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  readonly fixed attribute optional single uncertainty = 7;
+  readonly fixed attribute optional MeasurementUnitEnum measurementUnit = 8;
+  readonly fixed attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2729,7 +2707,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2753,7 +2731,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2768,7 +2746,7 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AttestationRequest;
@@ -2868,9 +2846,9 @@ endpoint 2 {
 
   server cluster IlluminanceMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 1;
-    ram      attribute maxMeasuredValue default = 0xfffe;
-    ram      attribute lightSensorType default = 1;
+    callback attribute minMeasuredValue default = 1;
+    callback attribute maxMeasuredValue default = 0xfffe;
+    callback attribute lightSensorType default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2909,9 +2887,9 @@ endpoint 3 {
   }
 
   server cluster OccupancySensing {
-    ram      attribute occupancy default = 0;
-    ram      attribute occupancySensorType default = 0;
-    ram      attribute occupancySensorTypeBitmap default = 0x1;
+    callback attribute occupancy;
+    callback attribute occupancySensorType;
+    callback attribute occupancySensorTypeBitmap;
     callback attribute holdTime;
     callback attribute holdTimeLimits;
     callback attribute generatedCommandList;
@@ -2953,8 +2931,8 @@ endpoint 4 {
 
   server cluster TemperatureMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = -27315;
-    ram      attribute maxMeasuredValue default = 32767;
+    callback attribute minMeasuredValue default = -27315;
+    callback attribute maxMeasuredValue default = 32767;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2994,13 +2972,13 @@ endpoint 5 {
 
   server cluster PressureMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 1;
-    ram      attribute maxMeasuredValue default = 32767;
+    callback attribute minMeasuredValue default = 1;
+    callback attribute maxMeasuredValue default = 32767;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 0x0004;
+    callback attribute clusterRevision;
   }
 }
 endpoint 6 {
@@ -3035,9 +3013,9 @@ endpoint 6 {
 
   server cluster FlowMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0x1;
-    ram      attribute maxMeasuredValue default = 0xFFF;
-    ram      attribute tolerance default = 8;
+    callback attribute minMeasuredValue default = 0x1;
+    callback attribute maxMeasuredValue default = 0xFFF;
+    callback attribute tolerance default = 8;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -3077,9 +3055,9 @@ endpoint 7 {
 
   server cluster RelativeHumidityMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0x1;
-    ram      attribute maxMeasuredValue default = 0x2710;
-    ram      attribute tolerance default = 8;
+    callback attribute minMeasuredValue default = 0x1;
+    callback attribute maxMeasuredValue default = 0x2710;
+    callback attribute tolerance default = 8;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -3142,7 +3120,7 @@ endpoint 8 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
@@ -3161,7 +3139,7 @@ endpoint 8 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
@@ -3180,7 +3158,7 @@ endpoint 8 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster OzoneConcentrationMeasurement {
@@ -3199,7 +3177,7 @@ endpoint 8 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster Pm25ConcentrationMeasurement {
@@ -3218,7 +3196,7 @@ endpoint 8 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
@@ -3237,7 +3215,7 @@ endpoint 8 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster Pm1ConcentrationMeasurement {
@@ -3256,7 +3234,7 @@ endpoint 8 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster Pm10ConcentrationMeasurement {
@@ -3275,7 +3253,7 @@ endpoint 8 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
@@ -3294,7 +3272,7 @@ endpoint 8 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster RadonConcentrationMeasurement {
@@ -3313,7 +3291,7 @@ endpoint 8 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 }
 endpoint 9 {

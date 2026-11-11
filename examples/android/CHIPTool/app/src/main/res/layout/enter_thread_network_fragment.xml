@@ -16,11 +16,20 @@
             android:padding="16dp"
             android:textSize="20sp"/>
 
+        <Button
+            android:id="@+id/fetchThreadDatasetBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/titleTv"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/enter_thread_fetch_from_system_btn"/>
+
         <TextView
             android:id="@+id/channelTv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/titleTv"
+            android:layout_below="@id/fetchThreadDatasetBtn"
             android:layout_marginTop="16dp"
             android:layout_marginHorizontal="16dp"
             android:text="@string/enter_thread_channel_hint"

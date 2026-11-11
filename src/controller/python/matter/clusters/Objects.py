@@ -486,14 +486,26 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
 
-        class ServerAttributionContextInformation(MatterIntEnum):
-            kServerAutomationRule = 0x0B
-            kServerSchedule = 0x0C
-            kServerTimer = 0x0D
-            kSecurityEvent = 0x0E
-            kDemandResponseEvent = 0x0F
-            kPhysicalInteraction = 0x10
-            kExternalProtocol = 0x11
+        class SemanticTagNamespaceId(MatterIntEnum):
+            kCompassDirection = 0x02
+            kCompassLocation = 0x03
+            kDirection = 0x04
+            kLevel = 0x05
+            kLocation = 0x06
+            kNumber = 0x07
+            kPosition = 0x08
+            kElectricalMeasurement = 0x0A
+            kCommodityTariffChronology = 0x0B
+            kCommodityTariffDirection = 0x0D
+            kLaundry = 0x0E
+            kPowerSource = 0x0F
+            kCommonArea = 0x10
+            kCommonLandmark = 0x11
+            kRelativePosition = 0x12
+            kClosure = 0x44
+            kClosurePanel = 0x45
+            kClosureWindow = 0x47
+            kClosureCabinet = 0x48
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -13071,6 +13083,21 @@ class OperationalCredentials(Cluster):
 
     class Structs:
         @dataclass
+        class CryptoProfileChainStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="PAACrypto", Tag=0, Type=OperationalCredentials.Enums.AttestationCryptoProfileEnum),
+                        ClusterObjectFieldDescriptor(Label="PAICrypto", Tag=1, Type=OperationalCredentials.Enums.AttestationCryptoProfileEnum),
+                        ClusterObjectFieldDescriptor(Label="DACCrypto", Tag=2, Type=OperationalCredentials.Enums.AttestationCryptoProfileEnum),
+                    ])
+
+            PAACrypto: 'OperationalCredentials.Enums.AttestationCryptoProfileEnum' = 0
+            PAICrypto: 'OperationalCredentials.Enums.AttestationCryptoProfileEnum' = 0
+            DACCrypto: 'OperationalCredentials.Enums.AttestationCryptoProfileEnum' = 0
+
+        @dataclass
         class FabricDescriptorStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13119,13 +13146,11 @@ class OperationalCredentials(Cluster):
                         ClusterObjectFieldDescriptor(Label="PAASupportedProfiles", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="PAISupportedProfiles", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="DACSupportedProfiles", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="CDSupportedProfiles", Tag=3, Type=uint),
                     ])
 
             PAASupportedProfiles: 'uint' = 0
             PAISupportedProfiles: 'uint' = 0
             DACSupportedProfiles: 'uint' = 0
-            CDSupportedProfiles: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -13174,13 +13199,13 @@ class OperationalCredentials(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="certificateType", Tag=0, Type=OperationalCredentials.Enums.CertificateChainTypeEnum),
-                        ClusterObjectFieldDescriptor(Label="cryptoProfile", Tag=1, Type=typing.Optional[OperationalCredentials.Enums.AttestationCryptoProfileEnum]),
+                        ClusterObjectFieldDescriptor(Label="cryptoProfile", Tag=1, Type=typing.Optional[OperationalCredentials.Structs.CryptoProfileChainStruct]),
                         ClusterObjectFieldDescriptor(Label="segmentID", Tag=2, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="maxSegmentSize", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             certificateType: OperationalCredentials.Enums.CertificateChainTypeEnum = 0
-            cryptoProfile: typing.Optional[OperationalCredentials.Enums.AttestationCryptoProfileEnum] = None
+            cryptoProfile: typing.Optional[OperationalCredentials.Structs.CryptoProfileChainStruct] = None
             segmentID: typing.Optional[uint] = None
             maxSegmentSize: typing.Optional[uint] = None
 
@@ -37476,9 +37501,9 @@ class Humidistat(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[Humidistat.Enums.ModeEnum]),
-                ClusterObjectFieldDescriptor(Label="mode", Tag=0x00000001, Type=Humidistat.Enums.ModeEnum),
-                ClusterObjectFieldDescriptor(Label="systemState", Tag=0x00000002, Type=Humidistat.Enums.SystemStateEnum),
+                ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[Humidistat.Enums.HumidistatModeEnum]),
+                ClusterObjectFieldDescriptor(Label="humidistatMode", Tag=0x00000001, Type=Humidistat.Enums.HumidistatModeEnum),
+                ClusterObjectFieldDescriptor(Label="humidistatSystemState", Tag=0x00000002, Type=Humidistat.Enums.HumidistatSystemStateEnum),
                 ClusterObjectFieldDescriptor(Label="userSetpoint", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="minSetpoint", Tag=0x00000004, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="maxSetpoint", Tag=0x00000005, Type=typing.Optional[uint]),
@@ -37497,9 +37522,9 @@ class Humidistat(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedModes: typing.List[Humidistat.Enums.ModeEnum] = field(default_factory=lambda: [])
-    mode: Humidistat.Enums.ModeEnum = 0
-    systemState: Humidistat.Enums.SystemStateEnum = 0
+    supportedModes: typing.List[Humidistat.Enums.HumidistatModeEnum] = field(default_factory=lambda: [])
+    humidistatMode: Humidistat.Enums.HumidistatModeEnum = 0
+    humidistatSystemState: Humidistat.Enums.HumidistatSystemStateEnum = 0
     userSetpoint: typing.Optional[uint] = None
     minSetpoint: typing.Optional[uint] = None
     maxSetpoint: typing.Optional[uint] = None
@@ -37518,7 +37543,7 @@ class Humidistat(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
-        class ModeEnum(MatterIntEnum):
+        class HumidistatModeEnum(MatterIntEnum):
             kHumidifier = 0x00
             kDehumidifier = 0x01
             kAuto = 0x02
@@ -37529,7 +37554,7 @@ class Humidistat(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4
 
-        class SystemStateEnum(MatterIntEnum):
+        class HumidistatSystemStateEnum(MatterIntEnum):
             kHumidifying = 0x00
             kDehumidifying = 0x01
             kFan = 0x02
@@ -37570,7 +37595,7 @@ class Humidistat(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="userSetpoint", Tag=0, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="mode", Tag=1, Type=typing.Optional[Humidistat.Enums.ModeEnum]),
+                        ClusterObjectFieldDescriptor(Label="humidistatMode", Tag=1, Type=typing.Optional[Humidistat.Enums.HumidistatModeEnum]),
                         ClusterObjectFieldDescriptor(Label="mistType", Tag=2, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="continuous", Tag=3, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="sleep", Tag=4, Type=typing.Optional[bool]),
@@ -37578,7 +37603,7 @@ class Humidistat(Cluster):
                     ])
 
             userSetpoint: typing.Optional[uint] = None
-            mode: typing.Optional[Humidistat.Enums.ModeEnum] = None
+            humidistatMode: typing.Optional[Humidistat.Enums.HumidistatModeEnum] = None
             mistType: typing.Optional[uint] = None
             continuous: typing.Optional[bool] = None
             sleep: typing.Optional[bool] = None
@@ -37597,12 +37622,12 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[Humidistat.Enums.ModeEnum])
+                return ClusterObjectFieldDescriptor(Type=typing.List[Humidistat.Enums.HumidistatModeEnum])
 
-            value: typing.List[Humidistat.Enums.ModeEnum] = field(default_factory=lambda: [])
+            value: typing.List[Humidistat.Enums.HumidistatModeEnum] = field(default_factory=lambda: [])
 
         @dataclass
-        class Mode(ClusterAttributeDescriptor):
+        class HumidistatMode(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000205
@@ -37613,12 +37638,12 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=Humidistat.Enums.ModeEnum)
+                return ClusterObjectFieldDescriptor(Type=Humidistat.Enums.HumidistatModeEnum)
 
-            value: Humidistat.Enums.ModeEnum = 0
+            value: Humidistat.Enums.HumidistatModeEnum = 0
 
         @dataclass
-        class SystemState(ClusterAttributeDescriptor):
+        class HumidistatSystemState(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000205
@@ -37629,9 +37654,9 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=Humidistat.Enums.SystemStateEnum)
+                return ClusterObjectFieldDescriptor(Type=Humidistat.Enums.HumidistatSystemStateEnum)
 
-            value: Humidistat.Enums.SystemStateEnum = 0
+            value: Humidistat.Enums.HumidistatSystemStateEnum = 0
 
         @dataclass
         class UserSetpoint(ClusterAttributeDescriptor):
@@ -53266,14 +53291,14 @@ class MediaFileManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(Label="size", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mimeType", Tag=3, Type=str),
-                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=4, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageURI", Tag=4, Type=str),
                     ])
 
             fileID: 'uint' = 0
             name: 'str' = ""
             size: 'uint' = 0
             mimeType: 'str' = ""
-            imageUri: 'str' = ""
+            imageURI: 'str' = ""
 
     class Commands:
         @dataclass
@@ -53290,13 +53315,13 @@ class MediaFileManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="size", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mimeType", Tag=2, Type=str),
-                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=3, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageURI", Tag=3, Type=str),
                     ])
 
             name: str = ""
             size: uint = 0
             mimeType: str = ""
-            imageUri: str = ""
+            imageURI: str = ""
 
         @dataclass
         class AddFileResponse(ClusterCommand):
@@ -53345,12 +53370,12 @@ class MediaFileManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="clientName", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="requestID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="supportedMimeTypes", Tag=2, Type=typing.Union[None, Nullable, typing.List[str]]),
+                        ClusterObjectFieldDescriptor(Label="supportedMimeTypes", Tag=2, Type=typing.Optional[typing.List[str]]),
                     ])
 
             clientName: str = ""
             requestID: uint = 0
-            supportedMimeTypes: typing.Union[None, Nullable, typing.List[str]] = None
+            supportedMimeTypes: typing.Optional[typing.List[str]] = None
 
         @dataclass
         class GetSharedFile(ClusterCommand):
@@ -53380,11 +53405,11 @@ class MediaFileManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaFileManagement.Enums.FileStatusEnum),
-                        ClusterObjectFieldDescriptor(Label="fileDescription", Tag=1, Type=typing.Union[None, Nullable, MediaFileManagement.Structs.FileDescriptionStruct]),
+                        ClusterObjectFieldDescriptor(Label="fileDescription", Tag=1, Type=typing.Union[Nullable, MediaFileManagement.Structs.FileDescriptionStruct]),
                     ])
 
             status: MediaFileManagement.Enums.FileStatusEnum = 0
-            fileDescription: typing.Union[None, Nullable, MediaFileManagement.Structs.FileDescriptionStruct] = None
+            fileDescription: typing.Union[Nullable, MediaFileManagement.Structs.FileDescriptionStruct] = NullValue
 
         @dataclass
         class OfferFile(ClusterCommand):
@@ -53401,14 +53426,14 @@ class MediaFileManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(Label="size", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mimeType", Tag=3, Type=str),
-                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=4, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageURI", Tag=4, Type=str),
                     ])
 
             clientName: str = ""
             name: str = ""
             size: uint = 0
             mimeType: str = ""
-            imageUri: str = ""
+            imageURI: str = ""
 
     class Attributes:
         @dataclass
@@ -65128,4 +65153,3 @@ class SampleMei(Cluster):
 
             count: uint = 0
             fabricIndex: uint = 0
-

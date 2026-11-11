@@ -2102,6 +2102,53 @@ TEST_F(TestChipCert, TestChipCert_ExtractAndValidateCATsFromOpCert)
     }
 }
 
+// Regression test: CAT identifier 0x0000 must be accepted by both the TLV and
+// ASN.1 cert parsing paths in CHIPCert.cpp. Previously IsValidCATIdentifier()
+// incorrectly rejected it, causing CHIP_ERROR_WRONG_CERT_DN / CHIP_ERROR_INVALID_ARGUMENT
+// on NOCs issued by clients using that identifier.
+TEST_F(TestChipCert, TestChipCert_CATIdentifierZeroIsValid)
+{
+    // CAT with identifier 0x0000 and version 1 — must be accepted.
+    constexpr CASEAuthTag kCATIdentifierZero = 0x0000'0001;
+
+    P256Keypair keypair;
+    EXPECT_EQ(keypair.Initialize(ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+
+    P256Keypair noc_keypair;
+    EXPECT_EQ(noc_keypair.Initialize(ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+
+    ChipDN noc_dn;
+    EXPECT_EQ(noc_dn.AddAttribute_MatterNodeId(0xDEDEDEDE00010001), CHIP_NO_ERROR);
+    EXPECT_EQ(noc_dn.AddAttribute_MatterFabricId(0xFAB000000000001D), CHIP_NO_ERROR);
+    EXPECT_EQ(noc_dn.AddAttribute_MatterCASEAuthTag(kCATIdentifierZero), CHIP_NO_ERROR);
+
+    ChipDN issuer_dn;
+    EXPECT_EQ(issuer_dn.AddAttribute_MatterRCACId(0x8888999944442222), CHIP_NO_ERROR);
+
+    X509CertRequestParams noc_params = { 1, 631161876, 729942000, noc_dn, issuer_dn };
+
+    uint8_t x509Buf[kMaxDERCertLength];
+    MutableByteSpan x509Cert(x509Buf);
+
+    // Exercise the ASN.1 path: NewNodeOperationalX509Cert calls ChipDN::EncodeToASN1
+    // which goes through the AddAttribute / AddCATs validation.
+    EXPECT_EQ(NewNodeOperationalX509Cert(noc_params, noc_keypair.Pubkey(), keypair, x509Cert), CHIP_NO_ERROR);
+
+    uint8_t chipBuf[kMaxCHIPCertLength];
+    MutableByteSpan chipCert(chipBuf);
+
+    // Exercise the TLV path: ConvertX509CertToChipCert + DecodeChipCert.
+    EXPECT_EQ(ConvertX509CertToChipCert(x509Cert, chipCert), CHIP_NO_ERROR);
+
+    ChipCertificateData certData;
+    EXPECT_EQ(DecodeChipCert(chipCert, certData), CHIP_NO_ERROR);
+
+    // Verify the CAT round-tripped correctly.
+    CATValues cats;
+    EXPECT_EQ(ExtractCATsFromOpCert(chipCert, cats), CHIP_NO_ERROR);
+    EXPECT_TRUE(cats.Contains(kCATIdentifierZero));
+}
+
 TEST_F(TestChipCert, TestChipCert_ExtractSubjectDNFromChipCert)
 {
     struct TestCase

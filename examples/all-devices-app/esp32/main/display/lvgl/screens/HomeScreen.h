@@ -22,7 +22,7 @@
 
 /**
  * Populates @a parent with the root Home screen:
- * category buttons for Devices, Switch Device Type, and System.
+ * category buttons for Devices, Update Device Type, and System.
  *
  * The caller must hold the LVGL lock.
  */

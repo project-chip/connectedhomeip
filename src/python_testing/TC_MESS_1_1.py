@@ -21,6 +21,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-stdin-pipe: dut-tv-app-stdin
 #     script-args: >
 #       --endpoint 1
 #       --storage-path admin_storage.json
@@ -64,7 +65,7 @@ class TC_MESS_1_1(MatterTestCommissionedDevice):
 
     def steps_TC_MESS_1_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads the SupportedLanguageCodes attribute.",
                      "Verify that a non-empty list of language tag strings is returned. Each entry is a valid "
                      "RFC 5646 language tag (e.g. 'en-US', 'fr-FR')."),

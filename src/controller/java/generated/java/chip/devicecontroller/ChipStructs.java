@@ -3404,6 +3404,82 @@ public static class BridgedDeviceBasicInformationClusterProductAppearanceStruct 
     return output.toString();
   }
 }
+public static class OperationalCredentialsClusterCryptoProfileChainStruct {
+  public Integer PAACrypto;
+  public Integer PAICrypto;
+  public Integer DACCrypto;
+  private static final long PAA_CRYPTO_ID = 0L;
+  private static final long PAI_CRYPTO_ID = 1L;
+  private static final long DAC_CRYPTO_ID = 2L;
+
+  public OperationalCredentialsClusterCryptoProfileChainStruct(
+    Integer PAACrypto,
+    Integer PAICrypto,
+    Integer DACCrypto
+  ) {
+    this.PAACrypto = PAACrypto;
+    this.PAICrypto = PAICrypto;
+    this.DACCrypto = DACCrypto;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PAA_CRYPTO_ID, new UIntType(PAACrypto)));
+    values.add(new StructElement(PAI_CRYPTO_ID, new UIntType(PAICrypto)));
+    values.add(new StructElement(DAC_CRYPTO_ID, new UIntType(DACCrypto)));
+
+    return new StructType(values);
+  }
+
+  public static OperationalCredentialsClusterCryptoProfileChainStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer PAACrypto = null;
+    Integer PAICrypto = null;
+    Integer DACCrypto = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PAA_CRYPTO_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          PAACrypto = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PAI_CRYPTO_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          PAICrypto = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DAC_CRYPTO_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          DACCrypto = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new OperationalCredentialsClusterCryptoProfileChainStruct(
+      PAACrypto,
+      PAICrypto,
+      DACCrypto
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OperationalCredentialsClusterCryptoProfileChainStruct {\n");
+    output.append("\tPAACrypto: ");
+    output.append(PAACrypto);
+    output.append("\n");
+    output.append("\tPAICrypto: ");
+    output.append(PAICrypto);
+    output.append("\n");
+    output.append("\tDACCrypto: ");
+    output.append(DACCrypto);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class OperationalCredentialsClusterFabricDescriptorStruct {
   public byte[] rootPublicKey;
   public Integer vendorID;
@@ -3635,22 +3711,18 @@ public static class OperationalCredentialsClusterPQCDeviceAttestationProfileStru
   public Integer PAASupportedProfiles;
   public Integer PAISupportedProfiles;
   public Integer DACSupportedProfiles;
-  public Integer CDSupportedProfiles;
   private static final long PAA_SUPPORTED_PROFILES_ID = 0L;
   private static final long PAI_SUPPORTED_PROFILES_ID = 1L;
   private static final long DAC_SUPPORTED_PROFILES_ID = 2L;
-  private static final long CD_SUPPORTED_PROFILES_ID = 3L;
 
   public OperationalCredentialsClusterPQCDeviceAttestationProfileStruct(
     Integer PAASupportedProfiles,
     Integer PAISupportedProfiles,
-    Integer DACSupportedProfiles,
-    Integer CDSupportedProfiles
+    Integer DACSupportedProfiles
   ) {
     this.PAASupportedProfiles = PAASupportedProfiles;
     this.PAISupportedProfiles = PAISupportedProfiles;
     this.DACSupportedProfiles = DACSupportedProfiles;
-    this.CDSupportedProfiles = CDSupportedProfiles;
   }
 
   public StructType encodeTlv() {
@@ -3658,7 +3730,6 @@ public static class OperationalCredentialsClusterPQCDeviceAttestationProfileStru
     values.add(new StructElement(PAA_SUPPORTED_PROFILES_ID, new UIntType(PAASupportedProfiles)));
     values.add(new StructElement(PAI_SUPPORTED_PROFILES_ID, new UIntType(PAISupportedProfiles)));
     values.add(new StructElement(DAC_SUPPORTED_PROFILES_ID, new UIntType(DACSupportedProfiles)));
-    values.add(new StructElement(CD_SUPPORTED_PROFILES_ID, new UIntType(CDSupportedProfiles)));
 
     return new StructType(values);
   }
@@ -3670,7 +3741,6 @@ public static class OperationalCredentialsClusterPQCDeviceAttestationProfileStru
     Integer PAASupportedProfiles = null;
     Integer PAISupportedProfiles = null;
     Integer DACSupportedProfiles = null;
-    Integer CDSupportedProfiles = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == PAA_SUPPORTED_PROFILES_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -3687,18 +3757,12 @@ public static class OperationalCredentialsClusterPQCDeviceAttestationProfileStru
           UIntType castingValue = element.value(UIntType.class);
           DACSupportedProfiles = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == CD_SUPPORTED_PROFILES_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          CDSupportedProfiles = castingValue.value(Integer.class);
-        }
       }
     }
     return new OperationalCredentialsClusterPQCDeviceAttestationProfileStruct(
       PAASupportedProfiles,
       PAISupportedProfiles,
-      DACSupportedProfiles,
-      CDSupportedProfiles
+      DACSupportedProfiles
     );
   }
 
@@ -3714,9 +3778,6 @@ public static class OperationalCredentialsClusterPQCDeviceAttestationProfileStru
     output.append("\n");
     output.append("\tDACSupportedProfiles: ");
     output.append(DACSupportedProfiles);
-    output.append("\n");
-    output.append("\tCDSupportedProfiles: ");
-    output.append(CDSupportedProfiles);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -18272,7 +18333,7 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
   public String name;
   public Long size;
   public String mimeType;
-  public String imageUri;
+  public String imageURI;
   private static final long FILE_ID_ID = 0L;
   private static final long NAME_ID = 1L;
   private static final long SIZE_ID = 2L;
@@ -18284,13 +18345,13 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
     String name,
     Long size,
     String mimeType,
-    String imageUri
+    String imageURI
   ) {
     this.fileID = fileID;
     this.name = name;
     this.size = size;
     this.mimeType = mimeType;
-    this.imageUri = imageUri;
+    this.imageURI = imageURI;
   }
 
   public StructType encodeTlv() {
@@ -18299,7 +18360,7 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
     values.add(new StructElement(NAME_ID, new StringType(name)));
     values.add(new StructElement(SIZE_ID, new UIntType(size)));
     values.add(new StructElement(MIME_TYPE_ID, new StringType(mimeType)));
-    values.add(new StructElement(IMAGE_URI_ID, new StringType(imageUri)));
+    values.add(new StructElement(IMAGE_URI_ID, new StringType(imageURI)));
 
     return new StructType(values);
   }
@@ -18312,7 +18373,7 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
     String name = null;
     Long size = null;
     String mimeType = null;
-    String imageUri = null;
+    String imageURI = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == FILE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -18337,7 +18398,7 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
       } else if (element.contextTagNum() == IMAGE_URI_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
           StringType castingValue = element.value(StringType.class);
-          imageUri = castingValue.value(String.class);
+          imageURI = castingValue.value(String.class);
         }
       }
     }
@@ -18346,7 +18407,7 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
       name,
       size,
       mimeType,
-      imageUri
+      imageURI
     );
   }
 
@@ -18366,8 +18427,8 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
     output.append("\tmimeType: ");
     output.append(mimeType);
     output.append("\n");
-    output.append("\timageUri: ");
-    output.append(imageUri);
+    output.append("\timageURI: ");
+    output.append(imageURI);
     output.append("\n");
     output.append("}\n");
     return output.toString();

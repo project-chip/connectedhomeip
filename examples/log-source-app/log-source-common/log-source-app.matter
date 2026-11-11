@@ -239,14 +239,26 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
-enum ServerAttributionContextInformation : enum8 {
-  kServerAutomationRule = 11;
-  kServerSchedule = 12;
-  kServerTimer = 13;
-  kSecurityEvent = 14;
-  kDemandResponseEvent = 15;
-  kPhysicalInteraction = 16;
-  kExternalProtocol = 17;
+enum SemanticTagNamespaceId : enum8 {
+  kCompassDirection = 2;
+  kCompassLocation = 3;
+  kDirection = 4;
+  kLevel = 5;
+  kLocation = 6;
+  kNumber = 7;
+  kPosition = 8;
+  kElectricalMeasurement = 10;
+  kCommodityTariffChronology = 11;
+  kCommodityTariffDirection = 13;
+  kLaundry = 14;
+  kPowerSource = 15;
+  kCommonArea = 16;
+  kCommonLandmark = 17;
+  kRelativePosition = 18;
+  kClosure = 68;
+  kClosurePanel = 69;
+  kClosureWindow = 71;
+  kClosureCabinet = 72;
 }
 
 enum SoftwareVersionCertificationStatusEnum : enum8 {
@@ -261,14 +273,6 @@ enum StreamUsageEnum : enum8 {
   kRecording = 1;
   kAnalysis = 2;
   kLiveView = 3;
-}
-
-enum SuppliedAttributionContextInformation : enum8 {
-  kDefaultClientAction = 0;
-  kUserInteraction = 1;
-  kClientAutomationRule = 2;
-  kClientSchedule = 3;
-  kClientTimer = 4;
 }
 
 enum TariffPriceTypeEnum : enum8 {
@@ -318,34 +322,6 @@ bitmap TestGlobalBitmap : bitmap32 {
   kSecondBit = 0x2;
 }
 
-struct SFrameKeyStruct {
-  octet_string<8> kid = 0;
-  octet_string<128> baseKey = 1;
-}
-
-struct SFrameStruct {
-  int16u audioCipherSuite = 0;
-  int16u videoCipherSuite = 1;
-  SFrameKeyStruct senderKey = 2;
-  SFrameKeyStruct receiveKeys[] = 3;
-  int8u ratchetBits = 4;
-  optional int8u ratchetTime = 5;
-}
-
-fabric_scoped struct WebRTCSessionStruct {
-  int16u id = 0;
-  node_id peerNodeID = 1;
-  endpoint_no peerEndpointID = 2;
-  StreamUsageEnum streamUsage = 3;
-  optional nullable int16u videoStreamID = 4;
-  optional nullable int16u audioStreamID = 5;
-  boolean metadataEnabled = 6;
-  optional int16u videoStreams[] = 7;
-  optional int16u audioStreams[] = 8;
-  optional nullable SFrameStruct SFrameConfig = 9;
-  fabric_idx fabricIndex = 254;
-}
-
 struct CurrencyStruct {
   int16u currency = 0;
   int8u decimalPoints = 1;
@@ -380,16 +356,6 @@ struct AtomicAttributeStatusStruct {
   status statusCode = 1;
 }
 
-struct AttributionData {
-  enum8 contextInformation = 0;
-  optional int32u sourceContext = 1;
-  optional node_id nodeID = 2;
-  optional group_id groupID = 3;
-  optional systime_ms systemTimeStamp = 4;
-  optional posix_ms epochTimeStamp = 5;
-  nullable fabric_idx fabricIndex = 6;
-}
-
 struct ICECandidateStruct {
   char_string candidate = 0;
   nullable char_string SDPMid = 1;
@@ -422,12 +388,6 @@ struct SemanticTagStruct {
   optional nullable char_string<64> label = 3;
 }
 
-fabric_scoped struct SuppliedAttributionData {
-  enum8 contextInformation = 0;
-  optional int32u sourceContext = 1;
-  fabric_idx fabricIndex = 254;
-}
-
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -439,6 +399,19 @@ struct ViewportStruct {
   int16u y1 = 1;
   int16u x2 = 2;
   int16u y2 = 3;
+}
+
+fabric_scoped struct WebRTCSessionStruct {
+  int16u id = 0;
+  node_id peerNodeID = 1;
+  endpoint_no peerEndpointID = 2;
+  StreamUsageEnum streamUsage = 3;
+  nullable int16u videoStreamID = 4;
+  nullable int16u audioStreamID = 5;
+  boolean metadataEnabled = 6;
+  optional int16u videoStreams[] = 7;
+  optional int16u audioStreams[] = 8;
+  fabric_idx fabricIndex = 254;
 }
 
 /** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
@@ -551,12 +524,12 @@ cluster AccessControl = 31 {
 
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
   attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
-  readonly attribute int16u subjectsPerAccessControlEntry = 2;
-  readonly attribute int16u targetsPerAccessControlEntry = 3;
-  readonly attribute int16u accessControlEntriesPerFabric = 4;
-  readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
+  readonly fixed attribute int16u subjectsPerAccessControlEntry = 2;
+  readonly fixed attribute int16u targetsPerAccessControlEntry = 3;
+  readonly fixed attribute int16u accessControlEntriesPerFabric = 4;
+  readonly fixed attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
-  provisional readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
+  provisional readonly changes_omitted attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -613,18 +586,18 @@ cluster GeneralCommissioning = 48 {
   }
 
   attribute access(write: administer) int64u breadcrumb = 0;
-  readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
+  readonly fixed attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
-  readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
-  readonly attribute boolean supportsConcurrentConnection = 4;
-  provisional readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
-  provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
-  provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
-  provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
+  readonly fixed attribute RegulatoryLocationTypeEnum locationCapability = 3;
+  readonly fixed attribute boolean supportsConcurrentConnection = 4;
+  readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
+  readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
+  readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
+  readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
-  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
+  readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -672,7 +645,7 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
   /** This command is used to indicate that the commissioning process is complete. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node. */
+  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
@@ -756,17 +729,17 @@ cluster NetworkCommissioning = 49 {
     int8s rssi = 5;
   }
 
-  readonly attribute access(read: administer) int8u maxNetworks = 0;
+  readonly fixed attribute access(read: administer) int8u maxNetworks = 0;
   readonly attribute access(read: administer) NetworkInfoStruct networks[] = 1;
-  readonly attribute optional int8u scanMaxTimeSeconds = 2;
-  readonly attribute optional int8u connectMaxTimeSeconds = 3;
+  readonly fixed attribute optional int8u scanMaxTimeSeconds = 2;
+  readonly fixed attribute optional int8u connectMaxTimeSeconds = 3;
   attribute access(write: administer) boolean interfaceEnabled = 4;
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  readonly attribute optional int16u threadVersion = 10;
+  readonly fixed attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  readonly fixed attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  readonly fixed attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -939,6 +912,12 @@ cluster OperationalCredentials = 62 {
     kPQCDeviceAttestation = 0x1;
   }
 
+  struct CryptoProfileChainStruct {
+    AttestationCryptoProfileEnum PAACrypto = 0;
+    AttestationCryptoProfileEnum PAICrypto = 1;
+    AttestationCryptoProfileEnum DACCrypto = 2;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -960,16 +939,15 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
     AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
-    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
   }
 
-  readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
+  readonly changes_omitted attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
-  readonly attribute int8u supportedFabrics = 2;
+  readonly fixed attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
-  readonly attribute octet_string trustedRootCertificates[] = 4;
+  readonly changes_omitted attribute octet_string trustedRootCertificates[] = 4;
   readonly attribute int8u currentFabricIndex = 5;
-  provisional readonly attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
+  provisional readonly changes_omitted attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -987,7 +965,7 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
-    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional CryptoProfileChainStruct cryptoProfile = 1;
     optional int16u segmentID = 2;
     optional int16u maxSegmentSize = 3;
   }
@@ -1129,7 +1107,7 @@ endpoint 0 {
     callback attribute supportedFabrics;
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AttestationRequest;

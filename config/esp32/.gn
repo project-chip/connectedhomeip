@@ -34,8 +34,9 @@ default_args = {
     "$dir_pw_log:impl",
   ]
 
-  pw_build_PIP_CONSTRAINTS =
-      [ "//third_party/connectedhomeip/scripts/setup/constraints.txt" ]
+  pw_build_PIP_CONSTRAINTS = [
+    "//third_party/connectedhomeip/scripts/setup/requirements.constraints.txt",
+  ]
   pw_build_PIP_REQUIREMENTS = [
     "//third_party/connectedhomeip/scripts/setup/requirements.build.txt",
     "//third_party/connectedhomeip/scripts/setup/requirements.esp32.txt",

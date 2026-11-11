@@ -105,7 +105,7 @@ class TC_ICDM_3_1(MatterTestCommissionedDevice):
 
     def steps_TC_ICDM_3_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads from the DUT the FeatureMap. If the CIP feature is not supported on the cluster, skip all remaining steps"),
             TestStep("2a", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster."),
             TestStep("2b", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.ICDM.S.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.ICDM.S.TEST_EVENT_TRIGGER for the Active Mode requirement."),

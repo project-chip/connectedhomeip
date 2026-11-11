@@ -67,6 +67,7 @@ set(SRC_DIRS_LIST
                       "${CHEF}/common/clusters/switch/"
                       "${CHEF}/common/clusters/target-navigator/"
                       "${CHEF}/common/clusters/temperature-control/"
+                      "${CHEF}/common/clusters/thermostat/"
                       "${CHEF}/common/clusters/wake-on-lan/"
                       "${CHEF}/common/clusters/water-heater-management/"
                       "${CHEF}/common/clusters/water-heater-mode/"

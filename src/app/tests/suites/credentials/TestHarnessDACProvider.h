@@ -68,6 +68,10 @@ public:
     CHIP_ERROR GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType documentType, DeviceAttestationCertProfile profile,
                                                    size_t offset, MutableByteSpan & out_document_buffer,
                                                    size_t & out_document_size) override;
+    CHIP_ERROR GetDeviceAttestationDocumentSegmentForChain(DeviceAttestationDocumentType documentType,
+                                                           const DeviceAttestationChainProfile & chain, size_t offset,
+                                                           MutableByteSpan & out_document_buffer,
+                                                           size_t & out_document_size) override;
     CharSpan GetDescription() { return mDescription; }
     bool IsSuccessCase() { return mIsSuccessCase; }
     uint16_t GetPid() { return mPid; }
@@ -92,6 +96,8 @@ private:
     ByteSpan mFirmwareInformation;
     CharSpan mDescription;
     DeviceAttestationProfileSupport mProfileSupport;
+    DeviceAttestationCertProfile mPaiProfileMlDsa44;
+    DeviceAttestationCertProfile mPaiProfileMlDsa65;
     bool mIsSuccessCase;
     uint16_t mPid;
 };

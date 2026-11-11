@@ -81,4 +81,32 @@ config FLASH_SHELL
 	bool
 	default n
 
+# Wi-Fi buffers trimmed for the C6 SRAM
+if WIFI_ESP32
+
+config ESP32_WIFI_STATIC_RX_BUFFER_NUM
+	int
+	default 6
+
+config ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM
+	int
+	default 12
+
+config ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM
+	int
+	depends on ESP32_WIFI_DYNAMIC_TX_BUFFER
+	default 12
+
+config ESP32_WIFI_RX_BA_WIN
+	int
+	depends on ESP32_WIFI_AMPDU_RX_ENABLED
+	default 4
+
+config ESP32_WIFI_TX_BA_WIN
+	int
+	depends on ESP32_WIFI_AMPDU_TX_ENABLED
+	default 4
+
+endif # WIFI_ESP32
+
 endif # CHIP

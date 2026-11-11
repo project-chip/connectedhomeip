@@ -472,16 +472,28 @@ enum class RelativePositionTag : uint8_t
     kUnknownEnumValue = 7,
 };
 
-// Enum for ServerAttributionContextInformation
-enum class ServerAttributionContextInformation : uint8_t
+// Enum for SemanticTagNamespaceId
+enum class SemanticTagNamespaceId : uint8_t
 {
-    kServerAutomationRule = 0x0B,
-    kServerSchedule       = 0x0C,
-    kServerTimer          = 0x0D,
-    kSecurityEvent        = 0x0E,
-    kDemandResponseEvent  = 0x0F,
-    kPhysicalInteraction  = 0x10,
-    kExternalProtocol     = 0x11,
+    kCompassDirection          = 0x02,
+    kCompassLocation           = 0x03,
+    kDirection                 = 0x04,
+    kLevel                     = 0x05,
+    kLocation                  = 0x06,
+    kNumber                    = 0x07,
+    kPosition                  = 0x08,
+    kElectricalMeasurement     = 0x0A,
+    kCommodityTariffChronology = 0x0B,
+    kCommodityTariffDirection  = 0x0D,
+    kLaundry                   = 0x0E,
+    kPowerSource               = 0x0F,
+    kCommonArea                = 0x10,
+    kCommonLandmark            = 0x11,
+    kRelativePosition          = 0x12,
+    kClosure                   = 0x44,
+    kClosurePanel              = 0x45,
+    kClosureWindow             = 0x47,
+    kClosureCabinet            = 0x48,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown

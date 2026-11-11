@@ -47,7 +47,7 @@ class TC_ALOGIN_12_3(MatterTestCommissionedDevice):
 
     def steps_TC_ALOGIN_12_3(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads the OAuthLoggedIn attribute from the DUT.",
                      "Verify that the response contains a boolean value (TRUE or FALSE)."),
             TestStep(2, "TH sends a GetDeviceAuthURI command to the DUT.",

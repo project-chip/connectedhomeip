@@ -68,7 +68,7 @@ class TC_ACL_2_11(MatterTestCommissionedDevice):
 
     def steps_TC_ACL_2_11(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning (already done) and precondition checks", is_commissioning=True),
+            TestStep(1, "Commissioning (already done) and precondition checks"),
             TestStep(2, "TH1 reads DUT Endpoint 0 AccessControl cluster CommissioningARL attribute"),
             TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster ARL attribute"),
             TestStep(4, "For each entry in ARL, iterate over each restriction and attempt access the restriction's ID on the Endpoint and Cluster in the ARL entry.",
