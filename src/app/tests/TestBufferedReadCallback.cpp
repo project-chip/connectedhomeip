@@ -321,6 +321,7 @@ void DataSeriesGenerator::Generate()
     for (auto & instruction : mInstructionList)
     {
         handle = System::PacketBufferHandle::New(1000);
+        ASSERT_FALSE(handle.IsNull());
         writer.Init(std::move(handle), true);
         status  = StatusIB();
         hasData = true;
@@ -453,6 +454,7 @@ void DataSeriesGenerator::Generate()
                 Clusters::UnitTesting::Structs::TestListStructOctet::Type listItem;
 
                 handle = System::PacketBufferHandle::New(1000);
+                ASSERT_FALSE(handle.IsNull());
                 writer.Init(std::move(handle), true);
                 status = StatusIB();
 
@@ -494,6 +496,7 @@ void DataSeriesGenerator::Generate()
             for (int i = 0; i < 512; i++)
             {
                 handle = System::PacketBufferHandle::New(1000);
+                ASSERT_FALSE(handle.IsNull());
                 writer.Init(std::move(handle), true);
                 status = StatusIB();
 
