@@ -65,44 +65,44 @@ examples-nrfconnect.yaml / nRF Connect SDK / Run unit tests for Zephyr native_po
   targets: nrf-native-sim-tests
 
 nightly.yaml / Nightly ASAN Testing across Crypto Backends / ASAN unit tests - BoringSSL
-  on:     schedule[{"cron": "0 0 * * *"}], workflow_dispatch
-  job-if: github.actor != 'restyled-io[bot]'
+  on:     schedule[{"cron": "0 0 * * *"}], pull_request, workflow_dispatch
+  job-if: github.actor != 'restyled-io[bot]' && github.event_name != 'pull_request'
   if:     -
   targets: linux-x64-tests-boringssl-asan-clang
 
 nightly.yaml / Nightly ASAN Testing across Crypto Backends / ASAN unit tests - mbedTLS
-  on:     schedule[{"cron": "0 0 * * *"}], workflow_dispatch
-  job-if: github.actor != 'restyled-io[bot]'
+  on:     schedule[{"cron": "0 0 * * *"}], pull_request, workflow_dispatch
+  job-if: github.actor != 'restyled-io[bot]' && github.event_name != 'pull_request'
   if:     -
   targets: linux-x64-tests-mbedtls-asan-clang
 
 nightly.yaml / Nightly ASAN Testing across Crypto Backends / ASAN unit tests - PSA
-  on:     schedule[{"cron": "0 0 * * *"}], workflow_dispatch
-  job-if: github.actor != 'restyled-io[bot]'
+  on:     schedule[{"cron": "0 0 * * *"}], pull_request, workflow_dispatch
+  job-if: github.actor != 'restyled-io[bot]' && github.event_name != 'pull_request'
   if:     -
   targets: linux-x64-tests-psa-asan-clang
 
 nightly.yaml / Nightly ASAN Unit Tests - PacketBuffer Pool / ASAN unit tests - PacketBuffer pool
-  on:     schedule[{"cron": "0 0 * * *"}], workflow_dispatch
+  on:     schedule[{"cron": "0 0 * * *"}], pull_request, workflow_dispatch
   job-if: github.actor != 'restyled-io[bot]'
   if:     -
   targets: linux-x64-tests-asan-clang-packetbuffer-pool
 
 nightly.yaml / Nightly ASAN Unit Tests - PacketBuffer Pool / ASAN unit tests - PacketBuffer pool, TCP off
-  on:     schedule[{"cron": "0 0 * * *"}], workflow_dispatch
+  on:     schedule[{"cron": "0 0 * * *"}], pull_request, workflow_dispatch
   job-if: github.actor != 'restyled-io[bot]'
   if:     -
   targets: linux-x64-tests-asan-clang-no-tcp-packetbuffer-pool
 
 nightly.yaml / Nightly MSAN Tests - Linux / Build and Run MSAN unit tests
-  on:     schedule[{"cron": "0 0 * * *"}], workflow_dispatch
-  job-if: github.actor != 'restyled-io[bot]'
+  on:     schedule[{"cron": "0 0 * * *"}], pull_request, workflow_dispatch
+  job-if: github.actor != 'restyled-io[bot]' && github.event_name != 'pull_request'
   if:     -
   targets: linux-x64-tests-msan-clang
 
 nightly.yaml / Nightly Unit Tests - Linux (various features) / Run Tests
-  on:     schedule[{"cron": "0 0 * * *"}], workflow_dispatch
-  job-if: github.actor != 'restyled-io[bot]'
+  on:     schedule[{"cron": "0 0 * * *"}], pull_request, workflow_dispatch
+  job-if: github.actor != 'restyled-io[bot]' && github.event_name != 'pull_request'
   if:     -
   gn: is_clang=true is_asan=true chip_crypto="boringssl" chip_enable_rotating_device_id=true chip_enable_icd_server=true chip_enable_icd_lit=true chip_enable_access_restrictions=true chip_build_all_platform_tests=true
 

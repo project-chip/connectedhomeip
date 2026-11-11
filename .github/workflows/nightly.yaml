@@ -21,7 +21,7 @@ on:
     #     branches:
     #         - master
     #         - 'v*-branch'
-    # pull_request:
+    pull_request:
     # merge_group:
 # --- END TEST SECTION ---
     workflow_dispatch:
@@ -48,7 +48,7 @@ env:
 jobs:
     nightly_repl_tests_linux_build:
         name: Nightly REPL Tests - Linux (BUILD)
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && github.event_name != 'pull_request'
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
@@ -239,7 +239,7 @@ jobs:
     nightly_repl_tests_linux_run:
         name: Nightly REPL Tests - Linux (RUN)
         needs: nightly_repl_tests_linux_build
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && github.event_name != 'pull_request'
         timeout-minutes: 45
         strategy:
             # These tests take a lot of time so we just run them on batches.
@@ -359,7 +359,7 @@ jobs:
     # See docs/ci-cd/host_unit_tests.md for which crypto backends run on PRs, pushes and nightly.
     nightly_asan_crypto_backends:
         name: Nightly ASAN Testing across Crypto Backends
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && github.event_name != 'pull_request'
         timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
@@ -431,7 +431,7 @@ jobs:
     nightly_repl_tests_report:
         name: Nightly REPL Tests - Test Report
         needs: nightly_repl_tests_linux_run
-        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' }}
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && github.event_name != 'pull_request' }}
 
         runs-on: ubuntu-latest
         concurrency:
@@ -510,7 +510,7 @@ jobs:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     nightly_msan_tests_linux:
         name: Nightly MSAN Tests - Linux
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && github.event_name != 'pull_request'
         timeout-minutes: 60
 
         # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
@@ -558,7 +558,7 @@ jobs:
     # See docs/ci-cd/host_unit_tests.md for which unit-test configurations run on PRs, pushes and nightly.
     nightly_unit_tests_various_features:
         name: Nightly Unit Tests - Linux (various features)
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && github.event_name != 'pull_request'
         timeout-minutes: 120
 
         runs-on: ubuntu-latest
