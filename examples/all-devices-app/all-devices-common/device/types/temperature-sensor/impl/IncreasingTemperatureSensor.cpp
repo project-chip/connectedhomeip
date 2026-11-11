@@ -81,18 +81,12 @@ void IncreasingTemperatureSensor::TimerFired()
                                                  : -1000);
     const int16_t maxTemp = mTempConfig.maxMeasuredValue.ValueOr(INT16_MAX);
 
-    // Simulate increasing temperature
-    if (mTemperatureMeasuredValue.IsNull() || mTemperatureMeasuredValue.Value() >= maxTemp)
-    {
-        mTemperatureMeasuredValue.SetNonNull(minTemp);
-    }
-    else
-    {
-        mTemperatureMeasuredValue.SetNonNull(static_cast<int16_t>(mTemperatureMeasuredValue.Value() + 1));
-    }
+    const DataModel::Nullable<int16_t> currentTemp = mTemperatureMeasurementCluster.Cluster().GetMeasuredValue();
+    const int16_t nextTemp =
+        (currentTemp.IsNull() || currentTemp.Value() >= maxTemp) ? minTemp : static_cast<int16_t>(currentTemp.Value() + 1);
 
-    ChipLogProgress(AppServer, "IncreasingTemperatureValue: Increasing to %d", mTemperatureMeasuredValue.Value());
-    LogErrorOnFailure(mTemperatureMeasurementCluster.Cluster().SetMeasuredValue(mTemperatureMeasuredValue));
+    ChipLogProgress(AppServer, "IncreasingTemperatureValue: Increasing to %d", nextTemp);
+    LogErrorOnFailure(mTemperatureMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(nextTemp)));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreaseTemperatureIntervalSec));
 }

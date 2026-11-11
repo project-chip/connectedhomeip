@@ -26,7 +26,7 @@ namespace app {
 namespace {
 
 constexpr System::Clock::Seconds16 kIncreasePressureIntervalSec = System::Clock::Seconds16(10);
-constexpr int16_t kPressureStepValue                            = 50;
+constexpr int16_t kPressureStepTenthsKilopascal                 = 50;
 
 int16_t GetEffectiveMinPressure(const PressureMeasurementCluster::Config & config)
 {
@@ -52,8 +52,7 @@ CHIP_ERROR IncreasingPressureSensor::Register(EndpointId endpoint, CodeDrivenDat
     ReturnErrorOnFailure(PressureSensor::Register(endpoint, provider, composition));
 
     const int16_t initialPressure = GetEffectiveMinPressure(mPressureConfig);
-    mPressureMeasuredValue        = initialPressure;
-    ReturnErrorOnFailure(mPressureMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mPressureMeasuredValue)));
+    ReturnErrorOnFailure(mPressureMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(initialPressure)));
 
     // Kick off the timer loop to increase pressure every few seconds
     return mTimerDelegate.StartTimer(this, kIncreasePressureIntervalSec);
@@ -67,21 +66,15 @@ void IncreasingPressureSensor::Unregister(CodeDrivenDataModelProvider & provider
 
 void IncreasingPressureSensor::TimerFired()
 {
-    const int16_t minPressure  = GetEffectiveMinPressure(mPressureConfig);
-    const int16_t maxPressure  = mPressureConfig.maxMeasuredValue.ValueOr(INT16_MAX);
-    const int32_t nextPressure = static_cast<int32_t>(mPressureMeasuredValue) + kPressureStepValue;
+    const int16_t minPressure     = GetEffectiveMinPressure(mPressureConfig);
+    const int16_t maxPressure     = mPressureConfig.maxMeasuredValue.ValueOr(INT16_MAX);
+    const int16_t currentPressure = mPressureMeasurementCluster.Cluster().GetMeasuredValue().ValueOr(minPressure);
+    const int32_t nextPressure    = static_cast<int32_t>(currentPressure) + kPressureStepTenthsKilopascal;
 
-    if (nextPressure > maxPressure)
-    {
-        mPressureMeasuredValue = minPressure;
-    }
-    else
-    {
-        mPressureMeasuredValue = static_cast<int16_t>(nextPressure);
-    }
+    const int16_t nextPressureValue = nextPressure > maxPressure ? minPressure : static_cast<int16_t>(nextPressure);
 
-    ChipLogProgress(AppServer, "IncreasingPressureValue: Increasing to %d", static_cast<int>(mPressureMeasuredValue));
-    LogErrorOnFailure(mPressureMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mPressureMeasuredValue)));
+    ChipLogProgress(AppServer, "IncreasingPressureValue: Increasing to %d", static_cast<int>(nextPressureValue));
+    LogErrorOnFailure(mPressureMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(nextPressureValue)));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreasePressureIntervalSec));
 }
