@@ -281,11 +281,11 @@ TEST_F(TestConfigurationMgr, FirmwareBuildTime)
     EXPECT_EQ(ConfigurationMgr().GetFirmwareBuildChipEpochTime(chipEpochTime), CHIP_NO_ERROR);
     EXPECT_EQ(overrideValue, chipEpochTime);
 
-    // Verify that the BuildTime.h parser can parse current CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE / TIME.
+    // Verify that the BuildTime.h parser can parse the current __DATE__ / __TIME__.
     do
     {
-        const char * date      = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE;
-        const char * timeOfDay = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME;
+        const char * date      = __DATE__;
+        const char * timeOfDay = __TIME__;
 
         // Check that strings look good.
         EXPECT_FALSE(BUILD_DATE_IS_BAD(date));
