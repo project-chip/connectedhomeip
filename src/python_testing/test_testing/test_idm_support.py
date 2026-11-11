@@ -820,6 +820,64 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                           for call in self.checker.default_controller.WriteAttribute.call_args_list], [3, 2])
         self.checker.record_accepted_violation.assert_not_called()
 
+    async def test_cancellation_after_transport_failure_remains_primary(self):
+        """A timeout during cleanup remains cancellation even after a failed write."""
+        import asyncio
+
+        for phase in ('readback', 'restoration'):
+            with self.subTest(phase=phase):
+                self.setUp()
+                info = self._prepare_writable_attribute()
+                started = asyncio.Event()
+                response = asyncio.get_running_loop().create_future()
+                cancellations = []
+                original_shield = asyncio.shield
+                self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
+                self.checker.read_single_attribute_check_success = AsyncMock(return_value=2)
+
+                async def capture_shield(operation):
+                    try:
+                        return await original_shield(operation)
+                    except asyncio.CancelledError as error:
+                        cancellations.append(error)
+                        raise
+
+                async def readback(**kwargs):
+                    if phase == 'readback':
+                        started.set()
+                        return await response
+                    return 3
+
+                async def write_attribute(**kwargs):
+                    if kwargs['attributes'][0][1].value == 3:
+                        raise ChipStackError(0x32)
+                    if phase == 'restoration':
+                        started.set()
+                        return await response
+                    return [SimpleNamespace(Status=Status.Success)]
+
+                self.checker.read_single_attribute = AsyncMock(side_effect=readback)
+                self.checker.default_controller.WriteAttribute = AsyncMock(side_effect=write_attribute)
+                with patch('support_modules.idm_support.asyncio.shield', side_effect=capture_shield):
+                    task = asyncio.create_task(self.checker.check_attribute_constraint(info, info.constraints))
+                    try:
+                        await asyncio.wait_for(started.wait(), 5)
+                        task.cancel('timeout after transport failure')
+                        delivered = asyncio.Event()
+                        asyncio.get_running_loop().call_soon(delivered.set)
+                        await asyncio.wait_for(delivered.wait(), 5)
+                        self.assertFalse(response.cancelled())
+                    finally:
+                        if not response.done():
+                            response.set_result(3 if phase == 'readback' else [SimpleNamespace(Status=Status.Success)])
+                    with self.assertRaises(asyncio.CancelledError) as raised:
+                        await asyncio.wait_for(task, 5)
+                self.assertIs(raised.exception, cancellations[0])
+                self.assertEqual([call.kwargs['attributes'][0][1].value
+                                  for call in self.checker.default_controller.WriteAttribute.call_args_list], [3, 2])
+                self.checker.record_warning.assert_not_called()
+                self.checker.default_controller.SendCommand.assert_not_called()
+
     async def test_cancelled_write_readback_assertion_preserves_cancellation(self):
         """Cleanup assertions must not replace cancellation of an applied write."""
         import asyncio

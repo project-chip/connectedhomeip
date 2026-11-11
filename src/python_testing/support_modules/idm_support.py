@@ -1185,20 +1185,21 @@ class IDMBaseTest(BasicCompositionTests):
         for test_value in test_values:
             result.attempted += 1
             execution_failure = None
+            cancellation = None
             result_status = None
 
             async def await_settled_probe_operation(operation: Awaitable[Any]) -> Any:
-                nonlocal execution_failure
+                nonlocal cancellation
                 pending = asyncio.ensure_future(operation)
                 while True:
                     try:
                         return await asyncio.shield(pending)
                     except asyncio.CancelledError as error:
+                        if cancellation is None:
+                            cancellation = error
                         if pending.cancelled():
                             raise
                         result.execution_error += 1
-                        if execution_failure is None:
-                            execution_failure = error
 
             try:
                 write_result = await await_settled_probe_operation(self.default_controller.WriteAttribute(
@@ -1208,8 +1209,8 @@ class IDMBaseTest(BasicCompositionTests):
                 ))
             except asyncio.CancelledError as error:
                 result.execution_error += 1
-                if execution_failure is None:
-                    execution_failure = error
+                if cancellation is None:
+                    cancellation = error
                 log.warning('Write cancelled for %s; checking and restoring the baseline', attribute_path)
             except InteractionModelError as error:
                 result_status = error.status
@@ -1279,7 +1280,7 @@ class IDMBaseTest(BasicCompositionTests):
                 if execution_failure is None:
                     execution_failure = error
             except signals.TestFailure as error:
-                if execution_failure is None:
+                if execution_failure is None and cancellation is None:
                     raise
                 result.execution_error += 1
                 log.warning("Write readback assertion failed for %s: %s", attribute_path, error)
@@ -1329,8 +1330,8 @@ class IDMBaseTest(BasicCompositionTests):
                                     restore_failed = True
                                     log.warning("Failed to verify restoration of %s to %s: observed %s",
                                                 attribute_path, original_value, restored_value)
-            if isinstance(execution_failure, asyncio.CancelledError):
-                raise execution_failure
+            if cancellation is not None:
+                raise cancellation
             if execution_failure is not None:
                 raise ConstraintProbeExecutionError(execution_failure, result) from execution_failure
             if restore_failed:
