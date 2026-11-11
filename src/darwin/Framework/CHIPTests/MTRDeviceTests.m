@@ -9369,10 +9369,12 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertEqual([idleDevice unitTestInterestedPathsChangedCount], idleChanges);
 }
 
-// Tests that a registration sends the wildcard element for any kind some delegate wants every path of, even beside a scoped delegate.
+// Tests that a registration sends the wildcard element for any kind some delegate wants every path of, even beside a scoped
+// delegate, and an empty array, not the wildcard, for a delegate that asked for no paths.
 - (void)test009_RegistrationSendsWildcardForEveryPath
 {
     __auto_type * server = [[MTRInterestedPathsTestXPCServer alloc] init];
+    NSNumber * noPathsNodeID = @(0x12344323);
     NSDictionary * expectedAttributesOnlyNode = @{
         MTRDeviceControllerRegistrationNodeIDKey : @(kDeviceId1),
         MTRDeviceControllerRegistrationInterestedPathsForAttributesKey : @[ @(1) ],
@@ -9383,11 +9385,16 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
         MTRDeviceControllerRegistrationInterestedPathsForAttributesKey : @[ @{} ],
         MTRDeviceControllerRegistrationInterestedPathsForEventsKey : @[ @{} ],
     };
-    XCTestExpectation * registrationReceived = [self expectationWithDescription:@"registration with both nodes received"];
+    NSDictionary * expectedNoPathsNode = @{
+        MTRDeviceControllerRegistrationNodeIDKey : noPathsNodeID,
+        MTRDeviceControllerRegistrationInterestedPathsForAttributesKey : @[],
+        MTRDeviceControllerRegistrationInterestedPathsForEventsKey : @[],
+    };
+    XCTestExpectation * registrationReceived = [self expectationWithDescription:@"registration with all three nodes received"];
     registrationReceived.assertForOverFulfill = NO;
     server.onControllerConfiguration = ^(NSDictionary * controllerState) {
         NSArray * nodes = controllerState[MTRDeviceControllerRegistrationNodeIDsKey];
-        if ([nodes containsObject:expectedAttributesOnlyNode] && [nodes containsObject:expectedEveryPathNode]) {
+        if ([nodes containsObject:expectedAttributesOnlyNode] && [nodes containsObject:expectedEveryPathNode] && [nodes containsObject:expectedNoPathsNode]) {
             [registrationReceived fulfill];
         }
     };
@@ -9395,12 +9402,15 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     __auto_type * controller = [self createControllerWithPlainServer:server];
     __auto_type * attributesOnlyDevice = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
     __auto_type * everyPathDevice = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    __auto_type * noPathsDevice = [MTRDevice deviceWithNodeID:noPathsNodeID controller:controller];
     __auto_type * attributesOnlyDelegate = [[MTRDeviceTestDelegate alloc] init];
     __auto_type * scopedDelegate = [[MTRDeviceTestDelegate alloc] init];
     __auto_type * everyPathDelegate = [[MTRDeviceTestDelegate alloc] init];
+    __auto_type * noPathsDelegate = [[MTRDeviceTestDelegate alloc] init];
     [attributesOnlyDevice addDelegate:attributesOnlyDelegate queue:dispatch_get_main_queue() interestedPathsForAttributes:@[ @(1) ] interestedPathsForEvents:nil];
     [everyPathDevice addDelegate:scopedDelegate queue:dispatch_get_main_queue() interestedPathsForAttributes:@[ @(2) ] interestedPathsForEvents:@[ @(2) ]];
     [everyPathDevice addDelegate:everyPathDelegate queue:dispatch_get_main_queue()];
+    [noPathsDevice addDelegate:noPathsDelegate queue:dispatch_get_main_queue() interestedPathsForAttributes:@[] interestedPathsForEvents:@[]];
 
     [self waitForExpectations:@[ registrationReceived ] timeout:kTimeoutInSeconds];
 
@@ -9408,6 +9418,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     [attributesOnlyDevice removeDelegate:attributesOnlyDelegate];
     [everyPathDevice removeDelegate:scopedDelegate];
     [everyPathDevice removeDelegate:everyPathDelegate];
+    [noPathsDevice removeDelegate:noPathsDelegate];
     [controller shutdown];
 }
 
