@@ -46,6 +46,7 @@ tests:
       command: "readAttribute"
       attribute: "NumberOfRinses"
       response:
+          saveAs: NumberOfRinsesValue
           constraints:
               type: enum8
               minValue: 0
