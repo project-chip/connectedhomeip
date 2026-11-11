@@ -181,11 +181,21 @@ CHIP_ERROR AsyncResponder::Init(System::Layer * layer, Messaging::ExchangeContex
 
 void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType eventType, CHIP_ERROR status)
 {
+    NotifyEventHandled(eventType, status, GetBdxStatusCodeFromChipError(status));
+}
+
+void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType eventType, StatusCode status)
+{
+    NotifyEventHandled(eventType, GetChipErrorFromBdxStatusCode(status), status);
+}
+
+void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType eventType, CHIP_ERROR error, StatusCode status)
+{
     // Record the error (if any) that is ending the transfer, so subclasses that report a terminal
     // error (e.g. from their destructor) can surface the real cause instead of a generic error.
-    if (status != CHIP_NO_ERROR)
+    if (error != CHIP_NO_ERROR)
     {
-        mTransferEndError = status;
+        mTransferEndError = error;
     }
 
     // If this is the end of the transfer (whether a clean end, or some sort of error condition), ensure
@@ -202,14 +212,14 @@ void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType e
         eventType == TransferSession::OutputEventType::kStatusReceived)
     {
         ChipLogProgress(BDX, "NotifyEventHandled : Event %s Error %" CHIP_ERROR_FORMAT,
-                        TransferSession::OutputEvent::TypeToString(eventType), status.Format());
+                        TransferSession::OutputEvent::TypeToString(eventType), error.Format());
         mDestroySelfAfterProcessingEvents = true;
     }
-    else if (status != CHIP_NO_ERROR)
+    else if (error != CHIP_NO_ERROR)
     {
         // If there was an error handling the output event, this should notify the transfer object to abort transfer
         // so it can send a status report across the exchange when we call ProcessOutputEvents below.
-        TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(status));
+        TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(status);
     }
 
     ProcessOutputEvents();
