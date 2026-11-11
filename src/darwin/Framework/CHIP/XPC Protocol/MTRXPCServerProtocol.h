@@ -48,13 +48,17 @@ MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedF
  * - MTRDeviceControllerRegistrationInterestedPathsForEventsKey: an array of the event paths the client's
  *   delegates for that node are interested in.
  *
- * A missing key means every attribute (or event) path.  Each element of either array is one of:
+ * Each element of either array is one of:
  *
+ * - An empty dictionary: every path on every endpoint.  A client sends this, as the only element, when one of
+ *   its delegates for that node has no interested paths of that kind.
  * - An NSNumber: an endpoint ID, meaning every path on that endpoint.
  * - A dictionary with NSNumber values under MTRDeviceControllerRegistrationInterestedPathEndpointIDKey and
  *   MTRDeviceControllerRegistrationInterestedPathClusterIDKey: every path in that cluster.
  * - The same dictionary plus MTRDeviceControllerRegistrationInterestedPathAttributeIDKey (attribute array)
  *   or MTRDeviceControllerRegistrationInterestedPathEventIDKey (event array): that single path.
+ *
+ * A client built before these keys sends neither, so a missing key means every attribute (or event) path.
  */
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathsForAttributesKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathsForEventsKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));
