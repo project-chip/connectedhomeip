@@ -34,6 +34,7 @@
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
+#include <device/types/closure/impl/ClosureVariants.h>
 #include <device/types/closure/impl/SimulatedClosure.h>
 #include <device/types/color-temperature-light/impl/LoggingColorTemperatureLight.h>
 #include <device/types/cooktop/impl/LoggingCooktop.h>
@@ -46,13 +47,16 @@
 #include <device/types/extended-color-light/impl/LoggingExtendedColorLight.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
+#include <device/types/flow-sensor/FlowSensor.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
 #include <device/types/generic-switch/GenericSwitch.h>
 #include <device/types/humidity-conditioner/impl/LoggingHumidityConditioner.h>
+#include <device/types/humidity-sensor/HumiditySensor.h>
 #include <device/types/humidity-sensor/impl/IncreasingHumiditySensor.h>
 #include <device/types/irrigation-system/impl/LoggingIrrigationSystem.h>
 #include <device/types/laundry-dryer/impl/EmulatedLaundryDryer.h>
 #include <device/types/laundry-washer/impl/EmulatedLaundryWasher.h>
+#include <device/types/light-sensor/LightSensor.h>
 #include <device/types/light-sensor/impl/IncreasingLightSensor.h>
 #include <device/types/microwave-oven/impl/EmulatedMicrowaveOven.h>
 #include <device/types/mode-select/impl/SimulatedModeSelect.h>
@@ -65,7 +69,9 @@
 #include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
 #include <device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.h>
 #include <device/types/oven/impl/LoggingOven.h>
+#include <device/types/power-source/BatteryPowerSource.h>
 #include <device/types/power-source/impl/DecreasingBatteryPowerSource.h>
+#include <device/types/pressure-sensor/PressureSensor.h>
 #include <device/types/pressure-sensor/impl/IncreasingPressureSensor.h>
 #include <device/types/proximity-ranger/ProximityRanger.h>
 #include <device/types/proximity-ranger/impl/LoggingProximityRanger.h>
@@ -74,20 +80,27 @@
 #include <device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.h>
 #include <device/types/room-air-conditioner/impl/LoggingRoomAirConditionerWithSensors.h>
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
+#include <device/types/soil-sensor/SoilSensor.h>
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
+#include <device/types/temperature-sensor/TemperatureSensor.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
 #include <device/types/thermostat/impl/LoggingThermostat.h>
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
 #include <device/types/water-heater/impl/SimulatedWaterHeater.h>
 #include <device/types/water-valve/impl/LoggingWaterValve.h>
+#include <device/types/window-covering/WindowCoveringVariants.h>
 #include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/Optional.h>
 #include <platform/DefaultTimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
+
+#include <clusters/SoilMeasurement/Attributes.h>
+#include <clusters/shared/Structs.h>
 
 #include <functional>
 #include <map>
@@ -266,13 +279,21 @@ public:
         }
     }
 
-    template <typename TDevice, typename... Args>
-    static DeviceRegistrationEntry MakeDevice(Args &&... args)
+    template <typename TDevice, typename EntryType = DeviceRegistrationEntry, typename... Args>
+    static EntryType MakeDevice(Args &&... args)
     {
         auto dev   = std::make_unique<TDevice>(std::forward<Args>(args)...);
         auto * raw = dev.get();
-        return DeviceRegistrationEntry{ std::move(dev), MakeAfterDeviceRegistrationCallback(raw),
-                                        MakeBeforeDeviceUnregistrationCallback(raw) };
+        return EntryType{ std::move(dev), MakeAfterDeviceRegistrationCallback(raw), MakeBeforeDeviceUnregistrationCallback(raw) };
+    }
+
+    template <typename TDevice, typename EntryType = DeviceRegistrationEntry, typename... Args>
+    static EntryType MakeDeviceWithTags(Span<const EndpointComposition::SemanticTag> tags, Args &&... args)
+    {
+        auto dev   = std::make_unique<TDevice>(std::forward<Args>(args)...);
+        auto * raw = dev.get();
+        return EntryType{ std::move(dev), MakeAfterDeviceRegistrationCallback(raw), MakeBeforeDeviceUnregistrationCallback(raw),
+                          tags };
     }
 
     using DeviceCreator = std::function<DeviceRegistrationEntry(const std::string & nodeLabel)>;
@@ -316,13 +337,41 @@ public:
         RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string &) { return c(); });
     }
 
+    void RegisterAlias(const std::string & alias, const std::string & target)
+    {
+        VerifyOrDie(mRegistry.find(target) != mRegistry.end());
+        mAliases[alias] = target;
+    }
+
     const std::string & GetDefaultDevice() const { return mDefaultDevice; }
 
-    bool IsValidDevice(const std::string & deviceTypeArg) const { return mRegistry.find(deviceTypeArg) != mRegistry.end(); }
+    bool IsValidDevice(const std::string & deviceTypeArg) const
+    {
+        return mRegistry.find(deviceTypeArg) != mRegistry.end() || mAliases.find(deviceTypeArg) != mAliases.end();
+    }
+
+    DeviceRegistrationEntryOfConcreteType<BridgedNode> CreateBridgedNode(const std::string & nodeLabel = "") const
+    {
+        VerifyOrDie(mContext.has_value());
+        static int sBridgedNodeCount = 0;
+        sBridgedNodeCount++;
+        std::string label = nodeLabel.empty() ? "Bridged Node " + std::to_string(sBridgedNodeCount) : nodeLabel;
+        return MakeDevice<BridgedNode, chip::app::DeviceRegistrationEntryOfConcreteType<BridgedNode>>(
+            mContext->timerDelegate, "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
+    }
+
+    DeviceRegistrationEntryOfConcreteType<Aggregator> CreateAggregator() const
+    {
+        VerifyOrDie(mContext.has_value());
+        return MakeDevice<Aggregator, chip::app::DeviceRegistrationEntryOfConcreteType<Aggregator>>(mContext->timerDelegate);
+    }
 
     DeviceRegistrationEntry Create(const std::string & deviceTypeArg, const std::string & nodeLabel = "") const
     {
-        auto it = mRegistry.find(deviceTypeArg);
+        auto aliasIt                      = mAliases.find(deviceTypeArg);
+        const std::string & effectiveType = (aliasIt != mAliases.end()) ? aliasIt->second : deviceTypeArg;
+
+        auto it = mRegistry.find(effectiveType);
         if (it != mRegistry.end())
         {
             return it->second(nodeLabel);
@@ -331,7 +380,7 @@ public:
             AppServer,
             "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.",
             deviceTypeArg.c_str());
-        return DeviceRegistrationEntry{};
+        return DeviceRegistrationEntry{ nullptr, nullptr, nullptr };
     }
 
     std::vector<std::string> SupportedDeviceTypes() const
@@ -346,6 +395,7 @@ public:
 
 private:
     std::map<std::string, DeviceCreator> mRegistry;
+    std::map<std::string, std::string> mAliases;
     std::optional<Context> mContext;
     std::string mDefaultDevice;
 
@@ -356,10 +406,7 @@ private:
         //       factories are usable.
         if constexpr (ALL_DEVICES_ENABLE_AGGREGATOR)
         {
-            RegisterCreator("aggregator", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return MakeDevice<Aggregator>(mContext->timerDelegate);
-            });
+            RegisterCreator("aggregator", [this]() { return DeviceRegistrationEntry(CreateAggregator()); });
         }
         if constexpr (ALL_DEVICES_ENABLE_AIR_PURIFIER)
         {
@@ -375,10 +422,27 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)
         {
             using AirQualitySensorCo2 =
+                AirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
+                                 Clusters::CarbonDioxideConcentrationMeasurement::Id>;
+            using SimulatedAirQualitySensorCo2 =
                 SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
                                           Clusters::CarbonDioxideConcentrationMeasurement::Id>;
 
-            using AirQualitySensorFull =
+            using AirQualitySensorFullType =
+                AirQualitySensor<Clusters::TemperatureMeasurement::Id,                                //
+                                 Clusters::RelativeHumidityMeasurement::Id,                           //
+                                 Clusters::CarbonDioxideConcentrationMeasurement::Id,                 //
+                                 Clusters::Pm25ConcentrationMeasurement::Id,                          //
+                                 Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, //
+                                 Clusters::CarbonMonoxideConcentrationMeasurement::Id,                //
+                                 Clusters::NitrogenDioxideConcentrationMeasurement::Id,               //
+                                 Clusters::OzoneConcentrationMeasurement::Id,                         //
+                                 Clusters::FormaldehydeConcentrationMeasurement::Id,                  //
+                                 Clusters::Pm1ConcentrationMeasurement::Id,                           //
+                                 Clusters::Pm10ConcentrationMeasurement::Id,                          //
+                                 Clusters::RadonConcentrationMeasurement::Id                          //
+                                 >;
+            using SimulatedAirQualitySensorFullType =
                 SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id,                                //
                                           Clusters::RelativeHumidityMeasurement::Id,                           //
                                           Clusters::CarbonDioxideConcentrationMeasurement::Id,                 //
@@ -395,23 +459,42 @@ private:
 
             RegisterCreator("air-quality-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                // Tagged with PositionTag::kTop to disambiguate from air-quality-sensor-full under wildcard allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<AirQualitySensorCo2>(mContext->timerDelegate, mContext->identifyDelegate, kAirQualityTag);
             });
+            RegisterCreator("air-quality-sensor-simulated", [this]() {
+                VerifyOrDie(mContext.has_value());
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualitySimulatedTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft),
+                };
+                return MakeDevice<SimulatedAirQualitySensorCo2>(mContext->timerDelegate, mContext->identifyDelegate,
+                                                                kAirQualitySimulatedTag);
+            });
             RegisterCreator("air-quality-sensor-full", [this]() {
                 VerifyOrDie(mContext.has_value());
-                // Tagged with PositionTag::kBottom to disambiguate from air-quality-sensor (see comment above).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityFullTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
-                return MakeDevice<AirQualitySensorFull>(mContext->timerDelegate, mContext->identifyDelegate, kAirQualityFullTag);
+                return MakeDevice<AirQualitySensorFullType>(mContext->timerDelegate, mContext->identifyDelegate,
+                                                            kAirQualityFullTag);
+            });
+            RegisterCreator("air-quality-sensor-full-simulated", [this]() {
+                VerifyOrDie(mContext.has_value());
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityFullSimulatedTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight),
+                };
+                return MakeDevice<SimulatedAirQualitySensorFullType>(mContext->timerDelegate, mContext->identifyDelegate,
+                                                                     kAirQualityFullSimulatedTag);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_AMBIENT_CONTEXT_SENSOR)
@@ -423,23 +506,19 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_BATTERY_STORAGE)
         {
-            RegisterCreator("battery-storage", [this]() {
+            RegisterCreator("battery-storage-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedBatteryStorage>(SimulatedBatteryStorage::Context{
                     .timerDelegate            = mContext->timerDelegate,
                     .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
                 });
             });
+            RegisterAlias("battery-storage", "battery-storage-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_BRIDGED_NODE)
         {
             RegisterCreator("bridged-node", [this](const std::string & nodeLabel) {
-                VerifyOrDie(mContext.has_value());
-                static int sBridgedNodeCount = 0;
-                sBridgedNodeCount++;
-                std::string label = nodeLabel.empty() ? "Bridged Node " + std::to_string(sBridgedNodeCount) : nodeLabel;
-                return MakeDevice<BridgedNode>(mContext->timerDelegate,
-                                               "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
+                return DeviceRegistrationEntry(CreateBridgedNode(nodeLabel));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_CHIME)
@@ -455,26 +534,17 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_CLOSURE)
         {
-            RegisterCreator("closure", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedClosure>(mContext->timerDelegate, mContext->identifyDelegate,
-                                                    SimulatedClosure::ThreePanelCabinetClosureConfig(), mContext->groupDataProvider,
-                                                    mContext->fabricTable, mContext->testEventTriggerDelegate);
-            });
-
-            RegisterCreator("closure-no-ps-no-sp", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedClosure>(
-                    mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoPSNoSP(),
-                    mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
-            });
-
-            RegisterCreator("closure-no-lt", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedClosure>(
-                    mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoLT(),
-                    mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
-            });
+            for (const auto & variant : ClosureVariants())
+            {
+                RegisterCreator(variant.name, [this, makeConfig = variant.makeConfig]() {
+                    VerifyOrDie(mContext.has_value());
+                    return MakeDevice<SimulatedClosure>(mContext->timerDelegate, mContext->identifyDelegate, makeConfig(),
+                                                        mContext->groupDataProvider, mContext->fabricTable,
+                                                        mContext->testEventTriggerDelegate);
+                });
+            }
+            RegisterAlias("closure", "closure-simulated");
+            RegisterAlias("closure-no-ps-no-sp", "closure-no-ps-no-sp-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
         {
@@ -555,13 +625,14 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_DISHWASHER)
         {
-            RegisterCreator("dishwasher", [this]() {
+            RegisterCreator("dishwasher-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<EmulatedDishwasher>(EmulatedDishwasher::Context{
                     .timerDelegate          = mContext->timerDelegate,
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                 });
             });
+            RegisterAlias("dishwasher", "dishwasher-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_EXTENDED_COLOR_LIGHT)
         {
@@ -616,7 +687,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_NETWORK_INFRASTRUCTURE_MANAGER)
         {
-            RegisterCreator("network-infrastructure-manager", [this](const std::string & nodeLabel) {
+            RegisterCreator("network-infrastructure-manager-simulated", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedNetworkInfrastructureManager>(SimulatedNetworkInfrastructureManager::Context{
                     .timerDelegate     = mContext->timerDelegate,
@@ -627,6 +698,7 @@ private:
                     .nodeLabel         = nodeLabel,
                 });
             });
+            RegisterAlias("network-infrastructure-manager", "network-infrastructure-manager-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
         {
@@ -644,8 +716,13 @@ private:
         {
             RegisterCreator("on-off-light-switch", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<OnOffLightSwitch>(mContext->timerDelegate, mContext->platformManager, mContext->bindingTable,
-                                                    mContext->bindingManager);
+                return MakeDevice<OnOffLightSwitch>(OnOffLightSwitch::Config{
+                    .timerDelegate   = mContext->timerDelegate,
+                    .platformManager = mContext->platformManager,
+                    .bindingTable    = mContext->bindingTable,
+                    .bindingManager  = mContext->bindingManager,
+                    .bindingHandler  = mContext->bindingHandler,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT)
@@ -655,7 +732,7 @@ private:
                 // Tagged with PositionTag::kTop to disambiguate from on-off-plug-with-sensors under wildcard allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kPlugTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<OnOffPlugInUnit>(OnOffPlugInUnit::Context{
@@ -675,7 +752,7 @@ private:
                 // allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kPlugWithSensorsTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
                 return MakeDevice<OnOffPlugWithSensors>(OnOffPlugWithSensors::Context{
@@ -694,7 +771,7 @@ private:
                 // Distinguish the two RAC variants when both are included by --device '*'.
                 const EndpointComposition::SemanticTag tag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<LoggingRoomAirConditioner>(mContext->timerDelegate, mContext->fabricTable, tag);
@@ -703,7 +780,7 @@ private:
                 VerifyOrDie(mContext.has_value());
                 const EndpointComposition::SemanticTag tag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
                 return MakeDevice<LoggingRoomAirConditionerWithSensors>(mContext->timerDelegate, mContext->fabricTable, tag);
@@ -723,7 +800,7 @@ private:
                 // Tagged with PositionTag::kTop to disambiguate from oven-2 under wildcard allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kOvenTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<LoggingOven>(mContext->timerDelegate,
@@ -737,7 +814,7 @@ private:
                 // Tagged with PositionTag::kBottom to disambiguate from oven (see comment above).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kOven2Tag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
                 return MakeDevice<LoggingOven>(mContext->timerDelegate,
@@ -754,7 +831,7 @@ private:
                 // Tagged with PositionTag::kTop to disambiguate from refrigerator-2 under wildcard allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kRefrigeratorTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<LoggingRefrigerator>(mContext->timerDelegate,
@@ -767,7 +844,7 @@ private:
                 // Tagged with PositionTag::kBottom to disambiguate from refrigerator (see comment above).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kRefrigerator2Tag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
                 return MakeDevice<LoggingRefrigerator>(mContext->timerDelegate,
@@ -779,11 +856,88 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)
         {
-            RegisterCreator("soil-sensor", []() { return MakeDevice<IncreasingMoistureSoilSensor>(); });
+            static const auto GetDefaultSoilMoistureLimits = []() {
+                static const Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type
+                    kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
+                        { .rangeMin = 0, .rangeMax = 100, .percentMax = chip::MakeOptional(static_cast<chip::Percent100ths>(10)) }
+                    };
+
+                const Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type
+                    kDefaultSoilMoistureMeasurementLimits = {
+                        .measurementType  = Clusters::Globals::MeasurementTypeEnum::kSoilMoisture,
+                        .measured         = true,
+                        .minMeasuredValue = 0,
+                        .maxMeasuredValue = 100,
+                        .accuracyRanges   = DataModel::List<const Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
+                            kDefaultSoilMoistureMeasurementLimitsAccuracyRange),
+                    };
+                return kDefaultSoilMoistureMeasurementLimits;
+            };
+
+            static constexpr Clusters::TemperatureMeasurementCluster::StartupConfiguration kDefaultSoilTemperatureConfig = {
+                .minMeasuredValue = DataModel::MakeNullable<int16_t>(-1000), // -10.00 °C
+                .maxMeasuredValue = DataModel::MakeNullable<int16_t>(5000),  // +50.00 °C
+                .tolerance        = 0,
+            };
+
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kSoilSensorTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kSoilSensorSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
+            RegisterCreator("soil-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDeviceWithTags<SoilSensor>(Span(&kSoilSensorTag, 1), mContext->timerDelegate,
+                                                      GetDefaultSoilMoistureLimits(), kDefaultSoilTemperatureConfig);
+            });
+            RegisterCreator("soil-sensor-simulated", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDeviceWithTags<IncreasingMoistureSoilSensor>(Span(&kSoilSensorSimulatedTag, 1), mContext->timerDelegate,
+                                                                        GetDefaultSoilMoistureLimits(),
+                                                                        kDefaultSoilTemperatureConfig);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
-            RegisterCreator("temperature-sensor", []() { return MakeDevice<IncreasingTemperatureSensor>(); });
+            static const Clusters::TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
+                .minMeasuredValue = DataModel::MakeNullable<int16_t>(-1000), // -10.00 °C
+                .maxMeasuredValue = DataModel::MakeNullable<int16_t>(5000),  // +50.00 °C
+                .tolerance        = 50,                                      // 0.50 °C
+            };
+            static const auto kDefaultTemperatureOptionalAttributes = []() {
+                Clusters::TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes;
+                optionalAttributes.Set<Clusters::TemperatureMeasurement::Attributes::Tolerance::Id>();
+                return optionalAttributes;
+            }();
+
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kTemperatureSensorTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kTemperatureSensorSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
+            RegisterCreator("temperature-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDeviceWithTags<TemperatureSensor>(Span(&kTemperatureSensorTag, 1), mContext->timerDelegate,
+                                                             kDefaultTemperatureConfig, kDefaultTemperatureOptionalAttributes);
+            });
+            RegisterCreator("temperature-sensor-simulated", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDeviceWithTags<IncreasingTemperatureSensor>(Span(&kTemperatureSensorSimulatedTag, 1),
+                                                                       mContext->timerDelegate, kDefaultTemperatureConfig,
+                                                                       kDefaultTemperatureOptionalAttributes);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_THERMOSTAT)
         {
@@ -798,7 +952,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_THREAD_BORDER_ROUTER)
         {
-            RegisterCreator("thread-border-router", [this](const std::string & nodeLabel) {
+            RegisterCreator("thread-border-router-simulated", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedThreadBorderRouter>(SimulatedThreadBorderRouter::Context{
                     .timerDelegate     = mContext->timerDelegate,
@@ -809,20 +963,22 @@ private:
                     .nodeLabel         = nodeLabel,
                 });
             });
+            RegisterAlias("thread-border-router", "thread-border-router-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
         {
-            RegisterCreator("electrical-sensor", [this]() {
+            RegisterCreator("electrical-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 // Tagged with PositionTag::kTop to disambiguate from on-off-plug-with-sensors under wildcard allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kElectricalSensorTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<SimulatedElectricalSensor>(mContext->timerDelegate, mContext->testEventTriggerDelegate,
                                                              Span(&kElectricalSensorTag, 1));
             });
+            RegisterAlias("electrical-sensor", "electrical-sensor-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_EXTRACTOR_HOOD)
         {
@@ -850,7 +1006,7 @@ private:
                 // Tagged with PositionTag::kTop to disambiguate from fan-no-onoff under wildcard allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kFanTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return MakeDevice<LoggingFan>(FanLoad::Context{
@@ -866,7 +1022,7 @@ private:
                 // Tagged with PositionTag::kBottom to disambiguate from fan (see comments above).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kFanNoOnOffTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = CommonNamespace::kPositionId,
+                    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
                 return MakeDevice<LoggingFan>(FanLoad::Context{
@@ -895,7 +1051,26 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
         {
-            RegisterCreator("power-source", []() { return MakeDevice<DecreasingBatteryPowerSource>(); });
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kPowerSourceTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kPowerSourceSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
+            RegisterCreator("power-source", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDeviceWithTags<BatteryPowerSource>(Span(&kPowerSourceTag, 1), mContext->timerDelegate);
+            });
+            RegisterCreator("power-source-simulated", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDeviceWithTags<DecreasingBatteryPowerSource>(Span(&kPowerSourceSimulatedTag, 1),
+                                                                        mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_SMOKE_CO_ALARM)
         {
@@ -976,44 +1151,103 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)
         {
+            static const Clusters::RelativeHumidityMeasurementCluster::Config kDefaultHumidityConfig = []() {
+                Clusters::RelativeHumidityMeasurementCluster::Config config;
+                config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(0);
+                config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(10000);
+                config.WithTolerance(100);
+                return config;
+            }();
+
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kHumiditySensorTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kHumiditySensorSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
             RegisterCreator("humidity-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingHumiditySensor>(mContext->timerDelegate);
+                return MakeDeviceWithTags<HumiditySensor>(Span(&kHumiditySensorTag, 1), mContext->timerDelegate,
+                                                          kDefaultHumidityConfig);
+            });
+            RegisterCreator("humidity-sensor-simulated", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDeviceWithTags<IncreasingHumiditySensor>(Span(&kHumiditySensorSimulatedTag, 1), mContext->timerDelegate,
+                                                                    kDefaultHumidityConfig);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_DRYER)
         {
-            RegisterCreator("laundry-dryer", [this]() {
+            RegisterCreator("laundry-dryer-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<EmulatedLaundryDryer>(mContext->timerDelegate);
             });
+            RegisterAlias("laundry-dryer", "laundry-dryer-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_WASHER)
         {
-            RegisterCreator("laundry-washer", [this]() {
+            RegisterCreator("laundry-washer-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<EmulatedLaundryWasher>(EmulatedLaundryWasher::Context{
                     .timerDelegate          = mContext->timerDelegate,
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                 });
             });
+            RegisterAlias("laundry-washer", "laundry-washer-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_LIGHT_SENSOR)
         {
+            static const Clusters::IlluminanceMeasurementCluster::StartupConfiguration kDefaultLightConfig = {
+                .minMeasuredValue = DataModel::MakeNullable<uint16_t>(1),
+                .maxMeasuredValue = DataModel::MakeNullable<uint16_t>(10000),
+                .tolerance        = 100,
+                .lightSensorType  = DataModel::MakeNullable<Clusters::IlluminanceMeasurement::LightSensorTypeEnum>(
+                    Clusters::IlluminanceMeasurement::LightSensorTypeEnum::kPhotodiode),
+            };
+            static const auto kDefaultLightOptionalAttributes = []() {
+                Clusters::IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes;
+                optionalAttributes.Set<Clusters::IlluminanceMeasurement::Attributes::Tolerance::Id>();
+                optionalAttributes.Set<Clusters::IlluminanceMeasurement::Attributes::LightSensorType::Id>();
+                return optionalAttributes;
+            }();
+
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kLightSensorTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kLightSensorSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
             RegisterCreator("light-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingLightSensor>(mContext->timerDelegate);
+                return MakeDeviceWithTags<LightSensor>(Span(&kLightSensorTag, 1), mContext->timerDelegate, kDefaultLightConfig,
+                                                       kDefaultLightOptionalAttributes);
+            });
+            RegisterCreator("light-sensor-simulated", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDeviceWithTags<IncreasingLightSensor>(Span(&kLightSensorSimulatedTag, 1), mContext->timerDelegate,
+                                                                 kDefaultLightConfig, kDefaultLightOptionalAttributes);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MICROWAVE_OVEN)
         {
-            RegisterCreator("microwave-oven", [this]() {
+            RegisterCreator("microwave-oven-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<EmulatedMicrowaveOven>(EmulatedMicrowaveOven::Context{
                     .timerDelegate          = mContext->timerDelegate,
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                 });
             });
+            RegisterAlias("microwave-oven", "microwave-oven-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_MODE_SELECT)
         {
@@ -1024,37 +1258,91 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)
         {
+            static const Clusters::PressureMeasurementCluster::Config kDefaultPressureConfig = []() {
+                Clusters::PressureMeasurementCluster::Config config;
+                config.minMeasuredValue = DataModel::MakeNullable<int16_t>(0);
+                config.maxMeasuredValue = DataModel::MakeNullable<int16_t>(10000);
+                config.WithTolerance(10);
+                return config;
+            }();
+
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kPressureSensorTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kPressureSensorSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
             RegisterCreator("pressure-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingPressureSensor>(mContext->timerDelegate);
+                return MakeDeviceWithTags<PressureSensor>(Span(&kPressureSensorTag, 1), mContext->timerDelegate,
+                                                          kDefaultPressureConfig);
+            });
+            RegisterCreator("pressure-sensor-simulated", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDeviceWithTags<IncreasingPressureSensor>(Span(&kPressureSensorSimulatedTag, 1), mContext->timerDelegate,
+                                                                    kDefaultPressureConfig);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_FLOW_SENSOR)
         {
+            static const Clusters::FlowMeasurementCluster::Config kDefaultFlowConfig = []() {
+                Clusters::FlowMeasurementCluster::Config config;
+                config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(0);
+                config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(10000);
+                config.WithTolerance(10);
+                return config;
+            }();
+
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kFlowSensorTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kFlowSensorSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
             RegisterCreator("flow-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingFlowSensor>(mContext->timerDelegate);
+                return MakeDeviceWithTags<FlowSensor>(Span(&kFlowSensorTag, 1), mContext->timerDelegate, kDefaultFlowConfig);
+            });
+            RegisterCreator("flow-sensor-simulated", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDeviceWithTags<IncreasingFlowSensor>(Span(&kFlowSensorSimulatedTag, 1), mContext->timerDelegate,
+                                                                kDefaultFlowConfig);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ROBOTIC_VACUUM_CLEANER)
         {
-            RegisterCreator("robotic-vacuum-cleaner", [this]() {
+            RegisterCreator("robotic-vacuum-cleaner-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedRoboticVacuumCleaner>(SimulatedRoboticVacuumCleaner::Context{
                     .timerDelegate          = mContext->timerDelegate,
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                 });
             });
+            RegisterAlias("robotic-vacuum-cleaner", "robotic-vacuum-cleaner-simulated");
         }
 
         if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING)
         {
-            RegisterCreator("window-covering", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedWindowCovering>(
-                    WindowCovering::Context{ .timerDelegate = mContext->timerDelegate },
-                    SimulatedWindowCovering::Context{ .groupDataProvider = mContext->groupDataProvider });
-            });
+            for (const auto & variant : WindowCoveringVariants())
+            {
+                RegisterCreator(variant.name, [this, makeConfig = variant.makeConfig]() {
+                    VerifyOrDie(mContext.has_value());
+                    return MakeDevice<SimulatedWindowCovering>(
+                        WindowCovering::Context{ .timerDelegate = mContext->timerDelegate },
+                        SimulatedWindowCovering::Context{ .groupDataProvider = mContext->groupDataProvider }, makeConfig());
+                });
+            }
+            RegisterAlias("window-covering-simulated", "window-covering");
         }
 
         // at least one device type MUST be enabled

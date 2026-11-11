@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/ConcreteAttributePath.h>
@@ -31,7 +32,16 @@
 #include <clusters/TimeSynchronization/Events.h>
 #include <clusters/TimeSynchronization/Metadata.h>
 #include <clusters/TimeSynchronization/Structs.h>
+#include <credentials/FabricTable.h>
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <lib/core/CancelableOperation.h>
+#include <lib/support/Defer.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <protocols/interaction_model/Constants.h>
+#include <system/RAIIMockClock.h>
+
+#include <optional>
+#include <utility>
 
 namespace {
 
@@ -42,6 +52,18 @@ using namespace chip::app::Clusters::TimeSynchronization;
 using namespace chip::app::Clusters::TimeSynchronization::Attributes;
 using namespace chip::Testing;
 
+// A platform time request that stays pending until the test completes it, standing in for the
+// asynchronous work a real delegate would do. Start() and Complete() are public because the test
+// drives the request from outside.
+class PlatformTimeRequest : public chip::Callback::CancelableOperation<TimeSourceEnum, GranularityEnum>
+{
+    using Base = chip::Callback::CancelableOperation<TimeSourceEnum, GranularityEnum>;
+
+public:
+    using Base::Complete;
+    using Base::Start;
+};
+
 // Test delegate that stubs UpdateTimeFromPlatformSource to prevent AttemptToGetTime() from
 // falling back to AttemptToGetTimeFromTrustedNode() on platforms where GetClock_RealTime() is
 // not implemented (e.g. Zephyr / nrf-native-sim). Falling back would attempt to establish a CASE
@@ -50,8 +72,23 @@ struct TestTimeSyncDelegate : public TimeSynchronization::DefaultTimeSyncDelegat
 {
     CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<TimeSynchronization::OnTimeSyncCompletion> * callback) override
     {
+        // Ideally the delegate API would take the Owned token directly (see CHIPCallback.h)
+        chip::Callback::Callback<TimeSynchronization::OnTimeSyncCompletion>::Owned onCompletion(callback);
+        VerifyOrReturnError(!mPlatformTimeRequest.IsPending(), CHIP_ERROR_BUSY);
+
+        if (mPlatformTimeResult.has_value())
+        {
+            onCompletion.Invoke(mPlatformTimeResult->first, mPlatformTimeResult->second);
+            return CHIP_NO_ERROR;
+        }
+        mPlatformTimeRequest.Start(std::move(onCompletion));
         return CHIP_NO_ERROR;
     }
+
+    // If set, UpdateTimeFromPlatformSource() calls the callback synchronously with this result.
+    // Otherwise the request stays pending in mPlatformTimeRequest.
+    std::optional<std::pair<TimeSourceEnum, GranularityEnum>> mPlatformTimeResult;
+    PlatformTimeRequest mPlatformTimeRequest;
 };
 
 struct TestTimeSynchronizationCluster : public ::testing::Test
@@ -61,6 +98,13 @@ struct TestTimeSynchronizationCluster : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     TestTimeSynchronizationCluster() {}
+
+    // Returns kInvalidEventId if there is no further event.
+    EventId NextEventId()
+    {
+        auto event = testContext.EventsGenerator().GetNextEvent();
+        return event.has_value() ? event->eventOptions.mPath.mEventId : kInvalidEventId;
+    }
 
     TestServerClusterContext testContext;
     TestTimeSyncDelegate delegate;
@@ -429,7 +473,7 @@ TEST_F(TestTimeSynchronizationCluster, SetTrustedTimeSourceTest)
     // Verify that MissingTrustedTimeSource event is emitted when set to null
     auto eventInfo = testContext.EventsGenerator().GetNextEvent();
     ASSERT_TRUE(eventInfo.has_value());
-    auto & event = *eventInfo; // NOLINT(bugprone-unchecked-optional-access)
+    auto & event = *eventInfo;
     EXPECT_EQ(event.eventOptions.mPath.mEventId, Events::MissingTrustedTimeSource::Id);
     Events::MissingTrustedTimeSource::DecodableType missingEvent;
     EXPECT_EQ(event.GetEventData(missingEvent), CHIP_NO_ERROR);
@@ -442,4 +486,111 @@ TEST_F(TestTimeSynchronizationCluster, SetTrustedTimeSourceTest)
     EXPECT_TRUE(readBackTTS.IsNull());
 
     timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A failed platform time sync (kNoTimeGranularity) falls back to the trusted node and then to NTP.
+// With neither configured, the fallback ends in a TimeFailure event.
+TEST_F(TestTimeSynchronizationCluster, PlatformTimeFailureFallsBack)
+{
+    const std::pair<TimeSourceEnum, GranularityEnum> failureResults[] = {
+        { TimeSourceEnum::kNone, GranularityEnum::kNoTimeGranularity },  // documented failure result
+        { TimeSourceEnum::kAdmin, GranularityEnum::kNoTimeGranularity }, // timeSource is ignored on failure
+    };
+
+    for (const auto & result : failureResults)
+    {
+        delegate.mPlatformTimeResult = result;
+        const BitFlags<Feature> features{ Feature::kTimeSyncClient };
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
+        ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
+        auto deferShutdown =
+            MakeDefer([&timeSynchronization] { timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown); });
+        ClusterTester tester(timeSynchronization);
+
+        // Clearing the trusted time source makes the cluster ask the delegate for the time.
+        Commands::SetTrustedTimeSource::Type request;
+        request.trustedTimeSource.SetNull();
+        EXPECT_TRUE(tester.Invoke(request).IsSuccess());
+
+        EXPECT_EQ(NextEventId(), Events::MissingTrustedTimeSource::Id);
+        EXPECT_EQ(NextEventId(), Events::TimeFailure::Id);
+        EXPECT_EQ(NextEventId(), kInvalidEventId);
+
+        Granularity::TypeInfo::DecodableType granularity{};
+        EXPECT_EQ(tester.ReadAttribute(Granularity::Id, granularity), CHIP_NO_ERROR);
+        EXPECT_EQ(granularity, GranularityEnum::kNoTimeGranularity);
+    }
+}
+
+TEST_F(TestTimeSynchronizationCluster, PlatformTimeSuccessSetsGranularity)
+{
+    const BitFlags<Feature> features{ Feature::kTimeSyncClient };
+    TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                   TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate },
+                                                   context);
+    ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
+    auto deferShutdown = MakeDefer([&timeSynchronization] { timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    ClusterTester tester(timeSynchronization);
+
+    Commands::SetTrustedTimeSource::Type request;
+    request.trustedTimeSource.SetNull();
+    EXPECT_TRUE(tester.Invoke(request).IsSuccess());
+    ASSERT_TRUE(delegate.mPlatformTimeRequest.IsPending());
+    delegate.mPlatformTimeRequest.Complete(TimeSourceEnum::kAdmin, GranularityEnum::kSecondsGranularity);
+
+    EXPECT_EQ(NextEventId(), Events::MissingTrustedTimeSource::Id);
+    EXPECT_EQ(NextEventId(), kInvalidEventId);
+
+    Granularity::TypeInfo::DecodableType granularity{};
+    EXPECT_EQ(tester.ReadAttribute(Granularity::Id, granularity), CHIP_NO_ERROR);
+    EXPECT_EQ(granularity, GranularityEnum::kSecondsGranularity);
+}
+
+// SetUTCTime makes a pending platform time request moot, so the cluster cancels it.
+TEST_F(TestTimeSynchronizationCluster, SetUTCTimeCancelsPlatformTimeRequest)
+{
+    System::Clock::Internal::RAIIMockClock mockClock;
+
+    // SetUTCTime updates the Last Known Good Time, which needs an initialized FabricTable.
+    TestPersistentStorageDelegate storage;
+    Credentials::PersistentStorageOpCertStore opCertStore;
+    ASSERT_SUCCESS(opCertStore.Init(&storage));
+    auto deferOpCertStoreFinish = MakeDefer([&opCertStore] { opCertStore.Finish(); });
+    FabricTable fabricTable;
+    FabricTable::InitParams initParams;
+    initParams.storage     = &storage;
+    initParams.opCertStore = &opCertStore;
+    ASSERT_SUCCESS(fabricTable.Init(initParams));
+    auto deferFabricTableShutdown = MakeDefer([&fabricTable] { fabricTable.Shutdown(); });
+
+    const TimeSynchronizationCluster::Context contextWithFabricTable = { .fabricTable            = fabricTable,
+                                                                         .caseSessionManager     = context.caseSessionManager,
+                                                                         .platformManager        = context.platformManager,
+                                                                         .interactionModelEngine = context.interactionModelEngine };
+
+    const BitFlags<Feature> features{ Feature::kTimeSyncClient };
+    TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                   TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate },
+                                                   contextWithFabricTable);
+    ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
+    auto deferShutdown = MakeDefer([&timeSynchronization] { timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    ClusterTester tester(timeSynchronization);
+
+    Commands::SetTrustedTimeSource::Type setTrustedTimeSource;
+    setTrustedTimeSource.trustedTimeSource.SetNull();
+    EXPECT_TRUE(tester.Invoke(setTrustedTimeSource).IsSuccess());
+    EXPECT_EQ(NextEventId(), Events::MissingTrustedTimeSource::Id);
+    ASSERT_TRUE(delegate.mPlatformTimeRequest.IsPending());
+
+    Commands::SetUTCTime::Type setUTCTime;
+    setUTCTime.UTCTime     = 1'000'000'000'000'000; // 2031 in the CHIP epoch, after the firmware build time
+    setUTCTime.granularity = GranularityEnum::kMillisecondsGranularity;
+    EXPECT_TRUE(tester.Invoke(setUTCTime).IsSuccess());
+    EXPECT_FALSE(delegate.mPlatformTimeRequest.IsPending());
+
+    Granularity::TypeInfo::DecodableType granularity{};
+    EXPECT_EQ(tester.ReadAttribute(Granularity::Id, granularity), CHIP_NO_ERROR);
+    EXPECT_EQ(granularity, GranularityEnum::kMillisecondsGranularity);
 }

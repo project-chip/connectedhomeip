@@ -631,7 +631,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
 #if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
     if (AliroDelegate::IsAliroCredentialType(credentialType))
     {
-        return AliroDelegate::GetInstance().GetCredential(credentialIndex, credentialType, credential);
+        return AliroDelegate::GetInstance().GetAliroCredential(credentialIndex, credentialType, credential);
     }
 
     size_t outLen;
@@ -751,8 +751,8 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
 #if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
     if (AliroDelegate::IsAliroCredentialType(credentialType))
     {
-        return AliroDelegate::GetInstance().SetCredential(credentialIndex, creator, modifier, credentialStatus, credentialType,
-                                                          credentialData);
+        return AliroDelegate::GetInstance().SetAliroCredential(credentialIndex, creator, modifier, credentialStatus, credentialType,
+                                                               credentialData);
     }
 
     size_t outLen;

@@ -69,12 +69,13 @@ CHIP_ERROR BindingHandler::Dispatch(EndpointId localEndpointId, Platform::Unique
     auto * context = Platform::New<BindingContext>(*mExchangeManager, std::move(command));
     VerifyOrReturnError(context != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    // From here on, the Binding::Manager owns the context and always calls ReleaseContext
-    // once it no longer needs it.
+    // On success the Binding::Manager owns the context and calls ReleaseContext once it no longer needs it.
+    // On failure the context was not taken and must be released here.
     CHIP_ERROR err = mBindingManager->NotifyBoundClusterChanged(localEndpointId, clusterId, context);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "NotifyBoundClusterChanged failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ReleaseContext(context);
     }
     return err;
 }

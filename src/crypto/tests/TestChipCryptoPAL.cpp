@@ -3113,6 +3113,89 @@ TEST_F(TestChipCryptoPAL, TestSerialNumber_x509Extraction)
     }
 }
 
+TEST_F(TestChipCryptoPAL, TestStripDerIntegerSignByte)
+{
+    struct TestCase
+    {
+        std::vector<uint8_t> derInteger;
+        std::vector<uint8_t> expected;
+    };
+
+    // clang-format off
+    const TestCase testCases[] = {
+        // DER INTEGER content          Expected
+        { {},                           {} },
+        { { 0x00 },                     { 0x00 } },
+        { { 0x01 },                     { 0x01 } },
+        { { 0x7F, 0x11 },               { 0x7F, 0x11 } },
+        { { 0x00, 0x80 },               { 0x80 } },
+        { { 0x00, 0xD4, 0x23, 0xCE },   { 0xD4, 0x23, 0xCE } },
+        { { 0xFB },                     { 0xFB } },
+        { { 0x00, 0x7F },               { 0x00, 0x7F } },
+    };
+    // clang-format on
+
+    for (const auto & testCase : testCases)
+    {
+        uint8_t buf[kMaxCertificateSerialNumberLength] = { 0 };
+        MutableByteSpan out(buf);
+        EXPECT_SUCCESS(StripDerIntegerSignByte(ByteSpan(testCase.derInteger.data(), testCase.derInteger.size()), out));
+        EXPECT_TRUE(out.data_equal(ByteSpan(testCase.expected.data(), testCase.expected.size())));
+    }
+
+    // A 20-byte value with its high bit set has 21 content octets and fits a 20-byte buffer.
+    uint8_t padded[kMaxCertificateSerialNumberLength + 1] = { 0x00, 0x8E };
+    uint8_t buf[kMaxCertificateSerialNumberLength]        = { 0 };
+    MutableByteSpan out(buf);
+    EXPECT_SUCCESS(StripDerIntegerSignByte(ByteSpan(padded), out));
+    EXPECT_EQ(out.size(), kMaxCertificateSerialNumberLength);
+    EXPECT_EQ(out.data()[0], 0x8E);
+
+    // 21 content octets without a sign byte do not fit.
+    uint8_t unpadded[kMaxCertificateSerialNumberLength + 1] = { 0x7F };
+    MutableByteSpan small(buf);
+    EXPECT_EQ(StripDerIntegerSignByte(ByteSpan(unpadded), small), CHIP_ERROR_BUFFER_TOO_SMALL);
+}
+
+TEST_F(TestChipCryptoPAL, TestSerialNumber_x509ExtractionHighBitSet)
+{
+    HeapChecker heapChecker;
+
+    const uint8_t expectedSerial8Bytes[]  = { 0x8e, 0xa1, 0xb2, 0xc3, 0xd4, 0xe5, 0xf6, 0x07 };
+    const uint8_t expectedSerial20Bytes[] = { 0x8e, 0xa1, 0xb2, 0xc3, 0xd4, 0xe5, 0xf6, 0x07, 0x18, 0x29,
+                                              0x3a, 0x4b, 0x5c, 0x6d, 0x7e, 0x8f, 0x90, 0xa1, 0xb2, 0xc3 };
+
+    struct TestCase
+    {
+        ByteSpan cert;
+        ByteSpan expectedSerialNumber;
+    };
+
+    const TestCase testCases[] = {
+        { ByteSpan(kDacSerialHighBit8Bytes), ByteSpan(expectedSerial8Bytes) },
+        { ByteSpan(kDacSerialHighBit20Bytes), ByteSpan(expectedSerial20Bytes) },
+    };
+
+    for (const auto & testCase : testCases)
+    {
+        EXPECT_SUCCESS(VerifyAttestationCertificateFormat(testCase.cert, AttestationCertType::kDAC));
+
+        uint8_t serialNumberBuf[kMaxCertificateSerialNumberLength] = { 0 };
+        MutableByteSpan serialNumber(serialNumberBuf);
+        EXPECT_SUCCESS(ExtractSerialNumberFromX509Cert(testCase.cert, serialNumber));
+        EXPECT_TRUE(serialNumber.data_equal(testCase.expectedSerialNumber));
+    }
+}
+
+TEST_F(TestChipCryptoPAL, TestSerialNumber_x509ExtractionTooLong)
+{
+    HeapChecker heapChecker;
+
+    uint8_t serialNumberBuf[kMaxCertificateSerialNumberLength] = { 0 };
+    MutableByteSpan serialNumber(serialNumberBuf);
+    EXPECT_EQ(ExtractSerialNumberFromX509Cert(ByteSpan(kDacSerial21Bytes), serialNumber), CHIP_ERROR_BUFFER_TOO_SMALL);
+}
+
 TEST_F(TestChipCryptoPAL, TestSubject_x509Extraction)
 {
     using namespace TestCerts;

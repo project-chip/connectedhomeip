@@ -33,6 +33,22 @@ exclude = [
 [tool.pyright]
 reportMissingTypeStubs = "warning"
 extraPaths = ["./src/python_testing/matter_testing_infrastructure"]
+exclude = [
+    # Pyright's default excludes, which are not applied by all versions when exclude is set
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*",
+    # Build outputs, which contain copies of scripts/ and src/ under out/*/obj
+    "**/out",
+    "scripts/py_matter_yamltests/build",
+    "scripts/py_matter_idl/build",
+    "src/python_testing/matter_testing_infrastructure/build",
+    "integrations/mobly/build",
+    # Submodules
+    "examples/common/QRCode/repo",
+    "examples/common/m5stack-tft/repo",
+    "third_party",
+]
 
 [tool.ruff.lint]
 select = [

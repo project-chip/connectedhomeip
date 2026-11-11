@@ -25,11 +25,11 @@
 # environment (via scripts/activate.sh). The pigweed git sub-module must still
 # be present though.
 #
-# External tool dependencies: bash, python3, gn, ninja
+# External tool dependencies: bash, python3, ninja (and gn, downloaded if missing or outdated)
 #
-# The zap-cli code generator and a small number of Python modules are
-# downloaded if necessary (see scripts/setup/requirements.build.txt) and
-# installed in a build environment directory. By default this is local to
+# The zap-cli code generator, gn (if missing or too old), and a small number of
+# Python modules are downloaded if necessary (see scripts/setup/requirements.build.txt)
+# and installed in a build environment directory. By default this is local to
 # the build directory, but an external directory can be specified using the
 # --build-env-dir option. The build environment directory can be shared by any
 # number of build directories, independently of target / tool chain.
@@ -75,9 +75,11 @@ function usage() { # status
 
 function main() { # ...
     CHIP_ROOT=$(cd "$(dirname "$0")/.." && pwd)
+    PIGWEED_CIPD_JSON="${CHIP_ROOT}/third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json"
     BUILD_ENV_DEPS=(
         "${CHIP_ROOT}/scripts/setup/requirements.build.txt"
         "${CHIP_ROOT}/scripts/setup/requirements.constraints.txt"
+        "${PIGWEED_CIPD_JSON}"
     )
     BUILD_ENV_DEPS_CODEGEN=(
         "${CHIP_ROOT}/scripts/setup/zap.version"
@@ -147,13 +149,15 @@ function main() { # ...
     fi
 
     # Check required tools are present
-    check_binary gn GN
     check_binary ninja NINJA
 
     # Create the build environment if necessary
     if ! check_build_env; then
         check_python 3.11
         configure_python_env
+        if ! check_gn; then
+            download_gn
+        fi
         if [[ -z "$CHIP_PREGEN_DIR" ]] && ! check_binary zap-cli; then
             download_zap
         fi
@@ -212,7 +216,7 @@ function gn_generate() { # [project options]
     ensure_no_clobber "${BUILD_DIR}/args.gn"
 
     # Pass --script-executable to all `gn` calls so scripts run in our venv
-    local gn=(gn --script-executable="${BUILD_ENV_DIR}/bin/python" --root="${PROJECT_PATH}")
+    local gn=("$GN" --script-executable="${BUILD_ENV_DIR}/bin/python" --root="${PROJECT_PATH}")
 
     # Run `gn args` so we know available arguments. The list will drive the
     # mapping of our command line options to GN args. Ostensibly `gn args`
@@ -222,9 +226,12 @@ function gn_generate() { # [project options]
     # those external dependencies during this pass.
     info "Configuring gn build arguments (see $BUILD_DIR/build-args.txt for supported arguments)"
     touch "${BUILD_DIR}/build.ninja"
-    "${gn[@]}" -q args "$BUILD_DIR" \
+    if ! "${gn[@]}" -q args "$BUILD_DIR" \
         --args='import("//build_overrides/chip.gni") import("${chip_root}/scripts/configure.preargs.gni")' \
-        --list --json >"${BUILD_DIR}/build-args.json"
+        --list --json >"${BUILD_DIR}/build-args.json"; then
+        cat "${BUILD_DIR}/build-args.json" >&2
+        fail "Failed to query GN build arguments"
+    fi
     call_impl describe_args "${BUILD_DIR}/build-args.json" >"${BUILD_DIR}/build-args.txt"
     {
         echo "# ${CONFIGURE_MARKER}"
@@ -262,6 +269,7 @@ function check_build_env() {
     [[ "$REPLY" == "$CURRENT_ENV_CKSUM" ]] || return 1
 
     [[ -r "${BUILD_ENV_PATH}/bin/activate" ]] || return 1
+    check_gn || return 1
     info "Using existing build environment: ${BUILD_ENV_PATH}"
     PYTHON="${BUILD_ENV_PATH}/bin/python"
 }
@@ -310,6 +318,52 @@ function generate_build_env_cksum() {
 
 function finalize_build_env() {
     echo "$CURRENT_ENV_CKSUM" >"${BUILD_ENV_PATH}/.cksum"
+}
+
+function check_gn() {
+    progress "Checking for gn"
+    local path
+    if [[ -x "${BUILD_ENV_PATH}/bin/gn" ]]; then
+        path="${BUILD_ENV_PATH}/bin/gn"
+    elif have_binary gn; then
+        path="$(hash -t gn)"
+    else
+        info "not found"
+        return 1
+    fi
+    # Pigweed's pw_build/ignore_group.gni calls the GN built-in path_exists()
+    # (added in upstream GN commit effea1e5, Jan 2023). Some OS packages
+    # (including Ubuntu 24.04's generate-ninja used in chip-build-minimal) ship
+    # an older GN snapshot without path_exists(), which fails during GN
+    # evaluation. Reject GN binaries that do not support path_exists so
+    # configure downloads the Pigweed-pinned GN binary from CIPD instead.
+    if ! "$path" help path_exists >/dev/null 2>&1; then
+        info "$path (too old, missing path_exists)"
+        return 1
+    fi
+    GN="$path"
+    info "$path"
+}
+
+function download_gn() {
+    local version="$(call_impl cipd_package_tag "$PIGWEED_CIPD_JSON" 'gn/gn/${platform}')"
+    [[ -n "$version" ]] || fail "Unable to determine gn CIPD version"
+    local platform="$(uname -sm)" flavor
+    case "$platform" in
+        Linux\ x86_64) flavor=linux-amd64 ;;
+        Linux\ arm64) flavor=linux-arm64 ;;
+        Linux\ aarch64) flavor=linux-arm64 ;;
+        Darwin\ x86_64) flavor=mac-amd64 ;;
+        Darwin\ arm64) flavor=mac-arm64 ;;
+        *) fail "Unable to determine gn flavor for $platform" ;;
+    esac
+    local url="https://chrome-infra-packages.appspot.com/dl/gn/gn/${flavor}/+/${version}"
+
+    progress "Installing gn from $url"
+    call_impl download_and_extract_zip "$url" "${BUILD_ENV_PATH}/bin" gn
+    chmod a+x "${BUILD_ENV_PATH}/bin/gn" # ZipFile.extract() does not handle permissions
+    GN="${BUILD_ENV_PATH}/bin/gn"
+    info "ok"
 }
 
 function download_zap() {

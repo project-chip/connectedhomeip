@@ -108,6 +108,16 @@ if (chip_mdns == "platform") {
   }
 }
 
+source_set("exponential-backoff") {
+  sources = [
+    "ExponentialBackOff.cpp",
+    "ExponentialBackOff.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/system" ]
+  deps = [ "${chip_root}/src/lib/support" ]
+}
+
 static_library("Linux") {
   sources = [
     "../DeviceSafeQueue.cpp",
@@ -239,6 +249,8 @@ static_library("Linux") {
         "../OpenThread/DnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.h",
+        "../OpenThread/OpenThreadTxtEntries.h",
+        "../OpenThread/TxtEntries.h",
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
@@ -251,7 +263,10 @@ static_library("Linux") {
         "DnssdImpl.h",
       ]
 
-      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+      deps += [
+        ":exponential-backoff",
+        "${chip_root}/src/lib/dnssd:platform_header",
+      ]
 
       public_configs += [ ":avahi_client_config" ]
     }
