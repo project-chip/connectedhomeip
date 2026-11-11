@@ -254,13 +254,13 @@ protected:
     CHIP_ERROR StartSync();
     CHIP_ERROR StopAutoScan();
 
-    virtual void UpdateWiFiNetworkStatus() {};
+    virtual void UpdateWiFiNetworkStatus(){};
 
 private:
     bool GetBssInfo(const gchar * inBssPath, NetworkCommissioning::WiFiScanResponse & outWiFiScanResponse) const noexcept;
 
-    virtual void PostNetworkConnect() {};
-    virtual void OnWiFiMediumAvailable(WpaSupplicantClient & inOutWpaSupplicantClient, bool inAvailable) {};
+    virtual void PostNetworkConnect(){};
+    virtual void OnWiFiMediumAvailable(WpaSupplicantClient & inOutWpaSupplicantClient, bool inAvailable){};
     void OnWpaPropertiesChanged(WpaSupplicant1Interface * iface, GVariant * properties);
     void OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     void OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res);
