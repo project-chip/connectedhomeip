@@ -25,6 +25,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/tests/DeviceCommissionerTestAccess.h>
+#include <credentials/tests/CHIPAttCert_test_vectors.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <clusters/OperationalCredentials/Attributes.h>
@@ -175,9 +176,8 @@ TEST_F(TestParseOperationalCredentialsInfo, PqcFeaturePreservesIndependentPaiAnd
         info.dacSupportedAttestationProfiles.Has(OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa65));
 }
 
-TEST_F(TestParseOperationalCredentialsInfo, RetainsLargestPaaProfileAndClearsItOnLegacyFallback)
+TEST_F(TestParseOperationalCredentialsInfo, RetainsPaaBitmapAndResetsItOnLegacyFallback)
 {
-    using Profile  = OperationalCredentials::AttestationCryptoProfileEnum;
     using Profiles = OperationalCredentials::AttestationCryptoProfileBitmap;
     for (const uint16_t bitmap : { uint16_t(1), uint16_t(3), uint16_t(5), uint16_t(7), uint16_t(9) })
     {
@@ -198,21 +198,10 @@ TEST_F(TestParseOperationalCredentialsInfo, RetainsLargestPaaProfileAndClearsItO
         access.SetAttributeCache(Platform::UniquePtr<ClusterStateCache>(cache.release()));
         ReadCommissioningInfo info;
         ASSERT_EQ(access.ParseOperationalCredentialsInfo(info), CHIP_NO_ERROR);
-        if (bitmap == 9)
-        {
-            EXPECT_FALSE(access.PaaAttestationIssuerProfile().HasValue());
-        }
-        else
-        {
-            ASSERT_TRUE(access.PaaAttestationIssuerProfile().HasValue());
-            EXPECT_EQ(access.PaaAttestationIssuerProfile().Value(),
-                      bitmap >= 5       ? Profile::kMlDsa65
-                          : bitmap == 3 ? Profile::kMlDsa44
-                                        : Profile::kEcdsaMatterLegacy);
-        }
+        EXPECT_EQ(info.paaSupportedAttestationProfiles.Raw(), bitmap);
         ASSERT_EQ(cachePtr->SetAttribute(featurePath, uint32_t(0)), CHIP_NO_ERROR);
         ASSERT_EQ(access.ParseOperationalCredentialsInfo(info), CHIP_NO_ERROR);
-        EXPECT_FALSE(access.PaaAttestationIssuerProfile().HasValue());
+        EXPECT_EQ(info.paaSupportedAttestationProfiles.Raw(), 1u);
     }
 }
 
@@ -306,6 +295,235 @@ TEST_F(TestParseOperationalCredentialsInfo, PqcFeatureFallsBackToLegacyWhenProfi
         OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy));
     EXPECT_TRUE(info.dacSupportedAttestationProfiles.Has(
         OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy));
+}
+
+TEST_F(TestParseOperationalCredentialsInfo, CertificateRequestsSerializeAndRetainTheCompleteChain)
+{
+    using Profile = OperationalCredentials::AttestationCryptoProfileEnum;
+    const Credentials::DeviceAttestationChainProfile chain{ Profile::kMlDsa65, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy };
+    DeviceCommissionerTestAccess access(&mCommissioner);
+    for (auto type : { Credentials::CertificateType::kPAI, Credentials::CertificateType::kDAC })
+    {
+        for (uint16_t segment = 0; segment < 3; ++segment)
+        {
+            OperationalCredentials::Commands::CertificateChainRequest::Type request;
+            ASSERT_EQ(
+                access.PrepareCertificateChainRequest(type, chain, segment == 0 ? NullOptional : MakeOptional(segment), request),
+                CHIP_NO_ERROR);
+            uint8_t buffer[128];
+            TLV::TLVWriter writer;
+            writer.Init(buffer);
+            ASSERT_EQ(request.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+            TLV::TLVReader reader;
+            reader.Init(buffer, writer.GetLengthWritten());
+            ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+            OperationalCredentials::Commands::CertificateChainRequest::DecodableType decoded;
+            ASSERT_EQ(decoded.Decode(reader), CHIP_NO_ERROR);
+            ASSERT_TRUE(decoded.cryptoProfile.HasValue());
+            EXPECT_EQ(decoded.cryptoProfile.Value().PAACrypto, chain.PAACrypto);
+            EXPECT_EQ(decoded.cryptoProfile.Value().PAICrypto, chain.PAICrypto);
+            EXPECT_EQ(decoded.cryptoProfile.Value().DACCrypto, chain.DACCrypto);
+            EXPECT_EQ(decoded.segmentID.HasValue(), segment != 0);
+            EXPECT_EQ(decoded.segmentID.ValueOr(0), segment);
+            ASSERT_TRUE(decoded.maxSegmentSize.HasValue());
+            EXPECT_EQ(decoded.maxSegmentSize.Value(), CertificateChainRequestTracker::kDefaultSegmentSize);
+        }
+    }
+    OperationalCredentials::Commands::CertificateChainRequest::Type request;
+    auto differentChain      = chain;
+    differentChain.PAACrypto = Profile::kMlDsa44;
+    EXPECT_EQ(access.PrepareCertificateChainRequest(Credentials::CertificateType::kDAC, differentChain, MakeOptional(uint16_t{ 3 }),
+                                                    request),
+              CHIP_ERROR_INCORRECT_STATE);
+    access.CancelCommissioningInteractions();
+    EXPECT_EQ(
+        access.PrepareCertificateChainRequest(Credentials::CertificateType::kDAC, chain, MakeOptional(uint16_t{ 3 }), request),
+        CHIP_ERROR_INCORRECT_STATE);
+    ASSERT_EQ(access.PrepareCertificateChainRequest(Credentials::CertificateType::kDAC, std::nullopt, NullOptional, request),
+              CHIP_NO_ERROR);
+    EXPECT_FALSE(request.cryptoProfile.HasValue());
+    EXPECT_FALSE(request.segmentID.HasValue());
+    EXPECT_FALSE(request.maxSegmentSize.HasValue());
+    differentChain.PAICrypto = Profile::kMlDsa65;
+    EXPECT_EQ(access.PrepareCertificateChainRequest(Credentials::CertificateType::kPAI, differentChain, NullOptional, request),
+              CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestParseOperationalCredentialsInfo, LegacyCertificateRequestsEncodeOnlyCertificateType)
+{
+    DeviceCommissionerTestAccess access(&mCommissioner);
+    for (auto type : { Credentials::CertificateType::kPAI, Credentials::CertificateType::kDAC })
+    {
+        OperationalCredentials::Commands::CertificateChainRequest::Type request;
+        ASSERT_EQ(access.PrepareCertificateChainRequest(type, std::nullopt, NullOptional, request), CHIP_NO_ERROR);
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        ASSERT_EQ(request.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        TLV::TLVType container;
+        ASSERT_EQ(reader.EnterContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetTag(), TLV::ContextTag(0));
+        uint8_t certificateType;
+        ASSERT_EQ(reader.Get(certificateType), CHIP_NO_ERROR);
+        EXPECT_EQ(certificateType, to_underlying(type));
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.ExitContainer(container), CHIP_NO_ERROR);
+    }
+}
+
+TEST_F(TestParseOperationalCredentialsInfo, CertificateRequestBoundsUseSelectedSubjectAndIssuer)
+{
+    using Profile = OperationalCredentials::AttestationCryptoProfileEnum;
+    const Credentials::DeviceAttestationChainProfile chain{ Profile::kMlDsa65, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy };
+    DeviceCommissionerTestAccess access(&mCommissioner);
+    OperationalCredentials::Commands::CertificateChainRequest::Type request;
+    uint8_t bytes[600] = {};
+    ASSERT_EQ(access.PrepareCertificateChainRequest(Credentials::CertificateType::kPAI, chain, NullOptional, request),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(access.CertificateRequestTracker().HandleResponse(
+                  ByteSpan(bytes), MakeOptional(static_cast<uint16_t>(Credentials::kMaxDERCertLengthMlDsa65)),
+                  MakeOptional(uint16_t{ 1 })),
+              CHIP_NO_ERROR);
+    ASSERT_EQ(access.PrepareCertificateChainRequest(Credentials::CertificateType::kDAC, chain, NullOptional, request),
+              CHIP_NO_ERROR);
+    // The selected DAC has an ML-DSA-44 issuer; a document requiring the ML-DSA-65 bound is invalid.
+    EXPECT_NE(access.CertificateRequestTracker().HandleResponse(
+                  ByteSpan(bytes), MakeOptional(static_cast<uint16_t>(Credentials::kMaxDERCertLengthMlDsa65)),
+                  MakeOptional(uint16_t{ 1 })),
+              CHIP_NO_ERROR);
+}
+
+TEST_F(TestParseOperationalCredentialsInfo, CertificateResponseRejectsProfilesDifferentFromTheRequest)
+{
+    class CertificateDevice : public DeviceProxy
+    {
+    public:
+        void Disconnect() override {}
+        NodeId GetDeviceId() const override { return 0x1234; }
+        Messaging::ExchangeManager * GetExchangeManager() const override { return nullptr; }
+        Optional<SessionHandle> GetSecureSession() const override { return NullOptional; }
+
+    private:
+        bool IsSecureConnected() const override { return false; }
+    } device;
+    class CertificateDelegate : public AutoCommissioner
+    {
+    public:
+        CHIP_ERROR CommissioningStepFinished(CHIP_ERROR error, CommissioningReport report) override
+        {
+            completions++;
+            result              = error;
+            receivedCertificate = report.Is<RequestedCertificate>();
+            return CHIP_NO_ERROR;
+        }
+        unsigned completions     = 0;
+        CHIP_ERROR result        = CHIP_ERROR_INTERNAL;
+        bool receivedCertificate = false;
+    } delegate;
+    DeviceCommissionerTestAccess access(&mCommissioner);
+    access.SetCommissioningDelegate(&delegate);
+    using Profile = OperationalCredentials::AttestationCryptoProfileEnum;
+    for (auto type : { Credentials::CertificateType::kPAI, Credentials::CertificateType::kDAC })
+    {
+        for (bool mismatch : { false, true })
+        {
+            Credentials::DeviceAttestationChainProfile chain{};
+            if (mismatch)
+            {
+                chain.PAACrypto = Profile::kMlDsa65;
+                chain.PAICrypto = type == Credentials::CertificateType::kPAI ? Profile::kEcdsaMatterLegacy : Profile::kMlDsa44;
+            }
+            OperationalCredentials::Commands::CertificateChainRequest::Type request;
+            ASSERT_EQ(access.PrepareCertificateChainRequest(type, chain, NullOptional, request), CHIP_NO_ERROR);
+            access.SetDeviceBeingCommissioned(&device);
+            access.SetCommissioningStage(type == Credentials::CertificateType::kPAI ? kSendPAICertificateRequest
+                                                                                    : kSendDACCertificateRequest);
+            OperationalCredentials::Commands::CertificateChainResponse::DecodableType response;
+            response.certificate  = type == Credentials::CertificateType::kPAI ? TestCerts::sTestCert_PAI_FFF1_8000_Cert
+                                                                               : TestCerts::sTestCert_DAC_FFF1_8000_0000_Cert;
+            const unsigned before = delegate.completions;
+            access.OnCertificateChainResponse(response);
+            EXPECT_EQ(delegate.completions, before + 1);
+            EXPECT_EQ(delegate.result, mismatch ? CHIP_ERROR_FAILED_DEVICE_ATTESTATION : CHIP_NO_ERROR);
+            EXPECT_EQ(delegate.receivedCertificate, !mismatch);
+            EXPECT_EQ(access.PrepareCertificateChainRequest(type, chain, MakeOptional(uint16_t{ 1 }), request),
+                      CHIP_ERROR_INCORRECT_STATE);
+        }
+    }
+    access.SetCommissioningDelegate(nullptr);
+}
+
+TEST_F(TestParseOperationalCredentialsInfo, OnlyInitialProfiledPaiRejectionAllowsAnotherChain)
+{
+    class CertificateDevice : public DeviceProxy
+    {
+    public:
+        void Disconnect() override {}
+        NodeId GetDeviceId() const override { return 0x1234; }
+        Messaging::ExchangeManager * GetExchangeManager() const override { return nullptr; }
+        Optional<SessionHandle> GetSecureSession() const override { return NullOptional; }
+
+    private:
+        bool IsSecureConnected() const override { return false; }
+    } device;
+    class CertificateDelegate : public AutoCommissioner
+    {
+    public:
+        CHIP_ERROR CommissioningStepFinished(CHIP_ERROR error, CommissioningReport report) override
+        {
+            result      = error;
+            unavailable = report.Is<AttestationChainNotAvailable>();
+            return CHIP_NO_ERROR;
+        }
+        CHIP_ERROR result = CHIP_ERROR_INTERNAL;
+        bool unavailable  = false;
+    } delegate;
+    DeviceCommissionerTestAccess access(&mCommissioner);
+    access.SetCommissioningDelegate(&delegate);
+    for (auto type : { Credentials::CertificateType::kPAI, Credentials::CertificateType::kDAC })
+    {
+        for (bool explicitChain : { false, true })
+        {
+            for (bool continuation : { false, true })
+            {
+                for (auto error : { CHIP_IM_GLOBAL_STATUS(InvalidCommand), CHIP_IM_GLOBAL_STATUS(Failure), CHIP_ERROR_TIMEOUT })
+                {
+                    std::optional<Credentials::DeviceAttestationChainProfile> chain;
+                    if (explicitChain)
+                    {
+                        chain.emplace();
+                    }
+                    OperationalCredentials::Commands::CertificateChainRequest::Type request;
+                    ASSERT_EQ(access.PrepareCertificateChainRequest(type, chain, NullOptional, request), CHIP_NO_ERROR);
+                    if (continuation)
+                    {
+                        const uint8_t segment[] = { 1 };
+                        ASSERT_EQ(access.CertificateRequestTracker().HandleResponse(ByteSpan(segment), MakeOptional(uint16_t{ 2 }),
+                                                                                    MakeOptional(uint16_t{ 1 })),
+                                  CHIP_NO_ERROR);
+                    }
+                    access.SetDeviceBeingCommissioned(&device);
+                    access.SetCommissioningStage(type == Credentials::CertificateType::kPAI ? kSendPAICertificateRequest
+                                                                                            : kSendDACCertificateRequest);
+                    access.OnCertificateChainFailureResponse(error);
+                    EXPECT_EQ(delegate.result, error);
+                    EXPECT_EQ(delegate.unavailable,
+                              type == Credentials::CertificateType::kPAI && explicitChain && !continuation &&
+                                  error == CHIP_IM_GLOBAL_STATUS(InvalidCommand));
+                    EXPECT_EQ(access.PrepareCertificateChainRequest(type, chain, MakeOptional(uint16_t{ 1 }), request),
+                              CHIP_ERROR_INCORRECT_STATE);
+                }
+            }
+        }
+    }
+    access.SetCommissioningDelegate(nullptr);
 }
 
 } // namespace

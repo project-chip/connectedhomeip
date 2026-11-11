@@ -78,7 +78,15 @@ MTR_DIRECT_MEMBERS
 
 - (void)dealloc
 {
-    [self cancel];
+    BOOL pending;
+    {
+        std::lock_guard lock(_lock);
+        pending = _completion != nil;
+    }
+    if (pending) {
+        [_device _pendingAttributeWaiterDeallocated];
+    }
+    [self _notifyCancellation];
 }
 
 - (void)cancel
@@ -140,9 +148,9 @@ MTR_DIRECT_MEMBERS
 
     if (!error) {
         MTR_LOG("%@ %p wait for attribute values completed", self, self);
-    } else if (error.domain == MTRErrorDomain && error.code == MTRErrorCodeTimeout) {
+    } else if ([error.domain isEqualToString:MTRErrorDomain] && error.code == MTRErrorCodeTimeout) {
         MTR_LOG("%@ %p wait for attribute values timed out", self, self);
-    } else if (error.domain == MTRErrorDomain && error.code == MTRErrorCodeCancelled) {
+    } else if ([error.domain isEqualToString:MTRErrorDomain] && error.code == MTRErrorCodeCancelled) {
         MTR_LOG("%@ %p wait for attribute values canceled", self, self);
     } else {
         MTR_LOG("%@ %p wait for attribute values unknown error: %@", self, self, error);

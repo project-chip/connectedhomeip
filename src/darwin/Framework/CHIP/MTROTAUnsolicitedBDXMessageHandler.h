@@ -21,6 +21,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <messaging/ExchangeMgr.h>
+#include <protocols/bdx/BusyResponder.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -29,7 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * When it receives a BDX ReceiveInit message from a node, it creates a new
  * MTROTAImageTransferHandler object as the exchange delegate that will
- * handle the transfer.
+ * handle the transfer, or handles responding with an appropriate
+ * standard-defined error if applicable.
  *
  * In all other cases, it fails out so that there is no exchange delegate created,
  * which means the message is potentially acked, but does not get a response.
@@ -63,6 +65,8 @@ private:
 
     // TODO: #36181 - Have a set of MTROTAImageTransferHandler objects.
     MTROTAImageTransferHandler * _Nullable mOTAImageTransferHandler = nullptr;
+
+    chip::bdx::BusyResponder mBusyResponder;
 
     chip::System::Layer * mSystemLayer;
 

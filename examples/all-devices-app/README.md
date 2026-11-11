@@ -71,58 +71,88 @@ The application supports the following device types (specified via the
 -   `air-purifier`
 -   `air-quality-sensor`
 -   `air-quality-sensor-full`
+-   `air-quality-sensor-full-simulated`
+-   `air-quality-sensor-simulated`
 -   `ambient-context-sensor`
+-   `battery-storage-simulated`
 -   `bridged-node`
 -   `chime`
+-   `closure-barrier`
+-   `closure-cabinet`
+-   `closure-door`
+-   `closure-garage-door`
+-   `closure-gate`
+-   `closure-no-ps-no-sp-simulated`
+-   `closure-simulated`
+-   `closure-window`
 -   `commissioning-proxy`
 -   `contact-sensor`
 -   `cooktop`
 -   `device-energy-management`
 -   `dimmable-light`
 -   `dimmable-plug-in-unit`
--   `dishwasher`
+-   `dishwasher-simulated`
 -   `doorbell`
--   `electrical-sensor`
+-   `electrical-sensor-simulated`
 -   `extractor-hood`
 -   `fan`
 -   `fan-no-onoff`
 -   `flow-sensor`
+-   `flow-sensor-simulated`
 -   `generic-switch`
 -   `humidity-conditioner`
 -   `humidity-sensor`
--   `laundry-dryer`
--   `laundry-washer`
+-   `humidity-sensor-simulated`
+-   `irrigation-system`
+-   `laundry-dryer-simulated`
+-   `laundry-washer-simulated`
 -   `light-sensor`
--   `microwave-oven`
+-   `light-sensor-simulated`
+-   `microwave-oven-simulated`
 -   `mode-select`
 -   `mounted-dimmable-load-control`
 -   `mounted-on-off-control`
--   `network-infrastructure-manager`
+-   `network-infrastructure-manager-simulated`
 -   `occupancy-sensor`
 -   `on-off-light`
 -   `on-off-light-switch`
 -   `on-off-plug-in-unit`
+-   `on-off-plug-with-sensors`
 -   `oven`
 -   `oven-2`
 -   `power-source`
+-   `power-source-simulated`
 -   `pressure-sensor`
+-   `pressure-sensor-simulated`
 -   `proximity-ranger`
 -   `rain-sensor`
 -   `refrigerator`
 -   `refrigerator-2`
--   `robotic-vacuum-cleaner`
+-   `robotic-vacuum-cleaner-simulated`
 -   `room-air-conditioner`
 -   `room-air-conditioner-with-sensors`
 -   `smoke-co-alarm`
 -   `soil-sensor`
+-   `soil-sensor-simulated`
 -   `speaker`
 -   `temperature-sensor`
+-   `temperature-sensor-simulated`
 -   `thermostat`
--   `thread-border-router`
+-   `thread-border-router-simulated`
 -   `water-freeze-detector`
+-   `water-heater`
 -   `water-leak-detector`
 -   `water-valve`
 -   `window-covering`
+-   `window-covering-awning`
+-   `window-covering-curtain`
+-   `window-covering-pergola`
+-   `window-covering-shutter`
+-   `window-covering-simulated`
+
+> [!NOTE] Legacy unadorned names (e.g., `battery-storage`, `closure`,
+> `dishwasher`, `robotic-vacuum-cleaner`, etc.) are retained as aliases pointing
+> to their simulated variants for backwards compatibility.
 
 You can run the application with `--help` to see the list of valid device types.
 
@@ -133,7 +163,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <aggregator|air-purifier|air-quality-sensor|air-quality-sensor-full|ambient-context-sensor|bridged-node|chime|commissioning-proxy|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|doorbell|electrical-sensor|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-conditioner|humidity-sensor|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mode-select|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|oven-2|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|refrigerator-2|robotic-vacuum-cleaner|room-air-conditioner|room-air-conditioner-with-sensors|smoke-co-alarm|soil-sensor|speaker|temperature-sensor|thermostat|thread-border-router|water-freeze-detector|water-leak-detector|water-valve|window-covering>
+  --device <aggregator|air-purifier|...|*>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1
@@ -156,6 +186,12 @@ Build the application using the following command:
 ./scripts/build/build_examples.py --target linux-x64-all-devices-boringssl-no-ble build
 ```
 
+[!NOTE] The `linux-x64-*` targets require a Linux build host (e.g. CI or a
+container). On macOS, use `darwin-arm64-all-devices-boringssl-no-ble` for Apple
+silicon, or `darwin-x64-all-devices-boringssl-no-ble` for Intel Macs. Run
+`./scripts/build/build_examples.py targets` to list the targets available on
+your host.
+
 ## Running the Application
 
 To run the application, specify the device type using the `--device` flag. The
@@ -172,6 +208,9 @@ rm -rf /tmp/chip_*
 
 # Run a chime on endpoint 1, a speaker on endpoint 2 (child of endpoint 1), and a dimmable light on endpoint 3
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device chime:1 --device speaker:2,parent=1 --device dimmable-light:3
+
+# Battery Storage (composite): parent on endpoint 1 plus five child endpoints (DEM, grid/battery electrical-sensor, grid/battery power-source)
+./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device battery-storage:1
 ```
 
 ## Bridging Support: Bridged Modifier (`,bridged`)

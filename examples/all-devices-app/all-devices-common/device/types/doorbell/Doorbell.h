@@ -21,6 +21,7 @@
 #include <app/clusters/bindings/binding-table.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/switch-server/SwitchCluster.h>
+#include <binding-handler/BindingHandler.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
@@ -38,6 +39,7 @@ public:
         DeviceLayer::PlatformManager & platformManager;
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
+        BindingHandler & bindingHandler;
         Clusters::IdentifyDelegate & identifyDelegate;
     };
 
@@ -49,6 +51,8 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
+
+    CHIP_ERROR TriggerChime(std::optional<uint8_t> chimeId = std::nullopt);
 
     // Doorbell actions (can be invoked via OOB accessors, named pipes, or physical button drivers)
     CHIP_ERROR HandleShortPress();

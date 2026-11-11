@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <stdlib.h>
+#include <string.h>
 
 #include <pw_unit_test/framework.h>
 
@@ -24,7 +24,7 @@
 int main(int argc, char * argv[])
 {
     testing::InitGoogleTest(&argc, argv);
-    if (argc == 2 && atoi(argv[1]) == 1)
+    if (argc == 2 && strcmp(argv[1], "1") == 0)
     {
         return RUN_ALL_TESTS();
     }

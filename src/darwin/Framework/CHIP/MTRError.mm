@@ -31,6 +31,8 @@ NSString * const MTRErrorDomain = @"MTRErrorDomain";
 
 NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
+NSString * const MTRBDXErrorDomain = @"MTRBDXErrorDomain";
+
 // Class for holding on to a CHIP_ERROR that we can use as the value
 // in a dictionary.
 @interface MTRErrorHolder : NSObject
@@ -314,7 +316,7 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         return CHIP_NO_ERROR;
     }
 
-    if (error.domain == MTRInteractionErrorDomain) {
+    if ([error.domain isEqualToString:MTRInteractionErrorDomain]) {
         chip::app::StatusIB status(static_cast<chip::Protocols::InteractionModel::Status>(error.code));
         if (error.userInfo != nil && error.userInfo[@"clusterStatus"] != nil) {
             status.mClusterStatus.emplace([error.userInfo[@"clusterStatus"] unsignedCharValue]);
@@ -322,7 +324,7 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         return status.ToChipError();
     }
 
-    if (error.domain != MTRErrorDomain) {
+    if (![error.domain isEqualToString:MTRErrorDomain]) {
         ChipLogError(Controller, "Trying to convert non-Matter error %@ to a Matter error code", error);
         return CHIP_ERROR_INTERNAL;
     }

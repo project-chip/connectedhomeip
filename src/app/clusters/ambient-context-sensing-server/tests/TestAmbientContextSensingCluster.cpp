@@ -255,7 +255,7 @@ TEST_F(TestAmbientContextSensingCluster, TestAttributes)
     EXPECT_EQ(clusterRevision, AmbientContextSensing::kRevision);
 
     // Read the feature map
-    uint32_t featureVal;
+    uint32_t featureVal = 0;
     EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureVal), CHIP_NO_ERROR);
     BitMask<AmbientContextSensing::Feature> featureMap = featureVal;
     EXPECT_TRUE(featureMap.Has(Feature::kHumanActivity));
@@ -450,7 +450,7 @@ TEST_F(TestAmbientContextSensingCluster, TestHoldTimeAttribute)
 
     // Verify that we can set a valid hold time via direct method call
     EXPECT_EQ(cluster.SetHoldTime(150), Protocols::InteractionModel::Status::Success);
-    uint16_t holdTime;
+    uint16_t holdTime = 0;
     EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
     EXPECT_EQ(holdTime, 150);
     EXPECT_EQ(cluster.GetHoldTime(), 150);
@@ -661,7 +661,7 @@ TEST_F(TestAmbientContextSensingCluster, TestSimultaneousDetectLimit)
 
     // Read SimultaneousDetectionLimit attribute: Exp: kDefaultSimultaneousDetectionLimit;
     bool isDetected;
-    uint8_t simultaneousDetectLimit;
+    uint8_t simultaneousDetectLimit = 0;
     EXPECT_EQ(tester.ReadAttribute(Attributes::SimultaneousDetectionLimit::Id, simultaneousDetectLimit), CHIP_NO_ERROR);
     EXPECT_EQ(simultaneousDetectLimit, kDefaultSimultaneousDetectionLimit);
 

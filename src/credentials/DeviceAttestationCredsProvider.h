@@ -34,6 +34,7 @@ namespace Credentials {
 using DeviceAttestationCertProfile       = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
 using DeviceAttestationCertProfileBitmap = app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap;
 using DeviceAttestationDocumentType      = app::Clusters::OperationalCredentials::CertificateChainTypeEnum;
+using DeviceAttestationChainProfile      = app::Clusters::OperationalCredentials::Structs::CryptoProfileChainStruct::Type;
 
 // Each bitmap describes the corresponding certificate's subject public key capabilities,
 // not its issuer's signature algorithm or the profile of the chain containing it.
@@ -123,13 +124,8 @@ public:
     virtual DeviceAttestationProfileSupport GetDeviceAttestationProfileSupport() const;
 
     /**
-     * Select the strongest complete stored attestation chain for profile-aware requests.
-     * This is a storage selector, independent of each certificate's public key profile.
-     * Both PAI and DAC reads, including all segments, must use this same chain.
-     * Providers must keep the selection stable while commissioning is in progress.
-     *
-     * The legacy default preserves source compatibility for existing providers. Providers
-     * with multiple chains override this method based on their complete chain inventory.
+     * Return the preferred storage selector for callers of the scalar profile APIs.
+     * CertificateChainRequest uses the explicit tuple passed to GetDeviceAttestationDocumentSegmentForChain.
      */
     virtual DeviceAttestationCertProfile GetPreferredDeviceAttestationChainProfile() const
     {
@@ -154,6 +150,22 @@ public:
     virtual CHIP_ERROR GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType documentType,
                                                            DeviceAttestationCertProfile profile, size_t offset,
                                                            MutableByteSpan & out_document_buffer, size_t & out_document_size);
+
+    /**
+     * Read a segment from the exact PAA/PAI/DAC chain requested by the caller.
+     * Each call is independent; no earlier certificate request is required.
+     * The caller must validate the phase-1 profile values and issuer strength ordering.
+     * The buffer and document size follow GetDeviceAttestationDocumentSegment's contract.
+     * Return CHIP_ERROR_NOT_FOUND if the complete chain is not provisioned, and
+     * CHIP_ERROR_INVALID_ARGUMENT for an invalid document type or offset.
+     *
+     * The default accepts only the all-legacy tuple and delegates to the existing segment API,
+     * preserving legacy providers without interpreting their scalar storage selectors as tuples.
+     */
+    virtual CHIP_ERROR GetDeviceAttestationDocumentSegmentForChain(DeviceAttestationDocumentType documentType,
+                                                                   const DeviceAttestationChainProfile & chain, size_t offset,
+                                                                   MutableByteSpan & out_document_buffer,
+                                                                   size_t & out_document_size);
 
     /**
      * @brief Signs a message using the device attestation private key

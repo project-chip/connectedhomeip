@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 #include <string>
 
@@ -75,6 +76,7 @@ class BLEManagerImpl final : public BLEManager,
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend BLEManager;
+    friend class BLEManagerImplTestAccess;
 
 public:
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
@@ -115,8 +117,9 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
     // Driven by BlueZ IO
-    static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
+    static void HandleNewConnection(uint64_t pendingTicket, uint64_t requestId);
     static void HandleConnectFailed(CHIP_ERROR error);
+    static void HandleConnectFailed(CHIP_ERROR error, uint64_t requestId);
     static void HandleWriteComplete(BLE_CONNECTION_OBJECT conId);
     static void HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed);
     static void HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
@@ -177,6 +180,7 @@ private:
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
 
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void HandleScannedDevice(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info, uint64_t requestId);
     void OnScanComplete() override;
 
     // ===== Members for internal use by the following friends.
@@ -185,6 +189,7 @@ private:
     friend BLEManagerImpl & BLEMgrImpl();
 
     static BLEManagerImpl sInstance;
+    std::atomic<uint64_t> mScanRequestId{ 0 };
 
     // ===== Private members reserved for use by this class only.
 
