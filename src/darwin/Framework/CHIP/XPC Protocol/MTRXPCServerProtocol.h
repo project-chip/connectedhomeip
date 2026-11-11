@@ -51,7 +51,7 @@ MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedF
  * Each element of either array is one of:
  *
  * - An empty dictionary: every path on every endpoint.  A client sends this, as the only element, when one of
- *   its delegates for that node has no interested paths of that kind.
+ *   its delegates for that node was given nil (not an empty array) for that kind of interested paths.
  * - An NSNumber: an endpoint ID, meaning every path on that endpoint.
  * - A dictionary with NSNumber values under MTRDeviceControllerRegistrationInterestedPathEndpointIDKey and
  *   MTRDeviceControllerRegistrationInterestedPathClusterIDKey: every path in that cluster.
