@@ -25,6 +25,11 @@ namespace {
 
 using NS = Clusters::Globals::SemanticTagNamespaceId;
 
+// Namespace Electrical Measurement (0x000A); see Namespace-ElectricalMeasurement.xml.
+constexpr uint8_t kTagAcPhase1 = 0x02;
+constexpr uint8_t kTagAcPhase2 = 0x03;
+constexpr uint8_t kTagAcPhase3 = 0x04;
+
 } // namespace
 
 const EndpointComposition::SemanticTag kGridConnectionTag[1] = {
@@ -84,13 +89,13 @@ const EndpointComposition::SemanticTag kString2Panel2Tags[2] = {
 };
 
 const EndpointComposition::SemanticTag kPhaseATag[1] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = 0x01 },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = kTagAcPhase1 },
 };
 const EndpointComposition::SemanticTag kPhaseBTag[1] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = 0x02 },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = kTagAcPhase2 },
 };
 const EndpointComposition::SemanticTag kPhaseCTag[1] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = 0x03 },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = kTagAcPhase3 },
 };
 
 Span<const EndpointComposition::SemanticTag> ParallelPanelTag(uint8_t panelIndex)
