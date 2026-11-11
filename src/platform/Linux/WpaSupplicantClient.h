@@ -70,6 +70,8 @@ class ConnectivityManagerImpl;
 
 namespace Internal {
 
+BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> GetWiFiSecurity(GVariant * wpa, GVariant * rsn);
+
 /**
  *  @brief
  *    A D-Bus client for the wpa_supplicant Wi-Fi control plane.
@@ -252,16 +254,13 @@ protected:
     CHIP_ERROR StartSync();
     CHIP_ERROR StopAutoScan();
 
-    virtual void UpdateWiFiNetworkStatus(){};
+    virtual void UpdateWiFiNetworkStatus() {};
 
 private:
-    friend class TestWpaSupplicantClient;
-
     bool GetBssInfo(const gchar * inBssPath, NetworkCommissioning::WiFiScanResponse & outWiFiScanResponse) const noexcept;
-    bool GetBssInfo(WpaSupplicant1BSS * bss, NetworkCommissioning::WiFiScanResponse & outWiFiScanResponse) const noexcept;
 
-    virtual void PostNetworkConnect(){};
-    virtual void OnWiFiMediumAvailable(WpaSupplicantClient & inOutWpaSupplicantClient, bool inAvailable){};
+    virtual void PostNetworkConnect() {};
+    virtual void OnWiFiMediumAvailable(WpaSupplicantClient & inOutWpaSupplicantClient, bool inAvailable) {};
     void OnWpaPropertiesChanged(WpaSupplicant1Interface * iface, GVariant * properties);
     void OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     void OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res);
