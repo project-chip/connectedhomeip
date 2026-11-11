@@ -20,17 +20,25 @@
 #include <app/clusters/bindings/BindingCluster.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
+#include <binding-handler/BindingCommand.h>
 #include <binding-handler/BindingHandler.h>
 #include <clusters/ClosureControl/Enums.h>
+#include <clusters/ClosureDimension/Enums.h>
+#include <clusters/Identify/Enums.h>
 #include <clusters/shared/Enums.h>
 #include <device/api/SingleEndpoint.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/PlatformManager.h>
-
-#include <optional>
 
 namespace chip::app {
 
-/// Closure Controller device type: sends Closure Control commands to bound closures.
+/// Closure Controller device type.
+///
+/// Client clusters:
+///   - Closure Control: mandatory
+///   - Identify: optional, enabled by Config::withIdentifyClient
+///   - Closure Dimension: optional, enabled by Config::withClosureDimensionClient
 class ClosureController : public SingleEndpoint
 {
 public:
@@ -40,15 +48,8 @@ public:
         Clusters::Binding::Manager & bindingManager;
         DeviceLayer::PlatformManager & platformManager;
         BindingHandler & bindingHandler;
-    };
-
-    /// Fields of a MoveTo / GroupedMoveTo command. Each field is optional in the command;
-    /// only set the fields that the target closure supports.
-    struct MoveToArgs
-    {
-        std::optional<Clusters::ClosureControl::TargetPositionEnum> position;
-        std::optional<bool> latch;
-        std::optional<Clusters::Globals::ThreeLevelAutoEnum> speed;
+        bool withIdentifyClient         = false;
+        bool withClosureDimensionClient = false;
     };
 
     explicit ClosureController(const Config & config);
@@ -59,10 +60,11 @@ public:
 
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
-    CHIP_ERROR SendMoveTo(const MoveToArgs & args);
-    CHIP_ERROR SendGroupedMoveTo(const MoveToArgs & args);
-    CHIP_ERROR SendStop();
-    CHIP_ERROR SendCalibrate();
+    /// Sends `command` to every binding on this endpoint for command->GetClusterId().
+    ///
+    /// Returns CHIP_ERROR_INCORRECT_STATE if the device is not registered, and
+    /// CHIP_ERROR_INVALID_ARGUMENT if `command` is null or its cluster is not an enabled client cluster.
+    CHIP_ERROR Dispatch(Platform::UniquePtr<BindingCommand> command);
 
     Clusters::BindingCluster & BindingCluster()
     {
@@ -71,6 +73,8 @@ public:
     }
 
 private:
+    bool IsEnabledClientCluster(ClusterId clusterId) const;
+
     Config mConfig;
     LazyRegisteredServerCluster<Clusters::BindingCluster> mBindingCluster;
 };
