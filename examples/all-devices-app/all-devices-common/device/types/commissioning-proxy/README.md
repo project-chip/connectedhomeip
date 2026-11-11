@@ -422,8 +422,8 @@ cluster.
 
 Adapter and driver are both constructed in
 `posix/linux/DeviceFactoryPlatformOverride.cpp`, which composes the driver onto
-the single `CommissioningProxy` with `AddTransport()` — a build with BLE
-adds that driver the same way — and derives the advertised `WiFiBand` from
+the single `CommissioningProxy` with `AddTransport()` — a build with BLE adds
+that driver the same way — and derives the advertised `WiFiBand` from
 `--wifipaf freq_list=`, since the device itself reads no command line. The same
 parsed list reaches the radio from `posix/main.cpp`.
 
