@@ -172,6 +172,12 @@ static uint32_t GetNextPinCode()
     std::getline(gPinCodeFile, pinCodeStr);
     if (!gPinCodeFile.fail())
     {
+        // Tolerate CRLF line endings, e.g. from a spreadsheet export.
+        if (!pinCodeStr.empty() && pinCodeStr.back() == '\r')
+        {
+            pinCodeStr.pop_back();
+        }
+
         if (pinCodeStr.length() > 8)
         {
             pinCodeStr = pinCodeStr.substr(0, 8);
