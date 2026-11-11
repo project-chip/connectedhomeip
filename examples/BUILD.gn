@@ -47,6 +47,10 @@ if (chip_build_tests) {
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/tests",
     ]
 
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+      tests += [ "${chip_root}/examples/camera-controller/webrtc-manager/tests" ]
+    }
+
     # TV Casting app tests (platform-independent)
     tests +=
         [ "${chip_root}/examples/tv-casting-app/tv-casting-common/core/tests" ]
