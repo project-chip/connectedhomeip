@@ -24,6 +24,7 @@ import copy
 import inspect
 import logging
 import time
+from collections.abc import Awaitable
 from dataclasses import dataclass
 from typing import Any, get_args
 
@@ -1185,22 +1186,38 @@ class IDMBaseTest(BasicCompositionTests):
             result.attempted += 1
             execution_failure = None
             result_status = None
+
+            async def await_settled_probe_operation(operation: Awaitable[Any]) -> Any:
+                nonlocal execution_failure
+                pending = asyncio.ensure_future(operation)
+                while True:
+                    try:
+                        return await asyncio.shield(pending)
+                    except asyncio.CancelledError as error:
+                        if pending.cancelled():
+                            raise
+                        result.execution_error += 1
+                        if execution_failure is None:
+                            execution_failure = error
+
             try:
-                write_result = await self.default_controller.WriteAttribute(
+                write_result = await await_settled_probe_operation(self.default_controller.WriteAttribute(
                     nodeId=self.dut_node_id,
                     attributes=[(attr_info.endpoint_id, attr_info.attribute(test_value))],
                     timedRequestTimeoutMs=timed_request_timeout_ms
-                )
+                ))
             except asyncio.CancelledError as error:
                 result.execution_error += 1
-                execution_failure = error
+                if execution_failure is None:
+                    execution_failure = error
                 log.warning('Write cancelled for %s; checking and restoring the baseline', attribute_path)
             except InteractionModelError as error:
                 result_status = error.status
             except ChipStackError as error:  # chipstack-ok
                 result.execution_error += 1
                 log.warning("Execution failed writing %s: %s", attribute_path, error)
-                execution_failure = error
+                if execution_failure is None:
+                    execution_failure = error
             else:
                 result_status = write_result[0].Status
 
@@ -1228,12 +1245,12 @@ class IDMBaseTest(BasicCompositionTests):
             restore_failed = False
             stored_violation = False
             try:
-                stored_value = await self.read_single_attribute(
+                stored_value = await await_settled_probe_operation(self.read_single_attribute(
                     dev_ctrl=self.default_controller,
                     node_id=self.dut_node_id,
                     endpoint=attr_info.endpoint_id,
                     attribute=attr_info.attribute
-                )
+                ))
                 read_back_failed = isinstance(stored_value, ValueDecodeFailure)
                 restore_needed = read_back_failed or stored_value != original_value
                 if read_back_failed and isinstance(stored_value.Reason, (InteractionModelError, ChipStackError)):
@@ -1262,18 +1279,18 @@ class IDMBaseTest(BasicCompositionTests):
                 if execution_failure is None:
                     execution_failure = error
             except signals.TestFailure as error:
-                if not isinstance(execution_failure, asyncio.CancelledError):
+                if execution_failure is None:
                     raise
                 result.execution_error += 1
-                log.warning("Cancelled write readback assertion failed for %s: %s", attribute_path, error)
+                log.warning("Write readback assertion failed for %s: %s", attribute_path, error)
             finally:
                 if restore_needed:
                     try:
-                        restore_result = await self.default_controller.WriteAttribute(
+                        restore_result = await await_settled_probe_operation(self.default_controller.WriteAttribute(
                             nodeId=self.dut_node_id,
                             attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))],
                             timedRequestTimeoutMs=timed_request_timeout_ms
-                        )
+                        ))
                     except InteractionModelError as error:
                         result.execution_error += 1
                         restore_failed = True
@@ -1291,12 +1308,12 @@ class IDMBaseTest(BasicCompositionTests):
                                         restore_result[0].Status)
                         else:
                             try:
-                                restored_value = await self.read_single_attribute_check_success(
+                                restored_value = await await_settled_probe_operation(self.read_single_attribute_check_success(
                                     endpoint=attr_info.endpoint_id,
                                     cluster=attr_info.cluster_class,
                                     attribute=attr_info.attribute,
                                     assert_on_error=False
-                                )
+                                ))
                             except (ChipStackError, InteractionModelError) as error:
                                 result.execution_error += 1
                                 log.warning("Execution failed verifying restoration of %s: %s", attribute_path, error)

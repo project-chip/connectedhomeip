@@ -637,6 +637,189 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
             attribute=attribute, cluster_class=cluster, datatype=xml_attribute.datatype,
             constraints=xml_attribute.constraints, enum_values=spec_enum_values(xml_cluster, xml_attribute.datatype))
 
+    async def test_cancelled_inflight_write_settles_before_readback_and_restoration(self):
+        """A cancelled await must not let cleanup overtake a pending native write."""
+        import asyncio
+
+        info = self._prepare_writable_attribute()
+        storage = {'value': 2}
+        started = asyncio.Event()
+        response = asyncio.get_running_loop().create_future()
+        self.checker.read_single_attribute_check_success = AsyncMock(return_value=2)
+        self.checker.read_single_attribute = AsyncMock(side_effect=lambda **kwargs: storage['value'])
+        self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
+
+        async def write_attribute(**kwargs):
+            value = kwargs['attributes'][0][1].value
+            if value == 3:
+                started.set()
+                return await response
+            storage['value'] = value
+            return [SimpleNamespace(Status=Status.Success)]
+
+        self.checker.default_controller.WriteAttribute = AsyncMock(side_effect=write_attribute)
+        task = asyncio.create_task(self.checker.check_attribute_constraint(info, info.constraints))
+        try:
+            await asyncio.wait_for(started.wait(), 5)
+            task.cancel('native write still pending')
+            cancellation_delivered = asyncio.Event()
+            asyncio.get_running_loop().call_soon(cancellation_delivered.set)
+            await asyncio.wait_for(cancellation_delivered.wait(), 5)
+            self.checker.read_single_attribute.assert_not_called()
+            self.assertFalse(task.done())
+            self.assertFalse(response.cancelled())
+        finally:
+            storage['value'] = 3
+            if not response.done():
+                response.set_result([SimpleNamespace(Status=Status.Success)])
+            with self.assertRaises(asyncio.CancelledError) as raised:
+                await asyncio.wait_for(task, 5)
+        self.assertEqual(str(raised.exception), 'native write still pending')
+        self.assertEqual(storage['value'], 2)
+        writes = self.checker.default_controller.WriteAttribute.call_args_list
+        self.assertEqual([call.kwargs['attributes'][0][1].value for call in writes], [3, 2])
+
+    async def test_repeated_cancellation_during_restoration_preserves_first_cancellation(self):
+        """Repeated cancellation must not cancel native cleanup or replace the first cancellation."""
+        import asyncio
+
+        info = self._prepare_writable_attribute()
+        storage = {'value': 2}
+        started = asyncio.Event()
+        restoring = asyncio.Event()
+        response = asyncio.get_running_loop().create_future()
+        restoration_response = asyncio.get_running_loop().create_future()
+        self.checker.read_single_attribute_check_success = AsyncMock(side_effect=lambda **kwargs: storage['value'])
+        self.checker.read_single_attribute = AsyncMock(side_effect=lambda **kwargs: storage['value'])
+        self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
+
+        async def write_attribute(**kwargs):
+            value = kwargs['attributes'][0][1].value
+            if value == 3:
+                started.set()
+                return await response
+            storage['value'] = value
+            restoring.set()
+            return await restoration_response
+
+        self.checker.default_controller.WriteAttribute = AsyncMock(side_effect=write_attribute)
+        task = asyncio.create_task(self.checker.check_attribute_constraint(info, info.constraints))
+        try:
+            await asyncio.wait_for(started.wait(), 5)
+            task.cancel('first cancellation')
+            storage['value'] = 3
+            response.set_result([SimpleNamespace(Status=Status.Success)])
+            await asyncio.wait_for(restoring.wait(), 5)
+            task.cancel('cancellation during cleanup')
+            cancellation_delivered = asyncio.Event()
+            asyncio.get_running_loop().call_soon(cancellation_delivered.set)
+            await asyncio.wait_for(cancellation_delivered.wait(), 5)
+            self.assertFalse(task.done())
+            self.assertFalse(restoration_response.cancelled())
+        finally:
+            if not response.done():
+                response.set_result([SimpleNamespace(Status=Status.Success)])
+            if not restoration_response.done():
+                restoration_response.set_result([SimpleNamespace(Status=Status.Success)])
+            with self.assertRaises(asyncio.CancelledError) as raised:
+                await asyncio.wait_for(task, 5)
+        self.assertEqual(str(raised.exception), 'first cancellation')
+        self.assertEqual(storage['value'], 2)
+        writes = self.checker.default_controller.WriteAttribute.call_args_list
+        self.assertEqual([call.kwargs['attributes'][0][1].value for call in writes], [3, 2])
+        self.assertEqual(self.checker.read_single_attribute_check_success.await_count, 2)
+
+    async def test_cancelled_write_cleanup_errors_preserve_cancellation_identity(self):
+        """Native completion and cleanup failures cannot replace the original cancellation."""
+        import asyncio
+
+        for failure in ('none', 'readback_status', 'readback_assertion', 'restore_transport',
+                        'restore_status', 'verification_transport', 'verification_assertion'):
+            with self.subTest(failure=failure):
+                self.setUp()
+                info = self._prepare_writable_attribute()
+                storage = {'value': 2}
+                started = asyncio.Event()
+                response = asyncio.get_running_loop().create_future()
+                cancellations = []
+                original_shield = asyncio.shield
+
+                async def capture_shield(operation):
+                    try:
+                        return await original_shield(operation)
+                    except asyncio.CancelledError as error:
+                        cancellations.append(error)
+                        raise
+
+                async def readback(**kwargs):
+                    if failure == 'readback_status':
+                        raise InteractionModelError(Status.ResourceExhausted)
+                    if failure == 'readback_assertion':
+                        raise signals.TestFailure('readback assertion')
+                    return storage['value']
+
+                async def verified_read(**kwargs):
+                    if self.checker.read_single_attribute_check_success.await_count > 1:
+                        if failure == 'verification_transport':
+                            raise ChipStackError(0x0b)
+                        if failure == 'verification_assertion':
+                            raise signals.TestFailure('verification assertion')
+                    return storage['value']
+
+                async def write_attribute(**kwargs):
+                    value = kwargs['attributes'][0][1].value
+                    if value == 3:
+                        started.set()
+                        return await response
+                    storage['value'] = value
+                    if failure == 'restore_transport':
+                        raise ChipStackError(0x0b)
+                    if failure == 'restore_status':
+                        raise InteractionModelError(Status.ResourceExhausted)
+                    return [SimpleNamespace(Status=Status.Success)]
+
+                self.checker.read_single_attribute_check_success = AsyncMock(side_effect=verified_read)
+                self.checker.read_single_attribute = AsyncMock(side_effect=readback)
+                self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
+                self.checker.default_controller.WriteAttribute = AsyncMock(side_effect=write_attribute)
+                with patch('support_modules.idm_support.asyncio.shield', side_effect=capture_shield):
+                    task = asyncio.create_task(self.checker.check_attribute_constraint(info, info.constraints))
+                    try:
+                        await asyncio.wait_for(started.wait(), 5)
+                        task.cancel('original native cancellation')
+                    finally:
+                        storage['value'] = 3
+                        if not response.done():
+                            response.set_exception(ChipStackError(0x32))
+                        with self.assertRaises(asyncio.CancelledError) as raised:
+                            await asyncio.wait_for(task, 5)
+                self.assertIs(raised.exception, cancellations[0])
+                self.assertEqual(str(raised.exception), 'original native cancellation')
+                self.assertEqual(storage['value'], 2)
+                self.assertEqual([call.kwargs['attributes'][0][1].value
+                                  for call in self.checker.default_controller.WriteAttribute.call_args_list], [3, 2])
+                self.checker.record_warning.assert_not_called()
+                self.checker.default_controller.SendCommand.assert_not_called()
+
+    async def test_attribute_ambiguous_write_failure_preserves_original_error(self):
+        """An assertion during cleanup must not hide an ambiguous native write failure."""
+        from support_modules.idm_support import ConstraintProbeExecutionError
+
+        info = self._prepare_writable_attribute()
+        self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
+        self.checker.read_single_attribute_check_success = AsyncMock(return_value=2)
+        self.checker.read_single_attribute = AsyncMock(side_effect=signals.TestFailure('readback assertion'))
+        primary = ChipStackError(0x32)
+        self.checker.default_controller.WriteAttribute.side_effect = [primary, [SimpleNamespace(Status=Status.Success)]]
+        with self.assertRaises(ConstraintProbeExecutionError) as raised:
+            await self.checker.check_attribute_constraint(info, info.constraints)
+        self.assertIs(raised.exception.__cause__, primary)
+        self.assertEqual((raised.exception.result.attempted, raised.exception.result.rejected), (1, 0))
+        self.assertGreaterEqual(raised.exception.result.execution_error, 2)
+        self.assertEqual([call.kwargs['attributes'][0][1].value
+                          for call in self.checker.default_controller.WriteAttribute.call_args_list], [3, 2])
+        self.checker.record_accepted_violation.assert_not_called()
+
     async def test_cancelled_write_readback_assertion_preserves_cancellation(self):
         """Cleanup assertions must not replace cancellation of an applied write."""
         import asyncio
@@ -644,6 +827,7 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         info = self._prepare_writable_attribute()
         storage = {'value': 2}
         applied = asyncio.Event()
+        completed = asyncio.Event()
         self.checker.read_single_attribute_check_success = AsyncMock(return_value=2)
         self.checker.read_single_attribute = AsyncMock(side_effect=signals.TestFailure('readback assertion failed'))
         self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
@@ -653,7 +837,7 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
             storage['value'] = value
             if value == 3:
                 applied.set()
-                await asyncio.Future()
+                await completed.wait()
             return [SimpleNamespace(Status=Status.Success)]
 
         self.checker.default_controller.WriteAttribute = AsyncMock(side_effect=write_attribute)
@@ -662,6 +846,7 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
             await asyncio.wait_for(applied.wait(), 5)
         finally:
             task.cancel('lost initial write reply')
+            completed.set()
         with self.assertRaises(asyncio.CancelledError) as raised:
             await task
         self.assertEqual(str(raised.exception), 'lost initial write reply')
@@ -669,7 +854,7 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         writes = self.checker.default_controller.WriteAttribute.call_args_list
         self.assertEqual([call.kwargs['attributes'][0][1].value for call in writes], [3, 2])
         self.assertEqual(self.checker.read_single_attribute.await_count, 1)
-        self.checker.record_accepted_violation.assert_not_called()
+        self.checker.record_accepted_violation.assert_called_once()
 
     async def test_cancelled_applied_write_restores_baseline_and_propagates_cancellation(self):
         """An applied write cancelled before its reply must restore state without suppressing cancellation."""
@@ -678,6 +863,7 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         info = self._prepare_writable_attribute()
         storage = {'value': 2}
         applied = asyncio.Event()
+        completed = asyncio.Event()
         self.checker.read_single_attribute_check_success = AsyncMock(return_value=2)
         self.checker.read_single_attribute = AsyncMock(side_effect=lambda **kwargs: storage['value'])
         self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
@@ -687,7 +873,7 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
             storage['value'] = value
             if value == 3:
                 applied.set()
-                await asyncio.Future()
+                await completed.wait()
             return [SimpleNamespace(Status=Status.Success)]
 
         self.checker.default_controller.WriteAttribute = AsyncMock(side_effect=write_attribute)
@@ -696,6 +882,7 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
             await asyncio.wait_for(applied.wait(), 5)
         finally:
             task.cancel('lost initial write reply')
+            completed.set()
         with self.assertRaises(asyncio.CancelledError) as raised:
             await task
         self.assertEqual(str(raised.exception), 'lost initial write reply')
