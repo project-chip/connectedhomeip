@@ -33,6 +33,7 @@
 #include <controller/ReadInteraction.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/support/Defer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
@@ -5048,7 +5049,6 @@ public:
 
     void OnSubscriptionEstablished(SubscriptionId) override
     {
-        mSubscriptionEstablishedCount++;
         if (mReadClient)
         {
             mReadClient->OverrideLivenessTimeout(System::Clock::Milliseconds32(50));
@@ -5096,8 +5096,7 @@ public:
         Platform::Delete(this);
     }
 
-    int mSubscriptionEstablishedCount = 0;
-    int mResubscriptionsAttempted     = 0;
+    int mResubscriptionsAttempted = 0;
 
 private:
     std::vector<ResubscribeCallbackEvent> & mEvents;
@@ -5110,6 +5109,7 @@ private:
 TEST_F(TestRead, TestUnsolicitedReportDeletesPendingResubscribeClient)
 {
     auto * engine = InteractionModelEngine::GetInstance();
+    std::vector<ResubscribeCallbackEvent> events;
 
     // 1. Establish a long-lived active subscription (tail of mpActiveReadClientList).
     struct ActiveSubscriptionCallback final : public MockInteractionModelApp
@@ -5127,6 +5127,10 @@ TEST_F(TestRead, TestUnsolicitedReportDeletesPendingResubscribeClient)
     activeParams.mKeepSubscriptions           = true;
 
     ReadClient activeClient(engine, &GetExchangeManager(), activeCallback, ReadClient::InteractionType::Subscribe);
+    auto cleanup = MakeDefer([&] {
+        engine->ShutdownActiveReads();
+        DrainAndServiceIO();
+    });
     ASSERT_SUCCESS(activeClient.SendRequest(activeParams));
 
     GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&]() { return activeCallback.mSubscriptionEstablished; });
@@ -5134,7 +5138,6 @@ TEST_F(TestRead, TestUnsolicitedReportDeletesPendingResubscribeClient)
 
     // 2. Establish a second auto-resubscribing client (prepended to head of mpActiveReadClientList)
     //    and let its overridden 50ms liveness timeout put it into mIsResubscriptionScheduled == true.
-    std::vector<ResubscribeCallbackEvent> events;
     auto selfDeletingCb = Platform::MakeUnique<SelfDeletingResubscribeCallback>(events);
     ASSERT_NE(selfDeletingCb.get(), nullptr);
 
@@ -5178,9 +5181,6 @@ TEST_F(TestRead, TestUnsolicitedReportDeletesPendingResubscribeClient)
     EXPECT_EQ(events[1], ResubscribeCallbackEvent::kDone);
     EXPECT_EQ(activeCallback.mNumAttributeResponse, 1);
     EXPECT_EQ(engine->GetNumActiveReadClients(), 1u);
-
-    engine->ShutdownActiveReads();
-    DrainAndServiceIO();
 }
 
 System::Clock::Timeout TestRead::ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval)
