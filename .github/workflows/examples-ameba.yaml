@@ -39,7 +39,11 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
+<<<<<<< HEAD
             image: ghcr.io/project-chip/chip-build-ameba:200
+=======
+            image: ghcr.io/project-chip/chip-build-ameba:219
+>>>>>>> d418996 (Bump in-tree Mbed TLS from 2.28 to 3.6.7 LTS (#75203))
             options: --user root
 
         steps:
