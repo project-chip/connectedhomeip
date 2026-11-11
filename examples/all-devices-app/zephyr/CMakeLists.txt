@@ -115,6 +115,11 @@ if(ALL_DEVICES_ENABLE_WINDOW_COVERING)
     math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 4")
 endif()
 
+# solar-power registers five simulators (baseline plus four topology variants).
+if(ALL_DEVICES_ENABLE_SOLAR_POWER)
+    math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 4")
+endif()
+
 # ot-config re-lists zephyr_interface's INTERFACE_COMPILE_DEFINITIONS, including
 # $<COMPILE_LANGUAGE:CXX> generator expressions. openthread/CMakeLists.txt uses
 # ot-config's defines to build a plain custom target, where COMPILE_LANGUAGE is
