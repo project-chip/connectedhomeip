@@ -20,7 +20,7 @@
 #include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <clusters/RvcOperationalState/Enums.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
-#include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
+#include <device/capabilities/service-area/impl/LoggingServiceAreaStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
 #include <oob-accessors/clusters/RvcOOBAccessor.h>
 #include <platform/DiagnosticDataProvider.h>
