@@ -564,6 +564,13 @@ TEST_F(TestBufferedReadCallback, TestInvalidInput)
 
 TEST_F(TestBufferedReadCallback, TestBufferedSequences)
 {
+    // The 512-item lists in this test need one PacketBuffer per item in BufferedReadCallback, more than a typical PacketBuffer pool
+    // holds.
+    if (CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE > 0)
+    {
+        GTEST_SKIP();
+    }
+
     ChipLogProgress(DataManagement, "Validating various sequences of attribute data IBs...");
 
     ChipLogProgress(DataManagement, "A --> A");
