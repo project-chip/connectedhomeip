@@ -189,7 +189,10 @@ void ExpectSemanticTags(ProviderAttributeReader & reader, EndpointId endpoint,
     EXPECT_EQ(actual, expected);
 }
 
-void ExpectNoRegisteredEndpoints(CodeDrivenDataModelProvider & provider) { EXPECT_TRUE(GetEndpoints(provider).empty()); }
+void ExpectNoRegisteredEndpoints(CodeDrivenDataModelProvider & provider)
+{
+    EXPECT_TRUE(GetEndpoints(provider).empty());
+}
 
 void ExpectBaselineEndpointIdsInvalid(const SimulatedSolarPower & device)
 {
@@ -228,8 +231,8 @@ void ExpectParentChildTree(CodeDrivenDataModelProvider & provider, EndpointId pa
 void ExpectPanelSensorClusters(CodeDrivenDataModelProvider & provider, EndpointId endpoint)
 {
     ExpectServerClusters(provider, endpoint,
-                       { Clusters::Descriptor::Id, Clusters::ElectricalEnergyMeasurement::Id,
-                         Clusters::ElectricalPowerMeasurement::Id, Clusters::PowerTopology::Id, Clusters::UserLabel::Id });
+                         { Clusters::Descriptor::Id, Clusters::ElectricalEnergyMeasurement::Id,
+                           Clusters::ElectricalPowerMeasurement::Id, Clusters::PowerTopology::Id, Clusters::UserLabel::Id });
 }
 
 template <typename DevicePtr, typename MakeDeviceFn, typename ExpectInvalidFn>
@@ -280,12 +283,12 @@ TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredTopologyAndDeviceTypes)
     ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
     ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
 
-    const EndpointId parentEndpoint       = device.GetEndpointId();
-    const EndpointId energyEndpoint       = device.GetEnergyManagement().GetEndpointId();
-    const EndpointId outputEndpoint       = device.GetOutputElectricalSensor().GetEndpointId();
-    const EndpointId gridSourceEndpoint   = device.GetGridPowerSource().GetEndpointId();
-    const EndpointId inverterEndpoint     = device.GetInverterTemperatureSensor().GetEndpointId();
-    const EndpointId childEndpoints[]     = { energyEndpoint, outputEndpoint, gridSourceEndpoint, inverterEndpoint };
+    const EndpointId parentEndpoint     = device.GetEndpointId();
+    const EndpointId energyEndpoint     = device.GetEnergyManagement().GetEndpointId();
+    const EndpointId outputEndpoint     = device.GetOutputElectricalSensor().GetEndpointId();
+    const EndpointId gridSourceEndpoint = device.GetGridPowerSource().GetEndpointId();
+    const EndpointId inverterEndpoint   = device.GetInverterTemperatureSensor().GetEndpointId();
+    const EndpointId childEndpoints[]   = { energyEndpoint, outputEndpoint, gridSourceEndpoint, inverterEndpoint };
 
     ASSERT_EQ(GetEndpoints(mProvider).size(), 6u);
     ExpectParentChildTree(mProvider, parentEndpoint, childEndpoints);
@@ -301,8 +304,7 @@ TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredTopologyAndDeviceTypes)
                          { Clusters::Descriptor::Id, Clusters::Identify::Id, Clusters::DeviceEnergyManagement::Id });
     ExpectPanelSensorClusters(mProvider, outputEndpoint);
     ExpectServerClusters(mProvider, gridSourceEndpoint, { Clusters::Descriptor::Id, Clusters::PowerSource::Id });
-    ExpectServerClusters(mProvider, inverterEndpoint,
-                         { Clusters::Descriptor::Id, Clusters::TemperatureMeasurement::Id });
+    ExpectServerClusters(mProvider, inverterEndpoint, { Clusters::Descriptor::Id, Clusters::TemperatureMeasurement::Id });
 
     EXPECT_EQ(device.GetEnergyManagement().GetESAType(), Clusters::DeviceEnergyManagement::ESATypeEnum::kSolarPV);
     EXPECT_TRUE(device.GetEnergyManagement().GetESACanGenerate());
@@ -427,16 +429,14 @@ TEST_F(SolarPowerTestFixture, ThreePhaseRegistersTopologyAndAcPhaseTags)
 TEST_F(SolarPowerTestFixture, BaselineRollsBackPartialRegistrationFailures)
 {
     TestRollBackForEndpointCount(
-        *this, 6u,
-        [this]() { return std::make_unique<SimulatedSolarPower>(MakeContext()); },
+        *this, 6u, [this]() { return std::make_unique<SimulatedSolarPower>(MakeContext()); },
         [](const SimulatedSolarPower & device) { ExpectBaselineEndpointIdsInvalid(device); });
 }
 
 TEST_F(SolarPowerTestFixture, FourParallelPanelsRollsBackPartialRegistrationFailures)
 {
     TestRollBackForEndpointCount(
-        *this, 10u,
-        [this]() { return std::make_unique<SimulatedSolarPowerFourParallelPanels>(MakeContext()); },
+        *this, 10u, [this]() { return std::make_unique<SimulatedSolarPowerFourParallelPanels>(MakeContext()); },
         [](const SimulatedSolarPowerFourParallelPanels & device) {
             ExpectBaselineEndpointIdsInvalid(device);
             for (size_t index = 0; index < SimulatedSolarPowerFourParallelPanels::kParallelPanelCount; ++index)
@@ -449,8 +449,7 @@ TEST_F(SolarPowerTestFixture, FourParallelPanelsRollsBackPartialRegistrationFail
 TEST_F(SolarPowerTestFixture, TwoStringsRollsBackPartialRegistrationFailures)
 {
     TestRollBackForEndpointCount(
-        *this, 8u,
-        [this]() { return std::make_unique<SimulatedSolarPowerTwoStrings>(MakeContext()); },
+        *this, 8u, [this]() { return std::make_unique<SimulatedSolarPowerTwoStrings>(MakeContext()); },
         [](const SimulatedSolarPowerTwoStrings & device) {
             ExpectBaselineEndpointIdsInvalid(device);
             ExpectPanelEndpointIdsInvalid(device.GetStringSensor(0));
@@ -461,8 +460,7 @@ TEST_F(SolarPowerTestFixture, TwoStringsRollsBackPartialRegistrationFailures)
 TEST_F(SolarPowerTestFixture, TwoStringsFourPanelsRollsBackPartialRegistrationFailures)
 {
     TestRollBackForEndpointCount(
-        *this, 10u,
-        [this]() { return std::make_unique<SimulatedSolarPowerTwoStringsFourPanels>(MakeContext()); },
+        *this, 10u, [this]() { return std::make_unique<SimulatedSolarPowerTwoStringsFourPanels>(MakeContext()); },
         [](const SimulatedSolarPowerTwoStringsFourPanels & device) {
             ExpectBaselineEndpointIdsInvalid(device);
             for (size_t index = 0; index < SimulatedSolarPowerTwoStringsFourPanels::kPanelEndpointCount; ++index)
@@ -475,8 +473,7 @@ TEST_F(SolarPowerTestFixture, TwoStringsFourPanelsRollsBackPartialRegistrationFa
 TEST_F(SolarPowerTestFixture, ThreePhaseRollsBackPartialRegistrationFailures)
 {
     TestRollBackForEndpointCount(
-        *this, 9u,
-        [this]() { return std::make_unique<SimulatedSolarPowerThreePhase>(MakeContext()); },
+        *this, 9u, [this]() { return std::make_unique<SimulatedSolarPowerThreePhase>(MakeContext()); },
         [](const SimulatedSolarPowerThreePhase & device) {
             ExpectBaselineEndpointIdsInvalid(device);
             for (size_t index = 0; index < 3; ++index)
