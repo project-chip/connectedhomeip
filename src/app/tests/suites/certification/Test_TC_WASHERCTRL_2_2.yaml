@@ -42,7 +42,7 @@ tests:
                 value: nodeId
 
     - label: "Step 2: TH reads from the DUT the the NumberOfRinses attribute"
-      PICS: WASHERCTRL.S.A0002
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002
       command: "readAttribute"
       attribute: "NumberOfRinses"
       response:
@@ -53,7 +53,7 @@ tests:
               maxValue: 3
 
     - label: "Step 3: TH reads from the DUT the the SupportedRinses attribute"
-      PICS: WASHERCTRL.S.A0003
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0003
       command: "readAttribute"
       attribute: "SupportedRinses"
       response:
@@ -63,7 +63,7 @@ tests:
               maxLength: 4
 
     - label: "Qualify NumberOfRinses baseline: select supported None"
-      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
       runIf: NumberOfRinsesValue not in supportedRinses and 0 in supportedRinses
       command: "writeAttribute"
       attribute: "NumberOfRinses"
@@ -71,7 +71,7 @@ tests:
           value: 0
 
     - label: "Qualify NumberOfRinses baseline: select supported Normal"
-      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
       runIf: >-
           NumberOfRinsesValue not in supportedRinses and 0 not in supportedRinses
           and 1 in supportedRinses
@@ -81,7 +81,7 @@ tests:
           value: 1
 
     - label: "Qualify NumberOfRinses baseline: select supported Extra"
-      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
       runIf: >-
           NumberOfRinsesValue not in supportedRinses and 0 not in supportedRinses
           and 1 not in supportedRinses and 2 in supportedRinses
@@ -91,7 +91,7 @@ tests:
           value: 2
 
     - label: "Qualify NumberOfRinses baseline: select supported Max"
-      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
       runIf: >-
           NumberOfRinsesValue not in supportedRinses and 0 not in supportedRinses
           and 1 not in supportedRinses and 2 not in supportedRinses and 3 in supportedRinses
@@ -101,7 +101,7 @@ tests:
           value: 3
 
     - label: "Qualify NumberOfRinses baseline: verify and save supported readback"
-      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
       runIf: NumberOfRinsesValue not in supportedRinses
       command: "readAttribute"
       attribute: "NumberOfRinses"
@@ -113,7 +113,7 @@ tests:
     - label:
           "Step 4: TH writes a supported NumberOfRinses attribute to DUT within
           the range of the SupportedRinses list"
-      PICS: WASHERCTRL.S.A0002
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002
       command: "writeAttribute"
       attribute: "NumberOfRinses"
       arguments:
@@ -130,7 +130,7 @@ tests:
     - label:
           "Step 5: after a few seconds, TH reads from the DUT the NumberOfRinses
           attribute"
-      PICS: WASHERCTRL.S.A0002
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002
       command: "readAttribute"
       attribute: "NumberOfRinses"
       response:
@@ -139,7 +139,7 @@ tests:
     - label:
           "Step 6a: TH writes an unsupported NumberOfRinses attribute to DUT
           while DUT is not in a valid state."
-      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
       runIf: >-
           0 not in supportedRinses and (unsupportedNumberOfRinsesValue == 0 or
           unsupportedNumberOfRinsesValue in supportedRinses or
@@ -154,7 +154,7 @@ tests:
     - label:
           "Step 6b: TH writes an unsupported NumberOfRinses attribute to DUT
           while DUT is not in a valid state."
-      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
       runIf: >-
           1 not in supportedRinses and (unsupportedNumberOfRinsesValue == 1 or
           ((unsupportedNumberOfRinsesValue in supportedRinses or
@@ -170,7 +170,7 @@ tests:
     - label:
           "Step 6c: TH writes an unsupported NumberOfRinses attribute to DUT
           while DUT is not in a valid state."
-      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
       runIf: >-
           2 not in supportedRinses and (unsupportedNumberOfRinsesValue == 2 or
           ((unsupportedNumberOfRinsesValue in supportedRinses or
@@ -186,7 +186,7 @@ tests:
     - label:
           "Step 6d: TH writes an unsupported NumberOfRinses attribute to DUT
           while DUT is not in a valid state."
-      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
       runIf: >-
           3 not in supportedRinses and (unsupportedNumberOfRinsesValue == 3 or
           ((unsupportedNumberOfRinsesValue in supportedRinses or
@@ -201,14 +201,14 @@ tests:
 
     - label:
           "Step 7: TH reads NumberOfRinses unchanged after the rejected write"
-      PICS: WASHERCTRL.S.A0002
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002
       command: "readAttribute"
       attribute: "NumberOfRinses"
       response:
           value: NumberOfRinsesValue
 
     - label: "Step 8: TH writes an undefined NumberOfRinses enum value"
-      PICS: WASHERCTRL.S.A0002
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002
       command: "writeAttribute"
       attribute: "NumberOfRinses"
       arguments:
@@ -218,7 +218,7 @@ tests:
 
     - label:
           "Step 9: TH reads NumberOfRinses unchanged after the undefined write"
-      PICS: WASHERCTRL.S.A0002
+      PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002
       command: "readAttribute"
       attribute: "NumberOfRinses"
       response:
