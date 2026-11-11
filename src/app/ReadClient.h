@@ -369,12 +369,17 @@ public:
 
     void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
+    /**
+     * Notify the subscription of an incoming message from the publisher and trigger any scheduled resubscription.
+     *
+     * If triggering resubscription fails synchronously, Close() may invoke Callback::OnDone and destroy this ReadClient
+     * before returning.
+     */
     void OnUnsolicitedMessageFromPublisher()
     {
-        TriggerResubscribeIfScheduled("unsolicited message");
-
-        // Then notify callbacks
         mpCallback.OnUnsolicitedMessageFromPublisher(this);
+        // TriggerResubscribeIfScheduled must run last because OnDone may destroy this ReadClient.
+        TriggerResubscribeIfScheduled("unsolicited message");
     }
 
     auto GetSubscriptionId() const
@@ -501,6 +506,9 @@ public:
      * communicating, so right now is a good time to try to resubscribe.
      *
      * The reason string is used for logging if a resubscribe is triggered.
+     *
+     * If the resubscription attempt fails synchronously, Close() may invoke
+     * Callback::OnDone and destroy this ReadClient before returning.
      *
      * Returns whether a resubscribe is triggered.
      */

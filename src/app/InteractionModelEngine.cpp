@@ -1027,37 +1027,34 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
     VerifyOrReturnError(report.GetSubscriptionId(&subscriptionId) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(report.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
 
-    ReadClient * foundSubscription = nullptr;
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    const ScopedNodeId peer = apExchangeContext->GetSessionHandle()->GetPeer();
+
+    // OnUnsolicitedMessageFromPublisher() may call OnDone() and destroy ReadClients in mpActiveReadClientList.
+    // A separate first pass finishes all notifications before the second pass looks up the target subscription.
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
-        auto peer = apExchangeContext->GetSessionHandle()->GetPeer();
-        if (readClient->GetFabricIndex() != peer.GetFabricIndex() || readClient->GetPeerNodeId() != peer.GetNodeId())
+        if (readClient->GetPeerScopedId() == peer)
+        {
+            readClient->OnUnsolicitedMessageFromPublisher();
+        }
+    }
+
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
+    {
+        if (readClient->GetPeerScopedId() != peer)
         {
             continue;
         }
-
-        // Notify Subscriptions about incoming communication from node
-        readClient->OnUnsolicitedMessageFromPublisher();
-
         if (!readClient->IsSubscriptionActive())
         {
             continue;
         }
-
         if (!readClient->IsMatchingSubscriptionId(subscriptionId))
         {
             continue;
         }
 
-        if (!foundSubscription)
-        {
-            foundSubscription = readClient;
-        }
-    }
-
-    if (foundSubscription)
-    {
-        foundSubscription->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
+        readClient->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
         return Status::Success;
     }
 
