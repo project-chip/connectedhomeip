@@ -62,6 +62,54 @@ tests:
               type: list
               maxLength: 4
 
+    - label: "Qualify NumberOfRinses baseline: select supported None"
+      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      runIf: NumberOfRinsesValue not in supportedRinses and 0 in supportedRinses
+      command: "writeAttribute"
+      attribute: "NumberOfRinses"
+      arguments:
+          value: 0
+
+    - label: "Qualify NumberOfRinses baseline: select supported Normal"
+      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      runIf: >-
+          NumberOfRinsesValue not in supportedRinses and 0 not in supportedRinses
+          and 1 in supportedRinses
+      command: "writeAttribute"
+      attribute: "NumberOfRinses"
+      arguments:
+          value: 1
+
+    - label: "Qualify NumberOfRinses baseline: select supported Extra"
+      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      runIf: >-
+          NumberOfRinsesValue not in supportedRinses and 0 not in supportedRinses
+          and 1 not in supportedRinses and 2 in supportedRinses
+      command: "writeAttribute"
+      attribute: "NumberOfRinses"
+      arguments:
+          value: 2
+
+    - label: "Qualify NumberOfRinses baseline: select supported Max"
+      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      runIf: >-
+          NumberOfRinsesValue not in supportedRinses and 0 not in supportedRinses
+          and 1 not in supportedRinses and 2 not in supportedRinses and 3 in supportedRinses
+      command: "writeAttribute"
+      attribute: "NumberOfRinses"
+      arguments:
+          value: 3
+
+    - label: "Qualify NumberOfRinses baseline: verify and save supported readback"
+      PICS: WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
+      runIf: NumberOfRinsesValue not in supportedRinses
+      command: "readAttribute"
+      attribute: "NumberOfRinses"
+      response:
+          saveAs: NumberOfRinsesValue
+          constraints:
+              python: value in supportedRinses
+
     - label:
           "Step 4: TH writes a supported NumberOfRinses attribute to DUT within
           the range of the SupportedRinses list"
