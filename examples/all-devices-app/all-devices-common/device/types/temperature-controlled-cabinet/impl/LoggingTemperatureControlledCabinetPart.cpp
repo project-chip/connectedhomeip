@@ -59,7 +59,6 @@ void LoggingTemperatureControlledCabinetPart::TimerFired()
 {
     ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Emulated operation timer finished.", mName);
     mCountdownTime.SetNull();
-    mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
 }
 
@@ -102,7 +101,6 @@ void LoggingTemperatureControlledCabinetPart::HandlePauseStateCallback(Clusters:
 {
     ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Pause command received.", mName);
     CancelTimer();
-    mOperationalState = Clusters::OperationalState::OperationalStateEnum::kPaused;
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kPaused));
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
 }
@@ -110,7 +108,6 @@ void LoggingTemperatureControlledCabinetPart::HandlePauseStateCallback(Clusters:
 void LoggingTemperatureControlledCabinetPart::HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Resume command received.", mName);
-    mOperationalState = Clusters::OperationalState::OperationalStateEnum::kRunning;
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     StartEmulatedOperationTimer();
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
@@ -119,7 +116,6 @@ void LoggingTemperatureControlledCabinetPart::HandleResumeStateCallback(Clusters
 void LoggingTemperatureControlledCabinetPart::HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Start command received.", mName);
-    mOperationalState = Clusters::OperationalState::OperationalStateEnum::kRunning;
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     StartEmulatedOperationTimer();
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
@@ -130,7 +126,6 @@ void LoggingTemperatureControlledCabinetPart::HandleStopStateCallback(Clusters::
     ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Stop command received.", mName);
     CancelTimer();
     mCountdownTime.SetNull();
-    mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
 }

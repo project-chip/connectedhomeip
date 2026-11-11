@@ -21,12 +21,12 @@
 
 namespace chip::app {
 
-class EmulatedMicrowaveOven : public MicrowaveOven,
-                              public Clusters::OperationalState::Delegate,
+class EmulatedMicrowaveOven : public Clusters::OperationalState::Delegate,
                               public Clusters::MicrowaveOvenControl::IntegrationDelegate,
                               public Clusters::MicrowaveOvenControl::AppDelegate,
                               public Clusters::ModeBase::AppDelegate,
-                              public TimerContext
+                              public TimerContext,
+                              public MicrowaveOven
 {
 public:
     struct Context
@@ -54,7 +54,7 @@ public:
     void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
     // -- MicrowaveOvenControl::IntegrationDelegate Interface --
-    uint8_t GetCurrentOperationalState() const override { return to_underlying(mOperationalState); }
+    uint8_t GetCurrentOperationalState() const override { return OperationalState().GetCurrentOperationalState(); }
     CHIP_ERROR GetNormalOperatingMode(uint8_t & mode) const override;
     bool IsSupportedMode(uint8_t mode) const override;
     bool IsSupportedOperationalStateCommand(EndpointId endpointId, CommandId commandId) const override;
@@ -102,7 +102,6 @@ private:
     void StartEmulatedOperationTimer(uint32_t durationSec = kEmulatedOperationDurationSec);
 
     TimerDelegate & mTimerDelegate;
-    Clusters::OperationalState::OperationalStateEnum mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
     DataModel::Nullable<uint32_t> mCountdownTime;
     System::Clock::Timestamp mOperationEndTime{};
 };

@@ -22,10 +22,10 @@
 
 namespace chip::app {
 
-class LoggingTemperatureControlledCabinetPart : public TemperatureControlledCabinetPart,
-                                                public Clusters::OperationalState::Delegate,
+class LoggingTemperatureControlledCabinetPart : public Clusters::OperationalState::Delegate,
                                                 public Clusters::IdentifyDelegate,
-                                                public TimerContext
+                                                public TimerContext,
+                                                public TemperatureControlledCabinetPart
 {
 public:
     LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, const char * name);
@@ -61,7 +61,6 @@ private:
 
     const char * mName;
     TimerDelegate & mTimerDelegate;
-    Clusters::OperationalState::OperationalStateEnum mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
     DataModel::Nullable<uint32_t> mCountdownTime;
 };
 

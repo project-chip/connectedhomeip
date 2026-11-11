@@ -48,6 +48,10 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::OperationalState::OperationalStateCluster & OperationalState() { return mOperationalStateCluster.Cluster(); }
+    const Clusters::OperationalState::OperationalStateCluster & OperationalState() const
+    {
+        return mOperationalStateCluster.Cluster();
+    }
     Clusters::MicrowaveOvenControlCluster & MicrowaveOvenControl() { return mMicrowaveOvenControlCluster.Cluster(); }
     Clusters::ModeBaseCluster & MicrowaveOvenMode() { return mMicrowaveOvenModeCluster.Cluster(); }
 

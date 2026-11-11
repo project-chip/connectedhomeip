@@ -21,11 +21,11 @@
 
 namespace chip::app {
 
-class EmulatedLaundryWasher : public LaundryWasher,
-                              public Clusters::OperationalState::Delegate,
+class EmulatedLaundryWasher : public Clusters::OperationalState::Delegate,
                               public Clusters::LaundryWasherControls::Delegate,
                               public Clusters::ModeBase::AppDelegate,
-                              public TimerContext
+                              public TimerContext,
+                              public LaundryWasher
 {
 public:
     struct Context
@@ -83,7 +83,6 @@ private:
     void StartEmulatedOperationTimer(uint32_t durationSec = kEmulatedOperationDurationSec);
 
     TimerDelegate & mTimerDelegate;
-    Clusters::OperationalState::OperationalStateEnum mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
     DataModel::Nullable<uint32_t> mCountdownTime;
     System::Clock::Timestamp mOperationEndTime{};
 };
