@@ -1203,6 +1203,7 @@ class IDMBaseTest(BasicCompositionTests):
         for test_value in test_values:
             result.attempted += 1
             execution_failure = None
+            pending_assertion = None
             cancellation = None
             result_status = None
 
@@ -1286,7 +1287,7 @@ class IDMBaseTest(BasicCompositionTests):
                     execution_failure = error
             except signals.TestFailure as error:
                 if execution_failure is None and cancellation is None:
-                    raise
+                    pending_assertion = error
                 result.execution_error += 1
                 log.warning("Write readback assertion failed for %s: %s", attribute_path, error)
             finally:
@@ -1339,6 +1340,8 @@ class IDMBaseTest(BasicCompositionTests):
                 raise cancellation
             if execution_failure is not None:
                 raise ConstraintProbeExecutionError(execution_failure, result) from execution_failure
+            if pending_assertion is not None:
+                raise pending_assertion
             if restore_failed:
                 break
 
