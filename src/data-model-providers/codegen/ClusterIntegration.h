@@ -169,8 +169,9 @@ public:
 
     /// Registers the cluster with the codegen data model provider.
     ///
-    /// Fails with CHIP_ERROR_INVALID_ARGUMENT if the ember configuration does not contain a
-    /// server instance of the cluster for each of its paths. Errors are logged.
+    /// Fails with CHIP_ERROR_INVALID_ARGUMENT if the ember configuration does not contain an
+    /// enabled server instance of the cluster for each of its paths (endpoints must already be
+    /// configured and enabled when Register() is called). Errors are logged.
     CHIP_ERROR Register() { return CodegenRegisteredServerClusterBase::Register(this->Registration()); }
 
     /// Unregisters the cluster. Does nothing if the cluster is not registered.
