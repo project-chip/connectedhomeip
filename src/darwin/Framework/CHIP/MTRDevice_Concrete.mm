@@ -781,10 +781,12 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 }
 #endif
 
+#ifdef DEBUG
+static std::atomic<uint32_t> sUserInvokeMinimumTimeoutOverrideMs { 0 };
+#endif
+
 // The shortest caller timeout a user command accepts: one session attempt, the bound OperationalSessionSetup uses
 // for one CASE attempt (CASESession::ComputeSigma1ResponseTimeout with the default MRP config).
-static std::atomic<uint32_t> sUserInvokeMinimumTimeoutOverrideMs { 0 };
-
 static uint32_t MTRUserInvokeMinimumTimeoutMs()
 {
 #ifdef DEBUG
