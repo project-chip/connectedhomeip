@@ -705,8 +705,7 @@ public:
         VerifyOrReturnValue(userIndex >= 1 && userIndex <= kStorageUsers, false);
         // Copy the credentials into owned storage: callers pass buffers that
         // may go out of scope (or get modified) right after this call.
-        VerifyOrReturnValue(totalCredentials == 0 ||
-                                (credentials != nullptr && totalCredentials <= kStorageCredentialsPerUser),
+        VerifyOrReturnValue(totalCredentials == 0 || (credentials != nullptr && totalCredentials <= kStorageCredentialsPerUser),
                             false);
         auto & user = mUsers[userIndex - 1];
         VerifyOrReturnValue(userName.size() <= kDoorLockMaxUsernameSize, false);
