@@ -47,7 +47,7 @@ public:
 
     /// DriveIO until the specified number of milliseconds has passed or until
     /// completionFunction returns true
-    void DriveIOUntil(System::Clock::Timeout maxWait, std::function<bool(void)> completionFunction);
+    void DriveIOUntil(System::Clock::Timeout maxWait, std::function<bool()> completionFunction);
 
     System::Layer & GetSystemLayer() { return *mSystemLayer; }
     Inet::EndPointManager<Inet::TCPEndPoint> * GetTCPEndPointManager() { return mTCPEndPointManager; }

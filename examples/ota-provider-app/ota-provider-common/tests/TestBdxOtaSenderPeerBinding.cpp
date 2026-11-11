@@ -115,13 +115,19 @@ public:
     }
 
 protected:
+    TestableBdxOtaSender & GetSender()
+    {
+        VerifyOrDie(mSender.has_value());
+        return *mSender;
+    }
+
     // Arms the transfer for kArmedRequesterNodeId, as a successful QueryImage would.
     void ArmForArmedRequester()
     {
-        ASSERT_SUCCESS(mSender->InitializeTransfer(GetBobFabricIndex(), kArmedRequesterNodeId));
-        ASSERT_SUCCESS(mSender->PrepareForTransfer(&GetSystemLayer(), TransferRole::kSender,
-                                                   BitFlags<TransferControlFlags>(TransferControlFlags::kReceiverDrive),
-                                                   kMaxBlockSize, kBdxTimeout, kBdxPollInterval));
+        ASSERT_SUCCESS(GetSender().InitializeTransfer(GetBobFabricIndex(), kArmedRequesterNodeId));
+        ASSERT_SUCCESS(GetSender().PrepareForTransfer(&GetSystemLayer(), TransferRole::kSender,
+                                                      BitFlags<TransferControlFlags>(TransferControlFlags::kReceiverDrive),
+                                                      kMaxBlockSize, kBdxTimeout, kBdxPollInterval));
     }
 
     System::PacketBufferHandle MakeReceiveInit()
@@ -143,7 +149,7 @@ protected:
     // Opens an exchange bound to `session`, tracked so teardown can abort it.
     Messaging::ExchangeContext * NewExchangeFor(const SessionHandle & session)
     {
-        Messaging::ExchangeContext * exchange = GetExchangeManager().NewContext(session, &*mSender);
+        Messaging::ExchangeContext * exchange = GetExchangeManager().NewContext(session, &GetSender());
         VerifyOrDie(exchange != nullptr);
         mExchanges.push_back(exchange);
         return exchange;
@@ -154,7 +160,7 @@ protected:
     {
         PayloadHeader payloadHeader;
         payloadHeader.SetMessageType(Protocols::BDX::Id, to_underlying(MessageType::ReceiveInit));
-        return mSender->OnMessageReceived(exchange, payloadHeader, MakeReceiveInit());
+        return GetSender().OnMessageReceived(exchange, payloadHeader, MakeReceiveInit());
     }
 
     CHIP_ERROR DeliverReceiveInitFrom(const SessionHandle & session) { return DeliverReceiveInitOn(NewExchangeFor(session)); }
@@ -205,8 +211,8 @@ TEST_F(TestBdxOtaSenderPeerBinding, DoesNotRejectALaterMessageOnTheDrivingExchan
     // Drain the pending output the init produced: the first poll accepts the transfer, the second
     // sends the ReceiveAccept. Without this the transfer session rejects any further message before
     // its own state machine sees it, which would hide what this test is asserting.
-    mSender->PollForOutput();
-    mSender->PollForOutput();
+    GetSender().PollForOutput();
+    GetSender().PollForOutput();
     DrainAndServiceIO();
 
     // The base now handles the second init and answers it with an unexpected-message status report,

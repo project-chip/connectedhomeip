@@ -8215,12 +8215,6 @@ bool emberAfMediaInputClusterRenameInputCallback(
 bool emberAfLowPowerClusterSleepCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                          const chip::app::Clusters::LowPower::Commands::Sleep::DecodableType & commandData);
 /**
- * @brief Keypad Input Cluster SendKey Command callback (from client)
- */
-bool emberAfKeypadInputClusterSendKeyCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::KeypadInput::Commands::SendKey::DecodableType & commandData);
-/**
  * @brief Content Launcher Cluster LaunchContent Command callback (from client)
  */
 bool emberAfContentLauncherClusterLaunchContentCallback(
