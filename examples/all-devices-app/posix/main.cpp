@@ -303,7 +303,17 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     chip::PayloadContents payload;
 
     payload.version = 0;
-    payload.rendezvousInformation.SetValue(RendezvousInformationFlag::kBLE);
+    payload.rendezvousInformation.SetValue(
+#if CONFIG_NETWORK_LAYER_BLE
+        RendezvousInformationFlag::kBLE
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+        // Thread MeshCoP (Mesh Commissioning Protocol) discovers and commissions uncommissioned
+        // Thread devices directly via the Thread Border Router (OTBR) without BLE.
+        RendezvousInformationFlag::kThread
+#else
+        RendezvousInformationFlag::kOnNetwork
+#endif
+    );
 
     if (GetCommissionableDataProvider()->GetSetupPasscode(payload.setUpPINCode) != CHIP_NO_ERROR)
     {

@@ -34,7 +34,7 @@
 - (bool)isPoweredOn
 {
     if (!self.hasStatus) {
-        constexpr uint64_t kStateWaitTimeoutNs = 5 * 1000 * 1000 * 1000ll;
+        constexpr uint64_t kStateWaitTimeoutNs = 5 * NSEC_PER_SEC;
         dispatch_semaphore_wait(self.statusSemaphore, dispatch_time(DISPATCH_TIME_NOW, kStateWaitTimeoutNs));
 
         if (!self.hasStatus) {

@@ -678,8 +678,12 @@ static NSString * const MTRSetupPayloadCodingKeyQRCode = @"qr";
     // did not encode it. When present, it carries almost the entire state of the object.
     NSString * qrCode = [coder decodeObjectOfClass:NSString.class forKey:MTRSetupPayloadCodingKeyQRCode];
     if (qrCode != nil) {
-        // encodeWithCoder: always stores a QR code that parses
-        RETURN_SAFELY_IGNORED [self initializeFromQRCode:qrCode validate:NO];
+        // encodeWithCoder: always stores a QR code that parses, so one that doesn't means the archive
+        // is corrupted. initializeFromQRCode: has logged the parse error.
+        if ([self initializeFromQRCode:qrCode validate:NO] != CHIP_NO_ERROR) {
+            [coder failWithError:[NSError errorWithDomain:NSCocoaErrorDomain code:NSCoderReadCorruptError userInfo:nil]];
+            return nil;
+        }
     } else {
         self.version = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyVersion];
         self.vendorID = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyVendorID];
