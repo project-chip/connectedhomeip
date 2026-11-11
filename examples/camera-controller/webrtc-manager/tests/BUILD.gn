@@ -22,5 +22,8 @@ chip_test_suite("tests") {
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ "..:offer-stream-validation" ]
+  public_deps = [
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "..:offer-stream-validation",
+  ]
 }
