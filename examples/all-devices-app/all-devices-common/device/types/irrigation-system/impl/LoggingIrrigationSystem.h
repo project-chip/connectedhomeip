@@ -38,8 +38,7 @@ public:
     IrrigationWaterValve(TimerDelegate & timerDelegate, const WaterValveConfig & config,
                          LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> & operationalState,
                          size_t & openValves) :
-        LoggingWaterValve(timerDelegate, config),
-        mOperationalState(operationalState), mOpenValves(openValves)
+        LoggingWaterValve(timerDelegate, config), mOperationalState(operationalState), mOpenValves(openValves)
     {}
 
     DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override;
@@ -55,8 +54,8 @@ private:
 };
 
 class LoggingIrrigationSystem : public Clusters::OperationalState::OperationalStateCluster::Delegate,
-                                public IrrigationSystem,
-                                public Clusters::IdentifyDelegate
+                                public Clusters::IdentifyDelegate,
+                                public IrrigationSystem
 {
 public:
     struct ValveList
