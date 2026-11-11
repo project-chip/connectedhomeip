@@ -29,6 +29,7 @@ behave like a master push; scheduled (nightly) workflows do not run on them.
 | clang ASan, BoringSSL, ICD + ARL + rotating id       | Nightly Unit Tests - Linux (various features) (`nightly.yaml`) | –            | –            | yes     | Feature flags; ~66m, `TestRead` waits on ICD timers |
 | clang ASan, BoringSSL / mbedTLS / PSA                | Nightly ASAN Testing across Crypto Backends (`nightly.yaml`)   | –            | –            | yes     | Crypto backends with ASan                           |
 | clang MSan                                           | Nightly MSAN Tests - Linux (`nightly.yaml`)                    | –            | –            | yes     | Uninitialized-memory checks                         |
+| clang ASan, PacketBuffer pool (15), TCP on / off     | Nightly ASAN Unit Tests - PacketBuffer Pool (`nightly.yaml`)   | –            | –            | yes     | Pool backend instead of heap PacketBuffers          |
 | macOS ASan, BoringSSL, `target_os="all"`             | Build on Darwin (clang, simulated) (`build.yaml`)              | yes          | yes          | –       | macOS host                                          |
 
 "Crypto paths": `src/credentials`, `src/crypto`, `src/pw_backends`,
