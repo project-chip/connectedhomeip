@@ -301,7 +301,7 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
     // Attempt to send another packet with insufficient headroom, which should also fail.
     EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(packet1.Retain(), true));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Error);
-    EXPECT_EQ(packet1->DataLength(), packet1->MaxDataLength());
+    EXPECT_EQ(packet1->DataLength(), dataLength);
 }
 
 // Test that the BTP engine correctly encodes a standalone ACK packet when there is unacked data.
@@ -360,9 +360,12 @@ TEST_F(TestBtpEngine, EncodeStandAloneAckNoUnackedData)
 // Test EncodeStandAloneAck when the packet buffer is too small to hold the header.
 TEST_F(TestBtpEngine, EncodeStandAloneAckInsufficientBuffer)
 {
-    // Create a new packet buffer with size smaller than the header size.
+    // Create a packet buffer with less space than the header size. The allocator may return more space than requested (for
+    // example, when PacketBuffers come from a pool), so move the data start forward until only that much space remains.
     auto ackPacket0 = System::PacketBufferHandle::New(kTransferProtocolStandaloneAckHeaderSize - 1);
-    EXPECT_FALSE(ackPacket0.IsNull());
+    ASSERT_FALSE(ackPacket0.IsNull());
+    ackPacket0->SetStart(ackPacket0->Start() + ackPacket0->MaxDataLength() - (kTransferProtocolStandaloneAckHeaderSize - 1));
+    ASSERT_LT(ackPacket0->MaxDataLength(), kTransferProtocolStandaloneAckHeaderSize);
 
     // Attempt to encode the standalone ACK and check that it fails.
     EXPECT_EQ(mBtpEngine.EncodeStandAloneAck(ackPacket0), CHIP_ERROR_NO_MEMORY);
