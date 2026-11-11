@@ -54,6 +54,7 @@ namespace chip::app::Clusters::BasicInformation {
 
 namespace details {
 // Matches the LocationName field constraint in the LocationDescriptorStruct used by DeviceLocation.
+// BridgedDeviceBasicInformationCluster.cpp enforces the same limit independently; update both if it changes.
 inline constexpr size_t kMaxDeviceLocationNameLength = 128;
 } // namespace details
 
