@@ -73,8 +73,8 @@ tests:
     - label: "Qualify NumberOfRinses baseline: select supported Normal"
       PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
       runIf: >-
-          NumberOfRinsesValue not in supportedRinses and 0 not in supportedRinses
-          and 1 in supportedRinses
+          NumberOfRinsesValue not in supportedRinses and 0 not in
+          supportedRinses and 1 in supportedRinses
       command: "writeAttribute"
       attribute: "NumberOfRinses"
       arguments:
@@ -83,8 +83,8 @@ tests:
     - label: "Qualify NumberOfRinses baseline: select supported Extra"
       PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
       runIf: >-
-          NumberOfRinsesValue not in supportedRinses and 0 not in supportedRinses
-          and 1 not in supportedRinses and 2 in supportedRinses
+          NumberOfRinsesValue not in supportedRinses and 0 not in
+          supportedRinses and 1 not in supportedRinses and 2 in supportedRinses
       command: "writeAttribute"
       attribute: "NumberOfRinses"
       arguments:
@@ -93,14 +93,16 @@ tests:
     - label: "Qualify NumberOfRinses baseline: select supported Max"
       PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
       runIf: >-
-          NumberOfRinsesValue not in supportedRinses and 0 not in supportedRinses
-          and 1 not in supportedRinses and 2 not in supportedRinses and 3 in supportedRinses
+          NumberOfRinsesValue not in supportedRinses and 0 not in
+          supportedRinses and 1 not in supportedRinses and 2 not in
+          supportedRinses and 3 in supportedRinses
       command: "writeAttribute"
       attribute: "NumberOfRinses"
       arguments:
           value: 3
 
-    - label: "Qualify NumberOfRinses baseline: verify and save supported readback"
+    - label:
+          "Qualify NumberOfRinses baseline: verify and save supported readback"
       PICS: WASHERCTRL.S.F01 && WASHERCTRL.S.A0002 && WASHERCTRL.S.A0003
       runIf: NumberOfRinsesValue not in supportedRinses
       command: "readAttribute"
