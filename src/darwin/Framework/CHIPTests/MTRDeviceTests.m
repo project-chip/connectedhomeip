@@ -9369,16 +9369,19 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertEqual([idleDevice unitTestInterestedPathsChangedCount], idleChanges);
 }
 
-// Tests that a registration leaves out the interested-paths key of any kind some delegate wants every path of.
-- (void)test009_RegistrationOmitsKeyForEveryPath
+// Tests that a registration sends the wildcard element for any kind some delegate wants every path of, even beside a scoped delegate.
+- (void)test009_RegistrationSendsWildcardForEveryPath
 {
     __auto_type * server = [[MTRInterestedPathsTestXPCServer alloc] init];
     NSDictionary * expectedAttributesOnlyNode = @{
         MTRDeviceControllerRegistrationNodeIDKey : @(kDeviceId1),
         MTRDeviceControllerRegistrationInterestedPathsForAttributesKey : @[ @(1) ],
+        MTRDeviceControllerRegistrationInterestedPathsForEventsKey : @[ @{} ],
     };
     NSDictionary * expectedEveryPathNode = @{
         MTRDeviceControllerRegistrationNodeIDKey : @(kDeviceId2),
+        MTRDeviceControllerRegistrationInterestedPathsForAttributesKey : @[ @{} ],
+        MTRDeviceControllerRegistrationInterestedPathsForEventsKey : @[ @{} ],
     };
     XCTestExpectation * registrationReceived = [self expectationWithDescription:@"registration with both nodes received"];
     registrationReceived.assertForOverFulfill = NO;
@@ -9393,14 +9396,17 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     __auto_type * attributesOnlyDevice = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
     __auto_type * everyPathDevice = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
     __auto_type * attributesOnlyDelegate = [[MTRDeviceTestDelegate alloc] init];
+    __auto_type * scopedDelegate = [[MTRDeviceTestDelegate alloc] init];
     __auto_type * everyPathDelegate = [[MTRDeviceTestDelegate alloc] init];
     [attributesOnlyDevice addDelegate:attributesOnlyDelegate queue:dispatch_get_main_queue() interestedPathsForAttributes:@[ @(1) ] interestedPathsForEvents:nil];
+    [everyPathDevice addDelegate:scopedDelegate queue:dispatch_get_main_queue() interestedPathsForAttributes:@[ @(2) ] interestedPathsForEvents:@[ @(2) ]];
     [everyPathDevice addDelegate:everyPathDelegate queue:dispatch_get_main_queue()];
 
     [self waitForExpectations:@[ registrationReceived ] timeout:kTimeoutInSeconds];
 
     server.onControllerConfiguration = nil;
     [attributesOnlyDevice removeDelegate:attributesOnlyDelegate];
+    [everyPathDevice removeDelegate:scopedDelegate];
     [everyPathDevice removeDelegate:everyPathDelegate];
     [controller shutdown];
 }
