@@ -1166,16 +1166,34 @@ class IDMBaseTest(BasicCompositionTests):
                                          attribute_id=attr_info.attribute_id)
 
         result = ConstraintProbeResult()
+        cancellation = None
+
+        async def await_settled_probe_operation(operation: Awaitable[Any]) -> Any:
+            nonlocal cancellation
+            pending = asyncio.ensure_future(operation)
+            while True:
+                try:
+                    return await asyncio.shield(pending)
+                except asyncio.CancelledError as error:
+                    if cancellation is None:
+                        cancellation = error
+                    if pending.cancelled():
+                        raise
+                    result.execution_error += 1
+
         if attr_info.write_optional:
             try:
-                baseline_write = await self.default_controller.WriteAttribute(
+                baseline_write = await await_settled_probe_operation(self.default_controller.WriteAttribute(
                     nodeId=self.dut_node_id,
                     attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))],
-                    timedRequestTimeoutMs=timed_request_timeout_ms)
+                    timedRequestTimeoutMs=timed_request_timeout_ms))
             except InteractionModelError as error:
                 baseline_status = error.status
             else:
                 baseline_status = baseline_write[0].Status
+            finally:
+                if cancellation is not None:
+                    raise cancellation
             if baseline_status == Status.UnsupportedWrite:
                 log.warning('Optional write constraint coverage NOT DEMONSTRATED for %s: unsupported write', attribute_path)
                 return result
@@ -1187,19 +1205,6 @@ class IDMBaseTest(BasicCompositionTests):
             execution_failure = None
             cancellation = None
             result_status = None
-
-            async def await_settled_probe_operation(operation: Awaitable[Any]) -> Any:
-                nonlocal cancellation
-                pending = asyncio.ensure_future(operation)
-                while True:
-                    try:
-                        return await asyncio.shield(pending)
-                    except asyncio.CancelledError as error:
-                        if cancellation is None:
-                            cancellation = error
-                        if pending.cancelled():
-                            raise
-                        result.execution_error += 1
 
             try:
                 write_result = await await_settled_probe_operation(self.default_controller.WriteAttribute(

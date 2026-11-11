@@ -820,6 +820,55 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                           for call in self.checker.default_controller.WriteAttribute.call_args_list], [3, 2])
         self.checker.record_accepted_violation.assert_not_called()
 
+    async def test_cancelled_optional_baseline_settles_before_propagating(self):
+        """Cancellation of qualification must drain native work without starting probes."""
+        import asyncio
+        from dataclasses import replace
+
+        info = replace(self._prepare_writable_attribute(), write_optional=True)
+        started = asyncio.Event()
+        response = asyncio.get_running_loop().create_future()
+        cancellations = []
+        original_shield = asyncio.shield
+        self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
+        self.checker.read_single_attribute_check_success = AsyncMock(return_value=2)
+
+        async def capture_shield(operation):
+            try:
+                return await original_shield(operation)
+            except asyncio.CancelledError as error:
+                cancellations.append(error)
+                raise
+
+        async def write_attribute(**kwargs):
+            started.set()
+            return await response
+
+        self.checker.default_controller.WriteAttribute = AsyncMock(side_effect=write_attribute)
+        with patch('support_modules.idm_support.asyncio.shield', side_effect=capture_shield):
+            task = asyncio.create_task(self.checker.check_attribute_constraint(info, info.constraints))
+            try:
+                await asyncio.wait_for(started.wait(), 5)
+                task.cancel('optional baseline cancellation')
+                delivered = asyncio.Event()
+                asyncio.get_running_loop().call_soon(delivered.set)
+                await asyncio.wait_for(delivered.wait(), 5)
+                self.assertFalse(response.cancelled())
+                self.assertFalse(task.done())
+            finally:
+                if not response.done():
+                    response.set_result([SimpleNamespace(Status=Status.Success)])
+                with self.assertRaises(asyncio.CancelledError) as raised:
+                    await asyncio.wait_for(task, 5)
+        self.assertIs(raised.exception, cancellations[0])
+        self.assertEqual(str(raised.exception), 'optional baseline cancellation')
+        self.assertEqual([call.kwargs['attributes'][0][1].value
+                          for call in self.checker.default_controller.WriteAttribute.call_args_list], [2])
+        self.checker.read_single_attribute.assert_not_awaited()
+        self.checker.record_warning.assert_not_called()
+        self.checker.record_accepted_violation.assert_not_called()
+        self.checker.default_controller.SendCommand.assert_not_called()
+
     async def test_cancellation_after_transport_failure_remains_primary(self):
         """A timeout during cleanup remains cancellation even after a failed write."""
         import asyncio
