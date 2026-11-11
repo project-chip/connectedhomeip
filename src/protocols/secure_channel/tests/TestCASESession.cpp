@@ -2286,8 +2286,19 @@ private:
         EXPECT_EQ(statusReport.GetProtocolId(), SecureChannel::Id);
         EXPECT_EQ(statusReport.GetGeneralCode(), GeneralStatusCode::kFailure);
         EXPECT_EQ(statusReport.GetProtocolCode(), mExpectedProtocolCode);
-        // A failure StatusReport should not be left pending MRP retransmission in the RetransTable.
-        EXPECT_EQ(ec->GetExchangeMgr()->GetReliableMessageMgr()->TestGetCountRetransTable(), 0);
+
+        // The failure StatusReport remains reliable, but the rejected Sigma1's MRP parameters must not govern its retransmission.
+        EXPECT_TRUE(payloadHeader.NeedsAck());
+        size_t numResponderRetransmissions = 0;
+        ec->GetExchangeMgr()->GetReliableMessageMgr()->EnumerateRetransTable([&](ReliableMessageMgr::RetransTableEntry * entry) {
+            if (!entry->ec->IsInitiator())
+            {
+                numResponderRetransmissions++;
+                EXPECT_EQ(entry->ec->GetSessionHandle()->GetRemoteMRPConfig(), GetDefaultMRPConfig());
+            }
+            return Loop::Continue;
+        });
+        EXPECT_EQ(numResponderRetransmissions, 1u);
         return CHIP_NO_ERROR;
     }
 
@@ -2304,14 +2315,24 @@ TEST_F(TestCASESession, Sigma1BadDestinationIdTest)
 
     SessionManager & sessionManager = GetSecureSessionManager();
 
-    constexpr size_t bufferSize     = 600;
-    System::PacketBufferHandle data = chip::System::PacketBufferHandle::New(bufferSize);
-    ASSERT_FALSE(data.IsNull());
+    uint8_t initiatorRandom[Crypto::kSHA256_Hash_Length] = { 1 };
+    uint8_t destinationId[Crypto::kSHA256_Hash_Length]   = { 2 };
+    Crypto::P256Keypair ephemeralKey;
+    ASSERT_SUCCESS(ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDH));
 
-    MutableByteSpan buf(data->Start(), data->AvailableDataLength());
-    // This uses a bogus destination id that is not going to match anything in practice.
-    EXPECT_EQ(EncodeSigma1Helper<Sigma1Params>(buf), CHIP_NO_ERROR);
-    data->SetDataLength(static_cast<uint16_t>(buf.size()));
+    CASESessionAccess::EncodeSigma1Inputs encodeParams;
+    encodeParams.initiatorRandom    = ByteSpan(initiatorRandom);
+    encodeParams.initiatorSessionId = 0;
+    encodeParams.destinationId      = ByteSpan(destinationId);
+    encodeParams.initiatorEphPubKey = &ephemeralKey.Pubkey();
+    const auto defaultMRPConfig     = GetDefaultMRPConfig();
+    const auto attackerMRPConfig =
+        ReliableMessageProtocolConfig(System::Clock::Milliseconds32(UINT32_MAX), System::Clock::Milliseconds32(UINT32_MAX),
+                                      defaultMRPConfig.mActiveThresholdTime);
+    encodeParams.initiatorSessionParams.SetMRPConfig(attackerMRPConfig);
+
+    System::PacketBufferHandle data;
+    ASSERT_SUCCESS(CASESessionAccess::EncodeSigma1(data, encodeParams));
 
     Optional<SessionHandle> session = sessionManager.CreateUnauthenticatedSession(GetAliceAddress(), GetDefaultMRPConfig());
     EXPECT_TRUE(session.HasValue());
