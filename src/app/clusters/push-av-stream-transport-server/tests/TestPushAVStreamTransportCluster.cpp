@@ -24,10 +24,10 @@
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
-#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/clusters/push-av-stream-transport-server/MigratePushAvStreamTransportServerStorage.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/FabricTestFixture.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
