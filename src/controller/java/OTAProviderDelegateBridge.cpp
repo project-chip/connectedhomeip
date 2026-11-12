@@ -51,13 +51,13 @@ OTAProviderDelegateBridge::~OTAProviderDelegateBridge()
 }
 
 CHIP_ERROR OTAProviderDelegateBridge::Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager,
-                                           jobject otaProviderDelegate)
+                                           jobject otaProviderDelegate, uint16_t maxBDXBlockSize)
 {
     ReturnLogErrorOnFailure(mOtaProviderDelegate.Init(otaProviderDelegate));
 
     Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, this);
     mBdxOTASender = std::make_unique<BdxOTASender>(mOtaProviderDelegate.ObjectRef());
-    return mBdxOTASender->Init(systemLayer, exchangeManager);
+    return mBdxOTASender->Init(systemLayer, exchangeManager, maxBDXBlockSize);
 }
 
 void OTAProviderDelegateBridge::Shutdown()

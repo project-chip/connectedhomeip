@@ -366,10 +366,14 @@ void DefaultOTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
     // Set the action to take once connection is successfully established
     mOnConnectedAction = onConnectedAction;
 
+    mHasFallenBackToMRP = false;
+
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(mProviderLocation.Value().providerNodeID), mProviderLocation.Value().fabricIndex);
 
-    mCASESessionManager->FindOrEstablishSession(GetProviderScopedId(), &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    mCASESessionManager->FindOrEstablishSession(GetProviderScopedId(), &mOnConnectedCallback, &mOnConnectionFailureCallback,
+                                                mSupportLargePayload ? TransportPayloadCapability::kLargePayload
+                                                                     : TransportPayloadCapability::kMRPPayload);
 }
 
 void DefaultOTARequestor::DisconnectFromProvider()
@@ -514,8 +518,28 @@ void DefaultOTARequestor::OnConnectionFailure(void * context, const ScopedNodeId
     VerifyOrDie(requestorCore != nullptr);
     requestorCore->mSessionHolder.Release();
 
+    if (!requestorCore->mProviderLocation.HasValue() || requestorCore->GetProviderScopedId() != peerId)
+    {
+        ChipLogProgress(SoftwareUpdate, "Ignoring stale connection failure for node 0x" ChipLogFormatX64,
+                        ChipLogValueX64(peerId.GetNodeId()));
+        return;
+    }
+
     ChipLogError(SoftwareUpdate, "Failed to connect to node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                  ChipLogValueX64(peerId.GetNodeId()), error.Format());
+
+    if (requestorCore->mSupportLargePayload && !requestorCore->mHasFallenBackToMRP)
+    {
+        ChipLogProgress(SoftwareUpdate, "Large payload session failed, falling back to MRP");
+        requestorCore->mHasFallenBackToMRP = true;
+
+        requestorCore->mCASESessionManager->FindOrEstablishSession(
+            requestorCore->GetProviderScopedId(), &requestorCore->mOnConnectedCallback,
+            &requestorCore->mOnConnectionFailureCallback, TransportPayloadCapability::kMRPPayload);
+        return;
+    }
+
+    requestorCore->mHasFallenBackToMRP = false;
 
     switch (requestorCore->mOnConnectedAction)
     {
@@ -823,9 +847,25 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & excha
 
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = bdx::TransferControlFlags::kReceiverDrive;
-    initOptions.MaxBlockSize     = mOtaRequestorDriver->GetMaxDownloadBlockSize();
-    initOptions.FileDesLength    = static_cast<uint16_t>(mFileDesignator.size());
-    initOptions.FileDesignator   = reinterpret_cast<const uint8_t *>(mFileDesignator.data());
+
+    if (sessionHandle->AllowsLargePayload())
+    {
+        size_t maxContiguousCapacity = System::PacketBuffer::kLargeBufMaxSizeWithoutReserve;
+        initOptions.MaxBlockSize =
+            static_cast<uint16_t>(std::min({ static_cast<size_t>(mOtaRequestorDriver->GetMaxDownloadBlockSize()),
+                                             static_cast<size_t>(kMaxLargeAppMessageLen - bdx::kDataBlockHeaderSize),
+                                             maxContiguousCapacity - bdx::kDataBlockHeaderSize }));
+    }
+    else
+    {
+        size_t maxContiguousCapacity = System::PacketBuffer::kMaxSizeWithoutReserve;
+        initOptions.MaxBlockSize =
+            static_cast<uint16_t>(std::min({ static_cast<size_t>(mOtaRequestorDriver->GetMaxDownloadBlockSize()),
+                                             static_cast<size_t>(kMaxAppMessageLen - bdx::kDataBlockHeaderSize),
+                                             maxContiguousCapacity - bdx::kDataBlockHeaderSize }));
+    }
+    initOptions.FileDesLength  = static_cast<uint16_t>(mFileDesignator.size());
+    initOptions.FileDesignator = reinterpret_cast<const uint8_t *>(mFileDesignator.data());
 
     chip::Messaging::ExchangeContext * exchangeCtx = exchangeMgr.NewContext(sessionHandle, &mBdxMessenger);
     VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);

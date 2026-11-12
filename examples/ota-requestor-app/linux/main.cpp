@@ -94,6 +94,7 @@ constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
 constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionWatchdogTimeout      = 'w';
 constexpr uint16_t kSkipExecImageFile          = 's';
+constexpr uint16_t kOptionLargePayload         = 'l';
 constexpr size_t kMaxFilePathSize              = 256;
 
 // Options without a short form.
@@ -120,6 +121,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "watchdogTimeout", chip::ArgParser::kArgumentRequired, kOptionWatchdogTimeout },
     { "skipExecImageFile", chip::ArgParser::kNoArgument, kSkipExecImageFile },
     { "maxBDXBlockSize", chip::ArgParser::kArgumentRequired, kOptionMaxBDXBlockSize },
+    { "largePayload", chip::ArgParser::kNoArgument, kOptionLargePayload },
     { "bdxSkipAfterFirstBlock", chip::ArgParser::kArgumentRequired, kOptionBDXSkipAfterFirstBlock },
     {},
 };
@@ -158,6 +160,9 @@ OptionSet cmdLineOptions = {
     "       If none or zero is supplied, the timeout is determined by the driver.\n"
     "  -s, --skipExecImageFile\n"
     "       To only check Notify Update Applied Command, skip the Image File execution.\n"
+    "  -l, --largePayload\n"
+    "       If supplied, enables support for large payloads.\n"
+    "       If a session is not open, it establishes a session using TCP to allow large data transmission.\n"
     "  --bdxSkipAfterFirstBlock <number of bytes>\n"
     "       For testing OTA providers. After the first block of each download, send a BDX BlockQueryWithSkip\n"
     "       that skips the given number of bytes, instead of a BlockQuery. The skipped bytes are missing from\n"
@@ -350,6 +355,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     }
+    case kOptionLargePayload: {
+        gRequestorCore.SetLargePayload(true);
+        break;
+    }
     case kOptionBDXSkipAfterFirstBlock: {
         uint32_t skip;
         if (!ParseInt(aValue, skip))
@@ -394,8 +403,8 @@ int main(int argc, char * argv[])
             return -1;
         }
 
-        // Set the boot reason to SoftwareUpdateCompleted since the OTA requestor is going to boot into the new image after applying
-        // the firmware update.
+        // Set the boot reason to SoftwareUpdateCompleted since the OTA requestor is going to boot into the new image after
+        // applying the firmware update.
         CHIP_ERROR err = ConfigurationMgr().StoreBootReason(to_underlying(BootReasonEnum::kSoftwareUpdateCompleted));
         if (err != CHIP_NO_ERROR)
         {
