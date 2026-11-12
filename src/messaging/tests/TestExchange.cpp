@@ -94,7 +94,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void OnResponseTimeout(ExchangeContext * ec) override {}
+    void OnResponseTimeout(ExchangeContext * ec) override { ++mResponseTimeoutCount; }
 
     ExchangeMessageDispatch & GetMessageDispatch() override
     {
@@ -107,6 +107,7 @@ public:
     }
 
     uint32_t mReceivedMessageCount             = 0;
+    uint32_t mResponseTimeoutCount             = 0;
     bool mKeepExchangeAliveOnMessageReceipt    = true;
     ExchangeContext * mExchange                = nullptr;
     ExchangeMessageDispatch * mMessageDispatch = nullptr;
@@ -225,10 +226,8 @@ TEST_F(TestExchange, CheckBasicExchangeMessageDispatch)
     }
 }
 
-// An exchange that is still waiting for a response when the ExchangeManager has already been
-// shut down must not dereference the now-cleared SessionManager. SessionManager::Shutdown()
-// expires any remaining secure sessions, which notifies their exchanges, so this ordering is
-// reachable whenever a consumer tears down the ExchangeManager while a session is still alive.
+// ExchangeManager::Shutdown() requires that no exchanges are active. These tests check that an
+// exchange that is still active after it can be released without touching the cleared SessionManager.
 TEST_F(TestExchange, OnSessionReleasedAfterExchangeManagerShutdown)
 {
     MockExchangeDelegate delegate;
@@ -236,17 +235,46 @@ TEST_F(TestExchange, OnSessionReleasedAfterExchangeManagerShutdown)
     ExchangeContext * ec = NewExchangeToBob(&delegate);
     ASSERT_NE(ec, nullptr);
 
-    ec->SetResponseTimeout(System::Clock::Seconds16(1));
+    constexpr System::Clock::Timeout kResponseTimeout = System::Clock::Milliseconds32(100);
+    ec->SetResponseTimeout(kResponseTimeout);
+    ASSERT_SUCCESS(ec->SendMessage(Protocols::SecureChannel::Id, kMsgType_TEST1,
+                                   System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                                   SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
+    DrainAndServiceIO();
+    ASSERT_EQ(delegate.mResponseTimeoutCount, 0u);
+
+    GetExchangeManager().Shutdown();
+
+    ec->OnSessionReleased();
+    EXPECT_EQ(delegate.mResponseTimeoutCount, 1u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    // The response timer must not run for the released exchange.
+    GetIOContext().DriveIOUntil(kResponseTimeout * 2, [] { return false; });
+    EXPECT_EQ(delegate.mResponseTimeoutCount, 1u);
+}
+
+TEST_F(TestExchange, AbortAllOtherCommunicationOnFabricAfterExchangeManagerShutdown)
+{
+    MockExchangeDelegate delegate;
+
+    ExchangeContext * ec = NewExchangeToBob(&delegate);
+    ASSERT_NE(ec, nullptr);
+
+    // A zero response timeout keeps the exchange waiting for a response without starting a timer.
+    ec->SetResponseTimeout(System::Clock::kZero);
     ASSERT_SUCCESS(ec->SendMessage(Protocols::SecureChannel::Id, kMsgType_TEST1,
                                    System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                                    SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
     DrainAndServiceIO();
 
-    // ExchangeManager::Shutdown() clears its SessionManager pointer.
     GetExchangeManager().Shutdown();
 
-    // The exchange is still expecting a response, so this reaches CancelResponseTimer().
+    ec->AbortAllOtherCommunicationOnFabric();
+
+    // The exchange must still be released when its session is released.
     ec->OnSessionReleased();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 // A crude test to exercise VerifyOrDieWithObject() in ObjectPool and

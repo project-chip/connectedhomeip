@@ -96,6 +96,15 @@ void ExchangeManager::Shutdown()
 {
     VerifyOrReturn(mState != State::kState_NotInitialized);
 
+    // Response timers can only be cancelled while mSessionManager is set.
+    mContextPool.ForEachActiveObject([](ExchangeContext * ec) {
+        if (ec->IsResponseExpected())
+        {
+            ec->CancelResponseTimer();
+        }
+        return Loop::Continue;
+    });
+
     mReliableMessageMgr.Shutdown();
 
     if (mSessionManager != nullptr)

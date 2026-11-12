@@ -293,8 +293,7 @@ void ExchangeContextDeletor::Release(ExchangeContext * ec)
 
 ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
                                  ExchangeDelegate * delegate, bool isEphemeralExchange) :
-    mDispatch(GetMessageDispatch(isEphemeralExchange, delegate)),
-    mSession(*this)
+    mDispatch(GetMessageDispatch(isEphemeralExchange, delegate)), mSession(*this)
 {
     VerifyOrDieWithObject(mExchangeMgr == nullptr, this);
 
@@ -435,8 +434,7 @@ void ExchangeContext::OnSessionReleased()
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
 {
-    // ExchangeManager::Shutdown() clears its SessionManager, so an exchange that outlives it
-    // can reach here with nothing to get the System::Layer from.
+    // GetSessionManager() returns nullptr once the ExchangeManager has been shut down.
     SessionManager * sessionManager = mExchangeMgr->GetSessionManager();
     VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -452,8 +450,7 @@ CHIP_ERROR ExchangeContext::StartResponseTimer()
 
 void ExchangeContext::CancelResponseTimer()
 {
-    // SessionManager::Shutdown() expires any remaining sessions, which notifies their exchanges.
-    // By then ExchangeManager::Shutdown() may already have cleared its SessionManager.
+    // GetSessionManager() returns nullptr once the ExchangeManager has been shut down.
     SessionManager * sessionManager = mExchangeMgr->GetSessionManager();
     VerifyOrReturn(sessionManager != nullptr);
 
@@ -669,13 +666,13 @@ void ExchangeContext::AbortAllOtherCommunicationOnFabric()
         return;
     }
 
+    SessionManager * sessionManager = GetExchangeMgr()->GetSessionManager();
+    VerifyOrReturn(sessionManager != nullptr);
+
     // Save our session so it does not actually go away.
     Optional<SessionHandle> session = mSession.Get();
 
     SetIgnoreSessionRelease(true);
-
-    SessionManager * sessionManager = GetExchangeMgr()->GetSessionManager();
-    VerifyOrReturn(sessionManager != nullptr);
 
     sessionManager->ExpireAllSessionsForFabric(mSession->GetFabricIndex());
 
