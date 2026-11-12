@@ -713,10 +713,10 @@ public:
         auto & user = mUsers[userIndex - 1];
         VerifyOrReturnValue(userName.size() <= kDoorLockMaxUsernameSize, false);
         memcpy(mUserNames[userIndex - 1], userName.data(), userName.size());
-        user.userName       = CharSpan(mUserNames[userIndex - 1], userName.size());
-        user.userUniqueId   = uniqueId;
-        user.userStatus     = userStatus;
-        user.userType       = userType;
+        user.userName           = CharSpan(mUserNames[userIndex - 1], userName.size());
+        user.userUniqueId       = uniqueId;
+        user.userStatus         = userStatus;
+        user.userType           = userType;
         user.credentialRule     = credentialRule;
         user.creationSource     = DlAssetSource::kMatterIM;
         user.createdBy          = creator;

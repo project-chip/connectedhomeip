@@ -1459,9 +1459,9 @@ void DoorLockCluster::HandleSetUser(const DataModel::InvokeRequest & request, co
 
     if (credentialRule == CredentialRuleEnum::kUnknownEnumValue)
     {
-        ChipLogProgress(Zcl,
-                        "[SetUser] Unable to set the user: credential rule is unknown [endpointId=%d,userIndex=%d,credentialRule=%u]",
-                        mPath.mEndpointId, userIndex, to_underlying(credentialRule.Value()));
+        ChipLogProgress(
+            Zcl, "[SetUser] Unable to set the user: credential rule is unknown [endpointId=%d,userIndex=%d,credentialRule=%u]",
+            mPath.mEndpointId, userIndex, to_underlying(credentialRule.Value()));
 
         handler->AddStatus(path, Status::InvalidCommand);
         return;
