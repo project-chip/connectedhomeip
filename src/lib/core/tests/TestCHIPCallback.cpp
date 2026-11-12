@@ -35,38 +35,37 @@
 
 using namespace chip::Callback;
 
+// Runs a statement that uses a deprecated CallbackDeque API without a deprecation warning.
+#define ALLOW_DEPRECATED(...)                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"") __VA_ARGS__;                \
+        _Pragma("GCC diagnostic pop")                                                                                              \
+    } while (0)
+
 /**
  * An example Callback registrar. Resumer::Resume() accepts Callbacks
  *   to be run during the next call to Resumer::Dispatch().  In an environment
  *   completely driven by callbacks, an application's main() would just call
  *   something like Resumer::Dispatch() in a loop.
  */
-class Resumer : private CallbackDeque
+class Resumer : private TypedCallbackDeque<CallFn>
 {
 public:
     /**
      * @brief run this callback next Dispatch
      */
-    void Resume(Callback<> * cb)
-    {
-        // always first thing: cancel to take ownership of
-        //  cb members
-        Enqueue(cb->Cancel());
-    }
+    void Resume(Callback<>::Owned cb) { Enqueue(std::move(cb)); }
 
     void Dispatch()
     {
-        CallbackDeque ready;
+        TypedCallbackDeque<CallFn> ready;
 
         DequeueAll(ready);
 
-        // runs the ready list
-        while (!ready.IsEmpty())
+        // runs the ready list, with one-shot semantics
+        while (auto * cb = ready.Take())
         {
-            Callback<> * cb = Callback<>::FromCancelable(ready.First());
-
-            // one-shot semantics
-            cb->Cancel();
             cb->Invoke();
         }
     }
@@ -164,6 +163,7 @@ TEST_F(TestCHIPCallback, ResumerTest)
 /**
  * An example Callback registrar. Notifier implements persistently-registered
  *  semantics, and uses Callbacks with a non-default signature.
+ *  Notifier covers the legacy custom-CancelFn path of the untyped CallbackDeque API.
  */
 class Notifier : private CallbackDeque
 {
@@ -182,18 +182,21 @@ public:
         }
     }
 
-    /**
-     * @brief example
-     */
     static void Cancel(Cancelable * cb)
     {
-        Dequeue(cb); // take off ready list
+        sCancelCount++;
+        ALLOW_DEPRECATED(Dequeue(cb)); // take off ready list
     }
 
     /**
      * @brief illustrate a case where this needs notification of cancellation
      */
-    void Register(Callback<NotifyFn> * cb) { Enqueue(cb->Cancel(), Cancel); }
+    void Register(Callback<NotifyFn> * cb) { ALLOW_DEPRECATED(Enqueue(cb->Cancel(), Cancel)); }
+
+    using CallbackDeque::Clear;
+    using CallbackDeque::Take;
+
+    static inline int sCancelCount = 0;
 };
 
 static void increment_by(int * n, int by)
@@ -229,14 +232,180 @@ TEST_F(TestCHIPCallback, NotifierTest)
     cancelcb.Cancel();
 }
 
+// A custom CancelFn runs only when the element is cancelled; internal removal unregisters without it.
+TEST_F(TestCHIPCallback, NotifierCancelFnRunsOnlyOnCancel)
+{
+    int n = 0;
+    Callback<Notifier::NotifyFn> a(reinterpret_cast<Notifier::NotifyFn>(increment_by), &n);
+    Callback<Notifier::NotifyFn> b(reinterpret_cast<Notifier::NotifyFn>(increment_by), &n);
+    Notifier::sCancelCount = 0;
+
+    {
+        Notifier notifier;
+        notifier.Register(&a);
+        notifier.Register(&b);
+        a.Cancel();
+        EXPECT_EQ(Notifier::sCancelCount, 1);
+
+        EXPECT_NE(notifier.Take(), nullptr);
+        EXPECT_EQ(Notifier::sCancelCount, 1);
+
+        notifier.Register(&a);
+        notifier.Clear();
+        EXPECT_EQ(Notifier::sCancelCount, 1);
+
+        notifier.Register(&a);
+    }
+    EXPECT_EQ(Notifier::sCancelCount, 1);
+}
+
+// The legacy raw Enqueue() takes ownership itself, so it accepts a Callback that is still
+// registered elsewhere.
+TEST_F(TestCHIPCallback, LegacyRawEnqueue)
+{
+    int n = 0;
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+    CallbackDeque first, second;
+
+    Cancelable * ca = cb.Cancel();
+    ALLOW_DEPRECATED(first.Enqueue(ca));
+    EXPECT_TRUE(cb.IsRegistered());
+    ALLOW_DEPRECATED(second.Enqueue(ca)); // still registered with first
+
+    EXPECT_TRUE(first.IsEmpty());
+    EXPECT_EQ(Callback<>::FromCancelable(second.Take()), &cb);
+    EXPECT_FALSE(cb.IsRegistered());
+    EXPECT_TRUE(second.IsEmpty());
+}
+
+TEST_F(TestCHIPCallback, TypedEnqueueAcceptsReferencePointerAndToken)
+{
+    int n = 0;
+    Callback<> byRef(reinterpret_cast<CallFn>(increment), &n);
+    Callback<> byPtr(reinterpret_cast<CallFn>(increment), &n);
+    Callback<> byToken(reinterpret_cast<CallFn>(increment), &n);
+    TypedCallbackDeque<CallFn> deque;
+
+    deque.Enqueue(byRef);
+    deque.Enqueue(&byPtr);
+    Callback<>::Owned token(byToken);
+    deque.Enqueue(std::move(token));
+    EXPECT_TRUE(byRef.IsRegistered());
+    EXPECT_TRUE(byPtr.IsRegistered());
+    EXPECT_TRUE(byToken.IsRegistered());
+
+    EXPECT_EQ(deque.First(), &byRef);
+    EXPECT_EQ(deque.Take(), &byRef);
+    EXPECT_EQ(deque.Take(), &byPtr);
+    EXPECT_EQ(deque.Take(), &byToken);
+    EXPECT_FALSE(byRef.IsRegistered());
+    EXPECT_FALSE(byPtr.IsRegistered());
+    EXPECT_FALSE(byToken.IsRegistered());
+    EXPECT_EQ(n, 0);
+}
+
+// The untyped deque only accepts tokens, so ownership is still taken at the call boundary.
+TEST_F(TestCHIPCallback, UntypedEnqueueTakesAToken)
+{
+    int n = 0;
+    Callback<> a(reinterpret_cast<CallFn>(increment), &n);
+    Callback<> b(reinterpret_cast<CallFn>(increment), &n);
+    CallbackDeque deque;
+
+    deque.Enqueue(Callback<>::Owned(a));
+    deque.Enqueue(Callback<>::Owned(b));
+    deque.Enqueue(Callback<>::Owned(a));
+    EXPECT_TRUE(a.IsRegistered());
+    EXPECT_TRUE(b.IsRegistered());
+
+    EXPECT_EQ(Callback<>::FromCancelable(deque.Take()), &b);
+    EXPECT_EQ(Callback<>::FromCancelable(deque.Take()), &a);
+    EXPECT_EQ(deque.Take(), nullptr);
+    EXPECT_FALSE(a.IsRegistered());
+    EXPECT_FALSE(b.IsRegistered());
+    EXPECT_EQ(n, 0);
+}
+
+TEST_F(TestCHIPCallback, TypedTakeReturnsNullWhenEmpty)
+{
+    TypedCallbackDeque<CallFn> deque;
+    EXPECT_EQ(deque.First(), nullptr);
+    EXPECT_EQ(deque.Take(), nullptr);
+}
+
+// Enqueueing a Callback that is already in a deque moves it to the end, rather than linking it twice.
+TEST_F(TestCHIPCallback, TypedEnqueueOfAnElementMovesItToTheEnd)
+{
+    int n = 0;
+    Callback<> a(reinterpret_cast<CallFn>(increment), &n);
+    Callback<> b(reinterpret_cast<CallFn>(increment), &n);
+    TypedCallbackDeque<CallFn> deque;
+
+    deque.Enqueue(a);
+    deque.Enqueue(b);
+    deque.Enqueue(a);
+    EXPECT_EQ(deque.Take(), &b);
+    EXPECT_EQ(deque.Take(), &a);
+    EXPECT_TRUE(deque.IsEmpty());
+}
+
+TEST_F(TestCHIPCallback, TypedClearUnregistersAllElements)
+{
+    int n = 0;
+    Callback<> a(reinterpret_cast<CallFn>(increment), &n);
+    Callback<> b(reinterpret_cast<CallFn>(increment), &n);
+    TypedCallbackDeque<CallFn> deque;
+
+    deque.Enqueue(a);
+    deque.Enqueue(b);
+    deque.Clear();
+    EXPECT_TRUE(deque.IsEmpty());
+    EXPECT_FALSE(a.IsRegistered());
+    EXPECT_FALSE(b.IsRegistered());
+}
+
+// A deque that goes away first must not leave its elements pointing at it: Cancel() on an element
+// would otherwise write into the destroyed deque.
+TEST_F(TestCHIPCallback, DestroyingANonEmptyDequeUnregistersItsElements)
+{
+    int n = 0;
+    Callback<> a(reinterpret_cast<CallFn>(increment), &n);
+    Callback<> b(reinterpret_cast<CallFn>(increment), &n);
+
+    {
+        TypedCallbackDeque<CallFn> deque;
+        deque.Enqueue(a);
+        deque.Enqueue(b);
+    }
+    EXPECT_FALSE(a.IsRegistered());
+    EXPECT_FALSE(b.IsRegistered());
+    a.Cancel();
+    b.Cancel();
+
+    // Same for elements that were moved to another deque, i.e. are still registered.
+    TypedCallbackDeque<CallFn> outer;
+    {
+        TypedCallbackDeque<CallFn> inner;
+        inner.Enqueue(a);
+        inner.DequeueAll(outer);
+        EXPECT_TRUE(inner.IsEmpty());
+        EXPECT_TRUE(a.IsRegistered());
+        inner.Enqueue(b);
+    }
+    EXPECT_FALSE(b.IsRegistered());
+    EXPECT_EQ(outer.Take(), &a);
+    EXPECT_TRUE(outer.IsEmpty());
+    EXPECT_EQ(n, 0);
+}
+
 // Verifies the mechanics of OperationalSessionSetup::NotifyRetryHandlers
 TEST_F(TestCHIPCallback, PersistentCallbacksThatDeallocateThemselves)
 {
-    CallbackDeque retryHandlers;
+    TypedCallbackDeque<CallFn> retryHandlers;
 
     int stackCallbackCalled = 0;
     Callback<> stackCallback{ [](void * context) { ++*static_cast<int *>(context); }, &stackCallbackCalled };
-    retryHandlers.Enqueue(stackCallback.Cancel());
+    retryHandlers.Enqueue(stackCallback);
 
     int heapCallbackCalled = 0;
     struct HeapCallback : public Callback<>
@@ -250,16 +419,14 @@ TEST_F(TestCHIPCallback, PersistentCallbacksThatDeallocateThemselves)
             chip::Platform::Delete(self);
         }
     };
-    retryHandlers.Enqueue((chip::Platform::New<HeapCallback>(&heapCallbackCalled))->Cancel());
+    retryHandlers.Enqueue(chip::Platform::New<HeapCallback>(&heapCallbackCalled));
 
-    CallbackDeque retryHandlerListSnapshot;
+    TypedCallbackDeque<CallFn> retryHandlerListSnapshot;
     retryHandlers.DequeueAll(retryHandlerListSnapshot);
-    while (!retryHandlerListSnapshot.IsEmpty())
+    while (auto * cb = retryHandlerListSnapshot.First())
     {
-        auto * cb = Callback<>::FromCancelable(retryHandlerListSnapshot.First());
-
-        CallbackDeque currentCallbackHolder;
-        currentCallbackHolder.Enqueue(cb->Cancel());
+        TypedCallbackDeque<CallFn> currentCallbackHolder;
+        currentCallbackHolder.Enqueue(cb);
 
         cb->mCall(cb->mContext);
 
@@ -267,7 +434,7 @@ TEST_F(TestCHIPCallback, PersistentCallbacksThatDeallocateThemselves)
         {
             // Callback has not been canceled as part of the call,
             // so is still supposed to be registered with us.
-            retryHandlers.Enqueue(cb->Cancel());
+            retryHandlers.Enqueue(cb);
         }
     }
 
@@ -316,20 +483,27 @@ static_assert(std::is_convertible_v<Callback<>::Owned, Cancelable::OwnedOrNull>,
 static_assert(!std::is_convertible_v<Callback<>::Owned &, Cancelable::OwnedOrNull &>, "Owned must not slice");
 static_assert(!std::is_convertible_v<Cancelable::Owned &, Cancelable::OwnedOrNull &>, "Owned must not slice");
 
+// Narrowing an OwnedOrNull back to an Owned aborts on null, so it has to be explicit.
+static_assert(std::is_constructible_v<Cancelable::Owned, Cancelable::OwnedOrNull>, "OwnedOrNull narrows to Owned");
+static_assert(!std::is_convertible_v<Cancelable::OwnedOrNull, Cancelable::Owned>, "narrowing is explicit");
+static_assert(std::is_constructible_v<Callback<>::Owned, Callback<>::OwnedOrNull>, "OwnedOrNull narrows to Owned");
+static_assert(!std::is_convertible_v<Callback<>::OwnedOrNull, Callback<>::Owned>, "narrowing is explicit");
+static_assert(!std::is_constructible_v<Callback<>::Owned, Cancelable::OwnedOrNull>, "narrowing keeps the signature");
+
 /**
  * A registrar in the shape CHIPCallback.h recommends for new APIs: it accepts callbacks by value
  * as Owned / OwnedOrNull tokens rather than as plain pointers.
  */
-class Acceptor : private CallbackDeque
+class Acceptor
 {
 public:
-    void Accept(Callback<>::Owned cb) { Enqueue(cb.Take()); }
+    void Accept(Callback<>::Owned cb) { mCallbacks.Enqueue(std::move(cb)); }
 
     // Returns whether a callback was actually provided.
     bool AcceptOptional(Callback<>::OwnedOrNull cb)
     {
         VerifyOrReturnValue(cb.HasValue(), false);
-        Enqueue(cb.Take());
+        mCallbacks.Enqueue(Callback<>::Owned(std::move(cb)));
         return true;
     }
 
@@ -338,7 +512,7 @@ public:
     bool AcceptAgnostic(Cancelable::OwnedOrNull cb)
     {
         VerifyOrReturnValue(cb.HasValue(), false);
-        Enqueue(cb.Take());
+        mCallbacks.Enqueue(Cancelable::Owned(std::move(cb)));
         return true;
     }
 
@@ -369,19 +543,21 @@ public:
         return true;
     }
 
+    // All entry points store type-erased; this is where the CallFn signature is recovered.
     void InvokeAll()
     {
         CallbackDeque ready;
-        DequeueAll(ready);
-        while (!ready.IsEmpty())
+        mCallbacks.DequeueAll(ready);
+        while (Cancelable * ca = ready.Take())
         {
-            Callback<> * cb = Callback<>::FromCancelable(ready.First());
-            cb->Cancel();
-            cb->Invoke();
+            Callback<>::FromCancelable(ca)->Invoke();
         }
     }
 
-    using CallbackDeque::IsEmpty;
+    bool IsEmpty() { return mCallbacks.IsEmpty(); }
+
+private:
+    CallbackDeque mCallbacks;
 };
 
 TEST_F(TestCHIPCallback, OwnedTakesOwnershipAtTheCallBoundary)
@@ -521,6 +697,24 @@ TEST_F(TestCHIPCallback, OwnedOrNullInvokesTheCallbackDirectly)
     EXPECT_EQ(n, 1);
     EXPECT_FALSE(cb.IsRegistered());
     EXPECT_TRUE(acceptor.IsEmpty());
+}
+
+// A callee that has checked HasValue() can narrow an OwnedOrNull to an Owned, consuming the source.
+TEST_F(TestCHIPCallback, OwnedOrNullNarrowsToOwned)
+{
+    int n = 0;
+    Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
+
+    Callback<>::OwnedOrNull optional(cb);
+    Callback<>::Owned owned(std::move(optional));
+    EXPECT_FALSE(optional.HasValue()); // NOLINT(bugprone-use-after-move)
+    EXPECT_EQ(Callback<>::FromCancelable(owned.Take()), &cb);
+
+    Cancelable::OwnedOrNull agnosticOptional(Callback<>::Owned{ cb });
+    Cancelable::Owned agnostic(std::move(agnosticOptional));
+    EXPECT_FALSE(agnosticOptional.HasValue()); // NOLINT(bugprone-use-after-move)
+    EXPECT_EQ(Callback<>::FromCancelable(agnostic.Take()), &cb);
+    EXPECT_EQ(n, 0);
 }
 
 // Invoke() forwards its arguments to the callback, so a callee completing synchronously reports an

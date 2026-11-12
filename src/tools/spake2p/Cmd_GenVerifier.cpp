@@ -172,12 +172,17 @@ static uint32_t GetNextPinCode()
     std::getline(gPinCodeFile, pinCodeStr);
     if (!gPinCodeFile.fail())
     {
+        // Tolerate CRLF line endings, e.g. from a spreadsheet export.
+        if (!pinCodeStr.empty() && pinCodeStr.back() == '\r')
+        {
+            pinCodeStr.pop_back();
+        }
+
         if (pinCodeStr.length() > 8)
         {
             pinCodeStr = pinCodeStr.substr(0, 8);
         }
-        pinCode = static_cast<uint32_t>(atoi(pinCodeStr.c_str()));
-        if (!chip::SetupPayload::IsValidSetupPIN(pinCode))
+        if (!ParseInt(pinCodeStr.c_str(), pinCode) || !chip::SetupPayload::IsValidSetupPIN(pinCode))
         {
             std::cerr << "The line " << pinCodeStr << " in PIN codes file is invalid, using a random PIN code.\n";
             pinCode = chip::kSetupPINCodeUndefinedValue;

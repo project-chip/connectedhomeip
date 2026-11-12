@@ -27,9 +27,11 @@
 namespace chip {
 namespace app {
 
+const ServerClusterRegistration ServerClusterRegistration::kEndOfList{};
+
 ServerClusterInterfaceRegistry::~ServerClusterInterfaceRegistry()
 {
-    while (mRegistrations != nullptr)
+    while (mRegistrations != EndOfList())
     {
         ServerClusterRegistration * next = mRegistrations->next;
         if (mContext.has_value())
@@ -43,9 +45,7 @@ ServerClusterInterfaceRegistry::~ServerClusterInterfaceRegistry()
 
 CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & entry)
 {
-    // we have no strong way to check if entry is already registered somewhere else, so we use "next" as some
-    // form of double-check
-    VerifyOrReturnError(entry.next == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!entry.IsRegistered(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(entry.serverClusterInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     Span<const ConcreteClusterPath> paths = entry.serverClusterInterface->GetPaths();
@@ -78,7 +78,7 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Unregister(ServerClusterInterface * w
     ServerClusterRegistration * prev    = nullptr;
     ServerClusterRegistration * current = mRegistrations;
 
-    while (current != nullptr)
+    while (current != EndOfList())
     {
         if (current->serverClusterInterface == what)
         {
@@ -94,7 +94,7 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Unregister(ServerClusterInterface * w
                 prev->next = next;
             }
 
-            if (mCachedInterface == current->serverClusterInterface)
+            if (mCachedInterface == what)
             {
                 mCachedInterface = nullptr;
             }
@@ -126,7 +126,7 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClust
     // The cluster searched for is not cached, do a linear search for it
     ServerClusterRegistration * current = mRegistrations;
 
-    while (current != nullptr)
+    while (current != EndOfList())
     {
         if (current->serverClusterInterface->PathsContains(clusterPath))
         {
@@ -153,7 +153,7 @@ CHIP_ERROR ServerClusterInterfaceRegistry::SetContext(ServerClusterContext && co
     mContext.emplace(std::move(context));
     bool had_failure = false;
 
-    for (ServerClusterRegistration * registration = mRegistrations; registration != nullptr; registration = registration->next)
+    for (ServerClusterRegistration * registration = mRegistrations; registration != EndOfList(); registration = registration->next)
     {
         CHIP_ERROR err = registration->serverClusterInterface->Startup(*mContext);
         if (err != CHIP_NO_ERROR)
@@ -186,7 +186,7 @@ void ServerClusterInterfaceRegistry::ClearContext()
     {
         return;
     }
-    for (ServerClusterRegistration * registration = mRegistrations; registration != nullptr; registration = registration->next)
+    for (ServerClusterRegistration * registration = mRegistrations; registration != EndOfList(); registration = registration->next)
     {
         registration->serverClusterInterface->Shutdown(ClusterShutdownType::kClusterShutdown);
     }

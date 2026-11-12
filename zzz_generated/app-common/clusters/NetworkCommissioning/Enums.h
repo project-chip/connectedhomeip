@@ -89,12 +89,12 @@ enum class ThreadCapabilitiesBitmap : uint16_t
 // Bitmap for WiFiSecurityBitmap
 enum class WiFiSecurityBitmap : uint8_t
 {
-    kUnencrypted   = 0x1,
-    kWep           = 0x2,
-    kWpaPersonal   = 0x4,
-    kWpa2Personal  = 0x8,
-    kWpa3Personal  = 0x10,
-    kWpa3MatterPdc = 0x20,
+    kUnencrypted  = 0x1,
+    kWep          = 0x2,
+    kWpaPersonal  = 0x4,
+    kWpa2Personal = 0x8,
+    kWpa3Personal = 0x10,
+    kIeee8021x    = 0x20,
 };
 } // namespace NetworkCommissioning
 } // namespace Clusters

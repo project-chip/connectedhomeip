@@ -29,6 +29,16 @@ config CHIP_APP_COMMON
     help
         Enable the common NXP Application implementation.
 
+config CHIP_APP_FAILSAFE_EARLY_EXPIRY
+    bool "Expire the commissioning fail-safe early when the CHIPoBLE link is lost"
+    default y if CHIP_NXP_PLATFORM_MCXW72
+    depends on CHIP_APP_COMMON && NET_L2_OPENTHREAD
+    help
+        MCXW72 only (shared 2.4 GHz radio). When the CHIPoBLE connection carrying the PASE session closes while the fail-safe is armed:
+        (i) ConnectNetwork not received -> expire the fail-safe immediately;
+        (ii) ConnectNetwork received, Thread not attached -> restart the Thread attacher 
+            and expire after 3 failed attach attempts. A successful attach cancels.
+
 config CHIP_APP_CLUSTERS
     bool "App Clusters"
     help
