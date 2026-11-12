@@ -59,7 +59,7 @@ class MdnsDiscovery:
             - `get_all_services()`: Get service info from all available discovered services.
             - `get_ptr_records()`: Discover PTR records for given service types.
             - `get_srv_record()`: Query SRV records for a given service instance.
-            - `has_srv_record()`: Check whether a known service instance answers a direct SRV query.
+            - `query_srv_and_txt_records()`: Query SRV and TXT records of a known service instance without browsing.
             - `get_txt_record()`: Query TXT records for a given service instance.
             - `get_quada_records()`: Query A/AAAA records for a given host.
             - `get_all_service_types()`: Discover all available service types.
@@ -237,17 +237,17 @@ class MdnsDiscovery:
 
         return record
 
-    async def has_srv_record(self, service_name: str,
-                             service_type: str,
-                             query_timeout_sec: float = QUERY_TIMEOUT_SEC
-                             ) -> bool:
+    async def query_srv_and_txt_records(self, service_name: str,
+                                        service_type: str,
+                                        query_timeout_sec: float = QUERY_TIMEOUT_SEC
+                                        ) -> MdnsServiceInfo | None:
         """
-        Asynchronously checks whether a known service instance answers an SRV query.
+        Asynchronously queries the SRV and TXT records of a known service instance.
 
         Unlike `get_srv_record`, this method does not browse the service type first.
-        It sends one direct SRV query for `service_name` and returns as soon as the
-        instance answers. Use it when the full instance name is already known and only
-        its presence matters.
+        It sends one direct SRV + TXT query for `service_name` and returns as soon as the
+        instance answers with its SRV record. Use it when the full instance name is
+        already known.
 
         Args:
             service_name (str): The full mDNS service instance name.
@@ -258,12 +258,16 @@ class MdnsDiscovery:
                 Defaults to QUERY_TIMEOUT_SEC (10 sec).
 
         Returns:
-            bool: True if the instance answered with an SRV record within the timeout, False otherwise.
+            Optional[MdnsServiceInfo]:
+                - MdnsServiceInfo with SRV data, and TXT data if the instance publishes it.
+                - None if the instance does not answer with an SRV record within the timeout.
         """
         async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             service_info = MdnsAsyncServiceInfo(name=service_name, type_=service_type)
-            service_info._query_record_types = {_TYPE_SRV}
-            return await service_info.async_request(zc=azc.zeroconf, timeout_ms=query_timeout_sec * 1000)
+            service_info._query_record_types = {_TYPE_SRV, _TYPE_TXT}
+            if not await service_info.async_request(zc=azc.zeroconf, timeout_ms=query_timeout_sec * 1000):
+                return None
+            return MdnsServiceInfo(service_info)
 
     async def get_txt_record(self, service_name: str,
                              service_type: str,

@@ -31,6 +31,7 @@ and devices commissioned on other fabrics.
 import asyncio
 import contextlib
 import sys
+from dataclasses import dataclass, field
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from python_path import PythonPath
@@ -45,6 +46,12 @@ TEST_COMPRESSED_FABRIC_ID = 0x1234567890ABCDEF
 TEST_ENDPOINT = 0
 TEST_DISCRIMINATOR = 3840
 TEST_PASSCODE = 20202021
+
+
+@dataclass
+class MockOperationalRecord:
+    """Mock MdnsServiceInfo returned by an operational SRV + TXT query."""
+    txt: dict[str, str] | None = field(default_factory=dict)
 
 
 class MockDeviceController:
@@ -148,7 +155,7 @@ async def test_dnssd_device_found_on_this_fabric():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.has_srv_record = AsyncMock(return_value=True)
+        mock_mdns.query_srv_and_txt_records = AsyncMock(return_value=MockOperationalRecord())
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
@@ -174,12 +181,12 @@ async def test_dnssd_queries_this_fabric_and_node_instance():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.has_srv_record = AsyncMock(return_value=True)
+        mock_mdns.query_srv_and_txt_records = AsyncMock(return_value=MockOperationalRecord())
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
-        kwargs = mock_mdns.has_srv_record.call_args.kwargs
+        kwargs = mock_mdns.query_srv_and_txt_records.call_args.kwargs
         if kwargs.get("service_name") != expected_service_name:
             return f"Expected query for {expected_service_name}, got {kwargs.get('service_name')}"
         if kwargs.get("service_type") != "_matter._tcp.local.":
@@ -203,7 +210,7 @@ async def test_dnssd_no_answer():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.has_srv_record = AsyncMock(return_value=False)
+        mock_mdns.query_srv_and_txt_records = AsyncMock(return_value=None)
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
@@ -228,7 +235,7 @@ async def test_dnssd_handled_error_returns_false():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.has_srv_record = AsyncMock(side_effect=OSError("Network is unreachable"))
+        mock_mdns.query_srv_and_txt_records = AsyncMock(side_effect=OSError("Network is unreachable"))
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
@@ -253,7 +260,7 @@ async def test_dnssd_exception_handling():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.has_srv_record = AsyncMock(side_effect=Exception("DNS-SD network error"))
+        mock_mdns.query_srv_and_txt_records = AsyncMock(side_effect=Exception("DNS-SD network error"))
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         try:
@@ -514,7 +521,7 @@ async def test_is_commissioned_on_current_fabric_scenario2_operational_shortcirc
     """
     Test: Device commissioned on THIS fabric.
 
-    Behavior: DNS-SD finds device operational -> return True immediately.
+    Behavior: DNS-SD finds device operational without IC=1 -> return True immediately.
     No PASE/CASE needed since DNS-SD confirms commissioning.
 
     Value: This is the FAST PATH optimization. Avoids connection overhead
@@ -524,8 +531,8 @@ async def test_is_commissioned_on_current_fabric_scenario2_operational_shortcirc
 
     mock_controller = MockDeviceController()
 
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
-        mock_dnssd.return_value = True
+    with patch.object(commissioning, '_get_operational_record_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
+        mock_dnssd.return_value = MockOperationalRecord(txt={"SII": "5000"})
 
         result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
 
@@ -536,12 +543,79 @@ async def test_is_commissioned_on_current_fabric_scenario2_operational_shortcirc
     return None
 
 
+async def test_is_commissioned_no_txt_record():
+    """
+    Test: Device answers with an SRV record but publishes no TXT record.
+
+    Behavior: The operational TXT record MAY be omitted when no keys are defined,
+    so a missing TXT record does not indicate incomplete commissioning.
+    Expected: is_commissioned returns True.
+    """
+    from matter.testing import commissioning
+
+    mock_controller = MockDeviceController()
+
+    with patch.object(commissioning, '_get_operational_record_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
+        mock_dnssd.return_value = MockOperationalRecord(txt=None)
+
+        result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
+
+        if not result:
+            return "Expected True when operational record has no TXT record"
+    return None
+
+
+async def test_is_commissioned_nfc_incomplete_commissioning():
+    """
+    Test: Device commissioned over NFC is still waiting for CommissioningComplete.
+
+    Behavior: A Commissionee using NFC-based commissioning publishes its operational
+    instance with TXT key IC=1 from the operational discovery step until it receives
+    CommissioningComplete. Its fabric is provisional and is removed if the fail-safe
+    expires.
+    Expected: is_commissioned returns False.
+    """
+    from matter.testing import commissioning
+
+    mock_controller = MockDeviceController()
+
+    with patch.object(commissioning, '_get_operational_record_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
+        mock_dnssd.return_value = MockOperationalRecord(txt={"IC": "1"})
+
+        result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
+
+        if result:
+            return "Expected False when operational record has IC=1"
+    return None
+
+
+async def test_is_commissioned_nfc_commissioning_complete():
+    """
+    Test: Device publishes IC=0 after NFC-based commissioning.
+
+    Behavior: IC=0 indicates the node is not waiting for CommissioningComplete.
+    Expected: is_commissioned returns True.
+    """
+    from matter.testing import commissioning
+
+    mock_controller = MockDeviceController()
+
+    with patch.object(commissioning, '_get_operational_record_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
+        mock_dnssd.return_value = MockOperationalRecord(txt={"IC": "0"})
+
+        result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
+
+        if not result:
+            return "Expected True when operational record has IC=0"
+    return None
+
+
 async def test_is_commissioned_not_operational():
     """
     Test: Device does not answer the operational DNS-SD query for this fabric.
 
     Behavior:
-    - DNS-SD operational returns False (factory fresh, off, or only on other fabrics)
+    - DNS-SD operational query returns no record (factory fresh, off, or only on other fabrics)
     - is_commissioned returns False without any further discovery
 
     Value: No side-effects when the device is not on this fabric. No PASE or CASE attempted.
@@ -550,8 +624,8 @@ async def test_is_commissioned_not_operational():
 
     mock_controller = MockDeviceController()
 
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_op:
-        mock_op.return_value = False
+    with patch.object(commissioning, '_get_operational_record_via_dnssd', new_callable=AsyncMock) as mock_op:
+        mock_op.return_value = None
 
         result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
 
@@ -572,7 +646,7 @@ async def test_is_commissioned_exception_propagation():
 
     mock_controller = MockDeviceController()
 
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
+    with patch.object(commissioning, '_get_operational_record_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
         mock_dnssd.side_effect = RuntimeError("DNS-SD infrastructure failure")
 
         try:
@@ -702,9 +776,15 @@ def main():
         # Category C: is_commissioned() Tests
         ("C1. is_commissioned: operational shortcircuit",
          test_is_commissioned_on_current_fabric_scenario2_operational_shortcircuit),
-        ("C2. is_commissioned: not operational",
+        ("C2. is_commissioned: no TXT record",
+         test_is_commissioned_no_txt_record),
+        ("C3. is_commissioned: NFC incomplete commissioning (IC=1)",
+         test_is_commissioned_nfc_incomplete_commissioning),
+        ("C4. is_commissioned: NFC commissioning complete (IC=0)",
+         test_is_commissioned_nfc_commissioning_complete),
+        ("C5. is_commissioned: not operational",
          test_is_commissioned_not_operational),
-        ("C3. is_commissioned: exception propagation",
+        ("C6. is_commissioned: exception propagation",
          test_is_commissioned_exception_propagation),
 
         # Category D: get_commissioned_fabric_count() Tests
