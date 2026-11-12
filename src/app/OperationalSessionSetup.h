@@ -350,7 +350,7 @@ private:
 
     uint8_t mResolveAttemptsAllowed = 0;
 
-    Callback::CallbackDeque mConnectionRetry;
+    Callback::TypedCallbackDeque<OnDeviceConnectionRetry> mConnectionRetry;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
 #if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
