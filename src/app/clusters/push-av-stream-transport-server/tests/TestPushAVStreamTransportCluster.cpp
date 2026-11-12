@@ -24,6 +24,7 @@
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/clusters/push-av-stream-transport-server/MigratePushAvStreamTransportServerStorage.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
@@ -564,6 +565,101 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestFabricRemovedDeallocatesConnect
 
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
     ASSERT_EQ(fabricHelper.TearDownTestFabric(fabric2), CHIP_NO_ERROR);
+}
+
+// Persisting CurrentConnections to storage, with writes failing on demand.
+class FailWritesAttributePersistenceProvider : public AttributePersistenceProvider
+{
+public:
+    FailWritesAttributePersistenceProvider(AttributePersistenceProvider & backing) : mBacking(backing) {}
+
+    void FailWrites(bool enabled) { mFailWrites = enabled; }
+
+    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override
+    {
+        VerifyOrReturnError(!mFailWrites, CHIP_ERROR_WRITE_FAILED);
+        return mBacking.WriteValue(aPath, aValue);
+    }
+
+    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) override
+    {
+        return mBacking.ReadValue(aPath, aValue);
+    }
+
+private:
+    AttributePersistenceProvider & mBacking;
+    bool mFailWrites = false;
+};
+
+// A storage failure while persisting a fabric removal keeps the connection evicted instead of
+// restoring an entry whose fabric is gone.
+TEST_F(TestPushAVStreamTransportServerLogic, TestFabricRemovedKeepsConnectionEvictedOnStoreFailure)
+{
+    chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
+
+    FabricIndex fabric1 = 1;
+    ASSERT_EQ(fabricHelper.SetUpTestFabric(fabric1), CHIP_NO_ERROR);
+
+    FailWritesAttributePersistenceProvider failingProvider(context.AttributePersistenceProvider());
+    app::ServerClusterContext failingContext{ context.Get().provider, context.Get().storage, failingProvider,
+                                              context.Get().interactionContext };
+
+    PushAvStreamTransportServer server(1, BitFlags<Feature>(1), fabricHelper.GetFabricTable());
+    ASSERT_EQ(server.Startup(failingContext), CHIP_NO_ERROR);
+
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    std::string url       = "https://192.168.1.100:554/stream/";
+    std::string trackName = "video";
+
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kContinuous;
+
+    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptions.videoStreamID.SetValue(1);
+    transportOptions.audioStreamID.SetValue(2);
+    transportOptions.TLSEndpointID    = 1;
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
+    server.GetLogic().SetDelegate(&mockDelegate);
+    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
+
+    Testing::MockCommandHandler commandHandler;
+    ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    Commands::AllocatePushTransport::DecodableType commandData;
+    commandData.transportOptions = transportOptions;
+
+    commandHandler.SetFabricIndex(fabric1);
+    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    ASSERT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
+
+    failingProvider.FailWrites(true);
+
+    EXPECT_EQ(fabricHelper.GetFabricTable().Delete(fabric1), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mockDelegate.deallocatedConnectionIds.size(), (size_t) 1);
+    // The storage write fails, but the entry must stay evicted rather than being restored.
+    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 0);
+
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(fabricHelper.TearDownTestFabric(fabric1), CHIP_NO_ERROR);
 }
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)

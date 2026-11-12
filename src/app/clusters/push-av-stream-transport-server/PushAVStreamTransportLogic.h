@@ -191,7 +191,7 @@ private:
     UpsertResultEnum
     UpsertStreamTransportConnection(const PushAvStreamTransport::TransportConfigurationStorage & transportConfiguration);
 
-    CHIP_ERROR RemoveStreamTransportConnection(const uint16_t connectionID);
+    CHIP_ERROR RemoveStreamTransportConnection(const uint16_t connectionID, bool revertOnStoreFailure = true);
 
     static void PushAVStreamTransportDeallocateCallback(chip::System::Layer *, void * callbackContext);
 

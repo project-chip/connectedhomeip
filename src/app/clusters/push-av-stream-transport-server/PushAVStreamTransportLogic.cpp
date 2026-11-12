@@ -165,7 +165,8 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
     return result;
 }
 
-CHIP_ERROR PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uint16_t transportConnectionId)
+CHIP_ERROR PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uint16_t transportConnectionId,
+                                                                             bool revertOnStoreFailure)
 {
     auto it = std::find_if(
         mCurrentConnections.begin(), mCurrentConnections.end(),
@@ -179,8 +180,11 @@ CHIP_ERROR PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(con
         CHIP_ERROR err = StoreCurrentConnections();
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Failed to store after removal, reverting: %" CHIP_ERROR_FORMAT, err.Format());
-            mCurrentConnections.push_back(removedValue); // Revert
+            if (revertOnStoreFailure)
+            {
+                ChipLogError(Zcl, "Failed to store after removal, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+                mCurrentConnections.push_back(removedValue); // Revert
+            }
             return err;
         }
 
@@ -205,12 +209,15 @@ void PushAvStreamTransportServerLogic::OnFabricRemoved(FabricIndex fabricIndex)
 
     for (uint16_t connectionID : connectionIDs)
     {
-        if (mDelegate != nullptr && mDelegate->DeallocatePushTransport(connectionID) != Status::Success)
+        if (mDelegate == nullptr || mDelegate->DeallocatePushTransport(connectionID) != Status::Success)
         {
             ChipLogError(Zcl, "OnFabricRemoved[ep=%d]: Delegate deallocate failed for ConnectionID %u", mEndpointId, connectionID);
+            // Keep the connection entry and its expiry timer so the teardown can be retried.
+            continue;
         }
-        // The fabric is gone, so the connection entry is removed regardless of the delegate result.
-        LogErrorOnFailure(RemoveStreamTransportConnection(connectionID));
+        // The fabric is gone and the delegate released the transport, so the entry stays evicted
+        // even if persisting the list fails; a later successful write corrects storage.
+        LogErrorOnFailure(RemoveStreamTransportConnection(connectionID, /*revertOnStoreFailure=*/false));
         RemoveTimerAppState(connectionID);
     }
 }
