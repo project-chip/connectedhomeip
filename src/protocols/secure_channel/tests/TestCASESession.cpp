@@ -3101,7 +3101,7 @@ TEST_F_FROM_FIXTURE(TestCASESession, TCPConnectionClosedDuringSendSigma3DeletesS
         EXPECT_EQ(delegateCommissioner.mNumPairingStarted, 1u);
         EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 1u);
         EXPECT_EQ(delegateCommissioner.mLastError, expectedError);
-        EXPECT_EQ(delegateCommissioner.mLastStage, SessionEstablishmentStage::kSentSigma1);
+        EXPECT_EQ(delegateCommissioner.mLastStage, SessionEstablishmentStage::kReceivedSigma2);
         EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
 #if CHIP_CONFIG_SLOW_CRYPTO
         // With CHIP_CONFIG_SLOW_CRYPTO, OnMessageReceived flushes a standalone MRP Ack for each

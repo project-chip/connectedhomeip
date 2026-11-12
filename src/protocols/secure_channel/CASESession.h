@@ -484,6 +484,21 @@ private:
     // destinationId/initiatorRandom from processing of Sigma1, and sets mIpk to the right IPK.
     CHIP_ERROR FindLocalNodeFromDestinationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
 
+    struct ScopedDeferSessionRelease
+    {
+        explicit ScopedDeferSessionRelease(CASESession & session) : mSession(session) { mSession.mDeferSessionRelease = true; }
+        ~ScopedDeferSessionRelease() { mSession.mDeferSessionRelease = false; }
+
+        ScopedDeferSessionRelease(const ScopedDeferSessionRelease &)             = delete;
+        ScopedDeferSessionRelease & operator=(const ScopedDeferSessionRelease &) = delete;
+
+    private:
+        CASESession & mSession;
+    };
+
+    CHIP_ERROR SendSigmaMessage(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle && msg);
+    CHIP_ERROR SendStatusReport(const Messaging::ExchangeHolder & exchangeCtxt, uint16_t protocolCode);
+
     CHIP_ERROR SendSigma1();
     CHIP_ERROR HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg);
     NextStep HandleSigma1(System::PacketBufferHandle && msg);
