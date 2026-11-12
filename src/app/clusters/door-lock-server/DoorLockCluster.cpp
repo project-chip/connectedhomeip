@@ -222,6 +222,17 @@ CHIP_ERROR DoorLockCluster::AcceptedCommands(const ConcreteClusterPath & path,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DoorLockCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    // GetUser is the only command with a response, and it is USR-gated.
+    static constexpr CommandId kUserGeneratedCommands[] = { Commands::GetUserResponse::Id };
+    if (!SupportsUSR())
+    {
+        return CHIP_NO_ERROR;
+    }
+    return builder.ReferenceExisting(kUserGeneratedCommands);
+}
+
 DataModel::ActionReturnStatus DoorLockCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                              AttributeValueEncoder & encoder)
 {
@@ -689,9 +700,6 @@ bool DoorLockCluster::IsLockoutEngaged() const
 {
     // A zero lockout end timestamp means no lockout was ever engaged. The
     // comparison is strict so that a (mock) clock that has not advanced past
-    // its zero point yet does not report an engaged lockout.
-    // A zero lockout end timestamp means no lockout was ever engaged. The
-    // comparison is strict so that a (mock) clock that has not advanced past
     // its zero point yet does not report an engaged lockout. Legacy compares
     // with >=; the only behavioral difference is at the exact expiry second,
     // where a mock clock would otherwise report a spurious lockout at boot.
@@ -932,7 +940,7 @@ bool DoorLockCluster::UserExists(uint16_t userIndex) const
     return UserStatusEnum::kAvailable != user.userStatus;
 }
 
-bool DoorLockCluster::FindOccupiedUserSlot(uint16_t startIndex, uint16_t & userIndex) const
+CHIP_ERROR DoorLockCluster::FindOccupiedUserSlot(uint16_t startIndex, uint16_t & userIndex) const
 {
     userIndex = 0;
     for (uint16_t i = startIndex; i <= mNumberOfTotalUsersSupported; ++i)
@@ -941,16 +949,16 @@ bool DoorLockCluster::FindOccupiedUserSlot(uint16_t startIndex, uint16_t & userI
         if (!mDelegate.GetUser(i, user))
         {
             ChipLogError(Zcl, "Unable to get user to check if slot is occupied: app error [userIndex=%d]", i);
-            return false;
+            return CHIP_ERROR_INTERNAL;
         }
 
         if (UserStatusEnum::kAvailable != user.userStatus)
         {
             userIndex = i;
-            return true;
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
+    return CHIP_NO_ERROR;
 }
 
 bool DoorLockCluster::FindUnoccupiedUserSlot(uint16_t & userIndex) const
@@ -1176,21 +1184,25 @@ Status DoorLockCluster::ClearUser(FabricIndex modifierFabricId, NodeId sourceNod
 Status DoorLockCluster::ClearUser(FabricIndex modifierFabricId, NodeId sourceNodeId, uint16_t userIndex, const UserInfo & user,
                                   bool sendUserChangeEvent)
 {
-    // appclusters, 5.2.4.37: all the credentials associated with user should be cleared when clearing the user
-    for (const auto & credential : user.credentials)
+    // appclusters, 5.2.4.37: all the credentials associated with user should be cleared when clearing the user.
+    // Delegate::GetUser only populates occupied slots, so an available slot has no credentials to read.
+    if (UserStatusEnum::kAvailable != user.userStatus)
     {
-        ChipLogProgress(
-            Zcl, "[ClearUser] Clearing associated credential [endpointId=%d,userIndex=%d,credentialType=%u,credentialIndex=%d]",
-            mPath.mEndpointId, userIndex, to_underlying(credential.credentialType), credential.credentialIndex);
-
-        if (!mDelegate.SetCredential(credential.credentialIndex, kUndefinedFabricIndex, kUndefinedFabricIndex,
-                                     DlCredentialStatus::kAvailable, credential.credentialType, ByteSpan()))
+        for (const auto & credential : user.credentials)
         {
-            ChipLogError(Zcl,
-                         "[ClearUser] Unable to remove credentials associated with user - internal error "
-                         "[endpointId=%d,userIndex=%d,credentialIndex=%d,credentialType=%u]",
-                         mPath.mEndpointId, userIndex, credential.credentialIndex, to_underlying(credential.credentialType));
-            return Status::Failure;
+            ChipLogProgress(
+                Zcl, "[ClearUser] Clearing associated credential [endpointId=%d,userIndex=%d,credentialType=%u,credentialIndex=%d]",
+                mPath.mEndpointId, userIndex, to_underlying(credential.credentialType), credential.credentialIndex);
+
+            if (!mDelegate.SetCredential(credential.credentialIndex, kUndefinedFabricIndex, kUndefinedFabricIndex,
+                                         DlCredentialStatus::kAvailable, credential.credentialType, ByteSpan()))
+            {
+                ChipLogError(Zcl,
+                             "[ClearUser] Unable to remove credentials associated with user - internal error "
+                             "[endpointId=%d,userIndex=%d,credentialIndex=%d,credentialType=%u]",
+                             mPath.mEndpointId, userIndex, credential.credentialIndex, to_underlying(credential.credentialType));
+                return Status::Failure;
+            }
         }
     }
 
@@ -1445,6 +1457,16 @@ void DoorLockCluster::HandleSetUser(const DataModel::InvokeRequest & request, co
         return;
     }
 
+    if (credentialRule == CredentialRuleEnum::kUnknownEnumValue)
+    {
+        ChipLogProgress(Zcl,
+                        "[SetUser] Unable to set the user: credential rule is unknown [endpointId=%d,userIndex=%d,credentialRule=%u]",
+                        mPath.mEndpointId, userIndex, to_underlying(credentialRule.Value()));
+
+        handler->AddStatus(path, Status::InvalidCommand);
+        return;
+    }
+
     ClusterStatusCode status(Status::Success);
     switch (operationType)
     {
@@ -1502,7 +1524,12 @@ void DoorLockCluster::HandleGetUser(const DataModel::InvokeRequest & request, ui
     // UserInfo might point into some application-static
     // buffers (for its credentials and whatnot).
     uint16_t nextAvailableUserIndex = 0;
-    if (FindOccupiedUserSlot(static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex))
+    if (FindOccupiedUserSlot(static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex) != CHIP_NO_ERROR)
+    {
+        handler->AddStatus(path, Status::Failure);
+        return;
+    }
+    if (nextAvailableUserIndex != 0)
     {
         response.nextUserIndex.SetNonNull(nextAvailableUserIndex);
     }

@@ -294,6 +294,9 @@ TEST_F(TestDoorLockClusterBasic, FeatureGatedCommandsAreAbsent)
     {
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::UnsupportedCommand);
     }
+
+    // No command implemented by this stage produces a response without USR.
+    EXPECT_TRUE(Testing::IsGeneratedCommandsListEqualTo(mCluster, {}));
 }
 
 TEST_F(TestDoorLockClusterBasic, LockDoorWithoutHardwareSupportFails)
@@ -714,9 +717,11 @@ public:
         user.userUniqueId   = uniqueId;
         user.userStatus     = userStatus;
         user.userType       = userType;
-        user.credentialRule = credentialRule;
-        user.createdBy      = creator;
-        user.lastModifiedBy = modifier;
+        user.credentialRule     = credentialRule;
+        user.creationSource     = DlAssetSource::kMatterIM;
+        user.createdBy          = creator;
+        user.modificationSource = DlAssetSource::kMatterIM;
+        user.lastModifiedBy     = modifier;
         for (size_t i = 0; i < totalCredentials; i++)
         {
             mUserCredentialsBacking[userIndex - 1][i] = credentials[i];
@@ -879,7 +884,7 @@ private:
         HolidaySchedule schedule{};
     };
 
-    UserInfo mUsers[kStorageUsers];
+    UserInfo mUsers[kStorageUsers]{};
     char mUserNames[kStorageUsers][kDoorLockUsernameBufferSize];
     CredentialStruct mUserCredentialsBacking[kStorageUsers][kStorageCredentialsPerUser];
     StorageCredentialInfo mCredentials[kStorageCredentials + 1];
@@ -933,6 +938,27 @@ public:
     ClusterTester tester{ mCluster };
 };
 
+namespace {
+
+void ExpectLockUserChangeEvent(ClusterTester & tester, DataOperationTypeEnum operation, uint16_t userIndex)
+{
+    auto event = tester.GetNextGeneratedEvent();
+    ASSERT_TRUE(event.has_value());
+    if (!event.has_value())
+    {
+        return;
+    }
+
+    Events::LockUserChange::DecodableType data;
+    ASSERT_EQ(event->GetEventData(data), CHIP_NO_ERROR);
+    EXPECT_EQ(data.lockDataType, LockDataTypeEnum::kUserIndex);
+    EXPECT_EQ(data.dataOperationType, operation);
+    ASSERT_FALSE(data.userIndex.IsNull());
+    EXPECT_EQ(data.userIndex.Value(), userIndex);
+}
+
+} // namespace
+
 // =============================================================================
 // User / credential / schedule / aliro command tests
 // =============================================================================
@@ -964,6 +990,12 @@ TEST_F(TestDoorLockClusterBasic, UserManagementUnsupportedWithoutFeature)
     }
 }
 
+TEST_F(TestDoorLockClusterStorage, GeneratedCommandListContainsGetUserResponse)
+{
+    // GetUser is the only command accepted by this stage that has a response.
+    EXPECT_TRUE(Testing::IsGeneratedCommandsListEqualTo(mCluster, { Commands::GetUserResponse::Id }));
+}
+
 TEST_F(TestDoorLockClusterStorage, SetUserCreateModifyClearEmitsUserChangeEvents)
 {
     // Create user 1 with a name.
@@ -982,7 +1014,7 @@ TEST_F(TestDoorLockClusterStorage, SetUserCreateModifyClearEmitsUserChangeEvents
         EXPECT_EQ(createResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
     }
     EXPECT_EQ(mDelegate.OccupiedUsers(), 1u);
-    ASSERT_TRUE(tester.GetNextGeneratedEvent().has_value()); // LockUserChange (add)
+    ExpectLockUserChangeEvent(tester, DataOperationTypeEnum::kAdd, 1);
 
     // Creating on the same slot again reports the cluster-specific OCCUPIED (3).
     auto occupiedResult = tester.Invoke(Commands::SetUser::Id, request);
@@ -1007,7 +1039,7 @@ TEST_F(TestDoorLockClusterStorage, SetUserCreateModifyClearEmitsUserChangeEvents
         EXPECT_EQ(modifyUser.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
     }
     EXPECT_EQ(mDelegate.OccupiedUsers(), 1u);
-    ASSERT_TRUE(tester.GetNextGeneratedEvent().has_value()); // LockUserChange (modify)
+    ExpectLockUserChangeEvent(tester, DataOperationTypeEnum::kModify, 1);
 
     // Clear: the user goes away.
     Commands::ClearUser::Type clearRequest;
@@ -1019,7 +1051,7 @@ TEST_F(TestDoorLockClusterStorage, SetUserCreateModifyClearEmitsUserChangeEvents
         EXPECT_EQ(clearResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
     }
     EXPECT_EQ(mDelegate.OccupiedUsers(), 0u);
-    ASSERT_TRUE(tester.GetNextGeneratedEvent().has_value()); // LockUserChange (clear)
+    ExpectLockUserChangeEvent(tester, DataOperationTypeEnum::kClear, 1);
 }
 
 TEST_F(TestDoorLockClusterStorage, SetUserIndexBoundsAndInvalidStatus)
@@ -1060,6 +1092,17 @@ TEST_F(TestDoorLockClusterStorage, SetUserIndexBoundsAndInvalidStatus)
     {
         EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
     }
+
+    // An unknown credential rule cannot be stored.
+    request.operationType  = DataOperationTypeEnum::kAdd;
+    request.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kUnknownEnumValue);
+    result                 = tester.Invoke(Commands::SetUser::Id, request);
+    ASSERT_TRUE(result.status.has_value());
+    if (result.status.has_value())
+    {
+        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
+    EXPECT_EQ(mDelegate.OccupiedUsers(), 0u);
 }
 
 TEST_F(TestDoorLockClusterStorage, GetUserResponseOnOccupiedAndEmptySlots)
@@ -1093,9 +1136,12 @@ TEST_F(TestDoorLockClusterStorage, GetUserResponseOnOccupiedAndEmptySlots)
         EXPECT_EQ(result.response->userIndex, 2u);
         EXPECT_TRUE(result.response->nextUserIndex.IsNull());
         ASSERT_FALSE(result.response->userName.IsNull());
-        EXPECT_EQ(result.response->userName.Value().size(), 3u);
+        EXPECT_TRUE(result.response->userName.Value().data_equal("bob"_span));
         ASSERT_FALSE(result.response->userUniqueID.IsNull());
         EXPECT_EQ(result.response->userUniqueID.Value(), 42u);
+        // SetUser records Matter as the creation and modification source.
+        EXPECT_FALSE(result.response->creatorFabricIndex.IsNull());
+        EXPECT_FALSE(result.response->lastModifiedFabricIndex.IsNull());
     }
 
     // Empty slot: fields stay null, only userIndex is set.

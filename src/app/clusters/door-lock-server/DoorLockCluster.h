@@ -191,6 +191,8 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
     // ---- Application-facing API ------------------------------------------------
 
     /// Applies a lock-state change originating from a local operation and emits the
@@ -347,7 +349,10 @@ private:
     bool UserIndexValid(uint16_t userIndex, uint16_t & maxNumberOfUsers) const;
     bool UserExists(uint16_t userIndex) const;
 
-    bool FindOccupiedUserSlot(uint16_t startIndex, uint16_t & userIndex) const;
+    /// Sets userIndex to the first occupied slot at or after startIndex, or 0
+    /// when no occupied slot exists. Returns CHIP_ERROR_INTERNAL on a delegate
+    /// lookup failure so callers can distinguish it from "no more users".
+    CHIP_ERROR FindOccupiedUserSlot(uint16_t startIndex, uint16_t & userIndex) const;
     bool FindUnoccupiedUserSlot(uint16_t & userIndex) const;
     bool FindUnoccupiedUserSlot(uint16_t startIndex, uint16_t & userIndex) const;
     bool WeekDayIndexValid(uint8_t weekDayIndex) const;
