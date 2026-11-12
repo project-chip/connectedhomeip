@@ -806,8 +806,8 @@
     XCTAssertEqual(dispatch_semaphore_wait(readRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
 
     // Semaphores, not expectations: on a queue without jumpers these items run after the test has returned.
-    os_unfair_lock lock = OS_UNFAIR_LOCK_INIT;
-    os_unfair_lock * lockPtr = &lock;
+    // Held strongly by the blocks below, which can outlive this test if a wait times out.
+    NSObject * lock = [[NSObject alloc] init];
     __block int started = 0;
     dispatch_semaphore_t jumperStarted = dispatch_semaphore_create(0);
     dispatch_semaphore_t j1Release = dispatch_semaphore_create(0);
@@ -815,9 +815,10 @@
         MTRAsyncWorkItem * jumper = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         jumper.jumpsUnsentWork = YES;
         jumper.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
-            os_unfair_lock_lock(lockPtr);
-            BOOL first = (++started == 1);
-            os_unfair_lock_unlock(lockPtr);
+            BOOL first;
+            @synchronized(lock) {
+                first = (++started == 1);
+            }
             dispatch_semaphore_signal(jumperStarted);
             if (first) {
                 dispatch_semaphore_wait(j1Release, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
@@ -831,9 +832,9 @@
     XCTAssertNotEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5 * NSEC_PER_SEC))), 0, @"only one jumper above width");
     dispatch_semaphore_signal(j1Release);
     XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"the second jumper runs once the first completes");
-    os_unfair_lock_lock(lockPtr);
-    XCTAssertEqual(started, 2);
-    os_unfair_lock_unlock(lockPtr);
+    @synchronized(lock) {
+        XCTAssertEqual(started, 2);
+    }
     readCompletion(MTRAsyncWorkComplete);
 }
 
@@ -854,8 +855,8 @@
     XCTAssertEqual(dispatch_semaphore_wait(readRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
 
     // Semaphores, not expectations: a jumper that never starts must not fulfill anything after the test returns.
-    os_unfair_lock lock = OS_UNFAIR_LOCK_INIT;
-    os_unfair_lock * lockPtr = &lock;
+    // Held strongly by the blocks below, which can outlive this test if a wait times out.
+    NSObject * lock = [[NSObject alloc] init];
     __block int started = 0;
     dispatch_semaphore_t jumperStarted = dispatch_semaphore_create(0);
     dispatch_semaphore_t j1Release = dispatch_semaphore_create(0);
@@ -864,9 +865,10 @@
         jumper.jumpsUnsentWork = YES;
         jumper.tracksSend = YES; // and it never calls workItem:readyToSend:, so it stays unsent
         jumper.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
-            os_unfair_lock_lock(lockPtr);
-            BOOL first = (++started == 1);
-            os_unfair_lock_unlock(lockPtr);
+            BOOL first;
+            @synchronized(lock) {
+                first = (++started == 1);
+            }
             dispatch_semaphore_signal(jumperStarted);
             if (first) {
                 dispatch_semaphore_wait(j1Release, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
@@ -879,9 +881,9 @@
     XCTAssertNotEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5 * NSEC_PER_SEC))), 0, @"a second send-tracking jumper does not start while the first runs");
     dispatch_semaphore_signal(j1Release);
     XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"the second jumper runs once the first completes");
-    os_unfair_lock_lock(lockPtr);
-    XCTAssertEqual(started, 2);
-    os_unfair_lock_unlock(lockPtr);
+    @synchronized(lock) {
+        XCTAssertEqual(started, 2);
+    }
     readCompletion(MTRAsyncWorkComplete);
 }
 
@@ -901,8 +903,8 @@
     [workQueue enqueueWorkItem:read description:@"unsent read R"];
     XCTAssertEqual(dispatch_semaphore_wait(readRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
 
-    os_unfair_lock lock = OS_UNFAIR_LOCK_INIT;
-    os_unfair_lock * lockPtr = &lock;
+    // Held strongly by the blocks below, which can outlive this test if a wait times out.
+    NSObject * lock = [[NSObject alloc] init];
     NSMutableArray<NSString *> * events = [NSMutableArray array];
     dispatch_semaphore_t jumperSending = dispatch_semaphore_create(0);
     dispatch_semaphore_t jumperSendRelease = dispatch_semaphore_create(0);
@@ -913,9 +915,9 @@
         [workQueue workItem:weakJumper readyToSend:^{
             dispatch_semaphore_signal(jumperSending);
             dispatch_semaphore_wait(jumperSendRelease, DISPATCH_TIME_FOREVER);
-            os_unfair_lock_lock(lockPtr);
-            [events addObject:@"J sent"];
-            os_unfair_lock_unlock(lockPtr);
+            @synchronized(lock) {
+                [events addObject:@"J sent"];
+            }
         }];
         completion(MTRAsyncWorkComplete);
     };
@@ -925,18 +927,18 @@
     XCTestExpectation * readSent = [self expectationWithDescription:@"read sent"];
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
         [workQueue workItem:weakRead readyToSend:^{
-            os_unfair_lock_lock(lockPtr);
-            [events addObject:@"R sent"];
-            os_unfair_lock_unlock(lockPtr);
+            @synchronized(lock) {
+                [events addObject:@"R sent"];
+            }
             [readSent fulfill];
         }];
     });
     [NSThread sleepForTimeInterval:0.3];
     dispatch_semaphore_signal(jumperSendRelease);
     [self waitForExpectations:@[ readSent ] timeout:2];
-    os_unfair_lock_lock(lockPtr);
-    XCTAssertEqualObjects(events, (@[ @"J sent", @"R sent" ]), @"the read sends after the jumper's send returns");
-    os_unfair_lock_unlock(lockPtr);
+    @synchronized(lock) {
+        XCTAssertEqualObjects(events, (@[ @"J sent", @"R sent" ]), @"the read sends after the jumper's send returns");
+    }
     readCompletion(MTRAsyncWorkComplete);
 }
 
@@ -1086,6 +1088,43 @@
     XCTAssertFalse([workQueue cancelWorkItemIfUnsent:item]);
     dispatch_semaphore_signal(release);
     [self waitForExpectations:@[ completed ] timeout:2];
+}
+
+- (void)testCancelBeforeEnqueueNeverRuns
+{
+    // A cancel can arrive after the caller made the item and before it enqueued it (a user command token is tied to
+    // its item first).  The cancel returns YES and the item never runs: the enqueue calls its cancel handler instead.
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    __block int readyCalls = 0;
+    XCTestExpectation * cancelled = [self expectationWithDescription:@"cancel handler ran"];
+    MTRAsyncWorkItem * item = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    item.jumpsUnsentWork = YES;
+    item.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        @synchronized(workQueue) {
+            readyCalls++;
+        }
+        completion(MTRAsyncWorkComplete);
+    };
+    item.cancelHandler = ^{
+        [cancelled fulfill];
+    };
+    XCTAssertTrue([workQueue cancelWorkItemIfUnsent:item], @"an item not yet enqueued has sent nothing");
+    [workQueue enqueueWorkItem:item description:@"cancelled before enqueue"];
+    [self waitForExpectations:@[ cancelled ] timeout:2];
+    XCTAssertEqual([workQueue itemCount], 0);
+
+    // Anything enqueued after it runs; the cancelled item still has not.
+    XCTestExpectation * nextRan = [self expectationWithDescription:@"next item ran"];
+    MTRAsyncWorkItem * next = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    next.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        completion(MTRAsyncWorkComplete);
+        [nextRan fulfill];
+    };
+    [workQueue enqueueWorkItem:next description:@"next"];
+    [self waitForExpectations:@[ nextRan ] timeout:2];
+    @synchronized(workQueue) {
+        XCTAssertEqual(readyCalls, 0);
+    }
 }
 
 - (void)testInvalidateWithJumperAboveWidthFreesItsSlot

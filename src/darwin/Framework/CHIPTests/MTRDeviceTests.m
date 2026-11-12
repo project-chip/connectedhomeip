@@ -40,6 +40,7 @@
 #import "MTRTestKeys.h"
 #import "MTRTestResponseValues.h"
 #import "MTRTestStorage.h"
+#import "MTRUserInvokeToken_Internal.h"
 
 #import <math.h> // For INFINITY
 #import <os/lock.h>
@@ -112,6 +113,20 @@ static MTRBaseDevice * GetConnectedDevice(void)
 - (BOOL)cancelledBeforeUse
 {
     return NO;
+}
+@end
+
+// A token cancelled by its caller between being tied to its invoke's work item and that item being enqueued.
+@interface MTRUserInvokeTokenCancelledAfterAttach : MTRUserInvokeToken
+@property (nonatomic) BOOL cancelResult;
+@end
+
+@implementation MTRUserInvokeTokenCancelledAfterAttach
+- (MTRUserInvokeTokenUse)attachToWorkItem:(MTRAsyncWorkItem *)workItem queue:(MTRAsyncWorkQueue *)queue
+{
+    MTRUserInvokeTokenUse use = [super attachToWorkItem:workItem queue:queue];
+    self.cancelResult = [self cancel];
+    return use;
 }
 @end
 
@@ -9268,6 +9283,7 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     // A user command already sent is not cancelled: it completes as usual.
     MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
     __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    [MTRBaseDevice unitTestResetSingleInvokeSendCount];
     MTRUserInvokeToken * token = [[MTRUserInvokeToken alloc] initWithTimeout:nil];
     XCTestExpectation * invokeDone = [[XCTestExpectation alloc] initWithDescription:@"Invoke done"];
     [device invokeCommandWithEndpointID:@(1)
@@ -9290,10 +9306,13 @@ static const unsigned kExpectedValueTestCachedValue = 3;
                                  XCTAssertNil(error);
                                  [invokeDone fulfill];
                              }];
-    // The accessory sleeps 1 s before answering, so the command is in flight here.
-    XCTestExpectation * inFlight = [[XCTestExpectation alloc] initWithDescription:@"In flight"];
-    inFlight.inverted = YES;
-    [self waitForExpectations:@[ inFlight ] timeout:0.5];
+    // Wait for the send itself, not a fixed time: the count goes up once the invoke request has gone out.  The
+    // accessory sleeps 1 s before answering, so the command is in flight here.
+    XCTNSPredicateExpectation * sent = [[XCTNSPredicateExpectation alloc] initWithPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable object, NSDictionary * _Nullable bindings) {
+        return [MTRBaseDevice unitTestSingleInvokeSendCount] > 0;
+    }]
+                                                                                     object:nil];
+    [self waitForExpectations:@[ sent ] timeout:(3 * kTimeoutInSeconds)];
     XCTAssertFalse([token cancel]);
     [self waitForExpectations:@[ invokeDone ] timeout:(3 * kTimeoutInSeconds)];
 }
@@ -9501,14 +9520,10 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     [self _waitForDeviceQueue:device];
     releaseSession();
     // Let the read's send happen before the user command is queued.
-    __block BOOL matterQueueTurned = NO;
+    XCTestExpectation * turned = [[XCTestExpectation alloc] initWithDescription:@"Matter queue turned"];
     [sController asyncDispatchToMatterQueue:^{
-        matterQueueTurned = YES;
+        [turned fulfill];
     } errorHandler:nil];
-    XCTNSPredicateExpectation * turned = [[XCTNSPredicateExpectation alloc] initWithPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable object, NSDictionary * _Nullable bindings) {
-        return matterQueueTurned;
-    }]
-                                                                                       object:nil];
     [self waitForExpectations:@[ turned ] timeout:kTimeoutInSeconds];
 
     [self _userInvokeUnitTestingTestOnDevice:device expectedValue:nil token:[[MTRUserInvokeToken alloc] initWithTimeout:nil] completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
@@ -9680,6 +9695,34 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     settle.inverted = YES;
     [self waitForExpectations:@[ settle ] timeout:kTimeoutInSeconds];
     XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0);
+}
+
+- (void)test079_TokenCancelledAfterItIsTiedBeforeEnqueueNeverSends
+{
+    // A token cancelled after it is tied to the invoke's work item, but before that item is enqueued, cancels the
+    // invoke: its cancel returns YES, and the invoke completes once with a cancelled error, is never sent, and
+    // leaves no expected value behind.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    [MTRBaseDevice unitTestResetSingleInvokeSendCount];
+    MTRUserInvokeTokenCancelledAfterAttach * token = [[MTRUserInvokeTokenCancelledAfterAttach alloc] initWithTimeout:nil];
+
+    NSMutableArray<NSString *> * results = [NSMutableArray array];
+    XCTestExpectation * invokeDone = [[XCTestExpectation alloc] initWithDescription:@"Invoke done"];
+    [self _userInvokeUnitTestingTestOnDevice:device expectedValue:@(9) token:token completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        [results addObject:error ? [NSString stringWithFormat:@"%@ %ld", error.domain, (long) error.code] : @"success"];
+        [invokeDone fulfill];
+    }];
+    XCTAssertTrue(token.cancelResult, @"the invoke had sent nothing when its token was cancelled");
+    [self waitForExpectations:@[ invokeDone ] timeout:(3 * kTimeoutInSeconds)];
+    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Nothing more arrives"];
+    settle.inverted = YES;
+    [self waitForExpectations:@[ settle ] timeout:1];
+
+    XCTAssertEqualObjects(results, (@[ [NSString stringWithFormat:@"%@ %ld", MTRErrorDomain, (long) MTRErrorCodeCancelled] ]));
+    XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0);
+    [self _waitForDeviceQueue:device];
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:[self _expectedValueTestPath]][MTRValueKey], @(kExpectedValueTestCachedValue));
 }
 
 @end

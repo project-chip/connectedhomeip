@@ -249,7 +249,8 @@ MTR_TESTABLE
 
 /// Cancels and removes the work item if it has not sent anything yet: it is still queued, or it is running but
 /// has not called workItem:readyToSend:.  Its readyHandler then never runs (or, if running, its completion
-/// returns NO) and its cancelHandler is called.  Returns NO, and changes nothing, if the item has sent or is no
+/// returns NO) and its cancelHandler is called.  An item not yet enqueued counts as unsent: this returns YES, and
+/// enqueueing it later cancels it instead.  Returns NO, and changes nothing, if the item has sent or is no
 /// longer in the queue.
 - (BOOL)cancelWorkItemIfUnsent:(MTRAsyncWorkItem<ContextType> *)workItem;
 @end
