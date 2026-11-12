@@ -293,7 +293,8 @@ void ExchangeContextDeletor::Release(ExchangeContext * ec)
 
 ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
                                  ExchangeDelegate * delegate, bool isEphemeralExchange) :
-    mDispatch(GetMessageDispatch(isEphemeralExchange, delegate)), mSession(*this)
+    mDispatch(GetMessageDispatch(isEphemeralExchange, delegate)),
+    mSession(*this)
 {
     VerifyOrDieWithObject(mExchangeMgr == nullptr, this);
 
