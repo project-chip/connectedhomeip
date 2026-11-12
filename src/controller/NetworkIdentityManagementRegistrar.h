@@ -285,8 +285,8 @@ private:
     const NodeId mNodeId;
     const EndpointId mEndpoint;
 
-    bool mStopped = false;                // set by StopAcceptingRequests() and never cleared
-    Callback::CallbackDeque mIdleWaiters; // WaitForIdle() callbacks
+    bool mStopped = false; // set by StopAcceptingRequests() and never cleared
+    Callback::TypedCallbackDeque<OnNetworkIdentityRegistrarIdleFunct> mIdleWaiters; // WaitForIdle() callbacks
 
     QueryIdentityOperation mQueryIdentity{ *this };
     AddClientOperation mAddClient{ *this };
