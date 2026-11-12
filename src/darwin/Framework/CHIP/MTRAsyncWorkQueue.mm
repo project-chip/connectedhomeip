@@ -39,6 +39,8 @@ typedef NS_ENUM(NSInteger, MTRAsyncWorkItemState) {
 - (void)setSent:(BOOL)sent;
 - (BOOL)countedAboveWidth;
 - (void)setCountedAboveWidth:(BOOL)countedAboveWidth;
+- (BOOL)cancelledBeforeEnqueue;
+- (void)setCancelledBeforeEnqueue:(BOOL)cancelledBeforeEnqueue;
 @end
 
 MTR_DIRECT_MEMBERS
@@ -47,6 +49,7 @@ MTR_DIRECT_MEMBERS
     MTRAsyncWorkItemState _state; // protected by queue lock once enqueued
     BOOL _sent; // workItem:readyToSend: was called: something has been, or is being, sent
     BOOL _countedAboveWidth; // running as the one user command allowed above the queue's width
+    BOOL _cancelledBeforeEnqueue; // cancelWorkItemIfUnsent: came before the item was enqueued; set under the queue lock
 }
 
 - (BOOL)sent
@@ -67,6 +70,16 @@ MTR_DIRECT_MEMBERS
 - (void)setCountedAboveWidth:(BOOL)countedAboveWidth
 {
     _countedAboveWidth = countedAboveWidth;
+}
+
+- (BOOL)cancelledBeforeEnqueue
+{
+    return _cancelledBeforeEnqueue;
+}
+
+- (void)setCancelledBeforeEnqueue:(BOOL)cancelledBeforeEnqueue
+{
+    _cancelledBeforeEnqueue = cancelledBeforeEnqueue;
 }
 
 #pragma mark Configuration by the client
@@ -127,6 +140,12 @@ MTR_DIRECT_MEMBERS
 - (BOOL)isStarted
 {
     return _state >= MTRAsyncWorkItemRunning;
+}
+
+// NO until the item is enqueued; read under the queue lock.
+- (BOOL)isEnqueued
+{
+    return _state != MTRAsyncWorkItemMutable;
 }
 
 - (void)assertMutable
@@ -318,6 +337,12 @@ struct ContextSnapshot {
 
     std::lock_guard lock(_lock);
     [item markEnqueued];
+    if (item.cancelledBeforeEnqueue) {
+        // Its cancel returned YES before it got here, so it must never run: complete it as cancelled instead.
+        MTR_LOG("MTRAsyncWorkQueue<%@, items count: %lu> work item [%llu] was cancelled before it was enqueued", context.description, static_cast<unsigned long>(_items.count), item.uniqueID);
+        [item cancel];
+        return;
+    }
     if (item.jumpsUnsentWork) {
         // A user command goes ahead of queued reads that have not started: not yet sent is queued, not running.
         // It stays behind running items, behind anything that is not such a read (including earlier user
@@ -612,6 +637,15 @@ struct ContextSnapshot {
 {
     ContextSnapshot context(self); // outside of lock
     std::lock_guard lock(_lock);
+    if (!workItem.isEnqueued) {
+        // Made but not enqueued yet (a user command token is tied to its item first): it has sent nothing.  The
+        // enqueue sees this, under the same lock, and cancels the item instead of queuing it.
+        if (workItem.cancelledBeforeEnqueue) {
+            return NO;
+        }
+        workItem.cancelledBeforeEnqueue = YES;
+        return YES;
+    }
     NSUInteger index = [_items indexOfObjectIdenticalTo:workItem];
     if (index == NSNotFound || workItem.sent || workItem.isComplete) {
         return NO;
