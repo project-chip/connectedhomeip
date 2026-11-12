@@ -288,4 +288,34 @@ public class Clusters {
       }
     }
   }
+
+  public static class KeypadInput {
+    public static final int Id = 0x0509;
+
+    public static class Commands {
+      public static class SendKey {
+        public static final int ID = 0x00;
+
+        public static class Fields {
+          public static final int KeyCode = 0x00;
+        }
+      }
+
+      public static class SendKeyResponse {
+        public static final int ID = 0x01;
+
+        public static class Fields {
+          public static final int Status = 0x00;
+        }
+      }
+    }
+
+    public static class Types {
+      public static class StatusEnum {
+        public static final int Success = 0x00;
+        public static final int UnsupportedKey = 0x01;
+        public static final int InvalidKeyInCurrentState = 0x02;
+      }
+    }
+  }
 }
