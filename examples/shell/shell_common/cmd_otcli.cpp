@@ -159,13 +159,11 @@ CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
         }
         exit(errno);
     }
-    else
-    {
-        // Parent process to wait on child.
-        int status;
-        wait(&status);
-        return (status) ? CHIP_ERROR_INCORRECT_STATE : CHIP_NO_ERROR;
-    }
+
+    // Parent process to wait on child.
+    int status;
+    wait(&status);
+    return (status) ? CHIP_ERROR_INCORRECT_STATE : CHIP_NO_ERROR;
 }
 
 #endif // CHIP_TARGET_STYLE_EMBEDDED/UNIX

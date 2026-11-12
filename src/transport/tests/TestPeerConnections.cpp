@@ -84,7 +84,7 @@ TEST_F(TestPeerConnections, TestBasicFunctionality)
     EXPECT_EQ(optionalSession.Value()->GetPeer(), ScopedNodeId(kCasePeer1NodeId, kFabricIndex));
     EXPECT_EQ(optionalSession.Value()->GetLocalScopedNodeId(), ScopedNodeId(kLocalNodeId, kFabricIndex));
     peerCATs = optionalSession.Value()->AsSecureSession()->GetPeerCATs();
-    EXPECT_EQ(memcmp(&peerCATs, &kPeer1CATs, sizeof(CATValues)), 0);
+    EXPECT_EQ(peerCATs.values, kPeer1CATs.values);
 
     // Second node, peer session id 3, local session id 4
     optionalSession = connections.CreateNewSecureSessionForTest(SecureSession::Type::kCASE, 4, kLocalNodeId, kCasePeer2NodeId,
@@ -97,7 +97,7 @@ TEST_F(TestPeerConnections, TestBasicFunctionality)
     EXPECT_EQ(optionalSession.Value()->GetLocalScopedNodeId(), ScopedNodeId(kLocalNodeId, kFabricIndex));
     EXPECT_EQ(optionalSession.Value()->AsSecureSession()->GetLastActivityTime(), 100_ms64);
     peerCATs = optionalSession.Value()->AsSecureSession()->GetPeerCATs();
-    EXPECT_EQ(memcmp(&peerCATs, &kPeer2CATs, sizeof(CATValues)), 0);
+    EXPECT_EQ(peerCATs.values, kPeer2CATs.values);
 
     //
     // Fill up the session table.
