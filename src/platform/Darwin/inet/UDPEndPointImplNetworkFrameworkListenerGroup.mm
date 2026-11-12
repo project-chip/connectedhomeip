@@ -41,14 +41,14 @@ namespace Inet {
 
             __auto_type monitorQueue = dispatch_queue_create(kInterfaceMonitorQueueName, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
             VerifyOrReturnError(nil != monitorQueue, CHIP_ERROR_NO_MEMORY);
-            ReturnErrorOnFailure(NetworkMonitor::Init(monitorQueue, addressType, interfaceId));
+            ReturnErrorOnFailure(mNetworkMonitor.Init(monitorQueue, addressType, interfaceId));
 
             __auto_type semaphore = dispatch_semaphore_create(0);
             __auto_type pathChangeBlock = ^(nw_path_t path) {
                 mLastPath = path;
                 dispatch_semaphore_signal(semaphore);
             };
-            ReturnErrorOnFailure(StartMonitorPaths(pathChangeBlock));
+            ReturnErrorOnFailure(mNetworkMonitor.StartMonitorPaths(pathChangeBlock));
             __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kStartUpInterfaceMonitorTimeoutInSeconds);
             VerifyOrReturnError(0 == dispatch_semaphore_wait(semaphore, timeout), CHIP_ERROR_INCORRECT_STATE);
 
@@ -76,7 +76,7 @@ namespace Inet {
 
         void UDPEndPointImplNetworkFrameworkListenerGroup::Unlisten()
         {
-            NetworkMonitor::Stop();
+            mNetworkMonitor.Stop();
             StopListeners();
 
             if (mInterfaceGroups != nullptr) {
@@ -215,6 +215,10 @@ namespace Inet {
                 return true;
             });
 
+            if (interfaceId.IsPresent() && targetInterface == nullptr) {
+                return INET_ERROR_UNKNOWN_INTERFACE;
+            }
+
             return (join ? JoinMulticastGroup(targetInterface, endpoint) : LeaveMulticastGroup(targetInterface, endpoint));
         }
 
@@ -222,14 +226,14 @@ namespace Inet {
         {
             uint32_t ifIndex = interface ? nw_interface_get_index(interface) : 0;
             CFNumberRef key = CFNumberCreate(nullptr, kCFNumberIntType, &ifIndex);
-            __auto_type * interfaceGroup = (InterfaceGroup *) CFDictionaryGetValue(mInterfaceGroups, key);
+            __auto_type * interfaceGroup = const_cast<InterfaceGroup *>(static_cast<const InterfaceGroup *>(CFDictionaryGetValue(mInterfaceGroups, key)));
             CFRelease(key);
 
             if (nullptr == interfaceGroup) {
                 __auto_type groupDescriptor = nw_group_descriptor_create_multicast(endpoint);
                 VerifyOrReturnError(nullptr != groupDescriptor, CHIP_ERROR_INCORRECT_STATE);
 
-                interfaceGroup = (InterfaceGroup *) calloc(1, sizeof(InterfaceGroup));
+                interfaceGroup = static_cast<InterfaceGroup *>(calloc(1, sizeof(InterfaceGroup)));
                 interfaceGroup->interface = interface;
 
                 CHIP_ERROR error = StartListeners(interfaceGroup, groupDescriptor);
@@ -276,7 +280,7 @@ namespace Inet {
         {
             uint32_t ifIndex = interface ? nw_interface_get_index(interface) : 0;
             CFNumberRef key = CFNumberCreate(nullptr, kCFNumberIntType, &ifIndex);
-            __auto_type * interfaceGroup = (InterfaceGroup *) CFDictionaryGetValue(mInterfaceGroups, key);
+            __auto_type * interfaceGroup = const_cast<InterfaceGroup *>(static_cast<const InterfaceGroup *>(CFDictionaryGetValue(mInterfaceGroups, key)));
             CFRelease(key);
 
             VerifyOrReturnError(nullptr != interfaceGroup, CHIP_ERROR_NOT_FOUND); // Nothing ever joined, can't leave!
