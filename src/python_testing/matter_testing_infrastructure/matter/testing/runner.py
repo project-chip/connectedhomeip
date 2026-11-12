@@ -372,7 +372,9 @@ def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
 
 async def read_global_wildcard_async(default_controller: ChipDeviceCtrl.ChipDeviceController, node_id: int) -> Attribute.AsyncReadTransaction.ReadResponse:
     """Perform the global wildcard read (Descriptor cluster + AttributeList / FeatureMap /
-    AcceptedCommandList on every endpoint) with a 60-second timeout.
+    AcceptedCommandList / GeneratedCommandList on every endpoint) with a 60-second timeout.
+
+    GeneratedCommandList is needed by the pseudo-PICS generator for the <cluster>.S.Cxx.Tx codes.
 
     Reusable by both the runner (pre-populate path) and MatterBaseTest guards
     (on-demand fallback when --skip-global-wildcard-population is set, or when the
@@ -389,6 +391,7 @@ async def read_global_wildcard_async(default_controller: ChipDeviceCtrl.ChipDevi
                 Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
                 Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
                 Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+                Attribute.AttributePath(None, None, GlobalAttributeIds.GENERATED_COMMAND_LIST_ID),
             ],
         ),
         timeout=60,
@@ -850,16 +853,7 @@ class MockTestRunner:
     """
 
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int | None = None,
-                 pics: dict[int, dict[str, bool]] | None = None, paa_trust_store_path=None,
-                 use_device_pics: bool = False):
-        """
-        Args:
-            use_device_pics: Let check_pics replace the given PICS with PICS generated from
-                the mocked read. Off by default because a mocked read cache usually holds only
-                the attributes one test needs, so the generated PICS would report every other
-                element as unsupported. With it off, mock tests (for example the ICDM unit
-                tests) run on exactly the PICS they pass in.
-        """
+                 pics: dict[int, dict[str, bool]] | None = None, paa_trust_store_path=None):
 
         from matter.testing.matter_stack_state import MatterStackState
         from matter.testing.matter_test_config import MatterTestConfig
@@ -871,7 +865,6 @@ class MockTestRunner:
         self.set_test(abs_filename, classname, test)
 
         self.set_test_config(self.config)
-        self.config.use_device_pics = use_device_pics
 
         # Honor the test class's server-interactions opt-out before the stack
         # starts advertising, mirroring run_tests_no_exit.
