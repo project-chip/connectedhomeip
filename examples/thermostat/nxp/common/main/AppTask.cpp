@@ -23,10 +23,8 @@
 #include "ICDUtil.h"
 #include "thermostat-delegate-impl.h"
 #include "thermostat-hold-delegate-impl.h"
-#include "thermostat-presets-delegate-impl.h"
 #include "thermostat-sensors-delegate-impl.h"
 #include "thermostat-setpoints-delegate-impl.h"
-#include "thermostat-suggestions-delegate-impl.h"
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/util/attribute-storage.h>
@@ -42,8 +40,6 @@ void ThermostatApp::AppTask::PreInitMatterStack()
 static chip::app::Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(1);
 static chip::app::Clusters::Thermostat::ThermostatSetpointsDelegate gSetpointsDelegate(1);
 static chip::app::Clusters::Thermostat::ThermostatHoldDelegate gHoldDelegate(1);
-static chip::app::Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(1);
-static chip::app::Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(1, gPresetsDelegate);
 static chip::app::Clusters::Thermostat::ThermostatSensorsDelegate gSensorsDelegate(1);
 void ThermostatApp::AppTask::PostInitMatterStack()
 {
@@ -59,8 +55,10 @@ ThermostatApp::AppTask & ThermostatApp::AppTask::GetDefaultInstance()
 
 void MatterThermostatClusterInitCallback(chip::EndpointId endpointId)
 {
-    chip::app::Clusters::Thermostat::ServerInit(endpointId, gThermostatDelegate, gSetpointsDelegate, gHoldDelegate,
-                                                gPresetsDelegate, gSuggestionsDelegate, gSensorsDelegate);
+    using namespace chip::app::Clusters::Thermostat;
+    // Register only heating and cooling interfaces; the concrete delegate also implements AutoMode.
+    ServerInit(endpointId, gThermostatDelegate, static_cast<ThermostatHeatingSetpoints::Delegate &>(gSetpointsDelegate),
+               static_cast<ThermostatCoolingSetpoints::Delegate &>(gSetpointsDelegate), gHoldDelegate, gSensorsDelegate);
 }
 
 chip::NXP::App::AppTaskBase & chip::NXP::App::GetAppTask()
