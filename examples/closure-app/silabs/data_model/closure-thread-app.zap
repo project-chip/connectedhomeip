@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 109,
+  "featureLevel": 110,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -51,13 +51,22 @@
           "label": "MA-rootdevice",
           "name": "MA-rootdevice",
           "deviceTypeOrder": 0
+        },
+        {
+          "code": 18,
+          "profileId": 259,
+          "label": "MA-otarequestor",
+          "name": "MA-otarequestor",
+          "deviceTypeOrder": 1
         }
       ],
       "deviceVersions": [
-        5
+        5,
+        1
       ],
       "deviceIdentifiers": [
-        22
+        22,
+        18
       ],
       "deviceTypeName": "MA-rootdevice",
       "deviceTypeCode": 22,
@@ -3855,7 +3864,6 @@
           "define": "GROUPCAST_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "JoinGroup",
@@ -4438,6 +4446,14 @@
             {
               "name": "Calibrate",
               "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "GroupedMoveTo",
+              "code": 3,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,

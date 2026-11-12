@@ -14,6 +14,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/ble/ble.gni")
+import("${chip_root}/src/platform/device.gni")
 
 source_set("commissioning-proxy-server") {
   # The cluster and its subsystems are independent of the application
@@ -80,17 +81,23 @@ if (chip_config_network_layer_ble) {
 # depend on commissioning-proxy-server without pulling in src/wifipaf. The platform
 # discovery hooks it needs come from CommissioningProxyPafAdapter, which the application
 # implements.
-source_set("paf-transport") {
-  sources = [
-    "CommissioningProxyPafAdapter.h",
-    "CommissioningProxyPafTransport.cpp",
-    "CommissioningProxyPafTransport.h",
-  ]
+#
+# Only defined when Wi-Fi PAF is enabled: src/wifipaf builds WiFiPAFLayer only under the
+# same condition, so on a no-PAF platform this driver would reference symbols that were
+# never compiled.
+if (chip_device_config_enable_wifipaf) {
+  source_set("paf-transport") {
+    sources = [
+      "CommissioningProxyPafAdapter.h",
+      "CommissioningProxyPafTransport.cpp",
+      "CommissioningProxyPafTransport.h",
+    ]
 
-  cflags = [ "-Wconversion" ]
+    cflags = [ "-Wconversion" ]
 
-  public_deps = [
-    ":commissioning-proxy-server",
-    "${chip_root}/src/wifipaf",
-  ]
+    public_deps = [
+      ":commissioning-proxy-server",
+      "${chip_root}/src/wifipaf",
+    ]
+  }
 }

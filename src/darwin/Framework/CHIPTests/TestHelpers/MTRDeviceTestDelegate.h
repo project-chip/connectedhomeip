@@ -55,6 +55,8 @@ typedef void (^MTRDeviceTestDelegateMetricsHandler)(MTRMetrics * metrics);
 @property (atomic, readonly) NSMutableArray<void (^)(NSError *)> * heldSessionRequestFailures;
 @property (atomic, readonly) NSMutableArray<BOOL (^)(void)> * heldSessionRequestSuccesses;
 @property (atomic, nullable) NSNumber * timeSynchronizationLossDetectionCadenceOverride;
+// Called after a subscription reattempt timer has handed its work to the Matter queue.
+@property (atomic, copy, nullable) dispatch_block_t onSubscriptionReattemptDispatched;
 @end
 
 @interface MTRDeviceTestDelegateWithSubscriptionSetupOverride : MTRDeviceTestDelegate

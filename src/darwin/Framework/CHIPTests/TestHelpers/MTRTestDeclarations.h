@@ -83,6 +83,9 @@ MTR_TESTABLE_DIRECT_MEMBERS
     expectedValueInterval:(NSNumber *)expectedValueInterval
           expectedValueID:(uint64_t *)expectedValueID;
 - (void)removeExpectedValuesForAttributePaths:(NSArray<MTRAttributePath *> *)attributePaths expectedValueID:(uint64_t)expectedValueID;
+- (void)_handleSubscriptionReset:(NSNumber * _Nullable)retryDelay;
+
+@property (nonatomic) BOOL reattemptingSubscription;
 
 @property (nonatomic, readonly, nullable) NSNumber * highestObservedEventNumber;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;

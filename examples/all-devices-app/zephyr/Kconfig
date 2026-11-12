@@ -16,6 +16,7 @@
 
 mainmenu "Matter All-Devices Zephyr"
 
+rsource "$(ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR)/config/zephyr/chip-module/Kconfig.defaults"
 rsource "Kconfig.defaults"
 rsource "Kconfig.devices"
 
