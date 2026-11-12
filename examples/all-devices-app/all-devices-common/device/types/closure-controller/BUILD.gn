@@ -18,11 +18,14 @@ source_set("closure-controller") {
   sources = [
     "ClosureController.cpp",
     "ClosureController.h",
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
   ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/binding-handler",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
     "${chip_root}/src/app/clusters/bindings",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
@@ -34,4 +37,16 @@ source_set("closure-controller") {
   ]
 
   deps = [ "${chip_root}/zzz_generated/app-common/devices" ]
+}
+
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":closure-controller",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+  ]
 }
