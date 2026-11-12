@@ -103,13 +103,13 @@ void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader,
 CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData,
                                        System::Clock::Timeout timeout)
 {
-    mTimeout           = timeout;
-    mState             = State::kIdle;
-    mRestartFromStart  = false;
-    mFinalized         = false;
-    mBlockAckEOFSent   = false;
-    mFinalizeSucceeded = false;
-    mCheckFirstBlock   = false;
+    mTimeout          = timeout;
+    mState            = State::kIdle;
+    mRestartFromStart = false;
+    mFinalized        = false;
+    mBlockAckEOFSent  = false;
+    mFinalizeResult.reset();
+    mCheckFirstBlock = false;
     mBdxTransfer.Reset();
 
     VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
@@ -236,34 +236,39 @@ CHIP_ERROR BDXDownloader::OnFinalized(CHIP_ERROR status)
                             mImageProcessor->ReportsFinalizeResult(),
                         CHIP_ERROR_INCORRECT_STATE);
 
-    if (status == CHIP_NO_ERROR)
+    VerifyOrReturnError(!mFinalizeResult.has_value(), CHIP_ERROR_INCORRECT_STATE);
+
+    // Only record the result here. FinishIfFinalized() acts on it once BlockAckEOF has also been sent, so the order in which
+    // the result and BlockAckEOF arrive does not matter, and a failure reported inside Finalize() still lets BlockAckEOF go out.
+    mFinalizeResult = status;
+    FinishIfFinalized();
+    return CHIP_NO_ERROR;
+}
+
+void BDXDownloader::FinishIfFinalized()
+{
+    VerifyOrReturn(mState == State::kInProgress && mBlockAckEOFSent);
+
+    const bool reportsResult = mImageProcessor != nullptr && mImageProcessor->ReportsFinalizeResult();
+    VerifyOrReturn(!reportsResult || mFinalizeResult.has_value());
+
+    Reset();
+    // A finished image is not a partial one, so a later EndDownload() leaves it alone. The next SetBDXParams() sets
+    // mRequestedOffset again, and the processor reports no resume offset, which clears mAttemptsWithoutProgress.
+    mResumeIdentity.reset();
+
+    if (!reportsResult || *mFinalizeResult == CHIP_NO_ERROR)
     {
-        mFinalizeSucceeded = true;
-        CompleteIfFinalized();
-        return CHIP_NO_ERROR;
+        SetState(State::kComplete, OTAChangeReasonEnum::kSuccess);
+        return;
     }
 
     // The image failed the processor's checks, e.g. its digest does not match its header. End the download as failed, which
     // discards the image, before the requestor is told it is downloaded and asks the provider to apply it.
-    ChipLogError(BDX, "Downloaded image failed its checks: %" CHIP_ERROR_FORMAT, status.Format());
-    Reset();
+    ChipLogError(BDX, "Downloaded image failed its checks: %" CHIP_ERROR_FORMAT, mFinalizeResult->Format());
     mBdxTransfer.Reset();
-    mResumeIdentity.reset();
     SetState(State::kIdle, OTAChangeReasonEnum::kFailure);
     LogErrorOnFailure(mImageProcessor->Abort());
-    return CHIP_NO_ERROR;
-}
-
-void BDXDownloader::CompleteIfFinalized()
-{
-    VerifyOrReturn(mState == State::kInProgress && mBlockAckEOFSent);
-    VerifyOrReturn(mFinalizeSucceeded || mImageProcessor == nullptr || !mImageProcessor->ReportsFinalizeResult());
-
-    Reset();
-    // A complete image is not a partial one, so a later EndDownload() leaves it alone. The next SetBDXParams() sets
-    // mRequestedOffset again, and the processor reports no resume offset, which clears mAttemptsWithoutProgress.
-    mResumeIdentity.reset();
-    SetState(State::kComplete, OTAChangeReasonEnum::kSuccess);
 }
 
 CHIP_ERROR BDXDownloader::FetchNextData()
@@ -420,10 +425,10 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
         if (outEvent.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF))
         {
             // BDX transfer is not complete until BlockAckEOF has been sent. A processor that reports the result of Finalize() may
-            // not have done so yet; the download then completes when it reports success. Until then the timeout keeps running, so
-            // a result that never arrives ends the download like a stalled transfer.
+            // not have done so yet; the download then finishes when it reports. Until then the timeout keeps running, so a result
+            // that never arrives ends the download like a stalled transfer.
             mBlockAckEOFSent = true;
-            CompleteIfFinalized();
+            FinishIfFinalized();
         }
         break;
     }

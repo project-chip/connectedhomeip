@@ -131,8 +131,9 @@ private:
     CHIP_ERROR HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent);
     void SetState(State state, app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason);
     void Reset();
-    // Reports the download complete once BlockAckEOF was sent and, if the processor reports it, the image passed its checks.
-    void CompleteIfFinalized();
+    // Once BlockAckEOF was sent and, if the processor reports one, the result of Finalize() is known: reports the download
+    // complete on success, or ends it as failed.
+    void FinishIfFinalized();
     uint64_t ChooseStartOffset();
     void DiscardPartialImage();
     std::optional<ImageIdentity> ComputeImageIdentity(ByteSpan fileDesignator) const;
@@ -160,8 +161,8 @@ private:
     bool mFinalized = false;
     // Set once BlockAckEOF was sent.
     bool mBlockAckEOFSent = false;
-    // Set once the processor reported that the finalized image passed its checks.
-    bool mFinalizeSucceeded = false;
+    // The result the processor reported for the finalized image, once it has.
+    std::optional<CHIP_ERROR> mFinalizeResult;
 };
 
 } // namespace chip
