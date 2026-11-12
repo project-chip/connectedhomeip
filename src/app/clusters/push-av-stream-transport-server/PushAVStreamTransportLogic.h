@@ -108,6 +108,11 @@ public:
 
     void Shutdown();
 
+    /// Tears down every connection created by the removed fabric: notifies the delegate and
+    /// removes the connection entries. Skips busy-status and accessing-fabric validation since
+    /// fabric removal is mandatory.
+    void OnFabricRemoved(FabricIndex fabricIndex);
+
     bool HasFeature(PushAvStreamTransport::Feature feature) const;
 
     Protocols::InteractionModel::Status ValidateIncomingTransportOptions(

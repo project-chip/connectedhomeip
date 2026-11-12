@@ -22,6 +22,7 @@
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <credentials/FabricTable.h>
 
 namespace chip {
 namespace app {
@@ -30,7 +31,7 @@ namespace Clusters {
 /// Integration of Push AV Stream Transport logic within the matter data model
 ///
 /// Translates between matter calls and Push AV Stream Transport logic
-class PushAvStreamTransportServer : public DefaultServerCluster
+class PushAvStreamTransportServer : public DefaultServerCluster, private FabricTable::Delegate
 {
 public:
     /**
@@ -41,11 +42,15 @@ public:
      *
      * @param aEndpointId The endpoint on which this cluster exists (must match zap configuration)
      * @param aFeatures   BitFlags indicating which features are supported by this instance
+     * @param aFabricTable Fabric table used to tear down connections when a fabric is removed;
+     *                     must outlive this instance
      *
      * @note The caller must ensure the delegate lives throughout the instance's lifetime
      */
-    PushAvStreamTransportServer(EndpointId aEndpointId, BitFlags<PushAvStreamTransport::Feature> aFeatures) :
-        DefaultServerCluster({ aEndpointId, PushAvStreamTransport::Id }), mLogic(aEndpointId, aFeatures)
+    PushAvStreamTransportServer(EndpointId aEndpointId, BitFlags<PushAvStreamTransport::Feature> aFeatures,
+                                FabricTable & aFabricTable) :
+        DefaultServerCluster({ aEndpointId, PushAvStreamTransport::Id }), mFabricTable(aFabricTable),
+        mLogic(aEndpointId, aFeatures)
     {
         mLogic.SetCluster(this);
     }
@@ -114,8 +119,15 @@ public:
         return mLogic.Init(mContext->attributeStorage);
     }
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override
+    {
+        ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+        return mFabricTable.AddFabricDelegate(this);
+    }
+
     void Shutdown(ClusterShutdownType shutdownType) override
     {
+        mFabricTable.RemoveFabricDelegate(this);
         DefaultServerCluster::Shutdown(shutdownType);
         mLogic.Shutdown();
     }
@@ -133,6 +145,10 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 private:
+    // FabricTable::Delegate: tear down a removed fabric's connections (fabric-scoped data).
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
+    FabricTable & mFabricTable;
     PushAvStreamTransportServerLogic mLogic;
 
     // Helpers to read list items

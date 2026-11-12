@@ -28,8 +28,10 @@
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/FabricTestFixture.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/tests/AppTestContext.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVDebug.h>
@@ -83,7 +85,8 @@ public:
 
 protected:
     MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
-    Clusters::PushAvStreamTransportServer mServer{ 1, BitFlags<Clusters::PushAvStreamTransport::Feature>(1) };
+    FabricTable mFabricTable;
+    Clusters::PushAvStreamTransportServer mServer{ 1, BitFlags<Clusters::PushAvStreamTransport::Feature>(1), mFabricTable };
     chip::Testing::ClusterTester mClusterTester;
 };
 
@@ -116,7 +119,8 @@ public:
 
 protected:
     MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
-    Clusters::PushAvStreamTransportServer mServer{ 1, BitFlags<Clusters::PushAvStreamTransport::Feature>() };
+    FabricTable mFabricTable;
+    Clusters::PushAvStreamTransportServer mServer{ 1, BitFlags<Clusters::PushAvStreamTransport::Feature>(), mFabricTable };
     chip::Testing::ClusterTester mClusterTester;
 };
 
@@ -158,11 +162,14 @@ public:
         return Status::Success;
     }
 
+    std::vector<uint16_t> deallocatedConnectionIds;
+
     Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) override
     {
         pushavStreams.erase(std::remove_if(pushavStreams.begin(), pushavStreams.end(),
                                            [connectionID](const PushAvStream & stream) { return stream.id == connectionID; }),
                             pushavStreams.end());
+        deallocatedConnectionIds.push_back(connectionID);
         ChipLogProgress(Zcl, "Deallocated Push AV Stream with ID: %d", connectionID);
         return Status::Success;
     }
@@ -423,7 +430,8 @@ public:
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
 protected:
-    PushAvStreamTransportServer mServer{ 1, BitFlags<Feature>(1) };
+    FabricTable mFabricTable;
+    PushAvStreamTransportServer mServer{ 1, BitFlags<Feature>(1), mFabricTable };
     chip::Testing::ClusterTester mClusterTester;
 };
 
@@ -483,6 +491,79 @@ TEST_F(TestPushAVStreamTransportServerLogic, AllocatePushTransportRejectsEndpoin
     const auto & status = commandHandler.GetStatuses()[0].status;
     ASSERT_TRUE(status.GetClusterSpecificCode().has_value());
     EXPECT_EQ(status.GetClusterSpecificCode().value(), to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
+}
+
+// Removing a fabric deallocates only that fabric's connections; other fabrics' connections survive.
+TEST_F(TestPushAVStreamTransportServerLogic, TestFabricRemovedDeallocatesConnections)
+{
+    chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
+
+    FabricIndex fabric1 = 1;
+    ASSERT_EQ(fabricHelper.SetUpTestFabric(fabric1), CHIP_NO_ERROR);
+    FabricIndex fabric2 = 2;
+    ASSERT_EQ(fabricHelper.AddAdditionalTestFabric(fabric2), CHIP_NO_ERROR);
+
+    PushAvStreamTransportServer server(1, BitFlags<Feature>(1), fabricHelper.GetFabricTable());
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
+
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    std::string url       = "https://192.168.1.100:554/stream/";
+    std::string trackName = "video";
+
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kContinuous;
+
+    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptions.videoStreamID.SetValue(1);
+    transportOptions.audioStreamID.SetValue(2);
+    transportOptions.TLSEndpointID    = 1;
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
+    server.GetLogic().SetDelegate(&mockDelegate);
+    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
+
+    Testing::MockCommandHandler commandHandler;
+    ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    Commands::AllocatePushTransport::DecodableType commandData;
+    commandData.transportOptions = transportOptions;
+
+    commandHandler.SetFabricIndex(fabric1);
+    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    commandHandler.SetFabricIndex(fabric2);
+    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+
+    ASSERT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 2);
+    uint16_t fabric1ConnectionID = server.GetLogic().mCurrentConnections[0].connectionID;
+
+    // Removing fabric1 fires OnFabricRemoved: fabric1's connection is deallocated, fabric2's remains.
+    EXPECT_EQ(fabricHelper.GetFabricTable().Delete(fabric1), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mockDelegate.deallocatedConnectionIds.size(), (size_t) 1);
+    EXPECT_EQ(mockDelegate.deallocatedConnectionIds[0], fabric1ConnectionID);
+
+    ASSERT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    EXPECT_EQ(server.GetLogic().mCurrentConnections[0].GetFabricIndex(), fabric2);
+
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(fabricHelper.TearDownTestFabric(fabric2), CHIP_NO_ERROR);
 }
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)

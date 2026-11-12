@@ -22,6 +22,7 @@
 #include <app/static-cluster-config/PushAvStreamTransport.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <app/server/Server.h>
 
 #include <cstdint>
 
@@ -48,7 +49,8 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         ChipLogProgress(AppServer, "Registering Push AV Stream Transport on endpoint %u, %d", endpointId, clusterInstanceIndex);
-        gServers[clusterInstanceIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(featureMap));
+        gServers[clusterInstanceIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(featureMap),
+                                              Server::GetInstance().GetFabricTable());
         return gServers[clusterInstanceIndex].Registration();
     }
 

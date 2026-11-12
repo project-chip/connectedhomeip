@@ -190,6 +190,31 @@ CHIP_ERROR PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(con
     return CHIP_NO_ERROR;
 }
 
+void PushAvStreamTransportServerLogic::OnFabricRemoved(FabricIndex fabricIndex)
+{
+    // Collect the connection IDs first: RemoveStreamTransportConnection erases from
+    // mCurrentConnections while this loop iterates over it.
+    std::vector<uint16_t> connectionIDs;
+    for (const TransportConfigurationStorage & connection : mCurrentConnections)
+    {
+        if (connection.GetFabricIndex() == fabricIndex)
+        {
+            connectionIDs.push_back(connection.connectionID);
+        }
+    }
+
+    for (uint16_t connectionID : connectionIDs)
+    {
+        if (mDelegate != nullptr && mDelegate->DeallocatePushTransport(connectionID) != Status::Success)
+        {
+            ChipLogError(Zcl, "OnFabricRemoved[ep=%d]: Delegate deallocate failed for ConnectionID %u", mEndpointId, connectionID);
+        }
+        // The fabric is gone, so the connection entry is removed regardless of the delegate result.
+        LogErrorOnFailure(RemoveStreamTransportConnection(connectionID));
+        RemoveTimerAppState(connectionID);
+    }
+}
+
 void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connectionID)
 {
     // Erase-Remove idiom

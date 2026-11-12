@@ -22,6 +22,7 @@
 #include <clusters/WebRTCTransportProvider/Commands.h>
 #include <clusters/WebRTCTransportProvider/Enums.h>
 #include <clusters/WebRTCTransportProvider/Metadata.h>
+#include <credentials/FabricTable.h>
 #include <string>
 #include <vector>
 
@@ -376,7 +377,7 @@ public:
     virtual CHIP_ERROR IsUTCTimeNull(bool & isNull) = 0;
 };
 
-class WebRTCTransportProviderCluster : public DefaultServerCluster
+class WebRTCTransportProviderCluster : public DefaultServerCluster, private FabricTable::Delegate
 {
 public:
     /**
@@ -386,8 +387,14 @@ public:
      * @param[in] endpointId The Endpoint where the WebRTC Transport Provider cluster is published.
      * @param[in] delegate   A reference to an implementation of the Delegate interface. Must remain
      *                       valid for the lifetime of this object.
+     * @param[in] fabricTable Fabric table used to tear down sessions when a fabric is removed; must
+     *                        outlive this object.
      */
-    WebRTCTransportProviderCluster(EndpointId endpointId, Delegate & delegate);
+    // Delegate is fully qualified: private inheritance of FabricTable::Delegate injects the name `Delegate`
+    WebRTCTransportProviderCluster(EndpointId endpointId, WebRTCTransportProvider::Delegate & delegate, FabricTable & fabricTable);
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType shutdownType) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -431,7 +438,11 @@ private:
         kAudio = 1,
     };
 
-    Delegate & mDelegate;
+    // FabricTable::Delegate: tear down a removed fabric's sessions (fabric-scoped data).
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
+    WebRTCTransportProvider::Delegate & mDelegate;
+    FabricTable & mFabricTable;
     std::vector<WebRTCSessionStruct> mCurrentSessions;
 
     // Helper functions
