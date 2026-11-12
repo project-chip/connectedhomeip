@@ -671,6 +671,7 @@
             }
         ],
         "Meter Identification": [
+            "ClusterRevision",
             "MeterType",
             "PointOfDelivery",
             "MeterSerialNumber",
