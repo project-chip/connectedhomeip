@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import dataclasses
 import re
 import xml.etree.ElementTree as ElementTree
 from pathlib import Path
@@ -28,9 +29,10 @@ from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.problem_notices import ProblemNotice
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (_DM_TO_DATA_MODEL_REVISION, _SPEC_VERSION_TO_DM, ClusterParser, DataModelLevel,
-                                         PrebuiltDataModelDirectory, XmlCluster, add_cluster_data_from_xml, build_xml_clusters,
-                                         check_clusters_for_unknown_commands, combine_derived_clusters_with_base,
-                                         data_model_revision_from_dm, get_data_model_directory)
+                                         PrebuiltDataModelDirectory, SpecParsingException, XmlCluster, add_cluster_data_from_xml,
+                                         build_xml_clusters, build_xml_global_data_types, check_clusters_for_unknown_commands,
+                                         combine_derived_clusters_with_base, data_model_revision_from_dm, get_data_model_directory,
+                                         instruction_dependency_masks)
 
 # TODO: improve the test coverage here
 # https://github.com/project-chip/connectedhomeip/issues/30958
@@ -458,6 +460,37 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
                                 "Did not find test attribute in XmlCluster.attributes")
             asserts.assert_equal(xml_cluster.attributes[ATTRIBUTE_ID].write_optional,
                                  write_support == 'optional', "Unexpected write_optional value")
+
+    def test_instruction_dependency_masks(self):
+        def bits(*indices):
+            return sum(1 << i for i in indices)
+
+        uat = Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap
+        expected_uat_dependent = (uat.kCustomInstruction | uat.kActuateSensorSeconds | uat.kActuateSensorTimes |
+                                  uat.kActuateSensorLightsBlink | uat.kResetButtonLightsBlink | uat.kResetButtonSeconds |
+                                  uat.kResetButtonTimes | uat.kSetupButtonSeconds | uat.kSetupButtonLightsBlink |
+                                  uat.kSetupButtonTimes | uat.kAppDefinedButton)
+        expected_uat_mandatory = (uat.kCustomInstruction | uat.kActuateSensorSeconds | uat.kActuateSensorTimes |
+                                  uat.kResetButtonSeconds | uat.kResetButtonTimes | uat.kSetupButtonSeconds |
+                                  uat.kSetupButtonTimes | uat.kAppDefinedButton)
+        clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
+        uat_bitmap = clusters[Clusters.IcdManagement.id].bitmaps['UserActiveModeTriggerBitmap']
+        asserts.assert_equal(instruction_dependency_masks(uat_bitmap), (expected_uat_dependent, expected_uat_mandatory),
+                             'Unexpected UserActiveModeTriggerBitmap Instruction Dependency masks')
+
+        global_data_types, _ = build_xml_global_data_types(PrebuiltDataModelDirectory.k1_7)
+        ph_bitmap = global_data_types['bitmaps']['PairingHintBitmap']
+        asserts.assert_equal(instruction_dependency_masks(ph_bitmap),
+                             (bits(4, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22), bits(4, 8, 10, 12, 15, 17, 19, 20, 21, 22)),
+                             'Unexpected PairingHintBitmap Instruction Dependency masks')
+
+    def test_instruction_dependency_masks_require_the_column(self):
+        clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
+        bitmap = clusters[Clusters.IcdManagement.id].bitmaps['UserActiveModeTriggerBitmap']
+        without_column = dataclasses.replace(bitmap, components={
+            bit: dataclasses.replace(component, instruction_dependency=None) for bit, component in bitmap.components.items()})
+        with asserts.assert_raises(SpecParsingException):
+            instruction_dependency_masks(without_column)
 
     def test_derived_clusters(self):
         clusters: dict[int, XmlCluster] = {}
