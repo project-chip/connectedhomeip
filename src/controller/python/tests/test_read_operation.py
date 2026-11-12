@@ -453,14 +453,14 @@ async def exercise_native_idm_restoration_contract(checker: Any, pause_dut: Call
 
 
 async def run_native_read_regressions(checker: Any, pause_dut: Callable[[], None], resume_dut: Callable[[], None],
-                                     inject_report: Callable[[Any, int, bool], None]) -> list[dict[str, Any]]:
+                                      inject_report: Callable[[Any, int, bool], None]) -> list[dict[str, Any]]:
     """Run both retained native groups against an already commissioned, fixture-owned software DUT.
 
     The fixture supplies its checker/controller, owned-process pause/resume callbacks,
     and test-only native report injection. These are not ordinary mock unit tests.
     """
     rows = await exercise_native_read_operation_contract(checker.default_controller, checker.dut_node_id,
-                                                        pause_dut, resume_dut, inject_report)
+                                                         pause_dut, resume_dut, inject_report)
     rows.extend(await exercise_native_idm_restoration_contract(checker, pause_dut, resume_dut))
     return rows
 
@@ -483,7 +483,7 @@ def main() -> None:
     async def run() -> None:
         async with fixture_factory() as fixture:
             rows = await run_native_read_regressions(fixture.checker, fixture.pause_dut,
-                                                    fixture.resume_dut, fixture.inject_report)
+                                                     fixture.resume_dut, fixture.inject_report)
             print(json.dumps({'native_read_regressions': rows}), flush=True)
 
     asyncio.run(run())
