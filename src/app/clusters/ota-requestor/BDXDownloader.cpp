@@ -251,13 +251,15 @@ void BDXDownloader::FinishIfFinalized()
 
     const bool reportsResult = mImageProcessor != nullptr && mImageProcessor->ReportsFinalizeResult();
     VerifyOrReturn(!reportsResult || mFinalizeResult.has_value());
+    // A processor that does not report a result is treated as one that reported success.
+    const CHIP_ERROR finalizeResult = reportsResult ? mFinalizeResult.value_or(CHIP_NO_ERROR) : CHIP_NO_ERROR;
 
     Reset();
     // A finished image is not a partial one, so a later EndDownload() leaves it alone. The next SetBDXParams() sets
     // mRequestedOffset again, and the processor reports no resume offset, which clears mAttemptsWithoutProgress.
     mResumeIdentity.reset();
 
-    if (!reportsResult || *mFinalizeResult == CHIP_NO_ERROR)
+    if (finalizeResult == CHIP_NO_ERROR)
     {
         SetState(State::kComplete, OTAChangeReasonEnum::kSuccess);
         return;
@@ -265,7 +267,7 @@ void BDXDownloader::FinishIfFinalized()
 
     // The image failed the processor's checks, e.g. its digest does not match its header. End the download as failed, which
     // discards the image, before the requestor is told it is downloaded and asks the provider to apply it.
-    ChipLogError(BDX, "Downloaded image failed its checks: %" CHIP_ERROR_FORMAT, mFinalizeResult->Format());
+    ChipLogError(BDX, "Downloaded image failed its checks: %" CHIP_ERROR_FORMAT, finalizeResult.Format());
     mBdxTransfer.Reset();
     SetState(State::kIdle, OTAChangeReasonEnum::kFailure);
     LogErrorOnFailure(mImageProcessor->Abort());
