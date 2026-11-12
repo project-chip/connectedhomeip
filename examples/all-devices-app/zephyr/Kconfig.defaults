@@ -15,14 +15,7 @@
 #
 
 
-DT_CHOSEN_IEEE802154 := zephyr,ieee802154
-
 if CHIP
-
-# Only enable the OpenThread L2 on boards that expose a 802.15.4 radio.
-config NET_L2_OPENTHREAD
-	default y if $(dt_chosen_enabled,$(DT_CHOSEN_IEEE802154))
-	default n
 
 choice STD_CPP
 	default STD_CPP17
