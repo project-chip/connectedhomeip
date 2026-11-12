@@ -22,10 +22,6 @@
 #include <app/clusters/bindings/binding-table.h>
 #include <binding-handler/BindingCommand.h>
 #include <binding-handler/BindingHandler.h>
-#include <clusters/ClosureControl/Enums.h>
-#include <clusters/ClosureDimension/Enums.h>
-#include <clusters/Identify/Enums.h>
-#include <clusters/shared/Enums.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>

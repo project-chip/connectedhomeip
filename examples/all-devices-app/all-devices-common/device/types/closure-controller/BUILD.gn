@@ -30,13 +30,15 @@ source_set("closure-controller") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+  ]
+
+  deps = [
     "${chip_root}/zzz_generated/app-common/clusters/ClosureControl",
     "${chip_root}/zzz_generated/app-common/clusters/ClosureDimension",
     "${chip_root}/zzz_generated/app-common/clusters/Identify",
     "${chip_root}/zzz_generated/app-common/clusters/shared:enums",
+    "${chip_root}/zzz_generated/app-common/devices",
   ]
-
-  deps = [ "${chip_root}/zzz_generated/app-common/devices" ]
 }
 
 source_set("posix") {
