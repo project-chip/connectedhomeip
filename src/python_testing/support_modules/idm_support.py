@@ -788,47 +788,32 @@ class IDMBaseTest(BasicCompositionTests):
         return max(event_numbers)
 
     @staticmethod
-    def assert_event_reported(events: list[EventReadResult], cluster: type[ClusterObjects.Cluster],
-                              event: type[ClusterObjects.ClusterEvent], endpoint: int | None = None):
-        """Assert the report data contains decoded data for the given event.
+    def assert_event_reported(events: list[EventReadResult], event: type[ClusterObjects.ClusterEvent] | None = None,
+                              endpoint: int | None = None):
+        """Assert the report data contains decoded data for an event.
 
         Args:
             events: Results returned by a read or subscription
-            cluster: Cluster the event is expected to come from
-            event: Event expected to be present
+            event: Event expected to be present, or None to accept any event, as a path naming
+                no event requires
             endpoint: Endpoint the event must come from, or None to accept any endpoint,
                 as the wildcard-endpoint paths require
         """
         for result in events:
-            if result.Header is None:
+            if result.Header is None or result.Data is None:
                 continue
             if endpoint is not None and result.Header.EndpointId != endpoint:
                 continue
-            if result.Header.ClusterId != cluster.id:
-                continue
-            if isinstance(result.Data, event):
+            if event is None or isinstance(result.Data, event):
                 return
 
         # Every result is listed, since a miss is usually the event arriving on another endpoint
         # or carrying a status or undecodable payload instead of data.
-        expected = f"{cluster.__name__}.{event.__name__}"
+        expected = "any event" if event is None else f"event {event.__qualname__}"
         if endpoint is not None:
             expected = f"{expected} on endpoint {endpoint}"
         reported = "\n  ".join(_describe_event_result(e) for e in events) if events else "<empty report>"
-        asserts.fail(f"Report data must contain event {expected}, got {len(events)} result(s):\n  {reported}")
-
-    @staticmethod
-    def assert_events_reported(events: list[EventReadResult]):
-        """Assert the report data carries data for at least one event.
-
-        Args:
-            events: Results returned by a read or subscription
-        """
-        with_data = [e for e in events if e.Data is not None]
-        asserts.assert_greater(
-            len(with_data), 0,
-            "Report data must contain data for at least one event"
-        )
+        asserts.fail(f"Report data must contain {expected}, got {len(events)} result(s):\n  {reported}")
 
     @staticmethod
     def assert_event_status_count(events: list[EventReadResult], status: Status, expected_count: int):
@@ -881,17 +866,25 @@ class IDMBaseTest(BasicCompositionTests):
                 f"Event number {event.Header.EventNumber} is below the requested EventMin {minimum}"
             )
 
-    async def emit_access_control_entry_changed(self, ctrl: ChipDeviceCtrl):
-        """Generate an AccessControlEntryChanged event by rewriting the ACL to its current value.
+    async def trigger_access_control_entry_changed(self, ctrl: ChipDeviceCtrl):
+        """Make the DUT generate AccessControlEntryChanged events by adding an ACL entry and removing it.
 
-        Every DUT supports this event and writing the ACL always emits one, so this gives a test
-        readable events without relying on a cluster only test applications implement.
+        Every DUT supports this event, so this gives a test readable events without relying on a
+        cluster only test applications implement. The added and removed entry produces Added and
+        Removed events however the DUT handles a write of an unchanged list.
 
         Args:
             ctrl: Controller to read and write the ACL with
         """
-        dut_acl = await self.get_dut_acl(ctrl=ctrl)
-        await self.write_dut_acl(ctrl=ctrl, acl=dut_acl)
+        dut_acl_original = await self.get_dut_acl(ctrl=ctrl)
+        extra_ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[ctrl.nodeId],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=Clusters.BasicInformation.id)],
+        )
+        await self.add_ace_to_dut_acl(ctrl=ctrl, ace=extra_ace, dut_acl_original=dut_acl_original)
+        await self.write_dut_acl(ctrl=ctrl, acl=dut_acl_original)
 
     @contextlib.asynccontextmanager
     async def restricted_privilege_controller(self, cluster_id: int, privilege):
