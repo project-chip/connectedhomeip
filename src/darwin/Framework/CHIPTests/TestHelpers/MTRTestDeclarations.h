@@ -139,7 +139,6 @@ typedef NS_ENUM(NSInteger, MTRTestSessionSetupPhase) {
 - (NSUInteger)unitTestInterestedPathsChangedCount;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
 // Must be called on the Matter queue.
-// Must be called on the Matter queue.
 - (NSUInteger)unitTestCASESetupReleasedForReachabilityCount;
 - (NSUInteger)unitTestEventsReportedSinceLastCheck;
 - (void)unitTestClearClusterData;

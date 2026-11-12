@@ -174,7 +174,7 @@ public:
 
     void ReleaseAllSessions();
 
-    // The phase of the session setup for peerId (not an address-update one), if there is one.
+    // The phase of the session setup for peerId, if there is one.
     Optional<OperationalSessionSetup::SetupPhase> GetSessionSetupPhase(const ScopedNodeId & peerId) const;
 
     /**

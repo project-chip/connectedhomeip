@@ -1304,19 +1304,15 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
             [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
         }
     } else if (((_internalDeviceState == MTRInternalDeviceStateSubscribing && !self.doingCASEAttemptForDeviceMayBeReachable) || shouldReattemptSubscription) && nodeLikelyReachable) {
-        // If we have reason to suspect that the node is now reachable and we haven't established a
-        // CASE session yet, let's consider it to be stalled and invalidate the pairing session,
-        // unless it is still resolving the address.
+        // If we have reason to suspect that the node is now reachable and we have started a CASE setup with it and it's
+        // still waiting for a Sigma2 or is waiting to retry, there's a possibility that it resolved the wrong addresses and we
+        // should restart the CASE attempt.
 
         // Reset back off for framework resubscription
         os_unfair_lock_lock(&self->_lock);
         [self _setLastSubscriptionAttemptWait:0];
         os_unfair_lock_unlock(&self->_lock);
 
-        // Decide in this Matter queue turn, on the setup's phase as of this notification. A setup whose Sigma1 is unanswered
-        // may have sent it to a stale address that this signal supersedes, and a setup waiting to retry would otherwise sit out
-        // its backoff; both are released. A setup still resolving the address, or one whose handshake has moved past Sigma1,
-        // is left to finish.
         auto * commissioner = [self._concreteController commissionerOnMatterQueue];
         if (commissioner != nullptr) {
             auto caseSessionMgr = commissioner->CASESessionMgr();

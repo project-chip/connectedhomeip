@@ -8569,6 +8569,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 
     __auto_type * device = [MTRDevice deviceWithNodeID:nodeID controller:controller];
     [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    // Wait for the address resolution to start.
     [self _waitForNodeID:nodeID controller:controller resolvingAddress:YES];
     return device;
 }
