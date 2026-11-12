@@ -212,12 +212,31 @@ void PushAvStreamTransportServerLogic::OnFabricRemoved(FabricIndex fabricIndex)
         if (mDelegate == nullptr || mDelegate->DeallocatePushTransport(connectionID) != Status::Success)
         {
             ChipLogError(Zcl, "OnFabricRemoved[ep=%d]: Delegate deallocate failed for ConnectionID %u", mEndpointId, connectionID);
-            // Keep the connection entry and its expiry timer so the teardown can be retried.
-            continue;
         }
-        // The fabric is gone and the delegate released the transport, so the entry stays evicted
-        // even if persisting the list fails; a later successful write corrects storage.
+        // The fabric is gone and the delegate has been notified, so the entry and its expiry
+        // timer are removed even when the delegate teardown failed; no later event retries it.
         LogErrorOnFailure(RemoveStreamTransportConnection(connectionID, /*revertOnStoreFailure=*/false));
+        RemoveTimerAppState(connectionID);
+    }
+}
+
+void PushAvStreamTransportServerLogic::RemoveConnectionsForMissingFabrics(const FabricTable & fabricTable)
+{
+    // Collect the connection IDs first: RemoveStreamTransportConnection erases from
+    // mCurrentConnections while this loop iterates over it.
+    std::vector<uint16_t> connectionIDs;
+    for (const TransportConfigurationStorage & connection : mCurrentConnections)
+    {
+        if (fabricTable.FindFabricWithIndex(connection.GetFabricIndex()) == nullptr)
+        {
+            connectionIDs.push_back(connection.connectionID);
+        }
+    }
+
+    for (uint16_t connectionID : connectionIDs)
+    {
+        ChipLogDetail(Zcl, "Push AV Stream Transport: dropping ConnectionID %u whose fabric no longer exists", connectionID);
+        LogErrorOnFailure(RemoveStreamTransportConnection(connectionID));
         RemoveTimerAppState(connectionID);
     }
 }

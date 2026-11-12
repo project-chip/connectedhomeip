@@ -76,18 +76,26 @@ public:
 
         EventManagement::CreateEventManagement(&GetExchangeManager(), std::size(logStorageResources), gCircularEventBuffer,
                                                logStorageResources, &mEventCounter);
+
+        ASSERT_EQ(mFabricHelper.SetUpTestFabric(mFabricIndex), CHIP_NO_ERROR);
     }
 
     void TearDown() override
     {
+        mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+        ASSERT_EQ(mFabricHelper.TearDownTestFabric(mFabricIndex), CHIP_NO_ERROR);
         EventManagement::DestroyEventManagement();
         AppContext::TearDown();
     }
 
 protected:
     MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
-    FabricTable mFabricTable;
-    Clusters::PushAvStreamTransportServer mServer{ 1, BitFlags<Clusters::PushAvStreamTransport::Feature>(1), mFabricTable };
+    // Connections are fabric-scoped, so the cluster is tested against a commissioned test fabric.
+    FabricIndex mFabricIndex                                = 1;
+    chip::Testing::TestServerClusterContext mFabricContext; // provides storage for the test fabric
+    chip::Testing::FabricTestFixture mFabricHelper{ &mFabricContext.StorageDelegate() };
+    Clusters::PushAvStreamTransportServer mServer{ 1, BitFlags<Clusters::PushAvStreamTransport::Feature>(1),
+                                                  mFabricHelper.GetFabricTable() };
     chip::Testing::ClusterTester mClusterTester;
 };
 
@@ -110,18 +118,25 @@ public:
 
         EventManagement::CreateEventManagement(&GetExchangeManager(), std::size(logStorageResources), gCircularEventBuffer,
                                                logStorageResources, &mEventCounter);
+
+        ASSERT_EQ(mFabricHelper.SetUpTestFabric(mFabricIndex), CHIP_NO_ERROR);
     }
 
     void TearDown() override
     {
+        mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+        ASSERT_EQ(mFabricHelper.TearDownTestFabric(mFabricIndex), CHIP_NO_ERROR);
         EventManagement::DestroyEventManagement();
         AppContext::TearDown();
     }
 
 protected:
     MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
-    FabricTable mFabricTable;
-    Clusters::PushAvStreamTransportServer mServer{ 1, BitFlags<Clusters::PushAvStreamTransport::Feature>(), mFabricTable };
+    FabricIndex mFabricIndex                                = 1;
+    chip::Testing::TestServerClusterContext mFabricContext; // provides storage for the test fabric
+    chip::Testing::FabricTestFixture mFabricHelper{ &mFabricContext.StorageDelegate() };
+    Clusters::PushAvStreamTransportServer mServer{ 1, BitFlags<Clusters::PushAvStreamTransport::Feature>(),
+                                                  mFabricHelper.GetFabricTable() };
     chip::Testing::ClusterTester mClusterTester;
 };
 
@@ -430,9 +445,19 @@ public:
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
+    void SetUp() override { ASSERT_EQ(mFabricHelper.SetUpTestFabric(mFabricIndex), CHIP_NO_ERROR); }
+    void TearDown() override
+    {
+        mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+        ASSERT_EQ(mFabricHelper.TearDownTestFabric(mFabricIndex), CHIP_NO_ERROR);
+    }
+
 protected:
-    FabricTable mFabricTable;
-    PushAvStreamTransportServer mServer{ 1, BitFlags<Feature>(1), mFabricTable };
+    // Connections are fabric-scoped, so the cluster is tested against a commissioned test fabric.
+    FabricIndex mFabricIndex                                = 1;
+    chip::Testing::TestServerClusterContext mFabricContext; // provides storage for the test fabric
+    chip::Testing::FabricTestFixture mFabricHelper{ &mFabricContext.StorageDelegate() };
+    PushAvStreamTransportServer mServer{ 1, BitFlags<Feature>(1), mFabricHelper.GetFabricTable() };
     chip::Testing::ClusterTester mClusterTester;
 };
 
@@ -592,7 +617,7 @@ private:
 };
 
 // A storage failure while persisting a fabric removal keeps the connection evicted instead of
-// restoring an entry whose fabric is gone.
+// restoring an entry whose fabric is gone, and a restart drops the stale entry from storage.
 TEST_F(TestPushAVStreamTransportServerLogic, TestFabricRemovedKeepsConnectionEvictedOnStoreFailure)
 {
     chip::Testing::TestServerClusterContext context;
@@ -658,7 +683,18 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestFabricRemovedKeepsConnectionEvi
     // The storage write fails, but the entry must stay evicted rather than being restored.
     EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 0);
 
+    // Simulate a restart: storage still holds the removed fabric's connection because the
+    // removal write failed, so a fresh cluster load must drop it instead of resurrecting it.
+    failingProvider.FailWrites(false);
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    PushAvStreamTransportServer restartedServer(1, BitFlags<Feature>(1), fabricHelper.GetFabricTable());
+    ASSERT_EQ(restartedServer.Startup(context.Get()), CHIP_NO_ERROR);
+    restartedServer.GetLogic().SetDelegate(&mockDelegate);
+    restartedServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(restartedServer.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(restartedServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
+
     ASSERT_EQ(fabricHelper.TearDownTestFabric(fabric1), CHIP_NO_ERROR);
 }
 

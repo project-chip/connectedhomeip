@@ -111,12 +111,15 @@ public:
     }
 
     /**
-     * Loads the persisted CurrentConnections. Must be called after Startup().
+     * Loads the persisted CurrentConnections and drops entries whose fabric no longer
+     * exists. Must be called after Startup().
      */
     CHIP_ERROR Init()
     {
         VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mLogic.Init(mContext->attributeStorage);
+        ReturnErrorOnFailure(mLogic.Init(mContext->attributeStorage));
+        mLogic.RemoveConnectionsForMissingFabrics(mFabricTable);
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override

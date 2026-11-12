@@ -10,6 +10,7 @@
 #include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <credentials/FabricTable.h>
 #include <functional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <string>
@@ -112,6 +113,12 @@ public:
     /// removes the connection entries. Skips busy-status and accessing-fabric validation since
     /// fabric removal is mandatory.
     void OnFabricRemoved(FabricIndex fabricIndex);
+
+    /// Removes connections whose fabric no longer exists in `fabricTable`.
+    ///
+    /// Fabric removal can leave entries in storage when persisting the removal failed;
+    /// called during Init so a restart does not resurrect entries for removed fabrics.
+    void RemoveConnectionsForMissingFabrics(const FabricTable & fabricTable);
 
     bool HasFeature(PushAvStreamTransport::Feature feature) const;
 
