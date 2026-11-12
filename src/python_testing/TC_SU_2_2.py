@@ -184,15 +184,18 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             TestStep(9, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
                      "QueryStatus is set to 'UpdateAvailable', Action field is set to 'AwaitNextAction', "
                      "ImageURI is set to the location where the image is located. "
-                     "DUT successfully finishes applying a software update, and the new software image version is being executed on the DUT. "
-                     "OTA-Subscriber sends a read request to read the VersionApplied event from the DUT.",
+                     "DUT successfully finishes applying a software update, and the new software image version is being executed on the DUT. ",
                      "Verify that there is a transfer of the software image from the TH/OTA-P to the DUT. "
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for all the state changes i.e. Querying, Downloading, Applying, Idle (optional)."
-                     "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnApply."
-                     "Verify that the VersionApplied event is generated whenever a new version starts executing after being applied due to a software update.Verify that the data in this event has the following"
-                     "SoftwareVersion - Same as the one available in the SoftwareVersion attribute of the Basic Information Cluster for the newly executing version"
-                     "ProductID - Same as what is available in the ProductID attribute of the Basic Information Cluster"),
-            TestStep(10, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable' "
+                     "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnApply."),
+            TestStep(10, "DUT sends the NotifyUpdateApplied Command to the OTA-P after installing the software update.", "Verify that the NotifyUpdateApplied message received on the OTA-P has the following fields."
+                        "UpdateToken - verify that it is the same as the one provided by the OTA provider in the QueryImageResponse."
+                        "SoftwareVersion - verify the software version on the DUT to match the version downloaded for the software update."),
+            TestStep(11, "TH reads BootReason in General Diagnostics cluster from the DUT.", "Verify that the returned value of BootReason is SoftwareUpdateCompleted"),
+            TestStep(12, "OTA-Subscriber sends a read request to read the VersionApplied event from the DUT.", "Verify that the VersionApplied event is generated whenever a new version starts executing after being applied due to a software update.Verify that the data in this event has the following"
+                                 "SoftwareVersion - Same as the one available in the SoftwareVersion attribute of the Basic Information Cluster for the newly executing version"
+                                 "ProductID - Same as what is available in the ProductID attribute of the Basic Information Cluster"),
+            TestStep(13, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable' "
                      "and SoftwareVersion is set to the same version the DUT just applied (V2), which is numerically equal to the current version.",
                      "Verify that the DUT does not start transferring the software image."),
         ]
@@ -1770,13 +1773,30 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             controller=controller, node_id=requestor_node_id, target_version=ota_image_version)
         logger.info('%s: Step #9.6 - DUT confirmed running software version %s.', step_number_s9, ota_image_version)
 
-        # [Start of Step #1 from TC_SU_2_7]
-        # After the device is updated, read the event it records on reboot. ReadEvent is used
-        # directly because an EventSubscription cannot reliably observe an event generated while
-        # the DUT was rebooting.
+        
+        
+        self.step(10)
+        step_number_s10 = "[STEP_10]"
+        # Add check with named pipe here
 
+
+        self.step(11)
+        step_number_s11 = "[STEP_11]"
+        boot_reason = await self.read_single_attribute_check_success(
+            cluster=Clusters.GeneralDiagnostics,
+            attribute=Clusters.GeneralDiagnostics.Attributes.BootReason,
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=self.get_endpoint(),
+        )
+        logger.info("%s Device BootReason value: %d", step_number_s11, boot_reason)
+        asserts.assert_equal(boot_reason, Clusters.GeneralDiagnostics.Enums.BootReasonEnum.kSoftwareUpdateCompleted, "BootReason is not SoftwareUpdateCompleted")
+
+
+        self.step(12)
         # Read the VersionApplied event: once the device is back and idle, it must be in the
         # event list.
+        step_number_s12 = "[STEP_12]"
         urgent = 1
         version_applied_event = Clusters.OtaSoftwareUpdateRequestor.Events.VersionApplied
         events_response = await controller.ReadEvent(
@@ -1784,7 +1804,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             events=[(0, version_applied_event, urgent)],
             fabricFiltered=True
         )
-        logger.info("%s Events gathered after reboot: %s", step_number_s9, events_response)
+        logger.info("%s Events gathered after reboot: %s", step_number_s12, events_response)
         # Only VersionApplied events should be in the list
         if len(events_response) == 0:
             asserts.fail("Failed to read events")
@@ -1792,7 +1812,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Look for the VersionApplied event
         for event in events_response:
             if event.Header.EventId == version_applied_event.event_id:
-                logger.info("%s VersionApplied event found after reboot.", step_number_s9)
+                logger.info("%s VersionApplied event found after reboot.", step_number_s12)
                 version_applied_event_data = event.Data
         asserts.assert_is_not_none(version_applied_event_data, "Failed to read the VersionApplied event")
         asserts.assert_equal(ota_image_version, version_applied_event_data.softwareVersion,
@@ -1805,19 +1825,18 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             attribute=Clusters.BasicInformation.Attributes.ProductID)
         asserts.assert_equal(version_applied_event_data.productID, product_id,
                              "ProductID from BasicInformationCluster is not the same from the VersionAppliedEvent")
-        # Software version already validated at verify_applied_basic_information and compared with ota_image_version
-        # [End of Step #1 from TC_SU_2_7]
-        self.step(10)
+        
+        self.step(13)
         # ------------------------------------------------------------------------------------
-        # [STEP_10]: Prerequisites - Setup Provider
+        # [STEP_13]: Prerequisites - Setup Provider
         # The DUT has just applied the V2 firmware in Step 9. By serving the same V2 image here
         # with updateAvailable, the DUT sees it as "same version" and rejects the download.
         # No separate firmware image is needed — the single V2 image (ota_image) is reused,
         # meaning only one firmware image is required for the entire test.
         # ------------------------------------------------------------------------------------
-        step_number_s10 = "[STEP_10]"
+        step_number_s13 = "[STEP_13]"
         logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s',
-                    step_number_s10, requestor_node_id, fabric_id)
+                    step_number_s13, requestor_node_id, fabric_id)
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -1836,7 +1855,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
 
         # ------------------------------------------------------------------------------------
-        # [STEP_10]: Step #10.1 - Subscribe to UpdateState attribute.
+        # [STEP_13]: Step #13.1 - Subscribe to UpdateState attribute.
         # Attribute subscription is used instead of event subscription because:
         #   1. After the Step 9 OTA reboot the DUT's event buffer contains stale
         #      StateTransition events (kApplying→kIdle etc.) that arrive first.
@@ -1851,7 +1870,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         )
 
         await self._start_subscription_bounded(
-            subscription_s10, step_number_s10,
+            subscription_s10, step_number_s13,
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=0,
@@ -1876,12 +1895,12 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             requestor_node_id=requestor_node_id,
             subscription=subscription_s10,
             timeout_sec=IDLE_BEFORE_ANNOUNCE_TIMEOUT_SEC,
-            step_name=step_number_s10,
+            step_name=step_number_s13,
         )
         subscription_s10.flush_reports()
 
         # ------------------------------------------------------------------------------------
-        # [STEP_10]: Step #10.2 - Controller sends AnnounceOTAProvider command, repeating until the
+        # [STEP_13]: Step #13.2 - Controller sends AnnounceOTAProvider command, repeating until the
         # provider confirms it received a QueryImage.
         #
         # The provider process was just replaced by start_provider() above, so the DUT's first
@@ -1891,17 +1910,17 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # transitions — is what makes the cycle observed below prove the same-version rejection
         # actually happened against this provider.
         # ------------------------------------------------------------------------------------
-        logger.info('%s: Step #10.2 - Controller sends AnnounceOTAProvider command', step_number_s10)
+        logger.info('%s: Step #10.2 - Controller sends AnnounceOTAProvider command', step_number_s13)
         await self._announce_until_provider_queried(
             controller=controller,
             provider_node_id=provider_node_id,
             requestor_node_id=requestor_node_id,
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC),
-            step_name=step_number_s10,
+            step_name=step_number_s13,
         )
 
         # ------------------------------------------------------------------------------------
-        # [STEP_10]: Step #10.3 - The DUT (on V2) must query the provider (which offers the same
+        # [STEP_13]: Step #13.3 - The DUT (on V2) must query the provider (which offers the same
         # V2), reject the image, and return to kIdle WITHOUT downloading.
         #
         # Strict-order verification over the FIFO report queue. await_first_value_asserting_no_
@@ -1922,28 +1941,28 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # an indefinite wait.
         # ------------------------------------------------------------------------------------
         logger.info('%s: Step #10.3 - Phase A — waiting for kQuerying (DUT queries the provider after announce).',
-                    step_number_s10)
+                    step_number_s13)
         subscription_s10.await_first_value_asserting_no_forbidden(
             target_value=kQuerying_s6,
             forbidden_values=s6_forbidden,
             timeout_sec=STEP6_CYCLE_TIMEOUT_SEC,
             expected_attribute=UpdateState_s6,
         )
-        logger.info('%s: kQuerying observed (expected).', step_number_s10)
+        logger.info('%s: kQuerying observed (expected).', step_number_s13)
 
         logger.info('%s: Phase B — waiting for return to kIdle (same-version image rejected, no download).',
-                    step_number_s10)
+                    step_number_s13)
         subscription_s10.await_first_value_asserting_no_forbidden(
             target_value=kIdle_s6,
             forbidden_values=s6_forbidden,
             timeout_sec=STEP6_CYCLE_TIMEOUT_SEC,
             expected_attribute=UpdateState_s6,
         )
-        logger.info('%s: kIdle after query observed — cycle completed without download.', step_number_s10)
+        logger.info('%s: kIdle after query observed — cycle completed without download.', step_number_s13)
 
         subscription_s10.cancel()
-        logger.info('%s: Step #10.4 - Query cycle fully completed after announce.', step_number_s10)
-        logger.info("%s: No image transfer occurred (expected — DUT already on V2).", step_number_s10)
+        logger.info('%s: Step #10.4 - Query cycle fully completed after announce.', step_number_s13)
+        logger.info("%s: No image transfer occurred (expected — DUT already on V2).", step_number_s13)
 
 
 if __name__ == "__main__":
