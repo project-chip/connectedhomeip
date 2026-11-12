@@ -33,7 +33,7 @@ from mobly import asserts, signals
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.clusters.Attribute import AttributePath, TypedAttributePath, ValueDecodeFailure
+from matter.clusters.Attribute import AttributePath, ReadOperationOptions, TypedAttributePath, ValueDecodeFailure
 from matter.clusters.enum import MatterIntEnum
 from matter.clusters.Types import Nullable, NullValue
 from matter.exceptions import ChipStackError
@@ -84,8 +84,14 @@ class ConstraintProbeResult:
 class ConstraintProbeExecutionError(ChipStackError):
     """A qualified probe failed during execution; retain its partial result."""
 
-    def __init__(self, error: ChipStackError | InteractionModelError, result: ConstraintProbeResult) -> None:
-        super().__init__(error.err if isinstance(error, ChipStackError) else 0x500 | int(error.status))
+    def __init__(self, error: ChipStackError | InteractionModelError | TimeoutError, result: ConstraintProbeResult) -> None:
+        if isinstance(error, TimeoutError):
+            error_code = 0x32
+        elif isinstance(error, ChipStackError):
+            error_code = error.err
+        else:
+            error_code = 0x500 | int(error.status)
+        super().__init__(error_code)
         self.result = result
 
 
@@ -1107,6 +1113,12 @@ class IDMBaseTest(BasicCompositionTests):
         is bounded by its enum definition instead. Attributes for which no violating
         value can be built return a result with probed == 0 without touching the DUT.
         Only an enum yields more than one value; see generate_constraint_violations.
+
+        One-shot reads explicitly opt into native abort with a 30-second deadline.
+        Restoration and verification share a separate 30-second budget. Tests may
+        override constraint_read_timeout_ms and constraint_restoration_timeout_ms
+        with positive millisecond values. Failed aborts retain native ownership until
+        settlement rather than abandoning a live callback-owned Future.
         """
         # An attribute that declares no constraint carries no bounds to resolve, and the
         # empty set reads the same as one whose every bound is unset.
@@ -1143,12 +1155,25 @@ class IDMBaseTest(BasicCompositionTests):
 
         # Read the original value once: every probe below restores it before the next one
         # runs, so each of them starts from the value read here.
-        original_value = await self.read_single_attribute_check_success(
+        read_timeout_ms = getattr(self, 'constraint_read_timeout_ms', 30000)
+        restoration_timeout_ms = getattr(self, 'constraint_restoration_timeout_ms', 30000)
+
+        async def bounded_read(operation: Awaitable[Any], timeout_ms: int) -> Any:
+            try:
+                async with asyncio.timeout(timeout_ms / 1000):
+                    return await operation
+            except TimeoutError as error:
+                for note in getattr(error.__cause__, '__notes__', ()):
+                    error.add_note(note)
+                raise
+
+        original_value = await bounded_read(self.read_single_attribute_check_success(
             endpoint=attr_info.endpoint_id,
             cluster=attr_info.cluster_class,
             attribute=attr_info.attribute,
-            assert_on_error=False
-        )
+            assert_on_error=False,
+            readOperation=ReadOperationOptions(read_timeout_ms)
+        ), read_timeout_ms)
         if original_value is None:
             log.warning("Unable to qualify readable baseline for %s.%s",
                         attr_info.cluster_name, attr_info.attribute_name)
@@ -1168,7 +1193,7 @@ class IDMBaseTest(BasicCompositionTests):
         result = ConstraintProbeResult()
         cancellation = None
 
-        async def await_settled_probe_operation(operation: Awaitable[Any]) -> Any:
+        async def await_settled_probe_operation(operation: Awaitable[Any], *, abortable_read: bool = False) -> Any:
             nonlocal cancellation
             pending = asyncio.ensure_future(operation)
             while True:
@@ -1177,6 +1202,8 @@ class IDMBaseTest(BasicCompositionTests):
                 except asyncio.CancelledError as error:
                     if cancellation is None:
                         cancellation = error
+                    if abortable_read and not pending.done():
+                        pending.cancel()
                     if pending.cancelled():
                         raise
                     result.execution_error += 1
@@ -1251,13 +1278,15 @@ class IDMBaseTest(BasicCompositionTests):
             restore_needed = True
             restore_failed = False
             stored_violation = False
+            restoration_diagnostics = []
             try:
-                stored_value = await await_settled_probe_operation(self.read_single_attribute(
+                stored_value = await await_settled_probe_operation(bounded_read(self.read_single_attribute(
                     dev_ctrl=self.default_controller,
                     node_id=self.dut_node_id,
                     endpoint=attr_info.endpoint_id,
-                    attribute=attr_info.attribute
-                ))
+                    attribute=attr_info.attribute,
+                    readOperation=ReadOperationOptions(read_timeout_ms)
+                ), read_timeout_ms), abortable_read=True)
                 read_back_failed = isinstance(stored_value, ValueDecodeFailure)
                 restore_needed = read_back_failed or stored_value != original_value
                 if read_back_failed and isinstance(stored_value.Reason, (InteractionModelError, ChipStackError)):
@@ -1280,7 +1309,11 @@ class IDMBaseTest(BasicCompositionTests):
                         problem=(f"{attribute_path} rejected out-of-bounds value {test_value} with "
                                  f"{status_name} instead of CONSTRAINT_ERROR"))
                     result.other_error += 1
-            except (ChipStackError, InteractionModelError) as error:  # chipstack-ok
+            except asyncio.CancelledError as error:
+                if cancellation is None:
+                    cancellation = error
+                result.execution_error += 1
+            except (ChipStackError, InteractionModelError, TimeoutError) as error:  # chipstack-ok
                 result.execution_error += 1
                 log.warning("Execution failed reading back %s: %s", attribute_path, error)
                 if execution_failure is None:
@@ -1292,18 +1325,22 @@ class IDMBaseTest(BasicCompositionTests):
                 log.warning("Write readback assertion failed for %s: %s", attribute_path, error)
             finally:
                 if restore_needed:
+                    restoration_deadline = asyncio.get_running_loop().time() + restoration_timeout_ms / 1000
                     try:
                         restore_result = await await_settled_probe_operation(self.default_controller.WriteAttribute(
                             nodeId=self.dut_node_id,
                             attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))],
-                            timedRequestTimeoutMs=timed_request_timeout_ms
+                            timedRequestTimeoutMs=timed_request_timeout_ms,
+                            interactionTimeoutMs=restoration_timeout_ms
                         ))
                     except InteractionModelError as error:
                         result.execution_error += 1
                         restore_failed = True
+                        restoration_diagnostics.append(f'Restoration write failed: {error!r}')
                         log.warning("Execution failed restoring %s: %s", attribute_path, error.status)
-                    except ChipStackError as error:  # chipstack-ok
+                    except (ChipStackError, TimeoutError) as error:  # chipstack-ok
                         result.execution_error += 1
+                        restoration_diagnostics.append(f'Restoration write failed: {error!r}')
                         log.warning("Execution failed restoring %s: %s", attribute_path, error)
                         if execution_failure is None:
                             execution_failure = error
@@ -1311,31 +1348,45 @@ class IDMBaseTest(BasicCompositionTests):
                         if restore_result[0].Status != Status.Success:
                             result.execution_error += 1
                             restore_failed = True
+                            restoration_diagnostics.append(f'Restoration write status: {restore_result[0].Status!r}')
                             log.warning("Failed to restore %s to %s: %s", attribute_path, original_value,
                                         restore_result[0].Status)
                         else:
                             try:
-                                restored_value = await await_settled_probe_operation(self.read_single_attribute_check_success(
+                                remaining_ms = int((restoration_deadline - asyncio.get_running_loop().time()) * 1000)
+                                if remaining_ms <= 0:
+                                    raise TimeoutError('Attribute restoration budget exhausted before verification')
+                                restored_value = await await_settled_probe_operation(bounded_read(self.read_single_attribute_check_success(
                                     endpoint=attr_info.endpoint_id,
                                     cluster=attr_info.cluster_class,
                                     attribute=attr_info.attribute,
-                                    assert_on_error=False
-                                ))
-                            except (ChipStackError, InteractionModelError) as error:
+                                    assert_on_error=False,
+                                    readOperation=ReadOperationOptions(remaining_ms)
+                                ), remaining_ms))
+                            except (ChipStackError, InteractionModelError, TimeoutError) as error:
                                 result.execution_error += 1
+                                restoration_diagnostics.append(f'Restoration verification failed: {error!r}')
+                                restoration_diagnostics.extend(getattr(error, '__notes__', ()))
                                 log.warning("Execution failed verifying restoration of %s: %s", attribute_path, error)
                                 if execution_failure is None:
                                     execution_failure = error
                             except signals.TestFailure as error:
                                 result.execution_error += 1
                                 restore_failed = True
+                                restoration_diagnostics.append(f'Restoration verification failed: {error!r}')
                                 log.warning("Failed to verify restoration of %s: %s", attribute_path, error)
                             else:
                                 if restored_value != original_value:
                                     result.execution_error += 1
                                     restore_failed = True
+                                    restoration_diagnostics.append(
+                                        f'Restoration verification mismatch: expected {original_value}, observed {restored_value}')
                                     log.warning("Failed to verify restoration of %s to %s: observed %s",
                                                 attribute_path, original_value, restored_value)
+            primary_error = cancellation or execution_failure or pending_assertion
+            if primary_error is not None:
+                for diagnostic in restoration_diagnostics:
+                    primary_error.add_note(diagnostic)
             if cancellation is not None:
                 raise cancellation
             if execution_failure is not None:

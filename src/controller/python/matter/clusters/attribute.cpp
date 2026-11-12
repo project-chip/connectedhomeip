@@ -543,6 +543,11 @@ exit:
     return ToPyChipError(err);
 }
 
+PyChipError pychip_ReadClient_AbortRead(ReadClient * apReadClient)
+{
+    return ToPyChipError(apReadClient == nullptr ? CHIP_NO_ERROR : apReadClient->AbortRead());
+}
+
 void pychip_ReadClient_ShutdownSubscription(ReadClient * apReadClient)
 {
     // If apReadClient is nullptr, it means that its life cycle has ended (such as an error happend), and nothing needs to be done.

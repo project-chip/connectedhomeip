@@ -2377,7 +2377,8 @@ class ChipDeviceControllerBase:
         eventNumberFilter: int | None = None,
         returnClusterObject: bool = False, reportInterval: tuple[int, int] | None = None,
         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
-        payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
+        payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD,
+        *, readOperation: ClusterAttribute.ReadOperationOptions | None = None
     ):
         '''
         Read a list of attributes and/or events from a target node
@@ -2415,6 +2416,11 @@ class ChipDeviceControllerBase:
 
         eventNumberFilter: Optional minimum event number filter.
 
+        readOperation: Explicitly opt into cancellation-safe one-shot native abort and
+            an optional overall timeout including session acquisition and retries.
+            Native completion is awaited even if abort fails; its diagnostic does
+            not replace the original cancellation/deadline. Not for subscriptions.
+
         returnClusterObject: This returns the data as consolidated cluster objects, with all attributes for a cluster inside
                              a single cluster-wide cluster object.
 
@@ -2443,10 +2449,18 @@ class ChipDeviceControllerBase:
         # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
 
         eventLoop = asyncio.get_running_loop()
+        if readOperation is not None and reportInterval is not None:
+            raise ValueError("ReadOperationOptions are only supported for one-shot reads")
+        deadline = (eventLoop.time() + readOperation.overallTimeoutMs / 1000
+                    if readOperation is not None and readOperation.overallTimeoutMs is not None else None)
 
         async def _read_impl():
             future = eventLoop.create_future()
-            device = await self.GetConnectedDevice(nodeId, payloadCapability=payloadCapability)
+            if deadline is None:
+                device = await self.GetConnectedDevice(nodeId, payloadCapability=payloadCapability)
+            else:
+                async with asyncio.timeout_at(deadline):
+                    device = await self.GetConnectedDevice(nodeId, payloadCapability=payloadCapability)
             attributePaths = [self._parseAttributePathTuple(
                 v) for v in attributes] if attributes else None
             clusterDataVersionFilters = [self._parseDataVersionFilterTuple(
@@ -2479,7 +2493,10 @@ class ChipDeviceControllerBase:
                                       reportInterval[0], reportInterval[1]) if reportInterval else None,
                                   fabricFiltered=fabricFiltered,
                                   keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe, allowLargePayload=allowLargePayload).raise_on_error()
-            await future
+            if readOperation is None:
+                await future
+            else:
+                await transaction.AwaitCompletion(deadline)
             if result := transaction.GetSubscriptionHandler():
                 return result
             return transaction.GetReadResponse()
@@ -2502,10 +2519,13 @@ class ChipDeviceControllerBase:
         returnClusterObject: bool = False,
         reportInterval: tuple[int, int] | None = None,
         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
-        payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
+        payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD,
+        *, readOperation: ClusterAttribute.ReadOperationOptions | None = None
     ):
         '''
         Read a list of attributes from a target node, this is a wrapper of DeviceController.Read()
+
+        readOperation: Optional explicit one-shot abort/deadline contract; see Read.
 
         nodeId: Target's Node ID
         attributes: A list of tuples of varying types depending on the type of read being requested:
@@ -2558,6 +2578,7 @@ class ChipDeviceControllerBase:
         Raises:
             - InteractionModelError (matter.interaction_model) on error
         '''
+        read_options = {'readOperation': readOperation} if readOperation is not None else {}
         res = await self.Read(nodeId,
                               attributes=attributes,
                               dataVersionFilters=dataVersionFilters,
@@ -2566,7 +2587,8 @@ class ChipDeviceControllerBase:
                               fabricFiltered=fabricFiltered,
                               keepSubscriptions=keepSubscriptions,
                               autoResubscribe=autoResubscribe,
-                              payloadCapability=payloadCapability)
+                              payloadCapability=payloadCapability,
+                              **read_options)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
         return res.attributes
@@ -2587,11 +2609,13 @@ class ChipDeviceControllerBase:
         reportInterval: tuple[int, int] | None = None,
         keepSubscriptions: bool = False,
         autoResubscribe: bool = True,
-        payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
+        payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD,
+        *, readOperation: ClusterAttribute.ReadOperationOptions | None = None
     ):
         '''
         Read a list of events from a target node, this is a wrapper of DeviceController.Read()
 
+        readOperation: Optional explicit one-shot abort/deadline contract; see Read.
         nodeId: Target's Node ID
         events: A list of tuples of varying types depending on the type of read being requested:
             (endpoint, Clusters.ClusterA.EventA, urgent):       Endpoint = specific,
@@ -2633,9 +2657,10 @@ class ChipDeviceControllerBase:
         Raises:
             - InteractionModelError (matter.interaction_model) on error
         '''
+        read_options = {'readOperation': readOperation} if readOperation is not None else {}
         res = await self.Read(nodeId=nodeId, events=events, eventNumberFilter=eventNumberFilter,
                               fabricFiltered=fabricFiltered, reportInterval=reportInterval, keepSubscriptions=keepSubscriptions,
-                              autoResubscribe=autoResubscribe, payloadCapability=payloadCapability)
+                              autoResubscribe=autoResubscribe, payloadCapability=payloadCapability, **read_options)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
         return res.events

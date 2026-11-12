@@ -945,8 +945,14 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
 
                 async def readback(**kwargs):
                     if phase == 'readback':
+                        from matter.clusters.Attribute import AsyncReadTransaction
+
+                        self.assertIsNotNone(kwargs['readOperation'])
+                        transaction = AsyncReadTransaction(response, asyncio.get_running_loop(), None, False)
+                        transaction.AbortRead = Mock()
                         started.set()
-                        return await response
+                        await transaction.AwaitCompletion()
+                        return response.result()
                     return 3
 
                 async def write_attribute(**kwargs):
@@ -978,6 +984,111 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                                   for call in self.checker.default_controller.WriteAttribute.call_args_list], [3, 2])
                 self.checker.record_warning.assert_not_called()
                 self.checker.default_controller.SendCommand.assert_not_called()
+
+    async def test_readback_deadline_aborts_without_cancelling_native_future(self):
+        """A stalled opted-in read settles before restoration and prevents later probes."""
+        import asyncio
+
+        from support_modules.idm_support import ConstraintProbeExecutionError
+
+        from matter.clusters.Attribute import AsyncReadTransaction
+
+        info = self._prepare_writable_attribute()
+        self.checker.constraint_read_timeout_ms = 10
+        self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
+        self.checker.read_single_attribute_check_success = AsyncMock(return_value=2)
+        response = asyncio.get_running_loop().create_future()
+        transaction = AsyncReadTransaction(response, asyncio.get_running_loop(), None, False)
+        transaction.AbortRead = Mock(side_effect=lambda: response.set_result(3))
+
+        async def readback(**kwargs):
+            self.assertEqual(kwargs['readOperation'].overallTimeoutMs, 10)
+            await transaction.AwaitCompletion()
+            return response.result()
+
+        self.checker.read_single_attribute = AsyncMock(side_effect=readback)
+        self.checker.default_controller.WriteAttribute.side_effect = [
+            [SimpleNamespace(Status=Status.ConstraintError)], [SimpleNamespace(Status=Status.Success)]]
+        with self.assertRaises(ConstraintProbeExecutionError) as raised:
+            await self.checker.check_attribute_constraint(info, info.constraints)
+        self.assertIsInstance(raised.exception.__cause__, TimeoutError)
+        self.assertFalse(response.cancelled())
+        transaction.AbortRead.assert_called_once()
+        self.assertEqual([call.kwargs['attributes'][0][1].value
+                          for call in self.checker.default_controller.WriteAttribute.call_args_list], [3, 2])
+        self.assertEqual(self.checker.read_single_attribute_check_success.await_count, 2)
+        self.checker.record_accepted_violation.assert_not_called()
+
+    async def test_restoration_write_exhausts_shared_verification_budget(self):
+        """Finite restoration writes settle, but exhausted cleanup cannot start verification."""
+        import asyncio
+
+        from support_modules.idm_support import ConstraintProbeExecutionError
+
+        info = self._prepare_writable_attribute()
+        self.checker.constraint_restoration_timeout_ms = 1
+        self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
+        self.checker.read_single_attribute_check_success = AsyncMock(return_value=2)
+        self.checker.read_single_attribute = AsyncMock(return_value=3)
+        response = asyncio.get_running_loop().create_future()
+
+        async def write_attribute(**kwargs):
+            if kwargs['attributes'][0][1].value == 3:
+                return [SimpleNamespace(Status=Status.ConstraintError)]
+            self.assertEqual(kwargs['interactionTimeoutMs'], 1)
+            asyncio.get_running_loop().call_later(0.01, response.set_result, [SimpleNamespace(Status=Status.Success)])
+            return await response
+
+        self.checker.default_controller.WriteAttribute = AsyncMock(side_effect=write_attribute)
+        with self.assertRaises(ConstraintProbeExecutionError) as raised:
+            await self.checker.check_attribute_constraint(info, info.constraints)
+        self.assertIsInstance(raised.exception.__cause__, TimeoutError)
+        self.assertIn('budget exhausted before verification', str(raised.exception.__cause__))
+        self.assertTrue(any('Restoration verification failed' in note for note in raised.exception.__cause__.__notes__))
+        self.assertFalse(response.cancelled())
+        self.assertEqual(self.checker.read_single_attribute_check_success.await_count, 1)
+        self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, 2)
+
+    async def test_verification_abort_failure_retains_distinct_diagnostics(self):
+        """Timeout conversion must preserve abort diagnostics and stop subsequent probes."""
+        import asyncio
+
+        from support_modules.idm_support import ConstraintProbeExecutionError
+
+        from matter.clusters.Attribute import AsyncReadTransaction
+
+        info = self._prepare_writable_attribute()
+        self.checker.constraint_restoration_timeout_ms = 10
+        self.checker.generate_constraint_violations = Mock(return_value=[3, 4])
+        self.checker.read_single_attribute = AsyncMock(return_value=3)
+        response = asyncio.get_running_loop().create_future()
+        transaction = AsyncReadTransaction(response, asyncio.get_running_loop(), None, False)
+
+        def failed_abort():
+            response.set_result(2)
+            raise ChipStackError(0x2f)
+
+        transaction.AbortRead = Mock(side_effect=failed_abort)
+
+        async def verified_read(**kwargs):
+            if self.checker.read_single_attribute_check_success.await_count == 1:
+                return 2
+            self.assertLessEqual(kwargs['readOperation'].overallTimeoutMs, 10)
+            await transaction.AwaitCompletion()
+            return response.result()
+
+        self.checker.read_single_attribute_check_success = AsyncMock(side_effect=verified_read)
+        self.checker.default_controller.WriteAttribute.side_effect = [
+            [SimpleNamespace(Status=Status.ConstraintError)], [SimpleNamespace(Status=Status.Success)]]
+        with self.assertRaises(ConstraintProbeExecutionError) as raised:
+            await self.checker.check_attribute_constraint(info, info.constraints)
+        self.assertIsInstance(raised.exception.__cause__, TimeoutError)
+        notes = raised.exception.__cause__.__notes__
+        self.assertTrue(any('Native read abort failed' in note for note in notes))
+        self.assertTrue(any('Restoration verification failed' in note for note in notes))
+        self.assertFalse(response.cancelled())
+        transaction.AbortRead.assert_called_once()
+        self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, 2)
 
     async def test_cancelled_write_readback_assertion_preserves_cancellation(self):
         """Cleanup assertions must not replace cancellation of an applied write."""

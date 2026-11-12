@@ -2533,7 +2533,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True, verify_wildcard_subscription: bool | None = None) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True, verify_wildcard_subscription: bool | None = None,
+            *, readOperation: Clusters.Attribute.ReadOperationOptions | None = None) -> object:
         """Read a single attribute value from a device.
 
         Args:
@@ -2546,11 +2547,14 @@ class MatterBaseTest(base_test.BaseTestClass):
                 wildcard-subscription verification.  None (default) defers to the
                 class-level default_verify_wildcard_subscription; False skips
                 the check for this read only.
+            readOperation: Explicit one-shot native abort/deadline options.
+                None preserves the controller's existing read behavior.
 
         Returns:
             The attribute value.
         """
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
+        read_options = {'readOperation': readOperation} if readOperation is not None else {}
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered, **read_options)
         data = result[endpoint]
         attr_ret = list(data.values())[0][attribute]
 
@@ -2625,14 +2629,21 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, endpoint: int | None = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD, verify_wildcard_subscription: bool | None = None) -> object:
+            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, endpoint: int | None = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD, verify_wildcard_subscription: bool | None = None,
+            *, readOperation: Clusters.Attribute.ReadOperationOptions | None = None) -> object:
+        """Read and validate an attribute, optionally opting into native abort/deadline handling.
+
+        readOperation is forwarded only when supplied; assertion and subscription-cache
+        verification behavior is unchanged.
+        """
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
             endpoint = self.get_endpoint()
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability)
+        read_options = {'readOperation': readOperation} if readOperation is not None else {}
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability, **read_options)
         attr_ret = result[endpoint][cluster][attribute]
         read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type

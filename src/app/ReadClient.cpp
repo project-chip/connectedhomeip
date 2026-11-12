@@ -203,6 +203,13 @@ CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscripti
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ReadClient::AbortRead()
+{
+    VerifyOrReturnError(IsReadType(), CHIP_ERROR_INVALID_ARGUMENT);
+    Close(CHIP_ERROR_CANCELLED, false);
+    return CHIP_NO_ERROR;
+}
+
 void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
 {
     if (IsReadType())

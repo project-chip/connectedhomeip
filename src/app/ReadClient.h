@@ -507,6 +507,13 @@ public:
     bool TriggerResubscribeIfScheduled(const char * reason);
 
     /**
+     * Abort a one-shot read with CHIP_ERROR_CANCELLED and OnDone. The stack must be locked,
+     * the client must still be alive, and this must not be called from a read callback.
+     * OnDone may destroy this client. Subscriptions are rejected without being changed.
+     */
+    CHIP_ERROR AbortRead();
+
+    /**
      * Returns the timeout after which we consider the subscription to have
      * dropped, if we have received no messages within that amount of time.
      *
