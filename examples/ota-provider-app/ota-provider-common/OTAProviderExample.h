@@ -133,6 +133,8 @@ public:
     const char * GetApplyUpdateRequestToken() const { return mApplyUpdateRequestUpdateToken; }
     // NewVersion field received in the most recent ApplyUpdateRequest from the requestor.
     uint32_t GetApplyUpdateRequestNewVersion() const { return mApplyUpdateRequestNewVersion; }
+    const char * GetNotifyUpdateAppliedToken() const { return mNotifyUpdateAppliedToken; }
+    uint32_t GetNotifyUpdateAppliedSoftwareVersion() const { return mNotifyUpdateAppliedSoftwareVersion; }
     // End of variables used for named pipes
     chip::Span<const DownloadProtocolEnum> GetProtocolsSupported() const
     {
@@ -165,6 +167,8 @@ private:
                            const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
     void
     SaveCommandSnapshot(const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
+    void SaveNotifyUpdateAppliedSnapshot(
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData);
 
     std::string MapFileToDesignator(const std::string & filePath);
 
@@ -203,5 +207,7 @@ private:
     // Hex-encoded update token received in the most recent ApplyUpdateRequest.
     char mApplyUpdateRequestUpdateToken[kUpdateTokenStrLen] = { 0 };
     // NewVersion field received in the most recent ApplyUpdateRequest.
-    uint32_t mApplyUpdateRequestNewVersion = 0;
+    uint32_t mApplyUpdateRequestNewVersion             = 0;
+    char mNotifyUpdateAppliedToken[kUpdateTokenStrLen] = { 0 };
+    uint32_t mNotifyUpdateAppliedSoftwareVersion       = 0;
 };
