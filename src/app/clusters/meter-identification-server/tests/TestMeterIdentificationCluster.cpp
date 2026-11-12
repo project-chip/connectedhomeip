@@ -64,13 +64,11 @@ TEST_F(TestMeterIdentificationCluster, AttributeListTest)
 
     // With ProtocolVersion optional attribute
     {
-        const DataModel::AttributeEntry optionalAttributes[] = { ProtocolVersion::kMetadataEntry,
-                                                                 PowerThreshold::kMetadataEntry };
+        const DataModel::AttributeEntry optionalAttributes[] = { ProtocolVersion::kMetadataEntry, PowerThreshold::kMetadataEntry };
         MeterIdentificationCluster::OptionalAttributeSet optionalAttributeSet;
         optionalAttributeSet.Set<ProtocolVersion::Id>();
 
-        MeterIdentificationCluster cluster(kRootEndpointId,
-                                           MeterIdentificationCluster::Config{}.WithProtocolVersion());
+        MeterIdentificationCluster cluster(kRootEndpointId, MeterIdentificationCluster::Config{}.WithProtocolVersion());
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -86,8 +84,7 @@ TEST_F(TestMeterIdentificationCluster, AttributeListTest)
 
     // With PowerThreshold feature
     {
-        const DataModel::AttributeEntry optionalAttributes[] = { ProtocolVersion::kMetadataEntry,
-                                                                 PowerThreshold::kMetadataEntry };
+        const DataModel::AttributeEntry optionalAttributes[] = { ProtocolVersion::kMetadataEntry, PowerThreshold::kMetadataEntry };
         MeterIdentificationCluster::OptionalAttributeSet optionalAttributeSet;
         optionalAttributeSet.Set<PowerThreshold::Id>();
 
@@ -108,15 +105,13 @@ TEST_F(TestMeterIdentificationCluster, AttributeListTest)
 
     // With both ProtocolVersion and PowerThreshold
     {
-        const DataModel::AttributeEntry optionalAttributes[] = { ProtocolVersion::kMetadataEntry,
-                                                                 PowerThreshold::kMetadataEntry };
+        const DataModel::AttributeEntry optionalAttributes[] = { ProtocolVersion::kMetadataEntry, PowerThreshold::kMetadataEntry };
         MeterIdentificationCluster::OptionalAttributeSet optionalAttributeSet;
         optionalAttributeSet.Set<ProtocolVersion::Id>();
         optionalAttributeSet.Set<PowerThreshold::Id>();
 
         MeterIdentificationCluster cluster(
-            kRootEndpointId,
-            MeterIdentificationCluster::Config{}.WithProtocolVersion().WithFeature(Feature::kPowerThreshold));
+            kRootEndpointId, MeterIdentificationCluster::Config{}.WithProtocolVersion().WithFeature(Feature::kPowerThreshold));
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -306,8 +301,7 @@ TEST_F(TestMeterIdentificationCluster, SetProtocolVersion)
 
     // With ProtocolVersion enabled
     {
-        MeterIdentificationCluster cluster(kRootEndpointId,
-                                           MeterIdentificationCluster::Config{}.WithProtocolVersion());
+        MeterIdentificationCluster cluster(kRootEndpointId, MeterIdentificationCluster::Config{}.WithProtocolVersion());
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
 
@@ -392,8 +386,7 @@ TEST_F(TestMeterIdentificationCluster, SetPowerThreshold)
         // Invalid powerThresholdSource -> ConstraintError
         Globals::Structs::PowerThresholdStruct::Type invalidThreshold;
         invalidThreshold.powerThresholdSource.SetNonNull(Globals::PowerThresholdSourceEnum::kUnknownEnumValue);
-        EXPECT_EQ(cluster.SetPowerThreshold(DataModel::MakeNullable(invalidThreshold)),
-                  CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        EXPECT_EQ(cluster.SetPowerThreshold(DataModel::MakeNullable(invalidThreshold)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         // Set to null
         EXPECT_EQ(cluster.SetPowerThreshold(DataModel::NullNullable), CHIP_NO_ERROR);
