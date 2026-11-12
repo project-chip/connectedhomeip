@@ -22,7 +22,9 @@ application's responsibility.
 
 It uses an optional delegate pattern
 (`chip::app::Clusters::OccupancySensingDelegate`) to notify the application
-about changes to the occupancy state or the hold time configuration.
+about changes to the occupancy state or the hold time configuration, or to
+provide predictive occupancy data when the Prediction (`PRED`) feature is
+enabled.
 
 ## Usage
 
@@ -32,9 +34,11 @@ provides the most flexibility and control.
 
 ### 1. Implement the Delegate (Optional)
 
-If your application needs to be notified of changes, create a class that
-inherits from `chip::app::Clusters::OccupancySensingDelegate` and implement its
-virtual methods.
+If your application needs to be notified of changes or supports predictive
+occupancy, create a class that inherits from
+`chip::app::Clusters::OccupancySensingDelegate` and implement the relevant
+virtual methods. All methods have default implementations, so only override what
+is needed.
 
 ```cpp
 #include "app/clusters/occupancy-sensor-server/OccupancySensingCluster.h"
@@ -51,6 +55,21 @@ public:
     {
         // Your logic to react to a hold time change
     }
+
+    // When the Prediction (PRED) feature is enabled:
+    CHIP_ERROR GetPredictedOccupancyAtIndex(
+        size_t index, chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type & prediction) override
+    {
+        if (index >= mPredictions.size())
+        {
+            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+        }
+        prediction = mPredictions[index];
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    std::vector<chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type> mPredictions;
 };
 ```
 
@@ -81,7 +100,7 @@ chip::app::RegisteredServerCluster<chip::app::Clusters::OccupancySensingCluster>
     chip::app::Clusters::OccupancySensingCluster::Config(kYourEndpointId)
         .WithFeatures(chip::app::Clusters::OccupancySensing::Feature::kPassiveInfrared)
         .WithHoldTime(60, kHoldTimeLimits, gTimerDelegate) // Enable HoldTime feature
-        .WithDelegate(gMyOccupancyDelegate)                // Attach optional delegate
+        .WithDelegate(&gMyOccupancyDelegate)               // Attach optional delegate
 );
 ```
 
@@ -119,6 +138,17 @@ void MySensorHardwareCallback(bool isOccupied)
         cluster->SetOccupancy(isOccupied);
     }
 }
+```
+
+### 5. Predictive Occupancy Updates
+
+When the `PRED` (Prediction) feature is enabled, the cluster exposes the
+`PredictedOccupancy` attribute. Whenever predictions are updated by the
+application or delegate, notify the cluster so the attribute is marked dirty for
+subscriptions:
+
+```cpp
+cluster->NotifyPredictedOccupancyChanged();
 ```
 
 ## Compatibility with ZAP/Codegen
