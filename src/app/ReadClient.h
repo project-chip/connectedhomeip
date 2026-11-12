@@ -510,6 +510,7 @@ public:
      * Abort a one-shot read with CHIP_ERROR_CANCELLED and OnDone. The stack must be locked,
      * the client must still be alive, and this must not be called from a read callback.
      * OnDone may destroy this client. Subscriptions are rejected without being changed.
+     * Clients without an active read exchange are rejected with CHIP_ERROR_INCORRECT_STATE.
      */
     CHIP_ERROR AbortRead();
 

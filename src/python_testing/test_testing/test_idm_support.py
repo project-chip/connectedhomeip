@@ -564,6 +564,11 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         self.checker.record_accepted_violation.assert_not_called()
 
     async def test_tc_idm_9_1_strict_unrelated_statuses_fail(self):
+        """Matter 1.7 TC-IDM-9.1 requires CONSTRAINT_ERROR for every eligible violating Invoke.
+
+        Other statuses provide no enforcement evidence. This certification-test policy
+        does not change the core specification's Invoke SHOULD or Write SHALL clauses.
+        """
         from TC_IDM_9_1 import TC_IDM_9_1
 
         for statuses in ((Status.InvalidCommand,), (Status.ResourceExhausted,),
@@ -1224,6 +1229,11 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                         'attributes'][0][1].value, 2)
 
     async def test_tc_idm_9_1_strict_writable_attribute_statuses(self):
+        """Matter 1.7 TC-IDM-9.1 requires CONSTRAINT_ERROR for every eligible violating Write.
+
+        SUCCESS, INVALID_COMMAND and RESOURCE_EXHAUSTED do not meet that test-plan policy;
+        this is not a change to the core specification's Invoke SHOULD or Write SHALL clauses.
+        """
         from TC_IDM_9_1 import TC_IDM_9_1
 
         for status in (Status.InvalidCommand, Status.ResourceExhausted, Status.ConstraintError, Status.Success):
@@ -1382,6 +1392,35 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
                         self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, 1)
                         self.assertEqual(self.checker.record_accepted_violation.call_count, accepted)
                     self.checker.default_controller.SendCommand.assert_not_called()
+
+    async def test_tc_idm_9_1_baseline_timeout_preserves_accumulated_verdict(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        for prior_status in (None, Status.Success, Status.ConstraintError):
+            with self.subTest(prior_status=prior_status):
+                self.setUp()
+                self._prepare_writable_attribute()
+                self.checker.endpoints_tlv[3] = deepcopy(self.checker.endpoints_tlv[2])
+                self.checker.endpoints_tlv[4] = deepcopy(self.checker.endpoints_tlv[2])
+                failure = TimeoutError('baseline deadline')
+                self.checker.read_single_attribute_check_success.side_effect = (
+                    [failure] if prior_status is None else [0, failure])
+                if prior_status is not None:
+                    self.checker.default_controller.WriteAttribute.return_value = [SimpleNamespace(Status=prior_status)]
+                accepted = int(prior_status == Status.Success)
+                rejected = int(prior_status == Status.ConstraintError)
+                attempted = int(prior_status is not None)
+                message = 'Writable attribute constraints not enforced' if accepted else 'Execution failed'
+                with self.assertLogs('TC_IDM_9_1', level='INFO') as captured, self.assertRaisesRegex(signals.TestFailure, message):
+                    await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+                self.assertTrue(any(f'attempted={attempted}, classified={attempted}, CONSTRAINT_ERROR={rejected}, '
+                                    f'accepted={accepted}, other IM or response status=0, execution errors=1'
+                                    in line for line in captured.output))
+                self.assertTrue(any('baseline deadline' in line for line in captured.output))
+                self.assertEqual(self.checker.default_controller.WriteAttribute.await_count, attempted)
+                self.assertEqual(self.checker.read_single_attribute_check_success.await_count, attempted + 1)
+                self.assertEqual(self.checker.record_accepted_violation.call_count, accepted)
+                self.checker.default_controller.SendCommand.assert_not_called()
 
     async def test_tc_idm_9_1_lost_write_response_restores_changed_or_unknown_state(self):
         from TC_IDM_9_1 import TC_IDM_9_1
@@ -1639,6 +1678,81 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         self.checker.verify_attribute_subscription_value.assert_awaited_once()
         self.checker.default_controller.WriteAttribute.assert_not_called()
         self.checker.record_error.assert_not_called()
+
+    async def test_nested_subscription_acl_read_settles_before_cancel_or_timeout(self):
+        import asyncio
+
+        from matter.clusters.Attribute import AsyncReadTransaction, ReadOperationOptions
+
+        for helper in ('plain', 'checked'):
+            for signal in ('cancel', 'timeout'):
+                with self.subTest(helper=helper, signal=signal):
+                    self.setUp()
+                    self._prepare_writable_attribute()
+                    cluster = Clusters.OnOff
+                    attribute = cluster.Attributes.StartUpOnOff
+                    value = cluster.Enums.StartUpOnOffEnum.kOff
+                    self.checker._effective_verify_wildcard_subscription = Mock(return_value=True)
+                    self.checker._cq_excluded_attr_ids = set()
+                    self.checker._fabric_filtered_match = Mock(return_value=False)
+                    self.checker.subscription_controller = SimpleNamespace(fabricId=1)
+                    self.checker.default_controller.fabricId = 1
+                    self.checker.matter_test_config = SimpleNamespace(controller_node_id=1)
+                    self.checker.wildcard_subscription_handler = Mock()
+                    self.checker.wildcard_subscription_handler.get_latest_value.return_value = 1
+                    self.checker.verify_attribute_subscription_value = MethodType(
+                        MatterBaseTest.verify_attribute_subscription_value, self.checker)
+                    self.checker._is_subscription_acl_removed = MethodType(
+                        MatterBaseTest._is_subscription_acl_removed, self.checker)
+                    loop = asyncio.get_running_loop()
+                    transaction = AsyncReadTransaction(loop.create_future(), loop, None, False)
+                    started = asyncio.Event()
+                    aborted = asyncio.Event()
+                    transaction.AbortRead = Mock(side_effect=aborted.set)
+                    options = ReadOperationOptions(1 if signal == 'timeout' else None)
+                    primary = []
+
+                    async def read_attribute(*args, **kwargs):
+                        self.assertIs(kwargs['readOperation'], options)
+                        if self.checker.default_controller.ReadAttribute.await_count == 1:
+                            return {2: {cluster: {attribute: value}}}
+                        self.assertEqual(kwargs['attributes'], [(0, Clusters.AccessControl.Attributes.Acl)])
+                        started.set()
+                        try:
+                            await transaction.AwaitCompletion(loop.time() if signal == 'timeout' else None)
+                        except (asyncio.CancelledError, TimeoutError) as error:
+                            primary.append(error)
+                            raise
+                        self.fail('The cancelled/deadline ACL read must not return success')
+
+                    self.checker.default_controller.ReadAttribute = AsyncMock(side_effect=read_attribute)
+                    with patch('matter.testing.matter_testing.asyncio.sleep', new=AsyncMock()):
+                        if helper == 'plain':
+                            operation = MatterBaseTest.read_single_attribute(
+                                self.checker, self.checker.default_controller, self.checker.dut_node_id,
+                                2, attribute, readOperation=options)
+                        else:
+                            operation = MatterBaseTest.read_single_attribute_check_success(
+                                self.checker, cluster, attribute, endpoint=2, readOperation=options)
+                        task = asyncio.create_task(operation)
+                        await started.wait()
+                        if signal == 'cancel':
+                            task.cancel('original ACL cancellation')
+                        await aborted.wait()
+                        if signal == 'cancel':
+                            task.cancel('repeated ACL cancellation')
+                        self.assertFalse(task.done())
+                        self.assertFalse(transaction._future.cancelled())
+                        transaction._future.set_result(transaction)
+                        expected = asyncio.CancelledError if signal == 'cancel' else TimeoutError
+                        with self.assertRaises(expected) as raised:
+                            await task
+                    self.assertIs(raised.exception, primary[0])
+                    if signal == 'cancel':
+                        self.assertEqual(raised.exception.args, ('original ACL cancellation',))
+                    transaction.AbortRead.assert_called_once()
+                    self.assertEqual(self.checker.default_controller.ReadAttribute.await_count, 2)
+                    self.checker.default_controller.WriteAttribute.assert_not_called()
 
     async def test_tc_idm_9_1_raised_write_statuses_are_classified(self):
         from TC_IDM_9_1 import TC_IDM_9_1

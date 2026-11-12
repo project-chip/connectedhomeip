@@ -206,6 +206,7 @@ CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscripti
 CHIP_ERROR ReadClient::AbortRead()
 {
     VerifyOrReturnError(IsReadType(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mExchange.Get() != nullptr, CHIP_ERROR_INCORRECT_STATE);
     Close(CHIP_ERROR_CANCELLED, false);
     return CHIP_NO_ERROR;
 }

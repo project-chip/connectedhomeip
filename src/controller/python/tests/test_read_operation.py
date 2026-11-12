@@ -1,11 +1,15 @@
 """Retained regression tests for the explicitly opted-in one-shot read contract."""
 
+import argparse
 import asyncio
+import json
+import runpy
+import sys
 import unittest
 from collections.abc import Callable
 from types import SimpleNamespace
 from typing import Any
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, Mock, patch
 
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import AsyncReadTransaction, ReadOperationOptions
@@ -13,6 +17,19 @@ from matter.exceptions import ChipStackError
 
 
 class TestReadOperation(unittest.IsolatedAsyncioTestCase):
+    async def test_native_runner_invokes_both_retained_regression_groups(self):
+        read_cases = AsyncMock(return_value=[{'case': 'read'}])
+        restoration_cases = AsyncMock(return_value=[{'case': 'restoration'}])
+        checker = SimpleNamespace(default_controller=object(), dut_node_id=1)
+        pause, resume, inject = Mock(), Mock(), Mock()
+        with patch.dict(run_native_read_regressions.__globals__, {
+                'exercise_native_read_operation_contract': read_cases,
+                'exercise_native_idm_restoration_contract': restoration_cases}):
+            rows = await run_native_read_regressions(checker, pause, resume, inject)
+        self.assertEqual(rows, [{'case': 'read'}, {'case': 'restoration'}])
+        read_cases.assert_awaited_once_with(checker.default_controller, 1, pause, resume, inject)
+        restoration_cases.assert_awaited_once_with(checker, pause, resume)
+
     def transaction(self):
         loop = asyncio.get_running_loop()
         transaction = AsyncReadTransaction(loop.create_future(), loop, None, False)
@@ -435,5 +452,42 @@ async def exercise_native_idm_restoration_contract(checker: Any, pause_dut: Call
     return results
 
 
+async def run_native_read_regressions(checker: Any, pause_dut: Callable[[], None], resume_dut: Callable[[], None],
+                                     inject_report: Callable[[Any, int, bool], None]) -> list[dict[str, Any]]:
+    """Run both retained native groups against an already commissioned, fixture-owned software DUT.
+
+    The fixture supplies its checker/controller, owned-process pause/resume callbacks,
+    and test-only native report injection. These are not ordinary mock unit tests.
+    """
+    rows = await exercise_native_read_operation_contract(checker.default_controller, checker.dut_node_id,
+                                                        pause_dut, resume_dut, inject_report)
+    rows.extend(await exercise_native_idm_restoration_contract(checker, pause_dut, resume_dut))
+    return rows
+
+
+def main() -> None:
+    """Run unit tests by default, or native regressions with an explicit owned-DUT fixture module.
+
+    --native-fixture supplies a Python file exporting the native_read_fixture async
+    context manager. It yields checker, pause_dut, resume_dut and inject_report
+    fields and owns commissioning and complete process/stack cleanup.
+    """
+    if '--native-fixture' not in sys.argv:
+        unittest.main()
+        return
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--native-fixture', required=True)
+    args = parser.parse_args()
+    fixture_factory = runpy.run_path(args.native_fixture)['native_read_fixture']
+
+    async def run() -> None:
+        async with fixture_factory() as fixture:
+            rows = await run_native_read_regressions(fixture.checker, fixture.pause_dut,
+                                                    fixture.resume_dut, fixture.inject_report)
+            print(json.dumps({'native_read_regressions': rows}), flush=True)
+
+    asyncio.run(run())
+
+
 if __name__ == '__main__':
-    unittest.main()
+    main()

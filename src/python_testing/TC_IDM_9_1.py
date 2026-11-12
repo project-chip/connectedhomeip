@@ -263,7 +263,7 @@ class TC_IDM_9_1(IDMBaseTest):
                 result = await self.check_attribute_constraint(attr_info, attr_info.constraints)
             except ConstraintProbeExecutionError as error:
                 result = error.result
-            except ChipStackError as e:  # chipstack-ok
+            except (ChipStackError, TimeoutError) as e:  # chipstack-ok
                 baseline_failure = (f"Execution failed qualifying writable attribute baseline for "
                                     f"{attr_info.cluster_name}.{attr_info.attribute_name}: {e}")
                 log.warning("%s", baseline_failure)

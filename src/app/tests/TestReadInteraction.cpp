@@ -519,6 +519,8 @@ using Milliseconds32 = System::Clock::Milliseconds32;
 class TestReadInteraction : public chip::Testing::AppContext
 {
 public:
+    void TestAbortReadInactive();
+
     static void SetUpTestSuiteCommon(bool syncScheduler = false)
     {
         AppContext::SetUpTestSuite();
@@ -806,6 +808,37 @@ void TestReadInteraction::TestReadClient()
 
     GenerateReportData(buf, ReportType::kValid, true /* aSuppressResponse*/);
     EXPECT_EQ(readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction), CHIP_NO_ERROR);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestAbortReadInactive)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestAbortReadInactive)
+void TestReadInteraction::TestAbortReadInactive()
+{
+    class CompletionCounter final : public MockInteractionModelApp
+    {
+    public:
+        void OnDone(ReadClient *) override { ++doneCount; }
+        uint32_t doneCount = 0;
+    } delegate;
+    ReadClient client(InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate, ReadClient::InteractionType::Read);
+    EXPECT_EQ(client.AbortRead(), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(delegate.doneCount, 0u);
+    EXPECT_FALSE(delegate.mReadError);
+
+    ReadPrepareParams params(GetSessionBobToAlice());
+    ASSERT_EQ(client.SendRequest(params), CHIP_NO_ERROR);
+    GetLoopback().mNumMessagesToDrop = 1;
+    DrainAndServiceIO();
+    auto payload = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    GenerateReportData(payload, ReportType::kValid, true);
+    PayloadHeader header;
+    header.SetMessageType(Protocols::InteractionModel::MsgType::ReportData);
+    ASSERT_EQ(client.OnMessageReceived(client.mExchange.Get(), header, std::move(payload)), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.doneCount, 1u);
+    EXPECT_FALSE(delegate.mReadError);
+    EXPECT_EQ(client.AbortRead(), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(delegate.doneCount, 1u);
+    EXPECT_FALSE(delegate.mReadError);
 }
 
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadUnexpectedSubscriptionId)
