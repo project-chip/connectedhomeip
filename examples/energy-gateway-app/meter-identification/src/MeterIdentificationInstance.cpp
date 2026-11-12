@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2025-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,29 +21,7 @@
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::MeterIdentification;
 
-namespace {
-static std::unique_ptr<Instance> gMeterIdentificationCluster;
-} // namespace
-
-Instance * MeterIdentification::GetInstance()
+MeterIdentificationCluster * MeterIdentification::GetInstance()
 {
-    return gMeterIdentificationCluster.get();
-}
-
-void emberAfMeterIdentificationClusterInitCallback(chip::EndpointId endpointId)
-{
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gMeterIdentificationCluster == nullptr);
-    gMeterIdentificationCluster =
-        std::make_unique<Instance>(endpointId, chip::BitMask<Feature, uint32_t>(Feature::kPowerThreshold));
-    TEMPORARY_RETURN_IGNORED gMeterIdentificationCluster->Init();
-}
-
-void emberAfMeterIdentificationClusterShutdownCallback(chip::EndpointId endpointId)
-{
-    if (gMeterIdentificationCluster)
-    {
-        gMeterIdentificationCluster->Shutdown();
-        gMeterIdentificationCluster.reset(nullptr);
-    }
+    return FindClusterOnEndpoint(1);
 }

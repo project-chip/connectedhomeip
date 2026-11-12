@@ -73,6 +73,7 @@ source_set("clusters") {
     "level-control",
     "localization-configuration-server",
     "media-file-management-server",
+    "meter-identification-server",
     "microwave-oven-control-server",
     "mode-base-server",
     "mode-select-server",
