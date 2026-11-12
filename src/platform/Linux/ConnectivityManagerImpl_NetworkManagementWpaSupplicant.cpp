@@ -1552,8 +1552,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetBssInfo(const char * bssPath, NetworkCom
     // may be gone when we try to get the properties.
     if (ssid == nullptr || bssid == nullptr)
     {
-        ChipLogDetail(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "BSS not found: %s",
-                      StringOrNullMarker(g_dbus_proxy_get_object_path(G_DBUS_PROXY(bss.get()))));
+        ChipLogDetail(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "BSS not found: %s", bssPath);
         return CHIP_ERROR_NOT_FOUND;
     }
 

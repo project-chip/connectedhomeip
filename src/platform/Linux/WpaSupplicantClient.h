@@ -70,6 +70,12 @@ class ConnectivityManagerImpl;
 
 namespace Internal {
 
+/**
+ * Classify the supported AKMs in the WPA and RSN BSS scan dictionaries.
+ * Unencrypted is set only when neither dictionary lists any AKM. Nonempty
+ * collections containing only unsupported AKMs (such as FT-only, FILS or OWE)
+ * produce an empty bitmap. Missing or malformed properties are ignored.
+ */
 BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> GetWiFiSecurity(GVariant * wpa, GVariant * rsn);
 
 /**
@@ -254,13 +260,13 @@ protected:
     CHIP_ERROR StartSync();
     CHIP_ERROR StopAutoScan();
 
-    virtual void UpdateWiFiNetworkStatus(){};
+    virtual void UpdateWiFiNetworkStatus() {};
 
 private:
     bool GetBssInfo(const gchar * inBssPath, NetworkCommissioning::WiFiScanResponse & outWiFiScanResponse) const noexcept;
 
-    virtual void PostNetworkConnect(){};
-    virtual void OnWiFiMediumAvailable(WpaSupplicantClient & inOutWpaSupplicantClient, bool inAvailable){};
+    virtual void PostNetworkConnect() {};
+    virtual void OnWiFiMediumAvailable(WpaSupplicantClient & inOutWpaSupplicantClient, bool inAvailable) {};
     void OnWpaPropertiesChanged(WpaSupplicant1Interface * iface, GVariant * properties);
     void OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     void OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res);

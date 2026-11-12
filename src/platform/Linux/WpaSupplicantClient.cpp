@@ -68,7 +68,7 @@ BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> GetWiFiSecurit
             {
                 result.Set(Security::kIeee8021x);
             }
-            else if (g_ascii_strcasecmp(value, "wpa-psk") == 0 || (!isRsn && g_ascii_strcasecmp(value, "wpa-none") == 0))
+            else if (g_ascii_strcasecmp(value, "wpa-psk") == 0)
             {
                 result.Set(isRsn ? Security::kWpa2Personal : Security::kWpaPersonal);
             }
@@ -289,8 +289,7 @@ bool WpaSupplicantClient::GetBssInfo(const gchar * inBssPath,
     // may be gone when we try to get the properties.
     if (ssid == nullptr || bssid == nullptr)
     {
-        ChipLogDetail(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "BSS not found: %s",
-                      StringOrNullMarker(g_dbus_proxy_get_object_path(G_DBUS_PROXY(bssProxy))));
+        ChipLogDetail(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "BSS not found: %s", inBssPath);
         return false;
     }
 
@@ -840,8 +839,8 @@ void WpaSupplicantClient::Start()
 
     mWpaSupplicant = GDBusWpaSupplicant{};
 
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](WpaSupplicantClient * self) { return self->StartOnGLib(); }, this);
+    CHIP_ERROR err =
+        PlatformMgrImpl().GLibMatterContextInvokeSync(+[](WpaSupplicantClient * self) { return self->StartOnGLib(); }, this);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start WiFi management"));
 }
 
