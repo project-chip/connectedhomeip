@@ -166,76 +166,47 @@ bool IsAccessibleAttributeEntry(const ConcreteAttributePath & path, const Access
     return (Access::GetAccessControl().Check(subjectDescriptor, requestPath, privilege) == CHIP_NO_ERROR);
 }
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+// Pre-fetches GetNextClient() before each loop body runs so the body may safely
+// destroy or unlink the current ReadClient (assuming other ReadClients remain untouched).
+class ReadClientList
+{
+public:
+    class Iterator
+    {
+    public:
+        explicit Iterator(ReadClient * current) : mCurrent(current), mNext(current != nullptr ? current->GetNextClient() : nullptr)
+        {}
+
+        ReadClient * operator*() const { return mCurrent; }
+
+        Iterator & operator++()
+        {
+            mCurrent = mNext;
+            mNext    = (mCurrent != nullptr) ? mCurrent->GetNextClient() : nullptr;
+            return *this;
+        }
+
+        bool operator!=(const Iterator & other) const { return mCurrent != other.mCurrent; }
+
+    private:
+        ReadClient * mCurrent;
+        ReadClient * mNext;
+    };
+
+    explicit ReadClientList(ReadClient * head) : mHead(head) {}
+
+    Iterator begin() const { return Iterator(mHead); }
+    Iterator end() const { return Iterator(nullptr); }
+
+private:
+    ReadClient * mHead;
+};
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
 } // namespace
 
 using Protocols::InteractionModel::Status;
-
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
-// Pre-fetches GetNextClient() before each loop body runs and registers on
-// InteractionModelEngine so RemoveReadClient() updates mNext if a callback
-// destroys any ReadClient in mpActiveReadClientList.
-struct InteractionModelEngine::ActiveReadClientIterator
-{
-    struct EndSentinel
-    {
-    };
-
-    ActiveReadClientIterator(InteractionModelEngine & engine, ReadClient * start) :
-        mEngine(engine), mCurrent(start), mNext(start != nullptr ? start->GetNextClient() : nullptr),
-        mNextIterator(engine.mpActiveReadClientIterators)
-    {
-        engine.mpActiveReadClientIterators = this;
-    }
-
-    ~ActiveReadClientIterator()
-    {
-        for (auto ** iter = &mEngine.mpActiveReadClientIterators; *iter != nullptr; iter = &(*iter)->mNextIterator)
-        {
-            if (*iter == this)
-            {
-                *iter = mNextIterator;
-                break;
-            }
-        }
-    }
-
-    ActiveReadClientIterator(const ActiveReadClientIterator &)             = delete;
-    ActiveReadClientIterator & operator=(const ActiveReadClientIterator &) = delete;
-
-    ReadClient * operator*() const { return mCurrent; }
-
-    ActiveReadClientIterator & operator++()
-    {
-        mCurrent = mNext;
-        mNext    = (mCurrent != nullptr) ? mCurrent->GetNextClient() : nullptr;
-        return *this;
-    }
-
-    bool operator!=(EndSentinel) const { return mCurrent != nullptr; }
-
-    InteractionModelEngine & mEngine;
-    ReadClient * mCurrent                    = nullptr;
-    ReadClient * mNext                       = nullptr;
-    ActiveReadClientIterator * mNextIterator = nullptr;
-};
-
-class InteractionModelEngine::ActiveReadClientRange
-{
-public:
-    explicit ActiveReadClientRange(InteractionModelEngine & engine) : mEngine(engine) {}
-
-    ActiveReadClientIterator begin() const { return ActiveReadClientIterator(mEngine, mEngine.mpActiveReadClientList); }
-    ActiveReadClientIterator::EndSentinel end() const { return {}; }
-
-private:
-    InteractionModelEngine & mEngine;
-};
-
-InteractionModelEngine::ActiveReadClientRange InteractionModelEngine::ActiveReadClients()
-{
-    return ActiveReadClientRange(*this);
-}
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
 Global<InteractionModelEngine> sInteractionModelEngine;
 
@@ -312,15 +283,10 @@ void InteractionModelEngine::Shutdown()
     // at destruction time, they won't attempt to reach back here to remove themselves
     // from this list.
     //
-    for (auto * readClient : ActiveReadClients())
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
         readClient->mpImEngine = nullptr;
         readClient->SetNextClient(nullptr);
-    }
-
-    for (auto * iter = mpActiveReadClientIterators; iter != nullptr; iter = iter->mNextIterator)
-    {
-        iter->mNext = nullptr;
     }
 
     //
@@ -464,7 +430,7 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPeerNodeId, SubscriptionId aSubscriptionId)
 {
     assertChipStackLockedByCurrentThread();
-    for (auto * readClient : ActiveReadClients())
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
         if (readClient->IsSubscriptionType() && readClient->IsMatchingSubscriptionId(aSubscriptionId) &&
             readClient->GetPeerScopedId() == aPeerNodeId)
@@ -509,7 +475,9 @@ void InteractionModelEngine::ShutdownAllSubscriptionHandlers()
 void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex,
                                                            const Optional<NodeId> & aPeerNodeId)
 {
-    for (auto * readClient : ActiveReadClients())
+    // This is assuming that ReadClient::Close will not affect any other
+    // ReadClients in the list.
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
         if (readClient->IsSubscriptionType())
         {
@@ -1063,7 +1031,7 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
 
     // OnUnsolicitedMessageFromPublisher() may call OnDone() and destroy ReadClients in mpActiveReadClientList.
     // A separate first pass finishes all notifications before the second pass looks up the target subscription.
-    for (auto * readClient : ActiveReadClients())
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
         if (readClient->GetPeerScopedId() == peer)
         {
@@ -1071,7 +1039,7 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
         }
     }
 
-    for (auto * readClient : ActiveReadClients())
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
         if (readClient->GetPeerScopedId() != peer)
         {
@@ -1188,7 +1156,7 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
 void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer, uint64_t aMonitoredSubject)
 {
-    for (auto * readClient : ActiveReadClients())
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
         CATValues cats;
 
@@ -1204,7 +1172,7 @@ void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer, uint64
 
 void InteractionModelEngine::OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType)
 {
-    for (auto * readClient : ActiveReadClients())
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
         if (readClient->GetPeerScopedId() == aPeer)
         {
@@ -1642,14 +1610,6 @@ void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)
         mpActiveReadClientList = apReadClient->GetNextClient();
     }
 
-    for (auto * iter = mpActiveReadClientIterators; iter != nullptr; iter = iter->mNextIterator)
-    {
-        if (iter->mNext == apReadClient)
-        {
-            iter->mNext = apReadClient->GetNextClient();
-        }
-    }
-
     apReadClient->SetNextClient(nullptr);
 }
 
@@ -1657,7 +1617,7 @@ size_t InteractionModelEngine::GetNumActiveReadClients()
 {
     size_t count = 0;
 
-    for ([[maybe_unused]] auto * readClient : ActiveReadClients())
+    for ([[maybe_unused]] auto * readClient : ReadClientList(mpActiveReadClientList))
     {
         count++;
     }
@@ -1667,7 +1627,7 @@ size_t InteractionModelEngine::GetNumActiveReadClients()
 
 bool InteractionModelEngine::InActiveReadClientList(ReadClient * apReadClient)
 {
-    for (auto * readClient : ActiveReadClients())
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
         if (readClient == apReadClient)
         {
@@ -2142,7 +2102,7 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
     });
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-    for (auto * readClient : ActiveReadClients())
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
         if (readClient->GetFabricIndex() == fabricIndex)
         {

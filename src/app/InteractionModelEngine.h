@@ -700,13 +700,7 @@ private:
     ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mReadHandlers;
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-    struct ActiveReadClientIterator;
-    class ActiveReadClientRange;
-
-    ActiveReadClientRange ActiveReadClients();
-
-    ReadClient * mpActiveReadClientList                    = nullptr;
-    ActiveReadClientIterator * mpActiveReadClientIterators = nullptr;
+    ReadClient * mpActiveReadClientList = nullptr;
 #endif
 
     ReadHandler::ApplicationCallback * mpReadHandlerApplicationCallback = nullptr;
