@@ -22,6 +22,7 @@
 #include <device/api/Interface.h>
 #include <device/types/ambient-context-sensor/OOBAccessors.h>
 #include <device/types/boolean-state-sensor/OOBAccessors.h>
+#include <device/types/closure-controller/OOBAccessors.h>
 #include <device/types/dimmable-light/OOBAccessors.h>
 #include <device/types/dimmable-plug-in-unit/OOBAccessors.h>
 #include <device/types/doorbell/OOBAccessors.h>
