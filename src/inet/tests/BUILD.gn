@@ -114,7 +114,6 @@ if (chip_build_tests && chip_system_config_use_openthread_inet_endpoints &&
       "${chip_root}/src/inet",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/platform",
-      "${chip_root}/third_party/openthread/platforms/simulation",
     ]
   }
 }

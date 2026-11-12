@@ -33,7 +33,6 @@ MANUAL_ALLOWLIST:
     - semantic-tag-namespace-enums.xml
     - test-cluster.xml
     - test-hidden-manufacturer-specific-cluster.xml
-    - wake-on-lan-cluster.xml
 
 INCOMPLETE_METADATA_ALLOWLIST:
     - electrical-energy-measurement-cluster.xml

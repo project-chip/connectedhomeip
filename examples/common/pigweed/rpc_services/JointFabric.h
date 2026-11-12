@@ -1,4 +1,4 @@
-#include "JFAManager.h"
+#include "JFAManagerBase.h"
 #include "JFARpc.h"
 #include "joint_fabric_service/joint_fabric_service.rpc.pb.h"
 

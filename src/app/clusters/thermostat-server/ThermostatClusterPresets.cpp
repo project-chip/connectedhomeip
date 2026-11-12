@@ -89,11 +89,15 @@ bool PresetHandlesExistAndMatch(const PresetStructWithOwnedMembers & preset, con
  *
  * @param[in] delegate The delegate to use.
  * @param[in] presetToMatch The preset to match with.
+ * @param[out] found true if a matching entry was found in the pending presets list, false otherwise.
  *
- * @return true if a matching entry was found in the pending presets list, false otherwise.
+ * @return CHIP_NO_ERROR if the pending presets list was searched successfully (whether or not a match was found), or the
+ *         CHIP_ERROR returned by the delegate if the search could not be completed.
  */
-bool MatchingPendingPresetExists(ThermostatPresets::Delegate & delegate, const PresetStructWithOwnedMembers & presetToMatch)
+CHIP_ERROR MatchingPendingPresetExists(ThermostatPresets::Delegate & delegate, const PresetStructWithOwnedMembers & presetToMatch,
+                                       bool & found)
 {
+    found = false;
     for (uint8_t i = 0; true; i++)
     {
         PresetStructWithOwnedMembers preset;
@@ -101,21 +105,21 @@ bool MatchingPendingPresetExists(ThermostatPresets::Delegate & delegate, const P
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            break;
+            return CHIP_NO_ERROR;
         }
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "MatchingPendingPresetExists: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
                          err.Format());
-            return false;
+            return err;
         }
 
         if (PresetHandlesExistAndMatch(preset, presetToMatch))
         {
-            return true;
+            found = true;
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
 }
 
 /**
@@ -191,19 +195,31 @@ CHIP_ERROR MaximumPresetScenarioCount(ThermostatPresets::Delegate & delegate, Pr
  * @brief Returns the count of preset entries in the pending presets list that have the matching presetHandle.
  * @param[in] delegate The delegate to use.
  * @param[in] presetHandleToMatch The preset handle to match.
+ * @param[out] count Count of the number of presets found with the matching presetHandle. Only meaningful when the
+ *             returned error is CHIP_NO_ERROR.
  *
- * @return count of the number of presets found with the matching presetHandle. Returns 0 if no matching presets were found.
+ * @return CHIP_NO_ERROR if the pending presets list was scanned to completion, or the CHIP_ERROR returned by the delegate
+ *         if the scan could not be completed.
  */
-uint8_t CountPresetsInPendingListWithPresetHandle(ThermostatPresets::Delegate & delegate, const ByteSpan & presetHandleToMatch)
+CHIP_ERROR CountPresetsInPendingListWithPresetHandle(ThermostatPresets::Delegate & delegate, const ByteSpan & presetHandleToMatch,
+                                                     uint8_t & count)
 {
-    uint8_t count = 0;
+    count = 0;
     for (uint8_t i = 0; true; i++)
     {
         PresetStructWithOwnedMembers preset;
         auto err = delegate.GetPendingPresetAtIndex(i, preset);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            return CHIP_NO_ERROR;
+        }
         if (err != CHIP_NO_ERROR)
         {
-            return count;
+            ChipLogError(Zcl,
+                         "CountPresetsInPendingListWithPresetHandle: GetPendingPresetAtIndex failed with error "
+                         "%" CHIP_ERROR_FORMAT,
+                         err.Format());
+            return err;
         }
 
         DataModel::Nullable<ByteSpan> presetHandle = preset.GetPresetHandle();
@@ -212,7 +228,6 @@ uint8_t CountPresetsInPendingListWithPresetHandle(ThermostatPresets::Delegate & 
             count++;
         }
     }
-    return count;
 }
 
 /**
@@ -428,11 +443,15 @@ std::optional<System::Clock::Milliseconds16> ThermostatPresets::GetMaxAtomicWrit
 /**
  * @brief Checks if the given preset handle is present in the presets attribute
  * @param[in] presetHandleToMatch The preset handle to match with.
+ * @param[out] found true if the given preset handle is present in the presets attribute list, false otherwise. Only
+ *             meaningful when the returned error is CHIP_NO_ERROR.
  *
- * @return true if the given preset handle is present in the presets attribute list, false otherwise.
+ * @return CHIP_NO_ERROR if the presets attribute list was searched successfully (whether or not a match was found), or the
+ *         CHIP_ERROR returned by the delegate if the search could not be completed.
  */
-bool ThermostatPresets::IsPresetHandlePresentInPresets(const ByteSpan & presetHandleToMatch)
+CHIP_ERROR ThermostatPresets::IsPresetHandlePresentInPresets(const ByteSpan & presetHandleToMatch, bool & found)
 {
+    found = false;
     PresetStructWithOwnedMembers matchingPreset;
     for (uint8_t i = 0; true; i++)
     {
@@ -440,30 +459,55 @@ bool ThermostatPresets::IsPresetHandlePresentInPresets(const ByteSpan & presetHa
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            return false;
+            return CHIP_NO_ERROR;
         }
 
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "IsPresetHandlePresentInPresets: GetPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
                          err.Format());
-            return false;
+            return err;
         }
 
         if (!matchingPreset.GetPresetHandle().IsNull() && matchingPreset.GetPresetHandle().Value().data_equal(presetHandleToMatch))
         {
-            return true;
+            found = true;
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
+}
+
+CHIP_ERROR ThermostatPresets::IsPresetHandlePresentInPresetsOrPending(const ByteSpan & presetHandleToMatch, bool & found)
+{
+    found = false;
+    if (mAtomicWriteSession.InAtomicWrite(std::make_optional(Presets::Id)))
+    {
+        uint8_t count = 0;
+        ReturnErrorOnFailure(CountPresetsInPendingListWithPresetHandle(mDelegate, presetHandleToMatch, count));
+        found = (count > 0);
+        return CHIP_NO_ERROR;
+    }
+    return IsPresetHandlePresentInPresets(presetHandleToMatch, found);
 }
 
 Status ThermostatPresets::SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle)
 {
     // If the preset handle passed in the command is not present in the Presets attribute, return INVALID_COMMAND.
-    if (!presetHandle.IsNull() && !IsPresetHandlePresentInPresets(presetHandle.Value()))
+    if (!presetHandle.IsNull())
     {
-        return Status::InvalidCommand;
+        bool present   = false;
+        CHIP_ERROR err = IsPresetHandlePresentInPresets(presetHandle.Value(), present);
+        if (err != CHIP_NO_ERROR)
+        {
+            // A real delegate error while searching must not be reported as InvalidCommand.
+            ChipLogError(Zcl, "SetActivePreset: IsPresetHandlePresentInPresets failed with error %" CHIP_ERROR_FORMAT,
+                         err.Format());
+            return StatusIB(err).mStatus;
+        }
+        if (!present)
+        {
+            return Status::InvalidCommand;
+        }
     }
 
     uint8_t buffer[kPresetHandleSize];
@@ -529,7 +573,10 @@ CHIP_ERROR ThermostatPresets::AppendPendingPreset(const PresetStruct::Type & new
         }
 
         // (b) There is no existing pending preset with this handle.
-        if (CountPresetsInPendingListWithPresetHandle(mDelegate, preset.GetPresetHandle().Value()) > 0)
+        uint8_t pendingCountWithHandle = 0;
+        ReturnErrorOnFailure(
+            CountPresetsInPendingListWithPresetHandle(mDelegate, preset.GetPresetHandle().Value(), pendingCountWithHandle));
+        if (pendingCountWithHandle > 0)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
@@ -643,13 +690,36 @@ Status ThermostatPresets::PrecommitPresets()
             return Status::InvalidInState;
         }
 
-        bool found = MatchingPendingPresetExists(mDelegate, preset);
+        bool found = false;
+        err        = MatchingPendingPresetExists(mDelegate, preset, found);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "PrecommitPresets: MatchingPendingPresetExists failed with error %" CHIP_ERROR_FORMAT, err.Format());
+            return Status::InvalidInState;
+        }
 
         // If a built in preset in the Presets attribute list is removed and not found in the pending presets list, return
         // CONSTRAINT_ERROR.
         if (IsBuiltIn(preset) && !found)
         {
             return Status::ConstraintError;
+        }
+
+        // If a removed preset is referenced by any schedule or schedule transition, return INVALID_IN_STATE.
+        if (!found && !preset.GetPresetHandle().IsNull())
+        {
+            bool inUse = false;
+            err        = mCluster.IsPresetHandleInUseBySchedules(preset.GetPresetHandle().Value(), inUse);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "PrecommitPresets: IsPresetHandleInUseBySchedules failed with error %" CHIP_ERROR_FORMAT,
+                             err.Format());
+                return Status::InvalidInState;
+            }
+            if (inUse)
+            {
+                return Status::InvalidInState;
+            }
         }
     }
 
@@ -669,7 +739,14 @@ Status ThermostatPresets::PrecommitPresets()
 
     if (!activePresetHandle.IsNull())
     {
-        uint8_t count = CountPresetsInPendingListWithPresetHandle(mDelegate, activePresetHandle.Value());
+        uint8_t count = 0;
+        err           = CountPresetsInPendingListWithPresetHandle(mDelegate, activePresetHandle.Value(), count);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "PrecommitPresets: CountPresetsInPendingListWithPresetHandle failed with error %" CHIP_ERROR_FORMAT,
+                         err.Format());
+            return Status::InvalidInState;
+        }
         if (count == 0)
         {
             return Status::InvalidInState;

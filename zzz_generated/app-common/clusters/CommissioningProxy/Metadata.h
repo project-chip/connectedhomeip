@@ -22,20 +22,23 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 namespace Transport {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Transport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Transport::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Transport
 namespace ScanMaxTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ScanMaxTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace ScanMaxTime
 namespace MaxSessions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxSessions::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxSessions::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxSessions
 namespace MaxCachedResults {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxCachedResults::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxCachedResults::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxCachedResults
 namespace NumCachedResults {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NumCachedResults::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -51,8 +54,9 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace CachedResults
 namespace WiFiBand {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(WiFiBand::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(WiFiBand::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace WiFiBand
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     Transport::kMetadataEntry,

@@ -189,13 +189,13 @@ tests:
       disabled: true
 
     - label:
-          "Step 3: If Groupcast cluster is enabled on the RootNode endpoint of
-          the DUT, skip to step 6. Otherwise, DUT binds GroupId with
-          GroupKeySetID in the GroupKeyMap attribute list on GroupKeyManagement
-          cluster"
+          "Step 3: If GC.C is supported and the Groupcast cluster is present on
+          the RootNode endpoint of the TH, skip to step 6. Otherwise, DUT binds
+          GroupId with GroupKeySetID in the GroupKeyMap attribute list on
+          GroupKeyManagement cluster"
       PICS: GRPKEY.C.A0000
       verification: |
-          If Groupcast cluster is enabled on the RootNode endpoint of the TH, skip to step 6. Otherwise, Execute below step
+          If GC.C is supported and the Groupcast cluster is present on the RootNode endpoint of the TH, skip to step 6. Otherwise, Execute below step
 
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 259, "groupKeySetID": 1, "fabricIndex": 1},{"groupId": 257, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
 
@@ -263,8 +263,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 4: DUT sends AddGroup Command to DUT on EP0 with the the
-          following settings GroupID: GroupID_1 GroupName: GroupName_1"
+          "Step 4: DUT sends AddGroup Command to TH on EP0 with the following
+          settings GroupID: GroupID_1 GroupName: GroupName_1"
       PICS: G.C.C00.Tx
       verification: |
           Note:
@@ -378,11 +378,14 @@ tests:
       disabled: true
 
     - label:
-          "Step 6: If Groupcast cluster is NOT enabled on the RootNode endpoint,
-          or its Sender feature is disabled, skip remaining steps. Otherwise,
-          DUT sends the Groupcast JoinGroup command on the TH on EP0 with
-          GroupID=1, Endpoints=[any endpoint from PartsList], KeySetID=1."
+          "Step 6: If the Groupcast cluster is not present on the RootNode
+          endpoint of the TH, skip remaining steps. Otherwise, DUT sends the
+          Groupcast JoinGroup command to the TH on EP0 with GroupID=1,
+          Endpoints=[any endpoint from PartsList], KeySetID=1."
+      PICS: GC.C
       verification: |
+          If the Groupcast cluster is not present on the RootNode endpoint of the TH, skip remaining steps. Otherwise, Execute below step
+
           ./chip-tool groupsettings add-group grp1 1 --addressPolicy 0
           ./chip-tool groupsettings add-keysets 1 0 0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
           ./chip-tool groupsettings bind-keyset 1 1
@@ -428,6 +431,7 @@ tests:
           "Step 7: DUT sends a command from a cluster enabled on the Endpoint
           provided in step 6 to TH. The command is sent as a group command using
           GroupID 1."
+      PICS: GC.C
       verification: |
           ./chip-tool onoff toggle 0xffffffffffff0001 1
 

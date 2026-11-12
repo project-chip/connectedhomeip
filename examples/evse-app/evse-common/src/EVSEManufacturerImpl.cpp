@@ -78,23 +78,33 @@ CHIP_ERROR EVSEManufacturer::Init(chip::EndpointId powerSourceEndpointId)
     TEMPORARY_RETURN_IGNORED dem->SetAbsMaxPower(7600000); // 7.6KW
 
     /*
-     * This is an example implementation for manufacturers to consider
-     *
-     * For Manufacturer to specify the hardware mains voltage in mV:
-     *  dg->HwSetNominalMainsVoltage(230000);       // 230V
-     *
-     * For Manufacturer to specify the hardware capability in mA:
-     *  dg->HwSetMaxHardwareCurrentLimit(32000);    // 32A
-     *
-     * For Manufacturer to specify the CircuitCapacity in mA (e.g. from DIP switches)
-     *  dg->HwSetCircuitCapacity(20000);            // 20A
-     *
+     * Manufacturers should replace these example values with the real hardware configuration.
+     * They are set here, before any client request can be processed, so that a UserMaximumChargeCurrent
+     * with no stored value is defaulted from CircuitCapacity before a client can write it.
      */
 
+    // Hardware mains voltage in mV
+    VerifyOrReturnError(dg->HwSetNominalMainsVoltage(230000) == Protocols::InteractionModel::Status::Success,
+                        CHIP_ERROR_INTERNAL); // 230V
+
+    // Hardware capability in mA
+    VerifyOrReturnError(dg->HwSetMaxHardwareChargeCurrentLimit(32000) == Protocols::InteractionModel::Status::Success,
+                        CHIP_ERROR_INTERNAL); // 32A
+    VerifyOrReturnError(dg->HwSetMaxHardwareDischargeCurrentLimit(32000) == Protocols::InteractionModel::Status::Success,
+                        CHIP_ERROR_INTERNAL); // 32A
+
+    // CircuitCapacity in mA, set by the installer (e.g. from DIP switches)
+    VerifyOrReturnError(dg->HwSetCircuitCapacity(20000) == Protocols::InteractionModel::Status::Success,
+                        CHIP_ERROR_INTERNAL); // 20A
+
     /* Once the system is initialised then check to see if the state was restored
-     * (e.g. after a power outage), and if the Enable timer check needs to be started
+     * (e.g. after a power outage), and if the Enable timer check needs to be started.
+     * If the check cannot be scheduled, the restored enable is disabled so it cannot outlive its deadline.
      */
-    dg->ScheduleCheckOnEnabledTimeout();
+    if (dg->ScheduleDeadlineCheckOrDisable() != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogError(AppServer, "EVSE: unable to schedule restored enable deadline check, EVSE disabled");
+    }
 
     return CHIP_NO_ERROR;
 }

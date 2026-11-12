@@ -32,12 +32,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(RebootCount::Id, BitFl
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace RebootCount
 namespace UpTime {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(UpTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(UpTime::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace UpTime
 namespace TotalOperationalHours {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TotalOperationalHours::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TotalOperationalHours::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TotalOperationalHours
 namespace BootReason {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(BootReason::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -67,8 +70,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TestEventTriggersEnabl
                                                           std::nullopt);
 } // namespace TestEventTriggersEnabled
 namespace DeviceLoadStatus {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(DeviceLoadStatus::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(DeviceLoadStatus::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace DeviceLoadStatus
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     NetworkInterfaces::kMetadataEntry,
