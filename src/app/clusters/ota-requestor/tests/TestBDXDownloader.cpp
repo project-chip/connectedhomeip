@@ -67,6 +67,11 @@ public:
     CHIP_ERROR Finalize() override
     {
         mFinalizeCount++;
+        // A processor that checks the image inside Finalize() reports the result before returning.
+        if (mReportInsideFinalize != nullptr)
+        {
+            EXPECT_EQ(mReportInsideFinalize->OnFinalized(mFinalizeResult), CHIP_NO_ERROR);
+        }
         return CHIP_NO_ERROR;
     }
     bool ReportsFinalizeResult() const override { return mReportsFinalizeResult; }
@@ -108,10 +113,13 @@ public:
     uint32_t mAbortCount        = 0;
     uint32_t mFinalizeCount     = 0;
     bool mReportsFinalizeResult = false;
-    uint32_t mProcessBlockCount = 0;
-    uint64_t mBytesReceived     = 0;
-    bool mSuspended             = false;
-    bool mAsync                 = false;
+    // When set, Finalize() reports mFinalizeResult to this downloader before it returns.
+    BDXDownloader * mReportInsideFinalize = nullptr;
+    CHIP_ERROR mFinalizeResult            = CHIP_NO_ERROR;
+    uint32_t mProcessBlockCount           = 0;
+    uint64_t mBytesReceived               = 0;
+    bool mSuspended                       = false;
+    bool mAsync                           = false;
     std::vector<uint8_t> mFile;
     // Bytes of the partial image each prepare kept, to compare with the offset requested from the provider.
     std::vector<uint64_t> mKeptAtPrepare;
@@ -156,12 +164,14 @@ public:
     {
         VerifyOrReturnError(!(mFailBlockAckEOF && event.msgTypeData.HasMessageType(MessageType::BlockAckEOF)),
                             CHIP_ERROR_SENDING_BLOCKED);
+        mBlockAckEOFCount += event.msgTypeData.HasMessageType(MessageType::BlockAckEOF) ? 1 : 0;
         mOutbox.push_back({ event.msgTypeData, event.MsgData.CloneData() });
         return CHIP_NO_ERROR;
     }
 
     std::deque<QueuedMessage> mOutbox;
-    bool mFailBlockAckEOF = false;
+    bool mFailBlockAckEOF      = false;
+    uint32_t mBlockAckEOFCount = 0;
 };
 
 class RecordingStateDelegate : public BDXDownloader::StateDelegate
@@ -797,22 +807,39 @@ TEST_F(TestBDXDownloader, PassedFinalizeCheckCompletesTheDownload)
     ExpectFileIsServedImage();
 }
 
-// A result reported before BlockAckEOF is sent, e.g. by a processor that checks the image inside Finalize(), completes the
-// download once BlockAckEOF is sent.
+// A processor that checks the image inside Finalize() reports its result before BlockAckEOF is sent. The download completes
+// once BlockAckEOF goes out, exactly once.
 TEST_F(TestBDXDownloader, FinalizeResultBeforeBlockAckEOFCompletesAfterIt)
 {
     mProcessor.mReportsFinalizeResult = true;
-    mMessenger.mFailBlockAckEOF       = true;
+    mProcessor.mReportInsideFinalize  = &mDownloader;
     StartDownload(kUnlimited);
-    ASSERT_EQ(mProcessor.mFinalizeCount, 1u);
 
-    EXPECT_EQ(mDownloader.OnFinalized(CHIP_NO_ERROR), CHIP_NO_ERROR);
-    EXPECT_EQ(mStateDelegate.mCompleteCount, 0u);
-    EXPECT_EQ(mDownloader.GetState(), OTADownloader::State::kInProgress);
+    EXPECT_EQ(mProcessor.mFinalizeCount, 1u);
+    EXPECT_EQ(mMessenger.mBlockAckEOFCount, 1u);
+    EXPECT_EQ(mStateDelegate.mCompleteCount, 1u);
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kComplete);
+    ExpectFileIsServedImage();
 }
 
-// A result from an attempt that already ended, e.g. a finalize still queued when the transfer timed out, must not complete or fail
-// the next attempt.
+// The same processor reporting a failure inside Finalize(): the download still sends BlockAckEOF, so the provider sees the
+// transfer end, and then ends as failed without completing.
+TEST_F(TestBDXDownloader, FailedFinalizeResultBeforeBlockAckEOFStillSendsBlockAckEOF)
+{
+    mProcessor.mReportsFinalizeResult = true;
+    mProcessor.mReportInsideFinalize  = &mDownloader;
+    mProcessor.mFinalizeResult        = CHIP_ERROR_INTEGRITY_CHECK_FAILED;
+    const uint32_t abortsBefore       = mProcessor.mAbortCount;
+    StartDownload(kUnlimited);
+
+    EXPECT_EQ(mProcessor.mFinalizeCount, 1u);
+    EXPECT_EQ(mMessenger.mBlockAckEOFCount, 1u);
+    EXPECT_EQ(mStateDelegate.mCompleteCount, 0u);
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kIdle);
+    EXPECT_EQ(mStateDelegate.mReason, OTAChangeReasonEnum::kFailure);
+    EXPECT_EQ(mProcessor.mAbortCount, abortsBefore + 1);
+}
+
 TEST_F(TestBDXDownloader, FinalizeResultAfterTimeoutIsRejected)
 {
     mProcessor.mReportsFinalizeResult = true;

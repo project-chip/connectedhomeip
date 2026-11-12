@@ -50,7 +50,7 @@ size_t Sha256DigestLength(OTAImageDigestType type)
 }
 
 // Bytes of a resumed partial image hashed per scheduled work item, so the event loop is not held for the whole partial image.
-constexpr size_t kPartialImageHashChunk = 1024;
+constexpr size_t kPartialImageHashChunk = 4096;
 
 } // namespace
 
