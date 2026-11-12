@@ -31,7 +31,6 @@ and devices commissioned on other fabrics.
 import asyncio
 import contextlib
 import sys
-from dataclasses import dataclass
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from python_path import PythonPath
@@ -46,12 +45,6 @@ TEST_COMPRESSED_FABRIC_ID = 0x1234567890ABCDEF
 TEST_ENDPOINT = 0
 TEST_DISCRIMINATOR = 3840
 TEST_PASSCODE = 20202021
-
-
-@dataclass
-class MockMdnsServiceInfo:
-    """Mock MdnsServiceInfo for testing DNS-SD discovery."""
-    instance_name: str
 
 
 class MockDeviceController:
@@ -141,7 +134,7 @@ def mock_mdns_module():
 
 async def test_dnssd_device_found_on_this_fabric():
     """
-    Test: Device found operational on THIS fabric via DNS-SD.
+    Test: Device answers the SRV query for its operational instance on THIS fabric.
 
     Scenario: Device is commissioned to this fabric and advertising.
     Expected: Returns True - device is operational on our fabric.
@@ -152,13 +145,10 @@ async def test_dnssd_device_found_on_this_fabric():
     from matter.testing.commissioning import _is_device_operational_via_dnssd
 
     mock_controller = MockDeviceController()
-    expected_instance_name = build_expected_instance_name(TEST_COMPRESSED_FABRIC_ID, TEST_NODE_ID)
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(return_value=[
-            MockMdnsServiceInfo(instance_name=expected_instance_name)
-        ])
+        mock_mdns.has_srv_record = AsyncMock(return_value=True)
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
@@ -168,41 +158,41 @@ async def test_dnssd_device_found_on_this_fabric():
     return None
 
 
-async def test_dnssd_device_on_different_fabric():
+async def test_dnssd_queries_this_fabric_and_node_instance():
     """
-    Test: Device advertising on different fabric (Scenario 3).
+    Test: The SRV query targets the instance name for this fabric AND node.
 
-    Scenario: Device is commissioned to another fabric but not ours.
-    Expected: Returns False - device not operational on OUR fabric.
+    Scenario: Another device on this fabric, or this device on another fabric, may advertise.
+    Expected: Only '{compressed_fabric_id}-{node_id}._matter._tcp.local.' is queried.
 
-    Value: Verifies we don't falsely detect devices on other fabrics as ours.
-    The fabric ID in the instance name must match our compressed fabric ID.
+    Value: Verifies that answers from other fabrics or other nodes cannot be mistaken for ours.
     """
     from matter.testing.commissioning import _is_device_operational_via_dnssd
 
     mock_controller = MockDeviceController()
+    expected_service_name = build_expected_instance_name(TEST_COMPRESSED_FABRIC_ID, TEST_NODE_ID) + "._matter._tcp.local."
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        # Device advertising on different fabric (different compressed fabric ID)
-        mock_mdns.get_operational_services = AsyncMock(return_value=[
-            MockMdnsServiceInfo(instance_name="AAAAAAAAAAAAAAAA-00000000000004D2")  # Different fabric, same node
-        ])
+        mock_mdns.has_srv_record = AsyncMock(return_value=True)
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
-        result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
+        await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
-        if result:
-            return "Expected False when device is on different fabric"
+        kwargs = mock_mdns.has_srv_record.call_args.kwargs
+        if kwargs.get("service_name") != expected_service_name:
+            return f"Expected query for {expected_service_name}, got {kwargs.get('service_name')}"
+        if kwargs.get("service_type") != "_matter._tcp.local.":
+            return f"Expected service type _matter._tcp.local., got {kwargs.get('service_type')}"
     return None
 
 
-async def test_dnssd_no_services_found():
+async def test_dnssd_no_answer():
     """
-    Test: No operational services found via DNS-SD.
+    Test: The operational instance does not answer the SRV query.
 
-    Scenario: Factory fresh device or device not advertising.
-    Expected: Returns False - no operational advertisements found.
+    Scenario: Factory fresh device, device off, or device only on other fabrics.
+    Expected: Returns False - no operational advertisement for this fabric and node.
 
     Value: Verifies correct behavior when DNS-SD finds nothing,
     which triggers the parallel PASE/CASE fallback.
@@ -213,22 +203,46 @@ async def test_dnssd_no_services_found():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(return_value=[])
+        mock_mdns.has_srv_record = AsyncMock(return_value=False)
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
         if result:
-            return "Expected False when no operational services found"
+            return "Expected False when the operational instance does not answer"
+    return None
+
+
+async def test_dnssd_handled_error_returns_false():
+    """
+    Test: DNS-SD query raises one of the handled error types.
+
+    Scenario: Socket error while sending or receiving the mDNS query (OSError).
+    Expected: Returns False, so callers fall back to a connection attempt.
+
+    Value: A transient network failure does not abort the caller.
+    """
+    from matter.testing.commissioning import _is_device_operational_via_dnssd
+
+    mock_controller = MockDeviceController()
+
+    with mock_mdns_module() as mock_mdns_mod:
+        mock_mdns = MagicMock()
+        mock_mdns.has_srv_record = AsyncMock(side_effect=OSError("Network is unreachable"))
+        mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
+
+        result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
+
+        if result:
+            return "Expected False when the DNS-SD query raises OSError"
     return None
 
 
 async def test_dnssd_exception_handling():
     """
-    Test: DNS-SD discovery raises a generic Exception.
+    Test: DNS-SD query raises a generic Exception.
 
-    Scenario: Network error, timeout, or other DNS-SD failure not mapped to the
-    handled types in _is_device_operational_via_dnssd.
+    Scenario: Failure not mapped to the handled types in _is_device_operational_via_dnssd.
     Expected: Exception propagates (only OSError/ValueError/RuntimeError/TypeError/ChipStackError are swallowed).
 
     Value: Callers see unexpected failures explicitly instead of a silent False.
@@ -239,7 +253,7 @@ async def test_dnssd_exception_handling():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(side_effect=Exception("DNS-SD network error"))
+        mock_mdns.has_srv_record = AsyncMock(side_effect=Exception("DNS-SD network error"))
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         try:
@@ -293,65 +307,6 @@ async def test_dnssd_import_error_propagates():
         if saved_submod:
             sys.modules['mdns_discovery.mdns_discovery'] = saved_submod
 
-    return None
-
-
-async def test_dnssd_multiple_services_finds_correct_one():
-    """
-    Test: Multiple services found, one matches our fabric+node.
-
-    Scenario: Network has multiple Matter devices, we find ours.
-    Expected: Returns True when our specific device is in the list.
-
-    Value: Verifies correct filtering when multiple devices advertise.
-    """
-    from matter.testing.commissioning import _is_device_operational_via_dnssd
-
-    mock_controller = MockDeviceController()
-    expected_instance_name = build_expected_instance_name(TEST_COMPRESSED_FABRIC_ID, TEST_NODE_ID)
-
-    with mock_mdns_module() as mock_mdns_mod:
-        mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(return_value=[
-            MockMdnsServiceInfo(instance_name="OTHERFABRICID00000-0000000000005678"),
-            MockMdnsServiceInfo(instance_name=expected_instance_name),  # Our device
-            MockMdnsServiceInfo(instance_name="ANOTHERFABRIC0000-0000000000009999"),
-        ])
-        mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
-
-        result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
-
-        if not result:
-            return "Expected True when this fabric's service is in the list"
-    return None
-
-
-async def test_dnssd_same_fabric_different_node():
-    """
-    Test: Service for same fabric but different node ID.
-
-    Scenario: Another device on our fabric, but not the one we're looking for.
-    Expected: Returns False - wrong node ID.
-
-    Value: Verifies both fabric AND node ID must match.
-    """
-    from matter.testing.commissioning import _is_device_operational_via_dnssd
-
-    mock_controller = MockDeviceController()
-    # Same fabric, different node
-    different_node_instance = build_expected_instance_name(TEST_COMPRESSED_FABRIC_ID, 9999)
-
-    with mock_mdns_module() as mock_mdns_mod:
-        mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(return_value=[
-            MockMdnsServiceInfo(instance_name=different_node_instance)
-        ])
-        mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
-
-        result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
-
-        if result:
-            return "Expected False when service is for different node ID"
     return None
 
 
@@ -581,61 +536,29 @@ async def test_is_commissioned_on_current_fabric_scenario2_operational_shortcirc
     return None
 
 
-async def test_is_commissioned_on_current_fabric_scenario1_factory_fresh():
+async def test_is_commissioned_not_operational():
     """
-    Test: SCENARIO 1 - Device is commissionable (factory fresh, pairing window open).
+    Test: Device does not answer the operational DNS-SD query for this fabric.
 
     Behavior:
-    - DNS-SD operational returns False (not on this fabric)
-    - DNS-SD commissionable returns True (device advertising _matterc._udp)
-    - is_commissioned returns False immediately (fast-fail)
+    - DNS-SD operational returns False (factory fresh, off, or only on other fabrics)
+    - is_commissioned returns False without any further discovery
 
-    Value: Factory-fresh devices are detected without side-effects (no PASE session opened).
+    Value: No side-effects when the device is not on this fabric. No PASE or CASE attempted.
     """
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
 
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_op, \
-            patch.object(commissioning, '_is_device_commissionable_via_dnssd', new_callable=AsyncMock) as mock_comm:
-
+    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_op:
         mock_op.return_value = False
-        mock_comm.return_value = True
 
         result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
 
         if result:
-            return "Expected False when device is commissionable (factory fresh)"
-        if not mock_comm.called:
-            return "Commissionable DNS-SD check should have been called"
-    return None
-
-
-async def test_is_commissioned_neither_dnssd_conclusive():
-    """
-    Test: Neither DNS-SD check is conclusive (device off, broken, or on another fabric).
-
-    Behavior:
-    - DNS-SD operational returns False
-    - DNS-SD commissionable returns False
-    - is_commissioned returns False (device not reachable)
-
-    Value: No side-effects when device is unreachable. No PASE or CASE attempted.
-    """
-    from matter.testing import commissioning
-
-    mock_controller = MockDeviceController()
-
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_op, \
-            patch.object(commissioning, '_is_device_commissionable_via_dnssd', new_callable=AsyncMock) as mock_comm:
-
-        mock_op.return_value = False
-        mock_comm.return_value = False
-
-        result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
-
-        if result:
-            return "Expected False when neither DNS-SD check is conclusive"
+            return "Expected False when device is not operational on this fabric"
+        if mock_controller.EstablishPASESession.called or mock_controller.GetConnectedDevice.called:
+            return "is_commissioned should not open PASE or CASE sessions"
     return None
 
 
@@ -763,12 +686,11 @@ def main():
     tests = [
         # Category A: DNS-SD Discovery Tests
         ("A1. DNS-SD: device found on THIS fabric", test_dnssd_device_found_on_this_fabric),
-        ("A2. DNS-SD: device on DIFFERENT fabric", test_dnssd_device_on_different_fabric),
-        ("A3. DNS-SD: no services found", test_dnssd_no_services_found),
-        ("A4. DNS-SD: exception handling", test_dnssd_exception_handling),
-        ("A5. DNS-SD: import error propagates", test_dnssd_import_error_propagates),
-        ("A6. DNS-SD: multiple services finds correct one", test_dnssd_multiple_services_finds_correct_one),
-        ("A7. DNS-SD: same fabric different node", test_dnssd_same_fabric_different_node),
+        ("A2. DNS-SD: queries this fabric and node instance", test_dnssd_queries_this_fabric_and_node_instance),
+        ("A3. DNS-SD: no answer", test_dnssd_no_answer),
+        ("A4. DNS-SD: handled error returns False", test_dnssd_handled_error_returns_false),
+        ("A5. DNS-SD: exception handling", test_dnssd_exception_handling),
+        ("A6. DNS-SD: import error propagates", test_dnssd_import_error_propagates),
 
         # Category B: Parallel Session Establishment Tests
         ("B1. Parallel: PASE wins race", test_parallel_session_pase_wins),
@@ -780,11 +702,9 @@ def main():
         # Category C: is_commissioned() Tests
         ("C1. is_commissioned: operational shortcircuit",
          test_is_commissioned_on_current_fabric_scenario2_operational_shortcircuit),
-        ("C2. is_commissioned: commissionable fast-fail (factory fresh)",
-         test_is_commissioned_on_current_fabric_scenario1_factory_fresh),
-        ("C3. is_commissioned: neither DNS-SD conclusive",
-         test_is_commissioned_neither_dnssd_conclusive),
-        ("C4. is_commissioned: exception propagation",
+        ("C2. is_commissioned: not operational",
+         test_is_commissioned_not_operational),
+        ("C3. is_commissioned: exception propagation",
          test_is_commissioned_exception_propagation),
 
         # Category D: get_commissioned_fabric_count() Tests

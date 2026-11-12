@@ -400,6 +400,8 @@ class SetupParameters:
 # Short timeout since DNS-SD is fast - device should respond quickly if operational
 DNSSD_DISCOVERY_TIMEOUT_SEC = 3
 
+_OPERATIONAL_SERVICE_TYPE = "_matter._tcp.local."
+
 
 class EstablishedSessionKind(StrEnum):
     """Session type that succeeded when establishing PASE and CASE in parallel."""
@@ -418,12 +420,14 @@ async def _is_device_operational_via_dnssd(
 
     This is a fast check that avoids the long CASE timeout when a device is not
     commissioned. Devices advertise operational services on _matter._tcp.local.
-    with instance name format: {compressed_fabric_id}-{node_id}
+    with instance name format: {compressed_fabric_id}-{node_id}. The check sends a
+    direct SRV query for that instance, so it returns as soon as the device answers
+    and only waits the full timeout when the device is not advertising.
 
     Args:
         dev_ctrl: The chip device controller instance (used to get compressed fabric ID)
         node_id: Node ID of the device to check
-        discovery_timeout_sec: Timeout for DNS-SD discovery (default 3 seconds)
+        discovery_timeout_sec: Timeout for the SRV query (default 3 seconds)
 
     Returns:
         True if device is advertising as operational on this fabric, False otherwise
@@ -431,69 +435,25 @@ async def _is_device_operational_via_dnssd(
     from mdns_discovery.mdns_discovery import MdnsDiscovery
 
     try:
-        # Build expected instance name for this fabric+node
         compressed_fabric_id = dev_ctrl.GetCompressedFabricId()
-        expected_instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
+        instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
 
-        LOGGER.info("Checking DNS-SD for operational service: %s", expected_instance_name)
+        LOGGER.info("Checking DNS-SD for operational service: %s", instance_name)
 
-        # Discover operational services
-        mdns = MdnsDiscovery()
-        services = await mdns.get_operational_services(
-            discovery_timeout_sec=discovery_timeout_sec,
-            log_output=False
+        is_advertised = await MdnsDiscovery().has_srv_record(
+            service_name=f'{instance_name}.{_OPERATIONAL_SERVICE_TYPE}',
+            service_type=_OPERATIONAL_SERVICE_TYPE,
+            query_timeout_sec=discovery_timeout_sec
         )
 
-        # Check if our expected instance is in the discovered services
-        for service in services:
-            if service.instance_name == expected_instance_name:
-                LOGGER.info("Device %s found operational on fabric %016X via DNS-SD", node_id, compressed_fabric_id)
-                return True
-
-        LOGGER.info("Device %s not found operational on fabric %016X via DNS-SD", node_id, compressed_fabric_id)
-        return False
+        if is_advertised:
+            LOGGER.info("Device %s found operational on fabric %016X via DNS-SD", node_id, compressed_fabric_id)
+        else:
+            LOGGER.info("Device %s not found operational on fabric %016X via DNS-SD", node_id, compressed_fabric_id)
+        return is_advertised
 
     except (OSError, ValueError, RuntimeError, TypeError, ChipStackError) as e:
         LOGGER.warning("DNS-SD check failed, will fall back to connection attempt: %s", e)
-        return False
-
-
-async def _is_device_commissionable_via_dnssd(
-    discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC
-) -> bool:
-    """
-    Check if any device is advertising as commissionable via DNS-SD on the network.
-
-    This check avoids long CASE timeouts when a device is in pairing mode.
-    Devices advertise commissionable services on _matterc._udp.local.
-
-    Args:
-        discovery_timeout_sec: Timeout for DNS-SD discovery (default 3 seconds)
-
-    Returns:
-        True if any device is advertising as commissionable, False otherwise
-    """
-    from mdns_discovery.mdns_discovery import MdnsDiscovery
-
-    try:
-        LOGGER.info("Checking DNS-SD for commissionable service (_matterc._udp.local.)")
-
-        # Discover commissionable services
-        mdns = MdnsDiscovery()
-        services = await mdns.get_commissionable_services(
-            discovery_timeout_sec=discovery_timeout_sec,
-            log_output=False
-        )
-
-        if services:
-            LOGGER.info("Found %s commissionable device(s) via DNS-SD", len(services))
-            return True
-
-        LOGGER.info("No commissionable devices found via DNS-SD")
-        return False
-
-    except (OSError, ValueError, RuntimeError, TypeError) as e:
-        LOGGER.warning("DNS-SD commissionable check failed: %s", e)
         return False
 
 
@@ -602,14 +562,9 @@ async def is_commissioned(
     """
     Check if the device is commissioned on the current fabric (Controller's fabric).
 
-    Uses a passive detection strategy:
-
-    1. DNS-SD operational check (_matter._tcp): if the device advertises as operational
-       for this fabric and node, returns True immediately.
-    2. DNS-SD commissionable check (_matterc._udp): if the device advertises a pairing
-       window, returns False immediately (fast-fail — device is not operational).
-    3. If neither mDNS check is conclusive, returns False (device is off, broken,
-       or on another fabric without an open commissioning window).
+    The device is considered commissioned when it answers a DNS-SD query for its
+    operational instance (_matter._tcp) on this fabric and node. Otherwise this returns
+    False: the device is factory fresh, off, broken, or only on other fabrics.
 
     This function is side-effect free: it does not open PASE or CASE sessions.
 
@@ -621,25 +576,7 @@ async def is_commissioned(
         True if the device is confirmed to be commissioned on this fabric, False otherwise.
     """
     try:
-        # Step 1: Fast DNS-SD check — is the device operational on this fabric?
-        is_operational = await _is_device_operational_via_dnssd(dev_ctrl, node_id)
-
-        if is_operational:
-            LOGGER.info("Device %s is operational via DNS-SD - confirmed commissioned", node_id)
-            return True
-
-        # Step 2: Fast DNS-SD check — if the device is commissionable (pairing window open)
-        is_commissionable = await _is_device_commissionable_via_dnssd()
-
-        if is_commissionable:
-            LOGGER.info("Device %s is commissionable via DNS-SD (pairing window open) - not commissioned", node_id)
-            return False
-
-        # Step 3: Neither mDNS check was conclusive.
-        # Device is off, broken, or on another fabric without a commissioning window.
-        LOGGER.info("Device %s not found via any DNS-SD check - not commissioned on this fabric", node_id)
-        return False
-
+        return await _is_device_operational_via_dnssd(dev_ctrl, node_id)
     except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
         LOGGER.error("Failed to check commissioning status for node %s: %s", node_id, e)
         raise
