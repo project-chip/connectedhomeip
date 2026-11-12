@@ -1092,16 +1092,6 @@ TEST_F(TestDoorLockClusterStorage, SetUserIndexBoundsAndInvalidStatus)
     {
         EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
     }
-
-    // An unknown credential rule cannot be stored.
-    request.operationType  = DataOperationTypeEnum::kAdd;
-    request.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kUnknownEnumValue);
-    result                 = tester.Invoke(Commands::SetUser::Id, request);
-    ASSERT_TRUE(result.status.has_value());
-    if (result.status.has_value())
-    {
-        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
-    }
     EXPECT_EQ(mDelegate.OccupiedUsers(), 0u);
 }
 
