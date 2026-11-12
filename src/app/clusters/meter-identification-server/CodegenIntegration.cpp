@@ -32,8 +32,7 @@ using namespace chip::app::Clusters::MeterIdentification::Attributes;
 
 namespace {
 
-constexpr size_t kMeterIdentificationFixedClusterCount =
-    MeterIdentification::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kMeterIdentificationFixedClusterCount = MeterIdentification::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kMeterIdentificationMaxClusterCount =
     kMeterIdentificationFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
@@ -74,10 +73,7 @@ public:
         return &gServers[clusterInstanceIndex].Cluster();
     }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override
-    {
-        gServers[clusterInstanceIndex].Destroy();
-    }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
 };
 
 } // namespace
