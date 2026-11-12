@@ -91,11 +91,11 @@ public:
 protected:
     MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
     // Connections are fabric-scoped, so the cluster is tested against a commissioned test fabric.
-    FabricIndex mFabricIndex                                = 1;
+    FabricIndex mFabricIndex = 1;
     chip::Testing::TestServerClusterContext mFabricContext; // provides storage for the test fabric
     chip::Testing::FabricTestFixture mFabricHelper{ &mFabricContext.StorageDelegate() };
     Clusters::PushAvStreamTransportServer mServer{ 1, BitFlags<Clusters::PushAvStreamTransport::Feature>(1),
-                                                  mFabricHelper.GetFabricTable() };
+                                                   mFabricHelper.GetFabricTable() };
     chip::Testing::ClusterTester mClusterTester;
 };
 
@@ -132,11 +132,11 @@ public:
 
 protected:
     MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
-    FabricIndex mFabricIndex                                = 1;
+    FabricIndex mFabricIndex = 1;
     chip::Testing::TestServerClusterContext mFabricContext; // provides storage for the test fabric
     chip::Testing::FabricTestFixture mFabricHelper{ &mFabricContext.StorageDelegate() };
     Clusters::PushAvStreamTransportServer mServer{ 1, BitFlags<Clusters::PushAvStreamTransport::Feature>(),
-                                                  mFabricHelper.GetFabricTable() };
+                                                   mFabricHelper.GetFabricTable() };
     chip::Testing::ClusterTester mClusterTester;
 };
 
@@ -454,7 +454,7 @@ public:
 
 protected:
     // Connections are fabric-scoped, so the cluster is tested against a commissioned test fabric.
-    FabricIndex mFabricIndex                                = 1;
+    FabricIndex mFabricIndex = 1;
     chip::Testing::TestServerClusterContext mFabricContext; // provides storage for the test fabric
     chip::Testing::FabricTestFixture mFabricHelper{ &mFabricContext.StorageDelegate() };
     PushAvStreamTransportServer mServer{ 1, BitFlags<Feature>(1), mFabricHelper.GetFabricTable() };
