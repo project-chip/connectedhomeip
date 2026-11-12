@@ -87,6 +87,18 @@
 #define MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE (1 * 60 * 60)
 #define MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_BUDGET 5
 
+// When MTRDevice receives attributes or events from a subscription, the
+// property lastSubscriptionActiveTime is set with receive time. At any point
+// if lastSubscriptionActiveTime is within this threshold, we should consider
+// that we are actively communicating with this device.
+// TODO: make this configurable - for now use 1.5 second
+#define MTR_DEVICE_ACTIVE_COMMUNICATION_THRESHOLD_SECONDS (1.5)
+
+// If a subscription takes abnormally long to establish, the reachability
+// property should be changed to unreachable, if the device is not actively
+// communicating with the device.
+#define MTR_DEVICE_SUBSCRIPTION_TAKES_TOO_LONG_THRESHOLD_SECONDS (10)
+
 #pragma mark - Constant string definitions
 
 static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
@@ -113,8 +125,6 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 @end
 
 typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
-
-#define kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription 10
 
 // Disabling pending crashes
 #define ENABLE_CONNECTIVITY_MONITORING 0
@@ -2047,8 +2057,26 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     [self _reattemptSubscriptionNowIfNeededWithReason:@"got unsolicited message from publisher"];
 }
 
-- (void)_markDeviceAsUnreachableIfNeverSubscribed
+- (void)_markDeviceAsUnreachableIfNeeded
 {
+    std::lock_guard lock(_lock);
+
+    // Nothing to do if subscription has established
+    if (HaveSubscriptionEstablishedRightNow(self->_internalDeviceState)) {
+        return;
+    }
+
+    // If subcription is actively being established, check later
+    if (self.lastSubscriptionActiveTime) {
+        NSTimeInterval intervalSinceDeviceLastActive = -[self.lastSubscriptionActiveTime timeIntervalSinceNow];
+        if (intervalSinceDeviceLastActive < MTR_DEVICE_ACTIVE_COMMUNICATION_THRESHOLD_SECONDS) {
+            // schedule 1/2 the active threshold in the future to check
+            [self _scheduleMarkDeviceAsUnreachableAfterWait:(MTR_DEVICE_ACTIVE_COMMUNICATION_THRESHOLD_SECONDS / 2)];
+            return;
+        }
+    }
+
+    // Use matter queue to avoid race with a timely report
     mtr_weakify(self);
     [_deviceController asyncDispatchToMatterQueue:^{
         mtr_strongify(self);
@@ -2056,14 +2084,22 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
         std::lock_guard lock(self->_lock);
 
-        if (HadSubscriptionEstablishedOnce(self->_internalDeviceState)) {
-            return;
-        }
-
         MTR_LOG("%@ still not subscribed, marking the device as unreachable", self);
         [self _changeState:MTRDeviceStateUnreachable];
     }
                                      errorHandler:nil];
+}
+
+- (void)_scheduleMarkDeviceAsUnreachableAfterWait:(NSTimeInterval)waitTime
+{
+    // Set up a timer to mark as not reachable if it takes too long to set up a subscription
+    mtr_weakify(self);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(waitTime) * static_cast<int64_t>(NSEC_PER_SEC)), self.queue, ^{
+        mtr_strongify(self);
+        VerifyOrReturn(self, MTR_LOG_DEBUG("_scheduleMarkUnreachableAfterWait called back with nil MTRDevice"));
+
+        [self _markDeviceAsUnreachableIfNeeded];
+    });
 }
 
 - (void)_handleReportBegin
@@ -3261,7 +3297,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         self.doingCASEAttemptForDeviceMayBeReachable = YES;
     }
 
-    __block bool markUnreachableAfterWait = true;
+    // Only schedule a timer for first subscriptions
+    __block bool markUnreachableAfterWait = !HadSubscriptionEstablishedOnce(self->_internalDeviceState);
 #ifdef DEBUG
     [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
         if ([testDelegate respondsToSelector:@selector(unitTestSuppressTimeBasedReachabilityChanges:)]) {
@@ -3272,15 +3309,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
     if (markUnreachableAfterWait) {
         // Set up a timer to mark as not reachable if it takes too long to set up a subscription
-        mtr_weakify(self);
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription) * static_cast<int64_t>(NSEC_PER_SEC)), self.queue, ^{
-            mtr_strongify(self);
-            VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason markUnreachableAfterWait called back with nil MTRDevice"));
-
-            if (!HaveSubscriptionEstablishedRightNow(self->_internalDeviceState)) {
-                [self _markDeviceAsUnreachableIfNeverSubscribed];
-            }
-        });
+        [self _scheduleMarkDeviceAsUnreachableAfterWait:MTR_DEVICE_SUBSCRIPTION_TAKES_TOO_LONG_THRESHOLD_SECONDS];
     }
 
     // This marks begin of initial subscription to the device (before CASE is established). The end is only marked after successfully setting
@@ -5538,9 +5567,6 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     return HaveSubscriptionEstablishedRightNow(_internalDeviceState);
 }
 
-// TODO: make this configurable - for now use 1.5 second
-#define MTRDEVICE_ACTIVE_COMMUNICATION_THRESHOLD_SECONDS (1.5)
-
 - (void)_deviceMayBeReachable
 {
     // Ignore this call if actively receiving communication from this device
@@ -5548,7 +5574,7 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
         std::lock_guard lock(self->_lock);
         if (self.lastSubscriptionActiveTime) {
             NSTimeInterval intervalSinceDeviceLastActive = -[self.lastSubscriptionActiveTime timeIntervalSinceNow];
-            if (intervalSinceDeviceLastActive < MTRDEVICE_ACTIVE_COMMUNICATION_THRESHOLD_SECONDS) {
+            if (intervalSinceDeviceLastActive < MTR_DEVICE_ACTIVE_COMMUNICATION_THRESHOLD_SECONDS) {
                 MTR_LOG("%@ _deviceMayBeReachable called and ignored, because last received communication from device %.6lf seconds ago", self, intervalSinceDeviceLastActive);
                 return;
             }
