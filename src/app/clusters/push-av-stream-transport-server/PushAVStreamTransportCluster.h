@@ -49,8 +49,8 @@ public:
      */
     PushAvStreamTransportServer(EndpointId aEndpointId, BitFlags<PushAvStreamTransport::Feature> aFeatures,
                                 FabricTable & aFabricTable) :
-        DefaultServerCluster({ aEndpointId, PushAvStreamTransport::Id }), mFabricTable(aFabricTable),
-        mLogic(aEndpointId, aFeatures)
+        DefaultServerCluster({ aEndpointId, PushAvStreamTransport::Id }),
+        mFabricTable(aFabricTable), mLogic(aEndpointId, aFeatures)
     {
         mLogic.SetCluster(this);
     }

@@ -217,7 +217,8 @@ namespace WebRTCTransportProvider {
 
 WebRTCTransportProviderCluster::WebRTCTransportProviderCluster(EndpointId endpointId, WebRTCTransportProvider::Delegate & delegate,
                                                                FabricTable & fabricTable) :
-    DefaultServerCluster({ endpointId, Id }), mDelegate(delegate), mFabricTable(fabricTable)
+    DefaultServerCluster({ endpointId, Id }),
+    mDelegate(delegate), mFabricTable(fabricTable)
 {}
 
 CHIP_ERROR WebRTCTransportProviderCluster::Startup(ServerClusterContext & context)

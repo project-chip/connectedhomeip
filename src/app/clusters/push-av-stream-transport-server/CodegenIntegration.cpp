@@ -19,10 +19,10 @@
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 #include <app/clusters/push-av-stream-transport-server/MigratePushAvStreamTransportServerStorage.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/PushAvStreamTransport.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
-#include <app/server/Server.h>
 
 #include <cstdint>
 
