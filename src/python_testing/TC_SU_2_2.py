@@ -360,6 +360,9 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             "-q", "updateAvailable"
         ]
 
+        # Pre-define named pipe arguments
+        self.named_pipe_arguments = ['--app-pipe', self.provider_app_pipe, '--app-pipe-out', self.provider_app_pipe_out]
+
         # ------------------------------------------------------------------------------------
         # Provider commissioning (done once before any step that requires AnnounceOTAProvider).
         # Start the provider for the first time with Busy/60s args (used in Step 1) so that
@@ -1422,9 +1425,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         self.step(9)
         # ------------------------------------------------------------------------------------
         # [STEP_9]: Prerequisites - Setup Provider
-        # The provider is started with updateAvailable args. The provider is kept running until
-        # kApplying is observed (BDX transfer complete), then terminated. This is the single
-        # full OTA update in the entire test — the DUT applies V2 and reboots.
+        # The provider is started with updateAvailable args and kept running through the DUT
+        # reboot so Step 10 can inspect the NotifyUpdateApplied command.
         # ------------------------------------------------------------------------------------
         step_number_s9 = "[STEP_9]"
         logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s',
@@ -1432,7 +1434,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info('%s: Prerequisite #1.0 - Launched Provider', step_number_s9)
 
         step9_provider_extra_args = provider_extra_args_updateAvailable + \
-            ['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', '3']
+            ['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', '3'] + self.named_pipe_arguments
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -1594,8 +1596,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_9]: Step #9.5 - Wait for kDelayedOnApply and then kApplying to confirm the BDX
-        # transfer is fully complete, then terminate the provider. The DUT will finish applying
-        # and reboot on its own.
+        # transfer is fully complete. The DUT will finish applying and reboot on its own.
         #
         # The download duration of a real DUT is unknown, so instead of an absolute timeout
         # this wait is bounded by a progress-stall watchdog: as long as UpdateStateProgress
@@ -1628,6 +1629,14 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             stall_timeout_sec=DOWNLOAD_STALL_TIMEOUT_SEC,
             liveness_matcher=progress_liveness_s9,
         )
+
+        # Read the value from updateToken to compare later, this must be the value for the QueryImageResponse during the transfer.
+        query_command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider",
+                                 "Endpoint": self.get_endpoint()}
+        self.write_to_app_pipe(query_command, self.provider_app_pipe)
+        query_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        expected_update_token = query_response_data["Payload"]["UpdateToken"]
+
         logger.info('%s: Step #9.5 - kDelayedOnApply observed — BDX transfer complete.', step_number_s9)
 
         # Start of step #7 of TC_SU_2_7
@@ -1720,9 +1729,6 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         subscription_attr_s9.cancel()
 
-        logger.info('%s: Step #9.5 - Terminating provider (download done, DUT applying firmware).', step_number_s9)
-        self.terminate_provider()
-
         # ------------------------------------------------------------------------------------
         # [STEP_9]: Step #9.6 - Wait for DUT to reboot after applying V2 firmware.
         # Expire the stale session so the controller reconnects cleanly, then poll until
@@ -1777,8 +1783,27 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         
         self.step(10)
         step_number_s10 = "[STEP_10]"
-        # Add check with named pipe here
+        notify_command = {"Name": "GetNotifyUpdateAppliedStatus", "Cluster": "OtaSoftwareUpdateProvider",
+                          "Endpoint": self.get_endpoint()}
+        self.write_to_app_pipe(notify_command, self.provider_app_pipe)
+        notify_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        logger.info("%s Provider NotifyUpdateApplied snapshot: %s", step_number_s10, notify_response_data)
 
+        received_update_token = notify_response_data["Payload"]["UpdateToken"]
+        received_software_version = notify_response_data["Payload"]["SoftwareVersion"]
+        asserts.assert_true(
+            len(received_update_token) > 0,
+            f"{step_number_s10}: Provider did not record a NotifyUpdateApplied command from the DUT.")
+        asserts.assert_equal(
+            received_update_token, expected_update_token,
+            f"{step_number_s10}: NotifyUpdateApplied UpdateToken does not match the QueryImageResponse UpdateToken.")
+        asserts.assert_equal(
+            received_software_version, ota_image_version,
+            f"{step_number_s10}: NotifyUpdateApplied SoftwareVersion does not match the downloaded software version.")
+        logger.info("%s NofityUpdateApplied data from named_pipe: UpdateToken %s, SoftwareVersion: %s ", step_number_s10, expected_update_token, ota_image_version)
+
+        # Terminate the provider at this point as is no longer needed.
+        self.terminate_provider()
 
         self.step(11)
         step_number_s11 = "[STEP_11]"
@@ -1864,13 +1889,13 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Attribute subscriptions always send keepalives (current value every max_interval),
         # keeping the session alive and avoiding stale-event issues entirely.
         # ------------------------------------------------------------------------------------
-        subscription_s10 = AttributeSubscriptionHandler(
+        subscription_s13 = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
 
         await self._start_subscription_bounded(
-            subscription_s10, step_number_s13,
+            subscription_s13, step_number_s13,
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=0,
@@ -1893,11 +1918,11 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         await self._wait_until_idle_before_announce(
             controller=controller,
             requestor_node_id=requestor_node_id,
-            subscription=subscription_s10,
+            subscription=subscription_s13,
             timeout_sec=IDLE_BEFORE_ANNOUNCE_TIMEOUT_SEC,
             step_name=step_number_s13,
         )
-        subscription_s10.flush_reports()
+        subscription_s13.flush_reports()
 
         # ------------------------------------------------------------------------------------
         # [STEP_13]: Step #13.2 - Controller sends AnnounceOTAProvider command, repeating until the
@@ -1942,7 +1967,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         logger.info('%s: Step #10.3 - Phase A — waiting for kQuerying (DUT queries the provider after announce).',
                     step_number_s13)
-        subscription_s10.await_first_value_asserting_no_forbidden(
+        subscription_s13.await_first_value_asserting_no_forbidden(
             target_value=kQuerying_s6,
             forbidden_values=s6_forbidden,
             timeout_sec=STEP6_CYCLE_TIMEOUT_SEC,
@@ -1952,7 +1977,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         logger.info('%s: Phase B — waiting for return to kIdle (same-version image rejected, no download).',
                     step_number_s13)
-        subscription_s10.await_first_value_asserting_no_forbidden(
+        subscription_s13.await_first_value_asserting_no_forbidden(
             target_value=kIdle_s6,
             forbidden_values=s6_forbidden,
             timeout_sec=STEP6_CYCLE_TIMEOUT_SEC,
@@ -1960,7 +1985,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         )
         logger.info('%s: kIdle after query observed — cycle completed without download.', step_number_s13)
 
-        subscription_s10.cancel()
+        subscription_s13.cancel()
         logger.info('%s: Step #10.4 - Query cycle fully completed after announce.', step_number_s13)
         logger.info("%s: No image transfer occurred (expected — DUT already on V2).", step_number_s13)
 

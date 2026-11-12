@@ -60,6 +60,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     current_provider_app_proc: OTAProviderSubprocess | None = None
     provider_app_path: str | None = None
     _test_budget_deadline: float | None = None
+    provider_app_pipe: str | None = None
+    provider_app_pipe_out: str | None = None
 
     def start_test_budget_clock(self, safety_margin_sec: float = 30.0) -> None:
         """Record the overall time budget of the running test body.
