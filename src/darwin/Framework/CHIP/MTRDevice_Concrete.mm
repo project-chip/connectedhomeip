@@ -785,6 +785,11 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 static std::atomic<uint32_t> sUserInvokeMinimumTimeoutOverrideMs { 0 };
 #endif
 
+// How long an invoke with expected values and no user command token may wait in the queue before it is sent.  Its
+// expected values are shown for the whole wait, so the wait needs a bound.  The value is the framework's default
+// timed interaction timeout: a choice, not a derived bound.
+static constexpr uint32_t kMTRUntokenedInvokeQueueTimeoutMs = MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS;
+
 // The shortest caller timeout a user command accepts: one session attempt, the bound OperationalSessionSetup uses
 // for one CASE attempt (CASESession::ComputeSigma1ResponseTimeout with the default MRP config).
 static uint32_t MTRUserInvokeMinimumTimeoutMs()
@@ -4164,6 +4169,22 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), @(UINT32_MAX));
     }
 
+    // An invoke with expected values and no token gets the bound a token's timeout gives: if it has sent nothing by
+    // then, it fails with a timeout, its expected values are removed, and it is never sent.
+    NSNumber * queueTimeoutMs = userInvokeToken ? userInvokeToken.timeoutMs : nil;
+    BOOL boundedWithoutToken = (!userInvokeToken && expectedValues);
+    if (boundedWithoutToken) {
+        queueTimeoutMs = @(kMTRUntokenedInvokeQueueTimeoutMs);
+        // As for a user command, the caller hears exactly once: from the result or from the timeout.
+        auto completedOnce = std::make_shared<std::atomic<bool>>(false);
+        MTRDeviceResponseHandler callerCompletion = completion;
+        completion = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            if (!completedOnce->exchange(true)) {
+                callerCompletion(values, error);
+            }
+        };
+    }
+
     serverSideProcessingTimeout = [serverSideProcessingTimeout copy];
     timeout = [timeout copy];
     commandFields = [commandFields copy];
@@ -4242,9 +4263,9 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             requestWillBeSent = ^BOOL {
                 mtr_strongify(self);
                 __block BOOL send = YES;
-                if (userInvokeToken && weakWorkItem) {
-                    // A user command that has sent nothing can be cancelled up to here: if it was, send nothing.
-                    // Its caller has already been completed by the cancel.  From here on it is sent and completes.
+                if ((userInvokeToken || boundedWithoutToken) && weakWorkItem) {
+                    // A command that has sent nothing can be cancelled up to here: if it was, send nothing.  Its
+                    // caller has already been completed by the cancel.  From here on it is sent and completes.
                     send = [workQueue workItem:weakWorkItem readyToSend:^ {}];
                 }
                 if (!send) {
@@ -4302,6 +4323,10 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                 dispatch_async(queue, ^{
                     completion(nil, error);
                 });
+            } else if (cancelledByTimeout->load()) {
+                dispatch_async(queue, ^{
+                    completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT]);
+                });
             }
         }];
     }
@@ -4325,24 +4350,23 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         case MTRUserInvokeTokenUseTied:
             break;
         }
-        NSNumber * userTimeoutMs = userInvokeToken.timeoutMs;
-        if (userTimeoutMs != nil) {
-            // The caller's timeout bounds the command's wait in the queue: if it has sent nothing by then, it fails
-            // with a timeout and is never sent.  No constant of our own on this path.
-            MTRAsyncWorkQueue * workQueue = _asyncWorkQueue;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (userTimeoutMs.doubleValue * NSEC_PER_MSEC)), self.queue, ^{
-                MTRAsyncWorkItem * item = weakWorkItem;
-                if (!item) {
-                    return;
-                }
-                cancelledByTimeout->store(true);
-                if ([workQueue cancelWorkItemIfUnsent:item]) {
-                    MTR_LOG("Invoke work item [%llu] timed out after %@ ms in the queue before it was sent", workItemID, userTimeoutMs);
-                } else {
-                    cancelledByTimeout->store(false); // already sent: it completes as usual
-                }
-            });
-        }
+    }
+    if (queueTimeoutMs != nil) {
+        // The caller's timeout, or for an invoke with expected values and no token the default above, bounds the
+        // command's wait in the queue: if it has sent nothing by then, it fails with a timeout and is never sent.
+        MTRAsyncWorkQueue * workQueue = _asyncWorkQueue;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (queueTimeoutMs.doubleValue * NSEC_PER_MSEC)), self.queue, ^{
+            MTRAsyncWorkItem * item = weakWorkItem;
+            if (!item) {
+                return;
+            }
+            cancelledByTimeout->store(true);
+            if ([workQueue cancelWorkItemIfUnsent:item]) {
+                MTR_LOG("Invoke work item [%llu] timed out after %@ ms in the queue before it was sent", workItemID, queueTimeoutMs);
+            } else {
+                cancelledByTimeout->store(false); // already sent: it completes as usual
+            }
+        });
     }
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"invoke %@ 0x%llx (%@) 0x%llx (%@): %@",
                                               endpointID,

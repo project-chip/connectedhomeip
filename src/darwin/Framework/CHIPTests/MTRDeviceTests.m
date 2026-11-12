@@ -9643,6 +9643,45 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:[self _expectedValueTestPath]][MTRValueKey], @(kExpectedValueTestCachedValue));
 }
 
+- (void)test078_InvokeWithoutTokenBehindSessionBlockedReadFailsAtQueueBound
+{
+    // A command with expected values and no token, queued behind a read that is waiting for its session, does not
+    // keep its expected value for the whole wait: once it has waited the default bound (10 s) unsent, it fails with
+    // a timeout, its expected value is removed, and it is never sent.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    [MTRBaseDevice unitTestResetSingleInvokeSendCount];
+    const NSTimeInterval bound = 10;
+
+    dispatch_block_t releaseSession = [self _holdMatterQueue];
+    [self _queueReadThroughOfUserInvokeReadPathOnDevice:device];
+    [self _waitForDeviceQueue:device];
+    __block NSError * failure;
+    __block BOOL completed = NO;
+    NSDate * invokedAt = [NSDate now];
+    [self _userInvokeUnitTestingTestOnDevice:device expectedValue:@(9) token:nil completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        failure = error;
+        completed = YES;
+    }];
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:[self _expectedValueTestPath]][MTRValueKey], @(9));
+
+    // The bound plus slack, with the read still waiting for its session.
+    XCTestExpectation * sessionPending = [[XCTestExpectation alloc] initWithDescription:@"Session still not ready"];
+    sessionPending.inverted = YES;
+    [self waitForExpectations:@[ sessionPending ] timeout:(bound + 2)];
+    [self _waitForDeviceQueue:device];
+
+    XCTAssertTrue(completed, @"still waiting %.1f s after it was invoked", [[NSDate now] timeIntervalSinceDate:invokedAt]);
+    XCTAssertEqual(failure.code, MTRErrorCodeTimeout);
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:[self _expectedValueTestPath]][MTRValueKey], @(kExpectedValueTestCachedValue));
+
+    releaseSession();
+    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Read finishes; the command is not sent"];
+    settle.inverted = YES;
+    [self waitForExpectations:@[ settle ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual([MTRBaseDevice unitTestSingleInvokeSendCount], 0);
+}
+
 @end
 
 @interface MTRDeviceResubscriptionTimerTests : MTRTestCase
