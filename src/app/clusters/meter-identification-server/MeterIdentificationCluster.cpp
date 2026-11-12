@@ -18,6 +18,8 @@
 
 #include "MeterIdentificationCluster.h"
 
+#include <algorithm>
+
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/MeterIdentification/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -72,18 +74,23 @@ MeterIdentificationCluster::MeterIdentificationCluster(EndpointId endpointId, co
 {
     if (!config.mPointOfDelivery.IsNull())
     {
+        // CopyString truncates to kMaximumStringSize if the config value is oversized; the stored
+        // span length must match what was actually copied, not the untruncated input size.
+        const size_t len = std::min(config.mPointOfDelivery.Value().size(), kMaximumStringSize);
         Platform::CopyString(mPointOfDeliveryBuf, config.mPointOfDelivery.Value());
-        mPointOfDelivery.SetNonNull(CharSpan(mPointOfDeliveryBuf, config.mPointOfDelivery.Value().size()));
+        mPointOfDelivery.SetNonNull(CharSpan(mPointOfDeliveryBuf, len));
     }
     if (!config.mMeterSerialNumber.IsNull())
     {
+        const size_t len = std::min(config.mMeterSerialNumber.Value().size(), kMaximumStringSize);
         Platform::CopyString(mMeterSerialNumberBuf, config.mMeterSerialNumber.Value());
-        mMeterSerialNumber.SetNonNull(CharSpan(mMeterSerialNumberBuf, config.mMeterSerialNumber.Value().size()));
+        mMeterSerialNumber.SetNonNull(CharSpan(mMeterSerialNumberBuf, len));
     }
     if (!config.mProtocolVersion.IsNull() && mOptionalAttributeSet.IsSet(ProtocolVersion::Id))
     {
+        const size_t len = std::min(config.mProtocolVersion.Value().size(), kMaximumStringSize);
         Platform::CopyString(mProtocolVersionBuf, config.mProtocolVersion.Value());
-        mProtocolVersion.SetNonNull(CharSpan(mProtocolVersionBuf, config.mProtocolVersion.Value().size()));
+        mProtocolVersion.SetNonNull(CharSpan(mProtocolVersionBuf, len));
     }
 
     if (!config.mPowerThreshold.IsNull() && !HasFeature(Feature::kPowerThreshold))
