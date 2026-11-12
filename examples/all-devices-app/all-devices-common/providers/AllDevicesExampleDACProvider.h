@@ -55,6 +55,19 @@ public:
     CHIP_ERROR GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer) override;
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer) override;
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) override;
+    CHIP_ERROR GetDeviceAttestationCertForProfile(Credentials::DeviceAttestationCertProfile profile,
+                                                  MutableByteSpan & out_dac_buffer) override;
+    CHIP_ERROR GetProductAttestationIntermediateCertForProfile(Credentials::DeviceAttestationCertProfile profile,
+                                                               MutableByteSpan & out_pai_buffer) override;
+    Credentials::DeviceAttestationProfileSupport GetDeviceAttestationProfileSupport() const override;
+    Credentials::DeviceAttestationCertProfile GetPreferredDeviceAttestationChainProfile() const override;
+    CHIP_ERROR GetDeviceAttestationDocumentSegment(Credentials::DeviceAttestationDocumentType documentType,
+                                                   Credentials::DeviceAttestationCertProfile profile, size_t offset,
+                                                   MutableByteSpan & out_document_buffer, size_t & out_document_size) override;
+    CHIP_ERROR GetDeviceAttestationDocumentSegmentForChain(Credentials::DeviceAttestationDocumentType documentType,
+                                                           const Credentials::DeviceAttestationChainProfile & chain, size_t offset,
+                                                           MutableByteSpan & out_document_buffer,
+                                                           size_t & out_document_size) override;
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer) override;
 
 private:

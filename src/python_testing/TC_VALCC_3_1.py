@@ -18,8 +18,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device water-valve:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -52,7 +52,7 @@ class TC_VALCC_3_1(MatterTestCommissionedDevice):
 
     def steps_TC_VALCC_3_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT if required", is_commissioning=True),
+            TestStep(1, "Commission DUT if required"),
             TestStep(2, "Set up a subscription to all attributes on the DUT"),
             TestStep(3, "Send a close command to the DUT and wait until the CurrentState is closed", "DUT returns SUCCESS"),
             TestStep(4, "Send Open command", "DUT returns SUCCESS"),

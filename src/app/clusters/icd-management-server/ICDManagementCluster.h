@@ -72,10 +72,10 @@ public:
     /**
      * @brief Constructor for ICDManagementCluster
      *
-     * @param userActiveModeTriggerInstruction The instruction string is copied into an internal buffer
-     *        during construction. The caller does not need to maintain the lifetime of the CharSpan
-     *        or its underlying data after the constructor returns. If the instruction exceeds
-     *        kUserActiveModeTriggerInstructionMaxLength (128 bytes), it will be truncated.
+     * @param userActiveModeTriggerInstruction The instruction string. The caller must maintain the
+     *        lifetime of the underlying data for the lifetime of the cluster instance (e.g. flash
+     *        or static storage). If the instruction exceeds kUserActiveModeTriggerInstructionMaxLength
+     *        (128 bytes), it will be truncated.
      */
     ICDManagementCluster(EndpointId endpointId, Crypto::SymmetricKeystore & symmetricKeystore, FabricTable & fabricTable,
                          ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
@@ -115,8 +115,7 @@ protected:
     const OptionalAttributeSet mOptionalAttributeSet;
     const BitMask<IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerBitmap;
     const OptionalCommandSet mEnabledCommands;
-    uint8_t mUserActiveModeTriggerInstructionLength;
-    char mUserActiveModeTriggerInstruction[IcdManagement::kUserActiveModeTriggerInstructionMaxLength];
+    const CharSpan mUserActiveModeTriggerInstruction;
 };
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
@@ -145,9 +144,9 @@ private:
  * including client registration/unregistration and fabric delegate management.
  * The fabric delegate is automatically registered/unregistered in Startup/Shutdown.
  *
- * @param userActiveModeTriggerInstruction The instruction string is copied into an internal buffer
- *        during construction (by the base class). The caller does not need to maintain the lifetime
- *        of the CharSpan or its underlying data after the constructor returns.
+ * @param userActiveModeTriggerInstruction The instruction string. The caller must maintain the
+ *        lifetime of the underlying data for the lifetime of the cluster instance (e.g. flash
+ *        or static storage).
  */
 class ICDManagementClusterWithCIP : public ICDManagementCluster
 {

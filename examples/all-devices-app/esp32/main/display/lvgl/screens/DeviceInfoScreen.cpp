@@ -18,9 +18,10 @@
 
 #include "DeviceInfoScreen.h"
 #include "DeviceTypeSelection.h"
+#include "DisplayBoard.h"
+#include "Ui.h"
 
 #include <app/server/Server.h>
-#include <bsp/esp-bsp.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
 #include <esp_netif.h>
@@ -31,8 +32,7 @@
 
 namespace {
 
-constexpr char TAG[]            = "DeviceInfoScreen";
-constexpr uint32_t kWaitForever = 0;
+constexpr char TAG[] = "DeviceInfoScreen";
 
 // The commissioning label waiting for a fabric count, or null when no such label exists. The
 // screen is rebuilt on every refresh, so a reply can outlive the label it was asked for; the
@@ -56,7 +56,7 @@ void RequestCommissioningStatus()
     chip::DeviceLayer::SystemLayer().ScheduleLambda([] {
         const uint8_t fabricCount = chip::Server::GetInstance().GetFabricTable().FabricCount();
 
-        if (!bsp_display_lock(kWaitForever))
+        if (!DisplayBoard::Lock())
         {
             ESP_LOGE(TAG, "Could not acquire display lock for the commissioning status");
             return;
@@ -66,15 +66,15 @@ void RequestCommissioningStatus()
         {
             if (fabricCount > 0)
             {
-                lv_label_set_text_fmt(sCommissioningLabel, "Commissioned: Yes (%u fab)", fabricCount);
+                lv_label_set_text_fmt(sCommissioningLabel, "%u fabric%s", fabricCount, fabricCount == 1 ? "" : "s");
             }
             else
             {
-                lv_label_set_text_static(sCommissioningLabel, "Commissioned: No");
+                lv_label_set_text_static(sCommissioningLabel, "Not commissioned");
             }
         }
 
-        bsp_display_unlock();
+        DisplayBoard::Unlock();
     });
 }
 
@@ -87,63 +87,83 @@ void OnRefreshClicked(lv_event_t * event)
     }
 }
 
+// Icon, muted key and a value label; returns the value label so callers can update it.
+lv_obj_t * AddRow(lv_obj_t * card, const char * symbol, const char * key, const char * value)
+{
+    lv_obj_t * row = lv_obj_create(card);
+    lv_obj_remove_style_all(row);
+    lv_obj_set_width(row, LV_PCT(100));
+    lv_obj_set_height(row, LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_column(row, Ui::Px(12, 6), LV_PART_MAIN);
+    lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(row, LV_OBJ_FLAG_CLICKABLE);
+
+    Ui::CreateIconBadge(row, symbol, Ui::Accent(), Ui::Px(40, 24));
+
+    lv_obj_t * text = lv_obj_create(row);
+    lv_obj_remove_style_all(text);
+    lv_obj_set_flex_grow(text, 1);
+    lv_obj_set_height(text, LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(text, LV_FLEX_FLOW_COLUMN);
+    lv_obj_clear_flag(text, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(text, LV_OBJ_FLAG_CLICKABLE);
+
+    Ui::CreateCaption(text, key);
+    lv_obj_t * valueLabel = lv_label_create(text);
+    lv_label_set_text(valueLabel, value);
+    lv_label_set_long_mode(valueLabel, LV_LABEL_LONG_DOT);
+    lv_obj_set_width(valueLabel, LV_PCT(100));
+    return valueLabel;
+}
+
 } // namespace
 
 void ShowDeviceInfo(lv_obj_t * parent)
 {
-    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_all(parent, 10, LV_PART_MAIN);
-    lv_obj_set_style_pad_row(parent, 6, LV_PART_MAIN);
-    lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    Ui::LayoutColumn(parent);
 
-    // Title
-    lv_obj_t * title = lv_label_create(parent);
-    lv_label_set_text_static(title, "Device Status");
-    lv_obj_set_style_text_color(title, lv_palette_lighten(LV_PALETTE_BLUE, 2), LV_PART_MAIN);
+    lv_obj_t * card = lv_obj_create(parent);
+    lv_obj_set_width(card, LV_PCT(100));
+    lv_obj_set_height(card, LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_row(card, Ui::Px(12, 4), LV_PART_MAIN);
+    lv_obj_clear_flag(card, LV_OBJ_FLAG_SCROLLABLE);
 
-    // Commissioning status, filled in once the CHIP thread reports the fabric count
-    lv_obj_t * commLabel = lv_label_create(parent);
-    lv_label_set_text_static(commLabel, "Commissioned: ...");
+    // Filled in once the CHIP thread reports the fabric count
+    lv_obj_t * commLabel = AddRow(card, LV_SYMBOL_HOME, "Fabrics", "...");
     lv_obj_add_event_cb(commLabel, OnCommissioningLabelDeleted, LV_EVENT_DELETE, nullptr);
     sCommissioningLabel = commLabel;
     RequestCommissioningStatus();
 
 #if CONFIG_LWIP_IPV4
-    // IP Address
     esp_netif_t * netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
     esp_netif_ip_info_t ipInfo;
     char ipBuf[48];
     if (netif != nullptr && esp_netif_get_ip_info(netif, &ipInfo) == ESP_OK && ipInfo.ip.addr != 0)
     {
-        snprintf(ipBuf, sizeof(ipBuf), "IP: " IPSTR, IP2STR(&ipInfo.ip));
+        snprintf(ipBuf, sizeof(ipBuf), IPSTR, IP2STR(&ipInfo.ip));
     }
     else
     {
-        snprintf(ipBuf, sizeof(ipBuf), "IP: Not Connected");
+        snprintf(ipBuf, sizeof(ipBuf), "Not connected");
     }
-    lv_obj_t * ipLabel = lv_label_create(parent);
-    lv_label_set_text(ipLabel, ipBuf);
+    AddRow(card, LV_SYMBOL_WIFI, "IP address", ipBuf);
 #endif // CONFIG_LWIP_IPV4
 
-    // Active Device Type
-    std::string devStr  = "Type: " + GetActiveDeviceType();
-    lv_obj_t * devLabel = lv_label_create(parent);
-    lv_label_set_text(devLabel, devStr.c_str());
+    AddRow(card, LV_SYMBOL_EDIT, "Device type", GetActiveDeviceType().c_str());
 
-    // Memory stats
     unsigned int freeInternalKb = heap_caps_get_free_size(MALLOC_CAP_8BIT | MALLOC_CAP_INTERNAL) / 1024;
     unsigned int freePsramKb    = heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024;
     char memBuf[64];
-    snprintf(memBuf, sizeof(memBuf), "RAM: %u KB | PSRAM: %u KB", freeInternalKb, freePsramKb);
-    lv_obj_t * memLabel = lv_label_create(parent);
-    lv_label_set_text(memLabel, memBuf);
+    snprintf(memBuf, sizeof(memBuf), "%u KB internal, %u KB PSRAM", freeInternalKb, freePsramKb);
+    AddRow(card, LV_SYMBOL_CHARGE, "Free memory", memBuf);
 
-    // Refresh button
     lv_obj_t * refreshBtn = lv_button_create(parent);
     lv_obj_set_width(refreshBtn, LV_PCT(100));
-    lv_obj_set_height(refreshBtn, 32);
     lv_obj_t * btnLabel = lv_label_create(refreshBtn);
-    lv_label_set_text_static(btnLabel, "Refresh Status");
+    lv_label_set_text_static(btnLabel, LV_SYMBOL_REFRESH "  Refresh");
     lv_obj_center(btnLabel);
     lv_obj_add_event_cb(refreshBtn, OnRefreshClicked, LV_EVENT_CLICKED, parent);
 }

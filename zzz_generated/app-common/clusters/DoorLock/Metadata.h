@@ -50,59 +50,71 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(OpenPeriod::Id, BitFla
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace OpenPeriod
 namespace NumberOfTotalUsersSupported {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfTotalUsersSupported::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfTotalUsersSupported::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfTotalUsersSupported
 namespace NumberOfPINUsersSupported {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfPINUsersSupported::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfPINUsersSupported::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfPINUsersSupported
 namespace NumberOfRFIDUsersSupported {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfRFIDUsersSupported::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfRFIDUsersSupported::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfRFIDUsersSupported
 namespace NumberOfWeekDaySchedulesSupportedPerUser {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfWeekDaySchedulesSupportedPerUser::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfWeekDaySchedulesSupportedPerUser::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfWeekDaySchedulesSupportedPerUser
 namespace NumberOfYearDaySchedulesSupportedPerUser {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfYearDaySchedulesSupportedPerUser::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfYearDaySchedulesSupportedPerUser::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfYearDaySchedulesSupportedPerUser
 namespace NumberOfHolidaySchedulesSupported {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfHolidaySchedulesSupported::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfHolidaySchedulesSupported::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfHolidaySchedulesSupported
 namespace MaxPINCodeLength {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxPINCodeLength::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxPINCodeLength::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxPINCodeLength
 namespace MinPINCodeLength {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinPINCodeLength::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MinPINCodeLength::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MinPINCodeLength
 namespace MaxRFIDCodeLength {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxRFIDCodeLength::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxRFIDCodeLength::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxRFIDCodeLength
 namespace MinRFIDCodeLength {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinRFIDCodeLength::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MinRFIDCodeLength::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MinRFIDCodeLength
 namespace CredentialRulesSupport {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CredentialRulesSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(CredentialRulesSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace CredentialRulesSupport
 namespace NumberOfCredentialsSupportedPerUser {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfCredentialsSupportedPerUser::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfCredentialsSupportedPerUser::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfCredentialsSupportedPerUser
 namespace Language {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Language::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -125,8 +137,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(OperatingMode::Id, Bit
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace OperatingMode
 namespace SupportedOperatingModes {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedOperatingModes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedOperatingModes::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace SupportedOperatingModes
 namespace DefaultConfigurationRegister {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(DefaultConfigurationRegister::Id,
@@ -187,14 +201,16 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(AliroReaderGroupIdenti
                                                           Access::Privilege::kAdminister, std::nullopt);
 } // namespace AliroReaderGroupIdentifier
 namespace AliroReaderGroupSubIdentifier {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(AliroReaderGroupSubIdentifier::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kAdminister, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AliroReaderGroupSubIdentifier::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kAdminister, std::nullopt);
 } // namespace AliroReaderGroupSubIdentifier
 namespace AliroExpeditedTransactionSupportedProtocolVersions {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(AliroExpeditedTransactionSupportedProtocolVersions::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kAdminister, std::nullopt);
 } // namespace AliroExpeditedTransactionSupportedProtocolVersions
 namespace AliroGroupResolvingKey {
@@ -204,23 +220,27 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(AliroGroupResolvingKey
 namespace AliroSupportedBLEUWBProtocolVersions {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(AliroSupportedBLEUWBProtocolVersions::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kAdminister, std::nullopt);
 } // namespace AliroSupportedBLEUWBProtocolVersions
 namespace AliroBLEAdvertisingVersion {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(AliroBLEAdvertisingVersion::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kAdminister, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AliroBLEAdvertisingVersion::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kAdminister, std::nullopt);
 } // namespace AliroBLEAdvertisingVersion
 namespace NumberOfAliroCredentialIssuerKeysSupported {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfAliroCredentialIssuerKeysSupported::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfAliroCredentialIssuerKeysSupported::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfAliroCredentialIssuerKeysSupported
 namespace NumberOfAliroEndpointKeysSupported {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfAliroEndpointKeysSupported::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfAliroEndpointKeysSupported::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfAliroEndpointKeysSupported
 constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
     LockState::kMetadataEntry,

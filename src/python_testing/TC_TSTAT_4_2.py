@@ -33,6 +33,20 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device thermostat:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import copy
@@ -129,8 +143,7 @@ class TC_TSTAT_4_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
     def steps_TC_TSTAT_4_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done",
-                     is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "TH writes to the Presets attribute without calling the AtomicRequest command",
                      " Verify that the write request returns INVALID_IN_STATE error since the client didn't send a request to edit the presets by calling AtomicRequest command."),
             TestStep("3", "TH writes to the Presets attribute after calling the AtomicRequest begin command but doesn't call AtomicRequest commit",

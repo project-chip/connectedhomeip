@@ -63,8 +63,7 @@ class TC_EEVSE_2_5(MatterTestCommissionedDevice, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_5(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event",

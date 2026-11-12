@@ -74,7 +74,6 @@ private:
                                          const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 
     bool mRegistered = false;
-    std::string mSetupURL;
     RegisteredServerCluster<ActionsCluster> mCluster;
 
     // Counts active instances for diagnostic logging. Multiple instances are valid when

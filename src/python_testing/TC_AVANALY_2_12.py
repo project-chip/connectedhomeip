@@ -55,7 +55,7 @@ class TC_AVANALY_2_12(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def steps_TC_AVANALY_2_12(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Access Zone Management cluster on the Analysis Node."),
             TestStep(3, "Define a Zone on the Analysis Node."),
             TestStep(4, "Verify that Zone Management on the camera device remains unchanged and independent."),

@@ -58,7 +58,7 @@ class TC_WEBRTCP_2_11(MatterTestCommissionedDevice, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_11(self) -> list[TestStep]:
         return [
-            TestStep("precondition-1", commission_if_required(), is_commissioning=True),
+            TestStep("precondition-1", commission_if_required()),
             TestStep("precondition-2", "Confirm no active WebRTC sessions exist in DUT"),
             TestStep(
                 1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",

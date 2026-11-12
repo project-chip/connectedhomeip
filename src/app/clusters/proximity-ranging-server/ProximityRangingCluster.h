@@ -19,6 +19,8 @@
 #include <app/clusters/proximity-ranging-server/ProximityRangingDriver.h>
 #include <app/clusters/proximity-ranging-server/RangingAdapter.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/ProximityRanging/AttributeIds.h>
 #include <clusters/ProximityRanging/ClusterId.h>
 #include <clusters/ProximityRanging/Commands.h>
 #include <clusters/ProximityRanging/Enums.h>
@@ -56,6 +58,8 @@ namespace ProximityRanging {
 class ProximityRangingCluster : public DefaultServerCluster, public ProximityRangingDriver::Callback
 {
 public:
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<Attributes::RangingConstraints::Id>;
+
     /**
      * Configuration builder for ProximityRangingCluster.
      *
@@ -70,6 +74,8 @@ public:
      *     driver routes ranging operations to. The backing array must outlive
      *     the cluster. Defaults to an empty span (cluster reads attributes
      *     and reports capabilities, but cannot start any ranging session).
+     *   - WithOptionalAttributes(): enables optional attributes. Defaults to
+     *     no optional attributes.
      */
     struct Config
     {
@@ -87,14 +93,21 @@ public:
             return *this;
         }
 
+        Config & WithOptionalAttributes(OptionalAttributeSet optionalAttributes)
+        {
+            mOptionalAttributeSet = optionalAttributes;
+            return *this;
+        }
+
         TimerDelegate & mTimerDelegate;
         BitMask<Feature> mFeatureMap;
         Span<RangingAdapter * const> mAdapters;
+        OptionalAttributeSet mOptionalAttributeSet;
     };
 
     ProximityRangingCluster(EndpointId endpoint, const Config & config) :
         DefaultServerCluster({ endpoint, ProximityRanging::Id }), mDriver(config.mAdapters, config.mTimerDelegate),
-        mFeatureMap(config.mFeatureMap)
+        mFeatureMap(config.mFeatureMap), mOptionalAttributeSet(config.mOptionalAttributeSet)
     {}
 
     // DefaultServerCluster implementation
@@ -136,6 +149,7 @@ private:
     ProximityRangingDriver mDriver;
     bool mDriverInitialized = false;
     const BitMask<Feature> mFeatureMap;
+    const OptionalAttributeSet mOptionalAttributeSet;
 
     uint8_t mNextSessionId = 0;
 };

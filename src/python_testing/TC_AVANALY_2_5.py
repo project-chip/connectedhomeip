@@ -58,7 +58,7 @@ class TC_AVANALY_2_5(MatterTestCommissionedDevice, AVANALYTestBase):
     def steps_TC_AVANALY_2_5(self) -> list[TestStep]:
         """Returns the list of test steps for TC-AVANALY-2.5."""
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads MaxAnalysisStreamCount attribute. Save as max_streams."),
             TestStep(3, "TH reads CurrentAnalysisStreamCount attribute. Save as current_streams."),
             TestStep(

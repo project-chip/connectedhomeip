@@ -74,7 +74,7 @@ class TC_MTRID_3_1(MatterTestCommissionedDevice, MeterIdentificationTestBaseHelp
     def steps_TC_MTRID_3_1(self) -> list[TestStep]:
 
         return [
-            TestStep("1", "Commissioning, already done", "DUT is commissioned.", is_commissioning=True),
+            TestStep("1", "Commissioning, already done", "DUT is commissioned."),
             TestStep("2", """Set up a subscription to the Meter Identification cluster:
                      - MinIntervalFloor: 0
                      - MaxIntervalCeiling: 10""", "Subscription successfully established."),

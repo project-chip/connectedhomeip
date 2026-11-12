@@ -28,6 +28,7 @@
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <pw_unit_test/framework.h>
 
@@ -580,6 +581,94 @@ TEST_F(TestInetEndPoint, TestUDPFailedRebindKeepsFixedPortShared)
     endPoint.Release();
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_UDP_ENDPOINT && !CHIP_SYSTEM_CONFIG_USE_DISPATCH
+TEST_F(TestInetEndPoint, TestUDPUnrecoverableSocketErrorDisarmsAndCloses)
+{
+    auto findSocketBoundToPort = [](uint16_t port) -> int {
+        for (int fd = 0; fd < FD_SETSIZE; ++fd)
+        {
+            sockaddr_in6 addr = {};
+            socklen_t len     = sizeof(addr);
+            if (getsockname(fd, reinterpret_cast<sockaddr *>(&addr), &len) == 0 && addr.sin6_family == AF_INET6 &&
+                ntohs(addr.sin6_port) == port)
+            {
+                return fd;
+            }
+        }
+        return -1;
+    };
+
+    if (!gSystemLayer.IsInitialized())
+    {
+        InitSystemLayer();
+        InitNetwork();
+    }
+
+    UDPEndPointHandle ep;
+    ASSERT_EQ(gUDP.NewEndPoint(ep), CHIP_NO_ERROR);
+
+    IPAddress loopback;
+    ASSERT_TRUE(IPAddress::FromString("::1", loopback));
+    ASSERT_EQ(ep->Bind(IPAddressType::kIPv6, loopback, 0), CHIP_NO_ERROR);
+    const uint16_t boundPort = ep->GetBoundPort();
+    ASSERT_NE(boundPort, 0);
+
+    struct ErrorContext
+    {
+        int errorCount       = 0;
+        CHIP_ERROR lastError = CHIP_NO_ERROR;
+    } ctx;
+
+    auto onMsg = [](UDPEndPoint *, System::PacketBufferHandle &&, const IPPacketInfo *) {};
+    auto onErr = [](UDPEndPoint * endPoint, CHIP_ERROR err, const IPPacketInfo *) {
+        auto * c = static_cast<ErrorContext *>(endPoint->mAppState);
+        c->errorCount++;
+        c->lastError = err;
+    };
+
+    ASSERT_EQ(ep->Listen(onMsg, onErr, &ctx), CHIP_NO_ERROR);
+
+    // Send a 1-byte packet to make select() mark the socket readable.
+    PacketBufferHandle buf = PacketBufferHandle::NewWithData("x", 1);
+    ASSERT_FALSE(buf.IsNull());
+    ASSERT_EQ(ep->SendTo(loopback, boundPort, std::move(buf)), CHIP_NO_ERROR);
+    buf = nullptr;
+
+    gSystemLayer.PrepareEvents();
+    gSystemLayer.WaitForEvents();
+
+    // Invalidate the underlying FD after select() marked it readable, before HandleEvents() calls recvmsg().
+    int rawFd = findSocketBoundToPort(boundPort);
+    ASSERT_GE(rawFd, 0);
+    ::close(rawFd);
+
+    gSystemLayer.HandleEvents();
+
+    // Verify OnReceiveError fired once with EBADF and the endpoint transitioned to kClosed.
+    EXPECT_EQ(ctx.errorCount, 1);
+    EXPECT_EQ(ctx.lastError, CHIP_ERROR_POSIX(EBADF));
+    EXPECT_EQ(findSocketBoundToPort(boundPort), -1);
+    EXPECT_EQ(ep->Listen(onMsg, onErr, &ctx), CHIP_ERROR_INCORRECT_STATE);
+
+    // Verify the next select() cycle does not spin on the dead socket.
+    // Note: Close() -> StopWatchingSocket() signals mWakeEvent once, so the first iteration
+    // drains the wake event and the second blocks until the 10ms timer expires.
+    bool timerFired = false;
+    auto onTimer    = [](Layer *, void * state) { *static_cast<bool *>(state) = true; };
+    ASSERT_EQ(gSystemLayer.StartTimer(10_ms32, onTimer, &timerFired), CHIP_NO_ERROR);
+    for (int i = 0; i < 2 && !timerFired; ++i)
+    {
+        gSystemLayer.PrepareEvents();
+        gSystemLayer.WaitForEvents();
+        gSystemLayer.HandleEvents();
+    }
+    EXPECT_TRUE(timerFired);
+    EXPECT_EQ(ctx.errorCount, 1);
+
+    ep.Release();
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_UDP_ENDPOINT && !CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 // Test the Inet resource limitations.

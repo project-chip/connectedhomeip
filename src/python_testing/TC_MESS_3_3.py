@@ -38,8 +38,7 @@ class TC_MESS_3_3(MatterTestCommissionedDevice, MESSTestBase):
 
     def steps_TC_MESS_3_3(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done. TH subscribes to events on the DUT.",
-                     is_commissioning=True),
+            TestStep(0, "Commissioning, already done. TH subscribes to events on the DUT."),
             TestStep(1, "Place the DUT in a muted or do-not-disturb state as per manufacturer documentation.",
                      "DUT is in a muted or do-not-disturb state."),
             TestStep(2, "TH sends a PresentMessagesRequest command to the DUT with MessageID="

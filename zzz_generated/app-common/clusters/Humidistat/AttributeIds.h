@@ -20,13 +20,13 @@ namespace SupportedModes {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedModes
 
-namespace Mode {
+namespace HumidistatMode {
 inline constexpr AttributeId Id = 0x00000001;
-} // namespace Mode
+} // namespace HumidistatMode
 
-namespace SystemState {
+namespace HumidistatSystemState {
 inline constexpr AttributeId Id = 0x00000002;
-} // namespace SystemState
+} // namespace HumidistatSystemState
 
 namespace UserSetpoint {
 inline constexpr AttributeId Id = 0x00000003;

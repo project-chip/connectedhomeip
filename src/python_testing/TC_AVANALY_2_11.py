@@ -59,11 +59,11 @@ class TC_AVANALY_2_11(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def steps_TC_AVANALY_2_11(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH enables a subset of context triggers. Verify success response."),
             TestStep(3, "TH sets TrackingEnabled attribute to True. Verify success response."),
             TestStep(4, "Reboot the DUT."),
-            TestStep(5, "Reconnect after reboot, already done.", is_commissioning=True),
+            TestStep(5, "Reconnect after reboot, already done."),
             TestStep(6, "TH reads ActiveAmbientContextTriggers attribute. Verify value is restored across reboot."),
             TestStep(7, "TH reads TrackingEnabled attribute. Verify value is restored across reboot."),
         ]

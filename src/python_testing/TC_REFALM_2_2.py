@@ -112,7 +112,7 @@ class TC_REFALM_2_2(MatterTestCommissionedDevice):
     def steps_TC_REFALM_2_2(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep(2, "Ensure that the door on the DUT is closed"),
             TestStep(3, "TH reads from the DUT the State attribute",
                      "Verify that the DUT response contains a 32-bit value with bit 0 set to 0"),

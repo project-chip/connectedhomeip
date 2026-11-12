@@ -101,7 +101,7 @@
  */
 #define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
 
-// Temporary setting to use CustomerAppTask for apps which are not upgraded to new architecture
+// Route shared platform callbacks through CustomerAppTask
 #define CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
 
 // Setting to prevent required Data Model implementation in AppTask

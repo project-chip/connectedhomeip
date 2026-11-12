@@ -44,6 +44,8 @@ CHIP_ERROR TemperatureSensor::Register(EndpointId endpoint, CodeDrivenDataModelP
     mTemperatureMeasurementCluster.Create(endpoint, mOptionalAttributes, mTempConfig);
     ReturnErrorOnFailure(provider.AddCluster(mTemperatureMeasurementCluster.Registration()));
 
+    ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));
+
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
@@ -52,6 +54,7 @@ CHIP_ERROR TemperatureSensor::Register(EndpointId endpoint, CodeDrivenDataModelP
 void TemperatureSensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+    UnregisterAdditionalClusters(provider);
     if (mTemperatureMeasurementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mTemperatureMeasurementCluster.Cluster()));

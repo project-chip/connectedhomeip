@@ -19,10 +19,22 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+
+#if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+#include <app/clusters/ota-requestor/DefaultOTARequestorEventGenerator.h>
+#include <app/clusters/ota-requestor/OTARequestorAttributes.h>
+
+namespace chip {
+OTARequestorAttributes & GetOTARequestorAttributes();
+void SetDefaultOTARequestorEventGenerator(DefaultOTARequestorEventGenerator & eventGenerator);
+DefaultOTARequestorEventGenerator & GetDefaultOTARequestorEventGenerator();
+} // namespace chip
+#else
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
+#endif // SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 
 #if defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>

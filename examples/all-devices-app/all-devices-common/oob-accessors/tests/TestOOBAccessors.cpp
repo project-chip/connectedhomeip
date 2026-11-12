@@ -23,8 +23,15 @@
 #include <app/clusters/mode-select-server/ModeSelectCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
+#include <app/server-cluster/testing/TestAttributeChangeListener.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <bridged-device-manager/BridgedDeviceManager.h>
+#include <bridged-device-manager/oob-accessors/AddBridgedDeviceOOBAccessor.h>
+#include <bridged-device-manager/oob-accessors/RemoveBridgedDeviceOOBAccessor.h>
+#include <device/api/SingleEndpoint.h>
+#include <devices/Types.h>
 #include <lib/core/TLV.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 #include <oob-accessors/NoopOOBAccessorRegistry.h>
 #include <oob-accessors/OOBDataSerializer.h>
@@ -58,22 +65,94 @@ protected:
     Testing::TestServerClusterContext mClusterContext;
 };
 
+struct TestOOBAccessor : public OOBAccessor
+{
+    std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan /* tlvData */) override
+    {
+        if (!action.data_equal("TestAction"_span))
+        {
+            return std::nullopt;
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+struct MockDeviceInterface : public SingleEndpoint
+{
+public:
+    MockDeviceInterface(Span<const DataModel::DeviceTypeEntry> deviceTypes) : SingleEndpoint(deviceTypes) {}
+
+    CHIP_ERROR Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override
+    {
+        ReturnErrorOnFailure(RegisterDescriptor(endpointId, provider, composition));
+        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+
+        mComposition = composition;
+        return CHIP_NO_ERROR;
+    }
+    void Unregister(CodeDrivenDataModelProvider & provider) override { UnregisterDescriptor(provider); }
+
+    EndpointComposition mComposition = {};
+};
+
 TEST_F(TestOOBAccessors, RegistryLifecycle)
 {
     InMemoryOOBAccessorRegistry registry;
     EXPECT_EQ(registry.Size(), 0U);
 
+    MockDeviceInterface dep1{ {} }, dep2{ {} };
+
     EXPECT_EQ(registry.Register(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
 
-    uint8_t buffer[64];
-    TLV::TLVWriter writer;
-    writer.Init(buffer);
-    TLV::TLVType outer;
-    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+    {
+        auto scopedDep = registry.WithDependency(&dep1);
+        EXPECT_EQ(registry.Register(std::make_unique<TestOOBAccessor>()), CHIP_NO_ERROR);
+    }
 
-    EXPECT_EQ(registry.HandleAction("NonExistentAction"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
+    // Register accessor without dependency, should be present even after Unregister(NoDependency{})
+    EXPECT_EQ(registry.Register(std::make_unique<TestOOBAccessor>()), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Size(), 2U);
+
+    {
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("NonExistentAction"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+                  CHIP_ERROR_NOT_FOUND);
+    }
+
+    {
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("TestAction"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    }
+
+    registry.Unregister(&dep2);
+    EXPECT_EQ(registry.Size(), 2U);
+    registry.Unregister(&dep1);
+    EXPECT_EQ(registry.Size(), 1U);
+    registry.Unregister(NoDependency{});
+    EXPECT_EQ(registry.Size(), 1U);
+
+    {
+        auto scopedDep = registry.WithDependency(&dep2);
+        EXPECT_EQ(registry.Register(std::make_unique<TestOOBAccessor>()), CHIP_NO_ERROR);
+    }
+
+    registry.Unregister(&dep2);
+    EXPECT_EQ(registry.Size(), 1U);
 
     registry.Clear();
     EXPECT_EQ(registry.Size(), 0U);
@@ -692,6 +771,141 @@ TEST_F(TestOOBAccessors, ModeSelectOOBAccessor)
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+class MockBridgedDeviceManager : public BridgedDeviceManager
+{
+public:
+    MockBridgedDeviceManager(CodeDrivenDataModelProvider & provider, EndpointIdAllocator & allocator, TimerDelegate & delegate) :
+        BridgedDeviceManager(provider, allocator), mTimerDelegate(delegate)
+    {}
+    DeviceRegistrationEntry CreateDevice(const std::string & deviceTypeArg, const std::string & nodeLabel) override
+    {
+        if (deviceTypeArg == "fail-device-type")
+        {
+            return DeviceRegistrationEntry{ nullptr, nullptr, nullptr };
+        }
+        return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(Span<const DataModel::DeviceTypeEntry>()), nullptr,
+                                        nullptr };
+    }
+
+    DeviceRegistrationEntryOfConcreteType<BridgedNode> CreateBridgedNode(const std::string & nodeLabel) override
+    {
+        return { std::make_unique<BridgedNode>(mTimerDelegate, "very-unique-test-id", nodeLabel), nullptr, nullptr };
+    }
+
+    DeviceRegistrationEntryOfConcreteType<Aggregator> CreateAggregator() override
+    {
+        return { std::make_unique<Aggregator>(mTimerDelegate), nullptr, nullptr };
+    }
+
+private:
+    TimerDelegate & mTimerDelegate;
+};
+
+class MockEndpointIdAllocator : public EndpointIdAllocator
+{
+public:
+    MockEndpointIdAllocator(EndpointId testStart = 1) : mNext(testStart) {}
+    EndpointId Allocate() override { return mNext++; }
+    EndpointId GetLastAllocatedEndpointId() { return mNext - 1; }
+
+private:
+    EndpointId mNext;
+};
+
+TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
+{
+    MockEndpointIdAllocator allocator;
+    CodeDrivenDataModelProvider provider(mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider());
+    EXPECT_EQ(provider.Startup(mClusterContext.ImContext()), CHIP_NO_ERROR);
+    MockBridgedDeviceManager deviceManager(provider, allocator, mTimerDelegate);
+
+    InMemoryOOBAccessorRegistry registry;
+    EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor>(deviceManager)), CHIP_NO_ERROR);
+
+    // Device creation successful
+    {
+        Testing::TestAttributeChangeListener listener;
+        provider.RegisterAttributeChangeListener(listener);
+
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+
+        // skip encoding a endpoint id at tag 1.
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.PutString(TLV::ContextTag(2), "test-device-type"), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("AddBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        // Expect 3 endpoint changes, 1 addition for the default aggregator (this will be created only here because it is created
+        // lazily), 1 addition of a bridged-node and 1 addition for the final device.
+        EXPECT_EQ(listener.ChangedEndpoints().size(), 3u);
+
+        provider.UnregisterAttributeChangeListener(listener);
+    }
+
+    // Device creation failed
+    {
+        Testing::TestAttributeChangeListener listener;
+        provider.RegisterAttributeChangeListener(listener);
+
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.PutString(TLV::ContextTag(2), "fail-device-type"), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("AddBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+                  CHIP_ERROR_INCORRECT_STATE);
+
+        EXPECT_EQ(listener.ChangedEndpoints().size(), 0u);
+        provider.UnregisterAttributeChangeListener(listener);
+    }
+}
+
+TEST_F(TestOOBAccessors, RemoveBridgedDeviceOOBAccessor)
+{
+    MockEndpointIdAllocator allocator;
+    CodeDrivenDataModelProvider provider(mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider());
+    EXPECT_EQ(provider.Startup(mClusterContext.ImContext()), CHIP_NO_ERROR);
+    MockBridgedDeviceManager deviceManager(provider, allocator, mTimerDelegate);
+
+    InMemoryOOBAccessorRegistry registry;
+    EXPECT_EQ(registry.Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(deviceManager)), CHIP_NO_ERROR);
+
+    auto id = deviceManager.AddBridgedDevice("test-device-type");
+    ASSERT_TRUE(id.has_value());
+
+    Testing::TestAttributeChangeListener listener;
+    provider.RegisterAttributeChangeListener(listener);
+
+    uint8_t buffer[64];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType outer;
+    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(id.value())), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(registry.HandleAction("RemoveBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+    // Verify that the device has been removed
+    EXPECT_TRUE(deviceManager.GetDevice(id.value()) == nullptr);
+
+    // Verify the device was unregistered.
+    // Expecting 2 endpoint changes, one removal for the device, one removal of its parent bridged-node device.
+    // There will be an aggregator lazily created and registered which will be removed only in the destructor so it will not appear
+    // here in the cound.
+    EXPECT_EQ(listener.ChangedEndpoints().size(), 2u);
 }
 
 TEST_F(TestOOBAccessors, NoopRegistryLifecycle)

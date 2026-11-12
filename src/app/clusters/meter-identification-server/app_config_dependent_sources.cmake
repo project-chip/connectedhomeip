@@ -16,7 +16,7 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
+    "${CLUSTER_DIR}/MeterIdentificationCluster.cpp"
+    "${CLUSTER_DIR}/MeterIdentificationCluster.h"
     "${CLUSTER_DIR}/MeterIdentificationTestEventTriggerHandler.h"
-    "${CLUSTER_DIR}/meter-identification-server.cpp"
-    "${CLUSTER_DIR}/meter-identification-server.h"
 )

@@ -25,7 +25,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 class TC_DGGEN_3_2(MatterTestCommissionedDevice):
     def steps_TC_DGGEN_3_2(self):
-        return [TestStep(0, "Commission DUT (already done)", is_commissioning=True),
+        return [TestStep(0, "Commission DUT (already done)"),
                 TestStep(1, "TH reads the MaxPathsPerInvoke attribute from the Basic Information Cluster from DUT. Save the value as `max_paths_per_invoke",
                          "Read is successful"),
                 TestStep(2, "TH reads FeatureMap attribute from the General Diagnostics Cluster from DUT",

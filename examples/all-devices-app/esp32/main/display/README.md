@@ -31,14 +31,22 @@ No graphics library or hardware driver headers are exposed outside the
 │  - ShowRestartingMessage()                             │
 │  - InitDisplayDataModelListener()                      │
 └──────────────┬───────────────────────────┬─────────────┘
-               │ (ESP32)                   │ (ESP32-S3)
+               │ (ESP32)                   │ (ESP32-S3, ESP32-S31)
                ▼                           ▼
-┌───────────────────────────────┐ ┌──────────────────────┐
-│        tft/ Renderer          │ │    lvgl/ Renderer    │
-│  - Vendored SPI TFT driver    │ │  - LVGL 9            │
-│  - ScreenFramework (C++)      │ │  - CoreS3 BSP        │
-│  - Mechanical buttons (A/B/C) │ │  - Capacitive touch  │
-└───────────────────────────────┘ └──────────────────────┘
+┌───────────────────────────────┐ ┌──────────────────────────┐
+│        tft/ Renderer          │ │      lvgl/ Renderer      │
+│  - Vendored SPI TFT driver    │ │  - LVGL 9                │
+│  - ScreenFramework (C++)      │ │  - Capacitive touch      │
+│  - Mechanical buttons (A/B/C) │ │  - board/DisplayBoard.h  │
+└───────────────────────────────┘ └────────────┬─────────────┘
+                                               │ one backend per board
+                                   ┌───────────┴───────────┐
+                                   ▼                       ▼
+                        ┌────────────────────┐ ┌────────────────────┐
+                        │ CoreS3DisplayBoard │ │ MosaicoDisplayBoard│
+                        │ m5stack_core_s3 BSP│ │ esp-mosaico-bsp    │
+                        │ esp_lvgl_port      │ │ esp_lvgl_adapter   │
+                        └────────────────────┘ └────────────────────┘
 ```
 
 ---
@@ -47,7 +55,7 @@ No graphics library or hardware driver headers are exposed outside the
 
 ```
 display/
-├── DeviceDisplay.h                 # Public interface (InitDeviceDisplay, ShowRestartingMessage)
+├── DeviceDisplay.h                 # Public interface (InitDeviceDisplay, ShowRestartingMessage, InitDisplayDataModelListener)
 ├── README.md                       # This document
 │
 ├── tft/                            # Button-driven renderer for ESP32
@@ -58,8 +66,16 @@ display/
 │       ├── DeviceSelectionScreen.h/.cpp
 │       └── QRCodeScreen.h/.cpp
 │
-└── lvgl/                           # Touch-driven renderer for ESP32-S3 (M5Stack CoreS3)
+└── lvgl/                           # Touch-driven renderer (M5Stack CoreS3, ESP-Mosaico)
     ├── DeviceDisplay.cpp           # Display bring-up, lifecycle, and sleep
+    ├── Ui.h/.cpp                   # Palette, fonts, size metrics and shared builders (tiles, badges, pills, animations)
+    ├── Theme.h/.cpp                # LVGL theme built on the default one: cards, buttons, sliders, dialogs, tables
+    ├── DisplayWake.h               # WakeDisplay(): undo an inactivity blank (display lock held)
+    ├── CommissioningMonitor.h/.cpp # Platform events -> stage text on the QR screen, Home on success
+    ├── board/                      # Board support package bindings, one backend compiled per board
+    │   ├── DisplayBoard.h              # Start, Lock, Unlock, SetBrightness, BoardName, EdgeInset
+    │   ├── CoreS3DisplayBoard.cpp      # M5Stack CoreS3: espressif/m5stack_core_s3 + esp_lvgl_port
+    │   └── MosaicoDisplayBoard.cpp     # ESP-Mosaico: esp-mosaico-bsp + esp_lvgl_adapter
     ├── DisplayNotificationHub.h/.cpp # Bridges Matter DataModel changes to LVGL widgets
     ├── NavigationStack.h/.cpp      # Push/pop screen navigation and breadcrumbs
     ├── DeviceScreenRegistry.h/.cpp # Registry of device screens, keyed by endpoint
@@ -92,7 +108,7 @@ display/
     │   ├── BridgedNodeScreen            # Bridged node
     │   └── AggregatorScreen             # Aggregator
     └── screens/                    # Application screens, reached by navigation
-        ├── HomeScreen.h/.cpp             # Root menu (Devices, Select Device, System)
+        ├── HomeScreen.h/.cpp             # Root menu (Devices, Update Device Type, System)
         ├── SystemMenuScreen.h/.cpp       # Submenu (QR Code, Status, Operations)
         ├── CommissioningCodesScreen.h/.cpp # Matter onboarding QR code and manual setup code
         ├── DeviceInfoScreen.h/.cpp       # Diagnostics (fabrics, IP, memory, active device)
@@ -118,12 +134,21 @@ cannot be opened.
 
 Exactly one renderer is compiled per target. `main/Kconfig.projbuild` derives
 `CONFIG_HAVE_DISPLAY` (any board with a panel) and `CONFIG_DISPLAY_LVGL` (CoreS3
-only) from the selected board; `main/CMakeLists.txt` switches on those:
+and Mosaico) from the selected board; `main/CMakeLists.txt` switches on those:
 
-| Renderer | Supported Targets              | Framework & Dependencies                         |
-| :------- | :----------------------------- | :----------------------------------------------- |
-| `tft/`   | M5Stack Basic/Gray, WROVER-KIT | `screen-framework` + SPI TFT driver (ESP32 only) |
-| `lvgl/`  | M5Stack CoreS3                 | LVGL 9 + `espressif/m5stack_core_s3` BSP         |
+| Renderer | Supported Targets              | Framework & Dependencies                            |
+| :------- | :----------------------------- | :-------------------------------------------------- |
+| `tft/`   | M5Stack Basic/Gray, WROVER-KIT | `screen-framework` + SPI TFT driver (ESP32 only)    |
+| `lvgl/`  | M5Stack CoreS3                 | LVGL 9 + `espressif/m5stack_core_s3` BSP            |
+| `lvgl/`  | ESP-Mosaico (ESP32-S31)        | LVGL 9 + `esp-mosaico-bsp` (`ESP_MOSAICO_BSP_PATH`) |
+
+The LVGL renderer never includes a BSP header directly. Everything it needs from
+the board (start the panel and LVGL task, take and release the LVGL lock, blank
+and restore the light output) goes through `display/lvgl/board/DisplayBoard.h`,
+and `main/CMakeLists.txt` compiles exactly one backend from
+`display/lvgl/board/` for the selected `CONFIG_DEVICE_TYPE_*`. Each backend
+wraps the LVGL port of its BSP: `esp_lvgl_port` on the CoreS3,
+`esp_lvgl_adapter` on the Mosaico.
 
 The legacy `tft/` driver accesses ESP32 hardware registers directly and does not
 compile for ESP32-S3. Targets using other chips must use `lvgl/` or add a
@@ -141,8 +166,14 @@ if (CONFIG_DISPLAY_LVGL)
     )
 endif()
 # ...
-idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST} SRC_DIRS ${SRC_DIRS_LIST})
+idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
+                       SRC_DIRS ${SRC_DIRS_LIST}
+                       PRIV_REQUIRES ${BOARD_REQUIRES})
+target_sources(${COMPONENT_LIB} PRIVATE ${BOARD_SRCS})
 ```
+
+`display/lvgl/board/` and `devices/chime/` hold one file per board, so those are
+added through `BOARD_SRCS` for the selected board instead of `SRC_DIRS`.
 
 `SRC_DIRS` compiles every source file in each listed directory, so a new `.cpp`
 in one of them builds without any CMake change. Adding a new _subdirectory_ does
@@ -161,27 +192,25 @@ directory is scanned at configure time, so an existing build directory needs
                                  │
                                  ▼
                   ┌───────────────────────────────┐
-                  │      bsp_display_start()      │  (Initializes PMIC rails, SPI panel,
-                  └──────────────┬────────────────┘   touch I2C, and esp_lvgl_port task)
+                  │     DisplayBoard::Start()     │  (BSP: power rails, panel, touch
+                  └──────────────┬────────────────┘   and the LVGL task)
                                  │
                                  ▼
                   ┌───────────────────────────────┐
-                  │ bsp_display_lock(kWaitForever)│
+                  │     DisplayBoard::Lock()      │
+                  │  - InitTheme()                │
                   │  - NavigationStack::Init()    │
                   │  - Push Home                  │
                   │  - Register Inactivity Timer  │
-                  │    bsp_display_unlock()       │
-                  └──────────────┬────────────────┘
-                                 │
-                                 ▼
-                  ┌───────────────────────────────┐
-                  │ bsp_display_backlight_on()    │  (Delayed until first frame drawn)
+                  │  - SetBrightness(on)          │  (Delayed until there is a frame)
+                  │    DisplayBoard::Unlock()     │
                   └──────────────┬────────────────┘
                                  │
                                  ▼
                   ┌───────────────────────────────┐
                   │ InitDisplayDataModelListener()│  (CHIP thread, after Server::Init:
                   │  - Hub Init()                 │   the fabric table is only populated
+                  │  - CommissioningMonitor::Init()│
                   │  - Push System > QR Code      │   by then. Pushed only when
                   │    when FabricCount() == 0    │   the device is not commissioned)
                   └──────────────┬────────────────┘
@@ -194,11 +223,20 @@ directory is scanned at configure time, so an existing build directory needs
     │                            ▼                           │
     │                    ┌───────────────┐                   │
     │                    │ Display Sleep │                   │
-    │                    │ - Backlight 0 │                   │
+    │                    │ - Fade to 0   │                   │
     │                    │ - Wake Overlay│                   │
     │                    └───────┬───────┘                   │
     └────────────────────────────┘───────────────────────────┘
 ```
+
+### Look and Feel
+
+`Theme.cpp` extends the default LVGL dark theme with an apply callback, so every
+widget is styled at creation: plain containers become cards, and buttons,
+sliders, switches and message boxes get matching styles. Screens compose from
+the builders in `Ui.h` and take sizes from `Ui::Px(large, small)`, which picks
+the first value on 480-class panels and the second on 320x240, so the CoreS3
+keeps its compact layout. Fonts follow the same rule.
 
 ### Thread Safety
 
@@ -215,10 +253,10 @@ ordering between them is fixed:
 LVGL operations must run under the LVGL port mutex:
 
 ```cpp
-if (bsp_display_lock(kWaitForever))
+if (DisplayBoard::Lock())
 {
     // LVGL operations...
-    bsp_display_unlock();
+    DisplayBoard::Unlock();
 }
 ```
 
@@ -245,9 +283,10 @@ touch or remotely via Matter protocol commands (over Wi-Fi/Thread).
 #### 1. UI to Matter (Touch Interactions)
 
 Local touch handlers must **never** synchronously block on
-`chip::DeviceLayer::StackLock` while holding `bsp_display_lock` to avoid ABBA
-deadlocks with the CHIP thread. Instead, user touch callbacks asynchronously
-post cluster mutations using `DeviceLayer::SystemLayer().ScheduleLambda()`:
+`chip::DeviceLayer::StackLock` while holding `DisplayBoard::Lock()` to avoid
+ABBA deadlocks with the CHIP thread. Instead, user touch callbacks
+asynchronously post cluster mutations using
+`DeviceLayer::SystemLayer().ScheduleLambda()`:
 
 ```cpp
 lv_obj_add_event_cb(toggleBtn, [](lv_event_t * event) {
@@ -271,7 +310,7 @@ Matter Protocol Command (CHIP Thread)
 DataModel::AttributeChangeListener::OnAttributeChanged(path)
        │
        ▼
-bsp_display_lock(kWaitForever)
+DisplayBoard::Lock()
        │
        ▼
 DisplayNotificationHub dispatches to matching widget callbacks
@@ -280,7 +319,7 @@ DisplayNotificationHub dispatches to matching widget callbacks
 Widget lambda updates LVGL labels/sliders directly
        │
        ▼
-bsp_display_unlock()
+DisplayBoard::Unlock()
 ```
 
 #### 3. Automatic Lifecycle & RAII Unregistration
@@ -302,16 +341,43 @@ DisplayNotificationHub::Instance().Subscribe(
 event on `card`. When the screen or card widget is destroyed, the hub
 immediately removes the subscription, ensuring no callback ever executes on a
 freed widget. Because both unregistration and event dispatch execute under
-`bsp_display_lock`, they are strictly serialized and cannot race.
+`DisplayBoard::Lock()`, they are strictly serialized and cannot race.
+
+### Commissioning Progress
+
+`CommissioningMonitor` registers a platform event handler from
+`InitDisplayDataModelListener()` and turns the commissioning session into a
+status line under the manual pairing code:
+
+| Event                                          | Status line                                   |
+| :--------------------------------------------- | :-------------------------------------------- |
+| `kCHIPoBLEConnectionEstablished`               | Controller connected over BLE                 |
+| `kSecureSessionEstablished` (PASE)             | Passcode verified, secure session open        |
+| `kOperationalNetworkEnabled`                   | Credentials received, joining Wi-Fi           |
+| `kWiFiConnectivityChange` (established)        | Joined Wi-Fi, waiting for the controller      |
+| `kSecureSessionEstablished` (CASE)             | Operational session established               |
+| `kCommissioningComplete`                       | Commissioning successful (green)              |
+| `kFailSafeTimerExpired`                        | Commissioning failed: timed out (red)         |
+| `kCHIPoBLEConnectionClosed` before credentials | Commissioning failed: controller disconnected |
+
+Before any of these the line reads "Waiting for a controller", or "Commissioned"
+when the node already has a fabric. A commissioned node shows a notice in place
+of the codes: the root node has no Basic Commissioning Method, so a window
+opened later carries its own passcode and the printed codes would not pair. The
+fabric count behind this comes from a `FabricTable::Delegate`, so a fabric
+removed by a controller brings the codes back. Every update wakes a blanked
+panel. On success, and only while the QR screen is the one showing, an LVGL
+one-shot timer pops the stack back to Home after the verdict has been on screen
+for a moment, and the line returns to "Commissioned".
 
 ### Auto-Sleep and Wake-on-Touch
 
 1. An LVGL timer checks `lv_display_get_inactive_time()` every second.
-2. After 30 seconds of inactivity, `bsp_display_backlight_off()` sets backlight
-   brightness to 0%.
+2. After 30 seconds of inactivity, an LVGL animation fades the brightness to 0
+   through `DisplayBoard::SetBrightness()`.
 3. A transparent full-screen overlay is added to `lv_layer_top()`.
 4. The first touch on the sleeping display triggers `LV_EVENT_PRESSED` on the
-   overlay, which calls `bsp_display_backlight_on()`, deletes the overlay, and
+   overlay, which calls `WakeDisplay()`: brightness back on, overlay deleted,
    resets the inactivity timer. The wake touch is absorbed so underlying widgets
    are not activated.
 
@@ -319,7 +385,7 @@ freed widget. Because both unregistration and event dispatch execute under
 
 ## Hierarchical Navigation (`NavigationStack`)
 
-The CoreS3 UI uses a push/pop stack model with clickable breadcrumb navigation.
+The LVGL UI uses a push/pop stack model with clickable breadcrumb navigation.
 
 ### Structure
 
@@ -428,6 +494,22 @@ placed in the tree by their parent endpoint, which `DeviceScreenRegistry` reads
 from the data model provider injected with `SetEndpointSource()`.
 
 ### Adding a New Target Board
+
+If the board has a touch panel and an ESP-IDF BSP with an LVGL port, reuse the
+`lvgl/` renderer:
+
+1. Add `display/lvgl/board/<Board>DisplayBoard.cpp` implementing the functions
+   declared in `DisplayBoard.h` on top of the BSP.
+2. Add a `DEVICE_TYPE_<BOARD>` choice in `main/Kconfig.projbuild` and include it
+   in the `HAVE_DISPLAY` and `DISPLAY_LVGL` defaults.
+3. Select the backend in the `BOARD_SRCS` block of `main/CMakeLists.txt` and add
+   the BSP to `main/idf_component.yml` under a `target ==` rule, or through
+   `EXTRA_COMPONENT_DIRS` if it is not on the registry.
+4. Add an `sdkconfig_<board>.defaults` with the LVGL requirements of the BSP
+   (color depth, `LV_CONF_SKIP`, allocator) plus `LV_USE_QRCODE`,
+   `LV_USE_TABVIEW` and `LV_USE_MSGBOX` for the screens here.
+
+For anything else, add a renderer:
 
 1. Create directory `display/<target>/`.
 2. Implement all three entry points declared in `DeviceDisplay.h` in

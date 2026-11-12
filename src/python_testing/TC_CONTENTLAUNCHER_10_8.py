@@ -42,7 +42,7 @@ class TC_CONTENTLAUNCHER_10_8(MatterTestCommissionedDevice):
 
     def steps_TC_CONTENTLAUNCHER_10_8(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads the Movable attribute from the DUT while content is playing.",
                      "DUT replies with a bool value indicating whether the current content can be replicated."),
             TestStep(2, "TH sends a ContentReplicationRequest command to the DUT while the Movable attribute is TRUE.",

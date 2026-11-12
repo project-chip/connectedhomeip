@@ -25,7 +25,7 @@ from matter.testing.runner import TestStep
 class ProductAppearanceBase(MatterTestCommissionedDevice):
     def steps(self) -> list[TestStep]:
         return [
-            TestStep(0, "DUT commissioned if not already done", is_commissioning=True),
+            TestStep(0, "DUT commissioned if not already done"),
             TestStep(1, "TH reads ProductAppearance attribute from the DUT.",
                      "Verify the finish is a valid ProductFinishEnum and the PrimaryColor is a valid ColorEnum")
         ]

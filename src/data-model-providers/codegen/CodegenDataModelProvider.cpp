@@ -41,14 +41,20 @@
 #include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <clusters/shared/GlobalIds.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/ScopedMemoryBuffer.h>
+#include <lib/support/Span.h>
 
+#include <array>
+#include <cstddef>
 #include <cstdint>
 #include <optional>
+
+#include <zap-generated/endpoint_config.h>
 
 namespace chip {
 namespace app {
@@ -95,6 +101,89 @@ DataModel::ServerClusterEntry ServerClusterEntryFrom(EndpointId endpointId, cons
     return entry;
 }
 
+// endpoint_config.zapt always defines both lists. Without them, Ember-backed attributes would silently lack the Fixed and
+// Changes Omitted qualities, so an endpoint_config.h that is hand-written or out of date must not compile.
+#if !defined(GENERATED_FIXED_ATTRIBUTES) || !defined(GENERATED_CHANGES_OMITTED_ATTRIBUTES)
+#error                                                                                                                             \
+    "zap-generated/endpoint_config.h must define GENERATED_FIXED_ATTRIBUTES and GENERATED_CHANGES_OMITTED_ATTRIBUTES; regenerate it"
+#endif
+
+struct GeneratedAttributeListEntry
+{
+    ClusterId clusterId;
+    AttributeId attributeId;
+};
+
+// GENERATED_*_ATTRIBUTES has one of two forms:
+//
+// 1) No value at all
+// 2) A list of comma-separated entries, with a comma after the last entry.
+//
+// The no-value form cannot be used to initialize a normal C++ array (those are not allowed to be
+// empty). While it's possible to work around this by adding a sentinel value at the end, that adds
+// a bit more rodata and makes the iteration over the list more confusing (have to exclude the last item).
+//
+// The trailing-comma form cannot be used as an argument to a variadic template function, which
+// could otherwise be used to deduce the length of the list and create an appropriate std::array.
+//
+// We handle this via the MakeGeneratedAttributeList functions below, which take an argument of the
+// form "{ GENERATED_*_ATTRIBUTES }" and deduce the list size from it. An empty list cannot deduce N
+// for the first function, so it selects the EmptyGeneratedAttributeList overload instead.
+template <size_t N>
+constexpr std::array<GeneratedAttributeListEntry, N> MakeGeneratedAttributeList(const GeneratedAttributeListEntry (&entries)[N])
+{
+    std::array<GeneratedAttributeListEntry, N> list{};
+    for (size_t i = 0; i < N; ++i)
+    {
+        list[i] = entries[i];
+    }
+    return list;
+}
+
+struct EmptyGeneratedAttributeList
+{
+};
+
+// [[maybe_unused]] because both lists might have nonzero length.
+[[maybe_unused]] constexpr std::array<GeneratedAttributeListEntry, 0> MakeGeneratedAttributeList(EmptyGeneratedAttributeList)
+{
+    return {};
+}
+
+constexpr auto kFixedAttributes          = MakeGeneratedAttributeList({ GENERATED_FIXED_ATTRIBUTES });
+constexpr auto kChangesOmittedAttributes = MakeGeneratedAttributeList({ GENERATED_CHANGES_OMITTED_ATTRIBUTES });
+
+bool IsInGeneratedAttributeList(Span<const GeneratedAttributeListEntry> list, ClusterId clusterId, AttributeId attributeId)
+{
+    for (const auto & entry : list)
+    {
+        if (entry.clusterId == clusterId && entry.attributeId == attributeId)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+// EmberAfAttributeMetadata has no room for the Fixed and Changes Omitted qualities, so endpoint_config.h lists the
+// attributes that have them.
+BitFlags<DataModel::AttributeQualityFlags> GeneratedAttributeQualities(ClusterId clusterId, AttributeId attributeId)
+{
+    return BitFlags<DataModel::AttributeQualityFlags>{}
+        .Set(DataModel::AttributeQualityFlags::kFixed, IsInGeneratedAttributeList(kFixedAttributes, clusterId, attributeId))
+        .Set(DataModel::AttributeQualityFlags::kChangesOmitted,
+             IsInGeneratedAttributeList(kChangesOmittedAttributes, clusterId, attributeId));
+}
+
+// The specification gives every global attribute the Fixed quality, and ClusterRevision and FeatureMap are the ones Ember
+// stores. Marking them here rather than in global-attributes.xml keeps them out of the generated lists, which would
+// otherwise cost two entries (16 bytes of flash) for every Ember-backed cluster.
+bool IsEmberStoredGlobalAttribute(AttributeId attributeId)
+{
+    return attributeId == Clusters::Globals::Attributes::ClusterRevision::Id ||
+        attributeId == Clusters::Globals::Attributes::FeatureMap::Id;
+}
+
 DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
 {
     const ConcreteAttributePath attributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
@@ -105,19 +194,22 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
         attribute.attributeId,
         BitFlags<DataModel::AttributeQualityFlags>{}
             .Set(AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE))
-            .Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite()),
+            .Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite())
+            .Set(DataModel::AttributeQualityFlags::kFixed, IsEmberStoredGlobalAttribute(attribute.attributeId))
+            // Set(flag, false) clears the flag, and Set(BitFlags) only adds flags. The generated qualities therefore go
+            // after the IsEmberStoredGlobalAttribute line, which would otherwise clear a generated kFixed.
+            .Set(GeneratedAttributeQualities(clusterPath.mClusterId, attribute.attributeId)),
         attribute.IsReadable() ? std::make_optional(RequiredPrivilege::ForReadAttribute(attributePath)) : std::nullopt,
         attribute.IsWritable() ? std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)) : std::nullopt);
 
     // NOTE: we do NOT provide additional info for:
     //    - IsExternal/IsAutomaticallyPersisted is not used by IM handling
     //    - Several specification flags are not available (reportable, quieter reporting,
-    //      fixed, source attribution)
+    //      source attribution)
 
     // TODO: Set additional flags:
     // entry.flags.Set(DataModel::AttributeQualityFlags::kFabricScoped)
     // entry.flags.Set(DataModel::AttributeQualityFlags::kFabricSensitive)
-    // entry.flags.Set(DataModel::AttributeQualityFlags::kChangesOmitted)
     return entry;
 }
 
@@ -390,9 +482,12 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
         // By spec these Attribute/AcceptedCommands/GeneratedCommants lists are:
         //   - lists of elements
         //   - read-only, with read privilege view
-        //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
-        DataModel::AttributeEntry globalListEntry(attributeId, DataModel::AttributeQualityFlags::kListAttribute,
-                                                  Access::Privilege::kView, std::nullopt);
+        //   - fixed value
+        DataModel::AttributeEntry globalListEntry(
+            attributeId,
+            BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                       DataModel::AttributeQualityFlags::kFixed),
+            Access::Privilege::kView, std::nullopt);
 
         ReturnErrorOnFailure(builder.Append(std::move(globalListEntry)));
     }
@@ -532,12 +627,15 @@ CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId, ReadOnly
     std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpointId);
     if (!endpoint_index.has_value())
     {
-        return {};
+        return CHIP_ERROR_NOT_FOUND;
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    return builder.ReferenceExisting(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
+    auto span = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+    ReturnErrorOnFailure(err);
+
+    return builder.ReferenceExisting(span);
 }
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID

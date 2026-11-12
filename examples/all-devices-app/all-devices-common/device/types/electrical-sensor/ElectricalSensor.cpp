@@ -31,6 +31,10 @@ CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
                                       EndpointComposition composition)
 {
     DeviceRegistrationTransaction transaction(*this, provider);
+    if (composition.tagList.empty())
+    {
+        composition.tagList = mConfig.tagList;
+    }
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // ElectricalEnergyMeasurement Cluster
