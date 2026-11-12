@@ -197,6 +197,7 @@ TEST_F(TestSingleEndpointServerClusterRegistry, BasicTest)
 TEST_F(TestSingleEndpointServerClusterRegistry, StressTest)
 {
     // make the test repeatable
+    // NOLINTNEXTLINE(bugprone-random-generator-seed)
     srand(1234);
 
     std::vector<FakeServerClusterInterface> items;
@@ -625,4 +626,17 @@ TEST_F(TestSingleEndpointServerClusterRegistry, UnregisterAllFromEndpointWithMul
 
     // The cluster on EP2 should still be there.
     EXPECT_EQ(registry.Get({ kEp2, kCluster1 }), &otherEndpointCluster);
+}
+
+TEST_F(TestSingleEndpointServerClusterRegistry, EmptyIteration)
+{
+    SingleEndpointServerClusterRegistry registry;
+    EXPECT_EQ(registry.AllServerClusterInstances().begin(), registry.AllServerClusterInstances().end());
+    EXPECT_EQ(registry.ClustersOnEndpoint(kEp1).begin(), registry.ClustersOnEndpoint(kEp1).end());
+
+    // A null start is an empty list
+    ServerClusterInterfaceRegistry::ServerClusterInstances instances(nullptr);
+    EXPECT_EQ(instances.begin(), instances.end());
+    SingleEndpointServerClusterRegistry::ClustersList clusters(nullptr, kEp1);
+    EXPECT_EQ(clusters.begin(), clusters.end());
 }

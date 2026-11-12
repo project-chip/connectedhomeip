@@ -37,11 +37,12 @@ public:
         class Iterator
         {
         public:
-            Iterator(ServerClusterRegistration * interface, EndpointId endpoint) : mEndpointId(endpoint), mRegistration(interface)
+            Iterator(ServerClusterRegistration * interface, EndpointId endpoint) :
+                mEndpointId(endpoint), mRegistration(interface != nullptr ? interface : EndOfList())
             {
-                if (mRegistration != nullptr)
+                if (mRegistration != EndOfList())
                 {
-                    mSpan = interface->serverClusterInterface->GetPaths();
+                    mSpan = mRegistration->serverClusterInterface->GetPaths();
                 }
                 AdvanceUntilMatchingEndpoint();
             }
@@ -66,12 +67,12 @@ public:
 
             void AdvanceUntilMatchingEndpoint()
             {
-                while (mRegistration != nullptr)
+                while (mRegistration != EndOfList())
                 {
                     if (mSpan.empty())
                     {
                         mRegistration = mRegistration->next;
-                        if (mRegistration != nullptr)
+                        if (mRegistration != EndOfList())
                         {
                             mSpan = mRegistration->serverClusterInterface->GetPaths();
                         }
@@ -90,7 +91,7 @@ public:
 
         constexpr ClustersList(ServerClusterRegistration * start, EndpointId endpointId) : mEndpointId(endpointId), mStart(start) {}
         Iterator begin() { return { mStart, mEndpointId }; }
-        Iterator end() { return { nullptr, mEndpointId }; }
+        Iterator end() { return { EndOfList(), mEndpointId }; }
 
     private:
         const EndpointId mEndpointId;

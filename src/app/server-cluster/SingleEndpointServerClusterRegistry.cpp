@@ -51,7 +51,7 @@ void SingleEndpointServerClusterRegistry::UnregisterAllFromEndpoint(EndpointId e
 {
     ServerClusterRegistration * prev    = nullptr;
     ServerClusterRegistration * current = mRegistrations;
-    while (current != nullptr)
+    while (current != EndOfList())
     {
         // Requirements for Paths:
         //   - GetPaths() MUST be non-empty
