@@ -22,6 +22,7 @@
 
 #include <device/types/ambient-context-sensor/NamedPipeTranslators.h>
 #include <device/types/boolean-state-sensor/NamedPipeTranslators.h>
+#include <device/types/closure-controller/NamedPipeTranslators.h>
 #include <device/types/dimmable-light/NamedPipeTranslators.h>
 #include <device/types/dimmable-plug-in-unit/NamedPipeTranslators.h>
 #include <device/types/doorbell/NamedPipeTranslators.h>
