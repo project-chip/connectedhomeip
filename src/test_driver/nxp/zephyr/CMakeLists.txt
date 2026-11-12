@@ -20,6 +20,24 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 # Perform common operations before find_package(Zephyr)
 include(${CHIP_ROOT}/config/nxp/app/pre-zephyr.cmake)
 
+# This build has no wall-clock time source (CONFIG_MBEDTLS_HAVE_TIME_DATE
+# unset), so mbedtls stubs mbedtls_x509_time_is_past/is_future to return 0 and
+# the crypto test's IsCertificateValidAtCurrentTime check cannot pass.
+list(APPEND CHIP_CFLAGS -DCURRENT_TIME_NOT_IMPLEMENTED=1)
+
+# Pigweed backends must be configured before find_package(Zephyr) because Zephyr
+# processes the Pigweed module during find_package(Zephyr) and binds each facade
+# to its backend at that point.
+include(${CHIP_ROOT}/third_party/pigweed/repo/pw_build/pigweed.cmake)
+include(${CHIP_ROOT}/third_party/pigweed/repo/pw_log/backend.cmake)
+include(${CHIP_ROOT}/third_party/pigweed/repo/pw_assert/backend.cmake)
+include(${CHIP_ROOT}/third_party/pigweed/repo/pw_sys_io/backend.cmake)
+
+pw_set_backend(pw_log pw_log_basic)
+pw_set_backend(pw_assert.check pw_assert_log.check_backend)
+pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
+pw_set_backend(pw_sys_io pw_sys_io_zephyr)
+
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/third_party/pigweed/repo)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
@@ -30,11 +48,6 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
 target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 target_compile_options(app PRIVATE -Werror -Wno-error=format)
-
-pw_set_backend(pw_log pw_log_basic)
-pw_set_backend(pw_assert.check pw_assert_log.check_backend)
-pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
-pw_set_backend(pw_sys_io pw_sys_io.zephyr)
 
 project(chip-nxp-test-driver-app)
 

@@ -77,6 +77,14 @@ public class ChipDeviceController {
     scanNetworksListener = listener;
   }
 
+  public void setThreadCredentialsNeededListener(ThreadCredentialsNeededListener listener) {
+    setThreadCredentialsNeededListener(deviceControllerPtr, listener);
+  }
+
+  public void setWiFiCredentialsNeededListener(WiFiCredentialsNeededListener listener) {
+    setWiFiCredentialsNeededListener(deviceControllerPtr, listener);
+  }
+
   /**
    * Sets this DeviceController to use the given issuer for issuing operational certs and verifying
    * the DAC. By default, the DeviceController uses an internal, OperationalCredentialsDelegate (see
@@ -1824,6 +1832,12 @@ public class ChipDeviceController {
 
   private native void stopDnssd(long deviceControllerPtr);
 
+  private native void setThreadCredentialsNeededListener(
+      long deviceControllerPtr, ThreadCredentialsNeededListener listener);
+
+  private native void setWiFiCredentialsNeededListener(
+      long deviceControllerPtr, WiFiCredentialsNeededListener listener);
+
   static {
     System.loadLibrary("CHIPController");
   }
@@ -1885,6 +1899,16 @@ public class ChipDeviceController {
         Optional<String> debugText,
         Optional<ArrayList<WiFiScanResult>> wiFiScanResults,
         Optional<ArrayList<ThreadScanResult>> threadScanResults);
+  }
+
+  /** Interface to listen for ThreadCredentialsNeeded events. */
+  public interface ThreadCredentialsNeededListener {
+    void onThreadCredentialsNeeded(int endpoint);
+  }
+
+  /** Interface to listen for WiFiCredentialsNeeded events. */
+  public interface WiFiCredentialsNeededListener {
+    void onWiFiCredentialsNeeded(int endpoint);
   }
 
   /** Interface to listen for callbacks from CHIPDeviceController. */

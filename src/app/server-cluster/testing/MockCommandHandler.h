@@ -81,10 +81,14 @@ public:
     // Encodes and stores response data, returning error if encoding fails (fallible version for robust test handling).
     CHIP_ERROR AddResponseData(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                const app::DataModel::EncodableToTLV & aEncodable) override;
+    CHIP_ERROR AddResponseData(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                               const EncodableResponsePayload & aPayload) override;
 
     // Encodes and stores response data, without error return (non-fallible version that assumes successful encoding in tests).
     void AddResponse(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                      const app::DataModel::EncodableToTLV & aEncodable) override;
+    void AddResponse(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                     const EncodableResponsePayload & aPayload) override;
 
     bool IsTimedInvoke() const override { return false; }
     void FlushAcksRightAwayOnSlowCommand() override {}

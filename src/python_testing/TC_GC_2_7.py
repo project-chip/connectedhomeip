@@ -48,19 +48,19 @@ from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_GC_2_7(MatterBaseTest):
+class TC_GC_2_7(MatterTestCommissionedDevice):
     def desc_TC_GC_2_7(self):
         return "[TC-GC-2.7] Multicast address policy and UsedMcastAddrCount with DUT as Server - PROVISIONAL"
 
     def steps_TC_GC_2_7(self):
         return [
-            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test). This fabric is F1", is_commissioning=True),
+            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test). This fabric is F1"),
             TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
             TestStep("1c", "TH subscribes to Membership attribute with min interval 0s and max interval 30s"),
             TestStep("1d", "TH subscribes to UsedMcastAddrCount attribute with min interval 0s and max interval 30s"),

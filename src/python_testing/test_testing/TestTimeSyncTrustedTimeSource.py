@@ -22,23 +22,14 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
-
-# We don't have a good pipe between the c++ enums in CommissioningDelegate and python
-# so this is hardcoded.
-# I realize this is dodgy, not sure how to cross the enum from c++ to python cleanly
-kConfigureUTCTime = 6
-kConfigureTimeZone = 7
-kConfigureDSTOffset = 8
-kConfigureDefaultNTP = 9
-kConfigureTrustedTimeSource = 19
 
 # NOTE: all of these tests require a specific app setup. Please see TestTimeSyncTrustedTimeSourceRunner.py
 
 
-class TestTestTimeSyncTrustedTimeSource(MatterBaseTest):
-    requires_dut = False
+class TestTestTimeSyncTrustedTimeSource(MatterTestCommissionedDevice):
+    disable_wildcard_subscription = True
 
     # This test needs to be run against an app that has previously been commissioned, has been reset
     # but not factory reset, and which has been started with the --simulate-no-internal-time flag.

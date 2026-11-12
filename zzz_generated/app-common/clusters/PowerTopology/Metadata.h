@@ -17,14 +17,15 @@ namespace app {
 namespace Clusters {
 namespace PowerTopology {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
 namespace AvailableEndpoints {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(AvailableEndpoints::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace AvailableEndpoints
 namespace ActiveEndpoints {

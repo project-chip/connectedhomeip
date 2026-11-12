@@ -169,11 +169,6 @@ void Recall(FabricIndex fabricIndex, EndpointId endpoint)
         fabricIndex, endpoint, ScenesManagement::ScenesServer::kGlobalSceneGroupId, ScenesManagement::ScenesServer::kGlobalSceneId);
 }
 
-void MarkInvalid(EndpointId endpoint)
-{
-    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-}
-
 } // namespace chip::app::Clusters::OnOff::Internal::Scenes
 
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT

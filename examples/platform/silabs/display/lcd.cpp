@@ -21,7 +21,24 @@
 
 #include "demo-ui.h"
 #include "lcd.h"
+#include <app/util/config.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/PlatformError.h>
+
+#if !SLI_SI91X_MCU_INTERFACE &&                                                                                                    \
+    (defined(MATTER_DM_PLUGIN_TIME_SYNCHRONIZATION_SERVER) ||                                                                      \
+     (defined(SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL) && SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL))
+#define SL_MATTER_TIME_SYNC_LCD_ENABLED 1
+#include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/MetadataLookup.h>
+#include <app/data-model-provider/Provider.h>
+#include <clusters/TimeSynchronization/ClusterId.h>
+#include <lib/support/TimeUtils.h>
+#include <platform/PlatformManager.h>
+#include <system/SystemClock.h>
+#else
+#define SL_MATTER_TIME_SYNC_LCD_ENABLED 0
+#endif
 
 #include "dmd.h"
 #include "glib.h"
@@ -130,16 +147,27 @@ int SilabsLCD::Update(void)
 
 void SilabsLCD::WriteDemoUI(bool state)
 {
+    dState.mainState = state;
+    // Device pages suppress the demo screen entirely.
+    if (mDevicePageCount > 0)
+    {
+        SetScreen(StatusScreen);
+        return;
+    }
     if (mCurrentScreen != DemoScreen)
     {
         mCurrentScreen = DemoScreen;
     }
-    dState.mainState = state;
     WriteDemoUI();
 }
 
 void SilabsLCD::WriteDemoUI()
 {
+    if (mDevicePageCount > 0)
+    {
+        SetScreen(StatusScreen);
+        return;
+    }
     Clear();
     if (customUI != nullptr)
     {
@@ -194,6 +222,39 @@ void SilabsLCD::WriteStatus()
         GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
     }
 
+#if SL_MATTER_TIME_SYNC_LCD_ENABLED
+    bool showUTC;
+    {
+        chip::DeviceLayer::StackLock lock;
+        auto * provider = chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+        chip::app::DataModel::ServerClusterFinder clusters(provider);
+        showUTC = clusters.Find({ chip::kRootEndpointId, chip::app::Clusters::TimeSynchronization::Id }).has_value();
+        if (showUTC)
+        {
+            chip::System::Clock::Microseconds64 utc;
+            const CHIP_ERROR error = chip::System::SystemClock().GetClock_RealTime(utc);
+            if (error == CHIP_NO_ERROR)
+            {
+                const auto seconds = static_cast<unsigned>((utc.count() / chip::kMicrosecondsPerSecond) % chip::kSecondsPerDay);
+                snprintf(str, sizeof(str), "UTC: %02u:%02u:%02u", seconds / chip::kSecondsPerHour,
+                         (seconds % chip::kSecondsPerHour) / chip::kSecondsPerMinute, seconds % chip::kSecondsPerMinute);
+            }
+            else
+            {
+                if (error != CHIP_ERROR_REAL_TIME_NOT_SYNCED)
+                {
+                    ChipLogError(DeviceLayer, "LCD UTC clock read failed: %" CHIP_ERROR_FORMAT, error.Format());
+                }
+                snprintf(str, sizeof(str), "UTC: not synced");
+            }
+        }
+    }
+    if (showUTC)
+    {
+        GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+    }
+#endif
+
     updateDisplay();
 }
 
@@ -214,6 +275,12 @@ void SilabsLCD::SetScreen(Screen_e screen)
         return;
     }
 
+    // Suppress the demo screen entirely once device pages are registered.
+    if (screen == DemoScreen && mDevicePageCount > 0)
+    {
+        screen = StatusScreen;
+    }
+
     switch (screen)
     {
     case DemoScreen:
@@ -227,6 +294,16 @@ void SilabsLCD::SetScreen(Screen_e screen)
         WriteQRCode();
         break;
 #endif
+    case DevicePageScreen:
+        if (mDevicePageCount == 0)
+        {
+            // No device pages registered; stay on the demo screen.
+            WriteDemoUI();
+            mCurrentScreen = DemoScreen;
+            return;
+        }
+        WriteDevicePage(mCurrentDevicePage);
+        break;
     default:
         break;
     }
@@ -235,25 +312,99 @@ void SilabsLCD::SetScreen(Screen_e screen)
 
 void SilabsLCD::CycleScreens(void)
 {
-#if SL_MATTER_QR_CODE_ENABLED
-    if (mCurrentScreen < QRCodeScreen)
-#else
-    if (mCurrentScreen < StatusScreen)
-#endif
+    // Advance through: [Demo ->] Status -> [QRCode] -> DevicePages... -> wrap.
+    // The demo screen is skipped entirely when at least one device page is registered.
+    const bool hasDevicePages  = mDevicePageCount > 0;
+    const Screen_e kWrapScreen = hasDevicePages ? StatusScreen : DemoScreen;
+
+    if (mCurrentScreen == DevicePageScreen)
     {
-        mCurrentScreen++;
+        if (mCurrentDevicePage + 1 < mDevicePageCount)
+        {
+            mCurrentDevicePage++;
+            SetScreen(DevicePageScreen);
+            return;
+        }
+        mCurrentDevicePage = 0;
+        SetScreen(kWrapScreen);
+        return;
+    }
+
+    constexpr uint8_t kLastBuiltInScreen =
+#if SL_MATTER_QR_CODE_ENABLED
+        QRCodeScreen;
+#else
+        StatusScreen;
+#endif
+
+    if (mCurrentScreen < kLastBuiltInScreen)
+    {
+        Screen_e next = static_cast<Screen_e>(mCurrentScreen + 1);
+        if (hasDevicePages && next == DemoScreen)
+        {
+            next = StatusScreen;
+        }
+        SetScreen(next);
+        return;
+    }
+
+    // Past the last built-in screen: enter device pages if any, otherwise wrap.
+    if (hasDevicePages)
+    {
+        mCurrentDevicePage = 0;
+        SetScreen(DevicePageScreen);
     }
     else
     {
-        mCurrentScreen = DemoScreen;
+        SetScreen(DemoScreen);
     }
-
-    SetScreen(static_cast<Screen_e>(mCurrentScreen));
 }
 
 void SilabsLCD::SetStatus(DisplayStatus_t & status)
 {
     mStatus = status;
+}
+
+CHIP_ERROR SilabsLCD::RegisterDevicePage(chip::EndpointId endpointId, const char * typeName, DevicePageDrawCB cb,
+                                         void * userContext, DevicePageButtonCB buttonCb)
+{
+    VerifyOrReturnError(cb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mDevicePageCount < mDevicePages.size(), CHIP_ERROR_NO_MEMORY);
+
+    mDevicePages[mDevicePageCount] = DevicePage{ endpointId, typeName, cb, userContext, buttonCb };
+    mDevicePageCount++;
+    return CHIP_NO_ERROR;
+}
+
+bool SilabsLCD::DispatchButtonToCurrentDevicePage()
+{
+    if (mCurrentScreen != DevicePageScreen || mCurrentDevicePage >= mDevicePageCount)
+    {
+        return false;
+    }
+    const DevicePage & page = mDevicePages[mCurrentDevicePage];
+    if (page.button == nullptr)
+    {
+        return false;
+    }
+    page.button(page.endpointId, page.userContext);
+    return true;
+}
+
+void SilabsLCD::WriteDevicePage(uint8_t index)
+{
+    if (index >= mDevicePageCount)
+    {
+        return;
+    }
+    const DevicePage & page = mDevicePages[index];
+    if (page.draw == nullptr)
+    {
+        return;
+    }
+    GLIB_clear(&glibContext);
+    page.draw(&glibContext, page.endpointId, page.userContext);
+    updateDisplay();
 }
 
 #if SL_MATTER_QR_CODE_ENABLED

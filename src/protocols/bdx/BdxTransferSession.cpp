@@ -329,8 +329,10 @@ CHIP_ERROR TransferSession::PrepareBlock(const BlockData & inData)
     VerifyOrReturnError(mPendingOutput == OutputEventType::kNone, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!mAwaitingResponse, CHIP_ERROR_INCORRECT_STATE);
 
-    // Verify non-zero data is provided and is no longer than MaxBlockSize (BlockEOF may contain 0 length data)
-    VerifyOrReturnError((inData.Data != nullptr) && (inData.Length <= mTransferMaxBlockSize), CHIP_ERROR_INVALID_ARGUMENT);
+    // Only a BlockEOF may be empty, and only an empty block may have null data. No block may exceed MaxBlockSize.
+    VerifyOrReturnError(inData.Length > 0 || inData.IsEof, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((inData.Data != nullptr || inData.Length == 0) && (inData.Length <= mTransferMaxBlockSize),
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     DataBlock blockMsg;
     blockMsg.BlockCounter = mNextBlockNum;
@@ -709,7 +711,8 @@ void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
 
     if (IsTransferLengthDefinite())
     {
-        VerifyOrReturn(mNumBytesProcessed + blockMsg.DataLength <= mTransferLength,
+        // Subtraction avoids wrap-around of the size_t sum on 32-bit targets.
+        VerifyOrReturn(mTransferLength >= mNumBytesProcessed && blockMsg.DataLength <= mTransferLength - mNumBytesProcessed,
                        PrepareStatusReport(StatusCode::kLengthMismatch));
     }
 
@@ -739,6 +742,13 @@ void TransferSession::HandleBlockEOF(System::PacketBufferHandle msgData)
 
     VerifyOrReturn(blockEOFMsg.BlockCounter == mLastQueryNum, PrepareStatusReport(StatusCode::kBadBlockCounter));
     VerifyOrReturn(blockEOFMsg.DataLength <= mTransferMaxBlockSize, PrepareStatusReport(StatusCode::kBadMessageContents));
+
+    if (IsTransferLengthDefinite())
+    {
+        // Subtraction avoids wrap-around of the size_t sum on 32-bit targets.
+        VerifyOrReturn(mTransferLength >= mNumBytesProcessed && blockEOFMsg.DataLength <= mTransferLength - mNumBytesProcessed,
+                       PrepareStatusReport(StatusCode::kLengthMismatch));
+    }
 
     mBlockEventData.Data         = blockEOFMsg.Data;
     mBlockEventData.Length       = blockEOFMsg.DataLength;

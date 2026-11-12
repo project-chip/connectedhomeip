@@ -133,6 +133,18 @@ class QRCodeTest {
 
     inPayload.setRendezvousInformation((1L shl 0) or (1L shl 1) or (1L shl 2))
     assertEquals(true, checkWriteRead(inPayload))
+
+    inPayload.setRendezvousInformation(1L shl 3)
+    assertEquals(true, checkWriteRead(inPayload))
+
+    inPayload.setRendezvousInformation(1L shl 4)
+    assertEquals(true, checkWriteRead(inPayload))
+
+    inPayload.setRendezvousInformation(1L shl 5)
+    assertEquals(true, checkWriteRead(inPayload))
+
+    inPayload.setRendezvousInformation((1L shl 1) or (1L shl 5))
+    assertEquals(true, checkWriteRead(inPayload))
   }
 
   /*
@@ -213,6 +225,27 @@ class QRCodeTest {
     payload = getDefaultPayload()
     payload.setupPinCode = (1L shl kSetupPINCodeFieldLengthInBits)
     assertEquals(false, payload.isValidQRCodePayload())
+
+    // test valid discovery capabilities
+    payload = getDefaultPayload()
+    payload.discoveryCapabilities = mutableSetOf(DiscoveryCapability.WIFI_PAF)
+    assertEquals(true, payload.isValidQRCodePayload())
+
+    payload = getDefaultPayload()
+    payload.discoveryCapabilities = mutableSetOf(DiscoveryCapability.THREAD)
+    assertEquals(true, payload.isValidQRCodePayload())
+
+    payload = getDefaultPayload()
+    payload.discoveryCapabilities =
+      mutableSetOf(
+        DiscoveryCapability.BLE,
+        DiscoveryCapability.ON_NETWORK,
+        DiscoveryCapability.SOFT_AP,
+        DiscoveryCapability.WIFI_PAF,
+        DiscoveryCapability.NFC,
+        DiscoveryCapability.THREAD
+      )
+    assertEquals(true, payload.isValidQRCodePayload())
   }
 
   /*

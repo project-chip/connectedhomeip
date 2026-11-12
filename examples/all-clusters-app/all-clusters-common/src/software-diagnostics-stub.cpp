@@ -17,9 +17,11 @@
 
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsTestEventTriggerHandler.h>
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
+#include <ctime>
 #include <lib/support/CHIPMemString.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <string>
 
 using namespace chip;
 using namespace chip::app;
@@ -42,7 +44,7 @@ void SetTestEventTrigger_SoftwareFaultOccurred()
     char timeChar[50];
     if (std::strftime(timeChar, sizeof(timeChar), "%c", std::localtime(&result)))
     {
-        softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
+        softwareFault.faultRecording.SetValue(ByteSpan::fromCharString(timeChar));
     }
 
     Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);

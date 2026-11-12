@@ -436,7 +436,9 @@ void TimeSynchronizationCluster::OnDeviceConnectionFailureFn()
 void TimeSynchronizationCluster::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                                  const StatusIB & aStatus)
 {
-    if (aPath.mClusterId != Id || aStatus.IsFailure())
+    // Defense-in-depth: ReadClient::ProcessAttributeReportIBs already rejects spec-violating
+    // AttributeStatusIB(Success), but keep the local nullptr check in case that invariant is ever loosened.
+    if (aPath.mClusterId != Id || aStatus.IsFailure() || apData == nullptr)
     {
         return;
     }
@@ -493,7 +495,7 @@ void TimeSynchronizationCluster::OnDone(ReadClient * apReadClient)
 
 void TimeSynchronizationCluster::OnTimeSyncCompletionFn(TimeSourceEnum timeSource, GranularityEnum granularity)
 {
-    if (timeSource != TimeSourceEnum::kNone && granularity == GranularityEnum::kNoTimeGranularity)
+    if (granularity == GranularityEnum::kNoTimeGranularity)
     {
         // Unable to get time from the delegate. Try remaining sources.
         CHIP_ERROR err = AttemptToGetTimeFromTrustedNode();
@@ -862,6 +864,7 @@ CHIP_ERROR TimeSynchronizationCluster::SetUTCTime(uint64_t utcTime, GranularityE
             ChipLogError(Zcl, "Error setting UTC time on the device: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
         }
+        mOnTimeSyncCompletion.Cancel(); // A pending platform time request is now moot
         GetDelegate()->UTCTimeAvailabilityChanged(utct);
         SetAttributeValue(mGranularity, gran, Granularity::Id);
         SetAttributeValue(mTimeSource, tsrc, TimeSource::Id);
@@ -1146,8 +1149,6 @@ TimeSynchronizationCluster::HandleSetTrustedTimeSource(CommandHandler * commandO
         Structs::TrustedTimeSourceStruct::Type ts = { commandObj->GetAccessingFabricIndex(), timeSource.Value().nodeID,
                                                       timeSource.Value().endpoint };
         tts.SetNonNull(ts);
-        // TODO: schedule a utctime read from this time source and emit event only on failure to get time
-        EmitTimeFailureEvent(GetDelegate(), GetEventsGenerator());
     }
     else
     {

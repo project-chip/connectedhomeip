@@ -44,14 +44,14 @@ from TC_GC_common import is_groupcast_on_root_node
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 # ModeSelect attribute IDs
 current_mode_attribute_id = 0x00000003
 
 
-class TC_MOD_2_3(MatterBaseTest):
+class TC_MOD_2_3(MatterTestCommissionedDevice):
 
     def desc_TC_MOD_2_3(self) -> str:
         """Returns a description of this test"""
@@ -63,7 +63,7 @@ class TC_MOD_2_3(MatterBaseTest):
 
     def steps_TC_MOD_2_3(self) -> list[TestStep]:
         return [
-            TestStep("0", "Commissioning, already done", is_commissioning=True),
+            TestStep("0", "Commissioning, already done"),
             TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed on the TH. EpochKey0 only."),
             TestStep("0b", "If the Groupcast cluster is enabled on the root node, skip this step. Otherwise, TH binds GroupIds 0x0001, with GroupKeySetID 0x01a1 in the GroupKeyMap attribute of GroupKeyManagement cluster."),
             TestStep("0c", "If the Groupcast cluster is enabled on the RootNode endpoint, the TH reads the Groupcast membership attribute on the DUT."),

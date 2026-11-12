@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2024-2026 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -12,27 +12,6 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-
-# Generate Zephyr version files for backward compatibility
-file(STRINGS "$ENV{ZEPHYR_BASE}/VERSION" ZEPHYR_VERSION_STRING REGEX "[0-9]+")
-string(REGEX REPLACE "[^0-9;]" "" ZEPHYR_VERSION_STRING "${ZEPHYR_VERSION_STRING}")
-string(REPLACE ";" "." ZEPHYR_VERSION_STRING "${ZEPHYR_VERSION_STRING}")
-file(WRITE "${CMAKE_BINARY_DIR}/modules/chip-module/zephyr_version.gni" "ZEPHYR_VERSION_STRING = \"${ZEPHYR_VERSION_STRING}\"\n")
-if(${ZEPHYR_VERSION_STRING} MATCHES "^3\\.3")
-  set(ZEPHYR_VERSION_OVERLAY_FILE "${CMAKE_BINARY_DIR}/zephyr_version.conf")
-  file(WRITE ${ZEPHYR_VERSION_OVERLAY_FILE} "CONFIG_ZEPHYR_VERSION_3_3=y\n")
-
-  function(add_compile_definitions)
-    foreach(flag IN LISTS ARGN)
-      add_definitions(-D${flag})
-      list(APPEND MATTER_CFLAGS "-D${flag}")
-    endforeach()
-    set(MATTER_CFLAGS "${MATTER_CFLAGS}" PARENT_SCOPE)
-  endfunction()
-
-  # Add required MbedTLS defines for Zephyr 3.3
-  add_compile_definitions(MBEDTLS_HKDF_C MBEDTLS_X509_CREATE_C MBEDTLS_X509_CSR_WRITE_C)
-endif()
 
 string(REPLACE "_retention" "" BASE_BOARD ${BOARD})
 string(REGEX REPLACE "_v[0-9]+" "" BASE_BOARD ${BASE_BOARD})
@@ -74,13 +53,8 @@ elseif("${BOARD}" STREQUAL "tl7218x_ml7m")
   set(ML_CONF_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.conf")
   if(NOT EXISTS "${ML_CONF_OVERLAY_FILE}")
     message(FATAL_ERROR "${ML_CONF_OVERLAY_FILE} doesn't exist")
-  endif() 
-elseif("${BOARD}" STREQUAL "tl3218x_ml3m")
-  set(ML_CONF_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.conf")
-  if(NOT EXISTS "${ML_CONF_OVERLAY_FILE}")
-    message(FATAL_ERROR "${ML_CONF_OVERLAY_FILE} doesn't exist")
-  endif() 
-  else()
+  endif()
+else()
   unset(ML_CONF_OVERLAY_FILE)
 endif()
 
@@ -126,7 +100,42 @@ else()
   unset(USB_CONF_OVERLAY_FILE)
 endif()
 
-if(${CONFIG_COMPRESS_LZMA} MATCHES y)
+set(LOCAL_BOARD_CONF_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.conf")
+if(NOT EXISTS "${LOCAL_BOARD_CONF_FILE}")
+  message(STATUS "${LOCAL_BOARD_CONF_FILE} doesn't exist")
+  unset(LOCAL_BOARD_CONF_FILE)
+endif()
+
+# Set the default config files before checking LZMA.
+if(NOT CONF_FILE)
+  set(CONF_FILE ${USB_CONF_OVERLAY_FILE} ${MARS_CONF_OVERLAY_FILE} ${ZEPHYR_VERSION_OVERLAY_FILE} prj.conf ${TFLM_CONF_OVERLAY_FILE} ${ML_CONF_OVERLAY_FILE} ${LOCAL_BOARD_CONF_FILE})
+endif()
+
+# Read the LZMA setting before Zephyr loads Kconfig.
+set(LZMA_KCONFIG "")
+set(LZMA_CONF_NAME OFF)
+string(REPLACE " " ";" LZMA_CONF_FILES "${CONF_FILE};${EXTRA_CONF_FILE}")
+foreach(conf_file IN LISTS LZMA_CONF_FILES)
+  if(NOT conf_file)
+    continue()
+  endif()
+  get_filename_component(conf_name "${conf_file}" NAME)
+  if(conf_name MATCHES "lzma")
+    set(LZMA_CONF_NAME ON)
+  endif()
+  if(NOT IS_ABSOLUTE "${conf_file}")
+    set(conf_file "${CMAKE_CURRENT_SOURCE_DIR}/${conf_file}")
+  endif()
+  if(EXISTS "${conf_file}")
+    file(STRINGS "${conf_file}" lzma_settings REGEX "^(CONFIG_COMPRESS_LZMA=[yn]|# CONFIG_COMPRESS_LZMA is not set)$")
+    if(lzma_settings)
+      list(GET lzma_settings -1 LZMA_KCONFIG)
+    endif()
+  endif()
+endforeach()
+
+if((${CONFIG_COMPRESS_LZMA} MATCHES y) OR (LZMA_KCONFIG STREQUAL "CONFIG_COMPRESS_LZMA=y") OR
+   (LZMA_CONF_NAME AND LZMA_KCONFIG STREQUAL "" AND NOT CONFIG_COMPRESS_LZMA STREQUAL "n"))
   set(BOOT_CONF_OVERLAY_FILE "${CHIP_ROOT}/config/telink/app/bootloader_compress_lzma.conf")
   set(FLASH_LAYOUT_SUFFIX "_lzma")
 else()
@@ -167,6 +176,7 @@ if(NOT EXISTS "${GLOBAL_DTC_OVERLAY_FILE}")
 endif()
 
 set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_${FLASH_SIZE}_flash${FLASH_LAYOUT_SUFFIX}.overlay")
+message(STATUS "Telink flash overlay: ${FLASH_DTC_OVERLAY_FILE}")
 if(NOT EXISTS "${FLASH_DTC_OVERLAY_FILE}")
   message(STATUS "${FLASH_DTC_OVERLAY_FILE} doesn't exist")
   unset(FLASH_DTC_OVERLAY_FILE)
@@ -181,17 +191,13 @@ else()
   set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE} ${MARS_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE} ${TFLM_OVERLAY_FILE} ${NFC_ONBOARDING_PAYLOAD_OVERLAY_FILE})
 endif()
 
-if(NOT CONF_FILE)
-  set(CONF_FILE ${USB_CONF_OVERLAY_FILE} ${MARS_CONF_OVERLAY_FILE} ${ZEPHYR_VERSION_OVERLAY_FILE} prj.conf ${TFLM_CONF_OVERLAY_FILE} ${ML_CONF_OVERLAY_FILE})
-endif()
-
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 # deep-sleep platform workaround
 if(CONFIG_PM AND (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION OR CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
-zephyr_link_libraries(
-  -Wl,--wrap,bt_is_ready
-)
+  zephyr_link_libraries(
+    -Wl,--wrap,bt_is_ready
+  )
 endif()

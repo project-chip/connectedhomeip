@@ -42,7 +42,7 @@ struct QueryResponderInfo : public QueryResponderRecord
     bool reportNowAsAdditional; // report as additional data required
 
     bool alsoReportAdditionalQName = false; // report more data when this record is listed
-    FullQName additionalQName;              // if alsoReportAdditionalQName is set, send this extra data
+    chip::Dnssd::FullQName additionalQName; // if alsoReportAdditionalQName is set, send this extra data
 
     void Clear()
     {
@@ -78,7 +78,7 @@ public:
     /// This is useful to avoid chattyness by sending back referenced records
     /// (e.g. when sending a PTR record, send the corresponding SRV and when sending
     ///  SRV, send back the corresponding A/AAAA records).
-    QueryResponderSettings & SetReportAdditional(const FullQName & qname)
+    QueryResponderSettings & SetReportAdditional(const chip::Dnssd::FullQName & qname)
     {
         if (IsValid())
         {
@@ -266,7 +266,7 @@ public:
 
     /// Marks queries matching this qname as 'to be additionally reported'
     /// @return the number of items marked new as 'additional data'.
-    size_t MarkAdditional(const FullQName & qname);
+    size_t MarkAdditional(const chip::Dnssd::FullQName & qname);
 
     /// Flag any additional responses required for the given iterator
     void MarkAdditionalRepliesFor(QueryResponderIterator it);

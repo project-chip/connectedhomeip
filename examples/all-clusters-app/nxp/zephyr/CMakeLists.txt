@@ -160,6 +160,7 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/oven-operational-state-delegate.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/test-hidden-manufacturer-specific-stub.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/thermostat-mode-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/source/ICDUtil.cpp
 )

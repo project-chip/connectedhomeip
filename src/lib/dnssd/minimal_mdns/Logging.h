@@ -19,8 +19,8 @@
 #include <inet/IPAddress.h>
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
-#include <lib/dnssd/minimal_mdns/Parser.h>
-#include <lib/dnssd/minimal_mdns/Query.h>
+#include <lib/dnssd/wire/Parser.h>
+#include <lib/dnssd/wire/Query.h>
 
 namespace mdns {
 namespace Minimal {
@@ -31,19 +31,19 @@ namespace Logging {
 
 #if CHIP_MINMDNS_HIGH_VERBOSITY
 
-void LogSendingQuery(const mdns::Minimal::Query & query);
-void LogReceivedResource(const mdns::Minimal::ResourceData & data);
-void LogFoundOperationalSrvRecord(const chip::PeerId & peerId, const mdns::Minimal::SerializedQNameIterator & targetHost);
-void LogFoundCommissionSrvRecord(const char * instance, const mdns::Minimal::SerializedQNameIterator & targetHost);
-void LogFoundIPAddress(const mdns::Minimal::SerializedQNameIterator & targetHost, const chip::Inet::IPAddress & addr);
+void LogSendingQuery(const chip::Dnssd::Query & query);
+void LogReceivedResource(const chip::Dnssd::ResourceData & data);
+void LogFoundOperationalSrvRecord(const chip::PeerId & peerId, const chip::Dnssd::SerializedQNameIterator & targetHost);
+void LogFoundCommissionSrvRecord(const char * instance, const chip::Dnssd::SerializedQNameIterator & targetHost);
+void LogFoundIPAddress(const chip::Dnssd::SerializedQNameIterator & targetHost, const chip::Inet::IPAddress & addr);
 
 #else
 
-inline void LogSendingQuery(const mdns::Minimal::Query & query) {}
-inline void LogReceivedResource(const mdns::Minimal::ResourceData & data) {}
-inline void LogFoundOperationalSrvRecord(const chip::PeerId & peerId, const mdns::Minimal::SerializedQNameIterator & targetHost) {}
-inline void LogFoundCommissionSrvRecord(const char * instance, const mdns::Minimal::SerializedQNameIterator & targetHost) {}
-inline void LogFoundIPAddress(const mdns::Minimal::SerializedQNameIterator & targetHost, const chip::Inet::IPAddress & addr) {}
+inline void LogSendingQuery(const chip::Dnssd::Query & query) {}
+inline void LogReceivedResource(const chip::Dnssd::ResourceData & data) {}
+inline void LogFoundOperationalSrvRecord(const chip::PeerId & peerId, const chip::Dnssd::SerializedQNameIterator & targetHost) {}
+inline void LogFoundCommissionSrvRecord(const char * instance, const chip::Dnssd::SerializedQNameIterator & targetHost) {}
+inline void LogFoundIPAddress(const chip::Dnssd::SerializedQNameIterator & targetHost, const chip::Inet::IPAddress & addr) {}
 
 #endif
 

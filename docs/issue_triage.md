@@ -146,4 +146,3 @@ types or functionality) as well as individual examples.
 | `examples/virtual-device-app`                  |                              | UNMAINTAINED |
 | `examples/water-heater-app`                    | James Harrow                 |              |
 | `examples/water-leak-detector-app`             |                              | UNMAINTAINED |
-| `examples/window-app`                          |                              | UNMAINTAINED |

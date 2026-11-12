@@ -69,7 +69,7 @@ declare_args() {
   # (default: ~/.cache/matter/msan_sysroot, overridable via SYSROOT_MSAN).
   # Raw `gn gen` users must set SYSROOT_MSAN or pass --args='msan_sysroot="..."'.
   # Declared here (rather than in compiler/BUILD.gn) so the fuzz templates and the
-  # pw_fuzzer toolchain, which import this .gni, can read is_msan.
+  # FuzzTest toolchain, which import this .gni, can read is_msan.
   msan_sysroot = getenv("SYSROOT_MSAN")
 
   # Debug prefix mapping (values for -fdebug-prefix-map=).

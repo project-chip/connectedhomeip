@@ -39,6 +39,13 @@ CHIP_ERROR OpenThreadUbusBorderRouterDelegate::Init(AttributeChangeCallback * at
 {
     mAttributeChangeCallback = attributeChangeCallback;
 
+    // The cluster uses Init() for two opposite things: Startup() passes the
+    // callback, and Shutdown() passes nullptr to detach it. The second runs on
+    // the way down, by which point ApplicationShutdown() has already stopped
+    // the ubus manager -- and registering a watch on a stopped manager is a
+    // VerifyOrDie. Detaching is not a fresh initialisation, so stop here.
+    VerifyOrReturnValue(attributeChangeCallback != nullptr, CHIP_NO_ERROR);
+
     mOtbr.SetResolvedCallback([](UbusWatch & watch, void * appState) {
         auto * self = static_cast<decltype(this)>(appState);
         ubus_invoke(&self->mUbusManager.Context(), watch.ObjectID(), "status", nullptr,

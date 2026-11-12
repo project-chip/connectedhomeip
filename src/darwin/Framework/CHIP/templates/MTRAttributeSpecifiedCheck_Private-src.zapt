@@ -11,6 +11,7 @@ using namespace chip::app;
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 static BOOL AttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}}Cluster(AttributeId aAttributeId)
 {
     using namespace Clusters::{{asUpperCamelCase name}};
@@ -28,6 +29,7 @@ static BOOL AttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}
         }
     }
 }
+#endif
 {{/if}}
 {{/if}}
 {{/zcl_clusters}}
@@ -35,6 +37,7 @@ static BOOL AttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+#if MTR_INCLUDE_CLUSTER_EXTENSION_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 static BOOL PrivateAttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}}Cluster(AttributeId aAttributeId)
 {
     using namespace Clusters::{{asUpperCamelCase name}};
@@ -53,6 +56,7 @@ static BOOL PrivateAttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronym
         }
     }
 }
+#endif
 {{/if}}
 {{/if}}
 {{/zcl_clusters}}
@@ -64,18 +68,22 @@ BOOL MTRPrivateAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttribute
         {{#zcl_clusters}}
         {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
         {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
         case Clusters::{{asUpperCamelCase name}}::Id: {
             return AttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aAttributeId);
         }
+#endif
         {{/if}}
         {{/if}}
         {{/zcl_clusters}}
         {{#zcl_clusters}}
         {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
         {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+#if MTR_INCLUDE_CLUSTER_EXTENSION_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
         case Clusters::{{asUpperCamelCase name}}::Id: {
             return PrivateAttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aAttributeId);
         }
+#endif
         {{/if}}
         {{/if}}
         {{/zcl_clusters}}

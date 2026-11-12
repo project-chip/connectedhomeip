@@ -56,6 +56,8 @@ TLVBoolean_True = TLV_TYPE_BOOLEAN + 1
 
 TLVEndOfContainer = 0x18
 
+MAX_TLV_NESTING_DEPTH = 32
+
 INT8_MIN = -128
 INT16_MIN = -32768
 INT32_MIN = -2147483648
@@ -119,8 +121,7 @@ class uint(int):
 
     def __init__(self, val: int):
         if (val < 0):
-            raise TypeError(
-                'expecting positive value, got negative value of %d instead' % val)
+            raise TypeError(f'expecting positive value, got negative value of {val} instead')
 
 
 class float32(float):
@@ -565,21 +566,33 @@ class TLVReader:
             decoding["strDataLen"] = 0
             decoding["strDataLenLen"] = 0
 
-    def _decodeVal(self, tlv, decoding):
+    def _decodeVal(self, tlv, decoding, depth=0):
         """decode primitive tlv value to the corresponding python value, tlv array and path are decoded as
         python list, tlv structure is decoded as python dictionary"""
         if decoding["type"] == "Structure":
+            if depth >= MAX_TLV_NESTING_DEPTH:
+                raise ValueError(
+                    f"TLV nesting depth exceeds maximum of {MAX_TLV_NESTING_DEPTH}"
+                )
             decoding["value"] = {}
             decoding["Structure"] = []
-            self._get(tlv, decoding["Structure"], decoding["value"])
+            self._get(tlv, decoding["Structure"], decoding["value"], depth + 1)
         elif decoding["type"] == "Array":
+            if depth >= MAX_TLV_NESTING_DEPTH:
+                raise ValueError(
+                    f"TLV nesting depth exceeds maximum of {MAX_TLV_NESTING_DEPTH}"
+                )
             decoding["value"] = []
             decoding["Array"] = []
-            self._get(tlv, decoding["Array"], decoding["value"])
+            self._get(tlv, decoding["Array"], decoding["value"], depth + 1)
         elif decoding["type"] == "Path":
+            if depth >= MAX_TLV_NESTING_DEPTH:
+                raise ValueError(
+                    f"TLV nesting depth exceeds maximum of {MAX_TLV_NESTING_DEPTH}"
+                )
             decoding["value"] = TLVList()
             decoding["Path"] = []
-            self._get(tlv, decoding["Path"], decoding["value"])
+            self._get(tlv, decoding["Path"], decoding["value"], depth + 1)
         elif decoding["type"] == "Null":
             decoding["value"] = None
         elif decoding["type"] == "End of Collection":
@@ -645,7 +658,7 @@ class TLVReader:
             self._bytesRead += 8
         elif "UTF-8 String" in decoding["type"]:
             (val,) = struct.unpack(
-                "<%ds" % decoding["strDataLen"],
+                f"<{decoding['strDataLen']}s",
                 tlv[self._bytesRead: self._bytesRead + decoding["strDataLen"]],
             )
             try:
@@ -655,7 +668,7 @@ class TLVReader:
             self._bytesRead += decoding["strDataLen"]
         elif "Byte String" in decoding["type"]:
             (val,) = struct.unpack(
-                "<%ds" % decoding["strDataLen"],
+                f"<{decoding['strDataLen']}s",
                 tlv[self._bytesRead: self._bytesRead + decoding["strDataLen"]],
             )
 
@@ -664,14 +677,14 @@ class TLVReader:
         else:
             raise ValueError("Attempt to decode unsupported TLV type")
 
-    def _get(self, tlv, decodings, out):
+    def _get(self, tlv, decodings, out, depth=0):
         endOfEncoding = False
 
         while len(tlv[self._bytesRead:]) > 0 and endOfEncoding is False:
             decoding = {}
             self._decodeControlAndTag(tlv, decoding)
             self._decodeStrLength(tlv, decoding)
-            self._decodeVal(tlv, decoding)
+            self._decodeVal(tlv, decoding, depth)
             decodings.append(decoding)
 
             if decoding["type"] == "End of Collection":

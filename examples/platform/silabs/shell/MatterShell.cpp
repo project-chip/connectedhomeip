@@ -36,7 +36,7 @@ using chip::Shell::Engine;
 namespace {
 
 constexpr uint32_t kShellProcessFlag   = 1;
-constexpr uint32_t kShellTaskStackSize = 2048;
+constexpr uint32_t kShellTaskStackSize = 1024;
 uint8_t shellTaskStack[kShellTaskStackSize];
 osThread_t shellTaskControlBlock;
 constexpr osThreadAttr_t kShellTaskAttr = { .name       = "shell",

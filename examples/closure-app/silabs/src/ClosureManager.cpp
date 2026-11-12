@@ -19,13 +19,11 @@
 #include "ClosureManager.h"
 #include "AppConfig.h"
 #include "AppTask.h"
-#include "ClosureControlEndpoint.h"
-#include "ClosureDimensionEndpoint.h"
+#include "CustomerAppManager.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <lib/support/TimeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
@@ -41,6 +39,52 @@ constexpr uint32_t kDefaultCountdownTimeSeconds   = 10;   // 10 seconds
 constexpr uint32_t kCalibrateCountdownTimeMs      = 3000; // 3 seconds
 constexpr uint32_t kMotionCountdownTimeMs         = 1000; // 1 second for each motion.
 constexpr chip::Percent100ths kMotionPositionStep = 2000; // 20% of the total range per motion interval.
+constexpr chip::Percent100ths kDefaultResolution  = 100;  // 1% resolution in Percent100ths.
+constexpr chip::Percent100ths kDefaultStepValue   = 1000; // 10% step value in Percent100ths.
+
+CustomerAppManager & AppManagerInstance()
+{
+    return CustomerAppManager::GetInstance();
+}
+
+// Packs an Action_t together with the action generation counter captured at ScheduleWork()
+// time, so a stale callback (e.g. scheduled for a MoveTo that was Stopped and immediately
+// replaced by a new MoveTo) can be told apart from the current action even though both share
+// the same Action_t value. Action_t values fit comfortably in kActionBits.
+constexpr uint32_t kActionBits = 8;
+constexpr uint32_t kActionMask = (1u << kActionBits) - 1;
+
+intptr_t PackActionToken(ClosureManager::Action_t action, uint32_t generation)
+{
+    uint32_t token = (generation << kActionBits) | (static_cast<uint32_t>(action) & kActionMask);
+    return static_cast<intptr_t>(token);
+}
+
+void UnpackActionToken(intptr_t actionToken, ClosureManager::Action_t & action, uint32_t & generation)
+{
+    uint32_t token = static_cast<uint32_t>(actionToken);
+    action         = static_cast<ClosureManager::Action_t>(token & kActionMask);
+    generation     = token >> kActionBits;
+}
+
+// Returns true if `action`/`generation` (as snapshotted when an AppEvent was posted or work was
+// scheduled) still match the ClosureManager's current action and generation, i.e. the action has
+// not been superseded (e.g. by a Stop followed by a new action of the same Action_t value) since
+// the snapshot was taken.
+bool IsActionGenerationCurrent(ClosureManager & instance, ClosureManager::Action_t action, uint32_t generation)
+{
+    return instance.GetCurrentAction() == action && instance.GetCurrentActionGeneration() == generation;
+}
+
+// Returns true if `actionToken` (as captured by PackActionToken() when the work was scheduled)
+// still matches the ClosureManager's current action and generation.
+bool IsActionTokenCurrent(ClosureManager & instance, intptr_t actionToken)
+{
+    ClosureManager::Action_t expectedAction;
+    uint32_t expectedGeneration;
+    UnpackActionToken(actionToken, expectedAction, expectedGeneration);
+    return IsActionGenerationCurrent(instance, expectedAction, expectedGeneration);
+}
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -79,8 +123,6 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEndpoint3TagList[]
 
 } // namespace
 
-ClosureManager ClosureManager::sClosureMgr;
-
 void ClosureManager::Init()
 {
     // Create cmsis os sw timer for light timer.
@@ -99,8 +141,47 @@ void ClosureManager::Init()
 
     // Closure endpoints initialization
     SuccessOrDie(mClosureEndpoint1.Init());
-    SuccessOrDie(mClosurePanelEndpoint2.Init());
-    SuccessOrDie(mClosurePanelEndpoint3.Init());
+    ClosureDimension::ClusterConformance conformanceEndpoint2;
+    conformanceEndpoint2.FeatureMap()
+        .Set(ClosureDimension::Feature::kPositioning)
+        .Set(ClosureDimension::Feature::kMotionLatching)
+        .Set(ClosureDimension::Feature::kUnit)
+        .Set(ClosureDimension::Feature::kLimitation)
+        .Set(ClosureDimension::Feature::kSpeed)
+        .Set(ClosureDimension::Feature::kTranslation);
+
+    ClosureDimension::ClusterInitParameters clusterInitParametersEndpoint2;
+    clusterInitParametersEndpoint2.resolution           = kDefaultResolution;
+    clusterInitParametersEndpoint2.stepValue            = kDefaultStepValue;
+    clusterInitParametersEndpoint2.unit                 = ClosureUnitEnum::kMillimeter;
+    clusterInitParametersEndpoint2.translationDirection = TranslationDirectionEnum::kDownward;
+    clusterInitParametersEndpoint2.overflow             = OverflowEnum::kTopInside;
+    clusterInitParametersEndpoint2.modulationType       = ModulationTypeEnum::kVentilation;
+    clusterInitParametersEndpoint2.latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+
+    SuccessOrDie(mClosurePanelEndpoint2.Init(conformanceEndpoint2, clusterInitParametersEndpoint2));
+
+    ClosureDimension::ClusterConformance conformanceEndpoint3;
+    conformanceEndpoint3.FeatureMap()
+        .Set(ClosureDimension::Feature::kPositioning)
+        .Set(ClosureDimension::Feature::kMotionLatching)
+        .Set(ClosureDimension::Feature::kUnit)
+        .Set(ClosureDimension::Feature::kLimitation)
+        .Set(ClosureDimension::Feature::kSpeed)
+        .Set(ClosureDimension::Feature::kRotation);
+
+    ClosureDimension::ClusterInitParameters clusterInitParametersEndpoint3;
+    clusterInitParametersEndpoint3.resolution     = kDefaultResolution;
+    clusterInitParametersEndpoint3.stepValue      = kDefaultStepValue;
+    clusterInitParametersEndpoint3.unit           = ClosureUnitEnum::kDegree;
+    clusterInitParametersEndpoint3.rotationAxis   = RotationAxisEnum::kCenteredVertical;
+    clusterInitParametersEndpoint3.overflow       = OverflowEnum::kTopInside;
+    clusterInitParametersEndpoint3.modulationType = ModulationTypeEnum::kVentilation;
+    clusterInitParametersEndpoint3.latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+
+    SuccessOrDie(mClosurePanelEndpoint3.Init(conformanceEndpoint3, clusterInitParametersEndpoint3));
 
     // Set Taglist for Closure endpoints
     SuccessOrDie(
@@ -193,9 +274,18 @@ CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint 
 
     if (conformance.HasFeature(ClosureDimension::Feature::kUnit))
     {
-        ReturnErrorOnFailure(
-            closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
-                .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) }));
+        if (conformance.HasFeature(ClosureDimension::Feature::kRotation))
+        {
+            ReturnErrorOnFailure(
+                closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
+                    .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(360) })); // degree
+        }
+        if (conformance.HasFeature(ClosureDimension::Feature::kTranslation))
+        {
+            ReturnErrorOnFailure(
+                closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
+                    .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) })); // millimeter
+        }
     }
     if (conformance.HasFeature(ClosureDimension::Feature::kLimitation))
     {
@@ -228,16 +318,20 @@ void ClosureManager::CancelTimer()
 
 void ClosureManager::InitiateAction(AppEvent * event)
 {
-    Action_t eventAction = static_cast<Action_t>(event->ClosureEvent.Action);
+    Action_t eventAction     = static_cast<Action_t>(event->ClosureEvent.Action);
+    uint32_t eventGeneration = event->ClosureEvent.Generation;
 
     ClosureManager & instance = ClosureManager::GetInstance();
 
     // We should not receive an event for a different action while another action is ongoing.
     // But due to asynchronous processing of commands and synchronous processing of the stop command,
     // this can happen if stop is received after InitaiteAction event is posted.
+    // Checking the action generation in addition to the action itself catches the case where a
+    // new action of the same Action_t value was started after this event was posted (e.g. Stop
+    // immediately followed by a new action of the same type), which the action check alone would miss.
     // This is a safety check to ensure that we do not initiate a new action while another action is in progress.
     // If this happens, we log an error and do not proceed with initiating the action.
-    VerifyOrReturn(eventAction == instance.GetCurrentAction(),
+    VerifyOrReturn(IsActionGenerationCurrent(instance, eventAction, eventGeneration),
                    ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d",
                                 to_underlying(eventAction), to_underlying(instance.GetCurrentAction())));
 
@@ -302,63 +396,102 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = closureManager->GetCurrentAction();
     event.ClosureEvent.EndpointId = closureManager->mCurrentActionEndpointId;
+    event.ClosureEvent.Generation = closureManager->GetCurrentActionGeneration();
     event.Handler                 = HandleClosureActionCompleteEvent;
     AppTask::GetAppTask().PostEvent(&event);
 }
 
 void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 {
-    Action_t currentAction = static_cast<Action_t>(event->ClosureEvent.Action);
+    Action_t currentAction   = static_cast<Action_t>(event->ClosureEvent.Action);
+    uint32_t eventGeneration = event->ClosureEvent.Generation;
 
     ClosureManager & instance = ClosureManager::GetInstance();
 
     // We should not receive an event for a different action while another action is ongoing.
     // But due to asynchronous processing of commands and synchronous processing of the stop command,
     // this can happen if stop is received after InitaiteAction event is posted.
+    // Checking the action generation in addition to the action itself catches the case where a
+    // new action of the same Action_t value was started after this timer event was posted (e.g.
+    // Stop immediately followed by a new action of the same type), which the action check alone would miss.
     // This is a safety check to ensure that we do not initiate a new action while another action is in progress.
     // If this happens, we log an error and do not proceed with initiating the action.
-    VerifyOrReturn(currentAction == instance.GetCurrentAction(),
+    VerifyOrReturn(IsActionGenerationCurrent(instance, currentAction, eventGeneration),
                    ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d",
                                 to_underlying(currentAction), to_underlying(instance.GetCurrentAction())));
+
+    // Pack the action together with the generation snapshotted on the event (rather than
+    // re-reading the current generation) so the scheduled work is tied to this specific event.
+    const intptr_t actionToken = PackActionToken(currentAction, eventGeneration);
 
     switch (currentAction)
     {
     case Action_t::CALIBRATE_ACTION:
-        LogErrorOnFailure(PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        }));
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledCalibrateComplete, actionToken));
         break;
     case Action_t::MOVE_TO_ACTION:
-        LogErrorOnFailure(PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureMotionAction(); }));
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledClosureMotion, actionToken));
         break;
     case Action_t::UNLATCH_ACTION:
-        LogErrorOnFailure(PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureUnlatchAction(); }));
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledClosureUnlatch, actionToken));
         break;
     case Action_t::SET_TARGET_ACTION:
-        LogErrorOnFailure(PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandlePanelSetTargetAction(instance.mCurrentActionEndpointId);
-        }));
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledPanelSetTarget, actionToken));
         break;
     case Action_t::PANEL_UNLATCH_ACTION:
-        LogErrorOnFailure(PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandlePanelUnlatchAction(instance.mCurrentActionEndpointId);
-        }));
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledPanelUnlatch, actionToken));
         break;
     case Action_t::PANEL_STEP_ACTION:
-        LogErrorOnFailure(PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandlePanelStepAction(instance.mCurrentActionEndpointId);
-        }));
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(HandleScheduledPanelStep, actionToken));
         break;
     default:
         break;
     }
 }
 
-void ClosureManager::HandleClosureActionComplete(Action_t action)
+void ClosureManager::HandleScheduledCalibrateComplete(intptr_t actionToken)
+{
+    ClosureManager & instance = GetInstance();
+    VerifyOrReturn(IsActionTokenCurrent(instance, actionToken));
+    AppManagerInstance().HandleClosureActionComplete(instance.GetCurrentAction());
+}
+
+void ClosureManager::HandleScheduledClosureMotion(intptr_t actionToken)
+{
+    ClosureManager & instance = GetInstance();
+    VerifyOrReturn(IsActionTokenCurrent(instance, actionToken));
+    AppManagerInstance().HandleClosureMotionAction();
+}
+
+void ClosureManager::HandleScheduledClosureUnlatch(intptr_t actionToken)
+{
+    ClosureManager & instance = GetInstance();
+    VerifyOrReturn(IsActionTokenCurrent(instance, actionToken));
+    AppManagerInstance().HandleClosureUnlatchAction();
+}
+
+void ClosureManager::HandleScheduledPanelSetTarget(intptr_t actionToken)
+{
+    ClosureManager & instance = GetInstance();
+    VerifyOrReturn(IsActionTokenCurrent(instance, actionToken));
+    AppManagerInstance().HandlePanelSetTargetAction(instance.mCurrentActionEndpointId);
+}
+
+void ClosureManager::HandleScheduledPanelUnlatch(intptr_t actionToken)
+{
+    ClosureManager & instance = GetInstance();
+    VerifyOrReturn(IsActionTokenCurrent(instance, actionToken));
+    AppManagerInstance().HandlePanelUnlatchAction(instance.mCurrentActionEndpointId);
+}
+
+void ClosureManager::HandleScheduledPanelStep(intptr_t actionToken)
+{
+    ClosureManager & instance = GetInstance();
+    VerifyOrReturn(IsActionTokenCurrent(instance, actionToken));
+    AppManagerInstance().HandlePanelStepAction(instance.mCurrentActionEndpointId);
+}
+
+void ClosureManager::HandleClosureActionCompleteDefault(Action_t action)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -475,6 +608,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = GetCurrentAction();
     event.ClosureEvent.EndpointId = mCurrentActionEndpointId;
+    event.ClosureEvent.Generation = GetCurrentActionGeneration();
     event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
@@ -496,7 +630,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
     mCurrentActionEndpointId = mClosureEndpoint1.GetEndpointId();
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    HandleClosureActionComplete(Action_t::STOP_ACTION);
+    AppManagerInstance().HandleClosureActionComplete(Action_t::STOP_ACTION);
 
     return Status::Success;
 }
@@ -642,15 +776,16 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
     // Post an event to initiate the move to action asynchronously.
     // MoveTo Command can only be initiated from Closure Control Endpoint (Endpoint 1).
     AppEvent event;
-    event.Type                = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action = mCurrentAction;
-    event.Handler             = InitiateAction;
+    event.Type                    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action     = mCurrentAction;
+    event.ClosureEvent.Generation = mActionGeneration;
+    event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
     return Status::Success;
 }
 
-void ClosureManager::HandleClosureMotionAction()
+void ClosureManager::HandleClosureMotionActionDefault()
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -687,8 +822,8 @@ void ClosureManager::HandleClosureMotionAction()
     bool isEndPoint3ProgressPossible = false;
 
     // Get the Next Current State to be set for the endpoint 2, if target postion is not reached.
-    if (GetPanelNextPosition(mClosurePanelEndpoint2CurrentState.Value(), mClosurePanelEndpoint2TargetState.Value(),
-                             mClosurePanelEndpoint2NextPosition))
+    if (AppManagerInstance().GetPanelNextPosition(mClosurePanelEndpoint2CurrentState.Value(),
+                                                  mClosurePanelEndpoint2TargetState.Value(), mClosurePanelEndpoint2NextPosition))
     {
         VerifyOrReturn(!mClosurePanelEndpoint2NextPosition.IsNull(),
                        ChipLogError(AppServer, "Failed to get next position for Endpoint 2"));
@@ -703,8 +838,8 @@ void ClosureManager::HandleClosureMotionAction()
     }
 
     // Get the Next Current State to be set for the endpoint 3, if target postion is not reached.
-    if (GetPanelNextPosition(mClosurePanelEndpoint3CurrentState.Value(), mClosurePanelEndpoint3TargetState.Value(),
-                             mClosurePanelEndpoint3NextPosition))
+    if (AppManagerInstance().GetPanelNextPosition(mClosurePanelEndpoint3CurrentState.Value(),
+                                                  mClosurePanelEndpoint3TargetState.Value(), mClosurePanelEndpoint3NextPosition))
     {
         VerifyOrReturn(!mClosurePanelEndpoint3NextPosition.IsNull(),
                        ChipLogError(AppServer, "Failed to get next position for Endpoint 3"));
@@ -788,7 +923,7 @@ void ClosureManager::HandleClosureMotionAction()
     }
 
     // Target reached and no latch action needed, call HandleClosureAction
-    instance.HandleClosureActionComplete(ClosureManager::Action_t::MOVE_TO_ACTION);
+    AppManagerInstance().HandleClosureActionComplete(ClosureManager::Action_t::MOVE_TO_ACTION);
 }
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(const Optional<Percent100ths> & position,
@@ -873,6 +1008,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = mCurrentAction;
     event.ClosureEvent.EndpointId = endpointId;
+    event.ClosureEvent.Generation = mActionGeneration;
     event.Handler                 = InitiateAction;
 
     AppTask::GetAppTask().PostEvent(&event);
@@ -880,7 +1016,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
     return Status::Success;
 }
 
-void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
+void ClosureManager::HandlePanelSetTargetActionDefault(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -903,7 +1039,7 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
     DataModel::Nullable<chip::Percent100ths> nextPosition = DataModel::NullNullable;
 
     // Get the Next Current State to be set for the endpoint 2, if target postion is not reached.
-    if (GetPanelNextPosition(panelCurrentState.Value(), panelTargetState.Value(), nextPosition))
+    if (AppManagerInstance().GetPanelNextPosition(panelCurrentState.Value(), panelTargetState.Value(), nextPosition))
     {
         VerifyOrReturn(!nextPosition.IsNull(), ChipLogError(AppServer, "Next position is not set for Endpoint %d", endpointId));
 
@@ -953,10 +1089,10 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
         }
     }
 
-    instance.HandleClosureActionComplete(Action_t::SET_TARGET_ACTION);
+    AppManagerInstance().HandleClosureActionComplete(Action_t::SET_TARGET_ACTION);
 }
 
-void ClosureManager::HandleClosureUnlatchAction()
+void ClosureManager::HandleClosureUnlatchActionDefault()
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -1018,10 +1154,10 @@ void ClosureManager::HandleClosureUnlatchAction()
     CancelTimer(); // Cancel any existing timer before proceeding with the motion action
 
     // After unlatching, we can proceed with the motion action
-    instance.HandleClosureMotionAction();
+    AppManagerInstance().HandleClosureMotionAction();
 }
 
-void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
+void ClosureManager::HandlePanelUnlatchActionDefault(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -1068,7 +1204,7 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
     instance.CancelTimer(); // Cancel any existing timer before starting a Set Target action
 
     // Call HandlePanelSetTargetAction to continue with the SetTarget action
-    instance.HandlePanelSetTargetAction(endpointId);
+    AppManagerInstance().HandlePanelSetTargetAction(endpointId);
 }
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const StepDirectionEnum & direction,
@@ -1124,13 +1260,14 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = mCurrentAction;
     event.ClosureEvent.EndpointId = endpointId;
+    event.ClosureEvent.Generation = mActionGeneration;
     event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
     return Status::Success;
 }
 
-void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
+void ClosureManager::HandlePanelStepActionDefault(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -1198,7 +1335,7 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         return;
     }
 
-    instance.HandleClosureActionComplete(PANEL_STEP_ACTION);
+    AppManagerInstance().HandleClosureActionComplete(PANEL_STEP_ACTION);
 }
 
 ClosureDimension::ClosureDimensionEndpoint * ClosureManager::GetPanelEndpointById(EndpointId endpointId)
@@ -1220,9 +1357,9 @@ ClosureDimension::ClosureDimensionEndpoint * ClosureManager::GetPanelEndpointByI
     }
 }
 
-bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & currentState,
-                                          const GenericDimensionStateStruct & targetState,
-                                          DataModel::Nullable<Percent100ths> & nextPosition)
+bool ClosureManager::GetPanelNextPositionDefault(const GenericDimensionStateStruct & currentState,
+                                                 const GenericDimensionStateStruct & targetState,
+                                                 DataModel::Nullable<Percent100ths> & nextPosition)
 {
     VerifyOrReturnValue(targetState.position.HasValue() && !targetState.position.Value().IsNull(), false,
                         ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Target position is not set"));

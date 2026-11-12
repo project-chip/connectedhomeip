@@ -54,7 +54,7 @@ class ChipStackException(Exception):
 class ChipStackError(ChipStackException):
     def __init__(self, code: int, msg=None):
         self.code = code
-        self.msg = msg if msg else "Chip Stack Error %d" % self.code
+        self.msg = msg if msg else f"Chip Stack Error {self.code}"
 
     @classmethod
     def from_chip_error(cls, chip_error: PyChipError) -> ChipStackError:
@@ -74,9 +74,9 @@ class DeviceError(ChipStackException):
         self.statusCode = statusCode
         self.systemErrorCode = systemErrorCode
         if not msg:
-            self.msg = "[ %08X:%d ]" % (profileId, statusCode)
+            self.msg = f"[ {profileId:08X}:{statusCode} ]"
             if systemErrorCode:
-                self.msg += " (system err %d)" % systemErrorCode
+                self.msg += f" (system err {systemErrorCode})"
         else:
             self.msg = msg
 
@@ -94,7 +94,7 @@ class InvalidArgumentCount(ChipStackException):
         self.given = given
 
     def __str__(self):
-        return "InvalidArgumentCount: Expect {}, {} given".format(self.expect, self.given)
+        return f"InvalidArgumentCount: Expect {self.expect}, {self.given} given"
 
 
 class InvalidArgumentType(ChipStackException):
@@ -104,7 +104,7 @@ class InvalidArgumentType(ChipStackException):
         self.argname = name
 
     def __str__(self):
-        return "InvalidArgumentType: Argument {} should be {}, {} got".format(self.argname, self.expect, self.given)
+        return f"InvalidArgumentType: Argument {self.argname} should be {self.expect}, {self.given} got"
 
 
 class UnknownCluster(ClusterError):
@@ -112,7 +112,7 @@ class UnknownCluster(ClusterError):
         self.cluster = cluster
 
     def __str__(self):
-        return "UnknownCluster: {}".format(self.cluster)
+        return f"UnknownCluster: {self.cluster}"
 
 
 class UnknownCommand(ClusterError):
@@ -121,7 +121,7 @@ class UnknownCommand(ClusterError):
         self.command = command
 
     def __str__(self):
-        return "UnknownCommand: cluster: {}, command: {}".format(self.cluster, self.command)
+        return f"UnknownCommand: cluster: {self.cluster}, command: {self.command}"
 
 
 class UnknownAttribute(ClusterError):
@@ -130,7 +130,7 @@ class UnknownAttribute(ClusterError):
         self.attribute = attribute
 
     def __str__(self):
-        return "UnknownAttribute: cluster: {}, attribute: {}".format(self.cluster, self.attribute)
+        return f"UnknownAttribute: cluster: {self.cluster}, attribute: {self.attribute}"
 
 
 class UnknownEvent(ClusterError):
@@ -139,4 +139,4 @@ class UnknownEvent(ClusterError):
         self.event = event
 
     def __str__(self):
-        return "UnknownEvent: cluster: {}, event: {}".format(self.cluster, self.event)
+        return f"UnknownEvent: cluster: {self.cluster}, event: {self.event}"

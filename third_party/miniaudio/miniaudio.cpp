@@ -31,7 +31,11 @@
 // "don't dlclose anything when testing under asan/lsan", we stub dlclose() to a no-op when
 // compiling under AddressSanitizer. This keeps the dynamic libraries mapped in memory at process
 // exit, enabling LSan to scan their static data sections and correctly recognize allocations as reachable.
-#if defined(__SANITIZE_ADDRESS__) || (defined(__has_feature) && __has_feature(address_sanitizer))
+#ifndef __has_feature
+#define __has_feature(x) 0
+#endif
+
+#if defined(__SANITIZE_ADDRESS__) || __has_feature(address_sanitizer)
 #include <dlfcn.h>
 static inline int dummy_dlclose(void * handle)
 {

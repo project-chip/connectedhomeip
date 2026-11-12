@@ -160,27 +160,27 @@ class ValidateMandatoryClusterParam(Mutator):
 
     def _attributeSpecificChecks(self, param: object, cluster_name):
         if not param["included"]:
-            print("WARNING: param 0x%X(%s) in cluster %s found, but included is false" %
-                  (self._param_entry["code"], self._param_entry["name"], cluster_name))
+            print("WARNING: param 0x{:X}({}) in cluster {} found, but included is false".format(
+                self._param_entry["code"], self._param_entry["name"], cluster_name))
             if self._forces_enable:
                 param["included"] = self._param_entry["included"]
 
         if param["storageOption"] == "NVM":
-            print("WARNING: param 0x%X(%s) in cluster %s found, but storageOption was NVM" %
-                  (self._param_entry["code"], self._param_entry["name"], cluster_name))
+            print("WARNING: param 0x{:X}({}) in cluster {} found, but storageOption was NVM".format(
+                self._param_entry["code"], self._param_entry["name"], cluster_name))
             if self._replace_if_storage_nvm:
                 param["storageOption"] = self._param_entry["storageOption"]
 
     def _commandSpecificChecks(self, param: object, cluster_name):
         if param["incoming"] != self._param_entry["incoming"]:
-            print("WARNING: param 0x%X(%s) in cluster %s found, but incoming field isn't correct" %
-                  (self._param_entry["code"], self._param_entry["name"], cluster_name))
+            print("WARNING: param 0x{:X}({}) in cluster {} found, but incoming field isn't correct".format(
+                self._param_entry["code"], self._param_entry["name"], cluster_name))
             if self._forces_enable:
                 param["incoming"] = self._param_entry["incoming"]
 
         if param["outgoing"] != self._param_entry["outgoing"]:
-            print("WARNING: param 0x%X(%s) in cluster %s found, but outgoing field isn't correct" %
-                  (self._param_entry["code"], self._param_entry["name"], cluster_name))
+            print("WARNING: param 0x{:X}({}) in cluster {} found, but outgoing field isn't correct".format(
+                self._param_entry["code"], self._param_entry["name"], cluster_name))
             if self._forces_enable:
                 param["outgoing"] = self._param_entry["outgoing"]
 
@@ -193,10 +193,8 @@ class ValidateMandatoryClusterParam(Mutator):
                 continue
 
             if param["name"] != self._param_entry["name"]:
-                print(
-                    "WARNING: param 0x%X has mismatching name %s (should be %s)" %
-                    (self._param_entry["code"], param["name"],
-                     self._param_entry["name"]))
+                print("WARNING: param 0x{:X} has mismatching name {} (should be {})".format(
+                    self._param_entry["code"], param["name"], self._param_entry["name"]))
 
             if self._param_key == "attributes":
                 self._attributeSpecificChecks(param, candidate["name"])
@@ -204,9 +202,8 @@ class ValidateMandatoryClusterParam(Mutator):
                 self._commandSpecificChecks(param, candidate["name"])
             break
         else:
-            print(
-                "WARNING: Did not find mandatory param %s in cluster %s (0x%X)" %
-                (self._param_entry["name"], candidate["name"], candidate["code"]))
+            print("WARNING: Did not find mandatory param {} in cluster {} (0x{:X})".format(
+                self._param_entry["name"], candidate["name"], candidate["code"]))
             if self._add_if_missing:
                 self._addEntry(candidate)
 
@@ -269,7 +266,7 @@ def main():
     for zap_filename in args.zap_filenames:
         body = loadZapfile(zap_filename)
 
-        print("==== Processing %s ====" % zap_filename)
+        print(f"==== Processing {zap_filename} ====")
         mutateZapbody(
             body, mutators=mutators)
         saveZapfile(body, zap_filename)

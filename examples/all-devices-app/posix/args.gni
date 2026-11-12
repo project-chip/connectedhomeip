@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/config/standalone/args.gni")
+import("${chip_root}/examples/platform/linux/openthread.gni")
 
 chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
 chip_project_config_include = "<CHIPProjectAppConfig.h>"
@@ -25,6 +26,8 @@ chip_project_config_include_dirs =
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
 chip_config_enable_groupcast = true
+
+chip_device_config_enable_wifi_pdc = true
 
 matter_enable_tracing_support = true
 matter_log_json_payload_decode_full = true

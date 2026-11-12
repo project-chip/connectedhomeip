@@ -47,11 +47,11 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
+class TC_EEVSE_2_4(MatterTestCommissionedDevice, EEVSEBaseTestHelper):
 
     def desc_TC_EEVSE_2_4(self) -> str:
         """Returns a description of this test"""
@@ -64,8 +64,7 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_4(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event",

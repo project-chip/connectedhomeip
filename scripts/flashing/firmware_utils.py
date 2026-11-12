@@ -370,7 +370,7 @@ class Flasher:
             elif not isinstance(result, list):
                 result = [result]
         else:
-            raise ValueError('Unknown: {}'.format(template))
+            raise ValueError(f'Unknown: {template}')
         return result
 
     def parse_argv(self, argv):
@@ -422,10 +422,9 @@ class Flasher:
         for key, value in vars(args).items():
             if key in self.option and value != getattr(self.option, key):
                 if isinstance(value, pathlib.Path):
-                    defaults.append('  {}: os.path.join(os.path.dirname(sys.argv[0]), {}),'.format(
-                        repr(key), repr(str(value))))
+                    defaults.append(f'  {repr(key)}: os.path.join(os.path.dirname(sys.argv[0]), {repr(str(value))}),')
                 else:
-                    defaults.append('  {}: {},'.format(repr(key), repr(value)))
+                    defaults.append(f'  {repr(key)}: {repr(value)},')
 
         script = """
             import sys

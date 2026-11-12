@@ -33,6 +33,22 @@ exclude = [
 [tool.pyright]
 reportMissingTypeStubs = "warning"
 extraPaths = ["./src/python_testing/matter_testing_infrastructure"]
+exclude = [
+    # Pyright's default excludes, which are not applied by all versions when exclude is set
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*",
+    # Build outputs, which contain copies of scripts/ and src/ under out/*/obj
+    "**/out",
+    "scripts/py_matter_yamltests/build",
+    "scripts/py_matter_idl/build",
+    "src/python_testing/matter_testing_infrastructure/build",
+    "integrations/mobly/build",
+    # Submodules
+    "examples/common/QRCode/repo",
+    "examples/common/m5stack-tft/repo",
+    "third_party",
+]
 
 [tool.ruff.lint]
 select = [
@@ -55,9 +71,7 @@ select = [
     # Check for builtin symbols aliasing
     "A",
     # pyupgrade rules to update syntax to the new preferred variant
-    "UP001", "UP003", "UP004", "UP005", "UP006", "UP007", "UP008", "UP009", "UP010", "UP011", "UP012", "UP013", "UP014", "UP015",
-    "UP017", "UP018", "UP019", "UP020", "UP021", "UP022", "UP023", "UP024", "UP025", "UP026", "UP028", "UP029", "UP030", "UP033",
-    "UP034", "UP035", "UP036", "UP037", "UP039", "UP040", "UP041", "UP042", "UP043", "UP044", "UP045",
+    "UP",
 ]
 ignore = [
     "ASYNC109", # Sometimes we use "timeout" argument in async functions

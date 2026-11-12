@@ -53,6 +53,7 @@ chip_test_suite("tests") {
     "TestIntrusiveList.cpp",
     "TestJsonToTlv.cpp",
     "TestJsonToTlvToJson.cpp",
+    "TestParseDecimal.cpp",
     "TestPersistedCounter.cpp",
     "TestPool.cpp",
     "TestPopCount.cpp",
@@ -94,6 +95,7 @@ chip_test_suite("tests") {
   ]
 
   public_deps = [
+    ":pw-test-macros",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",

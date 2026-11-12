@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <clusters/PumpConfigurationAndControl/EnumsCheck.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -264,7 +265,7 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
         ControlModeEnum controlMode;
         NumericAttributeTraits<ControlModeEnum>::StorageType tmp;
         memcpy(&tmp, value, size);
-        controlMode = NumericAttributeTraits<ControlModeEnum>::StorageToWorking(tmp);
+        controlMode = EnsureKnownEnumValue(NumericAttributeTraits<ControlModeEnum>::StorageToWorking(tmp));
         switch (controlMode)
         {
         case ControlModeEnum::kConstantFlow:

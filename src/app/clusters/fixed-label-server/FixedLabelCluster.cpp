@@ -17,6 +17,7 @@
 #include <app/clusters/fixed-label-server/FixedLabelCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/FixedLabel/Metadata.h>
+#include <lib/support/AutoRelease.h>
 
 namespace chip::app::Clusters {
 
@@ -24,32 +25,10 @@ using namespace FixedLabel::Attributes;
 
 namespace {
 
-class AutoReleaseIterator
-{
-public:
-    AutoReleaseIterator(DeviceLayer::DeviceInfoProvider & provider, EndpointId endpointId) :
-        mIterator(provider.IterateFixedLabel(endpointId))
-    {}
-    ~AutoReleaseIterator()
-    {
-        if (mIterator != nullptr)
-        {
-            mIterator->Release();
-        }
-    }
-
-    bool IsValid() const { return mIterator != nullptr; }
-
-    DeviceLayer::DeviceInfoProvider::FixedLabelIterator * operator->() { return mIterator; }
-
-private:
-    DeviceLayer::DeviceInfoProvider::FixedLabelIterator * mIterator;
-};
-
 CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder, DeviceLayer::DeviceInfoProvider & provider)
 {
-    AutoReleaseIterator it(provider, endpoint);
-    VerifyOrReturnValue(it.IsValid(), encoder.EncodeEmptyList());
+    AutoRelease it(provider.IterateFixedLabel(endpoint));
+    VerifyOrReturnValue(!it.IsNull(), encoder.EncodeEmptyList());
 
     return encoder.EncodeList([&it](const auto & encod) -> CHIP_ERROR {
         FixedLabel::Structs::LabelStruct::Type fixedlabel;

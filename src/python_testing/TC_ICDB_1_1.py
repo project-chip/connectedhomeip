@@ -52,6 +52,7 @@ from support_modules.icd_support import ICDBaseTest, ICDTransition
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -81,14 +82,14 @@ clientTypeEnum = cluster.Enums.ClientTypeEnum
 features = cluster.Bitmaps.Feature
 
 
-class TC_ICDB_1_1(ICDBaseTest):
+class TC_ICDB_1_1(MatterTestCommissionedDevice, ICDBaseTest):
 
     def desc_TC_ICDB_1_1(self) -> str:
         return "[TC-ICDB-1.1] ICD Check-In Protocol - Register client - idle mode duration [DUT as Server]"
 
     def steps_TC_ICDB_1_1(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(1, "TH reads from the DUT the RegisteredClients attribute.",
                      "If clients are registered, unregister them."),
             TestStep(2, "TH reads from the DUT the IdleModeDuration, ActiveModeDuration, and ActiveModeThreshold attributes.",

@@ -319,3 +319,128 @@ def generate_name(zap_file_path: str) -> str:
         names.append(_convert_filename(name))
     hash_string = generate_hash()
     return "_".join(names) + f"_{hash_string}"
+
+
+def merge_zap_files(
+    zap_file_paths: Sequence[str], output_zap_path: str
+) -> dict[str, dict[int, int]]:
+    """Merges multiple .zap files into a single composite .zap file.
+
+    Starts with `zap_file_paths[0]` as the base ZAP configuration:
+      - Root node (Endpoint 0): Takes the union of all enabled `(code, side)`
+        clusters across all input `.zap` files. If a cluster is enabled on the
+        root node in more than one `.zap` file, only the first instance seen in
+        `zap_file_paths` is kept (since attributes, features, commands, and
+        events do not affect C++ codegen).
+      - Non-root endpoints (`endpointId != 0`): Appended in order with their
+        `endpointId` reassigned incrementally and `parentEndpointIdentifier`
+        remapped accordingly.
+
+    Example:
+      App1.zap:
+      {
+        0: {clusterA, clusterB, ...},
+        1: {parent=0, ...},
+        2: {parent=0, ...},
+      }
+
+      App2.zap:
+      {
+        0: {clusterB, clusterC, ...},
+        1: {parent=0, ...},
+        2: {parent=1, ...},
+      }
+
+      Merged output .zap:
+      {
+        0: {clusterA, clusterB (from App1.zap), clusterC, ...},
+        1: {parent=0, ...},
+        2: {parent=0, ...},
+        3: {parent=0, ...},
+        4: {parent=3, ...},
+      }
+
+      Returned mapping:
+      {
+        "App1.zap": {0: 0, 1: 1, 2: 2},
+        "App2.zap": {0: 0, 1: 3, 2: 4},
+      }
+
+    Args:
+      zap_file_paths: Non-empty sequence of input .zap file paths.
+      output_zap_path: Destination path for the merged .zap file.
+
+    Returns:
+      A dictionary `{zap_file_path: {old_ep_id: new_ep_id}}` mapping each input
+      .zap file path to its old-to-new endpoint ID mapping.
+    """
+    if not zap_file_paths:
+        raise ValueError("zap_file_paths must not be empty")
+
+    with open(zap_file_paths[0]) as fp:
+        merged_zap = json.load(fp)
+
+    endpoint_mappings: dict[str, dict[int, int]] = {
+        zap_file_paths[0]: {
+            ep["endpointId"]: ep["endpointId"] for ep in merged_zap["endpoints"]
+        }
+    }
+
+    ep0_et_idx = next(
+        ep["endpointTypeIndex"]
+        for ep in merged_zap["endpoints"]
+        if ep["endpointId"] == 0
+    )
+    ep0_clusters = merged_zap["endpointTypes"][ep0_et_idx]["clusters"]
+    seen_ep0_clusters = {
+        (c["code"], c["side"]) for c in ep0_clusters if c.get("enabled") == 1
+    }
+    max_ep_id = max(ep["endpointId"] for ep in merged_zap["endpoints"])
+
+    for zap_path in zap_file_paths[1:]:
+        with open(zap_path) as fp:
+            current = json.load(fp)
+
+        ep_id_map = {0: 0}
+        for ep in current["endpoints"]:
+            old_ep_id = ep["endpointId"]
+            if old_ep_id == 0:
+                cur_ep0_et = current["endpointTypes"][ep["endpointTypeIndex"]]
+                for cluster in cur_ep0_et["clusters"]:
+                    key = (cluster["code"], cluster["side"])
+                    if (
+                        cluster.get("enabled") == 1
+                        and key not in seen_ep0_clusters
+                    ):
+                        ep0_clusters.append(copy.deepcopy(cluster))
+                        seen_ep0_clusters.add(key)
+            else:
+                max_ep_id += 1
+                ep_id_map[old_ep_id] = max_ep_id
+
+        endpoint_mappings[zap_path] = ep_id_map
+
+        for ep in current["endpoints"]:
+            old_ep_id = ep["endpointId"]
+            if old_ep_id == 0:
+                continue
+            et_copy = copy.deepcopy(
+                current["endpointTypes"][ep["endpointTypeIndex"]]
+            )
+            new_et_idx = len(merged_zap["endpointTypes"])
+            et_copy["id"] = new_et_idx + 1
+            merged_zap["endpointTypes"].append(et_copy)
+
+            ep_copy = copy.deepcopy(ep)
+            ep_copy["endpointId"] = ep_id_map[old_ep_id]
+            ep_copy["endpointTypeIndex"] = new_et_idx
+            parent_id = ep_copy.get("parentEndpointIdentifier")
+            if parent_id is not None and parent_id in ep_id_map:
+                ep_copy["parentEndpointIdentifier"] = ep_id_map[parent_id]
+            merged_zap["endpoints"].append(ep_copy)
+
+    os.makedirs(os.path.dirname(os.path.abspath(output_zap_path)), exist_ok=True)
+    with open(output_zap_path, "w") as fp:
+        json.dump(merged_zap, fp, indent=2)
+
+    return endpoint_mappings

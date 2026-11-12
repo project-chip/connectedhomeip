@@ -49,14 +49,14 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 cluster = Clusters.EnergyEvse
 
 
-class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
+class TC_EEVSE_2_3(MatterTestCommissionedDevice, EEVSEBaseTestHelper):
 
     def desc_TC_EEVSE_2_3(self) -> str:
         """Returns a description of this test"""
@@ -69,8 +69,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_3(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("1a", "TH reads from the DUT theFeatureMap_",
                      "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap."),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",

@@ -66,7 +66,10 @@ static_library("freertos") {
 
   public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  public_deps = [
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/src/platform:platform_base",
+  ]
 
   public_configs = []
 
@@ -76,7 +79,9 @@ static_library("freertos") {
       "//src/platform/OpenThread/GenericNetworkCommissioningThreadDriver.h",
       "//src/platform/OpenThread/OpenThreadDnssdImpl.cpp",
       "//src/platform/OpenThread/OpenThreadDnssdImpl.h",
+      "//src/platform/OpenThread/OpenThreadTxtEntries.h",
       "//src/platform/OpenThread/OpenThreadUtils.cpp",
+      "//src/platform/OpenThread/TxtEntries.h",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]

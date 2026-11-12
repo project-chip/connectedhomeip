@@ -60,6 +60,12 @@ enum class ModeTag : uint16_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 10,
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kCoreModes = 0x2,
+};
 } // namespace OvenMode
 } // namespace Clusters
 } // namespace app

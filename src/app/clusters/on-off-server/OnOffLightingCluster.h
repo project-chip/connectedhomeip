@@ -106,6 +106,8 @@ private:
     OnOffEffectDelegate & mEffectDelegate;
     chip::scenes::ScenesIntegrationDelegate * mScenesIntegrationDelegate;
 
+    static constexpr uint8_t kValueDeltaReportTrigger = 10;
+
     // Lighting Attributes
     bool mGlobalSceneControl = true;
 

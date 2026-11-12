@@ -46,6 +46,7 @@ project(chip-nxp-all-clusters-app-example)
 
 include(${CHIP_ROOT}/config/nxp/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+include(${CHIP_ROOT}/examples/thermostat/thermostat-common/thermostat-common.cmake)
 include(${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_se05x.cmake)
 
 target_include_directories(app
@@ -76,6 +77,8 @@ target_sources(app
     ${EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR}/factory_data/source/AppFactoryDataExample.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/source/ICDUtil.cpp
 )
+
+chip_add_thermostat_common(app)
 
 if(CONFIG_CHIP_APP_IDENTIFY)
     target_include_directories(app PRIVATE
@@ -121,13 +124,23 @@ if (CONFIG_CHIP_FACTORY_DATA)
     endif()
 endif()
 
-if(CONFIG_CHIP_WIFI)
+if(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD AND CONFIG_OPENTHREAD_BORDER_ROUTER)
+    chip_configure_data_model(app
+        ZAP_FILE ${THERMOSTAT_NXP_ZAP_DIR}/thermostat_matter_br.zap
+    )
+elseif(CONFIG_CHIP_WIFI)
     chip_configure_data_model(app
         ZAP_FILE ${THERMOSTAT_NXP_ZAP_DIR}/thermostat_matter_wifi.zap
     )
 elseif(CONFIG_NET_L2_OPENTHREAD)
     chip_configure_data_model(app
         ZAP_FILE ${THERMOSTAT_NXP_ZAP_DIR}/thermostat_matter_thread.zap
+    )
+endif()
+
+if(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD AND CONFIG_OPENTHREAD_BORDER_ROUTER)
+    target_compile_definitions(app PRIVATE
+        CHIP_DEVICE_CONFIG_ENABLE_TBR=1
     )
 endif()
 

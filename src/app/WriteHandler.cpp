@@ -35,6 +35,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/TextOnlyLogging.h>
@@ -46,33 +47,6 @@
 
 namespace chip {
 namespace app {
-
-namespace {
-
-using Protocols::InteractionModel::Status;
-
-/// Wraps a EndpointIterator and ensures that `::Release()` is called
-/// for the iterator (assuming it is non-null)
-class AutoReleaseGroupEndpointIterator
-{
-public:
-    explicit AutoReleaseGroupEndpointIterator(Credentials::GroupDataProvider::EndpointIterator * iterator) : mIterator(iterator) {}
-    ~AutoReleaseGroupEndpointIterator()
-    {
-        if (mIterator != nullptr)
-        {
-            mIterator->Release();
-        }
-    }
-
-    bool IsNull() const { return mIterator == nullptr; }
-    bool Next(Credentials::GroupDataProvider::GroupEndpoint & item) { return mIterator->Next(item); }
-
-private:
-    Credentials::GroupDataProvider::EndpointIterator * mIterator;
-};
-
-} // namespace
 
 using namespace Protocols::InteractionModel;
 using Status = Protocols::InteractionModel::Status;
@@ -102,7 +76,8 @@ void WriteHandler::Close()
     // successful.
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
-    mStateFlags.Clear(StateBits::kSuppressResponse);
+    mAccessingFabricIndex = kUndefinedFabricIndex;
+    mStateFlags.ClearAll();
     mDataModelProvider = nullptr;
     MoveToState(State::Uninitialized);
 }
@@ -164,6 +139,7 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
     // This is only relevant during chunked requests.
     //
     mExchangeCtx.Grab(apExchangeContext);
+    mAccessingFabricIndex = apExchangeContext->GetSessionHandle()->GetFabricIndex();
 
     Status status = HandleWriteRequestMessage(apExchangeContext, std::move(aPayload), aIsTimedWrite);
 
@@ -306,7 +282,6 @@ CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSucc
 
     Credentials::GroupDataProvider::GroupEndpoint mapping;
     Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
-    Credentials::GroupDataProvider::EndpointIterator * iterator;
 
     GroupId groupId         = mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     FabricIndex fabricIndex = GetAccessingFabricIndex();
@@ -314,8 +289,8 @@ CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSucc
     auto processingConcreteAttributePath = mProcessingAttributePath.Value();
     mProcessingAttributePath.ClearValue();
 
-    iterator = groupDataProvider->IterateEndpoints(fabricIndex);
-    VerifyOrReturnError(iterator != nullptr, CHIP_ERROR_NO_MEMORY);
+    AutoRelease iterator(groupDataProvider->IterateEndpoints(fabricIndex));
+    VerifyOrReturnError(!iterator.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     while (iterator->Next(mapping))
     {
@@ -332,7 +307,6 @@ CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSucc
             DeliverListWriteEnd(processingConcreteAttributePath, writeWasSuccessful);
         }
     }
-    iterator->Release();
     return CHIP_NO_ERROR;
 }
 namespace {
@@ -499,7 +473,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
                       "Received group attribute write for Group=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
                       groupId, ChipLogValueMEI(dataAttributePath.mClusterId), ChipLogValueMEI(dataAttributePath.mAttributeId));
 
-        AutoReleaseGroupEndpointIterator iterator(Credentials::GetGroupDataProvider()->IterateEndpoints(fabric));
+        AutoRelease iterator(Credentials::GetGroupDataProvider()->IterateEndpoints(fabric));
         VerifyOrExit(!iterator.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
         bool shouldReportListWriteEnd = ShouldReportListWriteEnd(
@@ -509,7 +483,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         std::optional<bool> isListAttribute = std::nullopt;
 
         Credentials::GroupDataProvider::GroupEndpoint mapping;
-        while (iterator.Next(mapping))
+        while (iterator->Next(mapping))
         {
             if (groupId != mapping.group_id)
             {
@@ -646,7 +620,8 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
     bool boolValue;
 
-    boolValue = mStateFlags.Has(StateBits::kSuppressResponse);
+    // SuppressResponse may be omitted when false, so do not inherit its value from a previous message.
+    boolValue = false;
     err       = writeRequestParser.GetSuppressResponse(&boolValue);
     if (err == CHIP_END_OF_TLV)
     {
@@ -655,12 +630,13 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
 
-    boolValue = mStateFlags.Has(StateBits::kIsTimedRequest);
+    boolValue = false;
     err       = writeRequestParser.GetTimedRequest(&boolValue);
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 
-    boolValue = mStateFlags.Has(StateBits::kHasMoreChunks);
+    // MoreChunkedMessages may be omitted when false, including on the final chunk; do not inherit its previous value.
+    boolValue = false;
     err       = writeRequestParser.GetMoreChunkedMessages(&boolValue);
     if (err == CHIP_ERROR_END_OF_TLV)
     {
@@ -762,7 +738,7 @@ CHIP_ERROR WriteHandler::AddStatusInternal(const ConcreteDataAttributePath & aPa
 
 FabricIndex WriteHandler::GetAccessingFabricIndex() const
 {
-    return mExchangeCtx->GetSessionHandle()->GetFabricIndex();
+    return mAccessingFabricIndex;
 }
 
 const char * WriteHandler::GetStateStr() const

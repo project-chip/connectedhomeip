@@ -72,9 +72,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, CompileTest)
     // The cluster should compile for any logic
     SoftwareDiagnosticsServerCluster cluster({}, DeviceLayer::GetDiagnosticDataProvider());
 
-    // Essentially say "code executes"
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }),
-              BitFlags<app::DataModel::ClusterQualityFlags>());
+              BitFlags<app::DataModel::ClusterQualityFlags>(app::DataModel::ClusterQualityFlags::kDiagnosticsData));
 }
 
 TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
@@ -267,7 +266,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, TestEventGeneration)
     Events::SoftwareFault::Type fault{
         .id             = 1234,
         .name           = Optional{ "test"_span },
-        .faultRecording = Optional{ ByteSpan(Uint8::from_const_char(faultData), strlen(faultData)) },
+        .faultRecording = Optional{ ByteSpan::fromCharString(faultData) },
     };
 
     SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(fault);

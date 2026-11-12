@@ -19,9 +19,9 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
-#include <protocols/interaction_model/Constants.h>
+#include <lib/core/TLVReader.h>
+#include <lib/core/TLVWriter.h>
 
 #include "Temperature.h"
 
@@ -125,9 +125,14 @@ public:
         return *this;
     }
 
+    OptionalSetpoint & operator=(const Optional<temperature> & other)
+    {
+        mTemperature = other;
+        return *this;
+    }
+
     bool HasTemperature() const override { return mTemperature.HasValue(); }
     temperature Temperature() const override;
-
     /*
      * Set the temperature value.
      * Returns true if the temperature was changed, false otherwise.

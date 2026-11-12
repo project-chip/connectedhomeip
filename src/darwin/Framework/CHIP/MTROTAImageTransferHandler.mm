@@ -26,7 +26,10 @@
 #import "NSStringSpanConversion.h"
 
 #include <chrono>
+#include <lib/support/TypeTraits.h>
+#include <optional>
 #include <platform/Darwin/UserDefaults.h>
+#include <protocols/bdx/StatusCode.h>
 
 using namespace chip;
 using namespace chip::bdx;
@@ -90,6 +93,28 @@ constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
 constexpr auto kBdxThrottleDefaultInterval = System::Clock::Milliseconds32(50);
 
 constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
+
+// MTRError.h documents MTRBDXErrorCode values as the BDX status codes from the Matter specification.
+static_assert(MTRBDXErrorCodeResponderBusy == to_underlying(bdx::StatusCode::kResponderBusy));
+static_assert(MTRBDXErrorCodeFileDesignatorUnknown == to_underlying(bdx::StatusCode::kFileDesignatorUnknown));
+static_assert(MTRBDXErrorCodeStartOffsetNotSupported == to_underlying(bdx::StatusCode::kStartOffsetNotSupported));
+
+static std::optional<bdx::StatusCode> BDXStatusCodeForError(NSError * error)
+{
+    if (![error.domain isEqualToString:MTRBDXErrorDomain]) {
+        return std::nullopt;
+    }
+
+    switch (error.code) {
+    case MTRBDXErrorCodeResponderBusy:
+    case MTRBDXErrorCodeFileDesignatorUnknown:
+    case MTRBDXErrorCodeStartOffsetNotSupported:
+        return static_cast<bdx::StatusCode>(error.code);
+    default:
+        MTR_LOG_ERROR("Unknown MTRBDXErrorDomain code %ld; rejecting BDX transfer with status UNKNOWN", static_cast<long>(error.code));
+        return bdx::StatusCode::kUnknown;
+    }
+}
 
 // An ARC-managed object that lets us do weak references to a MTROTAImageTransferHandler
 // (which is a C++ object).
@@ -168,7 +193,13 @@ CHIP_ERROR MTROTAImageTransferHandler::Init(Messaging::ExchangeContext * exchang
     } else {
         blockSize = kMaxBdxBlockSize;
     }
-    return AsyncResponder::Init(mSystemLayer, exchangeCtx, kBdxRole, flags, blockSize, kBdxTimeout);
+
+    System::Clock::Timeout timeout = kBdxTimeout;
+    auto timeoutOverride = Platform::GetUserDefaultBDXTransferTimeout();
+    if (timeoutOverride.has_value()) {
+        timeout = timeoutOverride.value();
+    }
+    return AsyncResponder::Init(mSystemLayer, exchangeCtx, kBdxRole, flags, blockSize, timeout);
 }
 
 MTROTAImageTransferHandler::~MTROTAImageTransferHandler()
@@ -176,8 +207,7 @@ MTROTAImageTransferHandler::~MTROTAImageTransferHandler()
     assertChipStackLockedByCurrentThread();
 
     if (mNeedToCallTransferSessionEnd) {
-        // TODO: Store the actual error involved in error cases, so we can pass the right thing here.
-        InvokeTransferSessionEndCallback(CHIP_ERROR_INTERNAL);
+        InvokeTransferSessionEndCallback(mTransferEndError);
     }
 
     MTROTAUnsolicitedBDXMessageHandler::GetInstance()->OnTransferHandlerDestroyed(this);
@@ -222,6 +252,15 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
                 }
 
                 if (error != nil) {
+                    auto bdxStatus = BDXStatusCodeForError(error);
+                    if (bdxStatus.has_value()) {
+                        MTR_LOG_ERROR("OTA provider delegate rejected BDX transfer for " ChipLogFormatScopedNodeId ": %@",
+                            ChipLogValueScopedNodeId(mPeer), error);
+                        mBDXRejectionError = error;
+                        NotifyEventHandled(eventType, *bdxStatus);
+                        return;
+                    }
+
                     CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
                     LogErrorOnFailure(err);
                     NotifyEventHandled(eventType, err);
@@ -303,7 +342,7 @@ void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR err
 
     // Always collect the metrics to avoid unbounded growth of the stats in the collector
     MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCategory:@("ota") removeMetrics:YES];
-    auto nsError = [MTRError errorForCHIPErrorCode:error];
+    NSError * nsError = (mBDXRejectionError != nil) ? mBDXRejectionError : [MTRError errorForCHIPErrorCode:error];
     if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:metrics:error:)]) {
         dispatch_async(delegateQueue, ^{
             [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId controller:controller
@@ -319,13 +358,17 @@ void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR err
     }
 }
 
-CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionEnd(const TransferSession::OutputEventType eventType)
+CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionEnd(const TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
+
+    TransferSession::OutputEventType eventType = event.EventType;
 
     CHIP_ERROR error = CHIP_NO_ERROR;
     if (eventType == TransferSession::OutputEventType::kTransferTimeout) {
         error = CHIP_ERROR_TIMEOUT;
+    } else if (eventType == TransferSession::OutputEventType::kStatusReceived) {
+        error = GetChipErrorFromBdxStatusCode(event.statusData.statusCode);
     } else if (eventType != TransferSession::OutputEventType::kAckEOFReceived) {
         error = CHIP_ERROR_INTERNAL;
     }
@@ -480,7 +523,7 @@ void MTROTAImageTransferHandler::HandleTransferSessionOutput(TransferSession::Ou
     case TransferSession::OutputEventType::kAckEOFReceived:
     case TransferSession::OutputEventType::kInternalError:
     case TransferSession::OutputEventType::kTransferTimeout:
-        err = OnTransferSessionEnd(eventType);
+        err = OnTransferSessionEnd(event);
         if (err != CHIP_NO_ERROR) {
             LogErrorOnFailure(err);
             NotifyEventHandled(eventType, err);

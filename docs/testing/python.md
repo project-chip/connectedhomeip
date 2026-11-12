@@ -99,6 +99,46 @@ file.
 The structured comments above the class definition are used to set up the CI for
 the tests. Please see [Running tests in CI](#running-tests-in-ci).
 
+### Declaring a test's device requirement
+
+`MatterBaseTest` is device-requirement neutral: on its own it does not say
+whether a test needs a commissioned device, an uncommissioned one, performs
+commissioning itself, or needs no device at all. Instead of deriving from
+`MatterBaseTest` directly, a test should derive from the marker base class that
+matches what it requires. These markers are currently **declarative only** —
+they add no runtime behavior and do not change method resolution order, setup,
+teardown, or test discovery. They give tooling (the Test Harness, CI selection,
+the structural check below) a single static signal for what each test needs.
+
+| Base class                       | The test...                                                                   |
+| -------------------------------- | ----------------------------------------------------------------------------- |
+| `MatterTestCommissionedDevice`   | requires a DUT already commissioned before it runs (the common case).         |
+| `MatterTestUncommissionedDevice` | requires an uncommissioned / commissionable DUT (not yet on a fabric).        |
+| `MatterTestCommissioner`         | commissions the DUT itself, or exercises commissioner-role flows (e.g. PASE). |
+| `CertificationUnitTestNoDevice`  | is a parser / validation / framework unit test that never talks to a DUT.     |
+| `BasicCompositionTests`          | intentionally supports either a commissioned **or** an uncommissioned device. |
+
+A test that commissions a _second_ fabric or a helper device while its own DUT
+is already commissioned is still `MatterTestCommissionedDevice`: classification
+follows the DUT's required starting state, not incidental commissioning actions.
+
+> **Wildcard subscription is a separate concern.** Whether the background
+> wildcard subscription runs is controlled by `requires_dut` /
+> `disable_wildcard_subscription` / `--no-wildcard-subscription` (see
+> [Wildcard subscription read verification](#wildcard-subscription-read-verification)).
+> For the three device-STATE markers (`MatterTestCommissionedDevice`,
+> `MatterTestUncommissionedDevice`, `MatterTestCommissioner`) this is
+> independent of classification — e.g. a `MatterTestCommissionedDevice` test may
+> still set `requires_dut = False` to skip the subscription. The one exception
+> is `CertificationUnitTestNoDevice`, which sets `requires_dut = False` on the
+> base: a test that never talks to a DUT can never use the subscription, so
+> no-device tests inherit that automatically and should not set it themselves.
+
+`TestDeviceRequirementMarkers.py` (under `test_testing/`) enforces the hierarchy
+invariants (the device-state markers are empty and subscription-independent,
+`CertificationUnitTestNoDevice` disables the subscription, markers are mutually
+exclusive) and checks that the reclassified tests declare the expected marker.
+
 ## Cluster Codegen
 
 -   [Objects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/clusters/Objects.py)
@@ -471,6 +511,10 @@ See
     -   use --int-arg, --bool-arg etc on the command line to specify PIXITs
     -   Warn users if they don’t set required values, add instructions in the
         comments
+    -   for a declarative alternative, declare required/optional PIXITs and
+        harness parameters up front with the `@pixit` / `@harness_params`
+        decorators — see
+        [Declarative PIXITs and harness parameters](./pics_and_pixit.md#declarative-pixits-and-harness-parameters)
 -   pixit_value = self.user_params.get("pixit_name", default)
 
 ## Support functionality
@@ -511,6 +555,12 @@ await self.request_device_reboot()
 # Factory reset - clears device state (removes KVS)
 await self.request_device_factory_reset()
 ```
+
+`request_device_reboot()` or `request_device_factory_reset` fails the test if
+the background wildcard subscription is still running, so a rebooting or factory
+resetting test class must set `disable_wildcard_subscription = True`. See
+[Rebooting or factory resetting the DUT](#rebooting-or-factory-resetting-the-dut)
+for why.
 
 ```shell
 # Example Command w/ run_python_test.py test runner:
@@ -899,9 +949,90 @@ for that run, e.g.:
     -   Example:
         `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
 
+-   `tags`: Labels the run, so that the runners can select it with `--tag`. A
+    tag is any lowercase name of letters, digits, `.` and `-` that doesn't start
+    with `skip-`. See
+    [Running a run only in the nightly job](#running-a-run-only-in-the-nightly-job)
+    and [Selecting runs by tag](#selecting-runs-by-tag). These tags also change
+    what CI does with the run:
+
+    -   `nightly`: moves the run out of PR CI and into the nightly job, for runs
+        that are too slow for PR CI, or that use an app PR CI doesn't run the
+        test against.
+    -   `needs-followup-fixes`: the run has problems tracked in `issues`, for
+        example a failure, or probes that a deny list skips. The tag doesn't
+        move the run, and alone it doesn't change what a failure does. With
+        `nightly`, the nightly job reports the result with its issues, and a
+        failure doesn't fail the job. Remove the tag once every issue is fixed.
+    -   `openssl-3.5`: moves the run out of PR CI and into the OpenSSL 3.5 job,
+        for runs that need an app and controller built with OpenSSL 3.5.
+    -   Example: `[nightly]`
+
+-   `issues`: The GitHub issues that track the problems of a
+    `needs-followup-fixes` run, as full issue URLs, one per line. Required with
+    `needs-followup-fixes`, and not allowed without it.
+
+    -   Example:
+
+        ```python
+        #     tags: [nightly, needs-followup-fixes]
+        #     issues:
+        #       - https://github.com/project-chip/connectedhomeip/issues/12345
+        ```
+
+-   `app` may also be a script that starts several applications, for example
+    around a mocked network, and logs the `app-ready-pattern` once they are up.
+    Such tests need root, so `local.py python-tests` skips them. List them under
+    `dedicated_runner` in `src/python_testing/test_metadata.yaml`.
+
+    -   Example: `scripts/tests/run_compro_test.py`
+
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test
 execution.
+
+### Running a run only in the nightly job
+
+The `nightly` tag moves one run of a test to the nightly job, while the test's
+other runs stay in PR CI. To move a whole test, tag each of its runs.
+
+| Run                               | Pull requests                 | Nightly                                                        |
+| --------------------------------- | ----------------------------- | -------------------------------------------------------------- |
+| No tags                           | Runs                          | Skipped                                                        |
+| `nightly`                         | Skipped                       | Runs. A failure fails the job                                  |
+| `needs-followup-fixes`            | Runs. A failure fails the job | Skipped                                                        |
+| `nightly`, `needs-followup-fixes` | Skipped                       | Runs. Reported with its issues; a failure doesn't fail the job |
+
+-   The nightly job runs each `nightly` run on its own and reports it as
+    `<script>::<run>`, for example `TC_ACE_1_2.py::run2`.
+-   Tags are free-form, so a misspelled `nightly` leaves the run in PR CI.
+-   A file on the `not_automated` list runs nowhere, tagged runs included.
+-   To run a `nightly` run locally, name it:
+    `./scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ACE_1_2.py --run run2`,
+    or select the `nightly` runs with `--tag nightly`.
+
+### Selecting runs by tag
+
+`execute_python_tests.py run`, `local.py python-tests` and `run_python_test.py`
+select runs with the same `--tag` option:
+
+-   `--tag <tag>` keeps only the runs with the tag, and `--tag skip-<tag>`
+    leaves them out. With several `--tag` values, a run must match each one.
+-   Runs tagged `nightly` or `openssl-3.5` are left out unless a `--tag` value
+    names the tag. Without `--tag`, the runners select the runs PR CI runs.
+-   `execute_python_tests.py` and `local.py` reject a `--tag` value whose tag no
+    run has, such as a misspelled tag.
+-   `run_python_test.py --run` names runs whatever their tags, and can't be
+    combined with `--tag`.
+-   `execute_python_tests.py` calls each selected run that has tags on its own,
+    and reports it as `<script>::<run>` with its tags and issues.
+
+| Selection                      | `--tag` values                     |
+| ------------------------------ | ---------------------------------- |
+| PR CI (the default)            | `skip-nightly`, `skip-openssl-3.5` |
+| Nightly job                    | `nightly`                          |
+| OpenSSL 3.5 job                | `openssl-3.5`                      |
+| PR CI runs with known problems | `needs-followup-fixes`             |
 
 # Test Module Guards
 
@@ -1067,8 +1198,8 @@ administer privilege, which can otherwise add noise and unnecessary DUT load.
 Before the subscription starts, the framework snapshots the DUT ACL and appends
 an administer entry for the subscription controller.
 
-`teardown_test` restores the original ACL snapshot so each test starts from a
-known ACL state.
+The framework restores the original ACL snapshot after each test, so each test
+starts from a known ACL state.
 
 Tests that replace the entire ACL during a step should include the subscription
 controller entry (see `get_subscription_acl_entry()` on `MatterBaseTest`) if
@@ -1105,6 +1236,17 @@ the subscription controller):
 -   Per test class: `default_verify_wildcard_subscription = False`
 -   Single read: pass `verify_wildcard_subscription=False` to the read helper,
     otherwise this defaults to True.
+
+### Rebooting Or Factory Resetting the DUT
+
+The subscription runs with `autoResubscribe=False`, so a DUT reboot or factory
+reset ends it: no further reports arrive and the cache keeps serving the values
+it held before the reboot. Post-reboot reads would then be verified against
+stale data, which can pass a test that should fail.
+
+`request_device_reboot()` or `request_device_factory_reset()` therefore fails
+the test when the subscription is still active. Test classes that reboot must
+set `disable_wildcard_subscription = True`.
 
 ### Known limitations
 

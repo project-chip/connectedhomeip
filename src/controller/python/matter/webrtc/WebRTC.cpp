@@ -168,6 +168,91 @@ void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateC
     }
 }
 
+PyChipError webrtc_get_video_frame_count(WebRTCClientHandle handle, uint32_t * out_count)
+{
+    if (out_count == nullptr)
+    {
+        ChipLogError(Zcl, "webrtc_get_video_frame_count: out_count is null");
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it == g_clients.end())
+    {
+        ChipLogError(Zcl, "webrtc_get_video_frame_count: Invalid WebRTCClientHandle");
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    *out_count = it->second->GetVideoFrameCount();
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError webrtc_get_video_bytes_count(WebRTCClientHandle handle, uint64_t * out_bytes)
+{
+    if (out_bytes == nullptr)
+    {
+        ChipLogError(Zcl, "webrtc_get_video_bytes_count: out_bytes is null");
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it == g_clients.end())
+    {
+        ChipLogError(Zcl, "webrtc_get_video_bytes_count: Invalid WebRTCClientHandle");
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    *out_bytes = it->second->GetVideoBytesCount();
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError webrtc_get_audio_packet_count(WebRTCClientHandle handle, uint32_t * out_count)
+{
+    if (out_count == nullptr)
+    {
+        ChipLogError(Zcl, "webrtc_get_audio_packet_count: out_count is null");
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it == g_clients.end())
+    {
+        ChipLogError(Zcl, "webrtc_get_audio_packet_count: Invalid WebRTCClientHandle");
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    *out_count = it->second->GetAudioPacketCount();
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError webrtc_get_audio_bytes_count(WebRTCClientHandle handle, uint64_t * out_bytes)
+{
+    if (out_bytes == nullptr)
+    {
+        ChipLogError(Zcl, "webrtc_get_audio_bytes_count: out_bytes is null");
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it == g_clients.end())
+    {
+        ChipLogError(Zcl, "webrtc_get_audio_bytes_count: Invalid WebRTCClientHandle");
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    *out_bytes = it->second->GetAudioBytesCount();
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError webrtc_reset_media_counters(WebRTCClientHandle handle)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it == g_clients.end())
+    {
+        ChipLogError(Zcl, "webrtc_reset_media_counters: Invalid WebRTCClientHandle");
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    it->second->ResetMediaCounters();
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
 WebRTCClientHandle webrtc_provider_client_create()
 {
     auto client               = std::make_unique<WebRTCTransportProviderClient>();

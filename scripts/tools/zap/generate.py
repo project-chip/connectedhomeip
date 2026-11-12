@@ -225,7 +225,7 @@ def matterPathFromZapPath(zap_config_path):
     if not target_path.endswith(".matter"):
         # We expect "something.zap" and don't handle corner cases of
         # multiple extensions. This is to work with existing codebase only
-        raise Exception("Unexpected input zap file  %s" % zap_config_path)
+        raise Exception(f"Unexpected input zap file  {zap_config_path}")
 
     return target_path
 
@@ -325,8 +325,9 @@ def runClangPrettifier(templates_file, output_dir):
             args = [clang_format, '-i']
             args.extend(clangOutputs)
             subprocess.check_call(args)
-            print('Formatted %d files using %s (%s)' %
-                  (len(clangOutputs), clang_format, subprocess.check_output([clang_format, '--version'])))
+            print(
+                f"Formatted {len(clangOutputs)} files using {clang_format} ({subprocess.check_output([clang_format, '--version'])})"
+            )
             for outputName in clangOutputs:
                 log.debug("Formatted: '%s'", outputName)
     except subprocess.CalledProcessError as err:
@@ -421,7 +422,7 @@ def main():
     if cmdLineArgs.delete_output_dir:
         shutil.rmtree(cmdLineArgs.outputDir)
     else:
-        print("Files generated in: %s" % cmdLineArgs.outputDir)
+        print(f"Files generated in: {cmdLineArgs.outputDir}")
 
 
 if __name__ == '__main__':

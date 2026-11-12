@@ -681,3 +681,34 @@
     return descriptionString;
 }
 @end
+
+@implementation MCMediaFileManagementClusterFileDescriptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _fileID = @(0);
+        _name = @"";
+        _size = @(0);
+        _mimeType = @"";
+        _imageURI = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MCMediaFileManagementClusterFileDescriptionStruct alloc] init];
+    other.fileID = self.fileID;
+    other.name = self.name;
+    other.size = self.size;
+    other.mimeType = self.mimeType;
+    other.imageURI = self.imageURI;
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fileID:%@; name:%@; size:%@; mimeType:%@; imageURI:%@; >", NSStringFromClass([self class]), _fileID, _name, _size, _mimeType, _imageURI];
+    return descriptionString;
+}
+@end

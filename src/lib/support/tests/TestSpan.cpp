@@ -29,6 +29,7 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 
@@ -263,6 +264,7 @@ TEST(TestSpan, TestSubSpan)
 
     subspan = span.SubSpan(1, 0);
     EXPECT_EQ(subspan.size(), 0u);
+    EXPECT_EQ(subspan.data(), &array[1]); // an empty span is not normalized to nullptr
 
     subspan = span.SubSpan(10);
     EXPECT_EQ(subspan.data(), &array[10]);
@@ -270,6 +272,7 @@ TEST(TestSpan, TestSubSpan)
 
     subspan = span.SubSpan(16);
     EXPECT_EQ(subspan.size(), 0u);
+    EXPECT_EQ(subspan.data(), array + 16); // one past the end, but still not nullptr
 }
 
 TEST(TestSpan, TestFromZclString)
@@ -284,6 +287,25 @@ TEST(TestSpan, TestFromZclString)
 
     CharSpan s2 = CharSpan::fromZclString(array);
     EXPECT_TRUE(s2.data_equal(CharSpan(str, 3)));
+
+    // A zero-length string yields an empty span that still points into the buffer.
+    constexpr uint8_t empty[2] = { 0, 0x41 };
+    EXPECT_TRUE(ByteSpan::fromZclString(empty).empty());
+    EXPECT_EQ(ByteSpan::fromZclString(empty).data(), &empty[1]);
+    EXPECT_TRUE(CharSpan::fromZclString(empty).empty());
+    EXPECT_EQ(CharSpan::fromZclString(empty).data(), reinterpret_cast<const char *>(&empty[1]));
+
+    // 0xFF (aka "null string") is treated as zero-length, likewise pointing into the buffer.
+    constexpr uint8_t nullString[2] = { 0xff, 0x41 };
+    EXPECT_TRUE(ByteSpan::fromZclString(nullString).empty());
+    EXPECT_EQ(ByteSpan::fromZclString(nullString).data(), &nullString[1]);
+
+    // A null pointer yields an empty span.
+    const uint8_t * nullPtr = nullptr;
+    EXPECT_TRUE(ByteSpan::fromZclString(nullPtr).empty());
+    EXPECT_EQ(ByteSpan::fromZclString(nullPtr).data(), nullptr);
+    EXPECT_TRUE(CharSpan::fromZclString(nullPtr).empty());
+    EXPECT_EQ(CharSpan::fromZclString(nullPtr).data(), nullptr);
 }
 
 TEST(TestSpan, TestFromCharString)
@@ -292,6 +314,27 @@ TEST(TestSpan, TestFromCharString)
 
     CharSpan s1 = CharSpan::fromCharString(str);
     EXPECT_TRUE(s1.data_equal(CharSpan(str, 3)));
+
+    ByteSpan s2 = ByteSpan::fromCharString(str);
+    EXPECT_TRUE(s2.data_equal(ByteSpan(reinterpret_cast<const uint8_t *>(str), 3)));
+
+    char mutableStr[] = "AcE";
+    EXPECT_TRUE(CharSpan::fromCharString(mutableStr).data_equal(s1));
+    EXPECT_TRUE(ByteSpan::fromCharString(mutableStr).data_equal(s2));
+
+    // An empty string yields an empty span that still points at the string.
+    static constexpr char emptyStr[] = "";
+    EXPECT_TRUE(CharSpan::fromCharString(emptyStr).empty());
+    EXPECT_EQ(CharSpan::fromCharString(emptyStr).data(), emptyStr);
+    EXPECT_TRUE(ByteSpan::fromCharString(emptyStr).empty());
+    EXPECT_EQ(ByteSpan::fromCharString(emptyStr).data(), reinterpret_cast<const uint8_t *>(emptyStr));
+
+    // A null pointer produces an empty span.
+    const char * nullStr = nullptr;
+    EXPECT_TRUE(CharSpan::fromCharString(nullStr).empty());
+    EXPECT_EQ(CharSpan::fromCharString(nullStr).data(), nullptr);
+    EXPECT_TRUE(ByteSpan::fromCharString(nullStr).empty());
+    EXPECT_EQ(ByteSpan::fromCharString(nullStr).data(), nullptr);
 }
 
 TEST(TestSpan, TestLiteral)
@@ -409,4 +452,81 @@ TEST(TestSpan, TestConstructorTypeDeduction)
     Span f(constNumsConstArray);
     EXPECT_TRUE(f.data_equal(Span<const uint8_t>(otherNums, 2)));
     static_assert(std::is_same_v<decltype(f), Span<const uint8_t>>);
+}
+
+TEST(TestSpan, TestFromCharSpan)
+{
+    CharSpan chars = "the quick brown fox ..."_span;
+    ByteSpan bytes = ByteSpan::fromCharSpan(chars);
+    EXPECT_EQ(bytes.size(), chars.size());
+    EXPECT_EQ(bytes.data(), reinterpret_cast<const uint8_t *>(chars.data()));
+
+    ByteSpan empty = ByteSpan::fromCharSpan(CharSpan());
+    EXPECT_TRUE(empty.empty());
+    EXPECT_EQ(empty.data(), nullptr);
+
+    // An empty (but non-null) CharSpan keeps its pointer.
+    ByteSpan emptyAtEnd = ByteSpan::fromCharSpan(chars.SubSpan(chars.size()));
+    EXPECT_TRUE(emptyAtEnd.empty());
+    EXPECT_EQ(emptyAtEnd.data(), reinterpret_cast<const uint8_t *>(chars.data()) + chars.size());
+
+    // These should be compile errors -- fromCharSpan only takes ByteSpan.
+    // ByteSpan disallowed1 = ByteSpan::fromCharSpan(bytes);
+    // CharSpan disallowed2 = CharSpan::fromCharSpan<const uint8_t>(chars);
+}
+
+// A zero-length TLV string yields a { nullptr, 0 } span, so these cases drive that value through
+// each copy helper. The assertions pin the normal contract; the null memmove argument itself is
+// reported only by -fsanitize=undefined.
+TEST(TestSpan, TestCopySpanToMutableSpanFromNullSource)
+{
+    const ByteSpan nullSource;
+    ASSERT_EQ(nullSource.data(), nullptr);
+
+    uint8_t buf[4] = { 1, 2, 3, 4 };
+    MutableByteSpan out(buf);
+    EXPECT_SUCCESS(CopySpanToMutableSpan(nullSource, out));
+    EXPECT_TRUE(out.empty());
+    EXPECT_EQ(buf[0], static_cast<uint8_t>(1));
+
+    MutableByteSpan nullOut;
+    EXPECT_SUCCESS(CopySpanToMutableSpan(nullSource, nullOut));
+    EXPECT_TRUE(nullOut.empty());
+}
+
+TEST(TestSpan, TestCopyCharSpanToMutableCharSpanFromNullSource)
+{
+    const CharSpan nullSource;
+    ASSERT_EQ(nullSource.data(), nullptr);
+
+    char buf[4] = { 'a', 'b', 'c', 'd' };
+    MutableCharSpan out(buf);
+    EXPECT_SUCCESS(CopyCharSpanToMutableCharSpan(nullSource, out));
+    EXPECT_TRUE(out.empty());
+    EXPECT_EQ(buf[0], 'a');
+
+    MutableCharSpan nullOut;
+    EXPECT_SUCCESS(CopyCharSpanToMutableCharSpan(nullSource, nullOut));
+    EXPECT_TRUE(nullOut.empty());
+}
+
+TEST(TestSpan, TestCopyCharSpanToMutableCharSpanWithTruncationFromNullSource)
+{
+    const CharSpan nullSource;
+    ASSERT_EQ(nullSource.data(), nullptr);
+
+    char buf[4] = { 'a', 'b', 'c', 'd' };
+    MutableCharSpan out(buf);
+    CopyCharSpanToMutableCharSpanWithTruncation(nullSource, out);
+    EXPECT_TRUE(out.empty());
+    EXPECT_EQ(buf[0], 'a');
+
+    MutableCharSpan nullOut;
+    CopyCharSpanToMutableCharSpanWithTruncation(nullSource, nullOut);
+    EXPECT_TRUE(nullOut.empty());
+
+    // Truncation means a non-empty source can reach the copy with a zero-size destination.
+    MutableCharSpan nullOutFromNonEmpty;
+    CopyCharSpanToMutableCharSpanWithTruncation("abc"_span, nullOutFromNonEmpty);
+    EXPECT_TRUE(nullOutFromNonEmpty.empty());
 }

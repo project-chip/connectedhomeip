@@ -52,6 +52,10 @@ using chip::app::Clusters::AccountLogin::Delegate;
 using chip::Protocols::InteractionModel::Status;
 using LoggedOutEvent = chip::app::Clusters::AccountLogin::Events::LoggedOut::Type;
 
+// Spec constraint on the Login command's SetupPIN field: a string of at least 8 characters.
+// This is a length check only; the PIN is never interpreted as a number, so leading zeros are fine.
+constexpr size_t kMinSetupPinLength = 8;
+
 static constexpr size_t kAccountLoginDeletageTableSize =
     MATTER_DM_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kAccountLoginDeletageTableSize <= kEmberInvalidEndpointIndex, "AccountLogin Delegate table size error");
@@ -129,6 +133,8 @@ public:
 
 private:
     CHIP_ERROR ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadOAuthLoggedInAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadFeatureMapAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 AccountLoginAttrAccess gAccountLoginAttrAccess;
@@ -137,11 +143,16 @@ CHIP_ERROR AccountLoginAttrAccess::Read(const app::ConcreteReadAttributePath & a
 {
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrReturnError(!isDelegateNull(delegate, endpoint), CHIP_NO_ERROR);
 
     switch (aPath.mAttributeId)
     {
     case app::Clusters::AccountLogin::Attributes::ClusterRevision::Id:
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
+    case app::Clusters::AccountLogin::Attributes::OAuthLoggedIn::Id:
+        return ReadOAuthLoggedInAttribute(endpoint, aEncoder, delegate);
+    case app::Clusters::AccountLogin::Attributes::FeatureMap::Id:
+        return ReadFeatureMapAttribute(endpoint, aEncoder, delegate);
     default:
         break;
     }
@@ -154,6 +165,19 @@ CHIP_ERROR AccountLoginAttrAccess::ReadRevisionAttribute(EndpointId endpoint, ap
 {
     uint16_t clusterRevision = delegate->GetClusterRevision(endpoint);
     return aEncoder.Encode(clusterRevision);
+}
+
+CHIP_ERROR AccountLoginAttrAccess::ReadOAuthLoggedInAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                              Delegate * delegate)
+{
+    return aEncoder.Encode(delegate->GetOAuthLoggedIn(endpoint));
+}
+
+CHIP_ERROR AccountLoginAttrAccess::ReadFeatureMapAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                           Delegate * delegate)
+{
+    uint32_t featureMap = delegate->GetFeatureMap(endpoint);
+    return aEncoder.Encode(featureMap);
 }
 
 } // anonymous namespace
@@ -187,6 +211,31 @@ exit:
     return true;
 }
 
+bool emberAfAccountLoginClusterGetDeviceAuthURICallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                        const Commands::GetDeviceAuthURI::DecodableType & /* commandData */)
+{
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    Delegate * delegate = GetDelegate(endpoint);
+    app::CommandResponseHelper<Commands::GetDeviceAuthURIResponse::Type> responder(command, commandPath);
+
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        delegate->HandleGetDeviceAuthURI(responder);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfAccountLoginClusterGetDeviceAuthURICallback error: %s", err.AsString());
+
+        command->AddStatus(commandPath, Status::Failure);
+    }
+
+    return true;
+}
+
 bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                              const Commands::Login::DecodableType & commandData)
 {
@@ -199,6 +248,12 @@ bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, cons
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    if (setupPin.size() < kMinSetupPinLength)
+    {
+        command->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
 
     if (!delegate->HandleLogin(tempAccountIdentifier, setupPin, nodeId))
     {
@@ -244,6 +299,7 @@ exit:
         // NodeId nodeId = getNodeId(commandObj);
         EventNumber eventNumber;
         LoggedOutEvent event{ .node = nodeId };
+        event.fabricIndex        = commandObj->GetAccessingFabricIndex();
         CHIP_ERROR logEventError = LogEvent(event, endpoint, eventNumber);
 
         if (CHIP_NO_ERROR != logEventError)

@@ -52,7 +52,7 @@ bool BindingCluster::IsValidBinding(const EndpointId localEndpoint, const Target
         }
     }
     // Entry has group id and no endpoint and node id
-    return (!entry.endpoint.HasValue() && !entry.node.HasValue() && entry.group.HasValue());
+    return (!entry.endpoint.HasValue() && !entry.node.HasValue() && entry.group.HasValue() && IsValidGroupId(entry.group.Value()));
 }
 
 CHIP_ERROR BindingCluster::CheckValidBindingList(const EndpointId localEndpoint, const DecodableBindingListType & bindingList,

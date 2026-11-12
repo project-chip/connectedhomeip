@@ -28,6 +28,10 @@
 
 #include <lib/support/CodeUtils.h>
 
+#include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
+
 // Note: CONFIG_BUILD_FOR_HOST_UNIT_TEST
 //
 // Certain unit tests are executed without a main dispatch queue, relying instead on a mock clock
@@ -96,8 +100,19 @@ namespace System {
         VerifyOrDie(nullptr != dispatchQueue);
 #endif
 
-        source = dispatch_source_create(sourceType, static_cast<uintptr_t>(watch->mFD), 0, dispatchQueue);
-        VerifyOrReturnError(nullptr != source, CHIP_ERROR_NO_MEMORY);
+        // The caller may close watch->mFD before async cancellation completes; watch a private dup.
+        int dupFD = ::fcntl(watch->mFD, F_DUPFD_CLOEXEC, 0);
+        if (dupFD < 0) {
+            watch->mPendingIO.Clear(flag);
+            return CHIP_ERROR_POSIX(errno);
+        }
+
+        source = dispatch_source_create(sourceType, static_cast<uintptr_t>(dupFD), 0, dispatchQueue);
+        if (nullptr == source) {
+            ::close(dupFD);
+            watch->mPendingIO.Clear(flag);
+            return CHIP_ERROR_NO_MEMORY;
+        }
 
         dispatch_source_set_event_handler(source, ^{
             if (watch->mPendingIO.Has(flag) && watch->mCallback != nullptr) {
@@ -105,6 +120,9 @@ namespace System {
                 events.Set(flag);
                 watch->mCallback(events, watch->mCallbackData);
             }
+        });
+        dispatch_source_set_cancel_handler(source, ^{
+            ::close(dupFD);
         });
         // only now we are sure the source exists and can become active
         dispatch_activate(source);

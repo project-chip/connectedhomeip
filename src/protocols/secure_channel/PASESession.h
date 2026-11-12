@@ -52,9 +52,7 @@ extern const char kSpake2pR2ISessionInfo[];
 
 inline constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
 
-class DLL_EXPORT PASESession : public Messaging::UnsolicitedMessageHandler,
-                               public Messaging::ExchangeDelegate,
-                               public PairingSession
+class DLL_EXPORT PASESession : public Messaging::UnsolicitedMessageHandler, public PairingSession
 {
 public:
     ~PASESession() override;

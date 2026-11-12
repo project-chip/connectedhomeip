@@ -31,8 +31,32 @@ include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cm
 # - config/esp32/components: Provides the 'chip' component (GN build wrapper)
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
+    "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common"
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/platform/esp32/led_widget"
 )
+
+# The ESP-Mosaico BSP comes from the checkout ESP_MOSAICO_BSP_PATH points at;
+# main/CMakeLists.txt insists on it for the Mosaico.
+if(${IDF_TARGET} STREQUAL "esp32s31")
+    set(ESP_MOSAICO_BSP_ROOT "$ENV{ESP_MOSAICO_BSP_PATH}")
+    if(EXISTS "${ESP_MOSAICO_BSP_ROOT}/components/esp-mosaico-bsp/CMakeLists.txt")
+        list(APPEND EXTRA_COMPONENT_DIRS
+            "${ESP_MOSAICO_BSP_ROOT}/components/esp-mosaico-bsp"
+            "${ESP_MOSAICO_BSP_ROOT}/components/mosaico_boot_splash"
+        )
+    endif()
+endif()
+
+if(${IDF_TARGET} STREQUAL "esp32")
+    list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components")
+else()
+    # screen-framework draws through the vendored TFT library, which only builds
+    # for the ESP32.  "main" implicitly requires every discovered component, so
+    # the framework has to be excluded rather than just left unused: its headers
+    # pull in tft.h as soon as CONFIG_HAVE_DISPLAY is set, whichever renderer
+    # that display happens to use.
+    list(APPEND EXCLUDE_COMPONENTS screen-framework)
+endif()
 
 # Compute project (output binary) name from the device selection.
 # ALL_DEVICES_ENABLED_DEVICES and ALL_DEVICES_APP_NAME may be passed as -D flags;
@@ -68,5 +92,10 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
 
 # -Werror=uninitialized will cause an error in "src/lib/support/LambdaBridge.h"
 idf_build_set_property(COMPILE_OPTIONS "-Wno-error=uninitialized" APPEND)
+
+# Designated initializers that leave trailing members to their defaults are used
+# throughout the code-driven data model. GCC 16 (ESP-IDF 6.2) warns on them under
+# -Wextra; the GN build of the CHIP library already passes this flag.
+idf_build_set_property(COMPILE_OPTIONS "-Wno-missing-field-initializers" APPEND)
 
 flashing_script()

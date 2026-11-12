@@ -190,7 +190,7 @@ void sl_matter_em4_check(uint32_t expected_idle_time_ms);
 // Keep the timerTask at the highest prio as some of our stacks tasks leverage eventing with timers.
 #define configTIMER_TASK_PRIORITY (55) /* Highest priority */
 #define configTIMER_QUEUE_LENGTH (10)
-#define configTIMER_TASK_STACK_DEPTH (1280 / sizeof(StackType_t))
+#define configTIMER_TASK_STACK_DEPTH (512 / sizeof(StackType_t))
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 #ifdef __NVIC_PRIO_BITS
@@ -227,7 +227,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION (0)
 #define configUSE_TICKLESS_IDLE_SIMPLE_DEBUG (1) /* See into vPortSuppressTicksAndSleep source code for explanation */
 #define configMAX_PRIORITIES (56)
-#define configMINIMAL_STACK_SIZE (320) /* Number of words to use for Idle and Timer stacks */
+#define configMINIMAL_STACK_SIZE (128) /* Number of words to use for Idle and Timer stacks */
 
 #ifdef HEAP_MONITORING
 #define configMAX_TASK_NAME_LEN (24)
@@ -301,7 +301,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configASSERT(x)                                                                                                            \
     if ((x) == 0)                                                                                                                  \
     {                                                                                                                              \
-        taskDISABLE_INTERRUPTS();                                                                                                  \
+        portDISABLE_INTERRUPTS();                                                                                                  \
         printf("\nFREERTOS ASSERT ( %s )\n", #x);                                                                                  \
         for (;;)                                                                                                                   \
             ;                                                                                                                      \
@@ -309,7 +309,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configASSERTNULL(x)                                                                                                        \
     if ((x) == NULL)                                                                                                               \
     {                                                                                                                              \
-        taskDISABLE_INTERRUPTS();                                                                                                  \
+        portDISABLE_INTERRUPTS();                                                                                                  \
         for (;;)                                                                                                                   \
             ;                                                                                                                      \
     }

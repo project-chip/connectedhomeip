@@ -146,9 +146,9 @@ class LightingMgrCmd(Cmd):
             except AttributeError:
                 doc = None
             if doc:
-                self.stdout.write("%s\n" % textwrap.dedent(doc))
+                self.stdout.write(f"{textwrap.dedent(doc)}\n")
             else:
-                self.stdout.write("No help on %s\n" % (line))
+                self.stdout.write(f"No help on {line}\n")
         else:
             self.print_topics(
                 "\nAvailable commands (type help <name> for more information):",
@@ -193,7 +193,7 @@ def attributeChangeCallback(
             #     clusterId, attributeId))
             pass
     else:
-        print("[PY] [ERR] unhandled endpoint {} ".format(endpoint))
+        print(f"[PY] [ERR] unhandled endpoint {endpoint} ")
 
 
 class Lighting:

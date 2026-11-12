@@ -256,6 +256,50 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AtomicRequestT
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::CertificationTypeEnum val)
+{
+    using EnumType = Globals::CertificationTypeEnum;
+    switch (val)
+    {
+    case EnumType::kDeviceAttestationPKI:
+    case EnumType::kOperationalPKI:
+    case EnumType::kVIDSignerPKI:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ClosurePanelTag val)
+{
+    using EnumType = Globals::ClosurePanelTag;
+    switch (val)
+    {
+    case EnumType::kLift:
+    case EnumType::kTilt:
+    case EnumType::kSliding:
+    case EnumType::kRotate:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ClosureTag val)
+{
+    using EnumType = Globals::ClosureTag;
+    switch (val)
+    {
+    case EnumType::kCovering:
+    case EnumType::kWindow:
+    case EnumType::kBarrier:
+    case EnumType::kCabinet:
+    case EnumType::kGate:
+    case EnumType::kGarageDoor:
+    case EnumType::kDoor:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LandmarkTag val)
 {
     using EnumType = Globals::LandmarkTag;
@@ -359,6 +403,18 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MeasurementTyp
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MediumType val)
+{
+    using EnumType = Globals::MediumType;
+    switch (val)
+    {
+    case EnumType::kAir:
+    case EnumType::kWater:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PositionTag val)
 {
     using EnumType = Globals::PositionTag;
@@ -401,6 +457,35 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositi
     case EnumType::kAbove:
     case EnumType::kFrontOf:
     case EnumType::kBehind:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::SemanticTagNamespaceId val)
+{
+    using EnumType = Globals::SemanticTagNamespaceId;
+    switch (val)
+    {
+    case EnumType::kCompassDirection:
+    case EnumType::kCompassLocation:
+    case EnumType::kDirection:
+    case EnumType::kLevel:
+    case EnumType::kLocation:
+    case EnumType::kNumber:
+    case EnumType::kPosition:
+    case EnumType::kElectricalMeasurement:
+    case EnumType::kCommodityTariffChronology:
+    case EnumType::kCommodityTariffDirection:
+    case EnumType::kLaundry:
+    case EnumType::kPowerSource:
+    case EnumType::kCommonArea:
+    case EnumType::kCommonLandmark:
+    case EnumType::kRelativePosition:
+    case EnumType::kClosure:
+    case EnumType::kClosurePanel:
+    case EnumType::kClosureWindow:
+    case EnumType::kClosureCabinet:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

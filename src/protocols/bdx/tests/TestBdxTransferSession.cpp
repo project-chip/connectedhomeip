@@ -699,6 +699,145 @@ TEST_F(TestBdxTransferSession, TestSendAcceptRejectsOversizeBlockSize)
     EXPECT_LE(initiatingSender.GetTransferBlockSize(), proposedBlockSize);
 }
 
+// Regression test: when the transfer has a definite length, a BlockEOF carrying more data than the remaining length must
+// be rejected with a LengthMismatch StatusReport, the same way an over-long Block is. PrepareBlock() does not enforce the
+// definite length on the sending side, so this injects a raw BlockEOF to exercise the receiving side.
+TEST_F(TestBdxTransferSession, TestBlockEOFExceedingDefiniteLengthIsRejected)
+{
+    TransferSession::OutputEvent outEvent;
+    TransferSession initiatingReceiver;
+    TransferSession respondingSender;
+
+    uint16_t proposedBlockSize     = 64;
+    uint64_t definiteLength        = 16;
+    uint16_t oversizeBlockLength   = 32; // within Max Block Size, but beyond the definite transfer length
+    TransferControlFlags driveMode = TransferControlFlags::kReceiverDrive;
+    System::Clock::Timeout timeout = System::Clock::Seconds16(24);
+
+    TransferSession::TransferInitData initOptions;
+    initOptions.TransferCtlFlags = driveMode;
+    initOptions.MaxBlockSize     = proposedBlockSize;
+    initOptions.StartOffset      = 0;
+    initOptions.Length           = definiteLength;
+    char testFileDes[9]          = { "test.txt" };
+    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
+    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+    initOptions.Metadata         = nullptr;
+    initOptions.MetadataLength   = 0;
+
+    BitFlags<TransferControlFlags> senderOpts;
+    senderOpts.Set(driveMode);
+
+    SendAndVerifyTransferInit(outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions, respondingSender,
+                              senderOpts, proposedBlockSize);
+
+    TransferSession::TransferAcceptData acceptData;
+    acceptData.ControlMode    = respondingSender.GetControlMode();
+    acceptData.StartOffset    = 0;
+    acceptData.Length         = definiteLength;
+    acceptData.MaxBlockSize   = proposedBlockSize;
+    acceptData.Metadata       = nullptr;
+    acceptData.MetadataLength = 0;
+
+    SendAndVerifyAcceptMsg(outEvent, respondingSender, TransferRole::kSender, acceptData, initiatingReceiver, initOptions);
+
+    SendAndVerifyQuery(respondingSender, initiatingReceiver, outEvent);
+
+    uint8_t fakeBlockData[64] = { 0 };
+    BlockEOF blockEOF;
+    blockEOF.BlockCounter = 0;
+    blockEOF.Data         = fakeBlockData;
+    blockEOF.DataLength   = oversizeBlockLength;
+
+    EXPECT_EQ(SendRawBdxMessage(blockEOF, MessageType::BlockEOF, initiatingReceiver), CHIP_NO_ERROR);
+
+    initiatingReceiver.PollOutput(outEvent, kNoAdvanceTime);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
+    VerifyStatusReport(outEvent.MsgData, StatusCode::kLengthMismatch);
+    EXPECT_EQ(initiatingReceiver.GetNumBytesProcessed(), 0u);
+}
+
+// Test that an empty block can be sent only as a BlockEOF, and that an empty BlockEOF can be sent with a null data pointer,
+// which is what a sender with no data left to send typically has.
+TEST_F(TestBdxTransferSession, TestEmptyBlocks)
+{
+    TransferSession::OutputEvent outEvent;
+    TransferSession initiatingReceiver;
+    TransferSession respondingSender;
+
+    uint16_t proposedBlockSize     = 64;
+    TransferControlFlags driveMode = TransferControlFlags::kReceiverDrive;
+    System::Clock::Timeout timeout = System::Clock::Seconds16(24);
+
+    TransferSession::TransferInitData initOptions;
+    initOptions.TransferCtlFlags = driveMode;
+    initOptions.MaxBlockSize     = proposedBlockSize;
+    initOptions.StartOffset      = 0;
+    initOptions.Length           = 0;
+    char testFileDes[9]          = { "test.txt" };
+    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
+    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+    initOptions.Metadata         = nullptr;
+    initOptions.MetadataLength   = 0;
+
+    BitFlags<TransferControlFlags> senderOpts;
+    senderOpts.Set(driveMode);
+
+    SendAndVerifyTransferInit(outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions, respondingSender,
+                              senderOpts, proposedBlockSize);
+
+    TransferSession::TransferAcceptData acceptData;
+    acceptData.ControlMode    = respondingSender.GetControlMode();
+    acceptData.StartOffset    = 0;
+    acceptData.Length         = 0;
+    acceptData.MaxBlockSize   = proposedBlockSize;
+    acceptData.Metadata       = nullptr;
+    acceptData.MetadataLength = 0;
+
+    SendAndVerifyAcceptMsg(outEvent, respondingSender, TransferRole::kSender, acceptData, initiatingReceiver, initOptions);
+
+    SendAndVerifyQuery(respondingSender, initiatingReceiver, outEvent);
+
+    uint8_t blockBuffer[1] = { 0 };
+    TransferSession::BlockData emptyBlock;
+    emptyBlock.Data   = blockBuffer;
+    emptyBlock.Length = 0;
+    emptyBlock.IsEof  = false;
+    // Only a BlockEOF may be empty, whether or not it has a data pointer.
+    EXPECT_EQ(respondingSender.PrepareBlock(emptyBlock), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyNoMoreOutput(respondingSender);
+    emptyBlock.Data = nullptr;
+    EXPECT_EQ(respondingSender.PrepareBlock(emptyBlock), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyNoMoreOutput(respondingSender);
+
+    TransferSession::BlockData nullDataWithLength;
+    nullDataWithLength.Data   = nullptr;
+    nullDataWithLength.Length = 1;
+    nullDataWithLength.IsEof  = true;
+    // A null data pointer is only allowed for an empty block.
+    EXPECT_EQ(respondingSender.PrepareBlock(nullDataWithLength), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyNoMoreOutput(respondingSender);
+
+    TransferSession::BlockData emptyBlockEOF;
+    emptyBlockEOF.Data   = nullptr;
+    emptyBlockEOF.Length = 0;
+    emptyBlockEOF.IsEof  = true;
+    EXPECT_EQ(respondingSender.PrepareBlock(emptyBlockEOF), CHIP_NO_ERROR);
+    respondingSender.PollOutput(outEvent, kNoAdvanceTime);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
+    VerifyBdxMessageToSend(outEvent, MessageType::BlockEOF);
+    VerifyNoMoreOutput(respondingSender);
+
+    EXPECT_EQ(AttachHeaderAndSend(outEvent.msgTypeData, std::move(outEvent.MsgData), initiatingReceiver), CHIP_NO_ERROR);
+    initiatingReceiver.PollOutput(outEvent, kNoAdvanceTime);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kBlockReceived);
+    EXPECT_EQ(outEvent.blockdata.Length, 0u);
+    EXPECT_TRUE(outEvent.blockdata.IsEof);
+    VerifyNoMoreOutput(initiatingReceiver);
+
+    SendAndVerifyBlockAck(respondingSender, initiatingReceiver, outEvent, true);
+}
+
 // Test that a TransferSession will emit kTransferTimeout if the specified timeout is exceeded while waiting for a response.
 TEST_F(TestBdxTransferSession, TestTimeout)
 {

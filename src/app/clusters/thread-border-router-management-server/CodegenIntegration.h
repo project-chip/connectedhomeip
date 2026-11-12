@@ -21,7 +21,7 @@
 #include <app/FailSafeContext.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
 #include <app/clusters/thread-border-router-management-server/thread-br-delegate.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -34,12 +34,11 @@ class ServerInstance
 {
 public:
     ServerInstance(EndpointId endpointId, Delegate * delegate, FailSafeContext & failSafeContext);
-    ~ServerInstance();
 
-    CHIP_ERROR Init();
+    CHIP_ERROR Init() { return mCluster.Register(); }
 
 private:
-    chip::app::RegisteredServerCluster<ThreadBorderRouterManagementCluster> mCluster;
+    chip::app::CodegenRegisteredServerCluster<ThreadBorderRouterManagementCluster> mCluster;
 };
 
 } // namespace ThreadBorderRouterManagement

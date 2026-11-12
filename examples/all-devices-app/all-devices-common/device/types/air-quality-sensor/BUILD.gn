@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 
 source_set("air-quality-sensor") {
   sources = [
+    "AirQualityOptionalClusters.h",
     "AirQualitySensor.cpp",
     "AirQualitySensor.h",
   ]
@@ -25,9 +26,17 @@ source_set("air-quality-sensor") {
     "${chip_root}/src/app/clusters/air-quality-server",
     "${chip_root}/src/app/clusters/concentration-measurement-server",
     "${chip_root}/src/app/clusters/identify-server",
+    "${chip_root}/src/app/clusters/relative-humidity-measurement-server",
+    "${chip_root}/src/app/clusters/temperature-measurement-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
+}
+
+source_set("simulated") {
+  sources = [ "impl/SimulatedAirQualitySensor.h" ]
+
+  public_deps = [ ":air-quality-sensor" ]
 }

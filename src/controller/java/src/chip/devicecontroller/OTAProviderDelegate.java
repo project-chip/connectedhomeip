@@ -30,6 +30,8 @@ public interface OTAProviderDelegate {
    * Called to handle a QueryImage command and is responsible for sending the response (if success)
    * or status (if error).
    *
+   * <p>Prefer overriding the 8-argument overload to receive {@code nodeId}.
+   *
    * @param vendorId Vendor ID applying to the OTA Requestor’s Node.
    * @param productId Product ID applying to the OTA Requestor’s Node.
    * @param softwareVersion Current version running on the OTA Requestor.
@@ -40,20 +42,67 @@ public interface OTAProviderDelegate {
    * @return QueryImageResponse Send Firmware image information, See detailed in {@link
    *     OTAProviderDelegate#QueryImageResponse}
    */
-  public QueryImageResponse handleQueryImage(
+  public default QueryImageResponse handleQueryImage(
       int vendorId,
       int productId,
       long softwareVersion,
       @Nullable Integer hardwareVersion,
       @Nullable String location,
       @Nullable Boolean requestorCanConsent,
-      @Nullable byte[] metadataForProvider);
+      @Nullable byte[] metadataForProvider) {
+    return null;
+  }
+
+  /**
+   * Handles a QueryImage command with the requestor's {@code nodeId}.
+   *
+   * <p>Defaults to the 7-argument {@code handleQueryImage} overload.
+   *
+   * @param nodeId OTA Requestor's Node ID.
+   * @param vendorId Vendor ID applying to the OTA Requestor's Node.
+   * @param productId Product ID applying to the OTA Requestor's Node.
+   * @param softwareVersion Current version running on the OTA Requestor.
+   * @param hardwareVersion OTA Requestor's hardware version. Can be set null.
+   * @param location OTA Requestor's current location. Can be set null.
+   * @param requestorCanConsent Whether user consent is required. Can be null.
+   * @param metadataForProvider Manufacturer-specific payload. Can be set null.
+   * @return QueryImageResponse Send Firmware image information, see {@link
+   *     OTAProviderDelegate#QueryImageResponse}
+   */
+  public default QueryImageResponse handleQueryImage(
+      long nodeId,
+      int vendorId,
+      int productId,
+      long softwareVersion,
+      @Nullable Integer hardwareVersion,
+      @Nullable String location,
+      @Nullable Boolean requestorCanConsent,
+      @Nullable byte[] metadataForProvider) {
+    return handleQueryImage(
+        vendorId,
+        productId,
+        softwareVersion,
+        hardwareVersion,
+        location,
+        requestorCanConsent,
+        metadataForProvider);
+  }
 
   /**
    * The callback will be invoked when receiving or responding to a QueryImage, it is called with an
    * ErrorCode.
    */
-  public void handleOTAQueryFailure(int error);
+  public default void handleOTAQueryFailure(int error) {}
+
+  /**
+   * Invoked when handling a QueryImage command from {@code nodeId} fails.
+   *
+   * @param nodeId OTA Requestor's Node ID
+   * @param error QueryImage response status or error code
+   */
+  public default void handleOTAQueryFailure(long nodeId, int error) {
+    handleOTAQueryFailure(error);
+  }
 
   /**
    * The callback will be invoked when BDX Transfer session is begined.
@@ -79,7 +128,7 @@ public interface OTAProviderDelegate {
   /**
    * The callback will be invoked when BDX Transfer session is ended.
    *
-   * @param nodeId errorCode if transfer is failed.
+   * @param errorCode error code if transfer is failed, or 0 on success.
    * @param nodeId OTA Requester's Node ID
    */
   public void handleBDXTransferSessionEnd(long errorCode, long nodeId);

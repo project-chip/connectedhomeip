@@ -50,6 +50,7 @@ amebad
 amebaiot
 AmebaZ
 amebaz2
+AMOLED
 ANC
 announcementReason
 AnnounceOTAProvider
@@ -125,6 +126,7 @@ AYNJV
 babaf
 backend
 backends
+backlight
 backticks
 backtrace
 backwards
@@ -178,6 +180,7 @@ BroadcastReceiver
 BromateConcentrationMeasurement
 BromodichloromethaneConcentrationMeasurement
 BromoformConcentrationMeasurement
+BSP
 bt
 btmgmt
 BTN
@@ -268,6 +271,7 @@ ClusterName
 ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
+ClosureControl
 CMAC
 cmake
 CMakeLists
@@ -280,10 +284,12 @@ COAP
 codeaurora
 codebase
 codec
+Codecov
 codegen
 CodeGenerator
 CodeLab
 codelabs
+CodeQL
 ColorControl
 Combinators
 Comcast
@@ -321,6 +327,7 @@ ContentApp's
 ContentAppPlatform
 ContentLaunch
 ContentLauncher
+ContentQueueing
 contrib
 controllee
 conv
@@ -437,6 +444,7 @@ DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
 DeviceTemperatureConfiguration
+devicetree
 Devkit
 DevKitC
 DevKitM
@@ -838,6 +846,7 @@ kDacPublicKey
 KeypadInput
 keypair
 keyset
+keystore
 kGroup
 kInvalidCommandId
 KitProg
@@ -885,6 +894,7 @@ libTransportLayer
 libudev
 libwebkitgtk
 lifecycle
+lifecycles
 lightbulb
 lightin
 LightingApp
@@ -1000,6 +1010,7 @@ Mockito
 ModeSelect
 modprobe
 Modustoolbox
+Mosaico
 moveMode
 MoveToHue
 MoveToLevel
@@ -1104,6 +1115,7 @@ operationalDataset
 operationalstate
 opkg
 OPTIGA
+optionals
 optionMask
 optionOverride
 optionsMask
@@ -1136,6 +1148,7 @@ otatesting
 otaURL
 OTBR
 otcli
+OTG
 OU
 outform
 outgoingCommands
@@ -1223,6 +1236,7 @@ ProductLabel
 ProductName
 ProductURL
 programmatically
+proguard
 proto
 protobuf
 protos
@@ -1306,6 +1320,7 @@ registry
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
+renderer
 Rendez
 RendezvousInformation
 RendezvousParameters
@@ -1320,6 +1335,7 @@ RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
+resync
 retargeting
 reusability
 reviwed
@@ -1376,6 +1392,7 @@ scm
 sco
 scp
 ScriptBinding
+scrollbar
 SDA
 SDB
 SDC
@@ -1405,6 +1422,7 @@ SetOTADownloader
 SetOtaRequestorDriver
 setpin
 setpoint
+setpoints
 SetpointRaiseLower
 SetRequestorInstance
 SetUpPINCode
@@ -1485,6 +1503,7 @@ subfolders
 submodule
 submodules
 subnet
+subobject
 subprocess
 SubscribeResponse
 SubscriptionId
@@ -1494,6 +1513,7 @@ subtypes
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
+superset
 suppressResponse
 svg
 SVR
@@ -1570,6 +1590,7 @@ TKIP
 TLS
 tlsr
 TLV
+TLX
 tmp
 tngvndl
 TODO
@@ -1589,6 +1610,8 @@ TotalVolatileOrganicCompoundsConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
+tradeoff
+tradeoffs
 transcoder
 TransferSession
 transitionTime
@@ -1616,6 +1639,7 @@ TXD
 txt
 uargument
 UART
+UBSan
 UDC
 udcport
 udhcpc
@@ -1641,9 +1665,11 @@ unpair
 unprovisioned
 unreferenced
 unregister
+unregisters
 unregistration
 Unsecure
 Unselect
+unsynchronized
 untrusted
 updateAvailable
 updateNotAvailable
@@ -1789,3 +1815,5 @@ zigbeealliance
 zigbeethread
 zsdk
 ZXing
+preflight
+xhigh

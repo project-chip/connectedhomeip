@@ -178,11 +178,13 @@ chip_test_suite("tests") {
     "TestDefaultSafeAttributePersistenceProvider.cpp",
     "TestDefaultTermsAndConditionsProvider.cpp",
     "TestDefaultThreadNetworkDirectoryStorage.cpp",
+    "TestDynamicAttributeMetadata.cpp",
     "TestEcosystemInformationCluster.cpp",
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
+    "TestFabricSensitiveAttributeRead.cpp",
     "TestFailSafeContext.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
@@ -224,6 +226,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/server:terms_and_conditions",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/app/tests:helpers",
+    "${chip_root}/src/app/tests/suites/commands/interaction_model",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/data-model-providers/codegen:instance-header",
@@ -251,9 +254,11 @@ chip_test_suite("tests") {
   # does not behave as expected on darwin
   if (chip_config_network_layer_ble && chip_device_platform == "linux") {
     test_sources += [ "TestCommissioningWindowManager.cpp" ]
+    sources = [ "CommissioningWindowManagerTestAccess.h" ]
     public_deps += [
       "${chip_root}/src/app/clusters/administrator-commissioning-server:administrator-commissioning-server",
       "${chip_root}/src/app/server",
+      "${chip_root}/src/lib/shell:shell",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
   }

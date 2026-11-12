@@ -26,13 +26,13 @@ import typing
 import xml.etree.ElementTree as ElementTree
 import zipfile
 from copy import deepcopy
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from enum import Enum, StrEnum, auto
 from importlib.resources.abc import Traversable
 
 import matter.clusters as Clusters
 import matter.testing.conformance as conformance_support
-from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceException,
+from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceException, ConformanceParseContext,
                                         ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
                                         parse_callable_from_xml)
 from matter.testing.data_model_errata import apply_errata, load_authoritative_errata
@@ -240,6 +240,10 @@ class XmlCommand:
     name: str
     conformance: ConformanceCallable
     privilege: int
+    # Field ID to command field definition (including per-field constraints).
+    # XmlDataTypeComponent is reused here because command fields carry the same
+    # shape as struct fields in the data model XML (id/name/type/quality/constraint).
+    fields: dict[uint, XmlDataTypeComponent] = field(default_factory=dict)
 
     def __str__(self):
         return f'{self.name} id:0x{self.id:02X} {self.id} conformance: {str(self.conformance)} privilege: {str(self.privilege)}'
@@ -384,8 +388,10 @@ ALIAS_PICS = {0x040C: 'CMOCONC',
               0x042D: 'PMKCONC',
               0x042E: 'TVOCCONC',
               0x042F: 'RNCONC',
+              0x0434: 'SMOKECONC',
               0x0071: 'HEPAFREMON',
               0x0072: 'ACFREMON',
+              0x0079: 'WTLREPMON',
               0x0405: 'RH',
               0x001C: 'PWM'}
 
@@ -935,18 +941,40 @@ class ClusterParser:
         return features
 
     def parse_attribute_constraints(self, element: ElementTree.Element) -> Constraints | None:
-        """Parse constraint information from an attribute element.
+        """Parse constraint information from an attribute or command field element.
+
+        An element may carry several sibling <constraint> children, each holding one
+        alternative the value may satisfy (e.g. AudioStreamAllocate.BitDepth allows 8,
+        16, 24 or 32, one <constraint><allowed> per value). All of them are parsed and
+        folded into a single Constraints object so that no alternative is dropped.
 
         Args:
-            element: The attribute XML element
+            element: The attribute or command field XML element
 
         Returns:
             Constraints object, or None if no constraints are defined
         """
-        # Find the constraint element
-        constraint_elem = element.find('./constraint')
-        if constraint_elem is None:
+        constraint_elems = element.findall('./constraint')
+        if not constraint_elems:
             return None
+
+        merged = self._parse_single_constraint(constraint_elems[0])
+        for constraint_elem in constraint_elems[1:]:
+            additional = self._parse_single_constraint(constraint_elem)
+            if additional.allowed is not None:
+                merged.allowed = (merged.allowed or []) + additional.allowed
+            # Bounds are not combined: a later <constraint> only supplies bounds the
+            # earlier ones left unset, so a single-constraint element parses exactly
+            # as it did before.
+            for constraint_field in fields(Constraints):
+                if constraint_field.name == 'allowed':
+                    continue
+                if getattr(merged, constraint_field.name) is None:
+                    setattr(merged, constraint_field.name, getattr(additional, constraint_field.name))
+        return merged
+
+    def _parse_single_constraint(self, constraint_elem: ElementTree.Element) -> Constraints:
+        """Parse one <constraint> element into a Constraints object."""
 
         # Helper to parse constraint reference from attribute value or element
         def parse_reference(elem: ElementTree.Element, value_str: str | None = None) -> ConstraintReference | None:
@@ -1163,6 +1191,36 @@ class ClusterParser:
                                            privilege=get_access_privilege_or_unknown(privilege)))
         return commands
 
+    def parse_command_fields(self, element: ElementTree.Element) -> dict[uint, XmlDataTypeComponent]:
+        """Parse the <field> children of a command element, including per-field constraints.
+
+        Command fields use the same XML shape as struct fields (id/name/type plus
+        optional <quality> and <constraint> children), so they are represented with
+        XmlDataTypeComponent. Constraints are parsed with parse_attribute_constraints,
+        which handles the full constraint vocabulary (min/max/between, minLength/
+        maxLength, minCount/maxCount, allowed, and attribute references).
+        """
+        fields: dict[uint, XmlDataTypeComponent] = {}
+        location = ClusterPathLocation(0, int(self._cluster_id) if self._cluster_id is not None else 0)
+        for xml_field in element.findall('./field'):
+            if 'id' not in xml_field.attrib or 'name' not in xml_field.attrib:
+                self._problems.append(ProblemNotice(
+                    "Spec XML Parsing", location=location, severity=ProblemSeverity.WARNING,
+                    problem=f"Field in command {element.attrib.get('name', '?')} with no id or name"))
+                continue
+            fid = uint(int(xml_field.attrib['id'], 0))
+            fields[fid] = XmlDataTypeComponent(
+                value=fid,
+                name=xml_field.attrib['name'],
+                conformance=self._parse_field_conformance(xml_field),
+                summary=xml_field.attrib.get('summary', None),
+                type_info=xml_field.attrib.get('type', None),
+                is_optional=self._isOptionalField(xml_field),
+                is_nullable=self._isNullableField(xml_field),
+                constraints=self.parse_attribute_constraints(xml_field),
+            )
+        return fields
+
     def parse_commands(self, command_type: CommandType) -> dict[uint, XmlCommand]:
         commands: dict[uint, XmlCommand] = {}
         for element, conformance_xml, access_xml in self.command_elements:
@@ -1177,7 +1235,8 @@ class ClusterParser:
 
             _, _, privilege = self.parse_access(element, access_xml, conformance)
             commands[uint(code)] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
-                                              privilege=get_access_privilege_or_unknown(privilege))
+                                              privilege=get_access_privilege_or_unknown(privilege),
+                                              fields=self.parse_command_fields(element))
         return commands
 
     def parse_events(self) -> dict[uint, XmlEvent]:
@@ -1274,6 +1333,7 @@ class PrebuiltDataModelDirectory(Enum):
     k1_5_1 = auto()
     k1_6 = auto()
     k1_6_1 = auto()
+    k1_7 = auto()
 
     @property
     def dirname(self):
@@ -1295,7 +1355,9 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.6"
         if self == PrebuiltDataModelDirectory.k1_6_1:
             return "1.6.1"
-        raise KeyError("Invalid enum: %r" % self)
+        if self == PrebuiltDataModelDirectory.k1_7:
+            return "1.7"
+        raise KeyError(f"Invalid enum: {self!r}")
 
 
 class DataModelLevel(Enum):
@@ -1314,7 +1376,7 @@ class DataModelLevel(Enum):
             return "globals"
         if self == DataModelLevel.kNamespace:
             return "namespaces"
-        raise KeyError("Invalid enum: %r" % self)
+        raise KeyError(f"Invalid enum: {self!r}")
 
 
 def get_data_model_directory(data_model_directory: PrebuiltDataModelDirectory | Traversable,
@@ -1777,7 +1839,10 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                     problems.append(tmp_problem)
                     continue
                 cluster_conformance_params = ConformanceParseParameters(
-                    feature_map=cluster_definition_xml[cid].feature_map, attribute_map=cluster_definition_xml[cid].attribute_map, command_map=cluster_definition_xml[cid].command_map)
+                    feature_map=cluster_definition_xml[cid].feature_map,
+                    attribute_map=cluster_definition_xml[cid].attribute_map,
+                    command_map=cluster_definition_xml[cid].command_map,
+                    context=ConformanceParseContext.DEVICE_TYPE)
                 conformance = parse_callable_from_xml(conformance_xml, cluster_conformance_params)
                 side_dict = {'server': ClusterSide.SERVER, 'client': ClusterSide.CLIENT}
                 side = side_dict[c.attrib['side']]
@@ -2014,6 +2079,40 @@ def build_xml_global_data_types(data_model_directory: PrebuiltDataModelDirectory
     return global_data_types, problems
 
 
+# BasicInformation.SpecificationVersion value for each pre-built data model. Matter 1.2 has no
+# SpecificationVersion attribute, so it is intentionally absent here.
+# Every PrebuiltDataModelDirectory other than k1_2 must appear as a value, which
+# TestSpecParsingSupport.test_prebuilt_data_model_mappings_complete enforces.
+_SPEC_VERSION_TO_DM: dict[int, PrebuiltDataModelDirectory] = {
+    0x01030000: PrebuiltDataModelDirectory.k1_3,
+    0x01040000: PrebuiltDataModelDirectory.k1_4,
+    0x01040100: PrebuiltDataModelDirectory.k1_4_1,
+    0x01040200: PrebuiltDataModelDirectory.k1_4_2,
+    0x01050000: PrebuiltDataModelDirectory.k1_5,
+    0x01050100: PrebuiltDataModelDirectory.k1_5_1,
+    0x01060000: PrebuiltDataModelDirectory.k1_6,
+    0x01060100: PrebuiltDataModelDirectory.k1_6_1,
+    0x01070000: PrebuiltDataModelDirectory.k1_7,
+}
+
+# BasicInformation.DataModelRevision reported by a node certified against each pre-built data
+# model. Several Matter releases share a DataModelRevision, so this is not one entry per
+# specification version. Every PrebuiltDataModelDirectory must appear as a key, which
+# TestSpecParsingSupport.test_prebuilt_data_model_mappings_complete enforces.
+_DM_TO_DATA_MODEL_REVISION: dict[PrebuiltDataModelDirectory, int] = {
+    PrebuiltDataModelDirectory.k1_2: 17,
+    PrebuiltDataModelDirectory.k1_3: 17,
+    PrebuiltDataModelDirectory.k1_4: 18,
+    PrebuiltDataModelDirectory.k1_4_1: 18,
+    PrebuiltDataModelDirectory.k1_4_2: 19,
+    PrebuiltDataModelDirectory.k1_5: 19,
+    PrebuiltDataModelDirectory.k1_5_1: 20,
+    PrebuiltDataModelDirectory.k1_6: 21,
+    PrebuiltDataModelDirectory.k1_6_1: 21,
+    PrebuiltDataModelDirectory.k1_7: 22,
+}
+
+
 def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirectory:
     ''' Returns the data model directory for a given specification revision.
 
@@ -2027,18 +2126,20 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
         # The expression (specification_version & uint(0xFFFF00FF)) might be inferred as int by mypy.
         specification_version = typing.cast(uint, specification_version & uint(0xFFFF00FF))
 
-    version_to_dm = {
-        0x01030000: PrebuiltDataModelDirectory.k1_3,
-        0x01040000: PrebuiltDataModelDirectory.k1_4,
-        0x01040100: PrebuiltDataModelDirectory.k1_4_1,
-        0x01040200: PrebuiltDataModelDirectory.k1_4_2,
-        0x01050000: PrebuiltDataModelDirectory.k1_5,
-        0x01050100: PrebuiltDataModelDirectory.k1_5_1,
-        0x01060000: PrebuiltDataModelDirectory.k1_6,
-        0x01060100: PrebuiltDataModelDirectory.k1_6_1,
-    }
-
-    if specification_version not in version_to_dm:
+    if specification_version not in _SPEC_VERSION_TO_DM:
         raise ConformanceException(f"Unknown specification_version 0x{specification_version:08X}")
 
-    return version_to_dm[specification_version]
+    return _SPEC_VERSION_TO_DM[specification_version]
+
+
+def data_model_revision_from_dm(data_model_directory: PrebuiltDataModelDirectory) -> int:
+    ''' Returns the BasicInformation.DataModelRevision expected of a node certified against a data model.
+
+        input: PrebuiltDataModelDirectory
+        output: the DataModelRevision value that data model requires
+        raises: ConformanceException if the given data model has no known DataModelRevision
+    '''
+    if data_model_directory not in _DM_TO_DATA_MODEL_REVISION:
+        raise ConformanceException(f"No known DataModelRevision for {data_model_directory.name}")
+
+    return _DM_TO_DATA_MODEL_REVISION[data_model_directory]

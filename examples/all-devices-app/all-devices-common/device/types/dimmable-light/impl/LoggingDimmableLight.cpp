@@ -23,7 +23,14 @@ namespace chip {
 namespace app {
 
 LoggingDimmableLight::LoggingDimmableLight(const Context & context, const Config & config) :
-    LoggingDimmableLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmableLight, 1), context, config)
+    DimmableLight(context,
+                  Delegates{
+                      .onOff        = *this,
+                      .levelControl = *this,
+                      .effect       = *this,
+                      .identify     = context.identifyDelegate,
+                  },
+                  config)
 {}
 
 } // namespace app

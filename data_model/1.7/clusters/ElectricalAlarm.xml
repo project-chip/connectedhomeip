@@ -1,0 +1,504 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x00A1" name="Electrical Alarm Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x00A1" name="Electrical Alarm">
+      <provisionalConform/>
+    </clusterId>
+  </clusterIds>
+  <classification hierarchy="derived" baseCluster="Alarm Base" role="utility" picsCode="ESALM" scope="Endpoint"/>
+  <features>
+    <feature bit="20" code="ADJUST" name="AdjustableThresholds" summary="Supports the ability to adjust the thresholds of alarms">
+      <optionalConform/>
+    </feature>
+    <feature bit="21" code="OVERVOLT" name="OverVoltage" summary="Supports activating alarms when a voltage measurement exceeds a threshold">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="22" code="UNDERVOLT" name="UnderVoltage" summary="Supports activating alarms when a voltage measurement falls below a threshold">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="23" code="OVERFREQ" name="OverFrequency" summary="Supports activating alarms when a frequency measurement exceeds a threshold">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="24" code="UNDERFREQ" name="UnderFrequency" summary="Supports activating alarms when a frequency measurement falls below a threshold">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="25" code="OVERPOWER" name="OverPower" summary="Supports activating alarms when a power measurement exceeds a threshold">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="26" code="UNDERPOWER" name="UnderPower" summary="Supports activating alarms when a power measurement falls below a threshold">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="27" code="OVERCUR" name="OverCurrent" summary="Supports activating alarms when a current measurement exceeds a threshold">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="28" code="UNDERCUR" name="UnderCurrent" summary="Supports activating alarms when a current measurement falls below a threshold">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="29" code="POWERIMP" name="PowerImport" summary="Supports activating alarms when power imported measurement exceeds a threshold">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="30" code="POWEREXP" name="PowerExport" summary="Supports activating alarms when power exported measurement falls below a threshold">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+  </features>
+  <dataTypes>
+    <bitmap name="AlarmBitmap">
+      <bitfield name="OverVoltage" bit="0" summary="The voltage exceeds the defined threshold">
+        <mandatoryConform>
+          <feature name="OVERVOLT"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="UnderVoltage" bit="1" summary="The voltage drops below the defined threshold">
+        <mandatoryConform>
+          <feature name="UNDERVOLT"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="OverFrequency" bit="2" summary="The frequency exceeds the defined threshold">
+        <mandatoryConform>
+          <feature name="OVERFREQ"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="UnderFrequency" bit="3" summary="The frequency drops below the defined threshold">
+        <mandatoryConform>
+          <feature name="UNDERFREQ"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="OverPower" bit="4" summary="The power draw exceeds the defined threshold">
+        <mandatoryConform>
+          <feature name="OVERPOWER"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="UnderPower" bit="5" summary="The power drops below the defined threshold">
+        <mandatoryConform>
+          <feature name="UNDERPOWER"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="OverCurrent" bit="6" summary="The current exceeds the defined threshold">
+        <mandatoryConform>
+          <feature name="OVERCUR"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="UnderCurrent" bit="7" summary="The current drops below the defined threshold">
+        <mandatoryConform>
+          <feature name="UNDERCUR"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="FrequencyQuality" bit="8" summary="The frequency quality deviates from acceptable standards">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="VoltageQuality" bit="9" summary="The voltage quality deviates from acceptable standards">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="SwappedPolarity" bit="10" summary="The polarity of the electrical connection is swapped">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="LossOfMeasurement" bit="11" summary="The system fails to measure electrical parameters">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="LossOfGridPower" bit="12" summary="The grid power supply is lost">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="PowerImported" bit="13" summary="Power is currently being imported above the defined threshold">
+        <mandatoryConform>
+          <feature name="POWERIMP"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="PowerExported" bit="14" summary="Power is currently being exported above the defined threshold">
+        <mandatoryConform>
+          <feature name="POWEREXP"/>
+        </mandatoryConform>
+      </bitfield>
+    </bitmap>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0080" name="OverVoltageThreshold" type="voltage-mV" default="4611686018427387904">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="OVERVOLT"/>
+      </mandatoryConform>
+      <constraint>
+        <min>
+          <compute>
+            <operation>add</operation>
+            <left>
+              <attribute name="UnderVoltageThreshold"/>
+            </left>
+            <right value="1"/>
+          </compute>
+        </min>
+      </constraint>
+    </attribute>
+    <attribute id="0x0081" name="UnderVoltageThreshold" type="voltage-mV" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="UNDERVOLT"/>
+      </mandatoryConform>
+      <constraint>
+        <max>
+          <compute>
+            <operation>subtract</operation>
+            <left>
+              <attribute name="OverVoltageThreshold"/>
+            </left>
+            <right value="1"/>
+          </compute>
+        </max>
+      </constraint>
+    </attribute>
+    <attribute id="0x0082" name="OverFrequencyThreshold" type="int64" default="1000000">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="OVERFREQ"/>
+      </mandatoryConform>
+      <constraint>
+        <min>
+          <compute>
+            <operation>add</operation>
+            <left>
+              <attribute name="UnderFrequencyThreshold"/>
+            </left>
+            <right value="1"/>
+          </compute>
+        </min>
+      </constraint>
+    </attribute>
+    <attribute id="0x0083" name="UnderFrequencyThreshold" type="int64" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="UNDERFREQ"/>
+      </mandatoryConform>
+      <constraint>
+        <max>
+          <compute>
+            <operation>subtract</operation>
+            <left>
+              <attribute name="OverFrequencyThreshold"/>
+            </left>
+            <right value="1"/>
+          </compute>
+        </max>
+      </constraint>
+    </attribute>
+    <attribute id="0x0084" name="OverPowerThreshold" type="power-mW" default="4611686018427387904">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="OVERPOWER"/>
+      </mandatoryConform>
+      <constraint>
+        <min>
+          <compute>
+            <operation>add</operation>
+            <left>
+              <attribute name="UnderPowerThreshold"/>
+            </left>
+            <right value="1"/>
+          </compute>
+        </min>
+      </constraint>
+    </attribute>
+    <attribute id="0x0085" name="UnderPowerThreshold" type="power-mW" default="-4611686018427387904">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="UNDERPOWER"/>
+      </mandatoryConform>
+      <constraint>
+        <max>
+          <compute>
+            <operation>subtract</operation>
+            <left>
+              <attribute name="OverPowerThreshold"/>
+            </left>
+            <right value="1"/>
+          </compute>
+        </max>
+      </constraint>
+    </attribute>
+    <attribute id="0x0086" name="OverCurrentThreshold" type="amperage-mA" default="4611686018427387904">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="OVERCUR"/>
+      </mandatoryConform>
+      <constraint>
+        <min>
+          <compute>
+            <operation>add</operation>
+            <left>
+              <attribute name="UnderCurrentThreshold"/>
+            </left>
+            <right value="1"/>
+          </compute>
+        </min>
+      </constraint>
+    </attribute>
+    <attribute id="0x0087" name="UnderCurrentThreshold" type="amperage-mA" default="-4611686018427387904">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="UNDERCUR"/>
+      </mandatoryConform>
+      <constraint>
+        <max>
+          <compute>
+            <operation>subtract</operation>
+            <left>
+              <attribute name="OverCurrentThreshold"/>
+            </left>
+            <right value="1"/>
+          </compute>
+        </max>
+      </constraint>
+    </attribute>
+    <attribute id="0x0088" name="PowerImportThreshold" type="power-mW" default="4611686018427387904">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="POWERIMP"/>
+      </mandatoryConform>
+      <constraint>
+        <min>
+          <maxOf>
+            <value>0</value>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <attribute name="PowerExportThreshold"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </maxOf>
+        </min>
+      </constraint>
+    </attribute>
+    <attribute id="0x0089" name="PowerExportThreshold" type="power-mW" default="-4611686018427387904">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="POWEREXP"/>
+      </mandatoryConform>
+      <constraint>
+        <max>
+          <minOf>
+            <value>0</value>
+            <compute>
+              <operation>subtract</operation>
+              <left>
+                <attribute name="PowerImportThreshold"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </minOf>
+        </max>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x80" name="SetElectricalAlarmThresholds" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="ADJUST"/>
+      </mandatoryConform>
+      <field id="0" name="OverVoltageThreshold" type="voltage-mV" default="4611686018427387904">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="OVERVOLT"/>
+        </optionalConform>
+        <constraint>
+          <min>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <field name="UnderVoltageThreshold"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </min>
+        </constraint>
+      </field>
+      <field id="1" name="UnderVoltageThreshold" type="voltage-mV" default="0">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="UNDERVOLT"/>
+        </optionalConform>
+        <constraint>
+          <max>
+            <compute>
+              <operation>subtract</operation>
+              <left>
+                <field name="OverVoltageThreshold"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </max>
+        </constraint>
+      </field>
+      <field id="2" name="OverFrequencyThreshold" type="int64" default="1000000">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="OVERFREQ"/>
+        </optionalConform>
+        <constraint>
+          <min>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <field name="UnderFrequencyThreshold"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </min>
+        </constraint>
+      </field>
+      <field id="3" name="UnderFrequencyThreshold" type="int64" default="0">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="UNDERFREQ"/>
+        </optionalConform>
+        <constraint>
+          <max>
+            <compute>
+              <operation>subtract</operation>
+              <left>
+                <field name="OverFrequencyThreshold"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </max>
+        </constraint>
+      </field>
+      <field id="4" name="OverPowerThreshold" type="power-mW" default="4611686018427387904">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="OVERPOWER"/>
+        </optionalConform>
+        <constraint>
+          <min>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <field name="UnderPowerThreshold"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </min>
+        </constraint>
+      </field>
+      <field id="5" name="UnderPowerThreshold" type="power-mW" default="-4611686018427387904">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="UNDERPOWER"/>
+        </optionalConform>
+        <constraint>
+          <max>
+            <compute>
+              <operation>subtract</operation>
+              <left>
+                <field name="OverPowerThreshold"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </max>
+        </constraint>
+      </field>
+      <field id="6" name="OverCurrentThreshold" type="amperage-mA" default="4611686018427387904">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="OVERCUR"/>
+        </optionalConform>
+        <constraint>
+          <min>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <field name="UnderCurrentThreshold"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </min>
+        </constraint>
+      </field>
+      <field id="7" name="UnderCurrentThreshold" type="amperage-mA" default="-4611686018427387904">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="UNDERCUR"/>
+        </optionalConform>
+        <constraint>
+          <max>
+            <compute>
+              <operation>subtract</operation>
+              <left>
+                <field name="OverCurrentThreshold"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </max>
+        </constraint>
+      </field>
+      <field id="8" name="PowerImportThreshold" type="power-mW" default="4611686018427387904">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="POWERIMP"/>
+        </optionalConform>
+        <constraint>
+          <min value="0"/>
+        </constraint>
+      </field>
+      <field id="9" name="PowerExportThreshold" type="power-mW" default="-4611686018427387904">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="POWEREXP"/>
+        </optionalConform>
+        <constraint>
+          <max value="0"/>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+</cluster>

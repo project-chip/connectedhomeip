@@ -18,9 +18,11 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-
 #include <app/CommandResponseHelper.h>
+#include <clusters/KeypadInput/Commands.h>
+#include <clusters/KeypadInput/Enums.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/TypeTraits.h>
 
 namespace chip {
 namespace app {
@@ -33,10 +35,23 @@ namespace KeypadInput {
 class Delegate
 {
 public:
+    /// Handles a SendKey command.
+    ///
+    /// The delegate is expected to answer through `helper` (either with a SendKeyResponse via
+    /// `helper.Success(response)` or with a status via `helper.Failure(...)`) before returning.
+    /// If no answer is sent, the cluster replies with a `Failure` status.
     virtual void HandleSendKey(CommandResponseHelper<Commands::SendKeyResponse::Type> & helper, const CECKeyCodeEnum & keyCode) = 0;
 
-    bool HasFeature(chip::EndpointId endpoint, Feature feature);
+    bool HasFeature(chip::EndpointId endpoint, Feature feature)
+    {
+        return (GetFeatureMap(endpoint) & chip::to_underlying(feature)) != 0;
+    }
 
+    /// Returns the value reported by the FeatureMap attribute of the cluster on `endpoint`.
+    ///
+    /// The returned value is read on every FeatureMap read. Changes are not reported to subscribers.
+    /// Implementations must not read the FeatureMap attribute of the Keypad Input cluster through
+    /// the data model, as that read calls back into this method.
     virtual uint32_t GetFeatureMap(chip::EndpointId endpoint) = 0;
 
     virtual ~Delegate() = default;

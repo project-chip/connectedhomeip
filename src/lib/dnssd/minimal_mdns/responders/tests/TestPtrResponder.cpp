@@ -21,8 +21,8 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/dnssd/minimal_mdns/Parser.h>
-#include <lib/dnssd/minimal_mdns/RecordData.h>
+#include <lib/dnssd/wire/Parser.h>
+#include <lib/dnssd/wire/RecordData.h>
 
 namespace {
 
@@ -30,6 +30,7 @@ using namespace chip;
 using namespace chip::Encoding;
 using namespace chip::Inet;
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 constexpr uint16_t kMdnsPort = 5353;
 

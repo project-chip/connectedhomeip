@@ -20,6 +20,7 @@
 #include <string.h>
 
 #include <lib/core/Optional.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -43,6 +44,17 @@
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#if __has_include(<app-common/zap-generated/cluster-objects.h>)
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#else
+// Some builds expose the generated headers under zzz_generated
+#include <zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.h>
+#include <zzz_generated/app-common/app-common/zap-generated/cluster-objects.h>
+#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
 #include "ConnectivityManagerImpl.h"
 #include "ConnectivityUtils.h"
 
@@ -51,6 +63,10 @@ using namespace ::chip::DeviceLayer::NetworkCommissioning;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 using namespace ::chip::WiFiPAF;
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+using chip::app::DataModel::List;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 namespace chip {
 namespace DeviceLayer {
@@ -95,6 +111,17 @@ void ConnectivityManagerImpl::UpdateEthernetNetworkingStatus()
     }
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+CHIP_ERROR ConnectivityManagerImpl::SetWiFiIfName(const char * ifName)
+{
+    VerifyOrReturnError(ifName != nullptr && strlen(ifName) < sizeof(sWiFiIfName), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(ConnectivityUtils::IsValidInterface(ifName), CHIP_ERROR_INVALID_ARGUMENT);
+    Platform::CopyString(sWiFiIfName, ifName);
+    ChipLogProgress(DeviceLayer, "Using WiFi interface: %s", sWiFiIfName);
+    return CHIP_NO_ERROR;
+}
+#endif
+
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -130,7 +157,14 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
+    // A WiFi interface name may have been configured explicitly (e.g. via the --wifi=<interface>
+    // command line option), in which case it has already been stored in sWiFiIfName. Only fall
+    // back to auto-detection when no interface has been set.
+    if (sWiFiIfName[0] != '\0')
+    {
+        ChipLogProgress(DeviceLayer, "Using WiFi interface: %s", sWiFiIfName);
+    }
+    else if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got WiFi interface: %s", sWiFiIfName);
     }
