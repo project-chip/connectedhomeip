@@ -90,6 +90,9 @@ protected:
 private:
     bool mProcessingOutputEvents = false;
 
+    // Whether the response timeout ended the transfer.
+    bool mResponseTimedOut = false;
+
     // The Exchange holder that holds the exchange context used for sending and receiving BDX messages.
     Messaging::ExchangeHolder mExchange;
 
