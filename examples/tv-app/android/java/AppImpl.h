@@ -104,8 +104,7 @@ public:
         mAccountLoginDelegate(commandDelegate, setupPIN),
         mContentLauncherDelegate(attributeDelegate, { "image/*", "video/*" },
                                  to_underlying(SupportedProtocolsBitmap::kDash) | to_underlying(SupportedProtocolsBitmap::kHls)),
-        mKeypadInputDelegate(commandDelegate),
-        mMediaPlaybackDelegate(attributeDelegate),
+        mKeypadInputDelegate(commandDelegate), mMediaPlaybackDelegate(attributeDelegate),
         mTargetNavigatorDelegate(attributeDelegate, { "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
 
