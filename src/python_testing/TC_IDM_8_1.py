@@ -119,8 +119,7 @@ class TC_IDM_8_1(IDMBaseTest):
     @async_test_body
     async def test_TC_IDM_8_1(self):
         self.step(0, "TH1 commissions the DUT, TH1 opens a commissioning window and TH2 commissions the DUT onto a second fabric. TH1 and TH2 read CurrentFabricIndex, stored as F1 and F2.",
-                  expectation="The DUT is a member of both fabrics and reports a distinct fabric index to each controller.",
-                  is_commissioning=True)
+                  expectation="The DUT is a member of both fabrics and reports a distinct fabric index to each controller.")
         await self.setup_class_helper(allow_pase=False)
         self.build_spec_xmls()
 
@@ -250,7 +249,7 @@ class TC_IDM_8_1(IDMBaseTest):
         asserts.assert_equal(fabric_label(fabrics_th2_after, f1, "TH2's Fabrics read"), FABRIC_LABEL_TH1,
                              "TH2 must observe the label TH1 set on its own fabric")
 
-        self.step(4, "For every fabric-scoped attribute discovered on the DUT, TH1 and TH2 read it both fabric filtered and unfiltered, then activate a subscription to it and TH1 modifies it wherever it is writable.",
+        self.step(4, "For every other fabric-scoped attribute discovered on the DUT, TH1 and TH2 read it both fabric filtered and unfiltered, then activate a subscription to it and TH1 modifies it wherever it is writable.",
                   expectation="A fabric-filtered read returns only the reader's own entries, the DUT reports the modified value to both TH1 and TH2, and no response contains fabric-sensitive data belonging to the other fabric.")
         modified = 0
         for info in attribute_infos:
