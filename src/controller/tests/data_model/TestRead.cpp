@@ -5183,6 +5183,94 @@ TEST_F(TestRead, TestUnsolicitedReportDeletesPendingResubscribeClient)
     EXPECT_EQ(engine->GetNumActiveReadClients(), 1u);
 }
 
+TEST_F(TestRead, TestUnsolicitedReportCallbackDestroysSiblingClient)
+{
+    auto * engine = InteractionModelEngine::GetInstance();
+
+    struct SubscriptionCallbackWithHook final : public MockInteractionModelApp
+    {
+        void OnSubscriptionEstablished(SubscriptionId) override { mSubscriptionEstablished = true; }
+        void OnUnsolicitedMessageFromPublisher(ReadClient *) override
+        {
+            mUnsolicitedCount++;
+            if (mOnUnsolicited)
+            {
+                mOnUnsolicited();
+            }
+        }
+
+        bool mSubscriptionEstablished = false;
+        int mUnsolicitedCount         = 0;
+        std::function<void()> mOnUnsolicited;
+    };
+
+    SubscriptionCallbackWithHook callbackC;
+    SubscriptionCallbackWithHook callbackB;
+    SubscriptionCallbackWithHook callbackA;
+
+    auto cleanup = MakeDefer([&] {
+        engine->ShutdownActiveReads();
+        DrainAndServiceIO();
+    });
+
+    // Establish C, then B, then A so mpActiveReadClientList order is A -> B -> C.
+    AttributePathParams attrPathC(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    ReadPrepareParams paramsC(GetSessionBobToAlice());
+    paramsC.mpAttributePathParamsList    = &attrPathC;
+    paramsC.mAttributePathParamsListSize = 1;
+    paramsC.mMaxIntervalCeilingSeconds   = 60;
+    paramsC.mKeepSubscriptions           = true;
+
+    ReadClient clientC(engine, &GetExchangeManager(), callbackC, ReadClient::InteractionType::Subscribe);
+    ASSERT_SUCCESS(clientC.SendRequest(paramsC));
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&]() { return callbackC.mSubscriptionEstablished; });
+    ASSERT_TRUE(callbackC.mSubscriptionEstablished);
+
+    EventPathParams eventPathB(kMockEndpoint1, MockClusterId(1), MockEventId(1));
+    ReadPrepareParams paramsB(GetSessionBobToAlice());
+    paramsB.mpEventPathParamsList      = &eventPathB;
+    paramsB.mEventPathParamsListSize   = 1;
+    paramsB.mMaxIntervalCeilingSeconds = 60;
+    paramsB.mKeepSubscriptions         = true;
+
+    auto clientB =
+        Platform::MakeUnique<ReadClient>(engine, &GetExchangeManager(), callbackB, ReadClient::InteractionType::Subscribe);
+    ASSERT_NE(clientB.get(), nullptr);
+    ASSERT_SUCCESS(clientB->SendRequest(paramsB));
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&]() { return callbackB.mSubscriptionEstablished; });
+    ASSERT_TRUE(callbackB.mSubscriptionEstablished);
+
+    EventPathParams eventPathA(kMockEndpoint1, MockClusterId(1), MockEventId(2));
+    ReadPrepareParams paramsA(GetSessionBobToAlice());
+    paramsA.mpEventPathParamsList      = &eventPathA;
+    paramsA.mEventPathParamsListSize   = 1;
+    paramsA.mMaxIntervalCeilingSeconds = 60;
+    paramsA.mKeepSubscriptions         = true;
+
+    callbackA.mOnUnsolicited = [&clientB]() { clientB = nullptr; };
+
+    ReadClient clientA(engine, &GetExchangeManager(), callbackA, ReadClient::InteractionType::Subscribe);
+    ASSERT_SUCCESS(clientA.SendRequest(paramsA));
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&]() { return callbackA.mSubscriptionEstablished; });
+    ASSERT_TRUE(callbackA.mSubscriptionEstablished);
+    ASSERT_EQ(engine->GetNumActiveReadClients(), 3u);
+
+    // Trigger an unsolicited report for C: visiting A destroys sibling B (the cached next pointer),
+    // and traversal must skip B and still notify and deliver the report to C.
+    callbackC.mNumAttributeResponse = 0;
+    {
+        AttributePathParams dirtyPath(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+        EXPECT_SUCCESS(engine->GetReportingEngine().SetDirty(dirtyPath));
+    }
+    DrainAndServiceIO();
+
+    EXPECT_EQ(callbackA.mUnsolicitedCount, 1);
+    EXPECT_EQ(callbackB.mUnsolicitedCount, 0);
+    EXPECT_EQ(callbackC.mUnsolicitedCount, 1);
+    EXPECT_EQ(callbackC.mNumAttributeResponse, 1);
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 2u);
+}
+
 System::Clock::Timeout TestRead::ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval)
 {
     // Add 1000ms of slack to our max interval to make sure we hit the
