@@ -29,8 +29,11 @@ namespace {
 
 constexpr uint8_t kDefaultEffectVariant = 0;
 
-CHIP_ERROR DispatchTriggerEffect(OOBAccessorRegistry & registry, EndpointId endpointId, uint8_t effectIdentifier,
-                                 uint8_t effectVariant)
+/// Writes the closure controller action TLV and dispatches it. Absent fields are not written.
+/// The meaning of each tag per action is documented in closure-controller/OOBAccessors.h.
+CHIP_ERROR DispatchClosureAction(OOBAccessorRegistry & registry, CharSpan actionName, EndpointId endpointId,
+                                 std::optional<uint8_t> tag2, std::optional<uint8_t> tag3, std::optional<uint16_t> tag4,
+                                 std::optional<bool> tag5)
 {
     uint8_t buffer[32];
     TLV::TLVWriter writer;
@@ -39,59 +42,21 @@ CHIP_ERROR DispatchTriggerEffect(OOBAccessorRegistry & registry, EndpointId endp
     TLV::TLVType outerType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), effectIdentifier));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(3), effectVariant));
-    ReturnErrorOnFailure(writer.EndContainer(outerType));
-    ReturnErrorOnFailure(writer.Finalize());
-
-    return registry.HandleAction("ClosureTriggerEffect"_span, ByteSpan(buffer, writer.GetLengthWritten()));
-}
-
-/// Encodes MoveTo, GroupedMoveTo, SetTarget and GroupedSetTarget. Absent fields are not written.
-CHIP_ERROR DispatchPositionAction(OOBAccessorRegistry & registry, CharSpan actionName, EndpointId endpointId,
-                                  std::optional<uint16_t> position, std::optional<bool> latch, std::optional<uint8_t> speed)
-{
-    uint8_t buffer[32];
-    TLV::TLVWriter writer;
-    writer.Init(buffer, sizeof(buffer));
-
-    TLV::TLVType outerType;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
-    if (position.has_value())
+    if (tag2.has_value())
     {
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), *position));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), *tag2));
     }
-    if (speed.has_value())
+    if (tag3.has_value())
     {
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(4), *speed));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(3), *tag3));
     }
-    if (latch.has_value())
+    if (tag4.has_value())
     {
-        ReturnErrorOnFailure(writer.PutBoolean(TLV::ContextTag(5), *latch));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(4), *tag4));
     }
-    ReturnErrorOnFailure(writer.EndContainer(outerType));
-    ReturnErrorOnFailure(writer.Finalize());
-
-    return registry.HandleAction(actionName, ByteSpan(buffer, writer.GetLengthWritten()));
-}
-
-/// Encodes Step and GroupedStep. Speed is not written when absent.
-CHIP_ERROR DispatchStepAction(OOBAccessorRegistry & registry, CharSpan actionName, EndpointId endpointId, uint8_t direction,
-                              uint16_t numberOfSteps, std::optional<uint8_t> speed)
-{
-    uint8_t buffer[32];
-    TLV::TLVWriter writer;
-    writer.Init(buffer, sizeof(buffer));
-
-    TLV::TLVType outerType;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), direction));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(3), numberOfSteps));
-    if (speed.has_value())
+    if (tag5.has_value())
     {
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(4), *speed));
+        ReturnErrorOnFailure(writer.PutBoolean(TLV::ContextTag(5), *tag5));
     }
     ReturnErrorOnFailure(writer.EndContainer(outerType));
     ReturnErrorOnFailure(writer.Finalize());
@@ -110,16 +75,27 @@ CHIP_ERROR ClosureControllerTranslator::TranslateAndExecute(EndpointId endpointI
     }
 
     std::string action = json["Name"].asString();
-    if (action == "ClosureMoveTo" || action == "ClosureGroupedMoveTo" || action == "ClosureSetTarget" ||
-        action == "ClosureGroupedSetTarget")
+    CharSpan actionName(action.data(), action.size());
+
+    if (action == "ClosureMoveTo" || action == "ClosureGroupedMoveTo")
+    {
+        auto position = ExtractUInt<uint8_t>(json, "Position");
+        VerifyOrReturnError(position.has_value() || !json.isMember("Position"), CHIP_ERROR_INVALID_ARGUMENT);
+        auto speed = ExtractUInt<uint8_t>(json, "Speed");
+        VerifyOrReturnError(speed.has_value() || !json.isMember("Speed"), CHIP_ERROR_INVALID_ARGUMENT);
+        auto latch = ExtractBool(json, "Latch");
+        VerifyOrReturnError(latch.has_value() || !json.isMember("Latch"), CHIP_ERROR_INVALID_ARGUMENT);
+        return DispatchClosureAction(registry, actionName, endpointId, position, speed, std::nullopt, latch);
+    }
+    if (action == "ClosureSetTarget" || action == "ClosureGroupedSetTarget")
     {
         auto position = ExtractUInt<uint16_t>(json, "Position");
         VerifyOrReturnError(position.has_value() || !json.isMember("Position"), CHIP_ERROR_INVALID_ARGUMENT);
-        auto latch = ExtractBool(json, "Latch");
-        VerifyOrReturnError(latch.has_value() || !json.isMember("Latch"), CHIP_ERROR_INVALID_ARGUMENT);
         auto speed = ExtractUInt<uint8_t>(json, "Speed");
         VerifyOrReturnError(speed.has_value() || !json.isMember("Speed"), CHIP_ERROR_INVALID_ARGUMENT);
-        return DispatchPositionAction(registry, CharSpan(action.data(), action.size()), endpointId, position, latch, speed);
+        auto latch = ExtractBool(json, "Latch");
+        VerifyOrReturnError(latch.has_value() || !json.isMember("Latch"), CHIP_ERROR_INVALID_ARGUMENT);
+        return DispatchClosureAction(registry, actionName, endpointId, std::nullopt, speed, position, latch);
     }
     if (action == "ClosureStep" || action == "ClosureGroupedStep")
     {
@@ -128,21 +104,17 @@ CHIP_ERROR ClosureControllerTranslator::TranslateAndExecute(EndpointId endpointI
         VerifyOrReturnError(direction.has_value() && numberOfSteps.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
         auto speed = ExtractUInt<uint8_t>(json, "Speed");
         VerifyOrReturnError(speed.has_value() || !json.isMember("Speed"), CHIP_ERROR_INVALID_ARGUMENT);
-        return DispatchStepAction(registry, CharSpan(action.data(), action.size()), endpointId, *direction, *numberOfSteps, speed);
+        return DispatchClosureAction(registry, actionName, endpointId, direction, speed, numberOfSteps, std::nullopt);
     }
-    if (action == "ClosureStop")
+    if (action == "ClosureStop" || action == "ClosureCalibrate")
     {
-        return DispatchAction(registry, "ClosureStop"_span, endpointId);
-    }
-    if (action == "ClosureCalibrate")
-    {
-        return DispatchAction(registry, "ClosureCalibrate"_span, endpointId);
+        return DispatchAction(registry, actionName, endpointId);
     }
     if (action == "ClosureIdentify")
     {
         auto identifyTime = ExtractUInt<uint16_t>(json, "IdentifyTime");
         VerifyOrReturnError(identifyTime.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-        return DispatchAction(registry, "ClosureIdentify"_span, endpointId, *identifyTime);
+        return DispatchClosureAction(registry, actionName, endpointId, std::nullopt, std::nullopt, identifyTime, std::nullopt);
     }
     if (action == "ClosureTriggerEffect")
     {
@@ -150,7 +122,8 @@ CHIP_ERROR ClosureControllerTranslator::TranslateAndExecute(EndpointId endpointI
         VerifyOrReturnError(effectIdentifier.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
         auto effectVariant = ExtractUInt<uint8_t>(json, "EffectVariant");
         VerifyOrReturnError(effectVariant.has_value() || !json.isMember("EffectVariant"), CHIP_ERROR_INVALID_ARGUMENT);
-        return DispatchTriggerEffect(registry, endpointId, *effectIdentifier, effectVariant.value_or(kDefaultEffectVariant));
+        return DispatchClosureAction(registry, actionName, endpointId, effectIdentifier,
+                                     effectVariant.value_or(kDefaultEffectVariant), std::nullopt, std::nullopt);
     }
     return CHIP_ERROR_NOT_FOUND;
 }
