@@ -175,33 +175,26 @@ CHIP_ERROR PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(con
     auto it = std::find_if(
         mCurrentConnections.begin(), mCurrentConnections.end(),
         [transportConnectionId](const TransportConfigurationStorage & s) { return s.connectionID == transportConnectionId; });
+    VerifyOrReturnValue(it != mCurrentConnections.end(), CHIP_NO_ERROR);
 
-    if (it != mCurrentConnections.end())
+    TransportConfigurationStorage removedValue = *it;
+    mCurrentConnections.erase(it);
+
+    CHIP_ERROR err = StoreCurrentConnections();
+    if (err != CHIP_NO_ERROR && revertOnStoreFailure)
     {
-        TransportConfigurationStorage removedValue = *it;
-        mCurrentConnections.erase(it);
-
-        CHIP_ERROR err = StoreCurrentConnections();
-        if (err != CHIP_NO_ERROR)
-        {
-            if (revertOnStoreFailure)
-            {
-                ChipLogError(Zcl, "Failed to store after removal, reverting: %" CHIP_ERROR_FORMAT, err.Format());
-                mCurrentConnections.push_back(removedValue); // Revert
-            }
-            return err;
-        }
-
-        // Notify the stack that the CurrentConnections attribute has changed.
-        mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        ChipLogError(Zcl, "Failed to store after removal, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+        mCurrentConnections.push_back(removedValue);
+        return err;
     }
-    return CHIP_NO_ERROR;
+
+    // Notify the stack that the CurrentConnections attribute has changed.
+    mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
+    return err;
 }
 
 void PushAvStreamTransportServerLogic::OnFabricRemoved(FabricIndex fabricIndex)
 {
-    // Collect the connection IDs first: RemoveStreamTransportConnection erases from
-    // mCurrentConnections while this loop iterates over it.
     std::vector<uint16_t> connectionIDs;
     for (const TransportConfigurationStorage & connection : mCurrentConnections)
     {
@@ -210,15 +203,29 @@ void PushAvStreamTransportServerLogic::OnFabricRemoved(FabricIndex fabricIndex)
             connectionIDs.push_back(connection.connectionID);
         }
     }
+    VerifyOrReturn(connectionIDs.empty() == false);
+
+    if (mDelegate != nullptr)
+    {
+        // DeallocatePushTransport returns Busy while a transport is uploading; setting the
+        // transports inactive first stops the upload so deallocation is not refused.
+        if (mDelegate->SetTransportStatus(connectionIDs, TransportStatusEnum::kInactive) != Status::Success)
+        {
+            ChipLogError(Zcl, "OnFabricRemoved[ep=%d]: Failed to set transports inactive", mEndpointId);
+        }
+
+        for (uint16_t connectionID : connectionIDs)
+        {
+            if (mDelegate->DeallocatePushTransport(connectionID) != Status::Success)
+            {
+                ChipLogError(Zcl, "OnFabricRemoved[ep=%d]: Delegate deallocate failed for ConnectionID %u", mEndpointId,
+                             connectionID);
+            }
+        }
+    }
 
     for (uint16_t connectionID : connectionIDs)
     {
-        if (mDelegate == nullptr || mDelegate->DeallocatePushTransport(connectionID) != Status::Success)
-        {
-            ChipLogError(Zcl, "OnFabricRemoved[ep=%d]: Delegate deallocate failed for ConnectionID %u", mEndpointId, connectionID);
-        }
-        // The fabric is gone and the delegate has been notified, so the entry and its expiry
-        // timer are removed even when the delegate teardown failed; no later event retries it.
         LogErrorOnFailure(RemoveStreamTransportConnection(connectionID, /*revertOnStoreFailure=*/false));
         RemoveTimerAppState(connectionID);
     }
@@ -226,8 +233,6 @@ void PushAvStreamTransportServerLogic::OnFabricRemoved(FabricIndex fabricIndex)
 
 void PushAvStreamTransportServerLogic::RemoveConnectionsForMissingFabrics(const FabricTable & fabricTable)
 {
-    // Collect the connection IDs first: RemoveStreamTransportConnection erases from
-    // mCurrentConnections while this loop iterates over it.
     std::vector<uint16_t> connectionIDs;
     for (const TransportConfigurationStorage & connection : mCurrentConnections)
     {

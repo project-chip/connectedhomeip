@@ -235,8 +235,6 @@ void WebRTCTransportProviderCluster::Shutdown(ClusterShutdownType shutdownType)
 
 void WebRTCTransportProviderCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-    // Collect the session IDs first: RemoveSession erases from mCurrentSessions while
-    // this loop iterates over it.
     std::vector<uint16_t> sessionIds;
     for (const WebRTCSessionStruct & session : mCurrentSessions)
     {

@@ -176,10 +176,14 @@ public:
 
     /**
      * @brief
-     *   Called when the server or the requestor ends a session via the EndSession command.
+     *   Called when the server or the requestor ends a session via the EndSession command,
+     *   or when the fabric that created the session is removed.
      *
      *   Internally decrement the ReferenceCount on any used video streams.
      *   Internally decrement the ReferenceCount on any used audio streams.
+     *
+     *   When invoked for fabric removal, no CASE session to the requestor can exist, so
+     *   implementations must not attempt to send End to the requestor from this path.
      *
      * @param[in] sessionId      The ID of the session to end.
      * @param[in] reasonCode     Reason for ending the session (e.g. normal closure, resource limit).

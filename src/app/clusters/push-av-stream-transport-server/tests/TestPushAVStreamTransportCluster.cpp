@@ -371,6 +371,26 @@ private:
     std::vector<Clusters::PushAvStreamTransport::PushAvStream> pushavStreams;
 };
 
+// Records SetTransportStatus calls and refuses deallocation, as a delegate does while a
+// transport is uploading.
+class BusyDeallocateDelegate : public TestPushAVStreamTransportDelegateImpl
+{
+public:
+    Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) override
+    {
+        return Protocols::InteractionModel::Status::Busy;
+    }
+
+    Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
+                                                           TransportStatusEnum transportStatus) override
+    {
+        mSetStatusCalls.emplace_back(connectionIDList, transportStatus);
+        return TestPushAVStreamTransportDelegateImpl::SetTransportStatus(connectionIDList, transportStatus);
+    }
+
+    std::vector<std::pair<std::vector<uint16_t>, TransportStatusEnum>> mSetStatusCalls;
+};
+
 class TestTLSClientManagementDelegate : public TLSClientManagementDelegate
 {
 
@@ -701,6 +721,78 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestFabricRemovedKeepsConnectionEvi
     EXPECT_EQ(restartedServer.Init(), CHIP_NO_ERROR);
     EXPECT_EQ(restartedServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
 
+    restartedServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(fabricHelper.TearDownTestFabric(fabric1), CHIP_NO_ERROR);
+}
+
+// A delegate that refuses deallocation (Busy) still gets its transports set inactive, and the
+// removed fabric's entries are torn down.
+TEST_F(TestPushAVStreamTransportServerLogic, TestFabricRemovedSetsTransportInactiveWhenDeallocateBusy)
+{
+    chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
+
+    FabricIndex fabric1 = 1;
+    ASSERT_EQ(fabricHelper.SetUpTestFabric(fabric1), CHIP_NO_ERROR);
+
+    BusyDeallocateDelegate busyDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
+
+    PushAvStreamTransportServer server(1, BitFlags<Feature>(1), fabricHelper.GetFabricTable());
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
+    server.GetLogic().SetDelegate(&busyDelegate);
+    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
+
+    Testing::MockCommandHandler commandHandler;
+    ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    Commands::AllocatePushTransport::DecodableType commandData;
+
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    std::string url       = "https://192.168.1.100:554/stream/";
+    std::string trackName = "video";
+
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kContinuous;
+
+    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptions.videoStreamID.SetValue(1);
+    transportOptions.audioStreamID.SetValue(2);
+    transportOptions.TLSEndpointID    = 1;
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    commandData.transportOptions = transportOptions;
+
+    commandHandler.SetFabricIndex(fabric1);
+    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    ASSERT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    uint16_t connectionID = server.GetLogic().mCurrentConnections[0].connectionID;
+
+    EXPECT_EQ(fabricHelper.GetFabricTable().Delete(fabric1), CHIP_NO_ERROR);
+
+    // The upload is stopped before deallocation is attempted.
+    ASSERT_EQ(busyDelegate.mSetStatusCalls.size(), (size_t) 1);
+    EXPECT_EQ(busyDelegate.mSetStatusCalls[0].second, TransportStatusEnum::kInactive);
+    EXPECT_EQ(busyDelegate.mSetStatusCalls[0].first, std::vector<uint16_t>({ connectionID }));
+
+    // The entry is removed even though the delegate returned Busy.
+    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 0);
+
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
     ASSERT_EQ(fabricHelper.TearDownTestFabric(fabric1), CHIP_NO_ERROR);
 }
 

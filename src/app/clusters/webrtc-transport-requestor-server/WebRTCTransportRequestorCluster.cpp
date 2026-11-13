@@ -55,9 +55,22 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportRequestor {
 
-WebRTCTransportRequestorCluster::WebRTCTransportRequestorCluster(EndpointId endpointId, Delegate & delegate) :
-    DefaultServerCluster({ endpointId, Id }), mDelegate(delegate)
+WebRTCTransportRequestorCluster::WebRTCTransportRequestorCluster(EndpointId endpointId, WebRTCTransportRequestor::Delegate & delegate,
+                                                                 FabricTable & fabricTable) :
+    DefaultServerCluster({ endpointId, Id }), mDelegate(delegate), mFabricTable(fabricTable)
 {}
+
+CHIP_ERROR WebRTCTransportRequestorCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    return mFabricTable.AddFabricDelegate(this);
+}
+
+void WebRTCTransportRequestorCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    mFabricTable.RemoveFabricDelegate(this);
+    DefaultServerCluster::Shutdown(shutdownType);
+}
 
 DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                              AttributeValueEncoder & encoder)
@@ -153,7 +166,7 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::HandleOffer(const
     VerifyOrReturnValue(session != nullptr, Status::NotFound);
 
     // Create arguments for Delegate.
-    Delegate::OfferArgs args;
+    WebRTCTransportRequestor::Delegate::OfferArgs args;
     args.sdp = std::string(req.sdp.data(), req.sdp.size());
 
     // Convert ICE servers list from DecodableList to vector.
@@ -339,6 +352,29 @@ void WebRTCTransportRequestorCluster::RemoveSession(uint16_t sessionId, NodeId p
     {
         // Notify the stack that the CurrentSessions attribute has changed.
         NotifyAttributeChanged(CurrentSessions::Id);
+    }
+}
+
+void WebRTCTransportRequestorCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    std::vector<WebRTCSessionStruct> removedSessions;
+    for (const WebRTCSessionStruct & session : mCurrentSessions)
+    {
+        if (session.GetFabricIndex() == fabricIndex)
+        {
+            removedSessions.push_back(session);
+        }
+    }
+
+    for (const WebRTCSessionStruct & session : removedSessions)
+    {
+        CHIP_ERROR err = mDelegate.HandleEnd(session, WebRTCEndReasonEnum::kUnknownReason);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "OnFabricRemoved: Failed to end WebRTC session %u: %" CHIP_ERROR_FORMAT, session.id, err.Format());
+        }
+        // The fabric is gone, so the session entry is removed regardless of the delegate result.
+        RemoveSession(session.id, session.peerNodeID, fabricIndex);
     }
 }
 

@@ -21,6 +21,7 @@
 #include <clusters/WebRTCTransportRequestor/Commands.h>
 #include <clusters/WebRTCTransportRequestor/Enums.h>
 #include <clusters/WebRTCTransportRequestor/Metadata.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -106,7 +107,9 @@ public:
     virtual CHIP_ERROR HandleEnd(const WebRTCSessionStruct & session, WebRTCEndReasonEnum reasonCode) = 0;
 };
 
-class WebRTCTransportRequestorCluster : public DefaultServerCluster
+// Delegate is fully qualified: private inheritance of FabricTable::Delegate injects the name
+// `Delegate` into this class scope.
+class WebRTCTransportRequestorCluster : public DefaultServerCluster, private FabricTable::Delegate
 {
 public:
     enum class UpsertResultEnum : uint8_t
@@ -122,8 +125,14 @@ public:
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param delegate A reference to the delegate to be used by this server.
      *                 The caller must ensure that the delegate lives throughout the instance's lifetime.
+     * @param fabricTable Fabric table used to tear down the removed fabric's sessions;
+     *                     must outlive this instance
      */
-    WebRTCTransportRequestorCluster(EndpointId endpointId, Delegate & delegate);
+    WebRTCTransportRequestorCluster(EndpointId endpointId, WebRTCTransportRequestor::Delegate & delegate,
+                                    FabricTable & fabricTable);
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType shutdownType) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -163,11 +172,15 @@ public:
     void RemoveSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex);
 
 private:
-    Delegate & mDelegate;
+    WebRTCTransportRequestor::Delegate & mDelegate;
+    FabricTable & mFabricTable;
     std::vector<WebRTCSessionStruct> mCurrentSessions;
 
     // Helper functions
     WebRTCSessionStruct * FindSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex);
+
+    // FabricTable::Delegate: tear down a removed fabric's sessions (fabric-scoped data).
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
     // Command handlers
     DataModel::ActionReturnStatus HandleOffer(const CommandHandler & commandHandler, const Commands::Offer::DecodableType & req);
