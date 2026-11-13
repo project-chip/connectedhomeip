@@ -910,47 +910,81 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_SOLAR_POWER)
         {
+            static const EndpointComposition::SemanticTag kSolarPowerTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber),
+                .tag         = 1,
+            };
+            static const EndpointComposition::SemanticTag kSolarPowerFourPanelsTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber),
+                .tag         = 2,
+            };
+            static const EndpointComposition::SemanticTag kSolarPowerTwoStringsTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber),
+                .tag         = 3,
+            };
+            static const EndpointComposition::SemanticTag kSolarPowerTwoStringsFourPanelsTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber),
+                .tag         = 4,
+            };
+            static const EndpointComposition::SemanticTag kSolarPowerThreePhaseTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber),
+                .tag         = 5,
+            };
+
             RegisterCreator("solar-power", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedSolarPower>(
-                    SimulatedSolarPower::Context{
-                        .timerDelegate            = mContext->timerDelegate,
-                        .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
-                        .fabricTable              = mContext->fabricTable,
-                    },
-                    SolarPower::Parameters{});
+                return MakeDeviceWithTags<SimulatedSolarPower>(Span(&kSolarPowerTag, 1),
+                                                               SimulatedSolarPower::Context{
+                                                                   .timerDelegate            = mContext->timerDelegate,
+                                                                   .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                                                                   .fabricTable              = mContext->fabricTable,
+                                                               },
+                                                               SolarPower::Parameters{});
             });
             RegisterCreator("solar-power-four-panels", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedSolarPowerFourParallelPanels>(SimulatedSolarPowerFourParallelPanels::Context{
-                    .timerDelegate            = mContext->timerDelegate,
-                    .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
-                    .fabricTable              = mContext->fabricTable,
-                });
+                return MakeDeviceWithTags<SimulatedSolarPowerFourParallelPanels>(
+                    Span(&kSolarPowerFourPanelsTag, 1),
+                    SimulatedSolarPowerFourParallelPanels::Context{
+                        .timerDelegate            = mContext->timerDelegate,
+                        .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                        .fabricTable              = mContext->fabricTable,
+                    });
             });
             RegisterCreator("solar-power-two-strings", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedSolarPowerTwoStrings>(SimulatedSolarPowerTwoStrings::Context{
-                    .timerDelegate            = mContext->timerDelegate,
-                    .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
-                    .fabricTable              = mContext->fabricTable,
-                });
+                return MakeDeviceWithTags<SimulatedSolarPowerTwoStrings>(
+                    Span(&kSolarPowerTwoStringsTag, 1),
+                    SimulatedSolarPowerTwoStrings::Context{
+                        .timerDelegate            = mContext->timerDelegate,
+                        .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                        .fabricTable              = mContext->fabricTable,
+                    });
             });
             RegisterCreator("solar-power-two-strings-four-panels", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedSolarPowerTwoStringsFourPanels>(SimulatedSolarPowerTwoStringsFourPanels::Context{
-                    .timerDelegate            = mContext->timerDelegate,
-                    .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
-                    .fabricTable              = mContext->fabricTable,
-                });
+                return MakeDeviceWithTags<SimulatedSolarPowerTwoStringsFourPanels>(
+                    Span(&kSolarPowerTwoStringsFourPanelsTag, 1),
+                    SimulatedSolarPowerTwoStringsFourPanels::Context{
+                        .timerDelegate            = mContext->timerDelegate,
+                        .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                        .fabricTable              = mContext->fabricTable,
+                    });
             });
             RegisterCreator("solar-power-three-phase", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedSolarPowerThreePhase>(SimulatedSolarPowerThreePhase::Context{
-                    .timerDelegate            = mContext->timerDelegate,
-                    .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
-                    .fabricTable              = mContext->fabricTable,
-                });
+                return MakeDeviceWithTags<SimulatedSolarPowerThreePhase>(
+                    Span(&kSolarPowerThreePhaseTag, 1),
+                    SimulatedSolarPowerThreePhase::Context{
+                        .timerDelegate            = mContext->timerDelegate,
+                        .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                        .fabricTable              = mContext->fabricTable,
+                    });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
