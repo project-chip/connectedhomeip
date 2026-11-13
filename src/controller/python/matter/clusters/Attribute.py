@@ -18,6 +18,7 @@
 # Needed to use types in type hints before they are fully defined.
 from __future__ import annotations
 
+import asyncio
 import builtins
 import ctypes
 import inspect
@@ -33,6 +34,7 @@ from typing import Any
 import construct  # type: ignore
 from rich.pretty import pprint  # type: ignore
 
+from ..exceptions import ChipStackError
 from ..interaction_model import (AttributePathIBstruct, DataVersionFilterIBstruct, EventPathIBstruct, InteractionModelError,
                                  PyWriteAttributeData)
 from ..interaction_model import Status as InteractionModelStatus
@@ -697,6 +699,25 @@ def _BuildEventIndex():
                                 'GeneratedObjects.' + clusterName + '.Events.' + eventName)
 
 
+@dataclass(frozen=True)
+class ReadOperationOptions:
+    """Opt into cancellation-safe one-shot reads, optionally with an overall deadline.
+
+    The deadline starts at controller Read entry, includes session acquisition and
+    retries, and is not extended by report chunks. Cancellation or deadline expiry
+    requests native abort and waits for OnDone without cancelling the owned Future.
+    If abort fails, ownership must still settle before the original error is raised;
+    abort failure is attached as a diagnostic and is not an abandonment deadline.
+    Subscriptions do not accept these options. Omit the options for legacy behavior.
+    """
+
+    overallTimeoutMs: int | None = None
+
+    def __post_init__(self):
+        if self.overallTimeoutMs is not None and (type(self.overallTimeoutMs) is not int or self.overallTimeoutMs <= 0):
+            raise ValueError("overallTimeoutMs must be a positive integer")
+
+
 class AsyncReadTransaction:
     @dataclass
     class ReadResponse:
@@ -713,12 +734,56 @@ class AsyncReadTransaction:
         self._cache = AttributeCache(returnClusterObject=returnClusterObject)
         self._changedPathSet: set[AttributePath] = set()
         self._pReadClient = None
+        self._native_done = False
         self._resultError: PyChipError | None = None
         self._notify_subscription_still_active_callback = None
         self._nodeId = nodeId
 
     def SetClientObjPointers(self, pReadClient):
-        self._pReadClient = pReadClient
+        if not self._native_done:
+            self._pReadClient = pReadClient
+
+    def AbortRead(self) -> None:
+        """Abort this one-shot native read and retain its Future until OnDone settles it.
+
+        The current pointer is read on the CHIP thread, so an already-completed read is
+        a no-op and a pointer cleared by OnDone cannot be reused. Subscriptions are rejected.
+        """
+        handle = GetLibraryHandle()
+        builtins.chipStack.Call(
+            lambda: handle.pychip_ReadClient_AbortRead(self._pReadClient)).raise_on_error()
+
+    async def AwaitCompletion(self, deadline: float | None = None) -> None:
+        """Await a one-shot read without cancelling its native callback-owned Future.
+
+        Cancellation/deadline requests abort once on the CHIP thread. The first
+        error remains primary through repeated cancellation and native settlement.
+        """
+        primary_error = None
+        abort_error = None
+        while not self._future.done():
+            timeout = None if primary_error is not None or deadline is None else max(0, deadline - self._event_loop.time())
+            try:
+                completed, _ = await asyncio.wait((self._future,), timeout=timeout)
+            except asyncio.CancelledError as error:
+                if primary_error is not None:
+                    continue
+                primary_error = error
+            else:
+                if completed:
+                    break
+                primary_error = TimeoutError("One-shot read overall deadline expired")
+            try:
+                self.AbortRead()
+            except (ChipStackError, InteractionModelError) as error:
+                abort_error = error
+        if primary_error is not None:
+            if not self._future.cancelled():
+                self._future.exception()
+            if abort_error is not None:
+                primary_error.add_note(f"Native read abort failed: {abort_error}")
+            raise primary_error
+        self._future.result()
 
     def GetAllEventValues(self):
         return self._events
@@ -867,6 +932,9 @@ class AsyncReadTransaction:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
     def handleDone(self):
+        if self._native_done:
+            return
+        self._native_done = True
         #
         # At the end of the life cycle, the C++ end memory has been released,
         # and pReadClient is set to None, otherwise it will cause a dangling pointer.
@@ -1262,8 +1330,8 @@ def Read(transaction: AsyncReadTransaction, device,
         eventNumberFilterPtr = ctypes.POINTER(ctypes.c_ulonglong)(
             ctypes.c_ulonglong(eventNumberFilter))
 
-    res = builtins.chipStack.Call(
-        lambda: handle.pychip_ReadClient_Read(
+    def start_read():
+        result = handle.pychip_ReadClient_Read(
             ctypes.py_object(transaction),
             ctypes.byref(readClientObj),
             device,
@@ -1276,9 +1344,12 @@ def Read(transaction: AsyncReadTransaction, device,
             eventPathsForCffi,
             ctypes.c_size_t(0 if events is None else len(events)),
             eventNumberFilterPtr,
-            ctypes.c_bool(allowLargePayload or False)))
+            ctypes.c_bool(allowLargePayload or False))
+        if result.is_success:
+            transaction.SetClientObjPointers(readClientObj)
+        return result
 
-    transaction.SetClientObjPointers(readClientObj)
+    res = builtins.chipStack.Call(start_read)
 
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
@@ -1315,6 +1386,8 @@ def Init():
         setter.Set('pychip_WriteClient_InitCallbacks', None, [
                    _OnWriteResponseCallbackFunct, _OnWriteErrorCallbackFunct, _OnWriteDoneCallbackFunct])
         handle.pychip_ReadClient_Read.restype = PyChipError
+        handle.pychip_ReadClient_AbortRead.restype = PyChipError
+        handle.pychip_ReadClient_AbortRead.argtypes = [c_void_p]
         setter.Set('pychip_ReadClient_InitCallbacks', None, [
                    _OnReadAttributeDataCallbackFunct, _OnReadEventDataCallbackFunct,
                    _OnSubscriptionEstablishedCallbackFunct, _OnResubscriptionAttemptedCallbackFunct,
