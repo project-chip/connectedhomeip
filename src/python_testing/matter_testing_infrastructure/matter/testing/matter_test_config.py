@@ -46,6 +46,7 @@ class MatterTestConfig:
 
     commissioning_method: str | None = None
     in_test_commissioning_method: str | None = None
+    _pre_test_commissioning_complete: bool = field(default=False, init=False, repr=False)
     discriminators: list[int] = field(default_factory=list)
     setup_passcodes: list[int] = field(default_factory=list)
     commissionee_ip_address_just_for_testing: str | None = None
