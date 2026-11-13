@@ -20,9 +20,15 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libLinuxPlatformTests"
 
-  test_sources = [ "TestExponentialBackOff.cpp" ]
+  test_sources = [
+    "TestExponentialBackOff.cpp",
+    "TestInterfaceAddressChanges.cpp",
+  ]
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ "${chip_root}/src/platform/Linux:exponential-backoff" ]
+  public_deps = [
+    "${chip_root}/src/platform/Linux:exponential-backoff",
+    "${chip_root}/src/platform/Linux:interface-address-changes",
+  ]
 }

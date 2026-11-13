@@ -118,6 +118,15 @@ source_set("exponential-backoff") {
   deps = [ "${chip_root}/src/lib/support" ]
 }
 
+source_set("interface-address-changes") {
+  sources = [
+    "InterfaceAddressChanges.cpp",
+    "InterfaceAddressChanges.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/lib/support" ]
+}
+
 static_library("Linux") {
   sources = [
     "../DeviceSafeQueue.cpp",
@@ -148,6 +157,8 @@ static_library("Linux") {
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
+    "InterfaceAddressMonitor.cpp",
+    "InterfaceAddressMonitor.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "NetworkCommissioningDriver.h",
@@ -161,6 +172,7 @@ static_library("Linux") {
   ]
 
   deps = [
+    ":interface-address-changes",
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/app/common:metadata",
