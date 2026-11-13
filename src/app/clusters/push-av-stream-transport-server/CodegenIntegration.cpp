@@ -125,14 +125,24 @@ CHIP_ERROR CodegenPushAvStreamTransportServer::Startup(ServerClusterContext & co
     return PushAvStreamTransportServer::Startup(context);
 }
 
+CHIP_ERROR SetDelegateAndInit(EndpointId endpointId, PushAvStreamTransportDelegate * delegate)
+{
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    PushAvStreamTransportServer * cluster = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
+    ReturnErrorOnFailure(cluster->TrySetDelegate(delegate));
+    return cluster->Init();
+}
+
 void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate)
 {
     ChipLogProgress(AppServer, "Setting Push AV Stream Transport delegate on endpoint %u", endpointId);
 
-    if (PushAvStreamTransportServer * cluster = FindClusterOnEndpoint(endpointId); cluster != nullptr)
+    const CHIP_ERROR err = SetDelegateAndInit(endpointId, delegate);
+    if (err != CHIP_NO_ERROR)
     {
-        cluster->SetDelegate(delegate);
-        TEMPORARY_RETURN_IGNORED cluster->Init();
+        ChipLogError(AppServer, "Push AV Stream Transport initialization failed on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+                     err.Format());
     }
 }
 

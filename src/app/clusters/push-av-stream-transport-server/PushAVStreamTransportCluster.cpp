@@ -109,6 +109,7 @@ DataModel::ActionReturnStatus PushAvStreamTransportServer::ReadAttribute(const D
         return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return ReadAndEncodeSupportedFormats(encoder); });
 
     case PushAvStreamTransport::Attributes::CurrentConnections::Id:
+        VerifyOrReturnValue(mLogic.IsInitialized(), Status::Failure);
         return aEncoder.EncodeList([this, &aEncoder](const auto & encoder) -> CHIP_ERROR {
             CHIP_ERROR err = ReadAndEncodeCurrentConnections(encoder, aEncoder.AccessingFabricIndex());
             if (err != CHIP_NO_ERROR)
@@ -139,6 +140,8 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServer::Invoke
                                                                                         CommandHandler * handler)
 {
     using namespace PushAvStreamTransport::Commands;
+
+    VerifyOrReturnValue(mLogic.IsInitialized(), Status::Failure);
 
     FabricIndex fabricIndex = request.GetAccessingFabricIndex();
 

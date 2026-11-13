@@ -36,8 +36,21 @@ public:
     PushAvStreamTransportServerLogic(EndpointId aEndpoint, BitFlags<PushAvStreamTransport::Feature> aFeatures);
     ~PushAvStreamTransportServerLogic();
 
+    CHIP_ERROR TrySetDelegate(PushAvStreamTransportDelegate * delegate)
+    {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mDelegate == nullptr || mDelegate == delegate || mCurrentConnections.empty(), CHIP_ERROR_BUSY);
+        SetDelegate(delegate);
+        return CHIP_NO_ERROR;
+    }
+
     void SetDelegate(PushAvStreamTransportDelegate * delegate)
     {
+        if (mDelegate != nullptr && mDelegate != delegate && !mCurrentConnections.empty())
+        {
+            ChipLogError(Zcl, "Cannot replace Push AV delegate while it owns connections on endpoint %u", mEndpointId);
+            return;
+        }
         mDelegate = delegate;
         if (mDelegate == nullptr)
         {
@@ -106,6 +119,8 @@ public:
      */
     CHIP_ERROR Init(AttributePersistenceProvider & attributeStorage);
 
+    bool IsInitialized() const { return mAttributeStorage != nullptr; }
+
     void Shutdown();
 
     bool HasFeature(PushAvStreamTransport::Feature feature) const;
@@ -165,10 +180,17 @@ private:
     /// an error if the check returns true
     bool IsNullDelegateWithLogging(EndpointId endpointIdForLogging);
 
+    DataModel::ActionReturnStatus
+    ValidateMotionZones(const PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::DecodableType & triggerOptions,
+                        bool validateZoneIds = true);
+
     /**
      * Helper function that loads all the persistent attributes from the KVS.
      */
-    void LoadPersistentAttributes();
+    CHIP_ERROR LoadPersistentAttributes();
+    CHIP_ERROR CleanupFailedRestoration();
+    Protocols::InteractionModel::Status
+    ValidateZoneSensitivity(const PushAvStreamTransport::Structs::TransportZoneOptionsStruct::DecodableType & zone) const;
 
     // Helpers to store and load CurrentConnections list
     CHIP_ERROR StoreCurrentConnections();
