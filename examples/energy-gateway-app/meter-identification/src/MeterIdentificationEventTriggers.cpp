@@ -29,7 +29,7 @@ namespace {
 class OldMeterIdentificationAttributes
 {
 private:
-    Instance * mInstance                           = nullptr;
+    MeterIdentificationCluster * mInstance         = nullptr;
     static constexpr size_t kMaximumStringSize     = 64;
     char mPointOfDeliveryBuf[kMaximumStringSize]   = {};
     char mMeterSerialNumberBuf[kMaximumStringSize] = {};

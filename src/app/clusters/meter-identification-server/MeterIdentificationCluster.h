@@ -1,6 +1,6 @@
-/**
+/*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,49 +17,118 @@
 
 #pragma once
 
-#include <stddef.h>
-
-#include <lib/core/Optional.h>
-
-#include <app-common/zap-generated/cluster-enums.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/util/basic-types.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model/Nullable.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/MeterIdentification/Attributes.h>
+#include <clusters/MeterIdentification/Metadata.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/Span.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace MeterIdentification {
+namespace chip::app::Clusters {
 
-class Instance : public AttributeAccessInterface
+class MeterIdentificationCluster : public DefaultServerCluster
 {
 public:
-    Instance(const EndpointId & aEndpointId, const BitMask<Feature> & aFeature) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mEndpointId(aEndpointId), mFeature(aFeature)
-    {}
-    ~Instance() override;
+    using Feature       = MeterIdentification::Feature;
+    using MeterTypeEnum = MeterIdentification::MeterTypeEnum;
 
-    // mPointOfDelivery / mMeterSerialNumber / mProtocolVersion are CharSpans bound (in the setters) to
-    // this object's own m*Buf[] buffers, so a defaulted copy would leave them aliasing the source's
-    // buffers. The instance is a single registered AttributeAccessInterface and is never copied; forbid
-    // copying so an accidental copy is a compile error rather than a dangling-span alias.
-    Instance(const Instance &)             = delete;
-    Instance & operator=(const Instance &) = delete;
+    // Optional attributes are tracked as a compile-time bitset.
+    using OptionalAttributeSet = app::OptionalAttributeSet<MeterIdentification::Attributes::ProtocolVersion::Id,
+                                                           MeterIdentification::Attributes::PowerThreshold::Id>;
 
-    CHIP_ERROR Init();
-    void Shutdown();
+    static constexpr size_t kMaximumStringSize = 64;
 
-    bool HasFeature(const Feature & aFeature) const;
+    class Config
+    {
+    public:
+        Config & WithFeatures(BitFlags<Feature> features)
+        {
+            mFeatureMap = features;
+            return *this;
+        }
 
-    // Attribute Accessors
+        Config & WithFeature(Feature feature)
+        {
+            mFeatureMap.Set(feature);
+            return *this;
+        }
+
+        Config & WithProtocolVersion()
+        {
+            mOptionalAttributes.Set<MeterIdentification::Attributes::ProtocolVersion::Id>();
+            return *this;
+        }
+
+        Config & WithProtocolVersion(DataModel::Nullable<CharSpan> value)
+        {
+            mOptionalAttributes.Set<MeterIdentification::Attributes::ProtocolVersion::Id>();
+            mProtocolVersion = value;
+            return *this;
+        }
+
+        Config & WithOptionalAttributes(OptionalAttributeSet attrs)
+        {
+            mOptionalAttributes = attrs;
+            return *this;
+        }
+
+        Config & WithMeterType(DataModel::Nullable<MeterTypeEnum> val)
+        {
+            mMeterType = val;
+            return *this;
+        }
+
+        Config & WithPointOfDelivery(DataModel::Nullable<CharSpan> val)
+        {
+            mPointOfDelivery = val;
+            return *this;
+        }
+
+        Config & WithMeterSerialNumber(DataModel::Nullable<CharSpan> val)
+        {
+            mMeterSerialNumber = val;
+            return *this;
+        }
+
+        Config & WithPowerThreshold(DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> val)
+        {
+            mPowerThreshold = val;
+            return *this;
+        }
+
+        BitFlags<Feature> mFeatureMap;
+        OptionalAttributeSet mOptionalAttributes;
+        DataModel::Nullable<MeterTypeEnum> mMeterType;
+        DataModel::Nullable<CharSpan> mPointOfDelivery;
+        DataModel::Nullable<CharSpan> mMeterSerialNumber;
+        DataModel::Nullable<CharSpan> mProtocolVersion;
+        DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> mPowerThreshold;
+    };
+
+    explicit MeterIdentificationCluster(EndpointId endpointId, const Config & config = {});
+
+    // The CharSpan members below point into this object's own buffers. A defaulted copy would
+    // shallow-copy those spans, aliasing the source object's buffers, so copying is disallowed.
+    MeterIdentificationCluster(const MeterIdentificationCluster &)             = delete;
+    MeterIdentificationCluster & operator=(const MeterIdentificationCluster &) = delete;
+
+    // --- ServerClusterInterface overrides ---
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    BitFlags<Feature> GetFeatureMap() const { return mFeatureMap; }
+    bool HasFeature(Feature feature) const { return mFeatureMap.Has(feature); }
+
     const DataModel::Nullable<MeterTypeEnum> & GetMeterType() const { return mMeterType; }
     const DataModel::Nullable<CharSpan> & GetPointOfDelivery() const { return mPointOfDelivery; }
     const DataModel::Nullable<CharSpan> & GetMeterSerialNumber() const { return mMeterSerialNumber; }
     const DataModel::Nullable<CharSpan> & GetProtocolVersion() const { return mProtocolVersion; }
     const DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> & GetPowerThreshold() const { return mPowerThreshold; }
 
-    // Internal Application API to set attribute values
     CHIP_ERROR SetMeterType(const DataModel::Nullable<MeterTypeEnum> & value);
     CHIP_ERROR SetPointOfDelivery(const DataModel::Nullable<CharSpan> & value);
     CHIP_ERROR SetMeterSerialNumber(const DataModel::Nullable<CharSpan> & value);
@@ -67,27 +136,20 @@ public:
     CHIP_ERROR SetPowerThreshold(const DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> & value);
 
 private:
-    // The maximum string size of 64 bytes is specified in:
-    // Matter Application Cluster Specification - Meter Identification Cluster
-    static constexpr size_t kMaximumStringSize = 64;
+    const BitFlags<Feature> mFeatureMap;
+    const OptionalAttributeSet mOptionalAttributeSet;
 
-    // Attribute storage
-    char mPointOfDeliveryBuf[kMaximumStringSize]   = {};
-    char mMeterSerialNumberBuf[kMaximumStringSize] = {};
-    char mProtocolVersionBuf[kMaximumStringSize]   = {};
+    // +1 for the null terminator that Platform::CopyString always writes; kMaximumStringSize is the
+    // spec max data length, not the buffer size.
+    char mPointOfDeliveryBuf[kMaximumStringSize + 1]   = {};
+    char mMeterSerialNumberBuf[kMaximumStringSize + 1] = {};
+    char mProtocolVersionBuf[kMaximumStringSize + 1]   = {};
+
     DataModel::Nullable<MeterTypeEnum> mMeterType;
     DataModel::Nullable<CharSpan> mPointOfDelivery;
     DataModel::Nullable<CharSpan> mMeterSerialNumber;
     DataModel::Nullable<CharSpan> mProtocolVersion;
     DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> mPowerThreshold;
-    EndpointId mEndpointId = 0;
-    BitMask<Feature> mFeature;
-
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
-} // namespace MeterIdentification
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters
