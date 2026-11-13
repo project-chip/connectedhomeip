@@ -55,7 +55,7 @@ SimulatedSolarPower::SimulatedSolarPower(const Context & context, const Config &
     {
         const auto & panel = config.panels[index];
         mPanels[index]     = std::make_unique<PanelElectricalSensor>(context.timerDelegate, context.testEventTriggerDelegate,
-                                                                     context.fabricTable, panel.tags, panel.role);
+                                                                 context.fabricTable, panel.tags, panel.role);
     }
 }
 
