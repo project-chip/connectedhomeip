@@ -619,6 +619,14 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
         return CHIP_NO_ERROR;
     }
 
+    // Changing the state or the pending command before the Answer is sent would stop the Answer from being sent.
+    if (transport->GetState() == WebrtcTransport::State::SendingAnswer)
+    {
+        ChipLogProgress(Camera, "Session ID %u: the Answer is not sent yet; the camera sends its candidates after it", sessionId);
+        transport->SetSendICECandidatesAfterAnswer(true);
+        return CHIP_NO_ERROR;
+    }
+
     // Schedule sending Ice Candidates when remote candidates are received. This keeps the exchange simple
     transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
     ScheduleICECandidatesSend(sessionId);
@@ -993,6 +1001,12 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
     case WebrtcTransport::CommandType::kAnswer:
         err = self->SendAnswerCommand(exchangeMgr, sessionHandle, sessionId);
         transport->MoveToState(WebrtcTransport::State::Idle);
+        if (err == CHIP_NO_ERROR && transport->GetSendICECandidatesAfterAnswer())
+        {
+            transport->SetSendICECandidatesAfterAnswer(false);
+            transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+            self->ScheduleICECandidatesSend(sessionId);
+        }
         break;
     case WebrtcTransport::CommandType::kICECandidates:
         err = self->SendICECandidatesCommand(exchangeMgr, sessionHandle, sessionId);
