@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2025 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Utilities for accessing parameters of the network interface and the wireless
- *          statistics(extracted from /proc/net/wireless) on Linux platforms.
+ *          statistics(extracted from /proc/net/wireless) on webOS platforms.
  */
 
 #pragma once

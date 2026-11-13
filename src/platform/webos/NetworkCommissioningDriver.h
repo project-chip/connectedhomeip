@@ -30,10 +30,10 @@ namespace DeviceLayer {
 namespace NetworkCommissioning {
 
 template <typename T>
-class LinuxScanResponseIterator : public Iterator<T>
+class WebOSScanResponseIterator : public Iterator<T>
 {
 public:
-    LinuxScanResponseIterator(std::vector<T> * apScanResponse) : mpScanResponse(apScanResponse) {}
+    WebOSScanResponseIterator(std::vector<T> * apScanResponse) : mpScanResponse(apScanResponse) {}
     size_t Count() override { return mpScanResponse != nullptr ? mpScanResponse->size() : 0; }
     bool Next(T & item) override
     {
@@ -57,20 +57,20 @@ private:
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-class LinuxWiFiDriver final : public WiFiDriver
+class WebOSWiFiDriver final : public WiFiDriver
 {
 public:
     class WiFiNetworkIterator final : public NetworkIterator
     {
     public:
-        WiFiNetworkIterator(LinuxWiFiDriver * aDriver) : driver(aDriver) {}
+        WiFiNetworkIterator(WebOSWiFiDriver * aDriver) : driver(aDriver) {}
         size_t Count() override;
         bool Next(Network & item) override;
         void Release() override { delete this; }
         ~WiFiNetworkIterator() override = default;
 
     private:
-        LinuxWiFiDriver * driver;
+        WebOSWiFiDriver * driver;
         bool exhausted = false;
     };
 
@@ -156,20 +156,20 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-class LinuxThreadDriver final : public ThreadDriver
+class WebOSThreadDriver final : public ThreadDriver
 {
 public:
     class ThreadNetworkIterator final : public NetworkIterator
     {
     public:
-        ThreadNetworkIterator(LinuxThreadDriver * aDriver) : driver(aDriver) {}
+        ThreadNetworkIterator(WebOSThreadDriver * aDriver) : driver(aDriver) {}
         size_t Count() override;
         bool Next(Network & item) override;
         void Release() override { delete this; }
         ~ThreadNetworkIterator() override = default;
 
     private:
-        LinuxThreadDriver * driver;
+        WebOSThreadDriver * driver;
         bool exhausted = false;
     };
 
@@ -204,7 +204,7 @@ private:
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-class LinuxEthernetDriver final : public EthernetDriver
+class WebOSEthernetDriver final : public EthernetDriver
 {
 public:
     struct EthernetNetworkIterator final : public NetworkIterator

@@ -27,5 +27,5 @@ gdbus_library("wpa") {
   c_namespace = "WpaSupplicant"
   interface_prefix = "fi.w1.wpa_supplicant"
   c_generate_object_manager = false
-  dbus_out_dir = "platform/Linux/dbus/wpa"
+  dbus_out_dir = "platform/webos/dbus/wpa"
 }

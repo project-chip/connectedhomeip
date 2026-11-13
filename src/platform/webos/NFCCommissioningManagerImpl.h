@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2025-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <nfc/NfcApplicationDelegate.h>
+#include <transport/raw/NfcApplicationDelegate.h>
 
 #include <platform/internal/NFCCommissioningManager.h>
 
@@ -130,7 +130,7 @@ public:
 };
 
 /**
- * Concrete implementation of the NFCCommissioningManagerImpl singleton object for the Linux platforms.
+ * Concrete implementation of the NFCCommissioningManagerImpl singleton object for the webOS platforms.
  */
 class NFCCommissioningManagerImpl final : public NFCCommissioningManager, private Nfc::NfcApplicationDelegate
 {
@@ -152,6 +152,8 @@ private:
 
     CHIP_ERROR _Init();
     void _Shutdown();
+    Nfc::NFCReaderTransport * _GetNFCReaderTransport() const { return nullptr; }
+    void _SetNFCReaderTransport(Nfc::NFCReaderTransport * readerTransport) {}
 
     // ===== Members for internal use by the following friends.
 
@@ -198,7 +200,7 @@ inline NFCCommissioningManager & NFCCommissioningMgr()
  * Returns the platform-specific implementation of the NFCCommissioningManager singleton object.
  *
  * Internal components can use this to gain access to features of the NFCCommissioningManager
- * that are specific to the Linux platforms.
+ * that are specific to the webOS platforms.
  */
 inline NFCCommissioningManagerImpl & NFCCommissioningMgrImpl()
 {

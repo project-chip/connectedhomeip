@@ -1,6 +1,6 @@
 /* @@@LICENSE
  *
- * Copyright (c) 2017-2025 LG Electronics, Inc.
+ * Copyright (c) 2017 LG Electronics, Inc.
  *
  * Confidential computer software. Valid license from LG required for
  * possession, use or copying. Consistent with FAR 12.211 and 12.212,
@@ -10,7 +10,6 @@
  *
  * LICENSE@@@
  */
-#pragma once
 #ifndef LSREQUESTER_H_
 #define LSREQUESTER_H_
 
@@ -25,7 +24,7 @@ class LsRequester
 public:
     static LsRequester * getInstance();
     void stop();
-    void restart();
+
     bool lsCallSync(const char * pAPI, const char * pParams, pbnjson::JValue & response, int timeout = 10);
     bool lsSubscribe(const char * pAPI, const char * pParams, void * ctx, LSFilterFunc func, LS::Call & call);
     bool lsSubscribe(const char * pAPI, const char * pParams, void * ctx, LSFilterFunc func, LSMessageToken * pulToken);
