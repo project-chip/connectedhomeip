@@ -16,7 +16,6 @@
  */
 
 #include <MeterIdentificationInstance.h>
-#include <app/util/af-types.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::MeterIdentification;

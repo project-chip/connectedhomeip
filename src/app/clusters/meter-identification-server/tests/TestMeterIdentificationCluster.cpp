@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/meter-identification-server/MeterIdentificationCluster.h>
@@ -36,7 +37,7 @@ using namespace chip::Testing;
 
 struct TestMeterIdentificationCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void SetUpTestSuite() { ASSERT_SUCCESS(chip::Platform::MemoryInit()); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     TestServerClusterContext testContext;
@@ -49,14 +50,14 @@ TEST_F(TestMeterIdentificationCluster, AttributeListTest)
     // No optional attributes, no features
     {
         MeterIdentificationCluster cluster(kRootEndpointId);
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, MeterIdentification::Id), attributes), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, MeterIdentification::Id), attributes));
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
         AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), {}), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(listBuilder.Append(Span(kMandatoryMetadata), {}));
         ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -69,14 +70,14 @@ TEST_F(TestMeterIdentificationCluster, AttributeListTest)
         optionalAttributeSet.Set<ProtocolVersion::Id>();
 
         MeterIdentificationCluster cluster(kRootEndpointId, MeterIdentificationCluster::Config{}.WithProtocolVersion());
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, MeterIdentification::Id), attributes), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, MeterIdentification::Id), attributes));
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
         AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet));
         ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -90,14 +91,14 @@ TEST_F(TestMeterIdentificationCluster, AttributeListTest)
 
         MeterIdentificationCluster cluster(kRootEndpointId,
                                            MeterIdentificationCluster::Config{}.WithFeature(Feature::kPowerThreshold));
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, MeterIdentification::Id), attributes), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, MeterIdentification::Id), attributes));
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
         AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet));
         ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -112,14 +113,14 @@ TEST_F(TestMeterIdentificationCluster, AttributeListTest)
 
         MeterIdentificationCluster cluster(
             kRootEndpointId, MeterIdentificationCluster::Config{}.WithProtocolVersion().WithFeature(Feature::kPowerThreshold));
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, MeterIdentification::Id), attributes), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, MeterIdentification::Id), attributes));
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
         AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet));
         ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -129,27 +130,27 @@ TEST_F(TestMeterIdentificationCluster, AttributeListTest)
 TEST_F(TestMeterIdentificationCluster, ReadMandatoryAttributesDefaultNull)
 {
     MeterIdentificationCluster cluster(kRootEndpointId);
-    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
     ClusterTester tester(cluster);
 
     uint16_t revision{};
-    ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(ClusterRevision::Id, revision));
     EXPECT_EQ(revision, MeterIdentification::kRevision);
 
     uint32_t featureMap{};
-    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(FeatureMap::Id, featureMap));
     EXPECT_EQ(featureMap, 0u);
 
     DataModel::Nullable<MeterTypeEnum> meterType;
-    ASSERT_EQ(tester.ReadAttribute(MeterType::Id, meterType), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(MeterType::Id, meterType));
     EXPECT_TRUE(meterType.IsNull());
 
     DataModel::Nullable<CharSpan> pointOfDelivery;
-    ASSERT_EQ(tester.ReadAttribute(PointOfDelivery::Id, pointOfDelivery), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(PointOfDelivery::Id, pointOfDelivery));
     EXPECT_TRUE(pointOfDelivery.IsNull());
 
     DataModel::Nullable<CharSpan> meterSerialNumber;
-    ASSERT_EQ(tester.ReadAttribute(MeterSerialNumber::Id, meterSerialNumber), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(MeterSerialNumber::Id, meterSerialNumber));
     EXPECT_TRUE(meterSerialNumber.IsNull());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -158,37 +159,37 @@ TEST_F(TestMeterIdentificationCluster, ReadMandatoryAttributesDefaultNull)
 TEST_F(TestMeterIdentificationCluster, SetMeterType)
 {
     MeterIdentificationCluster cluster(kRootEndpointId);
-    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
     ClusterTester tester(cluster);
 
     testContext.ChangeListener().DirtyList().clear();
 
     // Valid values
-    EXPECT_EQ(cluster.SetMeterType(DataModel::MakeNullable(MeterTypeEnum::kUtility)), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(cluster.SetMeterType(DataModel::MakeNullable(MeterTypeEnum::kUtility)));
     EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
     testContext.ChangeListener().DirtyList().clear();
 
     DataModel::Nullable<MeterTypeEnum> readVal;
-    ASSERT_EQ(tester.ReadAttribute(MeterType::Id, readVal), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(MeterType::Id, readVal));
     ASSERT_FALSE(readVal.IsNull());
     EXPECT_EQ(readVal.Value(), MeterTypeEnum::kUtility);
 
     // Setting same value -> no dirty notification
-    EXPECT_EQ(cluster.SetMeterType(DataModel::MakeNullable(MeterTypeEnum::kUtility)), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(cluster.SetMeterType(DataModel::MakeNullable(MeterTypeEnum::kUtility)));
     EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 0u);
 
     // Private
-    EXPECT_EQ(cluster.SetMeterType(DataModel::MakeNullable(MeterTypeEnum::kPrivate)), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(cluster.SetMeterType(DataModel::MakeNullable(MeterTypeEnum::kPrivate)));
     EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
     testContext.ChangeListener().DirtyList().clear();
 
     // Generic
-    EXPECT_EQ(cluster.SetMeterType(DataModel::MakeNullable(MeterTypeEnum::kGeneric)), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(cluster.SetMeterType(DataModel::MakeNullable(MeterTypeEnum::kGeneric)));
     EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
     testContext.ChangeListener().DirtyList().clear();
 
     // Set back to null
-    EXPECT_EQ(cluster.SetMeterType(DataModel::NullNullable), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(cluster.SetMeterType(DataModel::NullNullable));
     EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
     testContext.ChangeListener().DirtyList().clear();
 
@@ -204,34 +205,34 @@ TEST_F(TestMeterIdentificationCluster, SetMeterType)
 TEST_F(TestMeterIdentificationCluster, SetPointOfDelivery)
 {
     MeterIdentificationCluster cluster(kRootEndpointId);
-    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
     ClusterTester tester(cluster);
 
     testContext.ChangeListener().DirtyList().clear();
 
     // Normal string
-    EXPECT_EQ(cluster.SetPointOfDelivery(DataModel::MakeNullable("POD-12345"_span)), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(cluster.SetPointOfDelivery(DataModel::MakeNullable("POD-12345"_span)));
     EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
     testContext.ChangeListener().DirtyList().clear();
 
     DataModel::Nullable<CharSpan> readVal;
-    ASSERT_EQ(tester.ReadAttribute(PointOfDelivery::Id, readVal), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(PointOfDelivery::Id, readVal));
     ASSERT_FALSE(readVal.IsNull());
     EXPECT_TRUE(readVal.Value().data_equal("POD-12345"_span));
 
     // Same string -> no dirty notification
-    EXPECT_EQ(cluster.SetPointOfDelivery(DataModel::MakeNullable("POD-12345"_span)), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(cluster.SetPointOfDelivery(DataModel::MakeNullable("POD-12345"_span)));
     EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 0u);
 
     // Exactly 64 bytes string -> valid, and every byte must be preserved (no truncation from the
     // internal null-terminator handling).
     char buffer64[64];
     memset(buffer64, 'A', sizeof(buffer64));
-    EXPECT_EQ(cluster.SetPointOfDelivery(DataModel::MakeNullable(CharSpan(buffer64, sizeof(buffer64)))), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(cluster.SetPointOfDelivery(DataModel::MakeNullable(CharSpan(buffer64, sizeof(buffer64)))));
     EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
     testContext.ChangeListener().DirtyList().clear();
 
-    ASSERT_EQ(tester.ReadAttribute(PointOfDelivery::Id, readVal), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(PointOfDelivery::Id, readVal));
     ASSERT_FALSE(readVal.IsNull());
     EXPECT_TRUE(readVal.Value().data_equal(CharSpan(buffer64, sizeof(buffer64))));
 
@@ -242,7 +243,7 @@ TEST_F(TestMeterIdentificationCluster, SetPointOfDelivery)
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     // Null string -> valid
-    EXPECT_EQ(cluster.SetPointOfDelivery(DataModel::NullNullable), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(cluster.SetPointOfDelivery(DataModel::NullNullable));
     EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
     testContext.ChangeListener().DirtyList().clear();
 
@@ -252,17 +253,17 @@ TEST_F(TestMeterIdentificationCluster, SetPointOfDelivery)
 TEST_F(TestMeterIdentificationCluster, SetMeterSerialNumber)
 {
     MeterIdentificationCluster cluster(kRootEndpointId);
-    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
     ClusterTester tester(cluster);
 
     testContext.ChangeListener().DirtyList().clear();
 
-    EXPECT_EQ(cluster.SetMeterSerialNumber(DataModel::MakeNullable("SN-987654321"_span)), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(cluster.SetMeterSerialNumber(DataModel::MakeNullable("SN-987654321"_span)));
     EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
     testContext.ChangeListener().DirtyList().clear();
 
     DataModel::Nullable<CharSpan> readVal;
-    ASSERT_EQ(tester.ReadAttribute(MeterSerialNumber::Id, readVal), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(MeterSerialNumber::Id, readVal));
     ASSERT_FALSE(readVal.IsNull());
     EXPECT_TRUE(readVal.Value().data_equal("SN-987654321"_span));
 
@@ -270,11 +271,11 @@ TEST_F(TestMeterIdentificationCluster, SetMeterSerialNumber)
     // internal null-terminator handling).
     char buffer64[64];
     memset(buffer64, 'S', sizeof(buffer64));
-    EXPECT_EQ(cluster.SetMeterSerialNumber(DataModel::MakeNullable(CharSpan(buffer64, sizeof(buffer64)))), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(cluster.SetMeterSerialNumber(DataModel::MakeNullable(CharSpan(buffer64, sizeof(buffer64)))));
     EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
     testContext.ChangeListener().DirtyList().clear();
 
-    ASSERT_EQ(tester.ReadAttribute(MeterSerialNumber::Id, readVal), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(MeterSerialNumber::Id, readVal));
     ASSERT_FALSE(readVal.IsNull());
     EXPECT_TRUE(readVal.Value().data_equal(CharSpan(buffer64, sizeof(buffer64))));
 
@@ -292,7 +293,7 @@ TEST_F(TestMeterIdentificationCluster, SetProtocolVersion)
     // Without ProtocolVersion enabled
     {
         MeterIdentificationCluster cluster(kRootEndpointId);
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
 
         EXPECT_EQ(cluster.SetProtocolVersion(DataModel::MakeNullable("1.0"_span)), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
@@ -302,17 +303,17 @@ TEST_F(TestMeterIdentificationCluster, SetProtocolVersion)
     // With ProtocolVersion enabled
     {
         MeterIdentificationCluster cluster(kRootEndpointId, MeterIdentificationCluster::Config{}.WithProtocolVersion());
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
         ClusterTester tester(cluster);
 
         testContext.ChangeListener().DirtyList().clear();
 
-        EXPECT_EQ(cluster.SetProtocolVersion(DataModel::MakeNullable("v1.2.3"_span)), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(cluster.SetProtocolVersion(DataModel::MakeNullable("v1.2.3"_span)));
         EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
         testContext.ChangeListener().DirtyList().clear();
 
         DataModel::Nullable<CharSpan> readVal;
-        ASSERT_EQ(tester.ReadAttribute(ProtocolVersion::Id, readVal), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(tester.ReadAttribute(ProtocolVersion::Id, readVal));
         ASSERT_FALSE(readVal.IsNull());
         EXPECT_TRUE(readVal.Value().data_equal("v1.2.3"_span));
 
@@ -320,11 +321,11 @@ TEST_F(TestMeterIdentificationCluster, SetProtocolVersion)
         // the internal null-terminator handling).
         char buffer64[64];
         memset(buffer64, 'V', sizeof(buffer64));
-        EXPECT_EQ(cluster.SetProtocolVersion(DataModel::MakeNullable(CharSpan(buffer64, sizeof(buffer64)))), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(cluster.SetProtocolVersion(DataModel::MakeNullable(CharSpan(buffer64, sizeof(buffer64)))));
         EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
         testContext.ChangeListener().DirtyList().clear();
 
-        ASSERT_EQ(tester.ReadAttribute(ProtocolVersion::Id, readVal), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(tester.ReadAttribute(ProtocolVersion::Id, readVal));
         ASSERT_FALSE(readVal.IsNull());
         EXPECT_TRUE(readVal.Value().data_equal(CharSpan(buffer64, sizeof(buffer64))));
 
@@ -343,7 +344,7 @@ TEST_F(TestMeterIdentificationCluster, SetPowerThreshold)
     // Without PWRTHLD feature
     {
         MeterIdentificationCluster cluster(kRootEndpointId);
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
 
         Globals::Structs::PowerThresholdStruct::Type threshold;
         EXPECT_EQ(cluster.SetPowerThreshold(DataModel::MakeNullable(threshold)), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -355,7 +356,7 @@ TEST_F(TestMeterIdentificationCluster, SetPowerThreshold)
     {
         MeterIdentificationCluster cluster(kRootEndpointId,
                                            MeterIdentificationCluster::Config{}.WithFeature(Feature::kPowerThreshold));
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
         ClusterTester tester(cluster);
 
         testContext.ChangeListener().DirtyList().clear();
@@ -365,12 +366,12 @@ TEST_F(TestMeterIdentificationCluster, SetPowerThreshold)
         threshold.apparentPowerThreshold.SetValue(1200);
         threshold.powerThresholdSource.SetNonNull(Globals::PowerThresholdSourceEnum::kContract);
 
-        EXPECT_EQ(cluster.SetPowerThreshold(DataModel::MakeNullable(threshold)), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(cluster.SetPowerThreshold(DataModel::MakeNullable(threshold)));
         EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
         testContext.ChangeListener().DirtyList().clear();
 
         DataModel::Nullable<Globals::Structs::PowerThresholdStruct::DecodableType> readVal;
-        ASSERT_EQ(tester.ReadAttribute(PowerThreshold::Id, readVal), CHIP_NO_ERROR);
+        ASSERT_SUCCESS(tester.ReadAttribute(PowerThreshold::Id, readVal));
         ASSERT_FALSE(readVal.IsNull());
         EXPECT_TRUE(readVal.Value().powerThreshold.HasValue());
         EXPECT_EQ(readVal.Value().powerThreshold.Value(), 1000);
@@ -380,7 +381,7 @@ TEST_F(TestMeterIdentificationCluster, SetPowerThreshold)
         EXPECT_EQ(readVal.Value().powerThresholdSource.Value(), Globals::PowerThresholdSourceEnum::kContract);
 
         // Setting same struct -> no dirty notification
-        EXPECT_EQ(cluster.SetPowerThreshold(DataModel::MakeNullable(threshold)), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(cluster.SetPowerThreshold(DataModel::MakeNullable(threshold)));
         EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 0u);
 
         // Invalid powerThresholdSource -> ConstraintError
@@ -389,7 +390,7 @@ TEST_F(TestMeterIdentificationCluster, SetPowerThreshold)
         EXPECT_EQ(cluster.SetPowerThreshold(DataModel::MakeNullable(invalidThreshold)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         // Set to null
-        EXPECT_EQ(cluster.SetPowerThreshold(DataModel::NullNullable), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(cluster.SetPowerThreshold(DataModel::NullNullable));
         EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
         testContext.ChangeListener().DirtyList().clear();
 
@@ -412,33 +413,33 @@ TEST_F(TestMeterIdentificationCluster, ConfigInitialization)
     config.mPowerThreshold = DataModel::MakeNullable(threshold);
 
     MeterIdentificationCluster cluster(kRootEndpointId, config);
-    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
     ClusterTester tester(cluster);
 
     EXPECT_TRUE(cluster.HasFeature(Feature::kPowerThreshold));
 
     DataModel::Nullable<MeterTypeEnum> readMeterType;
-    ASSERT_EQ(tester.ReadAttribute(MeterType::Id, readMeterType), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(MeterType::Id, readMeterType));
     ASSERT_FALSE(readMeterType.IsNull());
     EXPECT_EQ(readMeterType.Value(), MeterTypeEnum::kPrivate);
 
     DataModel::Nullable<CharSpan> readPod;
-    ASSERT_EQ(tester.ReadAttribute(PointOfDelivery::Id, readPod), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(PointOfDelivery::Id, readPod));
     ASSERT_FALSE(readPod.IsNull());
     EXPECT_TRUE(readPod.Value().data_equal("POD-INITIAL"_span));
 
     DataModel::Nullable<CharSpan> readSn;
-    ASSERT_EQ(tester.ReadAttribute(MeterSerialNumber::Id, readSn), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(MeterSerialNumber::Id, readSn));
     ASSERT_FALSE(readSn.IsNull());
     EXPECT_TRUE(readSn.Value().data_equal("SN-INITIAL"_span));
 
     DataModel::Nullable<CharSpan> readPv;
-    ASSERT_EQ(tester.ReadAttribute(ProtocolVersion::Id, readPv), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(ProtocolVersion::Id, readPv));
     ASSERT_FALSE(readPv.IsNull());
     EXPECT_TRUE(readPv.Value().data_equal("v0.1"_span));
 
     DataModel::Nullable<Globals::Structs::PowerThresholdStruct::DecodableType> readPt;
-    ASSERT_EQ(tester.ReadAttribute(PowerThreshold::Id, readPt), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(PowerThreshold::Id, readPt));
     ASSERT_FALSE(readPt.IsNull());
     EXPECT_TRUE(readPt.Value().powerThreshold.HasValue());
     EXPECT_EQ(readPt.Value().powerThreshold.Value(), 5000);
