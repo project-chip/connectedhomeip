@@ -35,6 +35,7 @@
 #import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
+#import "MTRDevice_Test.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
@@ -97,6 +98,10 @@ static NSString * const sDeviceMayBeReachableReason = @"SPI client indicated the
 // Not static, because these are public API.
 NSString * const MTRPreviousDataKey = @"previousData";
 NSString * const MTRDataVersionKey = @"dataVersion";
+
+// Conformance to the test-only declarations in MTRDevice_Test.h, so the compiler checks them against this file.
+@interface MTRDevice_Concrete () <MTRDeviceConcreteTestMethods>
+@end
 
 // allow readwrite access to superclass properties
 @interface MTRDevice_Concrete ()

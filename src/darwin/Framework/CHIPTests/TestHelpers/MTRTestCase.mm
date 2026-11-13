@@ -16,8 +16,8 @@
 
 #import "MTRTestCase.h"
 
+#import "MTRDeviceController_Test.h"
 #import "MTRMockCB.h"
-#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 

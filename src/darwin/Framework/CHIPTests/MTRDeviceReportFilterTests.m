@@ -19,8 +19,8 @@
 
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceTestDelegate.h"
+#import "MTRDevice_Test.h"
 #import "MTRTestCase.h"
-#import "MTRTestDeclarations.h"
 #import "MTRTestResponseValues.h"
 
 static const uint16_t kTimeoutInSeconds = 3;

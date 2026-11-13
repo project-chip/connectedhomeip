@@ -31,6 +31,7 @@
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceControllerXPCParameters.h"
 #import "MTRDeviceController_Concrete.h"
+#import "MTRDeviceController_Test.h"
 #import "MTRDeviceController_XPC.h"
 #import "MTRDeviceController_XPC_Internal.h"
 #import "MTRDevice_Concrete.h"
@@ -66,7 +67,8 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 using namespace chip::Tracing::DarwinFramework;
 
-@interface MTRDeviceController ()
+// Conformance to the test-only declarations in MTRDeviceController_Test.h, so the compiler checks them against this file.
+@interface MTRDeviceController () <MTRDeviceControllerTestMethods>
 @property (readwrite, nonatomic) NSUUID * uniqueIdentifier;
 @end
 

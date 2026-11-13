@@ -28,6 +28,7 @@
 #import "MTRDeviceController_Internal.h"
 #import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Internal.h"
+#import "MTRDevice_Test.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
@@ -154,8 +155,9 @@ static NSArray<id> * MTRSortedInterestedPaths(NSSet<id> * paths)
 @end
 #endif
 
+// Conformance to the test-only declarations in MTRDevice_Test.h, so the compiler checks them against this file.
 MTR_DIRECT_MEMBERS
-@interface MTRDevice ()
+@interface MTRDevice () <MTRDeviceTestMethods>
 // nil until the first time we need it.  Access guarded by our lock.
 @property (nonatomic, readwrite, nullable) NSHashTable<MTRAttributeValueWaiter *> * attributeValueWaiters;
 #ifdef DEBUG

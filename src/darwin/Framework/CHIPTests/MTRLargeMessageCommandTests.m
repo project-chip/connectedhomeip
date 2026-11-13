@@ -19,7 +19,6 @@
 
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
-#import "MTRTestDeclarations.h"
 
 static const uint64_t kDeviceId1 = 0x12344321;
 static const uint16_t kTimeoutInSeconds = 3;
