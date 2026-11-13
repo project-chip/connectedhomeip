@@ -218,6 +218,21 @@ private:
     void ShutdownCommissioner(const CommissionerIdentity & key);
     chip::FabricId CurrentCommissionerId();
 
+    // Load a previously stored operational key and NOC chain for the given identity/fabric
+    // from the commissioner storage. On success, all output parameters are populated with
+    // the stored data.
+    CHIP_ERROR LoadCommissionerNOCChain(const CommissionerIdentity & identity, const chip::FabricId fabricId,
+                                        chip::Crypto::P256Keypair & keypair, chip::MutableByteSpan & rcac,
+                                        chip::MutableByteSpan & icac, chip::MutableByteSpan & noc);
+
+    // Store the operational key and NOC chain for later load with LoadCommissionerNOCChain.
+    // This functionality can be used to persist the operational identity across chip-tool
+    // invocations. Generating a new NOC on every invocation makes the FabricTable treat it
+    // as an identity change, which clears persisted CASE session resumption and forces a full
+    // CASE handshake for every command.
+    CHIP_ERROR StoreCommissionerNOCChain(const chip::Crypto::P256Keypair & keypair, const chip::ByteSpan & rcac,
+                                         const chip::ByteSpan & icac, const chip::ByteSpan & noc);
+
     static std::map<CommissionerIdentity, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     static std::set<CHIPCommand *> sDeferredCleanups;
 
