@@ -25,7 +25,6 @@ import unittest
 from unittest import mock
 
 import matter.logging
-
 from matter.testing.matter_testing import _native_logs_below_error_dropped
 
 PREVIOUS_FILTER = matter.logging.LOG_CATEGORY_DETAIL
