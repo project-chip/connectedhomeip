@@ -16,8 +16,8 @@ message FirstCluster {
   }
 
   // Attributes
-  /** int16u Type: 6 IsList: 0 FieldId: 1 */
-  int16u some_integer = 3145729;
+  /** int16u Type: 1 IsList: 0 FieldId: 1 */
+  uint32 some_integer = 524289;
     /*
     [(attribute) = {
       is_writable : true,
