@@ -134,9 +134,10 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
     def set_remote_ice_candidates(self, remote_candidates: list[IceCandidate]) -> None:
         """Sets the remote ICE candidates for the WebRTC peer connection.
 
-        Candidates received before a remote description is set are held, and set_remote_description()
-        applies them. libdatachannel rejects a remote candidate without a remote description, and a DUT
-        using trickle ICE can send candidates before the test sets the remote offer or answer.
+        Candidates received before a remote description is set are held,
+        and set_remote_description() applies them. Adding remote ICE
+        candidates before a remote description is set can fail, so they
+        must be buffered until the peer is ready.
 
         Args:
             remote_candidates (list[IceCandidate]): A list of remote ICE candidates to be set.
