@@ -24,6 +24,7 @@ from pathlib import Path
 CHIP_REPO_PATH = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 CHIP_REPO_STR = str(CHIP_REPO_PATH)
 CONTROLLER_TEST_SCRIPTS_DIR_PATH = CHIP_REPO_PATH / "src/controller/python/tests/scripts"
+PYTHON_TESTING_DIR_PATH = CHIP_REPO_PATH / "src/python_testing"
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC = shlex.quote(str(CHIP_REPO_PATH / "credentials/development/paa-root-certs"))
 
 CHIP_ALL_CLUSTERS_APP_FRAGMENT = "standalone/chip-all-clusters-app"
@@ -37,6 +38,8 @@ CHIP_TOOL_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/standalone/chip-tool
 LIT_ICD_APP_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/lit_icd/lit-icd-app"))
 
 MATTER_CONTROLLER_WHEEL_DIR_PATH = CHIP_REPO_PATH / "out/debug/linux_x64_gcc/obj/src/controller/python/matter-controller-wheels"
+MATTER_TESTING_WHEEL_DIR_PATH = (CHIP_REPO_PATH / "out/debug/linux_x64_gcc/obj/src/python_testing/"
+                                 "matter_testing_infrastructure/matter-testing._build_wheel")
 MATTER_CONTROLLER_WHEELS = ["matter_clusters", "matter_core", "matter_repl"]
 MATTER_CONTROLLER_INSTALL_WHEELS = (
     f"pip3 install --break-system-packages --find-links {shlex.quote(str(MATTER_CONTROLLER_WHEEL_DIR_PATH))} "

@@ -740,6 +740,14 @@ class TestMatterTestingSupport(CertificationUnitTestNoDevice):
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.STR.MULTI.2"), "bar")
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.JSON"), {"key": "value"})
 
+        for method in (None, "on-network", "ble-wifi"):
+            wifi_args = ["--wifi-ssid", "WIFI_1ST_AP", "--wifi-passphrase", "12345678"]
+            if method is not None:
+                wifi_args += ["--commissioning-method", method, "--discriminator", "3840", "--passcode", "20202021"]
+            parsed = convert_args_to_matter_config(p.parse_args(wifi_args))
+            asserts.assert_equal(parsed.wifi_ssid, "WIFI_1ST_AP")
+            asserts.assert_equal(parsed.wifi_passphrase, "12345678")
+
     def test_build_tree(self):
         # Root node is 0
         # We have two trees in the root node and two trees in the aggregator
