@@ -70,6 +70,10 @@ class InteractionModelEngine;
 class ReadClient : public Messaging::ExchangeDelegate
 {
 public:
+    /**
+     * While any Callback method is executing, no other ReadClient instance may be destroyed or shut down;
+     * only OnDone may destroy the ReadClient passed to it.
+     */
     class Callback
     {
     public:
@@ -331,8 +335,8 @@ public:
     /**
      * Destructor.
      *
-     * The ReadClient object may be destroyed at any time while not in the middle of executing a ReadClient::Callback
-     * callback, and may also be destroyed from inside the OnDone callback.
+     * The ReadClient object may be destroyed at any time while no ReadClient::Callback method is executing on any
+     * ReadClient, and may also be destroyed from inside its own OnDone callback.
      *
      * Destroying the ReadClient will abort the exchange context if a valid one still exists. It will also cancel any
      * liveness timers that may be active.
@@ -369,12 +373,17 @@ public:
 
     void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
+    /**
+     * Notify the subscription of an incoming message from the publisher and trigger any scheduled resubscription.
+     *
+     * If triggering resubscription fails synchronously, Close() may invoke Callback::OnDone and destroy this ReadClient
+     * before returning.
+     */
     void OnUnsolicitedMessageFromPublisher()
     {
-        TriggerResubscribeIfScheduled("unsolicited message");
-
-        // Then notify callbacks
         mpCallback.OnUnsolicitedMessageFromPublisher(this);
+        // TriggerResubscribeIfScheduled must run last because OnDone may destroy this ReadClient.
+        TriggerResubscribeIfScheduled("unsolicited message");
     }
 
     auto GetSubscriptionId() const
@@ -501,6 +510,9 @@ public:
      * communicating, so right now is a good time to try to resubscribe.
      *
      * The reason string is used for logging if a resubscribe is triggered.
+     *
+     * If the resubscription attempt fails synchronously, Close() may invoke
+     * Callback::OnDone and destroy this ReadClient before returning.
      *
      * Returns whether a resubscribe is triggered.
      */
