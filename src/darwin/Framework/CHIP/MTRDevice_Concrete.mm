@@ -456,6 +456,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device;
 - (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device;
 - (void)unitTestSubscriptionReattemptDispatchedForDevice:(MTRDevice *)device;
+- (void)unitTestOperationalAdvertisementSeenForDevice:(MTRDevice *)device;
 @end
 #endif
 
@@ -1247,6 +1248,20 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     assertChipStackLockedByCurrentThread();
 
     MTR_LOG("%@ saw new operational advertisement", self);
+
+#ifdef DEBUG
+    {
+        // The delegate is called directly on this (Matter queue) thread, not on
+        // the delegate queue, like the other unitTest* hooks, so it cannot wait
+        // on a syncRunOnWorkQueue from the test thread.
+        std::lock_guard lock(_lock);
+        [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+            if ([testDelegate respondsToSelector:@selector(unitTestOperationalAdvertisementSeenForDevice:)]) {
+                [testDelegate unitTestOperationalAdvertisementSeenForDevice:self];
+            }
+        }];
+    }
+#endif
 
     [self _triggerResubscribeWithReason:@"operational advertisement seen"
                     nodeLikelyReachable:YES
