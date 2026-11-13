@@ -700,9 +700,7 @@ CommissioneeDeviceProxy * DeviceCommissioner::CreateCommissioneeDevice()
 
 bool DeviceCommissioner::IsBeingCommissioned(const CommissioneeDeviceProxy & device) const
 {
-    // During kICDSendStayActive and kSendComplete, and kCleanup once the operational proxy has a node ID,
-    // mDeviceBeingCommissioned is the AutoCommissioner's OperationalDeviceProxy, not `device`, so match the commissionee
-    // by node ID.
+    // mDeviceBeingCommissioned can be an operational proxy rather than `device`, so match by node ID as well.
     return mDeviceBeingCommissioned != nullptr &&
         (mDeviceBeingCommissioned == &device || mDeviceBeingCommissioned->GetDeviceId() == device.GetDeviceId());
 }
