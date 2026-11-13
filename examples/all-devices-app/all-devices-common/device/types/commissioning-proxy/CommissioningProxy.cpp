@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "CommissioningProxyDevice.h"
+#include "CommissioningProxy.h"
 
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
@@ -25,20 +25,20 @@
 namespace chip {
 namespace app {
 
-CommissioningProxyDevice::CommissioningProxyDevice(const Context & context,
-                                                   const Clusters::CommissioningProxy::CommissioningProxyCluster::Config & config) :
+CommissioningProxy::CommissioningProxy(const Context & context,
+                                       const Clusters::CommissioningProxy::CommissioningProxyCluster::Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCommissioningByProxy, 1)),
     mContext(context), mConfig(config)
 {}
 
-void CommissioningProxyDevice::AddTransport(Clusters::CommissioningProxy::CommissioningProxyTransport & transport)
+void CommissioningProxy::AddTransport(Clusters::CommissioningProxy::CommissioningProxyTransport & transport)
 {
     VerifyOrDie(mTransportCount < kMaxTransports);
     mTransports[mTransportCount++] = &transport;
 }
 
-CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                              EndpointComposition composition)
+CHIP_ERROR CommissioningProxy::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                        EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
 
@@ -67,7 +67,7 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
     return CHIP_NO_ERROR;
 }
 
-void CommissioningProxyDevice::Unregister(CodeDrivenDataModelProvider & provider)
+void CommissioningProxy::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
 
