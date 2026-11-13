@@ -718,9 +718,9 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientUnicastOmitsFalseReques
         app::WriteClient writeClient(&GetExchangeManager(), &callback,
                                      aIsTimedWrite ? MakeOptional(static_cast<uint16_t>(1000)) : NullOptional, aSuppressResponse);
         EXPECT_EQ(writeClient.PrepareForSession(session), CHIP_NO_ERROR);
-        EXPECT_EQ(writeClient.EncodeAttribute(
-                      AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id),
-                      true),
+        EXPECT_EQ(writeClient.EncodeAttribute(AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id,
+                                                                  Clusters::UnitTesting::Attributes::Boolean::Id),
+                                              true),
                   CHIP_NO_ERROR);
         EXPECT_EQ(writeClient.FinalizeMessage(/* aHasMoreChunks = */ false), CHIP_NO_ERROR);
 

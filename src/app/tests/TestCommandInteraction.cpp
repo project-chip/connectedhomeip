@@ -1873,7 +1873,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderUnicastOmitsFalseRe
         EXPECT_EQ(commandSender.PrepareCommand(MakeTestCommandPath(kTestCommandIdWithData)), CHIP_NO_ERROR);
         EXPECT_EQ(commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true), CHIP_NO_ERROR);
         app::CommandSender::FinishCommandParameters finishCommandParams(aIsTimedRequest ? Optional<uint16_t>(1000)
-                                                                                         : Optional<uint16_t>::Missing());
+                                                                                        : Optional<uint16_t>::Missing());
         finishCommandParams.SetEndDataStruct(true);
         EXPECT_EQ(commandSender.FinishCommand(finishCommandParams), CHIP_NO_ERROR);
 
