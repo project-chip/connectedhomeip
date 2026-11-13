@@ -172,6 +172,24 @@ public:
     Protocols::InteractionModel::Status SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle);
 
     /**
+     * @brief React to ActivePresetHandle changing to newPresetHandle: notify the attribute change, emit the
+     *        ActivePresetChange event, and apply the now-active preset's setpoints to the occupied setpoint
+     *        attributes.
+     *
+     *        This is the single choke point for reacting to ActivePresetHandle changes, regardless of which code
+     *        path changed it (the SetActivePresetRequest command, or a delegate that changes ActivePresetHandle on
+     *        its own, e.g. when a thermostat suggestion is accepted).
+     *
+     * @param previousPresetHandle The value of ActivePresetHandle before the change, if known.
+     * @param newPresetHandle The handle of the now-active preset, or null if there is no active preset.
+     * @return Success if there is no matching preset (nothing to apply) or the setpoints were applied successfully;
+     *         an error status if applying the setpoints failed.
+     */
+    Protocols::InteractionModel::Status
+    NotifyActivePresetHandleChanged(Optional<DataModel::Nullable<ByteSpan>> previousPresetHandle,
+                                    DataModel::Nullable<ByteSpan> newPresetHandle);
+
+    /**
      * @brief Apply a preset to the pending lists of presets during an atomic write
      *
      * @param preset The preset to append
@@ -185,6 +203,16 @@ public:
     CHIP_ERROR IsPresetHandlePresentInPresetsOrPending(const ByteSpan & presetHandleToMatch, bool & found);
 
 private:
+    /**
+     * @brief Apply the occupied setpoints of the preset identified by presetHandle, if it exists in the Presets
+     *        attribute, to the OccupiedHeatingSetpoint/OccupiedCoolingSetpoint attributes.
+     *
+     * @param presetHandle The handle of the now-active preset, or null if there is no active preset.
+     * @return Success if there is no matching preset (nothing to apply) or the setpoints were applied successfully;
+     *         an error status if applying the setpoints failed.
+     */
+    Protocols::InteractionModel::Status ApplyActivePresetSetpoints(DataModel::Nullable<ByteSpan> presetHandle);
+
     ThermostatClusterBase & mCluster;
     AtomicWriteSession & mAtomicWriteSession;
     Delegate & mDelegate;
