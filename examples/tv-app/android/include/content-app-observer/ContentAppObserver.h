@@ -28,8 +28,8 @@ class ContentAppObserver : public ContentAppObserverDelegate
 public:
     ContentAppObserver();
 
-    void HandleContentAppMessage(chip::app::CommandResponseHelper<ContentAppMessageResponse> & helper,
-                                 const chip::Optional<chip::CharSpan> & data, const chip::CharSpan & encodingHint) override;
+    void HandleContentAppMessage(chip::app::CommandResponseHelper<ContentAppMessageResponse> & helper, chip::CharSpan data,
+                                 const chip::Optional<chip::CharSpan> & encodingHint) override;
     void SetEndpointId(chip::EndpointId epId) { mEndpointId = epId; };
 
 protected:

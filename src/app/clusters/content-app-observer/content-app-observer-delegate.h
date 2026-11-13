@@ -33,8 +33,10 @@ namespace ContentAppObserver {
 class Delegate
 {
 public:
+    // This corrected signature follows the command's required Data and optional EncodingHint fields.
+    // Implementations of the former optional-Data/required-EncodingHint interface must update their override.
     virtual void HandleContentAppMessage(CommandResponseHelper<Commands::ContentAppMessageResponse::Type> & helper,
-                                         const chip::Optional<chip::CharSpan> & data, const chip::CharSpan & encodingHint) = 0;
+                                         chip::CharSpan data, const chip::Optional<chip::CharSpan> & encodingHint) = 0;
 
     virtual ~Delegate() = default;
 };
