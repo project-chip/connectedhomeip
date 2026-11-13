@@ -79,14 +79,18 @@ public:
      * @param connectionID The connection ID of the transport that started
      * @param triggerType The type of trigger that started the transport
      * @param activationReason Optional reason for the activation
+     * @param cmafSessionNumber For CMAF transports, the CMAF session number of the recording that started. If absent,
+     *                          the delegate's GetCMAFSessionNumber() is used, which is only correct if the delegate's
+     *                          current session cannot change before the event is generated.
      * @return Status::Success if event was generated successfully, failure otherwise
      */
     Protocols::InteractionModel::Status
     NotifyTransportStarted(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
                            Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
-                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>())
+                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>(),
+                           Optional<uint64_t> cmafSessionNumber = Optional<uint64_t>())
     {
-        return mLogic.NotifyTransportStarted(connectionID, triggerType, activationReason);
+        return mLogic.NotifyTransportStarted(connectionID, triggerType, activationReason, cmafSessionNumber);
     }
 
     /**
@@ -97,12 +101,16 @@ public:
      *
      * @param connectionID The connection ID of the transport that stopped
      * @param triggerType The type of trigger that started the transport
+     * @param cmafSessionNumber For CMAF transports, the CMAF session number of the recording that ended. If absent, the
+     *                          delegate's GetCMAFSessionNumber() is used, which reports the wrong session if the delegate
+     *                          has already started the next one.
      * @return Status::Success if event was generated successfully, failure otherwise
      */
     Protocols::InteractionModel::Status NotifyTransportStopped(uint16_t connectionID,
-                                                               PushAvStreamTransport::TransportTriggerTypeEnum triggerType)
+                                                               PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
+                                                               Optional<uint64_t> cmafSessionNumber = Optional<uint64_t>())
     {
-        return mLogic.NotifyTransportStopped(connectionID, triggerType);
+        return mLogic.NotifyTransportStopped(connectionID, triggerType, cmafSessionNumber);
     }
 
     /**

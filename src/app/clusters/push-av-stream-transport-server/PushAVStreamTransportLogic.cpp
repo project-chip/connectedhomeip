@@ -1924,7 +1924,8 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(
     return Status::Success;
 }
 
-Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uint16_t connectionID)
+Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uint16_t connectionID,
+                                                                       const Optional<uint64_t> cmafSessionNumber)
 {
     Events::PushTransportEnd::Type event;
     EventNumber eventNumber;
@@ -1940,18 +1941,7 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
         // For CMAF container type, we need to provide CMAF session number
         if (event.containerType == ContainerFormatEnum::kCmaf)
         {
-            uint64_t sessionNumber = 0;
-            if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
-            {
-                event.CMAFSessionNumber = MakeOptional<uint64_t>(sessionNumber);
-            }
-            else
-            {
-                ChipLogError(Zcl, "GeneratePushTransportEndEvent: Unable to get CMAF session number for connection %u",
-                             connectionID);
-                // Don't include the session number if we can't get it
-                event.CMAFSessionNumber = Optional<uint64_t>();
-            }
+            event.CMAFSessionNumber = ResolveCMAFSessionNumber(connectionID, cmafSessionNumber);
         }
         else
         {
@@ -1976,7 +1966,8 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
 }
 
 Status PushAvStreamTransportServerLogic::NotifyTransportStarted(uint16_t connectionID, TransportTriggerTypeEnum triggerType,
-                                                                Optional<TriggerActivationReasonEnum> activationReason)
+                                                                Optional<TriggerActivationReasonEnum> activationReason,
+                                                                Optional<uint64_t> cmafSessionNumber)
 {
     ChipLogProgress(Zcl, "NotifyTransportStarted called for connectionID %u with triggerType %u", connectionID,
                     to_underlying(triggerType));
@@ -1993,27 +1984,33 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStarted(uint16_t connect
     ContainerFormatEnum containerType = transportConfig->transportOptions.Value().containerOptions.containerType;
 
     // For CMAF container type, we need to provide CMAF session number
-    Optional<uint64_t> cmafSessionNumber;
+    Optional<uint64_t> eventSessionNumber;
     if (containerType == ContainerFormatEnum::kCmaf)
     {
-        uint64_t sessionNumber = 0;
-        if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
-        {
-            cmafSessionNumber = MakeOptional<uint64_t>(sessionNumber);
-        }
-        else
-        {
-            ChipLogError(Zcl, "NotifyTransportStarted: Unable to get CMAF session number for connection %u", connectionID);
-            // Don't include the session number if we can't get it
-            cmafSessionNumber = Optional<uint64_t>();
-        }
+        eventSessionNumber = ResolveCMAFSessionNumber(connectionID, cmafSessionNumber);
     }
 
     // Generate the PushTransportBegin event
-    return GeneratePushTransportBeginEvent(connectionID, triggerType, activationReason, containerType, cmafSessionNumber);
+    return GeneratePushTransportBeginEvent(connectionID, triggerType, activationReason, containerType, eventSessionNumber);
 }
 
-Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType)
+Optional<uint64_t> PushAvStreamTransportServerLogic::ResolveCMAFSessionNumber(uint16_t connectionID,
+                                                                              const Optional<uint64_t> & cmafSessionNumber)
+{
+    VerifyOrReturnValue(!cmafSessionNumber.HasValue(), cmafSessionNumber);
+
+    uint64_t sessionNumber = 0;
+    if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
+    {
+        return MakeOptional(sessionNumber);
+    }
+
+    ChipLogError(Zcl, "Unable to get CMAF session number for connection %u", connectionID);
+    return NullOptional;
+}
+
+Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType,
+                                                                Optional<uint64_t> cmafSessionNumber)
 {
     ChipLogProgress(Zcl, "NotifyTransportStopped called for connectionID %u with triggerType %u", connectionID,
                     to_underlying(triggerType));
@@ -2027,7 +2024,7 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connect
     }
 
     // Generate the PushTransportEnd event
-    return GeneratePushTransportEndEvent(connectionID);
+    return GeneratePushTransportEndEvent(connectionID, cmafSessionNumber);
 }
 
 CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()

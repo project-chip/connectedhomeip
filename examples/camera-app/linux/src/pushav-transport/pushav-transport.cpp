@@ -19,16 +19,51 @@
 #include <clusters/push-av-stream-transport/push-av-stream-manager.h>
 #include <ctime>
 #include <filesystem>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
+#include <platform/KeyValueStoreManager.h>
+#include <platform/PlatformManager.h>
 #include <pushav-transport.h>
 #include <time.h>
 
 using namespace chip::app::Clusters::PushAvStreamTransport;
+using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
 
-PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
-                                 AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams) :
+namespace {
+
+// Connection IDs are unique only within one Push AV Stream Transport cluster, so the key includes its endpoint.
+chip::StorageKeyName SessionNumberKey(chip::EndpointId endpointId, uint16_t connectionID)
+{
+    return chip::StorageKeyName::Formatted("cam/pavst/%x/%x/sn", endpointId, connectionID);
+}
+
+struct TransportStartedEvent
+{
+    chip::app::Clusters::PushAvStreamTransportServer * server;
+    uint16_t connectionID;
+    TransportTriggerTypeEnum triggerType;
+    chip::Optional<TriggerActivationReasonEnum> activationReason;
+    uint64_t sessionNumber;
+};
+
+// Runs on the CHIP thread through PlatformMgr().ScheduleWork(); takes ownership of the TransportStartedEvent.
+void NotifyTransportStartedOnChipThread(intptr_t arg)
+{
+    auto * event = reinterpret_cast<TransportStartedEvent *>(arg);
+    event->server->NotifyTransportStarted(event->connectionID, event->triggerType, event->activationReason,
+                                          chip::MakeOptional(event->sessionNumber));
+    chip::Platform::Delete(event);
+}
+
+} // namespace
+
+PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, chip::EndpointId endpointId,
+                                 const uint16_t connectionID, AudioStreamStruct & audioStreamParams,
+                                 VideoStreamStruct & videoStreamParams) :
     mAudioStreamParams(audioStreamParams),
     mVideoStreamParams(videoStreamParams)
 {
+    mEndpointId                        = endpointId;
     mConnectionID                      = connectionID;
     mTransportStatus                   = TransportStatusEnum::kInactive;
     mBlindStartTime                    = std::chrono::steady_clock::time_point();
@@ -49,6 +84,18 @@ PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions
 
     std::filesystem::path outputPath = std::filesystem::path("/tmp") / uniqueDirName;
     mClipInfo.mOutputPath            = outputPath.string();
+
+    uint64_t storedSessionNumber = 0;
+
+    CHIP_ERROR err = KeyValueStoreMgr().Get(SessionNumberKey(endpointId, connectionID).KeyName(), &storedSessionNumber);
+    if (err == CHIP_NO_ERROR)
+    {
+        mSessionNumber = storedSessionNumber;
+    }
+    else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogError(Camera, "Transport[%u] Failed to load SessionNumber: %" CHIP_ERROR_FORMAT, connectionID, err.Format());
+    }
 }
 
 const char * GetAudioCodecName(int codecId)
@@ -152,9 +199,8 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
     }
 
     // Codecs are valid, proceed with configuration
-    mClipInfo.mHasAudio      = (transportOptions.audioStreams.HasValue() || transportOptions.audioStreamID.HasValue());
-    mClipInfo.mHasVideo      = (transportOptions.videoStreams.HasValue() || transportOptions.videoStreamID.HasValue());
-    mSessionStartedTimestamp = std::chrono::system_clock::time_point();
+    mClipInfo.mHasAudio = (transportOptions.audioStreams.HasValue() || transportOptions.audioStreamID.HasValue());
+    mClipInfo.mHasVideo = (transportOptions.videoStreams.HasValue() || transportOptions.videoStreamID.HasValue());
 
     mClipInfo.mUrl         = std::string(transportOptions.url.data(), transportOptions.url.size());
     mClipInfo.mTriggerType = static_cast<int>(transportOptions.triggerOptions.triggerType);
@@ -263,7 +309,7 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
     UpdateSendFlags();
     ChipLogProgress(Camera,
                     "Transport[%u] Session[%" PRIu64 "] ConfigureRecorderSettings success - Track=%s HasVideo=%s HasAudio=%s",
-                    mConnectionID, mSessionNumber, mClipInfo.mTrackName.c_str(), mClipInfo.mHasVideo ? "true" : "false",
+                    mConnectionID, mSessionNumber.load(), mClipInfo.mTrackName.c_str(), mClipInfo.mHasVideo ? "true" : "false",
                     mClipInfo.mHasAudio ? "true" : "false");
 
     return CHIP_NO_ERROR;
@@ -273,7 +319,6 @@ void PushAVTransport::InitializeRecorder()
 {
     if (mRecorder.get() == nullptr)
     {
-        mSessionStartedTimestamp = std::chrono::system_clock::time_point();
         mClipInfo.mSessionNumber = mSessionNumber;
         mRecorder                = std::make_unique<PushAVClipRecorder>(mClipInfo, mAudioInfo, mVideoInfo, mUploader.get());
         mRecorder->SetFabricIndex(mFabricIndex);
@@ -415,18 +460,46 @@ void PushAVTransport::StartRecordingAndStreaming()
         mManager->ResetTransportSinkStateForTransport(this);
     }
 
-    mRecorder->mClipInfo.mSessionNumber = mClipInfo.mSessionNumber;
+    uint64_t sessionNumber = StartNewSession();
     mRecorder->Start();
     mStreaming = true;
     UpdateSendFlags();
     if (IsStreaming())
     {
         ChipLogDetail(Camera, "Ready to stream");
-        GeneratePushTransportBeginEvent();
+        GeneratePushTransportBeginEvent(sessionNumber);
     }
 }
 
-void PushAVTransport::GeneratePushTransportBeginEvent()
+uint64_t PushAVTransport::StartNewSession()
+{
+    uint64_t sessionNumber              = ++mSessionNumber;
+    mSessionStartedTimestamp            = std::chrono::system_clock::now();
+    mClipInfo.mSessionNumber            = sessionNumber;
+    mRecorder->mClipInfo.mSessionNumber = sessionNumber;
+
+    CHIP_ERROR err = KeyValueStoreMgr().Put(SessionNumberKey(mEndpointId, mConnectionID).KeyName(), sessionNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Transport[%u] Failed to persist SessionNumber %" PRIu64 ": %" CHIP_ERROR_FORMAT, mConnectionID,
+                     sessionNumber, err.Format());
+    }
+
+    ChipLogProgress(Camera, "Transport[%u] Session[%" PRIu64 "] SESSION_STARTED Track=%s", mConnectionID, sessionNumber,
+                    mClipInfo.mTrackName.c_str());
+    return sessionNumber;
+}
+
+void PushAVTransport::ClearPersistedSessionNumber()
+{
+    CHIP_ERROR err = KeyValueStoreMgr().Delete(SessionNumberKey(mEndpointId, mConnectionID).KeyName());
+    if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogError(Camera, "Transport[%u] Failed to delete SessionNumber: %" CHIP_ERROR_FORMAT, mConnectionID, err.Format());
+    }
+}
+
+void PushAVTransport::GeneratePushTransportBeginEvent(uint64_t sessionNumber)
 {
     ChipLogProgress(
         Camera, "GeneratePushTransportBeginEvent: connectionID=%u, triggerType=%u, mCurrentActivationByManualTrigger=%s",
@@ -434,9 +507,23 @@ void PushAVTransport::GeneratePushTransportBeginEvent()
 
     if (mPushAvStreamTransportServer != nullptr)
     {
-        ChipLogProgress(Camera, "GeneratePushTransportBeginEvent: Calling NotifyTransportStarted for connection %u", mConnectionID);
-        // mActivationReason is optional - if not set, it defaults to empty value
-        mPushAvStreamTransportServer->NotifyTransportStarted(mConnectionID, mTransportTriggerType, mActivationReason);
+        // Posted to the CHIP event queue, like PushTransportEnd, so the events are reported in the order they happen even
+        // when a session starts on the media thread.
+        auto * event = chip::Platform::New<TransportStartedEvent>(TransportStartedEvent{
+            mPushAvStreamTransportServer, mConnectionID, mTransportTriggerType, mActivationReason, sessionNumber });
+
+        CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
+        if (event != nullptr)
+        {
+            err = chip::DeviceLayer::PlatformMgr().ScheduleWork(NotifyTransportStartedOnChipThread,
+                                                                reinterpret_cast<intptr_t>(event));
+        }
+        if (err != CHIP_NO_ERROR)
+        {
+            chip::Platform::Delete(event);
+            ChipLogError(Camera, "Failed to schedule PushTransportBegin for connection %u: %" CHIP_ERROR_FORMAT, mConnectionID,
+                         err.Format());
+        }
     }
     else
     {
@@ -798,27 +885,13 @@ uint16_t PushAVTransport::GetPreRollLength()
 
 void PushAVTransport::CheckAndUpdateSession()
 {
-    auto now = std::chrono::system_clock::now();
-
-    if (mSessionStartedTimestamp == std::chrono::system_clock::time_point())
-    {
-        mSessionStartedTimestamp = now;
-        mSessionNumber++;
-        ChipLogProgress(Camera, "Transport[%u] Session[%" PRIu64 "] SESSION_STARTED: First session initialized for Track=%s",
-                        mConnectionID, mSessionNumber, mClipInfo.mTrackName.c_str());
-        return;
-    }
-
-    auto elapsed = std::chrono::duration_cast<std::chrono::minutes>(now - mSessionStartedTimestamp).count();
+    auto elapsed =
+        std::chrono::duration_cast<std::chrono::minutes>(std::chrono::system_clock::now() - mSessionStartedTimestamp).count();
     if (elapsed >= kMaxSessionDurationMinutes)
     {
-        mSessionStartedTimestamp = now;
-
-        ChipLogProgress(Camera,
-                        "Transport[%u] Session[%" PRIu64
-                        "] SESSION_INCREMENTED: Session duration limit reached (%d min). New session "
-                        "started. Track=%s",
-                        mConnectionID, mSessionNumber, kMaxSessionDurationMinutes, mClipInfo.mTrackName.c_str());
+        ChipLogProgress(
+            Camera, "Transport[%u] Session[%" PRIu64 "] Session duration limit reached (%d min). Starting a new session. Track=%s",
+            mConnectionID, mSessionNumber.load(), kMaxSessionDurationMinutes, mClipInfo.mTrackName.c_str());
         mStreaming = false;
         UpdateSendFlags();
         {
@@ -826,6 +899,8 @@ void PushAVTransport::CheckAndUpdateSession()
             mRecorder.reset();
             InitializeRecorder();
         }
+        uint64_t sessionNumber = StartNewSession();
+
         auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() -
                                                                                mRecorder->mClipInfo.mActivationTime)
                                   .count();
@@ -834,5 +909,9 @@ void PushAVTransport::CheckAndUpdateSession()
         mRecorder->Start();
         mStreaming = true;
         UpdateSendFlags();
+        if (IsStreaming())
+        {
+            GeneratePushTransportBeginEvent(sessionNumber);
+        }
     }
 }
