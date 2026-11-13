@@ -231,6 +231,8 @@ CHIP_ERROR CommissionerDeclaration::ReadPayload(uint8_t * udcPayload, size_t pay
         case kPasscodeLengthTag:
             err = reader.Get(mPasscodeLength);
             break;
+        default:
+            break;
         }
         ReturnErrorOnFailure(
             err, ChipLogError(AppServer, "CommissionerDeclaration::ReadPayload read error %" CHIP_ERROR_FORMAT, err.Format()));
