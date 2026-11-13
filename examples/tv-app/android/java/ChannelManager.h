@@ -57,12 +57,12 @@ public:
                                const chip::Optional<chip::ByteSpan> & data) override;
 
     bool HandleRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
-                             const chip::app::DataModel::DecodableList<AdditionalInfoType> & externalIdList,
-                             const chip::ByteSpan & data) override;
+                             const chip::Optional<chip::app::DataModel::DecodableList<AdditionalInfoType>> & externalIdList,
+                             const chip::Optional<chip::ByteSpan> & data) override;
 
     bool HandleCancelRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
-                                   const chip::app::DataModel::DecodableList<AdditionalInfoType> & externalIdList,
-                                   const chip::ByteSpan & data) override;
+                                   const chip::Optional<chip::app::DataModel::DecodableList<AdditionalInfoType>> & externalIdList,
+                                   const chip::Optional<chip::ByteSpan> & data) override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
