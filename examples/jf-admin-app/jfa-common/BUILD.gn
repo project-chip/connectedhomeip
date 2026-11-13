@@ -24,8 +24,98 @@ chip_data_model("jfa-common") {
   is_server = true
 }
 
-source_set("jfa-manager") {
-  deps = [ "${chip_root}/src/lib" ]
+# Shared, OS-agnostic JointFabricDatastore::Delegate implementation.
+#
+# This source set exposes JFADatastoreSync.{h,cpp}, JFARpc.h and JFAPlatform.h.
+# Platforms (examples/jf-admin-app/linux/, future ports) depend on it and
+# provide their own implementation of the two JFAPlatform.h hooks.
+source_set("jfa-datastore-sync") {
+  sources = [
+    "include/JFADatastoreSync.h",
+    "include/JFAPlatform.h",
+    "include/JFARpc.h",
+    "src/JFADatastoreSync.cpp",
+  ]
+
   public_configs = [ ":config" ]
-  sources = []
+
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/controller",
+    "${chip_root}/src/lib",
+  ]
+}
+
+# Shared, OS-agnostic JointFabricAdministrator::Delegate implementation.
+#
+# This source set exposes JFAManagerBase.{h,cpp}. Platforms derive a concrete
+# JFAManager (see examples/jf-admin-app/linux/JFAManagerLinux.{h,cpp}) and
+# provide the chip::JFAMgr() singleton accessor declared in JFAManagerBase.h.
+source_set("jfa-manager-base") {
+  sources = [
+    "include/JFAManagerBase.h",
+    "src/JFAManagerBase.cpp",
+  ]
+
+  public_configs = [ ":config" ]
+
+  public_deps = [
+    ":jfa-datastore-sync",
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/controller",
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib",
+  ]
+}
+
+# Shared, OS-agnostic wire-up of the Joint Fabric Administrator into the running
+# Server.
+#
+# JFAInit.cpp holds the DeviceInstanceInfoProvider wrapper, the commissioning /
+# DNS-SD event handler, and the common delegate/provider wiring. Each platform
+# calls chip::JFAInitialize(server) and performs its own platform-specific steps
+# around it (see examples/jf-admin-app/linux/main.cpp for an example).
+source_set("jfa-init") {
+  sources = [
+    "include/JFAInit.h",
+    "src/JFAInit.cpp",
+  ]
+
+  public_configs = [ ":config" ]
+
+  public_deps = [
+    ":jfa-datastore-sync",
+    ":jfa-manager-base",
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/platform",
+  ]
+}
+
+# Shared, OS-agnostic Joint Fabric Administrator pigweed RPC server.
+#
+# RpcServer.cpp holds all the RPC logic; the wait/signal mechanism for the ICAC
+# CSR response is the only platform-specific part and is delegated to the
+# JFAResponseSignal.h shim. Each platform depends on this source set and links
+# its own shim implementation.
+source_set("jfa-rpc-server") {
+  sources = [
+    "include/JFAResponseSignal.h",
+    "src/RpcServer.cpp",
+  ]
+
+  public_configs = [ ":config" ]
+
+  include_dirs = [ "${chip_root}/examples/common" ]
+
+  public_deps = [
+    ":jfa-manager-base",
+    "${chip_root}/examples/common/pigweed:joint_fabric_service.nanopb_rpc",
+    "${chip_root}/examples/common/pigweed:rpc_services",
+    "${chip_root}/src/app",
+    "${chip_root}/src/lib",
+  ]
 }

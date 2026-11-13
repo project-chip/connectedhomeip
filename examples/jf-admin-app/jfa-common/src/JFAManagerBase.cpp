@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "JFAManager.h"
+#include "JFAManagerBase.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -24,9 +24,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/server/Server.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-#include <CommissionerMain.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#include "JFAPlatform.h"
 
 #include <controller/CHIPCluster.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -45,9 +43,7 @@ constexpr uint8_t kJFDatastoreShift = 3;
 
 constexpr chip::EndpointId kJointFabricAdminEndpointId = 1;
 
-JFAManager JFAManager::sJFA;
-
-CHIP_ERROR JFAManager::Init(Server & server)
+CHIP_ERROR JFAManagerBase::Init(Server & server)
 {
     mServer             = &server;
     mCASESessionManager = server.GetCASESessionManager();
@@ -55,7 +51,7 @@ CHIP_ERROR JFAManager::Init(Server & server)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR JFAManager::GetJointFabricMode(uint8_t & jointFabricMode)
+CHIP_ERROR JFAManagerBase::GetJointFabricMode(uint8_t & jointFabricMode)
 {
     jointFabricMode = ((IsDeviceCommissioned() ? 0 : 1) << kJFAvailableShift) |
         (IsDeviceCommissioned() ? (IsDeviceJFAdmin() ? (1 << kJFAdminShift) : 0) : 0) |
@@ -64,7 +60,8 @@ CHIP_ERROR JFAManager::GetJointFabricMode(uint8_t & jointFabricMode)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256PublicKey & trustedIcacPublicKeyB, uint16_t endpointId)
+CHIP_ERROR JFAManagerBase::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256PublicKey & trustedIcacPublicKeyB,
+                                                 uint16_t endpointId)
 {
     if (jfFabricIndex == kUndefinedFabricId)
     {
@@ -82,17 +79,17 @@ CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256Publ
     return CHIP_NO_ERROR;
 }
 
-void JFAManager::SetJFARpc(JFARpc & aJFARpc)
+void JFAManagerBase::SetJFARpc(JFARpc & aJFARpc)
 {
     mJFARpc = &aJFARpc;
 }
 
-JFARpc * JFAManager::GetJFARpc()
+JFARpc * JFAManagerBase::GetJFARpc()
 {
     return mJFARpc;
 }
 
-void JFAManager::HandleCommissioningCompleteEvent()
+void JFAManagerBase::HandleCommissioningCompleteEvent()
 {
     for (const auto & fb : mServer->GetFabricTable())
     {
@@ -206,9 +203,7 @@ void JFAManager::HandleCommissioningCompleteEvent()
 
                 if (!mCommissionerInitialized)
                 {
-                    CHIP_ERROR err = InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort,
-                                                      LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort, fb.GetFabricId(),
-                                                      fabricIndex);
+                    CHIP_ERROR err = JFAInitCommissioner(fb.GetFabricId(), fabricIndex);
                     if (err == CHIP_NO_ERROR)
                     {
                         mCommissionerInitialized = true;
@@ -227,7 +222,7 @@ void JFAManager::HandleCommissioningCompleteEvent()
     }
 }
 
-bool JFAManager::IsDeviceJFAdmin()
+bool JFAManagerBase::IsDeviceJFAdmin()
 {
     if (jfFabricIndex == kUndefinedFabricId)
     {
@@ -247,7 +242,7 @@ bool JFAManager::IsDeviceJFAdmin()
     return false;
 }
 
-bool JFAManager::IsDeviceJFAnchor()
+bool JFAManagerBase::IsDeviceJFAnchor()
 {
     if (jfFabricIndex == kUndefinedFabricId)
     {
@@ -267,7 +262,7 @@ bool JFAManager::IsDeviceJFAnchor()
     return false;
 }
 
-void JFAManager::ReleaseSession()
+void JFAManagerBase::ReleaseSession()
 {
     auto optionalSessionHandle = mSessionHolder.Get();
 
@@ -281,7 +276,7 @@ void JFAManager::ReleaseSession()
     mSessionHolder.Release();
 }
 
-void JFAManager::ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onConnectedAction)
+void JFAManagerBase::ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onConnectedAction)
 {
     VerifyOrDie(mServer != nullptr);
 
@@ -301,9 +296,9 @@ void JFAManager::ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onCo
     mCASESessionManager->FindOrEstablishSession(scopedNodeId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
 }
 
-void JFAManager::OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+void JFAManagerBase::OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
-    JFAManager * jfaManager = static_cast<JFAManager *>(context);
+    JFAManagerBase * jfaManager = static_cast<JFAManagerBase *>(context);
 
     VerifyOrDie(jfaManager != nullptr);
     jfaManager->mSessionHolder.Grab(sessionHandle);
@@ -323,13 +318,15 @@ void JFAManager::OnConnected(void * context, Messaging::ExchangeManager & exchan
     }
 
     default:
+        // Subclass-defined action; let the platform-specific manager handle it.
+        jfaManager->DispatchExtendedConnectedAction(jfaManager->mOnConnectedAction);
         break;
     }
 }
 
-void JFAManager::OnConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+void JFAManagerBase::OnConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
 {
-    JFAManager * jfaManager = static_cast<JFAManager *>(context);
+    JFAManagerBase * jfaManager = static_cast<JFAManagerBase *>(context);
     VerifyOrDie(jfaManager != nullptr);
 
     ChipLogError(JointFabric, "Failed to establish connection to 0x" ChipLogFormatX64 " on fabric index %d",
@@ -338,7 +335,7 @@ void JFAManager::OnConnectionFailure(void * context, const ScopedNodeId & peerId
     jfaManager->ReleaseSession();
 }
 
-CHIP_ERROR JFAManager::AnnounceJointFabricAdministrator()
+CHIP_ERROR JFAManagerBase::AnnounceJointFabricAdministrator()
 {
     Commands::AnnounceJointFabricAdministrator::Type request;
 
@@ -355,9 +352,9 @@ CHIP_ERROR JFAManager::AnnounceJointFabricAdministrator()
                                  OnAnnounceJointFabricAdministratorFailure);
 }
 
-void JFAManager::OnAnnounceJointFabricAdministratorResponse(void * context, const chip::app::DataModel::NullObjectType & data)
+void JFAManagerBase::OnAnnounceJointFabricAdministratorResponse(void * context, const chip::app::DataModel::NullObjectType & data)
 {
-    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    JFAManagerBase * jfaManagerCore = static_cast<JFAManagerBase *>(context);
     VerifyOrDie(jfaManagerCore != nullptr);
 
     ChipLogProgress(JointFabric, "OnAnnounceJointFabricAdministratorResponse");
@@ -366,16 +363,16 @@ void JFAManager::OnAnnounceJointFabricAdministratorResponse(void * context, cons
     TEMPORARY_RETURN_IGNORED jfaManagerCore->SendICACSRRequest();
 }
 
-void JFAManager::OnAnnounceJointFabricAdministratorFailure(void * context, CHIP_ERROR error)
+void JFAManagerBase::OnAnnounceJointFabricAdministratorFailure(void * context, CHIP_ERROR error)
 {
-    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    JFAManagerBase * jfaManagerCore = static_cast<JFAManagerBase *>(context);
     VerifyOrDie(jfaManagerCore != nullptr);
     jfaManagerCore->ReleaseSession();
 
     ChipLogError(JointFabric, "OnAnnounceJointFabricAdministratorFailure: %s\n", chip::ErrorStr(error));
 }
 
-CHIP_ERROR JFAManager::SendICACSRRequest()
+CHIP_ERROR JFAManagerBase::SendICACSRRequest()
 {
     Commands::ICACCSRRequest::Type request;
 
@@ -390,9 +387,9 @@ CHIP_ERROR JFAManager::SendICACSRRequest()
     return cluster.InvokeCommand(request, this, OnSendICACSRRequestResponse, OnSendICACSRRequestFailure);
 }
 
-void JFAManager::OnSendICACSRRequestResponse(void * context, const Commands::ICACCSRResponse::DecodableType & icaccsr)
+void JFAManagerBase::OnSendICACSRRequestResponse(void * context, const Commands::ICACCSRResponse::DecodableType & icaccsr)
 {
-    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    JFAManagerBase * jfaManagerCore = static_cast<JFAManagerBase *>(context);
     VerifyOrDie(jfaManagerCore != nullptr);
     P256PublicKey pubKey;
 
@@ -408,16 +405,16 @@ void JFAManager::OnSendICACSRRequestResponse(void * context, const Commands::ICA
     }
 }
 
-void JFAManager::OnSendICACSRRequestFailure(void * context, CHIP_ERROR error)
+void JFAManagerBase::OnSendICACSRRequestFailure(void * context, CHIP_ERROR error)
 {
-    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    JFAManagerBase * jfaManagerCore = static_cast<JFAManagerBase *>(context);
     VerifyOrDie(jfaManagerCore != nullptr);
     jfaManagerCore->ReleaseSession();
 
     ChipLogError(JointFabric, "OnSendICACSRRequestFailure: %s\n", chip::ErrorStr(error));
 }
 
-CHIP_ERROR JFAManager::SendCommissioningComplete()
+CHIP_ERROR JFAManagerBase::SendCommissioningComplete()
 {
     GeneralCommissioning::Commands::CommissioningComplete::Type request;
 
@@ -431,10 +428,10 @@ CHIP_ERROR JFAManager::SendCommissioningComplete()
     return cluster.InvokeCommand(request, this, OnCommissioningCompleteResponse, OnCommissioningCompleteFailure);
 }
 
-void JFAManager::OnCommissioningCompleteResponse(
+void JFAManagerBase::OnCommissioningCompleteResponse(
     void * context, const GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data)
 {
-    JFAManager * jfaManager = static_cast<JFAManager *>(context);
+    JFAManagerBase * jfaManager = static_cast<JFAManagerBase *>(context);
     VerifyOrDie(jfaManager != nullptr);
 
     ChipLogProgress(JointFabric, "OnCommissioningCompleteResponse, Code=%u", to_underlying(data.errorCode));
@@ -450,28 +447,32 @@ void JFAManager::OnCommissioningCompleteResponse(
         {
         case kStandardCommissioningComplete: {
             ChipLogProgress(JointFabric, "Standard Commissioning (nodeId=%ld) success", jfaManager->mNodeId);
+            // Let subclasses react to a successfully onboarded commissionee; default implementation is a no-op.
+            jfaManager->OnCommissioneeOnboarded(ScopedNodeId(jfaManager->mNodeId, jfaManager->jfFabricIndex));
             break;
         }
         case kJCMCommissioning: {
             ChipLogProgress(JointFabric, "Joint Commissioning Method (nodeId=%ld) success", jfaManager->mNodeId);
             break;
         }
+        default:
+            break;
         }
     }
 
     jfaManager->ReleaseSession();
 }
 
-void JFAManager::OnCommissioningCompleteFailure(void * context, CHIP_ERROR error)
+void JFAManagerBase::OnCommissioningCompleteFailure(void * context, CHIP_ERROR error)
 {
-    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    JFAManagerBase * jfaManagerCore = static_cast<JFAManagerBase *>(context);
     VerifyOrDie(jfaManagerCore != nullptr);
     jfaManagerCore->ReleaseSession();
 
     ChipLogError(JointFabric, "Received failure response %s\n", chip::ErrorStr(error));
 }
 
-CHIP_ERROR JFAManager::GetIcacCsr(MutableByteSpan & icacCsr)
+CHIP_ERROR JFAManagerBase::GetIcacCsr(MutableByteSpan & icacCsr)
 {
     JFARpc * jfaRpc = GetJFARpc();
 
