@@ -45,3 +45,20 @@ to build and test.
 
           $ cd examples/jf-control-app/
           $ rm -rf out/
+
+## RPC connection to the jf-admin-app
+
+The jf-control-app talks to the jf-admin-app (which hosts the RPC server) over
+pigweed RPC. The RPC server IPv6 address is not hardcoded: once the Anchor
+Administrator has been commissioned (`pairing ... --anchor true`), the
+controller knows the Anchor Administrator node id and resolves its operational
+IPv6 address via mDNS. The RPC connection is then established automatically
+using the resolved address.
+
+The address and port can still be provided manually:
+
+-   `--rpc-server-ip <IPv6>`: when provided, the RPC connection is established
+    at startup using this address and the mDNS discovery is skipped.
+-   `--rpc-server-port <port>`: overrides the default RPC listen port (33000).
+    This is a fixed pigweed port and is not discoverable over Matter, so it is
+    always taken from this argument (or the default) rather than from mDNS.
