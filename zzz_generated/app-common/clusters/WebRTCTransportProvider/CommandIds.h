@@ -13,7 +13,7 @@ namespace WebRTCTransportProvider {
 namespace Commands {
 
 // Total number of client to server commands supported by the cluster
-inline constexpr uint32_t kAcceptedCommandsCount = 5;
+inline constexpr uint32_t kAcceptedCommandsCount = 6;
 
 // Total number of server to client commands supported by the cluster (response commands)
 inline constexpr uint32_t kGeneratedCommandsCount = 2;
@@ -37,6 +37,10 @@ inline constexpr CommandId Id = 0x00000005;
 namespace EndSession {
 inline constexpr CommandId Id = 0x00000006;
 } // namespace EndSession
+
+namespace UpdateSession {
+inline constexpr CommandId Id = 0x00000007;
+} // namespace UpdateSession
 
 namespace SolicitOfferResponse {
 inline constexpr CommandId Id = 0x00000001;

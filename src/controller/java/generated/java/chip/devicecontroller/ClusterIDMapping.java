@@ -20821,6 +20821,7 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             CurrentSessions(0L),
+            SupportedSFrameCipherSuites(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -20870,7 +20871,8 @@ public class ClusterIDMapping {
             ProvideOffer(2L),
             ProvideAnswer(4L),
             ProvideICECandidates(5L),
-            EndSession(6L),;
+            EndSession(6L),
+            UpdateSession(7L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -20967,6 +20969,23 @@ public class ClusterIDMapping {
                     }
                     public static EndSessionCommandField value(int id) throws NoSuchFieldError {
                         for (EndSessionCommandField field : EndSessionCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum UpdateSessionCommandField {WebRTCSessionID(0),SFrameSenderKey(1),SFrameReceiveKeysToAdd(2),SFrameReceiveKIDsToRemove(3),;
+                    private final int id;
+                    UpdateSessionCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static UpdateSessionCommandField value(int id) throws NoSuchFieldError {
+                        for (UpdateSessionCommandField field : UpdateSessionCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

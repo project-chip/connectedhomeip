@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 
 source_set("webrtc-transport-provider-server") {
   sources = [
+    "SFrameConfigStorage.h",
     "WebRTCTransportProviderCluster.cpp",
     "WebRTCTransportProviderCluster.h",
   ]

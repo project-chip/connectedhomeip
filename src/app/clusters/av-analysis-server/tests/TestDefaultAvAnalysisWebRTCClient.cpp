@@ -119,8 +119,8 @@ protected:
         ReturnErrorOnFailure(BuildProvideOffer(request, videoStream));
         mSentSessionIdWasNull    = request.webRTCSessionID.IsNull();
         mSentSdp                 = std::string(request.sdp.data(), request.sdp.size());
-        mSentUsage               = request.streamUsage;
-        mSentOriginatingEndpoint = request.originatingEndpointID;
+        mSentUsage               = request.streamUsage.Value();
+        mSentOriginatingEndpoint = request.originatingEndpointID.Value();
         mSentVideoStreams.clear();
         if (request.videoStreams.HasValue())
         {
@@ -884,7 +884,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, OfferedSessionIsEstablishedAndRegister
     EXPECT_EQ(sessions[0].fabricIndex, kCameraNode.GetFabricIndex());
     EXPECT_EQ(sessions[0].peerEndpointID, kProviderEndpoint);
     EXPECT_EQ(sessions[0].streamUsage, Globals::StreamUsageEnum::kAnalysis);
-    ASSERT_FALSE(sessions[0].videoStreamID.IsNull());
+    ASSERT_FALSE(sessions[0].videoStreamID.Value().IsNull());
     EXPECT_EQ(sessions[0].videoStreamID.Value(), kVideoStreamId);
 
     // Tracked: ending this session is now a legitimate request
@@ -1519,7 +1519,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, TheRequestorRecordCarriesTheOfferedVid
 
     auto sessions = mRequestorCluster.GetCurrentSessions();
     ASSERT_EQ(sessions.size(), 1u);
-    ASSERT_FALSE(sessions[0].videoStreamID.IsNull());
+    ASSERT_FALSE(sessions[0].videoStreamID.Value().IsNull());
     EXPECT_EQ(sessions[0].videoStreamID.Value(), kVideoStreamId);
 }
 
@@ -1548,7 +1548,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, TheResponsesDeprecatedVideoStreamIdIsI
     EXPECT_EQ(mCallback.mLastStatus, Status::Success);
     auto sessions = mRequestorCluster.GetCurrentSessions();
     ASSERT_EQ(sessions.size(), 1u);
-    ASSERT_FALSE(sessions[0].videoStreamID.IsNull());
+    ASSERT_FALSE(sessions[0].videoStreamID.Value().IsNull());
     EXPECT_EQ(sessions[0].videoStreamID.Value(), kVideoStreamId);
 }
 
