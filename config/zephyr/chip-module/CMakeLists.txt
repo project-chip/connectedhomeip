@@ -222,6 +222,12 @@ if(CONFIG_CHIP)
         target_link_libraries(chip_codedriven_data_model PRIVATE chip)
     endif()
 
+    # libatomic fetch calls for RISC-V SoCs without the A extension (ESP32-C3, ESP32-C2).
+    if(CONFIG_RISCV AND NOT CONFIG_RISCV_ISA_EXT_A)
+        zephyr_library_named(chip_riscv_atomics)
+        target_sources(chip_riscv_atomics PRIVATE ${CHIP_ROOT}/src/platform/Zephyr/RiscvAtomics.c)
+    endif()
+
     if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
         target_link_options(chip INTERFACE
             -Wl,--wrap=malloc
