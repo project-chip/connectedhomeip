@@ -182,8 +182,9 @@ class XmlDataTypeComponent:
     is_optional: bool = False  # Whether field is optional
     is_nullable: bool = False  # Whether field can be null
     constraints: Constraints | None = None  # For min/max values, lists, etc.
-    # F quality on the field's <access> element: the field's value is only visible to
-    # clients on the associated fabric. Cross-fabric reads report the default value.
+    # S quality on the field's <access> element: the field's value is only visible to
+    # clients on the associated fabric, and is omitted when the struct is reported to
+    # any other fabric.
     fabric_sensitive: bool = False
 
 
@@ -232,10 +233,9 @@ class XmlAttribute:
     # F quality on the attribute's <access> element: the attribute is a list whose
     # entries each belong to a single fabric. Reads honour the request's fabric filter.
     fabric_scoped: bool = False
-    # S quality on the attribute's <access> element. Where a struct field carries this
-    # quality only that field is sensitive, but here the whole entry is: an entry
-    # belonging to another fabric carries no readable data, rather than a subset of
-    # fields that read back as defaults.
+    # S quality on the attribute's <access> element. The spec allows it only on a list
+    # of fabric-scoped structs, and the attribute is then always read as a
+    # fabric-filtered list, whatever the request's fabric filter says.
     fabric_sensitive: bool = False
 
     def access_string(self):

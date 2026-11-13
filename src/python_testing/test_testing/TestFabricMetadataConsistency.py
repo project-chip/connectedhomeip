@@ -41,6 +41,8 @@ cannot come back unnoticed.
 """
 
 import sys
+from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
 
 # The support module under test lives in src/python_testing, one level above here.
@@ -63,6 +65,32 @@ SPEC_GLOBAL_DATA_TYPES, _ = build_xml_global_data_types(PrebuiltDataModelDirecto
 SPEC_GLOBAL_STRUCTS = SPEC_GLOBAL_DATA_TYPES.get('structs', {})
 ZAP = zap_fabric_metadata.build_zap_fabric_metadata()
 
+
+class GapKind(Enum):
+    STRUCT_NOT_FABRIC_SCOPED_IN_ZAP = "spec marks the struct fabricScoped, ZAP does not"
+    STRUCT_FABRIC_SCOPED_ONLY_IN_ZAP = "ZAP marks the struct fabricScoped, the spec does not"
+    STRUCT_SENSITIVE_FIELDS_DIFFER = "fabric-sensitive fields differ between spec and ZAP"
+    EVENT_NOT_FABRIC_SENSITIVE_IN_ZAP = "spec marks the event fabricSensitive, ZAP does not"
+    COMMAND_NOT_FABRIC_SCOPED_IN_ZAP = "spec marks the command fabricScoped, ZAP does not"
+    ATTRIBUTE_NOT_FABRIC_SENSITIVE_IN_ZAP = "spec marks the attribute fabricSensitive, ZAP does not"
+    ATTRIBUTE_SENSITIVITY_NOT_ENFORCED = "attribute is fabric sensitive but nothing withholds other fabrics' entries"
+
+
+@dataclass(frozen=True)
+class FabricMetadataGap:
+    """One spec/ZAP disagreement. Equality ignores `detail`, which only explains it."""
+    kind: GapKind
+    cluster_id: int
+    # The attribute, event or command id, or the struct name: structs have no id.
+    element: int | str
+    detail: str = field(default='', compare=False)
+
+    def __str__(self) -> str:
+        cluster = SPEC_CLUSTERS[self.cluster_id].name
+        element = f"0x{self.element:04X}" if isinstance(self.element, int) else self.element
+        return f"{cluster}/{element}: {self.kind.value}{f' ({self.detail})' if self.detail else ''}"
+
+
 # Clusters that filter a fabric-sensitive list by the accessing fabric in their
 # own C++ code. The spec requires such an attribute to be reported fabric
 # filtered whatever the request's FabricFiltered flag says (Interaction Model,
@@ -82,16 +110,21 @@ HAND_FILTERING_CLUSTERS = frozenset({
 # filtering and their read privilege. Listed so a new one is noticed, because
 # TC-IDM-8.1 can only verify the filtered-read half of them.
 FABRIC_SCOPED_ATTRIBUTES_WITHOUT_MASKING = frozenset({
-    'Binding/Binding (entries are TargetStruct)',
-    'Group Key Management/GroupKeyMap (entries are GroupKeyMapStruct)',
-    'Group Key Management/GroupTable (entries are GroupInfoMapStruct)',
-    'OTA Software Update Requestor/DefaultOTAProviders (entries are ProviderLocation)',
-    'Operational Credentials/Fabrics (entries are FabricDescriptorStruct)',
-    'Operational Credentials/NOCs (entries are NOCStruct)',
+    (Clusters.Binding.id, Clusters.Binding.Attributes.Binding.attribute_id),
+    (Clusters.GroupKeyManagement.id, Clusters.GroupKeyManagement.Attributes.GroupKeyMap.attribute_id),
+    (Clusters.GroupKeyManagement.id, Clusters.GroupKeyManagement.Attributes.GroupTable.attribute_id),
+    (Clusters.OtaSoftwareUpdateRequestor.id,
+     Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders.attribute_id),
+    (Clusters.OperationalCredentials.id, Clusters.OperationalCredentials.Attributes.Fabrics.attribute_id),
+    (Clusters.OperationalCredentials.id, Clusters.OperationalCredentials.Attributes.NOCs.attribute_id),
 })
 
-# Gaps that exist today. Each entry is the finding string the checks below
-# generate. A gap is listed here only with a reason; anything else fails.
+_MESSAGES = Clusters.Messages
+_GROUP_KEY_MANAGEMENT = Clusters.GroupKeyManagement
+
+# Gaps that exist today. The elements are named through the generated cluster
+# objects, so a renamed or removed element fails at import rather than leaving a
+# stale entry. A gap is listed here only with a reason; anything else fails.
 KNOWN_FABRIC_METADATA_GAPS = frozenset({
     # The Messages cluster does not implement fabric scoping at all. ZAP has
     # isFabricScoped commented out on MessageStruct with a TODO dated January
@@ -107,11 +140,16 @@ KNOWN_FABRIC_METADATA_GAPS = frozenset({
     # "Access Modifier: Fabric Sensitive".
     # TODO: remove once the Messages cluster is fixed; tracked in
     # https://github.com/project-chip/connectedhomeip/issues/73948
-    'Messages/MessageStruct: spec fabricScoped, ZAP not',
-    'Messages/MessageStruct: fabric-sensitive fields differ, spec [0, 1, 2, 3, 4, 5, 6] ZAP [7, 8]',
-    'Messages/MessageQueued: spec fabricSensitive, ZAP not',
-    'Messages/MessagePresented: spec fabricSensitive, ZAP not',
-    'Messages/MessageComplete: spec fabricSensitive, ZAP not',
+    FabricMetadataGap(GapKind.STRUCT_NOT_FABRIC_SCOPED_IN_ZAP, _MESSAGES.id,
+                      _MESSAGES.Structs.MessageStruct.__name__),
+    FabricMetadataGap(GapKind.STRUCT_SENSITIVE_FIELDS_DIFFER, _MESSAGES.id,
+                      _MESSAGES.Structs.MessageStruct.__name__),
+    FabricMetadataGap(GapKind.EVENT_NOT_FABRIC_SENSITIVE_IN_ZAP, _MESSAGES.id,
+                      _MESSAGES.Events.MessageQueued.event_id),
+    FabricMetadataGap(GapKind.EVENT_NOT_FABRIC_SENSITIVE_IN_ZAP, _MESSAGES.id,
+                      _MESSAGES.Events.MessagePresented.event_id),
+    FabricMetadataGap(GapKind.EVENT_NOT_FABRIC_SENSITIVE_IN_ZAP, _MESSAGES.id,
+                      _MESSAGES.Events.MessageComplete.event_id),
 
     # Spec master marks GroupKeySetStruct "Access Modifier: Fabric Scoped"; ZAP
     # does not. Lower impact than the entries above because the struct is only
@@ -119,7 +157,8 @@ KNOWN_FABRIC_METADATA_GAPS = frozenset({
     # attribute, and the group data provider already keys its storage by fabric,
     # so no cross-fabric read path depends on the marker today. Recorded so the
     # disagreement is not rediscovered, not because a leak is known.
-    'Group Key Management/GroupKeySetStruct: spec fabricScoped, ZAP not',
+    FabricMetadataGap(GapKind.STRUCT_NOT_FABRIC_SCOPED_IN_ZAP, _GROUP_KEY_MANAGEMENT.id,
+                      _GROUP_KEY_MANAGEMENT.Structs.GroupKeySetStruct.__name__),
 })
 
 
@@ -157,7 +196,7 @@ def audited_cluster_ids() -> list[int]:
                   if is_standard_cluster_id(cluster_id) and cluster_id in ZAP.clusters)
 
 
-def struct_fabric_scoping_findings() -> list[str]:
+def struct_fabric_scoping_findings() -> list[FabricMetadataGap]:
     """Structs the spec marks fabric scoped that ZAP does not."""
     findings = []
     for cluster_id in audited_cluster_ids():
@@ -169,11 +208,29 @@ def struct_fabric_scoping_findings() -> list[str]:
             if zap_struct is None:
                 continue
             if not zap_struct.fabric_scoped:
-                findings.append(f"{xml_cluster.name}/{name}: spec fabricScoped, ZAP not")
+                findings.append(FabricMetadataGap(GapKind.STRUCT_NOT_FABRIC_SCOPED_IN_ZAP, cluster_id, name))
     return findings
 
 
-def struct_fabric_sensitive_field_findings() -> list[str]:
+def zap_only_struct_fabric_scoping_findings() -> list[FabricMetadataGap]:
+    """Structs ZAP marks fabric scoped that the spec does not.
+
+    The reverse of struct_fabric_scoping_findings. A device built from the SDK
+    then filters and masks a list the spec defines as readable by every fabric.
+    """
+    findings = []
+    for cluster_id in audited_cluster_ids():
+        xml_cluster = SPEC_CLUSTERS[cluster_id]
+        for name, struct in xml_cluster.structs.items():
+            if struct.fabric_scoped:
+                continue
+            zap_struct = ZAP.struct(cluster_id, name)
+            if zap_struct is not None and zap_struct.fabric_scoped:
+                findings.append(FabricMetadataGap(GapKind.STRUCT_FABRIC_SCOPED_ONLY_IN_ZAP, cluster_id, name))
+    return findings
+
+
+def struct_fabric_sensitive_field_findings() -> list[FabricMetadataGap]:
     """Structs whose fabric-sensitive field ids differ between spec and ZAP."""
     findings = []
     for cluster_id in audited_cluster_ids():
@@ -185,12 +242,13 @@ def struct_fabric_sensitive_field_findings() -> list[str]:
             spec_ids = sensitive_field_ids(struct)
             if spec_ids == zap_struct.sensitive_field_ids:
                 continue
-            findings.append(f"{xml_cluster.name}/{name}: fabric-sensitive fields differ, "
-                            f"spec {sorted(spec_ids)} ZAP {sorted(zap_struct.sensitive_field_ids)}")
+            findings.append(FabricMetadataGap(
+                GapKind.STRUCT_SENSITIVE_FIELDS_DIFFER, cluster_id, name,
+                f"spec {sorted(spec_ids)} ZAP {sorted(zap_struct.sensitive_field_ids)}"))
     return findings
 
 
-def event_fabric_sensitivity_findings() -> list[str]:
+def event_fabric_sensitivity_findings() -> list[FabricMetadataGap]:
     """Events the spec marks fabric sensitive that ZAP does not."""
     findings = []
     for cluster_id in audited_cluster_ids():
@@ -200,11 +258,12 @@ def event_fabric_sensitivity_findings() -> list[str]:
             if not event.fabric_sensitive:
                 continue
             if event_id not in zap_cluster.fabric_sensitive_event_ids:
-                findings.append(f"{xml_cluster.name}/{event.name}: spec fabricSensitive, ZAP not")
+                findings.append(FabricMetadataGap(GapKind.EVENT_NOT_FABRIC_SENSITIVE_IN_ZAP, cluster_id, event_id,
+                                                  event.name))
     return findings
 
 
-def command_fabric_scoping_findings() -> list[str]:
+def command_fabric_scoping_findings() -> list[FabricMetadataGap]:
     """Commands the spec marks fabric scoped that ZAP does not."""
     findings = []
     for cluster_id in audited_cluster_ids():
@@ -214,11 +273,12 @@ def command_fabric_scoping_findings() -> list[str]:
             if not command.fabric_scoped:
                 continue
             if command_id not in zap_cluster.fabric_scoped_command_ids:
-                findings.append(f"{xml_cluster.name}/{command.name}: spec fabricScoped, ZAP not")
+                findings.append(FabricMetadataGap(GapKind.COMMAND_NOT_FABRIC_SCOPED_IN_ZAP, cluster_id, command_id,
+                                                  command.name))
     return findings
 
 
-def attribute_fabric_sensitivity_findings() -> list[str]:
+def attribute_fabric_sensitivity_findings() -> list[FabricMetadataGap]:
     """Attributes the spec marks fabric sensitive that ZAP does not."""
     findings = []
     for cluster_id in audited_cluster_ids():
@@ -228,11 +288,12 @@ def attribute_fabric_sensitivity_findings() -> list[str]:
             if not attribute.fabric_sensitive:
                 continue
             if attribute_id not in zap_cluster.fabric_sensitive_attribute_ids:
-                findings.append(f"{xml_cluster.name}/{attribute.name}: spec fabricSensitive, ZAP not")
+                findings.append(FabricMetadataGap(GapKind.ATTRIBUTE_NOT_FABRIC_SENSITIVE_IN_ZAP, cluster_id,
+                                                  attribute_id, attribute.name))
     return findings
 
 
-def attribute_level_sensitivity_findings() -> list[str]:
+def attribute_level_sensitivity_findings() -> list[FabricMetadataGap]:
     """Fabric-sensitive attributes that nothing in the SDK filters or fully masks."""
     findings = []
     for cluster_id in audited_cluster_ids():
@@ -256,24 +317,22 @@ def attribute_level_sensitivity_findings() -> list[str]:
             # struct's items, so the full field set is the right comparison.
             if zap_struct.sensitive_field_ids == zap_struct.field_ids:
                 continue
-            if not zap_struct.sensitive_field_ids:
-                findings.append(f"{xml_cluster.name}/{attribute.name}: attribute is fabric sensitive but "
-                                f"{entry_type} masks no field and the cluster does not hand-filter")
-            else:
-                findings.append(f"{xml_cluster.name}/{attribute.name}: attribute is fabric sensitive but "
-                                f"{entry_type} masks only {sorted(zap_struct.sensitive_field_ids)} of "
-                                f"{sorted(zap_struct.field_ids)}")
+            findings.append(FabricMetadataGap(
+                GapKind.ATTRIBUTE_SENSITIVITY_NOT_ENFORCED, cluster_id, attribute_id,
+                f"{attribute.name}: {entry_type} masks {sorted(zap_struct.sensitive_field_ids)} of "
+                f"{sorted(zap_struct.field_ids)} and the cluster does not hand-filter"))
     return findings
 
 
-def all_fabric_metadata_findings() -> list[str]:
-    """Every finding the checks produce, across all six comparisons.
+def all_fabric_metadata_findings() -> list[FabricMetadataGap]:
+    """Every finding the checks produce, across all seven comparisons.
 
     Each comparison only sees its own subset, so a listed gap can only be
     matched against the combined set.
     """
     findings = []
     findings.extend(struct_fabric_scoping_findings())
+    findings.extend(zap_only_struct_fabric_scoping_findings())
     findings.extend(struct_fabric_sensitive_field_findings())
     findings.extend(event_fabric_sensitivity_findings())
     findings.extend(command_fabric_scoping_findings())
@@ -282,8 +341,8 @@ def all_fabric_metadata_findings() -> list[str]:
     return findings
 
 
-def fabric_scoped_attributes_without_masking() -> list[str]:
-    """Fabric-scoped attributes whose entries carry no fabric-sensitive field."""
+def fabric_scoped_attributes_without_masking() -> list[tuple[int, int]]:
+    """(cluster id, attribute id) of fabric-scoped attributes whose entries carry no fabric-sensitive field."""
     no_masking_rule = []
     for cluster_id in audited_cluster_ids():
         xml_cluster = SPEC_CLUSTERS[cluster_id]
@@ -299,15 +358,21 @@ def fabric_scoped_attributes_without_masking() -> list[str]:
             zap_ids = zap_struct.sensitive_field_ids if zap_struct is not None else frozenset()
             if spec_ids or zap_ids:
                 continue
-            no_masking_rule.append(f"{xml_cluster.name}/{attribute.name} (entries are {entry_type})")
+            no_masking_rule.append((cluster_id, attribute_id))
     return no_masking_rule
+
+
+def attribute_name(cluster_id: int, attribute_id: int) -> str:
+    """Cluster/attribute name of a spec attribute, for messages."""
+    xml_cluster = SPEC_CLUSTERS[cluster_id]
+    return f"{xml_cluster.name}/{xml_cluster.attributes[attribute_id].name}"
 
 
 class TestFabricMetadataConsistency(CertificationUnitTestNoDevice):
 
-    def assert_findings_are_known(self, findings: list[str], subject: str) -> None:
+    def assert_findings_are_known(self, findings: list[FabricMetadataGap], subject: str) -> None:
         """Fail on any finding that is not in the known-gap list."""
-        unexpected = [finding for finding in findings if finding not in KNOWN_FABRIC_METADATA_GAPS]
+        unexpected = sorted(str(finding) for finding in findings if finding not in KNOWN_FABRIC_METADATA_GAPS)
         asserts.assert_equal(unexpected, [], f"{subject}: spec and ZAP disagree and the gap is not a known one")
 
     def test_struct_fabric_scoping_matches_spec(self):
@@ -318,6 +383,14 @@ class TestFabricMetadataConsistency(CertificationUnitTestNoDevice):
         are returned to every reader.
         """
         self.assert_findings_are_known(struct_fabric_scoping_findings(), "struct fabric scoping")
+
+    def test_struct_fabric_scoping_only_where_the_spec_has_it(self):
+        """A struct ZAP marks isFabricScoped must be fabric scoped in the spec.
+
+        Otherwise a device built from the SDK withholds or masks entries the spec
+        lets every fabric read, and the spec-driven TC-IDM-8.1 never looks at them.
+        """
+        self.assert_findings_are_known(zap_only_struct_fabric_scoping_findings(), "ZAP-only struct fabric scoping")
 
     def test_struct_fabric_sensitive_fields_match_spec(self):
         """The set of fabric-sensitive field ids must be the same on both sides.
@@ -363,7 +436,7 @@ class TestFabricMetadataConsistency(CertificationUnitTestNoDevice):
         stays listed unless the combined set is compared. A listed gap that no
         longer occurs would be accepted again if the defect came back.
         """
-        stale = sorted(set(KNOWN_FABRIC_METADATA_GAPS) - set(all_fabric_metadata_findings()))
+        stale = sorted(str(gap) for gap in KNOWN_FABRIC_METADATA_GAPS - set(all_fabric_metadata_findings()))
         asserts.assert_equal(stale, [],
                              "these listed gaps no longer occur; remove them from KNOWN_FABRIC_METADATA_GAPS")
 
@@ -374,11 +447,13 @@ class TestFabricMetadataConsistency(CertificationUnitTestNoDevice):
         and their read privilege. The set is asserted so a new one is noticed,
         because TC-IDM-8.1 can only verify the filtered-read half of it.
         """
-        found = sorted(fabric_scoped_attributes_without_masking())
-        for entry in found:
-            self.print_step("census", f"  {entry}")
-        asserts.assert_equal(found, sorted(FABRIC_SCOPED_ATTRIBUTES_WITHOUT_MASKING),
-                             "the set of fabric-scoped attributes with nothing to mask changed")
+        found = set(fabric_scoped_attributes_without_masking())
+        for cluster_id, attribute_id in sorted(found):
+            self.print_step("census", f"  {attribute_name(cluster_id, attribute_id)}")
+        asserts.assert_equal(
+            sorted(attribute_name(*key) for key in found ^ FABRIC_SCOPED_ATTRIBUTES_WITHOUT_MASKING), [],
+            "the set of fabric-scoped attributes with nothing to mask changed; update "
+            "FABRIC_SCOPED_ATTRIBUTES_WITHOUT_MASKING")
 
 
 if __name__ == "__main__":

@@ -38,8 +38,7 @@ from mobly import asserts, signals  # noqa: E402 - import must follow the sys.pa
 from support_modules import idm_support  # noqa: E402
 
 import matter.clusters as Clusters  # noqa: E402
-from matter.clusters.Types import NullValue  # noqa: E402
-from matter.testing.global_attribute_ids import GlobalAttributeIds  # noqa: E402
+from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_cluster_id  # noqa: E402
 from matter.testing.matter_testing import CertificationUnitTestNoDevice  # noqa: E402
 from matter.testing.problem_notices import AttributePathLocation  # noqa: E402
 from matter.testing.runner import default_matter_test_main  # noqa: E402
@@ -47,6 +46,10 @@ from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_cl
 
 # Parsed once: build_xml_clusters walks the whole data model directory.
 XML_CLUSTERS, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_6_1)
+# The newest data model in the tree, so that adding a data model version re-runs the
+# seeding census against it.
+NEWEST_DATA_MODEL = list(PrebuiltDataModelDirectory)[-1]
+NEWEST_XML_CLUSTERS, _ = build_xml_clusters(NEWEST_DATA_MODEL)
 
 
 def make_dut(composition: dict) -> idm_support.IDMBaseTest:
@@ -109,6 +112,35 @@ def populate_membership(feature_map: int, endpoint_ids: list[int],
     return populated, ctrl, dut
 
 
+# Fabric-scoped attributes in the newest data model for which TC-IDM-8.1 has no way to
+# give the other fabric an entry: no populator is registered and the step 4 sweep does
+# not write them. On a DUT with one of these, the checks that need another fabric's
+# entry are reported as not exercised. A fabric-scoped attribute added to the spec
+# fails test_every_fabric_scoped_attribute_is_seeded_or_listed until it gets a
+# populator or a write payload in idm_support, or is listed here.
+ATTRIBUTES_TC_IDM_8_1_CANNOT_SEED = frozenset({
+    # Every fabric holds an entry once it is commissioned.
+    (Clusters.AccessControl.id, Clusters.AccessControl.Attributes.Acl.attribute_id),
+    (Clusters.OperationalCredentials.id, Clusters.OperationalCredentials.Attributes.NOCs.attribute_id),
+    (Clusters.OperationalCredentials.id, Clusters.OperationalCredentials.Attributes.Fabrics.attribute_id),
+    # No populator yet. The entries come from device-side state (restrictions, ecosystem
+    # data, power topology), from sessions or registrations the test does not set up,
+    # or from commands the sweep does not send.
+    (Clusters.AccessControl.id, Clusters.AccessControl.Attributes.Arl.attribute_id),
+    (Clusters.AccessControl.id, Clusters.AccessControl.Attributes.AuxiliaryACL.attribute_id),
+    (Clusters.EcosystemInformation.id, Clusters.EcosystemInformation.Attributes.DeviceDirectory.attribute_id),
+    (Clusters.EcosystemInformation.id, Clusters.EcosystemInformation.Attributes.LocationDirectory.attribute_id),
+    (Clusters.GroupKeyManagement.id, Clusters.GroupKeyManagement.Attributes.GroupKeyMap.attribute_id),
+    (Clusters.IcdManagement.id, Clusters.IcdManagement.Attributes.RegisteredClients.attribute_id),
+    (Clusters.PowerTopology.id, Clusters.PowerTopology.Attributes.ElectricalCircuitNodes.attribute_id),
+    (Clusters.PushAvStreamTransport.id, Clusters.PushAvStreamTransport.Attributes.CurrentConnections.attribute_id),
+    (Clusters.ScenesManagement.id, Clusters.ScenesManagement.Attributes.FabricSceneInfo.attribute_id),
+    (Clusters.TlsCertificateManagement.id,
+     Clusters.TlsCertificateManagement.Attributes.ProvisionedClientCertificates.attribute_id),
+    (Clusters.WebRTCTransportProvider.id, Clusters.WebRTCTransportProvider.Attributes.CurrentSessions.attribute_id),
+    (Clusters.WebRTCTransportRequestor.id, Clusters.WebRTCTransportRequestor.Attributes.CurrentSessions.attribute_id),
+})
+
 ACL_ID = Clusters.AccessControl.Attributes.Acl.attribute_id
 EXTENSION_ID = Clusters.AccessControl.Attributes.Extension.attribute_id
 SUBJECTS_PER_ENTRY_ID = Clusters.AccessControl.Attributes.SubjectsPerAccessControlEntry.attribute_id
@@ -119,6 +151,11 @@ GROUP_TABLE_ID = Clusters.GroupKeyManagement.Attributes.GroupTable.attribute_id
 MEMBERSHIP_ID = Clusters.Groupcast.Attributes.Membership.attribute_id
 LISTENER = Clusters.Groupcast.Bitmaps.Feature.kListener
 SENDER = Clusters.Groupcast.Bitmaps.Feature.kSender
+# TLV tags of AccessControlExtensionStruct.Data and TLSEndpointStruct.Hostname, for raw TLV entries.
+DATA_TAG = next(f.Tag for f in Clusters.AccessControl.Structs.AccessControlExtensionStruct.descriptor.Fields
+                if f.Label == "data")
+HOSTNAME_TAG = next(f.Tag for f in Clusters.TlsClientManagement.Structs.TLSEndpointStruct.descriptor.Fields
+                    if f.Label == "hostname")
 
 
 class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
@@ -153,19 +190,19 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
         asserts.assert_false(idm_support.struct_is_fabric_scoped(None),
                              "A missing struct type is not fabric scoped")
 
-    def test_fabric_sensitive_field_labels(self):
+    def test_fabric_sensitive_field_tags(self):
         # The spec marks Privilege/AuthMode/Subjects/Targets/AuxiliaryType of
         # AccessControlEntryStruct fabric sensitive, but not FabricIndex.
         xml_struct = XML_CLUSTERS[Clusters.AccessControl.id].structs["AccessControlEntryStruct"]
-        labels = idm_support.fabric_sensitive_field_labels(
-            Clusters.AccessControl.Structs.AccessControlEntryStruct, xml_struct)
-        asserts.assert_equal(labels, frozenset({"privilege", "authMode", "subjects", "targets", "auxiliaryType"}),
-                             "Unexpected fabric-sensitive field labels for AccessControlEntryStruct")
-        asserts.assert_not_in("fabricIndex", labels, "FabricIndex is not fabric sensitive")
+        tags = idm_support.fabric_sensitive_field_tags(xml_struct)
+        labels = {f.Label for f in Clusters.AccessControl.Structs.AccessControlEntryStruct.descriptor.Fields
+                  if f.Tag in tags}
+        asserts.assert_equal(labels, {"privilege", "authMode", "subjects", "targets", "auxiliaryType"},
+                             "The spec field IDs should be the generated struct's tags for those fields")
+        asserts.assert_not_in(idm_support.FABRIC_INDEX_TAG, tags, "FabricIndex is not fabric sensitive")
 
-        asserts.assert_equal(
-            idm_support.fabric_sensitive_field_labels(Clusters.AccessControl.Structs.AccessControlEntryStruct, None),
-            frozenset(), "A struct with no spec XML entry yields no labels")
+        asserts.assert_equal(idm_support.fabric_sensitive_field_tags(None), frozenset(),
+                             "A struct with no spec XML entry yields no tags")
 
     def test_discovery_finds_fabric_scoped_attributes_only(self):
         dut = make_dut({
@@ -182,8 +219,7 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
             "Discovery should return every fabric-scoped attribute and nothing else")
 
         acl = self.find(infos, Clusters.AccessControl.id, ACL_ID)
-        asserts.assert_true(acl.from_codegen and acl.from_spec_xml,
-                            "Both signals should identify ACL as fabric scoped")
+        asserts.assert_true(acl.has_fabric_index_field, "AccessControlEntryStruct carries a FabricIndex field")
         asserts.assert_equal(acl.struct_class, Clusters.AccessControl.Structs.AccessControlEntryStruct,
                              "Unexpected ACL entry struct")
         asserts.assert_in("privilege", acl.fabric_sensitive_labels,
@@ -222,16 +258,17 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
         asserts.assert_false(dut.attribute_is_writable(0, Clusters.AccessControl.id, SUBJECTS_PER_ENTRY_ID),
                              "SubjectsPerAccessControlEntry has no write privilege in the spec")
 
-    def test_discovery_reports_codegen_only_attributes(self):
+    def test_discovery_follows_the_spec_not_codegen(self):
         # PowerTopology.ElectricalCircuitNodes is a list of fabric-scoped structs in the
-        # generated code, but the 1.6.1 XML marks neither the attribute nor its struct
-        # fabricScoped. Discovery keeps it and flags the disagreement.
+        # generated code, but the 1.6.1 data model does not define the attribute. What
+        # the spec does not define as fabric scoped is not swept, whatever codegen says.
         attribute_id = Clusters.PowerTopology.Attributes.ElectricalCircuitNodes.attribute_id
+        asserts.assert_true(idm_support.struct_is_fabric_scoped(
+            idm_support.fabric_scoped_entry_type(Clusters.PowerTopology.Attributes.ElectricalCircuitNodes)),
+            "The generated entry struct carries a FabricIndex field")
         dut = make_dut({1: {Clusters.PowerTopology.id: attribute_list(attribute_id)}})
-        infos = dut.discover_fabric_scoped_attributes()
-        info = self.find(infos, Clusters.PowerTopology.id, attribute_id)
-        asserts.assert_true(info.from_codegen, "Codegen should identify the attribute as fabric scoped")
-        asserts.assert_false(info.from_spec_xml, "The 1.6.1 XML does not mark this attribute fabric scoped")
+        asserts.assert_equal(dut.discover_fabric_scoped_attributes(), [],
+                             "An attribute the spec does not mark fabric scoped must not be discovered")
 
     def test_discovery_reports_spec_only_attributes(self):
         # Messages.Messages is fabricScoped in the XML, but the generated MessageStruct
@@ -240,16 +277,16 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
         attribute_id = Clusters.Messages.Attributes.Messages.attribute_id
         dut = make_dut({1: {Clusters.Messages.id: attribute_list(attribute_id)}})
         info = self.find(dut.discover_fabric_scoped_attributes(), Clusters.Messages.id, attribute_id)
-        asserts.assert_true(info.from_spec_xml, "The XML marks Messages fabric scoped")
-        asserts.assert_false(info.from_codegen, "MessageStruct carries no FabricIndex field")
+        asserts.assert_false(info.has_fabric_index_field, "MessageStruct carries no FabricIndex field")
 
-        # The sensitive field labels still map (the spec field IDs match the generated
-        # tags), but without a FabricIndex field no entry can be attributed to another
-        # fabric, so the masking assertion reports that it checked nothing rather than
-        # passing vacuously.
+        # The sensitive fields still map onto the generated labels, but without a
+        # FabricIndex no entry can be attributed to another fabric, so the masking
+        # assertion reports that it checked nothing rather than passing vacuously.
         asserts.assert_in("messageText", info.fabric_sensitive_labels,
-                          "Fabric-sensitive labels should still map through the descriptor tags")
-        entries = [Clusters.Messages.Structs.MessageStruct(messageText="leaked")]
+                          "Fabric-sensitive tags should map onto the descriptor labels")
+        message_text_tag = next(f.Tag for f in Clusters.Messages.Structs.MessageStruct.descriptor.Fields
+                                if f.Label == "messageText")
+        entries = [{message_text_tag: "leaked"}]
         asserts.assert_equal(dut.assert_other_fabric_entries_masked(info, entries, own_fabric_index=1), 0,
                              "Without a FabricIndex field no entry can be checked for masking")
 
@@ -258,61 +295,62 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
         asserts.assert_equal(dut.discover_fabric_scoped_attributes(), [],
                              "Manufacturer-specific clusters have no spec or codegen fabric data")
 
-    def test_event_discovery_uses_the_spec_signal(self):
-        dut = make_dut({0: {Clusters.AccessControl.id: {
-            idm_support.EVENT_LIST_ID: [
-                Clusters.AccessControl.Events.AccessControlEntryChanged.event_id,
-                Clusters.AccessControl.Events.AccessControlExtensionChanged.event_id,
-            ]}}})
+    def test_event_discovery_uses_the_spec_events_the_features_allow(self):
+        # AccessControlExtensionChanged needs the Extension feature and
+        # FabricRestrictionReviewUpdate the ManagedDevice feature. No EventList is
+        # consulted: the spec's events, filtered by conformance, are the candidates.
+        entry_changed = Clusters.AccessControl.Events.AccessControlEntryChanged.event_id
+        extension_changed = Clusters.AccessControl.Events.AccessControlExtensionChanged.event_id
+        extension_feature = Clusters.AccessControl.Bitmaps.Feature.kExtension
+
+        dut = make_dut({0: {Clusters.AccessControl.id: {**attribute_list(ACL_ID, EXTENSION_ID),
+                                                        GlobalAttributeIds.FEATURE_MAP_ID: extension_feature}}})
         infos = dut.discover_fabric_sensitive_events()
-        asserts.assert_equal(
-            {i.event_id for i in infos},
-            {Clusters.AccessControl.Events.AccessControlEntryChanged.event_id,
-             Clusters.AccessControl.Events.AccessControlExtensionChanged.event_id},
-            "Both AccessControl events are fabric sensitive")
-        asserts.assert_true(all(i.from_codegen and i.from_spec_xml for i in infos),
-                            "Both signals should agree on the AccessControl events")
+        asserts.assert_equal({i.event_id for i in infos}, {entry_changed, extension_changed},
+                             "Both events the Extension feature allows should be discovered")
+        asserts.assert_true(all(i.has_fabric_index_field for i in infos),
+                            "The generated AccessControl events carry a FabricIndex field")
+
+        dut = make_dut({0: {Clusters.AccessControl.id: {**attribute_list(ACL_ID),
+                                                        GlobalAttributeIds.FEATURE_MAP_ID: 0}}})
+        asserts.assert_equal({i.event_id for i in dut.discover_fabric_sensitive_events()}, {entry_changed},
+                             "Events whose feature the DUT lacks must not be discovered")
 
     def test_event_discovery_excludes_non_sensitive_events(self):
         # BasicInformation.StartUp is not fabric sensitive and must not be swept.
-        dut = make_dut({0: {Clusters.BasicInformation.id: {
-            idm_support.EVENT_LIST_ID: [Clusters.BasicInformation.Events.StartUp.event_id]}}})
+        dut = make_dut({0: {Clusters.BasicInformation.id: attribute_list()}})
         asserts.assert_equal(dut.discover_fabric_sensitive_events(), [],
                              "A non-fabric-sensitive event must not be discovered")
 
-    def test_event_discovery_falls_back_to_codegen_event_list(self):
-        # EventList is not mandatory on every cluster; a cluster that omits it still
-        # reports its events, so discovery must not skip it.
-        dut = make_dut({0: {Clusters.AccessControl.id: attribute_list(ACL_ID)}})
-        infos = dut.discover_fabric_sensitive_events()
-        asserts.assert_in(Clusters.AccessControl.Events.AccessControlEntryChanged.event_id,
-                          {i.event_id for i in infos},
-                          "Events should be discovered from the codegen list when EventList is absent")
-
-    def test_masking_accepts_null_and_default_values(self):
+    def test_masking_accepts_omitted_fields(self):
         dut = make_dut({0: {Clusters.AccessControl.id: attribute_list(EXTENSION_ID)}})
         info = self.find(dut.discover_fabric_scoped_attributes(), Clusters.AccessControl.id, EXTENSION_ID)
 
         entries = [
-            Clusters.AccessControl.Structs.AccessControlExtensionStruct(data=b'\x17\x18', fabricIndex=1),
-            # Fabric 2's entry as fabric 1 should see it: sensitive data replaced by the default.
-            Clusters.AccessControl.Structs.AccessControlExtensionStruct(data=b'', fabricIndex=2),
+            {DATA_TAG: b'\x17\x18', idm_support.FABRIC_INDEX_TAG: 1},
+            # Fabric 2's entry as fabric 1 must see it: the sensitive field omitted.
+            {idm_support.FABRIC_INDEX_TAG: 2},
         ]
         asserts.assert_equal(dut.assert_other_fabric_entries_masked(info, entries, own_fabric_index=1), 1,
                              "Exactly one cross-fabric entry should have been checked")
 
-        # Null is equally acceptable per the spec wording ("null or default values").
-        nulled = [Clusters.AccessControl.Structs.AccessControlExtensionStruct(data=NullValue, fabricIndex=2)]
-        asserts.assert_equal(dut.assert_other_fabric_entries_masked(info, nulled, own_fabric_index=1), 1,
-                             "A nulled fabric-sensitive field should be accepted")
-
     def test_masking_fails_on_leaked_fabric_sensitive_data(self):
         dut = make_dut({0: {Clusters.AccessControl.id: attribute_list(EXTENSION_ID)}})
         info = self.find(dut.discover_fabric_scoped_attributes(), Clusters.AccessControl.id, EXTENSION_ID)
-        leaked = [Clusters.AccessControl.Structs.AccessControlExtensionStruct(data=b'\x17\x18', fabricIndex=2)]
+        leaked = [{DATA_TAG: b'\x17\x18', idm_support.FABRIC_INDEX_TAG: 2}]
         with asserts.assert_raises(signals.TestFailure,
                                    "Cross-fabric fabric-sensitive data must fail the masking assertion"):
             dut.assert_other_fabric_entries_masked(info, leaked, own_fabric_index=1)
+
+    def test_masking_fails_on_a_default_value_that_was_not_omitted(self):
+        # The spec requires the field to be omitted; sending its default value is not
+        # the same, even though a decoded entry could not tell the two apart.
+        dut = make_dut({0: {Clusters.AccessControl.id: attribute_list(EXTENSION_ID)}})
+        info = self.find(dut.discover_fabric_scoped_attributes(), Clusters.AccessControl.id, EXTENSION_ID)
+        defaulted = [{DATA_TAG: b'', idm_support.FABRIC_INDEX_TAG: 2}]
+        with asserts.assert_raises(signals.TestFailure,
+                                   "A fabric-sensitive field sent with its default value must fail"):
+            dut.assert_other_fabric_entries_masked(info, defaulted, own_fabric_index=1)
 
     def test_write_skip_reason_distinguishes_why_a_sweep_must_not_write(self):
         dut = make_dut({
@@ -353,47 +391,32 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
             asserts.assert_is_none(dut.fabric_report_ci_skip_reason(binding),
                                    "Outside CI the DUT must report the Binding change, so the sweep writes it")
 
-    def test_attribute_level_fabric_sensitivity_masks_the_whole_entry(self):
+    def test_attribute_level_fabric_sensitivity_withholds_rather_than_masks(self):
         # ProvisionedEndpoints carries the S quality on the attribute itself rather than
-        # on any field of TLSEndpointStruct, so every field but FabricIndex is masked.
+        # on any field of TLSEndpointStruct. The spec then has the attribute read as a
+        # fabric-filtered list, so the other fabric's entries are withheld, which
+        # assert_other_fabrics_withheld checks, and there is no field to mask.
         dut = make_dut({0: {Clusters.TlsClientManagement.id: attribute_list(PROVISIONED_ENDPOINTS_ID)}})
         info = self.find(dut.discover_fabric_scoped_attributes(),
                          Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID)
-
         asserts.assert_true(info.whole_entry_sensitive,
                             "ProvisionedEndpoints is marked fabric sensitive on the attribute")
-        asserts.assert_equal(info.fabric_sensitive_labels, frozenset(),
+        asserts.assert_equal(info.fabric_sensitive_tags, frozenset(),
                              "TLSEndpointStruct marks no individual field fabric sensitive")
-        asserts.assert_equal(
-            info.masked_field_labels,
-            frozenset({"endpointID", "hostname", "port", "caid", "ccdid", "referenceCount"}),
-            "Every field but FabricIndex must be masked when the attribute itself is sensitive")
 
-    def test_field_level_sensitivity_masks_only_the_marked_fields(self):
+    def test_field_level_sensitivity_names_the_marked_fields(self):
         dut = make_dut({0: {Clusters.AccessControl.id: attribute_list(ACL_ID)}})
         info = self.find(dut.discover_fabric_scoped_attributes(), Clusters.AccessControl.id, ACL_ID)
         asserts.assert_false(info.whole_entry_sensitive,
                              "The ACL attribute itself is fabric scoped, not fabric sensitive")
-        asserts.assert_equal(info.masked_field_labels, info.fabric_sensitive_labels,
-                             "Only the fields the struct marks should be masked")
-
-    def test_masking_fails_on_a_leaked_whole_sensitive_entry(self):
-        dut = make_dut({0: {Clusters.TlsClientManagement.id: attribute_list(PROVISIONED_ENDPOINTS_ID)}})
-        info = self.find(dut.discover_fabric_scoped_attributes(),
-                         Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID)
-        # Hostname is not fabric sensitive on its own, so this leak is only caught once
-        # the attribute's own S quality is honoured.
-        leaked = [Clusters.TlsClientManagement.Structs.TLSEndpointStruct(hostname=b'example.com', fabricIndex=2)]
-        with asserts.assert_raises(signals.TestFailure,
-                                   "A cross-fabric entry of a fabric-sensitive attribute must fail the masking assertion"):
-            dut.assert_other_fabric_entries_masked(info, leaked, own_fabric_index=1)
+        asserts.assert_true(info.fabric_sensitive_tags, "AccessControlEntryStruct marks fields fabric sensitive")
 
     def test_masking_reports_nothing_checked_for_own_fabric_only(self):
         # A fabric-filtered read returns only own-fabric entries, so there is nothing to
         # mask. The caller uses the count to tell that apart from a verified check.
         dut = make_dut({0: {Clusters.AccessControl.id: attribute_list(EXTENSION_ID)}})
         info = self.find(dut.discover_fabric_scoped_attributes(), Clusters.AccessControl.id, EXTENSION_ID)
-        own_only = [Clusters.AccessControl.Structs.AccessControlExtensionStruct(data=b'\x17\x18', fabricIndex=1)]
+        own_only = [{DATA_TAG: b'\x17\x18', idm_support.FABRIC_INDEX_TAG: 1}]
         asserts.assert_equal(dut.assert_other_fabric_entries_masked(info, own_only, own_fabric_index=1), 0,
                              "No cross-fabric entries means nothing was checked")
 
@@ -464,6 +487,37 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
         asserts.assert_is_none(dut.fabric_entry_populator(info),
                                "A writable attribute is populated by the sweep's own write")
 
+    def test_every_fabric_scoped_attribute_is_seeded_or_listed(self):
+        # Discovery and the read checks are generic, but giving the other fabric an
+        # entry is per attribute. This keeps a new fabric-scoped attribute from
+        # silently joining the "not exercised" list on every DUT that has it.
+        composition = {0: {cluster_id: attribute_list(*xml_cluster.attributes.keys())
+                           for cluster_id, xml_cluster in NEWEST_XML_CLUSTERS.items()
+                           if is_standard_cluster_id(cluster_id)}}
+        dut = make_dut(composition)
+        dut.xml_clusters = NEWEST_XML_CLUSTERS
+        ctrl = RecordingController(held_key_set_ids=[])
+        with mock.patch.object(idm_support.IDMBaseTest, "dut_node_id", new_callable=mock.PropertyMock, return_value=1):
+            unseeded = {(info.cluster_id, info.attribute_id) for info in dut.discover_fabric_scoped_attributes()
+                        if dut.fabric_entry_populator(info) is None
+                        and (dut.fabric_write_skip_reason(info) is not None
+                             or dut.fabric_scoped_write_payload(info, ctrl) is None)}
+
+        def names(keys) -> list[str]:
+            return sorted(f"{NEWEST_XML_CLUSTERS[c].name}.{NEWEST_XML_CLUSTERS[c].attributes[a].name}"
+                          if c in NEWEST_XML_CLUSTERS and a in NEWEST_XML_CLUSTERS[c].attributes
+                          else f"0x{c:04X}/0x{a:04X}" for c, a in keys)
+
+        asserts.assert_equal(
+            names(unseeded - ATTRIBUTES_TC_IDM_8_1_CANNOT_SEED), [],
+            f"The {NEWEST_DATA_MODEL.dirname} data model has fabric-scoped attributes TC-IDM-8.1 cannot give "
+            "another fabric an entry for. Add a populator (fabric_entry_populator) or a write payload "
+            "(fabric_scoped_write_payload) in idm_support, or list them in ATTRIBUTES_TC_IDM_8_1_CANNOT_SEED")
+        asserts.assert_equal(
+            names(ATTRIBUTES_TC_IDM_8_1_CANNOT_SEED - unseeded), [],
+            "These listed attributes can now be seeded or are no longer fabric scoped; remove them from "
+            "ATTRIBUTES_TC_IDM_8_1_CANNOT_SEED")
+
     def test_withholding_assertion_fails_on_a_returned_cross_fabric_entry(self):
         # The check that a fabric-sensitive attribute withholds another fabric's
         # entries rather than masking their fields. Exercised here against a
@@ -473,7 +527,7 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
         dut = make_dut({0: {Clusters.TlsClientManagement.id: attribute_list(PROVISIONED_ENDPOINTS_ID)}})
         info = self.find(dut.discover_fabric_scoped_attributes(),
                          Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID)
-        returned = [Clusters.TlsClientManagement.Structs.TLSEndpointStruct(hostname=b'example.com', fabricIndex=2)]
+        returned = [{HOSTNAME_TAG: b'example.com', idm_support.FABRIC_INDEX_TAG: 2}]
         with asserts.assert_raises(signals.TestFailure,
                                    "An entry belonging to another fabric must fail the withholding assertion"):
             dut.assert_other_fabrics_withheld(info, returned, own_fabric_index=1, reader_name="TH1")
@@ -482,7 +536,7 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
         dut = make_dut({0: {Clusters.TlsClientManagement.id: attribute_list(PROVISIONED_ENDPOINTS_ID)}})
         info = self.find(dut.discover_fabric_scoped_attributes(),
                          Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID)
-        own_only = [Clusters.TlsClientManagement.Structs.TLSEndpointStruct(hostname=b'example.com', fabricIndex=1)]
+        own_only = [{HOSTNAME_TAG: b'example.com', idm_support.FABRIC_INDEX_TAG: 1}]
         dut.assert_other_fabrics_withheld(info, own_only, own_fabric_index=1, reader_name="TH1")
 
     def make_coverage_dut(self) -> idm_support.IDMBaseTest:

@@ -168,7 +168,7 @@ class FabricScopedAttributeInfo:
 
     Aggregates the cluster/attribute identity, the generated Python classes used to
     read and write it, and the spec-parsed set of fabric-sensitive fields that must
-    read back as defaults for entries belonging to another fabric.
+    be omitted from entries belonging to another fabric.
     """
     endpoint_id: int
     cluster_id: int
@@ -179,41 +179,31 @@ class FabricScopedAttributeInfo:
     cluster_class: type[ClusterObjects.Cluster]
     # The list's entry type, or None when the attribute is not a list of structs.
     struct_class: type[ClusterObjects.ClusterObject] | None
-    # Generated dataclass field labels the spec marks fabric sensitive. Empty when the
-    # struct has no fabric-sensitive fields, or when the spec XML has no entry for it.
-    fabric_sensitive_labels: frozenset[str]
-    # The spec marks the attribute itself fabric sensitive, rather than naming individual
-    # fields of its entry struct. Every field of a cross-fabric entry must then read back
-    # as a default, so the check covers the whole struct instead of a labelled subset.
+    # Field IDs of the entry struct the spec marks fabric sensitive, which are also
+    # the fields' TLV tags. Empty when no field is marked.
+    fabric_sensitive_tags: frozenset[int]
+    # The spec marks the attribute itself fabric sensitive, so it is always read as a
+    # fabric-filtered list: the other fabric's entries are withheld, not masked.
     whole_entry_sensitive: bool
     # Write access per the spec XML, independent of whether a sweep may write it.
     writable: bool
     # Listed in FABRIC_WRITE_DENIED_ATTRIBUTES. Kept apart from `writable` so a report
     # can say "deliberately excluded" rather than "read-only" for Acl, NOCs and friends.
     write_denied: bool
-    # Which of the two signals identified this attribute. The signals disagree in the
-    # real data model, so both are kept to report the gaps rather than hide them.
-    from_codegen: bool
-    from_spec_xml: bool
+    # The generated entry struct has a FabricIndex field. Without one, a decoded entry
+    # cannot be attributed to a fabric, so only a populator's marker can identify it.
+    has_fabric_index_field: bool
 
     @property
     def path_str(self) -> str:
         return f"EP{self.endpoint_id} {self.cluster_name}.{self.attribute_name}"
 
     @property
-    def masked_field_labels(self) -> frozenset[str]:
-        """Fields of a cross-fabric entry that must read back as null or as their default.
-
-        An attribute the spec marks fabric sensitive masks its entries whole, so every
-        field but FabricIndex is covered. Otherwise only the fields the entry struct
-        itself marks are, which for many fabric-scoped attributes is none of them.
-        """
-        if not self.whole_entry_sensitive:
-            return self.fabric_sensitive_labels
+    def fabric_sensitive_labels(self) -> list[str]:
+        """Generated field labels of fabric_sensitive_tags, for messages."""
         descriptor = getattr(self.struct_class, 'descriptor', None)
-        if descriptor is None:
-            return self.fabric_sensitive_labels
-        return frozenset(f.Label for f in descriptor.Fields if f.Tag != FABRIC_INDEX_TAG)
+        labels = {f.Tag: f.Label for f in descriptor.Fields} if descriptor is not None else {}
+        return [labels.get(tag, str(tag)) for tag in sorted(self.fabric_sensitive_tags)]
 
 
 @dataclass
@@ -225,8 +215,9 @@ class FabricSensitiveEventInfo:
     event_id: int
     event_name: str
     event: type[ClusterObjects.ClusterEvent]
-    from_codegen: bool
-    from_spec_xml: bool
+    # The generated event has a FabricIndex field, which the steps use to tell which
+    # fabric a delivered event belongs to.
+    has_fabric_index_field: bool
 
     @property
     def path_str(self) -> str:
@@ -514,10 +505,6 @@ FABRIC_INDEX_TAG = 254
 # AccessControl test plan and used here to write a fabric-scoped entry harmlessly.
 D_OK_EMPTY = bytes.fromhex('1718')
 
-# EventList (0xFFFA) is not in GlobalAttributeIds because it is not required on every
-# cluster; clusters that omit it fall back to the codegen event list.
-EVENT_LIST_ID = 0xFFFA
-
 # Values used to give a fabric an entry in an attribute owned by its cluster's command
 # set, so the cross-fabric masking assertions have something to check. Chosen to be
 # inert: a TLS endpoint that is never connected to, and a group and key set whose ids
@@ -761,19 +748,23 @@ def struct_is_fabric_scoped(struct_type: type | None) -> bool:
     return any(f.Tag == FABRIC_INDEX_TAG and f.Label == 'fabricIndex' for f in descriptor.Fields)
 
 
-def fabric_sensitive_field_labels(struct_type: type | None, xml_struct: Any | None) -> frozenset[str]:
-    """Map the spec's fabric-sensitive field IDs onto generated dataclass field labels.
+def fabric_sensitive_field_tags(xml_struct: Any | None) -> frozenset[int]:
+    """The spec's fabric-sensitive field IDs of a struct, which are also their TLV tags.
 
-    Struct field IDs in the data model XML are the TLV tags used by the generated
-    classes, so the descriptor provides the ID-to-label mapping. Returns an empty set
-    when either side is missing, which callers treat as "nothing to check" rather than
-    as a failure.
+    Returns an empty set when the spec XML has no entry for the struct, which callers
+    treat as "nothing to check" rather than as a failure.
     """
-    descriptor = getattr(struct_type, 'descriptor', None)
-    if descriptor is None or xml_struct is None:
+    if xml_struct is None:
         return frozenset()
-    sensitive_ids = {component.value for component in xml_struct.components.values() if component.fabric_sensitive}
-    return frozenset(f.Label for f in descriptor.Fields if f.Tag in sensitive_ids)
+    return frozenset(int(component.value) for component in xml_struct.components.values()
+                     if component.fabric_sensitive)
+
+
+def tlv_fabric_index(entry: Any) -> int | None:
+    """The FabricIndex field of a raw TLV list entry, or None if it carries none."""
+    if not isinstance(entry, dict):
+        return None
+    return entry.get(FABRIC_INDEX_TAG)
 
 
 def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.ClusterCommand]:
@@ -1952,142 +1943,124 @@ class IDMBaseTest(BasicCompositionTests):
     # ========================================================================
 
     def discover_fabric_scoped_attributes(self) -> list[FabricScopedAttributeInfo]:
-        """Discover every fabric-scoped list attribute present on the DUT.
+        """Discover every attribute on the DUT that the spec defines as a fabric-scoped list.
 
         Walks the wildcard-read composition (endpoints_tlv) and keeps an attribute when
-        either signal marks it fabric scoped:
-
-        * codegen: the attribute is a list whose entry struct carries a FabricIndex
-          field (tag 254).
-        * spec XML: the attribute's <access> element, or that of its struct, carries
-          fabricScoped="true".
-
-        Neither signal alone is complete in the current data model, so the union is
-        used and the disagreements are reported by
-        record_fabric_metadata_disagreements rather than silently resolved.
+        the spec XML marks its <access> element fabricScoped or fabricSensitive (a
+        fabric-sensitive attribute is a fabric-scoped list by definition), or marks
+        its entry struct fabricScoped. The generated code is not consulted to decide
+        what is fabric scoped; it only says whether a decoded entry carries a
+        FabricIndex, recorded as has_fabric_index_field.
         """
         infos: list[FabricScopedAttributeInfo] = []
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster_data in endpoint.items():
                 if not is_standard_cluster_id(cluster_id):
                     continue
-                if cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
+                xml_cluster = self.xml_clusters.get(cluster_id)
+                if xml_cluster is None or cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
                     continue
 
-                xml_cluster = self.xml_clusters.get(cluster_id)
                 cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
                 for attribute_id in cluster_data.get(GlobalAttributeIds.ATTRIBUTE_LIST_ID, []):
                     if not is_standard_attribute_id(attribute_id):
                         continue
+                    xml_attribute = xml_cluster.attributes.get(attribute_id)
                     attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id].get(attribute_id)
-                    if attribute is None:
+                    if xml_attribute is None or attribute is None:
                         continue
 
                     struct_class = fabric_scoped_entry_type(attribute)
-                    from_codegen = struct_is_fabric_scoped(struct_class)
-
-                    xml_attribute = xml_cluster.attributes.get(attribute_id) if xml_cluster else None
-                    xml_struct = None
-                    if xml_cluster is not None and struct_class is not None:
-                        xml_struct = xml_cluster.structs.get(struct_class.__name__)
-                    from_spec_xml = bool(xml_attribute is not None and xml_attribute.fabric_scoped) or \
-                        bool(xml_struct is not None and xml_struct.fabric_scoped)
-
-                    if not (from_codegen or from_spec_xml):
+                    xml_struct = xml_cluster.structs.get(struct_class.__name__) if struct_class is not None else None
+                    if not (xml_attribute.fabric_scoped or xml_attribute.fabric_sensitive
+                            or (xml_struct is not None and xml_struct.fabric_scoped)):
                         continue
-
-                    writable = self.attribute_is_writable(endpoint_id, cluster_id, attribute_id)
 
                     infos.append(FabricScopedAttributeInfo(
                         endpoint_id=endpoint_id,
                         cluster_id=cluster_id,
-                        cluster_name=xml_cluster.name if xml_cluster else cluster_class.__name__,
+                        cluster_name=xml_cluster.name,
                         attribute_id=attribute_id,
                         attribute_name=attribute.__name__,
                         attribute=attribute,
                         cluster_class=cluster_class,
                         struct_class=struct_class,
-                        fabric_sensitive_labels=fabric_sensitive_field_labels(struct_class, xml_struct),
-                        whole_entry_sensitive=bool(xml_attribute is not None and xml_attribute.fabric_sensitive),
-                        writable=writable,
+                        fabric_sensitive_tags=fabric_sensitive_field_tags(xml_struct),
+                        whole_entry_sensitive=xml_attribute.fabric_sensitive,
+                        writable=self.attribute_is_writable(endpoint_id, cluster_id, attribute_id),
                         write_denied=(cluster_id, attribute_id) in FABRIC_WRITE_DENIED_ATTRIBUTES,
-                        from_codegen=from_codegen,
-                        from_spec_xml=from_spec_xml,
+                        has_fabric_index_field=struct_is_fabric_scoped(struct_class),
                     ))
         return infos
 
     def discover_fabric_sensitive_events(self) -> list[FabricSensitiveEventInfo]:
-        """Discover every fabric-sensitive event present on the DUT.
+        """Discover every event the spec marks fabric sensitive on the DUT's clusters.
 
-        Fabric sensitivity of an event is only expressed in the spec XML
-        (fabricSensitive="true" on its <access> element); the generated event classes
-        carry a FabricIndex field, which is a weaker signal because a non-sensitive
-        event may also be fabric scoped. Both are recorded so the disagreements are
-        visible in the report.
+        A DUT does not list the events it supports, so the candidates are the spec
+        XML's events for each cluster on the DUT whose conformance the cluster's
+        FeatureMap, AttributeList and command lists do not rule out. An optional
+        event may still be unsupported; the steps report an event that never
+        occurred as not exercised.
         """
         infos: list[FabricSensitiveEventInfo] = []
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster_data in endpoint.items():
                 if not is_standard_cluster_id(cluster_id):
                     continue
-                if cluster_id not in Clusters.ClusterObjects.ALL_EVENTS:
+                xml_cluster = self.xml_clusters.get(cluster_id)
+                if xml_cluster is None or cluster_id not in Clusters.ClusterObjects.ALL_EVENTS:
                     continue
 
-                xml_cluster = self.xml_clusters.get(cluster_id)
-                cluster_events = Clusters.ClusterObjects.ALL_EVENTS[cluster_id]
-                # A cluster that does not implement EventList still reports its events;
-                # fall back to the codegen list so those clusters are not skipped.
-                event_ids = cluster_data.get(EVENT_LIST_ID, list(cluster_events.keys()))
-                for event_id in event_ids:
-                    event = cluster_events.get(event_id)
-                    if event is None:
+                conformance_data = ConformanceAssessmentData(
+                    feature_map=cluster_data.get(GlobalAttributeIds.FEATURE_MAP_ID, 0),
+                    attribute_list=cluster_data.get(GlobalAttributeIds.ATTRIBUTE_LIST_ID, []),
+                    all_command_list=(cluster_data.get(GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID, [])
+                                      + cluster_data.get(GlobalAttributeIds.GENERATED_COMMAND_LIST_ID, [])),
+                    cluster_revision=cluster_data.get(GlobalAttributeIds.CLUSTER_REVISION_ID, 0))
+                for event_id, xml_event in xml_cluster.events.items():
+                    if not xml_event.fabric_sensitive:
                         continue
-                    xml_event = xml_cluster.events.get(event_id) if xml_cluster else None
-                    from_spec_xml = bool(xml_event is not None and xml_event.fabric_sensitive)
-                    from_codegen = any(f.Tag == FABRIC_INDEX_TAG for f in event.descriptor.Fields)
-                    if not from_spec_xml:
+                    decision = xml_event.conformance(conformance_data).decision
+                    if decision in (ConformanceDecision.NOT_APPLICABLE, ConformanceDecision.DISALLOWED):
+                        continue
+                    event = Clusters.ClusterObjects.ALL_EVENTS[cluster_id].get(event_id)
+                    if event is None:
                         continue
 
                     infos.append(FabricSensitiveEventInfo(
                         endpoint_id=endpoint_id,
                         cluster_id=cluster_id,
-                        cluster_name=xml_cluster.name if xml_cluster else str(cluster_id),
+                        cluster_name=xml_cluster.name,
                         event_id=event_id,
                         event_name=event.__name__,
                         event=event,
-                        from_codegen=from_codegen,
-                        from_spec_xml=from_spec_xml,
+                        has_fabric_index_field=any(f.Tag == FABRIC_INDEX_TAG for f in event.descriptor.Fields),
                     ))
         return infos
 
     def record_fabric_metadata_disagreements(self, attribute_infos: list[FabricScopedAttributeInfo],
                                              event_infos: list[FabricSensitiveEventInfo]) -> None:
-        """Record a note for every element the two fabric-scoping signals disagree on.
+        """Record a note for every element whose generated class has no FabricIndex field.
 
-        A disagreement is a data model bookkeeping gap rather than a DUT defect, so it
-        is recorded as a note: either the spec XML is missing the fabricScoped marker
-        for a struct that clearly carries a FabricIndex, or the generated struct is
-        missing the FabricIndex field the spec says it has.
+        The spec defines the element as fabric scoped, so the DUT has to treat it
+        that way, but the decoded data carries no FabricIndex to tell the fabrics'
+        entries apart. The checks that rely on one are then not exercised, and the
+        note says why. The SDK side of the gap is caught without a device by
+        TestFabricMetadataConsistency.
         """
         test_name = self.current_test_info.name
         for info in attribute_infos:
-            if info.from_codegen and info.from_spec_xml:
+            if info.has_fabric_index_field:
                 continue
-            if info.from_codegen:
-                problem = (f"{info.path_str} is a list of fabric-scoped structs in the generated code but the "
-                           "spec XML does not mark the attribute or its struct fabricScoped; fabric-sensitive "
-                           "field checks are skipped for it")
-            else:
-                problem = (f"{info.path_str} is marked fabric scoped in the spec XML but the generated struct "
-                           f"{info.struct_class.__name__ if info.struct_class else '<not a list>'} has no "
-                           "FabricIndex field")
             self.record_note(test_name=test_name,
                              location=AttributePathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
                                                             attribute_id=info.attribute_id),
-                             problem=problem)
+                             problem=(f"{info.path_str} is marked fabric scoped in the spec XML but the generated "
+                                      f"struct {info.struct_class.__name__ if info.struct_class else '<not a list>'} "
+                                      "has no FabricIndex field"))
 
         for event_info in event_infos:
-            if event_info.from_codegen:
+            if event_info.has_fabric_index_field:
                 continue
             self.record_note(test_name=test_name,
                              location=EventPathLocation(endpoint_id=event_info.endpoint_id,
@@ -2096,52 +2069,45 @@ class IDMBaseTest(BasicCompositionTests):
                              problem=(f"{event_info.path_str} is marked fabric sensitive in the spec XML but the "
                                       "generated event has no FabricIndex field"))
 
-    def assert_other_fabric_entries_masked(self, info: FabricScopedAttributeInfo, entries: list | Nullable,
+    def assert_other_fabric_entries_masked(self, info: FabricScopedAttributeInfo, tlv_entries: Any,
                                            own_fabric_index: int) -> int:
-        """Assert entries from other fabrics carry no fabric-sensitive data.
+        """Assert entries from other fabrics carry no fabric-sensitive field.
 
         The spec requires the fabric-sensitive fields of an entry belonging to another
-        fabric to read back as null or as the field's default value, so both are
-        accepted. Returns the number of cross-fabric entries checked, which lets the
-        caller distinguish "verified" from "nothing to verify".
+        fabric to be omitted from the report. A decoded entry fills an omitted field
+        with its default, so the check is made on the raw TLV of the read
+        (read_fabric_scoped_attribute_tlv), where an omitted field is an absent tag.
+        Returns the number of cross-fabric entries checked, which lets the caller
+        distinguish "verified" from "nothing to verify".
         """
-        labels = info.masked_field_labels
-        if not labels or not isinstance(entries, list):
+        if not info.fabric_sensitive_tags or not isinstance(tlv_entries, list):
             return 0
 
-        default_entry = info.struct_class()
         checked = 0
-        for entry in entries:
-            if getattr(entry, 'fabricIndex', own_fabric_index) == own_fabric_index:
+        for entry in tlv_entries:
+            entry_fabric_index = tlv_fabric_index(entry)
+            if entry_fabric_index is None or entry_fabric_index == own_fabric_index:
                 continue
             checked += 1
-            for label in sorted(labels):
-                value = getattr(entry, label)
-                if isinstance(value, Nullable):
-                    continue
-                asserts.assert_equal(
-                    value, getattr(default_entry, label),
-                    f"{info.path_str}: fabric-sensitive field {label} of the entry for fabric "
-                    f"{entry.fabricIndex} read from fabric {own_fabric_index} is neither null nor the "
-                    f"default value")
+            present = sorted(tag for tag in info.fabric_sensitive_tags if tag in entry)
+            asserts.assert_equal(
+                present, [],
+                f"{info.path_str}: the entry for fabric {entry_fabric_index} read from fabric {own_fabric_index} "
+                f"carries fabric-sensitive field tag(s) {present}; the spec requires them to be omitted")
         return checked
 
-    def assert_other_fabrics_withheld(self, info: FabricScopedAttributeInfo, entries: list | Nullable,
+    def assert_other_fabrics_withheld(self, info: FabricScopedAttributeInfo, tlv_entries: Any,
                                       own_fabric_index: int, reader_name: str) -> None:
         """Assert an unfiltered read of a fabric-sensitive attribute still hides other fabrics.
 
-        Where the spec marks the attribute itself fabric sensitive, rather than
-        naming fields of its entry struct, the list is reported fabric filtered
-        whatever the request asked for: an entry belonging to another fabric is
-        withheld outright rather than returned with its fields omitted. Only
-        meaningful once the other fabric is known to have an entry, so callers
-        gate this on a successful populate; otherwise an empty list would pass
-        without proving anything.
+        An attribute the spec marks fabric sensitive is always read as a
+        fabric-filtered list, whatever the request asked for, so an entry
+        belonging to another fabric must be absent from the raw TLV of the read.
         """
-        if not isinstance(entries, list):
+        if not isinstance(tlv_entries, list):
             return
-        foreign = [e for e in entries if getattr(e, 'fabricIndex', own_fabric_index) != own_fabric_index]
-        asserts.assert_equal(foreign, [],
+        foreign = [e for e in tlv_entries if tlv_fabric_index(e) not in (None, own_fabric_index)]
+        asserts.assert_equal(len(foreign), 0,
                              f"{info.path_str}: the spec marks this attribute fabric sensitive, so "
                              f"{reader_name}'s unfiltered read must not return the {len(foreign)} entry/entries "
                              f"belonging to another fabric")
@@ -2168,6 +2134,20 @@ class IDMBaseTest(BasicCompositionTests):
         return await self.read_single_attribute_check_success(
             dev_ctrl=dev_ctrl, endpoint=info.endpoint_id, cluster=info.cluster_class,
             attribute=info.attribute, fabric_filtered=fabric_filtered)
+
+    async def read_fabric_scoped_attribute_tlv(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl,
+                                               fabric_filtered: bool) -> Any:
+        """Read a discovered fabric-scoped attribute as raw TLV, failing on an error status.
+
+        A list comes back as a list of dicts keyed by field tag, so a field the DUT
+        omitted is an absent key rather than a default value.
+        """
+        response = await dev_ctrl.Read(self.dut_node_id, [(info.endpoint_id, info.attribute)],
+                                       fabricFiltered=fabric_filtered)
+        value = response.tlvAttributes.get(info.endpoint_id, {}).get(info.cluster_id, {}).get(info.attribute_id)
+        asserts.assert_false(isinstance(value, ValueDecodeFailure),
+                             f"{info.path_str}: the read returned an error: {value}")
+        return value
 
     async def write_fabric_scoped_attribute(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl,
                                             value: list) -> None:
@@ -2248,7 +2228,9 @@ class IDMBaseTest(BasicCompositionTests):
         result covers wildly different amounts of ground from one device to the
         next. Logging the tally per check, and naming every path a check could
         not be exercised against, is what lets a reader tell a thorough run from
-        an empty one without re-deriving it from the absence of failures.
+        an empty one without re-deriving it from the absence of failures. Paths a
+        check did not apply to are logged at debug level only: they follow from
+        the data model and read the same on every DUT.
         """
         records = self.fabric_check_records
         if not records:
@@ -2265,9 +2247,10 @@ class IDMBaseTest(BasicCompositionTests):
                      tally[FabricCheckOutcome.VERIFIED], tally[FabricCheckOutcome.NOT_APPLICABLE],
                      tally[FabricCheckOutcome.NOT_EXERCISED])
             for record in for_check:
-                if record.outcome is FabricCheckOutcome.VERIFIED:
-                    continue
-                log.info("    %-11s %s: %s", record.outcome, record.path, record.reason)
+                if record.outcome is FabricCheckOutcome.NOT_EXERCISED:
+                    log.info("    %-11s %s: %s", record.outcome, record.path, record.reason)
+                elif record.outcome is FabricCheckOutcome.NOT_APPLICABLE:
+                    log.debug("    %-11s %s: %s", record.outcome, record.path, record.reason)
 
         # Only the unexercised checks become notices. A check that did not apply
         # is a property of the data model rather than of this DUT, so recording
