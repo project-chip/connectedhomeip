@@ -112,6 +112,7 @@ def mock_mdns_module():
     inside _is_device_operational_via_dnssd resolves correctly.
     """
     mock_mdns_mod = MagicMock()
+    mock_mdns_mod.MdnsServiceType.OPERATIONAL.value = "_matter._tcp.local."
     mock_parent = MagicMock()
     mock_parent.mdns_discovery = mock_mdns_mod
 

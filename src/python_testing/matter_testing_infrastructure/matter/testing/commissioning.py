@@ -403,8 +403,6 @@ class SetupParameters:
 # Short timeout since DNS-SD is fast - device should respond quickly if operational
 DNSSD_DISCOVERY_TIMEOUT_SEC = 3
 
-_OPERATIONAL_SERVICE_TYPE = "_matter._tcp.local."
-
 
 class EstablishedSessionKind(StrEnum):
     """Session type that succeeded when establishing PASE and CASE in parallel."""
@@ -435,7 +433,7 @@ async def _get_operational_record_via_dnssd(
         The SRV and TXT data of the operational instance, or None if the device does not
         answer within the timeout or the query fails.
     """
-    from mdns_discovery.mdns_discovery import MdnsDiscovery
+    from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 
     try:
         compressed_fabric_id = dev_ctrl.GetCompressedFabricId()
@@ -444,8 +442,8 @@ async def _get_operational_record_via_dnssd(
         LOGGER.info("Checking DNS-SD for operational service: %s", instance_name)
 
         record = await MdnsDiscovery().query_srv_and_txt_records(
-            service_name=f'{instance_name}.{_OPERATIONAL_SERVICE_TYPE}',
-            service_type=_OPERATIONAL_SERVICE_TYPE,
+            service_name=f'{instance_name}.{MdnsServiceType.OPERATIONAL.value}',
+            service_type=MdnsServiceType.OPERATIONAL.value,
             query_timeout_sec=discovery_timeout_sec
         )
 
