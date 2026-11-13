@@ -1552,7 +1552,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetBssInfo(const char * bssPath, NetworkCom
     // may be gone when we try to get the properties.
     if (ssid == nullptr || bssid == nullptr)
     {
-        ChipLogDetail(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "BSS not found: %s", StringOrNullMarker(bssPath));
+        ChipLogDetail(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "BSS not found: %s", bssPath);
         return CHIP_ERROR_NOT_FOUND;
     }
 
@@ -1575,86 +1575,6 @@ CHIP_ERROR ConnectivityManagerImpl::_GetBssInfo(const char * bssPath, NetworkCom
                      WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Got a network with incorrect BSSID len: %" G_GSIZE_FORMAT " != 6", bssidLen);
         bssidLen = 0;
     }
-
-    // Internal sentinel (bit 7). Not a real WiFiSecurityBitmap value; keeps an EAP-only
-    // network from being reported as Open. Masked off before the result is returned.
-
-    // TODO: The following code will mistakenly recognize WEP encryption as OPEN network, this should be fixed by reading
-    // IEs (information elements) field instead of reading cooked data.
-
-    static constexpr chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> kEAP{ static_cast<uint8_t>(1 << 7) };
-
-    auto IsNetworkWPAPSK = [](GVariant * wpa) -> chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> {
-        chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> res;
-
-        if (wpa == nullptr)
-        {
-            return res;
-        }
-
-        GAutoPtr<GVariant> keyMgmt(g_variant_lookup_value(wpa, "KeyMgmt", nullptr));
-        if (keyMgmt == nullptr)
-        {
-            return res;
-        }
-        GBorrowedStrvPtr keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
-        const gchar ** keyMgmtsHandle = keyMgmts.get();
-
-        VerifyOrReturnError(keyMgmtsHandle != nullptr, res);
-
-        for (auto keyMgmtVal = *keyMgmtsHandle; keyMgmtVal != nullptr; keyMgmtVal = *(++keyMgmtsHandle))
-        {
-            if (g_strcasecmp(keyMgmtVal, "wpa-psk") == 0 || g_strcasecmp(keyMgmtVal, "wpa-none") == 0)
-            {
-                res.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpaPersonal);
-            }
-            else if (g_strcasecmp(keyMgmtVal, "wpa-eap") == 0)
-            {
-                res.Set(kEAP);
-            }
-        }
-
-        return res;
-    };
-    auto IsNetworkWPA2PSK = [](GVariant * rsn) -> chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> {
-        chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> res;
-
-        if (rsn == nullptr)
-        {
-            return res;
-        }
-        GAutoPtr<GVariant> keyMgmt(g_variant_lookup_value(rsn, "KeyMgmt", nullptr));
-        if (keyMgmt == nullptr)
-        {
-            return res;
-        }
-        GBorrowedStrvPtr keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
-        const gchar ** keyMgmtsHandle = keyMgmts.get();
-
-        VerifyOrReturnError(keyMgmtsHandle != nullptr, res);
-
-        for (auto keyMgmtVal = *keyMgmtsHandle; keyMgmtVal != nullptr; keyMgmtVal = *(++keyMgmtsHandle))
-        {
-            if (g_strcasecmp(keyMgmtVal, "wpa-psk") == 0 || g_strcasecmp(keyMgmtVal, "wpa-psk-sha256") == 0 ||
-                g_strcasecmp(keyMgmtVal, "wpa-ft-psk") == 0)
-            {
-                res.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpa2Personal);
-            }
-            else if (g_strcasecmp(keyMgmtVal, "wpa-eap") == 0 || g_strcasecmp(keyMgmtVal, "wpa-eap-sha256") == 0 ||
-                     g_strcasecmp(keyMgmtVal, "wpa-ft-eap") == 0)
-            {
-                res.Set(kEAP);
-            }
-            else if (g_strcasecmp(keyMgmtVal, "sae") == 0)
-            {
-                // wpa_supplicant will include "sae" in KeyMgmt field for WPA3 WiFi, this is not included in the wpa_supplicant
-                // document.
-                res.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpa3Personal);
-            }
-        }
-
-        return res;
-    };
 
     // Drop the network if its SSID or BSSID is illegal.
     VerifyOrReturnError(ssidLen <= kMaxWiFiSSIDLength, CHIP_ERROR_INTERNAL);
@@ -1680,14 +1600,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetBssInfo(const char * bssPath, NetworkCom
     result.wiFiBand = bandInfo.first;
     result.channel  = bandInfo.second;
 
-    chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> networkSecurityType(
-        IsNetworkWPAPSK(wpa_supplicant_1_bss_get_wpa(bss.get())), IsNetworkWPA2PSK(wpa_supplicant_1_bss_get_rsn(bss.get())));
-    if (!networkSecurityType.HasAny())
-    {
-        networkSecurityType.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kUnencrypted);
-    }
-    networkSecurityType.Clear(kEAP);
-    result.security = networkSecurityType;
+    result.security = Internal::GetWiFiSecurity(wpa_supplicant_1_bss_get_wpa(bss.get()), wpa_supplicant_1_bss_get_rsn(bss.get()));
 
     return CHIP_NO_ERROR;
 }

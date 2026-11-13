@@ -71,6 +71,14 @@ class ConnectivityManagerImpl;
 namespace Internal {
 
 /**
+ * Classify the supported AKMs in the WPA and RSN BSS scan dictionaries.
+ * Unencrypted is set only when neither dictionary lists any AKM. Nonempty
+ * collections containing only unsupported AKMs (such as FT-only, FILS or OWE)
+ * produce an empty bitmap. Missing or malformed properties are ignored.
+ */
+BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> GetWiFiSecurity(GVariant * wpa, GVariant * rsn);
+
+/**
  *  @brief
  *    A D-Bus client for the wpa_supplicant Wi-Fi control plane.
  *

@@ -36,6 +36,12 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#include <platform/Linux/WpaSupplicantClient.h>
+
+#include <initializer_list>
+#endif
+
 using namespace chip;
 using namespace chip::Logging;
 using namespace chip::Inet;
@@ -81,3 +87,74 @@ TEST_F(TestConnectivityMgr, GetNetworkInterfaces)
 
     GetDiagnosticDataProvider().ReleaseNetworkInterfaces(netifs);
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+namespace {
+
+GAutoPtr<GVariant> SecurityProperties(std::initializer_list<const gchar *> values)
+{
+    GVariantBuilder dictionary;
+    g_variant_builder_init(&dictionary, G_VARIANT_TYPE_VARDICT);
+    g_variant_builder_add(&dictionary, "{sv}", "KeyMgmt", g_variant_new_strv(values.begin(), static_cast<gssize>(values.size())));
+    return GAutoPtr<GVariant>(g_variant_ref_sink(g_variant_builder_end(&dictionary)));
+}
+
+TEST(TestWiFiSecurity, OpenAndMalformedProperties)
+{
+    EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, nullptr).Raw(), 0x01);
+    auto empty = SecurityProperties({});
+    EXPECT_EQ(Internal::GetWiFiSecurity(empty.get(), empty.get()).Raw(), 0x01);
+    GAutoPtr<GVariant> invalid(g_variant_ref_sink(g_variant_new_string("invalid")));
+    EXPECT_EQ(Internal::GetWiFiSecurity(invalid.get(), invalid.get()).Raw(), 0x01);
+    GVariantBuilder dictionary;
+    g_variant_builder_init(&dictionary, G_VARIANT_TYPE_VARDICT);
+    g_variant_builder_add(&dictionary, "{sv}", "KeyMgmt", g_variant_new_uint32(1));
+    GAutoPtr<GVariant> wrongType(g_variant_ref_sink(g_variant_builder_end(&dictionary)));
+    EXPECT_EQ(Internal::GetWiFiSecurity(wrongType.get(), wrongType.get()).Raw(), 0x01);
+}
+
+TEST(TestWiFiSecurity, NonFtEap)
+{
+    for (const auto * keyMgmt :
+         { "wpa-eap", "wpa-eap-sha256", "wpa-eap-suite-b", "wpa-eap-suite-b-192", "wpa-eap-sha384", "WPA-EAP-SHA384" })
+    {
+        auto properties = SecurityProperties({ keyMgmt });
+        EXPECT_EQ(Internal::GetWiFiSecurity(properties.get(), nullptr).Raw(), 0x20);
+        EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, properties.get()).Raw(), 0x20);
+        auto mixed = SecurityProperties({ keyMgmt, "wpa-psk", "sae-ext-key" });
+        EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, mixed.get()).Raw(), 0x38);
+    }
+}
+
+TEST(TestWiFiSecurity, FtOnlyAndUnknownAkmDoNotAdvertiseEap)
+{
+    for (const auto * keyMgmt : { "wpa-ft-eap", "wpa-ft-eap-sha384", "ft-sae", "ft-sae-ext-key", "fils-sha256", "fils-sha384",
+                                  "ft-fils-sha256", "ft-fils-sha384", "owe", "unknown-akm" })
+    {
+        auto properties = SecurityProperties({ keyMgmt });
+        EXPECT_EQ(Internal::GetWiFiSecurity(properties.get(), nullptr).Raw(), 0x00);
+        EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, properties.get()).Raw(), 0x00);
+        auto mixed = SecurityProperties({ keyMgmt, "wpa-psk" });
+        EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, mixed.get()).Raw(), 0x08);
+    }
+}
+
+TEST(TestWiFiSecurity, PersonalAndMixedSecurityUseIndependentInputs)
+{
+    auto psk = SecurityProperties({ "wpa-psk" });
+    EXPECT_EQ(Internal::GetWiFiSecurity(psk.get(), nullptr).Raw(), 0x04);
+    auto personal = SecurityProperties({ "wpa-psk", "wpa-psk-sha256", "wpa-ft-psk", "sae" });
+    EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, personal.get()).Raw(), 0x18);
+    for (const auto * keyMgmt : { "sae", "sae-ext-key" })
+    {
+        auto properties = SecurityProperties({ keyMgmt });
+        EXPECT_EQ(Internal::GetWiFiSecurity(properties.get(), nullptr).Raw(), 0x00);
+        EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, properties.get()).Raw(), 0x10);
+    }
+    auto eap = SecurityProperties({ "wpa-eap-suite-b", "wpa-psk", "sae-ext-key" });
+    EXPECT_EQ(Internal::GetWiFiSecurity(nullptr, eap.get()).Raw(), 0x38);
+    EXPECT_EQ(Internal::GetWiFiSecurity(psk.get(), eap.get()).Raw(), 0x3c);
+}
+
+} // namespace
+#endif

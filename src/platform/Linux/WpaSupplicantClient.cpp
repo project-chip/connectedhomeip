@@ -42,6 +42,55 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> GetWiFiSecurity(GVariant * wpa, GVariant * rsn)
+{
+    using Security = app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
+    BitFlags<Security> result;
+    bool hasKeyMgmt = false;
+    auto decode     = [&result, &hasKeyMgmt](GVariant * properties, bool isRsn) {
+        if (properties == nullptr || !g_variant_is_of_type(properties, G_VARIANT_TYPE_VARDICT))
+        {
+            return;
+        }
+        GAutoPtr<GVariant> keyMgmt(g_variant_lookup_value(properties, "KeyMgmt", G_VARIANT_TYPE_STRING_ARRAY));
+        if (keyMgmt == nullptr)
+        {
+            return;
+        }
+        GBorrowedStrvPtr values(g_variant_get_strv(keyMgmt.get(), nullptr));
+        for (const gchar ** entry = values.get(); entry != nullptr && *entry != nullptr; ++entry)
+        {
+            hasKeyMgmt          = true;
+            const gchar * value = *entry;
+            if (g_ascii_strcasecmp(value, "wpa-eap") == 0 || g_ascii_strcasecmp(value, "wpa-eap-sha256") == 0 ||
+                g_ascii_strcasecmp(value, "wpa-eap-suite-b") == 0 || g_ascii_strcasecmp(value, "wpa-eap-suite-b-192") == 0 ||
+                g_ascii_strcasecmp(value, "wpa-eap-sha384") == 0)
+            {
+                result.Set(Security::kIeee8021x);
+            }
+            else if (g_ascii_strcasecmp(value, "wpa-psk") == 0)
+            {
+                result.Set(isRsn ? Security::kWpa2Personal : Security::kWpaPersonal);
+            }
+            else if (isRsn && (g_ascii_strcasecmp(value, "wpa-psk-sha256") == 0 || g_ascii_strcasecmp(value, "wpa-ft-psk") == 0))
+            {
+                result.Set(Security::kWpa2Personal);
+            }
+            else if (isRsn && (g_ascii_strcasecmp(value, "sae") == 0 || g_ascii_strcasecmp(value, "sae-ext-key") == 0))
+            {
+                result.Set(Security::kWpa3Personal);
+            }
+        }
+    };
+    decode(wpa, false);
+    decode(rsn, true);
+    if (!hasKeyMgmt)
+    {
+        result.Set(Security::kUnencrypted);
+    }
+    return result;
+}
+
 namespace {
 
 static constexpr char kWpaSupplicantServiceName[] = "fi.w1.wpa_supplicant1";
@@ -240,7 +289,7 @@ bool WpaSupplicantClient::GetBssInfo(const gchar * inBssPath,
     // may be gone when we try to get the properties.
     if (ssid == nullptr || bssid == nullptr)
     {
-        ChipLogDetail(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "BSS not found: %s", StringOrNullMarker(inBssPath));
+        ChipLogDetail(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "BSS not found: %s", inBssPath);
         return false;
     }
 
@@ -266,101 +315,6 @@ bool WpaSupplicantClient::GetBssInfo(const gchar * inBssPath,
     ChipLogDetail(DeviceLayer, "Network Found: %s (%s) Signal:%d",
                   NullTerminated(StringOrNullMarker((const gchar *) ssidStr), ssidLen).c_str(), bssidStr, signal);
 
-    // Internal sentinel (bit 7). Not a real WiFiSecurityBitmap value; keeps an EAP-only
-    // network from being reported as Open. Masked off before the result is returned.
-
-    // TODO: The following code will mistakenly recognize WEP encryption as OPEN network, this should be fixed by reading
-    // IEs (information elements) field instead of reading cooked data.
-
-    static constexpr chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> kEAP{ static_cast<uint8_t>(1 << 7) };
-
-    auto IsNetworkWPAPSK = [](GVariant * wpa) -> chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> {
-        chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> res;
-
-        if (wpa == nullptr)
-        {
-            return res;
-        }
-
-        GAutoPtr<GVariant> keyMgmt(g_variant_lookup_value(wpa, "KeyMgmt", nullptr));
-        if (keyMgmt == nullptr)
-        {
-            return res;
-        }
-        GBorrowedStrvPtr keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
-        const gchar ** keyMgmtsHandle = keyMgmts.get();
-
-        VerifyOrReturnError(keyMgmtsHandle != nullptr, res);
-
-        for (auto keyMgmtVal = *keyMgmtsHandle; keyMgmtVal != nullptr; keyMgmtVal = *(++keyMgmtsHandle))
-        {
-            if (g_strcasecmp(keyMgmtVal, "wpa-psk") == 0 || g_strcasecmp(keyMgmtVal, "wpa-none") == 0)
-            {
-                res.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpaPersonal);
-            }
-            else if (g_strcasecmp(keyMgmtVal, "wpa-eap") == 0)
-            {
-                res.Set(kEAP);
-            }
-        }
-
-        return res;
-    };
-    auto IsNetworkWPA2PSK = [](GVariant * rsn) -> chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> {
-        chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> res;
-
-        if (rsn == nullptr)
-        {
-            return res;
-        }
-        GAutoPtr<GVariant> keyMgmt(g_variant_lookup_value(rsn, "KeyMgmt", nullptr));
-        if (keyMgmt == nullptr)
-        {
-            return res;
-        }
-        GBorrowedStrvPtr keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
-        const gchar ** keyMgmtsHandle = keyMgmts.get();
-
-        VerifyOrReturnError(keyMgmtsHandle != nullptr, res);
-
-        for (auto keyMgmtVal = *keyMgmtsHandle; keyMgmtVal != nullptr; keyMgmtVal = *(++keyMgmtsHandle))
-        {
-            if (g_strcasecmp(keyMgmtVal, "wpa-psk") == 0 || g_strcasecmp(keyMgmtVal, "wpa-psk-sha256") == 0 ||
-                g_strcasecmp(keyMgmtVal, "wpa-ft-psk") == 0)
-            {
-                res.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpa2Personal);
-            }
-            else if (g_strcasecmp(keyMgmtVal, "wpa-eap") == 0 || g_strcasecmp(keyMgmtVal, "wpa-eap-sha256") == 0 ||
-                     g_strcasecmp(keyMgmtVal, "wpa-ft-eap") == 0)
-            {
-                res.Set(kEAP);
-            }
-            else if (g_strcasecmp(keyMgmtVal, "sae") == 0)
-            {
-                // wpa_supplicant will include "sae" in KeyMgmt field for WPA3 WiFi, this is not included in the wpa_supplicant
-                // document.
-                res.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpa3Personal);
-            }
-        }
-
-        return res;
-    };
-    auto GetNetworkSecurityType =
-        [IsNetworkWPAPSK, IsNetworkWPA2PSK](
-            WpaSupplicant1BSSProxy * proxy) -> chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> {
-        GAutoPtr<GVariant> wpa(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "WPA"));
-        GAutoPtr<GVariant> rsn(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "RSN"));
-
-        chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> res(IsNetworkWPAPSK(wpa.get()),
-                                                                                    IsNetworkWPA2PSK(rsn.get()));
-        if (!res.HasAny())
-        {
-            res.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kUnencrypted);
-        }
-        res.Clear(kEAP);
-        return res;
-    };
-
     // Drop the network if its SSID or BSSID is illegal.
     VerifyOrReturnError(ssidLen <= DeviceLayer::Internal::kMaxWiFiSSIDLength, false);
     VerifyOrReturnError(bssidLen == kWiFiBSSIDLength, false);
@@ -372,7 +326,9 @@ bool WpaSupplicantClient::GetBssInfo(const gchar * inBssPath,
     auto bandInfo                       = GetBandAndChannelFromFrequency(frequency);
     outWiFiScanResponse.wiFiBand        = bandInfo.first;
     outWiFiScanResponse.channel         = bandInfo.second;
-    outWiFiScanResponse.security        = GetNetworkSecurityType(bssProxy);
+    GAutoPtr<GVariant> wpa(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "WPA"));
+    GAutoPtr<GVariant> rsn(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "RSN"));
+    outWiFiScanResponse.security = GetWiFiSecurity(wpa.get(), rsn.get());
 
     return true;
 }
