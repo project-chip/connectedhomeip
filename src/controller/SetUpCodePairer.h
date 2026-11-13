@@ -222,6 +222,8 @@ private:
     // RendezvousParameters in the future.
     bool DiscoveryInProgress() const;
 
+    bool NonDNSSDDiscoveryInProgress() const;
+
     // If there is nothing left to try (no PASE in progress, no queued discovered
     // parameters, no discovery in progress), notify the commissioner that pairing
     // has failed.  err is used as the failure error only if no PASE attempt has
@@ -312,6 +314,9 @@ private:
     // EstablishPASEConnection or PairDevice on mCommissioner and are now just
     // waiting to see whether that works.
     bool mWaitingForPASE = false;
+
+    // Whether the last PASE attempt started by ConnectToDiscoveredDevice was over NFC.
+    bool mLastPASEAttemptWasOverNFC = false;
 
     // mLastPASEError is the error from the last OnPairingComplete call we got.
     CHIP_ERROR mLastPASEError = CHIP_NO_ERROR;
