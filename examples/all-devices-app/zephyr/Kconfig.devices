@@ -74,6 +74,9 @@ config ALL_DEVICES_DEVICE_DISHWASHER
 config ALL_DEVICES_DEVICE_DOORBELL
 	bool "Doorbell"
 
+config ALL_DEVICES_DEVICE_ELECTRICAL_ENERGY_TARIFF
+	bool "Electrical energy tariff"
+
 config ALL_DEVICES_DEVICE_ELECTRICAL_SENSOR
 	bool "Electrical sensor"
 

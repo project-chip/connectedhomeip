@@ -58,6 +58,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'dimmable-plug-in-unit',
     'dishwasher',
     'doorbell',
+    'electrical-energy-tariff',
     'electrical-sensor',
     'extended-color-light',
     'extractor-hood',
