@@ -70,6 +70,13 @@ class InteractionModelEngine;
 class ReadClient : public Messaging::ExchangeDelegate
 {
 public:
+    enum class ResubscriptionSessionType : uint8_t
+    {
+        kReuseHeldSession,
+        kAttachToExistingSession,
+        kEstablishNewSession,
+    };
+
     /**
      * While any Callback method is executing, no other ReadClient instance may be destroyed or shut down;
      * only OnDone may destroy the ReadClient passed to it.
@@ -295,6 +302,23 @@ public:
          * The ReadClient MUST NOT be destroyed during execution of this callback (i.e. before the callback returns).
          */
         virtual void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) {}
+
+        /**
+         * Called when a subscription ReadClient starts a resubscription attempt, with the session it will use:
+         * - kReuseHeldSession: the session the ReadClient holds, which is aSession. A message from the peer on another
+         *   session can replace the held session, so this may differ from the session the subscription was set up on.
+         * - kAttachToExistingSession: the ReadClient holds no active session, and the CASE session manager attaches it to an
+         *   active CASE session to the peer, which is aSession. No CASE session is negotiated.
+         * - kEstablishNewSession: there is no active CASE session to the peer, so one has to be negotiated; aSession is
+         *   empty.
+         * The ReadClient MUST NOT be destroyed during this callback.
+         *
+         * Any Callback that wraps another Callback and forwards to it (like BufferedReadCallback and ClusterStateCache)
+         * must forward this too, or the wrapped Callback never sees it.
+         */
+        virtual void OnResubscriptionAttemptStarted(ResubscriptionSessionType aSessionType,
+                                                    const Optional<SessionHandle> & aSession)
+        {}
     };
 
     enum class InteractionType : uint8_t
@@ -395,6 +419,9 @@ public:
     FabricIndex GetFabricIndex() const { return mPeer.GetFabricIndex(); }
     NodeId GetPeerNodeId() const { return mPeer.GetNodeId(); }
     ScopedNodeId GetPeerScopedId() const { return mPeer; }
+    // The session held for this subscription. A message from the peer on another session replaces it, so the value is only
+    // meaningful when read on the Matter thread, and only until the thread next runs other work.
+    Optional<SessionHandle> GetHeldSession() const { return mReadPrepareParams.mSessionHolder.Get(); }
 
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };

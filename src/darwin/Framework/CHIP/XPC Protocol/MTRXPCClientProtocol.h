@@ -16,6 +16,7 @@
 
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDevice.h> // for MTRDeviceState
+#import <Matter/MTRMetrics.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,6 +29,8 @@ MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID;
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID;
 - (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary;
+@optional
+- (oneway void)device:(NSNumber *)nodeID collectedMetrics:(MTRMetrics *)metrics MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))

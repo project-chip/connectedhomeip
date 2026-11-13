@@ -25,6 +25,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class MTRDeviceController;
+@class MTRMetrics;
 
 typedef NS_ENUM(NSUInteger, MTRDeviceState) {
     MTRDeviceStateUnknown = 0,
@@ -475,6 +476,27 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_AVAILABLE(ios(17.6), macos(14.
  *
  */
 - (void)deviceConfigurationChanged:(MTRDevice *)device MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
+/**
+ * Subscription metrics for the device.  Like the other MTRDeviceDelegate callbacks, this is called on the queue the delegate was
+ * added with, never on the Matter queue or thread.
+ *
+ * It is called each time a subscription is established, drops, or fails or is abandoned during setup (including a subscription
+ * attempt ended by the controller shutting down or suspending, or the device being removed, which reports a cancelled error).  For a
+ * device that keeps dropping and failing to resubscribe, it can be called many times.
+ *
+ * Each call is a snapshot of what finished since the previous call, not a running total: a setup, session request or resubscription
+ * that is still in progress is reported in the call that follows its end, and the failed-attempt count restarts after an
+ * establishment.  All keys start with "dwnfw__subscription__" and are suffixed with "_begin", "_end" (carrying a duration and an
+ * error code) or "_event" (carrying a value): setup, case_session_request, active and resubscription durations; attempt_failed
+ * (the error); retry_ctr (failed attempts since the last establishment); retry_delay_ms (when a retry was scheduled); transport (an
+ * MTRTransportType value of the session, absent while no session has been provided); and device_vendor_id, device_product_id,
+ * device_uses_thread_bool and network_features, which are absent when the device's attributes are not known yet
+ * (device_uses_thread_bool is absent until the network features are known).  The duration and event keys other than these state
+ * keys are only present for what happened since the last call; retry_ctr is present in every call, and transport and the device
+ * keys are present whenever known, whether or not they changed.  These keys are stable.
+ */
+- (void)device:(MTRDevice *)device collectedMetrics:(MTRMetrics *)metrics MTR_NEWLY_AVAILABLE;
 
 @end
 

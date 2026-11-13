@@ -40,6 +40,11 @@ MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerIsRunningKe
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
+// In the controller context: @YES if the client handles device:collectedMetrics:.  A server must send device:collectedMetrics: only
+// to a client that registered with this key set to @YES.  A client whose registration omits the key (or sets anything but @YES)
+// predates the callback and must not be sent it; the server drops the metrics for that client.
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationMetricsSupportedKey MTR_NEWLY_AVAILABLE;
+
 /**
  * Each node dictionary in the MTRDeviceControllerRegistrationNodeIDsKey array may also hold:
  *

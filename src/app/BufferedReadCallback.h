@@ -126,6 +126,12 @@ private:
         return mCallback.OnCASESessionEstablished(aSession, aSubscriptionParams);
     }
 
+    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType,
+                                        const Optional<SessionHandle> & aSession) override
+    {
+        mCallback.OnResubscriptionAttemptStarted(aSessionType, aSession);
+    }
+
     /*
      * Given a reader positioned at a list element, allocate a packet buffer, copy the list item where
      * the reader is positioned into that buffer and add it to our buffered list for tracking.

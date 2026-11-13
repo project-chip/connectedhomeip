@@ -222,6 +222,12 @@ public:
         NextCallback().OnCASESessionEstablished(aSession, aSubscriptionParams);
     }
 
+    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType,
+                                        const Optional<SessionHandle> & aSession) override
+    {
+        NextCallback().OnResubscriptionAttemptStarted(aSessionType, aSession);
+    }
+
     BufferedReadCallback mBufferedCallback;
     bool mSawEmptyList               = false;
     bool mDecodingFailed             = false;
