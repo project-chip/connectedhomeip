@@ -506,7 +506,23 @@ public:
     //
     CHIP_ERROR SendCommandRequest(const SessionHandle & session, Optional<System::Clock::Timeout> timeout = NullOptional);
 
+    /**
+     * Declare the session this invoke will be sent on, so the encoding of SuppressResponse and TimedRequest
+     * can be chosen before the first command is encoded:
+     *   - Group session: Neither field is encoded.
+     *                    Fails with CHIP_ERROR_INVALID_ARGUMENT if this CommandSender was created for a timed invoke.
+     *   - Other sessions: A field is not encoded when FALSE and the peer reported InteractionModelRevision >= 14
+     *                     during session establishment.
+     *                     Otherwise both fields are encoded.
+     *
+     * To presever callers' compatibility, Calling PrepareForSession before encoding commands is optional for all sessions.
+     * Without PrepareForSession, both fields are encoded.
+     * When PrepareForSession is used, it must be called before the first command is added.
+     */
+    CHIP_ERROR PrepareForSession(const SessionHandle & session);
+
     // Sends a queued up group command request to the target encapsulated by the secureSession handle.
+    // Timed invokes are rejected with CHIP_ERROR_INVALID_ARGUMENT.
     //
     // If this function is successful, it will invoke the OnDone callback before returning to indicate
     // to the application that it can destroy and free this object.
@@ -677,6 +693,8 @@ private:
     State mState                = State::Idle;
     bool mSuppressResponse      = false;
     bool mTimedRequest          = false;
+    bool mGroupcastRequest      = false;
+    bool mOmitFalseRequestFlags = false;
     bool mBufferAllocated       = false;
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;

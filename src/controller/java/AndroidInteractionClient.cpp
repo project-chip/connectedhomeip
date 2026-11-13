@@ -314,6 +314,8 @@ CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong deviceP
     writeClient = Platform::New<app::WriteClient>(
         device->GetExchangeManager(), callback->GetChunkedWriteCallback(),
         convertedTimedRequestTimeoutMs != 0 ? Optional<uint16_t>(convertedTimedRequestTimeoutMs) : Optional<uint16_t>::Missing());
+    VerifyOrExit(writeClient != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    SuccessOrExit(err = writeClient->PrepareForSession(device->GetSecureSession().Value()));
 
     for (jint i = 0; i < listSize; i++)
     {
@@ -493,8 +495,10 @@ CHIP_ERROR extendableInvoke(JNIEnv * env, jlong handle, jlong callbackHandle, jl
     }
 
     commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), timedRequestTimeoutMs != 0);
+    VerifyOrExit(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
     config.SetRemoteMaxPathsPerInvoke(device->GetSecureSession().Value()->GetRemoteSessionParameters().GetMaxPathsPerInvoke());
     SuccessOrExit(err = commandSender->SetCommandSenderConfig(config));
+    SuccessOrExit(err = commandSender->PrepareForSession(device->GetSecureSession().Value()));
 
     for (jint i = 0; i < listSize; i++)
     {
@@ -703,6 +707,8 @@ CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong device
     VerifyOrExit(device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
     commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), timedRequestTimeoutMs != 0);
+    VerifyOrExit(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    SuccessOrExit(err = commandSender->PrepareForSession(device->GetSecureSession().Value()));
 
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getEndpointId", "(J)J", &getEndpointIdMethod));
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getClusterId", "(J)J", &getClusterIdMethod));

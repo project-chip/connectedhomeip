@@ -193,6 +193,7 @@ static_library("interaction-model") {
     "OperationalSessionSetup.cpp",
     "OperationalSessionSetup.h",
     "OperationalSessionSetupPool.h",
+    "OptionalRequestFlags.h",
     "PendingResponseTracker.h",
     "PendingResponseTrackerImpl.cpp",
     "PendingResponseTrackerImpl.h",

@@ -146,6 +146,8 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
                                                          callback->GetChunkedCallback(), aTimedWriteTimeoutMs);
     VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
 
+    ReturnErrorOnFailure(client->PrepareForSession(sessionHandle));
+
     if (sessionHandle->IsGroupSession())
     {
         ReturnErrorOnFailure(client->EncodeAttribute(chip::app::AttributePathParams(clusterId, attributeId), requestData));

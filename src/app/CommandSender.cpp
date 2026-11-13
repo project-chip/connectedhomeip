@@ -19,6 +19,7 @@
 #include "CommandSender.h"
 #include "StatusResponse.h"
 #include <app/InteractionModelTimeout.h>
+#include <app/OptionalRequestFlags.h>
 #include <app/TimedRequest.h>
 #include <platform/LockTracker.h>
 #include <protocols/Protocols.h>
@@ -110,8 +111,20 @@ CHIP_ERROR CommandSender::AllocateBuffer()
         ReturnErrorOnFailure(
             mInvokeRequestBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
-        mInvokeRequestBuilder.SuppressResponse(mSuppressResponse).TimedRequest(mTimedRequest);
-        ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
+        // Groupcast never encodes SuppressResponse or TimedRequest.
+        // For unicast sessions, they are only encoded if true or the peer reported InteractionModelRevision is unknown or < 14.
+        if (!mGroupcastRequest)
+        {
+            if (mSuppressResponse || !mOmitFalseRequestFlags)
+            {
+                mInvokeRequestBuilder.SuppressResponse(mSuppressResponse);
+            }
+            if (mTimedRequest || !mOmitFalseRequestFlags)
+            {
+                mInvokeRequestBuilder.TimedRequest(mTimedRequest);
+            }
+            ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
+        }
 
         mInvokeRequestBuilder.CreateInvokeRequests(/* aReserveEndBuffer = */ true);
         ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
@@ -122,8 +135,20 @@ CHIP_ERROR CommandSender::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CommandSender::PrepareForSession(const SessionHandle & session)
+{
+    VerifyOrReturnError(!mBufferAllocated, CHIP_ERROR_INCORRECT_STATE);
+    const bool isGroupSession = session->IsGroupSession();
+    VerifyOrReturnError(!(isGroupSession && mTimedRequest), CHIP_ERROR_INVALID_ARGUMENT);
+    mGroupcastRequest      = isGroupSession;
+    mOmitFalseRequestFlags = PeerAcceptsOmittedRequestFlags(session);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout)
 {
+    VerifyOrReturnError(!mGroupcastRequest, CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrReturnError(!mOmitFalseRequestFlags || PeerAcceptsOmittedRequestFlags(session), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(Finalize(mPendingInvokeData));
@@ -192,6 +217,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
 CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session)
 {
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mTimedRequest && !mTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(Finalize(mPendingInvokeData));
 

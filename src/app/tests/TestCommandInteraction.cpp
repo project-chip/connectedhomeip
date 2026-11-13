@@ -588,6 +588,11 @@ public:
     void TestCommandHandler_DelayReportData_Groupcast();
     void TestInteractionModelCommands_SendCommand_DelayReportData();
     void TestInteractionModelCommands_SendGroupCommand_DelayReportData();
+    void TestCommandHandler_UnicastMissingSuppressResponseAndTimedRequestAreFalse();
+    void TestCommandSenderUnicastOmitsFalseRequestFlags();
+    void TestCommandSenderUnicastPreparationIsEnforced();
+    void TestCommandHandler_GroupcastOmitsSuppressResponseAndTimedRequest();
+    void TestCommandHandler_GroupcastWithLegacySuppressResponseAndTimedRequest();
 
     /**
      * With the introduction of batch invoke commands, CommandHandler keeps track of incoming
@@ -615,7 +620,7 @@ public:
     // payload will be included.  Otherwise no payload will be included.
     static void GenerateInvokeRequest(System::PacketBufferHandle & aPayload, bool aSuppressResponse, bool aIsTimedRequest,
                                       CommandId aCommandId, ClusterId aClusterId = kTestClusterId,
-                                      EndpointId aEndpointId = kTestEndpointId);
+                                      EndpointId aEndpointId = kTestEndpointId, bool aIncludeFlags = true);
     // Generate an invoke response.  If aCommandId is kTestCommandIdWithData, a
     // payload will be included.  Otherwise no payload will be included.
     static void GenerateInvokeResponse(System::PacketBufferHandle & aPayload, CommandId aCommandId,
@@ -664,7 +669,7 @@ CommandPathParams MakeTestGroupCommandPath(GroupId aGroupId, ClusterId aClusterI
 
 void TestCommandInteraction::GenerateInvokeRequest(System::PacketBufferHandle & aPayload, bool aSuppressResponse,
                                                    bool aIsTimedRequest, CommandId aCommandId, ClusterId aClusterId,
-                                                   EndpointId aEndpointId)
+                                                   EndpointId aEndpointId, bool aIncludeFlags)
 
 {
     InvokeRequestMessage::Builder invokeRequestMessageBuilder;
@@ -673,7 +678,10 @@ void TestCommandInteraction::GenerateInvokeRequest(System::PacketBufferHandle & 
 
     EXPECT_EQ(invokeRequestMessageBuilder.Init(&writer), CHIP_NO_ERROR);
 
-    invokeRequestMessageBuilder.SuppressResponse(aSuppressResponse).TimedRequest(aIsTimedRequest);
+    if (aIncludeFlags)
+    {
+        invokeRequestMessageBuilder.SuppressResponse(aSuppressResponse).TimedRequest(aIsTimedRequest);
+    }
     InvokeRequests::Builder & invokeRequests = invokeRequestMessageBuilder.CreateInvokeRequests();
     ASSERT_EQ(invokeRequestMessageBuilder.GetError(), CHIP_NO_ERROR);
 
@@ -1744,25 +1752,314 @@ TEST_F(TestCommandInteraction, TestCommandSenderCommandSuccessResponseFlow)
 
 TEST_F(TestCommandInteraction, TestCommandSenderGroupCommandNoResponseFlow)
 {
-    mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    for (bool prepare : { false, true })
+    {
+        mockCommandSenderDelegate.ResetCounter();
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        SessionHandle groupSession = GetSessionBobToFriends();
+        if (prepare)
+        {
+            ASSERT_SUCCESS(commandSender.PrepareForSession(groupSession));
+        }
 
-    AddInvokeRequestData(&commandSender);
-    SessionHandle groupSession = GetSessionBobToFriends();
-    EXPECT_TRUE(groupSession->IsGroupSession());
-    EXPECT_EQ(commandSender.SendGroupCommandRequest(groupSession), CHIP_NO_ERROR);
+        AddInvokeRequestData(&commandSender);
+        chip::Testing::MessageCapturer messageLog(*this);
+        ASSERT_SUCCESS(commandSender.SendGroupCommandRequest(groupSession));
 
-    DrainAndServiceIO();
+        DrainAndServiceIO();
 
-    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
-    // No response is expected for a group command, so OnResponse and OnError should not be called.
-    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
-    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
-    // There should be no invoke response messages.
-    EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
+        ASSERT_EQ(messageLog.MessageCount(), 1u);
+        ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest));
+        System::PacketBufferTLVReader reader;
+        reader.Init(messageLog.MessagePayload(0).Retain());
+        InvokeRequestMessage::Parser parser;
+        ASSERT_SUCCESS(parser.Init(reader));
+        bool flag = true;
+        if (prepare)
+        {
+            EXPECT_EQ(parser.GetSuppressResponse(&flag), CHIP_END_OF_TLV);
+            EXPECT_EQ(parser.GetTimedRequest(&flag), CHIP_END_OF_TLV);
+        }
+        else
+        {
+            ASSERT_SUCCESS(parser.GetSuppressResponse(&flag));
+            EXPECT_FALSE(flag);
+            flag = true;
+            ASSERT_SUCCESS(parser.GetTimedRequest(&flag));
+            EXPECT_FALSE(flag);
+        }
+
+        EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+        EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+        EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+        EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
+
+        EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    }
+}
+
+TEST_F(TestCommandInteraction, TestCommandSenderGroupcastEncodingIsEnforced)
+{
+    // A CommandSender prepared for groupcast does not encode the fields a unicast peer may require, so it cannot send unicast.
+    {
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToFriends()), CHIP_NO_ERROR);
+        AddInvokeRequestData(&commandSender);
+        EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    }
+
+    // Groupcast cannot be timed, and the fields are written with the first command.
+    {
+        app::CommandSender timedSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ true);
+        EXPECT_EQ(timedSender.PrepareForSession(GetSessionBobToFriends()), CHIP_ERROR_INVALID_ARGUMENT);
+        AddInvokeRequestData(&timedSender);
+        EXPECT_EQ(timedSender.SendGroupCommandRequest(GetSessionBobToFriends()), CHIP_ERROR_INVALID_ARGUMENT);
+
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        AddInvokeRequestData(&commandSender);
+        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToFriends()), CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_UnicastMissingSuppressResponseAndTimedRequestAreFalse)
+{
+    auto processUnicastInvoke = [](bool aIsTimedInvoke) {
+        System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        GenerateInvokeRequest(commandDatabuf, /* aSuppressResponse = */ false, /* aIsTimedRequest = */ false,
+                              kTestCommandIdWithData, kTestClusterId, kTestEndpointId, /* aIncludeFlags = */ false);
+
+        BasicCommandPathRegistry<4> basicCommandPathRegistry;
+        MockCommandResponder mockCommandResponder;
+        CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
+        CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+        return commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), aIsTimedInvoke);
+    };
+
+    commandDispatchedCount = 0;
+    EXPECT_EQ(processUnicastInvoke(/* aIsTimedInvoke = */ false), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(commandDispatchedCount, 1u);
+
+    // A missing TimedRequest is FALSE, which mismatches a Timed Invoke transaction.
+    commandDispatchedCount = 0;
+    EXPECT_EQ(processUnicastInvoke(/* aIsTimedInvoke = */ true), Protocols::InteractionModel::Status::TimedRequestMismatch);
+    EXPECT_EQ(commandDispatchedCount, 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderUnicastOmitsFalseRequestFlags)
+{
+    struct EncodedFlags
+    {
+        CHIP_ERROR suppressResponseError;
+        bool suppressResponse;
+        CHIP_ERROR timedRequestError;
+        bool timedRequest;
+    };
+
+    auto encodeUnicastInvoke = [this](std::optional<uint16_t> aPeerRevision, bool aIsTimedRequest, bool aSuppressResponse) {
+        SessionParameters peerParameters;
+        peerParameters.SetMRPConfig(GetDefaultMRPConfig());
+        if (aPeerRevision.has_value())
+        {
+            peerParameters.SetInteractionModelRevision(*aPeerRevision);
+        }
+        SessionHandle session = GetSessionBobToAlice();
+        session->AsSecureSession()->SetRemoteSessionParameters(peerParameters);
+
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), aIsTimedRequest, aSuppressResponse);
+        EXPECT_EQ(commandSender.PrepareForSession(session), CHIP_NO_ERROR);
+        EXPECT_EQ(commandSender.PrepareCommand(MakeTestCommandPath(kTestCommandIdWithData)), CHIP_NO_ERROR);
+        EXPECT_EQ(commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true), CHIP_NO_ERROR);
+        app::CommandSender::FinishCommandParameters finishCommandParams(aIsTimedRequest ? Optional<uint16_t>(1000)
+                                                                                        : Optional<uint16_t>::Missing());
+        finishCommandParams.SetEndDataStruct(true);
+        EXPECT_EQ(commandSender.FinishCommand(finishCommandParams), CHIP_NO_ERROR);
+
+        System::PacketBufferHandle commandDatabuf;
+        EXPECT_EQ(commandSender.Finalize(commandDatabuf), CHIP_NO_ERROR);
+
+        System::PacketBufferTLVReader reader;
+        reader.Init(commandDatabuf.CloneData());
+        InvokeRequestMessage::Parser parser;
+        EXPECT_EQ(parser.Init(reader), CHIP_NO_ERROR);
+
+        EncodedFlags flags{ CHIP_NO_ERROR, true, CHIP_NO_ERROR, true };
+        flags.suppressResponseError = parser.GetSuppressResponse(&flags.suppressResponse);
+        flags.timedRequestError     = parser.GetTimedRequest(&flags.timedRequest);
+        return flags;
+    };
+
+    // The peer accepts omission: only a TRUE value is encoded.
+    EncodedFlags flags = encodeUnicastInvoke(14, /* aIsTimedRequest = */ false, /* aSuppressResponse = */ false);
+    EXPECT_EQ(flags.suppressResponseError, CHIP_END_OF_TLV);
+    EXPECT_EQ(flags.timedRequestError, CHIP_END_OF_TLV);
+
+    flags = encodeUnicastInvoke(14, /* aIsTimedRequest = */ true, /* aSuppressResponse = */ false);
+    EXPECT_EQ(flags.suppressResponseError, CHIP_END_OF_TLV);
+    EXPECT_EQ(flags.timedRequestError, CHIP_NO_ERROR);
+    EXPECT_TRUE(flags.timedRequest);
+
+    flags = encodeUnicastInvoke(14, /* aIsTimedRequest = */ false, /* aSuppressResponse = */ true);
+    EXPECT_EQ(flags.suppressResponseError, CHIP_NO_ERROR);
+    EXPECT_TRUE(flags.suppressResponse);
+    EXPECT_EQ(flags.timedRequestError, CHIP_END_OF_TLV);
+
+    // An older or unknown peer revision requires both fields.
+    for (std::optional<uint16_t> peerRevision : { std::optional<uint16_t>(13), std::optional<uint16_t>() })
+    {
+        flags = encodeUnicastInvoke(peerRevision, /* aIsTimedRequest = */ false, /* aSuppressResponse = */ false);
+        EXPECT_EQ(flags.suppressResponseError, CHIP_NO_ERROR);
+        EXPECT_FALSE(flags.suppressResponse);
+        EXPECT_EQ(flags.timedRequestError, CHIP_NO_ERROR);
+        EXPECT_FALSE(flags.timedRequest);
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderUnicastPreparationIsEnforced)
+{
+    auto setPeerRevision = [this](std::optional<uint16_t> aPeerRevision) {
+        SessionParameters peerParameters;
+        peerParameters.SetMRPConfig(GetDefaultMRPConfig());
+        if (aPeerRevision.has_value())
+        {
+            peerParameters.SetInteractionModelRevision(*aPeerRevision);
+        }
+        GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(peerParameters);
+    };
+
+    // The session passed to the last call decides between groupcast and unicast encoding.
+    {
+        mockCommandSenderDelegate.ResetCounter();
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToFriends()), CHIP_NO_ERROR);
+        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToAlice()), CHIP_NO_ERROR);
+        AddInvokeRequestData(&commandSender);
+        ASSERT_SUCCESS(commandSender.SendCommandRequest(GetSessionBobToAlice()));
+        DrainAndServiceIO();
+        EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 1);
+        EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+    }
+
+    // The fields are written with the first command.
+    {
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        AddInvokeRequestData(&commandSender);
+        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToAlice()), CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    // Fields omitted for one peer must not be sent on a session whose peer does not accept omission.
+    {
+        setPeerRevision(14);
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToAlice()), CHIP_NO_ERROR);
+        AddInvokeRequestData(&commandSender);
+        setPeerRevision(std::nullopt);
+        EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // A handler on the peer accepts the message with the fields omitted.
+    {
+        setPeerRevision(14);
+        mockCommandSenderDelegate.ResetCounter();
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToAlice()), CHIP_NO_ERROR);
+        AddInvokeRequestData(&commandSender);
+        EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+        DrainAndServiceIO();
+        EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 1);
+        EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+    }
 
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GroupcastOmitsSuppressResponseAndTimedRequest)
+{
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
+    EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToFriends()), CHIP_NO_ERROR);
+
+    constexpr GroupId kTestGroupId = 0x0101;
+    {
+        CommandPathParams commandPath = MakeTestGroupCommandPath(kTestGroupId, kTestClusterId, kTestCommandIdWithData);
+        app::CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.SetStartDataStruct(true);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.PrepareCommand(commandPath, prepareCommandParams));
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+        app::CommandSender::FinishCommandParameters finishCommandParams;
+        finishCommandParams.SetEndDataStruct(true);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.FinishCommand(finishCommandParams));
+    }
+
+    System::PacketBufferHandle commandDatabuf;
+    EXPECT_EQ(commandSender.Finalize(commandDatabuf), CHIP_NO_ERROR);
+
+    {
+        System::PacketBufferTLVReader reader;
+        reader.Init(commandDatabuf.CloneData());
+        InvokeRequestMessage::Parser parser;
+        EXPECT_EQ(parser.Init(reader), CHIP_NO_ERROR);
+        bool flag = true;
+        EXPECT_EQ(parser.GetSuppressResponse(&flag), CHIP_END_OF_TLV);
+        EXPECT_EQ(parser.GetTimedRequest(&flag), CHIP_END_OF_TLV);
+    }
+
+    BasicCommandPathRegistry<4> basicCommandPathRegistry;
+    MockGroupCommandResponder mockGroupCommandResponder(kTestGroupId, GetBobFabricIndex());
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockGroupCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+
+    commandDispatchedCount = 0;
+    Protocols::InteractionModel::Status status =
+        commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), /* isTimedInvoke = */ false);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(commandDispatchedCount, 1u);
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GroupcastWithLegacySuppressResponseAndTimedRequest)
+{
+    constexpr GroupId kTestGroupId = 0x0101;
+
+    auto processGroupInvoke = [this](bool aIsTimedRequest) {
+        mockCommandSenderExtendedDelegate.ResetCounter();
+        PendingResponseTrackerImpl pendingResponseTracker;
+        app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                         &pendingResponseTracker, aIsTimedRequest, /* aSuppressResponse = */ false);
+        {
+            CommandPathParams commandPath = MakeTestGroupCommandPath(kTestGroupId, kTestClusterId, kTestCommandIdWithData);
+            app::CommandSender::PrepareCommandParameters prepareCommandParams;
+            prepareCommandParams.SetStartDataStruct(true);
+            EXPECT_EQ(CHIP_NO_ERROR, commandSender.PrepareCommand(commandPath, prepareCommandParams));
+            EXPECT_EQ(CHIP_NO_ERROR, commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+            app::CommandSender::FinishCommandParameters finishCommandParams;
+            finishCommandParams.SetEndDataStruct(true);
+            EXPECT_EQ(CHIP_NO_ERROR, commandSender.FinishCommand(finishCommandParams));
+        }
+
+        System::PacketBufferHandle commandDatabuf;
+        EXPECT_EQ(commandSender.Finalize(commandDatabuf), CHIP_NO_ERROR);
+
+        BasicCommandPathRegistry<4> basicCommandPathRegistry;
+        MockGroupCommandResponder mockGroupCommandResponder(kTestGroupId, GetBobFabricIndex());
+        CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockGroupCommandResponder };
+        CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+        return commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), /* isTimedInvoke = */ false);
+    };
+
+    // Older senders include SuppressResponse and TimedRequest set to false; their presence is not an error.
+    commandDispatchedCount = 0;
+    EXPECT_EQ(processGroupInvoke(/* aIsTimedRequest = */ false), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(commandDispatchedCount, 1u);
+
+    // A groupcast invoke is never part of a timed transaction, so TimedRequest set to true is a mismatch.
+    commandDispatchedCount = 0;
+    EXPECT_EQ(processGroupInvoke(/* aIsTimedRequest = */ true), Protocols::InteractionModel::Status::TimedRequestMismatch);
+    EXPECT_EQ(commandDispatchedCount, 0u);
 }
 
 TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseFlow)

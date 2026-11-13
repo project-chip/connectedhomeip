@@ -257,6 +257,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
     }
 
     SuccessOrExit(err = sender->SetCommandSenderConfig(config));
+    SuccessOrExit(err = sender->PrepareForSession(device->GetSecureSession().Value()));
 
     for (size_t i = 0; i < length; i++)
     {
@@ -389,6 +390,7 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
     app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId, commandId,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
+    SuccessOrExit(err = sender->PrepareForSession(device->GetSecureSession().Value()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams, false));
 
     {
@@ -513,8 +515,9 @@ PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::C
 
     std::unique_ptr<CommandSender> sender = std::make_unique<CommandSender>(nullptr /* callback */, exchangeManager);
 
+    chip::Transport::OutgoingGroupSession session(groupId, devCtrl->GetFabricIndex());
     app::CommandPathParams cmdParams = { groupId, clusterId, commandId, (app::CommandPathFlags::kGroupIdValid) };
-
+    SuccessOrExit(err = sender->PrepareForSession(chip::SessionHandle(session)));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams, false));
 
     {
@@ -528,12 +531,7 @@ PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::C
 
     SuccessOrExit(err = sender->FinishCommand(Optional<uint16_t>::Missing()));
 
-    {
-        auto fabricIndex = devCtrl->GetFabricIndex();
-
-        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
-        SuccessOrExit(err = sender->SendGroupCommandRequest(chip::SessionHandle(session)));
-    }
+    SuccessOrExit(err = sender->SendGroupCommandRequest(chip::SessionHandle(session)));
 
     // TODO(#30985): Reconsider the purpose of busyWait and if it can be broken out into it's
     // own method/primitive.

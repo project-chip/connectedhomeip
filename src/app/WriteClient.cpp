@@ -25,6 +25,7 @@
 #include "lib/core/CHIPError.h"
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
+#include <app/OptionalRequestFlags.h>
 #include <app/TimedRequest.h>
 #include <app/WriteClient.h>
 
@@ -204,9 +205,18 @@ CHIP_ERROR WriteClient::StartNewMessage()
     ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(reservedSize));
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
-    mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
-    mWriteRequestBuilder.TimedRequest(mTimedRequestFieldValue);
-    ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
+    if (!mGroupcastRequest)
+    {
+        if (mSuppressResponse || !mOmitFalseRequestFlags)
+        {
+            mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
+        }
+        if (mTimedRequestFieldValue || !mOmitFalseRequestFlags)
+        {
+            mWriteRequestBuilder.TimedRequest(mTimedRequestFieldValue);
+        }
+        ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
+    }
     mWriteRequestBuilder.CreateWriteRequests();
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
 
@@ -455,9 +465,29 @@ void WriteClient::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "WriteClient moving to [%10.10s]", GetStateStr());
 }
 
+CHIP_ERROR WriteClient::PrepareForSession(const SessionHandle & session)
+{
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    const bool isGroupSession = session->IsGroupSession();
+    VerifyOrReturnError(!(isGroupSession && mTimedWriteTimeoutMs.HasValue()), CHIP_ERROR_INVALID_ARGUMENT);
+    mGroupcastRequest      = isGroupSession;
+    mOmitFalseRequestFlags = PeerAcceptsOmittedRequestFlags(session);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (session->IsGroupSession())
+    {
+        VerifyOrReturnError(!mTimedWriteTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        VerifyOrReturnError(!mGroupcastRequest, CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    }
+    VerifyOrReturnError(!mOmitFalseRequestFlags || PeerAcceptsOmittedRequestFlags(session), CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrExit(mState == State::AddAttribute, err = CHIP_ERROR_INCORRECT_STATE);
 

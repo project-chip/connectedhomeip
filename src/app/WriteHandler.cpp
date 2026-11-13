@@ -607,6 +607,8 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     // TODO: That's not technically InvalidAction, and we should probably make
     // our callees hand out Status as well.
     Status status = Status::InvalidAction;
+    // A groupcast write produces no response, so the SuppressResponse value in the message is ignored.
+    const bool isGroupWrite = mExchangeCtx->IsGroupExchangeContext();
 
     mLastSuccessfullyWrittenPath = std::nullopt;
 
@@ -628,10 +630,18 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
+    if (isGroupWrite)
+    {
+        boolValue = false;
+    }
     mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
 
     boolValue = false;
     err       = writeRequestParser.GetTimedRequest(&boolValue);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 

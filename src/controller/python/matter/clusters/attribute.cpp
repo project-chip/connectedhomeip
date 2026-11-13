@@ -421,6 +421,7 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
 
     VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
+    SuccessOrExit(err = client->PrepareForSession(device->GetSecureSession().Value()));
     SuccessOrExit(err =
                       ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength, forceLegacyListEncoding));
 
@@ -504,6 +505,8 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
 
     std::unique_ptr<WriteClient> client = std::make_unique<WriteClient>(
         app::InteractionModelEngine::GetInstance()->GetExchangeManager(), nullptr /* callback */, Optional<uint16_t>::Missing());
+    chip::Transport::OutgoingGroupSession session(groupId, devCtrl->GetFabricIndex());
+    SuccessOrExit(err = client->PrepareForSession(chip::SessionHandle(session)));
 
     for (size_t i = 0; i < attributeDataLength; i++)
     {
@@ -527,12 +530,7 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
                 chip::app::ConcreteDataAttributePath(kInvalidEndpointId, path.clusterId, path.attributeId, dataVersion), reader));
     }
 
-    {
-        auto fabricIndex = devCtrl->GetFabricIndex();
-
-        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
-        SuccessOrExit(err = client->SendWriteRequest(chip::SessionHandle(session), System::Clock::kZero));
-    }
+    SuccessOrExit(err = client->SendWriteRequest(chip::SessionHandle(session), System::Clock::kZero));
 
     if (busyWaitMs)
     {

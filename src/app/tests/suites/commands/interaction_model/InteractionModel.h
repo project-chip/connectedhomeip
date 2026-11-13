@@ -292,6 +292,8 @@ protected:
         VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         chip::app::CommandSender commandSender(mCallback, exchangeManager);
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
+        ReturnErrorOnFailure(commandSender.PrepareForSession(chip::SessionHandle(session)));
         chip::app::CommandSender::AddRequestDataParameters addRequestDataParams;
         // Using TestOnly AddRequestData to allow for an intentionally malformed request for server validation testing.
         ReturnErrorOnFailure(commandSender.TestOnlyAddRequestDataNoTimedCheck(commandPath, value, addRequestDataParams));
@@ -302,7 +304,6 @@ protected:
             commandSender.SetDelayReportData(delayReportData);
         }
 
-        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
         return commandSender.SendGroupCommandRequest(chip::SessionHandle(session));
     }
 
@@ -483,10 +484,11 @@ protected:
         chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
         VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
         chip::app::WriteClient writeClient(exchangeManager, &mChunkedWriteCallback, chip::NullOptional);
+        ReturnErrorOnFailure(writeClient.PrepareForSession(chip::SessionHandle(session)));
         ReturnErrorOnFailure(writeClient.EncodeAttribute(attributePathParams, value, dataVersion));
 
-        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
         return writeClient.SendWriteRequest(chip::SessionHandle(session));
     }
 
