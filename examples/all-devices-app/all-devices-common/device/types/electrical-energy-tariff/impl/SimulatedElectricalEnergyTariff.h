@@ -24,7 +24,10 @@
 namespace chip::app {
 
 /**
- * Electrical Energy Tariff that exposes a Commodity Price cluster with a fixed price.
+ * Active Electrical Energy Tariff that exposes a Commodity Price cluster with a fixed price.
+ *
+ * Commodity Price is only allowed on the active tariff, so this device reports IsActiveTariff() and
+ * its default TagList is ActiveTariffTagList().
  *
  * The Commodity Price cluster uses no features and no optional commands. On registration the
  * cluster is set to a currency of EUR with 2 decimal points and a current price of 25 (0.25 EUR per
@@ -39,7 +42,7 @@ public:
     /// Price per kWh in units of 10^-kCurrencyDecimalPoints of the currency.
     static constexpr int64_t kPricePerKWh = 25;
 
-    explicit SimulatedElectricalEnergyTariff(Span<const EndpointComposition::SemanticTag> tagList = {}) :
+    explicit SimulatedElectricalEnergyTariff(Span<const EndpointComposition::SemanticTag> tagList = ActiveTariffTagList()) :
         ElectricalEnergyTariff(tagList)
     {}
     ~SimulatedElectricalEnergyTariff() override = default;
@@ -47,6 +50,7 @@ public:
     Clusters::CommodityPrice::CommodityPriceCluster & CommodityPriceCluster();
 
 protected:
+    bool IsActiveTariff() const override { return true; }
     CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
     void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) override;
 

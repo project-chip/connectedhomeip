@@ -970,19 +970,7 @@ private:
         {
             RegisterCreator("electrical-energy-tariff", [this]() {
                 VerifyOrDie(mContext.has_value());
-                static const Clusters::Globals::Structs::SemanticTagStruct::Type kElectricalEnergyTariffTags[] = {
-                    {
-                        .mfgCode     = DataModel::NullNullable,
-                        .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kCommodityTariffChronology),
-                        .tag         = ElectricalEnergyTariff::kCommodityTariffChronologyCurrentTag,
-                    },
-                    {
-                        .mfgCode     = DataModel::NullNullable,
-                        .namespaceID = ElectricalEnergyTariff::kCommodityTariffCommodityNamespaceId,
-                        .tag         = ElectricalEnergyTariff::kCommodityTariffCommodityElectricalEnergyTag,
-                    },
-                };
-                return MakeDevice<SimulatedElectricalEnergyTariff>(Span(kElectricalEnergyTariffTags));
+                return MakeDevice<SimulatedElectricalEnergyTariff>();
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)

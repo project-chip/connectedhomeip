@@ -25,9 +25,16 @@ namespace chip::app {
 /**
  * Electrical Energy Tariff device type (0x0513).
  *
- * The device type has no mandatory server clusters. Commodity Price, Electrical Grid Conditions and
- * Commodity Tariff are all optional, so subclasses add the ones they support through
- * RegisterOptionalClusters() / UnregisterOptionalClusters().
+ * Cluster requirements:
+ *   - Commodity Price ([ActiveTariff].a+) and Commodity Tariff (O.a+) form a choice group: every
+ *     endpoint SHALL have at least one of them. Commodity Price is only allowed on the active tariff.
+ *   - Electrical Grid Conditions is optional.
+ * Subclasses register the clusters they support through RegisterOptionalClusters().
+ *
+ * Descriptor TagList requirements, checked by Register():
+ *   - The ElectricalEnergy tag (Commodity Tariff Commodity namespace) is mandatory.
+ *   - The Current tag (Commodity Tariff Chronology namespace) is mandatory when IsActiveTariff()
+ *     returns true.
  */
 class ElectricalEnergyTariff : public SingleEndpoint
 {
@@ -42,28 +49,42 @@ public:
     static constexpr uint8_t kCommodityTariffCommodityNamespaceId         = 0x0D;
     static constexpr uint8_t kCommodityTariffCommodityElectricalEnergyTag = 0x00;
 
+    /// Minimal TagList for a tariff that is not the active tariff: ElectricalEnergy.
+    static Span<const EndpointComposition::SemanticTag> DefaultTagList();
+
+    /// Minimal TagList for the active tariff: Current and ElectricalEnergy.
+    static Span<const EndpointComposition::SemanticTag> ActiveTariffTagList();
+
     /// `tagList` is the default Descriptor TagList, used when Register() receives a composition
     /// without tags. The caller must keep the tag storage valid for the lifetime of this object.
-    explicit ElectricalEnergyTariff(Span<const EndpointComposition::SemanticTag> tagList = {});
+    explicit ElectricalEnergyTariff(Span<const EndpointComposition::SemanticTag> tagList = DefaultTagList());
     ~ElectricalEnergyTariff() override = default;
 
+    using SingleEndpoint::Register;
+
+    /// Returns CHIP_ERROR_INVALID_ARGUMENT, without registering anything, if the TagList in use does
+    /// not meet the requirements listed in the class comment.
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
 
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
 protected:
+    /// Returns true if this endpoint represents the currently active tariff (the ActiveTariff
+    /// condition of the device type). Subclasses that register Commodity Price SHALL return true.
+    virtual bool IsActiveTariff() const { return false; }
+
     /// Called by Register() after the Descriptor is registered and before the endpoint is added.
-    virtual CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
-    {
-        return CHIP_NO_ERROR;
-    }
+    /// Implementations SHALL register Commodity Price, Commodity Tariff, or both.
+    virtual CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) = 0;
 
     /// Called by Unregister(), also when Register() fails partway. Implementations must only remove
     /// clusters that are constructed, and must not rely on GetEndpointId() since the endpoint ID is
     /// already reset at this point.
-    virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
+    virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) = 0;
 
 private:
+    CHIP_ERROR ValidateTagList(Span<const EndpointComposition::SemanticTag> tagList) const;
+
     const Span<const EndpointComposition::SemanticTag> mTagList;
 };
 

@@ -27,6 +27,7 @@
 #include <clusters/Descriptor/Attributes.h>
 #include <clusters/Descriptor/ClusterId.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <devices/Types.h>
 
 #include <algorithm>
@@ -44,24 +45,28 @@ constexpr EndpointId kEndpointId = 1;
 
 using SemanticTag = EndpointComposition::SemanticTag;
 
-const SemanticTag kTariffTags[] = {
-    {
-        .mfgCode     = DataModel::NullNullable,
-        .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kCommodityTariffChronology),
-        .tag         = ElectricalEnergyTariff::kCommodityTariffChronologyCurrentTag,
-    },
-    {
-        .mfgCode     = DataModel::NullNullable,
-        .namespaceID = ElectricalEnergyTariff::kCommodityTariffCommodityNamespaceId,
-        .tag         = ElectricalEnergyTariff::kCommodityTariffCommodityElectricalEnergyTag,
-    },
+const SemanticTag kPositionTopTag = {
+    .mfgCode     = DataModel::NullNullable,
+    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
 };
 
-const SemanticTag kOverrideTags[] = {
+const SemanticTag kElectricalEnergyTag = {
+    .mfgCode     = DataModel::NullNullable,
+    .namespaceID = ElectricalEnergyTariff::kCommodityTariffCommodityNamespaceId,
+    .tag         = ElectricalEnergyTariff::kCommodityTariffCommodityElectricalEnergyTag,
+};
+
+const SemanticTag kPositionAndElectricalEnergyTags[] = { kPositionTopTag, kElectricalEnergyTag };
+
+const SemanticTag kTagsWithoutElectricalEnergy[] = { kPositionTopTag };
+
+// Same namespace and tag values as ElectricalEnergy, but a manufacturer tag instead of a standard one.
+const SemanticTag kManufacturerElectricalEnergyTags[] = {
     {
-        .mfgCode     = DataModel::NullNullable,
-        .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
-        .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+        .mfgCode     = DataModel::MakeNullable(VendorId::TestVendor1),
+        .namespaceID = ElectricalEnergyTariff::kCommodityTariffCommodityNamespaceId,
+        .tag         = ElectricalEnergyTariff::kCommodityTariffCommodityElectricalEnergyTag,
     },
 };
 
@@ -86,6 +91,34 @@ std::vector<DecodedTag> ExpectedTags(Span<const SemanticTag> tags)
     }
     return result;
 }
+
+EndpointComposition WithTags(Span<const SemanticTag> tags)
+{
+    return EndpointComposition(kInvalidEndpointId, DataModel::EndpointCompositionPattern::kTree, tags);
+}
+
+/// Electrical Energy Tariff whose cluster hooks only count calls, used to test the generic type.
+class TestTariff : public ElectricalEnergyTariff
+{
+public:
+    using ElectricalEnergyTariff::ElectricalEnergyTariff;
+
+    bool activeTariff                        = false;
+    CHIP_ERROR registrationError             = CHIP_NO_ERROR;
+    unsigned registerOptionalClustersCalls   = 0;
+    unsigned unregisterOptionalClustersCalls = 0;
+
+protected:
+    bool IsActiveTariff() const override { return activeTariff; }
+
+    CHIP_ERROR RegisterOptionalClusters(EndpointId, CodeDrivenDataModelProvider &) override
+    {
+        registerOptionalClustersCalls++;
+        return registrationError;
+    }
+
+    void UnregisterOptionalClusters(CodeDrivenDataModelProvider &) override { unregisterOptionalClustersCalls++; }
+};
 
 class ElectricalEnergyTariffTestFixture : public ::testing::Test
 {
@@ -164,63 +197,89 @@ protected:
         EXPECT_EQ(iterator.GetStatus(), CHIP_NO_ERROR);
         return result;
     }
+
+    /// Expects that `device` registered nothing: no endpoint, and no cluster hook was called.
+    void ExpectNothingRegistered(const TestTariff & device)
+    {
+        EXPECT_EQ(device.GetEndpointId(), kInvalidEndpointId);
+        EXPECT_EQ(device.registerOptionalClustersCalls, 0u);
+        EXPECT_EQ(device.unregisterOptionalClustersCalls, 0u);
+        EXPECT_TRUE(HasNoEndpoints());
+    }
 };
 
-class FailingOptionalClusterElectricalEnergyTariff : public ElectricalEnergyTariff
+TEST_F(ElectricalEnergyTariffTestFixture, RegistersDescriptorWithDefaultTagList)
 {
-public:
-    CHIP_ERROR registrationError             = CHIP_ERROR_INTERNAL;
-    unsigned unregisterOptionalClustersCalls = 0;
-
-protected:
-    CHIP_ERROR RegisterOptionalClusters(EndpointId, CodeDrivenDataModelProvider &) override { return registrationError; }
-    void UnregisterOptionalClusters(CodeDrivenDataModelProvider &) override { unregisterOptionalClustersCalls++; }
-};
-
-TEST_F(ElectricalEnergyTariffTestFixture, GenericTypeRegistersOnlyDescriptor)
-{
-    ElectricalEnergyTariff device;
+    TestTariff device;
 
     EXPECT_EQ(device.GetEndpointId(), kInvalidEndpointId);
     ASSERT_EQ(device.Register(kEndpointId, mProvider), CHIP_NO_ERROR);
     EXPECT_EQ(device.GetEndpointId(), kEndpointId);
+    EXPECT_EQ(device.registerOptionalClustersCalls, 1u);
 
     EXPECT_EQ(GetServerClusterIds(kEndpointId), std::vector<ClusterId>{ Clusters::Descriptor::Id });
     ExpectElectricalEnergyTariffDeviceType(kEndpointId);
-    EXPECT_FALSE(HasDescriptorTagListAttribute(kEndpointId));
+    EXPECT_TRUE(HasDescriptorTagListAttribute(kEndpointId));
+    EXPECT_EQ(ReadDescriptorTagList(kEndpointId), ExpectedTags(ElectricalEnergyTariff::DefaultTagList()));
 
     device.Unregister(mProvider);
     EXPECT_EQ(device.GetEndpointId(), kInvalidEndpointId);
+    EXPECT_EQ(device.unregisterOptionalClustersCalls, 1u);
     EXPECT_TRUE(HasNoEndpoints());
-}
-
-TEST_F(ElectricalEnergyTariffTestFixture, DescriptorReportsDefaultTagList)
-{
-    SimulatedElectricalEnergyTariff device{ Span(kTariffTags) };
-    ASSERT_EQ(device.Register(kEndpointId, mProvider), CHIP_NO_ERROR);
-
-    EXPECT_TRUE(HasDescriptorTagListAttribute(kEndpointId));
-    EXPECT_EQ(ReadDescriptorTagList(kEndpointId), ExpectedTags(Span(kTariffTags)));
-
-    device.Unregister(mProvider);
 }
 
 TEST_F(ElectricalEnergyTariffTestFixture, CompositionTagListOverridesDefault)
 {
-    SimulatedElectricalEnergyTariff device{ Span(kTariffTags) };
-    ASSERT_EQ(
-        device.Register(kEndpointId, mProvider,
-                        EndpointComposition(kInvalidEndpointId, DataModel::EndpointCompositionPattern::kTree, Span(kOverrideTags))),
-        CHIP_NO_ERROR);
+    TestTariff device;
+    ASSERT_EQ(device.Register(kEndpointId, mProvider, WithTags(Span(kPositionAndElectricalEnergyTags))), CHIP_NO_ERROR);
 
-    EXPECT_EQ(ReadDescriptorTagList(kEndpointId), ExpectedTags(Span(kOverrideTags)));
+    EXPECT_EQ(ReadDescriptorTagList(kEndpointId), ExpectedTags(Span(kPositionAndElectricalEnergyTags)));
+
+    device.Unregister(mProvider);
+}
+
+TEST_F(ElectricalEnergyTariffTestFixture, RejectsDefaultTagListWithoutElectricalEnergy)
+{
+    TestTariff device{ Span(kTagsWithoutElectricalEnergy) };
+
+    EXPECT_EQ(device.Register(kEndpointId, mProvider), CHIP_ERROR_INVALID_ARGUMENT);
+    ExpectNothingRegistered(device);
+}
+
+TEST_F(ElectricalEnergyTariffTestFixture, RejectsCompositionTagListWithoutElectricalEnergy)
+{
+    TestTariff device;
+
+    EXPECT_EQ(device.Register(kEndpointId, mProvider, WithTags(Span(kTagsWithoutElectricalEnergy))), CHIP_ERROR_INVALID_ARGUMENT);
+    ExpectNothingRegistered(device);
+}
+
+TEST_F(ElectricalEnergyTariffTestFixture, RejectsManufacturerElectricalEnergyTag)
+{
+    TestTariff device;
+
+    EXPECT_EQ(device.Register(kEndpointId, mProvider, WithTags(Span(kManufacturerElectricalEnergyTags))),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    ExpectNothingRegistered(device);
+}
+
+TEST_F(ElectricalEnergyTariffTestFixture, ActiveTariffRequiresCurrentTag)
+{
+    TestTariff device;
+    device.activeTariff = true;
+
+    EXPECT_EQ(device.Register(kEndpointId, mProvider), CHIP_ERROR_INVALID_ARGUMENT);
+    ExpectNothingRegistered(device);
+
+    ASSERT_EQ(device.Register(kEndpointId, mProvider, WithTags(ElectricalEnergyTariff::ActiveTariffTagList())), CHIP_NO_ERROR);
+    EXPECT_EQ(ReadDescriptorTagList(kEndpointId), ExpectedTags(ElectricalEnergyTariff::ActiveTariffTagList()));
 
     device.Unregister(mProvider);
 }
 
 TEST_F(ElectricalEnergyTariffTestFixture, RejectsRepeatedRegistrationAndAllowsReuse)
 {
-    ElectricalEnergyTariff device;
+    TestTariff device;
     EXPECT_EQ(device.Register(kInvalidEndpointId, mProvider), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(device.GetEndpointId(), kInvalidEndpointId);
 
@@ -237,7 +296,8 @@ TEST_F(ElectricalEnergyTariffTestFixture, RejectsRepeatedRegistrationAndAllowsRe
 
 TEST_F(ElectricalEnergyTariffTestFixture, RollsBackWhenOptionalRegistrationFails)
 {
-    FailingOptionalClusterElectricalEnergyTariff device;
+    TestTariff device;
+    device.registrationError = CHIP_ERROR_INTERNAL;
 
     EXPECT_EQ(device.Register(kEndpointId, mProvider), CHIP_ERROR_INTERNAL);
     EXPECT_EQ(device.GetEndpointId(), kInvalidEndpointId);
@@ -249,6 +309,37 @@ TEST_F(ElectricalEnergyTariffTestFixture, RollsBackWhenOptionalRegistrationFails
     EXPECT_EQ(device.GetEndpointId(), kEndpointId);
     device.Unregister(mProvider);
     EXPECT_EQ(device.unregisterOptionalClustersCalls, 2u);
+}
+
+TEST_F(ElectricalEnergyTariffTestFixture, RegistersWithEndpointIdAllocator)
+{
+    constexpr EndpointId kFirstAllocatedEndpoint = 5;
+    ConsecutiveEndpointIdAllocator allocator(kFirstAllocatedEndpoint);
+    TestTariff device;
+
+    ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
+    EXPECT_EQ(device.GetEndpointId(), kFirstAllocatedEndpoint);
+
+    device.Unregister(mProvider);
+}
+
+TEST_F(ElectricalEnergyTariffTestFixture, SimulatedDefaultsToActiveTariffTagList)
+{
+    SimulatedElectricalEnergyTariff device;
+    ASSERT_EQ(device.Register(kEndpointId, mProvider), CHIP_NO_ERROR);
+
+    EXPECT_EQ(ReadDescriptorTagList(kEndpointId), ExpectedTags(ElectricalEnergyTariff::ActiveTariffTagList()));
+
+    device.Unregister(mProvider);
+}
+
+TEST_F(ElectricalEnergyTariffTestFixture, SimulatedRejectsTagListWithoutCurrent)
+{
+    SimulatedElectricalEnergyTariff device{ ElectricalEnergyTariff::DefaultTagList() };
+
+    EXPECT_EQ(device.Register(kEndpointId, mProvider), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(device.GetEndpointId(), kInvalidEndpointId);
+    EXPECT_TRUE(HasNoEndpoints());
 }
 
 TEST_F(ElectricalEnergyTariffTestFixture, SimulatedRegistersCommodityPrice)

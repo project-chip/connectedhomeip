@@ -18,10 +18,61 @@
 #include <device/types/electrical-energy-tariff/ElectricalEnergyTariff.h>
 
 #include <devices/Types.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip::app {
 
-ElectricalEnergyTariff::ElectricalEnergyTariff(Span<const EndpointComposition::SemanticTag> tagList) :
+namespace {
+
+using SemanticTag = EndpointComposition::SemanticTag;
+
+constexpr uint8_t kCommodityTariffChronologyNamespaceId =
+    to_underlying(Clusters::Globals::SemanticTagNamespaceId::kCommodityTariffChronology);
+
+bool ContainsStandardTag(Span<const SemanticTag> tagList, uint8_t namespaceId, uint8_t tag)
+{
+    for (const auto & entry : tagList)
+    {
+        if (entry.mfgCode.IsNull() && entry.namespaceID == namespaceId && entry.tag == tag)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+} // namespace
+
+Span<const SemanticTag> ElectricalEnergyTariff::DefaultTagList()
+{
+    static const SemanticTag kTags[] = {
+        {
+            .mfgCode     = DataModel::NullNullable,
+            .namespaceID = kCommodityTariffCommodityNamespaceId,
+            .tag         = kCommodityTariffCommodityElectricalEnergyTag,
+        },
+    };
+    return Span(kTags);
+}
+
+Span<const SemanticTag> ElectricalEnergyTariff::ActiveTariffTagList()
+{
+    static const SemanticTag kTags[] = {
+        {
+            .mfgCode     = DataModel::NullNullable,
+            .namespaceID = kCommodityTariffChronologyNamespaceId,
+            .tag         = kCommodityTariffChronologyCurrentTag,
+        },
+        {
+            .mfgCode     = DataModel::NullNullable,
+            .namespaceID = kCommodityTariffCommodityNamespaceId,
+            .tag         = kCommodityTariffCommodityElectricalEnergyTag,
+        },
+    };
+    return Span(kTags);
+}
+
+ElectricalEnergyTariff::ElectricalEnergyTariff(Span<const SemanticTag> tagList) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kElectricalEnergyTariff, 1)), mTagList(tagList)
 {}
 
@@ -29,12 +80,14 @@ CHIP_ERROR ElectricalEnergyTariff::Register(EndpointId endpoint, CodeDrivenDataM
                                             EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-    DeviceRegistrationTransaction transaction(*this, provider);
-
     if (composition.tagList.empty())
     {
         composition.tagList = mTagList;
     }
+    ReturnErrorOnFailure(ValidateTagList(composition.tagList));
+
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
     ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
@@ -47,6 +100,20 @@ void ElectricalEnergyTariff::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
     UnregisterOptionalClusters(provider);
+}
+
+CHIP_ERROR ElectricalEnergyTariff::ValidateTagList(Span<const SemanticTag> tagList) const
+{
+    VerifyOrReturnError(
+        ContainsStandardTag(tagList, kCommodityTariffCommodityNamespaceId, kCommodityTariffCommodityElectricalEnergyTag),
+        CHIP_ERROR_INVALID_ARGUMENT);
+    if (IsActiveTariff())
+    {
+        VerifyOrReturnError(
+            ContainsStandardTag(tagList, kCommodityTariffChronologyNamespaceId, kCommodityTariffChronologyCurrentTag),
+            CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip::app

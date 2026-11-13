@@ -26,6 +26,7 @@ if (chip_build_tests) {
     cflags = [ "-Wconversion" ]
 
     public_deps = [
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/api/allocator:endpoint-id-allocator",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-energy-tariff:simulated",
       "${chip_root}/src/app/data-model-provider/tests:encode-decode",
       "${chip_root}/src/app/server-cluster/testing",
