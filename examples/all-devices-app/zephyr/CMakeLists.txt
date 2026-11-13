@@ -115,6 +115,11 @@ if(ALL_DEVICES_ENABLE_WINDOW_COVERING)
     math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 4")
 endif()
 
+# solar-power registers one creator per entry in SolarPowerVariants.cpp (5 in total).
+if(ALL_DEVICES_ENABLE_SOLAR_POWER)
+    math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 4")
+endif()
+
 # ot-config re-lists zephyr_interface's INTERFACE_COMPILE_DEFINITIONS, including
 # $<COMPILE_LANGUAGE:CXX> generator expressions. openthread/CMakeLists.txt uses
 # ot-config's defines to build a plain custom target, where COMPILE_LANGUAGE is
@@ -177,6 +182,7 @@ target_sources(app PRIVATE
     src/delegates/ZephyrIdentifyDelegate.cpp
 
     # all-devices-common
+    ${ALL_DEVICES_COMMON_DIR}/providers/AllDevicesExampleDeviceInfoProviderImpl.cpp
     ${ALL_DEVICES_DEVICE_SOURCES}
     ${ALL_DEVICES_CLUSTER_SOURCES}
 )

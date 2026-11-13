@@ -111,6 +111,7 @@ source_set("device-instances") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/smoke-co-alarm",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/solar-power:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thermostat",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thread-border-router",

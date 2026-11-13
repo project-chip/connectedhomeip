@@ -37,6 +37,7 @@ bool IsExcludedFromWildcard(const std::string & type)
 {
     // These device types are excluded from the wildcard (*) expansion to prevent redundant,
     // invalid, or non-leaf endpoint structures.
+    // Do not expect anything except aggregator and bridged-node here.
     static const std::vector<std::string> kExcludedDevices = {
         "aggregator",   // Top-level container representing a bridge; not a standalone leaf device.
         "bridged-node", // Base class representing a bridged endpoint wrapper; not a standalone leaf device.

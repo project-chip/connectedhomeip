@@ -45,6 +45,8 @@ BitMask<ElectricalPowerMeasurement::Feature> PowerMeasurementFeaturesForRole(Sim
     {
     case SimulatedElectricalSensor::Role::kGrid:
         return BitMask<Feature>(Feature::kAlternatingCurrent);
+    case SimulatedElectricalSensor::Role::kAcPolyphaseOutput:
+        return BitMask<Feature>(Feature::kAlternatingCurrent, Feature::kPolyphasePower);
     case SimulatedElectricalSensor::Role::kBattery:
         return BitMask<Feature>(Feature::kDirectCurrent);
     case SimulatedElectricalSensor::Role::kGeneric:
@@ -61,7 +63,8 @@ PowerMeasurementOptionalAttributesForRole(SimulatedElectricalSensor::Role role)
 
     switch (role)
     {
-    case SimulatedElectricalSensor::Role::kGrid: {
+    case SimulatedElectricalSensor::Role::kGrid:
+    case SimulatedElectricalSensor::Role::kAcPolyphaseOutput: {
         OptionalAttributesSet attributes(OptionalAttributesSet::All());
         attributes.Set<ElectricalPowerMeasurement::Attributes::NeutralCurrent::Id>(false);
         return attributes;

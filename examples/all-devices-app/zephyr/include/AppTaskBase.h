@@ -27,6 +27,7 @@
 #include <device/types/root-node/RootNode.h>
 #include <lib/core/CHIPError.h>
 #include <platform/DefaultTimerDelegate.h>
+#include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -87,7 +88,7 @@ public:
     // Network Commissioning and Wi-Fi Network Diagnostics clusters.
     CHIP_ERROR InitWifiNetworking();
 
-    /// Storage/group data provider setup.
+    /// Sets up persistence and registers the group data and device info providers.
     CHIP_ERROR InitPersistence();
 
     TestEventTriggerDelegate & GetTestEventTriggerDelegate();
@@ -122,6 +123,7 @@ protected:
     Credentials::GroupDataProviderImpl mGroupDataProvider;
     SimpleTestEventTriggerDelegate mDefaultTestEventTriggerDelegate;
     ZephyrIdentifyDelegate mDefaultIdentifyDelegate;
+    DeviceLayer::AllDevicesExampleDeviceInfoProviderImpl mDeviceInfoProvider;
     DefaultTimerDelegate mTimerDelegate;
     BindingHandler mBindingHandler;
     DefaultAttributePersistenceProvider mAttributePersistenceProvider;
