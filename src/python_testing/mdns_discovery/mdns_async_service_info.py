@@ -54,10 +54,16 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 
     @property
     def _is_complete(self) -> bool:
-        """Complete single-record lookups without requiring unrelated address records."""
+        """
+        Complete SRV and TXT lookups without requiring unrelated address records.
+
+        A combined SRV + TXT lookup completes on the SRV record alone, because a TXT
+        record MAY be omitted. A TXT record sent in the same response, or during the
+        linger period of `async_request`, is still captured.
+        """
         if self._query_record_types == {_TYPE_TXT}:
             return bool(self.text)
-        if self._query_record_types == {_TYPE_SRV}:
+        if self._query_record_types in ({_TYPE_SRV}, {_TYPE_SRV, _TYPE_TXT}):
             return self.server is not None and self.port is not None
         return super()._is_complete
 
