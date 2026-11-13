@@ -57,6 +57,29 @@ class TC_OCC_2_1(MatterTestCommissionedDevice):
         cluster = Clusters.Objects.OccupancySensing
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
+    async def verify_predicted_occupancy(self, endpoint, feature_map, attribute_list):
+        cluster = Clusters.Objects.OccupancySensing
+        attributes = cluster.Attributes
+        has_feature_prediction = (feature_map & cluster.Bitmaps.Feature.kPrediction) != 0
+        has_attribute = attributes.PredictedOccupancy.attribute_id in attribute_list
+        asserts.assert_equal(has_attribute, has_feature_prediction, "PredictedOccupancy conformance failure")
+
+        if not has_feature_prediction:
+            log.info("Prediction feature not supported. Test step skipped")
+            self.mark_current_step_skipped()
+            return
+
+        predictions = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PredictedOccupancy)
+        previous_end = None
+        for entry in predictions:
+            asserts.assert_greater(entry.endTimestamp, entry.startTimestamp, "PredictedOccupancy end is not after start")
+            if previous_end is not None:
+                asserts.assert_greater(entry.startTimestamp, previous_end,
+                                       "PredictedOccupancy entries are not ordered or overlap")
+            asserts.assert_less_equal(entry.confidence, 100, "PredictedOccupancy confidence is not in valid range")
+            asserts.assert_less_equal(entry.occupancy, 0b00000001, "PredictedOccupancy occupancy is not in valid range")
+            previous_end = entry.endTimestamp
+
     def desc_TC_OCC_2_1(self) -> str:
         return "[TC-OCC-2.1] Attributes with DUT as Server"
 
@@ -76,7 +99,8 @@ class TC_OCC_2_1(MatterTestCommissionedDevice):
             TestStep(12, "Read UltrasonicUnoccupiedToOccupiedThreshold attribute, if supported"),
             TestStep(13, "Read PhysicalContactOccupiedToUnoccupiedDelay attribute, if supported"),
             TestStep(14, "Read PhysicalContactUnoccupiedToOccupiedDelay attribute, if supported"),
-            TestStep(15, "Read PhysicalContactUnoccupiedToOccupiedThreshold attribute, if supported")
+            TestStep(15, "Read PhysicalContactUnoccupiedToOccupiedThreshold attribute, if supported"),
+            TestStep(16, "Read PredictedOccupancy attribute, if the Prediction feature is supported")
         ]
 
     def pics_TC_OCC_2_1(self) -> list[str]:
@@ -160,7 +184,9 @@ class TC_OCC_2_1(MatterTestCommissionedDevice):
                                          "HoldTime attribute is less than HoldTimeMin.")
         else:
             log.info("HoldTime not supported. The rest of legacy attribute test can be skipped")
-            self.mark_all_remaining_steps_skipped(7)
+            self.mark_step_range_skipped(7, 15)
+            self.step(16)
+            await self.verify_predicted_occupancy(endpoint, feature_map, attribute_list)
             return
 
         self.step(7)
@@ -300,6 +326,9 @@ class TC_OCC_2_1(MatterTestCommissionedDevice):
         else:
             log.info("PhysicalContactUnoccupiedToOccupiedThreshold not supported. Test step skipped")
             self.mark_current_step_skipped()
+
+        self.step(16)
+        await self.verify_predicted_occupancy(endpoint, feature_map, attribute_list)
 
 
 if __name__ == "__main__":
