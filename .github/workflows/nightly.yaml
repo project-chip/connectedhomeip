@@ -180,6 +180,21 @@ jobs:
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-jf-admin-app-${BUILD_VARIANT}-clang"
 
+            - name: Build linux-x64-lock
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-lock-${BUILD_VARIANT}-clang-test-unified
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/unified-build"
+
+            # Same target as PR CI: asan-clang reports false positives in libdatachannel (#43340).
+            - name: Build linux-x64-camera
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-camera-${BUILD_VARIANT}
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-camera-${BUILD_VARIANT}"
+
             - name: ccache stats
               run: ccache -s
 
@@ -288,9 +303,8 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
 
-            # Tests in the nightly list of test_metadata.yaml read these variables. PR CI does not
-            # run those tests, so a variable missing here fails only the next nightly.
-            # BEGIN-IF-CHANGE-ALSO-CHANGE(src/python_testing/test_metadata.yaml)
+            # Run blocks tagged nightly read these variables. PR CI does not run those
+            # blocks, so a variable missing here fails only the next nightly.
             - name: Generate an argument environment file
               run: |
                   echo -n "" >/tmp/test_env.yaml
@@ -305,6 +319,8 @@ jobs:
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
                   echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-clang-test/all-devices-app" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-data-model-no-unique-id-app" >> /tmp/test_env.yaml
+                  echo "CAMERA_APP: objdir-clone/linux-x64-camera-${BUILD_VARIANT}/chip-camera-app" >> /tmp/test_env.yaml
+                  echo "CHIP_LOCK_APP: objdir-clone/linux-x64-lock-${BUILD_VARIANT}-clang-test-unified/chip-lock-app" >> /tmp/test_env.yaml
                   echo "FABRIC_ADMIN_APP: objdir-clone/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang/fabric-admin" >> /tmp/test_env.yaml
                   echo "FABRIC_BRIDGE_APP: objdir-clone/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
                   echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
@@ -315,7 +331,6 @@ jobs:
                   # Generic trace setups after applications
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
-            # END-IF-CHANGE-ALSO-CHANGE(src/python_testing/test_metadata.yaml)
 
             - name: Verify Testing Support for Software Update
               if: ${{matrix.filter == ''}}
@@ -324,7 +339,7 @@ jobs:
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
               run: |
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --keep-going --env-file /tmp/test_env.yaml --nightly --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file out/test-summary/run-summary.json --junit-file out/junit-results/${{matrix.filter}}-results.xml --junit-suite-name "Nightly CI Tests"'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --keep-going --env-file /tmp/test_env.yaml --tag nightly --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file out/test-summary/run-summary.json --junit-file out/junit-results/${{matrix.filter}}-results.xml --junit-suite-name "Nightly CI Tests"'
 
             - name: Upload JUnit XML Results
               if: always() && matrix.filter != ''

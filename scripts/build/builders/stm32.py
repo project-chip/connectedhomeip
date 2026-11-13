@@ -44,13 +44,10 @@ class stm32App(Enum):
 
 
 class stm32Board(Enum):
-    STM32WB55XX = auto()
     STM32WBA6XX = auto()
 
     def GetIC(self):
-        if self == stm32Board.STM32WB55XX:
-            return 'STM32WB5MM-DK'
-        if stm32Board.STM32WBA6XX:
+        if self == stm32Board.STM32WBA6XX:
             return 'STM32WBA65I-DK1'
         raise Exception(f'Unknown board #: {self!r}')
 
@@ -62,7 +59,7 @@ class stm32Builder(GnBuilder):
                  runner: Runner,
                  output_dir_lock: OutDirLock,
                  app: stm32App = stm32App.LIGHT,
-                 board: stm32Board = stm32Board.STM32WB55XX):
+                 board: stm32Board = stm32Board.STM32WBA6XX):
         super().__init__(root=app.BuildRoot(root, board.GetIC()), runner=runner, output_dir_lock=output_dir_lock)
 
         self.board = board

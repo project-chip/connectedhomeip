@@ -51,7 +51,6 @@ CHIP_ERROR BdxTransfer::AcceptAndReceiveData()
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode  = TransferControlFlags::kSenderDrive;
     acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
-    acceptData.StartOffset  = mTransfer.GetStartOffset();
     acceptData.Length       = mTransfer.GetTransferLength();
     return mTransfer.AcceptTransfer(acceptData);
 }
@@ -66,7 +65,6 @@ CHIP_ERROR BdxTransfer::AcceptAndSendData(const ByteSpan & data_to_send)
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode  = TransferControlFlags::kReceiverDrive;
     acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
-    acceptData.StartOffset  = mTransfer.GetStartOffset();
     acceptData.Length       = mTransfer.GetTransferLength();
     return mTransfer.AcceptTransfer(acceptData);
 }

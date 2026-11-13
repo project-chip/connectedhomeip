@@ -33,12 +33,15 @@
 #include <controller/ReadInteraction.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/support/Defer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemClock.h>
 #include <transport/SecureSession.h>
+
+#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -5025,6 +5028,159 @@ TEST_F(TestRead, TestReadHandler_KeepSubscriptionTest)
     EXPECT_NE(readCallback.mOnError, 0u);
     InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     DrainAndServiceIO();
+}
+
+namespace {
+
+enum class ResubscribeCallbackEvent : uint8_t
+{
+    kUnsolicitedMessage,
+    kDone,
+};
+
+// Mirrors production callbacks (e.g. TypedReadEventCallback) that own the ReadClient
+// and delete both the ReadClient and themselves inside OnDone.
+class SelfDeletingResubscribeCallback final : public ReadClient::Callback
+{
+public:
+    explicit SelfDeletingResubscribeCallback(std::vector<ResubscribeCallbackEvent> & events) : mEvents(events) {}
+
+    void AdoptReadClient(Platform::UniquePtr<ReadClient> readClient) { mReadClient = std::move(readClient); }
+
+    void OnSubscriptionEstablished(SubscriptionId) override
+    {
+        if (mReadClient)
+        {
+            mReadClient->OverrideLivenessTimeout(System::Clock::Milliseconds32(50));
+        }
+    }
+
+    void OnUnsolicitedMessageFromPublisher(ReadClient *) override
+    {
+        mEvents.push_back(ResubscribeCallbackEvent::kUnsolicitedMessage);
+    }
+
+    CHIP_ERROR GetHighestReceivedEventNumber(Optional<EventNumber> & aEventNumber) override
+    {
+        aEventNumber.ClearValue();
+        if (mFailEventNumberLookup)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
+    {
+        mResubscriptionsAttempted++;
+        if (mResubscriptionsAttempted == 1)
+        {
+            mFailEventNumberLookup = true;
+            return apReadClient->ScheduleResubscription(60000, NullOptional, false);
+        }
+        return aTerminationCause;
+    }
+
+    void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) override
+    {
+        if (aReadPrepareParams.mpEventPathParamsList != nullptr)
+        {
+            Platform::Delete<EventPathParams>(aReadPrepareParams.mpEventPathParamsList);
+        }
+    }
+
+    void OnDone(ReadClient *) override
+    {
+        mEvents.push_back(ResubscribeCallbackEvent::kDone);
+        mReadClient = nullptr;
+        Platform::Delete(this);
+    }
+
+    int mResubscriptionsAttempted = 0;
+
+private:
+    std::vector<ResubscribeCallbackEvent> & mEvents;
+    Platform::UniquePtr<ReadClient> mReadClient;
+    bool mFailEventNumberLookup = false;
+};
+
+} // namespace
+
+TEST_F(TestRead, TestUnsolicitedReportDeletesPendingResubscribeClient)
+{
+    auto * engine = InteractionModelEngine::GetInstance();
+    std::vector<ResubscribeCallbackEvent> events;
+
+    // 1. Establish a long-lived active subscription (tail of mpActiveReadClientList).
+    struct ActiveSubscriptionCallback final : public MockInteractionModelApp
+    {
+        void OnSubscriptionEstablished(SubscriptionId) override { mSubscriptionEstablished = true; }
+        bool mSubscriptionEstablished = false;
+    } activeCallback;
+
+    AttributePathParams activeAttrPath(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    ReadPrepareParams activeParams(GetSessionBobToAlice());
+    activeParams.mpAttributePathParamsList    = &activeAttrPath;
+    activeParams.mAttributePathParamsListSize = 1;
+    activeParams.mMinIntervalFloorSeconds     = 0;
+    activeParams.mMaxIntervalCeilingSeconds   = 60;
+    activeParams.mKeepSubscriptions           = true;
+
+    ReadClient activeClient(engine, &GetExchangeManager(), activeCallback, ReadClient::InteractionType::Subscribe);
+    auto cleanup = MakeDefer([&] {
+        engine->ShutdownActiveReads();
+        DrainAndServiceIO();
+    });
+    ASSERT_SUCCESS(activeClient.SendRequest(activeParams));
+
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&]() { return activeCallback.mSubscriptionEstablished; });
+    ASSERT_TRUE(activeCallback.mSubscriptionEstablished);
+
+    // 2. Establish a second auto-resubscribing client (prepended to head of mpActiveReadClientList)
+    //    and let its overridden 50ms liveness timeout put it into mIsResubscriptionScheduled == true.
+    auto selfDeletingCb = Platform::MakeUnique<SelfDeletingResubscribeCallback>(events);
+    ASSERT_NE(selfDeletingCb.get(), nullptr);
+
+    auto eventPath = Platform::MakeUnique<EventPathParams>(kMockEndpoint1, MockClusterId(1), MockEventId(1));
+    ASSERT_NE(eventPath.get(), nullptr);
+
+    ReadPrepareParams resubParams(GetSessionBobToAlice());
+    resubParams.mpEventPathParamsList      = eventPath.get();
+    resubParams.mEventPathParamsListSize   = 1;
+    resubParams.mMinIntervalFloorSeconds   = 0;
+    resubParams.mMaxIntervalCeilingSeconds = 60;
+    resubParams.mKeepSubscriptions         = true;
+
+    auto pendingClient =
+        Platform::MakeUnique<ReadClient>(engine, &GetExchangeManager(), *selfDeletingCb, ReadClient::InteractionType::Subscribe);
+    ASSERT_NE(pendingClient.get(), nullptr);
+
+    eventPath.release();
+    ASSERT_SUCCESS(pendingClient->SendAutoResubscribeRequest(std::move(resubParams)));
+    selfDeletingCb->AdoptReadClient(std::move(pendingClient));
+    SelfDeletingResubscribeCallback * rawSelfDeletingCb = selfDeletingCb.release();
+
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                [&]() { return rawSelfDeletingCb->mResubscriptionsAttempted == 1; });
+    ASSERT_EQ(rawSelfDeletingCb->mResubscriptionsAttempted, 1);
+    ASSERT_EQ(engine->GetNumActiveReadClients(), 2u);
+    rawSelfDeletingCb = nullptr;
+
+    // 3. Trigger an unsolicited attribute report for activeClient. OnUnsolicitedReportData visits
+    //    the head client first, whose scheduled resubscribe fails synchronously and deletes both
+    //    that ReadClient and its Callback inside OnDone before the report is dispatched to activeClient.
+    activeCallback.mNumAttributeResponse = 0;
+    {
+        AttributePathParams dirtyPath(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+        EXPECT_SUCCESS(engine->GetReportingEngine().SetDirty(dirtyPath));
+    }
+    DrainAndServiceIO();
+
+    ASSERT_EQ(events.size(), 2u);
+    EXPECT_EQ(events[0], ResubscribeCallbackEvent::kUnsolicitedMessage);
+    EXPECT_EQ(events[1], ResubscribeCallbackEvent::kDone);
+    EXPECT_EQ(activeCallback.mNumAttributeResponse, 1);
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 1u);
 }
 
 System::Clock::Timeout TestRead::ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval)

@@ -55,6 +55,9 @@ if (CONFIG_CHIP_APP_COMMON)
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/source/AppTaskZephyr.cpp
         )
     endif()
+    if (CONFIG_CHIP_APP_FAILSAFE_EARLY_EXPIRY)
+        target_compile_definitions(app PRIVATE CHIP_APP_FAILSAFE_EARLY_EXPIRY=1)
+    endif()
 endif()
 
 if (CONFIG_CHIP_APP_CLUSTERS)

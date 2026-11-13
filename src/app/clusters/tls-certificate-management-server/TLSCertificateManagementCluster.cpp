@@ -58,6 +58,12 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Commands::RemoveClientCertificate::kMetadataEntry,
 };
 
+constexpr CommandId kGeneratedCommands[] = {
+    Commands::ProvisionRootCertificateResponse::Id, Commands::FindRootCertificateResponse::Id,
+    Commands::LookupRootCertificateResponse::Id,    Commands::ClientCSRResponse::Id,
+    Commands::FindClientCertificateResponse::Id,    Commands::LookupClientCertificateResponse::Id,
+};
+
 TLSCertificateManagementCluster::TLSCertificateManagementCluster(const Context & context, EndpointId endpointId,
                                                                  TLSCertificateManagementDelegate & delegate,
                                                                  Tls::CertificateDependencyChecker & dependencyChecker,
@@ -556,6 +562,12 @@ CHIP_ERROR TLSCertificateManagementCluster::AcceptedCommands(const ConcreteClust
                                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.ReferenceExisting(kAcceptedCommands);
+}
+
+CHIP_ERROR TLSCertificateManagementCluster::GeneratedCommands(const ConcreteClusterPath & path,
+                                                              ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    return builder.ReferenceExisting(kGeneratedCommands);
 }
 
 CHIP_ERROR TLSCertificateManagementCluster::Attributes(const ConcreteClusterPath & path,

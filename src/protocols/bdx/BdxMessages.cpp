@@ -299,28 +299,15 @@ bool SendAccept::operator==(const SendAccept & another) const
 Encoding::LittleEndian::BufferWriter & ReceiveAccept::WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const
 {
     const BitFlags<TransferControlFlags> transferCtlFlags(Version & kVersionMask, TransferCtlFlags);
-    const bool widerange = (StartOffset > std::numeric_limits<uint32_t>::max()) || (Length > std::numeric_limits<uint32_t>::max());
+    const bool widerange = (Length > std::numeric_limits<uint32_t>::max());
 
     BitFlags<RangeControlFlags> rangeCtlFlags;
     rangeCtlFlags.Set(RangeControlFlags::kDefLen, Length > 0);
-    rangeCtlFlags.Set(RangeControlFlags::kStartOffset, StartOffset > 0);
     rangeCtlFlags.Set(RangeControlFlags::kWiderange, widerange);
 
     aBuffer.Put(transferCtlFlags.Raw());
     aBuffer.Put(rangeCtlFlags.Raw());
     aBuffer.Put16(MaxBlockSize);
-
-    if (StartOffset > 0)
-    {
-        if (widerange)
-        {
-            aBuffer.Put64(StartOffset);
-        }
-        else
-        {
-            aBuffer.Put32(static_cast<uint32_t>(StartOffset));
-        }
-    }
 
     if (Length > 0)
     {
@@ -344,7 +331,7 @@ Encoding::LittleEndian::BufferWriter & ReceiveAccept::WriteToBuffer(Encoding::Li
 CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
 {
     uint8_t transferCtl     = 0;
-    uint32_t tmpUint32Value = 0; // Used for reading non-wide length and offset fields
+    uint32_t tmpUint32Value = 0; // Used for reading a non-wide length field
     uint8_t * bufStart      = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
 
@@ -355,18 +342,12 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     // Only one of these values should be set. It is up to the caller to verify this.
     TransferCtlFlags.SetRaw(static_cast<uint8_t>(transferCtl & ~kVersionMask));
 
-    StartOffset = 0;
+    // A ReceiveAccept has no start offset field, but older versions of this SDK sent one, flagged by this Range Control bit.
     if (mRangeCtlFlags.Has(RangeControlFlags::kStartOffset))
     {
-        if (mRangeCtlFlags.Has(RangeControlFlags::kWiderange))
-        {
-            ReturnErrorOnFailure(bufReader.Read64(&StartOffset).StatusCode());
-        }
-        else
-        {
-            ReturnErrorOnFailure(bufReader.Read32(&tmpUint32Value).StatusCode());
-            StartOffset = tmpUint32Value;
-        }
+        const size_t startOffsetSize = mRangeCtlFlags.Has(RangeControlFlags::kWiderange) ? sizeof(uint64_t) : sizeof(uint32_t);
+        VerifyOrReturnError(bufReader.HasAtLeast(startOffsetSize), CHIP_ERROR_BUFFER_TOO_SMALL);
+        bufReader.Skip(startOffsetSize);
     }
 
     Length = 0;
@@ -430,8 +411,7 @@ bool ReceiveAccept::operator==(const ReceiveAccept & another) const
     }
 
     return ((Version == another.Version) && (TransferCtlFlags == another.TransferCtlFlags) &&
-            (StartOffset == another.StartOffset) && (MaxBlockSize == another.MaxBlockSize) && (Length == another.Length) &&
-            metadataMatches);
+            (MaxBlockSize == another.MaxBlockSize) && (Length == another.Length) && metadataMatches);
 }
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate

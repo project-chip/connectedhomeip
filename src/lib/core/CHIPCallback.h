@@ -96,6 +96,10 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
 
+#if CHIP_MEMORY_SANITIZER_ENABLED
+#include <sanitizer/msan_interface.h>
+#endif
+
 namespace chip {
 namespace Callback {
 
@@ -188,8 +192,18 @@ public:
      *
      * This is called automatically by Cancel() after the CancelFn has been invoked, but can also
      * be called manually as part of removing the cancelable from a data structure.
+     *
+     * The resulting values of mPrev and mNext are unspecified; no code may test or dereference them.
+     * MSAN builds mark them as uninitialized so that any such use is reported.
      */
-    void Invalidate() { mPrev = mNext = nullptr; }
+    void Invalidate()
+    {
+        mPrev = mNext = nullptr;
+#if CHIP_MEMORY_SANITIZER_ENABLED
+        __msan_allocated_memory(&mPrev, sizeof(mPrev));
+        __msan_allocated_memory(&mNext, sizeof(mNext));
+#endif
+    }
 
     // Not copyable
     Cancelable(const Cancelable &)             = delete;
@@ -256,6 +270,11 @@ public:
     class Owned : private OwnedOrNull // private so the checked Take() can't be bypassed
     {
     public:
+        /**
+         * Explicitly narrows an OwnedOrNull, which must have a value.
+         */
+        explicit Owned(OwnedOrNull && other) : Owned(other.Take()) {}
+
         /**
          * Transfers ownership of the Cancelable out of the token. Valid only if the token has not
          * been consumed.
@@ -337,6 +356,8 @@ public:
         mCall(mContext, std::forward<Args>(args)...);
     }
 
+    class OwnedOrNull;
+
     /**
      * Implicitly accepts a Callback (or pointer to one) and takes ownership of it.
      *
@@ -357,6 +378,11 @@ public:
         Owned(Callback & callback) : Cancelable::Owned(callback.Cancel()) {}
         Owned(Callback * callback) : Cancelable::Owned((callback != nullptr) ? callback->Cancel() : nullptr) {}
         Owned(std::nullptr_t) = delete;
+
+        /**
+         * Explicitly narrows an OwnedOrNull, which must have a value.
+         */
+        explicit Owned(Callback::OwnedOrNull && other) : Cancelable::Owned(std::move(other)) {}
 
         /**
          * Takes the callback out of the token and invokes it, for a callee that completes an
@@ -402,39 +428,64 @@ public:
 };
 
 /**
- * A doubly-linked list of Cancelables.
+ * A doubly-linked list of Cancelables, i.e. type-erased storage for callbacks. TypedCallbackDeque is
+ * the typed layer over it and is what most callees should use; CallbackDeque itself suits a shared
+ * layer underneath several typed APIs.
  *
- * By default the CancelFn used by this container is CallbackDeque::Dequeue, i.e. cancellation
- * only removes a Cancelable from the list, but performs no other cleanup.
+ * Elements are added via Enqueue(Cancelable::Owned). The mutators that take a raw Cancelable, a
+ * custom CancelFn or an insertion point are deprecated; they remain for source compatibility with
+ * existing users of this public class.
  *
- * Enqueue() optionally accepts a custom CancelFn, which must delegate to CallbackDeque::Dequeue.
- * However because both Cancelable members (mPrev and mNext) are used to represent the list structure
- * itself, such a custom CancelFn is unable to associate any additional context with each Cancelable.
+ * Removing an element via Take(), Clear(), the destructor, or Cancel() on the element unregisters
+ * it. DequeueAll() moves elements to another deque and leaves them registered. A custom CancelFn
+ * runs only when Cancel() is called on the element; Take(), Clear() and the destructor do not run it.
+ *
+ * By default the CancelFn used by this container only removes a Cancelable from the list, but
+ * performs no other cleanup. The deprecated Enqueue() overload that accepts a custom CancelFn
+ * requires it to delegate to CallbackDeque::Dequeue. However because both Cancelable members
+ * (mPrev and mNext) are used to represent the list structure itself, such a custom CancelFn is
+ * unable to associate any additional context with each Cancelable.
  */
 class CallbackDeque : protected Cancelable
 {
 public:
     CallbackDeque() { mNext = mPrev = this; }
+    ~CallbackDeque() { Clear(); }
+
+    /**
+     * Appends the callback. Because the token takes ownership, a callback already registered
+     * elsewhere, including in this deque, is unregistered first and so ends up at the back.
+     */
+    void Enqueue(Cancelable::Owned callback)
+    {
+        Cancelable * ca = callback.Take();
+        ca->mCancel     = _Dequeue;
+        _InsertBefore(ca, this);
+    }
 
     /**
      * @brief appends with overridden cancel function, in case the
      *   list change requires some other state update.
      */
-    void Enqueue(Cancelable * ca, void (*cancel)(Cancelable *))
+    [[deprecated("Use Enqueue(Cancelable::Owned) or TypedCallbackDeque")]] void Enqueue(Cancelable * ca,
+                                                                                        void (*cancel)(Cancelable *))
     {
-        // add to a doubly-linked list, set cancel function
-        InsertBefore(ca, this, cancel);
+        CancelAndInsertBefore(ca, this, cancel);
     }
 
     /**
      * @brief appends
      */
-    void Enqueue(Cancelable * ca) { Enqueue(ca, Dequeue); }
+    [[deprecated("Use Enqueue(Cancelable::Owned) or TypedCallbackDeque")]] void Enqueue(Cancelable * ca)
+    {
+        CancelAndInsertBefore(ca, this, _Dequeue);
+    }
 
     /**
      * @brief dequeue, but don't cancel, all cas that match the by()
      */
-    void DequeueBy(bool (*by)(uint64_t, const Cancelable *), uint64_t p, CallbackDeque & dequeued)
+    [[deprecated("Use Take() or DequeueAll()")]] void DequeueBy(bool (*by)(uint64_t, const Cancelable *), uint64_t p,
+                                                                CallbackDeque & dequeued)
     {
         VerifyOrDie(&dequeued != this);
         for (Cancelable * ca = mNext; ca != this;)
@@ -453,40 +504,57 @@ public:
      * @brief insert the node in a queue in order, sorted by "sortby(a, b)"
      *   sortby(a, b) should return 1 if a > b, -1 if a < b and 0 if a == b
      */
-    void InsertBy(Cancelable * ca, int (*sortby)(void *, const Cancelable *, const Cancelable *), void * p,
-                  void (*cancel)(Cancelable *))
+    [[deprecated]] void InsertBy(Cancelable * ca, int (*sortby)(void *, const Cancelable *, const Cancelable *), void * p,
+                                 void (*cancel)(Cancelable *))
     {
-        Cancelable * where; // node before which we need to insert
-        for (where = mNext; where != this; where = where->mNext)
-        {
-            if (sortby(p, ca, where) <= 0)
-            {
-                break;
-            }
-        }
-        InsertBefore(ca, where, cancel);
+        InsertSorted(ca, sortby, p, cancel);
     }
 
-    void InsertBy(Cancelable * ca, int (*sortby)(void *, const Cancelable *, const Cancelable *), void * p)
+    [[deprecated]] void InsertBy(Cancelable * ca, int (*sortby)(void *, const Cancelable *, const Cancelable *), void * p)
     {
-        InsertBy(ca, sortby, p, Dequeue);
+        InsertSorted(ca, sortby, p, _Dequeue);
     }
 
     /**
-     * @brief insert the node in a the list at a specific point
+     * @brief insert the node in the list at a specific point
      */
-    void InsertBefore(Cancelable * ca, Cancelable * where, void (*cancel)(Cancelable *))
+    [[deprecated]] void InsertBefore(Cancelable * ca, Cancelable * where, void (*cancel)(Cancelable *))
     {
-        ca->Cancel(); // make doubly-sure we're not corrupting another list somewhere
-        ca->mCancel = cancel;
-        _InsertBefore(ca, where);
+        CancelAndInsertBefore(ca, where, cancel);
     }
-    void InsertBefore(Cancelable * ca, Cancelable * where) { InsertBefore(ca, where, Dequeue); }
+
+    [[deprecated]] void InsertBefore(Cancelable * ca, Cancelable * where) { CancelAndInsertBefore(ca, where, _Dequeue); }
 
     /**
      * @brief returns first item unless list is empty, otherwise returns NULL
      */
     Cancelable * First() { return (!IsEmpty()) ? mNext : nullptr; }
+
+    /**
+     * Removes the first element and unregisters it. Returns null if the deque is empty.
+     */
+    Cancelable * Take()
+    {
+        VerifyOrReturnValue(!IsEmpty(), nullptr);
+        Cancelable * ca = mNext;
+        Remove(ca);
+        return ca;
+    }
+
+    /**
+     * Removes and unregisters all elements.
+     */
+    void Clear()
+    {
+        for (Cancelable * ca = mNext; ca != this;)
+        {
+            Cancelable * next = ca->mNext;
+            ca->mCancel       = nullptr;
+            ca->Invalidate();
+            ca = next;
+        }
+        mNext = mPrev = this;
+    }
 
     /**
      * @brief Moves all callbacks from this deque to the end of the ready deque, without cancelling them.
@@ -507,11 +575,9 @@ public:
      * Removes a Cancelable from the CallbackDeque containing it.
      * MUST NOT be called on a Cancelable that is not an element in a CallbackDeque.
      */
-    static void Dequeue(Cancelable * ca)
+    [[deprecated("Use Take(); only needed by custom CancelFns, which are deprecated")]] static void Dequeue(Cancelable * ca)
     {
-        _Dequeue(ca);
-        ca->mCancel = nullptr;
-        ca->Invalidate(); // Cancel() already does this, but this function is also a public API
+        Remove(ca);
     }
 
     /**
@@ -520,6 +586,12 @@ public:
     bool IsEmpty() { return mNext == this; }
 
 private:
+    static void Remove(Cancelable * ca)
+    {
+        _Dequeue(ca);
+        ca->mCancel = nullptr;
+        ca->Invalidate();
+    }
     static void _Dequeue(Cancelable * ca)
     {
         // The static analyzer does not model the circular list invariant (ca->mPrev->mNext == ca),
@@ -536,6 +608,61 @@ private:
         where->mPrev        = ca;
         ca->mNext           = where;
     }
+    void CancelAndInsertBefore(Cancelable * ca, Cancelable * where, void (*cancel)(Cancelable *))
+    {
+        ca->Cancel(); // make doubly-sure we're not corrupting another list somewhere
+        ca->mCancel = cancel;
+        _InsertBefore(ca, where);
+    }
+    void InsertSorted(Cancelable * ca, int (*sortby)(void *, const Cancelable *, const Cancelable *), void * p,
+                      void (*cancel)(Cancelable *))
+    {
+        Cancelable * where; // node before which we need to insert
+        for (where = mNext; where != this; where = where->mNext)
+        {
+            if (sortby(p, ca, where) <= 0)
+            {
+                break;
+            }
+        }
+        CancelAndInsertBefore(ca, where, cancel);
+    }
+};
+
+/**
+ * A CallbackDeque of Callback<T>, which accepts callbacks as Callback<T>::Owned tokens and returns
+ * them typed, so that callees need neither Callback::Cancel() nor Callback::FromCancelable().
+ *
+ * Elements are removed and unregistered via Take(), Clear(), the destructor, or Cancel() on the
+ * callback. DequeueAll() moves elements to another deque and leaves them registered.
+ */
+template <typename T>
+class TypedCallbackDeque : private CallbackDeque
+{
+public:
+    /**
+     * Appends the callback. Because the token takes ownership, a callback already registered
+     * elsewhere, including in this deque, is unregistered first and so ends up at the back.
+     */
+    void Enqueue(typename Callback<T>::Owned callback) { CallbackDeque::Enqueue(std::move(callback)); }
+
+    /**
+     * Returns the first element without removing it, or null if the deque is empty.
+     */
+    Callback<T> * First() { return Callback<T>::FromCancelable(CallbackDeque::First()); }
+
+    /**
+     * Removes the first element and unregisters it. Returns null if the deque is empty.
+     */
+    Callback<T> * Take() { return Callback<T>::FromCancelable(CallbackDeque::Take()); }
+
+    /**
+     * Moves all callbacks from this deque to the end of the ready deque, without unregistering them.
+     */
+    void DequeueAll(TypedCallbackDeque & ready) { CallbackDeque::DequeueAll(ready); }
+
+    using CallbackDeque::Clear;
+    using CallbackDeque::IsEmpty;
 };
 
 } // namespace Callback

@@ -16,5 +16,5 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/pump-configuration-and-control-server.cpp"
+    "${CLUSTER_DIR}/PumpConfigurationAndControlCluster.cpp"
 )

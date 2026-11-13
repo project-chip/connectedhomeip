@@ -19,6 +19,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeHolder.h>
 #include <protocols/bdx/BdxTransferSession.h>
+#include <protocols/bdx/StatusCode.h>
 #include <transport/raw/MessageHeader.h>
 
 #pragma once
@@ -137,8 +138,31 @@ public:
      *
      * @param[in] eventType The OutputEventType that was handled by the subclass.
      * @param[in] status The error code that occured when handling the event if an error occurs. Otherwise CHIP_NO_ERROR.
+     *                   An error aborts the transfer with a StatusReport carrying GetBdxStatusCodeFromChipError(status),
+     *                   unless the event already ended the transfer.  Use the StatusCode overload to send a specific
+     *                   BDX status instead.
      */
     void NotifyEventHandled(const TransferSession::OutputEventType eventType, CHIP_ERROR status);
+
+    /**
+     * Same as the CHIP_ERROR overload, for a subclass that failed to handle the event and needs the peer to get a
+     * specific BDX status, including statuses that no CHIP_ERROR maps to.  This overload always reports a failure;
+     * to report success, call the CHIP_ERROR overload with CHIP_NO_ERROR.
+     *
+     * The transfer is aborted with a StatusReport carrying "status", unless the event already ended the transfer,
+     * in which case nothing is sent to the peer.  Either way, mTransferEndError is set to
+     * GetChipErrorFromBdxStatusCode(status).
+     *
+     * Note: NotifyEventHandled is allowed to destroy the AsyncResponder before the call returns.
+     *          Callers must be careful about this.
+     *
+     * @param[in] eventType The OutputEventType that was handled by the subclass.
+     * @param[in] status The BDX status to report to the peer.
+     */
+    void NotifyEventHandled(const TransferSession::OutputEventType eventType, StatusCode status);
+
+private:
+    void NotifyEventHandled(const TransferSession::OutputEventType eventType, CHIP_ERROR error, StatusCode status);
 };
 
 } // namespace bdx

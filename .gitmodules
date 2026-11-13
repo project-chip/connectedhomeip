@@ -8,8 +8,8 @@
 	branch  = master
 [submodule "mbedtls"]
 	path = third_party/mbedtls/repo
-	url = https://github.com/ARMmbed/mbedtls.git
-	branch = mbedtls-2.28
+	url = https://github.com/Mbed-TLS/mbedtls.git
+	branch = mbedtls-3.6
 	excluded-platforms = esp32
 [submodule "qrcode"]
 	path = examples/common/QRCode/repo
@@ -247,11 +247,6 @@
 	url = https://github.com/asriot/ASR550X_Freertos.git
 	branch = matter
 	platforms = asr
-[submodule "third_party/st/STM32CubeWB"]
-	path = third_party/st/STM32CubeWB
-	url = https://github.com/STMicroelectronics/STM32CubeWB.git
-	branch = v1.18.0
-	platforms = stm32
 [submodule "third_party/st/x-cube-matter"]
 	path = third_party/st/x-cube-matter
 	url = https://github.com/STMicroelectronics/x-cube-matter.git
