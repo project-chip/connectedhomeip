@@ -282,7 +282,8 @@ static void GetAddrInfo(ResolveContext * sdCtx)
             continue;
         }
 
-        auto interfaceId = interface.first.interfaceId;
+        auto interfaceId = (sdCtx->requestedInterfaceId == kDNSServiceInterfaceIndexAny) ? kDNSServiceInterfaceIndexAny
+                                                                                         : interface.first.interfaceId;
         auto hostname    = interface.second.fullyQualifiedDomainName.c_str();
         auto sdRefCopy   = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
 
@@ -291,7 +292,7 @@ static void GetAddrInfo(ResolveContext * sdCtx)
         auto err = DNSServiceGetAddrInfo(&sdRefCopy, kDNSServiceFlagsShareConnection, interfaceId, protocol, hostname,
                                          OnGetAddrInfo, contextWithType);
         VerifyOrReturn(kDNSServiceErr_NoError == err, TEMPORARY_RETURN_IGNORED sdCtx->Finalize(err));
-        interface.second.isDNSLookUpRequested = true;
+        sdCtx->OnLookUpRequested(interface.first);
     }
 }
 
@@ -338,6 +339,7 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
 {
     ChipLogProgress(Discovery, "Resolve type=%s name=%s domain=%s interface=%" PRIu32, StringOrNullMarker(type),
                     StringOrNullMarker(name), StringOrNullMarker(domain), interfaceId);
+    sdCtx->requestedInterfaceId = interfaceId;
 
     auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
     if (err != kDNSServiceErr_NoError)
