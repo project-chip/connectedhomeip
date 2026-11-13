@@ -29,6 +29,7 @@ if (chip_device_config_enable_wifipaf) {
       "WiFiPAFLayer.cpp",
       "WiFiPAFLayer.h",
       "WiFiPAFLayerDelegate.h",
+      "WiFiPAFProtocol.h",
       "WiFiPAFRole.h",
       "WiFiPAFTP.cpp",
       "WiFiPAFTP.h",
