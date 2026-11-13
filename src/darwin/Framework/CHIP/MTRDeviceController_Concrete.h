@@ -38,6 +38,8 @@
 #include <credentials/FabricTable.h>
 #include <lib/core/DataModelTypes.h>
 
+class MTROperationalCredentialsDelegate;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController_Concrete : MTRDeviceController <MTRCommissioningDelegate, MTRCommissioningDelegate_Internal>
@@ -214,6 +216,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)asyncGetCommissionerOnMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
                              errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
+
+/**
+ * Runs the block on the Matter queue with this controller's operational credentials delegate and commissioner, if the
+ * controller is still running when the block would run; otherwise does nothing. Both are torn down on the Matter queue
+ * at shutdown, so they are valid only for the synchronous duration of the block.
+ */
+- (void)asyncGetOperationalCredentialsDelegateOnMatterQueue:(void (^)(MTROperationalCredentialsDelegate *,
+                                                                chip::Controller::DeviceCommissioner *))block;
 
 /**
  * Returns the transport used by the current session with the given device,

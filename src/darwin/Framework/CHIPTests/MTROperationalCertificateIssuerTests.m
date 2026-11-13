@@ -26,6 +26,7 @@
 static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint64_t kDeviceId = 0x12344321;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
+static NSString * kOnboardingPayload2 = @"MT:Y.K90KCZ16FQ1648G00";
 static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
 static NSString * kCSRNonceStr = @"01234567890123456789012345678901"; // 32 chars
@@ -38,6 +39,14 @@ static MTRTestKeys * sTestKeys = nil;
 
 @interface MTROperationalCertificateIssureTestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
+@property (nonatomic) uint64_t nodeID;
+@property (nonatomic) MTRErrorCode expectedErrorCode;
+@property (nonatomic, nullable) NSNumber * expectedCHIPErrorCode;
+// Fulfilled once commissionNodeWithID: has returned, after the controller has updated the commissioning's state.
+@property (atomic, strong, nullable) XCTestExpectation * commissionStartedExpectation;
+// Number of commissioningComplete callbacks received since nodeID was last set. Failed commissionings report a nil node
+// ID, so every completion is counted rather than only those naming nodeID.
+@property (atomic, readonly) NSUInteger commissioningCompleteCount;
 @end
 
 @implementation MTROperationalCertificateIssureTestDeviceControllerDelegate
@@ -46,6 +55,8 @@ static MTRTestKeys * sTestKeys = nil;
     self = [super init];
     if (self) {
         _expectation = expectation;
+        _nodeID = kDeviceId;
+        _expectedErrorCode = MTRErrorCodeIntegrityCheckFailed;
     }
     return self;
 }
@@ -58,27 +69,47 @@ static MTRTestKeys * sTestKeys = nil;
     params.csrNonce = [kCSRNonceStr dataUsingEncoding:NSUTF8StringEncoding];
 
     NSError * commissionError = nil;
-    [sController commissionNodeWithID:@(kDeviceId)
+    [sController commissionNodeWithID:@(_nodeID)
                   commissioningParams:params
                                 error:&commissionError];
     XCTAssertNil(commissionError);
+    [self.commissionStartedExpectation fulfill];
 
     // Keep waiting for controller:commissioningComplete:
+}
+
+- (void)setNodeID:(uint64_t)nodeID
+{
+    _nodeID = nodeID;
+    _commissioningCompleteCount = 0;
+}
+
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error nodeID:(NSNumber * _Nullable)nodeID metrics:(MTRMetrics *)metrics
+{
+    _commissioningCompleteCount++;
+    [self controller:controller commissioningComplete:error];
 }
 
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
 {
     XCTAssertNotNil(error);
     XCTAssertEqualObjects(error.domain, MTRErrorDomain);
-    XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+    XCTAssertEqual(error.code, _expectedErrorCode);
+    if (_expectedCHIPErrorCode) {
+        XCTAssertEqualObjects(error.userInfo[@"errorCode"], _expectedCHIPErrorCode);
+    }
     [_expectation fulfill];
     _expectation = nil;
 }
 
 @end
 
+typedef void (^IssuerCompletion)(MTROperationalCertificateChain * _Nullable info, NSError * _Nullable error);
+
 @interface OperationalCertificateIssuer : NSObject <MTROperationalCertificateIssuer>
 @property (nonatomic, readonly) BOOL shouldSkipAttestationCertificateValidation;
+@property (nonatomic) BOOL releasesCompletionWithoutCalling;
+@property (nonatomic, copy, nullable) void (^holdCompletion)(IssuerCompletion completion);
 @end
 
 @implementation OperationalCertificateIssuer
@@ -110,6 +141,15 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertEqualObjects(csrInfoCopy.csrElementsTLV, csrInfo.csrElementsTLV);
     XCTAssertEqualObjects(csrInfoCopy.attestationSignature, csrInfo.attestationSignature);
 
+    if (self.releasesCompletionWithoutCalling) {
+        return;
+    }
+
+    if (self.holdCompletion) {
+        self.holdCompletion(completion);
+        return;
+    }
+
     completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeIntegrityCheckFailed userInfo:nil]);
 }
 
@@ -126,15 +166,19 @@ static MTRTestKeys * sTestKeys = nil;
     [self setContinueAfterFailure:NO];
 }
 
-- (void)testFailedCertificateIssuance
+- (void)tearDown
 {
-    BOOL started = [self startAppWithName:@"all-clusters"
-                                arguments:@[]
-                                  payload:kOnboardingPayload];
-    XCTAssertTrue(started);
+    // A failed assertion skips stopController:, so don't leave the controller running for the next test.
+    if (sController.isRunning) {
+        [self stopController:sController];
+    }
+    sController = nil;
+    [super tearDown];
+}
 
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
-
+- (MTRDeviceController *)startControllerWithIssuer:(OperationalCertificateIssuer *)certificateIssuer
+                                          delegate:(id<MTRDeviceControllerDelegate>)delegate
+{
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -150,8 +194,6 @@ static MTRTestKeys * sTestKeys = nil;
 
     sTestKeys = testKeys;
 
-    __auto_type * certificateIssuer = [[OperationalCertificateIssuer alloc] init];
-
     // Needs to match what startControllerOnExistingFabric calls elsewhere in
     // this file do.
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
@@ -164,26 +206,209 @@ static MTRTestKeys * sTestKeys = nil;
 
     sController = controller;
 
-    __auto_type * deviceControllerDelegate =
-        [[MTROperationalCertificateIssureTestDeviceControllerDelegate alloc] initWithExpectation:expectation];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.device_controller_delegate", DISPATCH_QUEUE_SERIAL);
+    [controller setDeviceControllerDelegate:delegate queue:callbackQueue];
+    return controller;
+}
 
-    [controller setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
-
-    NSError * error;
-    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
-    XCTAssertNotNil(payload);
-    XCTAssertNil(error);
-
-    [controller setupCommissioningSessionWithPayload:payload newNodeID:@(kDeviceId) error:&error];
-    XCTAssertNil(error);
-
-    [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
-
+- (void)stopController:(MTRDeviceController *)controller
+{
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
-    [factory stopControllerFactory];
+    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+}
+
+- (void)setUpCommissioningSessionWithController:(MTRDeviceController *)controller payload:(NSString *)payloadString nodeID:(uint64_t)nodeID
+{
+    NSError * error;
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:payloadString error:&error];
+    XCTAssertNotNil(payload);
+    XCTAssertNil(error);
+
+    [controller setupCommissioningSessionWithPayload:payload newNodeID:@(nodeID) error:&error];
+    XCTAssertNil(error);
+}
+
+- (void)runCommissioningWithIssuer:(OperationalCertificateIssuer *)certificateIssuer
+                 expectedErrorCode:(MTRErrorCode)expectedErrorCode
+             expectedCHIPErrorCode:(nullable NSNumber *)expectedCHIPErrorCode
+{
+    BOOL started = [self startAppWithName:@"all-clusters"
+                                arguments:@[]
+                                  payload:kOnboardingPayload];
+    XCTAssertTrue(started);
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
+    __auto_type * deviceControllerDelegate =
+        [[MTROperationalCertificateIssureTestDeviceControllerDelegate alloc] initWithExpectation:expectation];
+    deviceControllerDelegate.expectedErrorCode = expectedErrorCode;
+    deviceControllerDelegate.expectedCHIPErrorCode = expectedCHIPErrorCode;
+
+    MTRDeviceController * controller = [self startControllerWithIssuer:certificateIssuer delegate:deviceControllerDelegate];
+    [self setUpCommissioningSessionWithController:controller payload:kOnboardingPayload nodeID:kDeviceId];
+
+    [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
+
+    [self stopController:controller];
+}
+
+- (void)testFailedCertificateIssuance
+{
+    [self runCommissioningWithIssuer:[[OperationalCertificateIssuer alloc] init]
+                   expectedErrorCode:MTRErrorCodeIntegrityCheckFailed
+               expectedCHIPErrorCode:nil];
+}
+
+- (void)testIssuerReleasesCompletionWithoutCalling
+{
+    __auto_type * certificateIssuer = [[OperationalCertificateIssuer alloc] init];
+    certificateIssuer.releasesCompletionWithoutCalling = YES;
+    [self runCommissioningWithIssuer:certificateIssuer
+                   expectedErrorCode:MTRErrorCodeGeneralError
+               expectedCHIPErrorCode:@(0xAC)]; // CHIP_ERROR_INTERNAL
+}
+
+- (void)runCanceledRequestReleasingItsCompletionAfterNextRequest:(BOOL)afterNextRequest
+{
+    XCTAssertTrue([self startAppWithName:@"all-clusters" arguments:@[] payload:kOnboardingPayload]);
+    XCTAssertTrue([self startAppWithName:@"all-clusters" arguments:@[] payload:kOnboardingPayload2]);
+
+    NSMutableArray<IssuerCompletion> * heldCompletions = [NSMutableArray array];
+    __block XCTestExpectation * requestExpectation = [self expectationWithDescription:@"First NOC request"];
+    __auto_type * certificateIssuer = [[OperationalCertificateIssuer alloc] init];
+    certificateIssuer.holdCompletion = ^(IssuerCompletion completion) {
+        [heldCompletions addObject:completion];
+        [requestExpectation fulfill];
+    };
+
+    XCTestExpectation * cancelExpectation = [self expectationWithDescription:@"First commissioning canceled"];
+    __auto_type * deviceControllerDelegate =
+        [[MTROperationalCertificateIssureTestDeviceControllerDelegate alloc] initWithExpectation:cancelExpectation];
+    deviceControllerDelegate.expectedErrorCode = MTRErrorCodeCancelled;
+    XCTestExpectation * commissionStarted = [self expectationWithDescription:@"First commissionNodeWithID returned"];
+    deviceControllerDelegate.commissionStartedExpectation = commissionStarted;
+
+    MTRDeviceController * controller = [self startControllerWithIssuer:certificateIssuer delegate:deviceControllerDelegate];
+    [self setUpCommissioningSessionWithController:controller payload:kOnboardingPayload nodeID:kDeviceId];
+    // The NOC request can arrive before commissionNodeWithID: returns on the delegate queue; cancel only after it has
+    // returned, so the cancel doesn't race the controller's update of the commissioning's state.
+    [self waitForExpectations:@[ requestExpectation, commissionStarted ] timeout:kPairingTimeoutInSeconds];
+    deviceControllerDelegate.commissionStartedExpectation = nil;
+
+    NSError * error;
+    XCTAssertTrue([controller cancelCommissioningForNodeID:@(kDeviceId) error:&error]);
+    XCTAssertNil(error);
+    [self waitForExpectations:@[ cancelExpectation ] timeout:kPairingTimeoutInSeconds];
+
+    if (afterNextRequest) {
+        requestExpectation = [self expectationWithDescription:@"Second NOC request"];
+    } else {
+        [heldCompletions removeAllObjects];
+        certificateIssuer.holdCompletion = nil;
+    }
+
+    XCTestExpectation * secondExpectation = [self expectationWithDescription:@"Second commissioning complete"];
+    deviceControllerDelegate.expectation = secondExpectation;
+    deviceControllerDelegate.expectedErrorCode = MTRErrorCodeIntegrityCheckFailed;
+    deviceControllerDelegate.nodeID = kDeviceId + 1;
+    [self setUpCommissioningSessionWithController:controller payload:kOnboardingPayload2 nodeID:kDeviceId + 1];
+
+    if (afterNextRequest) {
+        [self waitForExpectations:@[ requestExpectation ] timeout:kPairingTimeoutInSeconds];
+        XCTAssertEqual(heldCompletions.count, 2);
+
+        // Release the first request's completion uncalled, then complete the second.
+        IssuerCompletion secondCompletion = heldCompletions[1];
+        [heldCompletions removeAllObjects];
+        secondCompletion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeIntegrityCheckFailed userInfo:nil]);
+        secondCompletion = nil;
+    }
+    [self waitForExpectations:@[ secondExpectation ] timeout:kPairingTimeoutInSeconds];
+
+    // The first request's completion must not complete the second commissioning again, now or later: wait for any late
+    // completion to arrive, then check that the second node was completed exactly once.
+    XCTestExpectation * settled = [self expectationWithDescription:@"Late completions had a chance to arrive"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [settled fulfill];
+    });
+    [self waitForExpectations:@[ settled ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertEqual(deviceControllerDelegate.commissioningCompleteCount, 1u);
+
+    [self stopController:controller];
+}
+
+- (void)testCanceledRequestCompletionReleasedWhileIdleIsIgnored
+{
+    [self runCanceledRequestReleasingItsCompletionAfterNextRequest:NO];
+}
+
+- (void)testCanceledRequestCompletionReleasedDuringNextRequestIsIgnored
+{
+    [self runCanceledRequestReleasingItsCompletionAfterNextRequest:YES];
+}
+
+- (void)runCompletionDeliveredAfterShutdownCallingIt:(BOOL)callIt
+{
+    // Pins that a completion delivered after the controller shut down touches nothing the shutdown tore down: it is
+    // dropped without reaching the deleted operational credentials delegate. The window can't be forced here; this
+    // runs the late delivery, and an address sanitizer run catches a use of the deleted delegate.
+    XCTAssertTrue([self startAppWithName:@"all-clusters" arguments:@[] payload:kOnboardingPayload]);
+
+    NSMutableArray<IssuerCompletion> * heldCompletions = [NSMutableArray array];
+    XCTestExpectation * requestExpectation = [self expectationWithDescription:@"NOC request"];
+    __auto_type * certificateIssuer = [[OperationalCertificateIssuer alloc] init];
+    certificateIssuer.holdCompletion = ^(IssuerCompletion completion) {
+        [heldCompletions addObject:completion];
+        [requestExpectation fulfill];
+    };
+
+    XCTestExpectation * cancelExpectation = [self expectationWithDescription:@"Commissioning canceled"];
+    __auto_type * deviceControllerDelegate =
+        [[MTROperationalCertificateIssureTestDeviceControllerDelegate alloc] initWithExpectation:cancelExpectation];
+    deviceControllerDelegate.expectedErrorCode = MTRErrorCodeCancelled;
+    XCTestExpectation * commissionStarted = [self expectationWithDescription:@"commissionNodeWithID returned"];
+    deviceControllerDelegate.commissionStartedExpectation = commissionStarted;
+
+    MTRDeviceController * controller = [self startControllerWithIssuer:certificateIssuer delegate:deviceControllerDelegate];
+    [self setUpCommissioningSessionWithController:controller payload:kOnboardingPayload nodeID:kDeviceId];
+    [self waitForExpectations:@[ requestExpectation, commissionStarted ] timeout:kPairingTimeoutInSeconds];
+    deviceControllerDelegate.commissionStartedExpectation = nil;
+    XCTAssertEqual(heldCompletions.count, 1u);
+
+    // Cancel first so the commissioning has a defined end, then shut down while the issuer still holds the completion.
+    NSError * error;
+    XCTAssertTrue([controller cancelCommissioningForNodeID:@(kDeviceId) error:&error]);
+    XCTAssertNil(error);
+    [self waitForExpectations:@[ cancelExpectation ] timeout:kPairingTimeoutInSeconds];
+    [self stopController:controller];
+    NSUInteger completionsAtShutdown = deviceControllerDelegate.commissioningCompleteCount;
+    XCTAssertEqual(completionsAtShutdown, 1u);
+
+    IssuerCompletion completion = heldCompletions.firstObject;
+    [heldCompletions removeAllObjects];
+    if (callIt) {
+        completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeIntegrityCheckFailed userInfo:nil]);
+    }
+    // Releasing the last reference to an uncalled completion runs the issuer-dropped path.
+    completion = nil;
+
+    XCTestExpectation * settled = [self expectationWithDescription:@"Late completion had a chance to run"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [settled fulfill];
+    });
+    [self waitForExpectations:@[ settled ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertEqual(deviceControllerDelegate.commissioningCompleteCount, completionsAtShutdown);
+}
+
+- (void)testCompletionReleasedUncalledAfterShutdownIsDropped
+{
+    [self runCompletionDeliveredAfterShutdownCallingIt:NO];
+}
+
+- (void)testCompletionCalledAfterShutdownIsDropped
+{
+    [self runCompletionDeliveredAfterShutdownCallingIt:YES];
 }
 
 @end
