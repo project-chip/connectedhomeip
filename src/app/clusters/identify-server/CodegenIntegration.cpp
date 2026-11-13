@@ -143,7 +143,8 @@ IdentifyCluster * FindIdentifyClusterOnEndpoint(EndpointId endpointId)
     {
         return &legacyInstance->mCluster.Cluster();
     }
-    return nullptr;
+
+    return IdentifyCluster::FindByEndpoint(endpointId);
 }
 
 Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
