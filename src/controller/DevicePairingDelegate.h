@@ -34,6 +34,15 @@ namespace Controller {
 /**
  * A delegate that can be notified of progress as a "pairing" (which might mean
  * "PASE session establishment" or "commissioning") proceeds.
+ *
+ * A commissionee is in one of the following states. The end of each state is reported by exactly one call to the
+ * callback listed for it, except that Commission() moves a commissionee from Idle to Commissioning without a callback:
+ *
+ *  - PASE: entered on EstablishPASEConnection() or PairDevice(). Ends with OnPairingComplete().
+ *  - Idle: entered on OnPairingComplete(CHIP_NO_ERROR) after EstablishPASEConnection(), or on an
+ *    OnCommissioningComplete() failure after which the PASE session is kept. Ends with OnCommissioneeReleased().
+ *  - Commissioning: entered on Commission(), or directly after PASE for PairDevice(). Ends with
+ *    OnCommissioningComplete().
  */
 class DLL_EXPORT DevicePairingDelegate
 {
@@ -93,6 +102,27 @@ public:
      * @param error Error cause, if any
      */
     virtual void OnPairingDeleted(CHIP_ERROR error) {}
+
+    /**
+     * @brief
+     *   Called when a commissionee that has finished PASE establishment and is not being commissioned (the "Idle" state
+     *   described above) is released, because its PASE session was released, because StopPairing() was called for it, or
+     *   because EstablishPASEConnection() replaced it. The commissionee has already been released when this is called, so no
+     *   commissioning can be started for it without a new PASE session. This is called synchronously from the code that
+     *   released the commissionee.
+     *
+     *   Not called from DeviceCommissioner::Shutdown(), and not called for a commissionee that is still establishing PASE or
+     *   that is being commissioned.
+     *
+     * @param deviceId The device ID of the commissionee (CommissioneeDeviceProxy::GetDeviceId()), which is the same ID
+     *                 OnCommissioningComplete() reports for it: the commissioning ID until an operational identity has
+     *                 been applied to the commissionee.
+     *
+     * @param reason CHIP_ERROR_CANCELLED if StopPairing() was called for the commissionee; otherwise the reason the PASE
+     *               session was released (CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY) or replaced
+     *               (CHIP_ERROR_CONNECTION_ABORTED).
+     */
+    virtual void OnCommissioneeReleased(NodeId deviceId, CHIP_ERROR reason) {}
 
     /**
      *   Called when the commissioning process is complete (with success or error)

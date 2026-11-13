@@ -681,8 +681,44 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
 
     // Release the commissionee device after we have nulled out our pointers,
     // because that can call back in to us with error notifications as the
-    // session is released.
+    // session is released. Make sure the proxy does not call our
+    // OnCommissioneeSessionReleased: we are releasing it already, and callers
+    // that need to tell the pairing delegate do so themselves.
+    device->SetSessionReleaseDelegate(nullptr);
     mCommissioneeDevicePool.ReleaseObject(device);
+}
+
+CommissioneeDeviceProxy * DeviceCommissioner::CreateCommissioneeDevice()
+{
+    CommissioneeDeviceProxy * device = mCommissioneeDevicePool.CreateObject();
+    if (device != nullptr)
+    {
+        device->SetSessionReleaseDelegate(this);
+    }
+    return device;
+}
+
+bool DeviceCommissioner::IsBeingCommissioned(const CommissioneeDeviceProxy & device) const
+{
+    // mDeviceBeingCommissioned can be an operational proxy rather than `device`, so match by node ID as well.
+    return mDeviceBeingCommissioned != nullptr &&
+        (mDeviceBeingCommissioned == &device || mDeviceBeingCommissioned->GetDeviceId() == device.GetDeviceId());
+}
+
+void DeviceCommissioner::OnCommissioneeSessionReleased(CommissioneeDeviceProxy & device)
+{
+    // A commissionee in PASE establishment or being commissioned has its own failure path.
+    VerifyOrReturn(&device != mDeviceInPASEEstablishment && !IsBeingCommissioned(device));
+
+    // The proxy does not touch itself after calling us, so it can be released here.
+    NodeId deviceId = device.GetDeviceId();
+    ChipLogProgress(Controller, "PASE session to commissionee 0x" ChipLogFormatX64 " was released; releasing it",
+                    ChipLogValueX64(deviceId));
+    ReleaseCommissioneeDevice(&device);
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnCommissioneeReleased(deviceId, CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY);
+    }
 }
 
 CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** out_device)
@@ -892,10 +928,18 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         // already) or something has gone strange. Delete the old device, try
         // again.
         ChipLogError(Controller, "Found unconnected device, removing");
+        NodeId currentId = current->GetDeviceId();
+        bool wasIdle     = current != mDeviceInPASEEstablishment && !IsBeingCommissioned(*current);
         ReleaseCommissioneeDevice(current);
+        if (wasIdle && mPairingDelegate != nullptr)
+        {
+            mPairingDelegate->OnCommissioneeReleased(currentId, CHIP_ERROR_CONNECTION_ABORTED);
+            // The delegate may have started another PASE attempt; do not overwrite it.
+            VerifyOrExit(mDeviceInPASEEstablishment == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        }
     }
 
-    device = mCommissioneeDevicePool.CreateObject();
+    device = CreateCommissioneeDevice();
     VerifyOrExit(device != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mDeviceInPASEEstablishment = device;
@@ -1181,7 +1225,7 @@ CHIP_ERROR DeviceCommissioner::ContinueCommissioningAfterConnectNetworkRequest(N
     CommissioneeDeviceProxy * device = nullptr;
     if (!mDeviceBeingCommissioned)
     {
-        device = mCommissioneeDevicePool.CreateObject();
+        device = CreateCommissioneeDevice();
         if (!device)
             return CHIP_ERROR_NO_MEMORY;
 
@@ -1224,14 +1268,20 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
-    if (mDeviceBeingCommissioned == device)
+    if (IsBeingCommissioned(*device))
     {
         CancelCommissioningInteractions();
         CommissioningStageComplete(CHIP_ERROR_CANCELLED);
     }
     else
     {
+        bool wasIdle    = device != mDeviceInPASEEstablishment;
+        NodeId deviceId = device->GetDeviceId();
         ReleaseCommissioneeDevice(device);
+        if (wasIdle && mPairingDelegate != nullptr)
+        {
+            mPairingDelegate->OnCommissioneeReleased(deviceId, CHIP_ERROR_CANCELLED);
+        }
     }
     return CHIP_NO_ERROR;
 }

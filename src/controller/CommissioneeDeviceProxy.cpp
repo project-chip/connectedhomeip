@@ -52,18 +52,25 @@ CHIP_ERROR CommissioneeDeviceProxy::SendCommands(app::CommandSender * commandObj
 void CommissioneeDeviceProxy::OnSessionReleased()
 {
     mState = ConnectionState::NotConnected;
+    if (mSessionReleaseDelegate != nullptr)
+    {
+        mSessionReleaseDelegate->OnCommissioneeSessionReleased(*this);
+    }
 }
 
 void CommissioneeDeviceProxy::CloseSession()
 {
     VerifyOrReturn(mState == ConnectionState::SecureConnected);
-    if (mSecureSession)
-    {
-        mSecureSession->AsSecureSession()->MarkForEviction();
-    }
 
-    mState = ConnectionState::NotConnected;
+    // MarkForEviction() can synchronously reach OnSessionReleased() and our delegate, which may destroy this object. Do all
+    // member cleanup first, hold the session in a local handle, and touch nothing afterwards.
+    auto session = mSecureSession.Get();
+    mState       = ConnectionState::NotConnected;
     mPairing.Clear();
+    if (session.HasValue())
+    {
+        session.Value()->AsSecureSession()->MarkForEviction();
+    }
 }
 
 chip::Optional<SessionHandle> CommissioneeDeviceProxy::DetachSecureSession()

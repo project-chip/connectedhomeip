@@ -70,9 +70,22 @@ public:
 
     void SetDeviceBeingCommissioned(DeviceProxy * device) { mCommissioner->mDeviceBeingCommissioned = device; }
 
+    CommissioneeDeviceProxy * GetDeviceInPASEEstablishment() { return mCommissioner->mDeviceInPASEEstablishment; }
+
     Controller::SetUpCodePairer & GetSetUpCodePairer() { return mCommissioner->mSetUpCodePairer; }
 
     void FailPASE(CHIP_ERROR error) { mCommissioner->OnSessionEstablishmentError(error); }
+
+    void CompletePASE(const SessionHandle & session) { mCommissioner->OnSessionEstablished(session); }
+
+    CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId deviceId) { return mCommissioner->FindCommissioneeDevice(deviceId); }
+
+    SessionManager * GetSessionManager() { return mCommissioner->SessionMgr(); }
+
+    void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const Controller::CompletionStatus & completionStatus)
+    {
+        mCommissioner->CleanupCommissioning(proxy, nodeId, completionStatus);
+    }
 
 #if CONFIG_NETWORK_LAYER_BLE
     BLE_CONNECTION_OBJECT GetPASEConnectionObject() const

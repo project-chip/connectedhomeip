@@ -262,8 +262,12 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     // NOTE: Doing respondsToSelector check before dispatch, so we can kick off
     // commissioning ourselves if not.
     if ([strongDelegate respondsToSelector:@selector(commissioning:paseSessionEstablishmentComplete:)]) {
-        dispatch_async(_delegateQueue, ^{
+        // Set before any further dispatch: a release of the commissionee is queued on this same serial queue after us, so it
+        // must see the flag.
+        if (!error) {
             self.isWaitingAfterPASEEstablished = YES;
+        }
+        dispatch_async(_delegateQueue, ^{
             [strongDelegate commissioning:self paseSessionEstablishmentComplete:error];
         });
 
@@ -430,6 +434,24 @@ static inline void emitMetricForSetupPayload(NSString * payload)
             }
         }];
     });
+}
+
+- (void)controller:(MTRDeviceController *)controller commissioneeReleasedForNodeID:(NSNumber *)nodeID error:(NSError *)error
+{
+    if (![nodeID isEqual:_commissioningID]) {
+        return;
+    }
+
+    // Only a commissioning that is waiting after PASE has an idle commissionee to lose.
+    if ([_controller commissioneeReleasedWhileWaitingAfterPASE:self error:error]) {
+        MTRMetrics * cancelMetrics = self.cancelMetrics;
+        if (cancelMetrics) {
+            // A cancel already took this commissioning's metrics; the shared collector may belong to a newer one.
+            [self _dispatchCommissioningError:error withMetrics:cancelMetrics];
+        } else {
+            [self _dispatchCommissioningError:error];
+        }
+    }
 }
 
 - (void)controllerStartingNetworkScan:(MTRDeviceController *)controller

@@ -144,6 +144,22 @@ void MTRDeviceControllerDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
     // This is never actually called; just do nothing.
 }
 
+void MTRDeviceControllerDelegateBridge::OnCommissioneeReleased(chip::NodeId deviceId, CHIP_ERROR reason)
+{
+    MTRDeviceController * strongController = mController;
+    MTR_LOG("%@ MTRDeviceControllerDelegate commissionee 0x%016llX was released: %" CHIP_ERROR_FORMAT, strongController, deviceId, reason.Format());
+
+    auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
+    if (strongDelegate && mQueue && strongController
+        && [strongDelegate respondsToSelector:@selector(controller:commissioneeReleasedForNodeID:error:)]) {
+        NSNumber * nodeID = @(deviceId);
+        NSError * nsError = [MTRError errorForCHIPErrorCode:reason];
+        dispatch_async(mQueue, ^{
+            [strongDelegate controller:strongController commissioneeReleasedForNodeID:nodeID error:nsError];
+        });
+    }
+}
+
 void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info)
 {
     MTRDeviceController * strongController = mController;
