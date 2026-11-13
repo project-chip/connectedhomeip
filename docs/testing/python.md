@@ -1205,6 +1205,18 @@ Tests that replace the entire ACL during a step should include the subscription
 controller entry (see `get_subscription_acl_entry()` on `MatterBaseTest`) if
 subscription coverage needs to remain active through that step.
 
+#### Logging
+
+The priming read of the wildcard subscription reports every attribute on the
+DUT, which would add several megabytes of native SDK logs to each test. While
+the subscription is being established, the framework sets the native log filter
+to errors only. The native log filter is process-wide, so logs from
+`default_controller` during that time are reduced to errors as well. Reports
+received after the subscription is established are logged normally.
+
+Run the test with `--debug` to keep all native logs during the subscription
+setup.
+
 ### C/Q excluded attributes
 
 Attributes marked in the data model XML with:

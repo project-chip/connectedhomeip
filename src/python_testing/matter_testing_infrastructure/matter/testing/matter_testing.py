@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import inspect
 import json
 import logging
@@ -54,6 +55,7 @@ import matter.clusters as Clusters
 import matter.logging
 import matter.native
 import matter.testing.global_stash as global_stash
+from matter.ChipStack import ChipStack
 from matter.clusters import Attribute, ClusterObjects
 from matter.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 from matter.clusters.Types import NullValue
@@ -203,6 +205,26 @@ class SetupParameters:
     def manual_code(self):
         return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
                                                         self.custom_flow, self.capabilities, self.version)
+
+
+@contextlib.asynccontextmanager
+async def _native_logs_below_error_dropped(stack: ChipStack):
+    """Drops native SDK logs below Error (Progress, Detail and Automation) while the context is active.
+
+    Entering the context first waits for the Matter thread to finish its current task, so logs for
+    work already in progress (for example, the remaining processing of a response that just
+    completed an awaited call) are kept.
+
+    The native log filter is process-wide: logs from every controller are dropped, not only from
+    the code inside the context. The previous filter is restored on exit.
+    """
+    await stack.CallAsyncWithResult(lambda: None)
+    previous_filter = matter.logging.GetLogFilter()
+    matter.logging.SetLogFilter(matter.logging.LOG_CATEGORY_ERROR)
+    try:
+        yield
+    finally:
+        matter.logging.SetLogFilter(previous_filter)
 
 
 class BackgroundWildcardSubscriptionCache:
@@ -831,16 +853,20 @@ class MatterBaseTest(base_test.BaseTestClass):
                 ))],
             )
 
-            # Start the wildcard subscription using the secondary controller.
-            await handler.start(
-                dev_ctrl=self.subscription_controller,
-                node_id=self.dut_node_id,
-                attributes=[Attribute.AttributePath(None, None, None)],
-                min_interval_sec=0,
-                max_interval_sec=30,
-                keepSubscriptions=False,
-                autoResubscribe=False,
-            )
+            # Start the wildcard subscription using the secondary controller.  The priming read
+            # logs every attribute on the DUT, so native logs are reduced to errors unless --debug.
+            log_scope = (contextlib.nullcontext() if self.matter_test_config.debug
+                         else _native_logs_below_error_dropped(self.matter_stack.stack))
+            async with log_scope:
+                await handler.start(
+                    dev_ctrl=self.subscription_controller,
+                    node_id=self.dut_node_id,
+                    attributes=[Attribute.AttributePath(None, None, None)],
+                    min_interval_sec=0,
+                    max_interval_sec=30,
+                    keepSubscriptions=False,
+                    autoResubscribe=False,
+                )
 
         try:
             LOGGER.info("[MatterBaseTest] Starting wildcard subscription")
