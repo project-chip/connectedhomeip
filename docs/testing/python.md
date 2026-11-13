@@ -966,6 +966,9 @@ for that run, e.g.:
         failure doesn't fail the job. Remove the tag once every issue is fixed.
     -   `openssl-3.5`: moves the run out of PR CI and into the OpenSSL 3.5 job,
         for runs that need an app and controller built with OpenSSL 3.5.
+    -   `ble-wifi`: moves the run out of the REPL jobs and into the BLE-WiFi
+        step, for runs that commission over the mocked BLE and Wi-Fi topology.
+        See [Running the BLE-WiFi tests](#running-the-ble-wifi-tests).
     -   Example: `[nightly]`
 
 -   `issues`: The GitHub issues that track the problems of a
@@ -1018,8 +1021,9 @@ select runs with the same `--tag` option:
 
 -   `--tag <tag>` keeps only the runs with the tag, and `--tag skip-<tag>`
     leaves them out. With several `--tag` values, a run must match each one.
--   Runs tagged `nightly` or `openssl-3.5` are left out unless a `--tag` value
-    names the tag. Without `--tag`, the runners select the runs PR CI runs.
+-   Runs tagged `ble-wifi`, `nightly` or `openssl-3.5` are left out unless a
+    `--tag` value names the tag. Without `--tag`, the runners select the runs PR
+    CI runs.
 -   `execute_python_tests.py` and `local.py` reject a `--tag` value whose tag no
     run has, such as a misspelled tag.
 -   `run_python_test.py --run` names runs whatever their tags, and can't be
@@ -1027,12 +1031,35 @@ select runs with the same `--tag` option:
 -   `execute_python_tests.py` calls each selected run that has tags on its own,
     and reports it as `<script>::<run>` with its tags and issues.
 
-| Selection                      | `--tag` values                     |
-| ------------------------------ | ---------------------------------- |
-| PR CI (the default)            | `skip-nightly`, `skip-openssl-3.5` |
-| Nightly job                    | `nightly`                          |
-| OpenSSL 3.5 job                | `openssl-3.5`                      |
-| PR CI runs with known problems | `needs-followup-fixes`             |
+| Selection                      | `--tag` values                                      |
+| ------------------------------ | --------------------------------------------------- |
+| PR CI (the default)            | `skip-ble-wifi`, `skip-nightly`, `skip-openssl-3.5` |
+| Nightly job                    | `nightly`                                           |
+| OpenSSL 3.5 job                | `openssl-3.5`                                       |
+| BLE-WiFi step                  | `ble-wifi`                                          |
+| PR CI runs with known problems | `needs-followup-fixes`                              |
+
+### Running the BLE-WiFi tests
+
+Runs tagged `ble-wifi` commission the app over a mocked BLE and Wi-Fi topology,
+which needs root and network namespaces. CI runs them in their own step of the
+Linux test suites job:
+
+```shell
+scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --tag ble-wifi --env-file /tmp/cnet_env.yaml'
+```
+
+The environment file must map `ALL_DEVICES_APP` to a binary built with BLE and
+Wi-Fi. These tests are also listed under `dedicated_runner` in
+`src/python_testing/test_metadata.yaml`, so `local.py python-tests` skips them.
+
+The BLE-WiFi runner uses the same isolation locally and in CI: it re-executes
+inside a private mount namespace before replacing `/run`, then starts the app
+and controller in separate network namespaces with a private D-Bus and BLE/WPA
+mocks. The internal `--internal-inside-unshare` marker prevents the re-executed
+runner from creating another mount namespace. It is set by the runner, not by
+the user. Root runs also need the private mount namespace so the temporary
+`/run` mount does not affect the host.
 
 # Test Module Guards
 
