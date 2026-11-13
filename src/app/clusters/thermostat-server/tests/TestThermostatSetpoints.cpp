@@ -360,11 +360,36 @@ TEST_F(ThermostatTestFixture, TestSetpointRaiseLowerCommand)
     EXPECT_EQ(mHeatingDelegate.mOccupiedHeatingSetpoint, 2000);
     EXPECT_EQ(mCoolingDelegate.mOccupiedCoolingSetpoint, 2850);
 
-    // Invalid mode
-    req.mode   = static_cast<SetpointRaiseLowerModeEnum>(0x99);
-    req.amount = 10;
-    result     = tester.Invoke(req);
-    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
+    struct RawModeRequest
+    {
+        using ResponseType = Commands::SetpointRaiseLower::Type::ResponseType;
+
+        uint8_t rawMode = 0;
+        int8_t amount;
+
+        CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+        {
+            TLV::TLVType outer;
+            ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(0), rawMode));
+            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), amount));
+            return writer.EndContainer(outer);
+        }
+    };
+    for (const uint8_t mode : { uint8_t{ 3 }, uint8_t{ 0x99 } })
+    {
+        for (const int8_t amount : { int8_t{ 0 }, int8_t{ 10 } })
+        {
+            RawModeRequest raw;
+            raw.rawMode = mode;
+            raw.amount  = amount;
+            result      = tester.Invoke(Commands::SetpointRaiseLower::Id, raw);
+            ASSERT_TRUE(result.status.has_value());
+            EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+            EXPECT_EQ(mHeatingDelegate.mOccupiedHeatingSetpoint, 2000);
+            EXPECT_EQ(mCoolingDelegate.mOccupiedCoolingSetpoint, 2850);
+        }
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
