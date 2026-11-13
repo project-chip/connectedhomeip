@@ -223,6 +223,7 @@ protected:
         // method.
         ByteSpan initiatorEphPubKey;
         bool initiatorSessionParamStructPresent = false;
+        // Holds the default values when initiatorSessionParamStructPresent is false.
         SessionParameters initiatorSessionParams;
     };
 

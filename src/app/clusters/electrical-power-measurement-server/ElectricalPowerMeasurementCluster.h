@@ -73,6 +73,11 @@ public:
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
+    /// Measurement values are read from the Delegate on every attribute read and are not stored
+    /// by the cluster. Call this after a Delegate value changes so subscribers receive a report.
+    /// Deciding which changes are significant enough to report (Q quality) is up to the caller.
+    void MarkAttributeDirty(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;

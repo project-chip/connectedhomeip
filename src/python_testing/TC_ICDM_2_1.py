@@ -104,7 +104,7 @@ class TC_ICDM_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_ICDM_2_1(self) -> list[TestStep]:
         return [
-            TestStep("1a", "Commissioning, already done", is_commissioning=True),
+            TestStep("1a", "Commissioning, already done"),
             TestStep("1b", "CTH reads from the DUT the FeatureMap attribute."),
             TestStep(2, "TH reads from the DUT the ActiveModeThreshold attribute."),
             TestStep(3, "TH reads from the DUT the ActiveModeDuration attribute."),

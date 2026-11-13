@@ -18,8 +18,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device water-valve:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -54,7 +54,7 @@ class TC_VALCC_4_1(MatterTestCommissionedDevice):
 
     def steps_TC_VALCC_4_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Send Open command with duration set to 60"),
             TestStep(3, "Read OpenDuration attribute"),
             TestStep(4, "Read RemainingDuration attribute"),

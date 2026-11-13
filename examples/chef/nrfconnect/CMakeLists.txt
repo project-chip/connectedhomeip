@@ -121,6 +121,8 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/switch/SwitchEventHandler.cpp
     ${CHEF}/common/clusters/switch/SwitchManager.cpp
     ${CHEF}/common/clusters/temperature-control/static-supported-temperature-levels.cpp
+    ${CHEF}/common/clusters/thermostat/CodegenIntegration.cpp
+    ${CHEF}/common/clusters/thermostat/chef-thermostat.cpp
     ${CHEF}/common/clusters/target-navigator/TargetNavigatorManager.cpp
     ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
     ${CHEF}/common/clusters/water-heater-management/chef-water-heater-management.cpp

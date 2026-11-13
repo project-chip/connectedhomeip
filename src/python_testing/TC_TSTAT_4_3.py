@@ -101,8 +101,7 @@ class TC_TSTAT_4_3(MatterTestCommissionedDevice):
 
     def steps_TC_TSTAT_4_3(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done",
-                     is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2a", "TH reads the FeatureMap attribute.",
                      "Verify that the TSUGGEST bit is set in the FeatureMap value."),
             TestStep("2b", "TH reads the Presets attribute and saves it in a SupportedPresets variable.",

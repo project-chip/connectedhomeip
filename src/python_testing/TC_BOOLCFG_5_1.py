@@ -62,7 +62,7 @@ class TC_BOOLCFG_5_1(MatterTestCommissionedDevice):
 
     def steps_TC_BOOLCFG_5_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read FeatureMap attribute"),
             TestStep(3, "Verify SPRS feature is supported"),
             TestStep(4, "Create enabledAlarms and set to 0"),

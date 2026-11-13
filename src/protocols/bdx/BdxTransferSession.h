@@ -265,7 +265,8 @@ public:
      * @brief
      *   Prepare a Block message. The Block counter will be populated automatically.
      *
-     * @param inData Contains data for filling out the Block message
+     * @param inData Contains data for filling out the Block message. inData.Length may be 0 only for a BlockEOF
+     *               (inData.IsEof), and inData.Data may be null only if inData.Length is 0.
      *
      * @return CHIP_ERROR The result of the preparation of a Block message. May also indicate if the TransferSession object
      *                    is unable to handle this request.

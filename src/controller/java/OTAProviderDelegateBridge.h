@@ -59,7 +59,7 @@ public:
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
 
 private:
-    void sendOTAQueryFailure(uint8_t status);
+    void sendOTAQueryFailure(chip::NodeId nodeId, uint8_t status);
 
     chip::JniGlobalReference mOtaProviderDelegate;
     std::unique_ptr<BdxOTASender> mBdxOTASender = nullptr;

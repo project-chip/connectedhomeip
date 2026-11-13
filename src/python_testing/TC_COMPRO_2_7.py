@@ -135,7 +135,7 @@ class TC_COMPRO_2_7(MatterTestCommissionedDevice, COMPROBaseTest):
 
     def steps_TC_COMPRO_2_7(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT (proxy) to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT (proxy) to TH"),
             TestStep(2, "TH reads MaxSessions attribute",
                      "Value is a uint8 ≥ 1; store as max_sessions"),
             TestStep(3, "TH reads Transport attribute", "Store as valid_transports"),

@@ -55,7 +55,7 @@ class TC_AVANALY_2_1(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def steps_TC_AVANALY_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads the SupportedAmbientContexts attribute. Verify that it is list of valid semantic structs",
                         "Verify that there are no more than 50 entries"),
             TestStep(3, "TH reads the ActiveAmbientContextTriggers attribute. Verify that this is a list with zero entries"),

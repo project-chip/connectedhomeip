@@ -15,6 +15,9 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
+#include <app/clusters/push-av-stream-transport-server/MigratePushAvStreamTransportServerStorage.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/static-cluster-config/PushAvStreamTransport.h>
 #include <app/util/attribute-storage.h>
@@ -35,7 +38,8 @@ static constexpr size_t kPushAvStreamTransportFixedClusterCount =
 static constexpr size_t kPushAvStreamTransportMaxClusterCount =
     kPushAvStreamTransportFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<PushAvStreamTransportServer> gServers[kPushAvStreamTransportMaxClusterCount];
+LazyRegisteredServerCluster<PushAvStreamTransport::CodegenPushAvStreamTransportServer>
+    gServers[kPushAvStreamTransportMaxClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -109,6 +113,17 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
+
+CHIP_ERROR CodegenPushAvStreamTransportServer::Startup(ServerClusterContext & context)
+{
+    SafeAttributePersistenceProvider * srcProvider = GetSafeAttributePersistenceProvider();
+    if (srcProvider != nullptr)
+    {
+        LogErrorOnFailure(MigratePushAvStreamTransportServerStorage(mPath.mEndpointId, *srcProvider, context.attributeStorage));
+    }
+
+    return PushAvStreamTransportServer::Startup(context);
+}
 
 void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate)
 {

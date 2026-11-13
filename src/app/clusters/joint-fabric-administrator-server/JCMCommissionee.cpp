@@ -234,6 +234,13 @@ CHIP_ERROR JCMCommissionee::ReadAdminFabrics(OnCompletionFunc onComplete)
             const auto & fabricDescriptor = iter.GetValue();
             if (fabricDescriptor.fabricIndex == mInfo.adminFabricIndex)
             {
+                if (fabricDescriptor.rootPublicKey.size() != Crypto::kP256_PublicKey_Length)
+                {
+                    ChipLogError(JointFabric, "JCM: Administrator fabric root public key size mismatch");
+                    onComplete(CHIP_ERROR_INVALID_ARGUMENT);
+                    return;
+                }
+
                 mInfo.rootPublicKey.CopyFromSpan(fabricDescriptor.rootPublicKey);
                 mInfo.adminFabricId = fabricDescriptor.fabricID;
                 mInfo.adminVendorId = fabricDescriptor.vendorID;

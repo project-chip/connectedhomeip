@@ -343,6 +343,81 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckNew)
 #endif // CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
 }
 
+// This test expects New() to succeed for every size up to kMaxAllocSize. LwIP custom pools can't guarantee that:
+// their buffer sizes aren't known at compile time, so kMaxAllocSize can exceed the largest one and New() then fails.
+#if !CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_CUSTOM_POOL
+/**
+ *  Test that PacketBufferHandle::New() only admits sizes the returned buffer can hold.
+ */
+TEST_F(TestSystemPacketBuffer, CheckNewCapacityCoversRequest)
+{
+    const size_t kSizes[] = { PacketBuffer::kMaxSizeWithoutReserve, PacketBuffer::kMaxSizeWithoutReserve + 1u,
+                              PacketBuffer::kMaxAllocSize };
+
+    for (const size_t size : kSizes)
+    {
+        const PacketBufferHandle buffer = PacketBufferHandle::New(size, 0);
+
+        if (size > PacketBuffer::kMaxAllocSize)
+        {
+            EXPECT_TRUE(buffer.IsNull());
+            continue;
+        }
+
+        ASSERT_FALSE(buffer.IsNull());
+        EXPECT_GE(buffer->MaxDataLength(), size);
+    }
+}
+#endif // !CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_CUSTOM_POOL
+
+/**
+ *  Test that PacketBufferHandle::New() never returns a buffer smaller than the request, on any backend.
+ */
+TEST_F(TestSystemPacketBuffer, CheckNewNeverReturnsShorterBuffer)
+{
+    const size_t kSizes[] = { PacketBuffer::kMaxSizeWithoutReserve, PacketBuffer::kMaxSizeWithoutReserve + 1u,
+                              PacketBuffer::kMaxAllocSize };
+
+    for (const size_t size : kSizes)
+    {
+        const PacketBufferHandle buffer = PacketBufferHandle::New(size, 0);
+        if (!buffer.IsNull())
+        {
+            EXPECT_GE(buffer->MaxDataLength(), size);
+        }
+    }
+}
+
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
+namespace {
+size_t CountAllocatableBuffers()
+{
+    std::vector<PacketBufferHandle> buffers;
+    while (true)
+    {
+        PacketBufferHandle buffer = PacketBufferHandle::New(0, 0);
+        if (buffer.IsNull())
+        {
+            return buffers.size();
+        }
+        buffers.push_back(std::move(buffer));
+    }
+}
+} // namespace
+
+/**
+ *  Test that a PacketBufferHandle::New() request larger than one pool buffer leaves every pool buffer allocatable.
+ */
+TEST_F(TestSystemPacketBuffer, CheckOversizedNewKeepsPoolBuffers)
+{
+    const size_t available = CountAllocatableBuffers();
+    {
+        const PacketBufferHandle oversized = PacketBufferHandle::New(2 * PacketBuffer::kMaxSizeWithoutReserve + 1, 0);
+    }
+    EXPECT_EQ(CountAllocatableBuffers(), available);
+}
+#endif // CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
+
 /**
  *  Test PacketBuffer::Start() function.
  */

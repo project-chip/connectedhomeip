@@ -131,9 +131,6 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
         ChipLogError(DataManagement, "Read request on unknown cluster - no data version available");
     }
 
-    TLV::TLVWriter checkpoint;
-    reportBuilder.Checkpoint(checkpoint);
-
     // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
     //       explicitly ignores that case).
     //       Validation of attribute existence is done after ACL, in `ValidateAttributeIsReadable` below
@@ -491,7 +488,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     {
                         ChipLogError(DataManagement,
                                      "Fail to retrieve data, roll back and encode status on clusterId: " ChipLogFormatMEI
-                                     ", attributeId: " ChipLogFormatMEI "err = %" CHIP_ERROR_FORMAT,
+                                     ", attributeId: " ChipLogFormatMEI " err = %" CHIP_ERROR_FORMAT,
                                      ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId),
                                      err.Format());
                         // Try to encode our error as a status response.

@@ -62,7 +62,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 struct NanPeerInfo
 {
     uint8_t mac[6]{};
@@ -88,7 +88,7 @@ struct ScanTimerCtx
     chip::DeviceLayer::ConnectivityManagerImpl * self = nullptr;
     guint subscribe_id;
 };
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 // Records when the radio can carry Wi-Fi PAF frames
@@ -141,6 +141,9 @@ public:
     static ConnectivityManagerImpl & GetDefaultInstance(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    // The connect callback may be null. No result is reported then, wpa_supplicant keeps retrying if the connect fails,
+    // and Wi-Fi PAF sends are not held back during the association. If Wi-Fi is blocked, the network is still written and
+    // selected, so it is joined once Wi-Fi is unblocked, and CHIP_ERROR_INCORRECT_STATE is returned.
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
@@ -148,6 +151,8 @@ public:
                                               const Crypto::P256Keypair & clientIdentityKeypair,
                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    // Stop waiting for the result of a pending connect, without invoking its callback.
+    void CancelConnectWiFiNetwork();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     void PostWpaInterfaceProxyReady() CHIP_REQUIRES(mWpaSupplicantMutex);
     void _WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam);
@@ -247,9 +252,18 @@ private:
 #endif
 
 private:
-    CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
+    CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs, GVariant * blobs,
                                         NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
         CHIP_REQUIRES(mWpaSupplicantMutex);
+    /** Remove all networks from wpa_supplicant (including PDC, if any blobs) */
+    CHIP_ERROR ClearNetworks() CHIP_REQUIRES(mWpaSupplicantMutex);
+    /** Replace all networks in wpa_supplicant with the one described by networkArgs (a{sv}), after adding blobs (a{say},
+     *  nullable). After a failure wpa_supplicant holds no network and no PDC blobs. Neither argument is consumed. */
+    CHIP_ERROR WriteNetwork(GVariant * networkArgs, GVariant * blobs) CHIP_REQUIRES(mWpaSupplicantMutex);
+    /** The adding half of WriteNetwork, without its cleanup on failure. */
+    CHIP_ERROR AddNetwork(GVariant * networkArgs, GVariant * blobs) CHIP_REQUIRES(mWpaSupplicantMutex);
+    static void OnWiFiConnectTimeout(System::Layer * aLayer, void * aAppState);
+    void DisableNetworkAfterConnectFailure();
 #endif
 
 public:
@@ -363,7 +377,11 @@ private:
     CHIP_ERROR _StartWiFiManagement();
     CHIP_ERROR _StopWiFiManagement();
 
-    bool mAssociationStarted             = false;
+    // Written on the GLib thread, read by the connect deadline timer on the Matter thread.
+    std::atomic<bool> mAssociationStarted{ false };
+    // Identifies the connect a queued result belongs to, so a result that arrives after the next
+    // connect has started is not reported for it.
+    std::atomic<uint32_t> mConnectAttemptId{ 0 };
     unsigned int mAssociationRetriesLeft = 0;
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA

@@ -26,11 +26,25 @@
 
 // Including the Metadata from a concrete implementation
 #include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
+#include <clusters/HepaFilterMonitoring/Metadata.h>
+#include <clusters/WaterTankLevelMonitoring/Metadata.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
+
+struct ClusterEntry
+{
+    ClusterId id;
+    uint32_t revision;
+};
+
+// Aliased Resource Monitoring clusters defined in the specification
+constexpr ClusterEntry kActivatedCarbonFilterMonitoring = { ActivatedCarbonFilterMonitoring::Id,
+                                                            ActivatedCarbonFilterMonitoring::kRevision };
+constexpr ClusterEntry kHepaFilterMonitoring            = { HepaFilterMonitoring::Id, HepaFilterMonitoring::kRevision };
+constexpr ClusterEntry kWaterTankLevelMonitoring        = { WaterTankLevelMonitoring::Id, WaterTankLevelMonitoring::kRevision };
 
 // max of 20 characters as defined by the constraint on the ProductIdentifierValue in the specification
 static constexpr size_t kProductIdentifierValueMaxNameLength = 20u;

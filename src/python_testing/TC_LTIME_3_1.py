@@ -63,7 +63,7 @@ class TC_LTIME_3_1(MatterTestCommissionedDevice):
 
     def steps_TC_LTIME_3_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "TH is commissioned with DUT", is_commissioning=True),
+            TestStep(0, "TH is commissioned with DUT"),
             TestStep(1, "TH reads HourFormat attribute from DUT",
                      "Verify that the HourFormat attribute is of Enum8 datatype and that the values are 0 (12hr), 1 (24hr), and 255 (UseActiveLocale) as per the HourFormatEnum in the specification."),
             TestStep(2, "TH writes 0(12hr) to HourFormat attribute"),

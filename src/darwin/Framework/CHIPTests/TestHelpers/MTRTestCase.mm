@@ -250,25 +250,27 @@ static MTRMockCB * sMockCB;
     XCTAssertEqual([task terminationStatus], 0);
 }
 
-+ (void)doLaunchTask:(NSTask *)task
++ (BOOL)doLaunchTask:(NSTask *)task
 {
     NSError * launchError;
-    [task launchAndReturnError:&launchError];
+    BOOL launched = [task launchAndReturnError:&launchError];
     XCTAssertNil(launchError);
+    return launched;
 }
 
 - (void)launchTask:(NSTask *)task
 {
-    [self.class doLaunchTask:task];
-
-    [_runningTasks addObject:task];
+    // A task that never launched can't be terminated; -terminate would throw in tearDown.
+    if ([self.class doLaunchTask:task]) {
+        [_runningTasks addObject:task];
+    }
 }
 
 + (void)launchTask:(NSTask *)task
 {
-    [self doLaunchTask:task];
-
-    [sRunningCrossTestTasks addObject:task];
+    if ([self doLaunchTask:task]) {
+        [sRunningCrossTestTasks addObject:task];
+    }
 }
 
 - (NSTask *)relaunchTask:(NSTask *)task additionalArguments:(NSArray<NSString *> *)additionalArguments

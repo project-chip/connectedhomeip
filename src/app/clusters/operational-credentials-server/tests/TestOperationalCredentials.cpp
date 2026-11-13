@@ -21,12 +21,14 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
-#include <app/server/Server.h>
 #include <clusters/OperationalCredentials/Metadata.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <messaging/ExchangeMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <algorithm>
@@ -107,6 +109,17 @@ public:
     Credentials::DeviceAttestationCertProfile GetPreferredDeviceAttestationChainProfile() const override
     {
         return Credentials::DeviceAttestationCertProfile::kMlDsa44;
+    }
+
+    CHIP_ERROR GetDeviceAttestationDocumentSegmentForChain(Credentials::DeviceAttestationDocumentType documentType,
+                                                           const Credentials::DeviceAttestationChainProfile & chain, size_t offset,
+                                                           MutableByteSpan & buffer, size_t & totalSize) override
+    {
+        VerifyOrReturnError(chain.PAICrypto == AttestationCryptoProfileEnum::kEcdsaMatterLegacy &&
+                                chain.DACCrypto == AttestationCryptoProfileEnum::kEcdsaMatterLegacy &&
+                                chain.PAACrypto <= AttestationCryptoProfileEnum::kMlDsa44,
+                            CHIP_ERROR_NOT_FOUND);
+        return GetDeviceAttestationDocumentSegment(documentType, chain.PAACrypto, offset, buffer, totalSize);
     }
 
     CHIP_ERROR GetDeviceAttestationDocumentSegment(Credentials::DeviceAttestationDocumentType documentType,
@@ -216,16 +229,24 @@ struct TestOperationalCredentials : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    OperationalCredentialsCluster::Context MakeContext(BitFlags<Feature> featureMap = {})
+    OperationalCredentialsCluster::Context MakeContext(BitFlags<Feature> featureMap                                 = {},
+                                                       Credentials::DeviceAttestationCredentialsProvider * provider = nullptr)
     {
+        mCommissioningWindowManager.Init({
+            .fabricTable = mFabricTable, .sessionManager = mSessionManager, .exchangeManager = mExchangeManager,
+            .failSafeContext = mFailSafeContext,
+#if CONFIG_NETWORK_LAYER_BLE
+            .bleLayer = mBleLayer,
+#endif
+        });
         return {
-            .fabricTable                = Server::GetInstance().GetFabricTable(),
-            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
-            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
+            .fabricTable                = mFabricTable,
+            .failSafeContext            = mFailSafeContext,
+            .sessionManager             = mSessionManager,
             .dnssdServer                = app::DnssdServer::Instance(),
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-            .dacProvider                = mDacProvider,
-            .groupDataProvider          = *Server::GetInstance().GetGroupDataProvider(),
+            .commissioningWindowManager = mCommissioningWindowManager,
+            .dacProvider                = provider != nullptr ? *provider : mDacProvider,
+            .groupDataProvider          = mGroupDataProvider,
             .accessControl              = Access::GetAccessControl(),
             .platformManager            = DeviceLayer::PlatformMgr(),
             .eventManagement            = EventManagement::GetInstance(),
@@ -233,7 +254,16 @@ struct TestOperationalCredentials : public ::testing::Test
         };
     }
 
+    FabricTable mFabricTable;
+    FailSafeContext mFailSafeContext;
+    SessionManager mSessionManager;
+    Messaging::ExchangeManager mExchangeManager;
+    CommissioningWindowManager mCommissioningWindowManager;
+    Credentials::GroupDataProviderImpl mGroupDataProvider;
     TestDACProvider mDacProvider;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer mBleLayer;
+#endif
 };
 
 TEST_F(TestOperationalCredentials, TestPQCProviderRequirements)
@@ -367,8 +397,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestLegacyModeIgnoresP
     ClusterTester tester(cluster);
 
     Commands::CertificateChainRequest::Type request;
-    request.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+    request.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+    request.cryptoProfile.Emplace().DACCrypto = AttestationCryptoProfileEnum::kMlDsa44;
     request.segmentID.SetValue(3);
     request.maxSegmentSize.SetValue(700);
 
@@ -379,9 +409,10 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestLegacyModeIgnoresP
     {
         return;
     }
-    EXPECT_EQ(result.response->certificate.size(), 32u);
-    EXPECT_FALSE(result.response->totalDocumentSize.HasValue());
-    EXPECT_FALSE(result.response->nextSegmentID.HasValue());
+    const auto & response = result.response.value();
+    EXPECT_EQ(response.certificate.size(), 32u);
+    EXPECT_FALSE(response.totalDocumentSize.HasValue());
+    EXPECT_FALSE(response.nextSegmentID.HasValue());
 }
 
 TEST_F(TestOperationalCredentials, TestCertificateChainDocumentSizeLimit)
@@ -415,8 +446,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainDocumentSizeLimit)
     OperationalCredentialsCluster cluster(kRootEndpointId, sizeContext);
     ClusterTester tester(cluster);
     Commands::CertificateChainRequest::Type request;
-    request.certificateType = CertificateChainTypeEnum::kPAICertificate;
-    request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    request.certificateType                   = CertificateChainTypeEnum::kPAICertificate;
+    request.cryptoProfile.Emplace().PAICrypto = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
 
     auto accepted = tester.Invoke(request);
     ASSERT_TRUE(accepted.IsSuccess());
@@ -425,8 +456,9 @@ TEST_F(TestOperationalCredentials, TestCertificateChainDocumentSizeLimit)
     {
         return;
     }
-    ASSERT_TRUE(accepted.response->totalDocumentSize.HasValue());
-    EXPECT_EQ(accepted.response->totalDocumentSize.Value(), Credentials::kMaxDERCertLengthMlDsa65);
+    const auto & acceptedResponse = accepted.response.value();
+    ASSERT_TRUE(acceptedResponse.totalDocumentSize.HasValue());
+    EXPECT_EQ(acceptedResponse.totalDocumentSize.Value(), Credentials::kMaxDERCertLengthMlDsa65);
 
     // Provider metadata larger than the supported DER certificate limit must be rejected.
     ++provider.documentSize;
@@ -450,10 +482,11 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCFeatureServesLe
     {
         return;
     }
-    EXPECT_EQ(dacResult.response->certificate.size(), 32u);
-    EXPECT_EQ(dacResult.response->certificate.data()[0], 0u);
-    EXPECT_FALSE(dacResult.response->totalDocumentSize.HasValue());
-    EXPECT_FALSE(dacResult.response->nextSegmentID.HasValue());
+    const auto & dacResponse = dacResult.response.value();
+    EXPECT_EQ(dacResponse.certificate.size(), 32u);
+    EXPECT_EQ(dacResponse.certificate.data()[0], 0u);
+    EXPECT_FALSE(dacResponse.totalDocumentSize.HasValue());
+    EXPECT_FALSE(dacResponse.nextSegmentID.HasValue());
 
     Commands::CertificateChainRequest::Type paiRequest;
     paiRequest.certificateType = CertificateChainTypeEnum::kPAICertificate;
@@ -465,10 +498,11 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCFeatureServesLe
     {
         return;
     }
-    EXPECT_EQ(paiResult.response->certificate.size(), 48u);
-    EXPECT_EQ(paiResult.response->certificate.data()[0], 0x80u);
-    EXPECT_FALSE(paiResult.response->totalDocumentSize.HasValue());
-    EXPECT_FALSE(paiResult.response->nextSegmentID.HasValue());
+    const auto & paiResponse = paiResult.response.value();
+    EXPECT_EQ(paiResponse.certificate.size(), 48u);
+    EXPECT_EQ(paiResponse.certificate.data()[0], 0x80u);
+    EXPECT_FALSE(paiResponse.totalDocumentSize.HasValue());
+    EXPECT_FALSE(paiResponse.nextSegmentID.HasValue());
 }
 
 TEST_F(TestOperationalCredentials, TestCertificateChainRequestEcdsaProfilesSelectMixedPQCChain)
@@ -477,8 +511,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestEcdsaProfilesSelec
     ClusterTester tester(cluster);
 
     Commands::CertificateChainRequest::Type dacRequest;
-    dacRequest.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    dacRequest.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    dacRequest.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+    dacRequest.cryptoProfile.Emplace().PAACrypto = AttestationCryptoProfileEnum::kMlDsa44;
 
     auto dacResult = tester.Invoke(dacRequest);
     ASSERT_TRUE(dacResult.IsSuccess());
@@ -487,15 +521,16 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestEcdsaProfilesSelec
     {
         return;
     }
-    EXPECT_EQ(dacResult.response->certificate.size(), 96u);
-    EXPECT_EQ(dacResult.response->certificate.data()[0], 0x20u);
-    ASSERT_TRUE(dacResult.response->totalDocumentSize.HasValue());
-    EXPECT_EQ(dacResult.response->totalDocumentSize.Value(), 96u);
-    EXPECT_FALSE(dacResult.response->nextSegmentID.HasValue());
+    const auto & dacResponse = dacResult.response.value();
+    EXPECT_EQ(dacResponse.certificate.size(), 96u);
+    EXPECT_EQ(dacResponse.certificate.data()[0], 0x20u);
+    ASSERT_TRUE(dacResponse.totalDocumentSize.HasValue());
+    EXPECT_EQ(dacResponse.totalDocumentSize.Value(), 96u);
+    EXPECT_FALSE(dacResponse.nextSegmentID.HasValue());
 
     Commands::CertificateChainRequest::Type paiRequest;
-    paiRequest.certificateType = CertificateChainTypeEnum::kPAICertificate;
-    paiRequest.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    paiRequest.certificateType                   = CertificateChainTypeEnum::kPAICertificate;
+    paiRequest.cryptoProfile.Emplace().PAACrypto = AttestationCryptoProfileEnum::kMlDsa44;
 
     auto paiResult = tester.Invoke(paiRequest);
     ASSERT_TRUE(paiResult.IsSuccess());
@@ -504,11 +539,12 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestEcdsaProfilesSelec
     {
         return;
     }
-    EXPECT_EQ(paiResult.response->certificate.size(), 128u);
-    EXPECT_EQ(paiResult.response->certificate.data()[0], 0x40u);
-    ASSERT_TRUE(paiResult.response->totalDocumentSize.HasValue());
-    EXPECT_EQ(paiResult.response->totalDocumentSize.Value(), 128u);
-    EXPECT_FALSE(paiResult.response->nextSegmentID.HasValue());
+    const auto & paiResponse = paiResult.response.value();
+    EXPECT_EQ(paiResponse.certificate.size(), 128u);
+    EXPECT_EQ(paiResponse.certificate.data()[0], 0x40u);
+    ASSERT_TRUE(paiResponse.totalDocumentSize.HasValue());
+    EXPECT_EQ(paiResponse.totalDocumentSize.Value(), 128u);
+    EXPECT_FALSE(paiResponse.nextSegmentID.HasValue());
 }
 
 TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsupportedRequests)
@@ -521,19 +557,41 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     {
         Commands::CertificateChainRequest::Type request;
         request.certificateType = type;
-        request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+        auto & profiles         = request.cryptoProfile.Emplace();
+        if (type == CertificateChainTypeEnum::kDACCertificate)
+        {
+            profiles.DACCrypto = AttestationCryptoProfileEnum::kMlDsa44;
+        }
+        else
+        {
+            profiles.PAICrypto = AttestationCryptoProfileEnum::kMlDsa44;
+        }
         auto result = tester.Invoke(request);
         ASSERT_TRUE(result.status.has_value());
         if (!result.status.has_value())
         {
             return;
         }
-        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+        const auto & status = result.status.value();
+        EXPECT_EQ(status.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
     }
 
+    // PAA support must be checked even though this command retrieves a DAC.
+    Commands::CertificateChainRequest::Type unsupportedPaa;
+    unsupportedPaa.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+    unsupportedPaa.cryptoProfile.Emplace().PAACrypto = AttestationCryptoProfileEnum::kMlDsa65;
+    auto unsupportedPaaResult                        = tester.Invoke(unsupportedPaa);
+    ASSERT_TRUE(unsupportedPaaResult.status.has_value());
+    if (!unsupportedPaaResult.status.has_value())
+    {
+        return;
+    }
+    const auto & unsupportedPaaStatus = unsupportedPaaResult.status.value();
+    EXPECT_EQ(unsupportedPaaStatus.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+
     Commands::CertificateChainRequest::Type unsupportedProfile;
-    unsupportedProfile.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    unsupportedProfile.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa65);
+    unsupportedProfile.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+    unsupportedProfile.cryptoProfile.Emplace().DACCrypto = AttestationCryptoProfileEnum::kMlDsa65;
 
     auto unsupportedProfileResult = tester.Invoke(unsupportedProfile);
     ASSERT_TRUE(unsupportedProfileResult.status.has_value());
@@ -541,7 +599,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     {
         return;
     }
-    EXPECT_EQ(unsupportedProfileResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    const auto & unsupportedProfileStatus = unsupportedProfileResult.status.value();
+    EXPECT_EQ(unsupportedProfileStatus.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     Commands::CertificateChainRequest::Type outOfBoundsSegment;
     outOfBoundsSegment.certificateType = CertificateChainTypeEnum::kDACCertificate;
@@ -553,24 +612,26 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     {
         return;
     }
-    EXPECT_EQ(outOfBoundsResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    const auto & outOfBoundsStatus = outOfBoundsResult.status.value();
+    EXPECT_EQ(outOfBoundsStatus.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     // Unknown generated enum values must be rejected before profile-to-bitmap conversion.
     Commands::CertificateChainRequest::Type unknownProfile;
     unknownProfile.certificateType = CertificateChainTypeEnum::kDACCertificate;
     // The encoder rejects the sentinel itself; decoding 0xff maps it to kUnknownEnumValue.
-    unknownProfile.cryptoProfile.SetValue(static_cast<AttestationCryptoProfileEnum>(0xff));
-    auto unknownProfileResult = tester.Invoke(unknownProfile);
+    unknownProfile.cryptoProfile.Emplace().DACCrypto = static_cast<AttestationCryptoProfileEnum>(0xff);
+    auto unknownProfileResult                        = tester.Invoke(unknownProfile);
     ASSERT_TRUE(unknownProfileResult.status.has_value());
     if (!unknownProfileResult.status.has_value())
     {
         return;
     }
-    EXPECT_EQ(unknownProfileResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    const auto & unknownProfileStatus = unknownProfileResult.status.value();
+    EXPECT_EQ(unknownProfileStatus.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     Commands::CertificateChainRequest::Type unsupportedPqcProfile;
-    unsupportedPqcProfile.certificateType = CertificateChainTypeEnum::kPAICertificate;
-    unsupportedPqcProfile.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa65);
+    unsupportedPqcProfile.certificateType                   = CertificateChainTypeEnum::kPAICertificate;
+    unsupportedPqcProfile.cryptoProfile.Emplace().PAICrypto = AttestationCryptoProfileEnum::kMlDsa65;
 
     auto unsupportedPqcProfileResult = tester.Invoke(unsupportedPqcProfile);
     ASSERT_TRUE(unsupportedPqcProfileResult.status.has_value());
@@ -578,14 +639,15 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     {
         return;
     }
-    EXPECT_EQ(unsupportedPqcProfileResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    const auto & unsupportedPqcProfileStatus = unsupportedPqcProfileResult.status.value();
+    EXPECT_EQ(unsupportedPqcProfileStatus.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     // A SegmentID whose offset lands past the end of the document is a client error, not an
     // internal failure, so it has to surface as INVALID_COMMAND rather than the provider's
     // CHIP_ERROR_INVALID_ARGUMENT.
     Commands::CertificateChainRequest::Type outOfRangeSegment;
-    outOfRangeSegment.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    outOfRangeSegment.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    outOfRangeSegment.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+    outOfRangeSegment.cryptoProfile.Emplace().DACCrypto = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
     outOfRangeSegment.segmentID.SetValue(3);
 
     auto outOfRangeSegmentResult = tester.Invoke(outOfRangeSegment);
@@ -594,11 +656,12 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     {
         return;
     }
-    EXPECT_EQ(outOfRangeSegmentResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    const auto & outOfRangeSegmentStatus = outOfRangeSegmentResult.status.value();
+    EXPECT_EQ(outOfRangeSegmentStatus.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     Commands::CertificateChainRequest::Type undersizedSegmentSize;
-    undersizedSegmentSize.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    undersizedSegmentSize.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    undersizedSegmentSize.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+    undersizedSegmentSize.cryptoProfile.Emplace().DACCrypto = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
     undersizedSegmentSize.maxSegmentSize.SetValue(kDefaultCertificateSegmentSize - 1);
 
     auto undersizedSegmentSizeResult = tester.Invoke(undersizedSegmentSize);
@@ -607,15 +670,16 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     {
         return;
     }
-    EXPECT_EQ(undersizedSegmentSizeResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    const auto & undersizedSegmentStatus = undersizedSegmentSizeResult.status.value();
+    EXPECT_EQ(undersizedSegmentStatus.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     // TC-OPCREDS-3.9 step 8 requires INVALID_COMMAND above RESP_MAX, even if
     // the actual document would fit in a normal 600-byte segment.
     for (uint16_t maxSegmentSize : { static_cast<uint16_t>(kMaxCertificateSegmentSize + 1), std::numeric_limits<uint16_t>::max() })
     {
         Commands::CertificateChainRequest::Type oversizedSegmentSize;
-        oversizedSegmentSize.certificateType = CertificateChainTypeEnum::kDACCertificate;
-        oversizedSegmentSize.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+        oversizedSegmentSize.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+        oversizedSegmentSize.cryptoProfile.Emplace().DACCrypto = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
         oversizedSegmentSize.maxSegmentSize.SetValue(maxSegmentSize);
 
         auto result = tester.Invoke(oversizedSegmentSize);
@@ -624,7 +688,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
         {
             return;
         }
-        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+        const auto & status = result.status.value();
+        EXPECT_EQ(status.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
     }
 }
 
@@ -638,8 +703,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeAcceptsSegm
     for (uint16_t maxSegmentSize : { kDefaultCertificateSegmentSize, kMaxCertificateSegmentSize })
     {
         Commands::CertificateChainRequest::Type request;
-        request.certificateType = CertificateChainTypeEnum::kDACCertificate;
-        request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+        request.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+        request.cryptoProfile.Emplace().PAACrypto = AttestationCryptoProfileEnum::kMlDsa44;
         request.maxSegmentSize.SetValue(maxSegmentSize);
 
         auto result = tester.Invoke(request);
@@ -649,28 +714,174 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeAcceptsSegm
         {
             return;
         }
-        EXPECT_EQ(result.response->certificate.size(), 96u);
-        ASSERT_TRUE(result.response->totalDocumentSize.HasValue());
-        EXPECT_EQ(result.response->totalDocumentSize.Value(), 96u);
-        EXPECT_FALSE(result.response->nextSegmentID.HasValue());
+        const auto & response = result.response.value();
+        EXPECT_EQ(response.certificate.size(), 96u);
+        ASSERT_TRUE(response.totalDocumentSize.HasValue());
+        EXPECT_EQ(response.totalDocumentSize.Value(), 96u);
+        EXPECT_FALSE(response.nextSegmentID.HasValue());
     }
+}
+
+class ChainDACProvider : public TestDACProvider
+{
+public:
+    size_t calls     = 0;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    Credentials::DeviceAttestationProfileSupport GetDeviceAttestationProfileSupport() const override
+    {
+        const BitMask<AttestationCryptoProfileBitmap> issuers(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
+                                                              AttestationCryptoProfileBitmap::kSupportsMlDsa44,
+                                                              AttestationCryptoProfileBitmap::kSupportsMlDsa65);
+        return { issuers, issuers,
+                 BitMask<AttestationCryptoProfileBitmap>(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy) };
+    }
+
+    CHIP_ERROR GetDeviceAttestationDocumentSegmentForChain(Credentials::DeviceAttestationDocumentType documentType,
+                                                           const Credentials::DeviceAttestationChainProfile & chain, size_t offset,
+                                                           MutableByteSpan & buffer, size_t & totalSize) override
+    {
+        ++calls;
+        ReturnErrorOnFailure(error);
+        VerifyOrReturnError(offset < 601, CHIP_ERROR_INVALID_ARGUMENT);
+        totalSize = 601;
+        buffer.reduce_size(std::min(buffer.size(), totalSize - offset));
+        // Distinguish every tuple, document, and segment without allocating certificate fixtures.
+        memset(buffer.data(),
+               32 * to_underlying(chain.PAACrypto) + 8 * to_underlying(chain.PAICrypto) + 2 * to_underlying(documentType) +
+                   static_cast<int>(offset / 600),
+               buffer.size());
+        return CHIP_NO_ERROR;
+    }
+};
+
+TEST_F(TestOperationalCredentials, CertificateRequestsAreIndependentAndUseTheEntireTuple)
+{
+    ChainDACProvider provider;
+    OperationalCredentialsCluster cluster(kRootEndpointId,
+                                          MakeContext(BitFlags<Feature>(Feature::kPQCDeviceAttestation), &provider));
+    ClusterTester tester(cluster);
+    using Profile = AttestationCryptoProfileEnum;
+    // Request later segments first and interleave chains and document types.
+    for (uint16_t segment : std::array<uint16_t, 3>{ 1, 0, 1 })
+    {
+        for (auto paa : { Profile::kMlDsa65, Profile::kEcdsaMatterLegacy, Profile::kMlDsa44 })
+        {
+            for (auto pai : { Profile::kMlDsa65, Profile::kEcdsaMatterLegacy, Profile::kMlDsa44 })
+            {
+                for (auto type : { CertificateChainTypeEnum::kDACCertificate, CertificateChainTypeEnum::kPAICertificate })
+                {
+                    Commands::CertificateChainRequest::Type request;
+                    request.certificateType = type;
+                    auto & chain            = request.cryptoProfile.Emplace();
+                    chain.PAACrypto         = paa;
+                    chain.PAICrypto         = pai;
+                    request.segmentID.SetValue(segment);
+                    const auto calls = provider.calls;
+                    auto result      = tester.Invoke(request);
+                    if (pai > paa)
+                    {
+                        // An issuer cannot use a weaker profile than the certificate it signs.
+                        ASSERT_TRUE(result.status.has_value());
+                        if (!result.status.has_value())
+                        {
+                            return;
+                        }
+                        const auto & status = result.status.value();
+                        EXPECT_EQ(status.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+                        EXPECT_EQ(provider.calls, calls);
+                        continue;
+                    }
+                    ASSERT_TRUE(result.IsSuccess());
+                    ASSERT_TRUE(result.response.has_value());
+                    if (!result.response.has_value())
+                    {
+                        return;
+                    }
+                    const auto & response = result.response.value();
+                    EXPECT_EQ(provider.calls, calls + 1);
+                    EXPECT_EQ(response.certificate.size(), segment == 0 ? 600u : 1u);
+                    EXPECT_EQ(response.certificate[0],
+                              32 * to_underlying(paa) + 8 * to_underlying(pai) + 2 * to_underlying(type) + segment);
+                    ASSERT_TRUE(response.totalDocumentSize.HasValue());
+                    EXPECT_EQ(response.totalDocumentSize.Value(), 601u);
+                    EXPECT_EQ(response.nextSegmentID.HasValue(), segment == 0);
+                    if (segment == 0)
+                    {
+                        EXPECT_EQ(response.nextSegmentID.Value(), 1u);
+                    }
+                }
+            }
+        }
+    }
+}
+
+TEST_F(TestOperationalCredentials, CertificateRequestRejectsInvalidFieldsAndMissingChains)
+{
+    ChainDACProvider provider;
+    OperationalCredentialsCluster cluster(kRootEndpointId,
+                                          MakeContext(BitFlags<Feature>(Feature::kPQCDeviceAttestation), &provider));
+    ClusterTester tester(cluster);
+    using Profile = AttestationCryptoProfileEnum;
+    for (unsigned field = 0; field < 3; ++field)
+    {
+        Commands::CertificateChainRequest::Type request;
+        request.certificateType = CertificateChainTypeEnum::kDACCertificate;
+        auto & chain            = request.cryptoProfile.Emplace();
+        Profile * fields[]      = { &chain.PAACrypto, &chain.PAICrypto, &chain.DACCrypto };
+        *fields[field]          = static_cast<Profile>(0xff);
+        auto result             = tester.Invoke(request);
+        ASSERT_TRUE(result.status.has_value());
+        if (!result.status.has_value())
+        {
+            return;
+        }
+        const auto & status = result.status.value();
+        EXPECT_EQ(status.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+        EXPECT_EQ(provider.calls, 0u);
+    }
+    Commands::CertificateChainRequest::Type request;
+    request.certificateType = CertificateChainTypeEnum::kPAICertificate;
+    auto & chain            = request.cryptoProfile.Emplace();
+    chain.PAACrypto         = Profile::kMlDsa65;
+    chain.PAICrypto         = Profile::kMlDsa44;
+    // SegmentID is constrained to at most 100, independent of provider document bounds.
+    request.segmentID.SetValue(101);
+    auto invalidSegment = tester.Invoke(request);
+    ASSERT_TRUE(invalidSegment.status.has_value());
+    if (!invalidSegment.status.has_value())
+    {
+        return;
+    }
+    const auto & invalidSegmentStatus = invalidSegment.status.value();
+    EXPECT_EQ(invalidSegmentStatus.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    EXPECT_EQ(provider.calls, 0u);
+    request.segmentID.ClearValue();
+    provider.error = CHIP_ERROR_NOT_FOUND;
+    auto missing   = tester.Invoke(request);
+    ASSERT_TRUE(missing.status.has_value());
+    if (!missing.status.has_value())
+    {
+        return;
+    }
+    const auto & missingStatus = missing.status.value();
+    EXPECT_EQ(missingStatus.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    EXPECT_FALSE(missing.response.has_value());
+    EXPECT_EQ(provider.calls, 1u);
+    provider.error = CHIP_ERROR_INTERNAL;
+    auto failed    = tester.Invoke(request);
+    ASSERT_TRUE(failed.status.has_value());
+    if (!failed.status.has_value())
+    {
+        return;
+    }
+    const auto & failedStatus = failed.status.value();
+    EXPECT_EQ(failedStatus.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Failure);
 }
 
 TEST_F(TestOperationalCredentials, TestSetCSRVendorReserved)
 {
-    OperationalCredentialsCluster::Context context = {
-        .fabricTable                = Server::GetInstance().GetFabricTable(),
-        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
-        .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
-        .dnssdServer                = app::DnssdServer::Instance(),
-        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-        .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
-        .groupDataProvider          = *Server::GetInstance().GetGroupDataProvider(),
-        .accessControl              = Access::GetAccessControl(),
-        .platformManager            = DeviceLayer::PlatformMgr(),
-        .eventManagement            = EventManagement::GetInstance(),
-    };
-    OperationalCredentialsCluster cluster(kRootEndpointId, context);
+    OperationalCredentialsCluster cluster(kRootEndpointId, MakeContext());
 
     using Field = OperationalCredentialsCluster::CSRVendorReservedField;
     const uint8_t payload[]{ 0xAA, 0xBB, 0xCC };

@@ -23,7 +23,9 @@ namespace Attributes {
 
 namespace GroupKeyMap {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(GroupKeyMap::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(GroupKeyMap::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kChangesOmitted),
                    Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace GroupKeyMap
 namespace GroupTable {
@@ -32,12 +34,14 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace GroupTable
 namespace MaxGroupsPerFabric {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxGroupsPerFabric::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxGroupsPerFabric::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxGroupsPerFabric
 namespace MaxGroupKeysPerFabric {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxGroupKeysPerFabric::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxGroupKeysPerFabric::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxGroupKeysPerFabric
 constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
     GroupKeyMap::kMetadataEntry,

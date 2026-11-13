@@ -125,6 +125,10 @@ void InitIdentifyCluster()
 #include <smoke-co-alarm/chef-smoke-co-alarm.h>
 #endif // MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
+#if MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/thermostat/CodegenIntegration.h"
+#endif // MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -777,9 +781,85 @@ void WaterHeaterInit()
     delegate.SetEndpointId(1);
     static WaterHeaterManagement::Instance instance(
         1, delegate,
-        WaterHeaterManagement::Feature(to_underlying(WaterHeaterManagement::Feature::kTankPercent) |
-                                       to_underlying(WaterHeaterManagement::Feature::kEnergyManagement)));
+        BitMask<WaterHeaterManagement::Feature>(WaterHeaterManagement::Feature::kTankPercent,
+                                                WaterHeaterManagement::Feature::kEnergyManagement));
     VerifyOrDieWithMsg(instance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterManagement instance.");
+    VerifyOrDieWithMsg(Thermostat::Chef::InitThermostatClusterOnEndpoint(1) == CHIP_NO_ERROR, Zcl,
+                       "Failed to initialise Thermostat cluster.");
+#endif
+}
+
+/**
+ * This initializer is for the room air conditioner application rootnode_roomairconditioner_9cf3607804.
+ */
+void RoomAirConditionerInit()
+{
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_roomairconditioner_9cf3607804"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: RoomAirConditionerInit called more than once");
+    called = true;
+
+#if MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kRoomAirConditionerDeviceTypeId))
+    {
+        VerifyOrDieWithMsg(Thermostat::Chef::InitThermostatClusterOnEndpoint(1) == CHIP_NO_ERROR, Zcl,
+                           "Failed to initialise Thermostat cluster.");
+    }
+#endif
+}
+
+/**
+ * This initializer is for the thermostat application rootnode_thermostat_bm3fb8dhYi.
+ */
+void ThermostatInit()
+{
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_thermostat_bm3fb8dhYi"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: ThermostatInit called more than once");
+    called = true;
+
+#if MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kThermostatDeviceTypeId))
+    {
+        VerifyOrDieWithMsg(Thermostat::Chef::InitThermostatClusterOnEndpoint(1) == CHIP_NO_ERROR, Zcl,
+                           "Failed to initialise Thermostat cluster.");
+    }
+#endif
+}
+
+/**
+ * This initializer is for the air purifier application
+ * rootnode_airpurifier_airqualitysensor_temperaturesensor_humiditysensor_thermostat_56de3d5f45.
+ */
+void AirPurifierInit()
+{
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME,
+               "rootnode_airpurifier_airqualitysensor_temperaturesensor_humiditysensor_thermostat_56de3d5f45"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: AirPurifierInit called more than once");
+    called = true;
+
+#if MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(5, Device::kThermostatDeviceTypeId))
+    {
+        VerifyOrDieWithMsg(Thermostat::Chef::InitThermostatClusterOnEndpoint(5) == CHIP_NO_ERROR, Zcl,
+                           "Failed to initialise Thermostat cluster.");
+    }
 #endif
 }
 
@@ -876,6 +956,9 @@ void ApplicationInit()
     LaundryDryerInit();
     CastingvideoplayerContentappInit();
     WaterHeaterInit();
+    RoomAirConditionerInit();
+    ThermostatInit();
+    AirPurifierInit();
     ChimeInit();
     SmokeCoAlarmInit();
     InitModeSelect();

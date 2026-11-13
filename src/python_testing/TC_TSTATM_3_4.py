@@ -63,7 +63,7 @@ class TC_TSTATM_3_4(MatterTestCommissionedDevice):
 
     def steps_TC_TSTATM_3_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute",
                      "Verify that the DUT response contains a list of ModeOptionsStruct entries: "
                      "Verify that the list has two or more entries "

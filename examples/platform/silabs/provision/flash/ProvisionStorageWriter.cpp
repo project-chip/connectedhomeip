@@ -19,9 +19,11 @@
 #include <lib/support/CodeUtils.h>
 #include <provision/ProvisionStorageWriter.h>
 #include <provision/flash/ProvisionStorageFlash.h>
+
 #if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif
+
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {

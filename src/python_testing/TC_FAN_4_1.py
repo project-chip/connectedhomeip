@@ -106,7 +106,7 @@ class TC_FAN_4_1(MatterTestCommissionedDevice):
                 ]
 
     def steps_TC_FAN_4_1(self):
-        steps = [TestStep(1, "TH Commissions DUT.", is_commissioning=True),
+        steps = [TestStep(1, "TH Commissions DUT."),
                  TestStep(2, "TH subscribes to the Fan control cluster", "SUCCESS"),
                  TestStep(3, "TH reads the supported fan modes", "SUCCESS"),
                  TestStep(4, "If SPD is supported, TH reads SpeedMax", "SUCCESS"),
