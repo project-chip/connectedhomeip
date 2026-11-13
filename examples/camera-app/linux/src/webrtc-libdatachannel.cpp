@@ -376,11 +376,18 @@ public:
 
         std::vector<rtc::Candidate> heldCandidates;
         heldCandidates.swap(mHeldRemoteCandidates);
-        if (!heldCandidates.empty())
+        if (heldCandidates.empty())
         {
-            ChipLogProgress(Camera, "Applying %zu remote candidate(s) held until the remote description was set",
-                            heldCandidates.size());
+            return;
         }
+        if (!HasRemoteDescription())
+        {
+            ChipLogError(Camera, "No remote description (peer connection closed); dropping %zu held remote candidate(s)",
+                         heldCandidates.size());
+            return;
+        }
+        ChipLogProgress(Camera, "Applying %zu remote candidate(s) held until the remote description was set",
+                        heldCandidates.size());
         for (auto & candidate : heldCandidates)
         {
             mPeerConnection->addRemoteCandidate(std::move(candidate));
