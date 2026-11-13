@@ -51,18 +51,21 @@ log = logging.getLogger(__name__)
 
 
 def sdp_without_candidates(sdp: str) -> str:
-    """Returns the SDP without its candidate lines, so the DUT learns the candidates only from ProvideICECandidates."""
+    """Returns the SDP without its candidate lines, so the other side learns no candidates from it."""
     lines = sdp.splitlines()
     kept = [line for line in lines if not line.startswith(("a=candidate:", "a=end-of-candidates"))]
     return "\r\n".join(kept) + "\r\n"
 
 
 class TestWebRTCProviderEarlyICECandidates(MatterTestCommissionedDevice, WebRTCTestHelper):
-    """Checks that a WebRTC Transport Provider accepts ICE candidates that arrive before the SDP Answer.
+    """Checks that a WebRTC Transport Provider applies ICE candidates that arrive before the SDP Answer.
 
     In the SolicitOffer flow, a Requestor using trickle ICE can send ProvideICECandidates before ProvideAnswer.
     ProvideICECandidates and ProvideAnswer fail only with NOT_FOUND (unknown session or other peer), so the DUT
     has to accept both, apply the early candidates once the Answer is set, and establish the session.
+
+    The TH never uses the DUT's candidates, so only the DUT can start ICE connectivity checks, and it can reach
+    the TH only through the early candidates. The session connects only if the DUT applied them.
     """
 
     @property
@@ -80,6 +83,8 @@ class TestWebRTCProviderEarlyICECandidates(MatterTestCommissionedDevice, WebRTCT
         webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
         )
+        # The DUT's ICECandidates commands are still received, but their candidates are not applied.
+        webrtc_peer.set_remote_ice_candidates = lambda remote_candidates: None
 
         current_sessions = await self.read_single_attribute_check_success(
             cluster=WebRTCTransportProvider, attribute=WebRTCTransportProvider.Attributes.CurrentSessions, endpoint=endpoint
@@ -103,7 +108,7 @@ class TestWebRTCProviderEarlyICECandidates(MatterTestCommissionedDevice, WebRTCT
 
         offer_session_id, remote_offer_sdp = await webrtc_peer.get_remote_offer(timeout_s=30)
         asserts.assert_equal(offer_session_id, session_id, "Offer has the wrong session ID")
-        webrtc_peer.set_remote_offer(remote_offer_sdp)
+        webrtc_peer.set_remote_offer(sdp_without_candidates(remote_offer_sdp))
 
         local_candidates = await webrtc_peer.get_local_ice_candidates()
         asserts.assert_true(len(local_candidates) > 0, "The TH gathered no ICE candidates")
@@ -126,7 +131,14 @@ class TestWebRTCProviderEarlyICECandidates(MatterTestCommissionedDevice, WebRTCT
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
 
-        asserts.assert_true(await webrtc_peer.check_for_session_establishment(), "The WebRTC session was not established")
+        try:
+            established = await webrtc_peer.check_for_session_establishment()
+        except TimeoutError:
+            established = False
+        asserts.assert_true(
+            established,
+            "The WebRTC session was not established: the DUT did not apply the ICE candidates sent before the Answer",
+        )
 
         await self.send_single_cmd(
             cmd=WebRTCTransportProvider.Commands.EndSession(
