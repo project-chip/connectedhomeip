@@ -24,16 +24,19 @@ import copy
 import inspect
 import logging
 import time
+import types
+import typing
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Any, get_args
 
-from mobly import asserts
+from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.clusters.Attribute import AttributePath, TypedAttributePath, ValueDecodeFailure
+from matter.clusters.Attribute import AttributePath, SubscriptionTransaction, TypedAttributePath, ValueDecodeFailure
 from matter.clusters.enum import MatterIntEnum
 from matter.clusters.Types import Nullable, NullValue
 from matter.exceptions import ChipStackError
@@ -41,11 +44,11 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision, is_disallowed, is_obsolete
-from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler, WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                  is_standard_command_id)
 from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
-from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
+from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, EventPathLocation, ProblemLocation
 from matter.testing.spec_parsing import ConstraintReference, Constraints, XmlCluster, XmlDataTypeComponent
 from matter.tlv import uint
 
@@ -77,6 +80,33 @@ class ConstraintProbeResult:
     def probed(self) -> int:
         """Number of violating values the DUT actually answered."""
         return self.rejected + self.accepted + self.other_error
+
+
+class FabricCheckOutcome(StrEnum):
+    """How much one fabric check on one path actually established.
+
+    The distinction that matters is between the last two. A check that did not
+    apply says the DUT is compliant by construction; a check that was not
+    exercised says nothing at all, and a run full of those looks identical to a
+    clean one unless it is reported.
+    """
+    VERIFIED = 'verified'
+    NOT_APPLICABLE = 'not applicable'
+    NOT_EXERCISED = 'not exercised'
+
+
+FabricCheckLocation = AttributePathLocation | EventPathLocation
+
+
+@dataclass(frozen=True)
+class FabricCheckRecord:
+    """One check against one path, and what came of it."""
+    path: str
+    check: str
+    outcome: FabricCheckOutcome
+    location: FabricCheckLocation
+    # Why, for anything that is not VERIFIED.
+    reason: str = ''
 
 
 @dataclass
@@ -130,6 +160,84 @@ class CommandFieldInfo:
     @property
     def path_str(self) -> str:
         return f"EP{self.endpoint_id} {self.cluster_name}.{self.command_name}.{self.field.name}"
+
+
+@dataclass
+class FabricScopedAttributeInfo:
+    """Describes a single fabric-scoped list attribute discovered on the DUT.
+
+    Aggregates the cluster/attribute identity, the generated Python classes used to
+    read and write it, and the spec-parsed set of fabric-sensitive fields that must
+    be omitted from entries belonging to another fabric.
+    """
+    endpoint_id: int
+    cluster_id: int
+    cluster_name: str
+    attribute_id: int
+    attribute_name: str
+    attribute: type[ClusterObjects.ClusterAttributeDescriptor]
+    cluster_class: type[ClusterObjects.Cluster]
+    # The list's entry type, or None when the attribute is not a list of structs.
+    struct_class: type[ClusterObjects.ClusterObject] | None
+    # Field IDs of the entry struct the spec marks fabric sensitive, which are also
+    # the fields' TLV tags. Empty when no field is marked.
+    fabric_sensitive_tags: frozenset[int]
+    # The spec marks the attribute itself fabric sensitive, so it is always read as a
+    # fabric-filtered list: the other fabric's entries are withheld, not masked.
+    whole_entry_sensitive: bool
+    # Write access per the spec XML, independent of whether a sweep may write it.
+    writable: bool
+    # Listed in FABRIC_WRITE_DENIED_ATTRIBUTES. Kept apart from `writable` so a report
+    # can say "deliberately excluded" rather than "read-only" for Acl, NOCs and friends.
+    write_denied: bool
+    # The generated entry struct has a FabricIndex field. Without one, a decoded entry
+    # cannot be attributed to a fabric, so only a populator's marker can identify it.
+    has_fabric_index_field: bool
+
+    @property
+    def path_str(self) -> str:
+        return f"EP{self.endpoint_id} {self.cluster_name}.{self.attribute_name}"
+
+    @property
+    def fabric_sensitive_labels(self) -> list[str]:
+        """Generated field labels of fabric_sensitive_tags, for messages."""
+        descriptor = getattr(self.struct_class, 'descriptor', None)
+        labels = {f.Tag: f.Label for f in descriptor.Fields} if descriptor is not None else {}
+        return [labels.get(tag, str(tag)) for tag in sorted(self.fabric_sensitive_tags)]
+
+
+@dataclass
+class FabricSensitiveEventInfo:
+    """Describes a single fabric-sensitive event discovered on the DUT."""
+    endpoint_id: int
+    cluster_id: int
+    cluster_name: str
+    event_id: int
+    event_name: str
+    event: type[ClusterObjects.ClusterEvent]
+    # The generated event has a FabricIndex field, which the steps use to tell which
+    # fabric a delivered event belongs to.
+    has_fabric_index_field: bool
+
+    @property
+    def path_str(self) -> str:
+        return f"EP{self.endpoint_id} {self.cluster_name}.{self.event_name}"
+
+
+FabricEntryUndo = Callable[[], Awaitable[None]]
+FabricEntryMatch = Callable[[object], bool]
+FabricEntryPopulator = Callable[[FabricScopedAttributeInfo, ChipDeviceCtrl], Awaitable[bool]]
+
+
+def unsuccessful_write_statuses(result) -> list[str]:
+    """Status names from an attribute write that were not Success.
+
+    A list write returns one status per list operation. Status is an IntEnum,
+    which formats as a bare number under Python 3.11, so the name is what a
+    failure message can actually be read from.
+    """
+    return [str(getattr(entry.Status, 'name', entry.Status))
+            for entry in result if entry.Status != Status.Success]
 
 
 @dataclass
@@ -389,6 +497,74 @@ def _encodable_numeric_range(datatype: str, is_nullable: bool) -> tuple[int, int
     return type_min, type_max
 
 
+# TLV tag of the FabricIndex field carried by every fabric-scoped struct.
+FABRIC_INDEX_TAG = 254
+
+# Octstr of length 2 holding valid TLV (an empty TLV structure): the smallest value the
+# AccessControl cluster accepts for an Extension entry. Defined as D_OK_EMPTY in the
+# AccessControl test plan and used here to write a fabric-scoped entry harmlessly.
+D_OK_EMPTY = bytes.fromhex('1718')
+
+# Values used to give a fabric an entry in an attribute owned by its cluster's command
+# set, so the cross-fabric masking assertions have something to check. Chosen to be
+# inert: a TLS endpoint that is never connected to, and a group and key set whose ids
+# no other test state refers to.
+POPULATE_TLS_HOSTNAME = b"idm81.example.com"
+POPULATE_TLS_PORT = 443
+POPULATE_GROUP_ID = 0x8101
+POPULATE_GROUP_KEY_SET_ID = 0x8102
+# Kept apart from POPULATE_GROUP_ID: Groups and Groupcast share one group table, so a
+# shared id would let one populator's cleanup remove the other's group.
+POPULATE_GROUPCAST_GROUP_ID = 0x8103
+# Epoch keys are a fixed 16 octets. The first octet is varied per key below so the
+# three keys of the set differ, which the cluster requires.
+POPULATE_EPOCH_KEY = b"\x81" * 16
+POPULATE_EPOCH_START_TIME = 2220000
+# A message id is a fixed 16 octets. The first eight mark the entry as this test's and
+# the last eight carry the presenting controller's node id: Messages is one list on the
+# node rather than one per fabric, so two fabrics presenting the same id would be
+# indistinguishable from a single duplicate presentation.
+POPULATE_MESSAGE_ID_PREFIX = b"\x81\x08\x01\x00\x00\x00\x00\x00"
+POPULATE_MESSAGE_TEXT = "TC-IDM-8.1 fabric isolation probe"
+
+# Fabric-scoped attributes that must never be written by a device-wide fabric sweep.
+# Writing these either removes the controller's own access, rewrites credentials, or
+# fights the cluster's command-driven state machine.
+FABRIC_WRITE_DENIED_ATTRIBUTES: frozenset[tuple[int, int]] = frozenset({
+    # Writing the ACL can strip the test harness of its own Administer privilege.
+    # TC-IDM-8.1 step 2 writes it under controlled conditions instead, appending to
+    # the existing list so the harness keeps its access.
+    (Clusters.AccessControl.id, Clusters.AccessControl.Attributes.Acl.attribute_id),
+    # Credentials: writes are rejected, and the entries are owned by the
+    # OperationalCredentials command set (UpdateNOC / AddNOC / RemoveFabric).
+    (Clusters.OperationalCredentials.id, Clusters.OperationalCredentials.Attributes.NOCs.attribute_id),
+    (Clusters.OperationalCredentials.id, Clusters.OperationalCredentials.Attributes.Fabrics.attribute_id),
+    # Group state is owned by KeySetWrite / AddGroup and friends; a direct write would
+    # desynchronize the group key table from the group table.
+    (Clusters.GroupKeyManagement.id, Clusters.GroupKeyManagement.Attributes.GroupTable.attribute_id),
+    (Clusters.GroupKeyManagement.id, Clusters.GroupKeyManagement.Attributes.GroupKeyMap.attribute_id),
+    # Owned by RegisterClient / UnregisterClient.
+    (Clusters.IcdManagement.id, Clusters.IcdManagement.Attributes.RegisteredClients.attribute_id),
+    # Owned by the Scenes Management command set.
+    (Clusters.ScenesManagement.id, Clusters.ScenesManagement.Attributes.FabricSceneInfo.attribute_id),
+})
+
+# Writable fabric-scoped attributes that the SDK's example apps do not report after a
+# write, because of a known SDK bug. Under PICS_SDK_CI_ONLY the sweep skips their write
+# and report check entirely; the fabric-filtered read is still verified. Any other run
+# writes them and requires the report, so a DUT with the same bug fails.
+FABRIC_REPORT_DENIED_ATTRIBUTES: frozenset[tuple[int, int]] = frozenset({
+    # TODO: Remove once the missing notification in the code-driven Binding cluster is
+    # fixed. src/app/clusters/bindings/BindingCluster.cpp updates the binding table and
+    # notifies the application through NotifyBindingsChanged, but never calls
+    # NotifyAttributeChanged for Binding::Attributes::Binding, so a subscription to the
+    # attribute receives no report after a successful write. DefaultServerCluster
+    # requires each cluster to raise that notification itself (see the contract in
+    # src/app/server-cluster/ServerClusterExtension.h), which comparable code-driven
+    # clusters such as access-control-server do.
+    # Link to issue filed: https://github.com/project-chip/connectedhomeip/issues/73882
+    (Clusters.Binding.id, Clusters.Binding.Attributes.Binding.attribute_id),
+})
 # Largest value certainly encodable in any enum's underlying type: enum8 is the
 # narrowest, and a nullable enum8 reserves 0xFF for null. A violating value above this
 # could not be carried by an enum8 attribute, so none is generated past it.
@@ -541,6 +717,56 @@ def undefined_enum_values(enum_type: type[MatterIntEnum], spec_values: frozenset
 # ============================================================================
 
 
+def fabric_scoped_entry_type(attribute: type[ClusterObjects.ClusterAttributeDescriptor]) -> type | None:
+    """Return the entry type of a list attribute, unwrapping nullable/optional wrappers.
+
+    Returns None when the attribute is not a list, so callers can distinguish a
+    list-of-structs attribute (the only shape fabric scoping applies to) from a
+    scalar one.
+    """
+    def unwrap(annotation) -> type | None:
+        origin = typing.get_origin(annotation)
+        if origin is list:
+            args = get_args(annotation)
+            return args[0] if args else None
+        # typing.Optional[...] and typing.Union[Nullable, ...] both land here.
+        if origin is typing.Union or origin is types.UnionType:
+            for arg in get_args(annotation):
+                entry = unwrap(arg)
+                if entry is not None:
+                    return entry
+        return None
+
+    return unwrap(attribute.attribute_type.Type)
+
+
+def struct_is_fabric_scoped(struct_type: type | None) -> bool:
+    """True if the generated struct carries a FabricIndex field, i.e. it is fabric scoped."""
+    descriptor = getattr(struct_type, 'descriptor', None)
+    if descriptor is None:
+        return False
+    return any(f.Tag == FABRIC_INDEX_TAG and f.Label == 'fabricIndex' for f in descriptor.Fields)
+
+
+def fabric_sensitive_field_tags(xml_struct: Any | None) -> frozenset[int]:
+    """The spec's fabric-sensitive field IDs of a struct, which are also their TLV tags.
+
+    Returns an empty set when the spec XML has no entry for the struct, which callers
+    treat as "nothing to check" rather than as a failure.
+    """
+    if xml_struct is None:
+        return frozenset()
+    return frozenset(int(component.value) for component in xml_struct.components.values()
+                     if component.fabric_sensitive)
+
+
+def tlv_fabric_index(entry: Any) -> int | None:
+    """The FabricIndex field of a raw TLV list entry, or None if it carries none."""
+    if not isinstance(entry, dict):
+        return None
+    return entry.get(FABRIC_INDEX_TAG)
+
+
 def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.ClusterCommand]:
     """Get all commands for a given cluster ID.
 
@@ -587,6 +813,12 @@ class IDMBaseTest(BasicCompositionTests):
     """Base test class for IDM tests with shared functionality."""
 
     ROOT_NODE_ENDPOINT_ID = 0
+
+    def setup_test(self):
+        super().setup_test()
+        self.fabric_check_records: list[FabricCheckRecord] = []
+        self.fabric_entry_cleanups: list[tuple[str, FabricEntryUndo]] = []
+        self.fabric_entry_markers: dict[tuple[str, int], FabricEntryMatch] = {}
 
     # ========================================================================
     # Descriptor and Cluster Reading Utilities
@@ -1685,6 +1917,766 @@ class IDMBaseTest(BasicCompositionTests):
             checkable_attrs.append(attr_id)
 
         return checkable_attrs
+
+    def attribute_is_writable(self, endpoint_id: int, cluster_id: int, attribute_id: int) -> bool:
+        """Whether the DUT exposes the attribute and the spec grants write access to it.
+
+        Same gate the TC-IDM-9.1 sweep and get_writable_attributes_for_cluster apply,
+        narrowed to one attribute: it must be in the endpoint's AttributeList and its
+        spec XML entry must carry a write privilege. Callers that write one known
+        attribute use this to tell a DUT that rejected a legal write from a write that
+        was never legal, e.g. Extension on a DUT without the EXTS feature.
+        """
+        cluster_data = self.endpoints_tlv.get(endpoint_id, {}).get(cluster_id)
+        if cluster_data is None:
+            return False
+        if attribute_id not in cluster_data.get(GlobalAttributeIds.ATTRIBUTE_LIST_ID, []):
+            return False
+
+        xml_cluster = self.xml_clusters.get(cluster_id)
+        xml_attribute = xml_cluster.attributes.get(attribute_id) if xml_cluster else None
+        return xml_attribute is not None and \
+            xml_attribute.write_access != Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
+
+    # ========================================================================
+    # Fabric-Scoped Data Discovery (TC-IDM-8.1)
+    # ========================================================================
+
+    def discover_fabric_scoped_attributes(self) -> list[FabricScopedAttributeInfo]:
+        """Discover every attribute on the DUT that the spec defines as a fabric-scoped list.
+
+        Walks the wildcard-read composition (endpoints_tlv) and keeps an attribute when
+        the spec XML marks its <access> element fabricScoped or fabricSensitive (a
+        fabric-sensitive attribute is a fabric-scoped list by definition), or marks
+        its entry struct fabricScoped. The generated code is not consulted to decide
+        what is fabric scoped; it only says whether a decoded entry carries a
+        FabricIndex, recorded as has_fabric_index_field.
+        """
+        infos: list[FabricScopedAttributeInfo] = []
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster_data in endpoint.items():
+                if not is_standard_cluster_id(cluster_id):
+                    continue
+                xml_cluster = self.xml_clusters.get(cluster_id)
+                if xml_cluster is None or cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
+                    continue
+
+                cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
+                for attribute_id in cluster_data.get(GlobalAttributeIds.ATTRIBUTE_LIST_ID, []):
+                    if not is_standard_attribute_id(attribute_id):
+                        continue
+                    xml_attribute = xml_cluster.attributes.get(attribute_id)
+                    attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id].get(attribute_id)
+                    if xml_attribute is None or attribute is None:
+                        continue
+
+                    struct_class = fabric_scoped_entry_type(attribute)
+                    xml_struct = xml_cluster.structs.get(struct_class.__name__) if struct_class is not None else None
+                    if not (xml_attribute.fabric_scoped or xml_attribute.fabric_sensitive
+                            or (xml_struct is not None and xml_struct.fabric_scoped)):
+                        continue
+
+                    infos.append(FabricScopedAttributeInfo(
+                        endpoint_id=endpoint_id,
+                        cluster_id=cluster_id,
+                        cluster_name=xml_cluster.name,
+                        attribute_id=attribute_id,
+                        attribute_name=attribute.__name__,
+                        attribute=attribute,
+                        cluster_class=cluster_class,
+                        struct_class=struct_class,
+                        fabric_sensitive_tags=fabric_sensitive_field_tags(xml_struct),
+                        whole_entry_sensitive=xml_attribute.fabric_sensitive,
+                        writable=self.attribute_is_writable(endpoint_id, cluster_id, attribute_id),
+                        write_denied=(cluster_id, attribute_id) in FABRIC_WRITE_DENIED_ATTRIBUTES,
+                        has_fabric_index_field=struct_is_fabric_scoped(struct_class),
+                    ))
+        return infos
+
+    def discover_fabric_sensitive_events(self) -> list[FabricSensitiveEventInfo]:
+        """Discover every event the spec marks fabric sensitive on the DUT's clusters.
+
+        A DUT does not list the events it supports, so the candidates are the spec
+        XML's events for each cluster on the DUT whose conformance the cluster's
+        FeatureMap, AttributeList and command lists do not rule out. An optional
+        event may still be unsupported; the steps report an event that never
+        occurred as not exercised.
+        """
+        infos: list[FabricSensitiveEventInfo] = []
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster_data in endpoint.items():
+                if not is_standard_cluster_id(cluster_id):
+                    continue
+                xml_cluster = self.xml_clusters.get(cluster_id)
+                if xml_cluster is None or cluster_id not in Clusters.ClusterObjects.ALL_EVENTS:
+                    continue
+
+                conformance_data = ConformanceAssessmentData(
+                    feature_map=cluster_data.get(GlobalAttributeIds.FEATURE_MAP_ID, 0),
+                    attribute_list=cluster_data.get(GlobalAttributeIds.ATTRIBUTE_LIST_ID, []),
+                    all_command_list=(cluster_data.get(GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID, [])
+                                      + cluster_data.get(GlobalAttributeIds.GENERATED_COMMAND_LIST_ID, [])),
+                    cluster_revision=cluster_data.get(GlobalAttributeIds.CLUSTER_REVISION_ID, 0))
+                for event_id, xml_event in xml_cluster.events.items():
+                    if not xml_event.fabric_sensitive:
+                        continue
+                    decision = xml_event.conformance(conformance_data).decision
+                    if decision in (ConformanceDecision.NOT_APPLICABLE, ConformanceDecision.DISALLOWED):
+                        continue
+                    event = Clusters.ClusterObjects.ALL_EVENTS[cluster_id].get(event_id)
+                    if event is None:
+                        continue
+
+                    infos.append(FabricSensitiveEventInfo(
+                        endpoint_id=endpoint_id,
+                        cluster_id=cluster_id,
+                        cluster_name=xml_cluster.name,
+                        event_id=event_id,
+                        event_name=event.__name__,
+                        event=event,
+                        has_fabric_index_field=any(f.Tag == FABRIC_INDEX_TAG for f in event.descriptor.Fields),
+                    ))
+        return infos
+
+    def record_fabric_metadata_disagreements(self, attribute_infos: list[FabricScopedAttributeInfo],
+                                             event_infos: list[FabricSensitiveEventInfo]) -> None:
+        """Record a note for every element whose generated class has no FabricIndex field.
+
+        The spec defines the element as fabric scoped, so the DUT has to treat it
+        that way, but the decoded data carries no FabricIndex to tell the fabrics'
+        entries apart. The checks that rely on one are then not exercised, and the
+        note says why. The SDK side of the gap is caught without a device by
+        TestFabricMetadataConsistency.
+        """
+        test_name = self.current_test_info.name
+        for info in attribute_infos:
+            if info.has_fabric_index_field:
+                continue
+            self.record_note(test_name=test_name,
+                             location=AttributePathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+                                                            attribute_id=info.attribute_id),
+                             problem=(f"{info.path_str} is marked fabric scoped in the spec XML but the generated "
+                                      f"struct {info.struct_class.__name__ if info.struct_class else '<not a list>'} "
+                                      "has no FabricIndex field"))
+
+        for event_info in event_infos:
+            if event_info.has_fabric_index_field:
+                continue
+            self.record_note(test_name=test_name,
+                             location=EventPathLocation(endpoint_id=event_info.endpoint_id,
+                                                        cluster_id=event_info.cluster_id,
+                                                        event_id=event_info.event_id),
+                             problem=(f"{event_info.path_str} is marked fabric sensitive in the spec XML but the "
+                                      "generated event has no FabricIndex field"))
+
+    def assert_other_fabric_entries_masked(self, info: FabricScopedAttributeInfo, tlv_entries: Any,
+                                           own_fabric_index: int) -> int:
+        """Assert entries from other fabrics carry no fabric-sensitive field.
+
+        The spec requires the fabric-sensitive fields of an entry belonging to another
+        fabric to be omitted from the report. A decoded entry fills an omitted field
+        with its default, so the check is made on the raw TLV of the read
+        (read_fabric_scoped_attribute_tlv), where an omitted field is an absent tag.
+        Returns the number of cross-fabric entries checked, which lets the caller
+        distinguish "verified" from "nothing to verify".
+        """
+        if not info.fabric_sensitive_tags or not isinstance(tlv_entries, list):
+            return 0
+
+        checked = 0
+        for entry in tlv_entries:
+            entry_fabric_index = tlv_fabric_index(entry)
+            if entry_fabric_index is None or entry_fabric_index == own_fabric_index:
+                continue
+            checked += 1
+            present = sorted(tag for tag in info.fabric_sensitive_tags if tag in entry)
+            asserts.assert_equal(
+                present, [],
+                f"{info.path_str}: the entry for fabric {entry_fabric_index} read from fabric {own_fabric_index} "
+                f"carries fabric-sensitive field tag(s) {present}; the spec requires them to be omitted")
+        return checked
+
+    def assert_other_fabrics_withheld(self, info: FabricScopedAttributeInfo, tlv_entries: Any,
+                                      own_fabric_index: int, reader_name: str) -> None:
+        """Assert an unfiltered read of a fabric-sensitive attribute still hides other fabrics.
+
+        An attribute the spec marks fabric sensitive is always read as a
+        fabric-filtered list, whatever the request asked for, so an entry
+        belonging to another fabric must be absent from the raw TLV of the read.
+        """
+        if not isinstance(tlv_entries, list):
+            return
+        foreign = [e for e in tlv_entries if tlv_fabric_index(e) not in (None, own_fabric_index)]
+        asserts.assert_equal(len(foreign), 0,
+                             f"{info.path_str}: the spec marks this attribute fabric sensitive, so "
+                             f"{reader_name}'s unfiltered read must not return the {len(foreign)} entry/entries "
+                             f"belonging to another fabric")
+
+    def assert_filtered_read_is_own_fabric_only(self, info: FabricScopedAttributeInfo, entries: list | Nullable,
+                                                own_fabric_index: int, reader_name: str) -> None:
+        """Assert a fabric-filtered read returned no entries belonging to another fabric."""
+        if not isinstance(entries, list):
+            return
+        foreign = [e for e in entries if getattr(e, 'fabricIndex', own_fabric_index) != own_fabric_index]
+        asserts.assert_equal(foreign, [],
+                             f"{info.path_str}: {reader_name}'s fabric-filtered read returned "
+                             f"{len(foreign)} entry/entries belonging to another fabric")
+
+    async def read_current_fabric_index(self, dev_ctrl: ChipDeviceCtrl) -> int:
+        """Read CurrentFabricIndex, i.e. the fabric index the given controller is on."""
+        return await self.read_single_attribute_check_success(
+            dev_ctrl=dev_ctrl, endpoint=self.ROOT_NODE_ENDPOINT_ID, cluster=Clusters.OperationalCredentials,
+            attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+
+    async def read_fabric_scoped_attribute(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl,
+                                           fabric_filtered: bool) -> list | Nullable:
+        """Read a discovered fabric-scoped attribute from one controller's fabric."""
+        return await self.read_single_attribute_check_success(
+            dev_ctrl=dev_ctrl, endpoint=info.endpoint_id, cluster=info.cluster_class,
+            attribute=info.attribute, fabric_filtered=fabric_filtered)
+
+    async def read_fabric_scoped_attribute_tlv(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl,
+                                               fabric_filtered: bool) -> Any:
+        """Read a discovered fabric-scoped attribute as raw TLV, failing on an error status.
+
+        A list comes back as a list of dicts keyed by field tag, so a field the DUT
+        omitted is an absent key rather than a default value.
+        """
+        response = await dev_ctrl.Read(self.dut_node_id, [(info.endpoint_id, info.attribute)],
+                                       fabricFiltered=fabric_filtered)
+        value = response.tlvAttributes.get(info.endpoint_id, {}).get(info.cluster_id, {}).get(info.attribute_id)
+        asserts.assert_false(isinstance(value, ValueDecodeFailure),
+                             f"{info.path_str}: the read returned an error: {value}")
+        return value
+
+    async def write_fabric_scoped_attribute(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl,
+                                            value: list) -> None:
+        """Write a fabric-scoped attribute, asserting the DUT accepted the write.
+
+        A list write produces one status per list operation (the replace-all plus one
+        per appended item), so every status is checked: a failure on an item status
+        would otherwise be missed while the first status reports success.
+        """
+        result = await dev_ctrl.WriteAttribute(self.dut_node_id, [(info.endpoint_id, info.attribute(value=value))])
+        failures = unsuccessful_write_statuses(result)
+        asserts.assert_equal(failures, [], f"{info.path_str}: write returned {', '.join(failures)}")
+
+    def fabric_scoped_write_payload(self, info: FabricScopedAttributeInfo,
+                                    dev_ctrl: ChipDeviceCtrl) -> list | None:
+        """Return a harmless single-entry value for a writable fabric-scoped attribute.
+
+        Values are synthesized per attribute rather than generically: a fabric-scoped
+        struct usually carries cluster-specific validity rules (a Binding target must
+        identify either a node or a group, an Extension entry must hold valid TLV), so a
+        default-constructed entry would be rejected for reasons that have nothing to do
+        with fabric scoping. Returns None when no safe value is known, which callers
+        report as skipped rather than treating as a failure.
+        """
+        key = (info.cluster_id, info.attribute_id)
+        if key == (Clusters.AccessControl.id, Clusters.AccessControl.Attributes.Extension.attribute_id):
+            return [Clusters.AccessControl.Structs.AccessControlExtensionStruct(data=D_OK_EMPTY)]
+        if key == (Clusters.Binding.id, Clusters.Binding.Attributes.Binding.attribute_id):
+            # Node plus endpoint and no cluster: a binding that also names a cluster is
+            # only valid when the local endpoint has a client cluster to bind from, which
+            # an endpoint carrying just the Binding server does not
+            # (BindingCluster::IsValidBinding in src/app/clusters/bindings).
+            return [Clusters.Binding.Structs.TargetStruct(node=self.dut_node_id, endpoint=info.endpoint_id)]
+        if key == (Clusters.OtaSoftwareUpdateRequestor.id,
+                   Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders.attribute_id):
+            return [Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+                providerNodeID=dev_ctrl.nodeId, endpoint=self.ROOT_NODE_ENDPOINT_ID)]
+        return None
+
+    def fabric_write_skip_reason(self, info: FabricScopedAttributeInfo) -> str | None:
+        """Why a device-wide fabric sweep must not write this attribute, or None if it may.
+
+        Covers only the reasons the attribute's own metadata gives. Whether a value is
+        known that the cluster would accept is a separate question, answered by
+        fabric_scoped_write_payload.
+        """
+        if info.write_denied:
+            return ("writing it in a device-wide sweep would break the test session, so it is deliberately "
+                    "excluded")
+        if not info.writable:
+            return "the spec makes it read-only"
+        return None
+
+    def fabric_report_ci_skip_reason(self, info: FabricScopedAttributeInfo) -> str | None:
+        """Why CI must skip this attribute's write and report check, or None if it need not.
+
+        Unlike fabric_write_skip_reason, the check does apply to the attribute; a known
+        SDK bug only stops the example apps passing it, so it is skipped in CI alone.
+        """
+        if (info.cluster_id, info.attribute_id) in FABRIC_REPORT_DENIED_ATTRIBUTES and self.is_pics_sdk_ci_only:
+            return "the SDK's cluster does not report the change (a known bug), so the check is skipped in CI"
+        return None
+
+    # ========================================================================
+    # Fabric Check Coverage Accounting (TC-IDM-8.1)
+    # ========================================================================
+
+    def record_fabric_check(self, path: str, check: str, outcome: FabricCheckOutcome,
+                            location: FabricCheckLocation, reason: str = '') -> None:
+        """Record what one check established about one path."""
+        self.fabric_check_records.append(FabricCheckRecord(path=path, check=check, outcome=outcome,
+                                                           location=location, reason=reason))
+
+    def report_fabric_coverage(self, step_name: str) -> None:
+        """Log what the run verified, and record a note for everything it did not.
+
+        A fabric sweep passes on whatever the DUT happens to expose, so the same
+        result covers wildly different amounts of ground from one device to the
+        next. Logging the tally per check, and naming every path a check could
+        not be exercised against, is what lets a reader tell a thorough run from
+        an empty one without re-deriving it from the absence of failures. Paths a
+        check did not apply to are logged at debug level only: they follow from
+        the data model and read the same on every DUT.
+        """
+        records = self.fabric_check_records
+        if not records:
+            return
+
+        verified = [r for r in records if r.outcome is FabricCheckOutcome.VERIFIED]
+        log.info("%s coverage: %d of %d check(s) verified across %d path(s)",
+                 step_name, len(verified), len(records), len({r.path for r in records}))
+
+        for check in sorted({r.check for r in records}):
+            for_check = [r for r in records if r.check == check]
+            tally = {outcome: len([r for r in for_check if r.outcome is outcome]) for outcome in FabricCheckOutcome}
+            log.info("  %-26s %d verified, %d not applicable, %d not exercised", check,
+                     tally[FabricCheckOutcome.VERIFIED], tally[FabricCheckOutcome.NOT_APPLICABLE],
+                     tally[FabricCheckOutcome.NOT_EXERCISED])
+            for record in for_check:
+                if record.outcome is FabricCheckOutcome.NOT_EXERCISED:
+                    log.info("    %-11s %s: %s", record.outcome, record.path, record.reason)
+                elif record.outcome is FabricCheckOutcome.NOT_APPLICABLE:
+                    log.debug("    %-11s %s: %s", record.outcome, record.path, record.reason)
+
+        # Only the unexercised checks become notices. A check that did not apply
+        # is a property of the data model rather than of this DUT, so recording
+        # one per path would bury the findings that do vary between devices.
+        for record in records:
+            if record.outcome is not FabricCheckOutcome.NOT_EXERCISED:
+                continue
+            self.record_note(test_name=self.current_test_info.name, location=record.location,
+                             problem=f"{step_name}: {record.check} was not exercised for {record.path}: "
+                             f"{record.reason}")
+
+        # Cleared so the next step reports its own coverage under its own name.
+        self.fabric_check_records = []
+
+    # ========================================================================
+    # Populating the Other Fabric's Entries (TC-IDM-8.1)
+    # ========================================================================
+
+    def fabric_entry_populator(self, info: FabricScopedAttributeInfo) -> FabricEntryPopulator | None:
+        """Return a populator for this attribute, or None when no sequence is known.
+
+        The cross-fabric masking assertions only prove anything when the other
+        fabric actually has an entry, and most fabric-scoped attributes cannot be
+        written: they are owned by their cluster's command set. Where a safe
+        command sequence is known it is registered here, so the sweep can give
+        each fabric an entry of its own. Everything absent from this table is
+        reported as not exercised rather than counted as verified.
+        """
+        populators = {
+            (Clusters.TlsCertificateManagement.id,
+             Clusters.TlsCertificateManagement.Attributes.ProvisionedRootCertificates.attribute_id):
+            self.populate_tls_root_certificate,
+            (Clusters.TlsClientManagement.id,
+             Clusters.TlsClientManagement.Attributes.ProvisionedEndpoints.attribute_id):
+            self.populate_tls_endpoint,
+            (Clusters.GroupKeyManagement.id,
+             Clusters.GroupKeyManagement.Attributes.GroupTable.attribute_id):
+            self.populate_group_table,
+            (Clusters.Groupcast.id,
+             Clusters.Groupcast.Attributes.Membership.attribute_id):
+            self.populate_groupcast_membership,
+            (Clusters.Messages.id,
+             Clusters.Messages.Attributes.Messages.attribute_id):
+            self.populate_messages,
+        }
+        return populators.get((info.cluster_id, info.attribute_id))
+
+    def record_fabric_entry_cleanup(self, description: str, undo: FabricEntryUndo) -> None:
+        """Remember how to undo something the test changed on a fabric.
+
+        A command-owned entry cannot be restored by writing the attribute back, so
+        the usual read-then-rewrite approach does not apply. Cleanups are drained
+        in reverse order by run_fabric_entry_cleanups, which matters where one
+        entry references another.
+        """
+        self.fabric_entry_cleanups.append((description, undo))
+
+    async def run_fabric_entry_cleanups(self) -> None:
+        """Undo every recorded change, most recent first.
+
+        Failures are logged and skipped so one cluster refusing to clean up cannot
+        hide the test's own result or prevent the remaining entries being removed.
+        """
+        for description, undo in reversed(self.fabric_entry_cleanups):
+            try:
+                await undo()
+            except Exception as e:
+                log.warning("Could not clean up %s: %s", description, e)
+        self.fabric_entry_cleanups = []
+
+    def tls_command_helper(self, endpoint_id: int, dev_ctrl: ChipDeviceCtrl):
+        """Build the shared TLS command helper bound to one controller's fabric.
+
+        Imported here rather than at module scope: TC_TLS_Utils sits beside the
+        test modules rather than in support_modules and pulls in the cryptography
+        package, which only the two TLS populators need.
+        """
+        from TC_TLS_Utils import TLSUtils
+        return TLSUtils(self, endpoint=endpoint_id, dev_ctrl=dev_ctrl, node_id=self.dut_node_id)
+
+    async def provision_tls_root_certificate(self, endpoint_id: int, dev_ctrl: ChipDeviceCtrl) -> int | None:
+        """Provision a self-signed root certificate on the controller's own fabric.
+
+        Returns the CAID the DUT assigned, or None when it would not accept one.
+        The certificate is generated locally and is never used for a connection;
+        it exists so that the other fabric has an entry whose masking can be
+        checked.
+        """
+        tls = self.tls_command_helper(endpoint_id, dev_ctrl)
+        try:
+            response = await tls.send_provision_root_command(certificate=tls.gen_cert())
+        except Exception as e:
+            # Broad by intent: the shared helper turns a rejected command into a
+            # mobly TestFailure rather than an InteractionModelError, and a DUT
+            # that will not take another certificate is a coverage gap rather
+            # than a failure of the fabric checks.
+            log.info("Could not provision a TLS root certificate on node %d's fabric: %s", dev_ctrl.nodeId, e)
+            return None
+
+        caid = response.caid
+        self.record_fabric_entry_cleanup(
+            f"TLS root certificate {caid} on node {dev_ctrl.nodeId}'s fabric",
+            lambda: tls.send_remove_root_command(caid=caid))
+        return caid
+
+    async def populate_tls_root_certificate(self, info: FabricScopedAttributeInfo,
+                                            dev_ctrl: ChipDeviceCtrl) -> bool:
+        """Give ProvisionedRootCertificates an entry on the controller's fabric."""
+        caid = await self.provision_tls_root_certificate(info.endpoint_id, dev_ctrl)
+        return caid is not None
+
+    async def populate_tls_endpoint(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl) -> bool:
+        """Give ProvisionedEndpoints an entry on the controller's fabric.
+
+        An endpoint names the root certificate it trusts, so one is provisioned
+        first. The hostname and port are never connected to.
+        """
+        caid = await self.provision_tls_root_certificate(info.endpoint_id, dev_ctrl)
+        if caid is None:
+            return False
+
+        tls = self.tls_command_helper(info.endpoint_id, dev_ctrl)
+        try:
+            response = await tls.send_provision_tls_endpoint_command(
+                hostname=POPULATE_TLS_HOSTNAME, port=POPULATE_TLS_PORT, caid=caid)
+        except Exception as e:
+            log.info("Could not provision a TLS endpoint on node %d's fabric: %s", dev_ctrl.nodeId, e)
+            return False
+
+        provisioned_id = response.endpointID
+        self.record_fabric_entry_cleanup(
+            f"TLS endpoint {provisioned_id} on node {dev_ctrl.nodeId}'s fabric",
+            lambda: tls.send_remove_tls_endpoint_command(endpoint_id=provisioned_id))
+        return True
+
+    def endpoint_with_cluster(self, cluster_id: int) -> int | None:
+        """Lowest endpoint on the DUT carrying the given server cluster, or None."""
+        for endpoint_id in sorted(self.endpoints_tlv):
+            if cluster_id in self.endpoints_tlv[endpoint_id]:
+                return endpoint_id
+        return None
+
+    async def write_populate_group_key_set(self, dev_ctrl: ChipDeviceCtrl) -> None:
+        """Give the controller's fabric the key set the group populators bind to.
+
+        Both group populators need it and both run on a DUT with Groups and
+        Groupcast, so it is written, and its removal recorded, only when the fabric
+        does not hold it yet. A refused command raises for the populator to report.
+        """
+        indices = await dev_ctrl.SendCommand(self.dut_node_id, self.ROOT_NODE_ENDPOINT_ID,
+                                             Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices())
+        if POPULATE_GROUP_KEY_SET_ID in indices.groupKeySetIDs:
+            return
+
+        await dev_ctrl.SendCommand(
+            self.dut_node_id, self.ROOT_NODE_ENDPOINT_ID,
+            Clusters.GroupKeyManagement.Commands.KeySetWrite(
+                groupKeySet=Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
+                    groupKeySetID=POPULATE_GROUP_KEY_SET_ID,
+                    groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
+                    epochKey0=POPULATE_EPOCH_KEY,
+                    epochStartTime0=POPULATE_EPOCH_START_TIME,
+                    epochKey1=b"\x01" + POPULATE_EPOCH_KEY[1:],
+                    epochStartTime1=POPULATE_EPOCH_START_TIME + 1,
+                    epochKey2=b"\x02" + POPULATE_EPOCH_KEY[1:],
+                    epochStartTime2=POPULATE_EPOCH_START_TIME + 2)))
+        self.record_fabric_entry_cleanup(
+            f"group key set {POPULATE_GROUP_KEY_SET_ID} on node {dev_ctrl.nodeId}'s fabric",
+            lambda: dev_ctrl.SendCommand(
+                self.dut_node_id, self.ROOT_NODE_ENDPOINT_ID,
+                Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=POPULATE_GROUP_KEY_SET_ID)))
+
+    async def populate_group_table(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl) -> bool:
+        """Add a group on the controller's fabric, which is what GroupTable lists.
+
+        AddGroup is refused unless the accessing fabric already holds a key set
+        bound to the group id, so the key set and the GroupKeyMap entry are
+        written first. GroupKeyMap is on the sweep's write deny list because a
+        replacing write would desynchronize the group tables; the write here
+        appends to what the fabric already has and is undone in cleanup.
+
+        Each mutation records its own undo as soon as it lands, so a later step
+        failing still leaves the earlier ones removable in teardown. Cleanups
+        drain in reverse, which removes the group before the key set it needs.
+        """
+        groups_endpoint = self.endpoint_with_cluster(Clusters.Groups.id)
+        if groups_endpoint is None:
+            log.info("Cannot populate %s: the DUT exposes no Groups cluster", info.path_str)
+            return False
+
+        group_key_map = Clusters.GroupKeyManagement.Attributes.GroupKeyMap
+        try:
+            original_map = await self.read_single_attribute_check_success(
+                dev_ctrl=dev_ctrl, endpoint=self.ROOT_NODE_ENDPOINT_ID,
+                cluster=Clusters.GroupKeyManagement, attribute=group_key_map, fabric_filtered=True)
+
+            await self.write_populate_group_key_set(dev_ctrl)
+
+            updated_map = copy.deepcopy(original_map)
+            updated_map.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
+                groupId=POPULATE_GROUP_ID, groupKeySetID=POPULATE_GROUP_KEY_SET_ID))
+            write_result = await dev_ctrl.WriteAttribute(
+                self.dut_node_id, [(self.ROOT_NODE_ENDPOINT_ID, group_key_map(updated_map))])
+            # Recorded before the status check: a write that reports a failure may still
+            # have applied, and restoring the map the fabric started with is harmless
+            # where it did not.
+            self.record_fabric_entry_cleanup(
+                f"GroupKeyMap entry for group {POPULATE_GROUP_ID} on node {dev_ctrl.nodeId}'s fabric",
+                lambda: dev_ctrl.WriteAttribute(self.dut_node_id,
+                                                [(self.ROOT_NODE_ENDPOINT_ID, group_key_map(original_map))]))
+            failures = unsuccessful_write_statuses(write_result)
+            asserts.assert_equal(failures, [], f"GroupKeyMap write returned {', '.join(failures)}")
+
+            await dev_ctrl.SendCommand(self.dut_node_id, groups_endpoint,
+                                       Clusters.Groups.Commands.AddGroup(groupID=POPULATE_GROUP_ID, groupName=""))
+            self.record_fabric_entry_cleanup(
+                f"group {POPULATE_GROUP_ID} on node {dev_ctrl.nodeId}'s fabric",
+                lambda: dev_ctrl.SendCommand(self.dut_node_id, groups_endpoint,
+                                             Clusters.Groups.Commands.RemoveGroup(groupID=POPULATE_GROUP_ID)))
+        except (InteractionModelError, ChipStackError, signals.TestFailure) as e:
+            log.info("Could not add a group on node %d's fabric: %s", dev_ctrl.nodeId, e)
+            return False
+
+        return True
+
+    async def populate_groupcast_membership(self, info: FabricScopedAttributeInfo,
+                                            dev_ctrl: ChipDeviceCtrl) -> bool:
+        """Join a group on the controller's fabric, which is what Membership lists.
+
+        A Groupcast device refuses the GroupKeyMap write populate_group_table relies
+        on, so the group is joined through Groupcast instead, as TC-ACE-1.6 does.
+        Without a key, JoinGroup binds the group to a key set the fabric already
+        holds. A Listener must name an endpoint and a Sender-only device must not;
+        the root endpoint is never accepted.
+        """
+        endpoints = []
+        feature_map = self.endpoints_tlv[info.endpoint_id][info.cluster_id].get(GlobalAttributeIds.FEATURE_MAP_ID, 0)
+        if feature_map & Clusters.Groupcast.Bitmaps.Feature.kListener:
+            non_root = [ep for ep in sorted(self.endpoints_tlv) if ep != self.ROOT_NODE_ENDPOINT_ID]
+            if not non_root:
+                log.info("Cannot populate %s: a Listener must name an endpoint and the DUT has only the root",
+                         info.path_str)
+                return False
+            endpoints = [non_root[0]]
+
+        try:
+            await self.write_populate_group_key_set(dev_ctrl)
+            await dev_ctrl.SendCommand(
+                self.dut_node_id, info.endpoint_id,
+                Clusters.Groupcast.Commands.JoinGroup(groupID=POPULATE_GROUPCAST_GROUP_ID, endpoints=endpoints,
+                                                      keySetID=POPULATE_GROUP_KEY_SET_ID))
+            # Without an endpoint list LeaveGroup removes the group outright.
+            self.record_fabric_entry_cleanup(
+                f"Groupcast group {POPULATE_GROUPCAST_GROUP_ID} on node {dev_ctrl.nodeId}'s fabric",
+                lambda: dev_ctrl.SendCommand(self.dut_node_id, info.endpoint_id,
+                                             Clusters.Groupcast.Commands.LeaveGroup(groupID=POPULATE_GROUPCAST_GROUP_ID)))
+        except (InteractionModelError, ChipStackError, signals.TestFailure) as e:
+            log.info("Could not join a Groupcast group on node %d's fabric: %s", dev_ctrl.nodeId, e)
+            return False
+
+        return True
+
+    def populate_message_id(self, dev_ctrl: ChipDeviceCtrl) -> bytes:
+        """The 16-octet message id this test presents on one controller's fabric."""
+        return POPULATE_MESSAGE_ID_PREFIX + dev_ctrl.nodeId.to_bytes(8, 'big')
+
+    async def populate_messages(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl) -> bool:
+        """Queue a message on the controller's own fabric, which is what Messages lists.
+
+        PresentMessagesRequest is fabric scoped and needs only Operate privilege, so
+        each fabric can give itself an entry. StartTime and Duration are left null,
+        which presents the message immediately and until it is cancelled; cleanup
+        cancels it by the id used here.
+
+        MessageStruct carries no FabricIndex in the generated code, so the entry
+        cannot be attributed to a fabric by field. A marker is registered so the
+        isolation check can recognise it by its message id instead.
+        """
+        message_id = self.populate_message_id(dev_ctrl)
+        try:
+            await dev_ctrl.SendCommand(
+                self.dut_node_id, info.endpoint_id,
+                Clusters.Messages.Commands.PresentMessagesRequest(
+                    messageID=message_id,
+                    priority=Clusters.Messages.Enums.MessagePriorityEnum.kLow,
+                    messageControl=0,
+                    startTime=NullValue,
+                    duration=NullValue,
+                    messageText=POPULATE_MESSAGE_TEXT))
+        except (InteractionModelError, ChipStackError, signals.TestFailure) as e:
+            # A DUT that will not queue a message is a coverage gap rather than
+            # a fabric-check failure.
+            log.info("Could not queue a message on node %d's fabric: %s", dev_ctrl.nodeId, e)
+            return False
+
+        async def undo() -> None:
+            await dev_ctrl.SendCommand(
+                self.dut_node_id, info.endpoint_id,
+                Clusters.Messages.Commands.CancelMessagesRequest(messageIDs=[message_id]))
+
+        self.record_fabric_entry_cleanup(f"message {message_id.hex()} on node {dev_ctrl.nodeId}'s fabric", undo)
+        self.record_fabric_entry_marker(info, dev_ctrl,
+                                        lambda entry: getattr(entry, 'messageID', None) == message_id)
+        return True
+
+    def record_fabric_entry_marker(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl,
+                                   matches: FabricEntryMatch) -> None:
+        """Remember how to recognise the entry a populator created on one fabric.
+
+        The cross-fabric assertions attribute an entry to a fabric by its FabricIndex
+        field, and a struct the spec marks fabric scoped but codegen does not carries
+        no such field. Where the populator knows exactly which entry it created it
+        registers a predicate here, so isolation can be checked by the entry's own
+        identity rather than by a field the generated struct may be missing.
+        """
+        self.fabric_entry_markers[(info.path_str, dev_ctrl.nodeId)] = matches
+
+    def assert_populated_entry_not_leaked(self, info: FabricScopedAttributeInfo, entries: list | Nullable,
+                                          other_ctrl: ChipDeviceCtrl, reader_name: str) -> bool:
+        """Assert a fabric-filtered read does not return the entry another fabric created.
+
+        A fabric-filtered read returns only the accessing fabric's entries, so the
+        entry a populator created on the other fabric must be absent. Unlike the
+        FabricIndex-based assertions this holds even when the generated struct has no
+        FabricIndex, which is the case that would otherwise pass unnoticed: with no
+        such field every entry reads as the accessing fabric's own.
+
+        Returns True when the check could be made, i.e. the other fabric registered a
+        marker, so the caller can tell a verified check from one with nothing to check.
+        """
+        matches = self.fabric_entry_markers.get((info.path_str, other_ctrl.nodeId))
+        if matches is None or not isinstance(entries, list):
+            return False
+        leaked = [entry for entry in entries if matches(entry)]
+        asserts.assert_equal(leaked, [],
+                             f"{info.path_str}: {reader_name}'s fabric-filtered read returned the entry created "
+                             f"on the other fabric, so the DUT is not isolating this attribute by fabric")
+        return True
+
+    async def trigger_fabric_sensitive_event(self, info: FabricSensitiveEventInfo,
+                                             dev_ctrl: ChipDeviceCtrl) -> bool:
+        """Generate the given fabric-sensitive event on the controller's own fabric.
+
+        Returns False when no trigger is known, in which case the caller reports the
+        event as not exercised: most fabric-sensitive events require cluster-specific
+        state (a media session, a queued message, a commissioning request) that cannot
+        be created generically.
+        """
+        if info.cluster_id != Clusters.AccessControl.id:
+            return False
+
+        events = Clusters.AccessControl.Events
+        attributes = Clusters.AccessControl.Attributes
+        if info.event_id == events.AccessControlExtensionChanged.event_id:
+            # Writing an Extension entry generates the event on the writer's fabric.
+            # Extension is gated on the EXTS feature, so a DUT without it has no way to
+            # raise the event.
+            if not self.attribute_is_writable(self.ROOT_NODE_ENDPOINT_ID, Clusters.AccessControl.id,
+                                              attributes.Extension.attribute_id):
+                log.info("Cannot trigger %s: the DUT does not expose a writable Extension attribute", info.path_str)
+                return False
+            result = await dev_ctrl.WriteAttribute(
+                self.dut_node_id,
+                [(self.ROOT_NODE_ENDPOINT_ID, attributes.Extension(
+                    value=[Clusters.AccessControl.Structs.AccessControlExtensionStruct(data=D_OK_EMPTY)]))])
+            failures = unsuccessful_write_statuses(result)
+            if failures:
+                log.info("Cannot trigger %s: writing Extension returned %s", info.path_str, ', '.join(failures))
+                return False
+            return True
+        if info.event_id == events.AccessControlEntryChanged.event_id:
+            if not self.attribute_is_writable(self.ROOT_NODE_ENDPOINT_ID, Clusters.AccessControl.id,
+                                              attributes.Acl.attribute_id):
+                log.info("Cannot trigger %s: the DUT does not expose a writable Acl attribute", info.path_str)
+                return False
+            # Appending an entry to the writer's own ACL and removing it again generates
+            # the event on its fabric while leaving the ACL as it was found. A replacing
+            # write is avoided because it can remove the writer's own Administer privilege.
+            original_acl = await self.get_dut_acl(ctrl=dev_ctrl)
+            await self.add_ace_to_dut_acl(ctrl=dev_ctrl, ace=self.build_view_only_ace(), dut_acl_original=original_acl)
+            await self.write_dut_acl(ctrl=dev_ctrl, acl=original_acl)
+            return True
+        return False
+
+    def build_view_only_ace(self) -> Clusters.AccessControl.Structs.AccessControlEntryStruct:
+        """Build a harmless View-privilege ACE for a subject that is not in use.
+
+        Used where a test needs to change an ACL without affecting any controller's
+        access: the subject node ID is derived from the harness's own controller node ID
+        so it cannot collide with a commissioned controller.
+        """
+        return Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[self.matter_test_config.controller_node_id + 1000],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=Clusters.BasicInformation.id)])
+
+    def assert_no_events_for_fabric(self, handler: EventSubscriptionHandler, fabric_index: int,
+                                    description: str) -> None:
+        """Assert nothing the handler received is associated with the given fabric.
+
+        Events already on the DUT for the reader's own fabric legitimately arrive in a
+        subscription's priming report, so the assertion is scoped to the fabric under
+        test rather than requiring an empty queue.
+        """
+        leaked = []
+        while handler.get_size() > 0:
+            event = handler.get_event_from_queue(block=False, timeout=0)
+            if getattr(event.Data, 'fabricIndex', None) == fabric_index:
+                leaked.append(event)
+        asserts.assert_equal(leaked, [], f"{description}: received {len(leaked)} event(s) for fabric {fabric_index}")
+
+    def assert_no_subscription_events_for_fabric(self, subscription: SubscriptionTransaction, fabric_index: int,
+                                                 description: str) -> int:
+        """Assert nothing the subscription delivered is associated with the given fabric.
+
+        Reads the subscription's own event list rather than an EventSubscriptionHandler
+        queue: the priming report is dispatched before SetEventUpdateCallback runs, so a
+        leak in the priming report never reaches the handler. Returns the total number of
+        events the subscription delivered, which lets the caller tell a report that
+        legitimately excluded a fabric from one that carried nothing at all.
+        """
+        events = subscription.GetEvents()
+        leaked = [e for e in events if getattr(e.Data, 'fabricIndex', None) == fabric_index]
+        asserts.assert_equal(leaked, [], f"{description}: received {len(leaked)} event(s) for fabric {fabric_index}")
+        return len(events)
 
     # ========================================================================
     # Attribute Reading Helper Functions
