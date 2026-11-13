@@ -105,14 +105,6 @@ STEP6_CYCLE_TIMEOUT_SEC = 120
 # is not idle already, which is the exceptional case: the preceding step normally leaves it
 # quiescent on its periodic query timer.
 IDLE_BEFORE_ANNOUNCE_TIMEOUT_SEC = 120
-# Log line every OTA provider prints on receiving a QueryImage, whatever it then answers: see
-# OtaProviderLogic::QueryImage in src/app/clusters/ota-provider/OTAProviderCluster.cpp, which
-# logs it before dispatching to the application delegate. Step 4 polls it on the provider's
-# stdout as an out-of-band barrier: it is the only way to tell a query the provider actually
-# answered (with the invalid ImageURI under test) from one that died in a CASE session left
-# over from a previous provider process, since both leave the DUT in the same
-# kQuerying→kIdle transition.
-PROVIDER_QUERY_RECEIVED_LOG = "OTA Provider received QueryImage"
 
 
 class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
@@ -166,7 +158,10 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                      "Verify that the DUT waits for at least the time mentioned in the DelayedActionTime (3 minutes) before issuing another QueryImage command to the TH/OTA-P. "
                      "Verify that the transfer of the software image has been initiated after the second QueryImageResponse with UpdateAvailable status from the TH/OTA-P to the DUT."
                      ),
-            TestStep(4, "Cancel the transfer by forcing an error during the download of the OTA image to the DUT (the single full update is reserved for Step 9). Wait for the Idle timeout which should be no less than 5 minutes.",
+            TestStep(4, "Allow the DUT transfer data before canceling the transfer by forcing an error during the download of the OTA image to the DUT (the single full update is reserved for Step 9). Wait for the Idle timeout which should be no less than 5 minutes.",
+                     "Verify that there is a transfer of the software image from the TH/OTA-P to the DUT."
+                     "Verify that the Maximum Block Size requested by DUT should be - no larger than 1024 (2^10) bytes over non-TCP transports."
+                     "Verify that the Maximum Block Size requested by DUT should be- no larger than 8192 (2^13) bytes over TCP transport "
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to Idle. "
                      "Verify that the OTA-Subscriber receives a DownloadError event notification on BDX Idle timeout. "
                      "Verify that the data in this event has the following: "
@@ -236,6 +231,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         persistent KVS, so the DUT keeps talking to the same provider node.
         """
         self.terminate_provider()
+        restart_provider_args = ["-q", "updateNotAvailable", "--persistQueryImageStatus"] + self.named_pipe_arguments
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
@@ -244,7 +240,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             port=self._provider_port,
             kvs_path=self.KVS_PATH,
             log_file=self._next_provider_log_path(),
-            extra_args=["-q", "updateNotAvailable", "--persistQueryImageStatus"],
+            extra_args=restart_provider_args,
         )
 
     def _wait_until_idle_settled(self, subscription, settle_sec, timeout_sec, step_name) -> float:
@@ -296,6 +292,20 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             else:
                 current_state = val
                 idle_since = None
+
+    def is_tcp_transport(self, block_size_payload: dict) -> bool | None:
+        """Payload dict from named pipe BuildBlockSizeSnapshot. Fails if is None.
+
+        Args:
+            block_size_payload (dict): Payload dict
+
+        Returns:
+            bool: _True or False for TCP Transport
+        """
+        is_tcp = block_size_payload.get("IsTCPTransport")
+        asserts.assert_is_not_none(
+            is_tcp, "Provider did not capture the BDX ReceiveInit transport")
+        return is_tcp
 
     @async_test_body
     async def test_TC_SU_2_2(self):
@@ -353,10 +363,13 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         ota_image_version = await self.check_ota_image_version(
             controller=controller, requestor_node_id=requestor_node_id, ota_image_path=self.ota_image)
 
+        # Pre-define named pipe arguments
+        self.named_pipe_arguments = ['--app-pipe', self.provider_app_pipe, '--app-pipe-out', self.provider_app_pipe_out]
+
         # Pre-define all provider arg sets for reuse across steps
         provider_extra_args_updateAvailable = [
             "-q", "updateAvailable"
-        ]
+        ] + self.named_pipe_arguments
 
         # ------------------------------------------------------------------------------------
         # Provider commissioning (done once before any step that requires AnnounceOTAProvider).
@@ -550,10 +563,9 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # handshake for no benefit.
         self.restart_provider_not_available()
 
-        # Arm the barrier before the announce below, so that a QueryImage reaching this provider
-        # cannot slip past unnoticed. restart_provider_not_available() leaves the match armed on
-        # start_provider()'s own "Server initialization complete" wait, so this must follow it.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+        # Set the QueryImage received request count at the moment to start the Provider
+        # This value must increase when it receives the QueryImage and is processed in the HandleQueryImage
+        await self.set_query_image_request_count(step_number_s2)
 
         subscription_attr_state_updatenotavailable = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -675,7 +687,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         provider_extra_args_busy_180 = [
             "-q", "busy",
             "-t", str(STEP3_DELAYED_ACTION_TIME_SEC)
-        ]
+        ] + self.named_pipe_arguments
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -688,9 +700,9 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_busy_180,
         )
 
-        # Arm the barrier before the announce below; start_provider() leaves the match armed on
-        # its own "Server initialization complete" wait, so this must follow it.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+        # Set the QueryImage received request count at the moment to start the Provider
+        # This value must increase when it receives the QueryImage and is processed in the HandleQueryImage
+        await self.set_query_image_request_count(step_number_s3)
 
         subscription_attr_state_busy_180s = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -838,34 +850,53 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         logger.info('%s: Step #4.1 - Let the Device download until 1%% to then kill the Provider', step_number_s4)
         # Poll UpdateStateProgress so the kill happens after some BDX bytes have landed.
-        # Not a spec assertion: if 1% is never reported (quality Q, sparse updates), warn and
+        # Not a spec assertion: if 3% is never reported (quality Q, sparse updates), warn and
         # continue so the Idle / DownloadError checks below still run.
-        progress_poll_interval_sec = 10.0
+        progress_poll_interval_sec = 5.0
         progress_poll_timeout_sec = 300.0
         progress_deadline = time.time() + progress_poll_timeout_sec
-        update_state_progress = None
+        update_state_progress_s4 = None
         while True:
-            update_state_progress = await self.read_single_attribute_check_success(
+            update_state_progress_s4 = await self.read_single_attribute_check_success(
                 cluster=Clusters.OtaSoftwareUpdateRequestor,
                 attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress,
                 dev_ctrl=controller,
                 node_id=requestor_node_id,
                 endpoint=0,
             )
-            logger.info('%s: Step #4.1 - UpdateStateProgress is %s %%', step_number_s4, update_state_progress)
-            if isinstance(update_state_progress, int) and update_state_progress >= 1:
+            logger.info('%s: Step #4.1 - UpdateStateProgress is %s %%', step_number_s4, update_state_progress_s4)
+            if isinstance(update_state_progress_s4, int) and update_state_progress_s4 >= 3:
                 logger.info('%s: Step #4.1 - UpdateStateProgress is greater than 1%% (%s %%)',
-                            step_number_s4, update_state_progress)
+                            step_number_s4, update_state_progress_s4)
                 break
             remaining = progress_deadline - time.time()
             if remaining <= 0:
                 logger.warning(
                     '%s: Step #4.1 - 1%% has not been reached after %.0fs (last UpdateStateProgress=%s); '
                     'continuing to kill the provider.',
-                    step_number_s4, progress_poll_timeout_sec, update_state_progress)
+                    step_number_s4, progress_poll_timeout_sec, update_state_progress_s4)
                 break
             await asyncio.sleep(min(progress_poll_interval_sec, remaining))
 
+        # Read the DUTRequestedMaxBlockSize using NamedPipes after the condition was completed.
+        command = {"Name": "GetBlockSizeSnapShot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.get_endpoint()}
+        self.write_to_app_pipe(command, self.provider_app_pipe)
+        block_size_pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        logger.info("%s Named pipe for GetBlockSizeSnapShot from Provider %s", step_number_s4, block_size_pipe_data)
+        requested_block_size_s4 = block_size_pipe_data["Payload"]["DUTRequestedMaxBlockSize"]
+        provider_block_size_s4 = block_size_pipe_data["Payload"]["ProviderBlockSize"]
+        asserts.assert_is_not_none(requested_block_size_s4,
+                                   f"{step_number_s4}: TH Error: Provider did not capture the DUT BDX ReceiveInit")
+
+        # Validate the DUTRequestedMaxBlockSize
+        if self.is_tcp_transport(block_size_pipe_data["Payload"]):
+            # BlockSize is no larger than 2^13 for tcp
+            asserts.assert_less_equal(requested_block_size_s4, 8192, "Block size is greater than 8192 bytes.")
+        else:
+            # BlockSize is no larger than 2^10 for non-tcp
+            asserts.assert_less_equal(requested_block_size_s4, 1024, "Block size is greater than 1024 bytes.")
+        logger.info("%s RequestedBlockSize is: %d and valid. Provider BlockSize is : %d",
+                    step_number_s4, requested_block_size_s4, provider_block_size_s4)
         # Create the subscription for DownloadError
         subscription_download_error = EventSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -933,7 +964,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         else:
             asserts.fail("No DownloadError Event found")
 
-        if update_state_progress is NullValue:
+        if update_state_progress_s4 is NullValue:
             # If the UpdateState is Unknow the value can be Null
             asserts.assert_equal(event_download_error.progressPercent, NullValue,
                                  "Recorded Null value on UpdateStateProgress but a non NullValue was reported on DownloadError Event")
@@ -974,7 +1005,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         provider_extra_args_invalid_bdx = [
             "-i", "bdx://000000000000000X"
-        ]
+        ] + self.named_pipe_arguments
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -987,11 +1018,9 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_invalid_bdx,
         )
 
-        # Arm the out-of-band barrier now, before the announce below, so that a QueryImage
-        # reaching the provider can never slip past unnoticed between the announce and the
-        # check in the event loop. This has to run after start_provider(), which leaves the
-        # match armed on its own "Server initialization complete" wait.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+        # Set the QueryImage received request count at the moment to start the Provider
+        # This value must increase when it receives the QueryImage and is processed in the HandleQueryImage
+        await self.set_query_image_request_count(step_number_s5)
 
         # ------------------------------------------------------------------------------------
         # [STEP_5]: Step #5.1 - Matcher for OTA event logs
@@ -1096,8 +1125,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # RECEIVED proves the DUT rejected the invalid ImageURI. A query that timed out in a
         # CASE session left over from Step 3's and 4's provider process produces the very same
         # kQuerying→kIdle, and accepting that one would pass the step without the invalid-URI
-        # response ever reaching the DUT. The provider reports receipt out of band on its
-        # stdout (PROVIDER_QUERY_RECEIVED_LOG), which is polled here per candidate event.
+        # response ever reaching the DUT. The provider reports receipt out of band using
+        # the named pipe QueryImageSnapshot, which reads the QueryImageRequestCount as reference.
         event2 = None
         s5_t2_timeout = self.remaining_test_budget_sec(reserve_sec=2 * STEP_RESERVE_SEC)
         t_s5_t2_start = time.time()
@@ -1127,9 +1156,10 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
             evt2 = raw.Data
             if evt2.previousState == kQuerying and evt2.newState == kIdle:
-                # timeout=0: a poll, not a wait. The DUT can't reach Idle before the provider
+                # Check for QueryImageRequestCount. The DUT can't reach Idle before the provider
                 # has already logged receipt of this query, so the flag is already set here.
-                if not self.current_provider_app_proc.wait_for_output(timeout=0):
+                step5_query_image_count = self.read_query_image_request_count(step_number_s5)
+                if step5_query_image_count == self.current_provider_queryimage_request_count:
                     logger.info("%s: Discarding Querying→Idle — no QueryImage has reached the provider yet, "
                                 "so the query ended before it could be answered.", step_number_s5)
                     continue
@@ -1175,9 +1205,6 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             log_file=self._next_provider_log_path(),
         )
 
-        # Arm the barrier before the announce below; start_provider() leaves the match armed on
-        # its own "Server initialization complete" wait, so this must follow it.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
         kQuerying_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
         kDownloading_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
         kApplying_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
@@ -1289,21 +1316,21 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Start the provider first, then check RequestorCanConsent.
         self.step(8)
         step_number_s8 = "[STEP_8]"
+        step_8_provider_arguments = ['--userConsentNeeded'] + self.named_pipe_arguments
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
             setup_pincode=provider_setup_pincode,
             discriminator=provider_discriminator,
             port=provider_port,
-            extra_args=['--app-pipe', self.provider_app_pipe, '--app-pipe-out',
-                        self.provider_app_pipe_out, '--userConsentNeeded'],
+            extra_args=step_8_provider_arguments,
             kvs_path=self.KVS_PATH,
             log_file=self._next_provider_log_path(),
         )
 
-        # Arm the barrier before the announce below; start_provider() leaves the match armed on
-        # its own "Server initialization complete" wait, so this must follow it.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+        # Set the QueryImage received request count at the moment to start the Provider
+        # This value must increase when it receives the QueryImage and is processed in the HandleQueryImage
+        await self.set_query_image_request_count(step_number_s8)
 
         # Read the UpdateState to know which state the device was left in by the previous step.
         update_state_attr_s8 = await self.read_single_attribute_check_success(
@@ -1430,7 +1457,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info('%s: Prerequisite #1.0 - Launched Provider', step_number_s9)
 
         step9_provider_extra_args = provider_extra_args_updateAvailable + \
-            ['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', '3']
+            ['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', '3'] + self.named_pipe_arguments
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -1443,9 +1470,9 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             extra_args=step9_provider_extra_args,
         )
 
-        # Arm the barrier before the announce below; start_provider() leaves the match armed on
-        # its own "Server initialization complete" wait, so this must follow it.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+        # Set the QueryImage received request count at the moment to start the Provider
+        # This value must increase when it receives the QueryImage and is processed in the HandleQueryImage
+        await self.set_query_image_request_count(step_number_s9)
 
         # ------------------------------------------------------------------------------------
         # [STEP_9]: Step #9.1 - Matcher for OTA attribute reports
@@ -1831,10 +1858,9 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_updateAvailable,
         )
 
-        # Arm the barrier before the announce below, so that a QueryImage reaching this provider
-        # cannot slip past unnoticed. start_provider() leaves the match armed on its own "Server
-        # initialization complete" wait, so this must follow it.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+        # Set the QueryImage received request count at the moment to start the Provider
+        # This value must increase when it receives the QueryImage and is processed in the HandleQueryImage
+        await self.set_query_image_request_count(step_number_s10)
 
         # ------------------------------------------------------------------------------------
         # [STEP_10]: Step #10.1 - Subscribe to UpdateState attribute.
