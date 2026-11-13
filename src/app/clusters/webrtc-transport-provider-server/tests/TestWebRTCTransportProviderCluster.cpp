@@ -232,4 +232,24 @@ TEST_F(TestWebRTCTransportProviderCluster, TestReadUnsupportedAttribute)
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestWebRTCTransportProviderCluster, TestRejectsEmptyICECandidates)
+{
+    TestServerClusterContext context;
+    MockWebRTCTransportProviderDelegate mockDelegate;
+    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(server);
+    Commands::ProvideICECandidates::Type request;
+    request.webRTCSessionID = 1;
+    request.ICECandidates   = DataModel::List<ICECandidateStruct>();
+
+    auto response =
+        tester.Invoke<Commands::ProvideICECandidates::Type, DataModel::NullObjectType>(Commands::ProvideICECandidates::Id, request);
+    EXPECT_EQ(response.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::ConstraintError));
+
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 } // namespace
