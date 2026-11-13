@@ -689,7 +689,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestFabricRemovedKeepsConnectionEvi
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     PushAvStreamTransportServer restartedServer(1, BitFlags<Feature>(1), fabricHelper.GetFabricTable());
-    ASSERT_EQ(restartedServer.Startup(context.Get()), CHIP_NO_ERROR);
+    ASSERT_EQ(restartedServer.Startup(failingContext), CHIP_NO_ERROR);
     restartedServer.GetLogic().SetDelegate(&mockDelegate);
     restartedServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
     EXPECT_EQ(restartedServer.Init(), CHIP_NO_ERROR);
