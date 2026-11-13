@@ -18,6 +18,7 @@
 #import "MTRDiagnosticLogsDownloader.h"
 #import <Matter/Matter.h>
 
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/LockTracker.h>
 #include <protocols/bdx/BdxTransferServerDelegate.h>
@@ -41,6 +42,22 @@ static NSString * const kNetworkDiagnostics = @"NetworkDiagnostics";
 static NSString * const kCrash = @"Crash";
 
 constexpr uint8_t kDiagnosticLogsEndPoint = 0;
+// A device can still answer Busy for a short while after the local BDX session of an aborted
+// transfer has ended: it releases its transfer slot only after it has received the abort
+// StatusReport and polled its BDX session again (a 50 ms poll). The retry delay is the default
+// MRP active retransmit interval (about 300 ms), so the 3 retries together cover about 1.2 s, many
+// polls. The Busy status carries no reason, so a device that is genuinely busy also takes about
+// 1.2 s longer to report Busy; that is acceptable. The retries are only a safety net behind the
+// wait for the end of the aborted transfers' sessions.
+constexpr NSUInteger kMaxBusyRetries = 3;
+
+// Upper bound on how long a request is held for an aborted transfer's session to end, and on how
+// long an aborted transfer blocks later downloads of its node. It does not depend on the caller's
+// timeout, which can be 0 (none). The session end of an aborted transfer is normally reported once
+// the abort StatusReport has been delivered, but it is never reported when the StatusReport can
+// not be rejected or the peer has vanished. After this time the request is sent anyway, and the
+// Busy retries apply.
+constexpr NSTimeInterval kMaxWaitForAbortedTransfer = 5;
 
 class DiagnosticLogsDownloaderBridge;
 
@@ -52,8 +69,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSNumber * nodeID;
 @property (nonatomic) NSURL * fileURL;
 @property (nonatomic) NSFileHandle * fileHandle;
-@property (nonatomic) AbortHandler abortHandler;
+@property (nonatomic, nullable) AbortHandler abortHandler;
 @property (nonatomic) MTRStatusCompletion finalize;
+@property (nonatomic, nullable) dispatch_block_t request;
+@property (nonatomic) BOOL waitingForAbortedTransfer;
+@property (nonatomic) BOOL transferAborted;
+// Monotonic time (NSProcessInfo systemUptime) at which this download was kept as an aborted transfer.
+@property (nonatomic) NSTimeInterval abortedAt;
 
 - (instancetype)initWithType:(MTRDiagnosticLogType)type
                  fabricIndex:(NSNumber *)fabricIndex
@@ -78,11 +100,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)success;
 - (void)failure:(NSError *)error;
 - (void)cancelTimeoutTimer;
+- (void)cancelRequest;
+- (void)waitForAbortedTransfer;
+- (BOOL)retryRequestAfterBusy;
 - (void)abort:(NSError *)error;
 @end
 
 @interface MTRDownloads : NSObject
 @property (nonatomic, strong) NSMutableArray<MTRDownload *> * downloads;
+@property (nonatomic, strong) NSMutableArray<MTRDownload *> * abortedTransfers;
+// Monotonic time (NSProcessInfo systemUptime) of the last aborted transfer of each node, by key.
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> * lastAbortedTransferTimes;
 
 - (MTRDownload * _Nullable)get:(NSString *)fileDesignator
                    fabricIndex:(NSNumber *)fabricIndex
@@ -99,6 +127,17 @@ NS_ASSUME_NONNULL_BEGIN
 // Abort either all downloads for the given controller (if nodeID is nil), or
 // just the ones for the relevant node ID.
 - (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller nodeID:(nullable NSNumber *)nodeID;
+
+- (BOOL)hasAbortedTransferForFabricIndex:(NSNumber *)fabricIndex nodeID:(NSNumber *)nodeID;
+
+// Whether a transfer of the node was aborted within kMaxWaitForAbortedTransfer, even if its session has ended.
+- (BOOL)hasRecentAbortedTransferForFabricIndex:(NSNumber *)fabricIndex nodeID:(NSNumber *)nodeID;
+
+- (void)forgetExpiredAbortedTransfers;
+
+- (BOOL)abortedTransferEnded:(NSString *)fileDesignator fabricIndex:(NSNumber *)fabricIndex nodeID:(NSNumber *)nodeID;
+
+- (void)sendWaitingRequestForFabricIndex:(NSNumber *)fabricIndex nodeID:(NSNumber *)nodeID;
 
 @end
 
@@ -159,6 +198,7 @@ private:
 @implementation MTRDownload {
     // Guards access to _finalize to make sure we only finalize once.
     os_unfair_lock _lock;
+    NSUInteger _busyRetryCount;
 }
 
 static void OnTransferTimeout(chip::System::Layer * layer, void * context)
@@ -175,6 +215,28 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
         download.nodeID.unsignedLongLongValue, download.abortHandler);
 
     [download abort:[MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT]];
+}
+
+static void OnAbortedTransferWaitTimeout(chip::System::Layer * layer, void * context)
+{
+    assertChipStackLockedByCurrentThread();
+
+    auto * download = (__bridge MTRDownload *) context;
+    VerifyOrReturn(nil != download && download.waitingForAbortedTransfer && nil != download.request);
+
+    MTR_LOG("%@ Gave up waiting for the aborted log transfer to end", download);
+    download.waitingForAbortedTransfer = NO;
+    download.request();
+}
+
+static void OnBusyRetryTimer(chip::System::Layer * layer, void * context)
+{
+    assertChipStackLockedByCurrentThread();
+
+    auto * download = (__bridge MTRDownload *) context;
+    VerifyOrReturn(nil != download && nil != download.request);
+
+    download.request();
 }
 
 - (instancetype)initWithType:(MTRDiagnosticLogType)type
@@ -351,11 +413,51 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
     chip::DeviceLayer::SystemLayer().CancelTimer(OnTransferTimeout, (__bridge void *) self);
 }
 
+- (void)cancelRequest
+{
+    assertChipStackLockedByCurrentThread();
+    chip::DeviceLayer::SystemLayer().CancelTimer(OnBusyRetryTimer, (__bridge void *) self);
+    chip::DeviceLayer::SystemLayer().CancelTimer(OnAbortedTransferWaitTimeout, (__bridge void *) self);
+    _request = nil;
+    _waitingForAbortedTransfer = NO;
+}
+
+- (void)waitForAbortedTransfer
+{
+    assertChipStackLockedByCurrentThread();
+
+    _waitingForAbortedTransfer = YES;
+    CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Milliseconds64(static_cast<uint64_t>(kMaxWaitForAbortedTransfer * 1000)),
+        OnAbortedTransferWaitTimeout, (__bridge void *) self);
+    if (CHIP_NO_ERROR != err) {
+        // Without a deadline we must not hold the request.
+        _waitingForAbortedTransfer = NO;
+        _request();
+    }
+}
+
+- (BOOL)retryRequestAfterBusy
+{
+    assertChipStackLockedByCurrentThread();
+    VerifyOrReturnValue(nil != _request && _busyRetryCount < kMaxBusyRetries, NO);
+
+    CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(
+        chip::GetDefaultMRPConfig().mActiveRetransTimeout, OnBusyRetryTimer, (__bridge void *) self);
+    VerifyOrReturnValue(CHIP_NO_ERROR == err, NO);
+
+    _busyRetryCount++;
+    MTR_LOG("%@ Device busy, retrying log download request (%lu of %lu)", self, static_cast<unsigned long>(_busyRetryCount),
+        static_cast<unsigned long>(kMaxBusyRetries));
+    return YES;
+}
+
 - (void)abort:(NSError *)error
 {
     assertChipStackLockedByCurrentThread();
 
     [self cancelTimeoutTimer];
+    [self cancelRequest];
 
     // The abort handler does not finish the download: it only queues a BDX
     // StatusReport for the peer. Once that is sent the BDX session ends with
@@ -367,6 +469,7 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
     // download with this error and any later call does nothing.  And calling
     // failure: here does not affect the BDX session sending its StatusReport.
     if (self.abortHandler) {
+        self.transferAborted = YES;
         self.abortHandler(error);
     }
     [self failure:error];
@@ -419,6 +522,8 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
 {
     if (self = [super init]) {
         _downloads = [[NSMutableArray alloc] init];
+        _abortedTransfers = [[NSMutableArray alloc] init];
+        _lastAbortedTransferTimes = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -480,6 +585,18 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
         // and then not be able to dispatch the async task to do the removal.
         [self remove:download];
     }
+
+    // Aborted transfers of a node are not forgotten when only that node's downloads are
+    // aborted: starting a new download for the node aborts its downloads first, and the new
+    // download must still wait for the aborted transfers. They are dropped when they ended,
+    // when they are older than kMaxWaitForAbortedTransfer, or on controller shutdown.
+    if (!nodeID) {
+        for (MTRDownload * download in [_abortedTransfers copy]) {
+            if ([download.fabricIndex isEqual:fabricIndex]) {
+                [_abortedTransfers removeObject:download];
+            }
+        }
+    }
 }
 
 - (void)remove:(MTRDownload *)download
@@ -487,7 +604,100 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
     assertChipStackLockedByCurrentThread();
 
     [download cancelTimeoutTimer];
+    [download cancelRequest];
+    if (download.transferAborted) {
+        download.transferAborted = NO;
+        [download.fileHandle closeAndReturnError:nil];
+        _lastAbortedTransferTimes[[self _keyForFabricIndex:download.fabricIndex nodeID:download.nodeID]] = @(NSProcessInfo.processInfo.systemUptime);
+        // If the BDX session has already ended (the abort handler is cleared then), there is
+        // no transfer left to wait for.
+        if (nil != download.abortHandler) {
+            download.abortedAt = NSProcessInfo.processInfo.systemUptime;
+            [_abortedTransfers addObject:download];
+        }
+    }
     [_downloads removeObject:download];
+}
+
+- (NSString *)_keyForFabricIndex:(NSNumber *)fabricIndex nodeID:(NSNumber *)nodeID
+{
+    return [NSString stringWithFormat:@"%@-%@", fabricIndex, nodeID];
+}
+
+- (BOOL)hasRecentAbortedTransferForFabricIndex:(NSNumber *)fabricIndex nodeID:(NSNumber *)nodeID
+{
+    assertChipStackLockedByCurrentThread();
+
+    NSNumber * last = _lastAbortedTransferTimes[[self _keyForFabricIndex:fabricIndex nodeID:nodeID]];
+    VerifyOrReturnValue(nil != last, NO);
+    return NSProcessInfo.processInfo.systemUptime - last.doubleValue <= kMaxWaitForAbortedTransfer;
+}
+
+- (BOOL)hasAbortedTransferForFabricIndex:(NSNumber *)fabricIndex nodeID:(NSNumber *)nodeID
+{
+    assertChipStackLockedByCurrentThread();
+
+    [self forgetExpiredAbortedTransfers];
+
+    for (MTRDownload * download in _abortedTransfers) {
+        if ([download.fabricIndex isEqual:fabricIndex] && [download.nodeID isEqual:nodeID]) {
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
+- (void)forgetExpiredAbortedTransfers
+{
+    assertChipStackLockedByCurrentThread();
+
+    // Forget the transfers whose session end did not arrive in time.
+    NSTimeInterval now = NSProcessInfo.processInfo.systemUptime;
+    NSIndexSet * expired = [_abortedTransfers indexesOfObjectsPassingTest:^BOOL(MTRDownload * download, NSUInteger idx, BOOL * stop) {
+        return now - download.abortedAt > kMaxWaitForAbortedTransfer;
+    }];
+    [_abortedTransfers removeObjectsAtIndexes:expired];
+}
+
+- (BOOL)abortedTransferEnded:(NSString *)fileDesignator fabricIndex:(NSNumber *)fabricIndex nodeID:(NSNumber *)nodeID
+{
+    assertChipStackLockedByCurrentThread();
+
+    // An expired entry must not claim the session end of a later download with the same file
+    // designator: that session end belongs to the live download.
+    [self forgetExpiredAbortedTransfers];
+
+    NSUInteger index = [_abortedTransfers indexOfObjectPassingTest:^BOOL(MTRDownload * download, NSUInteger idx, BOOL * stop) {
+        return nil != download.abortHandler && [download matches:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
+    }];
+    VerifyOrReturnValue(NSNotFound != index, NO);
+    _abortedTransfers[index].abortHandler = nil;
+    [self sendWaitingRequestForFabricIndex:fabricIndex nodeID:nodeID];
+    return YES;
+}
+
+- (void)sendWaitingRequestForFabricIndex:(NSNumber *)fabricIndex nodeID:(NSNumber *)nodeID
+{
+    assertChipStackLockedByCurrentThread();
+
+    NSIndexSet * indexes = [_abortedTransfers indexesOfObjectsPassingTest:^BOOL(MTRDownload * download, NSUInteger idx, BOOL * stop) {
+        return [download.fabricIndex isEqual:fabricIndex] && [download.nodeID isEqual:nodeID];
+    }];
+    for (MTRDownload * download in [_abortedTransfers objectsAtIndexes:indexes]) {
+        VerifyOrReturn(nil == download.abortHandler);
+    }
+
+    [_abortedTransfers removeObjectsAtIndexes:indexes];
+
+    // Release every waiting download of the node, not only the first one.
+    for (MTRDownload * download in [_downloads copy]) {
+        if (download.waitingForAbortedTransfer && [download.fabricIndex isEqual:fabricIndex] && [download.nodeID isEqual:nodeID]) {
+            download.waitingForAbortedTransfer = NO;
+            chip::DeviceLayer::SystemLayer().CancelTimer(OnAbortedTransferWaitTimeout, (__bridge void *) download);
+            download.request();
+        }
+    }
 }
 @end
 
@@ -546,8 +756,35 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
     VerifyOrReturn(nil != download,
         dispatch_async(queue, ^{ completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL]); }));
 
+    BOOL waitForAbortedTransfer = [_downloads hasAbortedTransferForFabricIndex:fabricIndex nodeID:nodeID];
+    // The device can answer Busy for a moment after an aborted transfer's session has ended
+    // locally too, so a recent aborted transfer makes a Busy answer retryable even when there
+    // is nothing left to wait for.
+    BOOL retryOnBusy = waitForAbortedTransfer || [_downloads hasRecentAbortedTransferForFabricIndex:fabricIndex nodeID:nodeID];
+
+    // download.request holds sendRequest, which holds interactionModelDone, so both capture the
+    // download weakly: the download is kept alive by the download list until it is removed, and
+    // a response that arrives after that has nothing left to finish.
+    __weak MTRDownload * weakDownload = download;
     auto interactionModelDone = ^(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable response, NSError * _Nullable error) {
-        [download checkInteractionModelResponse:response error:error];
+        MTRDownload * strongDownload = weakDownload;
+        VerifyOrReturn(nil != strongDownload);
+
+        if (retryOnBusy && nil == error && [response.status isEqual:@(MTRDiagnosticLogsStatusBusy)]) {
+            [controller asyncDispatchToMatterQueue:^{
+                if (![strongDownload retryRequestAfterBusy]) {
+                    [strongDownload checkInteractionModelResponse:response error:error];
+                }
+            } errorHandler:^(NSError * dispatchError) {
+                // The controller is shutting down and can not retry. The device did answer
+                // (Busy), and that response, not the dispatch failure, is what the download
+                // reports; error is nil on this path.
+                [strongDownload checkInteractionModelResponse:response error:error];
+            }];
+            return;
+        }
+
+        [strongDownload checkInteractionModelResponse:response error:error];
     };
 
     auto * device = [MTRDevice deviceWithNodeID:nodeID controller:controller];
@@ -558,10 +795,25 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
     params.requestedProtocol = @(MTRDiagnosticLogsTransferProtocolBDX);
     params.transferFileDesignator = download.fileDesignator;
 
-    [cluster retrieveLogsRequestWithParams:params expectedValues:nil expectedValueInterval:nil completion:interactionModelDone];
+    auto sendRequest = ^{
+        [cluster retrieveLogsRequestWithParams:params expectedValues:nil expectedValueInterval:nil completion:interactionModelDone];
 
-    MTR_LOG("%@ Started log download attempt for node %016llX-%016llX (%llu)", download,
-        controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue);
+        MTR_LOG("%@ Started log download attempt for node %016llX-%016llX (%llu)", weakDownload,
+            controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue);
+    };
+
+    // The request is kept so a Busy answer can be retried.
+    download.request = sendRequest;
+
+    if (waitForAbortedTransfer) {
+        MTR_LOG("%@ Waiting for the aborted log transfer for node %016llX-%016llX (%llu) to end", download,
+            controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue);
+        [download waitForAbortedTransfer];
+        [_downloads sendWaitingRequestForFabricIndex:fabricIndex nodeID:nodeID];
+        return;
+    }
+
+    sendRequest();
 }
 
 - (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller
@@ -638,7 +890,13 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
         controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue,
         fileDesignator, error);
 
+    if ([_downloads abortedTransferEnded:fileDesignator fabricIndex:fabricIndex nodeID:nodeID]) {
+        return;
+    }
+
     VerifyOrReturn(nil != download);
+
+    download.abortHandler = nil;
 
     VerifyOrReturn(nil == error, [download failure:error]);
     [download success];
