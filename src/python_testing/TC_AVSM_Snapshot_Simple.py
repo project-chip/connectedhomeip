@@ -239,6 +239,190 @@ class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
                     except InteractionModelError as e:
                         log.error("Failed to deallocate snapshot stream %s: %s", range_stream_id, e)
 
+        # Verify concurrent Video and Snapshot stream execution in both allocation and deallocation orders
+        if feature_map & cluster.Bitmaps.Feature.kVideo:
+            stream_usages = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
+            )
+            trade_offs = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
+            )
+            min_viewport = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
+            )
+            sensor_params = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
+            )
+
+            def make_video_alloc_cmd(fps: int):
+                v_args = {
+                    "streamUsage": stream_usages[0],
+                    "videoCodec": trade_offs[0].codec,
+                    "minFrameRate": fps,
+                    "maxFrameRate": fps,
+                    "minResolution": min_viewport,
+                    "maxResolution": cluster.Structs.VideoResolutionStruct(
+                        width=sensor_params.sensorWidth, height=sensor_params.sensorHeight
+                    ),
+                    "minBitRate": trade_offs[0].minBitRate,
+                    "maxBitRate": trade_offs[0].minBitRate,
+                    "keyFrameInterval": 4000,
+                }
+                if watermark_supported:
+                    v_args["watermarkEnabled"] = False
+                if osd_supported:
+                    v_args["OSDEnabled"] = False
+                return commands.VideoStreamAllocate(**v_args)
+
+            def make_snapshot_alloc_cmd(cap_entry):
+                s_args = {
+                    "imageCodec": cap_entry.imageCodec,
+                    "maxFrameRate": cap_entry.maxFrameRate,
+                    "minResolution": cap_entry.resolution,
+                    "maxResolution": cap_entry.resolution,
+                    "quality": 90,
+                }
+                if watermark_supported:
+                    s_args["watermarkEnabled"] = False
+                if osd_supported:
+                    s_args["OSDEnabled"] = False
+                return commands.SnapshotStreamAllocate(**s_args)
+
+            async def dealloc_quietly(cmd):
+                try:
+                    await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
+                except InteractionModelError as e:
+                    log.error("Cleanup command %s failed: %s", cmd, e)
+
+            def extract_jpeg_dimensions(jpeg_bytes: bytes):
+                idx = 2
+                n = len(jpeg_bytes)
+                while idx + 4 <= n:
+                    if jpeg_bytes[idx] != 0xFF:
+                        idx += 1
+                        continue
+                    while idx < n and jpeg_bytes[idx] == 0xFF:
+                        idx += 1
+                    if idx >= n:
+                        break
+                    marker = jpeg_bytes[idx]
+                    idx += 1
+                    if marker in (0xD8, 0xD9) or (0xD0 <= marker <= 0xD7) or marker == 0x01:
+                        continue
+                    if idx + 2 > n:
+                        break
+                    seg_len = int.from_bytes(jpeg_bytes[idx:idx + 2], "big")
+                    if seg_len < 2 or idx + seg_len > n:
+                        break
+                    if marker in (0xC0, 0xC1, 0xC2) and seg_len >= 7:
+                        height = int.from_bytes(jpeg_bytes[idx + 3:idx + 5], "big")
+                        width = int.from_bytes(jpeg_bytes[idx + 5:idx + 7], "big")
+                        return width, height
+                    idx += seg_len
+                return None, None
+
+            async def assert_valid_snapshot_capture(target_stream_id, cap_entry):
+                resp = await self.send_single_cmd(
+                    cmd=commands.CaptureSnapshot(
+                        snapshotStreamID=target_stream_id,
+                        requestedResolution=cap_entry.resolution,
+                    ),
+                    endpoint=endpoint,
+                    payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
+                )
+                asserts.assert_greater(len(resp.data), 0, "Captured image data is empty during concurrent streaming")
+                asserts.assert_equal(resp.imageCodec, cap_entry.imageCodec, "Image codec mismatch")
+                asserts.assert_equal(resp.resolution, cap_entry.resolution, "Image resolution mismatch")
+                if resp.imageCodec == cluster.Enums.ImageCodecEnum.kJpeg:
+                    asserts.assert_true(resp.data.startswith(b"\xff\xd8"), "JPEG SOI marker missing")
+                    asserts.assert_true(resp.data.endswith(b"\xff\xd9"), "JPEG EOI marker missing")
+                    jpeg_width, jpeg_height = extract_jpeg_dimensions(resp.data)
+                    asserts.assert_equal(jpeg_width, cap_entry.resolution.width, "Encoded JPEG width mismatch")
+                    asserts.assert_equal(jpeg_height, cap_entry.resolution.height, "Encoded JPEG height mismatch")
+
+            # Case 1: Allocate lower-res Video stream first, then higher-res Snapshot stream second; deallocate Video first, then Snapshot
+            video_id = None
+            snap_id = None
+            try:
+                video_resp = await self.send_single_cmd(endpoint=endpoint, cmd=make_video_alloc_cmd(30))
+                video_id = video_resp.videoStreamID
+                current_fps = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=attr.CurrentFrameRate
+                )
+                asserts.assert_equal(current_fps, 30, "Video stream failed to start (CurrentFrameRate != 30)")
+
+                snap_resp = await self.send_single_cmd(endpoint=endpoint, cmd=make_snapshot_alloc_cmd(selected_cap))
+                snap_id = snap_resp.snapshotStreamID
+
+                await assert_valid_snapshot_capture(snap_id, selected_cap)
+                await assert_valid_snapshot_capture(NullValue, selected_cap)
+
+                # Stop Video stream while Snapshot stream stays active, and verify CaptureSnapshot still succeeds
+                await self.send_single_cmd(
+                    endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=video_id)
+                )
+                video_id = None
+
+                await assert_valid_snapshot_capture(snap_id, selected_cap)
+            finally:
+                if video_id is not None:
+                    await dealloc_quietly(commands.VideoStreamDeallocate(videoStreamID=video_id))
+                if snap_id is not None:
+                    await dealloc_quietly(commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id))
+
+            # Case 2: Allocate lower-res Snapshot stream first, then higher-fps Video stream second, then higher-res Snapshot stream;
+            # deallocate Snapshot streams first, then Video
+            video_id = None
+            snap_id = None
+            snap_hd_id = None
+            try:
+                snap_resp = await self.send_single_cmd(endpoint=endpoint, cmd=make_snapshot_alloc_cmd(caps[0]))
+                snap_id = snap_resp.snapshotStreamID
+                await assert_valid_snapshot_capture(snap_id, caps[0])
+
+                target_fps = min(60, sensor_params.maxFPS)
+                video_resp = await self.send_single_cmd(endpoint=endpoint, cmd=make_video_alloc_cmd(target_fps))
+                video_id = video_resp.videoStreamID
+                current_fps = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=attr.CurrentFrameRate
+                )
+                asserts.assert_equal(
+                    current_fps,
+                    target_fps,
+                    "Video stream failed to start while snapshot stream was active",
+                )
+
+                if selected_cap.resolution != caps[0].resolution:
+                    snap_hd_resp = await self.send_single_cmd(endpoint=endpoint, cmd=make_snapshot_alloc_cmd(selected_cap))
+                    snap_hd_id = snap_hd_resp.snapshotStreamID
+                    await assert_valid_snapshot_capture(snap_hd_id, selected_cap)
+
+                # Capture snapshot while both Snapshot and Video streams are running concurrently
+                await assert_valid_snapshot_capture(snap_id, caps[0])
+
+                if snap_hd_id is not None:
+                    await self.send_single_cmd(
+                        endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=snap_hd_id)
+                    )
+                    snap_hd_id = None
+
+                # Deallocate Snapshot stream while Video stream remains active, then re-allocate Snapshot stream
+                await self.send_single_cmd(
+                    endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id)
+                )
+                snap_id = None
+
+                snap_resp = await self.send_single_cmd(endpoint=endpoint, cmd=make_snapshot_alloc_cmd(selected_cap))
+                snap_id = snap_resp.snapshotStreamID
+                await assert_valid_snapshot_capture(snap_id, selected_cap)
+            finally:
+                if snap_hd_id is not None:
+                    await dealloc_quietly(commands.SnapshotStreamDeallocate(snapshotStreamID=snap_hd_id))
+                if snap_id is not None:
+                    await dealloc_quietly(commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id))
+                if video_id is not None:
+                    await dealloc_quietly(commands.VideoStreamDeallocate(videoStreamID=video_id))
+
 
 if __name__ == "__main__":
     default_matter_test_main()
