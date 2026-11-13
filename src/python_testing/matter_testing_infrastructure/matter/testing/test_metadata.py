@@ -17,8 +17,8 @@ import re
 import tempfile
 import unittest
 
-from metadata import (NEEDS_FOLLOWUP_FIXES_TAG, NIGHTLY_TAG, OPENSSL_3_5_TAG, Metadata, MetadataReader, RunArgumentsError,
-                      TagFilter, extract_runs_args, failure_fails_job, is_valid_tag_name, runs_in_pull_requests,
+from metadata import (BLE_WIFI_TAG, NEEDS_FOLLOWUP_FIXES_TAG, NIGHTLY_TAG, OPENSSL_3_5_TAG, Metadata, MetadataReader,
+                      RunArgumentsError, TagFilter, extract_runs_args, failure_fails_job, is_valid_tag_name, runs_in_pull_requests,
                       script_runs_in_pull_requests, unused_tag_values)
 
 
@@ -100,6 +100,9 @@ class TestMetadataReader(unittest.TestCase):
     #   run6:
     #     app: ${CHIP_LOCK_APP}
     #     tags: [slow]
+    #   run7:
+    #     app: ${CHIP_LOCK_APP}
+    #     tags: [ble-wifi]
     # === END CI TEST ARGUMENTS ===
     '''
 
@@ -121,10 +124,11 @@ class TestMetadataReader(unittest.TestCase):
         self.assertEqual(runs["run4"].issues, ["https://github.com/project-chip/connectedhomeip/issues/3"])
         self.assertEqual(runs["run5"].tags, [OPENSSL_3_5_TAG])
         self.assertEqual(runs["run6"].tags, ["slow"])
+        self.assertEqual(runs["run7"].tags, [BLE_WIFI_TAG])
 
         self.assertEqual([name for name, run in runs.items() if runs_in_pull_requests(run.tags)], ["run1", "run3", "run6"])
         self.assertEqual([name for name, run in runs.items() if failure_fails_job(run.tags)],
-                         ["run1", "run2", "run3", "run5", "run6"])
+                         ["run1", "run2", "run3", "run5", "run6", "run7"])
 
     def test_tag_filter(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -136,6 +140,7 @@ class TestMetadataReader(unittest.TestCase):
             ("skip-nightly",): ["run1", "run3", "run6"],
             ("nightly",): ["run2", "run4"],
             ("openssl-3.5",): ["run5"],
+            ("ble-wifi",): ["run7"],
             ("needs-followup-fixes",): ["run3"],
             ("skip-needs-followup-fixes",): ["run1", "run6"],
             ("slow",): ["run6"],
@@ -150,9 +155,9 @@ class TestMetadataReader(unittest.TestCase):
                 self.assertEqual([name for name, args in runs.items() if tag_filter.matches(args["tags"])], expected)
 
         self.assertEqual(TagFilter.parse([]), TagFilter())
-        self.assertEqual(str(TagFilter()), "skip-nightly skip-openssl-3.5")
+        self.assertEqual(str(TagFilter()), "skip-ble-wifi skip-nightly skip-openssl-3.5")
         self.assertEqual(str(TagFilter.parse(["nightly", "skip-needs-followup-fixes"])),
-                         "nightly skip-needs-followup-fixes skip-openssl-3.5")
+                         "nightly skip-ble-wifi skip-needs-followup-fixes skip-openssl-3.5")
 
     def test_tag_filter_invalid_tag(self):
         for value in ["Nightly", "skip-Nightly", "", "skip-", "skip-skip-slow", "-slow", "slow tag"]:
@@ -160,7 +165,7 @@ class TestMetadataReader(unittest.TestCase):
                 TagFilter.parse([value])
 
     def test_tag_names(self):
-        for name in [NIGHTLY_TAG, NEEDS_FOLLOWUP_FIXES_TAG, OPENSSL_3_5_TAG, "slow", "a", "tls1.3"]:
+        for name in [BLE_WIFI_TAG, NIGHTLY_TAG, NEEDS_FOLLOWUP_FIXES_TAG, OPENSSL_3_5_TAG, "slow", "a", "tls1.3"]:
             with self.subTest(name=name):
                 self.assertTrue(is_valid_tag_name(name))
         for name in ["", "Nightly", "skip-slow", "-slow", ".slow", "slow tag", "slow_tag"]:
