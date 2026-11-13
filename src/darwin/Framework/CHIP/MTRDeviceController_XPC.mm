@@ -132,12 +132,9 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
             NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
             MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
 
-            if (interestedPathsForAttributes != nil) {
-                nodeDictionary[MTRDeviceControllerRegistrationInterestedPathsForAttributesKey] = MTRRegistrationInterestedPaths(interestedPathsForAttributes);
-            }
-            if (interestedPathsForEvents != nil) {
-                nodeDictionary[MTRDeviceControllerRegistrationInterestedPathsForEventsKey] = MTRRegistrationInterestedPaths(interestedPathsForEvents);
-            }
+            // A nil union means some delegate wants every path; say so with the wildcard element.
+            nodeDictionary[MTRDeviceControllerRegistrationInterestedPathsForAttributesKey] = (interestedPathsForAttributes != nil) ? MTRRegistrationInterestedPaths(interestedPathsForAttributes) : @[ @{} ];
+            nodeDictionary[MTRDeviceControllerRegistrationInterestedPathsForEventsKey] = (interestedPathsForEvents != nil) ? MTRRegistrationInterestedPaths(interestedPathsForEvents) : @[ @{} ];
 
             [nodeIDs addObject:nodeDictionary];
         }
