@@ -323,8 +323,22 @@ static CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
     VerifyOrExit(ctx && ctx->mBrowseCb, error = CHIP_ERROR_INVALID_ARGUMENT);
     ctx->mServiceSize = GetResultSize(ctx->mPtrQueryResult);
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
-    mdns_lookup_delegated_service(NULL, ctx->mType, GetProtocolString(ctx->mProtocol), kMaxResults - ctx->mServiceSize,
-                                  &delegatedResults);
+    {
+        // Subtype browse: ctx->mType is "<subtype>._sub.<type>"; the delegated services are keyed by <type>.
+        const char * sub = strstr(ctx->mType, "._sub.");
+        if (sub != nullptr)
+        {
+            char subtype[sizeof(ctx->mType)] = {};
+            memcpy(subtype, ctx->mType, static_cast<size_t>(sub - ctx->mType));
+            mdns_lookup_delegated_service_with_subtype(NULL, sub + strlen("._sub."), GetProtocolString(ctx->mProtocol), subtype,
+                                                       kMaxResults - ctx->mServiceSize, &delegatedResults);
+        }
+        else
+        {
+            mdns_lookup_delegated_service(NULL, ctx->mType, GetProtocolString(ctx->mProtocol), kMaxResults - ctx->mServiceSize,
+                                          &delegatedResults);
+        }
+    }
     while (delegatedResults)
     {
         mdns_result_t * tmp    = delegatedResults->next;
