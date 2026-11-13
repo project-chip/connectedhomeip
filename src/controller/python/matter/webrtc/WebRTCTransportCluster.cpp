@@ -15,18 +15,19 @@
  *    limitations under the License.
  */
 
+#include <controller/python/matter/native/ChipMainLoopWork.h>
 #include <controller/webrtc/WebRTCTransportRequestorManager.h>
 // These methods are expected to be called from Python.
 extern "C" {
 // WebRTC Requestor functions
 void pychip_WebRTCTransportRequestor_Init()
 {
-    WebRTCTransportRequestorManager::Instance().Init();
+    chip::MainLoopWork::ExecuteInMainLoop([] { WebRTCTransportRequestorManager::Instance().Init(); });
 }
 
 void pychip_WebRTCTransportRequestor_Shutdown()
 {
-    WebRTCTransportRequestorManager::Instance().Shutdown();
+    chip::MainLoopWork::ExecuteInMainLoop([] { WebRTCTransportRequestorManager::Instance().Shutdown(); });
 }
 
 void pychip_WebRTCTransportRequestor_InitCallbacks(OnOfferCallback onOnOfferCallback, OnAnswerCallback onAnswerCallback,

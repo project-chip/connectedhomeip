@@ -383,6 +383,8 @@ EndpointInterface * CodeDrivenDataModelProvider::GetEndpointInterface(EndpointId
 
 ServerClusterInterface * CodeDrivenDataModelProvider::GetServerClusterInterface(const ConcreteClusterPath & clusterPath)
 {
+    // Cluster registrations are retained when an endpoint is removed, but its children must no longer be visible.
+    VerifyOrReturnValue(GetEndpointInterface(clusterPath.mEndpointId) != nullptr, nullptr);
     return mServerClusterRegistry.Get(clusterPath);
 }
 
