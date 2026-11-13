@@ -33,6 +33,9 @@ if (chip_build_tests) {
         "${chip_root}/examples/evse-app/evse-common/tests:tests-delegate",
       ]
     }
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+      tests += [ "${chip_root}/examples/energy-management/energy-management-triggers/tests" ]
+    }
     tests += [
       "${chip_root}/examples/all-devices-app/posix/app_options/tests",
       "${chip_root}/examples/all-devices-app/posix/emulated_network/tests",
