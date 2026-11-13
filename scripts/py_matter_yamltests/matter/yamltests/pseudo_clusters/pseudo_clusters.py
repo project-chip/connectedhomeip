@@ -20,6 +20,7 @@ from .clusters.discovery_commands import DiscoveryCommands
 from .clusters.equality_commands import EqualityCommands
 from .clusters.log_commands import LogCommands
 from .clusters.system_commands import SystemCommands
+from .clusters.value_commands import ValueCommands
 from .clusters.webrtc import WebRTC
 from .pseudo_cluster import PseudoCluster
 
@@ -80,6 +81,7 @@ def get_default_pseudo_clusters() -> PseudoClusters:
         EqualityCommands(),
         LogCommands(),
         SystemCommands(),
+        ValueCommands(),
         WebRTC(),
     ]
     return PseudoClusters(clusters)
