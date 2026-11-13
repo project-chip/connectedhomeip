@@ -250,6 +250,12 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPresets()
     {
         MPTZPresetStruct::Type preset;
         ReturnErrorOnFailure(DataModel::Decode(reader, preset));
+        if (preset.name.size() > kMaxMPTZPresetNameLength)
+        {
+            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Dropping stored preset %d with %u-byte name", mEndpointId,
+                         preset.presetID, static_cast<unsigned>(preset.name.size()));
+            continue;
+        }
         MPTZPresetHelper aMptzPresetHelper;
 
         aMptzPresetHelper.SetPresetID(preset.presetID);
@@ -1036,6 +1042,10 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     Optional<uint8_t> preset  = commandData.presetID;
     chip::CharSpan presetName = commandData.name;
     uint8_t presetToUse       = mCurrentPresetID;
+
+    VerifyOrReturnError(
+        presetName.size() <= kMaxMPTZPresetNameLength, Status::ConstraintError,
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Preset name exceeds the maximum byte length", mEndpointId));
 
     // Do we have a user provided preset ID? If yes, is it in range?
     //

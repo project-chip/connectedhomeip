@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <lib/support/CodeUtils.h>
 #include <string>
 #include <vector>
 
@@ -51,9 +52,12 @@ constexpr size_t kArrayTlvOverhead = 2;
 constexpr size_t kMptzPositionStructMaxSerializedSize =
     TLV::EstimateStructOverhead(sizeof(int16_t), sizeof(int16_t), sizeof(uint8_t));
 
+// Generated data model constraint shared by MPTZSavePresetRequest::name and MPTZPresetStruct::name.
+constexpr size_t kMaxMPTZPresetNameLength = 32;
+
 // Max size for an MPTZPresetStruct
-constexpr size_t kMaxMPTZPresetStructSerializedSize = TLV::EstimateStructOverhead(
-    sizeof(uint8_t), static_cast<size_t>(32) /* max preset name length */, kMptzPositionStructMaxSerializedSize);
+constexpr size_t kMaxMPTZPresetStructSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(uint8_t), kMaxMPTZPresetNameLength, kMptzPositionStructMaxSerializedSize);
 
 // Spec maximum number of entries in MPTZPresets (ZAP length="255").
 constexpr size_t kSpecMaxMPTZPresets = 255;
@@ -96,10 +100,13 @@ public:
     // Accessors and Mutators
     //
     std::string GetName() const { return mName; }
-    void SetName(chip::CharSpan aName)
+    bool SetName(chip::CharSpan aName)
     {
+        VerifyOrReturnValue(aName.size() <= kMaxMPTZPresetNameLength, false,
+                            ChipLogError(Zcl, "CameraAVSettingsUserLevelManagement: Preset name exceeds the maximum byte length"));
         mName = std::string(aName.begin(), aName.end());
         ChipLogProgress(Zcl, "My preset name being set %s", mName.c_str());
+        return true;
     }
 
     uint8_t GetPresetID() const { return mPresetID; }
