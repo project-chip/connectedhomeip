@@ -69,11 +69,11 @@ std::unique_ptr<ElectricalSensorManager> gESManager;
 bool gCommonClustersInitialized = false;
 
 // EVSE-specific instances
+chip::app::DefaultTimerDelegate gEvseTimerDelegate;
 std::unique_ptr<EnergyEvseDelegate> gEvseDelegate;
 std::unique_ptr<EvseTargetsDelegate> gEvseTargetsDelegate;
 std::unique_ptr<EnergyEvseManager> gEvseInstance;
 std::unique_ptr<EVSEManufacturer> gEvseManufacturer;
-chip::app::DefaultTimerDelegate gEvseTimerDelegate;
 
 /*
  *  @brief  Creates a Delegate and Instance for Energy EVSE cluster
@@ -252,7 +252,7 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
 
         ElectricalSensorManager::PtConfig ptConfig{
             .features    = BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology,
-                                                                  PowerTopology::Feature::kElectricalCircuit),
+                                                                     PowerTopology::Feature::kElectricalCircuit),
             .fabricTable = &Server::GetInstance().GetFabricTable(),
         };
 
