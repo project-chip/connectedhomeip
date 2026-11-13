@@ -561,3 +561,136 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+
+    nightly_all_devices_conformance_run:
+        name: Nightly All-Devices Conformance Tests - Linux (RUN)
+        needs: nightly_repl_tests_linux_build
+        if: github.actor != 'restyled-io[bot]'
+        timeout-minutes: 45
+        env:
+            BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
+
+        runs-on: namespace-profile-1x2
+
+        container:
+            image: ghcr.io/project-chip/chip-build:215
+            volumes:
+                - /var/run/nsc/:/var/run/nsc/
+            env:
+                NSC_TOKEN_FILE: ${{ env.NSC_TOKEN_FILE }}
+                NAMESPACE_ACTIONS_RESULTS_URL: ${{ env.NAMESPACE_ACTIONS_RESULTS_URL }}
+                NAMESPACE_ACTIONS_RESULTS_SERVICE: ${{ env.NAMESPACE_ACTIONS_RESULTS_SERVICE }}
+                NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD: ${{ env.NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD }}
+            options: >-
+                --privileged
+                --sysctl net.ipv6.conf.all.disable_ipv6=0
+                --sysctl net.ipv4.conf.all.forwarding=0
+                --sysctl net.ipv6.conf.all.forwarding=0
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-linux-${{ env.BUILD_VARIANT }}-all-devices-conformance
+
+            - name: Set ASAN symbolizer path
+              run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
+
+            - name: Set up a IPV6 known environment
+              uses: ./.github/actions/add-ipv6
+
+            - name: Download artifacts for running
+              uses: namespace-actions/download-artifact@v2
+              with:
+                  name: repl-build-data
+
+            - uses: Wandalen/wretry.action@e68c23e6309f2871ca8ae4763e7629b9c258e1ea # v3.8.0
+              name: Unpack artifacts
+              with:
+                  command: tar xfJ repl-build-data.tar.xz
+                  attempt_limit: 3
+                  attempt_delay: 2000
+
+            - name: Run All-Devices Conformance Report
+              run: |
+                  scripts/run_in_build_env.sh "python3 scripts/examples/all_devices_conformance_report.py \
+                      --skip-building \
+                      --python-env out/venv \
+                      --app-path objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-clang-test/all-devices-app \
+                      --html-out-dir /tmp/all_devices_conformance_report/publish"
+                  cp /tmp/all_devices_conformance_report/*.csv /tmp/all_devices_conformance_report/publish/
+
+            - name: Upload Conformance HTML & CSV Report
+              if: always()
+              uses: actions/upload-artifact@v7
+              with:
+                  name: all-devices-conformance-report
+                  path: /tmp/all_devices_conformance_report/publish
+                  retention-days: 30
+                  if-no-files-found: error
+
+            - name: Upload Conformance Raw Logs
+              if: always()
+              uses: actions/upload-artifact@v7
+              with:
+                  name: all-devices-conformance-logs
+                  path: /tmp/all_devices_conformance_report/*.txt
+                  retention-days: 14
+                  if-no-files-found: warn
+
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+
+    nightly_all_devices_conformance_report:
+        name: Nightly All-Devices Conformance - Publish Report
+        needs: nightly_all_devices_conformance_run
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' }}
+
+        runs-on: ubuntu-latest
+        concurrency:
+            group: gh-pages-deploy
+            cancel-in-progress: false
+        permissions:
+            contents: write
+
+        steps:
+            - name: Download Conformance Report Artifact
+              uses: actions/download-artifact@v8
+              with:
+                  name: all-devices-conformance-report
+                  path: conformance-report-publish
+
+            - name: Deploy Conformance Report to GitHub Pages
+              if: github.event_name != 'pull_request' && github.event_name != 'merge_group' && github.ref == 'refs/heads/master'
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: conformance-report-publish
+                  destination_dir: conformance-report/all-devices
+                  keep_files: false
+
+            - name: Write GitHub Step Summary
+              run: |
+                  {
+                    echo "### All-Devices Conformance Report"
+                    for f in conformance-report-publish/*_summary.csv; do
+                      if [ -f "$f" ]; then
+                        echo "- **$(head -n 1 "$f")**"
+                      fi
+                    done
+                    echo ""
+                    echo "Published URL (master): \`https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/conformance-report/all-devices/\`"
+                  } >> "$GITHUB_STEP_SUMMARY"
+
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
