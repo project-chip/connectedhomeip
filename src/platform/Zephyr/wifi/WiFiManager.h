@@ -215,11 +215,13 @@ private:
 #if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
     constexpr static uint64_t kWifiManagementEvents = NET_EVENT_WIFI_SCAN_RESULT | NET_EVENT_WIFI_SCAN_DONE |
         NET_EVENT_WIFI_CONNECT_RESULT | NET_EVENT_WIFI_DISCONNECT_RESULT | NET_EVENT_WIFI_IFACE_STATUS;
-    constexpr static uint64_t kIPv6ManagementEvents = NET_EVENT_IPV6_ADDR_ADD | NET_EVENT_IPV6_ADDR_DEL;
+    constexpr static uint64_t kIPv6ManagementEvents =
+        NET_EVENT_IPV6_ADDR_ADD | NET_EVENT_IPV6_ADDR_DEL | (IS_ENABLED(CONFIG_NET_IPV6_DAD) ? NET_EVENT_IPV6_DAD_SUCCEED : 0);
 #else
     constexpr static uint32_t kWifiManagementEvents = NET_EVENT_WIFI_SCAN_RESULT | NET_EVENT_WIFI_SCAN_DONE |
         NET_EVENT_WIFI_CONNECT_RESULT | NET_EVENT_WIFI_DISCONNECT_RESULT | NET_EVENT_WIFI_IFACE_STATUS;
-    constexpr static uint32_t kIPv6ManagementEvents = NET_EVENT_IPV6_ADDR_ADD | NET_EVENT_IPV6_ADDR_DEL;
+    constexpr static uint32_t kIPv6ManagementEvents =
+        NET_EVENT_IPV6_ADDR_ADD | NET_EVENT_IPV6_ADDR_DEL | (IS_ENABLED(CONFIG_NET_IPV6_DAD) ? NET_EVENT_IPV6_DAD_SUCCEED : 0);
 #endif
 
     // Event handling
