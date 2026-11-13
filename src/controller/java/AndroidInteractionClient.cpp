@@ -315,10 +315,7 @@ CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong deviceP
         device->GetExchangeManager(), callback->GetChunkedWriteCallback(),
         convertedTimedRequestTimeoutMs != 0 ? Optional<uint16_t>(convertedTimedRequestTimeoutMs) : Optional<uint16_t>::Missing());
     VerifyOrExit(writeClient != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    if (device->GetSecureSession().Value()->IsGroupSession())
-    {
-        SuccessOrExit(err = writeClient->PrepareForGroupcast());
-    }
+    SuccessOrExit(err = writeClient->PrepareForSession(device->GetSecureSession().Value()));
 
     for (jint i = 0; i < listSize; i++)
     {
@@ -501,10 +498,7 @@ CHIP_ERROR extendableInvoke(JNIEnv * env, jlong handle, jlong callbackHandle, jl
     VerifyOrExit(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
     config.SetRemoteMaxPathsPerInvoke(device->GetSecureSession().Value()->GetRemoteSessionParameters().GetMaxPathsPerInvoke());
     SuccessOrExit(err = commandSender->SetCommandSenderConfig(config));
-    if (device->GetSecureSession().Value()->IsGroupSession())
-    {
-        SuccessOrExit(err = commandSender->PrepareForGroupcast());
-    }
+    SuccessOrExit(err = commandSender->PrepareForSession(device->GetSecureSession().Value()));
 
     for (jint i = 0; i < listSize; i++)
     {
@@ -714,10 +708,7 @@ CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong device
 
     commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), timedRequestTimeoutMs != 0);
     VerifyOrExit(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    if (device->GetSecureSession().Value()->IsGroupSession())
-    {
-        SuccessOrExit(err = commandSender->PrepareForGroupcast());
-    }
+    SuccessOrExit(err = commandSender->PrepareForSession(device->GetSecureSession().Value()));
 
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getEndpointId", "(J)J", &getEndpointIdMethod));
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getClusterId", "(J)J", &getClusterIdMethod));

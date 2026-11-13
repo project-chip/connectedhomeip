@@ -318,13 +318,19 @@ public:
                                       TestListEncodingOverride encodingBehavior = TestListEncodingOverride::kNoOverride);
 
     /**
-     * Encode this write as a groupcast: SuppressResponse and TimedRequest are not encoded.
+     * Declare the session this write will be sent on, so the encoding of SuppressResponse and TimedRequest
+     * can be chosen before the first attribute is encoded:
+     *   - Group session: Neither field is encoded.
+     *                    Fails with CHIP_ERROR_INVALID_ARGUMENT if this WriteClient was created for a timed write.
+     *   - Other sessions: A field is not encoded when FALSE and the peer reported InteractionModelRevision >= 14
+     *                     during session establishment.
+     *                     Otherwise both fields are encoded.
      *
-     * Must be called before the first attribute is encoded. SendWriteRequest requires this call for a group
-     * session and rejects it for a unicast session. Fails with CHIP_ERROR_INVALID_ARGUMENT if this WriteClient
-     * was created for a timed write.
+     * To presever callers' compatibility, Calling PrepareForSession before encoding attributes is optional for all sessions.
+     * Without PrepareForSession, both fields are encoded.
+     * When PrepareForSession is used, it must be called before the first attribute is encoded.
      */
-    CHIP_ERROR PrepareForGroupcast();
+    CHIP_ERROR PrepareForSession(const SessionHandle & session);
 
     /**
      *  Once SendWriteRequest returns successfully, the WriteClient will
@@ -334,6 +340,7 @@ public:
      *  If the timeout is missing or is set to System::Clock::kZero, a value based on the MRP timeouts of the session will be used.
      *  If SendWriteRequest is never called, or the call fails, the API
      *  consumer is responsible for calling Shutdown on the WriteClient.
+     *  Timed writes on group sessions are rejected with CHIP_ERROR_INVALID_ARGUMENT.
      */
     CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = System::Clock::kZero);
 
@@ -569,8 +576,9 @@ private:
     // If mTimedWriteTimeoutMs has a value, we are expected to do a timed
     // write.
     Optional<uint16_t> mTimedWriteTimeoutMs;
-    bool mSuppressResponse = false;
-    bool mGroupcastRequest = false;
+    bool mSuppressResponse      = false;
+    bool mGroupcastRequest      = false;
+    bool mOmitFalseRequestFlags = false;
 
     // A list of buffers, one buffer for each chunk.
     System::PacketBufferHandle mChunks;

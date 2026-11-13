@@ -1752,6 +1752,7 @@ private:
             auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), &exchangeManager, isTimedRequest);
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
+            ReturnErrorOnFailure(commandSender->PrepareForSession(session));
             ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, MTRDataValueDictionaryDecodableType(commandFields),
                 (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue])));
 
@@ -1842,6 +1843,7 @@ private:
             app::CommandSender::ConfigParameters configParams;
             configParams.SetRemoteMaxPathsPerInvoke(remoteMaxPaths);
             ReturnErrorOnFailure(commandSender->SetCommandSenderConfig(configParams));
+            ReturnErrorOnFailure(commandSender->PrepareForSession(session));
 
             uint16_t commandRef = 0;
             for (MTRCommandWithRequiredResponse * command in commands) {
