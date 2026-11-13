@@ -168,6 +168,17 @@ public:
 
     /**
      * @brief
+     *   Checks only the transfer timeout, which PollOutput also checks first, and leaves any other pending output in place.
+     *
+     *   For a caller that cannot act on other output right now but must still notice that the transfer timed out.
+     *
+     * @param event     Set to kTransferTimeout if the timeout has expired, otherwise to kNone
+     * @param curTime   Current time
+     */
+    void PollTimeout(OutputEvent & event, System::Clock::Timestamp curTime);
+
+    /**
+     * @brief
      *   Gets the pending output event from the transfer session in the event param passed in by the caller.
      *   The output event may contain some data for the caller to act upon. If there is no pending output event,
      *   the caller will get an event of type OutputEventType::kNone.
