@@ -165,8 +165,21 @@ class PairOnNetworkLongOtaOverBdxCommand(
       logger.log(Level.INFO, "handleBDXTransferSessionBegin, $nodeId, $fileDesignator, $offset")
       try {
         val file = File(uri + fileName)
+        // The image is served from the requested offset. Throwing rejects the transfer with
+        // START_OFFSET_NOT_SUPPORTED, so the requestor downloads from offset 0.
+        if (offset < 0 || (offset > 0 && offset >= file.length())) {
+          throw IllegalArgumentException("Cannot serve $fileName from offset $offset")
+        }
         val fileInputStream = FileInputStream(file)
         bufferedInputStream = BufferedInputStream(fileInputStream)
+        var remaining = offset
+        while (remaining > 0) {
+          val skipped = bufferedInputStream!!.skip(remaining)
+          if (skipped <= 0) {
+            throw IllegalArgumentException("Cannot serve $fileName from offset $offset")
+          }
+          remaining -= skipped
+        }
       } catch (e: IOException) {
         logger.log(Level.INFO, "exception", e)
         inputStream?.close()

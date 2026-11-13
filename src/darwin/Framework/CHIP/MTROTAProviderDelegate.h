@@ -121,7 +121,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * The offset is the start offset (STARTOFS) from the node's BDX ReceiveInit
  * message, passed through unchanged: the byte offset in the OTA image at which the
- * transfer starts.
+ * transfer starts, for example to resume an interrupted download.
  *
  * To reject the transfer with a specific BDX status, pass completion an error
  * in MTRBDXErrorDomain:

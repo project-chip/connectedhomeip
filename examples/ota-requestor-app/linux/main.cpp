@@ -25,7 +25,10 @@
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #include <platform/Linux/OTAImageProcessorImpl.h>
 
+#include <filesystem>
 #include <optional>
+#include <string>
+#include <system_error>
 
 using chip::BDXDownloader;
 using chip::ByteSpan;
@@ -70,9 +73,11 @@ class SkipTestBDXDownloader : public BDXDownloader
 public:
     CHIP_ERROR BeginPrepareDownload() override;
     CHIP_ERROR FetchNextData() override;
+    CHIP_ERROR OnFinalized(CHIP_ERROR status) override;
 
 private:
     bool mSkipPending = false;
+    bool mSkipped     = false;
 };
 
 DefaultOTARequestor gRequestorCore;
@@ -213,6 +218,7 @@ void CustomOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
 CHIP_ERROR SkipTestBDXDownloader::BeginPrepareDownload()
 {
     mSkipPending = gBDXSkipAfterFirstBlock.has_value();
+    mSkipped     = false;
     return BDXDownloader::BeginPrepareDownload();
 }
 
@@ -221,9 +227,27 @@ CHIP_ERROR SkipTestBDXDownloader::FetchNextData()
     if (mSkipPending)
     {
         mSkipPending = false;
+        mSkipped     = true;
         return SkipData(*gBDXSkipAfterFirstBlock);
     }
     return BDXDownloader::FetchNextData();
+}
+
+CHIP_ERROR SkipTestBDXDownloader::OnFinalized(CHIP_ERROR status)
+{
+    // A download that skipped bytes fails the processor's checks, and the downloader then discards the image. Keep a copy of
+    // the finished file, which the processor has closed by now, so tests can check which bytes the provider served.
+    if (mSkipped)
+    {
+        std::error_code ec;
+        std::filesystem::copy_file(gOtaDownloadPath, std::string(gOtaDownloadPath) + ".skipped",
+                                   std::filesystem::copy_options::overwrite_existing, ec);
+        if (ec)
+        {
+            ChipLogError(SoftwareUpdate, "Could not keep a copy of the skipped download: %s", ec.message().c_str());
+        }
+    }
+    return BDXDownloader::OnFinalized(status);
 }
 
 void CustomOTARequestorDriver::AppliedNotifyUpdateTimer(System::Layer * systemLayer, void * appState)

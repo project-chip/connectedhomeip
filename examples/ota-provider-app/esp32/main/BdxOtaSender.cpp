@@ -121,6 +121,13 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         break;
     }
     case TransferSession::OutputEventType::kInitReceived: {
+        if (mTransfer.GetStartOffset() > 0)
+        {
+            // The block query callback reads the image from its start, so it cannot serve a transfer from another offset.
+            LogErrorOnFailure(mTransfer.AbortTransfer(StatusCode::kStartOffsetNotSupported));
+            break;
+        }
+
         // TransferSession will automatically reject a transfer if there are no
         // common supported control modes. It will also default to the smaller
         // block size.
