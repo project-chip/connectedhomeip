@@ -140,6 +140,8 @@ public:
      * a loss-of-sync with the session state on the associated peer. This could arise if there is evidence
      * of transport failure.
      *
+     * Pending MRP retransmissions on a defunct session are abandoned.
+     *
      * If messages are received thereafter on this session, the session SHALL be put back into the Active state.
      *
      * This SHALL only be callable on an active session.
@@ -304,8 +306,8 @@ private:
         //
         // The session is temporarily disabled due to suspicion of a loss of synchronization
         // with the session state on the peer (e.g transport failure).
-        // In this state, no new outbound exchanges can be created. However, if we receive valid messages
-        // again on this session, we CAN mark this session as being active again.
+        // In this state, no new outbound exchanges can be created, and pending MRP retransmissions are abandoned.
+        // However, if we receive valid messages again on this session, we CAN mark this session as being active again.
         //
         // Transitioning to this state does not detach any existing SessionHolders.
         //
