@@ -253,7 +253,6 @@ CHIP_ERROR BdxOTASession::OnTransferSessionBegin(TransferSession::OutputEvent & 
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode  = bdx::TransferControlFlags::kReceiverDrive;
     acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
-    acceptData.StartOffset  = mTransfer.GetStartOffset();
     acceptData.Length       = mTransfer.GetTransferLength();
 
     return mTransfer.AcceptTransfer(acceptData);

@@ -111,10 +111,12 @@ config NVS_LOOKUP_CACHE
 	bool
 	default y
 
-# Enable OpenThread
+# Enable OpenThread, only on boards that have a IEEE 802.15.4 radio
+DT_CHOSEN_IEEE802154 := zephyr,ieee802154
 config NET_L2_OPENTHREAD
-	bool
-	default y
+    bool
+    default y if $(dt_chosen_enabled,$(DT_CHOSEN_IEEE802154))
+    default n
 
 # Enable mbedTLS
 config MBEDTLS_ENABLE_HEAP
