@@ -19,6 +19,7 @@
 
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "lib/support/TypeTraits.h"
+#include "transport/raw/PeerAddress.h"
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/python/matter/native/PyChipError.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
@@ -81,6 +82,11 @@ void ScriptDevicePairingDelegate::SetCommissioningStatusUpdateCallback(
 void ScriptDevicePairingDelegate::SetCommissioningStageStartCallback(DevicePairingDelegate_OnCommissioningStageStartFunct callback)
 {
     mOnCommissioningStageStartCallback = callback;
+}
+
+void ScriptDevicePairingDelegate::SetInitialPhaseCompleteCallback(DevicePairingDelegate_OnInitialPhaseCompleteFunct callback)
+{
+    mOnInitialPhaseCompleteCallback = callback;
 }
 
 void ScriptDevicePairingDelegate::OnStatusUpdate(DevicePairingDelegate::Status status)
@@ -238,6 +244,42 @@ void ScriptDevicePairingDelegate::OnICDStayActiveComplete(ScopedNodeId deviceId,
 {
     ChipLogProgress(Controller, "ICD Stay Active Complete for device " ChipLogFormatX64 " / promisedActiveDuration: %u",
                     ChipLogValueX64(deviceId.GetNodeId()), promisedActiveDuration);
+}
+
+const char * TransportTypeToString(Transport::Type type)
+{
+    switch (type)
+    {
+    case Transport::Type::kUndefined:
+        return "Undefined";
+    case Transport::Type::kUdp:
+        return "UDP";
+    case Transport::Type::kBle:
+        return "BLE";
+    case Transport::Type::kTcp:
+        return "TCP";
+    case Transport::Type::kWiFiPAF:
+        return "Wi-Fi PAF";
+    case Transport::Type::kNfc:
+        return "NFC";
+    case Transport::Type::kThreadMeshcop:
+        return "ThreadMeshcop";
+    }
+    return "Unknown";
+}
+
+void ScriptDevicePairingDelegate::OnInitialPhaseComplete(PeerId peerId, Transport::Type transportType, bool isUnpowered)
+{
+    ChipLogProgress(Zcl, "ScriptDevicePairingDelegate::OnInitialPhaseComplete");
+
+    ChipLogProgress(Zcl, "nodeId=" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+    ChipLogProgress(Zcl, "stageStarting=%s (%d)", TransportTypeToString(transportType), int(transportType));
+    ChipLogProgress(Zcl, "isUnpowered=%s", isUnpowered ? "true" : "false");
+
+    if (mOnInitialPhaseCompleteCallback != nullptr)
+    {
+        mOnInitialPhaseCompleteCallback(peerId.GetNodeId(), TransportTypeToString(transportType), isUnpowered);
+    }
 }
 
 } // namespace Controller
