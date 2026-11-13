@@ -681,8 +681,8 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
 
     // Release the commissionee device after we have nulled out our pointers,
     // because that can call back in to us with error notifications as the
-    // session is released. Stop the proxy reporting that release back to us
-    // (OnCommissioneeSessionReleased): we are releasing it already, and callers
+    // session is released. Make sure the proxy does not call our
+    // OnCommissioneeSessionReleased: we are releasing it already, and callers
     // that need to tell the pairing delegate do so themselves.
     device->SetSessionReleaseDelegate(nullptr);
     mCommissioneeDevicePool.ReleaseObject(device);
@@ -700,8 +700,9 @@ CommissioneeDeviceProxy * DeviceCommissioner::CreateCommissioneeDevice()
 
 bool DeviceCommissioner::IsBeingCommissioned(const CommissioneeDeviceProxy & device) const
 {
-    // For kICDSendStayActive, kSendComplete and kCleanup the AutoCommissioner passes its operational proxy rather than the
-    // commissionee, so a pointer comparison is not enough: that proxy has the commissionee's node ID.
+    // During kICDSendStayActive and kSendComplete, and kCleanup once the operational proxy has a node ID,
+    // mDeviceBeingCommissioned is the AutoCommissioner's OperationalDeviceProxy, not `device`, so match the commissionee
+    // by node ID.
     return mDeviceBeingCommissioned != nullptr &&
         (mDeviceBeingCommissioned == &device || mDeviceBeingCommissioned->GetDeviceId() == device.GetDeviceId());
 }
