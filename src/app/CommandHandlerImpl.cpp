@@ -895,10 +895,7 @@ CHIP_ERROR CommandHandlerImpl::PrepareStatus(const ConcreteCommandPath & aComman
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
     VerifyOrReturnError(mState == State::NewResponseMessage || mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
-    if (mState == State::AddedCommand)
-    {
-        CreateBackupForResponseRollback();
-    }
+    CreateBackupForResponseRollback();
 
     auto commandPathRegistryEntry = GetCommandPathRegistry().Find(aCommandPath);
     VerifyOrReturnError(commandPathRegistryEntry.has_value(), CHIP_ERROR_INCORRECT_STATE);
