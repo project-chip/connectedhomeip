@@ -830,6 +830,10 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & excha
     chip::Messaging::ExchangeContext * exchangeCtx = exchangeMgr.NewContext(sessionHandle, &mBdxMessenger);
     VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
 
+    // Time out kDownloadTimeoutSec after a message gets no response, as specified. The progress timer alone checks only once
+    // per kDownloadTimeoutSec whether progress was made, so a stall could take up to twice that long to end.
+    exchangeCtx->SetResponseTimeout(kDownloadTimeoutSec);
+
     mBdxMessenger.Init(mBdxDownloader, exchangeCtx);
     mBdxDownloader->SetMessageDelegate(&mBdxMessenger);
     mBdxDownloader->SetStateDelegate(this);
