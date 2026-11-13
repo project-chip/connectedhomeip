@@ -190,7 +190,7 @@
         "APPLICATION_LAUNCHER_CLUSTER": ["application-launcher-server"],
         "AUDIO_CONTROL_CLUSTER": ["audio-control-server"],
         "AUDIO_OUTPUT_CLUSTER": ["audio-output-server"],
-        "AV_ANALYSIS_CLUSTER": [],
+        "AV_ANALYSIS_CLUSTER": ["av-analysis-server"],
         "BALLAST_CONFIGURATION_CLUSTER": [],
         "BASIC_INFORMATION_CLUSTER": ["basic-information"],
         "BINDING_CLUSTER": ["bindings"],
