@@ -18,6 +18,7 @@
 #include "DnssdError.h"
 #include "DnssdType.h"
 
+#include <algorithm>
 #include <cstdio>
 
 #include <lib/support/CHIPMemString.h>
@@ -245,8 +246,10 @@ CHIP_ERROR Browse(DnssdBrowseDelegate * delegate, uint32_t interfaceId, const ch
     return Browse(sdCtx, interfaceId, type);
 }
 
-static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err,
-                          const char * hostname, const struct sockaddr * address, uint32_t ttl, void * context)
+} // namespace
+
+void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err, const char * hostname,
+                   const struct sockaddr * address, uint32_t ttl, void * context)
 {
     ChipLogProgress(Discovery, "Mdns: %s flags: %d, interface: %u, hostname: %s, err: %" PRIi32 " (%s)", __func__, flags,
                     (unsigned) interfaceId, StringOrNullMarker(hostname), err, Error::ToString(err));
@@ -295,9 +298,8 @@ static void GetAddrInfo(ResolveContext * sdCtx)
     }
 }
 
-static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err,
-                      const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen, const unsigned char * txtRecord,
-                      void * context)
+void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err, const char * fullname,
+               const char * hostname, uint16_t port, uint16_t txtLen, const unsigned char * txtRecord, void * context)
 {
     ChipLogProgress(Discovery, "Mdns: %s flags: %d, interface: %u, fullname: %s, hostname: %s, port: %u, err: %" PRIi32 " (%s)",
                     __func__, flags, (unsigned) interfaceId, StringOrNullMarker(fullname), StringOrNullMarker(hostname),
@@ -318,9 +320,17 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
     if (!(flags & kDNSServiceFlagsMoreComing))
     {
         VerifyOrReturn(sdCtx->HasInterface(), TEMPORARY_RETURN_IGNORED sdCtx->Finalize(kDNSServiceErr_BadState));
+        auto needsLookUp = [](const auto & interface) { return !interface.second.isDNSLookUpRequested; };
+        if (sdCtx->HasAddress() && std::none_of(sdCtx->interfaces.begin(), sdCtx->interfaces.end(), needsLookUp))
+        {
+            TEMPORARY_RETURN_IGNORED sdCtx->Finalize();
+            return;
+        }
         GetAddrInfo(sdCtx);
     }
 }
+
+namespace {
 
 static CHIP_ERROR ResolveWithContext(ResolveContext * sdCtx, uint32_t interfaceId, const char * type, const char * name,
                                      const char * domain, ResolveContextWithType * contextWithType)
