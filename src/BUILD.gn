@@ -241,6 +241,13 @@ if (chip_build_tests) {
           [ "${chip_root}/src/controller/python/matter/case_capture/tests" ]
     }
 
+    # camera-controller is a host tool. Its tests are listed here rather than
+    # in //examples:example_tests because only this group is run by "check".
+    if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
+      tests +=
+          [ "${chip_root}/examples/camera-controller/webrtc-manager/tests" ]
+    }
+
     if (current_os != "zephyr") {
       tests += [ "${chip_root}/src/lib/dnssd/wire/records/tests" ]
     }

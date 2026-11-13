@@ -136,3 +136,9 @@ void WebRTCTransportRequestorManager::UpsertSession(
 {
     mWebRTCRegisteredServerCluster.Cluster().UpsertSession(session);
 }
+
+void WebRTCTransportRequestorManager::RecordOfferedSession(
+    const chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster::OfferedSession & offer)
+{
+    mWebRTCRegisteredServerCluster.Cluster().RecordOfferedSession(offer);
+}
