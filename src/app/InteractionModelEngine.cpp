@@ -1163,13 +1163,8 @@ void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer, uint64
     {
         CATValues cats;
 
-<<<<<<< HEAD
-        mpFabricTable->FetchCATs(pListItem->GetFabricIndex(), cats);
-        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer &&
-=======
-        TEMPORARY_RETURN_IGNORED mpFabricTable->FetchCATs(readClient->GetFabricIndex(), cats);
+        mpFabricTable->FetchCATs(readClient->GetFabricIndex(), cats);
         if (readClient->GetPeerScopedId() == aPeer &&
->>>>>>> 65bdb71 ([Interaction model] Avoid accessing ReadClient after OnDone during unsolicited report handling (#75306))
             (cats.CheckSubjectAgainstCATs(aMonitoredSubject) ||
              aMonitoredSubject == mpFabricTable->FindFabricWithIndex(readClient->GetFabricIndex())->GetNodeId()))
         {
