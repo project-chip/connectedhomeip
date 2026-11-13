@@ -25,6 +25,9 @@
 #include <protocols/bdx/BdxTransferSession.h>
 #include <transport/Session.h>
 
+#include <cstdint>
+#include <cstdio>
+
 using chip::bdx::StatusCode;
 using chip::bdx::TransferControlFlags;
 using chip::bdx::TransferSession;
@@ -112,6 +115,11 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
                 // After sending the StatusReport, exchange context gets closed so, set mExchangeCtx to null
                 mExchangeCtx = nullptr;
             }
+            if (mRejected)
+            {
+                // A rejected transfer is over once its StatusReport is sent.
+                Reset();
+            }
         }
         else
         {
@@ -121,6 +129,30 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         break;
     }
     case TransferSession::OutputEventType::kInitReceived: {
+        // Store the file designator, used during block query
+        uint16_t fdl       = 0;
+        const uint8_t * fd = mTransfer.GetFileDesignator(fdl);
+        if (fdl >= sizeof(mFileDesignator))
+        {
+            ChipLogError(BDX, "Cannot store file designator with length = %u", fdl);
+            RejectInit(StatusCode::kFileDesignatorUnknown);
+            return;
+        }
+        memcpy(mFileDesignator, fd, fdl);
+        mFileDesignator[fdl] = 0;
+
+        const uint64_t startOffset = mTransfer.GetStartOffset();
+        if (startOffset > 0)
+        {
+            const std::optional<StatusCode> rejection = CheckStartOffset(startOffset);
+            if (rejection.has_value())
+            {
+                RejectInit(*rejection);
+                return;
+            }
+        }
+        mReadOffset = startOffset;
+
         // TransferSession will automatically reject a transfer if there are no
         // common supported control modes. It will also default to the smaller
         // block size.
@@ -131,16 +163,18 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         VerifyOrReturn(mTransfer.AcceptTransfer(acceptData) == CHIP_NO_ERROR,
                        ChipLogError(BDX, "AcceptTransfter failed error:%" CHIP_ERROR_FORMAT, err.Format()));
 
-        // Store the file designator, used during block query
-        uint16_t fdl       = 0;
-        const uint8_t * fd = mTransfer.GetFileDesignator(fdl);
-        VerifyOrReturn(fdl < sizeof(mFileDesignator), ChipLogError(BDX, "Cannot store file designator with length = %u", fdl));
-        memcpy(mFileDesignator, fd, fdl);
-        mFileDesignator[fdl] = 0;
-
         break;
     }
-    case TransferSession::OutputEventType::kQueryReceived: {
+    case TransferSession::OutputEventType::kQueryReceived:
+    case TransferSession::OutputEventType::kQueryWithSkipReceived: {
+        if (event.EventType == TransferSession::OutputEventType::kQueryWithSkipReceived)
+        {
+            // A skip moves the read position for the rest of the transfer. Saturate so that a skip past the end of the image
+            // cannot wrap around to a position inside it.
+            const uint64_t bytesToSkip = event.bytesToSkip.BytesToSkip;
+            mReadOffset                = (bytesToSkip > UINT64_MAX - mReadOffset) ? UINT64_MAX : mReadOffset + bytesToSkip;
+        }
+
         TransferSession::BlockData blockData;
         uint16_t blockSize   = mTransfer.GetTransferBlockSize();
         uint16_t bytesToRead = blockSize;
@@ -157,7 +191,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         {
             if (CHIP_NO_ERROR !=
                 mOnBlockQueryCallback->mCall(mOnBlockQueryCallback->mContext, blockBuf, blockData.Length, blockData.IsEof,
-                                             mNumBytesSent))
+                                             mReadOffset))
             {
                 ChipLogError(BDX, "onBlockQuery Callback failed");
                 LogErrorOnFailure(mTransfer.AbortTransfer(StatusCode::kUnknown));
@@ -172,7 +206,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         }
 
         blockData.Data = blockBuf->Start();
-        mNumBytesSent  = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
+        mReadOffset += blockData.Length;
 
         if (CHIP_NO_ERROR != mTransfer.PrepareBlock(blockData))
         {
@@ -253,10 +287,40 @@ void BdxOtaSender::Reset()
         mExchangeCtx = nullptr;
     }
 
-    mInitialized  = false;
-    mNumBytesSent = 0;
+    mInitialized = false;
+    mRejected    = false;
+    mReadOffset  = 0;
 
     memset(mFileDesignator, 0, sizeof(mFileDesignator));
+}
+
+void BdxOtaSender::RejectInit(StatusCode reason)
+{
+    if (mTransfer.RejectTransfer(reason) == CHIP_NO_ERROR)
+    {
+        mRejected = true;
+    }
+    else
+    {
+        ChipLogError(BDX, "RejectTransfer failed");
+        Reset();
+    }
+}
+
+std::optional<StatusCode> BdxOtaSender::CheckStartOffset(uint64_t startOffset) const
+{
+    const auto entry = mFileDesignatorMap.find(mFileDesignator);
+    VerifyOrReturnValue(entry != mFileDesignatorMap.cend(), StatusCode::kFileDesignatorUnknown);
+
+    FILE * file = fopen(entry->second.c_str(), "r");
+    VerifyOrReturnValue(file != nullptr, StatusCode::kFileDesignatorUnknown);
+    const long fileSize = (fseek(file, 0, SEEK_END) == 0) ? ftell(file) : -1;
+    fclose(file);
+    VerifyOrReturnValue(fileSize >= 0, StatusCode::kFileDesignatorUnknown);
+
+    // An offset at the end of the image leaves an empty transfer; one past the end is invalid.
+    VerifyOrReturnValue(startOffset <= static_cast<uint64_t>(fileSize), StatusCode::kStartOffsetNotSupported);
+    return std::nullopt;
 }
 
 uint16_t BdxOtaSender::GetTransferBlockSize(void)
