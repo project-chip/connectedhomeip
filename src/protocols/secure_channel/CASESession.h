@@ -465,6 +465,10 @@ protected:
 private:
     friend class TestCASESession;
 
+    // Crypto backends report a MIC (AEAD tag) mismatch as a generic error, so only resource and argument errors pass through.
+    static CHIP_ERROR MapDecryptError(CHIP_ERROR err);
+    static CHIP_ERROR MapSignatureError(CHIP_ERROR err);
+
     using AutoReleaseSessionKey = Crypto::AutoReleaseSymmetricKey<Crypto::Aes128KeyHandle>;
 
     /*
