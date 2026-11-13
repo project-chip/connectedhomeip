@@ -27,7 +27,7 @@
 
 import asyncio
 import builtins
-from ctypes import CFUNCTYPE, Structure, c_bool, c_char_p, c_uint16, c_uint32, c_void_p, py_object, pythonapi
+from ctypes import CFUNCTYPE, POINTER, Structure, c_bool, c_char_p, c_size_t, c_uint16, c_uint32, c_void_p, py_object, pythonapi
 from threading import Condition, Lock
 from typing import Any
 
@@ -143,7 +143,8 @@ _ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
 
 @_singleton
 class ChipStack:
-    def __init__(self, persistentStorage: PersistentStorage, enableServerInteractions=True):
+    def __init__(self, persistentStorage: PersistentStorage, enableServerInteractions=True,
+                 mdnsInterfaces: list[str] | None = None):
         builtins.enableDebugMode = False
 
         self._persistentStorage = persistentStorage
@@ -164,8 +165,14 @@ class ChipStack:
         self.cbHandleChipThreadRun = HandleChipThreadRun
 
         # Initialize the chip stack.
+        # mdnsInterfaces restricts minimal mDNS to the named network interfaces.
+        mdnsInterfaceNames = [name.encode() for name in (mdnsInterfaces or [])]
+        # Native code would stop at an embedded NUL and match a shorter name.
+        if any(b"\0" in name for name in mdnsInterfaceNames):
+            raise ValueError("mdnsInterfaces must not contain NUL characters")
         res = self._ChipStackLib.pychip_DeviceController_StackInit(
-            self._persistentStorage.GetSdkStorageObject(), enableServerInteractions)
+            self._persistentStorage.GetSdkStorageObject(), enableServerInteractions,
+            (c_char_p * len(mdnsInterfaceNames))(*mdnsInterfaceNames), len(mdnsInterfaceNames))
         res.raise_on_error()
 
         im.InitIMDelegate()
@@ -270,7 +277,7 @@ class ChipStack:
             self._ChipStackLib = GetLibraryHandle()
             self._chipDLLPath = FindNativeLibraryPath(Library.CONTROLLER)
 
-            self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = [c_void_p, c_bool]
+            self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = [c_void_p, c_bool, POINTER(c_char_p), c_size_t]
             self._ChipStackLib.pychip_DeviceController_StackInit.restype = PyChipError
             self._ChipStackLib.pychip_DeviceController_StackShutdown.argtypes = []
             self._ChipStackLib.pychip_DeviceController_StackShutdown.restype = PyChipError

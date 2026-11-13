@@ -23,6 +23,7 @@ import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/controller/flags.gni")
 import("${chip_root}/src/data-model-providers/codegen/model.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/python.gni")
 import("${chip_root}/src/system/system.gni")
 import("${dir_pw_unit_test}/test.gni")
@@ -130,6 +131,7 @@ shared_library("ChipDeviceCtrl") {
     defines += [ "CHIP_CONFIG_MAX_ACTIVE_TCP_CONNECTIONS=20" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT=100" ]
+    defines += [ "PYCHIP_USE_MINMDNS=${chip_mdns_minimal}" ]
 
     if (chip_python_supports_stack_locking) {
       sources += [ "matter/native/ChipMainLoopWork_StackLock.cpp" ]
@@ -205,6 +207,10 @@ shared_library("ChipDeviceCtrl") {
       "${chip_root}/src/tracing/perfetto:event_storage",
       "${chip_root}/src/tracing/perfetto:simple_initialization",
     ]
+
+    if (chip_mdns_minimal) {
+      deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns:filtered_policy" ]
+    }
 
     if (chip_build_controller_dynamic_server) {
       defines += [ "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1" ]
