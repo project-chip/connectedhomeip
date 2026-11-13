@@ -35,20 +35,14 @@ namespace {
 
 const DataModel::EndpointEntry * GetEndpointEntry(EndpointId endpointId, Span<const DataModel::EndpointEntry> allEndpoints)
 {
-    unsigned idx = 0;
-    while (idx < allEndpoints.size())
+    for (auto & entry : allEndpoints)
     {
-        if (allEndpoints[idx].id == endpointId)
+        if (entry.id == endpointId)
         {
-            break;
+            return &entry;
         }
-        idx++;
     }
-    if (idx >= allEndpoints.size())
-    {
-        return nullptr;
-    }
-    return &allEndpoints[idx];
+    return nullptr;
 }
 
 /// Figures out if `childId` is a descendant of `parentId` given some specific endpoint entries
@@ -272,7 +266,7 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
 // already be unregistered.
 void DescriptorCluster::OnEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, DataModel::EndpointChangeType type)
 {
-    if (endpointId == kRootEndpointId)
+    if (endpointId == kRootEndpointId || endpointId == mPath.mEndpointId)
     {
         return;
     }
@@ -282,8 +276,9 @@ void DescriptorCluster::OnEndpointChanged(EndpointId endpointId, EndpointId pare
         parentEndpointId = kRootEndpointId;
     }
 
-    if (mPath.mEndpointId == parentEndpointId)
+    if (mPath.mEndpointId == parentEndpointId || mPath.mEndpointId == kRootEndpointId)
     {
+        // Root is notified for all changes in the tree.
         NotifyAttributeChanged(PartsList::Id);
         return;
     }
@@ -304,9 +299,9 @@ void DescriptorCluster::OnEndpointChanged(EndpointId endpointId, EndpointId pare
         return;
     }
 
-    if (mPath.mEndpointId == kRootEndpointId || IsDescendantOf(parentEntry, mPath.mEndpointId, endpoints))
+    if (IsDescendantOf(parentEntry, mPath.mEndpointId, endpoints))
     {
-        // Our composition pattern is full-family, and the parent endpoind and hence the changed endpoint too are our descendants.
+        // Our composition pattern is full-family, and the parent endpoint and hence the changed endpoint too are our descendants.
         // So our parts list is changed.
         NotifyAttributeChanged(PartsList::Id);
     }

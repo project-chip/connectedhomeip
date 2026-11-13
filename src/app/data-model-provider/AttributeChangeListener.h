@@ -89,6 +89,7 @@ public:
 
     /// Called when an endpoint's structure or composition changes
     /// (e.g., clusters added/removed, or for bridged device changes).
+    /// parentEndpointId is kInvalidEndpointId when the endpoint has no explicit parent (matching EndpointEntry::parentId).
     virtual void OnEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, EndpointChangeType type) {}
 
     AttributeChangeListener * GetNextAttributeChangeListener() const { return mNextAttributeChange; }
