@@ -35,6 +35,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/Defer.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemClock.h>
