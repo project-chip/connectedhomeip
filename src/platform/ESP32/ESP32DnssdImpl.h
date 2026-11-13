@@ -32,7 +32,7 @@ enum class ContextType
 struct GenericContext
 {
     ContextType mContextType;
-    char mType[kDnssdTypeMaxSize + 1];
+    char mType[kDnssdFullTypeAndProtocolMaxSize + 1];
     DnssdServiceProtocol mProtocol;
     Inet::InterfaceId mInterfaceId;
     void * mCbContext;
