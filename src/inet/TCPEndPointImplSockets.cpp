@@ -104,7 +104,6 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
         {
             sa.in6.sin6_family   = AF_INET6;
             sa.in6.sin6_port     = htons(port);
-            sa.in6.sin6_flowinfo = 0;
             sa.in6.sin6_addr     = addr.ToIPv6();
             sa.in6.sin6_scope_id = 0;
 
@@ -228,11 +227,12 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
 
     if (addrType == IPAddressType::kIPv6)
     {
-        sa.in6.sin6_family   = AF_INET6;
-        sa.in6.sin6_port     = htons(port);
-        sa.in6.sin6_flowinfo = 0;
-        sa.in6.sin6_addr     = addr.ToIPv6();
-        sa.in6.sin6_scope_id = intfId.GetPlatformInterface();
+        sa.in6.sin6_family                    = AF_INET6;
+        sa.in6.sin6_port                      = htons(port);
+        sa.in6.sin6_addr                      = addr.ToIPv6();
+        InterfaceId::PlatformType interfaceId = intfId.GetPlatformInterface();
+        VerifyOrReturnError(CanCastTo<decltype(sa.in6.sin6_scope_id)>(interfaceId), CHIP_ERROR_INCORRECT_STATE);
+        sa.in6.sin6_scope_id = static_cast<decltype(sa.in6.sin6_scope_id)>(interfaceId);
         sockaddrsize         = sizeof(sockaddr_in6);
     }
 #if INET_CONFIG_ENABLE_IPV4
