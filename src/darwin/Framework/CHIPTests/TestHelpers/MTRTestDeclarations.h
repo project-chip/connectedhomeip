@@ -75,6 +75,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 // Must be called on the Matter queue.
 - (void)_handleResubscriptionNeededWithDelay:(NSNumber *)resubscriptionDelayMs;
 // Must be called on the Matter queue.
+- (void)_handleSubscriptionError:(NSError *)error;
+// Must be called on the Matter queue.
 - (void)nodeMayBeAdvertisingOperational;
 - (void)_handleReportBegin;
 - (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
@@ -141,6 +143,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
 - (NSUInteger)unitTestAttributeCount;
 - (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block;
+// Whether an error is recorded as last logged for the path; syncs onto the device queue.
+- (BOOL)unitTestHasLastLoggedErrorForPath:(MTRAttributePath *)path;
 @end
 #endif
 

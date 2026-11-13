@@ -516,6 +516,12 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     // meant for an older ReadClient does nothing and releases its slot.
     uint64_t _readClientGeneration;
 
+    // The error last logged for each attribute path, so an identical repeat logs at
+    // detail level instead of error level. A path's entry is removed when it reports
+    // a value, and every entry when a subscription episode ends. Guarded by _lock;
+    // only touched on the device queue.
+    NSMutableDictionary<MTRAttributePath *, NSError *> * _lastLoggedErrorForPath;
+
     // Tracking of initial subscribe latency.  When _initialSubscribeStart is
     // nil, we are not tracking the latency.
     NSDate * _Nullable _initialSubscribeStart;
@@ -579,6 +585,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         _queue
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _expectedValueCache = [NSMutableDictionary dictionary];
+        _lastLoggedErrorForPath = [NSMutableDictionary dictionary];
         _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
         _state = MTRDeviceStateUnknown;
         _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
@@ -763,6 +770,16 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block
 {
     dispatch_sync(self.queue, block);
+}
+
+- (BOOL)unitTestHasLastLoggedErrorForPath:(MTRAttributePath *)path
+{
+    __block BOOL hasRecord = NO;
+    dispatch_sync(self.queue, ^{
+        std::lock_guard lock(self->_lock);
+        hasRecord = self->_lastLoggedErrorForPath[path] != nil;
+    });
+    return hasRecord;
 }
 #endif
 
@@ -1549,6 +1566,23 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     os_unfair_lock_unlock(&self->_timeSyncLock);
 }
 
+// Called on the Matter queue at a subscription boundary. Attribute reports reach the device
+// queue asynchronously from the Matter queue, so the clear is queued the same way: a report
+// that arrived before the boundary is handled first and cannot re-seed the next episode.
+- (void)_clearLastLoggedErrorsOnDeviceQueue
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    mtr_weakify(self);
+    dispatch_async(self.queue, ^{
+        mtr_strongify(self);
+        VerifyOrReturn(self, MTR_LOG_DEBUG("_clearLastLoggedErrorsOnDeviceQueue called back with nil MTRDevice"));
+
+        std::lock_guard lock(self->_lock);
+        [self->_lastLoggedErrorForPath removeAllObjects];
+    });
+}
+
 - (void)_handleSubscriptionError:(NSError *)error
 {
     assertChipStackLockedByCurrentThread();
@@ -1565,6 +1599,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
     [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
     _unreportedEvents = nil;
+    [self _clearLastLoggedErrorsOnDeviceQueue];
 
     [self _changeState:MTRDeviceStateUnreachable];
 }
@@ -1735,6 +1770,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
     // Change our state before going async.
     [self _changeState:MTRDeviceStateUnknown];
+    [self _clearLastLoggedErrorsOnDeviceQueue];
 
     // If we have never had a subscription established, stay in the Subscribing
     // state; don't transition to Resubscribing just because our attempt at
@@ -1862,6 +1898,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     assertChipStackLockedByCurrentThread();
 
     os_unfair_lock_assert_owner(&_lock);
+
+    [self _clearLastLoggedErrorsOnDeviceQueue];
 
     if (self.suspended) {
         MTR_LOG("%@ ignoring expected subscription reset on controller suspend", self);
@@ -4786,6 +4824,7 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     NSUInteger noDataCount = 0;
     NSUInteger sameAsReadCacheCount = 0;
     NSUInteger expectedValuePresentCount = 0;
+    NSUInteger unchangedErrorCount = 0;
     for (NSDictionary<NSString *, id> * attributeResponseValue in reportedAttributeValues) {
         MTRAttributePath * attributePath = attributeResponseValue[MTRAttributePathKey];
         MTRDeviceDataValueDictionary _Nullable attributeDataValue = attributeResponseValue[MTRDataKey];
@@ -4807,12 +4846,25 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
             shouldReportAttribute = YES;
             ++errorCount;
             previousValue = [self _cachedAttributeValueForPath:attributePath];
-            MTR_LOG_ERROR("%@ report %@ error %@ purge expected value %@ read cache %@", self, attributePath, attributeError,
-                _expectedValueCache[attributePath], previousValue);
+            // A repeat that still purges something stays at error level, since the purge is news.
+            NSError * lastLoggedError = _lastLoggedErrorForPath[attributePath];
+            BOOL isUnchangedError = lastLoggedError != nil && [lastLoggedError.domain isEqualToString:attributeError.domain]
+                && lastLoggedError.code == attributeError.code && _expectedValueCache[attributePath] == nil && previousValue == nil;
+            if (isUnchangedError) {
+                ++unchangedErrorCount;
+                MTR_LOG_DEBUG("%@ report %@ error %@ purge expected value %@ read cache %@", self, attributePath, attributeError,
+                    _expectedValueCache[attributePath], previousValue);
+            } else {
+                MTR_LOG_ERROR("%@ report %@ error %@ purge expected value %@ read cache %@", self, attributePath, attributeError,
+                    _expectedValueCache[attributePath], previousValue);
+            }
+            _lastLoggedErrorForPath[attributePath] = attributeError;
             _expectedValueCache[attributePath] = nil;
             // TODO: Is this clearing business really what we want?
             [self _setCachedAttributeValue:nil forPath:attributePath fromSubscription:isFromSubscription];
         } else {
+            [_lastLoggedErrorForPath removeObjectForKey:attributePath];
+
             // First separate data version and restore data value to a form without data version
             NSNumber * dataVersion = attributeDataValue[MTRDataVersionKey];
             MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:attributePath.endpoint clusterID:attributePath.cluster];
@@ -4951,9 +5003,9 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
         MTR_LOG("%@ report from reported values %@", self, path);
     }
 
-    MTR_LOG("%@ report of %lu attributes: %lu values, %lu errors, %lu same as read cache, %lu expected value still present, %lu no data", self,
+    MTR_LOG("%@ report of %lu attributes: %lu values, %lu errors, %lu same as read cache, %lu expected value still present, %lu no data, %lu unchanged errors", self,
         static_cast<unsigned long>(reportedAttributeValues.count), static_cast<unsigned long>(valueCount), static_cast<unsigned long>(errorCount), static_cast<unsigned long>(sameAsReadCacheCount),
-        static_cast<unsigned long>(expectedValuePresentCount), static_cast<unsigned long>(noDataCount));
+        static_cast<unsigned long>(expectedValuePresentCount), static_cast<unsigned long>(noDataCount), static_cast<unsigned long>(unchangedErrorCount));
 
     return attributesToReport;
 }
