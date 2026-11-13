@@ -24,6 +24,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <cstdint>
 #include <utility>
 #include <variant>
 
@@ -36,6 +37,10 @@ namespace app {
  * Sends unicast targets an InvokeCommandRequest and group targets an InvokeGroupCommandRequest, and
  * logs the result.
  *
+ * Commands that require a timed invoke (CommandType::MustUseTimedInvoke()) are sent to unicast targets
+ * with a kTimedInvokeTimeoutMs timeout. Group targets are skipped for these commands because group
+ * invokes cannot be timed.
+ *
  * @tparam CommandType Standard cluster command struct, e.g.:
  *         - Clusters::Chime::Commands::PlayChimeSound::Type
  *         - Clusters::OnOff::Commands::Toggle::Type
@@ -45,6 +50,8 @@ template <typename CommandType>
 class SimpleBindingCommand : public BindingCommand
 {
 public:
+    static constexpr uint16_t kTimedInvokeTimeoutMs = 10000;
+
     explicit SimpleBindingCommand(const CommandType & command) : mCommand(command) {}
     explicit SimpleBindingCommand(CommandType && command) : mCommand(std::move(command)) {}
 
@@ -66,8 +73,17 @@ public:
                              CommandType::GetClusterId(), CommandType::GetCommandId(), error.Format());
             };
 
-            CHIP_ERROR err = Controller::InvokeCommandRequest(&unicast->exchangeManager, unicast->session, unicast->endpoint,
-                                                              mCommand, onSuccess, onFailure);
+            CHIP_ERROR err;
+            if constexpr (CommandType::MustUseTimedInvoke())
+            {
+                err = Controller::InvokeCommandRequest(&unicast->exchangeManager, unicast->session, unicast->endpoint, mCommand,
+                                                       onSuccess, onFailure, kTimedInvokeTimeoutMs);
+            }
+            else
+            {
+                err = Controller::InvokeCommandRequest(&unicast->exchangeManager, unicast->session, unicast->endpoint, mCommand,
+                                                       onSuccess, onFailure);
+            }
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to invoke binding command: %" CHIP_ERROR_FORMAT, err.Format());
@@ -75,15 +91,23 @@ public:
         }
         else if (const auto * group = std::get_if<GroupBindingTarget>(&target))
         {
-            CHIP_ERROR err =
-                Controller::InvokeGroupCommandRequest(&group->exchangeManager, group->fabricIndex, group->groupId, mCommand);
-            if (err != CHIP_NO_ERROR)
+            if constexpr (CommandType::MustUseTimedInvoke())
             {
-                ChipLogError(AppServer, "Failed to invoke binding group command: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogError(AppServer, "Timed binding command (0x%" PRIx32 ", 0x%" PRIx32 ") cannot be sent to group %u; skipped",
+                             CommandType::GetClusterId(), CommandType::GetCommandId(), group->groupId);
             }
             else
             {
-                ChipLogProgress(AppServer, "Binding group command sent to group %u", group->groupId);
+                CHIP_ERROR err =
+                    Controller::InvokeGroupCommandRequest(&group->exchangeManager, group->fabricIndex, group->groupId, mCommand);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Failed to invoke binding group command: %" CHIP_ERROR_FORMAT, err.Format());
+                }
+                else
+                {
+                    ChipLogProgress(AppServer, "Binding group command sent to group %u", group->groupId);
+                }
             }
         }
     }
