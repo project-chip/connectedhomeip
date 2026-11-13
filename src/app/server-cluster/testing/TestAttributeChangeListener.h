@@ -39,7 +39,7 @@ public:
         }
     }
 
-    void OnEndpointChanged(EndpointId endpointId, app::DataModel::EndpointChangeType type) override
+    void OnEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, app::DataModel::EndpointChangeType type) override
     {
         mChangedEndpoints.push_back(endpointId);
     }

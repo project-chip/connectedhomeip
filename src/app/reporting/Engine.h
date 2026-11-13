@@ -133,7 +133,7 @@ public:
 
     // DataModel::AttributeChangeListener implementation
     void OnAttributeChanged(const ConcreteAttributePath & path, DataModel::AttributeChangeType type) override;
-    void OnEndpointChanged(EndpointId endpointId, DataModel::EndpointChangeType type) override;
+    void OnEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, DataModel::EndpointChangeType type) override;
 
 private:
     /**

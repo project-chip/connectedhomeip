@@ -27,7 +27,7 @@
 
 namespace chip::app::Clusters {
 
-class DescriptorCluster : public DefaultServerCluster
+class DescriptorCluster : public DefaultServerCluster, public DataModel::AttributeChangeListener
 {
 public:
     using SemanticTag           = Globals::Structs::SemanticTagStruct::Type;
@@ -43,9 +43,15 @@ public:
         mSemanticTags(semanticTags)
     {}
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType type) override;
+
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
+
+    // DataModel::AttributeChangeListener implementation
+    void OnEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, DataModel::EndpointChangeType type) override;
 
 protected:
     OptionalAttributesSet mEnabledOptionalAttributes;

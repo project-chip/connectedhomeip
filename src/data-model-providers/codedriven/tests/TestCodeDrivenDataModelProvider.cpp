@@ -55,7 +55,7 @@ public:
     };
 
     void OnAttributeChanged(const ConcreteAttributePath & path, AttributeChangeType type) override { mDirtyList.push_back(path); }
-    void OnEndpointChanged(EndpointId endpointId, EndpointChangeType type) override
+    void OnEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, EndpointChangeType type) override
     {
         mEndpointChanges.push_back({ endpointId, type });
     }

@@ -32,8 +32,21 @@ using namespace chip::app::Clusters::Descriptor::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
+
+const DataModel::EndpointEntry * GetEndpointEntry(EndpointId endpointId, Span<const DataModel::EndpointEntry> allEndpoints)
+{
+    for (auto & entry : allEndpoints)
+    {
+        if (entry.id == endpointId)
+        {
+            return &entry;
+        }
+    }
+    return nullptr;
+}
+
 /// Figures out if `childId` is a descendant of `parentId` given some specific endpoint entries
-bool IsDescendantOf(const DataModel::EndpointEntry * __restrict__ childEndpoint, const EndpointId parentId,
+bool IsDescendantOf(const DataModel::EndpointEntry * childEndpoint, const EndpointId parentId,
                     Span<const DataModel::EndpointEntry> allEndpoints)
 {
     // NOTE: this is not very efficient as we loop through all endpoints for each parent search
@@ -106,7 +119,7 @@ CHIP_ERROR ReadPartsAttribute(DataModel::Provider & provider, EndpointId endpoin
         return aEncoder.EncodeList([&endpoints](const auto & encoder) -> CHIP_ERROR {
             for (const auto & ep : endpoints)
             {
-                if (ep.id == 0)
+                if (ep.id == kRootEndpointId)
                 {
                     continue;
                 }
@@ -116,25 +129,10 @@ CHIP_ERROR ReadPartsAttribute(DataModel::Provider & provider, EndpointId endpoin
         });
     }
 
-    // find the given endpoint
-    unsigned idx = 0;
-    while (idx < endpoints.size())
-    {
-        if (endpoints[idx].id == endpoint)
-        {
-            break;
-        }
-        idx++;
-    }
-    if (idx >= endpoints.size())
-    {
-        // not found
-        return CHIP_ERROR_NOT_FOUND;
-    }
+    auto * endpointInfo = GetEndpointEntry(endpoint, endpoints);
+    VerifyOrReturnError(endpointInfo != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    auto & endpointInfo = endpoints[idx];
-
-    switch (endpointInfo.compositionPattern)
+    switch (endpointInfo->compositionPattern)
     {
     case DataModel::EndpointCompositionPattern::kFullFamily:
         // encodes ALL endpoints that have the specified endpoint as a descendant.
@@ -173,6 +171,24 @@ CHIP_ERROR ReadPartsAttribute(DataModel::Provider & provider, EndpointId endpoin
 } // namespace
 
 namespace chip::app::Clusters {
+
+CHIP_ERROR DescriptorCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    context.provider.RegisterAttributeChangeListener(*this);
+    return CHIP_NO_ERROR;
+}
+
+void DescriptorCluster::Shutdown(ClusterShutdownType type)
+{
+    if (mContext != nullptr)
+    {
+        mContext->provider.UnregisterAttributeChangeListener(*this);
+    }
+    DefaultServerCluster::Shutdown(type);
+}
+
 CHIP_ERROR DescriptorCluster::Attributes(const ConcreteClusterPath & path,
                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
@@ -243,6 +259,51 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
 #endif
     default:
         return Status::UnsupportedAttribute;
+    }
+}
+
+// Using parentEndpoint instead of the endpoint that was added or removed, because in case of removal, the endpoint's entry will
+// already be unregistered.
+void DescriptorCluster::OnEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, DataModel::EndpointChangeType type)
+{
+    if (endpointId == kRootEndpointId || endpointId == mPath.mEndpointId)
+    {
+        return;
+    }
+
+    if (parentEndpointId == kInvalidEndpointId)
+    {
+        parentEndpointId = kRootEndpointId;
+    }
+
+    if (mPath.mEndpointId == parentEndpointId || mPath.mEndpointId == kRootEndpointId)
+    {
+        // Root is notified for all changes in the tree.
+        NotifyAttributeChanged(PartsList::Id);
+        return;
+    }
+
+    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsList;
+    LogErrorOnFailure(mContext->provider.Endpoints(endpointsList));
+    auto endpoints = endpointsList.TakeBuffer();
+
+    auto * parentEntry = GetEndpointEntry(parentEndpointId, endpoints);
+    auto * mEntry      = GetEndpointEntry(mPath.mEndpointId, endpoints);
+
+    // Can't get the information about the endpoint tree to determine if this parts list attribute was changed.
+    VerifyOrReturn(parentEntry != nullptr && mEntry != nullptr);
+
+    if (mEntry->compositionPattern == DataModel::EndpointCompositionPattern::kTree)
+    {
+        // Our composition pattern is tree, but the endpoint is not our child (checked above)
+        return;
+    }
+
+    if (IsDescendantOf(parentEntry, mPath.mEndpointId, endpoints))
+    {
+        // Our composition pattern is full-family, and the parent endpoint and hence the changed endpoint too are our descendants.
+        // So our parts list is changed.
+        NotifyAttributeChanged(PartsList::Id);
     }
 }
 

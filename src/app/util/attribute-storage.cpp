@@ -1028,25 +1028,9 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable, MatterCluste
             emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
         }
 
-        // The Descriptor cluster on Endpoint 0 subscribing to OnEndpointChanged events.
-        //
-        // NOTE: this should eventually be refactored for descriptor cluster to detect these changes
-        EndpointId parentEndpointId = emberAfParentEndpointFromIndex(index);
-        while (parentEndpointId != kInvalidEndpointId)
-        {
-            emberAfAttributeChanged(parentEndpointId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id);
-            uint16_t parentIndex = emberAfIndexFromEndpoint(parentEndpointId);
-            if (parentIndex == kEmberInvalidEndpointIndex)
-            {
-                // Something has gone wrong.
-                break;
-            }
-            parentEndpointId = emberAfParentEndpointFromIndex(parentIndex);
-        }
-
-        CodegenDataModelProvider::Instance().NotifyEndpointChanged(
-            endpoint, enable ? DataModel::EndpointChangeType::kAdded : DataModel::EndpointChangeType::kRemoved);
-        emberAfAttributeChanged(/* endpoint = */ 0, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id);
+        CodegenDataModelProvider::Instance().NotifyEndpointChanged(endpoint, emberAfParentEndpointFromIndex(index),
+                                                                   enable ? DataModel::EndpointChangeType::kAdded
+                                                                          : DataModel::EndpointChangeType::kRemoved);
     }
 
     emberMetadataStructureGeneration++;
