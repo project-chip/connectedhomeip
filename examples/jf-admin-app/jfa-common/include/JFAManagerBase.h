@@ -16,11 +16,22 @@
  *    limitations under the License.
  */
 
+// OS-agnostic Joint Fabric Administrator manager base class.
+//
+// JFAManagerBase holds the shared logic, and each platform derives
+// a concrete subclass (for example JFAManagerLinux) that provides
+// its own singleton and overrides the virtual hooks when needed.
+//
+// Platform-specific commissioner-mode bring-up is reached through
+// JFAPlatform.h hooks, not through CommissionerMain.h directly, so this file
+// has no Linux dependency.
+
 #pragma once
 
-#include <AppMain.h>
 #include <app/server/JointFabricAdministrator.h>
 #include <app/server/Server.h>
+#include <credentials/CHIPCert.h>
+#include <crypto/CHIPCryptoPAL.h>
 
 #include <functional>
 #include <stdbool.h>
@@ -32,13 +43,20 @@
 
 namespace chip {
 
-class JFAManager : public app::JointFabricAdministrator::Delegate
+class JFAManagerBase : public app::JointFabricAdministrator::Delegate
 {
 public:
-    JFAManager() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
+    JFAManagerBase() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
+    ~JFAManagerBase() override = default;
 
-    CHIP_ERROR Init(Server & server);
-    void HandleCommissioningCompleteEvent();
+    virtual CHIP_ERROR Init(Server & server);
+    virtual void HandleCommissioningCompleteEvent();
+
+    // Called when the system transitions to "network ready" (DNS-SD up).
+    // Default: no-op. Platforms that need to restore state after a reboot
+    // override this hook. The reference Linux example never arms it.
+    virtual void OnNetworkReady() {}
+
     CHIP_ERROR FinalizeCommissioning(NodeId nodeId, bool isJCM, chip::Crypto::P256PublicKey & trustedIcacPublicKeyB,
                                      uint16_t peerAdminJFAdminClusterEndpointId);
 
@@ -54,17 +72,29 @@ public:
     bool IsDeviceJFAdmin();
     bool IsDeviceJFAnchor();
 
-private:
-    // Various actions to take when OnConnected callback is called
-    enum OnConnectedAction
+protected:
+    // Actions dispatched by OnConnected once CASE is established. The base
+    // handles the two values it knows about. Subclasses that need extra
+    // actions assign them numeric values starting at kFirstPlatformAction and
+    // override DispatchExtendedConnectedAction() to handle them.
+    enum OnConnectedAction : uint8_t
     {
         kStandardCommissioningComplete = 0,
         kJCMCommissioning              = 1,
+
+        // First numeric value available for subclass-defined actions. Values
+        // below this are reserved by the base.
+        kFirstPlatformAction = 32,
     };
 
-    friend JFAManager & JFAMgr(void);
+    // Called immediately after a commissionee has been fully onboarded onto
+    // the joint fabric (CommissioningComplete succeeded). Default: no-op.
+    virtual void OnCommissioneeOnboarded(ScopedNodeId commissionee) { (void) commissionee; }
 
-    static JFAManager sJFA;
+    // Escape hatch for subclass-defined OnConnectedAction values. Default
+    // does nothing; subclasses override to handle their own extended actions.
+    virtual void DispatchExtendedConnectedAction(OnConnectedAction action) { (void) action; }
+
     static void OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
@@ -102,9 +132,10 @@ private:
     void ReleaseSession();
 };
 
-inline JFAManager & JFAMgr(void)
-{
-    return JFAManager::sJFA;
-}
+// Returns the active JFAManager singleton. Defined per platform (see
+// JFAManagerLinux.cpp for the Linux example). Shared code and the pigweed
+// RPC server both go through this accessor, so neither has to know the
+// concrete subclass type.
+JFAManagerBase & JFAMgr();
 
 } // namespace chip

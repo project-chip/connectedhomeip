@@ -17,6 +17,7 @@
  */
 
 #include "JFADatastoreSync.h"
+#include "JFAPlatform.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -40,8 +41,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::Controller;
 using namespace chip::app::Clusters::JointFabricDatastore;
-
-extern DeviceCommissioner * GetDeviceCommissioner();
 
 [[maybe_unused]] constexpr uint8_t kJFAvailableShift = 0;
 [[maybe_unused]] constexpr uint8_t kJFAdminShift     = 1;
@@ -440,7 +439,7 @@ public:
                                 [pairingCommand](const chip::app::ConcreteAttributePath &) {
                                     auto lambdaCbContext = pairingCommand->mContext;
 
-                                    CHIP_ERROR connErr = GetDeviceCommissioner()->GetConnectedDevice(
+                                    CHIP_ERROR connErr = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(
                                         lambdaCbContext->nodeId, &pairingCommand->mOnAddGroupConnectedCallback,
                                         &pairingCommand->mOnAddGroupConnectionFailureCallback);
                                     if (connErr != CHIP_NO_ERROR)
@@ -625,7 +624,7 @@ public:
                                                         static_cast<unsigned>(originalCount), static_cast<unsigned>(removedCount),
                                                         static_cast<unsigned>(filteredTargets.size()));
 
-                                        CHIP_ERROR reconnectErr = GetDeviceCommissioner()->GetConnectedDevice(
+                                        CHIP_ERROR reconnectErr = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(
                                             lambdaCbContext->nodeId, &instance->mOnDeviceConnectedCallback,
                                             &instance->mOnDeviceConnectionFailureCallback);
                                         if (reconnectErr != CHIP_NO_ERROR)
@@ -884,7 +883,7 @@ public:
                                         ChipLogError(Controller, "Failed to iterate GroupKeyMap: %s", ErrorStr(keyMapErr));
                                     }
 
-                                    CHIP_ERROR commandErr = GetDeviceCommissioner()->GetConnectedDevice(
+                                    CHIP_ERROR commandErr = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(
                                         lambdaCbContext->nodeId, &instance->mOnFetchGroupsConnectedCallback,
                                         &instance->mOnFetchGroupsConnectionFailureCallback);
 
@@ -1103,7 +1102,7 @@ public:
             }
             else if (pairingCommand->mReadOnly == true)
             {
-                if constexpr (std ::is_same_v<T, app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type>)
+                if constexpr (std::is_same_v<T, app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type>)
                 {
                     if (!cbContext->groupKeySetId.HasValue())
                     {
@@ -1675,8 +1674,8 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
 
     StoreInFlightCommand(inFlightToken, pairingCommand);
 
-    CHIP_ERROR err = GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                 &pairingCommand->mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                          &pairingCommand->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         RemoveInFlightCommand(inFlightToken);
@@ -1699,8 +1698,8 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
 
     StoreInFlightCommand(inFlightToken, pairingCommand);
 
-    CHIP_ERROR err = GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                 &pairingCommand->mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                          &pairingCommand->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         RemoveInFlightCommand(inFlightToken);
@@ -1764,8 +1763,8 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
 
     StoreInFlightCommand(inFlightToken, pairingCommand);
 
-    CHIP_ERROR err = GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                 &pairingCommand->mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                          &pairingCommand->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         RemoveInFlightCommand(inFlightToken);
@@ -1789,8 +1788,8 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
 
     StoreInFlightCommand(inFlightToken, pairingCommand);
 
-    CHIP_ERROR err = GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                 &pairingCommand->mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                          &pairingCommand->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         RemoveInFlightCommand(inFlightToken);
@@ -1915,8 +1914,8 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
 
     StoreInFlightCommand(inFlightToken, pairingCommand);
 
-    CHIP_ERROR err = GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                 &pairingCommand->mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                          &pairingCommand->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         RemoveInFlightCommand(inFlightToken);
@@ -1940,8 +1939,8 @@ JFADatastoreSync::SyncNode(NodeId nodeId,
 
     StoreInFlightCommand(inFlightToken, pairingCommand);
 
-    CHIP_ERROR err = GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                 &pairingCommand->mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                          &pairingCommand->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         RemoveInFlightCommand(inFlightToken);
@@ -1967,8 +1966,8 @@ CHIP_ERROR JFADatastoreSync::FetchEndpointList(
 
     StoreInFlightCommand(inFlightToken, pairingCommand);
 
-    CHIP_ERROR err = GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                 &pairingCommand->mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                          &pairingCommand->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         RemoveInFlightCommand(inFlightToken);
@@ -1997,8 +1996,8 @@ CHIP_ERROR JFADatastoreSync::FetchEndpointGroupList(
 
     StoreInFlightCommand(inFlightToken, pairingCommand);
 
-    CHIP_ERROR err = GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                 &pairingCommand->mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                          &pairingCommand->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         RemoveInFlightCommand(inFlightToken);
@@ -2024,8 +2023,8 @@ CHIP_ERROR JFADatastoreSync::FetchEndpointBindingList(
 
     StoreInFlightCommand(inFlightToken, pairingCommand);
 
-    CHIP_ERROR err = GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                 &pairingCommand->mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                          &pairingCommand->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         RemoveInFlightCommand(inFlightToken);
@@ -2047,8 +2046,8 @@ CHIP_ERROR JFADatastoreSync::FetchGroupKeySetList(NodeId nodeId,
 
     StoreInFlightCommand(inFlightToken, pairingCommand);
 
-    CHIP_ERROR err = GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                 &pairingCommand->mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                          &pairingCommand->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         RemoveInFlightCommand(inFlightToken);
@@ -2072,8 +2071,8 @@ CHIP_ERROR JFADatastoreSync::FetchGroupKeySet(
 
     StoreInFlightCommand(inFlightToken, pairingCommand);
 
-    CHIP_ERROR err = GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                 &pairingCommand->mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                          &pairingCommand->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         RemoveInFlightCommand(inFlightToken);
@@ -2098,8 +2097,8 @@ CHIP_ERROR JFADatastoreSync::FetchACLList(
 
     StoreInFlightCommand(inFlightToken, pairingCommand);
 
-    CHIP_ERROR err = GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                 &pairingCommand->mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = chip::JFAGetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                          &pairingCommand->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         RemoveInFlightCommand(inFlightToken);
