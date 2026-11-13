@@ -483,6 +483,8 @@ class HostBuilder(GnBuilder):
                  unified=False,
                  chip_enable_endpoint_unique_id: bool | None = None,
                  all_devices_enabled_devices=None,
+                 enable_tcp=True,
+                 packetbuffer_pool=False,
                  ):
         """
         Construct a host builder.
@@ -539,6 +541,13 @@ class HostBuilder(GnBuilder):
 
         if not enable_thread:
             self.extra_gn_options.append('chip_enable_thread=false')
+
+        if not enable_tcp:
+            self.extra_gn_options.append('chip_inet_config_enable_tcp_endpoint=false')
+
+        if packetbuffer_pool:
+            # 15 is the SDK default pool size (src/system/SystemConfig.h); a size above 0 selects the internal PacketBuffer pool.
+            self.extra_gn_options.append('target_defines=["CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE=15"]')
 
         if disable_shell:
             self.extra_gn_options.append('chip_build_libshell=false')

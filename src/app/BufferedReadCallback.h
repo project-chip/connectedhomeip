@@ -36,6 +36,9 @@ namespace app {
  * upon completion of delivery of all chunks. This is then delivered to a compliant ReadClient::Callback
  * without any awareness on their part that chunking happened.
  *
+ * This class is not suited to reading long lists when PacketBuffers come from a fixed-size pool: each buffered
+ * list item holds one PacketBuffer until the list is delivered, and a list larger than the number of available
+ * PacketBuffers fails with CHIP_ERROR_NO_MEMORY.
  */
 class BufferedReadCallback : public ReadClient::Callback
 {
