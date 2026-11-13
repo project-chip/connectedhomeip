@@ -24,6 +24,7 @@ import logging
 import os
 import queue
 import random
+import re
 import select
 import shlex
 import socket
@@ -1914,6 +1915,16 @@ class MatterBaseTest(base_test.BaseTestClass):
         return global_stash.unstash_globally(self.user_params.get("data_model"))
 
     @property
+    def pseudo_pics(self) -> dict[int, dict[int, list[str]]]:
+        """Device-element PICS the runner generated from each DUT's global wildcard read.
+
+        Keyed {node_id: {endpoint_id: [pics_code, ...]}}. A DUT the runner did not read
+        (for example with --skip-global-wildcard-population) has no entry.
+        """
+        pseudo_pics = global_stash.unstash_globally(self.user_params.get("pseudo_pics"))
+        return pseudo_pics if pseudo_pics is not None else {}
+
+    @property
     def default_endpoint(self) -> int:
         return 0
 
@@ -2308,7 +2319,14 @@ class MatterBaseTest(base_test.BaseTestClass):
     def check_pics(self, pics_key: str, endpoint: int | None = None) -> bool:
         """Check if a PICS (Protocol Implementation Conformance Statement) key is enabled.
 
-        PICS are stored as an endpoint-keyed tree {endpoint: {code: bool}}.
+        Device-element codes are answered from the PICS generated from the DUT
+        (see pseudo_pics) and override the PICS file: cluster server (<cluster>.S),
+        attribute (.S.Axxxx), feature (.S.Fxx), accepted/generated command
+        (.S.Cxx.Rsp/.Tx), IDM.S and MCORE.ROLE.COMMISSIONEE. The PICS file is used
+        for every other code, and for every code when the DUT has no generated
+        PICS or MatterTestConfig.use_device_pics is False.
+
+        PICS-file codes are stored as an endpoint-keyed tree {endpoint: {code: bool}}.
         The key is looked up in the endpoint's slice, falling back to endpoint 0
         for codes that slice does not define: device-wide codes such as MCORE.*
         live on endpoint 0, and a PICS input with no endpoint structure is
@@ -2330,8 +2348,72 @@ class MatterBaseTest(base_test.BaseTestClass):
             endpoint = self.get_endpoint()
         codes = self.matter_test_config.pics.get(endpoint, {})
         if key in codes:
-            return codes[key]
-        return self.matter_test_config.pics.get(0, {}).get(key, False)
+            file_value = codes[key]
+        else:
+            file_value = self.matter_test_config.pics.get(0, {}).get(key, False)
+
+        device_value = self._device_pics_value(key, endpoint)
+        if device_value is None:
+            return file_value
+        if device_value != file_value:
+            self._log_pics_override(key, endpoint, file_value, device_value)
+        return device_value
+
+    # Device-element codes as generate_device_element_pics_from_device_wildcard
+    # writes them, matched in upper case:
+    #   <cluster>.S  <cluster>.S.A<attr:4>  <cluster>.S.F<bit:2>  <cluster>.S.C<cmd:2>.Rsp|.Tx
+    # Event codes (.S.Exx) are not generated, so they are not matched.
+    _DEVICE_ELEMENT_PICS_PATTERN = re.compile(
+        r'^(?P<cluster>[^.]+)\.S(?:\.(?:A[0-9A-F]{4}|F[0-9A-F]{2}|C[0-9A-F]{2}\.(?:RSP|TX)))?$')
+    # Generated codes that are not tied to a cluster. MCORE.ROLE.COMMISSIONEE describes
+    # the node and is only generated on endpoint 0.
+    _DEVICE_ELEMENT_PICS_PER_ENDPOINT = frozenset({'IDM.S'})
+    _DEVICE_ELEMENT_PICS_ENDPOINT_0 = frozenset({'MCORE.ROLE.COMMISSIONEE'})
+
+    def _device_pics_value(self, key: str, endpoint: int) -> bool | None:
+        """Return the DUT's value for a device-element PICS code, or None to use the PICS file.
+
+        None is returned when the override is disabled, when the DUT has no generated
+        PICS, and for codes the generator does not produce: non device-element codes,
+        event codes, and codes for clusters missing from the data model.
+        """
+        if not self.matter_test_config.use_device_pics:
+            return None
+        device_pics = self.pseudo_pics.get(self.dut_node_id)
+        if device_pics is None:
+            return None
+
+        upper_key = key.upper()
+        if upper_key in self._DEVICE_ELEMENT_PICS_ENDPOINT_0:
+            endpoint = 0
+        elif upper_key not in self._DEVICE_ELEMENT_PICS_PER_ENDPOINT:
+            match = self._DEVICE_ELEMENT_PICS_PATTERN.match(upper_key)
+            if match is None or match.group('cluster') not in self._data_model_cluster_pics_prefixes():
+                return None
+
+        return upper_key in {code.upper() for code in device_pics.get(endpoint, [])}
+
+    def _data_model_cluster_pics_prefixes(self) -> frozenset[str]:
+        """Upper-case PICS prefixes of the data model's clusters; empty without a data model."""
+        prefixes = getattr(self, '_cluster_pics_prefixes', None)
+        if prefixes is None:
+            data_model = self.data_model
+            clusters = data_model.clusters.values() if data_model is not None else []
+            prefixes = frozenset(cluster.pics.upper() for cluster in clusters if cluster.pics)
+            self._cluster_pics_prefixes = prefixes
+        return prefixes
+
+    def _log_pics_override(self, key: str, endpoint: int, file_value: bool, device_value: bool) -> None:
+        """Log, once per code and endpoint, that the DUT's value replaced a different PICS-file value."""
+        logged: set[tuple[str, int]] | None = getattr(self, '_logged_pics_overrides', None)
+        if logged is None:
+            logged = set()
+            self._logged_pics_overrides = logged
+        if (key, endpoint) in logged:
+            return
+        logged.add((key, endpoint))
+        LOGGER.info("[PSEUDO-PICS] %s on endpoint %d: PICS file says %s, DUT says %s; using the DUT value",
+                    key, endpoint, file_value, device_value)
 
     def pics_guard(self, pics_condition: bool):
         """Checks a condition and if False marks the test step as skipped and
