@@ -683,15 +683,21 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestFabricRemovedKeepsConnectionEvi
     // The storage write fails, but the entry must stay evicted rather than being restored.
     EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 0);
 
-    // Simulate a restart: storage still holds the removed fabric's connection because the
-    // removal write failed, so a fresh cluster load must drop it instead of resurrecting it.
-    failingProvider.FailWrites(false);
+    // Simulate a restart with failing storage writes: the stale entry is loaded, dropped by the
+    // filter, and stays evicted even though persisting the corrected list fails.
+    failingProvider.FailWrites(true);
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     PushAvStreamTransportServer restartedServer(1, BitFlags<Feature>(1), fabricHelper.GetFabricTable());
     ASSERT_EQ(restartedServer.Startup(context.Get()), CHIP_NO_ERROR);
     restartedServer.GetLogic().SetDelegate(&mockDelegate);
     restartedServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(restartedServer.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(restartedServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
+
+    // With writes working again, a subsequent load drops the stale entry still in storage and
+    // corrects the persisted list.
+    failingProvider.FailWrites(false);
     EXPECT_EQ(restartedServer.Init(), CHIP_NO_ERROR);
     EXPECT_EQ(restartedServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
 

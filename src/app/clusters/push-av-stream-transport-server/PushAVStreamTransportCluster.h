@@ -117,9 +117,7 @@ public:
     CHIP_ERROR Init()
     {
         VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(mLogic.Init(mContext->attributeStorage));
-        mLogic.RemoveConnectionsForMissingFabrics(mFabricTable);
-        return CHIP_NO_ERROR;
+        return mLogic.Init(mContext->attributeStorage, mFabricTable);
     }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override

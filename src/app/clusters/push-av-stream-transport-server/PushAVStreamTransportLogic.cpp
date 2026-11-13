@@ -92,12 +92,16 @@ PushAvStreamTransportServerLogic::PushAvStreamTransportServerLogic(EndpointId aE
 
 PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic() {}
 
-CHIP_ERROR PushAvStreamTransportServerLogic::Init(AttributePersistenceProvider & attributeStorage)
+CHIP_ERROR PushAvStreamTransportServerLogic::Init(AttributePersistenceProvider & attributeStorage, const FabricTable & fabricTable)
 {
     VerifyOrDie(mCluster != nullptr);
 
     mAttributeStorage = &attributeStorage;
-    LoadPersistentAttributes();
+    LogErrorOnFailure(LoadCurrentConnections());
+    RemoveConnectionsForMissingFabrics(fabricTable);
+
+    // Signal delegate that all persistent configuration attributes have been loaded.
+    TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
     return CHIP_NO_ERROR;
 }
 
@@ -236,7 +240,7 @@ void PushAvStreamTransportServerLogic::RemoveConnectionsForMissingFabrics(const 
     for (uint16_t connectionID : connectionIDs)
     {
         ChipLogDetail(Zcl, "Push AV Stream Transport: dropping ConnectionID %u whose fabric no longer exists", connectionID);
-        LogErrorOnFailure(RemoveStreamTransportConnection(connectionID));
+        LogErrorOnFailure(RemoveStreamTransportConnection(connectionID, /*revertOnStoreFailure=*/false));
         RemoveTimerAppState(connectionID);
     }
 }
@@ -256,15 +260,6 @@ void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connec
                              });
 
     mTimerContexts.erase(it, mTimerContexts.end());
-}
-
-void PushAvStreamTransportServerLogic::LoadPersistentAttributes()
-{
-    // Load currentConnections
-    LogErrorOnFailure(LoadCurrentConnections());
-
-    // Signal delegate that all persistent configuration attributes have been loaded.
-    TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
 }
 
 TransportConfigurationStorage * PushAvStreamTransportServerLogic::FindStreamTransportConnection(const uint16_t connectionID)

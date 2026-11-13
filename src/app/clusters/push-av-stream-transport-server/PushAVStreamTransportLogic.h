@@ -103,9 +103,12 @@ public:
     /**
      * Loads the persisted CurrentConnections from `attributeStorage` and notifies the delegate.
      *
-     * `attributeStorage` is used for all later CurrentConnections writes and must stay valid until Shutdown().
+     * Connections whose fabric no longer exists in `fabricTable` are dropped before the
+     * delegate is notified, so the delegate does not re-allocate transports for removed
+     * fabrics. `attributeStorage` is used for all later CurrentConnections writes and must
+     * stay valid until Shutdown().
      */
-    CHIP_ERROR Init(AttributePersistenceProvider & attributeStorage);
+    CHIP_ERROR Init(AttributePersistenceProvider & attributeStorage, const FabricTable & fabricTable);
 
     void Shutdown();
 
@@ -113,12 +116,6 @@ public:
     /// removes the connection entries. Skips busy-status and accessing-fabric validation since
     /// fabric removal is mandatory.
     void OnFabricRemoved(FabricIndex fabricIndex);
-
-    /// Removes connections whose fabric no longer exists in `fabricTable`.
-    ///
-    /// Fabric removal can leave entries in storage when persisting the removal failed;
-    /// called during Init so a restart does not resurrect entries for removed fabrics.
-    void RemoveConnectionsForMissingFabrics(const FabricTable & fabricTable);
 
     bool HasFeature(PushAvStreamTransport::Feature feature) const;
 
@@ -177,14 +174,15 @@ private:
     /// an error if the check returns true
     bool IsNullDelegateWithLogging(EndpointId endpointIdForLogging);
 
-    /**
-     * Helper function that loads all the persistent attributes from the KVS.
-     */
-    void LoadPersistentAttributes();
-
     // Helpers to store and load CurrentConnections list
     CHIP_ERROR StoreCurrentConnections();
     CHIP_ERROR LoadCurrentConnections();
+
+    /// Removes connections whose fabric no longer exists in `fabricTable`.
+    ///
+    /// Fabric removal can leave entries in storage when persisting the removal failed;
+    /// called during Init so a restart does not resurrect entries for removed fabrics.
+    void RemoveConnectionsForMissingFabrics(const FabricTable & fabricTable);
 
     // Helper functions
     uint16_t GenerateConnectionID();
