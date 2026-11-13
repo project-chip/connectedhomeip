@@ -218,6 +218,125 @@ TEST_F(TestThreadNetworkDirectoryCluster, TestPreferredExtendedPanId)
 }
 
 // ---------------------------------------------------------------------------
+// TestApplicationMutators: the application-facing accessors. Each keeps the cluster's
+// invariants on its own.
+// ---------------------------------------------------------------------------
+TEST_F(TestThreadNetworkDirectoryCluster, TestApplicationMutators)
+{
+    app::Testing::FakeThreadNetworkDirectoryStorage storage;
+    ThreadNetworkDirectoryCluster cluster(kTestEndpointId, storage);
+    chip::Testing::TestServerClusterContext context;
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // A dataset missing the required sub-TLVs is refused, as AddNetwork would refuse it.
+    constexpr uint8_t kTruncated[] = { 0x0e, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00 };
+    EXPECT_NE(cluster.AddOrUpdateNetwork(MakeExPanId1(), ByteSpan(kTruncated)), CHIP_NO_ERROR);
+
+    // An Extended PAN ID that disagrees with the dataset is refused too.
+    EXPECT_EQ(cluster.AddOrUpdateNetwork(MakeExPanId2(), ByteSpan(kDataset1)), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // A well-formed one is recorded and ThreadNetworks subscribers are told.
+    EXPECT_EQ(cluster.AddOrUpdateNetwork(MakeExPanId1(), ByteSpan(kDataset1)), CHIP_NO_ERROR);
+    EXPECT_TRUE(storage.ContainsNetwork(MakeExPanId1()));
+    {
+        auto & dirty = context.ChangeListener().DirtyList();
+        ASSERT_FALSE(dirty.empty());
+        EXPECT_EQ(dirty.back(), ConcreteAttributePath(kTestEndpointId, ThreadNetworkDirectory::Id, Attributes::ThreadNetworks::Id));
+        dirty.clear();
+    }
+
+    // A newer dataset for the same network replaces the stored one and notifies again.
+    {
+        EXPECT_EQ(cluster.AddOrUpdateNetwork(MakeExPanId1(), ByteSpan(kDataset1Updated)), CHIP_NO_ERROR);
+
+        uint8_t readBuffer[ThreadNetworkDirectoryStorage::kMaxThreadDatasetLen];
+        MutableByteSpan readBack(readBuffer);
+        EXPECT_EQ(storage.GetNetworkDataset(MakeExPanId1(), readBack), CHIP_NO_ERROR);
+        EXPECT_TRUE(readBack.data_equal(ByteSpan(kDataset1Updated)));
+
+        auto & dirty = context.ChangeListener().DirtyList();
+        ASSERT_FALSE(dirty.empty());
+        EXPECT_EQ(dirty.back(), ConcreteAttributePath(kTestEndpointId, ThreadNetworkDirectory::Id, Attributes::ThreadNetworks::Id));
+        dirty.clear();
+    }
+
+    // Re-recording the stored dataset is a no-op: nothing changed, so no notification.
+    EXPECT_EQ(cluster.AddOrUpdateNetwork(MakeExPanId1(), ByteSpan(kDataset1Updated)), CHIP_NO_ERROR);
+    EXPECT_TRUE(context.ChangeListener().DirtyList().empty());
+
+    // An older Active Timestamp is refused, as AddNetwork refuses it; the stored entry is untouched.
+    EXPECT_EQ(cluster.AddOrUpdateNetwork(MakeExPanId1(), ByteSpan(kDataset1)), CHIP_ERROR_INCORRECT_STATE);
+    {
+        uint8_t readBuffer[ThreadNetworkDirectoryStorage::kMaxThreadDatasetLen];
+        MutableByteSpan readBack(readBuffer);
+        EXPECT_EQ(storage.GetNetworkDataset(MakeExPanId1(), readBack), CHIP_NO_ERROR);
+        EXPECT_TRUE(readBack.data_equal(ByteSpan(kDataset1Updated)));
+        EXPECT_TRUE(context.ChangeListener().DirtyList().empty());
+    }
+
+    // A preference must name a network that is in the list.
+    auto exPanId2 = MakeExPanId2();
+    EXPECT_EQ(cluster.SetPreferredNetwork(&exPanId2), CHIP_ERROR_INVALID_ARGUMENT);
+    auto exPanId1 = MakeExPanId1();
+    EXPECT_EQ(cluster.SetPreferredNetwork(&exPanId1), CHIP_NO_ERROR);
+
+    {
+        std::optional<ThreadNetworkDirectoryStorage::ExtendedPanId> preferred;
+        EXPECT_EQ(cluster.GetPreferredNetwork(preferred), CHIP_NO_ERROR);
+        EXPECT_TRUE(preferred == exPanId1);
+    }
+
+    // Retracting the preferred network clears the preference.
+    EXPECT_EQ(cluster.ForgetNetwork(MakeExPanId1()), CHIP_NO_ERROR);
+    EXPECT_FALSE(storage.ContainsNetwork(MakeExPanId1()));
+    {
+        std::optional<ThreadNetworkDirectoryStorage::ExtendedPanId> preferred;
+        EXPECT_EQ(cluster.GetPreferredNetwork(preferred), CHIP_NO_ERROR);
+        EXPECT_FALSE(preferred.has_value());
+    }
+
+    // Retracting a network the preference does not name leaves it alone.
+    EXPECT_EQ(cluster.AddOrUpdateNetwork(MakeExPanId1(), ByteSpan(kDataset1)), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.AddOrUpdateNetwork(MakeExPanId2(), ByteSpan(kDataset2)), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetPreferredNetwork(&exPanId1), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.ForgetNetwork(MakeExPanId2()), CHIP_NO_ERROR);
+    {
+        std::optional<ThreadNetworkDirectoryStorage::ExtendedPanId> preferred;
+        EXPECT_EQ(cluster.GetPreferredNetwork(preferred), CHIP_NO_ERROR);
+        EXPECT_TRUE(preferred == exPanId1);
+    }
+
+    // Clearing the preference explicitly.
+    EXPECT_EQ(cluster.SetPreferredNetwork(nullptr), CHIP_NO_ERROR);
+    {
+        std::optional<ThreadNetworkDirectoryStorage::ExtendedPanId> preferred;
+        EXPECT_EQ(cluster.GetPreferredNetwork(preferred), CHIP_NO_ERROR);
+        EXPECT_FALSE(preferred.has_value());
+    }
+
+    // A failed removal leaves the network listed, so its preference is restored.
+    EXPECT_EQ(cluster.SetPreferredNetwork(&exPanId1), CHIP_NO_ERROR);
+    storage.SetRejectRemove(true);
+    EXPECT_EQ(cluster.ForgetNetwork(MakeExPanId1()), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    EXPECT_TRUE(storage.ContainsNetwork(MakeExPanId1()));
+    {
+        std::optional<ThreadNetworkDirectoryStorage::ExtendedPanId> preferred;
+        EXPECT_EQ(cluster.GetPreferredNetwork(preferred), CHIP_NO_ERROR);
+        EXPECT_TRUE(preferred == exPanId1);
+    }
+    storage.SetRejectRemove(false);
+    EXPECT_EQ(cluster.ForgetNetwork(MakeExPanId1()), CHIP_NO_ERROR);
+    EXPECT_FALSE(storage.ContainsNetwork(MakeExPanId1()));
+    {
+        std::optional<ThreadNetworkDirectoryStorage::ExtendedPanId> preferred;
+        EXPECT_EQ(cluster.GetPreferredNetwork(preferred), CHIP_NO_ERROR);
+        EXPECT_FALSE(preferred.has_value());
+    }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// ---------------------------------------------------------------------------
 // TestThreadNetworksList: list is initially empty; after directly adding
 // networks to the storage the attribute encodes correct field values.
 // ---------------------------------------------------------------------------
