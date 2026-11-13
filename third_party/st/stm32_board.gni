@@ -15,6 +15,7 @@
 declare_args() {
   # STM32 board used
   stm32_board = ""
+  stm32_app = ""
 }
 
 if (stm32_board == "") {

@@ -14,10 +14,11 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-
 import("//build_overrides/freertos.gni")
 import("//build_overrides/lwip.gni")
 import("//build_overrides/mbedtls.gni")
+import("${chip_root}/third_party/st/stm32_sdk.gni")
+import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   # CSMSIS PATHS #
@@ -155,16 +156,16 @@ SOURCES = [
   "${stm32_system_interfaces}/hw_otp.c",
   "${stm32_system_interfaces}/hw_rng.c",
   "${stm32_system_interfaces}/timer_if.c",
-  "${stm32_system_interfaces}/adv_trace_usart_if.c",
   "${stm32_system_interfaces}/app_bsp.c",
   "${stm32_system_App}/Modules/ble_timer.c",
-  "${stm32_system_App}/Interfaces/stm32_lpm_if.c",
+  "${stm32_system_interfaces}/adv_trace_usart_if.c",
   "${stm32_system_App}/Config/ADC_Ctrl/adc_ctrl_conf.c",
   "${stm32_system_App}/Config/CRC_Ctrl/crc_ctrl_conf.c",
   "${stm32_system_App}/Config/Debug_GPIO/app_debug.c",
   "${stm32_system_App}/Config/Flash/simple_nvm_arbiter_conf.c",
   "${stm32_system_App}/Config/LowPower/peripheral_init.c",
   "${stm32_system_App}/Config/LowPower/user_low_power_config.c",
+  "${stm32_system_App}/Interfaces/stm32_lpm_if.c",
 
   #mbedtls
   "${mbedtls_st}/library/aes.c",
@@ -325,10 +326,18 @@ INCLUDE_DIRS = [
   "${stm32_wb_sdk}/CMSIS/RTOS2/Include",
 ]
 
+if(stm32_app == "lit-icd-app") {
+  INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Generic-Switch-App/Core/Inc"]
+}else if (stm32_app == "lighting-app") {
+  if (chip_enable_ota_requestor) {
+      INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Appli_TrustZone/NonSecure/Core/Inc"]
+  } else {
+      INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Lighting-App/Core/Inc"]
+  }
+}
+
 DEFINES = [
   "CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>",
-
-  #"CHIP_PLATFORM_CONFIG_INCLUDE=<CHIPPlatformConfig.h>",
   "CHIP_HAVE_CONFIG_H",
   "OPENTHREAD_PROJECT_CORE_CONFIG_FILE=<stm32wba-openthread-matter-config.h>",
   "OPENTHREAD_CONFIG_FILE=<openthread_api_config_matter.h>",

@@ -767,6 +767,7 @@ def BuildStm32Target():
     # apps
     target.AppendFixedTargets([
         TargetPart('light', app=stm32App.LIGHT),
+        TargetPart('lit', app=stm32App.LIT),
     ])
 
     return target

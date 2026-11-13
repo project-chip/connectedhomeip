@@ -23,9 +23,8 @@ import("${stm32_sdk_build_root}/stm32_sdk.gni")
 
 assert(current_os == "freertos")
 
-stm32_project_dir_common =
-    "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/"
 examples_plat_dir = "${chip_root}/examples/platform/stm32"
+stm32_app_common = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/Application"
 app_data_model =
     "${chip_root}/examples/lighting-app/stm32/data_model:stm32-lighting"
 
@@ -47,7 +46,9 @@ if (chip_enable_ota_requestor) {
   # OEMiROT Secure_nsclib path
   oemirot_nsclib_path =
       "${examples_plat_dir}/STM32WBA65I-DK1/oemirot/Secure_nsclib"
-  stm32_ota_src = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/Application/OTA"
+  stm32_oemirot_ns_app = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Appli_TrustZone/NonSecure"
+} else {
+  stm32_app_src = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Lighting-App/Core"
 }
 
 # Sanity check
@@ -88,17 +89,14 @@ stm32_sdk("sdk") {
     "${chip_root}/src/platform/stm32",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
+    "include",
+    "${chip_root}/src/include",
   ]
 
   sources = [
     "${examples_plat_dir}/config_files/STM32WBA6/FreeRTOSConfig.h",
     "${examples_plat_dir}/config_files/STM32WBA6/matter_config.h",
     "include/CHIPProjectConfig.h",
-  ]
-
-  include_dirs += [
-    "include",
-    "${chip_root}/src/include",
   ]
 
   defines = [
@@ -112,33 +110,15 @@ stm32_executable("lighting_app") {
   deps = []
 
   output_name = "${stm32_board}-lighting.elf"
-  include_dirs = [
-    "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/",
-    "${stm32_project_dir_common}/Application/STM32_WPAN/Target",
-    "${stm32_project_dir_common}/Application/STM32_WPAN/App",
-    "${stm32_project_dir_common}/Application/App/Inc",
-    "include/",
-    "${chip_root}/src/include/",
-  ]
   defines = []
 
   sources = [
-    "${stm32_project_dir_common}/Application/App/Src/app_entry.cpp",
-    "${stm32_project_dir_common}/Application/STM32_WPAN/App/app_ble.c",
-    "${stm32_project_dir_common}/Application/STM32_WPAN/App/app_matter.c",
-    "${stm32_project_dir_common}/Application/STM32_WPAN/App/app_thread.c",
-    "${stm32_project_dir_common}/Application/STM32_WPAN/App/custom_stm.c",
-    "${stm32_project_dir_common}/Application/STM32_WPAN/Target/bleplat.c",
-    "${stm32_project_dir_common}/Application/STM32_WPAN/Target/bpka.c",
-    "${stm32_project_dir_common}/Application/STM32_WPAN/Target/host_stack_if.c",
-    "${stm32_project_dir_common}/Application/STM32_WPAN/Target/linklayer_plat.c",
-    "${stm32_project_dir_common}/Application/STM32_WPAN/Target/ll_sys_if.c",
-    "${stm32_project_dir_common}/Application/STM32_WPAN/Target/power_table.c",
     "src/AppTask.cpp",
     "src/IdentifierEffect.cpp",
     "src/LightingManager.cpp",
     "src/SoftwareDiagnosticsTestEventTriggerHandler.cpp",
     "src/ZclCallbacks.cpp",
+    "${stm32_app_common}/App/Src/app_entry.cpp",
   ]
 
   deps = [
@@ -172,11 +152,24 @@ stm32_executable("lighting_app") {
   if (chip_enable_ota_requestor) {
     defines += [ "STM32_OTA_ENABLED" ]
     sources += [
-      "${stm32_ota_src}/low_level_spi_device.c",
-      "${stm32_ota_src}/low_level_spi_flash.c",
-      "${stm32_ota_src}/stm_ota_spi_flash.c",
+      "${stm32_oemirot_ns_app}/Core/Src/main.c",
+      "${stm32_oemirot_ns_app}/Core/Src/stm32wbaxx_hal_msp.c",
+      "${stm32_oemirot_ns_app}/Core/Src/stm32wbaxx_it.c",
+      "${stm32_oemirot_ns_app}/Core/Src/syscalls.c",
+      "${stm32_oemirot_ns_app}/Core/Src/sysmem.c",
+      "${stm32_oemirot_ns_app}/Core/Src/system_stm32wbaxx.c",   
       "src/ota.cpp",
     ]
+  } else  {
+    sources += [
+      "${stm32_app_src}/Src/main.c",
+      "${stm32_app_src}/Src/stm32wbaxx_hal_msp.c",
+      "${stm32_app_src}/Src/stm32wbaxx_it.c",
+      "${stm32_app_src}/Src/syscalls.c",
+      "${stm32_app_src}/Src/sysmem.c",
+      "${stm32_app_src}/Src/system_stm32wbaxx.c",
+    ]
+
   }
 
   # OEMiROT TrustZone NonSecure configuration
@@ -188,7 +181,7 @@ stm32_executable("lighting_app") {
     ldscript = "${target_gen_dir}/STM32WBA65I-DK1_FLASH_NS.ld"
 
     # Add Secure_nsclib include path
-    include_dirs += [ oemirot_nsclib_path ]
+    include_dirs = [ oemirot_nsclib_path ]
   } else {
     # Standard linker script
     ldscript = "${examples_plat_dir}/ldscripts/STM32WBA65I-DK1_FLASH.ld"
