@@ -88,7 +88,7 @@ public:
     // Network Commissioning and Wi-Fi Network Diagnostics clusters.
     CHIP_ERROR InitWifiNetworking();
 
-    /// Storage/group data provider setup.
+    /// Sets up persistence and registers the group data and device info providers.
     CHIP_ERROR InitPersistence();
 
     TestEventTriggerDelegate & GetTestEventTriggerDelegate();

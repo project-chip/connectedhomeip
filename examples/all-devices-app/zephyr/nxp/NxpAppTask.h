@@ -19,7 +19,6 @@
 
 #include "AppFactoryData.h"
 #include <lib/support/CodeUtils.h>
-#include <platform/DeviceInfoProvider.h>
 
 namespace chip::app::AllDevices {
 
@@ -32,7 +31,6 @@ public:
     CHIP_ERROR InitCredentials()
     {
         ReturnErrorOnFailure(chip::NXP::App::AppFactoryData_PostMatterStackInit());
-        DeviceLayer::SetDeviceInfoProvider(&Self().mDeviceInfoProvider);
         return CHIP_NO_ERROR;
     }
 };

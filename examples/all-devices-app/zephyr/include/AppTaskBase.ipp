@@ -32,6 +32,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceControlServer.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
@@ -100,7 +101,6 @@ CHIP_ERROR AppTaskBase<Derived>::InitCredentials()
 #else
     Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
     DeviceLayer::SetDeviceInstanceInfoProvider(&DeviceLayer::DeviceInstanceInfoProviderMgrImpl());
-    DeviceLayer::SetDeviceInfoProvider(&Self().mDeviceInfoProvider);
     return CHIP_NO_ERROR;
 #endif
 }
@@ -152,6 +152,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitPersistence()
     mGroupDataProvider.SetSessionKeystore(mInitParams.sessionKeystore);
     ReturnErrorOnFailure(mGroupDataProvider.Init());
     Credentials::SetGroupDataProvider(&mGroupDataProvider);
+    DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider);
 
     return CHIP_NO_ERROR;
 }
