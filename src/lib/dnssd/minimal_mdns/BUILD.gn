@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/system/system.gni")
 
 declare_args() {
   # Makes unicast queries use a separate UDP endpoint that have an ephemeral port
@@ -43,6 +44,10 @@ declare_args() {
   #   - "none" will NOT compile any default policy, app is expected to call
   #     SetAddressPolicy apropriately
   chip_minmdns_default_policy = "default"
+
+  # Listen again when the network interfaces change (NetlinkInterfaceMonitor.h).
+  chip_minmdns_interface_monitor =
+      current_os == "linux" && chip_system_config_use_sockets
 }
 
 buildconfig_header("minmdns_buildconfig") {
@@ -61,6 +66,12 @@ buildconfig_header("minmdns_buildconfig") {
     defines += [ "CHIP_MINMDNS_HIGH_VERBOSITY=1" ]
   } else {
     defines += [ "CHIP_MINMDNS_HIGH_VERBOSITY=0" ]
+  }
+
+  if (chip_minmdns_interface_monitor) {
+    defines += [ "CHIP_MINMDNS_INTERFACE_MONITOR=1" ]
+  } else {
+    defines += [ "CHIP_MINMDNS_INTERFACE_MONITOR=0" ]
   }
 
   if (chip_minmdns_default_policy == "default") {
@@ -148,6 +159,13 @@ static_library("minimal_mdns") {
 
   if (chip_minmdns_high_verbosity) {
     sources += [ "Logging.cpp" ]
+  }
+
+  if (chip_minmdns_interface_monitor) {
+    sources += [
+      "NetlinkInterfaceMonitor.cpp",
+      "NetlinkInterfaceMonitor.h",
+    ]
   }
 
   public_deps = [

@@ -197,16 +197,46 @@ bool ServerBase::IsListening() const
     return listening;
 }
 
-CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, ListenIterator * it,
-                              uint16_t port)
+ServerBase::EndpointInfo * ServerBase::FindEndpoint(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType)
 {
-    ShutdownEndpoints(); // ensure everything starts fresh
+    EndpointInfo * found = nullptr;
+    mEndpoints.ForEachActiveObject([&](EndpointInfo * info) {
+        if (info->mInterfaceId == interfaceId && info->mAddressType == addressType)
+        {
+            found = info;
+            return chip::Loop::Break;
+        }
+        return chip::Loop::Continue;
+    });
+    return found;
+}
+
+CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, ListenIterator * it,
+                              uint16_t port, ListenDelegate * delegate)
+{
+    // Whatever the iterator no longer lists is closed after the pass below.
+    mEndpoints.ForEachActiveObject([](EndpointInfo * info) {
+        info->mListed = false;
+        return chip::Loop::Continue;
+    });
 
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
     chip::Inet::IPAddressType addressType;
+    bool full = false; // out of endpoints: open nothing more, but keep marking what is open
 
     while (it->Next(&interfaceId, &addressType))
     {
+        EndpointInfo * existing = FindEndpoint(interfaceId, addressType);
+        if (existing != nullptr)
+        {
+            existing->mListed = true;
+            continue;
+        }
+        if (full)
+        {
+            continue;
+        }
+
         chip::Inet::UDPEndPointHandle listenUdp;
         CHIP_ERROR err = udpEndPointManager->NewEndPoint(listenUdp);
         if (err != CHIP_NO_ERROR)
@@ -214,7 +244,8 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
             // Out of endpoints: keep the interfaces already bound.
             ChipLogError(DeviceLayer, "MDNS failed to allocate an endpoint for %s: %" CHIP_ERROR_FORMAT,
                          InterfaceName(interfaceId).Get(), err.Format());
-            break;
+            full = true;
+            continue;
         }
 
         // An interface may be gone by the time it is bound; skip it.
@@ -276,9 +307,24 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
         {
             ChipLogError(DeviceLayer, "MDNS endpoint table full at %s for address type %s", InterfaceName(interfaceId).Get(),
                          AddressTypeStr(addressType));
-            break;
+            full = true;
+            continue;
+        }
+        endpointInfo->mListed = true;
+
+        if (delegate != nullptr)
+        {
+            delegate->OnEndpointAdded(interfaceId, addressType);
         }
     }
+
+    mEndpoints.ForEachActiveObject([&](EndpointInfo * info) {
+        if (!info->mListed)
+        {
+            mEndpoints.ReleaseObject(info);
+        }
+        return chip::Loop::Continue;
+    });
 
     // If at least one IPv6 interface is used by the mDNS server, notify the application that DNS-SD is ready.
     if (!mIsInitialized)
