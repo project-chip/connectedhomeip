@@ -17,7 +17,7 @@
 #pragma once
 
 #include <device/types/power-source/BatteryPowerSource.h>
-#include <platform/DefaultTimerDelegate.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
