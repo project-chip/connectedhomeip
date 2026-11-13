@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/OTAImageHeader.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
@@ -35,9 +36,13 @@ class OTAImageProcessorImpl : public OTAImageProcessorInterface
 public:
     //////////// OTAImageProcessorInterface Implementation ///////////////
     CHIP_ERROR PrepareDownload() override;
+    CHIP_ERROR PrepareDownloadFrom(uint64_t offset) override;
     CHIP_ERROR Finalize() override;
     CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
+    CHIP_ERROR SuspendDownload() override;
+    uint64_t GetResumeOffset() override;
+    bool ReportsFinalizeResult() const override { return true; }
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
@@ -51,9 +56,22 @@ private:
     static void HandleFinalize(intptr_t context);
     static void HandleApply(intptr_t context);
     static void HandleAbort(intptr_t context);
+    static void HandleSuspend(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
+    static void HandleHashPartialImage(intptr_t context);
+
+    // Opens the image file for appending and reports the prepare to the downloader.
+    void FinishPrepare();
+    // Stops hashing a partial image that a resumed prepare started, e.g. because the download was suspended or aborted meanwhile.
+    void StopHashingPartialImage();
 
     CHIP_ERROR ProcessHeader(ByteSpan & block);
+    // Whether the image file holds exactly the payload bytes counted as received, so that a resumed download can append to it.
+    bool PartialImageIsIntact() const;
+    // Whether the image file holds the payload size of the header and the payload hashed as it was written matches the header's
+    // SHA-256 digest. Does not read the file: the blocks are hashed as they are written, and a resumed partial image when the
+    // download is prepared.
+    bool VerifyPayload();
 
     /**
      * Called to allocate memory for mBlock if necessary and set it to block
@@ -69,7 +87,19 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    const char * mImageFile = nullptr;
+    const char * mImageFile      = nullptr;
+    uint64_t mImageBytesReceived = 0;
+    uint64_t mPrepareOffset      = 0;
+    bool mSuspended              = false;
+    uint8_t mPayloadDigest[Crypto::kSHA256_Hash_Length];
+    size_t mPayloadDigestLength = 0;
+    bool mPayloadVerified       = false;
+    // SHA-256 of the payload bytes in the image file, updated as blocks are written.
+    Crypto::Hash_SHA256_stream mPayloadHash;
+    // The partial image being hashed in chunks by a resumed prepare, one scheduled work item per chunk.
+    std::ifstream mPartialImage;
+    uint64_t mPartialImageBytesHashed = 0;
+    bool mHashingPartialImage         = false;
 };
 
 } // namespace chip

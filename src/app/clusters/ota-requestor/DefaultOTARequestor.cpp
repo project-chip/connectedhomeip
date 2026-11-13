@@ -414,7 +414,7 @@ void DefaultOTARequestor::OnFabricRemoved(FabricIndex fabricIndex)
     ChipLogProgress(SoftwareUpdate, "OTA Requestor: tearing down update state bound to removed fabric %u",
                     static_cast<unsigned>(fabricIndex));
 
-    // EndDownload aborts the BDX exchange (a no-op if the downloader is not in kInProgress).
+    // EndDownload aborts the BDX exchange, or discards a suspended download if none is in progress.
     mBdxDownloader->EndDownload(CHIP_ERROR_CONNECTION_ABORTED);
     // Cancel the driver's periodic-query / Apply / retry timers (no-op if no timer armed).
     mOtaRequestorDriver->UpdateCancelled();
@@ -643,6 +643,12 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
         mBdxMessenger.Reset();
         break;
     case OTADownloader::State::kIdle:
+        if (reason == OTAChangeReasonEnum::kDelayByProvider)
+        {
+            // The provider answered the download with RESPONDER_BUSY. The driver schedules the same retry as for a Busy
+            // QueryImageResponse; the Idle transition below still generates the DownloadError event.
+            TEMPORARY_RETURN_IGNORED mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kBusy, System::Clock::kZero);
+        }
         if (reason != OTAChangeReasonEnum::kSuccess)
         {
             RecordErrorUpdateState(CHIP_ERROR_CONNECTION_ABORTED, reason);
@@ -657,6 +663,17 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
 void DefaultOTARequestor::OnUpdateProgressChanged(Nullable<uint8_t> percent)
 {
     TEMPORARY_RETURN_IGNORED mAttributes->SetUpdateStateProgress(percent);
+}
+
+void DefaultOTARequestor::OnDownloadRestartRequested()
+{
+    // The provider could not continue a partial image. Connect again and download from offset 0 within this update attempt, once
+    // the BDX event that triggered the restart has unwound.
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        VerifyOrReturn(GetCurrentUpdateState() == OTAUpdateStateEnum::kDownloading && mProviderLocation.HasValue());
+        ChipLogProgress(SoftwareUpdate, "Restarting the download from offset 0");
+        ConnectToProvider(kDownload);
+    });
 }
 
 IdleStateReason DefaultOTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
@@ -818,6 +835,9 @@ CHIP_ERROR DefaultOTARequestor::ExtractUpdateDescription(const QueryImageRespons
 CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     VerifyOrReturnError(mBdxDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    // ConnectToProvider() only proceeds with a provider location, but the update may be cancelled, and the location cleared, while
+    // the session is being established. Without it GetProviderScopedId() below has no value to read.
+    VerifyOrReturnError(mProviderLocation.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     // TODO: allow caller to provide their own OTADownloader instance and set BDX parameters
 
@@ -833,6 +853,7 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & excha
     mBdxMessenger.Init(mBdxDownloader, exchangeCtx);
     mBdxDownloader->SetMessageDelegate(&mBdxMessenger);
     mBdxDownloader->SetStateDelegate(this);
+    mBdxDownloader->SetImageIdentity(mTargetVersion, GetProviderScopedId());
 
     CHIP_ERROR err = mBdxDownloader->SetBDXParams(initOptions, kDownloadTimeoutSec);
     if (err == CHIP_NO_ERROR)
