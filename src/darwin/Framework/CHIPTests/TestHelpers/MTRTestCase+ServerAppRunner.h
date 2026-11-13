@@ -29,6 +29,12 @@ NS_ASSUME_NONNULL_BEGIN
  * after the app has already exited, is harmless.
  */
 - (void)terminate;
+
+// SIGSTOP / SIGCONT the running app, so it goes silent without withdrawing its advertisement. SIGSTOP only defers the
+// app's work: its timers are absolute deadlines, so on SIGCONT everything that came due runs at once and it sends on
+// the existing session. This does not simulate a peer that stops responding or traffic that is lost.
+- (BOOL)suspend;
+- (BOOL)resume;
 @end
 
 @interface MTRTestCase (ServerAppRunner)

@@ -110,6 +110,9 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 // nullable because technically _deviceController is nullable.
 @property (nonatomic, readonly, nullable) MTRDeviceController_Concrete * _concreteController;
 
+// Called on the Matter queue when the session the subscription last used recovers.
+- (void)_handleSessionToNodeRecovered;
+
 @end
 
 typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
@@ -134,6 +137,8 @@ using namespace chip::Protocols::InteractionModel;
 using namespace chip::Tracing::DarwinFramework;
 
 typedef void (^FirstReportHandler)(void);
+
+@class MTRDeviceMatterCPPObjectsHolder;
 
 namespace {
 
@@ -167,19 +172,63 @@ private:
     uint32_t mResubscriptionNumRetries = 0;
 };
 
+// Tells its holder when the watched session recovers. The holder owns it, so the back-pointer does not retain.
+class SessionRecoveryWatcher final : public SessionDelegate {
+public:
+    void SetHolder(MTRDeviceMatterCPPObjectsHolder * holder) { mHolder = holder; }
+
+    bool Watch(const SessionHandle & session) { return mSession.Grab(session); }
+    void Stop() { mSession.Release(); }
+
+    void OnSessionReleased() override {}
+    void OnSessionRecovered() override;
+
+#ifdef DEBUG
+    Transport::SecureSession * WatchedSecureSession()
+    {
+        VerifyOrReturnValue(mSession, nullptr);
+        return mSession->AsSecureSession();
+    }
+#endif
+
+private:
+    __unsafe_unretained MTRDeviceMatterCPPObjectsHolder * mHolder = nil;
+    SessionHolderWithDelegate mSession { *this };
+};
+
 } // anonymous namespace
 
 #pragma mark - MTRDeviceMatterCPPObjectsHolder
 
 // Class to hold C++ objects that can only be manipulated on the Matter queue
 @interface MTRDeviceMatterCPPObjectsHolder : NSObject
+- (instancetype)initWithDevice:(MTRDevice_Concrete *)device;
 @property (nonatomic, readonly) ReadClient * readClient;
 @property (nonatomic, readonly) SubscriptionCallback * subscriptionCallback; // valid when and only when readClient is valid
 - (void)setReadClient:(ReadClient * _Nullable)readClient subscriptionCallback:(SubscriptionCallback * _Nullable)subscriptionCallback;
 - (void)clearReadClientAndDeleteSubscriptionCallback;
+- (void)watchSessionForRecovery:(const SessionHandle &)session;
+// Called by the watcher on the Matter queue when the watched session recovers.
+- (void)_sessionRecovered;
+// Tears down the subscription objects and stops watching the session.
+- (void)invalidate;
+#ifdef DEBUG
+- (Transport::SecureSession * _Nullable)unitTestWatchedSecureSession;
+#endif
 @end
 
-@implementation MTRDeviceMatterCPPObjectsHolder
+@implementation MTRDeviceMatterCPPObjectsHolder {
+    __weak MTRDevice_Concrete * _device;
+    SessionRecoveryWatcher _sessionRecoveryWatcher;
+}
+- (instancetype)initWithDevice:(MTRDevice_Concrete *)device
+{
+    if (self = [super init]) {
+        _device = device;
+        _sessionRecoveryWatcher.SetHolder(self);
+    }
+    return self;
+}
 @synthesize readClient = _readClient;
 @synthesize subscriptionCallback = _subscriptionCallback;
 - (ReadClient *)readClient
@@ -228,7 +277,42 @@ private:
         }
     }
 }
+- (void)watchSessionForRecovery:(const SessionHandle &)session
+{
+    assertChipStackLockedByCurrentThread();
+    @synchronized(self) {
+        if (!_sessionRecoveryWatcher.Watch(session)) {
+            MTR_LOG_ERROR("%@: could not watch session %u for recovery", self, session->SessionIdForLogging());
+        }
+    }
+}
+- (void)_sessionRecovered
+{
+    assertChipStackLockedByCurrentThread();
+    MTRDevice_Concrete * device = _device;
+    VerifyOrReturn(device, MTR_LOG_DEBUG("MTRDeviceMatterCPPObjectsHolder session recovered with nil MTRDevice"));
+    [device _handleSessionToNodeRecovered];
+}
+- (void)invalidate
+{
+    assertChipStackLockedByCurrentThread();
+    [self clearReadClientAndDeleteSubscriptionCallback];
+    @synchronized(self) {
+        _sessionRecoveryWatcher.Stop();
+    }
+}
+#ifdef DEBUG
+- (Transport::SecureSession * _Nullable)unitTestWatchedSecureSession
+{
+    assertChipStackLockedByCurrentThread();
+    @synchronized(self) {
+        return _sessionRecoveryWatcher.WatchedSecureSession();
+    }
+}
+#endif
 @end
+
+void SessionRecoveryWatcher::OnSessionRecovered() { [mHolder _sessionRecovered]; }
 
 #pragma mark - MTRDevice
 
@@ -393,6 +477,13 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
  */
 @property (nonatomic) BOOL reattemptingSubscription;
 
+/**
+ * Set when the session the last subscription used recovers while a new
+ * subscription is being set up, so that if that setup fails the reattempt
+ * happens without waiting out the backoff.
+ */
+@property (nonatomic) BOOL sessionRecoveredDuringSubscriptionSetup;
+
 // Expected value cache is attributePath => NSArray of [NSDate of expiration time, NSDictionary of value, expected value ID]
 //   - See MTRDeviceExpectedValueFieldIndex for the definitions of indices into this array.
 // See MTRDeviceResponseHandler definition for value dictionary details.
@@ -440,6 +531,11 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
+- (NSNumber *)unitTestResubscriptionDelayOverrideForDevice:(MTRDevice *)device;
+- (NSNumber *)unitTestSubscriptionResetDelayOverrideForDevice:(MTRDevice *)device;
+- (void)unitTestSubscriptionSessionRequestStartedForDevice:(MTRDevice *)device;
+- (NSNumber *)unitTestRetryDelayOverrideForFailedSessionRequest:(MTRDevice *)device;
+- (BOOL)unitTestShouldIgnoreOperationalAdvertisementForDevice:(MTRDevice *)device;
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
 - (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
 - (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
@@ -593,7 +689,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         _persistedClusters = [NSMutableSet set];
         _highestObservedEventNumber = nil;
         _highestObservedEventNumberNeedsPersisting = NO;
-        _matterCPPObjectsHolder = [[MTRDeviceMatterCPPObjectsHolder alloc] init];
+        _matterCPPObjectsHolder = [[MTRDeviceMatterCPPObjectsHolder alloc] initWithDevice:self];
         _throttlingDeviceBecameActiveCallbacks = NO;
 
         // If there is a data store, make sure we have an observer to monitor system clock changes, so
@@ -632,7 +728,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     // Delete subscription callback object to tear down ReadClient
     MTRDeviceMatterCPPObjectsHolder * matterCPPObjectsHolder = self.matterCPPObjectsHolder;
     [self._concreteController asyncDispatchToMatterQueue:^{
-        [matterCPPObjectsHolder clearReadClientAndDeleteSubscriptionCallback];
+        [matterCPPObjectsHolder invalidate];
 #ifdef DEBUG
         // tell test delegate about having completed the deletion
         if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionCallbackDeleteForDevice:)]) {
@@ -1232,6 +1328,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         // the subscription after this point.
         std::lock_guard lock(self->_lock);
         [self _resetSubscription];
+        [self.matterCPPObjectsHolder invalidate];
     }
                                      errorHandler:nil];
 
@@ -1247,6 +1344,22 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     assertChipStackLockedByCurrentThread();
 
     MTR_LOG("%@ saw new operational advertisement", self);
+
+#ifdef DEBUG
+    __block BOOL ignoreAdvertisement = NO;
+    {
+        std::lock_guard lock(_lock);
+        [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+            if ([testDelegate respondsToSelector:@selector(unitTestShouldIgnoreOperationalAdvertisementForDevice:)]) {
+                ignoreAdvertisement = [testDelegate unitTestShouldIgnoreOperationalAdvertisementForDevice:self];
+            }
+        }];
+    }
+    if (ignoreAdvertisement) {
+        MTR_LOG("%@ ignoring operational advertisement for testing", self);
+        return;
+    }
+#endif
 
     [self _triggerResubscribeWithReason:@"operational advertisement seen"
                     nodeLikelyReachable:YES
@@ -1511,6 +1624,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
     // We have completed the subscription work - remove from the subscription pool.
     [self _clearSubscriptionPoolWork];
+
+    self.sessionRecoveredDuringSubscriptionSetup = NO;
 
     // No need to monitor connectivity after subscription establishment
     [self _stopConnectivityMonitoring];
@@ -1785,6 +1900,18 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     // If a previous resubscription failed, remove the item from the subscription pool.
     [self _clearSubscriptionPoolWork];
 
+#ifdef DEBUG
+    __block NSNumber * delayOverrideMs = nil;
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestResubscriptionDelayOverrideForDevice:)]) {
+            delayOverrideMs = [testDelegate unitTestResubscriptionDelayOverrideForDevice:self];
+        }
+    }];
+    if (delayOverrideMs) {
+        resubscriptionDelayMs = delayOverrideMs;
+    }
+#endif
+
     os_unfair_lock_unlock(&self->_lock);
 
     // Use the existing _triggerResubscribeWithReason mechanism, which does the right checks when
@@ -1896,7 +2023,16 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     NSUInteger reattemptGeneration = ++_subscriptionReattemptGeneration;
 
     NSTimeInterval secondsToWait;
-    if (_lastSubscriptionAttemptWait < MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS) {
+    BOOL reattemptAfterRecovery = self.sessionRecoveredDuringSubscriptionSetup;
+    if (reattemptAfterRecovery) {
+        // The session the last subscription used recovered while this attempt was being set up, so the node is
+        // reachable: reattempt without the backoff, after the server-provided delay if there is one, and restart the
+        // backoff in case that fails too.
+        self.sessionRecoveredDuringSubscriptionSetup = NO;
+        [self _setLastSubscriptionAttemptWait:0];
+        secondsToWait = (retryDelay != nil) ? retryDelay.doubleValue : 0;
+        MTR_LOG("%@ session recovered during subscription setup; reattempting without backoff in %f seconds", self, secondsToWait);
+    } else if (_lastSubscriptionAttemptWait < MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS) {
         _lastSubscriptionAttemptWait = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS;
         secondsToWait = _lastSubscriptionAttemptWait;
     } else if (retryDelay != nil) {
@@ -1916,6 +2052,18 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         [self _setLastSubscriptionAttemptWait:lastSubscriptionAttemptWait];
         secondsToWait = lastSubscriptionAttemptWait;
     }
+
+#ifdef DEBUG
+    __block NSNumber * resetDelayOverrideMs = nil;
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionResetDelayOverrideForDevice:)]) {
+            resetDelayOverrideMs = [testDelegate unitTestSubscriptionResetDelayOverrideForDevice:self];
+        }
+    }];
+    if (resetDelayOverrideMs != nil && !reattemptAfterRecovery && secondsToWait > 0) {
+        secondsToWait = resetDelayOverrideMs.doubleValue / 1000;
+    }
+#endif
 
     MTR_LOG("%@ scheduling to reattempt subscription in %f seconds", self, secondsToWait);
 
@@ -2503,6 +2651,29 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     }
 }
 
+- (void)_handleSessionToNodeRecovered
+{
+    assertChipStackLockedByCurrentThread();
+
+    BOOL haveReattemptOrReadClient;
+    {
+        std::lock_guard lock(_lock);
+        VerifyOrReturn(!self.suspended);
+        haveReattemptOrReadClient = self.reattemptingSubscription || self.matterCPPObjectsHolder.readClient != nullptr;
+        if (!haveReattemptOrReadClient && _internalDeviceState == MTRInternalDeviceStateSubscribing) {
+            // A new subscription is being set up and has no ReadClient yet; if that setup fails, reattempt right away.
+            MTR_LOG("%@ session to node recovered during subscription setup", self);
+            self.sessionRecoveredDuringSubscriptionSetup = YES;
+        }
+    }
+
+    VerifyOrReturn(haveReattemptOrReadClient);
+
+    [self _triggerResubscribeWithReason:@"session to node recovered"
+                    nodeLikelyReachable:YES
+                     poolWorkCompletion:nil];
+}
+
 - (void)_handleCASESessionEstablished:(const SessionHandle &)session
 {
     assertChipStackLockedByCurrentThread();
@@ -2518,6 +2689,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
             self, to_underlying(peerAddress.GetTransportType()));
         return;
     }
+
+    [self.matterCPPObjectsHolder watchSessionForRecovery:session];
 
     auto ipAddress = peerAddress.GetIPAddress();
     char buf[Inet::IPAddress::kMaxStringLength];
@@ -3194,6 +3367,26 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     [self _resetSubscriptionWithReasonString:@"Unit test reset subscription"];
 }
 
+- (BOOL)unitTestMarkWatchedSessionDefunct
+{
+    assertChipStackLockedByCurrentThread();
+
+    auto * session = [self.matterCPPObjectsHolder unitTestWatchedSecureSession];
+    VerifyOrReturnValue(session != nullptr, NO);
+    session->MarkAsDefunct();
+    return session->IsDefunct();
+}
+
+- (BOOL)unitTestReceiveOnWatchedSession
+{
+    assertChipStackLockedByCurrentThread();
+
+    auto * session = [self.matterCPPObjectsHolder unitTestWatchedSecureSession];
+    VerifyOrReturnValue(session != nullptr && session->IsDefunct(), NO);
+    session->MarkActiveRx();
+    return YES;
+}
+
 - (void)unitTestEndSubscriptionAsReadClientGivingUp
 {
     assertChipStackLockedByCurrentThread();
@@ -3307,8 +3500,23 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
+                                   __block NSNumber * resetRetryDelay = retryDelay;
+#ifdef DEBUG
+                                   {
+                                       std::lock_guard lock(self->_lock);
+                                       [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+                                           if ([testDelegate respondsToSelector:@selector(unitTestRetryDelayOverrideForFailedSessionRequest:)]) {
+                                               NSNumber * retryDelayOverride = [testDelegate unitTestRetryDelayOverrideForFailedSessionRequest:self];
+                                               if (retryDelayOverride != nil) {
+                                                   // A negative override clears the request's retry delay.
+                                                   resetRetryDelay = (retryDelayOverride.doubleValue < 0) ? nil : retryDelayOverride;
+                                               }
+                                           }
+                                       }];
+                                   }
+#endif
                                    [self _handleSubscriptionError:error];
-                                   [self _handleSubscriptionReset:retryDelay];
+                                   [self _handleSubscriptionReset:resetRetryDelay];
                                } errorHandler:nil];
                                return;
                            }
@@ -3559,6 +3767,15 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                            });
 #endif
                        }];
+
+#ifdef DEBUG
+    // The session request is now queued on the Matter queue, so work a test queues there next runs after it.
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionSessionRequestStartedForDevice:)]) {
+            [testDelegate unitTestSubscriptionSessionRequestStartedForDevice:self];
+        }
+    }];
+#endif
 
     // Set up connectivity monitoring in case network becomes routable after any part of the subscription process goes into backoff retries.
     [self _setupConnectivityMonitoring];
@@ -5492,6 +5709,9 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     // Ensure that any pre-existing resubscribe attempts we control don't try to
     // do anything.
     _reattemptingSubscription = NO;
+
+    // A recovery seen before the suspension says nothing about the node by the time we resume.
+    self.sessionRecoveredDuringSubscriptionSetup = NO;
 }
 
 - (void)controllerResumed

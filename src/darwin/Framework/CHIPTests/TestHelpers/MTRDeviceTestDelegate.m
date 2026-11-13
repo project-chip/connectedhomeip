@@ -61,6 +61,40 @@
     }
 }
 
+- (BOOL)unitTestShouldIgnoreOperationalAdvertisementForDevice:(MTRDevice *)device
+{
+    return self.ignoreOperationalAdvertisements;
+}
+
+- (NSNumber *)unitTestResubscriptionDelayOverrideForDevice:(MTRDevice *)device
+{
+    NSNumber * delayOverrideMs = self.resubscriptionDelayOverrideMs;
+    if (self.onResubscriptionDelayRequested != nil) {
+        self.onResubscriptionDelayRequested();
+    }
+    return delayOverrideMs;
+}
+
+- (NSNumber *)unitTestSubscriptionResetDelayOverrideForDevice:(MTRDevice *)device
+{
+    return self.subscriptionResetDelayOverrideMs;
+}
+
+- (void)unitTestSubscriptionSessionRequestStartedForDevice:(MTRDevice *)device
+{
+    if (self.onSubscriptionSessionRequestStarted != nil) {
+        self.onSubscriptionSessionRequestStarted();
+    }
+}
+
+- (NSNumber *)unitTestRetryDelayOverrideForFailedSessionRequest:(MTRDevice *)device
+{
+    if (self.onSessionRequestFailedRetryDelay != nil) {
+        return self.onSessionRequestFailedRetryDelay();
+    }
+    return nil;
+}
+
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device
 {
     if (self.subscriptionMaxIntervalOverride) {
