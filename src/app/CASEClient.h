@@ -70,6 +70,8 @@ public:
 
     const ReliableMessageProtocolConfig & GetRemoteMRPIntervals();
 
+    void SetSigma1UnackedTransmissionLimit(uint8_t limit) { mCASESession.SetSigma1UnackedTransmissionLimit(limit); }
+
     CHIP_ERROR EstablishSession(const CASEClientInitParams & params, const ScopedNodeId & peer,
                                 const Transport::PeerAddress & peerAddress, const ReliableMessageProtocolConfig & remoteMRPConfig,
                                 SessionEstablishmentDelegate * delegate);

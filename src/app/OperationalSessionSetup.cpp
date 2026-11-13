@@ -343,6 +343,11 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
     mCASEClient = mClientPool->Allocate();
     VerifyOrReturnError(mCASEClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
+    if (Resolver::Instance().HasMoreResults(mAddressLookupHandle))
+    {
+        mCASEClient->SetSigma1UnackedTransmissionLimit(CHIP_CONFIG_CASE_SIGMA1_TRANSMISSIONS_BEFORE_NEXT_ADDRESS);
+    }
+
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESession);
     CHIP_ERROR err = mCASEClient->EstablishSession(mInitParams, mPeerId, mDeviceAddress, config, this);
     if (err != CHIP_NO_ERROR)
