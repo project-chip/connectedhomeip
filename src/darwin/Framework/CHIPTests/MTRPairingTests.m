@@ -715,6 +715,13 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
 }
 
+- (void)test028_pairingAfterCancellation_SendComplete
+{
+    // SendComplete goes over the operational session, so the commissionee is not the device being commissioned; cancelling
+    // here must still end the commissioning.
+    [self doPairingTestAfterCancellationAtProgress:@"Performing next commissioning step 'SendComplete'"];
+}
+
 - (void)test009_PairWithReadingEndpointInformation
 {
     [self startServerApp];
