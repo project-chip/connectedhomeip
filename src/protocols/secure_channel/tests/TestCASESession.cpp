@@ -151,6 +151,7 @@ public:
     void TCPConnectionAttemptFailureAndUnrelatedConnection();
     void TCPSyncConnectAttemptDuringEstablishSession();
     void TCPConnectionClosedDuringSendSigma3DeletesSessionInDelegate();
+    void TCPConnectionClosedDuringSendStatusReportDeletesSessionInDelegate();
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
@@ -3286,6 +3287,96 @@ TEST_F_FROM_FIXTURE(TestCASESession, TCPConnectionClosedDuringSendSigma3DeletesS
         loopback.SetLoopbackTransportDelegate(nullptr);
         loopback.Reset();
         gPairingServer.Shutdown();
+        ServiceEvents();
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestCASESession, TCPConnectionClosedDuringSendStatusReportDeletesSessionInDelegate)
+{
+    using TCPAccess = Transport::TCPBaseTestAccess<2, 2>;
+
+    for (CHIP_ERROR sendError : { kFatalSendErrorNotRemappedToSuccessByMapSendError, CHIP_NO_ERROR })
+    {
+        Transport::TCP<2, 2> tcp;
+        Inet::TCPEndPointHandle endPoint;
+        ASSERT_EQ(GetIOContext().GetTCPEndPointManager()->NewEndPoint(endPoint), CHIP_NO_ERROR);
+        Transport::PeerAddress tcpPeerAddr = Transport::PeerAddress::TCP(GetBobAddress().GetIPAddress(), GetBobAddress().GetPort());
+        TCPAccess::Connection conn = TCPAccess::AllocateConnection(tcp, endPoint, tcpPeerAddr, Transport::TCPState::kConnecting);
+        ASSERT_TRUE(bool(conn));
+
+        CASESession * pairingResponder = chip::Platform::New<CASESession>();
+        ASSERT_NE(pairingResponder, nullptr);
+        pairingResponder->SetGroupDataProvider(&gDeviceGroupDataProvider);
+        SelfDeletingCASEDelegate delegateResponder(pairingResponder);
+
+        EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                                pairingResponder),
+                  CHIP_NO_ERROR);
+
+        EXPECT_EQ(pairingResponder->PrepareForSessionEstablishment(GetSecureSessionManager(), &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()),
+                  CHIP_NO_ERROR);
+        // Bind the responder's pending SecureSession to the TCP connection so that HandleConnectionClosed
+        // during SendStatusReport in HandleSigma3c evicts mSecureSessionHolder and invokes CASESession::OnSessionReleased().
+        ASSERT_TRUE(bool(pairingResponder->mSecureSessionHolder));
+        pairingResponder->mSecureSessionHolder->AsSecureSession()->SetTCPConnection(conn.Handle());
+
+        CASESession pairingCommissioner;
+        pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+        TestCASESecurePairingDelegate delegateCommissioner;
+
+        ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+        ASSERT_NE(contextCommissioner, nullptr);
+
+        auto & loopback                         = GetLoopback();
+        loopback.mSentMessageCount              = 0;
+        loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+        loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+        CloseTCPConnectionOnSend closeOnStatusReport(loopback, GetSecureSessionManager(), conn.Handle(), sendError,
+                                                     MakeOptional(Protocols::SecureChannel::MsgType::StatusReport));
+        loopback.SetLoopbackTransportDelegate(&closeOnStatusReport);
+
+        EXPECT_EQ(pairingCommissioner.EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                       ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                       nullptr, nullptr, &delegateCommissioner,
+                                                       Optional<ReliableMessageProtocolConfig>::Missing()),
+                  CHIP_NO_ERROR);
+
+        ServiceEvents();
+
+        CHIP_ERROR expectedError = (sendError != CHIP_NO_ERROR) ? sendError : CHIP_ERROR_CONNECTION_ABORTED;
+        EXPECT_TRUE(closeOnStatusReport.WasTriggered());
+        EXPECT_EQ(pairingResponder, nullptr);
+        EXPECT_EQ(delegateResponder.mNumPairingStarted, 1u);
+        EXPECT_EQ(delegateResponder.mNumPairingErrors, 1u);
+        EXPECT_EQ(delegateResponder.mLastError, expectedError);
+        EXPECT_EQ(delegateResponder.mLastStage, SessionEstablishmentStage::kReceivedSigma3);
+        EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+#if CHIP_CONFIG_SLOW_CRYPTO
+        // With CHIP_CONFIG_SLOW_CRYPTO, OnMessageReceived flushes a standalone MRP Ack for each
+        // received Sigma message (Sigma1, Sigma2, and Sigma3 -> 3 Sigma messages + 3 Acks = 6 messages;
+        // when sendError == CHIP_NO_ERROR, the responder's StatusReport and the initiator's StandaloneAck
+        // for it add 2 more -> 8 messages).
+        constexpr uint32_t kExpectedSentOnStatusReportSuccess = 8u;
+        constexpr uint32_t kExpectedSentOnStatusReportFailure = 6u;
+#else
+        // When sendError == CHIP_NO_ERROR, Sigma1, Sigma2, Sigma3, the responder's success StatusReport,
+        // and the initiator's StandaloneAck for that StatusReport are sent (5 messages); when
+        // sendError != CHIP_NO_ERROR, only Sigma1, Sigma2, and Sigma3 are sent (3 messages).
+        constexpr uint32_t kExpectedSentOnStatusReportSuccess = 5u;
+        constexpr uint32_t kExpectedSentOnStatusReportFailure = 3u;
+#endif
+        // In neither case does HandleSigma3c send a follow-up InvalidParam StatusReport after SendStatusReport fails.
+        EXPECT_EQ(loopback.mSentMessageCount,
+                  (sendError == CHIP_NO_ERROR) ? kExpectedSentOnStatusReportSuccess : kExpectedSentOnStatusReportFailure);
+
+        pairingCommissioner.Clear();
+        EXPECT_EQ(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1),
+                  CHIP_NO_ERROR);
+        loopback.SetLoopbackTransportDelegate(nullptr);
+        loopback.Reset();
         ServiceEvents();
     }
 }
