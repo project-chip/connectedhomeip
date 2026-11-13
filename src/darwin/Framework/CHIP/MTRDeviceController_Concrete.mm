@@ -1526,6 +1526,29 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return count;
 }
 
+// The test declarations mirror these values for tests compiled as Objective-C.
+static_assert(static_cast<NSInteger>(chip::OperationalSessionSetup::SetupPhase::kResolvingAddress) == 0);
+static_assert(static_cast<NSInteger>(chip::OperationalSessionSetup::SetupPhase::kAwaitingSigma2) == 1);
+static_assert(static_cast<NSInteger>(chip::OperationalSessionSetup::SetupPhase::kWaitingForRetry) == 2);
+static_assert(static_cast<NSInteger>(chip::OperationalSessionSetup::SetupPhase::kOther) == 3);
+
+- (NSInteger)unitTestSessionSetupPhaseForNodeID:(NSNumber *)nodeID
+{
+    assertChipStackLockedByCurrentThread();
+    auto peerId = _cppCommissioner->GetPeerScopedId(nodeID.unsignedLongLongValue);
+    auto phase = _cppCommissioner->CASESessionMgr()->GetSessionSetupPhase(peerId);
+    return phase.HasValue() ? static_cast<NSInteger>(phase.Value()) : -1;
+}
+
+- (BOOL)unitTestIsResolvingAddressForNodeID:(NSNumber *)nodeID
+{
+    __block NSInteger phase = -1;
+    [self syncRunOnWorkQueue:^{
+        phase = [self unitTestSessionSetupPhaseForNodeID:nodeID];
+    } error:nil];
+    return phase == static_cast<NSInteger>(chip::OperationalSessionSetup::SetupPhase::kResolvingAddress);
+}
+
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {
     std::lock_guard lock(*self.deviceMapLock);
@@ -1981,6 +2004,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         block(self->_cppCommissioner);
     });
+}
+
+- (chip::Controller::DeviceCommissioner * _Nullable)commissionerOnMatterQueue
+{
+    assertChipStackLockedByCurrentThread();
+    return _cppCommissioner;
 }
 
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler

@@ -241,6 +241,17 @@ public:
 
     bool IsForAddressUpdate() const { return mPerformingAddressUpdate; }
 
+    // Where a session setup is, for callers deciding whether to release it.  Other values may be added in the future.
+    enum class SetupPhase : uint8_t
+    {
+        kResolvingAddress, // Looking up the peer's address.
+        kAwaitingSigma2,   // Sent Sigma1 or Sigma1 with resumption, and has had no response yet.
+        kWaitingForRetry,  // Waiting to start another attempt after a failed one.
+        kOther,            // Any other point in the setup.
+    };
+
+    SetupPhase GetSetupPhase() const;
+
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished(const SessionHandle & session) override;
     void OnSessionEstablishmentError(CHIP_ERROR error, SessionEstablishmentStage stage) override;
@@ -293,6 +304,8 @@ public:
 #endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
 private:
+    friend class TestOperationalSessionSetupPhase;
+
     enum class State : uint8_t
     {
         Uninitialized,    // Error state: OperationalSessionSetup is useless

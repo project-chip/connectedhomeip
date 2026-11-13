@@ -197,6 +197,27 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     Connect(onConnection, nullptr, onSetupFailure, transportPayloadCapability);
 }
 
+OperationalSessionSetup::SetupPhase OperationalSessionSetup::GetSetupPhase() const
+{
+    if (mState == State::ResolvingAddress)
+    {
+        return SetupPhase::kResolvingAddress;
+    }
+    if (mState == State::WaitingForRetry)
+    {
+        return SetupPhase::kWaitingForRetry;
+    }
+    if (mState == State::Connecting && mCASEClient != nullptr)
+    {
+        auto caseState = mCASEClient->GetCASESessionState();
+        if (caseState == CASESession::State::kSentSigma1 || caseState == CASESession::State::kSentSigma1Resume)
+        {
+            return SetupPhase::kAwaitingSigma2;
+        }
+    }
+    return SetupPhase::kOther;
+}
+
 void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
 {
     auto & config = result.mrpRemoteConfig;

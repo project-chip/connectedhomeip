@@ -456,6 +456,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device;
 - (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device;
 - (void)unitTestSubscriptionReattemptDispatchedForDevice:(MTRDevice *)device;
+- (void)unitTestCASESetupReleasedForReachabilityForDevice:(MTRDevice *)device;
 @end
 #endif
 
@@ -463,6 +464,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 #ifdef DEBUG
     NSUInteger _unitTestAttributesReportedSinceLastCheck;
     NSUInteger _unitTestEventsReportedSinceLastCheck;
+    // CASE setups released by a reachability signal; only accessed on the Matter queue.
+    NSUInteger _unitTestCASESetupReleasedForReachabilityCount;
 #endif
 
     // _deviceCachePrimed is true if we have the data that comes from an initial
@@ -1301,23 +1304,38 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
             [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
         }
     } else if (((_internalDeviceState == MTRInternalDeviceStateSubscribing && !self.doingCASEAttemptForDeviceMayBeReachable) || shouldReattemptSubscription) && nodeLikelyReachable) {
-        // If we have reason to suspect that the node is now reachable and we haven't established a
-        // CASE session yet, let's consider it to be stalled and invalidate the pairing session.
+        // If we have reason to suspect that the node is now reachable and we have started a CASE setup with it and it's
+        // still waiting for a Sigma2 or is waiting to retry, there's a possibility that it resolved the wrong addresses and we
+        // should restart the CASE attempt.
 
         // Reset back off for framework resubscription
         os_unfair_lock_lock(&self->_lock);
         [self _setLastSubscriptionAttemptWait:0];
         os_unfair_lock_unlock(&self->_lock);
 
-        mtr_weakify(self);
-        [self._concreteController asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
-            mtr_strongify(self);
-            VerifyOrReturn(self, MTR_LOG_DEBUG("_triggerResubscribeWithReason asyncGetCommissionerOnMatterQueue called back with nil MTRDevice"));
-
+        auto * commissioner = [self._concreteController commissionerOnMatterQueue];
+        if (commissioner != nullptr) {
             auto caseSessionMgr = commissioner->CASESessionMgr();
             VerifyOrDie(caseSessionMgr != nullptr);
-            caseSessionMgr->ReleaseSession(commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue));
-        } errorHandler:nil /* not much we can do */];
+            auto peerId = commissioner->GetPeerScopedId(_nodeID.unsignedLongLongValue);
+            auto setupPhase = caseSessionMgr->GetSessionSetupPhase(peerId);
+            bool releaseSetup = setupPhase.HasValue()
+                && (setupPhase.Value() == OperationalSessionSetup::SetupPhase::kAwaitingSigma2
+                    || setupPhase.Value() == OperationalSessionSetup::SetupPhase::kWaitingForRetry);
+            if (!releaseSetup) {
+                MTR_LOG("%@ not interrupting CASE setup that is resolving the node's address or past Sigma1", self);
+            } else {
+                caseSessionMgr->ReleaseSession(peerId);
+#ifdef DEBUG
+                _unitTestCASESetupReleasedForReachabilityCount++;
+                [self _lockAndCallDelegatesWithBlock:^(id testDelegate) {
+                    if ([testDelegate respondsToSelector:@selector(unitTestCASESetupReleasedForReachabilityForDevice:)]) {
+                        [testDelegate unitTestCASESetupReleasedForReachabilityForDevice:self];
+                    }
+                }];
+#endif
+            }
+        }
     }
 
     // The subscription reattempt here eventually asyncs onto the matter queue for session,
@@ -3581,6 +3599,12 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     NSUInteger eventsReportedSinceLastCheck = _unitTestEventsReportedSinceLastCheck;
     _unitTestEventsReportedSinceLastCheck = 0;
     return eventsReportedSinceLastCheck;
+}
+
+- (NSUInteger)unitTestCASESetupReleasedForReachabilityCount
+{
+    assertChipStackLockedByCurrentThread();
+    return _unitTestCASESetupReleasedForReachabilityCount;
 }
 #endif
 
