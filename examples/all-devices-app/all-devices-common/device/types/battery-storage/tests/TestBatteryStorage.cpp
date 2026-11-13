@@ -313,13 +313,13 @@ TEST_F(BatteryStorageTestFixture, RegistersRequiredSemanticTags)
 
     ProviderAttributeReader reader(mProvider);
     ExpectSingleSemanticTag(reader, device.GetGridElectricalSensor().GetEndpointId(),
-                            to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPowerSource), 0x01);
+                            to_underlying(Clusters::Globals::SemanticTagNamespaceID::kPowerSource), 0x01);
     ExpectSingleSemanticTag(reader, device.GetGridPowerSource().GetEndpointId(),
-                            to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPowerSource), 0x01);
+                            to_underlying(Clusters::Globals::SemanticTagNamespaceID::kPowerSource), 0x01);
     ExpectSingleSemanticTag(reader, device.GetBatteryElectricalSensor().GetEndpointId(),
-                            to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPowerSource), 0x03);
+                            to_underlying(Clusters::Globals::SemanticTagNamespaceID::kPowerSource), 0x03);
     ExpectSingleSemanticTag(reader, device.GetBatteryPowerSource().GetEndpointId(),
-                            to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPowerSource), 0x03);
+                            to_underlying(Clusters::Globals::SemanticTagNamespaceID::kPowerSource), 0x03);
 
     ExpectAttributes(mProvider, ConcreteClusterPath(device.GetEnergyManagement().GetEndpointId(), Clusters::Descriptor::Id), {},
                      { Clusters::Descriptor::Attributes::TagList::Id });

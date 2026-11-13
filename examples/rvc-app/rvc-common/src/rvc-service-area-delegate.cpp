@@ -35,7 +35,7 @@ void RvcServiceAreaDelegate::SetMapTopology()
         AreaStructureWrapper{}
             .SetAreaId(supportedAreaID_A)
             .SetMapId(supportedMapId_XX)
-            .SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>());
+            .SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::CommonAreaTag>());
 
     // Area B has name, uses map XX
     auto areaB = AreaStructureWrapper{}
@@ -47,15 +47,15 @@ void RvcServiceAreaDelegate::SetMapTopology()
     auto areaC = AreaStructureWrapper{}
                      .SetAreaId(supportedAreaID_C)
                      .SetMapId(supportedMapId_YY)
-                     .SetLocationInfo(""_span, -1, Globals::AreaTypeTag::kPlayRoom)
-                     .SetLandmarkInfo(Globals::LandmarkTag::kBackDoor, Globals::RelativePositionTag::kNextTo);
+                     .SetLocationInfo(""_span, -1, Globals::CommonAreaTag::kPlayRoom)
+                     .SetLandmarkInfo(Globals::CommonLandmarkTag::kBackDoor, Globals::CommonRelativePositionTag::kNextTo);
 
     // Area D has null values for all landmark fields, Map YY
     auto areaD = AreaStructureWrapper{}
                      .SetAreaId(supportedAreaID_D)
                      .SetMapId(supportedMapId_YY)
                      .SetLocationInfo("My Location D"_span, DataModel::NullNullable, DataModel::NullNullable)
-                     .SetLandmarkInfo(Globals::LandmarkTag::kCouch, Globals::RelativePositionTag::kNextTo);
+                     .SetLandmarkInfo(Globals::CommonLandmarkTag::kCouch, Globals::CommonRelativePositionTag::kNextTo);
 
     GetInstance()->AddSupportedArea(areaA);
     GetInstance()->AddSupportedArea(areaB);
@@ -71,7 +71,7 @@ void RvcServiceAreaDelegate::SetNoMapTopology()
     auto areaA =
         AreaStructureWrapper{}
             .SetAreaId(supportedAreaID_A)
-            .SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>());
+            .SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::CommonAreaTag>());
 
     // Area B has name.
     auto areaB = AreaStructureWrapper{}
@@ -81,14 +81,14 @@ void RvcServiceAreaDelegate::SetNoMapTopology()
     // Area C has full SemData, no name.
     auto areaC = AreaStructureWrapper{}
                      .SetAreaId(supportedAreaID_C)
-                     .SetLocationInfo(""_span, -1, Globals::AreaTypeTag::kPlayRoom)
-                     .SetLandmarkInfo(Globals::LandmarkTag::kBackDoor, Globals::RelativePositionTag::kNextTo);
+                     .SetLocationInfo(""_span, -1, Globals::CommonAreaTag::kPlayRoom)
+                     .SetLandmarkInfo(Globals::CommonLandmarkTag::kBackDoor, Globals::CommonRelativePositionTag::kNextTo);
 
     // Area D has null values for all landmark fields.
     auto areaD = AreaStructureWrapper{}
                      .SetAreaId(supportedAreaID_D)
                      .SetLocationInfo("My Location D"_span, DataModel::NullNullable, DataModel::NullNullable)
-                     .SetLandmarkInfo(Globals::LandmarkTag::kCouch, Globals::RelativePositionTag::kNextTo);
+                     .SetLandmarkInfo(Globals::CommonLandmarkTag::kCouch, Globals::CommonRelativePositionTag::kNextTo);
 
     GetInstance()->AddSupportedArea(areaA);
     GetInstance()->AddSupportedArea(areaB);

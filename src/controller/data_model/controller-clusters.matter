@@ -1,7 +1,76 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-enum AreaTypeTag : enum8 {
+enum AlarmSeverityTag : enum8 {
+  kCritical = 0;
+  kMajor = 1;
+  kMinor = 2;
+}
+
+enum AtomicRequestTypeEnum : enum8 {
+  kBeginWrite = 0;
+  kCommitWrite = 1;
+  kRollbackWrite = 2;
+}
+
+enum CertificationTypeEnum : enum8 {
+  kDeviceAttestationPKI = 0;
+  kOperationalPKI = 1;
+  kVIDSignerPKI = 2;
+}
+
+enum ClosureCabinetTag : enum8 {
+  kCabinetDoor = 0;
+  kDrawer = 1;
+  kFlap = 2;
+}
+
+enum ClosureCoveringTag : enum8 {
+  kBlind = 0;
+  kAwning = 1;
+  kShutter = 2;
+  kVenetian = 3;
+  kCurtain = 4;
+}
+
+enum ClosurePanelTag : enum8 {
+  kLift = 0;
+  kTilt = 1;
+  kSliding = 2;
+  kRotate = 3;
+}
+
+enum ClosureTag : enum8 {
+  kCovering = 0;
+  kWindow = 1;
+  kBarrier = 2;
+  kCabinet = 3;
+  kGate = 4;
+  kGarageDoor = 5;
+  kDoor = 6;
+}
+
+enum ClosureWindowTag : enum8 {
+  kRoof = 0;
+  kFacade = 1;
+}
+
+enum CommodityTariffChronologyTag : enum8 {
+  kCurrent = 0;
+  kPrevious = 1;
+  kUpcoming = 2;
+}
+
+enum CommodityTariffCommodityTag : enum8 {
+  kElectricalEnergy = 0;
+}
+
+enum CommodityTariffFlowTag : enum8 {
+  kImport = 0;
+  kExport = 1;
+}
+
+enum CommonAreaTag : enum8 {
   kAisle = 0;
   kAttic = 1;
   kBackDoor = 2;
@@ -97,36 +166,38 @@ enum AreaTypeTag : enum8 {
   kToilet = 95;
 }
 
-enum AtomicRequestTypeEnum : enum8 {
-  kBeginWrite = 0;
-  kCommitWrite = 1;
-  kRollbackWrite = 2;
+enum CommonCompassDirectionTag : enum8 {
+  kNorthward = 0;
+  kNorthEastward = 1;
+  kEastward = 2;
+  kSouthEastward = 3;
+  kSouthward = 4;
+  kSouthWestward = 5;
+  kWestward = 6;
+  kNorthWestward = 7;
 }
 
-enum CertificationTypeEnum : enum8 {
-  kDeviceAttestationPKI = 0;
-  kOperationalPKI = 1;
-  kVIDSignerPKI = 2;
+enum CommonCompassLocationTag : enum8 {
+  kNorth = 0;
+  kNorthEast = 1;
+  kEast = 2;
+  kSouthEast = 3;
+  kSouth = 4;
+  kSouthWest = 5;
+  kWest = 6;
+  kNorthWest = 7;
 }
 
-enum ClosurePanelTag : enum8 {
-  kLift = 0;
-  kTilt = 1;
-  kSliding = 2;
-  kRotate = 3;
+enum CommonDirectionTag : enum8 {
+  kUpward = 0;
+  kDownward = 1;
+  kLeftward = 2;
+  kRightward = 3;
+  kForward = 4;
+  kBackward = 5;
 }
 
-enum ClosureTag : enum8 {
-  kCovering = 0;
-  kWindow = 1;
-  kBarrier = 2;
-  kCabinet = 3;
-  kGate = 4;
-  kGarageDoor = 5;
-  kDoor = 6;
-}
-
-enum LandmarkTag : enum8 {
+enum CommonLandmarkTag : enum8 {
   kAirConditioner = 0;
   kAirPurifier = 1;
   kBackDoor = 2;
@@ -180,11 +251,153 @@ enum LandmarkTag : enum8 {
   kWineCooler = 50;
 }
 
-enum LocationTag : enum8 {
+enum CommonLevelTag : enum8 {
+  kLow = 0;
+  kMedium = 1;
+  kHigh = 2;
+}
+
+enum CommonLocationTag : enum8 {
   kIndoor = 0;
   kOutdoor = 1;
   kInside = 2;
   kOutside = 3;
+  kZone = 4;
+}
+
+enum CommonNumberTag : enum8 {
+  kZero = 0;
+  kOne = 1;
+  kTwo = 2;
+  kThree = 3;
+  kFour = 4;
+  kFive = 5;
+  kSix = 6;
+  kSeven = 7;
+  kEight = 8;
+  kNine = 9;
+  kTen = 10;
+  kEleven = 11;
+  kTwelve = 12;
+  kThirteen = 13;
+  kFourteen = 14;
+  kFifteen = 15;
+  kSixteen = 16;
+  kSeventeen = 17;
+  kEighteen = 18;
+  kNineteen = 19;
+  kTwenty = 20;
+  kTwentyOne = 21;
+  kTwentyTwo = 22;
+  kTwentyThree = 23;
+  kTwentyFour = 24;
+  kTwentyFive = 25;
+  kTwentySix = 26;
+  kTwentySeven = 27;
+  kTwentyEight = 28;
+  kTwentyNine = 29;
+  kThirty = 30;
+}
+
+enum CommonPositionTag : enum8 {
+  kLeft = 0;
+  kRight = 1;
+  kTop = 2;
+  kBottom = 3;
+  kMiddle = 4;
+  kRow = 5;
+  kColumn = 6;
+}
+
+enum CommonRelativePositionTag : enum8 {
+  kUnder = 0;
+  kNextTo = 1;
+  kAround = 2;
+  kOn = 3;
+  kAbove = 4;
+  kFrontOf = 5;
+  kBehind = 6;
+}
+
+enum ElectricalDistributionFormFactorTag : enum8 {
+  kMiniature = 0;
+  kMoldedCase = 1;
+}
+
+enum ElectricalDistributionOverVoltageTag : enum8 {
+  kLineToNeutral = 0;
+  kLineToGround = 1;
+  kNeutralToGround = 2;
+  kLineToLine = 3;
+}
+
+enum ElectricalMeasurementTag : enum8 {
+  kDC = 0 [spec_name = "DC"];
+  kAC = 1 [spec_name = "AC"];
+  kACPhase1 = 2;
+  kACPhase2 = 3;
+  kACPhase3 = 4;
+}
+
+enum IdentifiedHumanActivityTag : enum8 {
+  kUnknown = 0;
+  kFall = 1;
+  kSleeping = 2;
+  kWalking = 3;
+  kWorkout = 4;
+  kSitting = 5;
+  kStanding = 6;
+  kDancing = 7;
+  kPackageDelivery = 8;
+  kPackageRetrieval = 9;
+}
+
+enum IdentifiedObjectTag : enum8 {
+  kUnknown = 0;
+  kAdult = 1;
+  kChild = 2;
+  kPerson = 3;
+  kRVC = 4 [spec_name = "RVC"];
+  kPet = 5;
+  kDog = 6;
+  kCat = 7;
+  kAnimal = 8;
+  kCar = 9;
+  kVehicle = 10;
+  kPackage = 11;
+  kClothes = 12;
+}
+
+enum IdentifiedSoundTag : enum8 {
+  kUnknown = 0;
+  kObjectFall = 1;
+  kSnoring = 2;
+  kCoughing = 3;
+  kBarking = 4;
+  kShattering = 5;
+  kBabyCrying = 6;
+  kUtilityAlarm = 7;
+  kUrgentShouting = 8;
+  kDoorbell = 9;
+  kKnocking = 10;
+  kUrgentSiren = 11;
+  kFaucetRunning = 12;
+  kKettleBoiling = 13;
+  kFanDryer = 14;
+  kClapping = 15;
+  kFingerSnapping = 16;
+  kMeowing = 17;
+  kLaughing = 18;
+  kGlassBreaking = 19;
+  kDoorKnocking = 20;
+  kPersonTalking = 21;
+}
+
+enum LaundryTag : enum8 {
+  kNormal = 0;
+  kLightDry = 1;
+  kExtraDry = 2;
+  kNoDry = 3;
 }
 
 enum MeasurementTypeEnum : enum16 {
@@ -213,14 +426,12 @@ enum MediumType : enum8 {
   kWater = 1;
 }
 
-enum PositionTag : enum8 {
-  kLeft = 0;
-  kRight = 1;
-  kTop = 2;
-  kBottom = 3;
-  kMiddle = 4;
-  kRow = 5;
-  kColumn = 6;
+enum PowerSourceTag : enum8 {
+  kUnknown = 0;
+  kGrid = 1;
+  kSolar = 2;
+  kBattery = 3;
+  kEV = 4 [spec_name = "EV"];
 }
 
 enum PowerThresholdSourceEnum : enum8 {
@@ -229,36 +440,47 @@ enum PowerThresholdSourceEnum : enum8 {
   kEquipment = 2;
 }
 
-enum RelativePositionTag : enum8 {
-  kUnder = 0;
-  kNextTo = 1;
-  kAround = 2;
-  kOn = 3;
-  kAbove = 4;
-  kFrontOf = 5;
-  kBehind = 6;
+enum RefrigeratorTag : enum8 {
+  kRefrigerator = 0;
+  kFreezer = 1;
 }
 
-enum SemanticTagNamespaceId : enum8 {
-  kCompassDirection = 2;
-  kCompassLocation = 3;
-  kDirection = 4;
-  kLevel = 5;
-  kLocation = 6;
-  kNumber = 7;
-  kPosition = 8;
+enum RoomAirConditionerTag : enum8 {
+  kEvaporator = 0;
+  kCondenser = 1;
+}
+
+enum SemanticTagNamespaceID : enum8 {
+  kCommonCompassDirection = 2;
+  kCommonCompassLocation = 3;
+  kCommonDirection = 4;
+  kCommonLevel = 5;
+  kCommonLocation = 6;
+  kCommonNumber = 7;
+  kCommonPosition = 8;
   kElectricalMeasurement = 10;
   kCommodityTariffChronology = 11;
-  kCommodityTariffDirection = 13;
+  kCommodityTariffCommodity = 13;
   kLaundry = 14;
   kPowerSource = 15;
   kCommonArea = 16;
   kCommonLandmark = 17;
-  kRelativePosition = 18;
+  kCommonRelativePosition = 18;
+  kCommodityTariffFlow = 19;
+  kRefrigerator = 65;
+  kRoomAirConditioner = 66;
+  kSwitches = 67;
   kClosure = 68;
   kClosurePanel = 69;
+  kClosureCovering = 70;
   kClosureWindow = 71;
   kClosureCabinet = 72;
+  kIdentifiedObject = 73;
+  kIdentifiedSound = 74;
+  kIdentifiedHumanActivity = 75;
+  kAlarmSeverity = 76;
+  kElectricalDistributionFormFactor = 77;
+  kElectricalDistributionOverVoltage = 78;
 }
 
 enum SoftwareVersionCertificationStatusEnum : enum8 {
@@ -273,6 +495,21 @@ enum StreamUsageEnum : enum8 {
   kRecording = 1;
   kAnalysis = 2;
   kLiveView = 3;
+}
+
+enum SwitchesTag : enum8 {
+  kOn = 0;
+  kOff = 1;
+  kToggle = 2;
+  kUp = 3;
+  kDown = 4;
+  kNext = 5;
+  kPrevious = 6;
+  kEnterOkSelect = 7;
+  kCustom = 8;
+  kOpen = 9;
+  kClose = 10;
+  kStop = 11;
 }
 
 enum TariffPriceTypeEnum : enum8 {
@@ -372,7 +609,7 @@ struct ICEServerStruct {
 struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
-  nullable AreaTypeTag areaType = 2;
+  nullable CommonAreaTag areaType = 2;
 }
 
 struct PowerThresholdStruct {
@@ -7499,8 +7736,8 @@ cluster ServiceArea = 336 {
   }
 
   struct LandmarkInfoStruct {
-    LandmarkTag landmarkTag = 0;
-    nullable RelativePositionTag relativePositionTag = 1;
+    CommonLandmarkTag landmarkTag = 0;
+    nullable CommonRelativePositionTag relativePositionTag = 1;
   }
 
   struct AreaInfoStruct {
