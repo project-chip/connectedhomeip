@@ -29,6 +29,7 @@
 #import "MTRProductIdentity.h"
 #import "MTRSetupPayload_Internal.h"
 #import "MTRUtilities.h"
+#import "NSStringSpanConversion.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 #import "zap-generated/MTRCommandPayloads_Private.h"
 
@@ -98,7 +99,9 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
         // Since OnPairingComplete(failure_code) might not be invoked in all cases, use this opportunity to inform of failed commissioning
         // and default the error to timeout since that is best guess in this layer.
         if (status == chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed && [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
-            OnCommissioningComplete(mDeviceNodeId, CHIP_ERROR_TIMEOUT);
+            chip::Controller::CompletionStatus completionStatus;
+            completionStatus.err = CHIP_ERROR_TIMEOUT;
+            NotifyCommissioningComplete(mDeviceNodeId, &completionStatus);
         }
     }
 }
@@ -179,9 +182,34 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
     mCommissioningParameters = nil;
 }
 
-void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
+void MTRDeviceControllerDelegateBridge::OnCommissioningSuccess(chip::PeerId peerId)
+{
+    NotifyCommissioningComplete(peerId.GetNodeId(), nullptr);
+}
+
+void MTRDeviceControllerDelegateBridge::OnCommissioningFailure(chip::PeerId peerId, const chip::Controller::CompletionStatus & completionStatus)
+{
+    NotifyCommissioningComplete(peerId.GetNodeId(), &completionStatus);
+}
+
+void MTRDeviceControllerDelegateBridge::NotifyCommissioningComplete(chip::NodeId nodeId, const chip::Controller::CompletionStatus * _Nullable completionStatus)
 {
     MTRDeviceController * strongController = mController;
+    CHIP_ERROR error = completionStatus ? completionStatus->err : CHIP_NO_ERROR;
+
+    NSMutableDictionary<NSErrorUserInfoKey, id> * userInfo = [NSMutableDictionary dictionary];
+    if (completionStatus && completionStatus->attestationResult.HasValue()) {
+        userInfo[MTRAttestationVerificationResultKey] = @(chip::to_underlying(completionStatus->attestationResult.Value()));
+    }
+    if (completionStatus && completionStatus->networkCommissioningStatus.HasValue()) {
+        userInfo[MTRNetworkCommissioningStatusKey] = @(chip::to_underlying(completionStatus->networkCommissioningStatus.Value()));
+    }
+    if (completionStatus && completionStatus->connectNetworkErrorValue.HasValue()) {
+        userInfo[MTRNetworkCommissioningConnectErrorValueKey] = @(completionStatus->connectNetworkErrorValue.Value());
+    }
+    if (completionStatus && !completionStatus->networkCommissioningDebugText.empty()) {
+        userInfo[MTRNetworkCommissioningDebugTextKey] = AsString(chip::CharSpan(completionStatus->networkCommissioningDebugText.data(), completionStatus->networkCommissioningDebugText.size()));
+    }
 
     MTR_LOG("%@ DeviceControllerDelegate Commissioning complete. NodeId 0x%016llx Status %s", strongController, nodeId, chip::ErrorStr(error));
     MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, error);
@@ -196,7 +224,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
         if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)] ||
             [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
             dispatch_async(mQueue, ^{
-                NSError * nsError = [MTRError errorForCHIPErrorCode:error];
+                NSError * nsError = [MTRError errorForCHIPErrorCode:error logContext:nil additionalUserInfo:userInfo];
                 NSNumber * nodeID = nil;
                 if (error == CHIP_NO_ERROR) {
                     nodeID = @(nodeId);
@@ -214,7 +242,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
         // If only the DEPRECATED function is defined
         if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:)]) {
             dispatch_async(mQueue, ^{
-                NSError * nsError = [MTRError errorForCHIPErrorCode:error];
+                NSError * nsError = [MTRError errorForCHIPErrorCode:error logContext:nil additionalUserInfo:userInfo];
                 [strongDelegate controller:strongController commissioningComplete:nsError];
             });
         }

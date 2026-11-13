@@ -1010,6 +1010,22 @@ void SetUpCodePairer::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
     }
 }
 
+void SetUpCodePairer::OnCommissioningSuccess(PeerId peerId)
+{
+    if (mPairingDelegate)
+    {
+        mPairingDelegate->OnCommissioningSuccess(peerId);
+    }
+}
+
+void SetUpCodePairer::OnCommissioningFailure(PeerId peerId, const CompletionStatus & completionStatus)
+{
+    if (mPairingDelegate)
+    {
+        mPairingDelegate->OnCommissioningFailure(peerId, completionStatus);
+    }
+}
+
 void SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, void * context)
 {
     ChipLogError(Controller, "Discovery timed out");
