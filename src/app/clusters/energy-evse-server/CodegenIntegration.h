@@ -110,6 +110,9 @@ public:
     DataModel::Nullable<int64_t> GetSessionEnergyDischarged() const;
     CHIP_ERROR SetSessionEnergyDischarged(DataModel::Nullable<int64_t> newValue);
 
+    EnergyEvseCluster & GetEnergyEvseCluster() { return mCluster.Cluster(); }
+    const EnergyEvseCluster & GetEnergyEvseCluster() const { return mCluster.Cluster(); }
+
 private:
     RegisteredServerCluster<EnergyEvseCluster> mCluster;
 };

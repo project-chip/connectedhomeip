@@ -55,7 +55,6 @@ endif()
 
 # Keep top-level src/app files explicit to avoid pulling unrelated src/app/*.cpp.
 set(APP_TOPLEVEL_EXTRA_SRCS
-    "${CHIP_ROOT}/src/app/SafeAttributePersistenceProvider.cpp"
     "${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp"
 )
 

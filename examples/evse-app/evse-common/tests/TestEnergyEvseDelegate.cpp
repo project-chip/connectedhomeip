@@ -18,6 +18,7 @@
 
 #include <EnergyEvseDelegateImpl.h>
 #include <EnergyEvseManager.h>
+#include <SafeAttributePersistenceAdapter.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/EventManagement.h>
@@ -28,6 +29,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <vector>
 
 using namespace chip;
@@ -77,7 +79,7 @@ public:
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     TestEnergyEvseDelegate() :
-        mDelegate(mTargetsDelegate),
+        mDelegate(mTargetsDelegate, mTimerDelegate),
         mInstance(kEndpointId, mDelegate, BitMask<Feature, uint32_t>(Feature::kChargingPreferences, Feature::kV2x),
                   BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent),
                   EnergyEvseCluster::OptionalCommandSet())
@@ -99,6 +101,7 @@ public:
         ASSERT_EQ(mProvider.Init(&mStorage), CHIP_NO_ERROR);
         SetSafeAttributePersistenceProvider(&mProvider);
 
+        mDelegate.SetAttributeStorage(GetSafeAttributePersistenceAdapter());
         mDelegate.SetInstance(&mInstance);
         ASSERT_EQ(mDelegate.HwSetCircuitCapacity(kCircuitCapacity_mA), Status::Success);
     }
@@ -107,6 +110,7 @@ public:
     {
         mDelegate.CancelActiveTimers();
         mDelegate.SetInstance(nullptr);
+        mDelegate.ClearAttributeStorage();
         EventManagement::DestroyEventManagement();
     }
 
@@ -162,6 +166,7 @@ protected:
     TestPersistentStorageDelegate mStorage;
     DefaultSafeAttributePersistenceProvider mProvider;
     std::vector<StateEnum> mStateChanges; // declared before mDelegate so it outlives the registered callback
+    TimerDelegateMock mTimerDelegate;
     EvseTargetsDelegate mTargetsDelegate;
     EnergyEvseDelegate mDelegate;
     Instance mInstance;
@@ -507,10 +512,11 @@ TEST_F(TestEnergyEvseDelegate, UserMaximumChargeCurrentWriteCancelsPendingDefaul
     // Use a fresh delegate so CircuitCapacity has not been reported yet
     mDelegate.SetInstance(nullptr);
     EvseTargetsDelegate targets;
-    EnergyEvseDelegate delegate(targets);
+    EnergyEvseDelegate delegate(targets, mTimerDelegate);
     Instance instance(kEndpointId, delegate, BitMask<Feature, uint32_t>(Feature::kChargingPreferences),
                       BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent),
                       EnergyEvseCluster::OptionalCommandSet());
+    delegate.SetAttributeStorage(GetSafeAttributePersistenceAdapter());
     delegate.SetInstance(&instance);
 
     ASSERT_EQ(delegate.InitializeUserMaximumChargeCurrent(), CHIP_NO_ERROR);
@@ -527,10 +533,11 @@ TEST_F(TestEnergyEvseDelegate, PendingDefaultAppliedWhenCircuitCapacityArrives)
 {
     mDelegate.SetInstance(nullptr);
     EvseTargetsDelegate targets;
-    EnergyEvseDelegate delegate(targets);
+    EnergyEvseDelegate delegate(targets, mTimerDelegate);
     Instance instance(kEndpointId, delegate, BitMask<Feature, uint32_t>(Feature::kChargingPreferences),
                       BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent),
                       EnergyEvseCluster::OptionalCommandSet());
+    delegate.SetAttributeStorage(GetSafeAttributePersistenceAdapter());
     delegate.SetInstance(&instance);
 
     ASSERT_EQ(delegate.InitializeUserMaximumChargeCurrent(), CHIP_NO_ERROR);
@@ -553,6 +560,7 @@ public:
     void SetUp() override
     {
         TestEnergyEvseDelegate::SetUp();
+        mManagerDelegate.SetAttributeStorage(GetSafeAttributePersistenceAdapter());
         mManagerDelegate.SetInstance(&mManager);
     }
 
@@ -560,6 +568,7 @@ public:
     {
         mManagerDelegate.CancelActiveTimers();
         mManagerDelegate.SetInstance(nullptr);
+        mManagerDelegate.ClearAttributeStorage();
         TestEnergyEvseDelegate::TearDown();
     }
 
@@ -585,7 +594,7 @@ protected:
     }
 
     EvseTargetsDelegate mManagerTargets;
-    EnergyEvseDelegate mManagerDelegate{ mManagerTargets };
+    EnergyEvseDelegate mManagerDelegate{ mManagerTargets, mTimerDelegate };
     EnergyEvseManager mManager;
 };
 
@@ -705,10 +714,11 @@ TEST_F(TestEnergyEvseManagerLoad, IndefiniteChargingEnableSurvivesReload)
 
     // Simulate a reboot with a new delegate and manager reading the same storage
     EvseTargetsDelegate targets;
-    EnergyEvseDelegate delegate(targets);
+    EnergyEvseDelegate delegate(targets, mTimerDelegate);
     EnergyEvseManager manager(kEndpointId, delegate, BitMask<Feature, uint32_t>(Feature::kChargingPreferences, Feature::kV2x),
                               BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent),
                               EnergyEvseCluster::OptionalCommandSet());
+    delegate.SetAttributeStorage(GetSafeAttributePersistenceAdapter());
     delegate.SetInstance(&manager);
 
     ASSERT_EQ(manager.LoadPersistentValues(), CHIP_NO_ERROR);

@@ -225,3 +225,8 @@ tests:
 CI:
     - name: evse
       app: evse
+    - name: all-devices-energy-evse
+      app: all-devices
+      args:
+          - --device
+          - energy-evse
