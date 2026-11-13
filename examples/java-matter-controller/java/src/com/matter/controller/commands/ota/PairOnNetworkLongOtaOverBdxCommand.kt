@@ -64,6 +64,36 @@ class PairOnNetworkLongOtaOverBdxCommand(
     this.devicePointer = devicePointer
   }
 
+  /** Skips [count] bytes, stopping early only at end of stream. */
+  private fun skipFully(stream: InputStream, count: Long) {
+    var remaining = count
+    while (remaining > 0) {
+      val skipped = stream.skip(remaining)
+      if (skipped > 0) {
+        remaining -= skipped
+      } else if (stream.read() >= 0) {
+        // skip() may return 0 before end of stream; reading one byte skips it
+        // and detects end of stream.
+        remaining--
+      } else {
+        return
+      }
+    }
+  }
+
+  /** Fills [buffer] unless end of stream is reached first; returns the number of bytes read. */
+  private fun readFully(stream: InputStream, buffer: ByteArray): Int {
+    var total = 0
+    while (total < buffer.size) {
+      val read = stream.read(buffer, total, buffer.size - total)
+      if (read < 0) {
+        break
+      }
+      total += read
+    }
+    return total
+  }
+
   private inner class InternalAnnouceOTACallback : InvokeCallback {
     override fun onError(e: Exception) {
       logger.log(Level.INFO, "AnnouceOTA receive onError" + e.message)
@@ -166,7 +196,9 @@ class PairOnNetworkLongOtaOverBdxCommand(
       try {
         val file = File(uri + fileName)
         val fileInputStream = FileInputStream(file)
-        bufferedInputStream = BufferedInputStream(fileInputStream)
+        val stream = BufferedInputStream(fileInputStream)
+        bufferedInputStream = stream
+        skipFully(stream, offset)
       } catch (e: IOException) {
         logger.log(Level.INFO, "exception", e)
         inputStream?.close()
@@ -192,26 +224,27 @@ class PairOnNetworkLongOtaOverBdxCommand(
       blockIndex: Long,
       bytesToSkip: Long
     ): OTAProviderDelegate.BDXData? {
-      // This code is just example code. This code doesn't check blockIndex and bytesToSkip
-      // variable.
       logger.log(
         Level.INFO,
         "handleBDXQuery sending.., $nodeId, $blockSize, $blockIndex, $bytesToSkip"
       )
-      if (bufferedInputStream == null) {
-        return OTAProviderDelegate.BDXData(ByteArray(0), true)
+      val stream = bufferedInputStream
+      // Returning null makes the native layer abort the transfer.
+      if (stream == null) {
+        logger.log(Level.INFO, "No OTA image stream, aborting BDX transfer")
+        return null
       }
       val packet = ByteArray(blockSize)
-      val len = bufferedInputStream!!.read(packet)
-
-      val sendPacket =
-        if (len < blockSize) {
-          packet.copyOf(len)
-        } else if (len < 0) {
-          ByteArray(0)
-        } else {
-          packet.clone()
+      val len =
+        try {
+          skipFully(stream, bytesToSkip)
+          readFully(stream, packet)
+        } catch (e: IOException) {
+          logger.log(Level.INFO, "exception", e)
+          return null
         }
+
+      val sendPacket = if (len < blockSize) packet.copyOf(len) else packet
 
       val isEOF = len < blockSize
 
