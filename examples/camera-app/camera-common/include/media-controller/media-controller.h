@@ -55,4 +55,5 @@ public:
     // Reset the transport's sink state (before starting transmission)
     // Call when transport wants data: pushav at clip record start, live stream at registration.
     virtual void ResetTransportSinkState(Transport * transport) = 0;
+    virtual void ClearVideoPreRollBuffer() {}
 };
