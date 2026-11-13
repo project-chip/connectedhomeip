@@ -42,18 +42,6 @@ Protocols::InteractionModel::Status MockEvseDelegate::EnableCharging(const DataM
 {
     VerifyOrReturnValue(mCluster != nullptr, Protocols::InteractionModel::Status::Failure);
 
-    // If there is currently an error present on the EVSE, return FAILURE
-    if (mCluster->GetFaultState() != FaultStateEnum::kNoError)
-    {
-        return Protocols::InteractionModel::Status::Failure;
-    }
-
-    // If Diagnostics are currently active, return FAILURE
-    if (mCluster->GetSupplyState() == SupplyStateEnum::kDisabledDiagnostics)
-    {
-        return Protocols::InteractionModel::Status::Failure;
-    }
-
     // Update SupplyState based on previous state:
     // - If previously Disabled -> ChargingEnabled
     // - If previously DischargingEnabled -> Enabled (both charging and discharging)
@@ -83,18 +71,6 @@ Protocols::InteractionModel::Status MockEvseDelegate::EnableDischarging(const Da
 {
     VerifyOrReturnValue(mCluster != nullptr, Protocols::InteractionModel::Status::Failure);
 
-    // If there is currently an error present on the EVSE, return FAILURE
-    if (mCluster->GetFaultState() != FaultStateEnum::kNoError)
-    {
-        return Protocols::InteractionModel::Status::Failure;
-    }
-
-    // If Diagnostics are currently active, return FAILURE
-    if (mCluster->GetSupplyState() == SupplyStateEnum::kDisabledDiagnostics)
-    {
-        return Protocols::InteractionModel::Status::Failure;
-    }
-
     // Update SupplyState based on previous state:
     // - If previously Disabled -> DischargingEnabled
     // - If previously ChargingEnabled -> Enabled (both charging and discharging)
@@ -121,12 +97,6 @@ Protocols::InteractionModel::Status MockEvseDelegate::EnableDischarging(const Da
 Protocols::InteractionModel::Status MockEvseDelegate::StartDiagnostics()
 {
     VerifyOrReturnValue(mCluster != nullptr, Protocols::InteractionModel::Status::Failure);
-
-    // EVSE SHALL enter Diagnostics state only if SupplyState is Disabled
-    if (mCluster->GetSupplyState() != SupplyStateEnum::kDisabled)
-    {
-        return Protocols::InteractionModel::Status::Failure;
-    }
 
     // Set SupplyState to DisabledDiagnostics
     TEMPORARY_RETURN_IGNORED mCluster->SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
