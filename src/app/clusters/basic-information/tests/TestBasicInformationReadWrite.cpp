@@ -16,6 +16,7 @@
  */
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
+#include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -24,8 +25,11 @@
 #include <clusters/BasicInformation/Enums.h>
 #include <clusters/BasicInformation/Metadata.h>
 #include <clusters/BasicInformation/Structs.h>
+#include <clusters/shared/Enums.h>
+#include <clusters/shared/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/ConfigurationManager.h>
@@ -605,6 +609,236 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
         ASSERT_EQ(tester.ReadAttribute(Attributes::LocalConfigDisabled::Id, readValue), CHIP_NO_ERROR);
         EXPECT_EQ(readValue, finalValue);
     }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestBasicInformationReadWrite, TestWriteDeviceLocation)
+{
+    BasicInformationOptionalAttributesSet optionalAttributeSet;
+    optionalAttributeSet.template Set<Attributes::DeviceLocation::Id>();
+    BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, mMockConfigurationManager,
+                                    chip::DeviceLayer::PlatformMgr(),
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
+    // --- Test Case 1: default value is null ---
+    {
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::DecodableType> readValue;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readValue), CHIP_NO_ERROR);
+        EXPECT_TRUE(readValue.IsNull());
+    }
+
+    // --- Test Case 2: write a valid location and read it back ---
+    {
+        Globals::Structs::LocationDescriptorStruct::Type location;
+        location.locationName = "Bedroom"_span;
+        location.floorNumber.SetNonNull(2);
+        location.areaType.SetNonNull(Globals::AreaTypeTag::kBedroom);
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> writeValue(location);
+
+        ASSERT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, writeValue), CHIP_NO_ERROR);
+
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::DecodableType> readValue;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readValue), CHIP_NO_ERROR);
+        ASSERT_FALSE(readValue.IsNull());
+        EXPECT_TRUE(readValue.Value().locationName.data_equal("Bedroom"_span));
+        ASSERT_FALSE(readValue.Value().floorNumber.IsNull());
+        EXPECT_EQ(readValue.Value().floorNumber.Value(), 2);
+        ASSERT_FALSE(readValue.Value().areaType.IsNull());
+        EXPECT_EQ(readValue.Value().areaType.Value(), Globals::AreaTypeTag::kBedroom);
+    }
+
+    // --- Test Case 3: a non-null value with all fields empty/null is rejected ---
+    {
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> writeValue(
+            Globals::Structs::LocationDescriptorStruct::Type{});
+        EXPECT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, writeValue),
+                  DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError));
+    }
+
+    // --- Test Case 4: writing null clears the value ---
+    {
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> writeValue;
+        ASSERT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, writeValue), CHIP_NO_ERROR);
+
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::DecodableType> readValue;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readValue), CHIP_NO_ERROR);
+        EXPECT_TRUE(readValue.IsNull());
+    }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Globals::AreaTypeTag::kUnknownEnumValue must be rejected by the cluster's own write
+// validation, as a documented contract of this attribute, not merely as a side effect of
+// DataModel::Encode() also refusing to transmit that sentinel (that encoder-level guard is
+// gated by CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES, which test/controller binaries
+// may enable). A typed write of the sentinel never reaches the cluster at all, since the
+// encoder already refuses to encode it, so the TLV for this write is built by hand with the
+// raw, otherwise-unassigned byte 40 in the AreaType field.
+TEST_F(TestBasicInformationReadWrite, TestWriteDeviceLocationRejectsUnknownAreaTag)
+{
+    BasicInformationOptionalAttributesSet optionalAttributeSet;
+    optionalAttributeSet.template Set<Attributes::DeviceLocation::Id>();
+    BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, mMockConfigurationManager,
+                                    chip::DeviceLayer::PlatformMgr(),
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    chip::Testing::WriteOperation writeOp(kRootEndpointId, BasicInformation::Id, Attributes::DeviceLocation::Id);
+
+    uint8_t buffer[256];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+
+    TLV::TLVType outerContainerType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType), CHIP_NO_ERROR);
+    TLV::TLVType structContainerType;
+    ASSERT_EQ(writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, structContainerType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.PutString(TLV::ContextTag(0), "Office"), CHIP_NO_ERROR); // LocationName
+    ASSERT_EQ(writer.PutNull(TLV::ContextTag(1)), CHIP_NO_ERROR);             // FloorNumber
+    ASSERT_EQ(writer.Put(TLV::ContextTag(2), static_cast<uint8_t>(Globals::AreaTypeTag::kUnknownEnumValue)),
+              CHIP_NO_ERROR); // AreaType, raw/invalid
+    ASSERT_EQ(writer.EndContainer(structContainerType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(outerContainerType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.EnterContainer(outerContainerType), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+
+    AttributeValueDecoder decoder(reader, writeOp.GetRequest().subjectDescriptor);
+    EXPECT_EQ(cluster.WriteAttribute(writeOp.GetRequest(), decoder),
+              DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError));
+
+    // Restart to confirm the rejected write was never persisted either, not just absent from
+    // the in-memory value checked above.
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    {
+        chip::Testing::ClusterTester tester(cluster);
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::DecodableType> readValue;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readValue), CHIP_NO_ERROR);
+        EXPECT_TRUE(readValue.IsNull());
+    }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestBasicInformationReadWrite, TestDeviceLocationLoadAndSave)
+{
+    BasicInformationOptionalAttributesSet optionalAttributeSet;
+    optionalAttributeSet.template Set<Attributes::DeviceLocation::Id>();
+    BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, mMockConfigurationManager,
+                                    chip::DeviceLayer::PlatformMgr(),
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
+    Globals::Structs::LocationDescriptorStruct::Type location;
+    location.locationName = "Kitchen"_span;
+    location.floorNumber.SetNonNull(1);
+    location.areaType.SetNonNull(Globals::AreaTypeTag::kKitchen);
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> writeValue(location);
+    ASSERT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, writeValue), CHIP_NO_ERROR);
+
+    // Re-start the cluster to force a load from persistent storage.
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::DecodableType> readValue;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readValue), CHIP_NO_ERROR);
+    ASSERT_FALSE(readValue.IsNull());
+    EXPECT_TRUE(readValue.Value().locationName.data_equal("Kitchen"_span));
+    ASSERT_FALSE(readValue.Value().floorNumber.IsNull());
+    EXPECT_EQ(readValue.Value().floorNumber.Value(), 1);
+    ASSERT_FALSE(readValue.Value().areaType.IsNull());
+    EXPECT_EQ(readValue.Value().areaType.Value(), Globals::AreaTypeTag::kKitchen);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Simulates a cluster that already has a valid, non-null DeviceLocation cached from a prior
+// successful Startup(), whose persisted record is then overwritten (bypassing WriteAttribute's
+// own length validation) with a LocationName that no longer fits the current storage limit
+// (e.g. left over from a firmware version with a larger limit, or corrupted storage). On the
+// next Startup(), the cluster must reset to null rather than keep serving the stale cached
+// value or load truncated/garbage data.
+TEST_F(TestBasicInformationReadWrite, TestDeviceLocationLoadIgnoresOversizedName)
+{
+    BasicInformationOptionalAttributesSet optionalAttributeSet;
+    optionalAttributeSet.template Set<Attributes::DeviceLocation::Id>();
+    BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, mMockConfigurationManager,
+                                    chip::DeviceLayer::PlatformMgr(),
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    {
+        chip::Testing::ClusterTester tester(cluster);
+        Globals::Structs::LocationDescriptorStruct::Type location;
+        location.locationName = "Kitchen"_span;
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> writeValue(location);
+        ASSERT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, writeValue), CHIP_NO_ERROR);
+    }
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    char oversizedName[140];
+    memset(oversizedName, 'A', sizeof(oversizedName));
+    Globals::Structs::LocationDescriptorStruct::Type oversizedLocation;
+    oversizedLocation.locationName = CharSpan(oversizedName, sizeof(oversizedName));
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> storedValue(oversizedLocation);
+
+    AttributePersistence persistence(testContext.AttributePersistenceProvider());
+    ASSERT_EQ(persistence.StoreTLV<256>({ kRootEndpointId, BasicInformation::Id, Attributes::DeviceLocation::Id }, storedValue),
+              CHIP_NO_ERROR);
+
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::DecodableType> readValue;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readValue), CHIP_NO_ERROR);
+    EXPECT_TRUE(readValue.IsNull());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// WriteAttribute rejects a non-null DeviceLocation with an empty LocationName, a null
+// FloorNumber, and a null AreaType (ConstraintError), so Startup() must apply the same rule to
+// a persisted record: a value never reachable through a normal write (e.g. from a firmware
+// version with a looser constraint, or corrupted storage) must not become readable on reload.
+TEST_F(TestBasicInformationReadWrite, TestDeviceLocationLoadIgnoresAllEmptyValue)
+{
+    BasicInformationOptionalAttributesSet optionalAttributeSet;
+    optionalAttributeSet.template Set<Attributes::DeviceLocation::Id>();
+    BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, mMockConfigurationManager,
+                                    chip::DeviceLayer::PlatformMgr(),
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    {
+        chip::Testing::ClusterTester tester(cluster);
+        Globals::Structs::LocationDescriptorStruct::Type location;
+        location.locationName = "Kitchen"_span;
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> writeValue(location);
+        ASSERT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, writeValue), CHIP_NO_ERROR);
+    }
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> storedValue(
+        Globals::Structs::LocationDescriptorStruct::Type{});
+
+    AttributePersistence persistence(testContext.AttributePersistenceProvider());
+    ASSERT_EQ(persistence.StoreTLV<256>({ kRootEndpointId, BasicInformation::Id, Attributes::DeviceLocation::Id }, storedValue),
+              CHIP_NO_ERROR);
+
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::DecodableType> readValue;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readValue), CHIP_NO_ERROR);
+    EXPECT_TRUE(readValue.IsNull());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

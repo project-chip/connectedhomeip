@@ -30,6 +30,7 @@ using BasicInformationOptionalAttributesSet = OptionalAttributeSet< //
     BasicInformation::Attributes::LocalConfigDisabled::Id,          //
     BasicInformation::Attributes::Reachable::Id,                    //
     BasicInformation::Attributes::ProductAppearance::Id,            //
+    BasicInformation::Attributes::DeviceLocation::Id,               //
     // Old specification versions had UniqueID as optional, so this
     // appears here even though MANDATORY in the latest spec. We
     // default it enabled (to decrease chances of error)
