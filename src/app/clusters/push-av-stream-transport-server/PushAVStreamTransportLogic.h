@@ -54,6 +54,7 @@ public:
             ChipLogError(Zcl, "Push AV Stream Transport : Trying to set TLS Client Management delegate to null");
             return;
         }
+        RaiseTLSEndpointReferenceCounts();
     }
 
     void SetTLSCertificateManagementDelegate(TLSCertificateManagementDelegate * delegate)
@@ -187,6 +188,37 @@ private:
     UpsertStreamTransportConnection(const PushAvStreamTransport::TransportConfigurationStorage & transportConfiguration);
 
     CHIP_ERROR RemoveStreamTransportConnection(const uint16_t connectionID);
+
+    /**
+     * @brief Adds delta to the ReferenceCount of a TLS endpoint provisioned on the root endpoint.
+     *
+     * Every transport in CurrentConnections holds one reference on its TLSEndpointID, so that TLS Client Management
+     * rejects RemoveEndpoint while a transport still uses the endpoint.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE if no TLS Client Management delegate is set, otherwise the delegate's result
+     *         (e.g. CHIP_ERROR_NOT_FOUND if the endpoint is not provisioned for the fabric).
+     */
+    CHIP_ERROR MutateTLSEndpointReferenceCount(FabricIndex fabricIndex, uint16_t tlsEndpointID, int8_t delta);
+
+    /**
+     * @brief Checks that tlsEndpointID is a TLS endpoint a push transport can use, and passes its certificates to the
+     *        delegate through SetTLSCerts().
+     *
+     * @return CHIP_NO_ERROR if the endpoint is provisioned for fabricIndex, has a client certificate, and its certificates
+     *         could be loaded; an error otherwise, which callers report as InvalidTLSEndpoint.
+     */
+    CHIP_ERROR LoadTLSEndpointCertificates(FabricIndex fabricIndex, uint16_t tlsEndpointID);
+
+    /**
+     * @brief Raises the ReferenceCount of each TLS endpoint used by CurrentConnections to at least the number of
+     *        connections that use it.
+     *
+     * Connections restored from storage do not take references when they are loaded, and connections stored by firmware
+     * that did not count references hold none. Counts are only raised, never lowered, so that references held by other
+     * users of the endpoint (for example another Push AV Stream Transport instance) are kept. Running it again has no
+     * effect once the counts are high enough.
+     */
+    void RaiseTLSEndpointReferenceCounts();
 
     static void PushAVStreamTransportDeallocateCallback(chip::System::Layer *, void * callbackContext);
 

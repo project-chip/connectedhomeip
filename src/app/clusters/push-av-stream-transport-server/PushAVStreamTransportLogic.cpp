@@ -17,6 +17,7 @@
  */
 
 #include "constants.h"
+#include <algorithm>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -186,8 +187,118 @@ CHIP_ERROR PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(con
 
         // Notify the stack that the CurrentConnections attribute has changed.
         mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
+
+        auto removedOptions = removedValue.GetTransportOptionsPtr();
+        if (removedOptions != nullptr)
+        {
+            LogErrorOnFailure(MutateTLSEndpointReferenceCount(removedValue.GetFabricIndex(), removedOptions->TLSEndpointID, -1));
+        }
     }
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PushAvStreamTransportServerLogic::MutateTLSEndpointReferenceCount(FabricIndex fabricIndex, uint16_t tlsEndpointID,
+                                                                             int8_t delta)
+{
+    VerifyOrReturnError(mTLSClientManagementDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    // Note: TLS clusters are always on EP0, per spec
+    ReturnErrorOnFailure(
+        mTLSClientManagementDelegate->MutateEndpointReferenceCount(kRootEndpointId, fabricIndex, tlsEndpointID, delta));
+    mTLSClientManagementDelegate->NotifyProvisionedEndpointsChanged();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PushAvStreamTransportServerLogic::LoadTLSEndpointCertificates(FabricIndex fabricIndex, uint16_t tlsEndpointID)
+{
+    VerifyOrReturnError(
+        mTLSClientManagementDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE,
+        ChipLogError(Zcl, "Push AV Stream Transport[ep=%d]: TLS Client Management Delegate is not set", mEndpointId));
+
+    // Note: TLS clusters are always on EP0, per spec
+    return mTLSClientManagementDelegate->FindProvisionedEndpointByID(
+        kRootEndpointId, fabricIndex, tlsEndpointID, [&](auto & TLSEndpoint) -> CHIP_ERROR {
+            // The spec requires a push transport's TLS endpoint to carry a non-null ccdid; a null one means no
+            // client certificate is associated with the endpoint, which the caller reports as an invalid TLS endpoint.
+            VerifyOrReturnError(!TLSEndpoint.ccdid.IsNull(), CHIP_ERROR_INVALID_ARGUMENT,
+                                ChipLogError(Zcl, "Push AV Stream Transport[ep=%d]: TLS endpoint %u has no client certificate",
+                                             mEndpointId, tlsEndpointID));
+
+            // Use heap allocation for large certificate buffers to reduce stack usage
+            auto rootCertBuffer   = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
+            auto clientCertBuffer = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();
+
+            Tls::CertificateTable::BufferedClientCert clientCertEntry(*clientCertBuffer);
+            Tls::CertificateTable::BufferedRootCert rootCertEntry(*rootCertBuffer);
+
+            if (mTLSCertificateManagementDelegate != nullptr)
+            {
+                auto & table = mTLSCertificateManagementDelegate->GetCertificateTable();
+                ReturnErrorOnFailure(table.GetClientCertificateEntry(fabricIndex, TLSEndpoint.ccdid.Value(), clientCertEntry));
+                ReturnErrorOnFailure(table.GetRootCertificateEntry(fabricIndex, TLSEndpoint.caid, rootCertEntry));
+            }
+            // Without a TLS Certificate Management delegate (in tests), the entries stay empty.
+            mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
+            return CHIP_NO_ERROR;
+        });
+}
+
+void PushAvStreamTransportServerLogic::RaiseTLSEndpointReferenceCounts()
+{
+    VerifyOrReturn(mTLSClientManagementDelegate != nullptr);
+
+    auto usesTLSEndpoint = [](const TransportConfigurationStorage & connection, FabricIndex fabricIndex, uint16_t tlsEndpointID) {
+        auto options = connection.GetTransportOptionsPtr();
+        return options != nullptr && connection.GetFabricIndex() == fabricIndex && options->TLSEndpointID == tlsEndpointID;
+    };
+
+    for (size_t i = 0; i < mCurrentConnections.size(); ++i)
+    {
+        auto options = mCurrentConnections[i].GetTransportOptionsPtr();
+        if (options == nullptr)
+        {
+            continue;
+        }
+        FabricIndex fabricIndex = mCurrentConnections[i].GetFabricIndex();
+        uint16_t tlsEndpointID  = options->TLSEndpointID;
+
+        // Handle each (fabric, TLS endpoint) pair once, at the first connection that uses it.
+        bool handledEarlier  = false;
+        size_t expectedCount = 0;
+        for (size_t j = 0; j < mCurrentConnections.size() && !handledEarlier; ++j)
+        {
+            if (usesTLSEndpoint(mCurrentConnections[j], fabricIndex, tlsEndpointID))
+            {
+                handledEarlier = (j < i);
+                expectedCount++;
+            }
+        }
+        if (handledEarlier)
+        {
+            continue;
+        }
+
+        size_t referenceCount   = 0;
+        auto readReferenceCount = [&referenceCount](auto & endpoint) -> CHIP_ERROR {
+            referenceCount = endpoint.referenceCount;
+            return CHIP_NO_ERROR;
+        };
+        CHIP_ERROR err = mTLSClientManagementDelegate->FindProvisionedEndpointByID(kRootEndpointId, fabricIndex, tlsEndpointID,
+                                                                                   readReferenceCount);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Push AV Stream Transport[ep=%d]: Cannot read TLS endpoint %u: %" CHIP_ERROR_FORMAT, mEndpointId,
+                         tlsEndpointID, err.Format());
+            continue;
+        }
+
+        if (referenceCount < expectedCount)
+        {
+            auto delta = static_cast<int8_t>(std::min<size_t>(expectedCount - referenceCount, static_cast<size_t>(INT8_MAX)));
+            ChipLogProgress(Zcl, "Push AV Stream Transport[ep=%d]: Raising TLS endpoint %u ReferenceCount by %d", mEndpointId,
+                            tlsEndpointID, delta);
+            LogErrorOnFailure(MutateTLSEndpointReferenceCount(fabricIndex, tlsEndpointID, delta));
+        }
+    }
 }
 
 void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connectionID)
@@ -211,6 +322,7 @@ void PushAvStreamTransportServerLogic::LoadPersistentAttributes()
 {
     // Load currentConnections
     LogErrorOnFailure(LoadCurrentConnections());
+    RaiseTLSEndpointReferenceCounts();
 
     // Signal delegate that all persistent configuration attributes have been loaded.
     TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
@@ -916,58 +1028,11 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     });
 
-    // Validate the TLS Endpoint
-    if (mTLSClientManagementDelegate != nullptr)
+    if (LoadTLSEndpointCertificates(handler.GetAccessingFabricIndex(), transportOptions.TLSEndpointID) != CHIP_NO_ERROR)
     {
-        // Note: TLS clusters are always on EP0, per spec
-        //
-        CHIP_ERROR tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
-            kRootEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID,
-            [&](auto & TLSEndpoint) -> CHIP_ERROR {
-                // The spec requires a push transport's TLS endpoint to carry a non-null ccdid; a null one means no
-                // client certificate is associated with the endpoint, which the caller reports as an invalid TLS endpoint.
-                VerifyOrReturnError(!TLSEndpoint.ccdid.IsNull(), CHIP_ERROR_INVALID_ARGUMENT,
-                                    ChipLogError(Zcl,
-                                                 "HandleAllocatePushTransport[ep=%d]: TLS endpoint %u has no client certificate",
-                                                 mEndpointId, commandData.transportOptions.TLSEndpointID));
-
-                // Use heap allocation for large certificate buffers to reduce stack usage
-                auto rootCertBuffer   = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
-                auto clientCertBuffer = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();
-
-                Tls::CertificateTable::BufferedClientCert clientCertEntry(*clientCertBuffer);
-                Tls::CertificateTable::BufferedRootCert rootCertEntry(*rootCertBuffer);
-
-                if (mTLSCertificateManagementDelegate != nullptr)
-                {
-                    auto & table = mTLSCertificateManagementDelegate->GetCertificateTable();
-                    ReturnErrorOnFailure(table.GetClientCertificateEntry(handler.GetAccessingFabricIndex(),
-                                                                         TLSEndpoint.ccdid.Value(), clientCertEntry));
-                    ReturnErrorOnFailure(
-                        table.GetRootCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.caid, rootCertEntry));
-                    mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
-                }
-                else
-                {
-                    // For tests, create empty cert entries
-                    mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
-                }
-                return CHIP_NO_ERROR;
-            });
-
-        VerifyOrDo(tlsEndpointValidityStatus == CHIP_NO_ERROR, {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
-                         mEndpointId);
-            auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
-            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
-            return std::nullopt;
-        });
-    }
-    else
-    {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLS Client Management Delegate is not set", mEndpointId);
-        auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
-        TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
+                     mEndpointId);
+        TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
         return std::nullopt;
     }
 
@@ -1191,6 +1256,15 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
     FabricIndex accessingFabricIndex = handler.GetAccessingFabricIndex();
 
+    CHIP_ERROR referenceErr = MutateTLSEndpointReferenceCount(accessingFabricIndex, transportOptions.TLSEndpointID, 1);
+    if (referenceErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Failed to reference TLS endpoint %u: %" CHIP_ERROR_FORMAT,
+                     mEndpointId, transportOptions.TLSEndpointID, referenceErr.Format());
+        handler.AddStatus(commandPath, Status::Failure);
+        return std::nullopt;
+    }
+
     retStatus = mDelegate->AllocatePushTransport(*transportOptionsPtr, connectionID, accessingFabricIndex);
 
     if (retStatus == Status::Success)
@@ -1204,6 +1278,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
         if (UpsertStreamTransportConnection(outTransportConfiguration) == UpsertResultEnum::kFailed)
         {
+            LogErrorOnFailure(MutateTLSEndpointReferenceCount(accessingFabricIndex, transportOptions.TLSEndpointID, -1));
             handler.AddStatus(commandPath, Status::Failure);
             return std::nullopt;
         }
@@ -1220,6 +1295,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     }
     else
     {
+        LogErrorOnFailure(MutateTLSEndpointReferenceCount(accessingFabricIndex, transportOptions.TLSEndpointID, -1));
         handler.AddStatus(commandPath, retStatus);
     }
 
@@ -1331,6 +1407,37 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
         return validateStreamStatus;
     }
 
+    auto previousTransportOptionsPtr = transportConfiguration->GetTransportOptionsPtr();
+    if (previousTransportOptionsPtr == nullptr)
+    {
+        ChipLogError(Zcl, "HandleModifyPushTransport[ep=%d]: Transport options missing for connection %u", mEndpointId,
+                     connectionID);
+        handler.AddStatus(commandPath, Status::NotFound);
+        return std::nullopt;
+    }
+
+    // The transport must use a valid TLS endpoint, as at allocation, and its certificates are loaded again because the
+    // endpoint, or the certificates provisioned on it, may have changed since then.
+    if (LoadTLSEndpointCertificates(fabricIndex, transportOptions.TLSEndpointID) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleModifyPushTransport[ep=%d]: TLSEndpointID %u of command data is not valid/Provisioned",
+                     mEndpointId, transportOptions.TLSEndpointID);
+        TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
+        return std::nullopt;
+    }
+
+    // A changed TLSEndpointID references the new endpoint first. Once the outcome is known, the endpoint the transport no
+    // longer uses is released: the previous one on success, the new one on failure.
+    uint16_t previousTLSEndpointID = previousTransportOptionsPtr->TLSEndpointID;
+    bool tlsEndpointChanged        = transportOptions.TLSEndpointID != previousTLSEndpointID;
+    if (tlsEndpointChanged && MutateTLSEndpointReferenceCount(fabricIndex, transportOptions.TLSEndpointID, 1) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleModifyPushTransport[ep=%d]: TLSEndpointID %u of command data is not valid/Provisioned",
+                     mEndpointId, transportOptions.TLSEndpointID);
+        TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
+        return std::nullopt;
+    }
+
     // Call the delegate
     status = mDelegate->ModifyPushTransport(connectionID, *transportOptionsPtr);
 
@@ -1350,6 +1457,12 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
         {
             mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
         }
+    }
+
+    if (tlsEndpointChanged)
+    {
+        uint16_t releasedTLSEndpointID = (status == Status::Success) ? previousTLSEndpointID : transportOptions.TLSEndpointID;
+        LogErrorOnFailure(MutateTLSEndpointReferenceCount(fabricIndex, releasedTLSEndpointID, -1));
     }
 
     handler.AddStatus(commandPath, status);
