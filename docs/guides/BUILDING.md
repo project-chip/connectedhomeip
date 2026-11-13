@@ -68,6 +68,19 @@ For Darwin host example:
 Please note that in the above commands, you should replace platform1,platform2
 with the specific platform names you wish to check out.
 
+A few submodules that only some Linux builds use are not part of `linux`. Add
+the matching name to check them out:
+
+-   `cirque`: Cirque tests and the OpenThread Border Router agent
+    (`third_party/ot-br-posix`)
+-   `imx`: i.MX builds with the secure enclave (the `-ele` modifier)
+-   `otns`: host builds with the `-otns` modifier, for the OpenThread Network
+    Simulator
+
+```shell
+./scripts/checkout_submodules.py --shallow --platform linux cirque
+```
+
 ## Updating Matter code
 
 If you already have the Matter code checked out, run the following commands to

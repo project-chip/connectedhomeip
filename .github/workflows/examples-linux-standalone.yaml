@@ -46,7 +46,7 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: linux
+                platform: linux otns
 
             - name: Build standalone tools
               run: |
