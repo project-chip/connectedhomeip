@@ -287,7 +287,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
     int32_t error;
     uint32_t wifi_security = 0;
 
-    error = matter_wifi_get_security_type(WLAN0_IDX, &wifi_security);
+    error = matter_wifi_sta_get_security_type(&wifi_security);
     err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
     if (err != CHIP_NO_ERROR)
     {
@@ -326,7 +326,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
     int32_t error;
     unsigned char channel;
 
-    error = matter_wifi_get_wifi_channel_number(WLAN0_IDX, &channel);
+    error = matter_wifi_sta_get_channel_number(&channel);
     err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
     if (err != CHIP_NO_ERROR)
         channelNumber = 0;
@@ -341,7 +341,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
     CHIP_ERROR err;
     int32_t error;
 
-    error = matter_wifi_get_rssi((int *) &rssi);
+    error = matter_wifi_sta_get_rssi((int *) &rssi);
     err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
 
     if (err != CHIP_NO_ERROR)
