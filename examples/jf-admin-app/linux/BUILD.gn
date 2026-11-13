@@ -38,17 +38,18 @@ executable("jfa-app") {
   sources = [
     "AppOptions.cpp",
     "AppOptions.h",
-    "JFADatastoreSync.cpp",
-    "JFAManager.cpp",
+    "JFAManagerLinux.cpp",
+    "JFAPlatformLinux.cpp",
     "include/CHIPProjectAppConfig.h",
-    "include/JFADatastoreSync.h",
-    "include/JFAManager.h",
-    "include/JFARpc.h",
+    "include/JFAManagerLinux.h",
     "main.cpp",
   ]
 
   deps = [
     "${chip_root}/examples/jf-admin-app/jfa-common",
+    "${chip_root}/examples/jf-admin-app/jfa-common:jfa-datastore-sync",
+    "${chip_root}/examples/jf-admin-app/jfa-common:jfa-init",
+    "${chip_root}/examples/jf-admin-app/jfa-common:jfa-manager-base",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",
@@ -65,7 +66,7 @@ executable("jfa-app") {
     sources += [
       "${chip_root}/examples/platform/linux/Rpc.cpp",
       "${chip_root}/examples/platform/linux/system_rpc_server.cc",
-      "rpc/RpcServer.cpp",
+      "rpc/JFAResponseSignalPosix.cpp",
     ]
 
     deps += [
@@ -84,6 +85,7 @@ executable("jfa-app") {
       "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:joint_fabric_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:rpc_services",
+      "${chip_root}/examples/jf-admin-app/jfa-common:jfa-rpc-server",
     ]
 
     deps += pw_build_LINK_DEPS

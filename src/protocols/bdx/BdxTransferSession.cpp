@@ -215,14 +215,12 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
 
     if (mRole == TransferRole::kSender)
     {
-        mStartOffset    = acceptData.StartOffset;
         mTransferLength = acceptData.Length;
 
         ReceiveAccept acceptMsg;
         acceptMsg.TransferCtlFlags.Set(acceptData.ControlMode);
         acceptMsg.Version        = mTransferVersion;
         acceptMsg.MaxBlockSize   = acceptData.MaxBlockSize;
-        acceptMsg.StartOffset    = acceptData.StartOffset;
         acceptMsg.Length         = acceptData.Length;
         acceptMsg.Metadata       = acceptData.Metadata;
         acceptMsg.MetadataLength = acceptData.MetadataLength;
@@ -329,8 +327,10 @@ CHIP_ERROR TransferSession::PrepareBlock(const BlockData & inData)
     VerifyOrReturnError(mPendingOutput == OutputEventType::kNone, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!mAwaitingResponse, CHIP_ERROR_INCORRECT_STATE);
 
-    // Verify non-zero data is provided and is no longer than MaxBlockSize (BlockEOF may contain 0 length data)
-    VerifyOrReturnError((inData.Data != nullptr) && (inData.Length <= mTransferMaxBlockSize), CHIP_ERROR_INVALID_ARGUMENT);
+    // Only a BlockEOF may be empty, and only an empty block may have null data. No block may exceed MaxBlockSize.
+    VerifyOrReturnError(inData.Length > 0 || inData.IsEof, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((inData.Data != nullptr || inData.Length == 0) && (inData.Length <= mTransferMaxBlockSize),
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     DataBlock blockMsg;
     blockMsg.BlockCounter = mNextBlockNum;
@@ -596,14 +596,12 @@ void TransferSession::HandleReceiveAccept(System::PacketBufferHandle msgData)
     VerifyOrReturn(rcvAcceptMsg.MaxBlockSize <= mMaxSupportedBlockSize, PrepareStatusReport(StatusCode::kBadMessageContents));
 
     mTransferMaxBlockSize = rcvAcceptMsg.MaxBlockSize;
-    mStartOffset          = rcvAcceptMsg.StartOffset;
     mTransferLength       = rcvAcceptMsg.Length;
 
     // Note: if VerifyProposedMode() returned with no error, then mControlMode must match the proposed mode in the ReceiveAccept
     // message
     mTransferAcceptData.ControlMode    = mControlMode;
     mTransferAcceptData.MaxBlockSize   = rcvAcceptMsg.MaxBlockSize;
-    mTransferAcceptData.StartOffset    = rcvAcceptMsg.StartOffset;
     mTransferAcceptData.Length         = rcvAcceptMsg.Length;
     mTransferAcceptData.Metadata       = rcvAcceptMsg.Metadata;
     mTransferAcceptData.MetadataLength = rcvAcceptMsg.MetadataLength;
@@ -640,7 +638,6 @@ void TransferSession::HandleSendAccept(System::PacketBufferHandle msgData)
 
     mTransferAcceptData.ControlMode    = mControlMode;
     mTransferAcceptData.MaxBlockSize   = sendAcceptMsg.MaxBlockSize;
-    mTransferAcceptData.StartOffset    = mStartOffset;    // Not included in SendAccept msg, so use member
     mTransferAcceptData.Length         = mTransferLength; // Not included in SendAccept msg, so use member
     mTransferAcceptData.Metadata       = sendAcceptMsg.Metadata;
     mTransferAcceptData.MetadataLength = sendAcceptMsg.MetadataLength;

@@ -252,8 +252,13 @@ public:
      * CancelBleIncompleteConnection will ensure that no more success/error
      * callbacks will happen until the next call to one of the NewBleConnection*
      * APIs.
+     * If platform cancellation fails, single-result requests remain busy until
+     * their terminal callback; their caller callbacks are still detached.
+     * The layer and its delegates must outlive unfinished platform requests.
      */
     CHIP_ERROR CancelBleIncompleteConnection();
+    /// Detach and cancel only if appState owns the pending single-result request.
+    CHIP_ERROR CancelBleIncompleteConnection(void * appState);
     CHIP_ERROR NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState = nullptr,
                                                BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
                                                BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError);
@@ -282,6 +287,9 @@ public:
                                                 BleConnectionDelegate::OnConnectionErrorFunct onError);
 
     CHIP_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
+
+    /// Close a connection that is not associated with a BLE endpoint.
+    CHIP_ERROR CloseUnclaimedConnection(BLE_CONNECTION_OBJECT connObj);
 
     void CloseAllBleConnections();
     void CloseBleConnection(BLE_CONNECTION_OBJECT connObj);
@@ -345,12 +353,19 @@ public:
     void HandleConnectionError(BLE_CONNECTION_OBJECT connObj, CHIP_ERROR err);
 
 private:
+    CHIP_ERROR CancelIncompleteConnection(bool pendingOnly);
+
     // Private data members:
 
     BleConnectionDelegate * mConnectionDelegate;
     BlePlatformDelegate * mPlatformDelegate;
     BleApplicationDelegate * mApplicationDelegate;
     chip::System::Layer * mSystemLayer;
+    // Caller callback context (or this for null), also the pending single-result request's cancellation owner.
+    void * mConnectionAppState                                           = nullptr;
+    BleConnectionDelegate::OnConnectionCompleteFunct mConnectionComplete = nullptr;
+    BleConnectionDelegate::OnConnectionErrorFunct mConnectionError       = nullptr;
+    bool mConnectionPending                                              = false;
 
     // Private functions:
     void HandleAckReceived(BLE_CONNECTION_OBJECT connObj);
@@ -360,6 +375,8 @@ private:
 
     static void OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj);
     static void OnConnectionError(void * appState, CHIP_ERROR err);
+    static void OnNewConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj);
+    static void OnNewConnectionError(void * appState, CHIP_ERROR err);
 };
 } /* namespace Ble */
 } /* namespace chip */

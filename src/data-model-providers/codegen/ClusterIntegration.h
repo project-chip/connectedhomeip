@@ -147,4 +147,42 @@ public:
     static ServerClusterInterface * FindClusterOnEndpoint(const FindClusterOnEndpointOptions & options, Delegate & delegate);
 };
 
+/// Implementation of `CodegenRegisteredServerCluster` that does not depend on the cluster type.
+class CodegenRegisteredServerClusterBase
+{
+protected:
+    static CHIP_ERROR Register(ServerClusterRegistration & registration);
+    static void Unregister(ServerClusterRegistration & registration);
+};
+
+/// A cluster created by the application, together with its registration with the codegen data
+/// model provider. The cluster is registered via `Register()` and unregistered when destroyed.
+///
+/// This is for clusters whose lifetime the application manages, as opposed to clusters created
+/// via `CodegenClusterIntegration::RegisterServer` from ember callbacks.
+template <typename SERVER_CLUSTER>
+class CodegenRegisteredServerCluster : private RegisteredServerCluster<SERVER_CLUSTER>, private CodegenRegisteredServerClusterBase
+{
+public:
+    using RegisteredServerCluster<SERVER_CLUSTER>::RegisteredServerCluster;
+    using RegisteredServerCluster<SERVER_CLUSTER>::Cluster;
+    ~CodegenRegisteredServerCluster() { Unregister(); }
+
+    /// Registers the cluster with the codegen data model provider.
+    ///
+    /// Fails with CHIP_ERROR_INVALID_ARGUMENT if the ember configuration does not contain an
+    /// enabled server instance of the cluster for each of its paths (endpoints must already be
+    /// configured and enabled when Register() is called). Errors are logged.
+    CHIP_ERROR Register() { return CodegenRegisteredServerClusterBase::Register(this->Registration()); }
+
+    /// Unregisters the cluster. Does nothing if the cluster is not registered.
+    ///
+    /// This remains safe to call after the codegen data model provider has been destroyed during
+    /// static destruction, because the provider unregisters all clusters when it is destroyed.
+    void Unregister() { CodegenRegisteredServerClusterBase::Unregister(this->Registration()); }
+
+    /// Returns true if the cluster is registered with the codegen data model provider.
+    bool IsRegistered() const { return this->Registration().IsRegistered(); }
+};
+
 } // namespace chip::app

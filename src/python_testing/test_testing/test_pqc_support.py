@@ -41,6 +41,7 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
 from mobly import signals
 
+from matter.interaction_model import InteractionModelError, Status
 from matter.tlv import TLVWriter
 
 _CHIP_ROOT = Path(__file__).resolve().parents[3]
@@ -48,15 +49,16 @@ sys.path.append(str(_CHIP_ROOT / "src/python_testing"))
 
 from support_modules.pqc_support import (AttestationCertType, AttestationCryptoProfile,  # noqa: E402
                                          AttestationCryptoProfileBitmap, CertificateChainType, CertificationType,
-                                         assert_attestation_certificate_format, assert_attestation_nonce, assert_authorized_paa,
-                                         assert_certificate_currently_valid, assert_dac_and_pai_ids, assert_profile_advertised,
-                                         certificate_algorithms_for_oids, find_issuing_paa, is_ml_dsa_supported, is_pqc_profile,
-                                         kAttestationChallengeLength, kAttestationNonceLength, kCertificateSegmentSize,
-                                         kMaxCertificateDocumentSize, kOidEcdsaWithSha256, kOidEcPublicKey, kOidMatterPid,
-                                         kOidMatterVid, kOidMlDsa44, kOidMlDsa65, parse_attestation_elements, parse_certificate,
-                                         profile_mask, retrieve_segmented_document, select_strongest_profile,
-                                         validate_attestation_chain, validate_certification_declaration,
-                                         verify_attestation_signature, verify_certificate_signature)
+                                         CryptoProfileChain, assert_attestation_certificate_format, assert_attestation_nonce,
+                                         assert_authorized_paa, assert_certificate_currently_valid, assert_dac_and_pai_ids,
+                                         assert_profile_advertised, candidate_attestation_chains, certificate_algorithms_for_oids,
+                                         find_issuing_paa, is_ml_dsa_supported, is_pqc_profile, kAttestationChallengeLength,
+                                         kAttestationNonceLength, kCertificateSegmentSize, kMaxCertificateDocumentSize,
+                                         kOidEcdsaWithSha256, kOidEcPublicKey, kOidMatterPid, kOidMatterVid, kOidMlDsa44,
+                                         kOidMlDsa65, parse_attestation_elements, parse_certificate, profile_mask,
+                                         request_first_available_pai, retrieve_segmented_document, validate_attestation_chain,
+                                         validate_certification_declaration, verify_attestation_signature,
+                                         verify_certificate_signature)
 
 _ML_DSA_VECTORS = _CHIP_ROOT / "src/crypto/tests/MlDsaAttestationChain_test_vectors.h"
 _DEV_VECTOR = (_CHIP_ROOT
@@ -129,25 +131,34 @@ class FixtureTestCase(unittest.TestCase):
         return parse_certificate(_LEGACY_PAA.read_bytes(), "legacy PAA")
 
 
+def _pairs(chains) -> list[tuple]:
+    return [(chain.PAACrypto, chain.PAICrypto) for chain in chains]
+
+
 class TestProfileSelection(unittest.TestCase):
-    def test_selects_ml_dsa_65_over_weaker_profiles(self):
-        bitmap = (AttestationCryptoProfileBitmap.kSupportsEcdsaMatterLegacy
-                  | AttestationCryptoProfileBitmap.kSupportsMlDsa44
-                  | AttestationCryptoProfileBitmap.kSupportsMlDsa65)
-        self.assertEqual(select_strongest_profile(int(bitmap), "PAA"), AttestationCryptoProfile.kMlDsa65)
+    def test_orders_candidates_by_paa_then_pai_strength(self):
+        legacy, ml_dsa_44, ml_dsa_65 = (AttestationCryptoProfile.kEcdsaMatterLegacy, AttestationCryptoProfile.kMlDsa44,
+                                        AttestationCryptoProfile.kMlDsa65)
+        every_profile = int(AttestationCryptoProfileBitmap.kSupportsEcdsaMatterLegacy
+                            | AttestationCryptoProfileBitmap.kSupportsMlDsa44
+                            | AttestationCryptoProfileBitmap.kSupportsMlDsa65)
+        chains = candidate_attestation_chains(every_profile, every_profile)
+        self.assertEqual(_pairs(chains), [(ml_dsa_65, ml_dsa_65), (ml_dsa_65, ml_dsa_44), (ml_dsa_65, legacy),
+                                          (ml_dsa_44, ml_dsa_44), (ml_dsa_44, legacy), (legacy, legacy)])
+        self.assertTrue(all(chain.DACCrypto == legacy for chain in chains))
 
-    def test_selects_ml_dsa_44_when_65_is_absent(self):
-        bitmap = (AttestationCryptoProfileBitmap.kSupportsEcdsaMatterLegacy
-                  | AttestationCryptoProfileBitmap.kSupportsMlDsa44)
-        self.assertEqual(select_strongest_profile(int(bitmap), "PAI"), AttestationCryptoProfile.kMlDsa44)
+    def test_never_pairs_a_pai_stronger_than_its_paa(self):
+        paa = int(AttestationCryptoProfileBitmap.kSupportsMlDsa44)
+        pai = int(AttestationCryptoProfileBitmap.kSupportsMlDsa65 | AttestationCryptoProfileBitmap.kSupportsEcdsaMatterLegacy)
+        self.assertEqual(_pairs(candidate_attestation_chains(paa, pai)),
+                         [(AttestationCryptoProfile.kMlDsa44, AttestationCryptoProfile.kEcdsaMatterLegacy)])
 
-    def test_selects_legacy_when_it_is_the_only_profile(self):
-        bitmap = AttestationCryptoProfileBitmap.kSupportsEcdsaMatterLegacy
-        self.assertEqual(select_strongest_profile(int(bitmap), "DAC"), AttestationCryptoProfile.kEcdsaMatterLegacy)
-
-    def test_empty_bitmap_fails(self):
+    def test_fails_when_no_valid_pairing_is_advertised(self):
         with self.assertRaises(signals.TestFailure):
-            select_strongest_profile(0, "PAA")
+            candidate_attestation_chains(int(AttestationCryptoProfileBitmap.kSupportsMlDsa44),
+                                         int(AttestationCryptoProfileBitmap.kSupportsMlDsa65))
+        with self.assertRaises(signals.TestFailure):
+            candidate_attestation_chains(0, int(AttestationCryptoProfileBitmap.kSupportsEcdsaMatterLegacy))
 
     def test_profile_mask_matches_the_generated_bitmap(self):
         self.assertEqual(profile_mask(AttestationCryptoProfile.kEcdsaMatterLegacy), 0x01)
@@ -431,10 +442,53 @@ class TestPaaResolution(FixtureTestCase):
                              AttestationCryptoProfile.kEcdsaMatterLegacy, "legacy")
 
 
+@_kNeedsMlDsa
+class TestChainFallback(unittest.TestCase):
+    """The DUT holds an ML-DSA-65 PAA with only a P-256 PAI, while also advertising an ML-DSA-44 PAI."""
+
+    def setUp(self):
+        paa = int(AttestationCryptoProfileBitmap.kSupportsMlDsa65 | AttestationCryptoProfileBitmap.kSupportsMlDsa44)
+        pai = int(AttestationCryptoProfileBitmap.kSupportsMlDsa44 | AttestationCryptoProfileBitmap.kSupportsEcdsaMatterLegacy)
+        self.candidates = candidate_attestation_chains(paa, pai)
+        self.held = (AttestationCryptoProfile.kMlDsa65, AttestationCryptoProfile.kEcdsaMatterLegacy)
+        self.source = _FakeSegmentSource(b"\xAA" * 1200)
+        self.requests = []
+
+    def _send(self, rejection_status=Status.InvalidCommand):
+        async def send(certificate_type, crypto_profile, segment_id, max_segment_size):
+            self.requests.append((crypto_profile.PAACrypto, crypto_profile.PAICrypto))
+            if (crypto_profile.PAACrypto, crypto_profile.PAICrypto) != self.held:
+                raise InteractionModelError(rejection_status)
+            return await self.source(certificate_type, crypto_profile, segment_id, max_segment_size)
+        return send
+
+    def test_falls_back_to_the_next_pairing_on_invalid_command(self):
+        chain, response = asyncio.run(request_first_available_pai(self._send(), self.candidates, kCertificateSegmentSize))
+
+        self.assertEqual((chain.PAACrypto, chain.PAICrypto), self.held)
+        self.assertEqual(self.requests, [(AttestationCryptoProfile.kMlDsa65, AttestationCryptoProfile.kMlDsa44), self.held])
+        self.assertEqual(response.nextSegmentID, 1)
+        self.assertEqual(self.source.requests, [(CertificateChainType.kPAICertificate, chain, 0, kCertificateSegmentSize)])
+
+    def test_propagates_a_status_other_than_invalid_command(self):
+        with self.assertRaises(InteractionModelError):
+            asyncio.run(request_first_available_pai(self._send(Status.Failure), self.candidates, kCertificateSegmentSize))
+        self.assertEqual(len(self.requests), 1)
+
+    def test_fails_when_every_pairing_is_rejected(self):
+        self.held = None
+        with self.assertRaisesRegex(signals.TestFailure, "every advertised PAA/PAI pairing"):
+            asyncio.run(request_first_available_pai(self._send(), self.candidates, kCertificateSegmentSize))
+        self.assertEqual(self.requests, _pairs(self.candidates))
+
+
 class TestSegmentedRetrieval(unittest.TestCase):
+    def setUp(self):
+        self.chain = CryptoProfileChain(PAACrypto=2, PAICrypto=1, DACCrypto=0)
+
     def _retrieve(self, source, document_name="PAI", max_segment_size=kCertificateSegmentSize):
         return asyncio.run(retrieve_segmented_document(
-            source, CertificateChainType.kPAICertificate, AttestationCryptoProfile.kMlDsa65, document_name,
+            source, CertificateChainType.kPAICertificate, self.chain, document_name,
             max_segment_size))
 
     def test_reassembles_a_multi_segment_document(self):
@@ -448,25 +502,24 @@ class TestSegmentedRetrieval(unittest.TestCase):
         # SegmentIDs must be requested in order starting at zero.
         self.assertEqual([request[2] for request in source.requests], [0, 1, 2, 3, 4])
         for certificate_type, crypto_profile, _, _ in source.requests:
-            # Both enum values are 2; identity also catches swapped argument types.
             self.assertIs(certificate_type, CertificateChainType.kPAICertificate)
-            self.assertIs(crypto_profile, AttestationCryptoProfile.kMlDsa65)
+            self.assertIs(crypto_profile, self.chain)
 
     def test_continues_from_an_already_received_first_segment(self):
         document = b"\xAA" * 1200
         source = _FakeSegmentSource(document)
         first_response = asyncio.run(source(
-            CertificateChainType.kPAICertificate, AttestationCryptoProfile.kMlDsa65, 0, kCertificateSegmentSize))
+            CertificateChainType.kPAICertificate, self.chain, 0, kCertificateSegmentSize))
 
         result = asyncio.run(retrieve_segmented_document(
-            source, CertificateChainType.kPAICertificate, AttestationCryptoProfile.kMlDsa65, "PAI",
+            source, CertificateChainType.kPAICertificate, self.chain, "PAI",
             first_response=first_response))
 
         self.assertEqual(result.der, document)
         self.assertEqual([request[2] for request in source.requests], [0, 1])
         for certificate_type, crypto_profile, _, _ in source.requests:
             self.assertIs(certificate_type, CertificateChainType.kPAICertificate)
-            self.assertIs(crypto_profile, AttestationCryptoProfile.kMlDsa65)
+            self.assertIs(crypto_profile, self.chain)
 
     def test_returns_a_single_segment_document_without_further_requests(self):
         document = b"\xAA" * 400

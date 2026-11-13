@@ -95,15 +95,16 @@ class TC_SC_5_1(MatterTestCommissionedDevice):
             TestStep("1", "TH writes the ACL attribute in the Access Control cluster to add Operate privileges for group 0x0103 and maintain the current administrative privileges for the TH."),
             TestStep("2a", "TH sends KeySetWrite command with a key that is NOT installed on the TH (to test key update in next step)."),
             TestStep("2b", "TH sends KeySetWrite command with a key that is pre-installed on the TH."),
+            TestStep("2c", "If Groupcast is not adopted, skip this step. Otherwise, TH writes GroupKeyMap with GroupId 0x0103 and GroupKeySetID 0x01a3 and expects INVALID_IN_STATE."),
             TestStep("3", "If Groupcast cluster is enabled on the RootNode endpoint, skip to step 7. Otherwise, TH binds GroupId 0x0103 with GroupKeySetID 0x01a3 in the GroupKeyMap attribute."),
             TestStep("4", "TH sends RemoveAllGroups command to the DUT on the current endpoint under test."),
             TestStep("5", "TH sends AddGroup Command to DUT on the current endpoint under test with GroupID 0x0103."),
             TestStep("6a", "TH sends ViewGroup command with GroupID 0x0103 (GroupNames supported)."),
             TestStep("6b", "TH sends ViewGroup command with GroupID 0x0103 (GroupNames not supported)."),
             TestStep("7", "If Groupcast NOT enabled, skip to step 10. TH sends LeaveGroup(groupID=0) to Groupcast cluster on EP0."),
-            TestStep("8a", "TH sends JoinGroup command to Groupcast cluster on EP0 with GroupID 0x0103, Endpoints, KeySetID 0x01a3."),
+            TestStep("8a", "TH sends JoinGroup on EP0 with GroupID 0x0103 and KeySetID 0x01a3. Endpoints is the current endpoint under test when the Listener feature is enabled, otherwise an empty list."),
             TestStep("8b", "TH reads Membership attribute from Groupcast cluster on EP0."),
-            TestStep("9a", "TH sends JoinGroup with a new GroupID 0x0104 and a new KeySetID 0x01a4 carrying a 16-byte Key (auto-creates a key set via Groupcast)."),
+            TestStep("9a", "TH sends JoinGroup with GroupID 0x0104 and KeySetID 0x01a4 carrying a 16-byte Key. Endpoints is the current endpoint under test when the Listener feature is enabled, otherwise an empty list."),
             TestStep("9b", "TH reads GroupKeyMap and verifies the Groupcast-created GroupID 0x0104 -> KeySetID 0x01a4 mapping."),
             TestStep("9c", "TH sends KeySetRead for GroupKeySetID 0x01a4 and verifies the auto-created GroupKeySet fields."),
             TestStep("9d", "TH cleans up by sending LeaveGroup(0x0104) and KeySetRemove(0x01a4)."),
@@ -200,7 +201,20 @@ class TC_SC_5_1(MatterTestCommissionedDevice):
             epochStartTime2=18446744073709551614)
         await dev_ctrl.SendCommand(commissioner_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(real_key_set))
 
+        # Step 2c: GroupKeyMap writes are rejected once Groupcast is adopted.
+        if not groupcast_adopted:
+            self.skip_step("2c")
+        else:
+            self.step("2c")
+            mapping = [Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
+                groupId=0x0103, groupKeySetID=0x01a3, fabricIndex=1)]
+            result = await dev_ctrl.WriteAttribute(
+                commissioner_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
+            asserts.assert_equal(result[0].Status, Status.InvalidInState,
+                                 "GroupKeyMap write should fail with INVALID_IN_STATE when Groupcast is adopted")
+
         # Step 3: GroupKeyMap binding (skip if Groupcast)
+        listener_enabled = False
         if groupcast_enabled:
             self.mark_step_range_skipped("3", "6b")
         else:
@@ -247,8 +261,8 @@ class TC_SC_5_1(MatterTestCommissionedDevice):
 
             # Step 8a: JoinGroup
             self.step("8a")
-            ln_enabled, _, _ = await get_feature_map(self)
-            join_endpoints = [groups_endpoint] if ln_enabled else []
+            listener_enabled, _, _ = await get_feature_map(self)
+            join_endpoints = [groups_endpoint] if listener_enabled else []
             await dev_ctrl.SendCommand(commissioner_node_id, 0, Clusters.Groupcast.Commands.JoinGroup(
                 groupID=0x0103, endpoints=join_endpoints, keySetID=0x01a3))
 
@@ -339,9 +353,16 @@ class TC_SC_5_1(MatterTestCommissionedDevice):
             self.step("12b")
             group_table = await self.read_single_attribute_check_success(
                 cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0)
-            if groupcast_adopted:
-                # When Groupcast Feature is set on the group key management cluster, the group table shall return empty
+            if groupcast_adopted or (groupcast_enabled and not listener_enabled):
+                # Adopted devices report an empty GroupTable. A Sender-only JoinGroup has no
+                # endpoints, and GroupTable must not contain an entry with an empty Endpoints list.
                 asserts.assert_equal(group_table, [], "GroupTable should be empty")
+            elif groupcast_enabled:
+                asserts.assert_equal(len(group_table), 1, "GroupTable should have 1 entry")
+                asserts.assert_equal(group_table[0].groupId, 0x0103, "GroupTable groupId mismatch")
+                asserts.assert_equal(group_table[0].endpoints, [groups_endpoint], "GroupTable endpoints mismatch")
+                asserts.assert_true(group_table[0].groupName is None,
+                                    "GroupName should be absent for a group created by JoinGroup")
             else:
                 asserts.assert_equal(len(group_table), 1, "GroupTable should have 1 entry")
                 asserts.assert_equal(group_table[0].groupId, 0x0103, "GroupTable groupId mismatch")

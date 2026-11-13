@@ -820,6 +820,11 @@ exit:
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 void NetworkCommissioningCluster::DisconnectLingeringConnection()
 {
+    // Only a wireless (Wi-Fi or Thread) instance can have a lingering
+    // connection to disconnect. An Ethernet instance has no wireless
+    // driver to disconnect through.
+    VerifyOrReturn(mpWirelessDriver != nullptr);
+
     bool haveConnectedNetwork = false;
     EnumerateAndRelease(mpBaseDriver->GetNetworks(), [&](const Network & network) {
         if (network.connected)

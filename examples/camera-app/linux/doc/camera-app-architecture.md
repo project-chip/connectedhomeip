@@ -39,7 +39,7 @@ other platforms by simply providing a new implementation of the
 -   **Responsibilities:**
     -   Initializes and configures the Matter clusters for camera functionality
         (e.g., `CameraAVStreamManagementCluster`,
-        `WebRTCTransportProviderCluster`, `ChimeServer`).
+        `WebRTCTransportProviderCluster`).
     -   Fetches camera capabilities and settings from the
         `CameraDeviceInterface` to configure the clusters.
     -   Manages the lifecycle of the cluster servers.
@@ -193,18 +193,6 @@ camera-app.
         restart them to limit maximum session duration, generating new session
         IDs.
 
--   **`ChimeManager`:**
-
-    -   **SDK Interface:** `chip::app::Clusters::Chime::Delegate`
-    -   **Responsibilities:** Implements the logic for the Chime cluster.
-    -   **Sound Management:** Provides a list of available chime sounds
-        (`GetChimeSoundByIndex`).
-    -   **Playback:** The `PlayChimeSound` command handler checks if the chime
-        is enabled and logs the intent to play the selected sound. The current
-        Linux example does not include actual audio playback for chimes.
-    -   **Configuration:** Interacts with the `ChimeServer` to get the enabled
-        state and selected chime ID.
-
 -   **`ZoneManager`:**
 
     -   **SDK Interface:** `chip::app::Clusters::ZoneManagement::Delegate`
@@ -269,7 +257,6 @@ graph TD
         CameraDevice -- owns --> CameraAVStreamManager
         CameraDevice -- owns --> WebRTCProviderManager
         CameraDevice -- owns --> PushAvStreamTransportManager
-        CameraDevice -- owns --> ChimeManager
         CameraDevice -- owns --> ZoneManager
 
         WebRTCProviderManager --> DefaultMediaController
@@ -280,7 +267,6 @@ graph TD
         CameraAVStreamManagementCluster
         WebRTCTransportProviderCluster
         PushAvStreamTransportServer
-        ChimeServer
         ZoneMgmtServer
     end
 
@@ -291,13 +277,11 @@ graph TD
     CameraApp --> CameraAVStreamManagementCluster
     CameraApp --> WebRTCTransportProviderCluster
     CameraApp --> PushAvStreamTransportServer
-    CameraApp --> ChimeServer
     CameraApp --> ZoneMgmtServer
 
     CameraAVStreamManagementCluster -- uses delegate --> CameraAVStreamManager
     WebRTCTransportProviderCluster -- uses delegate --> WebRTCProviderManager
     PushAvStreamTransportServer -- uses delegate --> PushAvStreamTransportManager
-    ChimeServer -- uses delegate --> ChimeManager
     ZoneMgmtServer -- uses delegate --> ZoneManager
 
     CameraAVStreamManager -- calls HAL --> CameraDevice

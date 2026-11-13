@@ -88,6 +88,9 @@ static NSString * kUpdatedSoftwareVersionString_10 = @"10.0";
 @property (nonatomic, copy) NSString * downloadFilePath;
 
 - (instancetype)initWithPayload:(NSString *)payload testcase:(MTROTAProviderTests *)testcase;
+- (instancetype)initWithPayload:(NSString *)payload
+                       testcase:(MTROTAProviderTests *)testcase
+                 extraArguments:(NSArray<NSString *> *)extraArguments;
 - (MTRDevice *)commissionWithNodeID:(NSNumber *)nodeID;
 @end
 
@@ -103,14 +106,21 @@ static NSString * kUpdatedSoftwareVersionString_10 = @"10.0";
 
 - (instancetype)initWithPayload:(NSString *)payload testcase:(MTROTAProviderTests *)testcase
 {
+    return [self initWithPayload:payload testcase:testcase extraArguments:@[]];
+}
+
+- (instancetype)initWithPayload:(NSString *)payload
+                       testcase:(MTROTAProviderTests *)testcase
+                 extraArguments:(NSArray<NSString *> *)extraArguments
+{
     __auto_type * downloadFilePath = [NSString stringWithFormat:@"/tmp/chip-ota-requestor-downloaded-image%u", [MTROTAProviderTests nextUniqueIndex]];
-    __auto_type * extraArguments = @[
+    __auto_type * arguments = [@[
         @"--otaDownloadPath",
         downloadFilePath,
         @"--autoApplyImage",
-    ];
+    ] arrayByAddingObjectsFromArray:extraArguments];
 
-    BOOL started = [testcase startAppWithName:@"ota-requestor" arguments:extraArguments payload:payload];
+    BOOL started = [testcase startAppWithName:@"ota-requestor" arguments:arguments payload:payload];
     if (!started) {
         return nil;
     }
@@ -343,6 +353,19 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
                    applyUpdateAction:(MTROTASoftwareUpdateProviderApplyUpdateAction)applyUpdateAction
                             testcase:(XCTestCase *)testcase;
 
+/**
+ * bytesToSkipAfterFirstBlock must be the requestor's --bdxSkipAfterFirstBlock
+ * value, or 0 if the requestor was started without that argument.
+ */
+- (instancetype)initWithRawImagePath:(NSString *)rawImagePath
+            otaImageDownloadFilePath:(NSString *)otaImageDownloadFilePath
+                              nodeID:(NSNumber *)nodeID
+                     softwareVersion:(NSNumber *)softwareVersion
+               softwareVersionString:(NSString *)softwareVersionString
+                   applyUpdateAction:(MTROTASoftwareUpdateProviderApplyUpdateAction)applyUpdateAction
+          bytesToSkipAfterFirstBlock:(uint32_t)bytesToSkipAfterFirstBlock
+                            testcase:(XCTestCase *)testcase;
+
 @property (nonatomic, readonly) XCTestExpectation * queryExpectation;
 @property (nonatomic, readonly) XCTestExpectation * bdxBeginExpectation;
 @property (nonatomic, readonly) XCTestExpectation * bdxQueryExpectation;
@@ -359,6 +382,25 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
                      softwareVersion:(NSNumber *)softwareVersion
                softwareVersionString:(NSString *)softwareVersionString
                    applyUpdateAction:(MTROTASoftwareUpdateProviderApplyUpdateAction)applyUpdateAction
+                            testcase:(MTROTAProviderTests *)testcase
+{
+    return [self initWithRawImagePath:rawImagePath
+             otaImageDownloadFilePath:otaImageDownloadFilePath
+                               nodeID:nodeID
+                      softwareVersion:softwareVersion
+                softwareVersionString:softwareVersionString
+                    applyUpdateAction:applyUpdateAction
+           bytesToSkipAfterFirstBlock:0
+                             testcase:testcase];
+}
+
+- (instancetype)initWithRawImagePath:(NSString *)rawImagePath
+            otaImageDownloadFilePath:(NSString *)otaImageDownloadFilePath
+                              nodeID:(NSNumber *)nodeID
+                     softwareVersion:(NSNumber *)softwareVersion
+               softwareVersionString:(NSString *)softwareVersionString
+                   applyUpdateAction:(MTROTASoftwareUpdateProviderApplyUpdateAction)applyUpdateAction
+          bytesToSkipAfterFirstBlock:(uint32_t)bytesToSkipAfterFirstBlock
                             testcase:(MTROTAProviderTests *)testcase
 {
     if (!(self = [super init])) {
@@ -378,6 +420,8 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
 
     __block NSFileHandle * readHandle;
     __block uint64_t imageSize;
+    __block uint64_t fileOffset;
+    __block uint64_t transferBlockSize;
     __block uint32_t lastBlockIndex = UINT32_MAX;
 
     sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
@@ -399,7 +443,9 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
         XCTAssertEqualObjects(nodeID, nodeID);
         XCTAssertEqual(controller, sController);
         XCTAssertEqualObjects(fileDesignator, imagePath);
+        // chip-ota-requestor-app always starts its download at offset 0.
         XCTAssertEqualObjects(offset, @(0));
+        fileOffset = offset.unsignedLongLongValue;
 
         readHandle = [NSFileHandle fileHandleForReadingAtPath:fileDesignator];
         XCTAssertNotNil(readHandle);
@@ -417,12 +463,16 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
         XCTAssertEqualObjects(nodeID, nodeID);
         XCTAssertEqual(controller, sController);
         XCTAssertEqualObjects(blockIndex, @(lastBlockIndex + 1));
-        XCTAssertEqualObjects(bytesToSkip, @(0)); // Don't expect to see skips here.
+        // --bdxSkipAfterFirstBlock makes chip-ota-requestor-app skip in its query for block 1 only.
+        XCTAssertEqualObjects(bytesToSkip, @(blockIndex.unsignedIntValue == 1 ? bytesToSkipAfterFirstBlock : 0));
         // Make sure we actually end up with multiple blocks.
         XCTAssertTrue(blockSize.unsignedLongLongValue < imageSize);
+        transferBlockSize = blockSize.unsignedLongLongValue;
 
         XCTAssertNotNil(readHandle);
-        uint64_t offset = blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
+        // A skip moves the read position for the rest of the transfer.
+        fileOffset += bytesToSkip.unsignedLongLongValue;
+        uint64_t offset = fileOffset + blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
         NSError * seekError = nil;
         [readHandle seekToOffset:offset error:&seekError];
         XCTAssertNil(seekError);
@@ -461,7 +511,20 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
         XCTAssertEqualObjects(params.updateToken, updateToken);
         XCTAssertEqualObjects(params.newVersion, softwareVersion);
 
-        XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:rawImagePath andPath:otaImageDownloadFilePath]);
+        // chip-ota-requestor-app removes the image header from the start of the first block, then writes everything it
+        // receives, so the skipped bytes, up to the end of the image, are missing from the download.
+        NSMutableData * expectedDownload = [NSMutableData dataWithContentsOfFile:rawImagePath];
+        XCTAssertNotNil(expectedDownload);
+        uint64_t headerSize = imageSize - expectedDownload.length;
+        NSUInteger skipStart = (NSUInteger) (transferBlockSize - headerSize);
+        XCTAssertLessThanOrEqual(skipStart, expectedDownload.length);
+        NSUInteger skipLength = MIN((NSUInteger) bytesToSkipAfterFirstBlock, expectedDownload.length - skipStart);
+        [expectedDownload replaceBytesInRange:NSMakeRange(skipStart, skipLength)
+                                    withBytes:NULL
+                                       length:0];
+        NSData * download = [NSData dataWithContentsOfFile:otaImageDownloadFilePath];
+        XCTAssertEqual(download.length, expectedDownload.length);
+        XCTAssertTrue([download isEqualToData:expectedDownload]);
 
         sOTAProviderDelegate.applyUpdateRequestHandler = nil;
         [sOTAProviderDelegate respondToApplyUpdateRequestWithAction:applyUpdateAction completion:completion];
@@ -939,6 +1002,67 @@ static BOOL sStackInitRan = NO;
     [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
 }
 
+- (void)test003c_ReceiveQueryImageRequestThenRejectBDXTransferWithBDXStatus
+{
+    // In this test we do the following:
+    //
+    // 1) Advertise ourselves to the device and, when it queries, claim to have an image.
+    // 2) When the device tries to start a BDX transfer, reject it with an MTRBDXErrorDomain error.
+    // 3) Check that the transfer-end callback gets that same NSError, and that no blocks are
+    //    requested (blockQueryHandler stays nil, so a BlockQuery would fail the test).
+    __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
+    __auto_type * device = [runner commissionWithNodeID:@(kDeviceId1)];
+
+    XCTestExpectation * queryExpectation = [self expectationWithDescription:@"handleQueryImageForNodeID called"];
+    XCTestExpectation * transferBeginExpectation = [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called"];
+    XCTestExpectation * transferEndExpectation = [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called"];
+
+    NSString * fakeImageURI = @"No such image, really";
+    NSError * rejectionError = [NSError errorWithDomain:MTRBDXErrorDomain code:MTRBDXErrorCodeFileDesignatorUnknown userInfo:nil];
+
+    sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        sOTAProviderDelegate.queryImageHandler = nil;
+        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+        XCTAssertIdentical(controller, sController);
+        [sOTAProviderDelegate respondAvailableWithDelay:@(0)
+                                                    uri:fakeImageURI
+                                            updateToken:[sOTAProviderDelegate generateUpdateToken]
+                                        softwareVersion:kUpdatedSoftwareVersion_5
+                                  softwareVersionString:kUpdatedSoftwareVersionString_5
+                                             completion:completion];
+        [queryExpectation fulfill];
+    };
+
+    sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
+        NSNumber * offset, MTRStatusCompletion completion) {
+        sOTAProviderDelegate.transferBeginHandler = nil;
+        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+        XCTAssertIdentical(controller, sController);
+        XCTAssertEqualObjects(fileDesignator, fakeImageURI);
+
+        sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, MTRMetrics * metrics, NSError * _Nullable error) {
+            sOTAProviderDelegate.transferEndHandler = nil;
+            XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+            XCTAssertIdentical(controller, sController);
+            XCTAssertEqualObjects(error.domain, MTRBDXErrorDomain);
+            XCTAssertEqual(error.code, MTRBDXErrorCodeFileDesignatorUnknown);
+            XCTAssertIdentical(error, rejectionError);
+            [transferEndExpectation fulfill];
+        };
+
+        [sOTAProviderDelegate respondError:rejectionError completion:completion];
+        [transferBeginExpectation fulfill];
+    };
+
+    XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
+
+    [self waitForExpectations:@[ queryExpectation, transferBeginExpectation, transferEndExpectation ]
+                      timeout:kTimeoutInSeconds
+                 enforceOrder:YES];
+    [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
+}
+
 - (void)test004_DoBDXTransferDenyUpdateRequest
 {
     // In this test we do the following:
@@ -998,6 +1122,64 @@ static BOOL sStackInitRan = NO;
     // inverted = YES, on it, this is basically a no-op, except for making
     // XCTest not complain about unwaited expectations.
     [self waitForExpectations:@[ checker.notifyUpdateAppliedExpectation ] timeout:kTimeoutInSeconds];
+}
+
+// Does a BDX transfer like test004 does, except that the requestor sends a
+// BlockQueryWithSkip that skips bytesToSkip bytes for block 1.
+- (void)doBDXTransferSkippingBytesAfterFirstBlock:(uint32_t)bytesToSkip rawImagePath:(NSString *)rawImagePath
+{
+    __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1
+                                                                    testcase:self
+                                                              extraArguments:@[ @"--bdxSkipAfterFirstBlock", @(bytesToSkip).stringValue ]];
+    __auto_type * device = [runner commissionWithNodeID:@(kDeviceId1)];
+
+    // Make every 4-byte word of the image different, so that data read from
+    // the wrong position does not match the expected data.  Make the image long
+    // enough that several blocks follow a skip shorter than the image.
+    const uint32_t rawImageWordCount = 1600;
+    NSMutableData * fakeImage = [NSMutableData dataWithCapacity:rawImageWordCount * sizeof(uint32_t)];
+    for (uint32_t i = 0; i < rawImageWordCount; ++i) {
+        [fakeImage appendBytes:&i length:sizeof(i)];
+    }
+
+    [[NSFileManager defaultManager] createFileAtPath:rawImagePath contents:fakeImage attributes:nil];
+
+    __auto_type * checker =
+        [[MTROTAProviderTransferChecker alloc] initWithRawImagePath:rawImagePath
+                                           otaImageDownloadFilePath:runner.downloadFilePath
+                                                             nodeID:@(kDeviceId1)
+                                                    softwareVersion:kUpdatedSoftwareVersion_5
+                                              softwareVersionString:kUpdatedSoftwareVersionString_5
+                                                  applyUpdateAction:MTROTASoftwareUpdateProviderApplyUpdateActionDiscontinue
+                                         bytesToSkipAfterFirstBlock:bytesToSkip
+                                                           testcase:self];
+    // The downloaded image is missing the skipped bytes, so it must not be applied.
+    checker.notifyUpdateAppliedExpectation.inverted = YES;
+
+    XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
+
+    [self waitForExpectations:@[ checker.queryExpectation, checker.bdxBeginExpectation, checker.bdxQueryExpectation ]
+                      timeout:(kTimeoutWithUpdateInSeconds) enforceOrder:YES];
+
+    [self waitForExpectations:@[ checker.bdxEndExpectation, checker.applyUpdateRequestExpectation, announceResponseExpectation ]
+                      timeout:kTimeoutInSeconds];
+
+    [self waitForExpectations:@[ checker.notifyUpdateAppliedExpectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test004b_DoBDXTransferWithBlockQueryWithSkip
+{
+    // The skip has to move the position in the image for every block after
+    // block 1, not just for block 1.  Skip more than one block, and not a
+    // multiple of the block size.
+    [self doBDXTransferSkippingBytesAfterFirstBlock:1500 rawImagePath:@"/tmp/ota-test004b-raw-image"];
+}
+
+- (void)test004c_DoBDXTransferWithBlockQueryWithSkipPastEnd
+{
+    // A skip past the end of the image has to be answered with an empty
+    // BlockEOF, and the transfer has to end successfully.
+    [self doBDXTransferSkippingBytesAfterFirstBlock:100000 rawImagePath:@"/tmp/ota-test004c-raw-image"];
 }
 
 // TODO: Enable tests 005, 006, 007 and 009 when PR #26040 is merged. Currently the poll interval causes delays in the BDX transfer

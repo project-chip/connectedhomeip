@@ -24,7 +24,6 @@ static_library("telink") {
     "../SingletonConfigurationManager.cpp",
     "../Zephyr/BLEAdvertisingArbiter.cpp",
     "../Zephyr/BLEAdvertisingArbiter.h",
-    "../Zephyr/BLEManagerImpl.cpp",
     "../Zephyr/ConfigurationManagerImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.h",
@@ -35,6 +34,7 @@ static_library("telink") {
     "../Zephyr/SystemTimeSupport.cpp",
     "../Zephyr/ZephyrConfig.cpp",
     "../Zephyr/ZephyrConfig.h",
+    "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
@@ -96,6 +96,8 @@ static_library("telink") {
         "../OpenThread/DnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.h",
+        "../OpenThread/OpenThreadTxtEntries.h",
+        "../OpenThread/TxtEntries.h",
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }

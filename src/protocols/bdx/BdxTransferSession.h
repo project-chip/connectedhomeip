@@ -64,7 +64,6 @@ public:
         TransferControlFlags ControlMode;
 
         uint16_t MaxBlockSize = 0;
-        uint64_t StartOffset  = 0; ///< Not used for SendAccept message
         uint64_t Length       = 0; ///< Not used for SendAccept message
 
         // Additional metadata (optional, TLV format)
@@ -223,6 +222,9 @@ public:
      * @brief
      *   Indicate that all transfer parameters are acceptable and prepare a SendAccept or ReceiveAccept message (depending on role).
      *
+     *   Accepting a transfer accepts the start offset proposed in the Init message. A responder that cannot use the proposed
+     *   start offset should call RejectTransfer(StatusCode::kStartOffsetNotSupported) instead.
+     *
      * @param acceptData Data used to populate an Accept message (some fields may differ from the original Init message)
      *
      * @return CHIP_ERROR Result of preparation of an Accept message. May also indicate if the TransferSession object is unable to
@@ -265,7 +267,8 @@ public:
      * @brief
      *   Prepare a Block message. The Block counter will be populated automatically.
      *
-     * @param inData Contains data for filling out the Block message
+     * @param inData Contains data for filling out the Block message. inData.Length may be 0 only for a BlockEOF
+     *               (inData.IsEof), and inData.Data may be null only if inData.Length is 0.
      *
      * @return CHIP_ERROR The result of the preparation of a Block message. May also indicate if the TransferSession object
      *                    is unable to handle this request.

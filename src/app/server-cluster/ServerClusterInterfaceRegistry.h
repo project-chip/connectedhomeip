@@ -36,8 +36,11 @@ namespace app {
 /// In practice this is a single-linked list element.
 struct ServerClusterRegistration
 {
-    // A single-linked list of clusters registered for the given `endpointId`
     ServerClusterInterface * const serverClusterInterface;
+
+    /// Managed by the registry. Null while the registration is not part of a registry.
+    /// The list is terminated by `EndOfList()` rather than null, so a registration can tell
+    /// whether it is registered without accessing the registry.
     ServerClusterRegistration * next;
 
     constexpr ServerClusterRegistration(ServerClusterInterface & interface, ServerClusterRegistration * next_item = nullptr) :
@@ -48,6 +51,25 @@ struct ServerClusterRegistration
     // we generally do not want to allow copies as those may have different "next" entries.
     ServerClusterRegistration(const ServerClusterRegistration & other)             = delete;
     ServerClusterRegistration & operator=(const ServerClusterRegistration & other) = delete;
+
+    /// Returns true if this registration is part of a registry.
+    ///
+    /// A registration must be unregistered before it is destroyed, to avoid leaving the registry with
+    /// a dangling pointer. When the registration may outlive the registry (e.g. due to the unspecified
+    /// order of static destruction), the call to `Unregister()` must be guarded, because the registry
+    /// may already be gone. `IsRegistered()` provides that guard without accessing the registry: a
+    /// registry clears all its entries when it is destroyed, so this returns false afterwards.
+    bool IsRegistered() const { return next != nullptr; }
+
+    /// The value of `next` for the last registration in a registry's list.
+    /// Its `serverClusterInterface` is null.
+    static constexpr const ServerClusterRegistration * EndOfList() { return &kEndOfList; }
+
+private:
+    // Used only for the end-of-list sentinel.
+    constexpr ServerClusterRegistration() : serverClusterInterface(nullptr), next(nullptr) {}
+
+    static const ServerClusterRegistration kEndOfList;
 };
 
 /// It is very typical to join together a registration and a Server
@@ -189,11 +211,12 @@ public:
         class Iterator
         {
         public:
-            Iterator(ServerClusterRegistration * registration) : mRegistration(registration) {}
+            Iterator(ServerClusterRegistration * registration) : mRegistration(registration != nullptr ? registration : EndOfList())
+            {}
 
             Iterator & operator++()
             {
-                if (mRegistration)
+                if (mRegistration != EndOfList())
                 {
                     mRegistration = mRegistration->next;
                 }
@@ -201,7 +224,8 @@ public:
             }
             bool operator==(const Iterator & other) const { return mRegistration == other.mRegistration; }
             bool operator!=(const Iterator & other) const { return mRegistration != other.mRegistration; }
-            ServerClusterInterface * operator*() { return mRegistration ? mRegistration->serverClusterInterface : nullptr; }
+            // Returns nullptr for end(), because the end-of-list sentinel has a null serverClusterInterface.
+            ServerClusterInterface * operator*() { return mRegistration->serverClusterInterface; }
 
         private:
             ServerClusterRegistration * mRegistration;
@@ -209,7 +233,7 @@ public:
 
         constexpr ServerClusterInstances(ServerClusterRegistration * start) : mStart(start) {}
         Iterator begin() { return { mStart }; }
-        Iterator end() { return { nullptr }; }
+        Iterator end() { return { EndOfList() }; }
 
     private:
         ServerClusterRegistration * mStart;
@@ -218,7 +242,13 @@ public:
     ServerClusterInstances AllServerClusterInstances();
 
 protected:
-    ServerClusterRegistration * mRegistrations = nullptr;
+    static constexpr ServerClusterRegistration * EndOfList()
+    {
+        // The list stores the sentinel in non-const `next` pointers, but never writes through it.
+        return const_cast<ServerClusterRegistration *>(ServerClusterRegistration::EndOfList());
+    }
+
+    ServerClusterRegistration * mRegistrations = EndOfList();
 
     // A one-element cache to speed up finding a cluster within an endpoint.
     // The endpointId specifies which endpoint the cache belongs to.
