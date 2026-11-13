@@ -129,7 +129,6 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         TransferSession::TransferAcceptData acceptData;
         acceptData.ControlMode  = TransferControlFlags::kReceiverDrive; // OTA must use receiver drive
         acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
-        acceptData.StartOffset  = mTransfer.GetStartOffset();
         acceptData.Length       = mTransfer.GetTransferLength();
         VerifyOrReturn(mTransfer.AcceptTransfer(acceptData) == CHIP_NO_ERROR,
                        ChipLogError(BDX, "AcceptTransfer failed: %" CHIP_ERROR_FORMAT, err.Format()));

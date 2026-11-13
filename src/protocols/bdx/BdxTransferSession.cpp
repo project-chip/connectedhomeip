@@ -215,14 +215,12 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
 
     if (mRole == TransferRole::kSender)
     {
-        mStartOffset    = acceptData.StartOffset;
         mTransferLength = acceptData.Length;
 
         ReceiveAccept acceptMsg;
         acceptMsg.TransferCtlFlags.Set(acceptData.ControlMode);
         acceptMsg.Version        = mTransferVersion;
         acceptMsg.MaxBlockSize   = acceptData.MaxBlockSize;
-        acceptMsg.StartOffset    = acceptData.StartOffset;
         acceptMsg.Length         = acceptData.Length;
         acceptMsg.Metadata       = acceptData.Metadata;
         acceptMsg.MetadataLength = acceptData.MetadataLength;
@@ -598,14 +596,12 @@ void TransferSession::HandleReceiveAccept(System::PacketBufferHandle msgData)
     VerifyOrReturn(rcvAcceptMsg.MaxBlockSize <= mMaxSupportedBlockSize, PrepareStatusReport(StatusCode::kBadMessageContents));
 
     mTransferMaxBlockSize = rcvAcceptMsg.MaxBlockSize;
-    mStartOffset          = rcvAcceptMsg.StartOffset;
     mTransferLength       = rcvAcceptMsg.Length;
 
     // Note: if VerifyProposedMode() returned with no error, then mControlMode must match the proposed mode in the ReceiveAccept
     // message
     mTransferAcceptData.ControlMode    = mControlMode;
     mTransferAcceptData.MaxBlockSize   = rcvAcceptMsg.MaxBlockSize;
-    mTransferAcceptData.StartOffset    = rcvAcceptMsg.StartOffset;
     mTransferAcceptData.Length         = rcvAcceptMsg.Length;
     mTransferAcceptData.Metadata       = rcvAcceptMsg.Metadata;
     mTransferAcceptData.MetadataLength = rcvAcceptMsg.MetadataLength;
@@ -642,7 +638,6 @@ void TransferSession::HandleSendAccept(System::PacketBufferHandle msgData)
 
     mTransferAcceptData.ControlMode    = mControlMode;
     mTransferAcceptData.MaxBlockSize   = sendAcceptMsg.MaxBlockSize;
-    mTransferAcceptData.StartOffset    = mStartOffset;    // Not included in SendAccept msg, so use member
     mTransferAcceptData.Length         = mTransferLength; // Not included in SendAccept msg, so use member
     mTransferAcceptData.Metadata       = sendAcceptMsg.Metadata;
     mTransferAcceptData.MetadataLength = sendAcceptMsg.MetadataLength;
