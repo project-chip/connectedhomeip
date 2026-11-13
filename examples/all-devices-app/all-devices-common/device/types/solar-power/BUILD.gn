@@ -41,14 +41,8 @@ source_set("simulated") {
   sources = [
     "impl/SimulatedSolarPower.cpp",
     "impl/SimulatedSolarPower.h",
-    "impl/SimulatedSolarPowerFourParallelPanels.cpp",
-    "impl/SimulatedSolarPowerFourParallelPanels.h",
-    "impl/SimulatedSolarPowerThreePhase.cpp",
-    "impl/SimulatedSolarPowerThreePhase.h",
-    "impl/SimulatedSolarPowerTwoStrings.cpp",
-    "impl/SimulatedSolarPowerTwoStrings.h",
-    "impl/SimulatedSolarPowerTwoStringsFourPanels.cpp",
-    "impl/SimulatedSolarPowerTwoStringsFourPanels.h",
+    "impl/SolarPowerVariants.cpp",
+    "impl/SolarPowerVariants.h",
   ]
 
   public_deps = [

@@ -17,7 +17,6 @@
 #include <device/types/solar-power/SolarPowerTags.h>
 
 #include <clusters/shared/Enums.h>
-#include <lib/support/CodeUtils.h>
 
 namespace chip::app::SolarPowerTags {
 
@@ -97,43 +96,5 @@ const EndpointComposition::SemanticTag kPhaseBTag[1] = {
 const EndpointComposition::SemanticTag kPhaseCTag[1] = {
     { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = kTagAcPhase3 },
 };
-
-Span<const EndpointComposition::SemanticTag> ParallelPanelTag(uint8_t panelIndex)
-{
-    switch (panelIndex)
-    {
-    case 1:
-        return Span(kParallelPanel1Tag);
-    case 2:
-        return Span(kParallelPanel2Tag);
-    case 3:
-        return Span(kParallelPanel3Tag);
-    case 4:
-        return Span(kParallelPanel4Tag);
-    default:
-        return Span<const EndpointComposition::SemanticTag>();
-    }
-}
-
-Span<const EndpointComposition::SemanticTag> StringPanelTags(uint8_t stringIndex, uint8_t panelIndexInString)
-{
-    if (stringIndex == 1 && panelIndexInString == 1)
-    {
-        return Span(kString1Panel1Tags);
-    }
-    if (stringIndex == 1 && panelIndexInString == 2)
-    {
-        return Span(kString1Panel2Tags);
-    }
-    if (stringIndex == 2 && panelIndexInString == 1)
-    {
-        return Span(kString2Panel1Tags);
-    }
-    if (stringIndex == 2 && panelIndexInString == 2)
-    {
-        return Span(kString2Panel2Tags);
-    }
-    return Span<const EndpointComposition::SemanticTag>();
-}
 
 } // namespace chip::app::SolarPowerTags

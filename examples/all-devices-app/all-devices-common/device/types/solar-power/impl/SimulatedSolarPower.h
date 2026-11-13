@@ -21,16 +21,43 @@
 #include <device/types/solar-power/SolarPower.h>
 #include <device/types/temperature-sensor/TemperatureSensor.h>
 
+#include <array>
+#include <memory>
+
 namespace chip::app {
 
-/// Simulated single-phase AC Solar Power (Figure 17): Identify, DEM, inverter temperature, grid power source, AC export sensor.
+/// Simulated Solar Power with configurable panel, string, or phase measurements.
 class SimulatedSolarPower : public SolarPower
 {
 public:
     using Context = SolarPower::Context;
 
-    explicit SimulatedSolarPower(const Context & context, Parameters parameters);
+    struct PanelConfig
+    {
+        Span<const EndpointComposition::SemanticTag> tags;
+        SimulatedElectricalSensor::Role role = SimulatedElectricalSensor::Role::kBattery;
+    };
+
+    static constexpr size_t kMaxPanelCount = 4;
+
+    struct Config
+    {
+        SimulatedElectricalSensor::Role outputSensorRole = SimulatedElectricalSensor::Role::kGrid;
+        Span<const PanelConfig> panels;
+        Span<const EndpointComposition::SemanticTag> tags;
+    };
+
+    /// Config supports at most kMaxPanelCount panels. All tag storage must outlive the device;
+    /// the panel configuration array is only used during construction.
+    explicit SimulatedSolarPower(const Context & context, const Config & config);
     ~SimulatedSolarPower() override = default;
+
+    /// Uses Config::tags when composition does not supply parent tags.
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override;
+
+    size_t GetPanelCount() const { return mPanelCount; }
+    PanelElectricalSensor & GetPanelSensor(size_t index);
 
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     EnergyManagement & GetEnergyManagement() { return mEnergyManagement; }
@@ -46,6 +73,9 @@ protected:
 
 private:
     TimerDelegate & mTimerDelegate;
+    Span<const EndpointComposition::SemanticTag> mTags;
+    std::array<std::unique_ptr<PanelElectricalSensor>, kMaxPanelCount> mPanels;
+    const size_t mPanelCount;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     EnergyManagement mEnergyManagement;
     TemperatureSensor mInverterTemperatureSensor;

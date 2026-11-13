@@ -42,20 +42,38 @@ Clusters::TemperatureMeasurementCluster::StartupConfiguration InverterTemperatur
     };
 }
 
-EndpointComposition ChildComposition(EndpointId parent, Span<const EndpointComposition::SemanticTag> tags)
-{
-    EndpointComposition composition = EndpointComposition::WithParent(parent);
-    composition.tagList             = tags;
-    return composition;
-}
-
 } // namespace
 
-SimulatedSolarPower::SimulatedSolarPower(const Context & context, Parameters parameters) :
-    SolarPower(context, parameters), mTimerDelegate(context.timerDelegate),
+SimulatedSolarPower::SimulatedSolarPower(const Context & context, const Config & config) :
+    SolarPower(context, Parameters{ .outputSensorRole = config.outputSensorRole }), mTimerDelegate(context.timerDelegate),
+    mTags(config.tags), mPanelCount(config.panels.size()),
     mEnergyManagement(context.timerDelegate, SolarPowerEnergyManagementConfig()),
     mInverterTemperatureSensor(context.timerDelegate, InverterTemperatureConfig())
-{}
+{
+    VerifyOrDie(mPanelCount <= kMaxPanelCount);
+    for (size_t index = 0; index < mPanelCount; ++index)
+    {
+        const auto & panel = config.panels[index];
+        mPanels[index]     = std::make_unique<PanelElectricalSensor>(context.timerDelegate, context.testEventTriggerDelegate,
+                                                                     context.fabricTable, panel.tags, panel.role);
+    }
+}
+
+CHIP_ERROR SimulatedSolarPower::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                         EndpointComposition composition)
+{
+    if (composition.tagList.empty())
+    {
+        composition.tagList = mTags;
+    }
+    return SolarPower::Register(allocator, provider, composition);
+}
+
+PanelElectricalSensor & SimulatedSolarPower::GetPanelSensor(size_t index)
+{
+    VerifyOrDie(index < mPanelCount);
+    return *mPanels[index];
+}
 
 CHIP_ERROR SimulatedSolarPower::RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
 {
@@ -77,12 +95,25 @@ CHIP_ERROR SimulatedSolarPower::RegisterAdditionalComposedEndpoints(EndpointIdAl
 {
     ReturnErrorOnFailure(mEnergyManagement.Register(allocator.Allocate(), provider, EndpointComposition::WithParent(parent)));
     ReturnErrorOnFailure(mInverterTemperatureSensor.Register(
-        allocator.Allocate(), provider, ChildComposition(parent, Span(SolarPowerTags::kInverterTemperatureTag))));
+        allocator.Allocate(), provider,
+        EndpointComposition(parent, DataModel::EndpointCompositionPattern::kTree, Span(SolarPowerTags::kInverterTemperatureTag))));
+    for (size_t index = 0; index < mPanelCount; ++index)
+    {
+        ReturnErrorOnFailure(mPanels[index]->Register(allocator.Allocate(), provider, EndpointComposition::WithParent(parent)));
+    }
     return CHIP_NO_ERROR;
 }
 
 void SimulatedSolarPower::UnregisterAdditionalComposedEndpoints(CodeDrivenDataModelProvider & provider)
 {
+    for (size_t index = mPanelCount; index > 0; --index)
+    {
+        auto & panel = *mPanels[index - 1];
+        if (panel.GetEndpointId() != kInvalidEndpointId)
+        {
+            panel.Unregister(provider);
+        }
+    }
     if (mInverterTemperatureSensor.GetEndpointId() != kInvalidEndpointId)
     {
         mInverterTemperatureSensor.Unregister(provider);

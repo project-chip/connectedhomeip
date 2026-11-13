@@ -18,10 +18,7 @@
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/solar-power/PanelElectricalSensor.h>
 #include <device/types/solar-power/impl/SimulatedSolarPower.h>
-#include <device/types/solar-power/impl/SimulatedSolarPowerFourParallelPanels.h>
-#include <device/types/solar-power/impl/SimulatedSolarPowerThreePhase.h>
-#include <device/types/solar-power/impl/SimulatedSolarPowerTwoStrings.h>
-#include <device/types/solar-power/impl/SimulatedSolarPowerTwoStringsFourPanels.h>
+#include <device/types/solar-power/impl/SolarPowerVariants.h>
 #include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>
 #include <pw_unit_test/framework.h>
 
@@ -32,6 +29,7 @@
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/DeviceEnergyManagement/ClusterId.h>
 #include <clusters/ElectricalEnergyMeasurement/ClusterId.h>
+#include <clusters/ElectricalPowerMeasurement/Attributes.h>
 #include <clusters/ElectricalPowerMeasurement/ClusterId.h>
 #include <clusters/Identify/ClusterId.h>
 #include <clusters/PowerSource/ClusterId.h>
@@ -41,9 +39,11 @@
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/Types.h>
 #include <lib/support/TimerDelegateMock.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <algorithm>
+#include <cstring>
 #include <initializer_list>
 #include <iterator>
 #include <memory>
@@ -59,6 +59,19 @@ using NS = Clusters::Globals::SemanticTagNamespaceId;
 constexpr uint8_t kTagAcPhase1 = 0x02;
 constexpr uint8_t kTagAcPhase2 = 0x03;
 constexpr uint8_t kTagAcPhase3 = 0x04;
+
+SimulatedSolarPower::Config VariantConfig(const char * name)
+{
+    for (const auto & variant : SolarPowerVariants())
+    {
+        if (strcmp(variant.name, name) == 0)
+        {
+            return variant.makeConfig();
+        }
+    }
+    ADD_FAILURE() << "Unknown solar-power variant: " << name;
+    return {};
+}
 
 class SolarPowerTestFixture : public ::testing::Test
 {
@@ -140,6 +153,16 @@ std::vector<DataModel::EndpointEntry> GetEndpoints(CodeDrivenDataModelProvider &
     EXPECT_EQ(provider.Endpoints(builder), CHIP_NO_ERROR);
     const auto buffer = builder.TakeBuffer();
     return std::vector<DataModel::EndpointEntry>(buffer.begin(), buffer.end());
+}
+
+void ExpectEndpointParent(CodeDrivenDataModelProvider & provider, EndpointId endpoint, EndpointId expectedParent)
+{
+    const auto endpoints = GetEndpoints(provider);
+    const auto entry =
+        std::find_if(endpoints.begin(), endpoints.end(), [endpoint](const auto & candidate) { return candidate.id == endpoint; });
+    ASSERT_NE(entry, endpoints.end());
+    EXPECT_EQ(entry->parentId, expectedParent);
+    EXPECT_EQ(entry->compositionPattern, DataModel::EndpointCompositionPattern::kTree);
 }
 
 void ExpectSingleDeviceType(CodeDrivenDataModelProvider & provider, EndpointId endpoint,
@@ -280,7 +303,7 @@ void TestUnregisterAndRegisterAgain(CodeDrivenDataModelProvider & provider, Test
 TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredTopologyAndDeviceTypes)
 {
     ConsecutiveEndpointIdAllocator allocator;
-    SimulatedSolarPower device(MakeContext(), {});
+    SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power"));
 
     ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
     ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
@@ -318,7 +341,7 @@ TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredTopologyAndDeviceTypes)
 TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredSemanticTags)
 {
     ConsecutiveEndpointIdAllocator allocator;
-    SimulatedSolarPower device(MakeContext(), {});
+    SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power"));
 
     ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
     ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
@@ -338,7 +361,7 @@ TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredSemanticTags)
 TEST_F(SolarPowerTestFixture, FourParallelPanelsRegistersTopologyAndTags)
 {
     ConsecutiveEndpointIdAllocator allocator;
-    SimulatedSolarPowerFourParallelPanels device(MakeContext());
+    SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power-four-panels"));
 
     ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
     ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
@@ -347,9 +370,9 @@ TEST_F(SolarPowerTestFixture, FourParallelPanelsRegistersTopologyAndTags)
 
     ProviderAttributeReader reader(mProvider);
     const uint16_t numberNs = to_underlying(NS::kNumber);
-    for (size_t index = 0; index < SimulatedSolarPowerFourParallelPanels::kParallelPanelCount; ++index)
+    for (size_t index = 0; index < device.GetPanelCount(); ++index)
     {
-        PanelElectricalSensor & panel = device.GetParallelPanelSensor(index);
+        PanelElectricalSensor & panel = device.GetPanelSensor(index);
         ExpectPanelSensorClusters(mProvider, panel.GetEndpointId());
         ExpectSemanticTags(reader, panel.GetEndpointId(), { { numberNs, static_cast<uint8_t>(index + 1) } });
     }
@@ -361,7 +384,7 @@ TEST_F(SolarPowerTestFixture, FourParallelPanelsRegistersTopologyAndTags)
 TEST_F(SolarPowerTestFixture, TwoStringsRegistersTopologyAndTags)
 {
     ConsecutiveEndpointIdAllocator allocator;
-    SimulatedSolarPowerTwoStrings device(MakeContext());
+    SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power-two-strings"));
 
     ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
     ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
@@ -370,8 +393,8 @@ TEST_F(SolarPowerTestFixture, TwoStringsRegistersTopologyAndTags)
 
     ProviderAttributeReader reader(mProvider);
     const uint16_t numberNs = to_underlying(NS::kNumber);
-    ExpectSemanticTags(reader, device.GetStringSensor(0).GetEndpointId(), { { numberNs, 1 } });
-    ExpectSemanticTags(reader, device.GetStringSensor(1).GetEndpointId(), { { numberNs, 2 } });
+    ExpectSemanticTags(reader, device.GetPanelSensor(0).GetEndpointId(), { { numberNs, 1 } });
+    ExpectSemanticTags(reader, device.GetPanelSensor(1).GetEndpointId(), { { numberNs, 2 } });
 
     device.Unregister(mProvider);
     EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
@@ -380,7 +403,7 @@ TEST_F(SolarPowerTestFixture, TwoStringsRegistersTopologyAndTags)
 TEST_F(SolarPowerTestFixture, TwoStringsFourPanelsRegistersTopologyAndTags)
 {
     ConsecutiveEndpointIdAllocator allocator;
-    SimulatedSolarPowerTwoStringsFourPanels device(MakeContext());
+    SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power-two-strings-four-panels"));
 
     ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
     ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
@@ -406,7 +429,7 @@ TEST_F(SolarPowerTestFixture, TwoStringsFourPanelsRegistersTopologyAndTags)
 TEST_F(SolarPowerTestFixture, ThreePhaseRegistersTopologyAndAcPhaseTags)
 {
     ConsecutiveEndpointIdAllocator allocator;
-    SimulatedSolarPowerThreePhase device(MakeContext());
+    SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power-three-phase"));
 
     ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
     ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
@@ -415,137 +438,140 @@ TEST_F(SolarPowerTestFixture, ThreePhaseRegistersTopologyAndAcPhaseTags)
 
     ProviderAttributeReader reader(mProvider);
     const uint16_t electricalMeasurementNs = to_underlying(NS::kElectricalMeasurement);
-    ExpectSemanticTags(reader, device.GetPhaseSensor(0).GetEndpointId(), { { electricalMeasurementNs, kTagAcPhase1 } });
-    ExpectSemanticTags(reader, device.GetPhaseSensor(1).GetEndpointId(), { { electricalMeasurementNs, kTagAcPhase2 } });
-    ExpectSemanticTags(reader, device.GetPhaseSensor(2).GetEndpointId(), { { electricalMeasurementNs, kTagAcPhase3 } });
+    ExpectSemanticTags(reader, device.GetPanelSensor(0).GetEndpointId(), { { electricalMeasurementNs, kTagAcPhase1 } });
+    ExpectSemanticTags(reader, device.GetPanelSensor(1).GetEndpointId(), { { electricalMeasurementNs, kTagAcPhase2 } });
+    ExpectSemanticTags(reader, device.GetPanelSensor(2).GetEndpointId(), { { electricalMeasurementNs, kTagAcPhase3 } });
 
     for (size_t index = 0; index < 3; ++index)
     {
-        ExpectPanelSensorClusters(mProvider, device.GetPhaseSensor(index).GetEndpointId());
+        ExpectPanelSensorClusters(mProvider, device.GetPanelSensor(index).GetEndpointId());
     }
 
     device.Unregister(mProvider);
     EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
 }
 
-TEST_F(SolarPowerTestFixture, BaselineRollsBackPartialRegistrationFailures)
+TEST_F(SolarPowerTestFixture, AllVariantsRollBackPartialRegistrationFailures)
 {
-    TestRollBackForEndpointCount(
-        mProvider, 5u, [this]() { return std::make_unique<SimulatedSolarPower>(MakeContext(), SolarPower::Parameters{}); },
-        [](SimulatedSolarPower & device) { ExpectBaselineEndpointIdsInvalid(device); });
+    for (const auto & variant : SolarPowerVariants())
+    {
+        const auto config = variant.makeConfig();
+        TestRollBackForEndpointCount(
+            mProvider, 5u + config.panels.size(),
+            [this, config]() { return std::make_unique<SimulatedSolarPower>(MakeContext(), config); },
+            [](SimulatedSolarPower & device) {
+                ExpectBaselineEndpointIdsInvalid(device);
+                for (size_t index = 0; index < device.GetPanelCount(); ++index)
+                {
+                    ExpectPanelEndpointIdsInvalid(device.GetPanelSensor(index));
+                }
+            });
+    }
 }
 
-TEST_F(SolarPowerTestFixture, FourParallelPanelsRollsBackPartialRegistrationFailures)
+TEST_F(SolarPowerTestFixture, AllVariantsCanUnregisterAndRegisterAgainAfterProviderStartup)
 {
-    TestRollBackForEndpointCount(
-        mProvider, 9u, [this]() { return std::make_unique<SimulatedSolarPowerFourParallelPanels>(MakeContext()); },
-        [](SimulatedSolarPowerFourParallelPanels & device) {
-            ExpectBaselineEndpointIdsInvalid(device);
-            for (size_t index = 0; index < SimulatedSolarPowerFourParallelPanels::kParallelPanelCount; ++index)
-            {
-                ExpectPanelEndpointIdsInvalid(device.GetParallelPanelSensor(index));
-            }
-        });
+    for (const auto & variant : SolarPowerVariants())
+    {
+        const auto config = variant.makeConfig();
+        TestUnregisterAndRegisterAgain(
+            mProvider, mContext, [this, config]() { return std::make_unique<SimulatedSolarPower>(MakeContext(), config); },
+            5u + config.panels.size(),
+            [](SimulatedSolarPower & device) {
+                ExpectBaselineEndpointIdsInvalid(device);
+                for (size_t index = 0; index < device.GetPanelCount(); ++index)
+                {
+                    ExpectPanelEndpointIdsInvalid(device.GetPanelSensor(index));
+                }
+            });
+    }
 }
 
-TEST_F(SolarPowerTestFixture, TwoStringsRollsBackPartialRegistrationFailures)
+TEST_F(SolarPowerTestFixture, AllVariantsRegisterDistinctParentTagsAndExpectedMeasurementFeatures)
 {
-    TestRollBackForEndpointCount(
-        mProvider, 7u, [this]() { return std::make_unique<SimulatedSolarPowerTwoStrings>(MakeContext()); },
-        [](SimulatedSolarPowerTwoStrings & device) {
-            ExpectBaselineEndpointIdsInvalid(device);
-            ExpectPanelEndpointIdsInvalid(device.GetStringSensor(0));
-            ExpectPanelEndpointIdsInvalid(device.GetStringSensor(1));
-        });
+    using Feature = Clusters::ElectricalPowerMeasurement::Feature;
+    struct ExpectedVariant
+    {
+        const char * name;
+        size_t panelCount;
+        uint8_t tag;
+        BitMask<Feature> outputFeatures;
+        BitMask<Feature> panelFeatures;
+    };
+    const ExpectedVariant expected[] = {
+        { "solar-power", 0, 1, BitMask<Feature>(Feature::kAlternatingCurrent), BitMask<Feature>(Feature::kDirectCurrent) },
+        { "solar-power-four-panels", 4, 2, BitMask<Feature>(Feature::kAlternatingCurrent),
+          BitMask<Feature>(Feature::kDirectCurrent) },
+        { "solar-power-two-strings", 2, 3, BitMask<Feature>(Feature::kAlternatingCurrent),
+          BitMask<Feature>(Feature::kDirectCurrent) },
+        { "solar-power-two-strings-four-panels", 4, 4, BitMask<Feature>(Feature::kAlternatingCurrent),
+          BitMask<Feature>(Feature::kDirectCurrent) },
+        { "solar-power-three-phase", 3, 5, BitMask<Feature>(Feature::kAlternatingCurrent, Feature::kPolyphasePower),
+          BitMask<Feature>(Feature::kAlternatingCurrent) },
+    };
+    ASSERT_EQ(SolarPowerVariants().size(), std::size(expected));
+
+    ConsecutiveEndpointIdAllocator allocator;
+    std::vector<std::unique_ptr<SimulatedSolarPower>> devices;
+    for (const auto & variant : expected)
+    {
+        devices.push_back(std::make_unique<SimulatedSolarPower>(MakeContext(), VariantConfig(variant.name)));
+        ASSERT_SUCCESS(devices.back()->Register(allocator, mProvider, EndpointComposition::WithParent(0)));
+    }
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
+    EXPECT_EQ(GetEndpoints(mProvider).size(), 38u);
+
+    ProviderAttributeReader reader(mProvider);
+    for (size_t index = 0; index < devices.size(); ++index)
+    {
+        auto & device = *devices[index];
+        EXPECT_EQ(device.GetPanelCount(), expected[index].panelCount);
+        ExpectEndpointParent(mProvider, device.GetEndpointId(), 0);
+        ExpectSingleDeviceType(mProvider, device.GetEndpointId(), Device::Type::kSolarPower);
+        ExpectSemanticTags(reader, device.GetEndpointId(), { { to_underlying(NS::kNumber), expected[index].tag } });
+        uint32_t features = 0;
+        ASSERT_SUCCESS(reader.Read(device.GetEndpointId(), Clusters::Descriptor::Id,
+                                   Clusters::Descriptor::Attributes::FeatureMap::Id, features));
+        EXPECT_NE(features & to_underlying(Clusters::Descriptor::Feature::kTagList), 0u);
+        ASSERT_SUCCESS(reader.Read(device.GetOutputElectricalSensor().GetEndpointId(), Clusters::ElectricalPowerMeasurement::Id,
+                                   Clusters::ElectricalPowerMeasurement::Attributes::FeatureMap::Id, features));
+        EXPECT_EQ(features, expected[index].outputFeatures.Raw());
+        for (size_t panel = 0; panel < device.GetPanelCount(); ++panel)
+        {
+            ASSERT_SUCCESS(reader.Read(device.GetPanelSensor(panel).GetEndpointId(), Clusters::ElectricalPowerMeasurement::Id,
+                                       Clusters::ElectricalPowerMeasurement::Attributes::FeatureMap::Id, features));
+            EXPECT_EQ(features, expected[index].panelFeatures.Raw());
+            ExpectEndpointParent(mProvider, device.GetPanelSensor(panel).GetEndpointId(), device.GetEndpointId());
+        }
+    }
+    for (auto & device : devices)
+    {
+        device->Unregister(mProvider);
+    }
+    ExpectNoRegisteredEndpoints(mProvider);
+    EXPECT_SUCCESS(mProvider.Shutdown());
 }
 
-TEST_F(SolarPowerTestFixture, TwoStringsFourPanelsRollsBackPartialRegistrationFailures)
+TEST_F(SolarPowerTestFixture, ExplicitParentTagsOverrideVariantTags)
 {
-    TestRollBackForEndpointCount(
-        mProvider, 9u, [this]() { return std::make_unique<SimulatedSolarPowerTwoStringsFourPanels>(MakeContext()); },
-        [](SimulatedSolarPowerTwoStringsFourPanels & device) {
-            ExpectBaselineEndpointIdsInvalid(device);
-            for (size_t index = 0; index < SimulatedSolarPowerTwoStringsFourPanels::kPanelEndpointCount; ++index)
-            {
-                ExpectPanelEndpointIdsInvalid(device.GetPanelSensor(index));
-            }
-        });
-}
-
-TEST_F(SolarPowerTestFixture, ThreePhaseRollsBackPartialRegistrationFailures)
-{
-    TestRollBackForEndpointCount(
-        mProvider, 8u, [this]() { return std::make_unique<SimulatedSolarPowerThreePhase>(MakeContext()); },
-        [](SimulatedSolarPowerThreePhase & device) {
-            ExpectBaselineEndpointIdsInvalid(device);
-            for (size_t index = 0; index < 3; ++index)
-            {
-                ExpectPanelEndpointIdsInvalid(device.GetPhaseSensor(index));
-            }
-        });
-}
-
-TEST_F(SolarPowerTestFixture, BaselineCanUnregisterAndRegisterAgainAfterProviderStartup)
-{
-    TestUnregisterAndRegisterAgain(
-        mProvider, mContext, [this]() { return std::make_unique<SimulatedSolarPower>(MakeContext(), SolarPower::Parameters{}); },
-        5u, [](SimulatedSolarPower & device) { ExpectBaselineEndpointIdsInvalid(device); });
-}
-
-TEST_F(SolarPowerTestFixture, FourParallelPanelsCanUnregisterAndRegisterAgainAfterProviderStartup)
-{
-    TestUnregisterAndRegisterAgain(
-        mProvider, mContext, [this]() { return std::make_unique<SimulatedSolarPowerFourParallelPanels>(MakeContext()); }, 9u,
-        [](SimulatedSolarPowerFourParallelPanels & device) {
-            ExpectBaselineEndpointIdsInvalid(device);
-            for (size_t index = 0; index < SimulatedSolarPowerFourParallelPanels::kParallelPanelCount; ++index)
-            {
-                ExpectPanelEndpointIdsInvalid(device.GetParallelPanelSensor(index));
-            }
-        });
-}
-
-TEST_F(SolarPowerTestFixture, TwoStringsCanUnregisterAndRegisterAgainAfterProviderStartup)
-{
-    TestUnregisterAndRegisterAgain(
-        mProvider, mContext, [this]() { return std::make_unique<SimulatedSolarPowerTwoStrings>(MakeContext()); }, 7u,
-        [](SimulatedSolarPowerTwoStrings & device) {
-            ExpectBaselineEndpointIdsInvalid(device);
-            ExpectPanelEndpointIdsInvalid(device.GetStringSensor(0));
-            ExpectPanelEndpointIdsInvalid(device.GetStringSensor(1));
-        });
-}
-
-TEST_F(SolarPowerTestFixture, TwoStringsFourPanelsCanUnregisterAndRegisterAgainAfterProviderStartup)
-{
-    TestUnregisterAndRegisterAgain(
-        mProvider, mContext, [this]() { return std::make_unique<SimulatedSolarPowerTwoStringsFourPanels>(MakeContext()); }, 9u,
-        [](SimulatedSolarPowerTwoStringsFourPanels & device) {
-            ExpectBaselineEndpointIdsInvalid(device);
-            for (size_t index = 0; index < SimulatedSolarPowerTwoStringsFourPanels::kPanelEndpointCount; ++index)
-            {
-                ExpectPanelEndpointIdsInvalid(device.GetPanelSensor(index));
-            }
-        });
-}
-
-TEST_F(SolarPowerTestFixture, ThreePhaseCanUnregisterAndRegisterAgainAfterProviderStartup)
-{
-    TestUnregisterAndRegisterAgain(
-        mProvider, mContext, [this]() { return std::make_unique<SimulatedSolarPowerThreePhase>(MakeContext()); }, 8u,
-        [](SimulatedSolarPowerThreePhase & device) {
-            ExpectBaselineEndpointIdsInvalid(device);
-            for (size_t index = 0; index < 3; ++index)
-            {
-                ExpectPanelEndpointIdsInvalid(device.GetPhaseSensor(index));
-            }
-        });
+    const EndpointComposition::SemanticTag tag[] = {
+        { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 42 },
+    };
+    ConsecutiveEndpointIdAllocator allocator;
+    SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power"));
+    ASSERT_SUCCESS(
+        device.Register(allocator, mProvider, EndpointComposition(0, DataModel::EndpointCompositionPattern::kTree, Span(tag))));
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
+    ProviderAttributeReader reader(mProvider);
+    ExpectSemanticTags(reader, device.GetEndpointId(), { { to_underlying(NS::kNumber), 42 } });
+    device.Unregister(mProvider);
+    EXPECT_SUCCESS(mProvider.Shutdown());
 }
 
 TEST_F(SolarPowerTestFixture, UnregistersCleanlyAfterProviderStartup)
 {
     ConsecutiveEndpointIdAllocator allocator;
-    SimulatedSolarPower device(MakeContext(), {});
+    SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power"));
 
     ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
     ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);

@@ -21,21 +21,10 @@
 
 namespace chip::app {
 
-namespace {
-
-EndpointComposition ChildComposition(EndpointId parent, Span<const EndpointComposition::SemanticTag> tags)
-{
-    EndpointComposition composition = EndpointComposition::WithParent(parent);
-    composition.tagList             = tags;
-    return composition;
-}
-
-} // namespace
-
 SolarPower::SolarPower(const Context & context, Parameters parameters) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSolarPower, 1)), mContext(context),
-    mOutputElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable, {},
-                            parameters.outputSensorRole),
+    mOutputElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
+                            Span(SolarPowerTags::kGridConnectionTag), parameters.outputSensorRole),
     mGridPowerSource("Solar power grid connection"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc, 0)
 {}
 
@@ -57,10 +46,11 @@ CHIP_ERROR SolarPower::Register(EndpointIdAllocator & allocator, CodeDrivenDataM
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
-    ReturnErrorOnFailure(mGridPowerSource.Register(allocator.Allocate(), provider,
-                                                   ChildComposition(mEndpointId, Span(SolarPowerTags::kGridConnectionTag))));
-    ReturnErrorOnFailure(mOutputElectricalSensor.Register(allocator.Allocate(), provider,
-                                                          ChildComposition(mEndpointId, Span(SolarPowerTags::kGridConnectionTag))));
+    ReturnErrorOnFailure(mGridPowerSource.Register(
+        allocator.Allocate(), provider,
+        EndpointComposition(mEndpointId, DataModel::EndpointCompositionPattern::kTree, Span(SolarPowerTags::kGridConnectionTag))));
+    ReturnErrorOnFailure(
+        mOutputElectricalSensor.Register(allocator.Allocate(), provider, EndpointComposition::WithParent(mEndpointId)));
 
     ReturnErrorOnFailure(RegisterAdditionalComposedEndpoints(allocator, provider, mEndpointId));
 

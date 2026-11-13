@@ -17,7 +17,6 @@
 #pragma once
 
 #include <device/api/Interface.h>
-#include <lib/support/Span.h>
 
 namespace chip::app::SolarPowerTags {
 
@@ -36,9 +35,5 @@ extern const EndpointComposition::SemanticTag kString2Panel2Tags[2];
 extern const EndpointComposition::SemanticTag kPhaseATag[1];
 extern const EndpointComposition::SemanticTag kPhaseBTag[1];
 extern const EndpointComposition::SemanticTag kPhaseCTag[1];
-
-Span<const EndpointComposition::SemanticTag> ParallelPanelTag(uint8_t panelIndex);
-
-Span<const EndpointComposition::SemanticTag> StringPanelTags(uint8_t stringIndex, uint8_t panelIndexInString);
 
 } // namespace chip::app::SolarPowerTags

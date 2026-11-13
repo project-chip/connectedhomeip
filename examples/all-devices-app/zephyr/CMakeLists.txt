@@ -115,7 +115,7 @@ if(ALL_DEVICES_ENABLE_WINDOW_COVERING)
     math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 4")
 endif()
 
-# solar-power registers five simulators (baseline plus four topology variants).
+# solar-power registers one creator per entry in SolarPowerVariants.cpp (5 in total).
 if(ALL_DEVICES_ENABLE_SOLAR_POWER)
     math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 4")
 endif()
