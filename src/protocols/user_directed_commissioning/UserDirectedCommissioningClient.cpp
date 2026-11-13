@@ -231,14 +231,17 @@ CHIP_ERROR CommissionerDeclaration::ReadPayload(uint8_t * udcPayload, size_t pay
         case kPasscodeLengthTag:
             err = reader.Get(mPasscodeLength);
             break;
+        default:
+            break;
         }
+        ReturnErrorOnFailure(
+            err, ChipLogError(AppServer, "CommissionerDeclaration::ReadPayload read error %" CHIP_ERROR_FORMAT, err.Format()));
     }
 
-    if (err == CHIP_END_OF_TLV)
-    {
-        // Exiting container
-        ReturnErrorOnFailure(reader.ExitContainer(outerContainerType));
-    }
+    VerifyOrReturnError(
+        err == CHIP_END_OF_TLV, err,
+        ChipLogError(AppServer, "CommissionerDeclaration::ReadPayload exiting early error %" CHIP_ERROR_FORMAT, err.Format()));
+    ReturnErrorOnFailure(reader.ExitContainer(outerContainerType));
 
     ChipLogProgress(AppServer, "UDC TLV parse complete");
     return CHIP_NO_ERROR;
