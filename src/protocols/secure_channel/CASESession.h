@@ -485,6 +485,21 @@ private:
     // destinationId/initiatorRandom from processing of Sigma1, and sets mIpk to the right IPK.
     CHIP_ERROR FindLocalNodeFromDestinationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
 
+    struct ScopedDeferSessionRelease
+    {
+        explicit ScopedDeferSessionRelease(CASESession & session) : mSession(session) { mSession.mDeferSessionRelease = true; }
+        ~ScopedDeferSessionRelease() { mSession.mDeferSessionRelease = false; }
+
+        ScopedDeferSessionRelease(const ScopedDeferSessionRelease &)             = delete;
+        ScopedDeferSessionRelease & operator=(const ScopedDeferSessionRelease &) = delete;
+
+    private:
+        CASESession & mSession;
+    };
+
+    CHIP_ERROR SendSigmaMessage(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle && msg);
+    CHIP_ERROR SendStatusReport(const Messaging::ExchangeHolder & exchangeCtxt, uint16_t protocolCode);
+
     CHIP_ERROR SendSigma1();
     CHIP_ERROR HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg);
     NextStep HandleSigma1(System::PacketBufferHandle && msg);
@@ -551,6 +566,7 @@ private:
     //
     // This pointer must be nulled out when the connection is closed.
     Transport::ActiveTCPConnectionHandle mPeerConnState;
+    CHIP_ERROR * mTCPConnectAttemptError = nullptr;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -587,6 +603,7 @@ private:
     Platform::SharedPtr<WorkHelper<HandleSigma3Data>> mHandleSigma3Helper;
 
     State mState;
+    bool mDeferSessionRelease = false;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     Optional<State> mStopHandshakeAtState = Optional<State>::Missing();
