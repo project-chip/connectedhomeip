@@ -17,6 +17,7 @@
 
 import asyncio
 import logging
+import threading
 import time
 from dataclasses import dataclass
 
@@ -61,6 +62,11 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         self._ice_candidates = IceCandidateList()
         # Sentinel to indicate end of ice candidates collection.
         self._ice_sentinel = "___ICE_DONE___"
+
+        # Remote candidates arrive on the Matter thread; remote descriptions are set from the test's thread.
+        self._remote_candidates_lock = threading.Lock()
+        self._remote_description_set = False
+        self._held_remote_candidates: list[IceCandidate] = []
 
         self._peer_state = PeerConnectionState.NEW
 
@@ -128,11 +134,44 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
     def set_remote_ice_candidates(self, remote_candidates: list[IceCandidate]) -> None:
         """Sets the remote ICE candidates for the WebRTC peer connection.
 
+        Candidates received before a remote description is set are held,
+        and set_remote_description() applies them. Adding remote ICE
+        candidates before a remote description is set can fail, so they
+        must be buffered until the peer is ready.
+
         Args:
             remote_candidates (list[IceCandidate]): A list of remote ICE candidates to be set.
         """
+        with self._remote_candidates_lock:
+            if not self._remote_description_set:
+                LOGGER.debug("Holding %d remote ICE candidates until a remote description is set", len(remote_candidates))
+                self._held_remote_candidates.extend(remote_candidates)
+                return
+        self._add_remote_ice_candidates(remote_candidates)
+
+    def _add_remote_ice_candidates(self, remote_candidates: list[IceCandidate]) -> None:
         for candidate in remote_candidates:
             self.add_ice_candidate(candidate.candidate, candidate.sdpMid or "video")
+
+    def set_remote_description(self, sdp: str, type_: str) -> None:
+        """Sets the remote SDP, then applies the held remote ICE candidates in arrival order.
+
+        Candidates that arrive while held ones are being applied are held too, so a later candidate never
+        reaches libdatachannel ahead of an earlier one.
+
+        Args:
+            sdp (str): The remote SDP.
+            type_ (str): The SDP type, "offer" or "answer".
+        """
+        super().set_remote_description(sdp, type_)
+        while True:
+            with self._remote_candidates_lock:
+                held_candidates, self._held_remote_candidates = self._held_remote_candidates, []
+                if not held_candidates:
+                    self._remote_description_set = True
+                    return
+            LOGGER.debug("Applying %d remote ICE candidates held until the remote description was set", len(held_candidates))
+            self._add_remote_ice_candidates(held_candidates)
 
     async def get_local_answer(self, timeout_sec: int | None = None) -> str:
         """Fetches the local SDP answer for the WebRTC peer connection.
@@ -345,11 +384,11 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
     def on_remote_ice_candidates(self, sessionId: int, candidates: list[IceCandidate]) -> None:
         """Callback function called when a remote ICE candidates are received through a matter command.
 
-        Implements trickle ICE by immediately applying received candidates to the peer connection.
+        Implements trickle ICE by applying received candidates to the peer connection, or holding them until a
+        remote description is set (see set_remote_ice_candidates()).
         Also stores them in the event queue for tests that may need to wait for and verify them.
         """
-        # Immediately apply candidates for trickle ICE support
-        LOGGER.debug("Applying %s candidates for trickle ICE support: %s", len(candidates), candidates)
+        LOGGER.debug("Received %s candidates for trickle ICE support: %s", len(candidates), candidates)
         self.set_remote_ice_candidates(candidates)
 
         # Also put in event queue for any waiting consumers

@@ -599,13 +599,32 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    const bool hasRemoteDescription = transport->GetPeerConnection()->HasRemoteDescription();
+
     for (const auto & candidate : candidates)
     {
-        ChipLogProgress(Camera, "Applying candidate: %s",
+        ChipLogProgress(Camera, "%s candidate: %s", hasRemoteDescription ? "Applying" : "Holding",
                         std::string(candidate.candidate.begin(), candidate.candidate.end()).c_str());
         std::string mid =
             candidate.SDPMid.IsNull() ? "" : std::string(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end());
         transport->AddRemoteCandidate(std::string(candidate.candidate.begin(), candidate.candidate.end()), mid);
+    }
+
+    // Candidates held before ProvideAnswer leave the session state unchanged, so a pending Offer is still sent and the
+    // Answer is still processed. The camera sends its own candidates after the Answer.
+    if (!hasRemoteDescription)
+    {
+        ChipLogProgress(Camera, "Session ID %u has no remote description yet; its candidates are held until ProvideAnswer",
+                        sessionId);
+        return CHIP_NO_ERROR;
+    }
+
+    // Changing the state or the pending command before the Answer is sent would stop the Answer from being sent.
+    if (transport->GetState() == WebrtcTransport::State::SendingAnswer)
+    {
+        ChipLogProgress(Camera, "Session ID %u: the Answer is not sent yet; the camera sends its candidates after it", sessionId);
+        transport->SetSendICECandidatesAfterAnswer(true);
+        return CHIP_NO_ERROR;
     }
 
     // Schedule sending Ice Candidates when remote candidates are received. This keeps the exchange simple
@@ -982,6 +1001,12 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
     case WebrtcTransport::CommandType::kAnswer:
         err = self->SendAnswerCommand(exchangeMgr, sessionHandle, sessionId);
         transport->MoveToState(WebrtcTransport::State::Idle);
+        if (err == CHIP_NO_ERROR && transport->GetSendICECandidatesAfterAnswer())
+        {
+            transport->SetSendICECandidatesAfterAnswer(false);
+            transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+            self->ScheduleICECandidatesSend(sessionId);
+        }
         break;
     case WebrtcTransport::CommandType::kICECandidates:
         err = self->SendICECandidatesCommand(exchangeMgr, sessionHandle, sessionId);
