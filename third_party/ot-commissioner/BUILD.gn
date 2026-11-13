@@ -15,10 +15,10 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${build_root}/config/compiler/compiler.gni")
-import("${chip_root}/third_party/mbedtls/mbedtls3.gni")
+import("${chip_root}/third_party/mbedtls/mbedtls.gni")
 
-mbedtls3_target("ot_commissioner_mbedtls") {
-  mbedtls_root = "repo/third_party/mbedtls/repo"
+mbedtls_target("ot_commissioner_mbedtls") {
+  mbedtls_source_root = "repo/third_party/mbedtls/repo"
 }
 
 config("mbedtls_config") {

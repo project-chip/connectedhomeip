@@ -8,8 +8,8 @@
 	branch  = master
 [submodule "mbedtls"]
 	path = third_party/mbedtls/repo
-	url = https://github.com/ARMmbed/mbedtls.git
-	branch = mbedtls-2.28
+	url = https://github.com/Mbed-TLS/mbedtls.git
+	branch = mbedtls-3.6
 	excluded-platforms = esp32
 [submodule "qrcode"]
 	path = examples/common/QRCode/repo

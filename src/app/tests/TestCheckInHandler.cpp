@@ -217,7 +217,10 @@ TEST_F(TestCheckInHandler, TestOnMessageReceived)
     iterator->Release();
     EXPECT_FALSE(located);
 
-    // Add back fabricB and validate check-in message again
+    // Add back fabricB and validate check-in message again.
+    // DeleteAllEntries destroyed clientInfoB's keys, so its key handles are stale; register from an empty entry.
+    clientInfoB           = ICDClientInfo();
+    clientInfoB.peer_node = ScopedNodeId(nodeIdB, fabricIdB);
     EXPECT_EQ(manager.UpdateFabricList(fabricIdB), CHIP_NO_ERROR);
     EXPECT_EQ(manager.SetKey(clientInfoB, ByteSpan(kKeyBuffer2)), CHIP_NO_ERROR);
     EXPECT_EQ(manager.StoreEntry(clientInfoB), CHIP_NO_ERROR);
@@ -246,6 +249,8 @@ TEST_F(TestCheckInHandler, TestOnMessageReceived)
     EXPECT_EQ(manager.DeleteAllEntries(fabricIdA), CHIP_NO_ERROR);
     EXPECT_EQ(manager.DeleteAllEntries(fabricIdB), CHIP_NO_ERROR);
     // Add back fabricA and validate check-in message again
+    clientInfoA           = ICDClientInfo();
+    clientInfoA.peer_node = ScopedNodeId(nodeIdA, fabricIdA);
     EXPECT_EQ(manager.UpdateFabricList(fabricIdA), CHIP_NO_ERROR);
     EXPECT_EQ(manager.SetKey(clientInfoA, ByteSpan(kKeyBuffer1)), CHIP_NO_ERROR);
     EXPECT_EQ(manager.StoreEntry(clientInfoA), CHIP_NO_ERROR);
