@@ -715,11 +715,25 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
 }
 
-- (void)test028_pairingAfterCancellation_SendComplete
+- (void)test028_cancellationAtSendComplete
 {
     // SendComplete goes over the operational session, so the commissionee is not the device being commissioned; cancelling
-    // here must still end the commissioning.
-    [self doPairingTestAfterCancellationAtProgress:@"Performing next commissioning step 'SendComplete'"];
+    // here must still end the commissioning as cancelled. Unlike test005-test008 this does not pair again afterwards: the
+    // step sends CommissioningComplete before the cancel can run, so the accessory may already have joined the fabric and
+    // closed its commissioning window.
+    [self startServerApp];
+    [self doPairingAndWaitForProgress:@"Performing next commissioning step 'SendComplete'" attestationDelegate:nil];
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"commissioningComplete delegate method called"];
+    self.controllerDelegate.expectation = expectation;
+
+    NSError * error;
+    XCTAssertTrue([sController stopDevicePairing:sDeviceId error:&error], @"stopDevicePairing failed: %@", error);
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+
+    error = self.controllerDelegate.commissioningCompleteError;
+    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    XCTAssertEqual(error.code, MTRErrorCodeCancelled);
 }
 
 - (void)test009_PairWithReadingEndpointInformation
