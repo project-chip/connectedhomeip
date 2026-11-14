@@ -1127,6 +1127,107 @@
     }
 }
 
+- (void)testCancelRunningUnsentItemFreesItsSlot
+{
+    // A started item that tracks its send but has not called workItem:readyToSend: yet has sent nothing: cancelling it
+    // frees its running slot, the next item starts, and its late send and completion are refused.
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    dispatch_semaphore_t started = dispatch_semaphore_create(0);
+    dispatch_semaphore_t release = dispatch_semaphore_create(0);
+    __block BOOL sendCalled = NO;
+    __block BOOL lateReadyToSend = YES;
+    __block BOOL lateCompletion = YES;
+    XCTestExpectation * finished = [self expectationWithDescription:@"cancelled item's handler finished"];
+    MTRAsyncWorkItem * item = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    item.tracksSend = YES;
+    MTRAsyncWorkItem * __weak weakItem = item;
+    item.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        dispatch_semaphore_signal(started);
+        dispatch_semaphore_wait(release, DISPATCH_TIME_FOREVER);
+        lateReadyToSend = [workQueue workItem:weakItem readyToSend:^{
+            sendCalled = YES;
+        }];
+        lateCompletion = completion(MTRAsyncWorkComplete);
+        [finished fulfill];
+    };
+    [workQueue enqueueWorkItem:item description:@"running unsent item"];
+    XCTAssertEqual(dispatch_semaphore_wait(started, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+
+    XCTestExpectation * nextRan = [self expectationWithDescription:@"next item ran"];
+    MTRAsyncWorkItem * next = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    next.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        completion(MTRAsyncWorkComplete);
+        [nextRan fulfill];
+    };
+    [workQueue enqueueWorkItem:next description:@"next"];
+
+    XCTAssertTrue([workQueue cancelWorkItemIfUnsent:item], @"a running item that has not sent can be cancelled");
+    [self waitForExpectations:@[ nextRan ] timeout:2];
+
+    dispatch_semaphore_signal(release);
+    [self waitForExpectations:@[ finished ] timeout:2];
+    XCTAssertFalse(lateReadyToSend, @"a cancelled item may not send");
+    XCTAssertFalse(sendCalled);
+    XCTAssertFalse(lateCompletion, @"a cancelled item's completion is refused");
+}
+
+- (void)testCancelRunningJumperAboveWidthFreesItsSlot
+{
+    // A jumper started above the width by an unsent read, cancelled before it sends: its above-width slot is freed, so
+    // the next jumper starts, and its late send and completion are refused.
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    dispatch_semaphore_t readRunning = dispatch_semaphore_create(0);
+    __block MTRAsyncWorkCompletionBlock readCompletion;
+    MTRAsyncWorkItem * read = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    read.tracksSend = YES;
+    read.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        readCompletion = completion;
+        dispatch_semaphore_signal(readRunning);
+    };
+    [workQueue enqueueWorkItem:read description:@"unsent read R"];
+    XCTAssertEqual(dispatch_semaphore_wait(readRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+
+    dispatch_semaphore_t jumperStarted = dispatch_semaphore_create(0);
+    dispatch_semaphore_t release = dispatch_semaphore_create(0);
+    __block BOOL sendCalled = NO;
+    __block BOOL lateReadyToSend = YES;
+    __block BOOL lateCompletion = YES;
+    XCTestExpectation * finished = [self expectationWithDescription:@"cancelled jumper's handler finished"];
+    MTRAsyncWorkItem * jumper = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    jumper.jumpsUnsentWork = YES;
+    MTRAsyncWorkItem * __weak weakJumper = jumper;
+    jumper.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        dispatch_semaphore_signal(jumperStarted);
+        dispatch_semaphore_wait(release, DISPATCH_TIME_FOREVER);
+        lateReadyToSend = [workQueue workItem:weakJumper readyToSend:^{
+            sendCalled = YES;
+        }];
+        lateCompletion = completion(MTRAsyncWorkComplete);
+        [finished fulfill];
+    };
+    [workQueue enqueueWorkItem:jumper description:@"jumper J1"];
+    XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"the jumper runs above width");
+
+    XCTestExpectation * nextRan = [self expectationWithDescription:@"second jumper ran"];
+    MTRAsyncWorkItem * next = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    next.jumpsUnsentWork = YES;
+    next.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        completion(MTRAsyncWorkComplete);
+        [nextRan fulfill];
+    };
+    [workQueue enqueueWorkItem:next description:@"jumper J2"];
+
+    XCTAssertTrue([workQueue cancelWorkItemIfUnsent:jumper], @"a running jumper that has not sent can be cancelled");
+    [self waitForExpectations:@[ nextRan ] timeout:2];
+
+    dispatch_semaphore_signal(release);
+    [self waitForExpectations:@[ finished ] timeout:2];
+    XCTAssertFalse(lateReadyToSend, @"a cancelled jumper may not send");
+    XCTAssertFalse(sendCalled);
+    XCTAssertFalse(lateCompletion, @"a cancelled jumper's completion is refused");
+    readCompletion(MTRAsyncWorkComplete);
+}
+
 - (void)testInvalidateWithJumperAboveWidthFreesItsSlot
 {
     MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
