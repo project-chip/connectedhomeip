@@ -174,15 +174,16 @@ class TestRestartFlagReader(unittest.TestCase):
         self.assertTrue(self.monitor.thread.is_alive())
 
     def test_failed_rejection_is_retried(self):
-        real_replace = os.replace
-        failures = [OSError("replace failed")]
+        real_link = os.link
+        failures = [OSError("link failed")]
 
-        def flaky_replace(src, dst):
+        def flaky_link(src, dst):
+            # Installing the rejection marker fails once; the monitor retries it on the next poll.
             if dst == self.flag and src.endswith(".rejected") and failures:
                 raise failures.pop()
-            return real_replace(src, dst)
+            return real_link(src, dst)
 
-        with mock.patch.object(run_python_test.os, "replace", flaky_replace):
+        with mock.patch.object(run_python_test.os, "link", flaky_link):
             self._start_monitor()
             self._assert_rejected(b"factory res3t", "factory res3t")
         self.assertEqual(failures, [])
