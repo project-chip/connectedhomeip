@@ -785,9 +785,9 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 static std::atomic<uint32_t> sUserInvokeMinimumTimeoutOverrideMs { 0 };
 #endif
 
-// How long an invoke with expected values and no user command token may wait in the queue before it is sent.  Its
-// expected values are shown for the whole wait, so the wait needs a bound.  The value is the framework's default
-// timed interaction timeout: a choice, not a derived bound.
+// How long an invoke with expected values and no user command token, or a write with an expected value, may wait in
+// the queue before it is sent.  Its expected values are shown for the whole wait, so the wait needs a bound.  The
+// value is the framework's default timed interaction timeout: a choice, not a derived bound.
 static constexpr uint32_t kMTRUntokenedInvokeQueueTimeoutMs = MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS;
 
 // The shortest caller timeout a user command accepts: one session attempt, the bound OperationalSessionSetup uses
@@ -3868,6 +3868,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
 
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
     uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
+    MTRAsyncWorkItem * __weak weakWorkItem = workItem; // the queue owns the item
     NSNumber * nodeID = _nodeID;
 
     // Write request data is an array of items (for now always length 1).  Each
@@ -3944,8 +3945,15 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         MTRRequestWillBeSentHandler requestWillBeSent = nil;
         if (useValueAsExpectedValue || requestExpectedValueInterval != [NSNull null]) {
             mtr_weakify(self);
+            MTRAsyncWorkQueue * workQueue = self.asyncWorkQueue;
             requestWillBeSent = ^BOOL {
                 mtr_strongify(self);
+                // A write that has sent nothing can be cancelled by its queue bound up to here: if it was, send
+                // nothing.  Its cancel handler has already removed its expected values.
+                if (weakWorkItem && ![workQueue workItem:weakWorkItem readyToSend:^ {}]) {
+                    MTR_LOG("Write attribute work item [%llu] was cancelled before it was sent", workItemID);
+                    return NO;
+                }
                 if (!self) {
                     return YES;
                 }
@@ -3988,10 +3996,11 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                    completion(MTRAsyncWorkComplete);
                                }];
     }];
-    // The work queue cancels its work items only when the device is invalidated.  A write dropped that way before
-    // it was sent still has a pending expected value, which would never expire, so remove it, and that of a write
-    // merged into this one, even if this write did not set one.  Removal only touches expected values that still
-    // carry these IDs; a write already in flight loses its expected value too, as the device is going away.
+    // The work queue cancels its work items when the device is invalidated, and the queue bound below cancels a write
+    // that has sent nothing.  A write dropped either way before it was sent still has a pending expected value, which
+    // would never expire, so remove it, and that of a write merged into this one, even if this write did not set one.
+    // Removal only touches expected values that still carry these IDs; a write already in flight loses its expected
+    // value too only when the device is going away.
     mtr_weakify(self);
     [workItem setCancelHandler:^{
         mtr_strongify(self);
@@ -4005,6 +4014,18 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                       expectedValueID:[request[MTRDeviceWriteRequestFieldExpectedValueIDIndex] unsignedLongLongValue]];
         }
     }];
+    if (useValueAsExpectedValue) {
+        // As for an invoke with expected values, the write's wait in the queue is bounded: if it has sent nothing by
+        // then, it is cancelled, its expected value is removed, and it is never sent.  A later write merged into this
+        // work item is cancelled with it.
+        MTRAsyncWorkQueue * workQueue = _asyncWorkQueue;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kMTRUntokenedInvokeQueueTimeoutMs * NSEC_PER_MSEC)), self.queue, ^{
+            MTRAsyncWorkItem * item = weakWorkItem;
+            if (item && [workQueue cancelWorkItemIfUnsent:item]) {
+                MTR_LOG("Write attribute work item [%llu] timed out after %u ms in the queue before it was sent", workItemID, kMTRUntokenedInvokeQueueTimeoutMs);
+            }
+        });
+    }
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ 0x%llx (%@) 0x%llx (%@): %@",
                                               endpointID,
                                               clusterID.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue)),

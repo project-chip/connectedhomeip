@@ -9725,6 +9725,74 @@ static const unsigned kExpectedValueTestCachedValue = 3;
     XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:[self _expectedValueTestPath]][MTRValueKey], @(kExpectedValueTestCachedValue));
 }
 
+- (void)test080_WriteWaitingForSessionIsDroppedAtQueueBound
+{
+    // A write with an expected value whose session is not ready does not keep its expected value for the whole wait:
+    // once it has waited the default bound (10 s) unsent, its expected value is removed, and when the session does
+    // become ready the write is not sent.
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * delegate;
+    __auto_type * device = [self _expectedValueTestDeviceWithDelegate:&delegate];
+    MTRAttributePath * path = [self _expectedValueTestPath];
+    const NSTimeInterval bound = 10;
+    const unsigned accessoryValue = 4;
+    const unsigned expectedValue = 9;
+
+    // Give the accessory a known value, so that a write that went out would show up there.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    XCTestExpectation * known = [[XCTestExpectation alloc] initWithDescription:@"Accessory has a known value"];
+    [baseDevice writeAttributeWithEndpointID:path.endpoint
+                                   clusterID:path.cluster
+                                 attributeID:path.attribute
+                                       value:[self _expectedValueTestDataValue:accessoryValue]
+                           timedWriteTimeout:nil
+                                       queue:dispatch_get_main_queue()
+                                  completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                      XCTAssertNil(error);
+                                      [known fulfill];
+                                  }];
+    [self waitForExpectations:@[ known ] timeout:kTimeoutInSeconds];
+
+    dispatch_block_t releaseSession = [self _holdMatterQueue];
+    NSDate * writtenAt = [NSDate now];
+    [device writeAttributeWithEndpointID:path.endpoint
+                               clusterID:path.cluster
+                             attributeID:path.attribute
+                                   value:[self _expectedValueTestDataValue:expectedValue]
+                   expectedValueInterval:@(60000)
+                       timedWriteTimeout:nil];
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(expectedValue));
+    // The write's work item has started and is waiting for its session.
+    [self _waitForDeviceQueue:device];
+
+    // The bound plus slack, with the write still waiting for its session.
+    XCTestExpectation * sessionPending = [[XCTestExpectation alloc] initWithDescription:@"Session still not ready"];
+    sessionPending.inverted = YES;
+    [self waitForExpectations:@[ sessionPending ] timeout:(bound + 2)];
+    [self _waitForDeviceQueue:device];
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:path][MTRValueKey], @(kExpectedValueTestCachedValue),
+        @"expected value still shown %.1f s after the write", [[NSDate now] timeIntervalSinceDate:writtenAt]);
+
+    releaseSession();
+    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Session ready; the write is not sent"];
+    settle.inverted = YES;
+    [self waitForExpectations:@[ settle ] timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * readBack = [[XCTestExpectation alloc] initWithDescription:@"Accessory value read back"];
+    __block id readValue;
+    [baseDevice readAttributesWithEndpointID:path.endpoint
+                                   clusterID:path.cluster
+                                 attributeID:path.attribute
+                                      params:nil
+                                       queue:dispatch_get_main_queue()
+                                  completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                      XCTAssertNil(error);
+                                      readValue = values.firstObject[MTRDataKey][MTRValueKey];
+                                      [readBack fulfill];
+                                  }];
+    [self waitForExpectations:@[ readBack ] timeout:kTimeoutInSeconds];
+    XCTAssertEqualObjects(readValue, @(accessoryValue), @"the dropped write reached the accessory");
+}
+
 @end
 
 @interface MTRDeviceResubscriptionTimerTests : MTRTestCase

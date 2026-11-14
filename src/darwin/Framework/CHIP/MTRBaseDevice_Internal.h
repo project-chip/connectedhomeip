@@ -270,7 +270,8 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 /**
  * Like the above, but also calls requestWillBeSent, if not nil, on the Matter queue once a session is ready, right
  * before the write request is sent.  It is not called if the write never gets to that point (e.g.
- * can't establish a session).  Writes always send: a NO return is treated as YES.  A nil requestWillBeSent means
+ * can't establish a session).  If it returns NO, the write is not sent and completes with CHIP_ERROR_CANCELLED; the
+ * caller has then already completed its own caller and ignores that completion.  A nil requestWillBeSent means
  * send.
  */
 - (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID

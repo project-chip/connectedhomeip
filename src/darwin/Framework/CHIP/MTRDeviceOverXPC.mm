@@ -44,8 +44,8 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
 - (void)fetchProxyHandleWithQueue:(dispatch_queue_t)queue completion:(MTRFetchProxyHandleCompletion)completion;
 
 // The XPC paths for writes and invokes.  requestWillBeSent, if not nil, is called right before the request goes to
-// the XPC proxy, and is handled as MTRBaseDevice's own paths handle it: writes always send, and an invoke whose
-// requestWillBeSent returns NO is not sent and completes with CHIP_ERROR_CANCELLED.
+// the XPC proxy, and is handled as MTRBaseDevice's own paths handle it: a write or invoke whose requestWillBeSent
+// returns NO is not sent and completes with CHIP_ERROR_CANCELLED.
 - (void)_writeAttributeOverXPCWithEndpointID:(NSNumber *)endpointID
                                    clusterID:(NSNumber *)clusterID
                                  attributeID:(NSNumber *)attributeID
@@ -303,10 +303,13 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
             return;
         }
 
-        // The write request goes to the XPC proxy now.
-        if (requestWillBeSent) {
-            // Writes always send; the return value is for invokes.
-            (void) requestWillBeSent();
+        // The write request goes to the XPC proxy now.  As in MTRBaseDevice's own path, NO means the write was
+        // cancelled before it was sent: send nothing.
+        if (requestWillBeSent && !requestWillBeSent()) {
+            dispatch_async(queue, ^{
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]);
+            });
+            return;
         }
         [handle.proxy writeAttributeWithController:self.controllerID
                                             nodeId:self.nodeID.unsignedLongLongValue

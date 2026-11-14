@@ -1320,10 +1320,10 @@ private:
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-            // The session is ready and the write request goes out from here.
-            if (requestWillBeSent) {
-                // Writes always send; the return value is for invokes.
-                (void) requestWillBeSent();
+            // The session is ready and the write request goes out from here, unless requestWillBeSent says the
+            // write was cancelled before it was sent.
+            if (requestWillBeSent && !requestWillBeSent()) {
+                return CHIP_ERROR_CANCELLED;
             }
 
             // Controller::WriteAttribute guarantees that there will be exactly one call to either the success callback or the
