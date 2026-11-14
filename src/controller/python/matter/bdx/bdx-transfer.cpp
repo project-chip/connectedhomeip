@@ -59,8 +59,18 @@ CHIP_ERROR BdxTransfer::AcceptAndSendData(const ByteSpan & data_to_send)
 {
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
     mAwaitingAccept = false;
+
+    const uint64_t startOffset = mTransfer.GetStartOffset();
+    if (startOffset > data_to_send.size())
+    {
+        ReturnErrorOnFailure(mTransfer.RejectTransfer(StatusCode::kStartOffsetNotSupported));
+        mRejected = true;
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     mData.assign(data_to_send.begin(), data_to_send.end());
-    mDataCount = data_to_send.size();
+    mDataCount            = data_to_send.size();
+    mDataTransferredCount = static_cast<size_t>(startOffset);
 
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode  = TransferControlFlags::kReceiverDrive;
