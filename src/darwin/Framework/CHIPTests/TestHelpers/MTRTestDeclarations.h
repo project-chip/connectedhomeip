@@ -109,6 +109,10 @@ MTR_TESTABLE_DIRECT_MEMBERS
 + (void)unitTestResetInvokeRequestMessageCount;
 + (NSUInteger)unitTestInvokeRequestMessageCount;
 
+// Counts single invoke requests actually sent from MTRBaseDevice's invoke path.
++ (void)unitTestResetSingleInvokeSendCount;
++ (NSUInteger)unitTestSingleInvokeSendCount;
+
 // Forces the MaxPathsPerInvoke reported for batched invokes; 0 restores reading it from the session.
 + (void)unitTestSetMaxPathsPerInvokeOverride:(uint16_t)maxPathsPerInvoke;
 @end
@@ -141,6 +145,12 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
 - (NSUInteger)unitTestAttributeCount;
 - (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block;
+@end
+
+@interface MTRDevice (UserInvokeTestHooks)
+// The shortest caller timeout a user command accepts (one session attempt), and an override (0 restores it).
++ (uint32_t)unitTestUserInvokeMinimumTimeoutMs;
++ (void)unitTestSetUserInvokeMinimumTimeoutOverrideMs:(uint32_t)overrideMs;
 @end
 #endif
 

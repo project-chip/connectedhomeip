@@ -264,6 +264,7 @@ static NSUInteger HashPath(NSNumber * _Nullable endpoint, NSNumber * _Nullable c
 
 #ifdef DEBUG
 static std::atomic<uint64_t> sBatchInvokeRequestMessageCount { 0 };
+static std::atomic<uint64_t> sSingleInvokeSendCount { 0 };
 static std::atomic<uint16_t> sMaxPathsPerInvokeOverride { 0 };
 #endif
 
@@ -1116,6 +1117,17 @@ private:
                      queue:(dispatch_queue_t)queue
                 completion:(MTRDeviceResponseHandler)completion
 {
+    [self readAttributePaths:attributePaths eventPaths:eventPaths params:params includeDataVersion:includeDataVersion requestWillBeSent:nil queue:queue completion:completion];
+}
+
+- (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                    params:(MTRReadParams * _Nullable)params
+        includeDataVersion:(BOOL)includeDataVersion
+         requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                     queue:(dispatch_queue_t)queue
+                completion:(MTRDeviceResponseHandler)completion
+{
     // NOTE: Do not log the read here.  This is called ether from
     // readAttributePaths:eventPaths:params:queue:completion: or MTRDevice, both
     // of which already log, and we want to be able to tell the two codepaths apart.
@@ -1248,6 +1260,10 @@ private:
                 engine, &exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
             VerifyOrReturnError(readClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
+            if (requestWillBeSent) {
+                // Reads always send; the return value is for invokes.
+                (void) requestWillBeSent();
+            }
             err = readClient->SendRequest(readParams);
 
             if (err != CHIP_NO_ERROR) {
@@ -1289,9 +1305,27 @@ private:
                                 queue:(dispatch_queue_t)queue
                            completion:(MTRDeviceResponseHandler)completion
 {
+    [self _writeAttributeWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID value:value timedWriteTimeout:timeoutMs requestWillBeSent:nil queue:queue completion:completion];
+}
+
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                    requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion
+{
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+            // The session is ready and the write request goes out from here, unless requestWillBeSent says the
+            // write was cancelled before it was sent.
+            if (requestWillBeSent && !requestWillBeSent()) {
+                return CHIP_ERROR_CANCELLED;
+            }
+
             // Controller::WriteAttribute guarantees that there will be exactly one call to either the success callback or the
             // failure callback, for a non-group session.
             auto onSuccessCb = [successCb, bridge](const app::ConcreteAttributePath & attribPath) {
@@ -1679,6 +1713,29 @@ private:
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                    timedInvokeTimeout:timeoutMs
+           serverSideProcessingTimeout:serverSideProcessingTimeout
+                               logCall:logCall
+                     requestWillBeSent:nil
+                                 queue:queue
+                            completion:completion];
+}
+
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                             logCall:(BOOL)logCall
+                   requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
     endpointID = (endpointID == nil) ? nil : [endpointID copy];
     clusterID = (clusterID == nil) ? nil : [clusterID copy];
     commandID = (commandID == nil) ? nil : [commandID copy];
@@ -1762,7 +1819,16 @@ private:
                 auto serverTimeoutInSeconds = System::Clock::Seconds16(serverSideProcessingTimeout.unsignedShortValue);
                 invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds, true /*isFirstMessageOnExchange*/));
             }
+            // The session is ready and the invoke request goes out now.
+            // A nil requestWillBeSent means send.  NO means the caller cancelled the command before it was sent:
+            // send nothing.  The caller has already been told, and ignores the error this returns.
+            if (requestWillBeSent && !requestWillBeSent()) {
+                return CHIP_ERROR_CANCELLED;
+            }
             ReturnErrorOnFailure(commandSender->SendCommandRequest(session, invokeTimeout));
+#ifdef DEBUG
+            sSingleInvokeSendCount.fetch_add(1, std::memory_order_relaxed);
+#endif
 
             decoder.release();
             commandSender.release();
@@ -2642,6 +2708,16 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 + (NSUInteger)unitTestInvokeRequestMessageCount
 {
     return static_cast<NSUInteger>(sBatchInvokeRequestMessageCount.load(std::memory_order_relaxed));
+}
+
++ (void)unitTestResetSingleInvokeSendCount
+{
+    sSingleInvokeSendCount.store(0, std::memory_order_relaxed);
+}
+
++ (NSUInteger)unitTestSingleInvokeSendCount
+{
+    return static_cast<NSUInteger>(sSingleInvokeSendCount.load(std::memory_order_relaxed));
 }
 
 + (void)unitTestSetMaxPathsPerInvokeOverride:(uint16_t)maxPathsPerInvoke

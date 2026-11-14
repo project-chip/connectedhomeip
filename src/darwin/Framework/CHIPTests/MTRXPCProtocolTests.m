@@ -32,6 +32,41 @@ static const uint16_t kTimeoutInSeconds = 3;
 // Inverted expectation timeout
 static const uint16_t kNegativeTimeoutInSeconds = 1;
 
+@interface MTRDevice (XPCExpectedValueTests)
+// The value a read returns right now: the expected value if one is in effect, else the cached value.
+- (nullable NSDictionary<NSString *, id> *)_attributeValueDictionaryForAttributePath:(MTRAttributePath *)attributePath;
+@end
+
+// MTRBaseDevice's send-time paths, as MTRDevice calls them.  A NO return from requestWillBeSent means "do not send":
+// invokes honour it; reads and writes always send.
+@interface MTRBaseDevice (XPCRequestWillBeSentTests)
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                             logCall:(BOOL)logCall
+                   requestWillBeSent:(BOOL (^_Nullable)(void))requestWillBeSent
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion;
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                    requestWillBeSent:(BOOL (^_Nullable)(void))requestWillBeSent
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion;
+- (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                    params:(MTRReadParams * _Nullable)params
+        includeDataVersion:(BOOL)includeDataVersion
+         requestWillBeSent:(BOOL (^_Nullable)(void))requestWillBeSent
+                     queue:(dispatch_queue_t)queue
+                completion:(MTRDeviceResponseHandler)completion;
+@end
+
 @interface MTRClusterStateCacheContainer (Test)
 // Obsolete method is moved to this test suite to keep tests compatible
 - (void)subscribeWithDeviceController:(MTRDeviceController *)deviceController
@@ -2384,6 +2419,279 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                           }];
     [self waitForExpectations:@[ callExpectation, responseExpectation, _xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
+}
+
+- (void)testMTRDeviceWriteOverXPCReachesProxy
+{
+    // An MTRDevice on a controller over XPC sends its writes over XPC, and the expected value interval starts when
+    // the write goes to the XPC proxy.
+    uint64_t myNodeId = 9876543210;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSDictionary * myValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @654321 };
+    MTRAttributePath * myPath = [MTRAttributePath attributePathWithEndpointID:myEndpointId clusterID:myClusterId attributeID:myAttributeId];
+    // Long enough that the presence check right after the proxy call can't race the expiry, even on a slow
+    // (sanitizer) run; the absence check below waits for twice this.
+    const NSTimeInterval expectedValueInterval = 5;
+
+    XCTestExpectation * callExpectation = [[XCTestExpectation alloc] initWithDescription:@"XPC write received"];
+
+    __auto_type uuid = self.controllerUUID;
+    _handleWriteAttribute = ^(id controller, NSNumber * nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * attributeId,
+        id value, NSNumber * _Nullable timedWriteTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
+        XCTAssertEqualObjects(endpointId, myEndpointId);
+        XCTAssertEqualObjects(clusterId, myClusterId);
+        XCTAssertEqualObjects(attributeId, myAttributeId);
+        XCTAssertEqualObjects(value, myValue);
+        XCTAssertNil(timedWriteTimeout);
+        [callExpectation fulfill];
+        completion([MTRDeviceController encodeXPCResponseValues:@[ @{ MTRAttributePathKey : myPath } ]], nil);
+    };
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    [device writeAttributeWithEndpointID:myEndpointId
+                               clusterID:myClusterId
+                             attributeID:myAttributeId
+                                   value:myValue
+                   expectedValueInterval:@(expectedValueInterval * 1000)
+                       timedWriteTimeout:nil];
+
+    // Waited on with XCTWaiter, so that a write that never reaches the proxy fails on this assertion.
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ callExpectation ] timeout:kTimeoutInSeconds], XCTWaiterResultCompleted);
+    // The expected value is in effect: its interval has just started.
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:myPath], myValue);
+
+    // The interval started when the write went out, so the expected value is gone once it has passed.
+    XCTestExpectation * intervalPassed = [[XCTestExpectation alloc] initWithDescription:@"Expected value interval passed"];
+    intervalPassed.inverted = YES;
+    [self waitForExpectations:@[ intervalPassed ] timeout:(2 * expectedValueInterval)];
+    XCTAssertNil([device _attributeValueDictionaryForAttributePath:myPath]);
+}
+
+- (void)testMTRDeviceInvokeOverXPCReachesProxy
+{
+    // An MTRDevice on a controller over XPC sends its invokes over XPC, and the expected value interval starts when
+    // the invoke goes to the XPC proxy.
+    uint64_t myNodeId = 9876543210;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myCommandId = @300;
+    NSNumber * myAttributeId = @400;
+    NSDictionary * myFields = @{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] };
+    NSDictionary * myExpectedValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @7 };
+    MTRAttributePath * myPath = [MTRAttributePath attributePathWithEndpointID:myEndpointId clusterID:myClusterId attributeID:myAttributeId];
+    NSArray * myResults = @[ @{ MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:myEndpointId clusterID:myClusterId commandID:myCommandId] } ];
+    // Long enough that the presence check right after the proxy call can't race the expiry, even on a slow
+    // (sanitizer) run; the absence check below waits for twice this.
+    const NSTimeInterval expectedValueInterval = 5;
+
+    XCTestExpectation * callExpectation = [[XCTestExpectation alloc] initWithDescription:@"XPC invoke received"];
+    XCTestExpectation * responseExpectation = [[XCTestExpectation alloc] initWithDescription:@"Invoke response received"];
+
+    __auto_type uuid = self.controllerUUID;
+    _handleInvokeCommand
+        = ^(id controller, NSNumber * nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * commandId, id commandFields,
+            NSNumber * _Nullable timedInvokeTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+              XCTAssertTrue([controller isEqualToString:uuid]);
+              XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
+              XCTAssertEqualObjects(endpointId, myEndpointId);
+              XCTAssertEqualObjects(clusterId, myClusterId);
+              XCTAssertEqualObjects(commandId, myCommandId);
+              XCTAssertEqualObjects(commandFields, myFields);
+              XCTAssertNil(timedInvokeTimeout);
+              [callExpectation fulfill];
+              completion([MTRDeviceController encodeXPCResponseValues:myResults], nil);
+          };
+
+    __block NSArray<NSDictionary<NSString *, id> *> * responseValues;
+    __block NSError * responseError;
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    [device invokeCommandWithEndpointID:myEndpointId
+                              clusterID:myClusterId
+                              commandID:myCommandId
+                          commandFields:myFields
+                         expectedValues:@[ @{ MTRAttributePathKey : myPath, MTRDataKey : myExpectedValue } ]
+                  expectedValueInterval:@(expectedValueInterval * 1000)
+                     timedInvokeTimeout:nil
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 // Checked after the waits below, so that a failure is an assertion in the test itself.
+                                 responseValues = values;
+                                 responseError = error;
+                                 [responseExpectation fulfill];
+                             }];
+
+    // Waited on with XCTWaiter, so that an invoke that never reaches the proxy fails on this assertion.
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ callExpectation ] timeout:kTimeoutInSeconds], XCTWaiterResultCompleted);
+    // The expected value is in effect: its interval has just started.
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:myPath], myExpectedValue);
+    [self waitForExpectations:@[ responseExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertNil(responseError);
+    XCTAssertEqualObjects(responseValues, myResults);
+
+    // The interval started when the invoke went out, so the expected value is gone once it has passed.
+    XCTestExpectation * intervalPassed = [[XCTestExpectation alloc] initWithDescription:@"Expected value interval passed"];
+    intervalPassed.inverted = YES;
+    [self waitForExpectations:@[ intervalPassed ] timeout:(2 * expectedValueInterval)];
+    XCTAssertNil([device _attributeValueDictionaryForAttributePath:myPath]);
+}
+
+- (void)testMTRDeviceReadThroughOverXPCReachesProxy
+{
+    // An MTRDevice on a controller over XPC reads through over XPC.  With no subscription yet, a read of an attribute
+    // reads through.
+    uint64_t myNodeId = 9876543210;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    MTRAttributePath * myPath = [MTRAttributePath attributePathWithEndpointID:myEndpointId clusterID:myClusterId attributeID:myAttributeId];
+    NSArray * myValues = @[ @{ MTRAttributePathKey : myPath, MTRDataKey : @ { MTRTypeKey : MTRSignedIntegerValueType, MTRValueKey : @123456, MTRDataVersionKey : @(1) } } ];
+
+    XCTestExpectation * callExpectation = [[XCTestExpectation alloc] initWithDescription:@"XPC read received"];
+    __auto_type uuid = self.controllerUUID;
+    _handleReadAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, MTRReadParams * _Nullable params,
+        void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
+        XCTAssertEqualObjects(endpointId, myEndpointId);
+        XCTAssertEqualObjects(clusterId, myClusterId);
+        XCTAssertEqualObjects(attributeId, myAttributeId);
+        [callExpectation fulfill];
+        completion([MTRDeviceController encodeXPCResponseValues:myValues], nil);
+    };
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    [device readAttributeWithEndpointID:myEndpointId clusterID:myClusterId attributeID:myAttributeId params:nil];
+
+    // Waited on with XCTWaiter, so that a read that never reaches the proxy fails on this assertion.
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ callExpectation ] timeout:kTimeoutInSeconds], XCTWaiterResultCompleted,
+        @"an MTRDevice read-through over XPC reaches the proxy");
+}
+
+- (void)testXPCInvokeNotSentWhenRequestWillBeSentReturnsNo
+{
+    // An invoke whose requestWillBeSent returns NO is not sent: like MTRBaseDevice's own path, the XPC path completes
+    // it with a cancelled error and never calls the proxy.
+    __block NSUInteger proxyCalls = 0;
+    _handleInvokeCommand
+        = ^(id controller, NSNumber * nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * commandId, id commandFields,
+            NSNumber * _Nullable timedInvokeTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+              proxyCalls += 1;
+              completion([MTRDeviceController encodeXPCResponseValues:@[ @{ MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:endpointId clusterID:clusterId commandID:commandId] } ]], nil);
+          };
+
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(9876543210) controller:_remoteDeviceController];
+    __block NSUInteger handlerCalls = 0;
+    __block NSError * responseError;
+    __block NSUInteger completions = 0;
+    XCTestExpectation * responseExpectation = [[XCTestExpectation alloc] initWithDescription:@"Invoke completed"];
+    [device _invokeCommandWithEndpointID:@100
+        clusterID:@200
+        commandID:@300
+        commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+        timedInvokeTimeout:nil
+        serverSideProcessingTimeout:nil
+        logCall:NO
+        requestWillBeSent:^BOOL {
+            handlerCalls += 1;
+            return NO;
+        }
+        queue:dispatch_get_main_queue()
+        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            completions += 1;
+            responseError = error;
+            [responseExpectation fulfill];
+        }];
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ responseExpectation ] timeout:kTimeoutInSeconds], XCTWaiterResultCompleted);
+    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Nothing more arrives"];
+    settle.inverted = YES;
+    [self waitForExpectations:@[ settle ] timeout:kNegativeTimeoutInSeconds];
+
+    XCTAssertEqual(proxyCalls, 0u, @"an invoke whose requestWillBeSent returned NO does not reach the proxy");
+    XCTAssertEqual(handlerCalls, 1u);
+    XCTAssertEqual(completions, 1u);
+    XCTAssertEqualObjects(responseError.domain, MTRErrorDomain);
+    XCTAssertEqual(responseError.code, MTRErrorCodeCancelled);
+}
+
+- (void)testGuardXPCWriteNotSentWhenRequestWillBeSentReturnsNo
+{
+    // Guard: like an invoke, and like MTRBaseDevice's own write path, an XPC write whose requestWillBeSent returns NO
+    // is not sent and completes once with a cancelled error.
+    __block NSUInteger proxyCalls = 0;
+    _handleWriteAttribute = ^(id controller, NSNumber * nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * attributeId,
+        id value, NSNumber * _Nullable timedWriteTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+        proxyCalls += 1;
+        completion([MTRDeviceController encodeXPCResponseValues:@[ @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointId clusterID:clusterId attributeID:attributeId] } ]], nil);
+    };
+
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(9876543210) controller:_remoteDeviceController];
+    __block NSUInteger handlerCalls = 0;
+    __block NSError * responseError;
+    __block NSUInteger completions = 0;
+    XCTestExpectation * responseExpectation = [[XCTestExpectation alloc] initWithDescription:@"Write completed"];
+    [device _writeAttributeWithEndpointID:@100
+        clusterID:@200
+        attributeID:@300
+        value:@{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @1 }
+        timedWriteTimeout:nil
+        requestWillBeSent:^BOOL {
+            handlerCalls += 1;
+            return NO;
+        }
+        queue:dispatch_get_main_queue()
+        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            completions += 1;
+            responseError = error;
+            [responseExpectation fulfill];
+        }];
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ responseExpectation ] timeout:kTimeoutInSeconds], XCTWaiterResultCompleted);
+    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Nothing more arrives"];
+    settle.inverted = YES;
+    [self waitForExpectations:@[ settle ] timeout:kNegativeTimeoutInSeconds];
+
+    XCTAssertEqual(proxyCalls, 0u, @"a write whose requestWillBeSent returned NO does not reach the proxy");
+    XCTAssertEqual(handlerCalls, 1u);
+    XCTAssertEqual(completions, 1u);
+    XCTAssertEqualObjects(responseError.domain, MTRErrorDomain);
+    XCTAssertEqual(responseError.code, MTRErrorCodeCancelled);
+}
+
+- (void)testGuardXPCReadSentWhenRequestWillBeSentReturnsNo
+{
+    // Guard: reads always send, like MTRBaseDevice's own path.  A NO from requestWillBeSent does not stop an XPC read.
+    __block NSUInteger proxyCalls = 0;
+    _handleReadAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, MTRReadParams * _Nullable params,
+        void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+        proxyCalls += 1;
+        completion([MTRDeviceController encodeXPCResponseValues:@[ @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointId clusterID:clusterId attributeID:attributeId], MTRDataKey : @ { MTRTypeKey : MTRSignedIntegerValueType, MTRValueKey : @1 } } ]], nil);
+    };
+
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(9876543210) controller:_remoteDeviceController];
+    __block NSUInteger handlerCalls = 0;
+    __block NSError * responseError;
+    XCTestExpectation * responseExpectation = [[XCTestExpectation alloc] initWithDescription:@"Read completed"];
+    [device readAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:@100 clusterID:@200 attributeID:@300] ]
+        eventPaths:nil
+        params:nil
+        includeDataVersion:YES
+        requestWillBeSent:^BOOL {
+            handlerCalls += 1;
+            return NO;
+        }
+        queue:dispatch_get_main_queue()
+        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            responseError = error;
+            [responseExpectation fulfill];
+        }];
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ responseExpectation ] timeout:kTimeoutInSeconds], XCTWaiterResultCompleted);
+    XCTAssertEqual(proxyCalls, 1u, @"a read is sent whatever requestWillBeSent returns");
+    XCTAssertNil(responseError);
 }
 
 - (void)testXPCConnectionFailure

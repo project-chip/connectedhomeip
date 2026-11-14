@@ -21,6 +21,8 @@
 #import <Matter/MTRStructsObjc_Private.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+@class MTRUserInvokeToken;
 // Nothing here for now, but leaving this file in place in case we need to add
 // something.
 

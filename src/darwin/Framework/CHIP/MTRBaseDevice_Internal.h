@@ -52,6 +52,12 @@ inline constexpr uint64_t kAttestationChallengeTagValue = (kAttestationChallenge
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ * Called on the Matter queue once a request has its session, right before the request is sent.  Returning NO
+ * means "do not send": the request's owner has cancelled it.
+ */
+typedef BOOL (^MTRRequestWillBeSentHandler)(void);
+
 static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 {
     static_assert(MTRTransportTypeUndefined == (uint8_t) chip::Transport::Type::kUndefined, "MTRTransportType != Transport::Type");
@@ -130,6 +136,24 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                   timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
          serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
                              logCall:(BOOL)logCall
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion;
+
+/**
+ * Like the above, but also calls requestWillBeSent, if not nil, on the Matter queue once a session is ready, right
+ * before the invoke request is sent.  It is not called if the invoke never gets to that point (e.g.
+ * can't establish a session).  If it returns NO, nothing is sent and the action ends with CHIP_ERROR_CANCELLED;
+ * the caller has then already completed its own caller and ignores that completion.  A nil requestWillBeSent means
+ * send.
+ */
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                             logCall:(BOOL)logCall
+                   requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion;
 
@@ -220,6 +244,19 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                 completion:(MTRDeviceResponseHandler)completion;
 
 /**
+ * Like the above, but also calls requestWillBeSent, if not nil, on the Matter queue once a session is ready, right
+ * before the read request is sent.  It is not called if no session could be had.  Reads always send: a NO return
+ * is treated as YES.  A nil requestWillBeSent means send.  For use from MTRDevice only.
+ */
+- (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                    params:(MTRReadParams * _Nullable)params
+        includeDataVersion:(BOOL)includeDataVersion
+         requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                     queue:(dispatch_queue_t)queue
+                completion:(MTRDeviceResponseHandler)completion;
+
+/**
  * Same as the public version, except for logging.  For use from MTRDevice only.
  */
 - (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
@@ -227,6 +264,22 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                           attributeID:(NSNumber *)attributeID
                                 value:(id)value
                     timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion;
+
+/**
+ * Like the above, but also calls requestWillBeSent, if not nil, on the Matter queue once a session is ready, right
+ * before the write request is sent.  It is not called if the write never gets to that point (e.g.
+ * can't establish a session).  If it returns NO, the write is not sent and completes with CHIP_ERROR_CANCELLED; the
+ * caller has then already completed its own caller and ignores that completion.  A nil requestWillBeSent means
+ * send.
+ */
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                    requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
                                 queue:(dispatch_queue_t)queue
                            completion:(MTRDeviceResponseHandler)completion;
 

@@ -23,6 +23,18 @@
  * If nil, the framework will try to select an appropriate timeout value itself.
  */
  @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+
+/**
+ * Marks the command as a user command and lets its caller cancel it while it is still queued.
+ *
+ * If nil (the default value), the command is queued in order with other work, as before.
+ *
+ * Only MTRCluster (MTRDevice-based) commands use this; MTRBaseCluster commands ignore it.  Copies of this
+ * object share the token rather than copying it, since cancelling is shared state.
+ *
+ * @see MTRUserInvokeToken
+ */
+@property (nonatomic, strong, nullable) MTRUserInvokeToken * userInvokeToken MTR_PROVISIONALLY_AVAILABLE;
 {{! This is using the pre-renaming names for the isAvailableBefore test, because the pre-rename things inherit
     from the post-rename ones and need to have this selector.}}
 {{else if (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name))}}

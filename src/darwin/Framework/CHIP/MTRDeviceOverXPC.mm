@@ -23,9 +23,14 @@
 #import "MTRDeviceControllerOverXPC_Internal.h"
 #import "MTRDeviceControllerXPCConnection.h"
 #import "MTRError.h"
+#import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+// MTRBaseDevice's send callback type (MTRBaseDevice_Internal.h, which this file cannot import: its C++ nodeID property
+// would clash with this class's own).  NO means "do not send".
+typedef BOOL (^MTRRequestWillBeSentHandler)(void);
 
 typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error);
 
@@ -37,6 +42,35 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
 @property (nonatomic, strong, readonly) MTRDeviceControllerXPCConnection * xpcConnection;
 
 - (void)fetchProxyHandleWithQueue:(dispatch_queue_t)queue completion:(MTRFetchProxyHandleCompletion)completion;
+
+// The XPC paths for writes and invokes.  requestWillBeSent, if not nil, is called right before the request goes to
+// the XPC proxy, and is handled as MTRBaseDevice's own paths handle it: a write or invoke whose requestWillBeSent
+// returns NO is not sent and completes with CHIP_ERROR_CANCELLED.
+- (void)_writeAttributeOverXPCWithEndpointID:(NSNumber *)endpointID
+                                   clusterID:(NSNumber *)clusterID
+                                 attributeID:(NSNumber *)attributeID
+                                       value:(id)value
+                           timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                           requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                                       queue:(dispatch_queue_t)queue
+                                  completion:(MTRDeviceResponseHandler)completion;
+- (void)_invokeCommandOverXPCWithEndpointID:(NSNumber *)endpointID
+                                  clusterID:(NSNumber *)clusterID
+                                  commandID:(NSNumber *)commandID
+                              commandFields:(id)commandFields
+                         timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                          requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                                      queue:(dispatch_queue_t)queue
+                                 completion:(MTRDeviceResponseHandler)completion;
+- (void)_invokeCommandOverXPCWithEndpointID:(NSNumber *)endpointID
+                                  clusterID:(NSNumber *)clusterID
+                                  commandID:(NSNumber *)commandID
+                              commandFields:(id)commandFields
+                         timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                          requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                                      queue:(dispatch_queue_t)queue
+                                 completion:(MTRDeviceResponseHandler)completion;
 
 @end
 
@@ -149,12 +183,31 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                      queue:(dispatch_queue_t)queue
                 completion:(MTRDeviceResponseHandler)completion
 {
+    [self readAttributePaths:attributePaths eventPaths:eventPaths params:params includeDataVersion:includeDataVersion requestWillBeSent:nil queue:queue completion:completion];
+}
+
+// MTRDevice reads through this selector.  An XPC device must override it, or MTRBaseDevice's local session path runs
+// instead and reads stop forwarding over XPC.
+- (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                    params:(MTRReadParams * _Nullable)params
+        includeDataVersion:(BOOL)includeDataVersion
+         requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                     queue:(dispatch_queue_t)queue
+                completion:(MTRDeviceResponseHandler)completion
+{
     if (attributePaths == nil || eventPaths != nil) {
         MTR_LOG_ERROR("MTRBaseDevice doesn't support reading event paths over XPC");
         dispatch_async(queue, ^{
             completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]);
         });
         return;
+    }
+
+    // The read requests go to the XPC proxy now.
+    if (requestWillBeSent) {
+        // Reads always send; the return value is for invokes.
+        (void) requestWillBeSent();
     }
 
     // TODO: Have a better XPC setup for the multiple-paths case, instead of
@@ -202,6 +255,46 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                                 queue:(dispatch_queue_t)queue
                            completion:(MTRDeviceResponseHandler)completion
 {
+    [self _writeAttributeOverXPCWithEndpointID:endpointID
+                                     clusterID:clusterID
+                                   attributeID:attributeID
+                                         value:value
+                             timedWriteTimeout:timeoutMs
+                             requestWillBeSent:nil
+                                         queue:queue
+                                    completion:completion];
+}
+
+// MTRDevice writes through this selector, not the one above.  An XPC device must override the requestWillBeSent
+// selectors too, or MTRBaseDevice's local session path runs instead and writes stop forwarding over XPC.
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                    requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion
+{
+    [self _writeAttributeOverXPCWithEndpointID:endpointID
+                                     clusterID:clusterID
+                                   attributeID:attributeID
+                                         value:value
+                             timedWriteTimeout:timeoutMs
+                             requestWillBeSent:requestWillBeSent
+                                         queue:queue
+                                    completion:completion];
+}
+
+- (void)_writeAttributeOverXPCWithEndpointID:(NSNumber *)endpointID
+                                   clusterID:(NSNumber *)clusterID
+                                 attributeID:(NSNumber *)attributeID
+                                       value:(id)value
+                           timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                           requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                                       queue:(dispatch_queue_t)queue
+                                  completion:(MTRDeviceResponseHandler)completion
+{
     MTR_LOG_DEBUG("Writing attribute ...");
 
     __auto_type workBlock = ^(MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error) {
@@ -210,6 +303,14 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
             return;
         }
 
+        // The write request goes to the XPC proxy now.  As in MTRBaseDevice's own path, NO means the write was
+        // cancelled before it was sent: send nothing.
+        if (requestWillBeSent && !requestWillBeSent()) {
+            dispatch_async(queue, ^{
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]);
+            });
+            return;
+        }
         [handle.proxy writeAttributeWithController:self.controllerID
                                             nodeId:self.nodeID.unsignedLongLongValue
                                         endpointId:endpointID
@@ -240,6 +341,25 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
+    [self _invokeCommandOverXPCWithEndpointID:endpointID
+                                    clusterID:clusterID
+                                    commandID:commandID
+                                commandFields:commandFields
+                           timedInvokeTimeout:timeoutMs
+                            requestWillBeSent:nil
+                                        queue:queue
+                                   completion:completion];
+}
+
+- (void)_invokeCommandOverXPCWithEndpointID:(NSNumber *)endpointID
+                                  clusterID:(NSNumber *)clusterID
+                                  commandID:(NSNumber *)commandID
+                              commandFields:(id)commandFields
+                         timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                          requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                                      queue:(dispatch_queue_t)queue
+                                 completion:(MTRDeviceResponseHandler)completion
+{
     MTR_LOG_DEBUG("Invoking command ...");
 
     __auto_type workBlock = ^(MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error) {
@@ -248,6 +368,14 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
             return;
         }
 
+        // The invoke request goes to the XPC proxy now.  As in MTRBaseDevice's own path, NO means the caller cancelled
+        // the command before it was sent: send nothing.
+        if (requestWillBeSent && !requestWillBeSent()) {
+            dispatch_async(queue, ^{
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]);
+            });
+            return;
+        }
         [handle.proxy invokeCommandWithController:self.controllerID
                                            nodeId:self.nodeID.unsignedLongLongValue
                                        endpointId:endpointID
@@ -280,6 +408,51 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
+    [self _invokeCommandOverXPCWithEndpointID:endpointID
+                                    clusterID:clusterID
+                                    commandID:commandID
+                                commandFields:commandFields
+                           timedInvokeTimeout:timeoutMs
+                  serverSideProcessingTimeout:serverSideProcessingTimeout
+                            requestWillBeSent:nil
+                                        queue:queue
+                                   completion:completion];
+}
+
+// MTRDevice invokes through this selector, not the one above.  An XPC device must override the requestWillBeSent
+// selectors too, or MTRBaseDevice's local session path runs instead and invokes stop forwarding over XPC.
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                             logCall:(BOOL)logCall
+                   requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
+    [self _invokeCommandOverXPCWithEndpointID:endpointID
+                                    clusterID:clusterID
+                                    commandID:commandID
+                                commandFields:commandFields
+                           timedInvokeTimeout:timeoutMs
+                  serverSideProcessingTimeout:serverSideProcessingTimeout
+                            requestWillBeSent:requestWillBeSent
+                                        queue:queue
+                                   completion:completion];
+}
+
+- (void)_invokeCommandOverXPCWithEndpointID:(NSNumber *)endpointID
+                                  clusterID:(NSNumber *)clusterID
+                                  commandID:(NSNumber *)commandID
+                              commandFields:(id)commandFields
+                         timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                          requestWillBeSent:(MTRRequestWillBeSentHandler _Nullable)requestWillBeSent
+                                      queue:(dispatch_queue_t)queue
+                                 completion:(MTRDeviceResponseHandler)completion
+{
     if (serverSideProcessingTimeout != nil) {
         MTR_LOG_ERROR("MTRBaseDevice doesn't support invokes with a server-side processing timeout over XPC");
         dispatch_async(queue, ^{
@@ -288,13 +461,14 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
         return;
     }
 
-    [self invokeCommandWithEndpointID:endpointID
-                            clusterID:clusterID
-                            commandID:commandID
-                        commandFields:commandFields
-                   timedInvokeTimeout:timeoutMs
-                                queue:queue
-                           completion:completion];
+    [self _invokeCommandOverXPCWithEndpointID:endpointID
+                                    clusterID:clusterID
+                                    commandID:commandID
+                                commandFields:commandFields
+                           timedInvokeTimeout:timeoutMs
+                            requestWillBeSent:requestWillBeSent
+                                        queue:queue
+                                   completion:completion];
 }
 
 - (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID

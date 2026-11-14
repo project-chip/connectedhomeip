@@ -6,6 +6,8 @@
 #import <Matter/MTRStructsObjc_Private.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+@class MTRUserInvokeToken;
 {{> placeholder_comment}}
 
 {{#zcl_clusters}}

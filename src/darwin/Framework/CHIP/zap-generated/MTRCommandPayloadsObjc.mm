@@ -52,6 +52,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _identifyTime = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -63,6 +64,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.identifyTime = self.identifyTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -133,6 +136,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _effectVariant = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -145,6 +149,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.effectVariant = self.effectVariant;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -218,6 +224,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupName = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -230,6 +237,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupName = self.groupName;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -422,6 +431,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -433,6 +443,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -632,6 +644,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupList = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -643,6 +656,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupList = self.groupList;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -848,6 +863,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -859,6 +875,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -1046,6 +1064,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -1056,6 +1075,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -1123,6 +1144,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupName = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -1135,6 +1157,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupName = self.groupName;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -1216,6 +1240,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -1226,6 +1251,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -1289,6 +1316,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -1299,6 +1327,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -1362,6 +1392,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -1372,6 +1403,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -1439,6 +1472,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _effectVariant = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -1451,6 +1485,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.effectVariant = self.effectVariant;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -1532,6 +1568,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -1542,6 +1579,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -1611,6 +1650,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _offWaitTime = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -1624,6 +1664,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.offWaitTime = self.offWaitTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -1704,6 +1746,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -1718,6 +1761,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -1806,6 +1851,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -1820,6 +1866,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -1910,6 +1958,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -1925,6 +1974,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -2012,6 +2063,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -2024,6 +2076,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -2101,6 +2155,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -2115,6 +2170,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -2203,6 +2260,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -2217,6 +2275,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -2307,6 +2367,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -2322,6 +2383,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -2409,6 +2472,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -2421,6 +2485,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -2492,6 +2558,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _frequency = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -2503,6 +2570,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.frequency = self.frequency;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -2571,6 +2640,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arl = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -2582,6 +2652,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arl = self.arl;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -2793,6 +2865,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -2805,6 +2878,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -2883,6 +2958,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _transitionTime = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -2896,6 +2972,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.transitionTime = self.transitionTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -2975,6 +3053,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -2987,6 +3066,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -3065,6 +3146,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _duration = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -3078,6 +3160,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.duration = self.duration;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -3157,6 +3241,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -3169,6 +3254,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -3245,6 +3332,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -3257,6 +3345,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -3335,6 +3425,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _duration = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -3348,6 +3439,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.duration = self.duration;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -3427,6 +3520,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -3439,6 +3533,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -3515,6 +3611,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -3527,6 +3624,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -3605,6 +3704,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _duration = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -3618,6 +3718,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.duration = self.duration;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -3697,6 +3799,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -3709,6 +3812,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -3787,6 +3892,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _duration = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -3800,6 +3906,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.duration = self.duration;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -3875,6 +3983,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -3885,6 +3994,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -3918,6 +4029,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _metadataForProvider = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -3936,6 +4048,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.metadataForProvider = self.metadataForProvider;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -4061,6 +4175,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 
 @implementation MTROTASoftwareUpdateProviderClusterQueryImageParams (Deprecated)
@@ -4276,6 +4391,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newVersion = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -4288,6 +4404,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newVersion = self.newVersion;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -4357,6 +4475,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams
 - (instancetype)init
@@ -4471,6 +4590,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _softwareVersion = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -4483,6 +4603,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.softwareVersion = self.softwareVersion;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -4552,6 +4674,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams
 - (instancetype)init
@@ -4569,6 +4692,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _endpoint = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -4584,6 +4708,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.endpoint = self.endpoint;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -4666,6 +4792,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 
 @implementation MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams (Deprecated)
@@ -4700,6 +4827,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _breadcrumb = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -4712,6 +4840,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -4888,6 +5018,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _breadcrumb = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -4901,6 +5032,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -5074,6 +5207,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -5084,6 +5218,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -5252,6 +5388,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _tcUserResponse = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -5264,6 +5401,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.tcUserResponse = self.tcUserResponse;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -5426,6 +5565,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _breadcrumb = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -5438,6 +5578,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -5701,6 +5843,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _possessionNonce = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -5717,6 +5860,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.possessionNonce = self.possessionNonce;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -5814,6 +5959,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _breadcrumb = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -5826,6 +5972,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -5902,6 +6050,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _breadcrumb = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -5914,6 +6063,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -6125,6 +6276,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _breadcrumb = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -6137,6 +6289,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -6330,6 +6484,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _breadcrumb = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -6343,6 +6498,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -6422,6 +6579,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _possessionNonce = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -6434,6 +6592,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.possessionNonce = self.possessionNonce;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -6611,6 +6771,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _transferFileDesignator = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -6624,6 +6785,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.transferFileDesignator = self.transferFileDesignator;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -6842,6 +7005,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _eventTrigger = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -6854,6 +7018,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.eventTrigger = self.eventTrigger;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -6923,6 +7089,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -6933,6 +7100,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -7101,6 +7270,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _count = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -7114,6 +7284,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.count = self.count;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -7275,6 +7447,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -7285,6 +7458,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -7348,6 +7523,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -7358,6 +7534,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -7421,6 +7599,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -7431,6 +7610,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -7494,6 +7675,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -7504,6 +7686,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -7573,6 +7757,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _timeSource = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -7586,6 +7771,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.timeSource = self.timeSource;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -7662,6 +7849,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRTimeSynchronizationClusterSetTrustedTimeSourceParams
 - (instancetype)init
@@ -7671,6 +7859,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _trustedTimeSource = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -7682,6 +7871,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.trustedTimeSource = self.trustedTimeSource;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -7756,6 +7947,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _timeZone = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -7767,6 +7959,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.timeZone = self.timeZone;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -7951,6 +8145,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _dstOffset = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -7962,6 +8157,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.dstOffset = self.dstOffset;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -8059,6 +8256,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _defaultNTP = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -8070,6 +8268,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.defaultNTP = self.defaultNTP;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -8145,6 +8345,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _timeoutMs = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -8157,6 +8358,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.timeoutMs = self.timeoutMs;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -8236,6 +8439,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _salt = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -8251,6 +8455,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.salt = self.salt;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -8343,6 +8549,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _commissioningTimeout = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -8354,6 +8561,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.commissioningTimeout = self.commissioningTimeout;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -8420,6 +8629,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -8430,6 +8640,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -8495,6 +8707,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _attestationNonce = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -8506,6 +8719,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.attestationNonce = self.attestationNonce;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -8762,6 +8977,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _maxSegmentSize = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -8776,6 +8992,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.maxSegmentSize = self.maxSegmentSize;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -8977,6 +9195,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _isForUpdateNOC = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -8989,6 +9208,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.isForUpdateNOC = self.isForUpdateNOC;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -9168,6 +9389,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _adminVendorId = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -9183,6 +9405,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.adminVendorId = self.adminVendorId;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -9268,6 +9492,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _icacValue = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -9280,6 +9505,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.icacValue = self.icacValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -9469,6 +9696,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _label = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -9480,6 +9708,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.label = self.label;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -9548,6 +9778,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _fabricIndex = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -9559,6 +9790,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.fabricIndex = self.fabricIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -9627,6 +9860,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _rootCACertificate = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -9638,6 +9872,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.rootCACertificate = self.rootCACertificate;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -9722,6 +9958,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _vvsc = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -9735,6 +9972,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.vvsc = self.vvsc;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -9820,6 +10059,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _clientChallenge = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -9832,6 +10072,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.clientChallenge = self.clientChallenge;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -10004,6 +10246,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupKeySet = [MTRGroupKeyManagementClusterGroupKeySetStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -10015,6 +10258,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupKeySet = self.groupKeySet;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -10120,6 +10365,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupKeySetID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -10131,6 +10377,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupKeySetID = self.groupKeySetID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -10322,6 +10570,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupKeySetID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -10333,6 +10582,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupKeySetID = self.groupKeySetID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -10399,6 +10650,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -10409,6 +10661,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -10587,6 +10841,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _clientType = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -10602,6 +10857,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.clientType = self.clientType;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -10776,6 +11033,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _verificationKey = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -10788,6 +11046,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.verificationKey = self.verificationKey;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -10862,6 +11122,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _stayActiveDuration = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -10873,6 +11134,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.stayActiveDuration = self.stayActiveDuration;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -11028,6 +11291,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -11038,6 +11302,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -11101,6 +11367,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -11111,6 +11378,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -11284,6 +11553,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newMode = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -11295,6 +11565,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -11466,6 +11738,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newModeTag = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -11477,6 +11750,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newModeTag = self.newModeTag;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -11545,6 +11820,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newMode = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -11556,6 +11832,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -11624,6 +11902,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newMode = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -11635,6 +11914,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -11806,6 +12087,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newModeTag = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -11817,6 +12099,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newModeTag = self.newModeTag;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -11885,6 +12169,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newMode = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -11896,6 +12181,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -12067,6 +12354,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newModeTag = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -12078,6 +12366,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newModeTag = self.newModeTag;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -12146,6 +12436,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newMode = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -12157,6 +12448,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -12328,6 +12621,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newModeTag = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -12339,6 +12633,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newModeTag = self.newModeTag;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -12407,6 +12703,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newMode = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -12418,6 +12715,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -12589,6 +12888,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newModeTag = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -12600,6 +12900,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newModeTag = self.newModeTag;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -12670,6 +12972,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _targetTemperatureLevel = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -12682,6 +12985,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.targetTemperatureLevel = self.targetTemperatureLevel;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -12759,6 +13064,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newMode = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -12770,6 +13076,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -12941,6 +13249,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newModeTag = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -12952,6 +13261,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newModeTag = self.newModeTag;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -13018,6 +13329,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -13028,6 +13340,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -13093,6 +13407,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _alarms = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -13104,6 +13419,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.alarms = self.alarms;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -13172,6 +13489,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _mask = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -13183,6 +13501,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.mask = self.mask;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -13259,6 +13579,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _startAfterSetting = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -13274,6 +13595,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.startAfterSetting = self.startAfterSetting;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -13369,6 +13692,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _timeToAdd = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -13380,6 +13704,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.timeToAdd = self.timeToAdd;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -13446,6 +13772,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -13456,6 +13783,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -13519,6 +13848,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -13529,6 +13859,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -13592,6 +13924,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -13602,6 +13935,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -13665,6 +14000,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -13675,6 +14011,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -13846,6 +14184,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -13856,6 +14195,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -13919,6 +14260,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -13929,6 +14271,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -14100,6 +14444,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -14110,6 +14455,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -14183,6 +14530,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _extensionFieldSetStructs = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -14198,6 +14546,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.extensionFieldSetStructs = self.extensionFieldSetStructs;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -14458,6 +14808,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -14470,6 +14821,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -14749,6 +15102,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -14761,6 +15115,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -14933,6 +15289,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -14944,6 +15301,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -15109,6 +15468,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -15121,6 +15481,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -15297,6 +15659,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _transitionTime = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -15310,6 +15673,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.transitionTime = self.transitionTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -15392,6 +15757,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -15403,6 +15769,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -15608,6 +15976,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _sceneIdentifierTo = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -15623,6 +15992,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.sceneIdentifierTo = self.sceneIdentifierTo;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -15804,6 +16175,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newMode = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -15815,6 +16187,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -15986,6 +16360,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newModeTag = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -15997,6 +16372,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newModeTag = self.newModeTag;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -16077,6 +16454,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _mcastAddrPolicy = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -16094,6 +16472,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.mcastAddrPolicy = self.mcastAddrPolicy;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -16216,6 +16596,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _endpoints = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -16228,6 +16609,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.endpoints = self.endpoints;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -16437,6 +16820,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _key = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -16450,6 +16834,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.key = self.key;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -16529,6 +16915,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _useAuxiliaryACL = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -16541,6 +16928,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.useAuxiliaryACL = self.useAuxiliaryACL;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -16614,6 +17003,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _durationSeconds = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -16626,6 +17016,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.durationSeconds = self.durationSeconds;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -16698,6 +17090,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -16708,6 +17101,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -16771,6 +17166,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -16781,6 +17177,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -16844,6 +17242,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -16854,6 +17253,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -16919,6 +17320,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _alarmsToSuppress = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -16930,6 +17332,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.alarmsToSuppress = self.alarmsToSuppress;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -16998,6 +17402,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _alarmsToEnableDisable = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -17009,6 +17414,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.alarmsToEnableDisable = self.alarmsToEnableDisable;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -17079,6 +17486,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _targetLevel = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -17091,6 +17499,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.targetLevel = self.targetLevel;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -17171,6 +17581,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -17181,6 +17592,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -17246,6 +17659,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _boostInfo = [MTRWaterHeaterManagementClusterWaterHeaterBoostInfoStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -17257,6 +17671,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.boostInfo = self.boostInfo;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -17343,6 +17759,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -17353,6 +17770,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -17418,6 +17837,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _details = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -17429,6 +17849,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.details = self.details;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -17650,6 +18072,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _details = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -17661,6 +18084,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.details = self.details;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -17908,6 +18333,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _messageURI = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -17927,6 +18353,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.messageURI = self.messageURI;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -18067,6 +18495,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _messageIDs = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -18078,6 +18507,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.messageIDs = self.messageIDs;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -18172,6 +18603,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -18185,6 +18617,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -18257,6 +18691,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -18267,6 +18702,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -18334,6 +18771,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -18346,6 +18784,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -18419,6 +18859,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -18431,6 +18872,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -18500,6 +18943,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -18510,6 +18954,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -18579,6 +19025,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -18592,6 +19039,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -18695,6 +19144,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -18707,6 +19157,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -18811,6 +19263,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -18821,6 +19274,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -18892,6 +19347,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -18906,6 +19362,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -18987,6 +19445,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -18997,6 +19456,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -19190,6 +19651,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -19200,6 +19662,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -19269,6 +19733,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _maximumChargeCurrent = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -19282,6 +19747,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.maximumChargeCurrent = self.maximumChargeCurrent;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -19363,6 +19830,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _maximumDischargeCurrent = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -19375,6 +19843,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.maximumDischargeCurrent = self.maximumDischargeCurrent;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -19449,6 +19919,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -19459,6 +19930,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -19524,6 +19997,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _chargingTargetSchedules = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -19535,6 +20009,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.chargingTargetSchedules = self.chargingTargetSchedules;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -19654,6 +20130,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -19664,6 +20141,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -19727,6 +20206,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -19737,6 +20217,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -19802,6 +20284,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newMode = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -19813,6 +20296,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -19984,6 +20469,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newModeTag = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -19995,6 +20481,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newModeTag = self.newModeTag;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -20063,6 +20551,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newMode = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -20074,6 +20563,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -20245,6 +20736,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newModeTag = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -20256,6 +20748,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newModeTag = self.newModeTag;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -20324,6 +20818,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newMode = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -20335,6 +20830,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -20506,6 +21003,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newModeTag = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -20517,6 +21015,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newModeTag = self.newModeTag;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -20585,6 +21085,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _alarms = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -20596,6 +21097,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.alarms = self.alarms;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -20664,6 +21167,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _mask = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -20675,6 +21179,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.mask = self.mask;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -20761,6 +21267,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _powerExportThreshold = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -20781,6 +21288,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.powerExportThreshold = self.powerExportThreshold;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -20906,6 +21415,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _mask = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -20917,6 +21427,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.mask = self.mask;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -20985,6 +21497,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _pinCode = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -20996,6 +21509,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.pinCode = self.pinCode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -21067,6 +21582,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _pinCode = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -21078,6 +21594,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.pinCode = self.pinCode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -21151,6 +21669,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _pinCode = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -21163,6 +21682,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.pinCode = self.pinCode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -21249,6 +21770,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _endMinute = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -21266,6 +21788,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.endMinute = self.endMinute;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -21354,6 +21878,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _userIndex = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -21366,6 +21891,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.userIndex = self.userIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -21592,6 +22119,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _userIndex = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -21604,6 +22132,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.userIndex = self.userIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -21681,6 +22211,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _localEndTime = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -21695,6 +22226,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.localEndTime = self.localEndTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -21774,6 +22307,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _userIndex = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -21786,6 +22320,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.userIndex = self.userIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -21982,6 +22518,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _userIndex = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -21994,6 +22531,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.userIndex = self.userIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -22071,6 +22610,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _operatingMode = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -22085,6 +22625,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.operatingMode = self.operatingMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -22162,6 +22704,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _holidayIndex = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -22173,6 +22716,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.holidayIndex = self.holidayIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -22368,6 +22913,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _holidayIndex = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -22379,6 +22925,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.holidayIndex = self.holidayIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -22459,6 +23007,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _credentialRule = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -22476,6 +23025,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.credentialRule = self.credentialRule;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -22599,6 +23150,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _userIndex = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -22610,6 +23162,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.userIndex = self.userIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -22891,6 +23445,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _userIndex = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -22902,6 +23457,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.userIndex = self.userIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -22980,6 +23537,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _userType = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -22996,6 +23554,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.userType = self.userType;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -23206,6 +23766,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _credential = [MTRDoorLockClusterCredentialStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -23217,6 +23778,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.credential = self.credential;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -23431,6 +23994,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _credential = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -23442,6 +24006,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.credential = self.credential;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -23516,6 +24082,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _pinCode = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -23527,6 +24094,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.pinCode = self.pinCode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -23604,6 +24173,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupResolvingKey = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -23618,6 +24188,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupResolvingKey = self.groupResolvingKey;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -23696,6 +24268,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -23706,6 +24279,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -23769,6 +24344,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -23779,6 +24355,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -23842,6 +24420,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -23852,6 +24431,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -23915,6 +24496,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -23925,6 +24507,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -23990,6 +24574,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _liftValue = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -24001,6 +24586,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.liftValue = self.liftValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -24069,6 +24656,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _liftPercent100thsValue = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -24080,6 +24668,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.liftPercent100thsValue = self.liftPercent100thsValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -24148,6 +24738,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _tiltValue = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -24159,6 +24750,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.tiltValue = self.tiltValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -24227,6 +24820,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _tiltPercent100thsValue = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -24238,6 +24832,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.tiltPercent100thsValue = self.tiltPercent100thsValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -24304,6 +24900,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -24314,6 +24911,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -24383,6 +24982,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _speed = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -24396,6 +24996,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.speed = self.speed;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -24477,6 +25079,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -24487,6 +25090,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -24556,6 +25161,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _speed = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -24569,6 +25175,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.speed = self.speed;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -24656,6 +25264,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _speed = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -24669,6 +25278,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.speed = self.speed;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -24756,6 +25367,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _speed = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -24769,6 +25381,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.speed = self.speed;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -24850,6 +25464,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _speed = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -24863,6 +25478,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.speed = self.speed;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -24950,6 +25567,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _speed = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -24963,6 +25581,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.speed = self.speed;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -25040,6 +25660,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newAreas = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -25051,6 +25672,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newAreas = self.newAreas;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -25240,6 +25863,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _skippedArea = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -25251,6 +25875,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.skippedArea = self.skippedArea;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -25420,6 +26046,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _amount = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -25432,6 +26059,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.amount = self.amount;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -25643,6 +26272,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _transitions = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -25657,6 +26287,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.transitions = self.transitions;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -25770,6 +26402,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _modeToReturn = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -25782,6 +26415,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.modeToReturn = self.modeToReturn;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -25940,6 +26575,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -25950,6 +26586,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -26015,6 +26653,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _scheduleHandle = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -26026,6 +26665,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.scheduleHandle = self.scheduleHandle;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -26094,6 +26735,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _presetHandle = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -26105,6 +26747,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.presetHandle = self.presetHandle;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -26182,6 +26826,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _expirationInMinutes = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -26195,6 +26840,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.expirationInMinutes = self.expirationInMinutes;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -26274,6 +26921,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _uniqueID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -26285,6 +26933,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.uniqueID = self.uniqueID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -26478,6 +27128,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _timeout = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -26491,6 +27142,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.timeout = self.timeout;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -26594,6 +27247,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _lowestOff = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -26607,6 +27261,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.lowestOff = self.lowestOff;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -26697,6 +27353,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optimal = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -26713,6 +27370,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optimal = self.optimal;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -26822,6 +27481,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -26837,6 +27497,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -26923,6 +27585,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -26937,6 +27600,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -27022,6 +27687,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -27037,6 +27703,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -27123,6 +27791,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -27137,6 +27806,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -27220,6 +27891,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -27234,6 +27906,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -27319,6 +27993,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -27334,6 +28009,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -27422,6 +28099,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -27437,6 +28115,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -27525,6 +28205,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -27540,6 +28221,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -27626,6 +28309,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -27640,6 +28324,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -27725,6 +28411,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -27740,6 +28427,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -27826,6 +28515,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -27840,6 +28530,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -27937,6 +28629,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -27952,6 +28645,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -28038,6 +28733,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -28052,6 +28748,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -28137,6 +28835,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -28152,6 +28851,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -28240,6 +28941,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -28255,6 +28957,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -28347,6 +29051,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -28364,6 +29069,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -28452,6 +29159,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -28464,6 +29172,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -28545,6 +29255,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -28561,6 +29272,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -28656,6 +29369,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -28673,6 +29387,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -28765,6 +29481,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _colorPalette = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -28779,6 +29496,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.colorPalette = self.colorPalette;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -28921,6 +29640,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -28931,6 +29651,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -29010,6 +29732,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _reportingCondition = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -29028,6 +29751,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.reportingCondition = self.reportingCondition;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -29255,6 +29980,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _sessionID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -29266,6 +29992,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.sessionID = self.sessionID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -29334,6 +30062,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _clientIdentity = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -29345,6 +30074,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.clientIdentity = self.clientIdentity;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -29504,6 +30235,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _clientIdentifier = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -29516,6 +30248,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.clientIdentifier = self.clientIdentifier;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -29599,6 +30333,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _identifier = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -29613,6 +30348,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.identifier = self.identifier;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -29791,6 +30528,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _networkAdministratorSharedSecret = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -29802,6 +30540,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.networkAdministratorSharedSecret = self.networkAdministratorSharedSecret;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -29868,6 +30608,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -29878,6 +30619,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -30030,6 +30773,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -30040,6 +30784,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -30192,6 +30938,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -30202,6 +30949,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -30265,6 +31014,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -30275,6 +31025,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -30431,6 +31183,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _breadcrumb = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -30443,6 +31196,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -30517,6 +31272,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _pendingDataset = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -30528,6 +31284,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.pendingDataset = self.pendingDataset;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -30596,6 +31354,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _operationalDataset = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -30607,6 +31366,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.operationalDataset = self.operationalDataset;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -30675,6 +31436,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _extendedPanID = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -30686,6 +31448,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.extendedPanID = self.extendedPanID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -30754,6 +31518,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _extendedPanID = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -30765,6 +31530,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.extendedPanID = self.extendedPanID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -30934,6 +31701,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _wiFiBand = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -30951,6 +31719,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.wiFiBand = self.wiFiBand;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -31134,6 +31904,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _sessionID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -31145,6 +31916,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.sessionID = self.sessionID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -31220,6 +31993,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _wiFiBands = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -31232,6 +32006,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.wiFiBands = self.wiFiBands;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -31438,6 +32214,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _wiFiBands = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -31451,6 +32228,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.wiFiBands = self.wiFiBands;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -31530,6 +32309,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _wiFiBands = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -31542,6 +32322,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.wiFiBands = self.wiFiBands;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -31620,6 +32402,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _message = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -31633,6 +32416,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.message = self.message;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -31811,6 +32596,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _match = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -31822,6 +32608,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.match = self.match;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -31997,6 +32785,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _minorNumber = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -32009,6 +32798,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.minorNumber = self.minorNumber;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -32080,6 +32871,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _count = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -32091,6 +32883,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.count = self.count;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -32171,6 +32965,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _data = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -32188,6 +32983,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.data = self.data;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -32831,6 +33628,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _data = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -32845,6 +33643,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.data = self.data;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -32951,6 +33751,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _data = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -32965,6 +33766,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.data = self.data;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -33067,6 +33870,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _data = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -33079,6 +33883,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.data = self.data;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -33256,6 +34062,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -33266,6 +34073,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -33329,6 +34138,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -33339,6 +34149,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -33402,6 +34214,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -33412,6 +34225,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -33473,6 +34288,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRMediaPlaybackClusterStartOverParams
 - (instancetype)init
@@ -33480,6 +34296,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -33490,6 +34307,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -33553,6 +34372,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -33563,6 +34383,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -33626,6 +34448,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -33636,6 +34459,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -33701,6 +34526,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _audioAdvanceUnmuted = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -33712,6 +34538,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.audioAdvanceUnmuted = self.audioAdvanceUnmuted;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -33783,6 +34611,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _audioAdvanceUnmuted = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -33794,6 +34623,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.audioAdvanceUnmuted = self.audioAdvanceUnmuted;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -33865,6 +34696,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _deltaPositionMilliseconds = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -33876,6 +34708,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.deltaPositionMilliseconds = self.deltaPositionMilliseconds;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -33944,6 +34778,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _deltaPositionMilliseconds = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -33955,6 +34790,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.deltaPositionMilliseconds = self.deltaPositionMilliseconds;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -34128,6 +34965,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _position = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -34139,6 +34977,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.position = self.position;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -34209,6 +35049,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _audioOutputIndex = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -34221,6 +35062,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.audioOutputIndex = self.audioOutputIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -34292,6 +35135,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _trackID = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -34303,6 +35147,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.trackID = self.trackID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -34369,6 +35215,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -34379,6 +35226,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -34444,6 +35293,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _index = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -34455,6 +35305,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.index = self.index;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -34521,6 +35373,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -34531,6 +35384,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -34594,6 +35449,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -34604,6 +35460,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -34671,6 +35529,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _name = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -34683,6 +35542,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.name = self.name;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -34752,6 +35613,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -34762,6 +35624,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -34827,6 +35691,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _keyCode = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -34838,6 +35703,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.keyCode = self.keyCode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -35009,6 +35876,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _contentAppProductID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -35026,6 +35894,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.contentAppProductID = self.contentAppProductID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -35284,6 +36154,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _nextUrl = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -35303,6 +36174,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.nextUrl = self.nextUrl;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -35741,6 +36614,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -35751,6 +36625,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -36033,6 +36909,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _presetID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -36044,6 +36921,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.presetID = self.presetID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -36112,6 +36991,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _index = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -36123,6 +37003,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.index = self.index;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -36193,6 +37075,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _name = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -36205,6 +37088,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.name = self.name;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -36278,6 +37163,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _data = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -36290,6 +37176,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.data = self.data;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -36368,6 +37256,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _application = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -36379,6 +37268,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.application = self.application;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -36451,6 +37342,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _application = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -36462,6 +37354,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.application = self.application;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -36635,6 +37529,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _tempAccountIdentifier = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -36646,6 +37541,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.tempAccountIdentifier = self.tempAccountIdentifier;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -36813,6 +37710,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _node = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -36826,6 +37724,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.node = self.node;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -36903,6 +37803,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _node = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -36914,6 +37815,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.node = self.node;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -36983,6 +37886,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -36993,6 +37897,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -37189,6 +38095,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _newPIN = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -37201,6 +38108,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.newPIN = self.newPIN;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -37270,6 +38179,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -37280,6 +38190,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -37436,6 +38348,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -37446,6 +38359,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -37509,6 +38424,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -37519,6 +38435,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -37586,6 +38504,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _bonusTime = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -37598,6 +38517,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.bonusTime = self.bonusTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -37672,6 +38593,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _screenTime = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -37683,6 +38605,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.screenTime = self.screenTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -37749,6 +38673,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -37759,6 +38684,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -37822,6 +38749,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -37832,6 +38760,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -37897,6 +38827,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _rating = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -37908,6 +38839,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.rating = self.rating;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -37976,6 +38909,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _rating = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -37987,6 +38921,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.rating = self.rating;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -38055,6 +38991,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _channels = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -38066,6 +39003,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.channels = self.channels;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -38167,6 +39106,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _channelIndexes = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -38178,6 +39118,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.channelIndexes = self.channelIndexes;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -38268,6 +39210,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _applications = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -38279,6 +39222,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.applications = self.applications;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -38370,6 +39315,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _applications = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -38381,6 +39327,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.applications = self.applications;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -38472,6 +39420,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _timeWindow = [MTRContentControlClusterTimeWindowStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -38483,6 +39432,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.timeWindow = self.timeWindow;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -38583,6 +39534,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _timeWindowIndexes = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -38594,6 +39546,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.timeWindowIndexes = self.timeWindowIndexes;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -38686,6 +39640,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _encodingHint = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -38698,6 +39653,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.encodingHint = self.encodingHint;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -38895,6 +39852,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _imageURI = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -38909,6 +39867,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.imageURI = self.imageURI;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -39085,6 +40045,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _fileID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -39096,6 +40057,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.fileID = self.fileID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -39168,6 +40131,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _supportedMimeTypes = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -39181,6 +40145,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.supportedMimeTypes = self.supportedMimeTypes;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -39280,6 +40246,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _responseID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -39291,6 +40258,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.responseID = self.responseID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -39483,6 +40452,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _imageURI = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -39498,6 +40468,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.imageURI = self.imageURI;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -39576,6 +40548,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -39586,6 +40559,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -39649,6 +40624,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -39659,6 +40635,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -39722,6 +40700,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -39732,6 +40711,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -39799,6 +40780,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _unmutePolicy = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -39811,6 +40793,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.unmutePolicy = self.unmutePolicy;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -39889,6 +40873,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _unmuteVolume = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -39902,6 +40887,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.unmuteVolume = self.unmuteVolume;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -39987,6 +40974,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _unmutePolicy = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -39999,6 +40987,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.unmutePolicy = self.unmutePolicy;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -40080,6 +41070,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _endpointID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -40093,6 +41084,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.endpointID = self.endpointID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -40307,6 +41300,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _endpointID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -40321,6 +41315,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.endpointID = self.endpointID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -40443,6 +41439,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _zoneID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -40454,6 +41451,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.zoneID = self.zoneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -40522,6 +41521,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _trigger = [MTRZoneManagementClusterZoneTriggerControlStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -40533,6 +41533,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.trigger = self.trigger;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -40609,6 +41611,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _zoneID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -40620,6 +41623,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.zoneID = self.zoneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -40698,6 +41703,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _bitDepth = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -40714,6 +41720,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.bitDepth = self.bitDepth;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -40886,6 +41894,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _audioStreamID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -40897,6 +41906,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.audioStreamID = self.audioStreamID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -40985,6 +41996,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _osdEnabled = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -41006,6 +42018,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.osdEnabled = self.osdEnabled;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -41205,6 +42219,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _osdEnabled = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -41218,6 +42233,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.osdEnabled = self.osdEnabled;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -41298,6 +42315,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _videoStreamID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -41309,6 +42327,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.videoStreamID = self.videoStreamID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -41389,6 +42409,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _osdEnabled = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -41406,6 +42427,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.osdEnabled = self.osdEnabled;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -41593,6 +42616,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _osdEnabled = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -41606,6 +42630,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.osdEnabled = self.osdEnabled;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -41686,6 +42712,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _snapshotStreamID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -41697,6 +42724,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.snapshotStreamID = self.snapshotStreamID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -41765,6 +42794,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _streamPriorities = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -41776,6 +42806,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.streamPriorities = self.streamPriorities;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -41868,6 +42900,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _requestedResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -41880,6 +42913,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.requestedResolution = self.requestedResolution;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -42064,6 +43099,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _zoom = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -42077,6 +43113,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.zoom = self.zoom;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -42164,6 +43202,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _zoomDelta = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -42177,6 +43216,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.zoomDelta = self.zoomDelta;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -42260,6 +43301,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _presetID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -42271,6 +43313,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.presetID = self.presetID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -42341,6 +43385,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _name = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -42353,6 +43398,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.name = self.name;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -42427,6 +43474,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _presetID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -42438,6 +43486,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.presetID = self.presetID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -42508,6 +43558,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _viewport = [MTRDataTypeViewportStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -42520,6 +43571,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.viewport = self.viewport;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -42600,6 +43653,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _zoomDelta = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -42614,6 +43668,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.zoomDelta = self.zoomDelta;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -42718,6 +43774,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _audioStreams = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -42738,6 +43795,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.audioStreams = self.audioStreams;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -43114,6 +44173,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _audioStreams = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -43136,6 +44196,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.audioStreams = self.audioStreams;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -43497,6 +44559,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _sdp = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -43509,6 +44572,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.sdp = self.sdp;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -43582,6 +44647,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _iceCandidates = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -43594,6 +44660,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.iceCandidates = self.iceCandidates;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -43701,6 +44769,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _reason = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -43713,6 +44782,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.reason = self.reason;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -43790,6 +44861,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _iceTransportPolicy = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -43804,6 +44876,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.iceTransportPolicy = self.iceTransportPolicy;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -43945,6 +45019,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _sdp = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -43957,6 +45032,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.sdp = self.sdp;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -44030,6 +45107,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _iceCandidates = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -44042,6 +45120,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.iceCandidates = self.iceCandidates;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -44149,6 +45229,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _reason = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -44161,6 +45242,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.reason = self.reason;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -44232,6 +45315,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -44243,6 +45327,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.transportOptions = self.transportOptions;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -44735,6 +45821,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _connectionID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -44746,6 +45833,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.connectionID = self.connectionID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -44816,6 +45905,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -44828,6 +45918,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.transportOptions = self.transportOptions;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -45060,6 +46152,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _transportStatus = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -45072,6 +46165,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.transportStatus = self.transportStatus;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -45154,6 +46249,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _userDefined = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -45168,6 +46264,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.userDefined = self.userDefined;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -45254,6 +46352,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _connectionID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -45265,6 +46364,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.connectionID = self.connectionID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -45621,6 +46722,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _motionSensitivity = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -45634,6 +46736,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.motionSensitivity = self.motionSensitivity;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -45755,6 +46859,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _chimeID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -45766,6 +46871,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.chimeID = self.chimeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -45837,6 +46944,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _contextTriggers = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -45848,6 +46956,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.contextTriggers = self.contextTriggers;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -45990,6 +47100,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _contextTriggers = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -46001,6 +47112,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.contextTriggers = self.contextTriggers;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -46143,6 +47256,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _nodeID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -46154,6 +47268,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.nodeID = self.nodeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -46315,6 +47431,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _pushAVEndpointID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -46328,6 +47445,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.pushAVEndpointID = self.pushAVEndpointID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -46408,6 +47527,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _analysisStreamID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -46419,6 +47539,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.analysisStreamID = self.analysisStreamID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -46487,6 +47609,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _analysisStreamID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -46498,6 +47621,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.analysisStreamID = self.analysisStreamID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -46566,6 +47691,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _tariffComponentID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -46577,6 +47703,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.tariffComponentID = self.tariffComponentID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -46860,6 +47988,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _dayEntryID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -46871,6 +48000,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.dayEntryID = self.dayEntryID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -47051,6 +48182,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _label = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -47065,6 +48197,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.label = self.label;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -47147,6 +48281,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _responseTimeoutSeconds = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -47159,6 +48294,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.responseTimeoutSeconds = self.responseTimeoutSeconds;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -47343,6 +48480,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupKeySet = [MTRJointFabricDatastoreClusterDatastoreGroupKeySetStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -47354,6 +48492,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupKeySet = self.groupKeySet;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -47459,6 +48599,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupKeySet = [MTRJointFabricDatastoreClusterDatastoreGroupKeySetStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -47470,6 +48611,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupKeySet = self.groupKeySet;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -47575,6 +48718,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupKeySetID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -47586,6 +48730,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupKeySetID = self.groupKeySetID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -47664,6 +48810,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupPermission = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -47680,6 +48827,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupPermission = self.groupPermission;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -47788,6 +48937,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupPermission = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -47804,6 +48954,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupPermission = self.groupPermission;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -47912,6 +49064,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -47923,6 +49076,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -47997,6 +49152,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _icac = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -48011,6 +49167,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.icac = self.icac;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -48092,6 +49250,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _icac = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -48105,6 +49264,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.icac = self.icac;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -48185,6 +49346,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _nodeID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -48196,6 +49358,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.nodeID = self.nodeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -48266,6 +49430,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _friendlyName = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -48278,6 +49443,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.friendlyName = self.friendlyName;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -48349,6 +49516,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _nodeID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -48360,6 +49528,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.nodeID = self.nodeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -48430,6 +49600,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _friendlyName = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -48442,6 +49613,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.friendlyName = self.friendlyName;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -48513,6 +49686,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _nodeID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -48524,6 +49698,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.nodeID = self.nodeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -48596,6 +49772,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _friendlyName = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -48609,6 +49786,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.friendlyName = self.friendlyName;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -48687,6 +49866,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -48700,6 +49880,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -48778,6 +49960,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -48791,6 +49974,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -48869,6 +50054,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _binding = [MTRJointFabricDatastoreClusterDatastoreBindingTargetStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -48882,6 +50068,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.binding = self.binding;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -48975,6 +50163,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _nodeID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -48988,6 +50177,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.nodeID = self.nodeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -49064,6 +50255,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _aclEntry = [MTRJointFabricDatastoreClusterDatastoreAccessControlEntryStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -49076,6 +50268,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.aclEntry = self.aclEntry;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -49223,6 +50417,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _nodeID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -49235,6 +50430,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.nodeID = self.nodeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -49304,6 +50501,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -49314,6 +50512,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -49478,6 +50678,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _icacValue = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -49489,6 +50690,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.icacValue = self.icacValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -49654,6 +50857,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _salt = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -49669,6 +50873,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.salt = self.salt;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -49747,6 +50953,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -49757,6 +50964,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -49909,6 +51118,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -49919,6 +51129,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -49984,6 +51196,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _endpointID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -49995,6 +51208,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.endpointID = self.endpointID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -50065,6 +51280,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _caid = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -50077,6 +51293,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.caid = self.caid;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -50242,6 +51460,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _caid = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -50253,6 +51472,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.caid = self.caid;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -50436,6 +51657,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _fingerprint = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -50447,6 +51669,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.fingerprint = self.fingerprint;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -50604,6 +51828,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _caid = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -50615,6 +51840,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.caid = self.caid;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -50685,6 +51912,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _ccdid = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -50697,6 +51925,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.ccdid = self.ccdid;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -50878,6 +52108,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _intermediateCertificates = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -50891,6 +52122,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.intermediateCertificates = self.intermediateCertificates;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -50987,6 +52220,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _ccdid = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -50998,6 +52232,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.ccdid = self.ccdid;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -51204,6 +52440,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _fingerprint = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -51215,6 +52452,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.fingerprint = self.fingerprint;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -51372,6 +52611,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _ccdid = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -51383,6 +52623,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.ccdid = self.ccdid;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -51459,6 +52701,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _endpointID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -51474,6 +52717,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.endpointID = self.endpointID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -51653,6 +52898,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _endpointID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -51664,6 +52910,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.endpointID = self.endpointID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -51832,6 +53080,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _endpointID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -51843,6 +53092,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.endpointID = self.endpointID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -51909,6 +53160,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -51919,6 +53171,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -51980,6 +53234,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestSpecificResponseParams
 - (instancetype)init
@@ -52083,6 +53338,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -52093,6 +53349,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -52154,6 +53412,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestAddArgumentsResponseParams
 - (instancetype)init
@@ -52257,6 +53516,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -52267,6 +53527,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -52328,6 +53590,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestSimpleArgumentResponseParams
 - (instancetype)init
@@ -52431,6 +53694,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -52441,6 +53705,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -52502,6 +53768,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestStructArrayArgumentResponseParams
 - (instancetype)init
@@ -52814,6 +54081,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg2 = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -52826,6 +54094,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg2 = self.arg2;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -52895,6 +54165,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestListInt8UReverseResponseParams
 - (instancetype)init
@@ -53014,6 +54285,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg1 = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -53025,6 +54297,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -53090,6 +54364,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestEnumsResponseParams
 - (instancetype)init
@@ -53212,6 +54487,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg6 = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -53228,6 +54504,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg6 = self.arg6;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -53528,6 +54806,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestNullableOptionalResponseParams
 - (instancetype)init
@@ -53670,6 +54949,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg1 = [MTRUnitTestingClusterSimpleStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -53681,6 +54961,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -53757,6 +55039,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestComplexNullableOptionalResponseParams
 - (instancetype)init
@@ -54220,6 +55503,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg1 = [MTRUnitTestingClusterNestedStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -54231,6 +55515,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -54325,6 +55611,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterBooleanResponseParams
 - (instancetype)init
@@ -54430,6 +55717,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg1 = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -54441,6 +55729,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -54539,6 +55829,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterSimpleStructResponseParams
 - (instancetype)init
@@ -54661,6 +55952,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg1 = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -54672,6 +55964,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -54759,6 +56053,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestEmitTestEventResponseParams
 - (instancetype)init
@@ -54864,6 +56159,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg1 = [MTRUnitTestingClusterNestedStructList new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -54875,6 +56171,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -55056,6 +56354,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams
 - (instancetype)init
@@ -55161,6 +56460,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg1 = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -55172,6 +56472,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -55375,6 +56677,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestBatchHelperResponseParams
 - (instancetype)init
@@ -55473,6 +56776,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg1 = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -55484,6 +56788,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -55571,6 +56877,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterStringEchoResponseParams
 - (instancetype)init
@@ -55671,6 +56978,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg2 = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -55683,6 +56991,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg2 = self.arg2;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -55752,6 +57062,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterGlobalEchoResponseParams
 - (instancetype)init
@@ -55871,6 +57182,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg1 = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -55882,6 +57194,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -55955,6 +57269,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestComplexNullableOptionalRequestParams
 - (instancetype)init
@@ -55986,6 +57301,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _nullableOptionalList = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -56008,6 +57324,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.nullableOptionalList = self.nullableOptionalList;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -56280,6 +57598,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterSimpleStructEchoRequestParams
 - (instancetype)init
@@ -56289,6 +57608,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg1 = [MTRUnitTestingClusterSimpleStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -56300,6 +57620,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -56376,6 +57698,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTimedInvokeRequestParams
 - (instancetype)init
@@ -56383,6 +57706,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -56393,6 +57717,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -56454,6 +57780,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams
 - (instancetype)init
@@ -56463,6 +57790,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg1 = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -56474,6 +57802,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -56542,6 +57872,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestEmitTestEventRequestParams
 - (instancetype)init
@@ -56555,6 +57886,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg3 = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -56568,6 +57900,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg3 = self.arg3;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -56641,6 +57975,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams
 - (instancetype)init
@@ -56650,6 +57985,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg1 = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -56661,6 +57997,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -56726,6 +58064,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
+@dynamic userInvokeToken;
 @end
 @implementation MTRUnitTestingClusterTestBatchHelperRequestParams
 - (instancetype)init
@@ -56739,6 +58078,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _fillCharacter = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -56752,6 +58092,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.fillCharacter = self.fillCharacter;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -56830,6 +58172,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _fillCharacter = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -56843,6 +58186,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.fillCharacter = self.fillCharacter;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -56917,6 +58262,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _payload = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -56928,6 +58274,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.payload = self.payload;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -56998,6 +58346,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _field2 = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -57010,6 +58359,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.field2 = self.field2;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -57091,6 +58442,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -57101,6 +58453,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -57166,6 +58520,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg1 = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -57177,6 +58532,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -57338,6 +58695,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -57348,6 +58706,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }
@@ -57504,6 +58864,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _arg2 = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
+        _userInvokeToken = nil;
     }
     return self;
 }
@@ -57516,6 +58877,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.arg2 = self.arg2;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+    // Copies share the token: cancelling it cancels the invoke made with either object.
+    other.userInvokeToken = self.userInvokeToken;
 
     return other;
 }

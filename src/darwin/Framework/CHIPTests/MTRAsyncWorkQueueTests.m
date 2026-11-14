@@ -688,4 +688,513 @@
     XCTAssertEqual([workQueue itemCount], 0, @"Queue should be empty after all items complete");
 }
 
+#pragma mark - User commands ahead of unsent reads
+
+// A read that has sent nothing is queued, not running, so a user command ("jumper") may go ahead of it.
+- (MTRAsyncWorkItem *)_readItemNamed:(NSString *)name order:(NSMutableArray<NSString *> *)order sendNow:(BOOL)sendNow onQueue:(MTRAsyncWorkQueue *)workQueue
+{
+    MTRAsyncWorkItem * item = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    item.tracksSend = YES;
+    MTRAsyncWorkItem * __weak weakItem = item;
+    item.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        @synchronized(order) {
+            [order addObject:name];
+        }
+        if (sendNow) {
+            [workQueue workItem:weakItem readyToSend:^ {}];
+        }
+        completion(MTRAsyncWorkComplete);
+    };
+    return item;
+}
+
+- (MTRAsyncWorkItem *)_jumperNamed:(NSString *)name order:(NSMutableArray<NSString *> *)order
+{
+    MTRAsyncWorkItem * item = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    item.jumpsUnsentWork = YES;
+    item.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        @synchronized(order) {
+            [order addObject:name];
+        }
+        completion(MTRAsyncWorkComplete);
+    };
+    return item;
+}
+
+// Holds the queue's only slot until the returned block is called.
+- (dispatch_block_t)_holdQueue:(MTRAsyncWorkQueue *)workQueue order:(NSMutableArray<NSString *> *)order
+{
+    dispatch_semaphore_t started = dispatch_semaphore_create(0);
+    dispatch_semaphore_t release = dispatch_semaphore_create(0);
+    MTRAsyncWorkItem * hold = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    hold.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        @synchronized(order) {
+            [order addObject:@"hold"];
+        }
+        dispatch_semaphore_signal(started);
+        dispatch_semaphore_wait(release, DISPATCH_TIME_FOREVER);
+        completion(MTRAsyncWorkComplete);
+    };
+    [workQueue enqueueWorkItem:hold description:@"hold"];
+    XCTAssertEqual(dispatch_semaphore_wait(started, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+    return ^{
+        dispatch_semaphore_signal(release);
+    };
+}
+
+- (void)_waitForOrderCount:(NSUInteger)count order:(NSMutableArray<NSString *> *)order
+{
+    XCTNSPredicateExpectation * done = [[XCTNSPredicateExpectation alloc] initWithPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable object, NSDictionary * _Nullable bindings) {
+        @synchronized(order) {
+            return order.count >= count;
+        }
+    }]
+                                                                                     object:nil];
+    [self waitForExpectations:@[ done ] timeout:2];
+}
+
+- (void)testJumperRunsAheadOfQueuedReads
+{
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    NSMutableArray<NSString *> * order = [NSMutableArray array];
+    dispatch_block_t release = [self _holdQueue:workQueue order:order];
+    [workQueue enqueueWorkItem:[self _readItemNamed:@"A" order:order sendNow:YES onQueue:workQueue] description:@"read A"];
+    [workQueue enqueueWorkItem:[self _readItemNamed:@"B" order:order sendNow:YES onQueue:workQueue] description:@"read B"];
+    [workQueue enqueueWorkItem:[self _jumperNamed:@"J" order:order] description:@"jumper J"];
+    release();
+    [self _waitForOrderCount:4 order:order];
+    @synchronized(order) {
+        XCTAssertEqualObjects(order, (@[ @"hold", @"J", @"A", @"B" ]));
+    }
+}
+
+- (void)testJumperRunsBesideUnsentRead
+{
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    NSMutableArray<NSString *> * order = [NSMutableArray array];
+    dispatch_semaphore_t readRunning = dispatch_semaphore_create(0);
+    __block MTRAsyncWorkCompletionBlock readCompletion;
+    MTRAsyncWorkItem * read = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    read.tracksSend = YES;
+    read.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        readCompletion = completion; // phase 1: waiting for a session, nothing sent
+        dispatch_semaphore_signal(readRunning);
+    };
+    [workQueue enqueueWorkItem:read description:@"unsent read R"];
+    XCTAssertEqual(dispatch_semaphore_wait(readRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+
+    [workQueue enqueueWorkItem:[self _jumperNamed:@"J" order:order] description:@"jumper J"];
+    [self _waitForOrderCount:1 order:order];
+    @synchronized(order) {
+        XCTAssertEqualObjects(order, (@[ @"J" ]), @"the jumper starts while the only slot holds an unsent read");
+    }
+    readCompletion(MTRAsyncWorkComplete);
+}
+
+- (void)testOnlyOneJumperAboveWidth
+{
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    dispatch_semaphore_t readRunning = dispatch_semaphore_create(0);
+    __block MTRAsyncWorkCompletionBlock readCompletion;
+    MTRAsyncWorkItem * read = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    read.tracksSend = YES;
+    read.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        readCompletion = completion;
+        dispatch_semaphore_signal(readRunning);
+    };
+    [workQueue enqueueWorkItem:read description:@"unsent read R"];
+    XCTAssertEqual(dispatch_semaphore_wait(readRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+
+    // Semaphores, not expectations: on a queue without jumpers these items run after the test has returned.
+    // Held strongly by the blocks below, which can outlive this test if a wait times out.
+    NSObject * lock = [[NSObject alloc] init];
+    __block int started = 0;
+    dispatch_semaphore_t jumperStarted = dispatch_semaphore_create(0);
+    dispatch_semaphore_t j1Release = dispatch_semaphore_create(0);
+    for (int i = 0; i < 2; i++) {
+        MTRAsyncWorkItem * jumper = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        jumper.jumpsUnsentWork = YES;
+        jumper.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+            BOOL first;
+            @synchronized(lock) {
+                first = (++started == 1);
+            }
+            dispatch_semaphore_signal(jumperStarted);
+            if (first) {
+                dispatch_semaphore_wait(j1Release, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+            }
+            completion(MTRAsyncWorkComplete);
+        };
+        [workQueue enqueueWorkItem:jumper descriptionWithFormat:@"jumper J%d", i + 1];
+    }
+    XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"one jumper runs above width");
+    // Give the second jumper every chance to start, too.
+    XCTAssertNotEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5 * NSEC_PER_SEC))), 0, @"only one jumper above width");
+    dispatch_semaphore_signal(j1Release);
+    XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"the second jumper runs once the first completes");
+    @synchronized(lock) {
+        XCTAssertEqual(started, 2);
+    }
+    readCompletion(MTRAsyncWorkComplete);
+}
+
+- (void)testOnlyOneSendTrackingJumperAboveWidth
+{
+    // The cap on user commands above the width holds even for user commands that also track their send: while one
+    // runs beside work that has sent nothing, a second waits for it, although everything running is still unsent.
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    dispatch_semaphore_t readRunning = dispatch_semaphore_create(0);
+    __block MTRAsyncWorkCompletionBlock readCompletion;
+    MTRAsyncWorkItem * read = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    read.tracksSend = YES;
+    read.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        readCompletion = completion;
+        dispatch_semaphore_signal(readRunning);
+    };
+    [workQueue enqueueWorkItem:read description:@"unsent read R"];
+    XCTAssertEqual(dispatch_semaphore_wait(readRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+
+    // Semaphores, not expectations: a jumper that never starts must not fulfill anything after the test returns.
+    // Held strongly by the blocks below, which can outlive this test if a wait times out.
+    NSObject * lock = [[NSObject alloc] init];
+    __block int started = 0;
+    dispatch_semaphore_t jumperStarted = dispatch_semaphore_create(0);
+    dispatch_semaphore_t j1Release = dispatch_semaphore_create(0);
+    for (int i = 0; i < 2; i++) {
+        MTRAsyncWorkItem * jumper = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        jumper.jumpsUnsentWork = YES;
+        jumper.tracksSend = YES; // and it never calls workItem:readyToSend:, so it stays unsent
+        jumper.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+            BOOL first;
+            @synchronized(lock) {
+                first = (++started == 1);
+            }
+            dispatch_semaphore_signal(jumperStarted);
+            if (first) {
+                dispatch_semaphore_wait(j1Release, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+            }
+            completion(MTRAsyncWorkComplete);
+        };
+        [workQueue enqueueWorkItem:jumper descriptionWithFormat:@"send-tracking jumper J%d", i + 1];
+    }
+    XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"one jumper runs above width");
+    XCTAssertNotEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5 * NSEC_PER_SEC))), 0, @"a second send-tracking jumper does not start while the first runs");
+    dispatch_semaphore_signal(j1Release);
+    XCTAssertEqual(dispatch_semaphore_wait(jumperStarted, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"the second jumper runs once the first completes");
+    @synchronized(lock) {
+        XCTAssertEqual(started, 2);
+    }
+    readCompletion(MTRAsyncWorkComplete);
+}
+
+- (void)testReadSendAfterJumperSendReturns
+{
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    dispatch_semaphore_t readRunning = dispatch_semaphore_create(0);
+    __block MTRAsyncWorkItem * __weak weakRead;
+    __block MTRAsyncWorkCompletionBlock readCompletion;
+    MTRAsyncWorkItem * read = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    read.tracksSend = YES;
+    weakRead = read;
+    read.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        readCompletion = completion;
+        dispatch_semaphore_signal(readRunning);
+    };
+    [workQueue enqueueWorkItem:read description:@"unsent read R"];
+    XCTAssertEqual(dispatch_semaphore_wait(readRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+
+    // Held strongly by the blocks below, which can outlive this test if a wait times out.
+    NSObject * lock = [[NSObject alloc] init];
+    NSMutableArray<NSString *> * events = [NSMutableArray array];
+    dispatch_semaphore_t jumperSending = dispatch_semaphore_create(0);
+    dispatch_semaphore_t jumperSendRelease = dispatch_semaphore_create(0);
+    MTRAsyncWorkItem * jumper = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    jumper.jumpsUnsentWork = YES;
+    MTRAsyncWorkItem * __weak weakJumper = jumper;
+    jumper.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        [workQueue workItem:weakJumper readyToSend:^{
+            dispatch_semaphore_signal(jumperSending);
+            dispatch_semaphore_wait(jumperSendRelease, DISPATCH_TIME_FOREVER);
+            @synchronized(lock) {
+                [events addObject:@"J sent"];
+            }
+        }];
+        completion(MTRAsyncWorkComplete);
+    };
+    [workQueue enqueueWorkItem:jumper description:@"jumper J"];
+    XCTAssertEqual(dispatch_semaphore_wait(jumperSending, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"jumper reached its send");
+
+    XCTestExpectation * readSent = [self expectationWithDescription:@"read sent"];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+        [workQueue workItem:weakRead readyToSend:^{
+            @synchronized(lock) {
+                [events addObject:@"R sent"];
+            }
+            [readSent fulfill];
+        }];
+    });
+    [NSThread sleepForTimeInterval:0.3];
+    dispatch_semaphore_signal(jumperSendRelease);
+    [self waitForExpectations:@[ readSent ] timeout:2];
+    @synchronized(lock) {
+        XCTAssertEqualObjects(events, (@[ @"J sent", @"R sent" ]), @"the read sends after the jumper's send returns");
+    }
+    readCompletion(MTRAsyncWorkComplete);
+}
+
+- (void)testJumperInPhase1DoesNotHoldReadSend
+{
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    dispatch_semaphore_t readRunning = dispatch_semaphore_create(0);
+    __block MTRAsyncWorkItem * __weak weakRead;
+    __block MTRAsyncWorkCompletionBlock readCompletion;
+    MTRAsyncWorkItem * read = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    read.tracksSend = YES;
+    weakRead = read;
+    read.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        readCompletion = completion;
+        dispatch_semaphore_signal(readRunning);
+    };
+    [workQueue enqueueWorkItem:read description:@"unsent read R"];
+    XCTAssertEqual(dispatch_semaphore_wait(readRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+
+    __block MTRAsyncWorkCompletionBlock jumperCompletion;
+    dispatch_semaphore_t jumperRunning = dispatch_semaphore_create(0);
+    MTRAsyncWorkItem * jumper = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    jumper.jumpsUnsentWork = YES;
+    jumper.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        jumperCompletion = completion; // stuck in phase 1: never calls readyToSend
+        dispatch_semaphore_signal(jumperRunning);
+    };
+    [workQueue enqueueWorkItem:jumper description:@"jumper J"];
+    // At the base the jumper waits behind R; either way R's send must not wait for it.
+    dispatch_semaphore_wait(jumperRunning, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5 * NSEC_PER_SEC)));
+
+    __block BOOL sentInsideCall = NO;
+    __block BOOL inCall = YES;
+    [workQueue workItem:weakRead readyToSend:^{
+        sentInsideCall = inCall;
+    }];
+    inCall = NO;
+    XCTAssertTrue(sentInsideCall, @"a jumper in phase 1 does not hold back a read that has its session");
+    readCompletion(MTRAsyncWorkComplete);
+    // The jumper has run by now (beside R, or after it); let it finish so the queue drains.
+    if (!jumperCompletion) {
+        dispatch_semaphore_wait(jumperRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC));
+    }
+    if (jumperCompletion) {
+        jumperCompletion(MTRAsyncWorkComplete);
+    }
+}
+
+- (void)testReadPhasesBackToBackWithoutJumper
+{
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    XCTestExpectation * done = [self expectationWithDescription:@"read done"];
+    __block BOOL sentInsideCall = NO;
+    MTRAsyncWorkItem * read = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    read.tracksSend = YES;
+    MTRAsyncWorkItem * __weak weakRead = read;
+    read.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        __block BOOL inCall = YES;
+        [workQueue workItem:weakRead readyToSend:^{
+            sentInsideCall = inCall;
+        }];
+        inCall = NO;
+        completion(MTRAsyncWorkComplete);
+        [done fulfill];
+    };
+    [workQueue enqueueWorkItem:read description:@"read R"];
+    [self waitForExpectations:@[ done ] timeout:2];
+    XCTAssertTrue(sentInsideCall, @"with no jumper, a read's send runs inside its readyToSend call");
+}
+
+- (void)testJumperWaitsForSentRead
+{
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    NSMutableArray<NSString *> * order = [NSMutableArray array];
+    dispatch_semaphore_t readSent = dispatch_semaphore_create(0);
+    dispatch_semaphore_t readRelease = dispatch_semaphore_create(0);
+    MTRAsyncWorkItem * read = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    read.tracksSend = YES;
+    MTRAsyncWorkItem * __weak weakRead = read;
+    read.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        [workQueue workItem:weakRead readyToSend:^ {}];
+        dispatch_semaphore_signal(readSent);
+        dispatch_semaphore_wait(readRelease, DISPATCH_TIME_FOREVER);
+        @synchronized(order) {
+            [order addObject:@"R"];
+        }
+        completion(MTRAsyncWorkComplete);
+    };
+    [workQueue enqueueWorkItem:read description:@"sent read R"];
+    XCTAssertEqual(dispatch_semaphore_wait(readSent, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+    [workQueue enqueueWorkItem:[self _jumperNamed:@"J" order:order] description:@"jumper J"];
+    [NSThread sleepForTimeInterval:0.3];
+    @synchronized(order) {
+        XCTAssertEqual(order.count, 0, @"a read that has sent finishes first");
+    }
+    dispatch_semaphore_signal(readRelease);
+    [self _waitForOrderCount:2 order:order];
+    @synchronized(order) {
+        XCTAssertEqualObjects(order, (@[ @"R", @"J" ]));
+    }
+}
+
+- (void)testCancelQueuedItemNeverRuns
+{
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    NSMutableArray<NSString *> * order = [NSMutableArray array];
+    dispatch_block_t release = [self _holdQueue:workQueue order:order];
+    __block int readyCalls = 0;
+    XCTestExpectation * cancelled = [self expectationWithDescription:@"cancel handler ran"];
+    MTRAsyncWorkItem * victim = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    victim.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        readyCalls++;
+        completion(MTRAsyncWorkComplete);
+    };
+    victim.cancelHandler = ^{
+        [cancelled fulfill];
+    };
+    [workQueue enqueueWorkItem:victim description:@"victim"];
+    [workQueue enqueueWorkItem:[self _jumperNamed:@"next" order:order] description:@"next"];
+    XCTAssertTrue([workQueue cancelWorkItemIfUnsent:victim]);
+    release();
+    [self waitForExpectations:@[ cancelled ] timeout:2];
+    [self _waitForOrderCount:2 order:order];
+    [NSThread sleepForTimeInterval:0.2];
+    XCTAssertEqual(readyCalls, 0);
+    XCTAssertEqual([workQueue itemCount], 0);
+}
+
+- (void)testCancelSentItemRefused
+{
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    dispatch_semaphore_t sent = dispatch_semaphore_create(0);
+    dispatch_semaphore_t release = dispatch_semaphore_create(0);
+    XCTestExpectation * completed = [self expectationWithDescription:@"sent item completed"];
+    MTRAsyncWorkItem * item = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    item.jumpsUnsentWork = YES;
+    MTRAsyncWorkItem * __weak weakItem = item;
+    item.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        [workQueue workItem:weakItem readyToSend:^ {}];
+        dispatch_semaphore_signal(sent);
+        dispatch_semaphore_wait(release, DISPATCH_TIME_FOREVER);
+        XCTAssertTrue(completion(MTRAsyncWorkComplete));
+        [completed fulfill];
+    };
+    [workQueue enqueueWorkItem:item description:@"sent item"];
+    XCTAssertEqual(dispatch_semaphore_wait(sent, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+    XCTAssertFalse([workQueue cancelWorkItemIfUnsent:item]);
+    dispatch_semaphore_signal(release);
+    [self waitForExpectations:@[ completed ] timeout:2];
+}
+
+- (void)testCancelBeforeEnqueueNeverRuns
+{
+    // A cancel can arrive after the caller made the item and before it enqueued it (a user command token is tied to
+    // its item first).  The cancel returns YES and the item never runs: the enqueue calls its cancel handler instead.
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    __block int readyCalls = 0;
+    XCTestExpectation * cancelled = [self expectationWithDescription:@"cancel handler ran"];
+    MTRAsyncWorkItem * item = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    item.jumpsUnsentWork = YES;
+    item.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        @synchronized(workQueue) {
+            readyCalls++;
+        }
+        completion(MTRAsyncWorkComplete);
+    };
+    item.cancelHandler = ^{
+        [cancelled fulfill];
+    };
+    XCTAssertTrue([workQueue cancelWorkItemIfUnsent:item], @"an item not yet enqueued has sent nothing");
+    [workQueue enqueueWorkItem:item description:@"cancelled before enqueue"];
+    [self waitForExpectations:@[ cancelled ] timeout:2];
+    XCTAssertEqual([workQueue itemCount], 0);
+
+    // Anything enqueued after it runs; the cancelled item still has not.
+    XCTestExpectation * nextRan = [self expectationWithDescription:@"next item ran"];
+    MTRAsyncWorkItem * next = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    next.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        completion(MTRAsyncWorkComplete);
+        [nextRan fulfill];
+    };
+    [workQueue enqueueWorkItem:next description:@"next"];
+    [self waitForExpectations:@[ nextRan ] timeout:2];
+    @synchronized(workQueue) {
+        XCTAssertEqual(readyCalls, 0);
+    }
+}
+
+- (void)testInvalidateWithJumperAboveWidthFreesItsSlot
+{
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    dispatch_semaphore_t readRunning = dispatch_semaphore_create(0);
+    MTRAsyncWorkItem * read = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    read.tracksSend = YES;
+    read.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        dispatch_semaphore_signal(readRunning); // never completes before invalidate
+    };
+    [workQueue enqueueWorkItem:read description:@"unsent read R"];
+    XCTAssertEqual(dispatch_semaphore_wait(readRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+
+    dispatch_semaphore_t jumperRunning = dispatch_semaphore_create(0);
+    MTRAsyncWorkItem * jumper = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    jumper.jumpsUnsentWork = YES;
+    jumper.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        dispatch_semaphore_signal(jumperRunning); // never completes before invalidate
+    };
+    [workQueue enqueueWorkItem:jumper description:@"jumper J"];
+    XCTAssertEqual(dispatch_semaphore_wait(jumperRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0, @"jumper runs above width");
+
+    [workQueue invalidate];
+    XCTAssertEqual([workQueue itemCount], 0);
+
+    XCTestExpectation * nextRan = [self expectationWithDescription:@"item after invalidate ran"];
+    MTRAsyncWorkItem * next = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    next.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        completion(MTRAsyncWorkComplete);
+        [nextRan fulfill];
+    };
+    [workQueue enqueueWorkItem:next description:@"next"];
+    [self waitForExpectations:@[ nextRan ] timeout:2];
+}
+
+- (void)testSendFailureAfterReadyToSendReleasesJumperSlot
+{
+    // Fifth exit: the send hook ran (item marked sent) and the send itself then failed; the item completes through
+    // its normal completion, which releases the jumper slot.
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null];
+    dispatch_semaphore_t readRunning = dispatch_semaphore_create(0);
+    __block MTRAsyncWorkCompletionBlock readCompletion;
+    MTRAsyncWorkItem * read = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    read.tracksSend = YES;
+    read.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        readCompletion = completion;
+        dispatch_semaphore_signal(readRunning);
+    };
+    [workQueue enqueueWorkItem:read description:@"unsent read R"];
+    XCTAssertEqual(dispatch_semaphore_wait(readRunning, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC)), 0);
+
+    NSMutableArray<NSString *> * order = [NSMutableArray array];
+    MTRAsyncWorkItem * failing = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    failing.jumpsUnsentWork = YES;
+    MTRAsyncWorkItem * __weak weakFailing = failing;
+    failing.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        [workQueue workItem:weakFailing readyToSend:^ {}];
+        @synchronized(order) {
+            [order addObject:@"J1 send failed"];
+        }
+        completion(MTRAsyncWorkComplete); // the send failed after the hook
+    };
+    [workQueue enqueueWorkItem:failing description:@"jumper J1"];
+    [workQueue enqueueWorkItem:[self _jumperNamed:@"J2" order:order] description:@"jumper J2"];
+    [self _waitForOrderCount:2 order:order];
+    @synchronized(order) {
+        XCTAssertEqualObjects(order, (@[ @"J1 send failed", @"J2" ]), @"the slot is free for the next jumper while R is still unsent");
+    }
+    readCompletion(MTRAsyncWorkComplete);
+}
+
 @end
