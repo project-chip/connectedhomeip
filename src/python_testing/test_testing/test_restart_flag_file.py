@@ -324,18 +324,28 @@ class TestRestartFlagReader(unittest.TestCase):
 
     def test_request_published_before_rejection_is_not_overwritten(self):
         self._real_replace = os.replace
+        real_link = os.link
         injected = []
 
-        def racing_replace(src, dst):
-            # The monitor is about to act on the flag file holding the unknown content: a valid request lands first.
-            if not injected and (src == self.flag or (dst == self.flag and src.endswith(".rejected"))):
+        def inject_before_rejection_install(src, dst):
+            # The monitor has claimed the unknown content and is about to install the rejection marker: a valid
+            # request lands in that window.
+            if not injected and dst == self.flag and src.endswith(".rejected"):
                 injected.append(True)
                 self._write_flag_directly("restart")
+
+        def racing_replace(src, dst):
+            inject_before_rejection_install(src, dst)
             return self._real_replace(src, dst)
+
+        def racing_link(src, dst):
+            inject_before_rejection_install(src, dst)
+            return real_link(src, dst)
 
         with open(self.flag, "w") as f:
             f.write("factory res3t")
-        with mock.patch.object(run_python_test.os, "replace", racing_replace):
+        with mock.patch.object(run_python_test.os, "replace", racing_replace), \
+                mock.patch.object(run_python_test.os, "link", racing_link):
             self._start_monitor()
             self._wait_for(lambda: self.app_manager.called)
             self._wait_consumed()

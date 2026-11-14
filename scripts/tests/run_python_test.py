@@ -395,7 +395,6 @@ class AppRestartMonitor:
 
     def _publish_rejection(self, content: str) -> None:
         rejected_path = f"{self.restart_flag_file}.rejected"
-        published = False
         try:
             # O_EXCL never follows a symlink planted at this path; unlinking first removes such a link, not its target.
             with contextlib.suppress(FileNotFoundError):
@@ -407,8 +406,12 @@ class AppRestartMonitor:
             claim = self._claim_flag_file(content)
             if claim is not None:
                 try:
-                    os.replace(rejected_path, self.restart_flag_file)
-                    published = True
+                    # A link never overwrites, so a request published after the claim keeps the flag path.
+                    os.link(rejected_path, self.restart_flag_file)
+                except FileExistsError:
+                    # A newer request was published since the claim; it wins, and the unknown content is dropped.
+                    os.unlink(claim)
+                    return
                 except BaseException:
                     self._restore_claim(claim)
                     raise
@@ -416,9 +419,9 @@ class AppRestartMonitor:
         except OSError:
             pass  # Retried on the next poll.
         finally:
-            if not published:
-                with contextlib.suppress(OSError):
-                    os.unlink(rejected_path)
+            # After a successful link the flag path holds its own link to the marker, so the sibling always goes.
+            with contextlib.suppress(OSError):
+                os.unlink(rejected_path)
 
     def _run(self) -> None:
         unknown_polls, unknown_content = 0, None
