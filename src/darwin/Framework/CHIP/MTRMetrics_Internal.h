@@ -30,7 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 // The flow ID for a UUID string received from another process, or a new flow ID if it is not one.
 + (NSUUID *)_flowIDWithString:(id _Nullable)flowID;
 
-// The current flow ID, or a new one if there is none.
+// The current flow ID, or a new one if there is none.  Callers capture it before work that
+// hops queues and make it current again on the other side, so every callback caused by one
+// event (a report, a session result, a subscription reset) shares a flow.
 + (NSUUID *)_currentOrNewFlowID;
 
 // Runs block with flowID current on this thread, then restores the previous current flow ID.

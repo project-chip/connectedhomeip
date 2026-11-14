@@ -357,7 +357,6 @@ MTR_DIRECT_MEMBERS
 - (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^ _Nullable)(MTRDeviceDelegateInfo * delegateInfo))block
 {
     os_unfair_lock_assert_owner(&self->_lock);
-    // Every delegate gets the same flow for one callback.
     MTRMetricsScope metricsScope(block ? [MTRMetrics _currentOrNewFlowID] : MTRMetrics.currentFlowID);
 
     NSUInteger delegateInfoCount = _delegateManager.delegateInfoCount;
@@ -369,7 +368,6 @@ MTR_DIRECT_MEMBERS
 - (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
 {
     os_unfair_lock_assert_owner(&self->_lock);
-    // Every delegate gets the same flow for one callback.
     MTRMetricsScope metricsScope([MTRMetrics _currentOrNewFlowID]);
 
     NSUInteger delegateInfoCount = _delegateManager.delegateInfoCount;
