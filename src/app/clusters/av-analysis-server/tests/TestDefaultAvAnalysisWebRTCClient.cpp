@@ -476,9 +476,11 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
     RecordingCallback mCallback;
     FakePeerDelegate mPeerDelegate;
     StubRequestorDelegate mRequestorDelegate;
+    FabricTable mFabricTable;
     // Not endpoint 1: the offer's OriginatingEndpointID must come from this registration and not
     // from a plausible default
-    WebRTCTransportRequestor::WebRTCTransportRequestorCluster mRequestorCluster{ kRequestorEndpoint, mRequestorDelegate };
+    WebRTCTransportRequestor::WebRTCTransportRequestorCluster mRequestorCluster{ kRequestorEndpoint, mRequestorDelegate,
+                                                                                 mFabricTable };
     // Declared last: the client's destructor cancels through the delegate and the requestor
     // cluster, so they must still be alive. InterceptingWebRTCClient overrides EstablishSession.
     InterceptingWebRTCClient mClient;

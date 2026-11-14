@@ -136,7 +136,7 @@ public:
 class TestValidateUrl : public ::testing::Test
 {
 public:
-    TestValidateUrl() : mServer{ 1, BitFlags<Feature>(1) }, mClusterTester(mServer) {}
+    TestValidateUrl() : mClusterTester(mServer) {}
 
     void SetUp() override
     {
@@ -234,7 +234,8 @@ public:
     }
 
 protected:
-    PushAvStreamTransportServer mServer;
+    FabricTable mFabricTable;
+    PushAvStreamTransportServer mServer{ 1, BitFlags<Feature>(1), mFabricTable };
     chip::Testing::ClusterTester mClusterTester;
 };
 

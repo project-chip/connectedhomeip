@@ -21,6 +21,7 @@
 #include <app/data-model/Decode.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/FabricTestFixture.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/WebRTCTransportProvider/Attributes.h>
@@ -57,6 +58,11 @@ public:
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession, bool & outDeferredOffer) override
     {
+        outSession.id             = args.sessionId;
+        outSession.peerNodeID     = args.peerNodeId;
+        outSession.peerEndpointID = args.originatingEndpointId;
+        outSession.streamUsage    = args.streamUsage;
+        outSession.SetFabricIndex(args.fabricIndex);
         return CHIP_NO_ERROR;
     }
 
@@ -72,7 +78,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) override { return CHIP_NO_ERROR; }
+    std::vector<uint16_t> endedSessionIds;
+
+    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) override
+    {
+        endedSessionIds.push_back(sessionId);
+        return CHIP_NO_ERROR;
+    }
 
     CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<std::vector<uint16_t>> & videoStreams,
                                    Optional<std::vector<uint16_t>> & audioStreams) override
@@ -131,7 +143,8 @@ struct TestWebRTCTransportProviderCluster : public ::testing::Test
 TEST_F(TestWebRTCTransportProviderCluster, TestAttributes)
 {
     MockWebRTCTransportProviderDelegate mockDelegate;
-    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
+    FabricTable fabricTable;
+    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate, fabricTable);
 
     ASSERT_TRUE(IsAttributesListEqualTo(server, { WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry }));
 }
@@ -139,7 +152,8 @@ TEST_F(TestWebRTCTransportProviderCluster, TestAttributes)
 TEST_F(TestWebRTCTransportProviderCluster, TestCommands)
 {
     MockWebRTCTransportProviderDelegate mockDelegate;
-    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
+    FabricTable fabricTable;
+    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate, fabricTable);
 
     ASSERT_TRUE(IsAcceptedCommandsListEqualTo(server,
                                               {
@@ -154,7 +168,8 @@ TEST_F(TestWebRTCTransportProviderCluster, TestCommands)
 TEST_F(TestWebRTCTransportProviderCluster, TestCurrentSessionsAttribute)
 {
     MockWebRTCTransportProviderDelegate mockDelegate;
-    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
+    FabricTable fabricTable;
+    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate, fabricTable);
 
     // Initially, no sessions should exist
     auto sessions = server.GetCurrentSessions();
@@ -164,7 +179,8 @@ TEST_F(TestWebRTCTransportProviderCluster, TestCurrentSessionsAttribute)
 TEST_F(TestWebRTCTransportProviderCluster, TestSessionManagement)
 {
     MockWebRTCTransportProviderDelegate mockDelegate;
-    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
+    FabricTable fabricTable;
+    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate, fabricTable);
 
     // Verify initial state
     auto sessions = server.GetCurrentSessions();
@@ -180,7 +196,8 @@ TEST_F(TestWebRTCTransportProviderCluster, TestReadCurrentSessionsAttribute)
 {
     TestServerClusterContext context;
     MockWebRTCTransportProviderDelegate mockDelegate;
-    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
+    FabricTable fabricTable;
+    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate, fabricTable);
     ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(server);
@@ -200,7 +217,8 @@ TEST_F(TestWebRTCTransportProviderCluster, TestReadClusterRevisionAttribute)
 {
     TestServerClusterContext context;
     MockWebRTCTransportProviderDelegate mockDelegate;
-    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
+    FabricTable fabricTable;
+    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate, fabricTable);
     ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(server);
@@ -218,7 +236,8 @@ TEST_F(TestWebRTCTransportProviderCluster, TestReadUnsupportedAttribute)
 {
     TestServerClusterContext context;
     MockWebRTCTransportProviderDelegate mockDelegate;
-    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
+    FabricTable fabricTable;
+    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate, fabricTable);
     ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(server);
@@ -230,6 +249,53 @@ TEST_F(TestWebRTCTransportProviderCluster, TestReadUnsupportedAttribute)
     EXPECT_EQ(status.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::UnsupportedAttribute);
 
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Removing a fabric ends only that fabric's sessions; other fabrics' sessions survive.
+TEST_F(TestWebRTCTransportProviderCluster, TestFabricRemovedTearsDownSessions)
+{
+    TestServerClusterContext context;
+    FabricTestFixture fabricHelper{ &context.StorageDelegate() };
+
+    FabricIndex fabric1 = kTestFabricIndex;
+    ASSERT_EQ(fabricHelper.SetUpTestFabric(fabric1), CHIP_NO_ERROR);
+    FabricIndex fabric2 = static_cast<FabricIndex>(kTestFabricIndex + 1);
+    ASSERT_EQ(fabricHelper.AddAdditionalTestFabric(fabric2), CHIP_NO_ERROR);
+
+    MockWebRTCTransportProviderDelegate mockDelegate;
+    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate, fabricHelper.GetFabricTable());
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(server);
+
+    Commands::SolicitOffer::Type solicitRequest;
+    solicitRequest.streamUsage   = StreamUsageEnum::kLiveView;
+    solicitRequest.videoStreamID = Optional<DataModel::Nullable<uint16_t>>(1);
+
+    tester.SetFabricIndex(fabric1);
+    auto result = tester.Invoke(Commands::SolicitOffer::Id, solicitRequest);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_EQ(server.GetCurrentSessions().size(), 1u);
+    uint16_t session1 = server.GetCurrentSessions()[0].id;
+
+    tester.SetFabricIndex(fabric2);
+    auto result2 = tester.Invoke(Commands::SolicitOffer::Id, solicitRequest);
+    ASSERT_TRUE(result2.IsSuccess());
+    ASSERT_EQ(server.GetCurrentSessions().size(), 2u);
+    uint16_t session2 = server.GetCurrentSessions()[1].id;
+
+    // Removing fabric1 fires OnFabricRemoved: fabric1's session ends, fabric2's remains.
+    EXPECT_EQ(fabricHelper.GetFabricTable().Delete(fabric1), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mockDelegate.endedSessionIds.size(), 1u);
+    EXPECT_EQ(mockDelegate.endedSessionIds[0], session1);
+
+    ASSERT_EQ(server.GetCurrentSessions().size(), 1u);
+    EXPECT_EQ(server.GetCurrentSessions()[0].id, session2);
+    EXPECT_EQ(server.GetCurrentSessions()[0].GetFabricIndex(), fabric2);
+
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(fabricHelper.TearDownTestFabric(fabric2), CHIP_NO_ERROR);
 }
 
 } // namespace
