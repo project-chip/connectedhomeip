@@ -55,9 +55,11 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportRequestor {
 
-WebRTCTransportRequestorCluster::WebRTCTransportRequestorCluster(EndpointId endpointId, WebRTCTransportRequestor::Delegate & delegate,
+WebRTCTransportRequestorCluster::WebRTCTransportRequestorCluster(EndpointId endpointId,
+                                                                 WebRTCTransportRequestor::Delegate & delegate,
                                                                  FabricTable & fabricTable) :
-    DefaultServerCluster({ endpointId, Id }), mDelegate(delegate), mFabricTable(fabricTable)
+    DefaultServerCluster({ endpointId, Id }),
+    mDelegate(delegate), mFabricTable(fabricTable)
 {}
 
 CHIP_ERROR WebRTCTransportRequestorCluster::Startup(ServerClusterContext & context)

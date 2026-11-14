@@ -480,7 +480,7 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
     // Not endpoint 1: the offer's OriginatingEndpointID must come from this registration and not
     // from a plausible default
     WebRTCTransportRequestor::WebRTCTransportRequestorCluster mRequestorCluster{ kRequestorEndpoint, mRequestorDelegate,
-                                                                                mFabricTable };
+                                                                                 mFabricTable };
     // Declared last: the client's destructor cancels through the delegate and the requestor
     // cluster, so they must still be alive. InterceptingWebRTCClient overrides EstablishSession.
     InterceptingWebRTCClient mClient;
