@@ -2690,6 +2690,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             [responseExpectation fulfill];
         }];
     XCTAssertEqual([XCTWaiter waitForExpectations:@[ responseExpectation ] timeout:kTimeoutInSeconds], XCTWaiterResultCompleted);
+    XCTAssertEqual(handlerCalls, 1u, @"requestWillBeSent runs once");
     XCTAssertEqual(proxyCalls, 1u, @"a read is sent whatever requestWillBeSent returns");
     XCTAssertNil(responseError);
 }
