@@ -2627,7 +2627,6 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         return;
     }
 
-    // Every callback caused by this report, on either queue, runs in the flow that is current now.
     NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
     mtr_weakify(self);
     [_deviceController asyncDispatchToMatterQueue:^{
@@ -2661,7 +2660,6 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
 - (void)_injectPossiblyInvalidEventReport:(NSArray<MTRDeviceResponseValueDictionary> *)eventReport
 {
-    // Every callback caused by this report runs in the flow that is current now.
     NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
     mtr_weakify(self);
     dispatch_async(self.queue, ^{
@@ -3161,7 +3159,6 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     os_unfair_lock_assert_owner(&self->_lock);
     MTR_LOG_ERROR("%@ %@ - resetting subscription", self, reasonString);
 
-    // The callbacks caused by this reset share one flow, including those after the hop to the Matter queue.
     NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
     MTRMetricsScope metricsScope(flowID);
 
@@ -3189,7 +3186,6 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     assertChipStackLockedByCurrentThread();
     os_unfair_lock_assert_owner(&_lock);
 
-    // The callbacks caused by this reset share one flow.
     MTRMetricsScope metricsScope([MTRMetrics _currentOrNewFlowID]);
 
     [self.matterCPPObjectsHolder clearReadClientAndDeleteSubscriptionCallback];
@@ -3229,10 +3225,9 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 }
 #endif
 
-// Not called with the lock held.
+// Reports a failed session for subscription setup as a subscription error and a reset, on the Matter queue.
 - (void)_handleSessionFailureWithError:(NSError *)error retryDelay:(NSNumber * _Nullable)retryDelay
 {
-    // The callbacks caused by this failure share one flow, including those after the hop to the Matter queue.
     NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
     mtr_weakify(self);
     [_deviceController asyncDispatchToMatterQueue:^{

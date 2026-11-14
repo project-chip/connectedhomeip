@@ -25,7 +25,6 @@ void MTRDeviceConnectionBridge::OnConnected(
     void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle)
 {
     auto * object = static_cast<MTRDeviceConnectionBridge *>(context);
-    // The result of the CASE session runs in the flow that is current, or in a new one.
     MTRMetricsScope metricsScope([MTRMetrics _currentOrNewFlowID]);
     object->mCompletionHandler(&exchangeMgr, chip::MakeOptional<chip::SessionHandle>(*sessionHandle->AsSecureSession()), nil, nil);
     object->Release();
