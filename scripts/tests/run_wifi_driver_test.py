@@ -28,6 +28,22 @@ case asks for, and checks the networks and blobs the mock is left with:
                           still succeed.
     add-network-fails     AddNetwork fails for a PDC network after its blobs were
                           added; the blobs must not be left behind.
+    remove-network-reverted
+                          RemoveNetwork of the commissioned network, then fail-safe
+                          expiry; the network and its stored SSID and passphrase
+                          must be restored.
+    remove-network-committed
+                          RemoveNetwork of the commissioned network, then
+                          CommissioningComplete; no SSID or passphrase may be left
+                          in the KVS.
+    pdc-remove-network-reverted
+                          As remove-network-reverted, for a PDC network; its stored
+                          network identity, client identity, and keypair must be
+                          restored.
+    pdc-remove-network-committed
+                          As remove-network-committed, for a PDC network; no
+                          network identity, client identity, or keypair may be
+                          left in the KVS.
 
 Must run as root, for the namespaces and the bus.
 
@@ -70,7 +86,14 @@ FAILSAFE_S = 5
 # Long enough for the fail-safe to expire and the driver to act on it.
 REVERT_DONE_TIMEOUT_S = FAILSAFE_S + 10
 
-CASES = ("save-config-fails", "no-blob-support", "add-network-fails")
+CASES = ("save-config-fails", "no-blob-support", "add-network-fails", "remove-network-reverted", "remove-network-committed",
+         "pdc-remove-network-reverted", "pdc-remove-network-committed")
+
+# The LinuxWiFiDriver KVS keys for its one network: those a passphrase network stores, those a
+# PDC network stores, and all of them.
+PASSPHRASE_KVS_KEYS = ("wifi-ssid", "wifi-pass")
+PDC_KVS_KEYS = ("wifi-ssid", "wifi-ni", "wifi-ci", "wifi-cik")
+ALL_KVS_KEYS = ("wifi-ssid", "wifi-pass", "wifi-ni", "wifi-ci", "wifi-cik")
 
 
 class CheckFailed(Exception):
@@ -111,6 +134,16 @@ class Tool:
         return self.run(cluster, command, *args, str(NODE_ID), "0", *options, timeout=timeout).stdout
 
 
+def kvs_value(kvs_path: str, key: str) -> str | None:
+    """Returns the stored (base64) value of a key in the application's KVS file, or None if the key is absent."""
+    with open(kvs_path) as kvs:
+        for line in kvs:
+            name, separator, value = line.partition("=")
+            if separator and name.strip() == key:
+                return value.strip()
+    return None
+
+
 def wait_for(predicate, timeout: float, what: str) -> bool:
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
@@ -121,7 +154,7 @@ def wait_for(predicate, timeout: float, what: str) -> bool:
     return False
 
 
-def case_save_config_fails(iface, tool: Tool) -> None:
+def case_save_config_fails(iface, tool: Tool, kvs_path: str) -> None:
     iface.save_config_fails = True
     result = tool.commission()
     check(result.returncode == 0, "commissioning succeeds although SaveConfig fails")
@@ -136,14 +169,14 @@ def case_save_config_fails(iface, tool: Tool) -> None:
     check(iface.current_network != "/", "wpa_supplicant still has a current network")
 
 
-def case_no_blob_support(iface, tool: Tool) -> None:
+def case_no_blob_support(iface, tool: Tool, kvs_path: str) -> None:
     iface.blobs_supported = False
     result = tool.commission()
     check(result.returncode == 0, "commissioning succeeds with a wpa_supplicant that has no blob support")
     check(iface.current_network != "/", "the network was selected")
 
 
-def case_add_network_fails(iface, tool: Tool) -> None:
+def case_add_network_fails(iface, tool: Tool, kvs_path: str) -> None:
     result = tool.commission()
     check(result.returncode == 0, "commissioning succeeds")
 
@@ -166,10 +199,88 @@ def case_add_network_fails(iface, tool: Tool) -> None:
     check(not iface.blobs, f"no PDC blobs are left after AddNetwork fails (blobs: {sorted(iface.blobs)})")
 
 
+def commission_with_pdc_network(tool: Tool, kvs_path: str) -> None:
+    """Commission, then replace the network with a PDC one and commit it.
+
+    The PDC network is committed without ConnectNetwork, which would remove the
+    operational network from wpa_supplicant and drop the tool's link to the device;
+    committing writes the PDC keys to the KVS all the same.
+    """
+    result = tool.commission()
+    check(result.returncode == 0, "commissioning succeeds")
+
+    _, network_identity = generate_network_identity()
+    tool.invoke("generalcommissioning", "arm-fail-safe", "60", "0")
+    tool.invoke("networkcommissioning", "add-or-update-wi-fi-network",
+                f"hex:{MOCK_AP_SSID.encode().hex()}", "hex:",
+                options=("--NetworkIdentity", f"hex:{network_identity.hex()}"))
+    tool.invoke("generalcommissioning", "commissioning-complete")
+    check(wait_for(lambda: all(kvs_value(kvs_path, key) for key in PDC_KVS_KEYS), 10, "the PDC network to be committed"),
+          "the PDC network identity, client identity, and keypair are stored")
+    check(not kvs_value(kvs_path, "wifi-pass"), "no passphrase is stored for the PDC network")
+
+
+def check_network_stored(kvs_path: str, stored_keys: tuple[str, ...]) -> None:
+    for key in stored_keys:
+        check(bool(kvs_value(kvs_path, key)), f"the network's {key} is stored")
+
+
+def check_remove_network_reverted(tool: Tool, kvs_path: str, stored_keys: tuple[str, ...]) -> None:
+    check_network_stored(kvs_path, stored_keys)
+    stored = {key: kvs_value(kvs_path, key) for key in ALL_KVS_KEYS}
+
+    tool.invoke("generalcommissioning", "arm-fail-safe", str(FAILSAFE_S), "0")
+    tool.invoke("networkcommissioning", "remove-network", f"hex:{MOCK_AP_SSID.encode().hex()}")
+    wait_for(lambda: False, REVERT_DONE_TIMEOUT_S, "the fail-safe to expire")
+
+    networks = tool.invoke("networkcommissioning", "read", "networks")
+    check(MOCK_AP_SSID.encode().hex() in networks.lower(), "the network is listed again after the fail-safe expires")
+    for key in ALL_KVS_KEYS:
+        check(kvs_value(kvs_path, key) == stored[key], f"the stored {key} is unchanged after the fail-safe expires")
+
+
+def check_remove_network_committed(tool: Tool, kvs_path: str, stored_keys: tuple[str, ...]) -> None:
+    check_network_stored(kvs_path, stored_keys)
+
+    tool.invoke("generalcommissioning", "arm-fail-safe", "60", "0")
+    tool.invoke("networkcommissioning", "remove-network", f"hex:{MOCK_AP_SSID.encode().hex()}")
+    tool.invoke("generalcommissioning", "commissioning-complete")
+    wait_for(lambda: not any(kvs_value(kvs_path, key) for key in ALL_KVS_KEYS), 10, "the removal to be committed")
+
+    for key in ALL_KVS_KEYS:
+        check(not kvs_value(kvs_path, key), f"no {key} is stored after the removal is committed")
+
+
+def case_remove_network_reverted(iface, tool: Tool, kvs_path: str) -> None:
+    result = tool.commission()
+    check(result.returncode == 0, "commissioning succeeds")
+    check_remove_network_reverted(tool, kvs_path, PASSPHRASE_KVS_KEYS)
+
+
+def case_remove_network_committed(iface, tool: Tool, kvs_path: str) -> None:
+    result = tool.commission()
+    check(result.returncode == 0, "commissioning succeeds")
+    check_remove_network_committed(tool, kvs_path, PASSPHRASE_KVS_KEYS)
+
+
+def case_pdc_remove_network_reverted(iface, tool: Tool, kvs_path: str) -> None:
+    commission_with_pdc_network(tool, kvs_path)
+    check_remove_network_reverted(tool, kvs_path, PDC_KVS_KEYS)
+
+
+def case_pdc_remove_network_committed(iface, tool: Tool, kvs_path: str) -> None:
+    commission_with_pdc_network(tool, kvs_path)
+    check_remove_network_committed(tool, kvs_path, PDC_KVS_KEYS)
+
+
 CASE_FUNCTIONS = {
     "save-config-fails": case_save_config_fails,
     "no-blob-support": case_no_blob_support,
     "add-network-fails": case_add_network_fails,
+    "remove-network-reverted": case_remove_network_reverted,
+    "remove-network-committed": case_remove_network_committed,
+    "pdc-remove-network-reverted": case_pdc_remove_network_reverted,
+    "pdc-remove-network-committed": case_pdc_remove_network_committed,
 }
 
 
@@ -206,7 +317,7 @@ def main(app: str, tool: str, case_name: str, ns_index: int, log_level: str) -> 
 
         tool_dir = stack.enter_context(tempfile.TemporaryDirectory(prefix="wifi-driver-tool-"))
         try:
-            CASE_FUNCTIONS[case_name](iface, Tool(tool, net_ns, tool_dir))
+            CASE_FUNCTIONS[case_name](iface, Tool(tool, net_ns, tool_dir), os.path.join(storage_dir, "kvs-app"))
         except CheckFailed as e:
             log.error("FAIL: %s", e)
             raise SystemExit(1)

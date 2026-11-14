@@ -31,6 +31,7 @@
 #include <device/api/SingleEndpoint.h>
 #include <devices/Types.h>
 #include <lib/core/TLV.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 #include <oob-accessors/NoopOOBAccessorRegistry.h>
 #include <oob-accessors/OOBDataSerializer.h>
@@ -881,7 +882,7 @@ TEST_F(TestOOBAccessors, RemoveBridgedDeviceOOBAccessor)
     EXPECT_EQ(registry.Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(deviceManager)), CHIP_NO_ERROR);
 
     auto id = deviceManager.AddBridgedDevice("test-device-type");
-    EXPECT_TRUE(id.has_value());
+    ASSERT_TRUE(id.has_value());
 
     Testing::TestAttributeChangeListener listener;
     provider.RegisterAttributeChangeListener(listener);
@@ -891,7 +892,6 @@ TEST_F(TestOOBAccessors, RemoveBridgedDeviceOOBAccessor)
     writer.Init(buffer);
     TLV::TLVType outer;
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): checked above
     EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(id.value())), CHIP_NO_ERROR);
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
@@ -899,7 +899,6 @@ TEST_F(TestOOBAccessors, RemoveBridgedDeviceOOBAccessor)
     EXPECT_EQ(registry.HandleAction("RemoveBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
     // Verify that the device has been removed
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): checked above
     EXPECT_TRUE(deviceManager.GetDevice(id.value()) == nullptr);
 
     // Verify the device was unregistered.

@@ -98,8 +98,10 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
         self.setup_reflector_device()
 
     def teardown_class(self):
-        self.teardown_reflector_device()
-        super().teardown_class()
+        try:
+            self.teardown_reflector_device()
+        finally:
+            super().teardown_class()
 
     def desc_TC_PROXR_2_4(self) -> str:
         return "[TC-PROXR-2.4] Periodic Proximity Ranging Functionality (DUT as Server)"

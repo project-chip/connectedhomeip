@@ -23,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 MTR_EXTERN NSErrorDomain const MTRErrorDomain MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 MTR_EXTERN NSErrorDomain const MTRInteractionErrorDomain MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSErrorDomain const MTRBDXErrorDomain MTR_AVAILABLE(ios(27.4), macos(27.4), watchos(27.4), tvos(27.4));
 
 /**
  * MTRErrorDomain contains errors caused by data processing the framework
@@ -159,5 +160,29 @@ typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode){
     MTRInteractionErrorCodeDynamicConstraintError MTR_PROVISIONALLY_AVAILABLE                                 = 0xcf,
     MTRInteractionErrorCodeInvalidTransportType MTR_PROVISIONALLY_AVAILABLE                                   = 0xd1,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * MTRBDXErrorDomain contains errors that represent a Bulk Data Exchange (BDX)
+ * StatusReport protocol code from the Matter specification.
+ */
+typedef NS_ERROR_ENUM(MTRBDXErrorDomain, MTRBDXErrorCode){
+    /**
+     * RESPONDER_BUSY: the responder is too busy to proceed with a new transfer
+     * at this moment.
+     */
+    MTRBDXErrorCodeResponderBusy = 0x19,
+
+    /**
+     * FILE_DESIGNATOR_UNKNOWN: the requested file designator is not known to
+     * the responder.
+     */
+    MTRBDXErrorCodeFileDesignatorUnknown = 0x51,
+
+    /**
+     * START_OFFSET_NOT_SUPPORTED: the requested start offset is not supported
+     * by the responder.
+     */
+    MTRBDXErrorCodeStartOffsetNotSupported = 0x52,
+} MTR_AVAILABLE(ios(27.4), macos(27.4), watchos(27.4), tvos(27.4));
 
 NS_ASSUME_NONNULL_END
