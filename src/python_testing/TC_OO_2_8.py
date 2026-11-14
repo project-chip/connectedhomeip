@@ -37,6 +37,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 48 seconds.
+#     tags: [slow]
 #   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device on-off-light --discriminator 1234 --KVS kvs1
@@ -51,6 +53,8 @@
 #       --endpoint 1
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 47 seconds.
+#     tags: [slow]
 # === END CI TEST ARGUMENTS ===
 
 import asyncio

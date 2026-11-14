@@ -41,7 +41,8 @@ import coloredlogs
 from colorama import Fore, Style
 
 from matter.testing.defaults import TestingDefaults
-from matter.testing.metadata import TAG_OPTION_HELP, Metadata, MetadataReader, RunArgumentsError, TagFilter, extract_runs_args
+from matter.testing.metadata import (SLOW_TAG, TAG_OPTION_HELP, Metadata, MetadataReader, RunArgumentsError, TagFilter,
+                                     extract_runs_args)
 from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
 
@@ -317,6 +318,8 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
 
     for run in runs:
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
+        if SLOW_TAG in run.tags:
+            log.warning("SLOW run '%s' is executing. Be patient...", run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
                   run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
                   ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric)

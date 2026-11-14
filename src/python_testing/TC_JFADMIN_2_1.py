@@ -31,6 +31,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
+#     # Takes about 79 seconds.
+#     tags: [slow]
 # === END CI TEST ARGUMENTS ===
 
 import base64

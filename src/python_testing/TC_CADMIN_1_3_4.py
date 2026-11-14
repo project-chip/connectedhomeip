@@ -30,6 +30,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 3.4 minutes.
+#     tags: [slow]
 #   run2:
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -43,6 +45,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: false
 #     quiet: true
+#     # Takes about 12 seconds.
+#     tags: [slow]
 # === END CI TEST ARGUMENTS ===
 
 import asyncio

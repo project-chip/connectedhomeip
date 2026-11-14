@@ -37,7 +37,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     tags: [nightly]
+#     # Takes about 2.3 minutes.
+#     tags: [nightly, slow]
 #   run2:
 #     app: ${FABRIC_SYNC_APP}
 #     app-args: --discriminator=1234
@@ -55,7 +56,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#     tags: [nightly]
+#     # Takes about 2.3 minutes.
+#     tags: [nightly, slow]
 # === END CI TEST ARGUMENTS ===
 
 # This test requires a TH_ICD_SERVER application. Please specify with --string-arg th_icd_server_app_path:<path_to_app>

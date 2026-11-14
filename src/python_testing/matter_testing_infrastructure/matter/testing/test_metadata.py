@@ -17,8 +17,8 @@ import re
 import tempfile
 import unittest
 
-from metadata import (NEEDS_FOLLOWUP_FIXES_TAG, NIGHTLY_TAG, OPENSSL_3_5_TAG, Metadata, MetadataReader, RunArgumentsError,
-                      TagFilter, extract_runs_args, failure_fails_job, is_valid_tag_name, runs_in_pull_requests,
+from metadata import (NEEDS_FOLLOWUP_FIXES_TAG, NIGHTLY_TAG, OPENSSL_3_5_TAG, SLOW_TAG, Metadata, MetadataReader, RunArgumentsError,
+                      TagFilter, extract_runs_args, failure_fails_job, is_valid_tag_name, reported_per_run, runs_in_pull_requests,
                       script_runs_in_pull_requests, unused_tag_values)
 
 
@@ -99,6 +99,7 @@ class TestMetadataReader(unittest.TestCase):
     #     tags: [openssl-3.5]
     #   run6:
     #     app: ${CHIP_LOCK_APP}
+    #     # Takes about 2 minutes.
     #     tags: [slow]
     # === END CI TEST ARGUMENTS ===
     '''
@@ -120,11 +121,20 @@ class TestMetadataReader(unittest.TestCase):
         self.assertEqual(runs["run4"].tags, [NIGHTLY_TAG, NEEDS_FOLLOWUP_FIXES_TAG])
         self.assertEqual(runs["run4"].issues, ["https://github.com/project-chip/connectedhomeip/issues/3"])
         self.assertEqual(runs["run5"].tags, [OPENSSL_3_5_TAG])
-        self.assertEqual(runs["run6"].tags, ["slow"])
+        self.assertEqual(runs["run6"].tags, [SLOW_TAG])
 
         self.assertEqual([name for name, run in runs.items() if runs_in_pull_requests(run.tags)], ["run1", "run3", "run6"])
         self.assertEqual([name for name, run in runs.items() if failure_fails_job(run.tags)],
                          ["run1", "run2", "run3", "run5", "run6"])
+        self.assertEqual([name for name, run in runs.items() if reported_per_run(run.tags)], ["run2", "run3", "run4", "run5"])
+
+    def test_reported_per_run(self):
+        for tags in [[NIGHTLY_TAG], [OPENSSL_3_5_TAG], [NEEDS_FOLLOWUP_FIXES_TAG], [NIGHTLY_TAG, SLOW_TAG]]:
+            with self.subTest(tags=tags):
+                self.assertTrue(reported_per_run(tags))
+        for tags in [[], [SLOW_TAG], ["any-tag"], ["any-tag", SLOW_TAG]]:
+            with self.subTest(tags=tags):
+                self.assertFalse(reported_per_run(tags))
 
     def test_tag_filter(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -247,7 +257,8 @@ class TestMetadataReader(unittest.TestCase):
             "only a nightly needs-followup-fixes run":
                 (one_run_file_content("tags: [nightly, needs-followup-fixes]", f"issues: [{issue}]"), False, True),
             "only an openssl-3.5 run": (one_run_file_content("tags: [openssl-3.5]"), False, False),
-            "only a run with a tag that only selects": (one_run_file_content("tags: [slow]"), True, False),
+            "only a slow run": (one_run_file_content("tags: [slow]"), True, False),
+            "only a run with a tag that only selects": (one_run_file_content("tags: [any-tag]"), True, False),
             "no CI test arguments": ("# A support module with no CI test arguments\n", True, False),
         }
         nightly_filter = TagFilter.parse(["nightly"])

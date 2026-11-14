@@ -37,7 +37,7 @@ import coloredlogs
 import yaml
 
 from matter.testing.metadata import (TAG_OPTION_HELP, RunArgumentsError, TagFilter, extract_runs_args, failure_fails_job,
-                                     unused_tag_values)
+                                     reported_per_run, unused_tag_values)
 
 log = logging.getLogger(__name__)
 
@@ -151,8 +151,9 @@ def load_env_from_yaml(file_path):
 def select_script_runs(python_files: list[str], tag_filter: TagFilter, not_automated: set[str]) -> list[ScriptRun]:
     """Return the run_python_test.py calls for the runs that match tag_filter, except in the not_automated files.
 
-    A script whose matching runs have tags is called once per run, so that each result carries the run's tags and
-    issues. Any other script is called once, and run_python_test.py picks the same runs with the same --tag values.
+    A script is called once per matching run when one of them is reported_per_run(), so that each result carries the
+    run's tags and issues. Any other script is called once, and run_python_test.py picks the same runs with the same
+    --tag values.
     """
     script_runs = []
     for script in python_files:
@@ -162,7 +163,7 @@ def select_script_runs(python_files: list[str], tag_filter: TagFilter, not_autom
         if not tag_filter.matches_script(runs):
             continue
         matching_runs = {run: args for run, args in runs.items() if tag_filter.matches(args["tags"])}
-        if any(args["tags"] for args in matching_runs.values()):
+        if any(reported_per_run(args["tags"]) for args in matching_runs.values()):
             script_runs.extend(ScriptRun(script, run, args["tags"], args["issues"]) for run, args in matching_runs.items())
         else:
             script_runs.append(ScriptRun(script))

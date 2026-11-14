@@ -39,6 +39,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 35 seconds.
+#     tags: [slow]
 #   run2:
 #     app: ${FABRIC_SYNC_APP}
 #     app-args: --discriminator=1234
@@ -58,6 +60,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 30 seconds.
+#     tags: [slow]
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
