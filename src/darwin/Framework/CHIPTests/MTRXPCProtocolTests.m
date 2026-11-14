@@ -2618,10 +2618,10 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     XCTAssertEqual(responseError.code, MTRErrorCodeCancelled);
 }
 
-- (void)testGuardXPCWriteSentWhenRequestWillBeSentReturnsNo
+- (void)testGuardXPCWriteNotSentWhenRequestWillBeSentReturnsNo
 {
-    // Guard: writes always send, like MTRBaseDevice's own path.  A NO from requestWillBeSent does not stop an XPC
-    // write.
+    // Guard: like an invoke, and like MTRBaseDevice's own write path, an XPC write whose requestWillBeSent returns NO
+    // is not sent and completes once with a cancelled error.
     __block NSUInteger proxyCalls = 0;
     _handleWriteAttribute = ^(id controller, NSNumber * nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * attributeId,
         id value, NSNumber * _Nullable timedWriteTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
@@ -2632,6 +2632,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(9876543210) controller:_remoteDeviceController];
     __block NSUInteger handlerCalls = 0;
     __block NSError * responseError;
+    __block NSUInteger completions = 0;
     XCTestExpectation * responseExpectation = [[XCTestExpectation alloc] initWithDescription:@"Write completed"];
     [device _writeAttributeWithEndpointID:@100
         clusterID:@200
@@ -2644,13 +2645,20 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         }
         queue:dispatch_get_main_queue()
         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            completions += 1;
             responseError = error;
             [responseExpectation fulfill];
         }];
     XCTAssertEqual([XCTWaiter waitForExpectations:@[ responseExpectation ] timeout:kTimeoutInSeconds], XCTWaiterResultCompleted);
-    XCTAssertEqual(proxyCalls, 1u, @"a write is sent whatever requestWillBeSent returns");
+    XCTestExpectation * settle = [[XCTestExpectation alloc] initWithDescription:@"Nothing more arrives"];
+    settle.inverted = YES;
+    [self waitForExpectations:@[ settle ] timeout:kNegativeTimeoutInSeconds];
+
+    XCTAssertEqual(proxyCalls, 0u, @"a write whose requestWillBeSent returned NO does not reach the proxy");
     XCTAssertEqual(handlerCalls, 1u);
-    XCTAssertNil(responseError);
+    XCTAssertEqual(completions, 1u);
+    XCTAssertEqualObjects(responseError.domain, MTRErrorDomain);
+    XCTAssertEqual(responseError.code, MTRErrorCodeCancelled);
 }
 
 - (void)testGuardXPCReadSentWhenRequestWillBeSentReturnsNo
