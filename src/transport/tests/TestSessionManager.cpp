@@ -1211,6 +1211,13 @@ TEST_F(TestSessionManager, SessionRecoveredAfterDefunct)
     session->MarkActiveRx();
     EXPECT_EQ(delegate.mRecoveredCount, 1);
 
+    // A second defunct-to-active transition on the same session notifies again.
+    session->MarkAsDefunct();
+    EXPECT_TRUE(session->IsDefunct());
+    session->MarkActiveRx();
+    EXPECT_TRUE(session->IsActiveSession());
+    EXPECT_EQ(delegate.mRecoveredCount, 2);
+
     sessionManager.Shutdown();
 }
 
