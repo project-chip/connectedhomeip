@@ -57,7 +57,8 @@ public:
     CHIP_ERROR AcceptAndReceiveData();
 
     // Accepts the transfer with the intent of sending data. This will send an AcceptReceive message to the other end of the
-    // transfer.
+    // transfer. data_to_send is the whole file: the transfer sends it from the start offset the other end asked for. If that
+    // offset is past the end of data_to_send, this rejects the transfer with START_OFFSET_NOT_SUPPORTED and returns an error.
     CHIP_ERROR AcceptAndSendData(const ByteSpan & data_to_send);
 
     // Rejects the transfer.

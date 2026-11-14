@@ -252,20 +252,26 @@ PyChipError pychip_Bdx_StopExpectingBdxTransfer(PyObject transferObtainedContext
 PyChipError pychip_Bdx_AcceptTransferAndReceiveData(chip::bdx::BdxTransfer * transfer, PyObject dataReceivedContext,
                                                     PyObject transferCompletedContext)
 {
-    TransferInfo * transferInfo              = gTransfers.TransferInfoForTransfer(transfer);
+    TransferInfo * transferInfo = gTransfers.TransferInfoForTransfer(transfer);
+    CHIP_ERROR err              = transfer->AcceptAndReceiveData();
+    // Python releases both contexts when the accept fails, so only a successful accept may keep them.
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, ToPyChipError(err));
     transferInfo->OnDataReceivedContext      = dataReceivedContext;
     transferInfo->OnTransferCompletedContext = transferCompletedContext;
-    return ToPyChipError(transfer->AcceptAndReceiveData());
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 
 // Accepts a transfer with the intent to send data to the other device.
 PyChipError pychip_Bdx_AcceptTransferAndSendData(chip::bdx::BdxTransfer * transfer, const uint8_t * dataBuffer, size_t dataLength,
                                                  PyObject transferCompletedContext)
 {
-    TransferInfo * transferInfo              = gTransfers.TransferInfoForTransfer(transfer);
-    transferInfo->OnTransferCompletedContext = transferCompletedContext;
+    TransferInfo * transferInfo = gTransfers.TransferInfoForTransfer(transfer);
     chip::ByteSpan data(dataBuffer, dataLength);
-    return ToPyChipError(transfer->AcceptAndSendData(data));
+    CHIP_ERROR err = transfer->AcceptAndSendData(data);
+    // Python releases transferCompletedContext when the accept fails, so only a successful accept may keep it.
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, ToPyChipError(err));
+    transferInfo->OnTransferCompletedContext = transferCompletedContext;
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 
 // Rejects a transfer.

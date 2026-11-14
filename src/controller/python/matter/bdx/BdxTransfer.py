@@ -51,6 +51,10 @@ class BdxTransfer:
 
     async def accept_and_send_data(self) -> None:
         ''' Accepts the transfer with the intent of sending data.
+
+        The data given when the transfer was created is the whole file, and the transfer sends it from
+        init_message.StartOffset. If that offset is past the end of the data, this rejects the transfer with
+        START_OFFSET_NOT_SUPPORTED and raises.
         '''
         assert self._data is not None
         eventLoop = asyncio.get_running_loop()

@@ -83,8 +83,6 @@ shared_library("ChipDeviceCtrl") {
       "ChipDeviceController-StorageDelegate.h",
       "JsonTlv.cpp",
       "OpCredsBinding.cpp",
-      "matter/bdx/bdx-transfer.cpp",
-      "matter/bdx/bdx-transfer.h",
       "matter/bdx/bdx.cpp",
       "matter/bdx/test-bdx-transfer-server.cpp",
       "matter/bdx/test-bdx-transfer-server.h",
@@ -199,6 +197,7 @@ shared_library("ChipDeviceCtrl") {
       "${chip_root}/src/tracing/perfetto",
       "${chip_root}/src/tracing/perfetto:file_output",
       "${chip_root}/third_party/jsoncpp",
+      "matter/bdx:bdx-transfer",
     ]
 
     deps = [
