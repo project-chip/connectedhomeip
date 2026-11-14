@@ -171,8 +171,8 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
     // The issuer callback and the handling of its result run in one flow, even if the issuer calls the completion
     // later on another queue.
     NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
-    MTRMetricsScope flowScope(flowID);
-    MTRDispatchCallbackWithFlowID(mOperationalCertificateIssuerQueue, ^{
+    dispatch_async(mOperationalCertificateIssuerQueue, ^{
+        MTRMetricsScope issuerScope(flowID);
         [mOperationalCertificateIssuer
             issueOperationalCertificateForRequest:csrInfo
                                   attestationInfo:attestationInfo
