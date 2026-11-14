@@ -51,6 +51,7 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
+#import "MTRMetricsScope_Internal.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRServerEndpoint_Internal.h"
@@ -342,7 +343,11 @@
         return;
     }
 
-    [self _updateInternalState:[dictionary mutableCopy]];
+    // The state and primed callbacks run in the flow of the change; the flow is not part of the stored state.
+    NSMutableDictionary * newState = [dictionary mutableCopy];
+    MTRMetricsScope metricsScope([MTRMetrics _flowIDWithString:newState[kMTRDeviceInternalPropertyFlowID]]);
+    [newState removeObjectForKey:kMTRDeviceInternalPropertyFlowID];
+    [self _updateInternalState:newState];
 }
 
 - (void)_updateInternalState:(NSMutableDictionary *)newState
@@ -527,8 +532,12 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
                   expectedValueInterval:expectedValueInterval
                      timedInvokeTimeout:timeout
             serverSideProcessingTimeout:serverSideProcessingTimeout
-                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable receivedValues, NSError * _Nullable receivedError) {
+                                 NSUUID * flowID = [MTRMetrics _flowIDWithString:MTRFlowIDFromResponseValues(receivedValues) ?: MTR_SAFE_CAST(receivedError, NSError).userInfo[MTRErrorFlowIDKey]];
+                                 NSArray * values = MTRResponseValuesByRemovingFlowID(receivedValues);
+                                 NSError * error = MTRErrorByRemovingFlowID(receivedError);
                                  dispatch_async(queue, ^{
+                                     MTRMetricsScope metricsScope(flowID);
                                      if (values == nil && error == nil) {
                                          MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) without values or error", self, endpointID, clusterID, commandID);
                                          completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
@@ -580,8 +589,12 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
         }] deviceController:[[self deviceController] uniqueIdentifier]
                      nodeID:[self nodeID]
              invokeCommands:commands
-                 completion:^(NSArray<MTRDeviceResponseValueDictionary> * _Nullable responses, NSError * _Nullable error) {
+                 completion:^(NSArray<MTRDeviceResponseValueDictionary> * _Nullable receivedResponses, NSError * _Nullable receivedError) {
+                     NSUUID * flowID = [MTRMetrics _flowIDWithString:MTRFlowIDFromResponseValues(receivedResponses) ?: MTR_SAFE_CAST(receivedError, NSError).userInfo[MTRErrorFlowIDKey]];
+                     NSArray * responses = MTRResponseValuesByRemovingFlowID(receivedResponses);
+                     NSError * error = MTRErrorByRemovingFlowID(receivedError);
                      dispatch_async(queue, ^{
+                         MTRMetricsScope metricsScope(flowID);
                          if (responses == nil && error == nil) {
                              MTR_LOG_ERROR("%@ got invoke responses for %@ without values or error", self, commands);
                              completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
@@ -639,8 +652,11 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
                        nodeID:[self nodeID]
             downloadLogOfType:type
                       timeout:timeout
-                   completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                   completion:^(NSURL * _Nullable url, NSError * _Nullable receivedError) {
+                       NSUUID * flowID = [MTRMetrics _flowIDWithString:MTR_SAFE_CAST(receivedError, NSError).userInfo[MTRErrorFlowIDKey]];
+                       NSError * error = MTRErrorByRemovingFlowID(receivedError);
                        dispatch_async(queue, ^{
+                           MTRMetricsScope metricsScope(flowID);
                            if (url == nil && error == nil) {
                                MTR_LOG_ERROR("%@ got log download response without URL or error", self);
                                completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);

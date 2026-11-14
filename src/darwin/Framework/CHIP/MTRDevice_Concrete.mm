@@ -40,6 +40,7 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
+#import "MTRMetricsScope_Internal.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
 #import "MTRUtilities.h"
@@ -156,9 +157,9 @@ public:
 private:
     void OnSubscriptionEstablished(chip::SubscriptionId aSubscriptionId) override;
 
-    void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
+    void HandleEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
 
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void HandleAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
 
     CHIP_ERROR OnResubscriptionNeeded(chip::app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 
@@ -727,6 +728,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyEstimatedSubscriptionLatency, _estimatedSubscriptionLatency, properties);
         MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress, @(_diagnosticLogTransferInProgress), properties);
     }
+
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyFlowID, MTRMetrics.currentFlowID.UUIDString, properties);
 
     return properties;
 }
@@ -2624,11 +2627,13 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         return;
     }
 
+    NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
     mtr_weakify(self);
     [_deviceController asyncDispatchToMatterQueue:^{
         mtr_strongify(self);
         VerifyOrReturn(self, MTR_LOG_DEBUG("_injectAttributeReport asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
+        MTRMetricsScope blockScope(flowID);
         // _getAttributesToReportWithReportedValues logs each attribute.
         MTR_LOG("%@ injected attribute report (%p) with %lu attributes", self, attributeReport, static_cast<unsigned long>(attributeReport.count));
         [self _handleReportBegin];
@@ -2636,6 +2641,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
             mtr_strongify(self);
             VerifyOrReturn(self, MTR_LOG_DEBUG("_injectAttributeReport async to self.queue with nil MTRDevice"));
 
+            MTRMetricsScope innerScope(flowID);
             [self _handleAttributeReport:attributeReport fromSubscription:isFromSubscription];
             [self _handleReportEnd];
         });
@@ -2654,11 +2660,13 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
 - (void)_injectPossiblyInvalidEventReport:(NSArray<MTRDeviceResponseValueDictionary> *)eventReport
 {
+    NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
     mtr_weakify(self);
     dispatch_async(self.queue, ^{
         mtr_strongify(self);
         VerifyOrReturn(self, MTR_LOG_DEBUG("_injectPossiblyInvalidEventReport async to self.queue with nil MTRDevice"));
 
+        MTRMetricsScope blockScope(flowID);
         [self _handleEventReport:eventReport];
     });
 }
@@ -3151,10 +3159,15 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     os_unfair_lock_assert_owner(&self->_lock);
     MTR_LOG_ERROR("%@ %@ - resetting subscription", self, reasonString);
 
+    NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
+    MTRMetricsScope metricsScope(flowID);
+
     mtr_weakify(self);
     [_deviceController asyncDispatchToMatterQueue:^{
         mtr_strongify(self);
         VerifyOrReturn(self, MTR_LOG_DEBUG("_resetSubscriptionWithReasonString asyncDispatchToMatterQueue called back with nil MTRDevice"));
+
+        MTRMetricsScope blockScope(flowID);
 
         MTR_LOG("%@ subscription reset disconnecting ReadClient and SubscriptionCallback", self);
 
@@ -3172,6 +3185,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 {
     assertChipStackLockedByCurrentThread();
     os_unfair_lock_assert_owner(&_lock);
+
+    MTRMetricsScope metricsScope([MTRMetrics _currentOrNewFlowID]);
 
     [self.matterCPPObjectsHolder clearReadClientAndDeleteSubscriptionCallback];
     _readClientGeneration++;
@@ -3209,6 +3224,21 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     InteractionModelEngine::GetInstance()->ShutdownSubscriptions(readClient->GetFabricIndex(), readClient->GetPeerNodeId());
 }
 #endif
+
+// Reports a failed session for subscription setup as a subscription error and a reset, on the Matter queue.
+- (void)_handleSessionFailureWithError:(NSError *)error retryDelay:(NSNumber * _Nullable)retryDelay
+{
+    NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
+    mtr_weakify(self);
+    [_deviceController asyncDispatchToMatterQueue:^{
+        mtr_strongify(self);
+        VerifyOrReturn(self, MTR_LOG_DEBUG("_handleSessionFailureWithError asyncDispatchToMatterQueue called back with nil MTRDevice"));
+
+        MTRMetricsScope blockScope(flowID);
+        [self _handleSubscriptionError:error];
+        [self _handleSubscriptionReset:retryDelay];
+    } errorHandler:nil];
+}
 
 // assume lock is held
 - (void)_setupSubscriptionWithReason:(NSString *)reason
@@ -3303,13 +3333,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
                            if (error != nil) {
                                MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
-                               [self->_deviceController asyncDispatchToMatterQueue:^{
-                                   mtr_strongify(self);
-                                   VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason asyncDispatchToMatterQueue called back with nil MTRDevice"));
-
-                                   [self _handleSubscriptionError:error];
-                                   [self _handleSubscriptionReset:retryDelay];
-                               } errorHandler:nil];
+                               [self _handleSessionFailureWithError:error retryDelay:retryDelay];
                                return;
                            }
 
@@ -3326,7 +3350,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
                                    // _getAttributesToReportWithReportedValues logs each attribute.
                                    MTR_LOG("%@ got attribute report (%p) with %lu attributes", self, value, static_cast<unsigned long>(value.count));
-                                   dispatch_async(self.queue, ^{
+                                   MTRDispatchCallbackWithFlowID(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription attribute report async to device queue called back with nil MTRDevice"));
 
@@ -3348,7 +3372,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
                                    // _handleEventReport logs each event.
                                    MTR_LOG("%@ got event report (%p) with %lu events", self, value, static_cast<unsigned long>(value.count));
-                                   dispatch_async(self.queue, ^{
+                                   MTRDispatchCallbackWithFlowID(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription event report async to device queue called back with nil MTRDevice"));
 
@@ -3395,7 +3419,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                                    [self _changeState:MTRDeviceStateReachable];
 
                                    // Then async work that shouldn't be performed on the matter queue
-                                   dispatch_async(self.queue, ^{
+                                   MTRDispatchCallbackWithFlowID(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription established async to device queue called back with nil MTRDevice"));
 
@@ -3443,7 +3467,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription report end called back with nil MTRDevice"));
 
                                    MTR_LOG("%@ got report end", self);
-                                   dispatch_async(self.queue, ^{
+                                   MTRDispatchCallbackWithFlowID(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription report end async to device queue called back with nil MTRDevice"));
 
@@ -5629,7 +5653,7 @@ void SubscriptionCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptio
     MTRBaseSubscriptionCallback::OnSubscriptionEstablished(aSubscriptionId);
 }
 
-void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
+void SubscriptionCallback::HandleEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
 {
     if (mEventReports == nil) {
         // Never got a OnReportBegin?  Not much to do other than tear things down.
@@ -5661,7 +5685,7 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
     QueueInterimReport();
 }
 
-void SubscriptionCallback::OnAttributeData(
+void SubscriptionCallback::HandleAttributeData(
     const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     if (aPath.IsListItemOperation()) {
