@@ -237,8 +237,10 @@ if (chip_build_tests) {
     # provide, notably <mutex>, <condition_variable> and <thread>, which
     # Zephyr's libstdc++ is built without.
     if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
-      tests +=
-          [ "${chip_root}/src/controller/python/matter/case_capture/tests" ]
+      tests += [
+        "${chip_root}/src/controller/python/matter/bdx/tests",
+        "${chip_root}/src/controller/python/matter/case_capture/tests",
+      ]
     }
 
     if (current_os != "zephyr") {
