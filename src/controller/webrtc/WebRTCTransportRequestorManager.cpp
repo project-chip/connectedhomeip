@@ -20,6 +20,7 @@
 
 #include "WebRTCTransportRequestorManager.h"
 #include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
+#include <app/server/Server.h>
 #include <controller/webrtc/access_control/WebRTCAccessControl.h>
 #include <platform/PlatformManager.h>
 
@@ -45,7 +46,7 @@ void WebRTCTransportRequestorManager::Init()
 {
     Controller::AccessControl::InitAccessControl(kWebRTCRequesterDynamicEndpointId);
 
-    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, *this);
+    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, *this, Server::GetInstance().GetFabricTable());
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());
     if (err != CHIP_NO_ERROR)
     {
