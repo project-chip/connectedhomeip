@@ -199,6 +199,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::WindowCovering::Id:
         MatterWindowCoveringClusterInitCallback(endpoint);
         break;
+    case app::Clusters::PumpConfigurationAndControl::Id:
+        MatterPumpConfigurationAndControlClusterInitCallback(endpoint);
+        break;
     case app::Clusters::Thermostat::Id:
         MatterThermostatClusterInitCallback(endpoint);
         break;
@@ -412,6 +415,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::WindowCovering::Id:
         MatterWindowCoveringClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::PumpConfigurationAndControl::Id:
+        MatterPumpConfigurationAndControlClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::Thermostat::Id:
         MatterThermostatClusterShutdownCallback(endpoint, shutdownType);
