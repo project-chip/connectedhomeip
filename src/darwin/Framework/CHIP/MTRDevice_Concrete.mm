@@ -4843,13 +4843,14 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
 
         // if this is an error, report and purge cache
         if (attributeError) {
-            shouldReportAttribute = YES;
             ++errorCount;
             previousValue = [self _cachedAttributeValueForPath:attributePath];
             // A repeat that still purges something stays at error level, since the purge is news.
             NSError * lastLoggedError = _lastLoggedErrorForPath[attributePath];
             BOOL isUnchangedError = lastLoggedError != nil && [lastLoggedError.domain isEqualToString:attributeError.domain]
                 && lastLoggedError.code == attributeError.code && _expectedValueCache[attributePath] == nil && previousValue == nil;
+            // The delegate already has this error for this path in this episode.
+            shouldReportAttribute = !isUnchangedError;
             if (isUnchangedError) {
                 ++unchangedErrorCount;
                 MTR_LOG_DEBUG("%@ report %@ error %@ purge expected value %@ read cache %@", self, attributePath, attributeError,
