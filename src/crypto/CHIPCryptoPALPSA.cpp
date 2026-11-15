@@ -78,6 +78,38 @@ bool isValidTag(const uint8_t * tag, size_t tag_length)
     return tag != nullptr && (tag_length == 8 || tag_length == 12 || tag_length == 16);
 }
 
+/**
+ * Computes a MAC, like psa_mac_compute().
+ *
+ * Mbed TLS implements psa_mac_compute() with a driver operation initialized by
+ * MBEDTLS_PSA_MAC_OPERATION_INIT, which sets only the first member of its context union. For HMAC,
+ * the nested hash operation keeps whatever was on the stack, and psa_hash_setup() fails with
+ * PSA_ERROR_BAD_STATE when its id field is not zero. Using the multi-part API on an operation that
+ * is zeroed as a whole avoids this.
+ */
+psa_status_t computeMac(psa_key_id_t key, psa_algorithm_t algorithm, const uint8_t * input, size_t input_length, uint8_t * mac,
+                        size_t mac_size, size_t * mac_length)
+{
+    psa_mac_operation_t operation;
+    memset(&operation, 0, sizeof(operation));
+
+    psa_status_t status = psa_mac_sign_setup(&operation, key, algorithm);
+    if (status == PSA_SUCCESS)
+    {
+        status = psa_mac_update(&operation, input, input_length);
+    }
+    if (status == PSA_SUCCESS)
+    {
+        status = psa_mac_sign_finish(&operation, mac, mac_size, mac_length);
+    }
+    if (status != PSA_SUCCESS)
+    {
+        psa_mac_abort(&operation);
+    }
+
+    return status;
+}
+
 } // namespace
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
@@ -548,7 +580,7 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
     status = psa_import_key(&attrs, key, key_length, &keyId);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
-    status = psa_mac_compute(keyId, algorithm, message, message_length, out_buffer, out_length, &out_length);
+    status = computeMac(keyId, algorithm, message, message_length, out_buffer, out_length, &out_length);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -568,7 +600,7 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * m
     const psa_algorithm_t algorithm = PSA_ALG_HMAC(PSA_ALG_SHA_256);
     psa_status_t status             = PSA_SUCCESS;
 
-    status = psa_mac_compute(key.As<psa_key_id_t>(), algorithm, message, message_length, out_buffer, out_length, &out_length);
+    status = computeMac(key.As<psa_key_id_t>(), algorithm, message, message_length, out_buffer, out_length, &out_length);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -643,7 +675,7 @@ exit:
 
         for (size_t iteration = 0; iteration < iteration_count; ++iteration)
         {
-            status = psa_mac_compute(keyId, algorithm, in, inLength, out, sizeof(out), &outLength);
+            status = computeMac(keyId, algorithm, in, inLength, out, sizeof(out), &outLength);
             VerifyOrExit(status == PSA_SUCCESS && outLength == kMacLength, error = CHIP_ERROR_INTERNAL);
 
             for (size_t byteNo = 0; byteNo < kMacLength; ++byteNo)
