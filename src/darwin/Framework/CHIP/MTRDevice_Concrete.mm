@@ -323,6 +323,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)addWaiter:(MTRAsyncReadWaiter *)waiter;
 - (void)moveWaitersForPath:(MTRAttributeRequestPath *)path toWaiters:(MTRAsyncReadWaiters *)other;
 - (NSArray<MTRAsyncReadWaiter *> *)takeAll;
+- (BOOL)hasWaiters;
 @end
 
 @implementation MTRAsyncReadWaiters {
@@ -370,6 +371,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     NSArray<MTRAsyncReadWaiter *> * taken = [_waiters copy];
     [_waiters removeAllObjects];
     return taken;
+}
+
+- (BOOL)hasWaiters
+{
+    std::lock_guard lock(_lock);
+    return _waiters.count > 0;
 }
 
 - (void)dealloc
@@ -603,6 +610,9 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     // This boolean keeps track of any device configuration changes received in an attribute report.
     // If this is true when the report ends, we notify the delegate.
     BOOL _deviceConfigurationChanged;
+
+    // Set under _lock before the work queue is invalidated; asynchronous reads check it.
+    BOOL _invalidated;
 
     // Keep track of the current schedule of time updates (only valid if
     // timeUpdateTimer is not nil).
@@ -1308,6 +1318,10 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 {
     MTR_LOG("%@ invalidate", self);
 
+    {
+        std::lock_guard lock(_lock);
+        _invalidated = YES;
+    }
     [_asyncWorkQueue invalidate];
 
     [self _cancelTimeUpdateTimer];
@@ -3781,10 +3795,16 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                                                          attributeID:attributeID];
     MTRAsyncReadWaiter * waiter = [[MTRAsyncReadWaiter alloc] initWithPath:attributePath queue:queue completion:completion];
 
+    BOOL invalidated;
     BOOL suspended;
     {
         std::lock_guard lock(_lock);
+        invalidated = _invalidated;
         suspended = self.suspended;
+    }
+    if (invalidated) {
+        [waiter callWithValues:nil error:[MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]];
+        return;
     }
     if (suspended) {
         [waiter callWithValues:nil error:[MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]];
@@ -3937,6 +3957,22 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                 return;
             }
 
+            BOOL invalidated;
+            {
+                std::lock_guard lock(self->_lock);
+                invalidated = self->_invalidated;
+            }
+            if (invalidated && [waiters hasWaiters]) {
+                MTR_LOG("Read attribute work item [%llu] not sent: device was invalidated", workItemID);
+                if (completion(MTRAsyncWorkComplete)) {
+                    NSError * cancelled = [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED];
+                    for (MTRAsyncReadWaiter * cancelledWaiter in [waiters takeAll]) {
+                        [cancelledWaiter callWithValues:nil error:cancelled];
+                    }
+                }
+                return;
+            }
+
             MTRReadParams * readParams = [[MTRReadParams alloc] init];
             // Read results update the attribute cache, which holds the non-fabric-filtered values
             // our subscription reports, so make sure we don't ask for fabric-filtering on
@@ -4004,6 +4040,18 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                                   endpointID,
                                                   clusterID.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue)),
                                                   attributeID.unsignedLongLongValue, MTRAttributeNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue), static_cast<MTRAttributeIDType>(attributeID.unsignedLongLongValue))];
+
+        // An invalidate between the caller's check and this enqueue has already emptied the queue, so cancel what was enqueued since.
+        if (waiter) {
+            BOOL invalidated;
+            {
+                std::lock_guard lock(_lock);
+                invalidated = _invalidated;
+            }
+            if (invalidated) {
+                [_asyncWorkQueue invalidate];
+            }
+        }
     } else {
         [self _readThroughSkipped];
         if (waiter && attributeValueToReturn) {

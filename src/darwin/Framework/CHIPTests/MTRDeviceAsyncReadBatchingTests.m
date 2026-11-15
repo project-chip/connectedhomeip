@@ -275,7 +275,8 @@ static char kCallerQueueKey;
 
 - (void)waitForCompletions:(XCTestExpectation *)done
 {
-    (void) [XCTWaiter waitForExpectations:@[ done ] timeout:kWaitTimeout];
+    XCTWaiterResult result = [XCTWaiter waitForExpectations:@[ done ] timeout:kWaitTimeout];
+    XCTAssertEqual(result, XCTWaiterResultCompleted, @"fewer than %lu completions arrived", (unsigned long) done.expectedFulfillmentCount);
     // A second call for the same read would already be on the device queue or the caller's queue.
     [_device unitTestSyncRunOnDeviceQueue:^ {}];
     dispatch_sync(_callerQueue, ^ {});

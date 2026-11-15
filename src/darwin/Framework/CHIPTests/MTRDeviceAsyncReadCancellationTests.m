@@ -379,6 +379,39 @@ static char kCallerQueueKey;
     }
 }
 
+- (void)testAsyncReadIssuedAfterInvalidateWhileAReadThroughIsHeldCallsBackOnceWithCancelled
+{
+    [self holdReadThroughsOfDevice:_device];
+
+    MTRCancellationTestReadCall * held = [self readPath:[self onOffPathOnEndpoint:1] ofDevice:_device onQueue:[self callerQueueNamed:@"caller.held"]];
+    [self waitForReadThrough:0 heldFor:held];
+
+    [self allowToComplete:@[ held ]];
+    [_device invalidate];
+    MTRCancellationTestReadCall * late = [self readPath:[self onOffPathOnEndpoint:2] ofDevice:_device onQueue:[self callerQueueNamed:@"caller.late"]];
+    [self allowToComplete:@[ late ]];
+    [self waitForCompletionOf:@[ held, late ]];
+
+    [self assertNoSecondCompletionOf:@[ held, late ] device:_device];
+    [self assertCancelledOnItsQueue:held];
+    [self assertCancelledOnItsQueue:late];
+    XCTAssertEqual(_readThroughs.count, 1);
+}
+
+- (void)testAsyncReadIssuedAfterInvalidateWithNothingRunningCallsBackOnceWithCancelledWithoutAReadThrough
+{
+    [self holdReadThroughsOfDevice:_device];
+
+    [_device invalidate];
+    MTRCancellationTestReadCall * late = [self readPath:[self onOffPathOnEndpoint:1] ofDevice:_device onQueue:[self callerQueueNamed:@"caller.late"]];
+    [self allowToComplete:@[ late ]];
+    [self waitForCompletionOf:@[ late ]];
+
+    [self assertNoSecondCompletionOf:@[ late ] device:_device];
+    [self assertCancelledOnItsQueue:late];
+    XCTAssertEqual(_readThroughs.count, 0);
+}
+
 #pragma mark - Releasing the device
 
 - (void)testReleasingDeviceWhileReadThroughIsHeldCancelsWaiterOnceWhenTheResultArrivesLate
