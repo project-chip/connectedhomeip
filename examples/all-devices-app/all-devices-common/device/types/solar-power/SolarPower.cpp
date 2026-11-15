@@ -24,7 +24,7 @@ namespace chip::app {
 SolarPower::SolarPower(const Context & context, Parameters parameters) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSolarPower, 1)), mContext(context),
     mOutputElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
-                            Span(SolarPowerTags::kGridConnectionTag), parameters.outputSensorRole),
+                            context.deviceInfoProvider, Span(SolarPowerTags::kGridConnectionTag), parameters.outputSensorRole),
     mGridPowerSource("Solar power grid connection"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc, 0)
 {}
 

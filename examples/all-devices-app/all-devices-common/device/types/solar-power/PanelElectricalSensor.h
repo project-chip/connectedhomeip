@@ -20,7 +20,9 @@
 #include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <credentials/FabricTable.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/TimerDelegate.h>
+#include <platform/DeviceInfoProvider.h>
 
 namespace chip::app {
 
@@ -29,10 +31,14 @@ class PanelElectricalSensor : public SimulatedElectricalSensor
 {
 public:
     PanelElectricalSensor(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate,
-                          FabricTable & fabricTable, Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList,
-                          Role role = Role::kBattery);
+                          FabricTable & fabricTable, DeviceLayer::DeviceInfoProvider & deviceInfoProvider,
+                          Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList, Role role = Role::kBattery);
 
-    Clusters::UserLabelCluster & UserLabelCluster() { return mUserLabelCluster.Cluster(); }
+    Clusters::UserLabelCluster & UserLabelCluster()
+    {
+        VerifyOrDie(mUserLabelCluster.IsConstructed());
+        return mUserLabelCluster.Cluster();
+    }
 
 protected:
     CHIP_ERROR RegisterAdditionalServerClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
@@ -40,6 +46,7 @@ protected:
 
 private:
     FabricTable & mFabricTable;
+    DeviceLayer::DeviceInfoProvider & mDeviceInfoProvider;
     LazyRegisteredServerCluster<Clusters::UserLabelCluster> mUserLabelCluster;
 };
 

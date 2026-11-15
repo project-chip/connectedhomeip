@@ -79,9 +79,6 @@ public:
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
-    void SetUp() override { DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider); }
-    void TearDown() override { DeviceLayer::SetDeviceInfoProvider(nullptr); }
-
 protected:
     SolarPower::Context MakeContext()
     {
@@ -89,6 +86,7 @@ protected:
             .timerDelegate            = mTimerDelegate,
             .testEventTriggerDelegate = mTestEventTriggerDelegate,
             .fabricTable              = mContext.GetFabricTable(),
+            .deviceInfoProvider       = mDeviceInfoProvider,
         };
     }
 
@@ -298,6 +296,30 @@ void TestUnregisterAndRegisterAgain(CodeDrivenDataModelProvider & provider, Test
     expectInvalid(*device);
     ExpectNoRegisteredEndpoints(provider);
     EXPECT_EQ(provider.Shutdown(), CHIP_NO_ERROR);
+}
+
+TEST_F(SolarPowerTestFixture, AllVariantsRegisterWithoutGlobalDeviceInfoProvider)
+{
+    ASSERT_EQ(DeviceLayer::GetDeviceInfoProvider(), nullptr);
+
+    for (const auto & variant : SolarPowerVariants())
+    {
+        ConsecutiveEndpointIdAllocator allocator;
+        SimulatedSolarPower device(MakeContext(), variant.makeConfig());
+
+        ASSERT_SUCCESS(device.Register(allocator, mProvider));
+        ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
+
+        EXPECT_TRUE(device.IdentifyCluster().PathsContains({ device.GetEndpointId(), Clusters::Identify::Id }));
+        for (size_t index = 0; index < device.GetPanelCount(); ++index)
+        {
+            auto & panel = device.GetPanelSensor(index);
+            EXPECT_TRUE(panel.UserLabelCluster().PathsContains({ panel.GetEndpointId(), Clusters::UserLabel::Id }));
+        }
+
+        device.Unregister(mProvider);
+        EXPECT_SUCCESS(mProvider.Shutdown());
+    }
 }
 
 TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredTopologyAndDeviceTypes)

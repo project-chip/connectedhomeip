@@ -17,24 +17,20 @@
 #include <device/types/solar-power/PanelElectricalSensor.h>
 
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/DeviceInfoProvider.h>
 
 namespace chip::app {
 
 PanelElectricalSensor::PanelElectricalSensor(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate,
-                                             FabricTable & fabricTable,
+                                             FabricTable & fabricTable, DeviceLayer::DeviceInfoProvider & deviceInfoProvider,
                                              Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList, Role role) :
-    SimulatedElectricalSensor(timerDelegate, testEventTriggerDelegate, tagList, role),
-    mFabricTable(fabricTable)
+    SimulatedElectricalSensor(timerDelegate, testEventTriggerDelegate, tagList, role), mFabricTable(fabricTable),
+    mDeviceInfoProvider(deviceInfoProvider)
 {}
 
 CHIP_ERROR PanelElectricalSensor::RegisterAdditionalServerClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
 {
-    DeviceLayer::DeviceInfoProvider * deviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
-    VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
     mUserLabelCluster.Create(
-        endpoint, Clusters::UserLabelCluster::Context{ .deviceInfoProvider = *deviceInfoProvider, .fabricTable = mFabricTable });
+        endpoint, Clusters::UserLabelCluster::Context{ .deviceInfoProvider = mDeviceInfoProvider, .fabricTable = mFabricTable });
     return provider.AddCluster(mUserLabelCluster.Registration());
 }
 

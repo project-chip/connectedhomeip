@@ -20,6 +20,7 @@
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/solar-power/SolarPower.h>
 #include <device/types/temperature-sensor/TemperatureSensor.h>
+#include <lib/support/CodeUtils.h>
 
 #include <array>
 #include <memory>
@@ -59,7 +60,11 @@ public:
     size_t GetPanelCount() const { return mPanelCount; }
     PanelElectricalSensor & GetPanelSensor(size_t index);
 
-    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+    Clusters::IdentifyCluster & IdentifyCluster()
+    {
+        VerifyOrDie(mIdentifyCluster.IsConstructed());
+        return mIdentifyCluster.Cluster();
+    }
     EnergyManagement & GetEnergyManagement() { return mEnergyManagement; }
     TemperatureSensor & GetInverterTemperatureSensor() { return mInverterTemperatureSensor; }
 

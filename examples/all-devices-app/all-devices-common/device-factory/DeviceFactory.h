@@ -97,6 +97,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/Optional.h>
 #include <platform/DefaultTimerDelegate.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 
@@ -314,6 +315,7 @@ public:
         BindingHandler & bindingHandler;
         TestEventTriggerDelegate & testEventTriggerDelegate;
         Clusters::IdentifyDelegate & identifyDelegate;
+        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
     };
 
     static DeviceFactory & GetInstance()
@@ -915,6 +917,7 @@ private:
                             .timerDelegate            = mContext->timerDelegate,
                             .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
                             .fabricTable              = mContext->fabricTable,
+                            .deviceInfoProvider       = mContext->deviceInfoProvider,
                         },
                         makeConfig());
                 });

@@ -23,6 +23,7 @@
 #include <device/types/power-source/WiredPowerSource.h>
 #include <device/types/solar-power/PanelElectricalSensor.h>
 #include <lib/support/TimerDelegate.h>
+#include <platform/DeviceInfoProvider.h>
 
 namespace chip::app {
 
@@ -35,6 +36,7 @@ public:
         TimerDelegate & timerDelegate;
         TestEventTriggerDelegate & testEventTriggerDelegate;
         FabricTable & fabricTable;
+        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
     };
 
     struct Parameters
