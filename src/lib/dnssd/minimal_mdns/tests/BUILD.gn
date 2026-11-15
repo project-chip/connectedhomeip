@@ -39,6 +39,12 @@ chip_test_suite("tests") {
     test_sources += [ "TestMinimalMdnsServer.cpp" ]
   }
 
+  # Builds InterfaceId values from integer indexes, which LwIP's InterfaceId
+  # is not.
+  if (chip_system_config_use_sockets) {
+    test_sources += [ "TestPacketSourceFilter.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [

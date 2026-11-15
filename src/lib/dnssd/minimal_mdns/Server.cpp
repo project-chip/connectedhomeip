@@ -16,6 +16,7 @@
  */
 
 #include "Server.h"
+#include "PacketSourceFilter.h"
 
 #include <errno.h>
 #include <utility>
@@ -475,6 +476,17 @@ void ServerBase::OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::S
     if (data.Size() < HeaderRef::kSizeBytes)
     {
         ChipLogError(Discovery, "Packet too small for mDNS data: %d bytes", static_cast<int>(data.Size()));
+        return;
+    }
+
+    chip::Inet::InterfaceAddressIterator interfaceAddresses;
+    if (!IsFromAttachedSubnet(*info, interfaceAddresses))
+    {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
+        char srcAddressString[chip::Inet::IPAddress::kMaxStringLength];
+        info->SrcAddress.ToString(srcAddressString);
+        ChipLogDetail(Discovery, "Ignoring mDNS packet from %s: not on an attached subnet", srcAddressString);
+#endif
         return;
     }
 
