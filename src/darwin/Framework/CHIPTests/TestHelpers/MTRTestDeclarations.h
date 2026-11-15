@@ -58,6 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable MTRDevice *)_existingDeviceForNodeID:(NSNumber *)nodeID;
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * sessionAttemptPool;
 @property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
 @end
 

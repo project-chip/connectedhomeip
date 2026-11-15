@@ -613,7 +613,7 @@ static void TestBrowseCallback(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
     [self invokeToggleOnDevice:device completion:^{
         [invokeCompletions addObject:@YES];
     }];
-    [self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] > countBefore || controller.concurrentSubscriptionPool.itemCount > 0); }
+    [self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] > countBefore || controller.sessionAttemptPool.itemCount > 0); }
             timeout:kPromptSeconds
         description:@"session request started its connectivity monitor"];
     return device;
@@ -628,8 +628,8 @@ static void TestBrowseCallback(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
     NSMutableArray * invokeCompletions = [NSMutableArray array];
     [self startThreadSessionRequestOnController:controller nodeID:@(0x1001) invokeCompletions:invokeCompletions];
 
-    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, 0, @"session request should be waiting on the monitor");
-    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0); }
+    XCTAssertEqual(controller.sessionAttemptPool.itemCount, 0, @"session request should be waiting on the monitor");
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.sessionAttemptPool.itemCount > 0); }
                           timeout:kMonitorWaitSeconds + kPromptSeconds
                       description:@"session work item enqueued although the connectivity monitor never reported"]);
 #else
@@ -673,7 +673,7 @@ static void TestBrowseCallback(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
         invokeCompleted = YES;
     }];
 
-    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0 || invokeCompleted); }
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.sessionAttemptPool.itemCount > 0 || invokeCompleted); }
                           timeout:kPromptSeconds
                       description:@"session work item enqueued as soon as the monitor reported"]);
     DNSServiceRefDeallocate(advertiser);
@@ -690,7 +690,7 @@ static void TestBrowseCallback(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
     MTRDevice * device = [self deviceWithNodeID:@(0x1004) controller:controller usesThread:NO];
     [self invokeToggleOnDevice:device completion:^ {}];
 
-    XCTAssertTrue([self stays:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount == 0 && [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore); } duration:kMonitorWaitSeconds + 1], @"non-Thread session request must not use the monitor or the subscription pool");
+    XCTAssertTrue([self stays:^{ return (BOOL) (controller.sessionAttemptPool.itemCount == 0 && [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore); } duration:kMonitorWaitSeconds + 1], @"non-Thread session request must not use the monitor or the subscription pool");
 #else
     XCTSkip(@"Requires DEBUG test hooks");
 #endif
@@ -705,13 +705,13 @@ static void TestBrowseCallback(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
     NSMutableArray * invokeCompletions = [NSMutableArray array];
     [self startThreadSessionRequestOnController:controller nodeID:@(0x1006) invokeCompletions:invokeCompletions];
     NSUInteger generation = [MTRDeviceConnectivityMonitor unitTestSharedConnectionGeneration];
-    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, 0);
+    XCTAssertEqual(controller.sessionAttemptPool.itemCount, 0);
     XCTAssertEqual(waitingMonitorReports.count, 0);
 
     [MTRDeviceConnectivityMonitor unitTestDisconnectSharedConnectionFromDaemon];
 
     XCTAssertTrue([self waitUntil:^{ return (BOOL) (waitingMonitorReports.count > 0); } timeout:kPromptSeconds description:@"waiting monitor unblocked by daemon disconnect"]);
-    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0); }
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.sessionAttemptPool.itemCount > 0); }
                           timeout:kPromptSeconds
                       description:@"waiting Thread session request proceeds after daemon disconnect"]);
     XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], 0, @"monitors on the lost connection are stopped");
@@ -736,7 +736,7 @@ static void TestBrowseCallback(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
 
     NSMutableArray * invokeCompletions = [NSMutableArray array];
     [self startThreadSessionRequestOnController:controller nodeID:@(0x1005) invokeCompletions:invokeCompletions];
-    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0); }
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.sessionAttemptPool.itemCount > 0); }
                           timeout:kMonitorWaitSeconds + kPromptSeconds
                       description:@"session work item enqueued after the wait timed out"]);
 
@@ -829,14 +829,14 @@ static void TestBrowseCallback(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
     [poolSlotHolder setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
         releasePoolSlot = completion;
     }];
-    [controller.concurrentSubscriptionPool enqueueWorkItem:poolSlotHolder description:@"hold the only subscription pool slot"];
-    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"subscription pool slot held"]);
+    [controller.sessionAttemptPool enqueueWorkItem:poolSlotHolder description:@"hold the only session attempt slot"];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"session attempt slot held"]);
 
     NSMutableArray * invokeCompletions = [NSMutableArray array];
     [self startThreadSessionRequestOnController:controller nodeID:nodeID invokeCompletions:invokeCompletions];
     XCTAssertTrue([self waitUntil:^{ return (BOOL) (invokeCompletions.count > 0); }
                           timeout:kInvokeOnDeadPeerSeconds
-                      description:@"invoke sent on the existing session without waiting for a subscription pool slot"]);
+                      description:@"invoke sent on the existing session without waiting for a session attempt slot"]);
     XCTAssertNotNil(releasePoolSlot);
     if (releasePoolSlot) {
         releasePoolSlot(MTRAsyncWorkComplete);
@@ -929,14 +929,14 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
     [poolSlotHolder setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
         releasePoolSlot = completion;
     }];
-    [controller.concurrentSubscriptionPool enqueueWorkItem:poolSlotHolder description:@"hold the only subscription pool slot"];
-    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"subscription pool slot held"]);
+    [controller.sessionAttemptPool enqueueWorkItem:poolSlotHolder description:@"hold the only session attempt slot"];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"session attempt slot held"]);
 
     NSMutableArray * invokeCompletions = [NSMutableArray array];
     [self startThreadSessionRequestOnController:controller nodeID:peerNodeID invokeCompletions:invokeCompletions];
     XCTAssertTrue([self waitUntil:^{ return (BOOL) (invokeCompletions.count > 0); }
                           timeout:kMonitorWaitSeconds + kPromptSeconds
-                      description:@"invoke answered on the existing session without waiting for a subscription pool slot"]);
+                      description:@"invoke answered on the existing session without waiting for a session attempt slot"]);
     if (releasePoolSlot) {
         releasePoolSlot(MTRAsyncWorkComplete);
     }
@@ -1111,7 +1111,7 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
 #endif
 }
 
-- (void)test024_InvokeUsesExistingSessionWhileTheSubscriptionPoolIsFull
+- (void)test024_InvokeUsesExistingSessionWhileTheSessionAttemptPoolIsFull
 {
 #ifdef DEBUG
     NSNumber * peerNodeID = @(0x100D);
@@ -1122,8 +1122,8 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
     [poolSlotHolder setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
         releasePoolSlot = completion;
     }];
-    [controller.concurrentSubscriptionPool enqueueWorkItem:poolSlotHolder description:@"hold the only subscription pool slot"];
-    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"subscription pool slot held"]);
+    [controller.sessionAttemptPool enqueueWorkItem:poolSlotHolder description:@"hold the only session attempt slot"];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"session attempt slot held"]);
 
     MTRDevice * device = [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
     __block BOOL invokeCompleted = NO;
@@ -1148,7 +1148,7 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
     NSMutableArray * invokeCompletions = [NSMutableArray array];
     [self startThreadSessionRequestOnController:controller nodeID:@(0x100E) invokeCompletions:invokeCompletions];
 
-    XCTAssertTrue([self stays:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount == 0 && [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1 && invokeCompletions.count == 0); } duration:kMonitorWaitSeconds], @"a new session to a Thread node still waits for DNS-SD");
+    XCTAssertTrue([self stays:^{ return (BOOL) (controller.sessionAttemptPool.itemCount == 0 && [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1 && invokeCompletions.count == 0); } duration:kMonitorWaitSeconds], @"a new session to a Thread node still waits for DNS-SD");
     [self waitForMonitorWaitToEndWithMonitorCount:countBefore];
 #else
     XCTSkip(@"Requires DEBUG test hooks");
@@ -1236,7 +1236,7 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
                                  invokeCompleted = YES;
                              }];
     XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1); } timeout:kPromptSeconds description:@"large-payload session request started its connectivity monitor"]);
-    XCTAssertTrue([self stays:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount == 0 && [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1 && !invokeCompleted); } duration:kMonitorWaitSeconds], @"an MRP session is not handed to a large-payload request");
+    XCTAssertTrue([self stays:^{ return (BOOL) (controller.sessionAttemptPool.itemCount == 0 && [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1 && !invokeCompleted); } duration:kMonitorWaitSeconds], @"an MRP session is not handed to a large-payload request");
     [self waitForMonitorWaitToEndWithMonitorCount:countBefore];
 #else
     XCTSkip(@"Requires DEBUG test hooks");
@@ -1398,7 +1398,7 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
     }];
     XCTAssertTrue([self waitUntil:^{ return invokeCompleted; } timeout:kPromptSeconds description:@"invoke on the existing session answered while another node waits on DNS-SD"]);
     XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore + 1, @"the other node is still waiting on its own monitor");
-    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, 0);
+    XCTAssertEqual(controller.sessionAttemptPool.itemCount, 0);
     XCTAssertEqual(otherNodeInvokeCompletions.count, 0);
     [self waitForMonitorWaitToEndWithMonitorCount:countBefore];
 #else
@@ -1443,11 +1443,11 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
     NSMutableArray * invokeCompletions = [NSMutableArray array];
     [self startThreadSessionRequestOnController:controller nodeID:peerNodeID invokeCompletions:invokeCompletions];
     XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore + 1, @"no active session, so the request waits on DNS-SD");
-    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, 0);
+    XCTAssertEqual(controller.sessionAttemptPool.itemCount, 0);
     XCTAssertEqual(invokeCompletions.count, 0);
-    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0 || invokeCompletions.count > 0); }
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.sessionAttemptPool.itemCount > 0 || invokeCompletions.count > 0); }
                           timeout:kMonitorWaitSeconds + kPromptSeconds
-                      description:@"session attempt proceeds through the subscription pool once the monitor wait is over"]);
+                      description:@"session attempt proceeds through the session attempt pool once the monitor wait is over"]);
 #else
     XCTSkip(@"Requires DEBUG test hooks");
 #endif
@@ -1595,7 +1595,7 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
     XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1); } timeout:kPromptSeconds description:@"session request waits on its connectivity monitor"]);
     XCTAssertEqual([controller unitTestSessionRequestsWaitingOnConnectivityMonitorCount], 1);
 
-    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0 || errors.count > 0); } timeout:kMonitorWaitSeconds + kPromptSeconds description:@"monitor wait timed out"]);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.sessionAttemptPool.itemCount > 0 || errors.count > 0); } timeout:kMonitorWaitSeconds + kPromptSeconds description:@"monitor wait timed out"]);
     XCTAssertEqual([controller unitTestSessionRequestsWaitingOnConnectivityMonitorCount], 0, @"a request whose wait timed out is no longer failed by shutdown");
     XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
 #else
@@ -1619,8 +1619,8 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
     [poolSlotHolder setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
         releasePoolSlot = completion;
     }];
-    [controller.concurrentSubscriptionPool enqueueWorkItem:poolSlotHolder description:@"hold the only subscription pool slot"];
-    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"subscription pool slot held"]);
+    [controller.sessionAttemptPool enqueueWorkItem:poolSlotHolder description:@"hold the only session attempt slot"];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"session attempt slot held"]);
 
     NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
     NSMutableArray * invokeCompletions = [NSMutableArray array];
@@ -1634,7 +1634,7 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
     DNSServiceRef advertiser = [self advertiseInstance:instanceName port:kControllerPeerPort];
     XCTAssertTrue([self waitUntil:^{ return (BOOL) (invokeCompletions.count > 0); }
                           timeout:kPromptSeconds + kPromptSeconds
-                      description:@"invoke answered on the session that appeared, without waiting for a subscription pool slot"]);
+                      description:@"invoke answered on the session that appeared, without waiting for a session attempt slot"]);
     DNSServiceRefDeallocate(advertiser);
     if (releasePoolSlot) {
         releasePoolSlot(MTRAsyncWorkComplete);
@@ -1657,8 +1657,8 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
     [poolSlotHolder setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
         releasePoolSlot = completion;
     }];
-    [controller.concurrentSubscriptionPool enqueueWorkItem:poolSlotHolder description:@"hold the only subscription pool slot"];
-    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"subscription pool slot held"]);
+    [controller.sessionAttemptPool enqueueWorkItem:poolSlotHolder description:@"hold the only session attempt slot"];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"session attempt slot held"]);
 
     MTRDevice * device = [self deviceWithNodeID:@(0x1054) controller:controller usesThread:YES];
     MTRAttributeRequestPath * readPath = [self descriptorPartsListPath];
@@ -1673,7 +1673,7 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
                         userInvokeToken:[[MTRUserInvokeToken alloc] initWithTimeout:nil]
                                   queue:dispatch_get_main_queue()
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {}];
-    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount >= 3); }
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.sessionAttemptPool.itemCount >= 3); }
                           timeout:kMonitorWaitSeconds + kPromptSeconds
                       description:@"the read's and the user command's session requests both wait in the pool"]);
     if (releasePoolSlot) {
@@ -1722,6 +1722,57 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
     dispatch_semaphore_signal(matterQueueBlocker);
     XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRBaseDevice unitTestReadSendCount] > 0); } timeout:kPromptSeconds description:@"the read sent on its session while the command waits on DNS-SD"]);
     [self waitForMonitorWaitToEndWithMonitorCount:countBefore];
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+#pragma mark - Session attempts and the subscription pool
+
+- (void)test056_NewSessionAttemptDoesNotWaitBehindAFullSubscriptionPool
+{
+#ifdef DEBUG
+    // A subscription establishment can hold its pool slot for one CASE attempt, which to a sleepy peer runs for
+    // minutes. A session request to another, reachable node needs a new CASE session; it must not wait for that slot.
+    NSNumber * peerNodeID = @(0x1056);
+    MTRDeviceController * peer;
+    MTRDeviceController * controller = [self controllerWithControllerPeer:peerNodeID peer:&peer];
+    __block MTRAsyncWorkCompletionBlock releasePoolSlot;
+    MTRAsyncWorkItem * poolSlotHolder = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_main_queue()];
+    [poolSlotHolder setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        releasePoolSlot = completion;
+    }];
+    [controller.concurrentSubscriptionPool enqueueWorkItem:poolSlotHolder description:@"hold the only subscription pool slot"];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"subscription pool slot held"]);
+
+    // The peer is advertised under this host's own name, as establishSessionFromController:toNode: does, so the
+    // connectivity monitor reports and the operational resolve gets an address for a new CASE attempt.
+    NSString * instanceName = [NSString stringWithFormat:@"%016llX-%016llX", controller.compressedFabricID.unsignedLongLongValue, peerNodeID.unsignedLongLongValue];
+    DNSServiceRef advertiser = NULL;
+    XCTAssertEqual(DNSServiceRegister(&advertiser, kDNSServiceFlagsNoAutoRename, 0, instanceName.UTF8String, kOperationalType, kLocalDot, NULL, htons(kControllerPeerPort), 0, NULL, TestRegisterCallback, NULL), kDNSServiceErr_NoError);
+    MTRDevice * device = [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
+    __block BOOL invokeCompleted = NO;
+    __block NSError * invokeError;
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(MTRClusterIDTypeOnOffID)
+                              commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)
+                          commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 invokeError = error;
+                                 invokeCompleted = YES;
+                             }];
+    XCTAssertTrue([self waitUntil:^{ return invokeCompleted; }
+                          timeout:kMonitorWaitSeconds + kCASEEstablishmentSeconds
+                      description:@"invoke sent on a new session while the subscription pool slot is still held"]);
+    // The peer answered: no error, or a status from the peer, not a failure to reach it.
+    XCTAssertTrue(invokeError == nil || [invokeError.domain isEqualToString:MTRInteractionErrorDomain], @"invoke error: %@", invokeError);
+    DNSServiceRefDeallocate(advertiser);
+    if (releasePoolSlot) {
+        releasePoolSlot(MTRAsyncWorkComplete);
+    }
 #else
     XCTSkip(@"Requires DEBUG test hooks");
 #endif

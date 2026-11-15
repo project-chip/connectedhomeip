@@ -302,6 +302,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 
 /**
+ * A queue of the same width for new CASE session attempts to Thread nodes. It throttles them like subscription
+ * establishment, but in its own lane, so a slow session attempt holding a subscription slot does not delay them.
+ */
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * sessionAttemptPool;
+
+/**
  * The per-controller data store this controller was initialized with, if any.
  */
 @property (nonatomic, readonly, nullable) MTRDeviceControllerDataStore * controllerDataStore;
