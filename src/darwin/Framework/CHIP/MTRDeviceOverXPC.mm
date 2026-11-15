@@ -38,8 +38,8 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
 
 - (void)fetchProxyHandleWithQueue:(dispatch_queue_t)queue completion:(MTRFetchProxyHandleCompletion)completion;
 
-// The XPC paths for writes and invokes.  requestWillBeSent, if not nil, is called right before the request goes to
-// the XPC proxy.
+// The XPC paths for writes and invokes.  requestWillBeSent, if not nil, is called when the request completes, right
+// before completion: the service does not tell the client when it sends the request.
 - (void)_writeAttributeOverXPCWithEndpointID:(NSNumber *)endpointID
                                    clusterID:(NSNumber *)clusterID
                                  attributeID:(NSNumber *)attributeID
@@ -278,10 +278,6 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
             return;
         }
 
-        // The write request goes to the XPC proxy now.
-        if (requestWillBeSent) {
-            requestWillBeSent();
-        }
         [handle.proxy writeAttributeWithController:self.controllerID
                                             nodeId:self.nodeID.unsignedLongLongValue
                                         endpointId:endpointID
@@ -292,6 +288,11 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                                         completion:^(id _Nullable values, NSError * _Nullable error) {
                                             dispatch_async(queue, ^{
                                                 MTR_LOG_DEBUG("Attribute written");
+                                                // The client cannot see when the service sends the request, so the expected value
+                                                // interval starts here, when it completes, and cannot run out before the send.
+                                                if (requestWillBeSent) {
+                                                    requestWillBeSent();
+                                                }
                                                 completion([MTRDeviceController decodeXPCResponseValues:values], error);
                                                 // The following captures the proxy handle in the closure so that the
                                                 // handle won't be released prior to block call.
@@ -339,10 +340,6 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
             return;
         }
 
-        // The invoke request goes to the XPC proxy now.
-        if (requestWillBeSent) {
-            requestWillBeSent();
-        }
         [handle.proxy invokeCommandWithController:self.controllerID
                                            nodeId:self.nodeID.unsignedLongLongValue
                                        endpointId:endpointID
@@ -353,6 +350,11 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                                        completion:^(id _Nullable values, NSError * _Nullable error) {
                                            dispatch_async(queue, ^{
                                                MTR_LOG_DEBUG("Command invoked");
+                                               // The client cannot see when the service sends the request, so the expected value
+                                               // interval starts here, when it completes, and cannot run out before the send.
+                                               if (requestWillBeSent) {
+                                                   requestWillBeSent();
+                                               }
                                                completion([MTRDeviceController decodeXPCResponseValues:values], error);
                                                // The following captures the proxy handle in the closure so that the
                                                // handle won't be released prior to block call.

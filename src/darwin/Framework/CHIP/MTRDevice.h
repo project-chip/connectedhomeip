@@ -194,7 +194,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * @param expectedValueInterval  interval in milliseconds during which reads of the attribute will return the value being
  * written, counted from when the write request is sent to the device.  For a timed write, it is counted from when the
  * Timed Request that precedes the write is sent.  For a controller from +sharedControllerWithID:xpcConnectBlock:, it is
- * counted from when the write is passed to the XPC service.  While the write is still waiting to be sent (for example
+ * counted from when the XPC service reports the write complete.  While the write is still waiting to be sent (for example
  * behind other work for the device, or for a session), reads also return the value being written.  If the write fails,
  * the expected value is removed.  This value must be within [1, UINT32_MAX], and will be clamped to this range.
  *
@@ -272,7 +272,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *                               device.  For a timed invoke, it is counted from when the
  *                               Timed Request that precedes the invoke is sent.  For a
  *                               controller from +sharedControllerWithID:xpcConnectBlock:, it
- *                               is counted from when the invoke is passed to the XPC service.
+ *                               is counted from when the XPC service reports the invoke complete.
  *                               While the invoke is still waiting to be sent (for example
  *                               behind other work for the device, or for a session), reads
  *                               also return the expected values.  If the invoke fails, the

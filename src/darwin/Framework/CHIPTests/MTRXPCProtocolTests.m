@@ -2394,7 +2394,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 - (void)testMTRDeviceWriteOverXPCReachesProxy
 {
     // An MTRDevice on a controller over XPC sends its writes over XPC, and the expected value interval starts when
-    // the write goes to the XPC proxy.
+    // the write completes.
     uint64_t myNodeId = 9876543210;
     NSNumber * myEndpointId = @100;
     NSNumber * myClusterId = @200;
@@ -2434,7 +2434,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // The expected value is in effect: its interval has just started.
     XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:myPath], myValue);
 
-    // The interval started when the write went out, so the expected value is gone once it has passed.
+    // The interval started when the write completed, so the expected value is gone once it has passed.
     XCTestExpectation * intervalPassed = [[XCTestExpectation alloc] initWithDescription:@"Expected value interval passed"];
     intervalPassed.inverted = YES;
     [self waitForExpectations:@[ intervalPassed ] timeout:(2 * expectedValueInterval)];
@@ -2444,7 +2444,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 - (void)testMTRDeviceInvokeOverXPCReachesProxy
 {
     // An MTRDevice on a controller over XPC sends its invokes over XPC, and the expected value interval starts when
-    // the invoke goes to the XPC proxy.
+    // the invoke completes.
     uint64_t myNodeId = 9876543210;
     NSNumber * myEndpointId = @100;
     NSNumber * myClusterId = @200;
@@ -2502,7 +2502,104 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     XCTAssertNil(responseError);
     XCTAssertEqualObjects(responseValues, myResults);
 
-    // The interval started when the invoke went out, so the expected value is gone once it has passed.
+    // The interval started when the invoke completed, so the expected value is gone once it has passed.
+    XCTestExpectation * intervalPassed = [[XCTestExpectation alloc] initWithDescription:@"Expected value interval passed"];
+    intervalPassed.inverted = YES;
+    [self waitForExpectations:@[ intervalPassed ] timeout:(2 * expectedValueInterval)];
+    XCTAssertNil([device _attributeValueDictionaryForAttributePath:myPath]);
+}
+
+- (void)testMTRDeviceWriteOverXPCKeepsExpectedValueUntilCompletion
+{
+    // The client cannot see when the service sends a write, so the expected value interval starts when the write
+    // completes.  A write the service holds for longer than the interval keeps its expected value until then.
+    uint64_t myNodeId = 9876543210;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSDictionary * myValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @654321 };
+    MTRAttributePath * myPath = [MTRAttributePath attributePathWithEndpointID:myEndpointId clusterID:myClusterId attributeID:myAttributeId];
+    const NSTimeInterval expectedValueInterval = 2;
+
+    XCTestExpectation * callExpectation = [[XCTestExpectation alloc] initWithDescription:@"XPC write received"];
+    __block void (^heldCompletion)(id _Nullable values, NSError * _Nullable error);
+    _handleWriteAttribute = ^(id controller, NSNumber * nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * attributeId,
+        id value, NSNumber * _Nullable timedWriteTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+        heldCompletion = completion;
+        [callExpectation fulfill];
+    };
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    [device writeAttributeWithEndpointID:myEndpointId
+                               clusterID:myClusterId
+                             attributeID:myAttributeId
+                                   value:myValue
+                   expectedValueInterval:@(expectedValueInterval * 1000)
+                       timedWriteTimeout:nil];
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ callExpectation ] timeout:kTimeoutInSeconds], XCTWaiterResultCompleted);
+
+    // The service holds the write for twice the interval.  The expected value is still in effect.
+    XCTestExpectation * held = [[XCTestExpectation alloc] initWithDescription:@"Write held past the interval"];
+    held.inverted = YES;
+    [self waitForExpectations:@[ held ] timeout:(2 * expectedValueInterval)];
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:myPath], myValue);
+
+    // The write completes now, so the interval starts now and the expected value is gone once it has passed.
+    heldCompletion([MTRDeviceController encodeXPCResponseValues:@[ @{ MTRAttributePathKey : myPath } ]], nil);
+    XCTestExpectation * intervalPassed = [[XCTestExpectation alloc] initWithDescription:@"Expected value interval passed"];
+    intervalPassed.inverted = YES;
+    [self waitForExpectations:@[ intervalPassed ] timeout:(2 * expectedValueInterval)];
+    XCTAssertNil([device _attributeValueDictionaryForAttributePath:myPath]);
+}
+
+- (void)testMTRDeviceInvokeOverXPCKeepsExpectedValueUntilCompletion
+{
+    // As for writes: an invoke the service holds for longer than the interval keeps its expected value until it
+    // completes.
+    uint64_t myNodeId = 9876543210;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myCommandId = @300;
+    NSNumber * myAttributeId = @400;
+    NSDictionary * myFields = @{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] };
+    NSDictionary * myExpectedValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @7 };
+    MTRAttributePath * myPath = [MTRAttributePath attributePathWithEndpointID:myEndpointId clusterID:myClusterId attributeID:myAttributeId];
+    NSArray * myResults = @[ @{ MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:myEndpointId clusterID:myClusterId commandID:myCommandId] } ];
+    const NSTimeInterval expectedValueInterval = 2;
+
+    XCTestExpectation * callExpectation = [[XCTestExpectation alloc] initWithDescription:@"XPC invoke received"];
+    XCTestExpectation * responseExpectation = [[XCTestExpectation alloc] initWithDescription:@"Invoke response received"];
+    __block void (^heldCompletion)(id _Nullable values, NSError * _Nullable error);
+    _handleInvokeCommand
+        = ^(id controller, NSNumber * nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * commandId, id commandFields,
+            NSNumber * _Nullable timedInvokeTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+              heldCompletion = completion;
+              [callExpectation fulfill];
+          };
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    [device invokeCommandWithEndpointID:myEndpointId
+                              clusterID:myClusterId
+                              commandID:myCommandId
+                          commandFields:myFields
+                         expectedValues:@[ @{ MTRAttributePathKey : myPath, MTRDataKey : myExpectedValue } ]
+                  expectedValueInterval:@(expectedValueInterval * 1000)
+                     timedInvokeTimeout:nil
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 [responseExpectation fulfill];
+                             }];
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ callExpectation ] timeout:kTimeoutInSeconds], XCTWaiterResultCompleted);
+
+    // The service holds the invoke for twice the interval.  The expected value is still in effect.
+    XCTestExpectation * held = [[XCTestExpectation alloc] initWithDescription:@"Invoke held past the interval"];
+    held.inverted = YES;
+    [self waitForExpectations:@[ held ] timeout:(2 * expectedValueInterval)];
+    XCTAssertEqualObjects([device _attributeValueDictionaryForAttributePath:myPath], myExpectedValue);
+
+    // The invoke completes now, so the interval starts now and the expected value is gone once it has passed.
+    heldCompletion([MTRDeviceController encodeXPCResponseValues:myResults], nil);
+    [self waitForExpectations:@[ responseExpectation ] timeout:kTimeoutInSeconds];
     XCTestExpectation * intervalPassed = [[XCTestExpectation alloc] initWithDescription:@"Expected value interval passed"];
     intervalPassed.inverted = YES;
     [self waitForExpectations:@[ intervalPassed ] timeout:(2 * expectedValueInterval)];
