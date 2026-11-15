@@ -5174,8 +5174,8 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
                     *shouldReportValue = YES;
                     *attributeValueToReport = cachedValue;
                     *previousValue = previousExpectedValue[MTRDeviceExpectedValueFieldValueIndex];
-                    _expectedValueCache[attributePath] = nil;
                 }
+                _expectedValueCache[attributePath] = nil;
             }
         }
     } else {
