@@ -3774,17 +3774,14 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         XCTAssertEqual(controller.devices.count, 1);
     }
 
-    // Wait for the report processing to finish, so the MTRDevice object may dealloc
-    [controller syncRunOnWorkQueue:^{
-        ;
-    } error:nil];
+    // The MTRDevice deallocates once the priming report's chunks still being processed on the Matter queue let go of
+    // it. Those chunks keep arriving after the autoreleasepool reaps, so a single sync of that queue is not enough:
+    // wait for the subscription callback to be deleted and for the controller to report the device gone.
+    [self waitForExpectations:@[ subscriptionCallbackDeleted, controllerAddedDevice, controllerRemovedDevice ] timeout:60];
 
-    // report should still be ongoing
+    // The device went away mid-report, so its report never ended.
     XCTAssertFalse(subscriptionReportEnd1);
     XCTAssertEqual(controller.devices.count, 0);
-
-    // dealloc -> delete should be called soon after the autoreleasepool reaps
-    [self waitForExpectations:@[ subscriptionCallbackDeleted, controllerAddedDevice, controllerRemovedDevice ] timeout:60];
 
     // Make sure to ignore notifications about device changes triggered by ResetCommissionee.
     controllerDelegate.onDevicesChanged = nil;
