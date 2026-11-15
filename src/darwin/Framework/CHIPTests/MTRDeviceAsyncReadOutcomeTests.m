@@ -207,8 +207,7 @@ static char kCallbackQueueKey;
 - (void)assertCalledOnceOnGivenQueue:(MTRAsyncReadRecord *)record
 {
     [_device unitTestSyncRunOnDeviceQueue:^ {}];
-    dispatch_sync(_callbackQueue, ^{
-    });
+    dispatch_sync(_callbackQueue, ^ {});
     XCTAssertEqual(record.callCount, 1, @"completion must run exactly once");
     XCTAssertTrue(record.everyCallOnGivenQueue, @"completion must run on the queue the caller gave");
 }
@@ -280,8 +279,7 @@ static char kCallbackQueueKey;
     [self waitForExpectations:@[ readThroughStarted ] timeout:5];
 
     [_device unitTestSyncRunOnDeviceQueue:^ {}];
-    dispatch_sync(_callbackQueue, ^{
-    });
+    dispatch_sync(_callbackQueue, ^ {});
     XCTAssertEqual(record.callCount, 0, @"completion ran while its read-through was still outstanding");
     XCTAssertTrue([[self readThroughPathsAtIndex:0] containsObject:[self requestPathFor:[self onOffPath]]]);
 

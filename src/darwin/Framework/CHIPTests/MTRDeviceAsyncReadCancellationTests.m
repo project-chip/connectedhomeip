@@ -249,11 +249,9 @@ static char kCallerQueueKey;
 - (void)assertNoSecondCompletionOf:(NSArray<MTRCancellationTestReadCall *> *)calls device:(MTRDevice * _Nullable)device
 {
     for (NSUInteger pass = 0; pass < 2; pass++) {
-        [device unitTestSyncRunOnDeviceQueue:^{
-        }];
+        [device unitTestSyncRunOnDeviceQueue:^ {}];
         for (MTRCancellationTestReadCall * call in calls) {
-            dispatch_sync(call.queue, ^{
-            });
+            dispatch_sync(call.queue, ^ {});
         }
     }
     [self waitForExpectations:[calls valueForKey:@"completedAgain"] timeout:0.5];

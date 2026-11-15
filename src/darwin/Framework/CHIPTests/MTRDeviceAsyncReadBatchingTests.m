@@ -395,7 +395,7 @@ static char kCallerQueueKey;
         [self answerReadThroughAtIndex:1
                             withValues:@[
                                 [self dataReportForPath:dataPath],
-                                @ { MTRAttributePathKey : errorPath, MTRErrorKey : pathError },
+                                @{ MTRAttributePathKey : errorPath, MTRErrorKey : pathError },
                             ]];
     }
     [self waitForCompletions:done];
