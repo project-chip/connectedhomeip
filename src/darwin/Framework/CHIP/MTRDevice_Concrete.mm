@@ -5276,6 +5276,8 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
                      previousValue:&previousValue];
 
         if (shouldReportValue) {
+            // The delegate now has a value for this path, so the next error for it is news.
+            [_lastLoggedErrorForPath removeObjectForKey:attributePath];
             if (previousValue) {
                 [attributesToReport addObject:@{ MTRAttributePathKey : attributePath, MTRDataKey : attributeValueToReport, MTRPreviousDataKey : previousValue }];
             } else {

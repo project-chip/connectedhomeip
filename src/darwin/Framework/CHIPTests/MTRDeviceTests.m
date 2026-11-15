@@ -8982,6 +8982,81 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     });
 }
 
+// A delivered expected value starts a new episode, so after it expires with nothing in the read cache, the error it
+// replaced is delivered again.
+- (void)test049j_AttributeErrorIsDeliveredAgainAfterAnExpectedValueExpires
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device setDelegate:delegate queue:queue];
+
+    __auto_type * path = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(0x4005)];
+
+    __block NSUInteger deliveredErrors = 0;
+    __block NSUInteger deliveredValues = 0;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * item in data) {
+            if (![item[MTRAttributePathKey] isEqual:path]) {
+                continue;
+            }
+            if (item[MTRErrorKey] != nil) {
+                deliveredErrors++;
+            } else {
+                deliveredValues++;
+            }
+        }
+    };
+    void (^inject)(NSArray<NSDictionary<NSString *, id> *> *) = ^(NSArray<NSDictionary<NSString *, id> *> * report) {
+        XCTestExpectation * reportEnd = [self expectationWithDescription:@"report end"];
+        delegate.onReportEnd = ^{
+            [reportEnd fulfill];
+        };
+        [device unitTestInjectAttributeReport:report fromSubscription:YES];
+        [self waitForExpectations:@[ reportEnd ] timeout:kTimeoutInSeconds];
+        delegate.onReportEnd = ^{
+        };
+    };
+    void (^flushDelegateQueue)(void) = ^{
+        XCTestExpectation * flushed = [self expectationWithDescription:@"delegate queue flushed"];
+        dispatch_async(queue, ^{
+            [flushed fulfill];
+        });
+        [self waitForExpectations:@[ flushed ] timeout:kTimeoutInSeconds];
+    };
+
+    NSArray * failure = [self _attributeErrorReportForPath:path code:MTRInteractionErrorCodeFailure];
+
+    inject(failure);
+    XCTAssertEqual(deliveredErrors, 1, @"first error");
+
+    // The expected value is delivered and expires with nothing in the read cache, so no value replaces it.
+    uint64_t expectedValueID = 0;
+    [device setExpectedValues:@[ @{
+        MTRAttributePathKey : path,
+        MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(7) },
+    } ]
+        expectedValueInterval:@(100)
+              expectedValueID:&expectedValueID];
+    flushDelegateQueue();
+    XCTAssertEqual(deliveredValues, 1, @"the expected value is delivered");
+
+    XCTestExpectation * expired = [self expectationWithDescription:@"expected value expired"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1 * NSEC_PER_SEC)), queue, ^{
+        [expired fulfill];
+    });
+    [self waitForExpectations:@[ expired ] timeout:kTimeoutInSeconds];
+    [device unitTestSyncRunOnDeviceQueue:^ {}];
+    flushDelegateQueue();
+    XCTAssertEqual(deliveredValues, 1, @"expiry with an empty read cache delivers no value");
+
+    deliveredErrors = 0;
+    inject(failure);
+    XCTAssertEqual(deliveredErrors, 1, @"the error after the expected value is delivered");
+}
+
 - (void)test050_readAttributePaths_withWildCardPath
 {
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
