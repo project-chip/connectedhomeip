@@ -101,6 +101,7 @@ public:
     void TestBuildAndSendSingleReportDataLargePayload();
     void TestMergeOverlappedAttributePath();
     void TestMergeAttributePathWhenDirtySetPoolExhausted();
+    void TestShutdownForgetsDroppedRun();
 
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
@@ -493,6 +494,32 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeAttributePathWhenDirtySetPoolE
                                       AttributePathParams(kTestEndpointId + 1, kTestClusterId + 1, 1)));
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Shutdown();
+}
+
+TEST_F_FROM_FIXTURE(TestReportingEngine, TestShutdownForgetsDroppedRun)
+{
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
+                                                          app::reporting::GetDefaultReportScheduler()),
+              CHIP_NO_ERROR);
+    Engine & engine = InteractionModelEngine::GetInstance()->GetReportingEngine();
+
+    // A run is scheduled, as when a path is marked dirty while the stack shuts down, and the system layer drops it unrun,
+    // as its Shutdown() does with every pending timer.
+    EXPECT_EQ(engine.ScheduleRun(), CHIP_NO_ERROR);
+    EXPECT_TRUE(engine.IsRunScheduled());
+    GetSystemLayer().CancelTimer(Engine::Run, &engine);
+
+    engine.Shutdown();
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
+                                                          app::reporting::GetDefaultReportScheduler()),
+              CHIP_NO_ERROR);
+
+    // After the restart a new run must be scheduled and must run.
+    EXPECT_EQ(engine.ScheduleRun(), CHIP_NO_ERROR);
+    DrainAndServiceIO();
+    EXPECT_FALSE(engine.IsRunScheduled());
+
+    engine.Shutdown();
 }
 
 } // namespace reporting

@@ -319,6 +319,20 @@ void Engine::Shutdown()
     // Flush out the event buffer synchronously
     ScheduleUrgentEventDeliverySync();
 
+    // A run scheduled now never happens: the system layer drops pending work when it shuts down. Cancel it and forget it, so
+    // that ScheduleRun() schedules a new run once the engine is initialized again.
+    if (mRunScheduled)
+    {
+        Messaging::ExchangeManager * exchangeManager = mpImEngine->GetExchangeManager();
+        SessionManager * sessionManager = (exchangeManager != nullptr) ? exchangeManager->GetSessionManager() : nullptr;
+        System::Layer * systemLayer     = (sessionManager != nullptr) ? sessionManager->SystemLayer() : nullptr;
+        if (systemLayer != nullptr)
+        {
+            systemLayer->CancelTimer(Run, this);
+        }
+        mRunScheduled = false;
+    }
+
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
     mGlobalDirtySet.ReleaseAll();
