@@ -264,6 +264,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
         .bindingHandler           = mBindingHandler,
         .testEventTriggerDelegate = *mInitParams.testEventTriggerDelegate,
         .identifyDelegate         = Self().GetIdentifyDelegate(),
+        .deviceInfoProvider       = mDeviceInfoProvider,
     });
 
     return CHIP_NO_ERROR;
