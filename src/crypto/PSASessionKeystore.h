@@ -39,9 +39,7 @@ public:
                                  AttestationChallenge & attestationChallenge) override;
     void DestroyKey(Symmetric128BitsKeyHandle & key) override;
     void DestroyKey(HkdfKeyHandle & key) override;
-#if CHIP_CONFIG_ENABLE_ICD_CIP
     CHIP_ERROR PersistICDKey(Symmetric128BitsKeyHandle & key) override;
-#endif
 
 private:
     CHIP_ERROR DeriveSessionKeys(PsaKdf & kdf, Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
