@@ -196,6 +196,23 @@
     }
 }
 
+- (BOOL)unitTestReadThroughForDevice:(MTRDevice *)device
+                               paths:(NSArray<MTRAttributeRequestPath *> *)paths
+                          completion:(MTRDeviceResponseHandler)completion
+{
+    __auto_type onReadThrough = self.onReadThrough;
+    if (onReadThrough == nil) {
+        return NO;
+    }
+    onReadThrough(paths, completion);
+    return YES;
+}
+
+- (NSNumber * _Nullable)unitTestSubscriptionAbleToReportOverrideForDevice:(MTRDevice *)device
+{
+    return self.subscriptionAbleToReportOverride;
+}
+
 @end
 
 @implementation MTRDeviceTestDelegateWithSubscriptionSetupOverride

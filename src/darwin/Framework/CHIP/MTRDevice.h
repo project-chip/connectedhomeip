@@ -186,6 +186,30 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                                                  params:(MTRReadParams * _Nullable)params;
 
 /**
+ * Read attribute in a designated attribute path, calling the completion once its
+ * value is available.
+ *
+ * When the attribute's value is kept current by the subscription, the completion
+ * is called with the value -readAttributeWithEndpointID:clusterID:attributeID:params:
+ * would return.  Otherwise the attribute is read from the device first, batched and
+ * de-duplicated with other reads of this device, and the completion is called once
+ * that read finishes.
+ *
+ * The value is not fabric-filtered, and params.filterByFabric is ignored.
+ *
+ * @param completion  called on the given queue.  On success, values holds one
+ *                    response-value dictionary for the attribute, as described in
+ *                    MTRDeviceResponseHandler, with either an MTRDataKey or an
+ *                    MTRErrorKey.  error is set only when no value could be read.
+ */
+- (void)readAttributeWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                        attributeID:(NSNumber *)attributeID
+                             params:(MTRReadParams * _Nullable)params
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
+
+/**
  * Write to attribute in a designated attribute path
  *
  * @param value       A data-value NSDictionary object as described in

@@ -291,6 +291,112 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     MTRDeviceWorkItemDuplicateReadTypeID = 1,
 };
 
+@interface MTRAsyncReadWaiter : NSObject
+@property (nonatomic, readonly) MTRAttributePath * path;
+@property (nonatomic, readonly) dispatch_queue_t queue;
+@property (nonatomic, readonly) MTRDeviceResponseHandler completion;
+- (instancetype)initWithPath:(MTRAttributePath *)path queue:(dispatch_queue_t)queue completion:(MTRDeviceResponseHandler)completion;
+- (void)callWithValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)values error:(NSError * _Nullable)error;
+@end
+
+@implementation MTRAsyncReadWaiter
+- (instancetype)initWithPath:(MTRAttributePath *)path queue:(dispatch_queue_t)queue completion:(MTRDeviceResponseHandler)completion
+{
+    if (self = [super init]) {
+        _path = path;
+        _queue = queue;
+        _completion = completion;
+    }
+    return self;
+}
+
+- (void)callWithValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)values error:(NSError * _Nullable)error
+{
+    MTRDeviceResponseHandler completion = _completion;
+    dispatch_async(_queue, ^{
+        completion(values, error);
+    });
+}
+@end
+
+@interface MTRAsyncReadWaiters : NSObject
+- (void)addWaiter:(MTRAsyncReadWaiter *)waiter;
+- (void)moveWaitersForPath:(MTRAttributeRequestPath *)path toWaiters:(MTRAsyncReadWaiters *)other;
+- (NSArray<MTRAsyncReadWaiter *> *)takeAll;
+@end
+
+@implementation MTRAsyncReadWaiters {
+    os_unfair_lock _lock;
+    NSMutableArray<MTRAsyncReadWaiter *> * _waiters;
+}
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _lock = OS_UNFAIR_LOCK_INIT;
+        _waiters = [NSMutableArray array];
+    }
+    return self;
+}
+
+- (void)addWaiter:(MTRAsyncReadWaiter *)waiter
+{
+    std::lock_guard lock(_lock);
+    [_waiters addObject:waiter];
+}
+
+- (void)moveWaitersForPath:(MTRAttributeRequestPath *)path toWaiters:(MTRAsyncReadWaiters *)other
+{
+    NSMutableArray<MTRAsyncReadWaiter *> * moving = [NSMutableArray array];
+    {
+        std::lock_guard lock(_lock);
+        NSIndexSet * indexes = [_waiters indexesOfObjectsPassingTest:^BOOL(MTRAsyncReadWaiter * waiter, NSUInteger idx, BOOL * stop) {
+            MTRAttributeRequestPath * waiterPath = [MTRAttributeRequestPath requestPathWithEndpointID:waiter.path.endpoint
+                                                                                            clusterID:waiter.path.cluster
+                                                                                          attributeID:waiter.path.attribute];
+            return [waiterPath isEqual:path];
+        }];
+        [moving addObjectsFromArray:[_waiters objectsAtIndexes:indexes]];
+        [_waiters removeObjectsAtIndexes:indexes];
+    }
+    for (MTRAsyncReadWaiter * waiter in moving) {
+        [other addWaiter:waiter];
+    }
+}
+
+- (NSArray<MTRAsyncReadWaiter *> *)takeAll
+{
+    std::lock_guard lock(_lock);
+    NSArray<MTRAsyncReadWaiter *> * taken = [_waiters copy];
+    [_waiters removeAllObjects];
+    return taken;
+}
+
+- (void)dealloc
+{
+    NSError * cancelled = [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED];
+    for (MTRAsyncReadWaiter * waiter in _waiters) {
+        [waiter callWithValues:nil error:cancelled];
+    }
+}
+@end
+
+@interface MTRReadWorkItemData : NSObject
+@property (nonatomic, readonly) NSMutableArray<MTRAttributeRequestPath *> * paths;
+@property (nonatomic, readonly) MTRAsyncReadWaiters * waiters;
+@end
+
+@implementation MTRReadWorkItemData
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _paths = [NSMutableArray array];
+        _waiters = [[MTRAsyncReadWaiters alloc] init];
+    }
+    return self;
+}
+@end
+
 namespace {
 // These cover spec attributes, private clusters and private extensions of spec clusters.
 BOOL AttributeIsSpecified(ClusterId clusterID, AttributeId attributeID)
@@ -456,6 +562,10 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device;
 - (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device;
 - (void)unitTestSubscriptionReattemptDispatchedForDevice:(MTRDevice *)device;
+- (BOOL)unitTestReadThroughForDevice:(MTRDevice *)device
+                               paths:(NSArray<MTRAttributeRequestPath *> *)paths
+                          completion:(MTRDeviceResponseHandler)completion;
+- (NSNumber * _Nullable)unitTestSubscriptionAbleToReportOverrideForDevice:(MTRDevice *)device;
 @end
 #endif
 
@@ -1340,6 +1450,16 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
     // For unit testing only, matching logic in setDelegate
 #ifdef DEBUG
+    __block NSNumber * ableToReportOverride;
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionAbleToReportOverrideForDevice:)]) {
+            ableToReportOverride = [testDelegate unitTestSubscriptionAbleToReportOverrideForDevice:self];
+        }
+    }];
+    if (ableToReportOverride != nil) {
+        return ableToReportOverride.boolValue;
+    }
+
     __block BOOL useTestDelegateOverride = NO;
     __block BOOL testDelegateShouldSetUpSubscriptionForDevice = NO;
     [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
@@ -3646,6 +3766,70 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
                                                                            clusterID:clusterID
                                                                          attributeID:attributeID];
+    return [self _readAttributePath:attributePath params:params waiter:nil];
+}
+
+- (void)readAttributeWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                        attributeID:(NSNumber *)attributeID
+                             params:(MTRReadParams * _Nullable)params
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion
+{
+    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
+                                                                           clusterID:clusterID
+                                                                         attributeID:attributeID];
+    MTRAsyncReadWaiter * waiter = [[MTRAsyncReadWaiter alloc] initWithPath:attributePath queue:queue completion:completion];
+
+    BOOL suspended;
+    {
+        std::lock_guard lock(_lock);
+        suspended = self.suspended;
+    }
+    if (suspended) {
+        [waiter callWithValues:nil error:[MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]];
+        return;
+    }
+
+    [self _readAttributePath:attributePath params:params waiter:waiter];
+}
+
+- (void)_completeAsyncReadWaiter:(MTRAsyncReadWaiter *)waiter
+                  withReadValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)readValues
+                       readError:(NSError * _Nullable)readError
+{
+    MTRAttributePath * attributePath = waiter.path;
+    if (readError) {
+        [waiter callWithValues:nil error:readError];
+        return;
+    }
+
+    for (NSDictionary<NSString *, id> * readValue in readValues) {
+        if (![readValue[MTRAttributePathKey] isEqual:attributePath]) {
+            continue;
+        }
+        if (readValue[MTRErrorKey] != nil) {
+            [waiter callWithValues:@[ @{ MTRAttributePathKey : attributePath, MTRErrorKey : readValue[MTRErrorKey] } ] error:nil];
+            return;
+        }
+        break;
+    }
+
+    NSDictionary<NSString *, id> * value = [self _attributeValueDictionaryForAttributePath:attributePath];
+    if (value == nil) {
+        [waiter callWithValues:nil error:[MTRError errorForCHIPErrorCode:CHIP_ERROR_SCHEMA_MISMATCH]];
+        return;
+    }
+    [waiter callWithValues:@[ @{ MTRAttributePathKey : attributePath, MTRDataKey : value } ] error:nil];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_readAttributePath:(MTRAttributePath *)attributePath
+                                                        params:(MTRReadParams * _Nullable)params
+                                                        waiter:(MTRAsyncReadWaiter * _Nullable)waiter
+{
+    NSNumber * endpointID = attributePath.endpoint;
+    NSNumber * clusterID = attributePath.cluster;
+    NSNumber * attributeID = attributePath.attribute;
 
     BOOL hasChangesOmittedQuality = [self _attributeReadNeedsReadThroughForPath:attributePath params:params];
 
@@ -3657,6 +3841,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     // 2. The attribute has the Changes Omitted quality, so we won't get reports for it.
     // 3. The attribute is not in the spec, and the read params asks to assume
     //    an unknown attribute has the Changes Omitted quality.
+    // 4. An asynchronous read has no value to complete with.
     //
     // But all this only happens if this device is not suspended.  If it's suspended, read-throughs will fail
     // anyway, so we should not bother trying.
@@ -3665,7 +3850,8 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
         std::lock_guard lock(_lock);
         readThroughsAllowed = !self.suspended;
     }
-    if (readThroughsAllowed && (![self _subscriptionAbleToReport] || hasChangesOmittedQuality)) {
+    BOOL asyncReadHasNoValue = (waiter != nil && attributeValueToReturn == nil);
+    if (readThroughsAllowed && (![self _subscriptionAbleToReport] || hasChangesOmittedQuality || asyncReadHasNoValue)) {
         // Read requests container will be a mutable array of attribute request paths.  The
         // params only decide whether to read through, so reads with any params can be
         // batched together and checked against each other for duplicates.
@@ -3674,24 +3860,40 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                                                                            attributeID:attributeID];
 
         // But first, check if a duplicate read request is already queued and return
-        if ([_asyncWorkQueue hasDuplicateForTypeID:MTRDeviceWorkItemDuplicateReadTypeID workItemData:readRequestPath]) {
+        if (waiter == nil && [_asyncWorkQueue hasDuplicateForTypeID:MTRDeviceWorkItemDuplicateReadTypeID workItemData:readRequestPath]) {
             return attributeValueToReturn;
         }
 
-        NSMutableArray<MTRAttributeRequestPath *> * readRequests = [NSMutableArray arrayWithObject:readRequestPath];
+        MTRReadWorkItemData * readWorkItemData = [[MTRReadWorkItemData alloc] init];
+        [readWorkItemData.paths addObject:readRequestPath];
+        if (waiter) {
+            [readWorkItemData.waiters addWaiter:waiter];
+        }
+        NSMutableArray<MTRAttributeRequestPath *> * readRequests = readWorkItemData.paths;
+        MTRAsyncReadWaiters * waiters = readWorkItemData.waiters;
 
         // Create work item, set ready handler to perform task, then enqueue the work
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
         NSNumber * nodeID = [self nodeID];
 
-        [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:^(id opaqueDataCurrent, id opaqueDataNext) {
+        [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readWorkItemData handler:^(id opaqueDataCurrent, id opaqueDataNext) {
             mtr_hide(self); // don't capture self accidentally
-            NSMutableArray<MTRAttributeRequestPath *> * readRequestsCurrent = opaqueDataCurrent;
-            NSMutableArray<MTRAttributeRequestPath *> * readRequestsNext = opaqueDataNext;
+            MTRReadWorkItemData * readWorkItemDataCurrent = opaqueDataCurrent;
+            MTRReadWorkItemData * readWorkItemDataNext = opaqueDataNext;
+            NSMutableArray<MTRAttributeRequestPath *> * readRequestsCurrent = readWorkItemDataCurrent.paths;
+            NSMutableArray<MTRAttributeRequestPath *> * readRequestsNext = readWorkItemDataNext.paths;
 
             MTRBatchingOutcome outcome = MTRNotBatched;
             while (readRequestsNext.count) {
+                auto readItem = readRequestsNext.firstObject;
+                if ([readRequestsCurrent containsObject:readItem]) {
+                    [readRequestsNext removeObjectAtIndex:0];
+                    [readWorkItemDataNext.waiters moveWaitersForPath:readItem toWaiters:readWorkItemDataCurrent.waiters];
+                    outcome = MTRBatchedPartially;
+                    continue;
+                }
+
                 // Can only read up to 9 paths at a time, per spec
                 if (readRequestsCurrent.count >= 9) {
                     MTR_LOG("Batching read attribute work item [%llu]: cannot add more work, item is full [0x%016llX:%@:0x%llx:0x%llx]", workItemID, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
@@ -3699,8 +3901,8 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                 }
 
                 // merge the next item's first request into the current item's list
-                auto readItem = readRequestsNext.firstObject;
                 [readRequestsNext removeObjectAtIndex:0];
+                [readWorkItemDataNext.waiters moveWaitersForPath:readItem toWaiters:readWorkItemDataCurrent.waiters];
                 [readRequestsCurrent addObject:readItem];
                 MTR_LOG("Batching read attribute work item [%llu]: added %@ (now %lu requests total) [0x%016llX:%@:0x%llx:0x%llx]",
                     workItemID, readItem, static_cast<unsigned long>(readRequestsCurrent.count), nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
@@ -3721,6 +3923,12 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             }
             *stop = NO;
         }];
+        [workItem setCancelHandler:^{
+            NSError * cancelled = [MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED];
+            for (MTRAsyncReadWaiter * cancelledWaiter in [waiters takeAll]) {
+                [cancelledWaiter callWithValues:nil error:cancelled];
+            }
+        }];
         [workItem setReadyHandler:^(MTRDevice_Concrete * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
             // Sanity check
             if (readRequests.count == 0) {
@@ -3735,35 +3943,62 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
             // read-throughs.
             readParams.filterByFabric = NO;
 
-            MTRBaseDevice * baseDevice = [self newBaseDevice];
             mtr_weakify(self);
+            MTRDeviceResponseHandler readCompletion = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                mtr_strongify(self);
+                VerifyOrReturn(self, MTR_LOG_DEBUG("readAttributeWithEndpointID base device completion called back with nil MTRDevice"));
+                if (values) {
+                    // Since the format is the same data-value dictionary, this looks like an
+                    // attribute report.  _getAttributesToReportWithReportedValues logs each attribute.
+                    MTR_LOG("Read attribute work item [%llu] result: (%p) with %lu attributes  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, static_cast<unsigned long>(values.count), nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                    [self _handleAttributeReport:values fromSubscription:NO];
+                }
+
+                // TODO: better retry logic
+                if (error && (retryCount < 2)) {
+                    MTR_LOG_ERROR("Read attribute work item [%llu] failed (will retry): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                    completion(MTRAsyncWorkNeedsRetry);
+                } else {
+                    if (error) {
+                        MTR_LOG("Read attribute work item [%llu] failed (giving up): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                    }
+                    // A cancelled item's waiters belong to its cancel handler.
+                    if (completion(MTRAsyncWorkComplete)) {
+                        for (MTRAsyncReadWaiter * readWaiter in [waiters takeAll]) {
+                            [self _completeAsyncReadWaiter:readWaiter withReadValues:values readError:error];
+                        }
+                    }
+                }
+            };
+
+#ifdef DEBUG
+            __block id readThroughTestDelegate;
+            {
+                std::lock_guard lock(self->_lock);
+                [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+                    if ([testDelegate respondsToSelector:@selector(unitTestReadThroughForDevice:paths:completion:)]) {
+                        readThroughTestDelegate = testDelegate;
+                    }
+                }];
+            }
+            dispatch_queue_t deviceQueue = self.queue;
+            if (readThroughTestDelegate && [readThroughTestDelegate unitTestReadThroughForDevice:self paths:[readRequests copy] completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    dispatch_async(deviceQueue, ^{
+                        readCompletion(values, error);
+                    });
+                }]) {
+                return;
+            }
+#endif
+
+            MTRBaseDevice * baseDevice = [self newBaseDevice];
             [baseDevice
                 readAttributePaths:readRequests
                         eventPaths:nil
                             params:readParams
                 includeDataVersion:YES
                              queue:self.queue
-                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                            mtr_strongify(self);
-                            VerifyOrReturn(self, MTR_LOG_DEBUG("readAttributeWithEndpointID base device completion called back with nil MTRDevice"));
-                            if (values) {
-                                // Since the format is the same data-value dictionary, this looks like an
-                                // attribute report.  _getAttributesToReportWithReportedValues logs each attribute.
-                                MTR_LOG("Read attribute work item [%llu] result: (%p) with %lu attributes  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, static_cast<unsigned long>(values.count), nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                [self _handleAttributeReport:values fromSubscription:NO];
-                            }
-
-                            // TODO: better retry logic
-                            if (error && (retryCount < 2)) {
-                                MTR_LOG_ERROR("Read attribute work item [%llu] failed (will retry): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                completion(MTRAsyncWorkNeedsRetry);
-                            } else {
-                                if (error) {
-                                    MTR_LOG("Read attribute work item [%llu] failed (giving up): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                }
-                                completion(MTRAsyncWorkComplete);
-                            }
-                        }];
+                        completion:readCompletion];
         }];
         [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"read %@ 0x%llx (%@) 0x%llx (%@)",
                                                   endpointID,
@@ -3771,6 +4006,11 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                                   attributeID.unsignedLongLongValue, MTRAttributeNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue), static_cast<MTRAttributeIDType>(attributeID.unsignedLongLongValue))];
     } else {
         [self _readThroughSkipped];
+        if (waiter && attributeValueToReturn) {
+            [waiter callWithValues:@[ @{ MTRAttributePathKey : attributePath, MTRDataKey : attributeValueToReturn } ] error:nil];
+        } else if (waiter) {
+            [waiter callWithValues:nil error:[MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]];
+        }
     }
 
     return attributeValueToReturn;

@@ -52,6 +52,11 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, nullable) NSNumber * timeSynchronizationLossDetectionCadenceOverride;
 // Called after a subscription reattempt timer has handed its work to the Matter queue.
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionReattemptDispatched;
+// When set, a read-through goes to this block instead of the device.  The block
+// owns the completion and may call it later, but never before it returns.
+@property (atomic, copy, nullable) void (^onReadThrough)(NSArray<MTRAttributeRequestPath *> * paths, MTRDeviceResponseHandler completion);
+// When set, overrides whether the device's subscription counts as able to report.
+@property (atomic, nullable) NSNumber * subscriptionAbleToReportOverride;
 @end
 
 @interface MTRDeviceTestDelegateWithSubscriptionSetupOverride : MTRDeviceTestDelegate
