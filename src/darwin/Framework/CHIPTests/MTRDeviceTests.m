@@ -2087,6 +2087,66 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ readFabricLabelExpectation ] timeout:kTimeoutInSeconds];
 }
 
+// Tests that a failed invoke removes its expected values before it calls its completion, so the completion sees the
+// attribute's cached value rather than the failed invoke's expected value.
+- (void)test019b_FailedInvokeRemovesExpectedValuesBeforeCompletion
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    // The delegate and the completion share one serial queue, so they run in the order they were dispatched.
+    dispatch_queue_t queue = dispatch_queue_create("test019b", DISPATCH_QUEUE_SERIAL);
+
+    // No endpoint 0xFFFE on the device, so the invoke fails.
+    NSNumber * endpointID = @(0xFFFE);
+    __auto_type * expectedPath = [MTRAttributePath attributePathWithEndpointID:endpointID
+                                                                     clusterID:@(MTRClusterIDTypeOnOffID)
+                                                                   attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+
+    __block BOOL expectedValueRemoved = NO;
+    XCTestExpectation * expectedValueReported = [self expectationWithDescription:@"expected value reported"];
+    XCTestExpectation * expectedValueRemovedReported = [self expectationWithDescription:@"expected value removal reported"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * item in data) {
+            if (![item[MTRAttributePathKey] isEqual:expectedPath]) {
+                continue;
+            }
+            if (item[MTRDataKey]) {
+                [expectedValueReported fulfill];
+            } else {
+                expectedValueRemoved = YES;
+                [expectedValueRemovedReported fulfill];
+            }
+        }
+    };
+    [device setDelegate:delegate queue:queue];
+
+    XCTestExpectation * invokeCompleted = [self expectationWithDescription:@"invoke completed"];
+    [device invokeCommandWithEndpointID:endpointID
+                              clusterID:@(MTRClusterIDTypeOnOffID)
+                              commandID:@(MTRCommandIDTypeClusterOnOffCommandOnID)
+                          commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                         expectedValues:@[ @{
+                             MTRAttributePathKey : expectedPath,
+                             MTRDataKey : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) },
+                         } ]
+                  expectedValueInterval:@(60000)
+                     timedInvokeTimeout:nil
+                                  queue:queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 XCTAssertNotNil(error);
+                                 XCTAssertTrue(expectedValueRemoved, @"completion ran before the expected value was removed");
+                                 [invokeCompleted fulfill];
+                             }];
+
+    [self waitForExpectations:@[ expectedValueReported, expectedValueRemovedReported, invokeCompleted ]
+                      timeout:kTimeoutInSeconds
+                 enforceOrder:YES];
+
+    [device removeDelegate:delegate];
+}
+
 - (void)test020_ReadMultipleAttributes
 {
     XCTestExpectation * expectation =
