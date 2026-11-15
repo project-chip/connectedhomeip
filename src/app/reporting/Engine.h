@@ -201,6 +201,9 @@ private:
      */
     static void Run(System::Layer * aSystemLayer, void * apAppState);
 
+    // Cancels a pending run, if any, and clears mRunScheduled.
+    void CancelScheduledRun();
+
     CHIP_ERROR ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten);
     void GetMinEventLogPosition(uint32_t & aMinLogPosition);
 

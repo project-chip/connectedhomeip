@@ -310,6 +310,9 @@ CHIP_ERROR Engine::Init(EventManagement * apEventManagement)
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
     mpEventManagement   = apEventManagement;
+    // A run scheduled before an earlier shutdown may have been dropped without running, which would
+    // otherwise leave mRunScheduled set and make every ScheduleRun() a no-op.
+    mRunScheduled = false;
 
     return CHIP_NO_ERROR;
 }
@@ -322,6 +325,19 @@ void Engine::Shutdown()
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
     mGlobalDirtySet.ReleaseAll();
+    CancelScheduledRun();
+}
+
+void Engine::CancelScheduledRun()
+{
+    Messaging::ExchangeManager * exchangeManager = mpImEngine->GetExchangeManager();
+    SessionManager * sessionManager              = (exchangeManager != nullptr) ? exchangeManager->GetSessionManager() : nullptr;
+    System::Layer * systemLayer                  = (sessionManager != nullptr) ? sessionManager->SystemLayer() : nullptr;
+    if (systemLayer != nullptr)
+    {
+        systemLayer->CancelTimer(Run, this);
+    }
+    mRunScheduled = false;
 }
 
 bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFilter> * aDataVersionFilterList,
