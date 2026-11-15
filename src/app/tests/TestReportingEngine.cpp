@@ -101,6 +101,7 @@ public:
     void TestBuildAndSendSingleReportDataLargePayload();
     void TestMergeOverlappedAttributePath();
     void TestMergeAttributePathWhenDirtySetPoolExhausted();
+    void TestScheduleRunAfterPendingRunDroppedAcrossRestart();
 
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
@@ -415,6 +416,31 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeOverlappedAttributePath)
                     clusterInfo->mAttributeId == kInvalidAttributeId);
     }
     InteractionModelEngine::GetInstance()->GetReportingEngine().Shutdown();
+}
+
+// A run that was scheduled but dropped before it ran, as when the system layer shuts down with the
+// run still pending, must not stop the engine from scheduling runs after it is shut down and initialized again.
+TEST_F_FROM_FIXTURE(TestReportingEngine, TestScheduleRunAfterPendingRunDroppedAcrossRestart)
+{
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
+                                                          app::reporting::GetDefaultReportScheduler()),
+              CHIP_NO_ERROR);
+    Engine & engine = InteractionModelEngine::GetInstance()->GetReportingEngine();
+
+    EXPECT_EQ(engine.ScheduleRun(), CHIP_NO_ERROR);
+    EXPECT_TRUE(engine.IsRunScheduled());
+
+    // Drop the pending run without running it, as a system layer shutdown does.
+    GetSystemLayer().CancelTimer(Engine::Run, &engine);
+
+    engine.Shutdown();
+    EXPECT_EQ(engine.Init(&EventManagement::GetInstance()), CHIP_NO_ERROR);
+
+    // The new run is scheduled and runs, which clears the flag.
+    EXPECT_EQ(engine.ScheduleRun(), CHIP_NO_ERROR);
+    DrainAndServiceIO();
+    EXPECT_FALSE(engine.IsRunScheduled());
+    engine.Shutdown();
 }
 
 TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeAttributePathWhenDirtySetPoolExhausted)
