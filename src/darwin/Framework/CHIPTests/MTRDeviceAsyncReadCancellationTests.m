@@ -388,8 +388,11 @@ static char kCallerQueueKey;
 
     [self allowToComplete:@[ held ]];
     [_device invalidate];
-    MTRCancellationTestReadCall * late = [self readPath:[self onOffPathOnEndpoint:2] ofDevice:_device onQueue:[self callerQueueNamed:@"caller.late"]];
+    dispatch_queue_t lateQueue = [self callerQueueNamed:@"caller.late"];
+    dispatch_suspend(lateQueue);
+    MTRCancellationTestReadCall * late = [self readPath:[self onOffPathOnEndpoint:2] ofDevice:_device onQueue:lateQueue];
     [self allowToComplete:@[ late ]];
+    dispatch_resume(lateQueue);
     [self waitForCompletionOf:@[ held, late ]];
 
     [self assertNoSecondCompletionOf:@[ held, late ] device:_device];
@@ -403,8 +406,11 @@ static char kCallerQueueKey;
     [self holdReadThroughsOfDevice:_device];
 
     [_device invalidate];
-    MTRCancellationTestReadCall * late = [self readPath:[self onOffPathOnEndpoint:1] ofDevice:_device onQueue:[self callerQueueNamed:@"caller.late"]];
+    dispatch_queue_t lateQueue = [self callerQueueNamed:@"caller.late"];
+    dispatch_suspend(lateQueue);
+    MTRCancellationTestReadCall * late = [self readPath:[self onOffPathOnEndpoint:1] ofDevice:_device onQueue:lateQueue];
     [self allowToComplete:@[ late ]];
+    dispatch_resume(lateQueue);
     [self waitForCompletionOf:@[ late ]];
 
     [self assertNoSecondCompletionOf:@[ late ] device:_device];
