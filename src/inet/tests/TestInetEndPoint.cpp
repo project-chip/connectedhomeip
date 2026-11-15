@@ -41,6 +41,7 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ParseDecimal.h>
 #include <system/SystemError.h>
 
 #include "TestInetCommon.h"
@@ -846,7 +847,11 @@ int SocketBoundTo(uint16_t port)
     VerifyOrReturnValue(dir != nullptr, -1);
     while (const dirent * entry = readdir(dir))
     {
-        const int fd      = atoi(entry->d_name);
+        int fd;
+        if (!ParseDecimal(entry->d_name, fd))
+        {
+            continue;
+        }
         sockaddr_in6 addr = {};
         socklen_t len     = sizeof(addr);
         if (getsockname(fd, reinterpret_cast<sockaddr *>(&addr), &len) == 0 && addr.sin6_family == AF_INET6 &&

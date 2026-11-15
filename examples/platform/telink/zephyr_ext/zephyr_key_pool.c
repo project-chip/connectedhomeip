@@ -171,6 +171,7 @@ bool key_pool_init(struct key_pool_data * key_pool)
 
         /* set all keys to current state */
         key_pool_poll(key_pool, true);
+        /* all done */
     } while (0);
 
     if (!result)

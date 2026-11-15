@@ -7320,7 +7320,7 @@ class NetworkCommissioning(Cluster):
             kWpaPersonal = 0x4
             kWpa2Personal = 0x8
             kWpa3Personal = 0x10
-            kWpa3MatterPdc = 0x20
+            kIeee8021x = 0x20
 
     class Structs:
         @dataclass

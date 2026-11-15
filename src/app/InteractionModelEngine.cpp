@@ -166,6 +166,44 @@ bool IsAccessibleAttributeEntry(const ConcreteAttributePath & path, const Access
     return (Access::GetAccessControl().Check(subjectDescriptor, requestPath, privilege) == CHIP_NO_ERROR);
 }
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+// Pre-fetches GetNextClient() before each loop body runs so the body may safely
+// destroy or unlink the current ReadClient (assuming other ReadClients remain untouched).
+class ReadClientList
+{
+public:
+    class Iterator
+    {
+    public:
+        explicit Iterator(ReadClient * current) : mCurrent(current), mNext(current != nullptr ? current->GetNextClient() : nullptr)
+        {}
+
+        ReadClient * operator*() const { return mCurrent; }
+
+        Iterator & operator++()
+        {
+            mCurrent = mNext;
+            mNext    = (mCurrent != nullptr) ? mCurrent->GetNextClient() : nullptr;
+            return *this;
+        }
+
+        bool operator!=(const Iterator & other) const { return mCurrent != other.mCurrent; }
+
+    private:
+        ReadClient * mCurrent;
+        ReadClient * mNext;
+    };
+
+    explicit ReadClientList(ReadClient * head) : mHead(head) {}
+
+    Iterator begin() const { return Iterator(mHead); }
+    Iterator end() const { return Iterator(nullptr); }
+
+private:
+    ReadClient * mHead;
+};
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
 } // namespace
 
 using Protocols::InteractionModel::Status;
@@ -245,12 +283,10 @@ void InteractionModelEngine::Shutdown()
     // at destruction time, they won't attempt to reach back here to remove themselves
     // from this list.
     //
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
         readClient->mpImEngine = nullptr;
-        auto * tmpClient       = readClient->GetNextClient();
         readClient->SetNextClient(nullptr);
-        readClient = tmpClient;
     }
 
     //
@@ -394,17 +430,14 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPeerNodeId, SubscriptionId aSubscriptionId)
 {
     assertChipStackLockedByCurrentThread();
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
-        // Grab the next client now, because we might be about to delete readClient.
-        auto * nextClient = readClient->GetNextClient();
         if (readClient->IsSubscriptionType() && readClient->IsMatchingSubscriptionId(aSubscriptionId) &&
-            readClient->GetFabricIndex() == aPeerNodeId.GetFabricIndex() && readClient->GetPeerNodeId() == aPeerNodeId.GetNodeId())
+            readClient->GetPeerScopedId() == aPeerNodeId)
         {
             readClient->Close(CHIP_NO_ERROR);
             return CHIP_NO_ERROR;
         }
-        readClient = nextClient;
     }
 
     return CHIP_ERROR_KEY_NOT_FOUND;
@@ -444,10 +477,8 @@ void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<Fabric
 {
     // This is assuming that ReadClient::Close will not affect any other
     // ReadClients in the list.
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
-        // Grab the next client now, because we might be about to delete readClient.
-        auto * nextClient = readClient->GetNextClient();
         if (readClient->IsSubscriptionType())
         {
             bool fabricMatches = !aFabricIndex.HasValue() || (aFabricIndex.Value() == readClient->GetFabricIndex());
@@ -457,7 +488,6 @@ void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<Fabric
                 readClient->Close(CHIP_NO_ERROR);
             }
         }
-        readClient = nextClient;
     }
 }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
@@ -997,37 +1027,34 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
     VerifyOrReturnError(report.GetSubscriptionId(&subscriptionId) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(report.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
 
-    ReadClient * foundSubscription = nullptr;
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    const ScopedNodeId peer = apExchangeContext->GetSessionHandle()->GetPeer();
+
+    // OnUnsolicitedMessageFromPublisher() may call OnDone() and destroy ReadClients in mpActiveReadClientList.
+    // A separate first pass finishes all notifications before the second pass looks up the target subscription.
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
-        auto peer = apExchangeContext->GetSessionHandle()->GetPeer();
-        if (readClient->GetFabricIndex() != peer.GetFabricIndex() || readClient->GetPeerNodeId() != peer.GetNodeId())
+        if (readClient->GetPeerScopedId() == peer)
+        {
+            readClient->OnUnsolicitedMessageFromPublisher();
+        }
+    }
+
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
+    {
+        if (readClient->GetPeerScopedId() != peer)
         {
             continue;
         }
-
-        // Notify Subscriptions about incoming communication from node
-        readClient->OnUnsolicitedMessageFromPublisher();
-
         if (!readClient->IsSubscriptionActive())
         {
             continue;
         }
-
         if (!readClient->IsMatchingSubscriptionId(subscriptionId))
         {
             continue;
         }
 
-        if (!foundSubscription)
-        {
-            foundSubscription = readClient;
-        }
-    }
-
-    if (foundSubscription)
-    {
-        foundSubscription->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
+        readClient->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
         return Status::Success;
     }
 
@@ -1129,37 +1156,28 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
 void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer, uint64_t aMonitoredSubject)
 {
-    for (ReadClient * pListItem = mpActiveReadClientList; pListItem != nullptr;)
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
-        auto pNextItem = pListItem->GetNextClient();
-        // It is possible that pListItem is destroyed by the app in OnActiveModeNotification.
-        // Get the next item before invoking `OnActiveModeNotification`.
         CATValues cats;
 
-        TEMPORARY_RETURN_IGNORED mpFabricTable->FetchCATs(pListItem->GetFabricIndex(), cats);
-        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer &&
+        TEMPORARY_RETURN_IGNORED mpFabricTable->FetchCATs(readClient->GetFabricIndex(), cats);
+        if (readClient->GetPeerScopedId() == aPeer &&
             (cats.CheckSubjectAgainstCATs(aMonitoredSubject) ||
-             aMonitoredSubject == mpFabricTable->FindFabricWithIndex(pListItem->GetFabricIndex())->GetNodeId()))
+             aMonitoredSubject == mpFabricTable->FindFabricWithIndex(readClient->GetFabricIndex())->GetNodeId()))
         {
-            pListItem->OnActiveModeNotification();
+            readClient->OnActiveModeNotification();
         }
-        pListItem = pNextItem;
     }
 }
 
 void InteractionModelEngine::OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType)
 {
-    // TODO: Follow up to use a iterator function to avoid copy/paste here.
-    for (ReadClient * pListItem = mpActiveReadClientList; pListItem != nullptr;)
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
-        // It is possible that pListItem is destroyed by the app in OnPeerTypeChange.
-        // Get the next item before invoking `OnPeerTypeChange`.
-        auto pNextItem = pListItem->GetNextClient();
-        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer)
+        if (readClient->GetPeerScopedId() == aPeer)
         {
-            pListItem->OnPeerTypeChange(aType);
+            readClient->OnPeerTypeChange(aType);
         }
-        pListItem = pNextItem;
     }
 }
 
@@ -1597,12 +1615,10 @@ void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)
 
 size_t InteractionModelEngine::GetNumActiveReadClients()
 {
-    ReadClient * pListItem = mpActiveReadClientList;
-    size_t count           = 0;
+    size_t count = 0;
 
-    while (pListItem)
+    for ([[maybe_unused]] auto * readClient : ReadClientList(mpActiveReadClientList))
     {
-        pListItem = pListItem->GetNextClient();
         count++;
     }
 
@@ -1611,16 +1627,12 @@ size_t InteractionModelEngine::GetNumActiveReadClients()
 
 bool InteractionModelEngine::InActiveReadClientList(ReadClient * apReadClient)
 {
-    ReadClient * pListItem = mpActiveReadClientList;
-
-    while (pListItem)
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
-        if (pListItem == apReadClient)
+        if (readClient == apReadClient)
         {
             return true;
         }
-
-        pListItem = pListItem->GetNextClient();
     }
 
     return false;
@@ -2090,20 +2102,12 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
     });
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
+    for (auto * readClient : ReadClientList(mpActiveReadClientList))
     {
-        // ReadClient::Close may delete the read client so that readClient->GetNextClient() will be use-after-free.
-        // We need save readClient as nextReadClient before closing.
         if (readClient->GetFabricIndex() == fabricIndex)
         {
             ChipLogProgress(InteractionModel, "Fabric removed, deleting obsolete read client with FabricIndex: %u", fabricIndex);
-            auto * nextReadClient = readClient->GetNextClient();
             readClient->Close(CHIP_ERROR_IM_FABRIC_DELETED, false);
-            readClient = nextReadClient;
-        }
-        else
-        {
-            readClient = readClient->GetNextClient();
         }
     }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
