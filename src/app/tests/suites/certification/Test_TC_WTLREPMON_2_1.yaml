@@ -55,7 +55,7 @@ tests:
               maxValue: 1
 
     - label: "Step 4a: TH reads from the DUT the ChangeIndication attribute."
-      PICS: WTLREPMON.S.A0002 && !WTLREPMON.S.F01
+      PICS: WTLREPMON.S.A0002
       command: "readAttribute"
       attribute: "ChangeIndication"
       response:
@@ -64,7 +64,7 @@ tests:
               anyOf: [0, 2]
 
     - label: "Step 4b: TH reads from the DUT the ChangeIndication attribute."
-      PICS: WTLREPMON.S.F01 && WTLREPMON.S.A0002
+      PICS: WTLREPMON.S.F01
       command: "readAttribute"
       attribute: "ChangeIndication"
       response:
