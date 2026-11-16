@@ -8675,6 +8675,8 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     __auto_type * path = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(0x4001)];
     __auto_type * otherPath = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(0x4002)];
     NSString * deviceTag = [NSString stringWithFormat:@"%p", device];
+    // The report summary line names the device by node ID rather than by its description.
+    NSString * nodeTag = [NSString stringWithFormat:@"node 0x%016llX", device.nodeID.unsignedLongLongValue];
     NSString * errorLineTag = [NSString stringWithFormat:@"report %@ error", path];
     NSString * otherErrorLineTag = [NSString stringWithFormat:@"report %@ error", otherPath];
 
@@ -8683,7 +8685,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     NSMutableArray<NSString *> * otherLines = [NSMutableArray array];
     NSMutableArray<NSString *> * detailLines = [NSMutableArray array];
     MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
-        if (![message containsString:deviceTag]) {
+        if (![message containsString:deviceTag] && ![message containsString:nodeTag]) {
             return;
         }
         os_unfair_lock_lock(&linesLock);
