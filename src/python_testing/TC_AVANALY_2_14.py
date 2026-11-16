@@ -60,7 +60,7 @@ class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def steps_TC_AVANALY_2_14(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(
                 2,
                 "TH creates a remote zone in Zone Management cluster with a valid NodeId. Save as remote_zone_id.",

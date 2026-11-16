@@ -342,11 +342,25 @@ CHIP_ERROR ModeBaseCluster::AcceptedCommands(const ConcreteClusterPath & path,
     // MicrowaveOvenMode is a special case. It does not support the ChangeToMode command.
     if (mPath.mClusterId != MicrowaveOvenMode::Id)
     {
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::ChangeToMode::kMetadataEntry }));
+        if (mPath.mClusterId == ThermostatMode::Id)
+        {
+            ReturnErrorOnFailure(builder.AppendElements({ ThermostatMode::Commands::ChangeToMode::kMetadataEntry }));
+        }
+        else
+        {
+            ReturnErrorOnFailure(builder.AppendElements({ Commands::ChangeToMode::kMetadataEntry }));
+        }
     }
-    if (mFeature.Has(Feature::kCoreModes))
+    if (mPath.mClusterId != MicrowaveOvenMode::Id && mFeature.Has(Feature::kCoreModes))
     {
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::ChangeToModeByCoreTag::kMetadataEntry }));
+        if (mPath.mClusterId == ThermostatMode::Id)
+        {
+            ReturnErrorOnFailure(builder.AppendElements({ ThermostatMode::Commands::ChangeToModeByCoreTag::kMetadataEntry }));
+        }
+        else
+        {
+            ReturnErrorOnFailure(builder.AppendElements({ Commands::ChangeToModeByCoreTag::kMetadataEntry }));
+        }
     }
     return CHIP_NO_ERROR;
 }

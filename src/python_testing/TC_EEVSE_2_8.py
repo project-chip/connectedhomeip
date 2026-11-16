@@ -65,7 +65,7 @@ class TC_EEVSE_2_8(MatterTestCommissionedDevice, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_8(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("3", "TH reads from the DUT the VehicleID attribute.",

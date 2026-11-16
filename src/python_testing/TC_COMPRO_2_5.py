@@ -85,7 +85,7 @@ class TC_COMPRO_2_5(MatterTestCommissionedDevice, COMPROBaseTest):
 
     def steps_TC_COMPRO_2_5(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH"),
             TestStep(2, "TH reads ScanMaxTime attribute and saves as original_scan_max_time",
                      "DUT returns a uint8 value >= 1"),
             TestStep(3, "TH writes ScanMaxTime attribute with value (original_scan_max_time + 1), "

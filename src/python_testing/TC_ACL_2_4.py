@@ -17,7 +17,20 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#   run2:
+#     app: ${CAMERA_APP}
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -29,6 +42,21 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
+#     tags: [nightly]
+#   run3:
+#     app: ${CHIP_LOCK_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     tags: [nightly]
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -58,7 +86,7 @@ class TC_ACL_2_4(MatterTestCommissionedDevice):
 
     def steps_TC_ACL_2_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH1 commissions DUT using admin node ID N1", is_commissioning=True),
+            TestStep(1, "TH1 commissions DUT using admin node ID N1"),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
                      "Result is SUCCESS, value is stored as F1"),
             TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute and saves as acl_original",

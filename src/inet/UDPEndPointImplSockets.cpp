@@ -502,6 +502,7 @@ void UDPEndPointImplSockets::CloseImpl()
 
 CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
 {
+    VerifyOrReturnError(mState != State::kClosed, CHIP_ERROR_INCORRECT_STATE);
     if (mSocket == kInvalidSocketFd)
     {
         constexpr int type     = (SOCK_DGRAM | SOCK_CLOEXEC);
@@ -591,6 +592,18 @@ CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
             }
         }
 #endif // defined(IPV6_RECVPKTINFO)
+
+#ifdef IPV6_AUTOFLOWLABEL
+        if (addressType == IPAddressType::kIPv6)
+        {
+            constexpr int zero = 0;
+            res                = setsockopt(mSocket, IPPROTO_IPV6, IPV6_AUTOFLOWLABEL, &zero, sizeof(zero));
+            if (res != 0)
+            {
+                ChipLogError(Inet, "IPV6_AUTOFLOWLABEL failed: %d", errno);
+            }
+        }
+#endif // defined(IPV6_AUTOFLOWLABEL)
 
         // On systems that support it, disable the delivery of SIGPIPE
         // signals when writing to a closed socket.  This is mostly
@@ -758,6 +771,21 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
     }
     else
     {
+        // For unrecoverable socket errors, disarm the read watch and close the
+        // endpoint since we will never be able to read data from these sockets.
+
+        // The list of unrecoverable errors is based on first pass of
+        // https://man7.org/linux/man-pages/man3/errno.3.html and may not be complete.
+        // - ENOTCONN: Socket marked defunct by Darwin/XNU kernel (sosetdefunct / TN2277).
+        // - EBADF: File descriptor is invalid or reclaimed/closed by the OS.
+        // - ESHUTDOWN: Socket receive/send channel has been shut down.
+        // - ENXIO: Bound network interface index was detached/removed.
+        if (lStatus == CHIP_ERROR_POSIX(ENOTCONN) || lStatus == CHIP_ERROR_POSIX(EBADF) || lStatus == CHIP_ERROR_POSIX(ESHUTDOWN) ||
+            lStatus == CHIP_ERROR_POSIX(ENXIO))
+        {
+            Close();
+        }
+
         if (OnReceiveError != nullptr && lStatus != CHIP_ERROR_POSIX(EAGAIN))
         {
             OnReceiveError(this, lStatus, nullptr);

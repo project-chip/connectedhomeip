@@ -949,11 +949,10 @@ private:
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendCertificateChainRequestCommand(
-        DeviceProxy * device, Credentials::CertificateType certificateType, Optional<System::Clock::Timeout> timeout,
-        Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> cryptoProfile = NullOptional,
-        Optional<uint16_t> segmentId                                                                = NullOptional,
-        Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> issuerProfile = NullOptional);
+    CHIP_ERROR SendCertificateChainRequestCommand(DeviceProxy * device, Credentials::CertificateType certificateType,
+                                                  Optional<System::Clock::Timeout> timeout,
+                                                  std::optional<Credentials::DeviceAttestationChainProfile> chain = std::nullopt,
+                                                  Optional<uint16_t> segmentId                                    = NullOptional);
     /* This function sends an Attestation request to the device.
        The function does not hold a reference to the device object.
      */
@@ -986,6 +985,10 @@ private:
 
     void ExtendArmFailSafeForDeviceAttestation(const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
                                                Credentials::AttestationVerificationResult result);
+    CHIP_ERROR
+    PrepareCertificateChainRequest(Credentials::CertificateType certificateType,
+                                   std::optional<Credentials::DeviceAttestationChainProfile> chain, Optional<uint16_t> segmentId,
+                                   app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type & request);
     CHIP_ERROR ContinueCertificateChainRequest(Optional<System::Clock::Timeout> timeout);
     static void OnCertificateChainFailureResponse(void * context, CHIP_ERROR error);
     static void OnCertificateChainResponse(
@@ -1222,13 +1225,13 @@ private:
         {
             requestTracker.Reset();
             hasActiveRequest = false;
-            cryptoProfile.ClearValue();
+            chain.reset();
         }
 
         bool hasActiveRequest                        = false;
         uint32_t generation                          = 0;
         Credentials::CertificateType certificateType = static_cast<Credentials::CertificateType>(0);
-        Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> cryptoProfile;
+        std::optional<Credentials::DeviceAttestationChainProfile> chain;
         CertificateChainRequestTracker requestTracker;
     };
     chip::Callback::Callback<OnNetworkIdentityAvailableFunct> mOnNetworkIdentityRequestCallback;
@@ -1274,7 +1277,6 @@ private:
 
     SetUpCodePairer mSetUpCodePairer;
     CertificateChainRequestState mCertificateChainRequestState;
-    Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> mPaaAttestationIssuerProfile;
     AutoCommissioner mAutoCommissioner;
     CommissioningDelegate * mDefaultCommissioner =
         &mAutoCommissioner; // Commissioning delegate to call when PairDevice / Commission functions are used

@@ -206,7 +206,6 @@ struct ReceiveAccept : public BdxMessage
     // All required
     uint8_t Version       = 0; ///< The agreed upon version for the transfer
     uint16_t MaxBlockSize = 0; ///< Chosen max block size to use in transfer
-    uint64_t StartOffset  = 0; ///< Chosen start offset of data. 0 for no offset.
     uint64_t Length       = 0; ///< Length of transfer. 0 if length is indefinite.
 
     // Additional metadata (optional, TLV format)

@@ -60,11 +60,11 @@ class TC_PROXR_2_1(MatterTestCommissionedDevice, ProximityRangingTestBase):
 
     def steps_TC_PROXR_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, test_plan_support.commission_if_required(), is_commissioning=True),
+            TestStep(1, test_plan_support.commission_if_required()),
             TestStep("2a", test_plan_support.read_attribute("RangingCapabilities"),
-                     "Verify a list of RangingCapabilitiesStruct; exactly one element has Technology "
-                     "WiFiRoundTripTimeRanging or WiFiNextGenerationRanging; MaxConcurrentSessions is present and "
-                     "greater than 0."),
+                     "Verify a list of RangingCapabilitiesStruct; at least one element has Technology "
+                     "WiFiRoundTripTimeRanging or WiFiNextGenerationRanging, with at most one element per Wi-Fi "
+                     "Technology value; MaxConcurrentSessions is present and greater than 0 on each Wi-Fi element."),
             TestStep("2b", test_plan_support.read_attribute("RangingCapabilities"),
                      "Verify exactly one element has Technology BluetoothChannelSounding; "
                      "MaxConcurrentSessions is present and greater than 0."),
@@ -83,12 +83,7 @@ class TC_PROXR_2_1(MatterTestCommissionedDevice, ProximityRangingTestBase):
                      "do not include MinRangingInterval, MaxSessionDuration or MaxRangingInstances."),
         ]
 
-    def _verify_single_capability(self, capabilities, technologies):
-        matter_asserts.assert_list(capabilities, "RangingCapabilities")
-        matching = [c for c in capabilities if c.technology in technologies]
-        asserts.assert_equal(len(matching), 1,
-                             f"Expected exactly one RangingCapabilities element for {technologies}, got {len(matching)}")
-        cap = matching[0]
+    def _assert_max_concurrent_sessions(self, cap):
         # MaxConcurrentSessions is treated as MANDATORY here: the field is planned to
         # change from optional to mandatory in the spec, so this test holds devices to
         # that now. NOTE the deliberate divergence from the current SDK data model,
@@ -102,7 +97,38 @@ class TC_PROXR_2_1(MatterTestCommissionedDevice, ProximityRangingTestBase):
                                    "MaxConcurrentSessions must be present (mandatory)")
         matter_asserts.assert_valid_uint8(cap.maxConcurrentSessions, "MaxConcurrentSessions")
         asserts.assert_greater(cap.maxConcurrentSessions, 0, "MaxConcurrentSessions must be greater than 0")
+
+    def _verify_single_capability(self, capabilities, technologies):
+        matter_asserts.assert_list(capabilities, "RangingCapabilities")
+        matching = [c for c in capabilities if c.technology in technologies]
+        asserts.assert_equal(len(matching), 1,
+                             f"Expected exactly one RangingCapabilities element for {technologies}, got {len(matching)}")
+        cap = matching[0]
+        self._assert_max_concurrent_sessions(cap)
         return cap
+
+    def _verify_wifi_capabilities(self, capabilities):
+        # Technology is an enum, so each Wi-Fi technology value is a distinct kind of
+        # capability element: a device may advertise BOTH a WiFiRoundTripTimeRanging
+        # and a WiFiNextGenerationRanging element under the single WFUSDPD feature.
+        # Require at least one Wi-Fi element, at most one element PER Wi-Fi Technology
+        # value (a duplicate for the same technology is a defect), and
+        # MaxConcurrentSessions > 0 on each. This replaces the earlier exactly-one
+        # check that wrongly failed a device listing both Wi-Fi technologies.
+        matter_asserts.assert_list(capabilities, "RangingCapabilities")
+        wifi_caps = [c for c in capabilities if c.technology in WIFI_TECHNOLOGIES]
+        asserts.assert_greater_equal(
+            len(wifi_caps), 1,
+            "Expected at least one RangingCapabilities element with Technology WiFiRoundTripTimeRanging "
+            "or WiFiNextGenerationRanging")
+        seen = set()
+        for cap in wifi_caps:
+            asserts.assert_not_in(
+                cap.technology, seen,
+                f"At most one RangingCapabilities element is allowed per Wi-Fi Technology; "
+                f"{cap.technology} appears more than once")
+            seen.add(cap.technology)
+            self._assert_max_concurrent_sessions(cap)
 
     @run_if_endpoint_matches(has_cluster(Clusters.ProximityRanging))
     async def test_TC_PROXR_2_1(self):
@@ -113,7 +139,7 @@ class TC_PROXR_2_1(MatterTestCommissionedDevice, ProximityRangingTestBase):
         self.step("2a")
         if await self.feature_guard(endpoint, _PROXR, Feature.kWiFiUsdProximityDetection):
             caps = await self.read_proxr_attribute(_PROXR.Attributes.RangingCapabilities)
-            self._verify_single_capability(caps, WIFI_TECHNOLOGIES)
+            self._verify_wifi_capabilities(caps)
 
         self.step("2b")
         if await self.feature_guard(endpoint, _PROXR, Feature.kBluetoothChannelSounding):

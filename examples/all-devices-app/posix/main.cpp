@@ -27,10 +27,8 @@
 #include <TraceDecoder.h>
 #include <TraceHandlers.h>
 #endif
-#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/DeviceLoadStatusProvider.h>
 #include <app/InteractionModelEngine.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
@@ -42,14 +40,31 @@
 
 #include <app_options/AppOptions.h>
 #include <app_options/DeviceTypeParser.h>
+
+#include <binding-handler/BindingHandler.h>
+#include <device-factory/DeviceFactory.h>
+#include <device/api/SingleEndpoint.h>
+#include <device/api/allocator/DynamicEndpointIdAllocator.h>
+#include <oob-accessors/OOBAccessorHook.h>
+#include <oob-accessors/OOBAccessorRegistry.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 #include <posix/named_pipe/Dispatcher.h>
+#include <posix/named_pipe/translators/BridgedDeviceTranslator.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemLayer.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/ThreadStackManager.h>
+#endif
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <inet/EndPointStateOpenThread.h>
+#include <openthread-system.h>
+#include <openthread/instance.h>
+#endif
 
 #include <BleInit.h>
 #include <TermHandling.h>
@@ -74,12 +89,13 @@ using namespace chip::ArgParser;
 void ApplicationShutdown();
 
 namespace {
+
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
 Credentials::GroupDataProviderImpl gGroupDataProvider;
-chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 DefaultTimerDelegate gTimerDelegate;
 LoggingIdentifyDelegate gIdentifyDelegate;
+BindingHandler gBindingHandler;
 chip::app::PosixAudioManager gAudioManager;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -109,6 +125,7 @@ void SetupNamedPipe(const char * namedPipePath)
         ChipLogError(AppServer, "Failed to start named pipe at %s: %" CHIP_ERROR_FORMAT, namedPipePath, err.Format());
         LogErrorOnFailure(NamedPipe::Dispatcher::Instance().Stop());
     }
+    LogErrorOnFailure(NamedPipe::Dispatcher::Instance().EnsureTranslatorRegistered<NamedPipe::BridgedDeviceTranslator>());
 }
 
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
@@ -149,10 +166,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         chipDie();
     }
 
-    // Initialize the safe attribute persistence provider
-    SuccessOrDie(gSafeAttributePersistenceProvider.Init(initParams.persistentStorageDelegate));
-    SetSafeAttributePersistenceProvider(&gSafeAttributePersistenceProvider);
-
     // Set the global DAC provider before server/cluster init so any integration path that
     // snapshots the provider during construction sees a valid implementation.
     static DeviceLayer::AllDevicesExampleDACProvider sDacProvider;
@@ -177,13 +190,16 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .testEventTriggerDelegate   = sTestEventTriggerDelegate,                               //
             .bindingTable               = Binding::Table::GetInstance(),                           //
             .bindingManager             = Binding::Manager::GetInstance(),                         //
+            .bindingHandler             = gBindingHandler,                                         //
             .identifyDelegate           = gIdentifyDelegate,                                       //
             .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
             .eventManagement            = EventManagement::GetInstance(),                          //
             .timerDelegate              = gTimerDelegate,                                          //
             .minGuaranteedSubscriptionsPerFabric =
                 InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
-            .enableWiFi = AppOptions::GetConfig().enableWiFi,                                    //
+            .enableWiFi   = AppOptions::GetConfig().IsWiFiEnabled(),                             //
+            .emulateWiFi  = AppOptions::GetConfig().emulateWiFi,                                 //
+            .enableThread = AppOptions::GetConfig().IsThreadEnabled(),                           //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
@@ -251,12 +267,32 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
 #endif // PW_RPC_ENABLED
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = []() { chip::DeviceLayer::ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = []() { chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+#endif
+
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Server init failed: %" CHIP_ERROR_FORMAT, err.Format());
         chipDie();
+    }
+
+    {
+        auto & server = Server::GetInstance();
+        if (CHIP_ERROR bindingErr =
+                gBindingHandler.Init(Binding::Manager::GetInstance(),
+                                     { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                     server.GetExchangeManager());
+            bindingErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "BindingHandler::Init() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
+        }
     }
 
     // Now that the server has started and we are done with our startup logging,
@@ -267,7 +303,17 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     chip::PayloadContents payload;
 
     payload.version = 0;
-    payload.rendezvousInformation.SetValue(RendezvousInformationFlag::kBLE);
+    payload.rendezvousInformation.SetValue(
+#if CONFIG_NETWORK_LAYER_BLE
+        RendezvousInformationFlag::kBLE
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+        // Thread MeshCoP (Mesh Commissioning Protocol) discovers and commissions uncommissioned
+        // Thread devices directly via the Thread Border Router (OTBR) without BLE.
+        RendezvousInformationFlag::kThread
+#else
+        RendezvousInformationFlag::kOnNetwork
+#endif
+    );
 
     if (GetCommissionableDataProvider()->GetSetupPasscode(payload.setUpPINCode) != CHIP_NO_ERROR)
     {
@@ -302,6 +348,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     gMainLoopImplementation = nullptr;
 
     LogErrorOnFailure(NamedPipe::Dispatcher::Instance().Stop());
+    gBindingHandler.Shutdown();
     devices.Shutdown();
 
     Server::GetInstance().Shutdown();
@@ -394,19 +441,51 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 
     ReturnErrorOnFailure(AppOptions::ValidateConfig());
 
-    const char * kvsPath = AppOptions::GetConfig().kvsPath.empty() ? CHIP_CONFIG_KVS_PATH : AppOptions::GetConfig().kvsPath.c_str();
+    const auto & config = AppOptions::GetConfig();
+
+    const char * kvsPath = config.kvsPath.empty() ? CHIP_CONFIG_KVS_PATH : config.kvsPath.c_str();
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(kvsPath));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
-    ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider, AppOptions::GetConfig()));
+    if (config.IsThreadEnabled())
+    {
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+        const std::vector<std::string> & threadArgs = config.threadArgs;
+        std::vector<char *> args;
+
+        args.reserve(threadArgs.size() + 2);
+        args.push_back(argv[0]);
+        std::transform(threadArgs.begin(), threadArgs.end(), std::back_inserter(args),
+                       [](const std::string & arg) { return const_cast<char *>(arg.data()); });
+        args.push_back(nullptr); // argv[argc] must be a null pointer.
+        otSysInit(static_cast<int>(args.size() - 1), args.data());
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
+        ChipLogProgress(AppServer, "Thread initialized.");
+#else
+        ChipLogError(AppServer, "Thread support is not compiled in");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+#endif
+    }
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    else
+    {
+        ChipLogError(AppServer, "--thread-arg is required when the OpenThread endpoint is enabled.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+#endif
+
+    ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider, config));
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
     static AllDevicesExampleDeviceInfoProviderImpl sExampleDeviceInfoProvider;
     DeviceLayer::SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
-    const auto & config = AppOptions::GetConfig();
-    auto vendorId       = config.vendorId.has_value() ? config.vendorId : std::nullopt;
-    auto productId      = config.productId.has_value() ? config.productId : std::nullopt;
+    auto vendorId  = config.vendorId.has_value() ? config.vendorId : std::nullopt;
+    auto productId = config.productId.has_value() ? config.productId : std::nullopt;
     static AllDevicesExampleDeviceInstanceInfoProviderImpl sAppDeviceInstanceInfoProvider(
         DeviceLayer::GetDeviceInstanceInfoProvider(), vendorId, productId);
     DeviceLayer::SetDeviceInstanceInfoProvider(&sAppDeviceInstanceInfoProvider);
@@ -422,7 +501,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     // Synchronous on purpose. The Wi-Fi PAF publish that follows starts management
     // itself if it is not up yet, and a second start while the first is still
     // completing deadlocks.
-    if (config.enableWiFi)
+    if (config.enableWiFi && !config.emulateWiFi)
     {
         LogErrorOnFailure(DeviceLayer::ConnectivityMgrImpl().StartWiFiManagementSync());
     }

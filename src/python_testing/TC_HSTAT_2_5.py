@@ -66,7 +66,7 @@ class TC_HSTAT_2_5(HSTATBase):
 
     def steps_TC_HSTAT_2_5(self):
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep(2, "TH sends command On to the On/Off cluster on the same endpoint as this cluster.",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep(3, "TH sends command SetSettings with the Mode field set to Humidifier",
@@ -90,7 +90,7 @@ class TC_HSTAT_2_5(HSTATBase):
             TestStep(12, "TH sends command Off to the On/Off cluster on the same endpoint as this cluster.",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep(13, "TH reads from the DUT the MistType attribute.",
-                     "Verify that the DUT response contains a value between 1 and 3 inclusive."),
+                     "Verify that the DUT response contains a value with at least 1 defined bit set."),
         ]
 
     @property
@@ -111,8 +111,8 @@ class TC_HSTAT_2_5(HSTATBase):
         self.step(3)
         # TH sends command SetSettings with the Mode field set to Humidifier
         # Verify DUT responds w/ status SUCCESS(0x00)
-        await self.send_SetSettingsCommand_expect_success(mode=self.modeHumidifier)
-        dut_SystemState = await self.read_attribute_expect_success(attribute=self.attributes.SystemState)
+        await self.send_SetSettingsCommand_expect_success(humidistatMode=self.modeHumidifier)
+        dut_SystemState = await self.read_attribute_expect_success(attribute=self.attributes.HumidistatSystemState)
         log.info("State is: %s", dut_SystemState)
 
         if self.warmFeatureSupported:
@@ -183,10 +183,9 @@ class TC_HSTAT_2_5(HSTATBase):
 
         self.step(13)
         # TH reads from the DUT the MistType attribute.
-        # Verify that the DUT response contains a value between 1 and 3 inclusive.
+        # Verify that the DUT response contains a value with at least 1 defined bit set.
         dut_MistType = await self.read_attribute_expect_success(attribute=self.attributes.MistType)
-        asserts.assert_greater_equal(dut_MistType, 1, "MistType is less than 1")
-        asserts.assert_less_equal(dut_MistType, 3, "MistType is greater than 3")
+        asserts.assert_true((dut_MistType & 1) | (dut_MistType & 2), "At least one defined bit must be set.")
 
 
 if __name__ == '__main__':

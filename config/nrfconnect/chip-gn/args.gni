@@ -28,4 +28,5 @@ chip_external_mbedtls = true
 
 custom_toolchain = "${chip_root}/config/nrfconnect/chip-gn/toolchain:zephyr"
 
-pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/setup/constraints.txt" ]
+pw_build_PIP_CONSTRAINTS =
+    [ "${chip_root}/scripts/setup/requirements.constraints.txt" ]

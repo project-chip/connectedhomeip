@@ -46,6 +46,19 @@
 #       --endpoint 2
 #     factory-reset: true
 #     quiet: true
+#   run3:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device closure-door:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 2
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -89,7 +102,7 @@ class TC_CLDIM_3_3(MatterTestCommissionedDevice):
 
     def steps_TC_CLDIM_3_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If Limitation feature is supported, read LimitRange attribute"),
             TestStep("2c", "If Positioning feature is supported, read Resolution attribute"),

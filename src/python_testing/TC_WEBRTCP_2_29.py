@@ -57,7 +57,7 @@ class TC_WebRTCP_2_29(MatterTestCommissionedDevice, WEBRTCPTestBase):
 
     def steps_TC_WebRTCP_2_29(self) -> list[TestStep]:
         return [
-            TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
+            TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send ProvideOffer with no VideoStreams or AudioStreams => expect INVALID_COMMAND"),
             TestStep(3, "Allocate Audio and Video streams via CameraAVStreamManagement"),
             TestStep(4, "Send ProvideOffer with VideoStreams containing invalid VideoStreamID => expect DYNAMIC_CONSTRAINT_ERROR"),

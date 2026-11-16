@@ -17,10 +17,10 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     factory-reset: true
 #     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -58,7 +58,7 @@ class TC_SC_3_1(MatterTestCommissionedDevice):
         self.th = self.default_controller
         case_capture.SetObserver(self.th)
 
-        self.step("1a", "TH and the DUT are commissioned.", is_commissioning=True)
+        self.step("1a", "TH and the DUT are commissioned.")
         try:
             await self.th.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False)
         except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Can not use assert_raises because error is not expected

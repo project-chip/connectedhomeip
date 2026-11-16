@@ -55,7 +55,7 @@ class TC_WebRTCP_2_8(MatterTestCommissionedDevice, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_8(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "DUT commissioned", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned"),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement"),
             TestStep(2, "TH writes SoftRecordingPrivacyModeEnabled to TRUE on CameraAVStreamManagement cluster",
                      "DUT responds with success"),

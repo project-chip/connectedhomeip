@@ -35,7 +35,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kUserSetpoint), userSetpoint);
-    encoder.Encode(to_underlying(Fields::kMode), mode);
+    encoder.Encode(to_underlying(Fields::kHumidistatMode), humidistatMode);
     encoder.Encode(to_underlying(Fields::kMistType), mistType);
     encoder.Encode(to_underlying(Fields::kContinuous), continuous);
     encoder.Encode(to_underlying(Fields::kSleep), sleep);
@@ -57,9 +57,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, userSetpoint);
         }
-        else if (__context_tag == to_underlying(Fields::kMode))
+        else if (__context_tag == to_underlying(Fields::kHumidistatMode))
         {
-            err = DataModel::Decode(reader, mode);
+            err = DataModel::Decode(reader, humidistatMode);
         }
         else if (__context_tag == to_underlying(Fields::kMistType))
         {

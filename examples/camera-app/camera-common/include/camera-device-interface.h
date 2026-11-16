@@ -19,10 +19,10 @@
 #pragma once
 #include "camera-avstream-controller.h"
 #include "media-controller.h"
+#include <app/clusters/ambient-context-sensing-server/AmbientContextSensingDelegate.h>
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
-#include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 #include <app/clusters/zone-management-server/zone-management-server.h>
@@ -120,9 +120,6 @@ class CameraDeviceInterface
 public:
     virtual ~CameraDeviceInterface() = default;
 
-    // Getter for Chime Delegate
-    virtual chip::app::Clusters::ChimeDelegate & GetChimeDelegate() = 0;
-
     // Getter for WebRTCProvider Delegate
     virtual chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() = 0;
 
@@ -150,6 +147,9 @@ public:
 
     // Getter for the AVAnalysis Delegate
     virtual chip::app::Clusters::AvAnalysisDelegate & GetAVAnalysisDelegate() = 0;
+
+    // Getter for the AmbientContextSensing Delegate
+    virtual chip::app::Clusters::AmbientContextSensing::AmbientContextSensingDelegate & GetAmbientContextSensingDelegate() = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface

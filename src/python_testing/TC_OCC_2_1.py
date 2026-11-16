@@ -25,20 +25,6 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --endpoint 1
-#     factory-reset: true
-#     quiet: true
-#   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device occupancy-sensor --discriminator 1234 --KVS kvs1
 #     script-args: >
@@ -76,7 +62,7 @@ class TC_OCC_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_OCC_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read Occupancy attribute."),
             TestStep(3, "Read OccupancySensorType attribute."),
             TestStep(4, "Read OccupancySensorTypeBitmap attribute."),

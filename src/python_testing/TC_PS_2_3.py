@@ -21,13 +21,14 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device power-source:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -54,7 +55,7 @@ class TC_PS_2_3(MatterTestCommissionedDevice):
         return ["PWRTL.S"]
 
     def steps_TC_PS_2_3(self):
-        return [TestStep(1, "Commission DUT to TH", "", is_commissioning=True),
+        return [TestStep(1, "Commission DUT to TH", ""),
                 TestStep(2, "Subscribe to all attributes of the PowerSource Cluster"),
                 TestStep(3, "Accumulate all attribute reports on the endpoint under test for 30 seconds",
                             "For each of the attributes in the set of BatTimeToFullCharge, BatPercentRemaining and BatTimeRemaining, verify that there are not more than 4 reports per attribute where the value is non-null over the period of accumulation.")]

@@ -69,7 +69,7 @@ class TC_COMMTR_3_1(MatterTestCommissionedDevice, CommodityMeteringTestBaseHelpe
     def steps_TC_COMMTR_3_1(self) -> list[TestStep]:
 
         return [
-            TestStep("1", "Commissioning, already done", "DUT is commissioned", is_commissioning=True),
+            TestStep("1", "Commissioning, already done", "DUT is commissioned"),
             TestStep("2", """Set up a subscription to the Commodity Metering cluster attributes:
                      - MinIntervalFloor: 0
                      - MaxIntervalCeiling: 10""",

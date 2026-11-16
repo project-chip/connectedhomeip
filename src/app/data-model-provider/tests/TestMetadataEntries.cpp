@@ -34,7 +34,8 @@ constexpr AttributeQualityFlags kAllAttributeQualities[] = {
     AttributeQualityFlags::kFabricScoped,    //
     AttributeQualityFlags::kFabricSensitive, //
     AttributeQualityFlags::kChangesOmitted,  //
-    AttributeQualityFlags::kTimed,
+    AttributeQualityFlags::kTimed,           //
+    AttributeQualityFlags::kFixed,
 };
 
 constexpr CommandQualityFlags kAllCommandQualities[] = {
@@ -66,6 +67,7 @@ TEST(TestMetadataEntries, TestAttributeQualityEncoding)
         EXPECT_FALSE(a.HasFlags(AttributeQualityFlags::kFabricSensitive));
         EXPECT_FALSE(a.HasFlags(AttributeQualityFlags::kChangesOmitted));
         EXPECT_FALSE(a.HasFlags(AttributeQualityFlags::kTimed));
+        EXPECT_FALSE(a.HasFlags(AttributeQualityFlags::kFixed));
     }
 
     for (auto flag : kAllAttributeQualities)
@@ -87,14 +89,16 @@ TEST(TestMetadataEntries, TestAttributeQualityEncoding)
 
     // Test multi-option set
     {
-        AttributeEntry a(123, { AttributeQualityFlags::kFabricSensitive, AttributeQualityFlags::kTimed }, std::nullopt,
-                         std::nullopt);
+        AttributeEntry a(123,
+                         { AttributeQualityFlags::kFabricSensitive, AttributeQualityFlags::kTimed, AttributeQualityFlags::kFixed },
+                         std::nullopt, std::nullopt);
 
         EXPECT_FALSE(a.HasFlags(AttributeQualityFlags::kListAttribute));
         EXPECT_FALSE(a.HasFlags(AttributeQualityFlags::kFabricScoped));
         EXPECT_TRUE(a.HasFlags(AttributeQualityFlags::kFabricSensitive));
         EXPECT_FALSE(a.HasFlags(AttributeQualityFlags::kChangesOmitted));
         EXPECT_TRUE(a.HasFlags(AttributeQualityFlags::kTimed));
+        EXPECT_TRUE(a.HasFlags(AttributeQualityFlags::kFixed));
     }
 }
 

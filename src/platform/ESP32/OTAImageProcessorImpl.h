@@ -52,6 +52,7 @@ public:
     class OTARcpProcessorDelegate
     {
     public:
+        virtual ~OTARcpProcessorDelegate()                                                                        = default;
         virtual esp_err_t OnOtaRcpPrepareDownload()                                                               = 0;
         virtual esp_err_t OnOtaRcpProcessBlock(const uint8_t * buffer, size_t bufLen, size_t & rcpOtaReceivedLen) = 0;
         virtual esp_err_t OnOtaRcpFinalize()                                                                      = 0;

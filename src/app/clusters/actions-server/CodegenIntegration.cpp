@@ -20,7 +20,6 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <lib/support/CharSpanToStdString.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
@@ -40,20 +39,14 @@ ActionsCluster::OptionalAttributesSet BuildOptionalAttributes(EndpointId endpoin
     return optionalAttributes;
 }
 
-// Returns the SetupURL attribute value as a std::string, or an empty string on failure.
-// An empty return value means the attribute is absent or unreadable.
-std::string ReadSetupURL(EndpointId endpointId)
+// Returns the SetupURL attribute default value (pointing directly to flash), or std::nullopt if absent or empty.
+std::optional<CharSpan> ReadSetupURL(EndpointId endpointId)
 {
     CharSpan urlSpan;
     VerifyOrReturnValue(Attributes::SetupURL::GetDefault(endpointId, urlSpan) == Protocols::InteractionModel::Status::Success,
-                        std::string());
-    return CharSpanToStdString(urlSpan);
-}
-
-std::optional<CharSpan> SetupURLSpan(const std::string & url)
-{
-    VerifyOrReturnValue(!url.empty(), std::nullopt);
-    return CharSpan(url.data(), url.size());
+                        std::nullopt);
+    VerifyOrReturnValue(!urlSpan.empty(), std::nullopt);
+    return urlSpan;
 }
 
 } // namespace
@@ -61,8 +54,7 @@ std::optional<CharSpan> SetupURLSpan(const std::string & url)
 uint8_t ActionsServer::sInstanceCount = 0;
 
 ActionsServer::ActionsServer(EndpointId endpointId, Delegate & delegate) :
-    mSetupURL(ReadSetupURL(endpointId)),
-    mCluster(endpointId, delegate, BuildOptionalAttributes(endpointId), SetupURLSpan(mSetupURL))
+    mCluster(endpointId, delegate, BuildOptionalAttributes(endpointId), ReadSetupURL(endpointId))
 {
     // The Actions cluster has "Scope: Node" per the Matter spec. However, a device can have
     // multiple aggregator endpoints (e.g. a Zigbee bridge on EP1 and a Z-Wave bridge on EP2),

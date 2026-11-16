@@ -186,15 +186,18 @@ CHIP_ERROR SoftwareDiagnosticsServerCluster::Attributes(const ConcreteClusterPat
 
     AttributeListBuilder listBuilder(builder);
 
-    static constexpr DataModel::AttributeEntry optionalEntries[] = {
-        //
-        Attributes::ThreadMetrics::kMetadataEntry,            //
-        Attributes::CurrentHeapFree::kMetadataEntry,          //
-        Attributes::CurrentHeapUsed::kMetadataEntry,          //
-        Attributes::CurrentHeapHighWatermark::kMetadataEntry, //
+    AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
+        { mOptionalAttributeSet.IsSet(Attributes::ThreadMetrics::Id), Attributes::ThreadMetrics::kMetadataEntry },
+
+        { mOptionalAttributeSet.IsSet(Attributes::CurrentHeapFree::Id), Attributes::CurrentHeapFree::kMetadataEntry },
+
+        { mOptionalAttributeSet.IsSet(Attributes::CurrentHeapUsed::Id), Attributes::CurrentHeapUsed::kMetadataEntry },
+
+        { mOptionalAttributeSet.IsSet(Attributes::CurrentHeapHighWatermark::Id) && mDiagnosticDataProvider.SupportsWatermarks(),
+          Attributes::CurrentHeapHighWatermark::kMetadataEntry },
     };
 
-    return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalEntries), mOptionalAttributeSet);
+    return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalAttributeEntries));
 }
 
 } // namespace Clusters

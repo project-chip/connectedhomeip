@@ -41,7 +41,8 @@ public:
      * The cluster's feature map is derived from the technologies of the
      * supplied adapters, so the caller does not pass a feature mask in.
      */
-    ProximityRanger(TimerDelegate & timerDelegate, std::vector<Clusters::ProximityRanging::RangingAdapter *> adapters);
+    ProximityRanger(TimerDelegate & timerDelegate, std::vector<Clusters::ProximityRanging::RangingAdapter *> adapters,
+                    Clusters::ProximityRanging::ProximityRangingCluster::OptionalAttributeSet optionalAttributes = {});
     ~ProximityRanger() override = default;
 
     // Non-copyable / non-movable: copying or moving this device would invalidate the
@@ -74,6 +75,7 @@ private:
 
     TimerDelegate & mTimerDelegate;
     const std::vector<Clusters::ProximityRanging::RangingAdapter *> mAdapters;
+    const Clusters::ProximityRanging::ProximityRangingCluster::OptionalAttributeSet mOptionalAttributes;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ProximityRanging::ProximityRangingCluster> mProximityRangingCluster;

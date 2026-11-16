@@ -84,7 +84,6 @@ offers extra sample applications for different device-types
                 <li> <a href="../../../examples/water-heater-app/silabs/README.md">Water Heater App</a></li>
                 <li> <a href="../../../examples/lit-icd-app/silabs/README.md">LIT ICD App</a></li>
                 <li> <a href="../../../examples/refrigerator-app/silabs/README.md">Refrigerator App</a></li>
-                <li> <a href="../../../examples/window-app/silabs/README.md">Window App</a></li>
             </ul>
           </td>
           <td>

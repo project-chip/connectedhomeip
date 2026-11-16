@@ -16,6 +16,10 @@
 
 #pragma once
 
+#include <memory>
+#include <optional>
+#include <vector>
+
 #include <app/TestEventTriggerDelegate.h>
 #include <device/types/closure-panel/impl/SimulatedClosurePanel.h>
 #include <device/types/closure/Closure.h>
@@ -59,12 +63,6 @@ public:
         Closure::Config closure;
         std::vector<PanelList> panels;
     };
-
-    /// Closure configs, each combining the closure's features with its panel configs to simulate a
-    /// specific closure device such as a cabinet.
-    static Config ThreePanelCabinetClosureConfig();
-    static Config ThreePanelCabinetClosureConfigNoLT();
-    static Config ThreePanelCabinetClosureConfigNoPSNoSP();
 
     SimulatedClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Config config,
                      Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,

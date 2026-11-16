@@ -36,6 +36,7 @@
 #include <avahi-common/watch.h>
 
 #include <lib/dnssd/platform/Dnssd.h>
+#include <platform/Linux/ExponentialBackOff.h>
 #include <system/SystemLayer.h>
 
 struct AvahiWatch
@@ -111,6 +112,7 @@ public:
     CHIP_ERROR SetHostname(const char * hostname);
     CHIP_ERROR PublishService(const DnssdService & service, DnssdPublishCallback callback, void * context);
     CHIP_ERROR StopPublish();
+    CHIP_ERROR FinalizePublish();
     CHIP_ERROR Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                       chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context, intptr_t * browseIdentifier);
     CHIP_ERROR StopBrowse(intptr_t browseIdentifier);
@@ -162,7 +164,55 @@ private:
         }
     };
 
+    /// One address published for a Matter hostname: the Avahi interface
+    /// and protocol it is published on, the address, and its text form.
+    struct HostAddress
+    {
+        AvahiIfIndex mInterface;
+        AvahiProtocol mProtocol;
+        AvahiAddress mAddress;
+        std::string mText;
+    };
+
+    /// Frees an Avahi entry group, withdrawing whatever it published.
+    struct AvahiEntryGroupDeleter
+    {
+        void operator()(AvahiEntryGroup * group) const;
+    };
+
+    using AvahiEntryGroupPtr = std::unique_ptr<AvahiEntryGroup, AvahiEntryGroupDeleter>;
+
+    /// The address records of a Matter hostname, published in an entry
+    /// group of their own, apart from the services that use the hostname.
+    struct HostGroup
+    {
+        AvahiEntryGroupPtr mGroup;
+        std::vector<std::string> mAddresses; ///< "<interface>/<address>" of each record, sorted.
+        bool mInUse = false;                 ///< Claimed by a published service since the last StopPublish().
+    };
+
+    struct AvahiStringListDeleter
+    {
+        void operator()(AvahiStringList * list) const { avahi_string_list_free(list); }
+    };
+
+    /// A published service: its entry group, and what it was published
+    /// with, so that it can be published again after a collision.
+    struct ServiceGroup
+    {
+        AvahiEntryGroupPtr mGroup;
+        AvahiIfIndex mInterface = AVAHI_IF_UNSPEC;
+        AvahiProtocol mProtocol = AVAHI_PROTO_UNSPEC;
+        std::string mName;
+        std::string mType;
+        std::string mHost;
+        uint16_t mPort = 0;
+        std::unique_ptr<AvahiStringList, AvahiStringListDeleter> mText;
+        std::vector<std::string> mSubTypes; ///< Full subtype names, "<subtype>._sub.<type>".
+    };
+
     MdnsAvahi() : mClient(nullptr) {}
+    ~MdnsAvahi();
     static MdnsAvahi sInstance;
 
     /// Allocates a new resolve context with a unique `mNumber`
@@ -177,6 +227,21 @@ private:
 
     static void HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState state, void * context);
     void HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState state);
+    std::string GetGroupDescription(const AvahiEntryGroup * group) const;
+    CHIP_ERROR PublishHostAddresses(const DnssdService & service, const std::string & hostname, AvahiIfIndex interface,
+                                    std::string & key);
+    static CHIP_ERROR GetHostAddresses(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
+                                       std::vector<HostAddress> & addresses);
+    static std::vector<std::string> GetAddressKeys(const std::vector<HostAddress> & addresses);
+    static CHIP_ERROR AddHostAddressRecords(AvahiEntryGroup * group, const std::string & hostname,
+                                            const std::vector<HostAddress> & addresses);
+    static CHIP_ERROR AddServiceRecords(AvahiEntryGroup * group, const ServiceGroup & serviceGroup);
+
+    void ScheduleCollisionRetry();
+    void CancelCollisionRetry();
+    static void HandleCollisionRetryTimer(System::Layer * layer, void * context);
+    void HandleCollisionRetryTimer();
+    static CHIP_ERROR RepublishServiceGroup(const ServiceGroup & serviceGroup);
 
     static void HandleBrowse(AvahiServiceBrowser * broswer, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
                              const char * name, const char * type, const char * domain, AvahiLookupResultFlags flags,
@@ -192,7 +257,15 @@ private:
     void * mAsyncReturnContext;
 
     AvahiClient * mClient;
-    std::map<std::string, AvahiEntryGroup *> mPublishedGroups;
+    std::map<std::string, ServiceGroup> mPublishedGroups;
+    std::map<std::string, HostGroup> mHostGroups;
+
+    // Retrying DNS-SD advertising after an entry group collision.
+    static constexpr System::Clock::Seconds32 kCollisionRetryInitialDelay = System::Clock::Seconds32(1);
+    static constexpr System::Clock::Seconds32 kCollisionRetryMaxDelay     = System::Clock::Seconds32(32);
+    DeviceLayer::Internal::ExponentialBackOff mCollisionRetryBackOff{ kCollisionRetryInitialDelay, kCollisionRetryMaxDelay,
+                                                                      2 * kCollisionRetryMaxDelay };
+    bool mCollisionRetryPending = false;
     Poller mPoller;
     static constexpr size_t kMaxBrowseRetries = 4;
 

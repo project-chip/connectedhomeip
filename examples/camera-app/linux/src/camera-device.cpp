@@ -41,7 +41,6 @@
 
 using namespace chip;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
@@ -525,8 +524,8 @@ void CameraDevice::Shutdown()
     // Close WebRTC connections while the SystemLayer is still alive, so that WebRTC callbacks can safely use ScheduleLambda.
     mWebRTCProviderManager.CloseConnection();
 
-    // Stop Video and Audio Streams so their threads don't access CameraDevice members (like mAudioStreamPtsOffsetMs) after
-    // destruction.
+    // Stop Video, Audio, and Snapshot Streams so their threads don't access CameraDevice members (like mAudioStreamPtsOffsetMs)
+    // after destruction.
     for (auto & stream : mVideoStreams)
     {
         StopVideoStream(stream.videoStreamParams.videoStreamID);
@@ -534,6 +533,10 @@ void CameraDevice::Shutdown()
     for (auto & stream : mAudioStreams)
     {
         StopAudioStream(stream.audioStreamParams.audioStreamID);
+    }
+    for (auto & stream : mSnapshotStreams)
+    {
+        StopSnapshotStream(stream.snapshotStreamParams.snapshotStreamID);
     }
 }
 
@@ -869,6 +872,11 @@ bool CameraDevice::MatchClosestSnapshotParams(const VideoResolutionStruct & requ
 
     for (const auto & stream : mSnapshotStreams)
     {
+        if (!stream.isAllocated)
+        {
+            continue;
+        }
+
         int64_t streamPixels = static_cast<int64_t>(stream.snapshotStreamParams.minResolution.width) *
             stream.snapshotStreamParams.minResolution.height;
         int64_t diff    = streamPixels - requestedPixels;
@@ -918,7 +926,7 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
         // Find the stream that matched
         for (auto & s : mSnapshotStreams)
         {
-            if (s.snapshotStreamParams.minResolution.width == matchedRes.width &&
+            if (s.isAllocated && s.snapshotStreamParams.minResolution.width == matchedRes.width &&
                 s.snapshotStreamParams.minResolution.height == matchedRes.height &&
                 s.snapshotStreamParams.imageCodec == matchedCodec)
             {
@@ -932,7 +940,7 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
     {
         streamId = streamID.Value();
         auto it  = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
-            return s.snapshotStreamParams.snapshotStreamID == streamId;
+            return s.isAllocated && s.snapshotStreamParams.snapshotStreamID == streamId;
         });
         if (it == mSnapshotStreams.end())
         {
@@ -1381,6 +1389,11 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
     {
         ChipLogError(Camera, "Snapshot streamID : %u not found", streamID);
         return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
+    }
+
+    if (it->snapshotContext != nullptr)
+    {
+        StopSnapshotStream(streamID);
     }
 
     // Create the GStreamer pipeline
@@ -1999,7 +2012,9 @@ void CameraDevice::InitializeSnapshotStreams()
                         kSnapshotStreamFrameRate /* FrameRate */,
                         { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
                         { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
-                        90 /* Quality */ },
+                        90 /* Quality */,
+                        false /* EncodedPixels */,
+                        false /* HardwareEncoder */ },
                       streamId);
 }
 
@@ -2071,17 +2086,14 @@ bool CameraDevice::AddSnapshotStream(
 
     SnapshotStream snapshotStream = { { streamId, snapshotStreamAllocateArgs.imageCodec, snapshotStreamAllocateArgs.maxFrameRate,
                                         snapshotStreamAllocateArgs.minResolution, snapshotStreamAllocateArgs.maxResolution,
-                                        snapshotStreamAllocateArgs.quality, 0 /* RefCount */ },
+                                        snapshotStreamAllocateArgs.quality, 0 /* RefCount */,
+                                        snapshotStreamAllocateArgs.encodedPixels, snapshotStreamAllocateArgs.hardwareEncoder,
+                                        snapshotStreamAllocateArgs.watermarkEnabled, snapshotStreamAllocateArgs.OSDEnabled },
                                       false,
                                       nullptr };
 
     mSnapshotStreams.push_back(snapshotStream);
     return true;
-}
-
-ChimeDelegate & CameraDevice::GetChimeDelegate()
-{
-    return mChimeManager;
 }
 
 WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
@@ -2122,6 +2134,11 @@ ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
 AvAnalysisDelegate & CameraDevice::GetAVAnalysisDelegate()
 {
     return mAVAnalysisManager;
+}
+
+AmbientContextSensing::AmbientContextSensingDelegate & CameraDevice::GetAmbientContextSensingDelegate()
+{
+    return mAmbientContextSensingManager;
 }
 
 MediaController & CameraDevice::GetMediaController()

@@ -58,7 +58,7 @@ class TC_AVANALY_2_3(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def steps_TC_AVANALY_2_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads the SupportedAmbientContexts attribute, save as `supported_ambient_contexts`."),
             TestStep(3, "If the DUT has feature PerZoneDetect, TH reads the Zones attribute from the ZoneManagement cluster.",
                         "If there are no zones defined, TH creates one. Save the ZoneIDs as 'zoneIDs'."),

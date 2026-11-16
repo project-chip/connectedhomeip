@@ -58,7 +58,7 @@ class TC_AVANALY_2_9(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def steps_TC_AVANALY_2_9(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Simulate entity detection in Zone 1."),
             TestStep(
                 3,

@@ -61,7 +61,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
-  <classification class="simple" scope="endpoint"/>
+  <classification superset="Streaming Audio Player" class="simple" scope="endpoint"/>
   <conditions>
     <condition name="ContentAppPlatform" summary="The device includes a Content App Platform. A Content App is usually an application built by a Content Provider. An Audio Player with a Content App Platform is able to launch Content Apps and represent these apps as separate endpoints."/>
     <condition name="PhysicalInputs" summary="The device has physical inputs for media."/>

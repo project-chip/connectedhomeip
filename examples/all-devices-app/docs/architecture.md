@@ -222,14 +222,18 @@ sequenceDiagram
 
     App->>Factory: Create(deviceType, label)
     Factory->>Device: new ConcreteDevice(...)
-    Factory-->>App: DeviceRegistrationEntry { device, onDeviceRegistered }
+    Factory-->>App: DeviceRegistrationEntry { device, afterDeviceRegistration, beforeDeviceUnregistration }
 
     App->>Device: Register(endpointIdAllocator, Provider)
     Device->>Provider: AddEndpoint / AddCluster (assigns EndpointId)
     Device-->>App: CHIP_NO_ERROR
 
-    App->>Factory: onDeviceRegistered()
-    Factory->>Hook: (Hooks::OnDeviceRegistered(*device), ...)
+    App->>Factory: afterDeviceRegistration()
+    Factory->>Hook: (Hooks::AfterDeviceRegistration(*device), ...)
+
+    App->>Factory: beforeDeviceUnregistration()
+    Factory->>Hook: (Hooks::BeforeDeviceUnregistration(*device), ...)
+    Factory->>Device: Unregister(Provider)
 ```
 
 1. **Factory Registration**: Enabled device types register creator lambdas in
@@ -247,12 +251,24 @@ sequenceDiagram
     - `factory.Create(type, label)` instantiates the device and returns a
       `DeviceRegistrationEntry` struct containing the
       `std::unique_ptr<DeviceInterface>` and a
-      `std::function<void()> onDeviceRegistered` callback.
+      `std::function<void()> afterDeviceRegistration` callback and a
+      `std::function<void()> beforeDeviceUnregistration` callback.
     - The application registers the endpoint with the
       `CodeDrivenDataModelProvider`, allocating its valid runtime `EndpointId`.
-    - The application invokes `entry.onDeviceRegistered()`, which expands the
-      `variadic` fold expression `(Hooks::OnDeviceRegistered(*rawDevice), ...)`
-      statically for each configured hook.
+      `entry.Register(...)` invokes the device registration and then invokes the
+      `afterDeviceRegistration` callback, which expands the `variadic` fold
+      expression `(Hooks::AfterDeviceRegistration(*rawDevice), ...)` statically
+      for each configured hook.
+4. **Unregistration**
+    - The application invokes `entry.Unregister(provider)`. This first invokes
+      the `beforeDeviceUnregistration` callback, which invokes each configured
+      hook's `BeforeDeviceUnregistration(*rawDevice)` callback, allowing
+      registrations tied to the device to be removed while the device is still
+      valid.
+    - `entry.Unregister(...)` then calls `DeviceInterface::Unregister(provider)`
+      to remove the endpoint and its clusters from the data model provider.
+    - `DeviceInstances::Shutdown()` unregisters every constructed device,
+      unregisters the root node, and only then releases the device objects.
 
 ---
 

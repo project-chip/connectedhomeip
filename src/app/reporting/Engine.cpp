@@ -131,9 +131,6 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
         ChipLogError(DataManagement, "Read request on unknown cluster - no data version available");
     }
 
-    TLV::TLVWriter checkpoint;
-    reportBuilder.Checkpoint(checkpoint);
-
     // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
     //       explicitly ignores that case).
     //       Validation of attribute existence is done after ACL, in `ValidateAttributeIsReadable` below

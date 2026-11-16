@@ -115,8 +115,7 @@ class TC_COMPRO_2_9(MatterTestCommissionedDevice, COMPROBaseTest):
         return [
             TestStep(1, "Commission DUT to TH; verify the DUT has valid Operational "
                      "Credentials and a CASE session can be established",
-                     "CASE session establishment succeeds",
-                     is_commissioning=True),
+                     "CASE session establishment succeeds"),
             TestStep(2, "TH reads DeviceTypeList attribute on the endpoint under test",
                      "List SHALL contain an entry with DeviceType 0x0092 (Commissioning By Proxy)"),
             TestStep(3, "TH reads Transport attribute",

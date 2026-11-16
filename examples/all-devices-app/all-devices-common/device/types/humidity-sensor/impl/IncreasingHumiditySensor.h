@@ -30,7 +30,7 @@ namespace app {
 class IncreasingHumiditySensor : public HumiditySensor, public TimerContext
 {
 public:
-    IncreasingHumiditySensor(TimerDelegate & timerDelegate);
+    IncreasingHumiditySensor(TimerDelegate & timerDelegate, Clusters::RelativeHumidityMeasurementCluster::Config humidityConfig);
     ~IncreasingHumiditySensor() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;

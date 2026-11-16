@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
+#include <app/clusters/thermostat-user-interface-configuration-server/ThermostatUserInterfaceConfigurationCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/types/temperature-sensor/TemperatureSensor.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -27,10 +28,14 @@ namespace app {
 /**
  * Simulated temperature sensor that increases the reported temperature over time.
  */
-class IncreasingTemperatureSensor : public TemperatureSensor, public TimerContext
+class IncreasingTemperatureSensor : public TemperatureSensor,
+                                    public TimerContext,
+                                    public Clusters::ThermostatUserInterfaceConfiguration::Delegate
 {
 public:
-    IncreasingTemperatureSensor();
+    IncreasingTemperatureSensor(TimerDelegate & timerDelegate,
+                                Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig,
+                                Clusters::TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes = {});
     ~IncreasingTemperatureSensor() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -39,9 +44,17 @@ public:
     // TimerContext
     void TimerFired() override;
 
+    // ThermostatUserInterfaceConfiguration::Delegate
+    void OnTemperatureDisplayModeChanged(Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value) override;
+    void OnKeypadLockoutChanged(Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value) override;
+
+protected:
+    CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
+    void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override;
+
 private:
-    DefaultTimerDelegate mTimerDelegate;
     DataModel::Nullable<int16_t> mTemperatureMeasuredValue;
+    LazyRegisteredServerCluster<Clusters::ThermostatUserInterfaceConfigurationCluster> mUserInterfaceCluster;
 };
 
 } // namespace app

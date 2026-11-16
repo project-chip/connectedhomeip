@@ -60,6 +60,11 @@ public:
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override
+    {
+        return BitFlags<DataModel::ClusterQualityFlags>(DataModel::ClusterQualityFlags::kDiagnosticsData);
+    }
+
 private:
     DeviceLayer::DiagnosticDataProvider & mProvider;
     const BitFlags<EthernetNetworkDiagnostics::Feature> mEnabledFeatures;

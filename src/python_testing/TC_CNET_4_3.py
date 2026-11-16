@@ -57,7 +57,7 @@ class TC_CNET_4_3(MatterTestCommissionedDevice):
 
     def steps_TC_CNET_4_3(self) -> list[TestStep]:
         return [
-            TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
+            TestStep(1, test_plan_support.commission_if_required(), ""),
             TestStep(2, "TH reads the MaxNetworks attribute from the DUT",
                      "Verify that MaxNetworks attribute value is within a range of 1 to 255"),
             TestStep(3, "TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters of the DUT)",

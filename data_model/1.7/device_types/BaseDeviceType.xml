@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -78,11 +78,11 @@ Davis, CA 95616, USA
     <condition name="SIT" summary="The node is a short idle time intermittently connected device"/>
     <condition name="LIT" summary="The node is a long idle time intermittently connected device"/>
     <condition name="Active" summary="The node is always able to communicate"/>
-    <condition name="Node" summary="the device type is classified as a Node device type (see Data Model specification)"/>
-    <condition name="App" summary="the device type is classified as an Application device type (see Data Model specification)"/>
-    <condition name="Simple" summary="the device type is classified as a Simple device type (see Data Model specification)"/>
-    <condition name="Dynamic" summary="the device type is classified as a Dynamic device type (see Data Model specification)"/>
-    <condition name="Composed" summary="the device type is composed of 2 or more device types (see System Model specification)"/>
+    <condition name="Node" summary="the device type is classified as a Node device type (see xref:ref_DeviceTypeClassification[xrefstyle=full])"/>
+    <condition name="App" summary="the device type is classified as an Application device type (see xref:ref_ApplicationDeviceType[xrefstyle=full])"/>
+    <condition name="Simple" summary="the device type is classified as a Simple device type (see xref:ref_SimpleDeviceType[xrefstyle=full])"/>
+    <condition name="Dynamic" summary="the device type is classified as a Dynamic device type (see xref:ref_DynamicDeviceType[xrefstyle=full])"/>
+    <condition name="Composed" summary="the device type is composed of 2 or more device types (see xref:ref_ComposedDeviceTypes[xrefstyle=full])"/>
     <condition name="Client" summary="there exists a client application cluster on the endpoint"/>
     <condition name="Server" summary="there exists a server application cluster on the endpoint"/>
     <condition name="Duplicate" summary="the endpoint and at least one of its siblings have overlap in application device type(s)"/>

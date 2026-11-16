@@ -46,6 +46,21 @@ public:
     virtual void HandleLaunchUrl(CommandResponseHelper<Commands::LauncherResponse::Type> & helper, const CharSpan & contentUrl,
                                  const CharSpan & displayString, const BrandingInformation & brandingInformation) = 0;
 
+    /**
+     * Handle a LaunchURL command with all of its fields, including PlaybackPreferences and the
+     * ContentQueueing fields (ContentType, ContentHeaders, OffsetMillisecs, QueueType, NextURL).
+     *
+     * The cluster server calls this method for every LaunchURL command. The default forwards
+     * ContentURL, DisplayString and BrandingInformation to the HandleLaunchUrl above and ignores
+     * the other fields. Delegates that support ContentQueueing must override this method.
+     */
+    virtual void HandleLaunchUrlRequest(CommandResponseHelper<Commands::LauncherResponse::Type> & helper,
+                                        const Commands::LaunchURL::DecodableType & request)
+    {
+        HandleLaunchUrl(helper, request.contentURL, request.displayString.ValueOr(CharSpan()),
+                        request.brandingInformation.ValueOr(BrandingInformation()));
+    }
+
     virtual void HandleContentReplicationRequest(CommandResponseHelper<Commands::ContentReplicationResponse::Type> & helper)
     {
         Commands::ContentReplicationResponse::Type response;

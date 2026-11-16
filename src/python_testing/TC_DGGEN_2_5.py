@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -58,7 +58,7 @@ class TC_DGGEN_2_5(MatterTestCommissionedDevice):
         return ["DGGEN.S"]
 
     def steps_TC_DGGEN_2_5(self):
-        return [TestStep(1, "Ensure DUT is commissioned in TH1’s fabric.", "TH1 is able to communicate with DUT.", is_commissioning=True),
+        return [TestStep(1, "Ensure DUT is commissioned in TH1’s fabric.", "TH1 is able to communicate with DUT."),
                 TestStep(2, "TH1 reads DUT’s ClusterRevision global attribute in General Diagnostics cluster.",
                          "If the ClusterRevision is < 3, then skip the rest of the test steps."),
                 TestStep(3, "Commission DUT to TH2's fabric.", "TH2 is able to communicate with DUT."),

@@ -60,6 +60,8 @@ public:
 
     void UnregisterFeatureClusters(CodeDrivenDataModelProvider & provider);
 
+    Clusters::OTARequestorCluster & Cluster() { return mOtaRequestorCluster.Cluster(); }
+
 private:
     Context mContext;
     LazyRegisteredServerCluster<Clusters::OTARequestorCluster> mOtaRequestorCluster;

@@ -99,6 +99,7 @@ public:
     int64_t GetCumulativeEnergyExported() { return mTotalEnergyExported; }
     void SetEEMCluster(ElectricalEnergyMeasurementCluster * eemCluster) { mEEMCluster = eemCluster; }
     ElectricalEnergyMeasurementCluster * GetEEMCluster() { return mEEMCluster; }
+    void SetEndpointId(chip::EndpointId endpointId) { mEndpointId = endpointId; }
 
     // TimerContext override
     void TimerFired() override { FakeReadingsUpdate(); }
@@ -155,6 +156,8 @@ private:
 
     // EEM cluster to call `GenerateSnapshot()` on
     ElectricalEnergyMeasurementCluster * mEEMCluster = nullptr;
+
+    chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
 
     // For faking and testing purposes, insead of random values, we will incrementally change the value in a range
     uint32_t mDeterministicOffsetStep = 0;

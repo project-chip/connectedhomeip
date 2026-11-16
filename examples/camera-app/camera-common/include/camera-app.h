@@ -22,12 +22,14 @@
 
 #include "camera-device-interface.h"
 #include "simulated-av-analysis-webrtc-client.h"
+#include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
 #include <app/clusters/av-analysis-server/DefaultAvAnalysisCameraClient.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/MigrateCameraAvSettingsUserLevelManagementCluster.h>
 #include <app/clusters/camera-av-stream-management-server/MigrationCameraAVStreamManagementCluster.h>
 #include <app/util/config.h>
 #include <cstring>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <utility>
 
@@ -52,7 +54,6 @@ private:
     // SDK cluster servers
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster>
         mWebRTCTransportProviderServer;
-    std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::MigrateCameraAvSettingsUserLevelManagementCluster>
         mAVSettingsUserLevelMgmtServer;
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvStreamManagement::MigrationCameraAVStreamManagementCluster>
@@ -61,6 +62,8 @@ private:
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::AvAnalysisCluster> mAVAnalysisServer;
     chip::app::Clusters::DefaultAvAnalysisCameraClient mAVAnalysisCameraClient;
     SimulatedAvAnalysisWebRTCClient mAVAnalysisWebRTCClient;
+    chip::app::DefaultTimerDelegate mAmbientContextSensingTimerDelegate;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::AmbientContextSensingCluster> mAmbientContextSensingServer;
 
     // Method to instantiate CameraAVStreamMgmt and set attribute defaults for initialization.
     void CreateAndInitializeCameraAVStreamMgmt();

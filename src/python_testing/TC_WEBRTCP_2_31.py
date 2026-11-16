@@ -61,7 +61,7 @@ class TC_WebRTCP_2_31(MatterTestCommissionedDevice, WEBRTCPTestBase):
 
     def steps_TC_WebRTCP_2_31(self) -> list[TestStep]:
         return [
-            TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
+            TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send SolicitOffer with no VideoStreams or AudioStreams => expect INVALID_COMMAND"),
             TestStep(3, "Allocate a Video stream via VideoStreamAllocate"),
             TestStep(4, "Allocate an Audio stream via AudioStreamAllocate"),

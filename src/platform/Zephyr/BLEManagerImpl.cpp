@@ -34,9 +34,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/internal/BLEManager.h>
-#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-#include <platform/DeviceControlServer.h>
-#endif
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
@@ -55,16 +52,6 @@
 
 #if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 #include <ncs_version.h>
-#elif CHIP_DEVICE_LAYER_TARGET_TELINK
-extern "C" {
-#if defined(CONFIG_BT_B9X)
-extern __attribute__((noinline)) int b9x_bt_blc_mac_init(uint8_t * bt_mac);
-#elif defined(CONFIG_BT_TLX)
-extern __attribute__((noinline)) int tlx_bt_blc_mac_init(uint8_t * bt_mac);
-#elif defined(CONFIG_BT_W91)
-extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac);
-#endif
-}
 #endif
 
 #include <array>
@@ -168,16 +155,8 @@ int InitRandomStaticAddress(bool idPresent, int & id)
     bt_addr_le_t addr;
 
     // generating the address
-#if CHIP_DEVICE_LAYER_TARGET_TELINK
-#if defined(CONFIG_BT_B9X)
-    b9x_bt_blc_mac_init(addr.a.val);
-#elif defined(CONFIG_BT_TLX)
-    tlx_bt_blc_mac_init(addr.a.val);
-#elif defined(CONFIG_BT_W91)
-    telink_bt_blc_mac_init(addr.a.val);
-#endif
-#else
-    error = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
+    addr.type = BT_ADDR_LE_RANDOM;
+    error     = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
 
     if (error)
     {
@@ -186,28 +165,22 @@ int InitRandomStaticAddress(bool idPresent, int & id)
     }
 
     BT_ADDR_SET_STATIC(&addr.a);
-#endif
 
-    if (BT_ADDR_IS_STATIC(&addr.a)) // in case of Random static address, create a new id
+    if (!idPresent)
     {
-        addr.type = BT_ADDR_LE_RANDOM;
-
-        if (!idPresent)
-        {
-            id = bt_id_create(&addr, nullptr);
-        }
+        id = bt_id_create(&addr, nullptr);
+    }
 #if CONFIG_BT_ID_MAX == 2
-        else
-        {
-            id = bt_id_reset(1, &addr, nullptr);
-        }
+    else
+    {
+        id = bt_id_reset(1, &addr, nullptr);
+    }
 #endif // CONFIG_BT_BONDABLE
 
-        if (id < 0)
-        {
-            ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", id);
-            return id;
-        }
+    if (id < 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", id);
+        return id;
     }
 
     ChipLogProgress(DeviceLayer, "BLE address: %02X:%02X:%02X:%02X:%02X:%02X", addr.a.val[5], addr.a.val[4], addr.a.val[3],
@@ -216,19 +189,6 @@ int InitRandomStaticAddress(bool idPresent, int & id)
 }
 
 } // unnamed namespace
-
-#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && defined(CONFIG_BT_TLX)
-// Telink TLX: keep a scheduler task active for BLE/802.15.4 coexistence.
-int StartMinimalBLEAdvertisement()
-{
-    static const struct bt_data minimal_ad[] = {
-        BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
-    };
-    const struct bt_le_adv_param params =
-        BT_LE_ADV_PARAM_INIT(0 /* non-connectable, non-scannable */, BT_GAP_ADV_FAST_INT_MIN_1, BT_GAP_ADV_FAST_INT_MAX_1, NULL);
-    return bt_le_adv_start(&params, minimal_ad, ARRAY_SIZE(minimal_ad), NULL, 0);
-}
-#endif // CONFIG_BT_TLX
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
@@ -264,17 +224,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #else
     err = InitRandomStaticAddress(false, id);
     VerifyOrReturnError(err == 0 && id == kMatterBleIdentity, MapErrorZephyr(err));
-#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     err = bt_enable(nullptr);
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-#endif
 #endif // CONFIG_BT_BONDABLE
-
-#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && defined(CONFIG_BT_TLX)
-    // Telink TLX: start a minimal BLE advertisement before dual-mode so Thread's tlx_start_radio() does not block.
-    int adv_err = StartMinimalBLEAdvertisement();
-    VerifyOrReturnError(adv_err == 0, MapErrorZephyr(adv_err));
-#endif
 
     TEMPORARY_RETURN_IGNORED BLEAdvertisingArbiter::Init(static_cast<uint8_t>(id));
 
@@ -362,15 +314,6 @@ void BLEManagerImpl::DriveBLEState()
                 mFlags.Clear(Flags::kChipoBleGattServiceRegister);
             }
         }
-
-#if defined(CONFIG_BT_TLX) && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION &&                                                 \
-    !CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
-        // Telink TLX: stop the minimal advertisement once Thread is attached.
-        if (ConnectivityMgr().IsThreadAttached())
-        {
-            bt_le_adv_stop();
-        }
-#endif
     }
 }
 
@@ -701,15 +644,6 @@ exit:
     // Unref bt_conn before scheduling DriveBLEState.
     bt_conn_unref(connEvent->BtConn);
 
-#if defined(CONFIG_BT_TLX) && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION &&                                                 \
-    !CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
-    // Telink TLX: keep BLE idle after disconnect (bt_conn_unref() may resume advertising).
-    if (!mFlags.Has(Flags::kAdvertisingEnabled))
-    {
-        bt_le_adv_stop();
-    }
-#endif
-
     ChipDeviceEvent disconnectEvent;
     disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
     ReturnErrorOnFailure(PlatformMgr().PostEvent(&disconnectEvent));
@@ -934,21 +868,6 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     TEMPORARY_RETURN_IGNORED CloseConnection(conId);
-}
-
-void BLEManagerImpl::CheckNonConcurrentBleClosing()
-{
-#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    if (IsBleClosing())
-    {
-        CHIP_ERROR error =
-            DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
-        if (error != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "PostCloseAllBLEConnections failed: %" CHIP_ERROR_FORMAT, error.Format());
-        }
-    }
-#endif
 }
 
 bool BLEManagerImpl::IsSubscribed(bt_conn * conn)

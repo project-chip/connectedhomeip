@@ -21,6 +21,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-stdin-pipe: dut-tv-app-stdin
 #     script-args: >
 #       --endpoint 1
 #       --storage-path admin_storage.json
@@ -39,7 +40,6 @@ from mobly import asserts
 from TC_MEDIAFILEMANAGEMENTTestBase import MEDIAFILEMANAGEMENTTestBase
 
 import matter.clusters as Clusters
-from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.pixit import pixit
@@ -62,8 +62,7 @@ class TC_MEDIAFILEMANAGEMENT_2_2(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
     def steps_TC_MEDIAFILEMANAGEMENT_2_2(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done. TH ensures at least one file exists on the DUT, adding one "
-                     "with AddFile if AvailableFiles is empty, and records the AvailableStorage value.",
-                     is_commissioning=True),
+                     "with AddFile if AvailableFiles is empty, and records the AvailableStorage value."),
             TestStep(1, "TH sends a DeleteFile command to the DUT with the FileID of an existing file.",
                      "The DUT responds with a success status response (value 0x00)."),
             TestStep(2, "TH reads the AvailableFiles attribute from the DUT.",
@@ -82,37 +81,14 @@ class TC_MEDIAFILEMANAGEMENT_2_2(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
            required=False, default=30)
     @run_if_endpoint_matches(has_cluster(Clusters.MediaFileManagement))
     async def test_TC_MEDIAFILEMANAGEMENT_2_2(self):
-        cluster = Clusters.MediaFileManagement
         endpoint = self.get_endpoint()
 
         self.step(0)
         await self.read_mfm_capabilities(endpoint)
-        available_files = await self.read_available_files(endpoint)
-
-        if not available_files:
-            # The precondition requires a file to delete, so create one rather than skipping.
-            log.info("AvailableFiles is empty; adding a file so there is something to delete")
-            supported_mime_types = await self.read_supported_mime_types(endpoint)
-            mime_type = self.pick_supported_mime_type(supported_mime_types, _FALLBACK_MIME_TYPE)
-            file_size = self.pixit("file_size")
-            response = None
-
-            async def send_add_file():
-                nonlocal response
-                response = await self.send_add_file(
-                    endpoint, name=_FILE_NAME, size=file_size, mime_type=mime_type,
-                    image_uri=self.bdx_uri("thumbnail.jpg"))
-
-            await self.serve_bdx_upload(bytes(file_size), timeout_sec=self.pixit("bdx_timeout_sec"),
-                                        send_command=send_add_file())
-            asserts.assert_is_not_none(response, "No AddFileResponse was received while setting up a file to delete")
-            asserts.assert_equal(response.status, cluster.Enums.FileStatusEnum.kSuccess,
-                                 "Could not add a file to delete; AddFile did not succeed")
-            asserts.assert_true(response.fileID is not NullValue,
-                                "AddFile reported success but returned a null FileID")
-            available_files = await self.read_available_files(endpoint)
-
-        asserts.assert_true(available_files, "The DUT must have at least one file for this test to delete")
+        # The precondition requires a file to delete, so create one rather than skipping.
+        available_files, _ = await self.ensure_file_available(
+            endpoint, name=_FILE_NAME, size=self.pixit("file_size"), fallback_mime_type=_FALLBACK_MIME_TYPE,
+            bdx_timeout_sec=self.pixit("bdx_timeout_sec"))
         target = available_files[0]
         file_id = target.fileID
         storage_before = await self.read_available_storage(endpoint)

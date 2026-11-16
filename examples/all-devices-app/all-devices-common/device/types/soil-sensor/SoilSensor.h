@@ -19,6 +19,7 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
 #include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
+#include <clusters/SoilMeasurement/Attributes.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 

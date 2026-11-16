@@ -84,7 +84,7 @@ class TC_EPALM_2_3(MatterTestCommissionedDevice):
         features = cluster.Bitmaps.Feature
         alarm_bits = cluster.Bitmaps.AlarmBitmap
 
-        self.step(1, "Commission DUT to TH (already done)", is_commissioning=True)
+        self.step(1, "Commission DUT to TH (already done)")
 
         self.step(2, "TH reads from the DUT the FeatureMap attribute. TH records the value as FM.",
                   expectation="Verify that the DUT response contains a map32 value.")

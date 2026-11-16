@@ -24,10 +24,13 @@
 #include <lib/support/CHIPMem.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <string>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ContentLauncher;
+using namespace chip::literals;
 
 namespace {
 
@@ -48,6 +51,9 @@ public:
                          const Structs::BrandingInformationStruct::Type & brandingInformation) override
     {
         mLaunchUrlCalled = true;
+        mLaunchUrlContentUrl.assign(contentUrl.data(), contentUrl.size());
+        mLaunchUrlDisplayString.assign(displayString.data(), displayString.size());
+        mLaunchUrlProviderName.assign(brandingInformation.providerName.data(), brandingInformation.providerName.size());
     }
 
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override { return CHIP_NO_ERROR; }
@@ -57,8 +63,11 @@ public:
     uint32_t GetFeatureMap(EndpointId endpoint) override { return mFeatureMap; }
     uint16_t GetClusterRevision(EndpointId endpoint) override { return 3; }
 
-    bool mLaunchContentCalled    = false;
-    bool mLaunchUrlCalled        = false;
+    bool mLaunchContentCalled = false;
+    bool mLaunchUrlCalled     = false;
+    std::string mLaunchUrlContentUrl;
+    std::string mLaunchUrlDisplayString;
+    std::string mLaunchUrlProviderName;
     uint32_t mStreamingProtocols = 0x03;
     uint32_t mFeatureMap         = 0x00FF;
 };
@@ -128,6 +137,87 @@ TEST_F(TestContentLaunchServer, TestDelegateDefaultHandlePlayPreset)
     ASSERT_TRUE(mockHandler.HasStatus());
     EXPECT_EQ(mockHandler.GetLastStatus().status,
               Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusEnum::kPresetNotFound));
+}
+
+TEST_F(TestContentLaunchServer, TestDelegateDefaultHandleLaunchUrlRequestForwardsFields)
+{
+    TestDelegate delegate;
+    chip::Testing::MockCommandHandler mockHandler;
+    ConcreteCommandPath commandPath(1, Id, Commands::LaunchURL::Id);
+    CommandResponseHelper<Commands::LauncherResponse::Type> helper(&mockHandler, commandPath);
+
+    Commands::LaunchURL::DecodableType request;
+    request.contentURL = "https://example.com/content"_span;
+    request.displayString.SetValue("Now playing"_span);
+    Structs::BrandingInformationStruct::Type branding;
+    branding.providerName = "Provider"_span;
+    request.brandingInformation.SetValue(branding);
+    request.queueType.SetValue(DataModel::MakeNullable(QueueTypeEnum::kNext));
+
+    delegate.HandleLaunchUrlRequest(helper, request);
+
+    // A delegate that only implements the three-field HandleLaunchUrl still receives those fields.
+    EXPECT_TRUE(delegate.mLaunchUrlCalled);
+    EXPECT_EQ(delegate.mLaunchUrlContentUrl, "https://example.com/content");
+    EXPECT_EQ(delegate.mLaunchUrlDisplayString, "Now playing");
+    EXPECT_EQ(delegate.mLaunchUrlProviderName, "Provider");
+}
+
+TEST_F(TestContentLaunchServer, TestDelegateDefaultHandleLaunchUrlRequestWithoutOptionalFields)
+{
+    TestDelegate delegate;
+    chip::Testing::MockCommandHandler mockHandler;
+    ConcreteCommandPath commandPath(1, Id, Commands::LaunchURL::Id);
+    CommandResponseHelper<Commands::LauncherResponse::Type> helper(&mockHandler, commandPath);
+
+    Commands::LaunchURL::DecodableType request;
+    request.contentURL = "https://example.com/content"_span;
+
+    delegate.HandleLaunchUrlRequest(helper, request);
+
+    // Absent DisplayString and BrandingInformation are forwarded as empty values.
+    EXPECT_TRUE(delegate.mLaunchUrlCalled);
+    EXPECT_EQ(delegate.mLaunchUrlContentUrl, "https://example.com/content");
+    EXPECT_TRUE(delegate.mLaunchUrlDisplayString.empty());
+    EXPECT_TRUE(delegate.mLaunchUrlProviderName.empty());
+}
+
+TEST_F(TestContentLaunchServer, TestDelegateOverrideHandleLaunchUrlRequestReceivesQueueingFields)
+{
+    class QueueingDelegate : public TestDelegate
+    {
+    public:
+        void HandleLaunchUrlRequest(CommandResponseHelper<Commands::LauncherResponse::Type> & helper,
+                                    const Commands::LaunchURL::DecodableType & request) override
+        {
+            mQueueType       = request.queueType;
+            mOffsetMillisecs = request.offsetMillisecs;
+        }
+
+        Optional<DataModel::Nullable<QueueTypeEnum>> mQueueType;
+        Optional<DataModel::Nullable<uint32_t>> mOffsetMillisecs;
+    };
+
+    QueueingDelegate delegate;
+    chip::Testing::MockCommandHandler mockHandler;
+    ConcreteCommandPath commandPath(1, Id, Commands::LaunchURL::Id);
+    CommandResponseHelper<Commands::LauncherResponse::Type> helper(&mockHandler, commandPath);
+
+    Commands::LaunchURL::DecodableType request;
+    request.contentURL = "https://example.com/content"_span;
+    request.queueType.SetValue(DataModel::MakeNullable(QueueTypeEnum::kLast));
+    request.offsetMillisecs.SetValue(DataModel::MakeNullable(static_cast<uint32_t>(5000)));
+
+    // Called through the base class, as the cluster server does.
+    static_cast<Delegate &>(delegate).HandleLaunchUrlRequest(helper, request);
+
+    // A delegate that supports ContentQueueing sees the queueing fields; the three-field
+    // HandleLaunchUrl is not involved.
+    EXPECT_FALSE(delegate.mLaunchUrlCalled);
+    ASSERT_TRUE(delegate.mQueueType.HasValue());
+    EXPECT_EQ(delegate.mQueueType.Value().Value(), QueueTypeEnum::kLast);
+    ASSERT_TRUE(delegate.mOffsetMillisecs.HasValue());
+    EXPECT_EQ(delegate.mOffsetMillisecs.Value().Value(), 5000u);
 }
 
 TEST_F(TestContentLaunchServer, TestDelegateGetSupportedStreamingProtocols)

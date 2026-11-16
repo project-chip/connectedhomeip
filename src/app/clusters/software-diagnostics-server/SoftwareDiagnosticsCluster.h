@@ -75,6 +75,11 @@ public:
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override
+    {
+        return BitFlags<DataModel::ClusterQualityFlags>(DataModel::ClusterQualityFlags::kDiagnosticsData);
+    }
+
     // Encodes the thread metrics list, using the provided encoder.
     CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & encoder);
 

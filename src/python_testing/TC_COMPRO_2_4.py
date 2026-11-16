@@ -196,7 +196,7 @@ class TC_COMPRO_2_4(MatterTestCommissionedDevice, COMPROBaseTest):
 
     def steps_TC_COMPRO_2_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT (proxy) to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT (proxy) to TH"),
             TestStep(2, "TH reads Transport attribute", "Store as valid_transports"),
             TestStep(3, "TH reads WiFiBand attribute (if WI supported)", "Store as valid_bands"),
             TestStep(4, "For each transport bit in valid_transports: Ensure ED is commissionable "
@@ -318,6 +318,7 @@ class TC_COMPRO_2_4(MatterTestCommissionedDevice, COMPROBaseTest):
         # Add kNtl to this list once such a transport lands.
         kWiFiPAF_bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
         kBle_bit = int(cp.Bitmaps.CapabilitiesBitmap.kBle)
+        kNtl_bit = int(cp.Bitmaps.CapabilitiesBitmap.kNtl)
         all_defined_transports = sorted([kBle_bit, kWiFiPAF_bit])
         transports_to_test = [b for b in all_defined_transports if valid_transports & b]
 
@@ -527,7 +528,7 @@ class TC_COMPRO_2_4(MatterTestCommissionedDevice, COMPROBaseTest):
         # ----------------------------------------------------------------
         # Step 11: ProxyConnectRequest with unsupported Transport bit.
         # ----------------------------------------------------------------
-        defined_transports = [kBle_bit, kWiFiPAF_bit]
+        defined_transports = [kBle_bit, kWiFiPAF_bit, kNtl_bit]
         unsupported_transport = next(
             (b for b in defined_transports if not (valid_transports & b)), None)
         if unsupported_transport is None:

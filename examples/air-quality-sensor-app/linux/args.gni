@@ -17,6 +17,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/config/standalone/args.gni")
+import("${chip_root}/examples/platform/linux/openthread.gni")
 
 chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
 chip_project_config_include = "<CHIPProjectAppConfig.h>"

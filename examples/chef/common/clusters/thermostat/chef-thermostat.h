@@ -69,7 +69,7 @@ public:
     Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed) override;
 
 private:
-    EndpointId mEndpointId                                     = kInvalidEndpointId;
+    [[maybe_unused]] EndpointId mEndpointId                    = kInvalidEndpointId;
     DataModel::Nullable<temperature> mLocalTemperature         = DataModel::NullNullable;
     DataModel::Nullable<temperature> mOutdoorTemperature       = DataModel::NullNullable;
     int8_t mLocalTemperatureCalibration                        = kDefaultLocalTemperatureCalibration;
@@ -128,20 +128,20 @@ public:
     Protocols::InteractionModel::Status SetMinDeadband(temperature minDeadband, bool & changed);
 
 private:
-    EndpointId mEndpointId                 = kInvalidEndpointId;
-    temperature mAbsMinHeatSetpointLimit   = kDefaultAbsMinHeatSetpointLimit;
-    temperature mAbsMaxHeatSetpointLimit   = kDefaultAbsMaxHeatSetpointLimit;
-    temperature mMinHeatSetpointLimit      = kDefaultAbsMinHeatSetpointLimit;
-    temperature mMaxHeatSetpointLimit      = kDefaultAbsMaxHeatSetpointLimit;
-    temperature mOccupiedHeatingSetpoint   = kDefaultHeatingSetpoint;
-    temperature mUnoccupiedHeatingSetpoint = kDefaultHeatingSetpoint;
-    temperature mAbsMinCoolSetpointLimit   = kDefaultAbsMinCoolSetpointLimit;
-    temperature mAbsMaxCoolSetpointLimit   = kDefaultAbsMaxCoolSetpointLimit;
-    temperature mMinCoolSetpointLimit      = kDefaultAbsMinCoolSetpointLimit;
-    temperature mMaxCoolSetpointLimit      = kDefaultAbsMaxCoolSetpointLimit;
-    temperature mOccupiedCoolingSetpoint   = kDefaultCoolingSetpoint;
-    temperature mUnoccupiedCoolingSetpoint = kDefaultCoolingSetpoint;
-    temperature mMinDeadband               = kDefaultDeadBand;
+    [[maybe_unused]] EndpointId mEndpointId = kInvalidEndpointId;
+    temperature mAbsMinHeatSetpointLimit    = kDefaultAbsMinHeatSetpointLimit;
+    temperature mAbsMaxHeatSetpointLimit    = kDefaultAbsMaxHeatSetpointLimit;
+    temperature mMinHeatSetpointLimit       = kDefaultAbsMinHeatSetpointLimit;
+    temperature mMaxHeatSetpointLimit       = kDefaultAbsMaxHeatSetpointLimit;
+    temperature mOccupiedHeatingSetpoint    = kDefaultHeatingSetpoint;
+    temperature mUnoccupiedHeatingSetpoint  = kDefaultHeatingSetpoint;
+    temperature mAbsMinCoolSetpointLimit    = kDefaultAbsMinCoolSetpointLimit;
+    temperature mAbsMaxCoolSetpointLimit    = kDefaultAbsMaxCoolSetpointLimit;
+    temperature mMinCoolSetpointLimit       = kDefaultAbsMinCoolSetpointLimit;
+    temperature mMaxCoolSetpointLimit       = kDefaultAbsMaxCoolSetpointLimit;
+    temperature mOccupiedCoolingSetpoint    = kDefaultCoolingSetpoint;
+    temperature mUnoccupiedCoolingSetpoint  = kDefaultCoolingSetpoint;
+    temperature mMinDeadband                = kDefaultDeadBand;
 };
 
 class ChefThermostatHoldDelegate : public ThermostatHold::Delegate
