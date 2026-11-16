@@ -648,6 +648,16 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
             const auto transportOptionsPtr = transportConfig.GetTransportOptionsPtr();
             if (transportOptionsPtr)
             {
+                CHIP_ERROR certError = mPushAvStreamTransportServer->GetLogic().LoadTLSCertsIntoDelegate(
+                    transportConfig.GetFabricIndex(), transportOptionsPtr->TLSEndpointID);
+                if (certError != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl,
+                                 "Failed to load TLS certificates for connection ID: %u, not re-allocating: %" CHIP_ERROR_FORMAT,
+                                 connectionID, certError.Format());
+                    continue;
+                }
+
                 Protocols::InteractionModel::Status status =
                     this->AllocatePushTransport(*transportOptionsPtr, connectionID, transportConfig.GetFabricIndex());
                 if (status != Protocols::InteractionModel::Status::Success)
@@ -719,6 +729,11 @@ void PushAvStreamTransportManager::HandleAmbientContextTrigger(uint8_t namespace
 void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
                                                Tls::CertificateTable::BufferedRootCert & rootCertEntry)
 {
+    mBufferRootCert.clear();
+    mBufferClientCert.clear();
+    mBufferClientCertKey.clear();
+    mBufferIntermediateCerts.clear();
+
     auto rootSpan = rootCertEntry.GetCert().certificate.Value();
     mBufferRootCert.assign(rootSpan.data(), rootSpan.data() + rootSpan.size());
 

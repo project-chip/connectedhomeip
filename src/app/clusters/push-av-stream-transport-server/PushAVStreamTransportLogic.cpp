@@ -876,6 +876,40 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
     return Status::Success;
 }
 
+CHIP_ERROR PushAvStreamTransportServerLogic::LoadTLSCertsIntoDelegate(FabricIndex fabricIndex, uint16_t tlsEndpointID)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mTLSClientManagementDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Note: TLS clusters are always on EP0, per spec
+    return mTLSClientManagementDelegate->FindProvisionedEndpointByID(
+        kRootEndpointId, fabricIndex, tlsEndpointID, [&](auto & TLSEndpoint) -> CHIP_ERROR {
+            // The spec requires a push transport's TLS endpoint to carry a non-null ccdid; a null one means no
+            // client certificate is associated with the endpoint, which the caller reports as an invalid TLS endpoint.
+            VerifyOrReturnError(!TLSEndpoint.ccdid.IsNull(), CHIP_ERROR_INVALID_ARGUMENT,
+                                ChipLogError(Zcl,
+                                             "HandleAllocatePushTransport[ep=%d]: TLS endpoint %u has no client certificate",
+                                             mEndpointId, tlsEndpointID));
+
+            // Use heap allocation for large certificate buffers to reduce stack usage
+            auto rootCertBuffer   = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
+            auto clientCertBuffer = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();
+
+            Tls::CertificateTable::BufferedClientCert clientCertEntry(*clientCertBuffer);
+            Tls::CertificateTable::BufferedRootCert rootCertEntry(*rootCertBuffer);
+
+            if (mTLSCertificateManagementDelegate != nullptr)
+            {
+                auto & table = mTLSCertificateManagementDelegate->GetCertificateTable();
+                ReturnErrorOnFailure(table.GetClientCertificateEntry(fabricIndex, TLSEndpoint.ccdid.Value(), clientCertEntry));
+                ReturnErrorOnFailure(table.GetRootCertificateEntry(fabricIndex, TLSEndpoint.caid, rootCertEntry));
+            }
+            // Without a certificate management delegate (tests), the delegate receives empty cert entries.
+            mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
+            return CHIP_NO_ERROR;
+        });
+}
+
 std::optional<DataModel::ActionReturnStatus>
 PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                               const Commands::AllocatePushTransport::DecodableType & commandData)
@@ -919,41 +953,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     // Validate the TLS Endpoint
     if (mTLSClientManagementDelegate != nullptr)
     {
-        // Note: TLS clusters are always on EP0, per spec
-        //
-        CHIP_ERROR tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
-            kRootEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID,
-            [&](auto & TLSEndpoint) -> CHIP_ERROR {
-                // The spec requires a push transport's TLS endpoint to carry a non-null ccdid; a null one means no
-                // client certificate is associated with the endpoint, which the caller reports as an invalid TLS endpoint.
-                VerifyOrReturnError(!TLSEndpoint.ccdid.IsNull(), CHIP_ERROR_INVALID_ARGUMENT,
-                                    ChipLogError(Zcl,
-                                                 "HandleAllocatePushTransport[ep=%d]: TLS endpoint %u has no client certificate",
-                                                 mEndpointId, commandData.transportOptions.TLSEndpointID));
-
-                // Use heap allocation for large certificate buffers to reduce stack usage
-                auto rootCertBuffer   = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
-                auto clientCertBuffer = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();
-
-                Tls::CertificateTable::BufferedClientCert clientCertEntry(*clientCertBuffer);
-                Tls::CertificateTable::BufferedRootCert rootCertEntry(*rootCertBuffer);
-
-                if (mTLSCertificateManagementDelegate != nullptr)
-                {
-                    auto & table = mTLSCertificateManagementDelegate->GetCertificateTable();
-                    ReturnErrorOnFailure(table.GetClientCertificateEntry(handler.GetAccessingFabricIndex(),
-                                                                         TLSEndpoint.ccdid.Value(), clientCertEntry));
-                    ReturnErrorOnFailure(
-                        table.GetRootCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.caid, rootCertEntry));
-                    mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
-                }
-                else
-                {
-                    // For tests, create empty cert entries
-                    mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
-                }
-                return CHIP_NO_ERROR;
-            });
+        CHIP_ERROR tlsEndpointValidityStatus =
+            LoadTLSCertsIntoDelegate(handler.GetAccessingFabricIndex(), transportOptions.TLSEndpointID);
 
         VerifyOrDo(tlsEndpointValidityStatus == CHIP_NO_ERROR, {
             ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
