@@ -439,8 +439,11 @@ void PushAVTransport::GeneratePushTransportBeginEvent()
     if (mPushAvStreamTransportServer != nullptr)
     {
         ChipLogProgress(Camera, "GeneratePushTransportBeginEvent: Calling NotifyTransportStarted for connection %u", mConnectionID);
-        // mActivationReason is optional - if not set, it defaults to empty value
-        mPushAvStreamTransportServer->NotifyTransportStarted(mConnectionID, reportedTriggerType, mActivationReason);
+        // The spec allows ActivationReason in PushTransportBegin only when TriggerType is Command.
+        const chip::Optional<TriggerActivationReasonEnum> reportedActivationReason =
+            (reportedTriggerType == TransportTriggerTypeEnum::kCommand) ? mActivationReason
+                                                                        : chip::Optional<TriggerActivationReasonEnum>();
+        mPushAvStreamTransportServer->NotifyTransportStarted(mConnectionID, reportedTriggerType, reportedActivationReason);
     }
     else
     {

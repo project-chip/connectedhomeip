@@ -109,7 +109,7 @@ public:
         std::string mTrackName;                                ///< Track name for segmented files
         std::string mUrl;                                      ///< URL for uploading clips;
         int mTriggerType;                                      ///< Recording trigger type
-        bool mUploadManifest = true;                           ///< Upload index.mpd (false for CMAF Interface-1)
+        bool mUploadManifest = true;                           ///< Upload index.mpd manifests
         std::chrono::steady_clock::time_point mActivationTime; ///< Time when the recording started
         uint16_t mMotionDetectedDurationS;                     ///< Current motion detected duration
         uint16_t mPreviousMotionDetectedDurationS;             ///< Previous duration before augmentation
@@ -278,7 +278,7 @@ private:
     int64_t mLastVideoPts        = 0;
     int64_t mLastAudioPts        = 0;
     bool mMetadataSet            = false;
-    bool mUploadMPD              = false;
+    bool mUploadMPD              = false; ///< Start manifest not yet uploaded; initialised from mClipInfo.mUploadManifest
     bool firstSegmentReady       = false;
 
     std::vector<int> mUploadSegmentID;
