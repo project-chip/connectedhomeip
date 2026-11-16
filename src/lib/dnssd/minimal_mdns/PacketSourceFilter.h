@@ -21,6 +21,7 @@
 #include <inet/IPPrefix.h>
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPError.h>
+#include <lib/dnssd/minimal_mdns/Server.h>
 
 namespace mdns {
 namespace Minimal {
@@ -29,7 +30,7 @@ namespace Minimal {
 /// interface it was received on, as RFC 6762 section 5.5 and 11 recommend for mDNS.
 ///
 /// A packet is accepted when any of these hold:
-///   - it was sent to a multicast group (link-scoped mDNS groups are never routed)
+///   - it was sent to the mDNS group (224.0.0.251 or ff02::fb), which routers should never forward
 ///   - its source is an IPv6 link-local address
 ///   - its source is inside a subnet configured on `info.Interface`
 ///     (on any interface if `info.Interface` is not set)
@@ -39,7 +40,7 @@ namespace Minimal {
 template <typename AddressIterator>
 bool IsFromAttachedSubnet(const chip::Inet::IPPacketInfo & info, AddressIterator & addresses)
 {
-    if (info.DestAddress.IsMulticast() || info.SrcAddress.IsIPv6LinkLocal())
+    if ((info.DestAddress == BroadcastIpAddresses::Get(info.DestAddress.Type())) || info.SrcAddress.IsIPv6LinkLocal())
     {
         return true;
     }
