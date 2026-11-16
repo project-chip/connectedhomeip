@@ -25,6 +25,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 
 namespace chip {
 namespace Dnssd {
@@ -64,6 +65,19 @@ CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & 
 CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter subtype);
 
 CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter nameDesc, DiscoveryType type);
+
+/// Skips "<subtype>._sub." at the start of a DNS-SD service name; other names are left unchanged.
+inline void SkipServiceSubtypeLabels(const char *& name)
+{
+    constexpr size_t kSubtypePartLength = sizeof(kSubtypeServiceNamePart) - 1;
+
+    const char * subtypeEnd = strchr(name, '.');
+    if (subtypeEnd != nullptr && strncmp(subtypeEnd + 1, kSubtypeServiceNamePart, kSubtypePartLength) == 0 &&
+        subtypeEnd[1 + kSubtypePartLength] == '.')
+    {
+        name = subtypeEnd + 1 + kSubtypePartLength + 1;
+    }
+}
 
 } // namespace Dnssd
 } // namespace chip
