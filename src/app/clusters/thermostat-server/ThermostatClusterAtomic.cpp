@@ -17,7 +17,9 @@
 
 #include "ThermostatClusterAtomic.h"
 
+#include <access/AccessControl.h>
 #include <app/GlobalAttributes.h>
+#include <clusters/Thermostat/MetadataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <functional>
@@ -78,6 +80,59 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
         attributeRequestCount++;
     }
     return attributeIdsIter.GetStatus() == CHIP_NO_ERROR;
+}
+
+/**
+ * @brief Checks if the client has permission to write to the requested attribute
+ *
+ * @param[in] commandObj The command handler object.
+ * @param[in] commandPath The concrete command path.
+ * @param[in] attributeId The attribute ID being requested.
+ * @return Status::Success if the client has write access, Status::UnsupportedAccess otherwise.
+ */
+Status CheckAttributeWriteAccess(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, AttributeId attributeId)
+{
+    if (commandObj == nullptr)
+    {
+        return Status::UnsupportedAccess;
+    }
+
+    auto entry = DataModel::ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Thermostat::Id>::EntryFor(attributeId);
+    if (!entry.has_value())
+    {
+        // Not a metadata attribute; it cannot be written atomically.
+        return Status::InvalidCommand;
+    }
+
+    Access::RequestPath requestPath{
+        .cluster     = commandPath.mClusterId,
+        .endpoint    = commandPath.mEndpointId,
+        .requestType = Access::RequestType::kAttributeWriteRequest,
+        .entityId    = attributeId,
+    };
+
+    auto writePrivilege = entry->GetWritePrivilege();
+    if (!writePrivilege.has_value())
+    {
+        // Attribute is not writable; this is not an access-control failure.
+        return Status::InvalidCommand;
+    }
+
+    const CHIP_ERROR accessError =
+        Access::GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, *writePrivilege);
+    if (accessError == CHIP_ERROR_ACCESS_DENIED)
+    {
+        return Status::UnsupportedAccess;
+    }
+    if (accessError == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL)
+    {
+        return Status::AccessRestricted;
+    }
+    if (accessError == CHIP_NO_ERROR)
+    {
+        return Status::Success;
+    }
+    return Status::Failure;
 }
 
 } // anonymous namespace
@@ -289,30 +344,29 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
     status = Status::Success;
     for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
     {
-        // If we've gotten this far, then the client has manage permission to call AtomicRequest,
-        // which is also the privilege necessary to write to the atomic attributes, so no need to do
-        // the "If the client does not have sufficient privilege to write to the attribute" check
-        // from the spec.
         auto & attributeStatus = attributeStatuses[i];
-        auto statusCode        = Status::Success;
-        switch (attributeStatus.attributeID)
+        auto statusCode        = CheckAttributeWriteAccess(commandObj, commandPath, attributeStatus.attributeID);
+        if (statusCode == Status::Success)
         {
-        case Presets::Id:
-        case Schedules::Id:
-        case SensorSchedule::Id:
-            if (InAtomicWrite(std::make_optional(attributeStatus.attributeID)))
+            switch (attributeStatus.attributeID)
             {
-                statusCode = Status::Busy;
+            case Presets::Id:
+            case Schedules::Id:
+            case SensorSchedule::Id:
+                if (InAtomicWrite(std::make_optional(attributeStatus.attributeID)))
+                {
+                    statusCode = Status::Busy;
+                }
+                else if (mState == State::Open)
+                {
+                    // Only one Atomic Write State is supported, and it belongs to another client.
+                    statusCode = Status::ResourceExhausted;
+                }
+                break;
+            default:
+                statusCode = Status::InvalidCommand;
+                break;
             }
-            else if (mState == State::Open)
-            {
-                // Only one Atomic Write State is supported, and it belongs to another client.
-                statusCode = Status::ResourceExhausted;
-            }
-            break;
-        default:
-            statusCode = Status::InvalidCommand;
-            break;
         }
         if (statusCode != Status::Success)
         {
@@ -365,6 +419,24 @@ AtomicWriteSession::CommitAtomicWrite(CommandHandler * commandObj, const Concret
     if (!InAtomicWrite(commandObj, attributeStatuses))
     {
         return Status::InvalidInState;
+    }
+
+    status = Status::Success;
+    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+    {
+        auto & attributeStatus = attributeStatuses[i];
+        auto statusCode        = CheckAttributeWriteAccess(commandObj, commandPath, attributeStatus.attributeID);
+        if (statusCode != Status::Success)
+        {
+            attributeStatus.statusCode = to_underlying(statusCode);
+            status                     = Status::Failure;
+        }
+    }
+    if (status != Status::Success)
+    {
+        Rollback();
+        SendAtomicResponse(commandObj, commandPath, status, attributeStatuses);
+        return std::nullopt;
     }
 
     status = ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWritePrecommit);

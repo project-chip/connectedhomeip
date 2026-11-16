@@ -30,16 +30,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TargetState::Id, BitFl
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TargetState
 namespace Resolution {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Resolution::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Resolution::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Resolution
 namespace StepValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(StepValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(StepValue::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace StepValue
 namespace Unit {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Unit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Unit::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Unit
 namespace UnitRange {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(UnitRange::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -50,24 +53,29 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LimitRange::Id, BitFla
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LimitRange
 namespace TranslationDirection {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TranslationDirection::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TranslationDirection::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TranslationDirection
 namespace RotationAxis {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RotationAxis::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RotationAxis::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RotationAxis
 namespace Overflow {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Overflow::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Overflow::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Overflow
 namespace ModulationType {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ModulationType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ModulationType::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ModulationType
 namespace LatchControlModes {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(LatchControlModes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(LatchControlModes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace LatchControlModes
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     CurrentState::kMetadataEntry,

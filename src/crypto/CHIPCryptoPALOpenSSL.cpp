@@ -1917,6 +1917,7 @@ CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, Mutable
     serialNumberLen = static_cast<size_t>(ASN1_STRING_length(serialNumberASN1));
     VerifyOrExit(serialNumberLen <= serialNumber.size(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
+    // OpenSSL stores an ASN1_INTEGER as a magnitude (sign in the type), so a DER sign byte can never be present here.
     memcpy(serialNumber.data(), ASN1_STRING_get0_data(serialNumberASN1), serialNumberLen);
     serialNumber.reduce_size(serialNumberLen);
 

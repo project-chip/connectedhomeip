@@ -19248,33 +19248,34 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & v
 namespace Humidistat {
 namespace Attributes {
 
-namespace Mode {
+namespace HumidistatMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::HumidistatModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    value = defaultVal.As<chip::app::Clusters::Humidistat::ModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::Humidistat::HumidistatModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
-} // namespace Mode
+} // namespace HumidistatMode
 
-namespace SystemState {
+namespace HumidistatSystemState {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::SystemStateEnum & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::Humidistat::HumidistatSystemStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    value = defaultVal.As<chip::app::Clusters::Humidistat::SystemStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::Humidistat::HumidistatSystemStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
-} // namespace SystemState
+} // namespace HumidistatSystemState
 
 namespace UserSetpoint {
 
@@ -29332,49 +29333,6 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & v
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::KeypadInput::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    *value = Traits::StorageToWorking(temp);
-    return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::KeypadInput::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::KeypadInput::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
-}
-
 } // namespace FeatureMap
 
 namespace ClusterRevision {
@@ -29387,49 +29345,6 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & v
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
-}
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::KeypadInput::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    *value = Traits::StorageToWorking(temp);
-    return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::KeypadInput::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::KeypadInput::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision

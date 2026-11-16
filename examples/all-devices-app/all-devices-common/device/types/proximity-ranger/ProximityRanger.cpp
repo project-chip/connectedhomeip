@@ -48,10 +48,10 @@ BitMask<ProximityRanging::Feature> ProximityRanger::DeriveFeatures() const
     return features;
 }
 
-ProximityRanger::ProximityRanger(TimerDelegate & timerDelegate,
-                                 std::vector<Clusters::ProximityRanging::RangingAdapter *> adapters) :
+ProximityRanger::ProximityRanger(TimerDelegate & timerDelegate, std::vector<Clusters::ProximityRanging::RangingAdapter *> adapters,
+                                 Clusters::ProximityRanging::ProximityRangingCluster::OptionalAttributeSet optionalAttributes) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)),
-    mTimerDelegate(timerDelegate), mAdapters(std::move(adapters))
+    mTimerDelegate(timerDelegate), mAdapters(std::move(adapters)), mOptionalAttributes(optionalAttributes)
 {}
 
 CHIP_ERROR ProximityRanger::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -71,6 +71,7 @@ CHIP_ERROR ProximityRanger::Register(chip::EndpointId endpoint, CodeDrivenDataMo
         endpoint,
         ProximityRanging::ProximityRangingCluster::Config(mTimerDelegate)
             .WithFeatures(DeriveFeatures())
+            .WithOptionalAttributes(mOptionalAttributes)
             .WithAdapters(Span<ProximityRanging::RangingAdapter * const>(mAdapters.data(), mAdapters.size())));
     ReturnErrorOnFailure(provider.AddCluster(mProximityRangingCluster.Registration()));
 

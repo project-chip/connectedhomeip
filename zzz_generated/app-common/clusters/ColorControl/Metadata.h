@@ -62,80 +62,99 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Options::Id, BitFlags<
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Options
 namespace NumberOfPrimaries {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfPrimaries::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfPrimaries::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace NumberOfPrimaries
 namespace Primary1X {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary1X::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary1X::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary1X
 namespace Primary1Y {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary1Y::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary1Y::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary1Y
 namespace Primary1Intensity {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary1Intensity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary1Intensity::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary1Intensity
 namespace Primary2X {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary2X::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary2X::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary2X
 namespace Primary2Y {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary2Y::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary2Y::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary2Y
 namespace Primary2Intensity {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary2Intensity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary2Intensity::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary2Intensity
 namespace Primary3X {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary3X::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary3X::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary3X
 namespace Primary3Y {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary3Y::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary3Y::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary3Y
 namespace Primary3Intensity {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary3Intensity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary3Intensity::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary3Intensity
 namespace Primary4X {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary4X::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary4X::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary4X
 namespace Primary4Y {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary4Y::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary4Y::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary4Y
 namespace Primary4Intensity {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary4Intensity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary4Intensity::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary4Intensity
 namespace Primary5X {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary5X::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary5X::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary5X
 namespace Primary5Y {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary5Y::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary5Y::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary5Y
 namespace Primary5Intensity {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary5Intensity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary5Intensity::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary5Intensity
 namespace Primary6X {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary6X::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary6X::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary6X
 namespace Primary6Y {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary6Y::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary6Y::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary6Y
 namespace Primary6Intensity {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Primary6Intensity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Primary6Intensity::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Primary6Intensity
 namespace WhitePointX {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(WhitePointX::Id, BitFlags<DataModel::AttributeQualityFlags>(),

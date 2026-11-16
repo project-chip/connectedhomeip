@@ -46,13 +46,14 @@
 #     factory-reset: true
 #     app-ready-pattern: Server initialization complete
 #     quiet: true
+#     tags: [nightly]
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
 import logging
 
 from mobly import asserts
-from support_modules.su_testbase import SoftwareUpdateBaseTest
+from support_modules.su_support import SoftwareUpdateBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl

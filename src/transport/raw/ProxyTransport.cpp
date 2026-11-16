@@ -19,9 +19,17 @@
 #include <transport/raw/ProxyTransport.h>
 
 #include <lib/support/logging/CHIPLogging.h>
+#include <transport/raw/MessageHeader.h>
 
 namespace chip {
 namespace Transport {
+
+namespace {
+
+// Exchange Flags, Protocol Opcode, Exchange ID and Protocol ID: the fields every Protocol Header carries.
+constexpr size_t kMinPayloadHeaderLength = 6;
+
+} // namespace
 
 CHIP_ERROR ProxyTransportBase::Init(const ProxyListenParameters &)
 {
@@ -37,7 +45,8 @@ CHIP_ERROR ProxyTransportBase::Activate(uint16_t sessionId, ProxyTransportDelega
     ChipLogProgress(Inet, "ProxyTransport: activating session %u", sessionId);
     mSessionId = sessionId;
     mDelegate  = delegate;
-    mActive    = true;
+    mPaseLocalSessionId.reset();
+    mActive = true;
     return CHIP_NO_ERROR;
 }
 
@@ -47,6 +56,14 @@ void ProxyTransportBase::Deactivate()
     mActive    = false;
     mDelegate  = nullptr;
     mSessionId = 0;
+    mPaseLocalSessionId.reset();
+}
+
+CHIP_ERROR ProxyTransportBase::SetPaseLocalSessionId(uint16_t sessionId, uint16_t localSessionId)
+{
+    VerifyOrReturnError(mActive && sessionId == mSessionId, CHIP_ERROR_INCORRECT_STATE);
+    mPaseLocalSessionId = localSessionId;
+    return CHIP_NO_ERROR;
 }
 
 void ProxyTransportBase::Close()
@@ -90,6 +107,36 @@ CHIP_ERROR ProxyTransportBase::OnProxyMessageReceived(uint16_t sessionId, ByteSp
     // zero-length packet carries nothing for the stack to parse.
     VerifyOrReturnError(!message.empty(), CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Inet, "ProxyTransport: empty message for session %u", sessionId));
+
+    PacketHeader header;
+    uint16_t headerLength = 0;
+    CHIP_ERROR err        = header.Decode(message.data(), message.size(), &headerLength);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Inet, "ProxyTransport: message for session %u is not a Matter message: %" CHIP_ERROR_FORMAT, sessionId,
+                     err.Format());
+        return err;
+    }
+
+    // An encrypted Protocol Header cannot be decoded here, so require room for the smallest one and the MIC.
+    if (message.size() - headerLength < kMinPayloadHeaderLength + header.MICTagLength())
+    {
+        ChipLogError(Inet, "ProxyTransport: message for session %u is too short for a Matter message", sessionId);
+        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
+    }
+
+    // Unsecured messages are accepted at any time. An encrypted message is accepted only for the
+    // unicast PASE session established through this proxy session, so group messages are always rejected.
+    if (header.IsEncrypted())
+    {
+        bool allowed = header.IsUnicastSession() && mPaseLocalSessionId == header.GetSessionId();
+        if (!allowed)
+        {
+            ChipLogError(Inet, "ProxyTransport: message for session %u is for Session ID %u, not this proxy session's", sessionId,
+                         header.GetSessionId());
+            return CHIP_ERROR_KEY_NOT_FOUND;
+        }
+    }
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(message.data(), message.size());
     VerifyOrReturnError(!buf.IsNull(), CHIP_ERROR_NO_MEMORY,

@@ -35,6 +35,7 @@
 #include <matter/tracing/build_config.h>
 #include <system/SystemClock.h>
 
+#include <optional>
 #include <string>
 
 namespace chip {
@@ -42,12 +43,14 @@ namespace Controller {
 
 class DeviceCommissioner;
 
+// NOTE: This enum is mirrored by CommissioningStage in src/controller/python/matter/ChipDeviceCtrl.py,
+// which needs to be updated when stages are added, removed, or reordered.
 enum CommissioningStage : uint8_t
 {
     kError,
     kSecurePairing,              ///< Establish a PASE session with the device
     kReadCommissioningInfo,      ///< Query Attributes relevant to commissioning (can perform multiple read interactions)
-    kArmFailsafe,                ///< Send ArmFailSafe (0x30:0) command to the device
+    kArmFailSafe,                ///< Send ArmFailSafe (0x30:0) command to the device
     kConfigRegulatory,           ///< Send SetRegulatoryConfig (0x30:2) command to the device
     kConfigureUTCTime,           ///< SetUTCTime if the DUT has a time cluster
     kConfigureTimeZone,          ///< Configure a time zone if one is required and available
@@ -90,7 +93,7 @@ enum CommissioningStage : uint8_t
     // failure" conditions still makes sense.
 
     /// Send ScanNetworks (0x31:0) command to the device.
-    /// ScanNetworks can happen anytime after kArmFailsafe.
+    /// ScanNetworks can happen anytime after kArmFailSafe.
     kScanNetworks,
     /// Waiting for the higher layer to provide network credentials before continuing the workflow.
     /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
@@ -104,10 +107,13 @@ enum CommissioningStage : uint8_t
     kRequestWiFiCredentials,          ///< Wi-Fi credentials are needed; ask for those.
     kRequestThreadCredentials,        ///< Thread credentials are needed; ask for those.
     kPDCGetNetworkIdentity,           ///< Retrieve PDC Network Identity from the NetworkIdentityRegistrar
-    kCleanup,                         ///< Call delegates with status, free memory, clear timers and state.
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-    kUnpoweredPhaseComplete, ///< Commissioning completed until connect network for unpowered commissioning (NFC)
-#endif
+    kUnpoweredPhaseComplete,          ///< Commissioning completed until connect network for unpowered commissioning (NFC)
+
+    // NOTE: kCleanup must remain the highest-numbered stage; per-stage arrays are sized as kCleanup + 1.
+    kCleanup, ///< Call delegates with status, free memory, clear timers and state.
+
+    // Deprecated aliases, retained for source compatibility.
+    kArmFailsafe [[deprecated("Use kArmFailSafe")]] = kArmFailSafe,
 };
 
 enum class ICDRegistrationStrategy : uint8_t
@@ -229,7 +235,7 @@ public:
     // If the failsafe timer value is passed in as part of the commissioning parameters, that value will be used. If not supplied,
     // the AutoCommissioner will set this to the recommended value read from the node. If that is not set, it will fall back to the
     // default kDefaultFailsafeTimeout.
-    // This value should be set before running PerformCommissioningStep for the kArmFailsafe step.
+    // This value should be set before running PerformCommissioningStep for the kArmFailSafe step.
     const Optional<uint16_t> GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
 
     // Value to use when re-setting the commissioning failsafe timer immediately prior to operational discovery.
@@ -421,17 +427,10 @@ public:
     // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
     const Optional<ByteSpan> GetDAC() const { return mDAC; }
 
-    // Attestation profiles to use for the PAI and DAC CertificateChainRequest commands.
-    // When unset, legacy Matter behavior is used for the corresponding certificate.
-    const Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum>
-    GetPAIAttestationCertificateRequestProfile() const
+    // One tuple selects both certificates and all their segments. Unset uses legacy requests.
+    std::optional<Credentials::DeviceAttestationChainProfile> GetAttestationCertificateChain() const
     {
-        return mPAIAttestationCertificateRequestProfile;
-    }
-    const Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum>
-    GetDACAttestationCertificateRequestProfile() const
-    {
-        return mDACAttestationCertificateRequestProfile;
+        return mAttestationCertificateChain;
     }
 
     // Node ID when a matching fabric is found in the Node Operational Credentials cluster.
@@ -661,16 +660,10 @@ public:
         mDAC = MakeOptional(dac);
         return *this;
     }
-    CommissioningParameters &
-    SetPAIAttestationCertificateRequestProfile(app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum profile)
+    // All three profiles are required to identify the chain used by both certificate requests.
+    CommissioningParameters & SetAttestationCertificateChain(const Credentials::DeviceAttestationChainProfile & chain)
     {
-        mPAIAttestationCertificateRequestProfile.SetValue(profile);
-        return *this;
-    }
-    CommissioningParameters &
-    SetDACAttestationCertificateRequestProfile(app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum profile)
-    {
-        mDACAttestationCertificateRequestProfile.SetValue(profile);
+        mAttestationCertificateChain = chain;
         return *this;
     }
     CommissioningParameters & SetRemoteNodeId(NodeId id)
@@ -801,11 +794,7 @@ public:
         return *this;
     }
     void ClearICDStayActiveDurationMsec() { mICDStayActiveDurationMsec.ClearValue(); }
-    void ClearAttestationCertificateRequestProfiles()
-    {
-        mPAIAttestationCertificateRequestProfile.ClearValue();
-        mDACAttestationCertificateRequestProfile.ClearValue();
-    }
+    void ClearAttestationCertificateChain() { mAttestationCertificateChain.reset(); }
 
     Span<const app::AttributePathParams> GetExtraReadPaths() const { return mExtraReadPaths; }
 
@@ -880,8 +869,7 @@ private:
     Optional<ByteSpan> mAttestationSignature;
     Optional<ByteSpan> mPAI;
     Optional<ByteSpan> mDAC;
-    Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> mPAIAttestationCertificateRequestProfile;
-    Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> mDACAttestationCertificateRequestProfile;
+    std::optional<Credentials::DeviceAttestationChainProfile> mAttestationCertificateChain;
     Optional<NodeId> mRemoteNodeId;
     Optional<VendorId> mRemoteVendorId;
     Optional<uint16_t> mRemoteProductId;
@@ -1043,6 +1031,7 @@ struct ReadCommissioningInfo
     NodeId remoteNodeId               = kUndefinedNodeId;
     bool supportsConcurrentConnection = true;
     bool supportsPqcDeviceAttestation = false;
+    BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap> paaSupportedAttestationProfiles;
     BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap> paiSupportedAttestationProfiles;
     BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap> dacSupportedAttestationProfiles;
     ICDManagementClusterInfo icd;
@@ -1057,6 +1046,11 @@ struct AttestationErrorInfo
 {
     AttestationErrorInfo(Credentials::AttestationVerificationResult result) : attestationResult(result) {}
     Credentials::AttestationVerificationResult attestationResult;
+};
+
+// Reported only when the initial PAI request with an explicit chain returns InvalidCommand.
+struct AttestationChainNotAvailable
+{
 };
 
 struct CommissioningErrorInfo
@@ -1110,13 +1104,13 @@ public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
      * kReadCommissioningInfo: ReadCommissioningInfo
-     * kArmFailsafe: CommissioningErrorInfo if there is an error
+     * kArmFailSafe: CommissioningErrorInfo if there is an error
      * kConfigRegulatory: CommissioningErrorInfo if there is an error
      * kConfigureUTCTime: None
      * kConfigureTimeZone: TimeZoneResponseInfo
      * kConfigureDSTOffset: None
      * kConfigureDefaultNTP: None
-     * kSendPAICertificateRequest: RequestedCertificate
+     * kSendPAICertificateRequest: RequestedCertificate, or AttestationChainNotAvailable if the chain is unavailable
      * kSendDACCertificateRequest: RequestedCertificate
      * kSendAttestationRequest: AttestationResponse
      * kAttestationVerification: AttestationErrorInfo if there is an error
@@ -1145,7 +1139,8 @@ public:
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
                   AttestationErrorInfo, CommissioningErrorInfo, OperationalCertErrorInfo, NetworkCommissioningStatusInfo,
-                  TimeZoneResponseInfo, Credentials::JCM::TrustVerificationError, PDCNetworkIdentityInfo, PDCClientIdentityInfo>
+                  TimeZoneResponseInfo, Credentials::JCM::TrustVerificationError, PDCNetworkIdentityInfo, PDCClientIdentityInfo,
+                  AttestationChainNotAvailable>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

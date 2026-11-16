@@ -74,12 +74,14 @@ public:
      * to attempt to obtain time from any source, it returns CHIP_NO_ERROR and calls the callback on completion.
      * If the delegate has a time available at the time of this call, it may call the callback synchronously from within
      * this function.
-     * If the delegate needs to reach out asynchronously to obtain a time, it saves this callback to call asynchronously.
-     * The delegate should track these callbacks in a CallbackDeque to ensure they can be properly cancelled.
+     * If the delegate needs to reach out asynchronously to obtain a time, it takes ownership of the callback as described
+     * in CHIPCallback.h (e.g. via CancelableOperation) and must not call it once it has been cancelled. The cluster cancels
+     * the callback when the time gets set by other means while the request is pending.
      * If the delegate is successful in obtaining the time, it sets the time using the platform time API (SetClock_RealTime)
      * and calls the callback with the time source and granularity set as appropriate.
      * If the delegate is unsuccessful in obtaining the time, it calls the callback with timeSource set to kNone and
-     * granularity set to kNoTimeGranularity.
+     * granularity set to kNoTimeGranularity. (Any callback with granularity kNoTimeGranularity is treated as a failure,
+     * whatever the timeSource.)
      */
     virtual CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback) = 0;
 

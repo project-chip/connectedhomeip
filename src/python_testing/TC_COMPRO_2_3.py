@@ -466,6 +466,7 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
         defined_transports = [
             int(cp.Bitmaps.CapabilitiesBitmap.kBle),
             int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF),
+            int(cp.Bitmaps.CapabilitiesBitmap.kNtl),
         ]
         unsupported_transport = next(
             (b for b in defined_transports if not (valid_transports & b)), None)

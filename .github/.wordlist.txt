@@ -327,6 +327,7 @@ ContentApp's
 ContentAppPlatform
 ContentLaunch
 ContentLauncher
+ContentQueueing
 contrib
 controllee
 conv
@@ -1114,6 +1115,7 @@ operationalDataset
 operationalstate
 opkg
 OPTIGA
+optionals
 optionMask
 optionOverride
 optionsMask
@@ -1813,3 +1815,5 @@ zigbeealliance
 zigbeethread
 zsdk
 ZXing
+preflight
+xhigh

@@ -59,13 +59,13 @@ class TC_PROXR_3_2(ProximityRangerTHServerTest):
             await self.ask_dut_to_commission_th_servers()
 
         # Steps 2, 7, 12 configure a single-feature FeatureMap on the TH; not representable on
-        # the reference all-devices-app (see TC_PROXR_3_1 for the root cause). Additionally, on
-        # this app only the BLERBC adapter advertises periodicRangingSupport=true
-        # (LoggingProximityRanger.cpp); the WiFi and BLTCS periodic passes still exercise the
-        # command path because the server validates only that the interval is non-zero
-        # (ProximityRangingCluster.cpp), but they do not confirm the DUT honours the capability.
-        # Each is advanced then marked skipped (what skip_step does), keeping all 16 steps in
-        # order for the runner.
+        # the reference all-devices-app (see TC_PROXR_3_1 for the root cause). On this app the
+        # BLERBC adapter and both Wi-Fi USD adapters advertise periodicRangingSupport=true
+        # (LoggingProximityRanger.cpp); only the BLTCS adapter does not. The BLTCS periodic
+        # pass still exercises the command path because the server validates only that the
+        # interval is non-zero (ProximityRangingCluster.cpp), but it does not confirm the DUT
+        # honours a periodic capability the adapter never advertises. Each is advanced then
+        # marked skipped (what skip_step does), keeping all 16 steps in order for the runner.
         self.step(2, "Enable the WFUSDPD feature and configure the Technology to WiFiRoundTripTimeRanging and "
                   "disable other Proximity Ranging features on TH_I and TH_R.")
         self.mark_current_step_skipped()

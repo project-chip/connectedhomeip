@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 #include <algorithm>
+#include <ios>
 #include <optional>
 #include <pw_unit_test/framework.h>
 
@@ -34,6 +35,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include "MockAvAnalysisDelegate.h"
 
@@ -56,14 +58,6 @@ static constexpr uint8_t kTestMaxAnalysisStreams  = 8;
 
 // Test ambient contexts
 // Define the list of semantic tags for the endpoint
-// A command handler's response, for assertions. clang-tidy does not treat ASSERT_TRUE(has_value())
-// as a guard (bugprone-unchecked-optional-access), so the optional is read through value_or: an
-// absent response reads as Failure and fails the assertion that follows.
-chip::app::DataModel::ActionReturnStatus StatusOf(const std::optional<chip::app::DataModel::ActionReturnStatus> & aResponse)
-{
-    return aResponse.value_or(chip::app::DataModel::ActionReturnStatus(chip::Protocols::InteractionModel::Status::Failure));
-}
-
 const std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> testAmbientContexts = {
     { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),
       MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Package"_span)) },
@@ -331,7 +325,7 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         return code.has_value() ? code->GetStatus() : Status::InvalidAction;
     }
 
-    Status ImmediateActivateStatus(uint16_t aAnalysisStreamId, EndpointId aWebRTCEndpoint)
+    std::optional<DataModel::ActionReturnStatus> ImmediateActivateStatus(uint16_t aAnalysisStreamId, EndpointId aWebRTCEndpoint)
     {
         InvalidatableCommandHandler handler;
         handler.SetFabricIndex(1);
@@ -341,10 +335,10 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         commandData.webRTCEndpointID = MakeOptional(aWebRTCEndpoint);
         auto response                = mServer.GetLogic().HandleActivateAnalysisStream(handler, path, commandData);
         EXPECT_TRUE(response.has_value()) << "ActivateAnalysisStream unexpectedly parked";
-        return StatusOf(response).GetStatusCode().GetStatus();
+        return response;
     }
 
-    Status ImmediateDeactivateStatus(uint16_t aAnalysisStreamId)
+    std::optional<DataModel::ActionReturnStatus> ImmediateDeactivateStatus(uint16_t aAnalysisStreamId)
     {
         InvalidatableCommandHandler handler;
         handler.SetFabricIndex(1);
@@ -353,10 +347,10 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         commandData.analysisStreamID = aAnalysisStreamId;
         auto response                = mServer.GetLogic().HandleDeactivateAnalysisStream(handler, path, commandData);
         EXPECT_TRUE(response.has_value()) << "DeactivateAnalysisStream unexpectedly parked";
-        return StatusOf(response).GetStatusCode().GetStatus();
+        return response;
     }
 
-    Status ImmediateRemoveStatus(uint16_t aAnalysisStreamId)
+    std::optional<DataModel::ActionReturnStatus> ImmediateRemoveStatus(uint16_t aAnalysisStreamId)
     {
         InvalidatableCommandHandler handler;
         handler.SetFabricIndex(1);
@@ -365,7 +359,7 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         commandData.analysisStreamID = aAnalysisStreamId;
         auto response                = mServer.GetLogic().HandleRemoveAnalysisStream(handler, path, commandData);
         EXPECT_TRUE(response.has_value()) << "RemoveAnalysisStream unexpectedly parked";
-        return StatusOf(response).GetStatusCode().GetStatus();
+        return response;
     }
 
     // The last status recorded on aHandler, or InvalidAction when it was never answered: no handler
@@ -456,8 +450,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersRequiresAnEstablishedSt
 
     // RemoteContextDetection and no established analysis stream, the command returns INVALID_IN_STATE
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
-    ASSERT_TRUE(response.has_value());
-    ASSERT_EQ(StatusOf(response).GetStatusCode().GetStatus(), Status::InvalidInState);
+    ASSERT_EQ(response, Status::InvalidInState);
 
     // No context triggers were enabled by the rejected command
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType active;
@@ -472,8 +465,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersRequiresAnEstablishedSt
     EstablishStream(establishHandler, 0x1234, Status::Success, 7);
 
     response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
-    ASSERT_TRUE(response.has_value());
-    ASSERT_TRUE(StatusOf(response).IsSuccess());
+    ASSERT_EQ(response, Status::Success);
 
     // Null ContextTriggers means the whole supported set is enabled
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, active), CHIP_NO_ERROR);
@@ -497,8 +489,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersEnablesASpecificContext
         EncodeContextTriggers(testAmbientContexts.front(), DataModel::MakeNullable(zoneIDs), tlvBuffer, sizeof(tlvBuffer));
 
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
-    ASSERT_TRUE(response.has_value());
-    ASSERT_TRUE(StatusOf(response).IsSuccess());
+    ASSERT_EQ(response, Status::Success);
 
     // Exactly the requested context is enabled, carrying its zone list
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType active;
@@ -537,8 +528,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersRejectsAnUnsupportedCon
     commandData.contextTriggers = EncodeContextTriggers(unsupportedContext, DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer));
 
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
-    ASSERT_TRUE(response.has_value());
-    ASSERT_EQ(StatusOf(response).GetStatusCode().GetStatus(), Status::ConstraintError);
+    ASSERT_EQ(response, Status::ConstraintError);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersAppliesNothingWhenAnyTriggerIsInvalid)
@@ -563,8 +553,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersAppliesNothingWhenAnyTr
     commandData.contextTriggers = EncodeContextTriggers(triggers, tlvBuffer, sizeof(tlvBuffer));
 
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
-    ASSERT_TRUE(response.has_value());
-    ASSERT_EQ(StatusOf(response).GetStatusCode().GetStatus(), Status::ConstraintError);
+    ASSERT_EQ(response, Status::ConstraintError);
 
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType active;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, active), CHIP_NO_ERROR);
@@ -592,8 +581,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersIgnoresDuplicateEntries
     commandData.contextTriggers = EncodeContextTriggers(triggers, tlvBuffer, sizeof(tlvBuffer));
 
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
-    ASSERT_TRUE(response.has_value());
-    ASSERT_TRUE(StatusOf(response).IsSuccess());
+    ASSERT_EQ(response, Status::Success);
 
     // Exactly one entry, carrying the first occurrence's zone list
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType active;
@@ -625,14 +613,14 @@ TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersUpdatesTheZonesOfAnExis
     firstHandler.SetFabricIndex(1);
     commandData.contextTriggers = EncodeContextTriggers(
         testAmbientContexts.front(), DataModel::MakeNullable(std::vector<uint16_t>{ 1, 2 }), tlvBuffer, sizeof(tlvBuffer));
-    ASSERT_TRUE(StatusOf(mServer.GetLogic().HandleEnableContextTriggers(firstHandler, path, commandData)).IsSuccess());
+    ASSERT_EQ(mServer.GetLogic().HandleEnableContextTriggers(firstHandler, path, commandData), Status::Success);
 
     // The same context again with other zones: the entry is updated, not duplicated
     InvalidatableCommandHandler secondHandler;
     secondHandler.SetFabricIndex(1);
     commandData.contextTriggers = EncodeContextTriggers(
         testAmbientContexts.front(), DataModel::MakeNullable(std::vector<uint16_t>{ 3 }), tlvBuffer, sizeof(tlvBuffer));
-    ASSERT_TRUE(StatusOf(mServer.GetLogic().HandleEnableContextTriggers(secondHandler, path, commandData)).IsSuccess());
+    ASSERT_EQ(mServer.GetLogic().HandleEnableContextTriggers(secondHandler, path, commandData), Status::Success);
 
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType active;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, active), CHIP_NO_ERROR);
@@ -668,7 +656,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersRejectsZonesTheDelegate
         testAmbientContexts.front(), DataModel::MakeNullable(std::vector<uint16_t>{ 9 }), tlvBuffer, sizeof(tlvBuffer));
 
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
-    ASSERT_EQ(StatusOf(response).GetStatusCode().GetStatus(), Status::NotFound);
+    ASSERT_EQ(response, Status::NotFound);
 
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType active;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, active), CHIP_NO_ERROR);
@@ -696,24 +684,20 @@ TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersIsExhaustedOnlyOnceTheL
     InvalidatableCommandHandler invalidHandler;
     invalidHandler.SetFabricIndex(1);
     commandData.contextTriggers = EncodeContextTriggers(unsupportedContext, DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer));
-    ASSERT_EQ(
-        StatusOf(mServer.GetLogic().HandleEnableContextTriggers(invalidHandler, path, commandData)).GetStatusCode().GetStatus(),
-        Status::ConstraintError);
+    ASSERT_EQ(mServer.GetLogic().HandleEnableContextTriggers(invalidHandler, path, commandData), Status::ConstraintError);
 
     // A valid list is refused for capacity, and nothing is applied
     InvalidatableCommandHandler validHandler;
     validHandler.SetFabricIndex(1);
     commandData.contextTriggers =
         EncodeContextTriggers(testAmbientContexts.front(), DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer));
-    ASSERT_EQ(StatusOf(mServer.GetLogic().HandleEnableContextTriggers(validHandler, path, commandData)).GetStatusCode().GetStatus(),
-              Status::ResourceExhausted);
+    ASSERT_EQ(mServer.GetLogic().HandleEnableContextTriggers(validHandler, path, commandData), Status::ResourceExhausted);
 
     // So is the whole supported set
     InvalidatableCommandHandler nullHandler;
     nullHandler.SetFabricIndex(1);
     commandData.contextTriggers.SetNull();
-    ASSERT_EQ(StatusOf(mServer.GetLogic().HandleEnableContextTriggers(nullHandler, path, commandData)).GetStatusCode().GetStatus(),
-              Status::ResourceExhausted);
+    ASSERT_EQ(mServer.GetLogic().HandleEnableContextTriggers(nullHandler, path, commandData), Status::ResourceExhausted);
 
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType active;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, active), CHIP_NO_ERROR);
@@ -758,7 +742,7 @@ TEST_F(TestRemoteAvAnalysisCluster, CreateActiveSessionRecordsASessionWithoutASt
     ConcreteCommandPath enablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
     Commands::EnableContextTriggers::DecodableType enableData;
     enableData.contextTriggers.SetNull();
-    ASSERT_TRUE(StatusOf(mServer.GetLogic().HandleEnableContextTriggers(enableHandler, enablePath, enableData)).IsSuccess());
+    ASSERT_EQ(mServer.GetLogic().HandleEnableContextTriggers(enableHandler, enablePath, enableData), Status::Success);
 
     // The point of the API: the session exists, but no AnalysisSessionStart is reported for it
     uint16_t sessionId = 0;
@@ -966,15 +950,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteDisableContextTriggersCommandTest)
 
     auto response = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, kCommandPath, commandData);
 
-    // The response should contain an ActionReturnStatus
-    if (response.has_value())
-    {
-        ASSERT_TRUE(StatusOf(response).IsSuccess());
-    }
-    else
-    {
-        FAIL();
-    }
+    ASSERT_EQ(response, Status::Success);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, EstablishAnalysisStreamSuccess)
@@ -1095,7 +1071,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EstablishThatCannotStartIsAnsweredAtOnce)
     busyHandler.SetFabricIndex(1);
     auto busyResponse = mServer.GetLogic().HandleEstablishAnalysisStream(busyHandler, path, commandData);
     ASSERT_TRUE(busyResponse.has_value()) << "EstablishAnalysisStream unexpectedly parked";
-    ASSERT_EQ(StatusOf(busyResponse).GetStatusCode().GetStatus(), Status::Busy);
+    ASSERT_EQ(busyResponse, Status::Busy);
 
     // The client refuses for any other reason
     mFakeCameraClient.mAllocationResult = CHIP_ERROR_NO_MEMORY;
@@ -1103,7 +1079,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EstablishThatCannotStartIsAnsweredAtOnce)
     failHandler.SetFabricIndex(1);
     auto failResponse = mServer.GetLogic().HandleEstablishAnalysisStream(failHandler, path, commandData);
     ASSERT_TRUE(failResponse.has_value()) << "EstablishAnalysisStream unexpectedly parked";
-    ASSERT_EQ(StatusOf(failResponse).GetStatusCode().GetStatus(), Status::Failure);
+    ASSERT_EQ(failResponse, Status::Failure);
 
     // Neither refusal left an interaction behind
     mFakeCameraClient.mAllocationResult = CHIP_NO_ERROR;
@@ -1178,15 +1154,13 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateRequiresExactlyOneEndpointField)
 
     // Neither endpoint field selects a transport
     auto response = mServer.GetLogic().HandleActivateAnalysisStream(commandHandler, path, commandData);
-    ASSERT_TRUE(response.has_value());
-    ASSERT_EQ(StatusOf(response).GetStatusCode().GetStatus(), Status::InvalidCommand);
+    ASSERT_EQ(response, Status::InvalidCommand);
 
     // Both fields are ambiguous
     commandData.webRTCEndpointID = MakeOptional(static_cast<EndpointId>(2));
     commandData.pushAVEndpointID = MakeOptional(static_cast<EndpointId>(3));
     response                     = mServer.GetLogic().HandleActivateAnalysisStream(commandHandler, path, commandData);
-    ASSERT_TRUE(response.has_value());
-    ASSERT_EQ(StatusOf(response).GetStatusCode().GetStatus(), Status::InvalidCommand);
+    ASSERT_EQ(response, Status::InvalidCommand);
 
     ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 0);
 }
@@ -1321,8 +1295,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateWithPushAVEndpointIsUnsupported)
     commandData.pushAVEndpointID = MakeOptional(static_cast<EndpointId>(3));
 
     auto response = mServer.GetLogic().HandleActivateAnalysisStream(commandHandler, path, commandData);
-    ASSERT_TRUE(response.has_value());
-    ASSERT_EQ(StatusOf(response).GetStatusCode().GetStatus(), Status::InvalidCommand);
+    ASSERT_EQ(response, Status::InvalidCommand);
     ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 0);
 }
 
@@ -1355,8 +1328,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateInitiatesAWebRTCSession)
     removeData.analysisStreamID = 0;
     ConcreteCommandPath removePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::RemoveAnalysisStream::Id };
     auto busyResponse = mServer.GetLogic().HandleRemoveAnalysisStream(busyHandler, removePath, removeData);
-    ASSERT_TRUE(busyResponse.has_value());
-    ASSERT_EQ(StatusOf(busyResponse).GetStatusCode().GetStatus(), Status::Busy);
+    ASSERT_EQ(busyResponse, Status::Busy);
 
     // The camera assigns session 55: the entry records it and the command answers SUCCESS
     ASSERT_NE(mFakeWebRTCClient.mLastCallback, nullptr);
@@ -1378,8 +1350,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateInitiatesAWebRTCSession)
     InvalidatableCommandHandler secondHandler;
     secondHandler.SetFabricIndex(1);
     auto secondResponse = mServer.GetLogic().HandleActivateAnalysisStream(secondHandler, path, commandData);
-    ASSERT_TRUE(secondResponse.has_value());
-    ASSERT_TRUE(StatusOf(secondResponse).IsSuccess());
+    ASSERT_EQ(secondResponse, Status::Success);
     ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 1);
 }
 
@@ -1655,8 +1626,7 @@ TEST_F(TestRemoteAvAnalysisCluster, DeactivateThatCannotStartLeavesTheStreamActi
     commandData.analysisStreamID = 0;
 
     auto response = mServer.GetLogic().HandleDeactivateAnalysisStream(deactivateHandler, path, commandData);
-    ASSERT_TRUE(response.has_value());
-    ASSERT_EQ(StatusOf(response).GetStatusCode().GetStatus(), Status::Busy);
+    ASSERT_EQ(response, Status::Busy);
 
     // The session is untouched, so the stream is still active and deactivatable
     ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kWebRTCActive);
@@ -2476,7 +2446,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersIgnoresRepeatedZones)
     // than MaxZones, which the persisted size is computed from
     commandData.contextTriggers = EncodeContextTriggers(
         testAmbientContexts.front(), DataModel::MakeNullable(std::vector<uint16_t>{ 2, 1, 2, 1, 2 }), tlvBuffer, sizeof(tlvBuffer));
-    ASSERT_TRUE(StatusOf(mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData)).IsSuccess());
+    ASSERT_EQ(mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData), Status::Success);
 
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType active;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, active), CHIP_NO_ERROR);
@@ -2512,7 +2482,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersAcceptsAnEmptyZoneList)
     commandData.contextTriggers = EncodeContextTriggers(
         testAmbientContexts.front(), DataModel::MakeNullable(std::vector<uint16_t>{}), tlvBuffer, sizeof(tlvBuffer));
 
-    ASSERT_TRUE(StatusOf(mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData)).IsSuccess());
+    ASSERT_EQ(mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData), Status::Success);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, CommandsSurviveALostDelegate)
@@ -2532,23 +2502,21 @@ TEST_F(TestRemoteAvAnalysisCluster, CommandsSurviveALostDelegate)
     uint8_t tlvBuffer[256];
     enableData.contextTriggers = EncodeContextTriggers(
         testAmbientContexts.front(), DataModel::MakeNullable(std::vector<uint16_t>{ 1 }), tlvBuffer, sizeof(tlvBuffer));
-    ASSERT_EQ(
-        StatusOf(mServer.GetLogic().HandleEnableContextTriggers(enableHandler, enablePath, enableData)).GetStatusCode().GetStatus(),
-        Status::Failure);
+    ASSERT_EQ(mServer.GetLogic().HandleEnableContextTriggers(enableHandler, enablePath, enableData), Status::Failure);
 
     // The null-list branch reaches the same guards without any zones
     InvalidatableCommandHandler nullHandler;
     nullHandler.SetFabricIndex(1);
     Commands::EnableContextTriggers::DecodableType nullData;
     nullData.contextTriggers.SetNull();
-    ASSERT_TRUE(StatusOf(mServer.GetLogic().HandleEnableContextTriggers(nullHandler, enablePath, nullData)).IsSuccess());
+    ASSERT_EQ(mServer.GetLogic().HandleEnableContextTriggers(nullHandler, enablePath, nullData), Status::Success);
 
     InvalidatableCommandHandler disableHandler;
     disableHandler.SetFabricIndex(1);
     ConcreteCommandPath disablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::DisableContextTriggers::Id };
     Commands::DisableContextTriggers::DecodableType disableData;
     disableData.contextTriggers.SetNull();
-    ASSERT_TRUE(StatusOf(mServer.GetLogic().HandleDisableContextTriggers(disableHandler, disablePath, disableData)).IsSuccess());
+    ASSERT_EQ(mServer.GetLogic().HandleDisableContextTriggers(disableHandler, disablePath, disableData), Status::Success);
 
     // And a session with zones cannot validate them
     uint16_t sessionId = 0;
@@ -2574,9 +2542,7 @@ TEST_F(TestRemoteAvAnalysisCluster, AStartupFailureLeavesTheClusterInert)
     ConcreteCommandPath establishPath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
     Commands::EstablishAnalysisStream::DecodableType establishData;
     establishData.nodeID = 0x1234;
-    ASSERT_EQ(StatusOf(cameraOnly.GetLogic().HandleEstablishAnalysisStream(establishHandler, establishPath, establishData))
-                  .GetStatusCode()
-                  .GetStatus(),
+    ASSERT_EQ(cameraOnly.GetLogic().HandleEstablishAnalysisStream(establishHandler, establishPath, establishData),
               Status::ResourceExhausted);
     ASSERT_EQ(mFakeCameraClient.mAllocationRequests, 0);
 
@@ -2586,10 +2552,7 @@ TEST_F(TestRemoteAvAnalysisCluster, AStartupFailureLeavesTheClusterInert)
     ConcreteCommandPath enablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
     Commands::EnableContextTriggers::DecodableType enableData;
     enableData.contextTriggers.SetNull();
-    ASSERT_EQ(StatusOf(cameraOnly.GetLogic().HandleEnableContextTriggers(enableHandler, enablePath, enableData))
-                  .GetStatusCode()
-                  .GetStatus(),
-              Status::InvalidInState);
+    ASSERT_EQ(cameraOnly.GetLogic().HandleEnableContextTriggers(enableHandler, enablePath, enableData), Status::InvalidInState);
 
     // And nothing can be activated, deactivated or removed
     InvalidatableCommandHandler activateHandler;
@@ -2598,10 +2561,7 @@ TEST_F(TestRemoteAvAnalysisCluster, AStartupFailureLeavesTheClusterInert)
     Commands::ActivateAnalysisStream::DecodableType activateData;
     activateData.analysisStreamID = 0;
     activateData.webRTCEndpointID = MakeOptional(static_cast<EndpointId>(1));
-    ASSERT_EQ(StatusOf(cameraOnly.GetLogic().HandleActivateAnalysisStream(activateHandler, activatePath, activateData))
-                  .GetStatusCode()
-                  .GetStatus(),
-              Status::NotFound);
+    ASSERT_EQ(cameraOnly.GetLogic().HandleActivateAnalysisStream(activateHandler, activatePath, activateData), Status::NotFound);
 
     cameraOnly.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

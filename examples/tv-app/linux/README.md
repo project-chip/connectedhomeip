@@ -170,6 +170,22 @@ Navigate to a new target:
     $ ./out/debug/chip-tool targetnavigator navigate-target Target Data node-id endpoint-id
     $ ./out/debug/chip-tool targetnavigator navigate-target 2 foo1 1234 6 (target id 2 on endpoint 6)
 
+## Content Launcher playback queue
+
+The tv-app has no media player. For `LaunchURL` commands that use the
+ContentQueueing fields, it logs what a player would act on, so the
+playback-confirmation prompts in TC-CONTENTLAUNCHER-10.9 are checked against
+these `ContentLauncherManager::HandleLaunchUrlRequest` log lines:
+
+-   `QueueType=<n> (Replace|Next|Last)`, `OffsetMillisecs=<n>`,
+    `NextURL provided` and `ContentHeaders count=<n>` when those fields are
+    present.
+-   A `ContentType` that matches an `AcceptHeader` entry is accepted. Any other
+    `ContentType` is rejected with `URLNotAvailable`.
+
+TC-CONTENTLAUNCHER-10.9 also requires a playable URL:
+`--string-arg content_url:<url>`.
+
 ## Media File Management
 
 The tv-app implements the Media File Management cluster with the MediaSharing

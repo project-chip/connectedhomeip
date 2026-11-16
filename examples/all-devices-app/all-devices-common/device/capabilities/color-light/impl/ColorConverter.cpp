@@ -194,6 +194,36 @@ void ColorConverter::ConvertHueSatToXY(uint8_t hue, uint8_t sat, uint16_t & outX
     outY = static_cast<uint16_t>(std::clamp((cieY / sum) * kXYScale, 0.0f, static_cast<float>(kMaxXYValue)));
 }
 
+// Degenerate or fully out-of-gamut xy falls back to white; channels are rescaled so the brightest is 1.
+void ColorConverter::ConvertXYToRgb(uint16_t x, uint16_t y, float & outRed, float & outGreen, float & outBlue)
+{
+    const float chromaticityX = static_cast<float>(x) / kXYScale;
+    const float chromaticityY = static_cast<float>(y) / kXYScale;
+
+    if (chromaticityY < kMinChromaticityY)
+    {
+        outRed = outGreen = outBlue = 1.0f;
+        return;
+    }
+
+    const float cieX = chromaticityX / chromaticityY;
+    const float cieZ = (1.0f - chromaticityX - chromaticityY) / chromaticityY;
+
+    const float red   = std::max((3.2404542f * cieX) - 1.5371385f - (0.4985314f * cieZ), 0.0f);
+    const float green = std::max((-0.9692660f * cieX) + 1.8760108f + (0.0415560f * cieZ), 0.0f);
+    const float blue  = std::max((0.0556434f * cieX) - 0.2040259f + (1.0572252f * cieZ), 0.0f);
+
+    const float peak = std::max({ red, green, blue });
+    if (peak <= 0.0f)
+    {
+        outRed = outGreen = outBlue = 1.0f;
+        return;
+    }
+
+    outRed   = SrgbFromLinear(red / peak);
+    outGreen = SrgbFromLinear(green / peak);
+    outBlue  = SrgbFromLinear(blue / peak);
+}
 // The inverse. MoveToColor accepts any xy in the plane, including points outside the sRGB triangle that
 // have no hue/saturation at all, so the out-of-gamut result is brought back in rather than trusted.
 void ColorConverter::ConvertXYToHueSat(uint16_t x, uint16_t y, uint8_t & outHue, uint8_t & outSat)

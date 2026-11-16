@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/window-covering-server/WindowCoveringCluster.h>
@@ -592,10 +593,7 @@ TEST_F(TestWindowCoveringCluster, Command_GoToLiftPercentage)
         delegate.Reset();
         auto result = tester.Invoke<Commands::GoToLiftPercentage::Type>(cmd);
         EXPECT_FALSE(result.IsSuccess());
-        auto statusCode = result.GetStatusCode();
-        ASSERT_TRUE(statusCode.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-        EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
+        EXPECT_EQ(result.GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::ConstraintError));
         EXPECT_EQ(delegate.mHandleMovementCallCount, 0);
         EXPECT_EQ(cluster.GetTargetPositionLiftPercent100ths().Value(), kWcPercent100thsMaxClosed);
     }
@@ -630,10 +628,7 @@ TEST_F(TestWindowCoveringCluster, Command_GoToTiltPercentage)
         delegate.Reset();
         auto result = tester.Invoke<Commands::GoToTiltPercentage::Type>(cmd);
         EXPECT_FALSE(result.IsSuccess());
-        auto statusCode = result.GetStatusCode();
-        ASSERT_TRUE(statusCode.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-        EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
+        EXPECT_EQ(result.GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::ConstraintError));
         EXPECT_EQ(delegate.mHandleMovementCallCount, 0);
     }
 
@@ -664,10 +659,7 @@ TEST_F(TestWindowCoveringCluster, MotionLock)
 
         auto result = tester.Invoke<Commands::UpOrOpen::Type>(Commands::UpOrOpen::Type());
         ASSERT_FALSE(result.IsSuccess());
-        auto statusCode = result.GetStatusCode();
-        ASSERT_TRUE(statusCode.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-        EXPECT_EQ(statusCode->GetStatus(), Status::Busy);
+        EXPECT_EQ(result.GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::Busy));
     }
 
     // Calibration mode -> Failure.
@@ -678,10 +670,7 @@ TEST_F(TestWindowCoveringCluster, MotionLock)
 
         auto result = tester.Invoke<Commands::UpOrOpen::Type>(Commands::UpOrOpen::Type());
         ASSERT_FALSE(result.IsSuccess());
-        auto statusCode = result.GetStatusCode();
-        ASSERT_TRUE(statusCode.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-        EXPECT_EQ(statusCode->GetStatus(), Status::Failure);
+        EXPECT_EQ(result.GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::Failure));
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);

@@ -22,12 +22,14 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 namespace MaxUserDefinedZones {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxUserDefinedZones::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxUserDefinedZones::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxUserDefinedZones
 namespace MaxZones {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxZones::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxZones::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxZones
 namespace Zones {
 inline constexpr DataModel::AttributeEntry
@@ -40,16 +42,18 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace Triggers
 namespace SensitivityMax {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SensitivityMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SensitivityMax::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace SensitivityMax
 namespace Sensitivity {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Sensitivity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Sensitivity
 namespace TwoDCartesianMax {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TwoDCartesianMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TwoDCartesianMax::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TwoDCartesianMax
 constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
     MaxZones::kMetadataEntry,

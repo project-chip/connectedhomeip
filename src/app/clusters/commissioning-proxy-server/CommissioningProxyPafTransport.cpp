@@ -162,6 +162,17 @@ CHIP_ERROR CommissioningProxyPafTransport::ProxyPafDelegate::WiFiPAFMessageRecei
 {
     if (SessionSlot * slot = mOwner.FindSlotByPeer(rxInfo.peer_id))
     {
+        // Data that cannot be forwarded terminates the session. Returning the error makes
+        // the PAFTP endpoint close itself, which reaches WiFiPAFCloseSession() below and
+        // tears the session down.
+        CHIP_ERROR err = CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(msg->Start(), msg->DataLength()));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "ProxyPafDelegate: invalid message from commissionee on proxy session %u: %" CHIP_ERROR_FORMAT,
+                         slot->sessionId, err.Format());
+            return err;
+        }
+
         // DispatchMessageResponse copies the payload into the IM ProxyMessageResponse
         // synchronously, so msg can be released when this scope returns.
         if (mOwner.mHost != nullptr)
@@ -388,8 +399,8 @@ void CommissioningProxyPafTransport::HandleForegroundScanDone(void * context)
     }
     self->mScanResultCount = 0;
 
-    // The one-shot scan has released the NAN subscribe slot; resume a background scan
-    // that was paused to make room for it.
+    // Resume a background scan that was paused to make room for the one-shot scan. The
+    // platform can hold the NAN subscribe slot until this returns, so the resume is deferred.
     self->OnAllSessionsClosed();
 }
 
@@ -495,16 +506,17 @@ void CommissioningProxyPafTransport::HandleConnectSuccess(void * context)
         ChipLogProgress(AppServer, "OnConnectSuccess: no pending connect ctx; ignoring stale callback");
         return;
     }
+    ConnectCtx & pendingConnect = *self->mPendingConnect;
     self->mTimerDelegate.CancelTimer(&self->mConnectTimer);
 
-    const uint16_t discriminator = self->mPendingConnect->discriminator;
+    const uint16_t discriminator = pendingConnect.discriminator;
 
     WiFiPAF::WiFiPAFSession keyInfo{};
     keyInfo.discriminator              = discriminator;
     WiFiPAF::WiFiPAFLayer & layer      = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
     WiFiPAF::WiFiPAFSession * pPafInfo = layer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccDisc, keyInfo);
 
-    app::CommandHandler * cmd = self->mPendingConnect->handle.Get();
+    app::CommandHandler * cmd = pendingConnect.handle.Get();
     if (cmd == nullptr || pPafInfo == nullptr)
     {
         ChipLogError(AppServer, "OnConnectSuccess: cmd=%p pPafInfo=%p for disc %u", (void *) cmd, (void *) pPafInfo, discriminator);
@@ -516,7 +528,7 @@ void CommissioningProxyPafTransport::HandleConnectSuccess(void * context)
         return;
     }
 
-    if (self->mPendingConnect->cluster == nullptr)
+    if (pendingConnect.cluster == nullptr)
     {
         ChipLogError(AppServer, "OnConnectSuccess: cluster gone at connect complete; tearing down PAF session");
         self->FailPendingConnect(Status::Failure, /*cancelTimer=*/false);
@@ -533,7 +545,7 @@ void CommissioningProxyPafTransport::HandleConnectSuccess(void * context)
         return;
     }
 
-    ConnectCtx ctx = std::move(*self->mPendingConnect);
+    ConnectCtx ctx = std::move(pendingConnect);
     self->mPendingConnect.reset();
 
     const uint16_t sessionId = ctx.cluster->Sessions().AllocSessionId();

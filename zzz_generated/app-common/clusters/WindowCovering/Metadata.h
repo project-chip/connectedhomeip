@@ -22,16 +22,21 @@ inline constexpr uint32_t kRevision = 8;
 namespace Attributes {
 
 namespace Type {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Type::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Type::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Type
 namespace PhysicalClosedLimitLift {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PhysicalClosedLimitLift::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(PhysicalClosedLimitLift::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace PhysicalClosedLimitLift
 namespace PhysicalClosedLimitTilt {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PhysicalClosedLimitTilt::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(PhysicalClosedLimitTilt::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace PhysicalClosedLimitTilt
 namespace CurrentPositionLift {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentPositionLift::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -78,8 +83,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TargetPositionTiltPerc
                                                           std::nullopt);
 } // namespace TargetPositionTiltPercent100ths
 namespace EndProductType {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(EndProductType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(EndProductType::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace EndProductType
 namespace CurrentPositionLiftPercent100ths {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentPositionLiftPercent100ths::Id,

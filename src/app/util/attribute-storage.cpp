@@ -597,7 +597,14 @@ static Status typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, uint8_t 
         }
 
         // Just copy the length.
-        memmove(dest, src, 2);
+        if (src == nullptr)
+        {
+            memset(dest, 0, 2);
+        }
+        else
+        {
+            memmove(dest, src, 2);
+        }
     }
     else
     {

@@ -31,6 +31,7 @@
 #include <credentials/CHIPCertificateSet.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
+#include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/TLV.h>
@@ -661,7 +662,8 @@ CHIP_ERROR ChipDN::GetCertType(CertType & certType) const
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterCASEAuthTag)
         {
             VerifyOrReturnError(CanCastTo<CASEAuthTag>(rdn[i].mChipVal), CHIP_ERROR_WRONG_CERT_DN);
-            VerifyOrReturnError(IsValidCASEAuthTag(static_cast<CASEAuthTag>(rdn[i].mChipVal)), CHIP_ERROR_WRONG_CERT_DN);
+            CASEAuthTag cat = static_cast<CASEAuthTag>(rdn[i].mChipVal);
+            VerifyOrReturnError(IsValidCASEAuthTag(cat), CHIP_ERROR_WRONG_CERT_DN);
             catsPresent = true;
         }
     }

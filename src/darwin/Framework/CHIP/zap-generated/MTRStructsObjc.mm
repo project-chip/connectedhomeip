@@ -3131,6 +3131,39 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation MTROperationalCredentialsClusterCryptoProfileChainStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _paaCrypto = @(0);
+
+        _paiCrypto = @(0);
+
+        _dacCrypto = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROperationalCredentialsClusterCryptoProfileChainStruct alloc] init];
+
+    other.paaCrypto = self.paaCrypto;
+    other.paiCrypto = self.paiCrypto;
+    other.dacCrypto = self.dacCrypto;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: paaCrypto:%@; paiCrypto:%@; dacCrypto:%@; >", NSStringFromClass([self class]), _paaCrypto, _paiCrypto, _dacCrypto];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTROperationalCredentialsClusterFabricDescriptorStruct
 - (instancetype)init
 {
@@ -3258,8 +3291,6 @@ NS_ASSUME_NONNULL_BEGIN
         _paiSupportedProfiles = @(0);
 
         _dacSupportedProfiles = @(0);
-
-        _cdSupportedProfiles = @(0);
     }
     return self;
 }
@@ -3271,14 +3302,13 @@ NS_ASSUME_NONNULL_BEGIN
     other.paaSupportedProfiles = self.paaSupportedProfiles;
     other.paiSupportedProfiles = self.paiSupportedProfiles;
     other.dacSupportedProfiles = self.dacSupportedProfiles;
-    other.cdSupportedProfiles = self.cdSupportedProfiles;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: paaSupportedProfiles:%@; paiSupportedProfiles:%@; dacSupportedProfiles:%@; cdSupportedProfiles:%@; >", NSStringFromClass([self class]), _paaSupportedProfiles, _paiSupportedProfiles, _dacSupportedProfiles, _cdSupportedProfiles];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: paaSupportedProfiles:%@; paiSupportedProfiles:%@; dacSupportedProfiles:%@; >", NSStringFromClass([self class]), _paaSupportedProfiles, _paiSupportedProfiles, _dacSupportedProfiles];
     return descriptionString;
 }
 

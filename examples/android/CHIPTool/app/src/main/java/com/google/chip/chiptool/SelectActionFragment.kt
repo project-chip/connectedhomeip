@@ -47,7 +47,7 @@ class SelectActionFragment : Fragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     _binding = SelectActionFragmentBinding.inflate(inflater, container, false)
 
@@ -62,6 +62,7 @@ class SelectActionFragment : Fragment() {
     }
 
     binding.scanQrBtn.setOnClickListener { handleScanQrCodeClicked() }
+    binding.deviceManagementBtn.setOnClickListener { handleDeviceManagementClicked() }
     binding.onOffClusterBtn.setOnClickListener { handleOnOffClicked() }
     binding.sensorClustersBtn.setOnClickListener { handleSensorClicked() }
     binding.multiAdminClusterBtn.setOnClickListener { handleMultiAdminClicked() }
@@ -135,7 +136,7 @@ class SelectActionFragment : Fragment() {
     val locationPermissionGranted =
       ContextCompat.checkSelfPermission(
         requireContext(),
-        Manifest.permission.ACCESS_FINE_LOCATION
+        Manifest.permission.ACCESS_FINE_LOCATION,
       ) == PackageManager.PERMISSION_GRANTED
 
     // Android 12 new permission
@@ -176,6 +177,11 @@ class SelectActionFragment : Fragment() {
   private fun handleScanQrCodeClicked() {
     getCallback()?.setNetworkType(null)
     showFragment(BarcodeFragment.newInstance())
+  }
+
+  /** Notifies listener of Device Center button click. */
+  private fun handleDeviceManagementClicked() {
+    showFragment(com.google.chip.chiptool.devicemanagement.DeviceCenterFragment.newInstance())
   }
 
   /** Notifies listener of Light On/Off & Level Cluster button click. */

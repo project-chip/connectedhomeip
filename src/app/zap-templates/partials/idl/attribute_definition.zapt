@@ -12,6 +12,14 @@
 {{~/unless~}}{{~#unless isReportableAttribute~}}
   nosubscribe {{!marker to place a space even with whitespace removal~}}
 {{~/unless~}}
+{{~#if isChangeOmitted~}}
+  changes_omitted {{!marker to place a space even with whitespace removal~}}
+{{~/if~}}
+{{~#if persistence~}}
+  {{~#if (is_str_equal persistence "fixed")~}}
+    fixed {{!marker to place a space even with whitespace removal~}}
+  {{~/if~}}
+{{~/if~}}
 {{~!Removes spaces~}} attribute {{!ensure space}}
   {{~#chip_access_elements entity="attribute"~}}
     {{~#first~}}access({{~/first~}}

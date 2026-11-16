@@ -275,6 +275,36 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadBasicAttributes)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestElectricalPowerMeasurementCluster, MarkAttributeDirtyReportsChange)
+{
+    MockElectricalPowerMeasurementDelegate delegate;
+
+    ElectricalPowerMeasurementCluster::OptionalAttributesSet optionalAttrs;
+    optionalAttrs.Set<Attributes::ActiveCurrent::Id>();
+
+    ElectricalPowerMeasurementCluster cluster(ElectricalPowerMeasurementCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .delegate           = delegate,
+        .features           = BitMask<Feature>(),
+        .optionalAttributes = optionalAttrs,
+    });
+
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    tester.GetDirtyList().clear();
+
+    delegate.SetActivePower(DataModel::MakeNullable<int64_t>(60000));
+    delegate.SetActiveCurrent(DataModel::MakeNullable<int64_t>(260));
+    cluster.MarkAttributeDirty(ActivePower::Id);
+    cluster.MarkAttributeDirty(ActiveCurrent::Id);
+
+    EXPECT_EQ(tester.GetDirtyList().size(), 2u);
+    EXPECT_TRUE(tester.IsAttributeDirty(ActivePower::Id));
+    EXPECT_TRUE(tester.IsAttributeDirty(ActiveCurrent::Id));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestElectricalPowerMeasurementCluster, ReadRangesList)
 {
     chip::Testing::TestServerClusterContext context;

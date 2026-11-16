@@ -36,8 +36,8 @@
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyBleTransport.h>
 #endif
 #if defined(__linux__) && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#include <CommissioningProxyPafAdapter.h>
-#include <app/clusters/commissioning-proxy-server/CommissioningProxyPafTransport.h>
+#include <CommissioningProxyPafAdapter.h>                                           // nogncheck
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyPafTransport.h> // nogncheck
 #include <app/server/Server.h>
 #include <app_options/AppOptions.h>
 #include <platform/CHIPDeviceLayer.h>

@@ -174,7 +174,7 @@ public:
 #elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
         return this->alloc_size;
 #elif CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_CUSTOM_POOL
-        // Temporary workaround for custom pbufs by assuming size to be PBUF_POOL_BUFSIZE
+        // Temporary workaround for custom pbufs: assume the whole pbuf, struct included, is PBUF_POOL_BUFSIZE bytes.
         if (this->flags & PBUF_FLAG_IS_CUSTOM)
             return LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - kStructureSize;
         else
@@ -378,8 +378,16 @@ private:
     // Memory required for a maximum-size PacketBuffer.
     static constexpr uint16_t kBlockSize = PacketBuffer::kStructureSize + PacketBuffer::kMaxSizeWithoutReserve;
 
-    // Note: this condition includes DOXYGEN to work around a Doxygen error. DOXYGEN is never defined in any actual build.
-#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL || defined(DOXYGEN)
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_STANDARD_POOL
+    // New() returns a single pool buffer whatever size is requested, so kMaxAllocSize, the largest request it
+    // accepts, must be exactly one buffer's size: larger admits requests no buffer can hold, smaller rejects
+    // regular-size requests. Without TCP, kMaxAllocSize is kMaxSizeWithoutReserve, so the assert always holds.
+    static_assert(kMaxAllocSize == kMaxSizeWithoutReserve,
+                  "On pool builds with TCP, CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES must equal the pool buffer "
+                  "capacity.");
+#endif // CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_STANDARD_POOL
+
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
     typedef union
     {
         pbuf Header;
@@ -388,7 +396,7 @@ private:
     static BufferPoolElement sBufferPool[CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE];
     static PacketBuffer * sFreeList;
     static PacketBuffer * BuildFreeList();
-#endif // CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL || defined(DOXYGEN)
+#endif // CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
 
 #if CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK
     static void InternalCheck(const PacketBuffer * buffer);

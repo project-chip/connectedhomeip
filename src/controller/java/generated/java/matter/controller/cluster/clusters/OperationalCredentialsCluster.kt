@@ -201,7 +201,7 @@ class OperationalCredentialsCluster(
 
   suspend fun certificateChainRequest(
     certificateType: UByte,
-    cryptoProfile: UByte?,
+    cryptoProfile: OperationalCredentialsClusterCryptoProfileChainStruct?,
     segmentID: UShort?,
     maxSegmentSize: UShort?,
     timedInvokeTimeout: Duration? = null,
@@ -215,7 +215,9 @@ class OperationalCredentialsCluster(
     tlvWriter.put(ContextSpecificTag(TAG_CERTIFICATE_TYPE_REQ), certificateType)
 
     val TAG_CRYPTO_PROFILE_REQ: Int = 1
-    cryptoProfile?.let { tlvWriter.put(ContextSpecificTag(TAG_CRYPTO_PROFILE_REQ), cryptoProfile) }
+    cryptoProfile?.let {
+      cryptoProfile.toTlv(ContextSpecificTag(TAG_CRYPTO_PROFILE_REQ), tlvWriter)
+    }
 
     val TAG_SEGMENT_ID_REQ: Int = 2
     segmentID?.let { tlvWriter.put(ContextSpecificTag(TAG_SEGMENT_ID_REQ), segmentID) }

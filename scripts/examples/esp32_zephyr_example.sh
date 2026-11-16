@@ -45,7 +45,7 @@ if [[ ! -f "examples/$APP/esp32_zephyr/CMakeLists.txt" || -z "$BOARD" ]]; then
     echo "Usage: $0 <application> <board> [west build args...]" >&2
     echo "Applications:" >&2
     ls examples/*/esp32_zephyr/CMakeLists.txt | awk -F/ '{print "  "$2}' >&2
-    echo "Boards: esp32c6_devkitc/esp32c6/hpcore" >&2
+    echo "Boards: esp32c6_devkitc/esp32c6/hpcore, esp32c3_devkitm" >&2
     exit 1
 fi
 

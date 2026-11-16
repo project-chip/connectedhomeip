@@ -67,7 +67,8 @@ CHIP_ERROR EnergyEvseCluster::SetSupplyState(SupplyStateEnum newValue)
 CHIP_ERROR EnergyEvseCluster::SetFaultState(FaultStateEnum newValue)
 {
     VerifyOrReturnError(mFaultState != newValue, CHIP_NO_ERROR);
-    VerifyOrReturnError(newValue < FaultStateEnum::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(EnsureKnownEnumValue(newValue) != FaultStateEnum::kUnknownEnumValue,
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mFaultState = newValue;
     mDelegate.OnFaultStateChanged(newValue);
     NotifyAttributeChanged(FaultState::Id);

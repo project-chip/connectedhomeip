@@ -26,8 +26,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MPTZPosition::Id, BitF
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MPTZPosition
 namespace MaxPresets {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxPresets::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxPresets::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxPresets
 namespace MPTZPresets {
 inline constexpr DataModel::AttributeEntry
