@@ -454,7 +454,7 @@ async def _get_operational_record_via_dnssd(
         return record
 
     except (OSError, ValueError, RuntimeError, TypeError, ChipStackError) as e:
-        LOGGER.warning("DNS-SD check failed, will fall back to connection attempt: %s", e)
+        LOGGER.warning("DNS-SD query for node %s failed, treating it as not found: %s", node_id, e)
         return None
 
 
@@ -603,12 +603,7 @@ async def is_commissioned(
     Returns:
         True if the device is confirmed to be commissioned on this fabric, False otherwise.
     """
-    try:
-        record = await _get_operational_record_via_dnssd(dev_ctrl, node_id)
-    except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
-        LOGGER.error("Failed to check commissioning status for node %s: %s", node_id, e)
-        raise
-
+    record = await _get_operational_record_via_dnssd(dev_ctrl, node_id)
     if record is None:
         return False
 

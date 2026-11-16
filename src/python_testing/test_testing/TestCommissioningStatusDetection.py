@@ -226,7 +226,7 @@ async def test_dnssd_handled_error_returns_false():
     Test: DNS-SD query raises one of the handled error types.
 
     Scenario: Socket error while sending or receiving the mDNS query (OSError).
-    Expected: Returns False, so callers fall back to a connection attempt.
+    Expected: Returns False, the same as when the device does not answer.
 
     Value: A transient network failure does not abort the caller.
     """
@@ -639,21 +639,26 @@ async def test_is_commissioned_not_operational():
 
 async def test_is_commissioned_exception_propagation():
     """
-    Test: Exception from DNS-SD operational check propagates correctly.
+    Test: An unexpected exception from the DNS-SD query propagates through is_commissioned.
+
+    Scenario: The query raises an exception type that _get_operational_record_via_dnssd does not handle.
+    Expected: The exception reaches the caller instead of becoming False.
 
     Value: Ensures callers see infrastructure failures.
     """
-    from matter.testing import commissioning
+    from matter.testing.commissioning import is_commissioned
 
     mock_controller = MockDeviceController()
 
-    with patch.object(commissioning, '_get_operational_record_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
-        mock_dnssd.side_effect = RuntimeError("DNS-SD infrastructure failure")
+    with mock_mdns_module() as mock_mdns_mod:
+        mock_mdns = MagicMock()
+        mock_mdns.query_srv_and_txt_records = AsyncMock(side_effect=Exception("DNS-SD infrastructure failure"))
+        mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         try:
-            await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
-            return "Expected RuntimeError to propagate"
-        except RuntimeError as e:
+            await is_commissioned(mock_controller, TEST_NODE_ID)
+            return "Expected Exception to propagate"
+        except Exception as e:
             if "DNS-SD infrastructure failure" not in str(e):
                 return f"Unexpected error message: {e}"
     return None
