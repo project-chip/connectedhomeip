@@ -563,13 +563,7 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
         mCurrentActivationByManualTrigger = hasManualTrigger;
         mActivationReason                 = chip::MakeOptional(activationReason);
 
-        if (HandleTriggerDetected())
-        {
-            // Event generation is handled differently based on trigger type:
-            // - Command: Begin event already generated at cluster server
-            // - Motion: GeneratePushTransportBeginEvent() would be called inside `HandleTriggerDetected` API if needed
-        }
-        else
+        if (!HandleTriggerDetected())
         {
             mCurrentActivationByManualTrigger = previousActivationByManualTrigger;
             mActivationReason                 = previousActivationReason;

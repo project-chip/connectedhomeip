@@ -278,7 +278,7 @@ private:
     int64_t mLastVideoPts        = 0;
     int64_t mLastAudioPts        = 0;
     bool mMetadataSet            = false;
-    bool mUploadMPD              = false; ///< Start manifest not yet uploaded; initialised from mClipInfo.mUploadManifest
+    bool mUploadMPD              = false; ///< True while the start manifest has not been uploaded
     bool firstSegmentReady       = false;
 
     std::vector<int> mUploadSegmentID;
