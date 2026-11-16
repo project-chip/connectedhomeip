@@ -215,8 +215,8 @@ Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
     outNetworkIndex = 0;
     VerifyOrReturnError(mStagingNetwork.Matches(networkId), Status::kNetworkIDNotFound);
 
-    // Use empty ssid for representing invalid network
-    mStagingNetwork.ssidLen = 0;
+    // Reset the staged network. The saved network is left intact for RevertConfiguration().
+    mStagingNetwork = WiFiNetwork();
     return Status::kSuccess;
 }
 
