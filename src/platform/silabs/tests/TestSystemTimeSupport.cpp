@@ -104,9 +104,9 @@ TEST_F(TestSystemTimeSupport, StartupAndResetLeaveUTCUnsynchronized)
 
 TEST_F(TestSystemTimeSupport, UTCAdvancesAndAcceptsCorrections)
 {
-    gTicks = 32768 * 10;
+    gTicks = uint64_t{ 32768 } * 10;
     ASSERT_EQ(clock.SetClock_RealTime(Microseconds64(kValidUTC)), CHIP_NO_ERROR);
-    gTicks += 32768 * 60;
+    gTicks += uint64_t{ 32768 } * 60;
     Microseconds64 utc;
     Milliseconds64 utcMS;
     ASSERT_EQ(clock.GetClock_RealTime(utc), CHIP_NO_ERROR);

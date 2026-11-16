@@ -210,6 +210,9 @@ protected:
 #endif
     std::set<uint8_t> mDeviceIds;
     bool mDeviceSubscribed = false;
+    // NXP GAP device IDs are 0-based and bounded by gAppMaxConnections_c (1-3), so 0xFF is never a real ID.
+    static constexpr uint8_t kInvalidConId = 0xFF;
+    uint8_t mChipobleConId                 = kInvalidConId; // GAP device id subscribed to CHIPoBLE TX
 
     uint8_t mReadHandleSize  = 0;
     uint8_t mWriteHandleSize = 0;
@@ -287,6 +290,11 @@ public:
     void SetBLEServiceMode(service_mode_t mode) { mServiceMode = mode; };
 
     CHIP_ERROR DisconnectAndUnbond(void);
+
+    // True if conId is the connection subscribed to the CHIPoBLE TX characteristic
+    // (the commissioning link), as opposed to e.g. Aliro/proprietary GATT links.
+    bool IsChipoBleConId(uint8_t conId) const { return (mChipobleConId != kInvalidConId) && (mChipobleConId == conId); }
+    void ClearChipobleConId(void) { mChipobleConId = kInvalidConId; }
 };
 
 } // namespace Internal

@@ -16,13 +16,22 @@
  *    limitations under the License.
  */
 
-#include "JFAManager.h"
+#include "JFAManagerLinux.h"
 
-#include <lib/support/logging/CHIPLogging.h>
+namespace chip {
 
-JFAManager JFAManager::sJFA;
-
-CHIP_ERROR JFAManager::Init()
+JFAManagerLinux & JFAManagerLinux::GetDefaultInstance()
 {
-    return CHIP_NO_ERROR;
+    static JFAManagerLinux sJFA;
+    return sJFA;
 }
+
+// Provides the chip::JFAMgr() accessor declared in JFAManagerBase.h for the
+// Linux example. Shared code (JFAManagerBase.cpp, JointFabric.h RPC server)
+// never names the concrete derived type.
+JFAManagerBase & JFAMgr()
+{
+    return JFAManagerLinux::GetDefaultInstance();
+}
+
+} // namespace chip
