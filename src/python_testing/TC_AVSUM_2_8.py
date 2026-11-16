@@ -64,10 +64,10 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
             TestStep(9, "Read the DPTZStreams attribute, verify that the new viewport is the old viewport + deltaX"),
             TestStep(10, "Setup deltaY to move the viewport down, send via DPTZRelativeMove. Verify success"),
             TestStep(11, "Read the DPTZStreams attribute, verify that the new viewport is the old viewport + deltaY"),
-            TestStep(12, "Repeatedly invoke DPTZRelativeMove with a Zoom Delta of 100%, verify no error on max out of sensor size"),
-            TestStep(13, "Read the MinViewport from the device, create values of deltaX and deltaY that would result in a viewport smaller than the minimum"),
+            TestStep(12, "Repeatedly invoke DPTZRelativeMove with a Zoom Delta of -100% (make the viewport larger), verify no error on max out of sensor size"),
+            TestStep(13, "Create values of deltaX and deltaY that would move the full-sensor viewport beyond the top left of the sensor Cartesian plane"),
             TestStep(14, "Via DPTZRelativeMove send the created values of deltaX and deltaY. Verify success"),
-            TestStep(15, "Read the DPTZStreams attribute, verify that the new viewport is set to the dimensions of MinViewport"),
+            TestStep(15, "Read the DPTZStreams attribute, verify that the viewport keeps its size and is moved to the nearest position within the sensor, i.e. the full sensor"),
         ]
 
     def pics_TC_AVSUM_2_8(self) -> list[str]:
@@ -162,21 +162,19 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
         sensorsize = sensordimensions.sensorWidth * sensordimensions.sensorHeight
         zoomedsize = currentsize * 2
 
-        await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=100)
+        await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=-100)
 
         while True:
             if zoomedsize < sensorsize:
                 zoomedsize = zoomedsize * 2
-                await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=100)
+                await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=-100)
             else:
                 break
 
         self.step(13)
-        minviewport = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.MinViewportResolution)
-
-        # Current viewport is at the sensor max
-        deltaX = -(sensordimensions.sensorWidth - minviewport.width + 1)
-        deltaY = -(sensordimensions.sensorHeight - minviewport.height + 1)
+        # Current viewport is at the sensor max, any movement leaves the sensor Cartesian plane
+        deltaX = -(sensordimensions.sensorWidth // 2)
+        deltaY = -(sensordimensions.sensorHeight // 2)
 
         self.step(14)
         await self.send_dptz_relative_move_command(endpoint, videoStreamID, deltaX, deltaY)
@@ -187,12 +185,12 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
         for streams in dptz_streams_dut:
             if streams.videoStreamID == videoStreamID:
                 # verify the viewport dimensions
-                viewportwidth = streams.viewport.x2 - streams.viewport.x1
-                viewportheight = streams.viewport.y2 - streams.viewport.y1
-                asserts.assert_equal(viewportwidth, minviewport.width,
-                                     "Viewport not set to the same width as MinViewportResolution")
-                asserts.assert_equal(viewportheight, minviewport.height,
-                                     "Viewport not set to the same height as MinViewportResolution")
+                asserts.assert_equal((streams.viewport.x1, streams.viewport.y1), (0, 0),
+                                     "Viewport not moved to the nearest position within the sensor")
+                asserts.assert_equal(streams.viewport.x2, sensordimensions.sensorWidth,
+                                     "Viewport width not preserved when moved within the sensor")
+                asserts.assert_equal(streams.viewport.y2, sensordimensions.sensorHeight,
+                                     "Viewport height not preserved when moved within the sensor")
                 match_found = True
                 break
 
