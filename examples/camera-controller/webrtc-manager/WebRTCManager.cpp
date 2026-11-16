@@ -18,7 +18,6 @@
 
 #include "WebRTCManager.h"
 
-#include <app/server/Server.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <controller/webrtc/WebRTCTransportRequestorManager.h>
 #include <controller/webrtc/access_control/WebRTCAccessControl.h>
@@ -120,12 +119,11 @@ WebRTCManager::~WebRTCManager()
     Disconnect();
 }
 
-void WebRTCManager::Init()
+void WebRTCManager::Init(chip::FabricTable & fabricTable)
 {
     Controller::AccessControl::InitAccessControl(kWebRTCRequesterDynamicEndpointId);
 
-    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate,
-                                          Server::GetInstance().GetFabricTable());
+    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate, fabricTable);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());
     if (err != CHIP_NO_ERROR)
     {

@@ -20,7 +20,6 @@
 
 #include "WebRTCTransportRequestorManager.h"
 #include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
-#include <app/server/Server.h>
 #include <controller/webrtc/access_control/WebRTCAccessControl.h>
 #include <platform/PlatformManager.h>
 
@@ -42,11 +41,11 @@ OnEndCallback gOnEndCallback                     = nullptr;
 
 using namespace chip::python;
 
-void WebRTCTransportRequestorManager::Init()
+void WebRTCTransportRequestorManager::Init(chip::FabricTable & fabricTable)
 {
     Controller::AccessControl::InitAccessControl(kWebRTCRequesterDynamicEndpointId);
 
-    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, *this, Server::GetInstance().GetFabricTable());
+    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, *this, fabricTable);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());
     if (err != CHIP_NO_ERROR)
     {
