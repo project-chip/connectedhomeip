@@ -26,7 +26,7 @@ namespace mdns {
 namespace Minimal {
 
 /// Returns true if the packet described by `info` came from the local link of the
-/// interface it was received on, as RFC 6762 section 11 requires for mDNS.
+/// interface it was received on, as RFC 6762 section 5.5 and 11 recommend for mDNS.
 ///
 /// A packet is accepted when any of these hold:
 ///   - it was sent to a multicast group (link-scoped mDNS groups are never routed)
