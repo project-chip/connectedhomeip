@@ -195,8 +195,7 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
             VideoResolutionStruct minResolution = mCameraDeviceHAL->GetCameraHALInterface().GetMinViewport();
             VideoSensorParamsStruct sensorParms = mCameraDeviceHAL->GetCameraHALInterface().GetVideoSensorParams();
 
-            // Signed 32-bit values so that moving or zooming past the sensor edges cannot wrap; the viewport is moved back
-            // inside the sensor once all adjustments have been applied.
+            // Signed so that moves and zooms past the sensor edge cannot wrap.
             int32_t x1 = stream.viewport.x1;
             int32_t y1 = stream.viewport.y1;
             int32_t x2 = stream.viewport.x2;
@@ -214,41 +213,34 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 y2 += aDeltaY.Value();
             }
 
-            if (aZoomDelta.HasValue())
+            if (aZoomDelta.HasValue() && (aZoomDelta.Value() != 0))
             {
-                int8_t zoomDelta = aZoomDelta.Value();
-                if (zoomDelta != 0)
+                int8_t zoomDelta       = aZoomDelta.Value();
+                int64_t originalWidth  = x2 - x1;
+                int64_t originalHeight = y2 - y1;
+                double viewportAR      = 0;
+                if (originalHeight > 0)
                 {
-                    // A positive ZoomDelta makes the viewport smaller, a negative one larger. The percentage applies to the
-                    // viewport area and the aspect ratio is kept.
-                    //
-                    int64_t originalWidth  = x2 - x1;
-                    int64_t originalHeight = y2 - y1;
-                    int64_t newSize        = originalWidth * originalHeight * (100 - zoomDelta) / 100;
+                    viewportAR = floorf((static_cast<float>(originalWidth) / originalHeight) * 100) / 100;
+                }
 
-                    // If the new viewport after zoom would be less than the min, scale it to the min
-                    //
-                    int64_t minSize = static_cast<int64_t>(minResolution.width) * minResolution.height;
-                    newSize         = std::max(newSize, minSize);
-
-                    // The new width of a rectangle with a defined aspect ratio is the square root of the new size
-                    // of that rectangle multiplied by the aspect ratio
-                    //
-                    double viewportAR = floorf((static_cast<float>(originalWidth) / originalHeight) * 100) / 100;
+                if (viewportAR > 0)
+                {
+                    // Positive ZoomDelta makes the viewport smaller, negative larger; the percentage applies to the area.
+                    int64_t newSize = originalWidth * originalHeight * (100 - zoomDelta) / 100;
+                    newSize         = std::max(newSize, static_cast<int64_t>(minResolution.width) * minResolution.height);
 
                     int32_t newWidth  = static_cast<int32_t>(round(sqrt(newSize * viewportAR)));
                     int32_t newHeight = static_cast<int32_t>(newWidth / viewportAR);
 
-                    // Resize around the centre point of the current viewport
-                    //
-                    int32_t centerX2 = x1 + x2;
-                    int32_t centerY2 = y1 + y2;
-                    x1               = (centerX2 - newWidth) / 2;
-                    x2               = x1 + newWidth;
-                    y1               = (centerY2 - newHeight) / 2;
-                    y2               = y1 + newHeight;
+                    // Keep the centre point of the viewport
+                    x1 = (x1 + x2 - newWidth) / 2;
+                    x2 = x1 + newWidth;
+                    y1 = (y1 + y2 - newHeight) / 2;
+                    y2 = y1 + newHeight;
                 }
             }
+
             // Is the requested viewport smaller than the minimum, if yes scale to the minimum size, starting at x1, y1.
             //
             if (((x2 - x1) < minResolution.width) || ((y2 - y1) < minResolution.height))
