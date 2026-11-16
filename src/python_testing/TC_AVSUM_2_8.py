@@ -58,7 +58,7 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
             TestStep(3, "Send a VideoStreamAllocate command to AVStreamManagement to allocate a video stream ID. Record the returned ID"),
             TestStep(4, "Send DPTZRelativeMove with the allocated stream ID, invalid Zoom Delta. Verify ConstraintError response"),
             TestStep(5, "Create a viewport with a valid AR. Set this via DPTZSetViewport"),
-            TestStep(6, "Setup deltaX and deltaY to move beyond the cartesian plan, send via DPTZRelativeMove. Verify success"),
+            TestStep(6, "Setup deltaX and deltaY to move beyond the cartesian plan, send via DPTZRelativeMove. Verify the viewport clamps at the sensor bounds for negative and positive deltas"),
             TestStep(7, "Read the DPTZStreams attribute, store the viewport associated with the allocated stream id"),
             TestStep(8, "Setup deltaX to move the viewport to the right, send via DPTZRelativeMove. Verify success"),
             TestStep(9, "Read the DPTZStreams attribute, verify that the new viewport is the old viewport + deltaX"),
@@ -120,6 +120,29 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
         deltaX = -x1 * 2
         deltaY = -viewportheight * 2
         await self.send_dptz_relative_move_command(endpoint, videoStreamID, deltaX=deltaX, deltaY=deltaY)
+
+        # The move is clamped, leaving the viewport pinned at the top left of the sensor
+        homeViewport = Globals.Structs.ViewportStruct(x1=0, y1=0, x2=viewportwidth, y2=viewportheight)
+        asserts.assert_true(await self.dptzstreamentryvalid(endpoint, videoStreamID, homeViewport),
+                            "Negative delta move did not clamp the viewport to the top left of the sensor")
+
+        # Send positive deltas that move beyond the right and bottom sensor edges. The move must clamp,
+        # leaving the viewport pinned at the bottom right of the sensor with its size unchanged.
+        deltaXP = sensordimensions.sensorWidth
+        deltaYP = sensordimensions.sensorHeight
+        await self.send_dptz_relative_move_command(endpoint, videoStreamID, deltaX=deltaXP, deltaY=deltaYP)
+
+        clampedViewport = Globals.Structs.ViewportStruct(x1=sensordimensions.sensorWidth - viewportwidth,
+                                                         y1=sensordimensions.sensorHeight - viewportheight,
+                                                         x2=sensordimensions.sensorWidth,
+                                                         y2=sensordimensions.sensorHeight)
+        asserts.assert_true(await self.dptzstreamentryvalid(endpoint, videoStreamID, clampedViewport),
+                            "Positive delta move did not clamp the viewport to the bottom right of the sensor")
+
+        # Move the viewport back to the top left for the following steps, which rely on an unclamped move
+        await self.send_dptz_relative_move_command(endpoint, videoStreamID, deltaX=-deltaXP, deltaY=-deltaYP)
+        asserts.assert_true(await self.dptzstreamentryvalid(endpoint, videoStreamID, homeViewport),
+                            "Viewport did not return to the top left of the sensor")
 
         self.step(7)
         dptz_streams_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.DPTZStreams)

@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <camera-avsettingsuserlevel-manager.h>
 #include <cmath>
@@ -195,37 +196,26 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
             VideoResolutionStruct minResolution             = mCameraDeviceHAL->GetCameraHALInterface().GetMinViewport();
             VideoSensorParamsStruct sensorParms             = mCameraDeviceHAL->GetCameraHALInterface().GetVideoSensorParams();
 
-            if (aDeltaX.HasValue())
+            if (aDeltaX.HasValue() && aDeltaX.Value() != 0)
             {
-                int16_t deltaX = aDeltaX.Value();
-                if (deltaX != 0)
-                {
-                    // if the delta would move us out of the cartesian plane of the sensor, limit to the left hand edge
-                    int16_t x1Movement =
-                        ((deltaX < 0) && (abs(deltaX) > viewport.x1)) ? static_cast<int16_t>(-viewport.x1) : deltaX;
-                    viewport.x1 = static_cast<uint16_t>(viewport.x1 + x1Movement);
-
-                    int16_t x2Movement =
-                        ((deltaX < 0) && (abs(deltaX) > viewport.x2)) ? static_cast<int16_t>(-viewport.x2) : deltaX;
-                    viewport.x2 = static_cast<uint16_t>(viewport.x2 + x2Movement);
-                }
+                int shift = aDeltaX.Value();
+                // Limit the shift so x1 >= 0 and x2 stays within the sensor; both edges
+                // move by the same clamped shift, preserving the viewport width.
+                shift = std::max<int>(shift, -static_cast<int>(viewport.x1));
+                shift = std::min<int>(shift, static_cast<int>(sensorParms.sensorWidth) - static_cast<int>(viewport.x2));
+                viewport.x1 = static_cast<uint16_t>(viewport.x1 + shift);
+                viewport.x2 = static_cast<uint16_t>(viewport.x2 + shift);
             }
 
-            if (aDeltaY.HasValue())
+            if (aDeltaY.HasValue() && aDeltaY.Value() != 0)
             {
-                int16_t deltaY = aDeltaY.Value();
-                if (deltaY != 0)
-                {
-                    // if the delta would move us out of the cartesian plane of the sensor, limit to the top hand edge
-                    //
-                    int16_t y1Movement =
-                        ((deltaY < 0) && (abs(deltaY) > viewport.y1)) ? static_cast<int16_t>(-viewport.y1) : deltaY;
-                    viewport.y1 = static_cast<uint16_t>(viewport.y1 + y1Movement);
-
-                    int16_t y2Movement =
-                        ((deltaY < 0) && (abs(deltaY) > viewport.y2)) ? static_cast<int16_t>(-viewport.y2) : deltaY;
-                    viewport.y2 = static_cast<uint16_t>(viewport.y2 + y2Movement);
-                }
+                int shift = aDeltaY.Value();
+                // Limit the shift so y1 >= 0 and y2 stays within the sensor; both edges
+                // move by the same clamped shift, preserving the viewport height.
+                shift = std::max<int>(shift, -static_cast<int>(viewport.y1));
+                shift = std::min<int>(shift, static_cast<int>(sensorParms.sensorHeight) - static_cast<int>(viewport.y2));
+                viewport.y1 = static_cast<uint16_t>(viewport.y1 + shift);
+                viewport.y2 = static_cast<uint16_t>(viewport.y2 + shift);
             }
 
             if (aZoomDelta.HasValue())
