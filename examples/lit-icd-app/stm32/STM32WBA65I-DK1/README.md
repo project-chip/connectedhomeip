@@ -40,15 +40,25 @@ and discriminator above must match the values configured in the firmware.
 
 ### LIT ICD
 
--   The Thread interface is configured as a Sleepy End Device.
--   ICD Management is enabled. The device supports the ICD client-management and
-    stay-active interactions exposed by the Matter ICD Management cluster.
--   The application uses the configured ICD slow-poll interval of 300 seconds,
-    fast-poll interval of 200 milliseconds, idle duration of 450 seconds, and
-    active duration of 2 seconds.
--   On first boot, the device opens a BLE commissioning window. After
-    commissioning, it reconnects to its saved Thread network and retains its
-    fabric and network data in non-volatile storage.
+- The Thread interface is configured as a Sleepy End Device.
+- ICD Management is enabled. The device supports the ICD client-management and
+  stay-active interactions exposed by the Matter ICD Management cluster.
+- On first boot, the device opens a BLE commissioning window. After
+  commissioning, it reconnects to its saved Thread network and retains its
+  fabric and network data in non-volatile storage.
+
+The LIT ICD timing values documented for this example are:
+
+| Parameter                                   | Value    | Meaning                   |
+| ------------------------------------------- | -------- | ------------------------- |
+| `CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL` | 300 s    | Thread slow-poll interval |
+| `CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL` | 200 ms   | Thread fast-poll interval |
+| `CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC`    | 450 s    | ICD idle-mode duration    |
+| `CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS`   | 2,000 ms | ICD active-mode duration  |
+| `CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS`  | 5,000 ms | Active-mode threshold     |
+
+In the STM32 project, these timing macros are defined in
+`Middlewares/Third_Party/connectedhomeip/src/platform/stm32/stm32wba/CHIPDevicePlatformConfig.h`.
 
 The ICD Management cluster is separate from the Switch cluster: ICD behavior
 controls how the device sleeps and becomes reachable, while Generic Switch
@@ -71,7 +81,7 @@ press duration determines whether the release is reported as short or long.
 These are Switch cluster events, not On/Off commands: a Matter client should
 subscribe to the Switch events on endpoint 1 to observe button actions.
 
-### Board Buttons and LCD
+### Board Buttons
 
 | Input           | Application action                                      |
 | --------------- | ------------------------------------------------------- |
@@ -79,11 +89,21 @@ subscribe to the Switch events on endpoint 1 to observe button actions.
 | B2 / JOY_SELECT | Factory reset                                           |
 | B3 / JOY_LEFT   | Generate Generic Switch press/release events            |
 
+### LCD, Trace, and Low Power
+
 The LCD is disabled by default for this application. If a build enables LCD
 support (`CFG_LCD_SUPPORTED == 1`), it shows BLE connection and Thread network
 status: `BLE Connected` while a BLE connection is active, `Fabric Created` after
 commissioning, and `Network Joined` after Thread connectivity has been
 established. A failed commissioning attempt is shown as `Fabric Failed`.
+
+Configure the LCD (`CFG_LCD_SUPPORTED`), trace (`CFG_LOG_SUPPORTED`), and
+low-power (`CFG_LPM_LEVEL`) options in
+`third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Generic-Switch-App/Core/Inc/app_conf.h`.
+
+The application configuration sets `CFG_LPM_LEVEL = 2`, enabling Standby mode
+(`CFG_LPM_STANDBY_SUPPORTED = 1`) and disabling logs and debug support for
+low-power operation.
 
 ## Matter Data Model
 
