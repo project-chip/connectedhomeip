@@ -110,6 +110,8 @@ bool sIsNetworkEnabled     = false;
 bool sIsNetworkAttached    = false;
 bool sHaveBLEConnections   = false;
 
+DefaultAttributePersistenceProvider gSimpleAttributePersistence;
+
 /**
  * @brief Set deferred attributes storage
  *
