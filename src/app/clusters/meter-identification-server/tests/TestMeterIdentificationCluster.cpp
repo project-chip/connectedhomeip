@@ -373,9 +373,9 @@ TEST_F(TestMeterIdentificationCluster, SetPowerThreshold)
         DataModel::Nullable<Globals::Structs::PowerThresholdStruct::DecodableType> readVal;
         ASSERT_SUCCESS(tester.ReadAttribute(PowerThreshold::Id, readVal));
         ASSERT_FALSE(readVal.IsNull());
-        EXPECT_TRUE(readVal.Value().powerThreshold.HasValue());
+        ASSERT_TRUE(readVal.Value().powerThreshold.HasValue());
         EXPECT_EQ(readVal.Value().powerThreshold.Value(), 1000);
-        EXPECT_TRUE(readVal.Value().apparentPowerThreshold.HasValue());
+        ASSERT_TRUE(readVal.Value().apparentPowerThreshold.HasValue());
         EXPECT_EQ(readVal.Value().apparentPowerThreshold.Value(), 1200);
         ASSERT_FALSE(readVal.Value().powerThresholdSource.IsNull());
         EXPECT_EQ(readVal.Value().powerThresholdSource.Value(), Globals::PowerThresholdSourceEnum::kContract);
@@ -441,7 +441,7 @@ TEST_F(TestMeterIdentificationCluster, ConfigInitialization)
     DataModel::Nullable<Globals::Structs::PowerThresholdStruct::DecodableType> readPt;
     ASSERT_SUCCESS(tester.ReadAttribute(PowerThreshold::Id, readPt));
     ASSERT_FALSE(readPt.IsNull());
-    EXPECT_TRUE(readPt.Value().powerThreshold.HasValue());
+    ASSERT_TRUE(readPt.Value().powerThreshold.HasValue());
     EXPECT_EQ(readPt.Value().powerThreshold.Value(), 5000);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
