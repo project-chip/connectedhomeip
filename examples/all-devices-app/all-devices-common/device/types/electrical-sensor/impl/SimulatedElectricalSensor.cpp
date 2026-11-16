@@ -84,7 +84,8 @@ PowerMeasurementOptionalAttributesForRole(SimulatedElectricalSensorDelegate::Rol
 SimulatedElectricalSensorDelegate::SimulatedElectricalSensorDelegate(TimerDelegate & timerDelegate,
                                                                      TestEventTriggerDelegate & testEventTriggerDelegate,
                                                                      Role role) :
-    mRole(role), mFakeReadings(timerDelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
+    mRole(role),
+    mFakeReadings(timerDelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
 {}
 
 ElectricalSensor::Config
