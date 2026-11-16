@@ -233,7 +233,6 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                     int32_t newWidth  = static_cast<int32_t>(round(sqrt(newSize * viewportAR)));
                     int32_t newHeight = static_cast<int32_t>(newWidth / viewportAR);
 
-                    // Keep the centre point of the viewport
                     x1 = (x1 + x2 - newWidth) / 2;
                     x2 = x1 + newWidth;
                     y1 = (y1 + y2 - newHeight) / 2;
