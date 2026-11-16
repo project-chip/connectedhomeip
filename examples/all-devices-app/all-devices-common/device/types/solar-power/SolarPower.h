@@ -73,12 +73,9 @@ protected:
 
     virtual void UnregisterAdditionalComposedEndpoints(CodeDrivenDataModelProvider & provider) {}
 
-    const Context & GetContext() const { return mContext; }
-
 private:
     void UnregisterMandatoryComposedEndpoints(CodeDrivenDataModelProvider & provider);
 
-    Context mContext;
     EndpointId mEndpointId = kInvalidEndpointId;
 
     PanelElectricalSensor mOutputElectricalSensor;
