@@ -186,4 +186,37 @@ ServerClusterInterface * CodegenClusterIntegration::FindClusterOnEndpoint(const 
     return interface;
 }
 
+CHIP_ERROR CodegenRegisteredServerClusterBase::Register(ServerClusterRegistration & registration)
+{
+    Span<const ConcreteClusterPath> paths = registration.serverClusterInterface->GetPaths();
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    for (const ConcreteClusterPath & path : paths)
+    {
+        if (emberAfFindServerCluster(path.mEndpointId, path.mClusterId) == nullptr)
+        {
+            err = CHIP_ERROR_INVALID_ARGUMENT;
+            break;
+        }
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        err = CodegenDataModelProvider::Instance().Registry().Register(registration);
+    }
+
+    if (err != CHIP_NO_ERROR && !paths.empty())
+    {
+        ChipLogFailure(err, AppServer, "Failed to register cluster %u/" ChipLogFormatMEI, paths.front().mEndpointId,
+                       ChipLogValueMEI(paths.front().mClusterId));
+    }
+    return err;
+}
+
+void CodegenRegisteredServerClusterBase::Unregister(ServerClusterRegistration & registration)
+{
+    VerifyOrReturn(registration.IsRegistered());
+    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(registration.serverClusterInterface);
+}
+
 } // namespace chip::app

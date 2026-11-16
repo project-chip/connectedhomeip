@@ -153,6 +153,13 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, TestCommands)
                                               }));
 }
 
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, TestReadClusterRevision)
+{
+    uint16_t clusterRevision = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
+    EXPECT_EQ(clusterRevision, kRevision);
+}
+
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReadAllAttributesWithClusterTesterTest)
 {
     uint8_t maxPresets = 0;

@@ -116,6 +116,9 @@ private:
     uint16_t mTXCharCCCDAttrHandle;
     uint16_t mSubscribedConIds[kMaxConnections];
     char mDeviceName[kMaxDeviceNameLength + 1];
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    System::PacketBufferHandle c3CharDataBufferHandle;
+#endif
     CHIP_ERROR MapBLEError(int bleErr);
 
     void DriveBLEState(void);
@@ -143,6 +146,7 @@ private:
     BLEManagerImpl::CHIPoBLEConState * GetConnectionState(uint8_t connectionHandle, bool allocate);
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    CHIP_ERROR PrepareC3CharData();
     void HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data);
 #endif
     static CHIP_ERROR HandleGapMsg(T_IO_MSG * p_gap_msg);

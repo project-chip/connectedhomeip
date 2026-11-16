@@ -1044,7 +1044,7 @@ cluster NetworkCommissioning = 49 {
     kWPAPersonal = 0x4 [spec_name = "WPA-PERSONAL"];
     kWPA2Personal = 0x8 [spec_name = "WPA2-PERSONAL"];
     kWPA3Personal = 0x10 [spec_name = "WPA3-PERSONAL"];
-    kWPA3MatterPDC = 0x20 [spec_name = "WPA3-Matter-PDC"];
+    kIEEE8021X = 0x20 [spec_name = "IEEE8021X"];
   }
 
   struct NetworkInfoStruct {

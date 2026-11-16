@@ -32,7 +32,7 @@ CHIP_ERROR GenericEventManagementTestEventTriggerHandler::HandleFillUpEventLoggi
     for (uint8_t hardwareFault = to_underlying(GeneralDiagnostics::HardwareFaultEnum::kUnspecified);
          hardwareFault < kMaxHardwareFaults; hardwareFault++)
     {
-        hardwareFaults.add(hardwareFault);
+        ReturnErrorOnFailure(hardwareFaults.add(hardwareFault));
     }
 
     /* Fill up the critical logging buffer by 10 hardware faults. */
