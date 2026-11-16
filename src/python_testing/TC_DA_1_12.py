@@ -38,6 +38,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}-ml-dsa-44.perfetto
 #     factory-reset: true
 #     quiet: true
+#     tags: [openssl-3.5]
 #   ml-dsa-65:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: >
@@ -59,6 +60,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}-ml-dsa-65.perfetto
 #     factory-reset: true
 #     quiet: true
+#     tags: [openssl-3.5]
 # === END CI TEST ARGUMENTS ===
 
 import logging

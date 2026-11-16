@@ -72,7 +72,7 @@ uint32_t KeypadInputManager::GetFeatureMap(chip::EndpointId endpoint)
     }
 
     uint32_t featureMap = 0;
-    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    Attributes::FeatureMap::GetDefault(endpoint, featureMap);
     return featureMap;
 }
 #endif // MATTER_DM_PLUGIN_KEYPAD_INPUT_SERVER

@@ -97,6 +97,7 @@ CHIP_ERROR Manager::EstablishConnection(const ScopedNodeId & nodeId)
             mLastSessionEstablishmentError = CHIP_NO_ERROR;
             // At this point connectionCallback is null since it deletes itself when the callback is called.
             connectionCallback = Platform::New<ConnectionCallback>(*this);
+            VerifyOrReturnError(connectionCallback != nullptr, CHIP_ERROR_NO_MEMORY);
             mInitParams.mCASESessionManager->FindOrEstablishSession(nodeId, connectionCallback->GetOnDeviceConnected(),
                                                                     connectionCallback->GetOnDeviceConnectionFailure());
         }
@@ -154,7 +155,6 @@ CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId clu
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBoundDeviceChangedHandler != nullptr, CHIP_ERROR_HANDLER_NOT_SET);
 
-    CHIP_ERROR error      = CHIP_NO_ERROR;
     auto * bindingContext = mPendingNotificationMap.NewPendingNotificationContext(context);
     VerifyOrReturnError(bindingContext != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -166,10 +166,20 @@ CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId clu
         {
             if (iter->type == MATTER_UNICAST_BINDING)
             {
-                error = mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
-                SuccessOrExit(error);
-                error = EstablishConnection(ScopedNodeId(iter->nodeId, iter->fabricIndex));
-                SuccessOrExit(error);
+                CHIP_ERROR error = mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
+                if (error == CHIP_NO_ERROR)
+                {
+                    error = EstablishConnection(ScopedNodeId(iter->nodeId, iter->fabricIndex));
+                }
+                // bindingContext owns the context at this point. Returning an error would make the caller
+                // release the context a second time, so the failure is only logged.
+                if (error != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer,
+                                 "Failed to notify bound cluster change on endpoint %u, cluster " ChipLogFormatMEI
+                                 " to node " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                                 endpoint, ChipLogValueMEI(cluster), ChipLogValueX64(iter->nodeId), error.Format());
+                }
             }
             else if (iter->type == MATTER_MULTICAST_BINDING)
             {
@@ -178,10 +188,9 @@ CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId clu
         }
     }
 
-exit:
     bindingContext->DecrementConsumersNumber();
 
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Manager::AddBindingEntry(const Binding::TableEntry & entry)

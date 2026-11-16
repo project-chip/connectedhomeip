@@ -54,6 +54,9 @@ public:
         bool enableWiFi                       = false;
         bool emulateWiFi                      = false; // use EmulatedWiFiDriver; implies enableWiFi
         uint32_t bleController                = 0;
+        /// Arguments forwarded to otSysInit() in OpenThread-endpoint builds; in non-endpoint
+        /// Thread builds, "--thread" pushes "yes" to mark Thread as enabled.
+        std::vector<std::string> threadArgs;
         /// Listen port for the Pigweed RPC server, unset when --rpc-server-port was not given.
         /// This is unconditionally parsed, but only consumed by builds compiled with Pigweed RPC
         /// support (chip_enable_pw_rpc), so that the option stays unit-testable and the struct
@@ -65,6 +68,9 @@ public:
         // Frequencies in MHz parsed out of "--wifipaf freq_list=", in the order given.
         std::vector<uint16_t> wifipafFreqList;
 #endif
+
+        bool IsWiFiEnabled() const { return enableWiFi; }
+        bool IsThreadEnabled() const { return !threadArgs.empty(); }
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
@@ -86,6 +92,7 @@ public:
     static const AppConfig * TryGetConfig() { return sIsConfigValidated ? &mConfig : nullptr; }
     static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
     static CHIP_ERROR ValidateConfig();
+    static void Reset();
 
 private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,

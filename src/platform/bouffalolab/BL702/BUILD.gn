@@ -110,6 +110,8 @@ static_library("BL702") {
         "../../OpenThread/DnssdImpl.cpp",
         "../../OpenThread/OpenThreadDnssdImpl.cpp",
         "../../OpenThread/OpenThreadDnssdImpl.h",
+        "../../OpenThread/OpenThreadTxtEntries.h",
+        "../../OpenThread/TxtEntries.h",
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }

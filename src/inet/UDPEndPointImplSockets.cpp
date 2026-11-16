@@ -593,6 +593,18 @@ CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
         }
 #endif // defined(IPV6_RECVPKTINFO)
 
+#ifdef IPV6_AUTOFLOWLABEL
+        if (addressType == IPAddressType::kIPv6)
+        {
+            constexpr int zero = 0;
+            res                = setsockopt(mSocket, IPPROTO_IPV6, IPV6_AUTOFLOWLABEL, &zero, sizeof(zero));
+            if (res != 0)
+            {
+                ChipLogError(Inet, "IPV6_AUTOFLOWLABEL failed: %d", errno);
+            }
+        }
+#endif // defined(IPV6_AUTOFLOWLABEL)
+
         // On systems that support it, disable the delivery of SIGPIPE
         // signals when writing to a closed socket.  This is mostly
         // needed on iOS which has the peculiar habit of sending

@@ -53,6 +53,7 @@
 #include <mbedtls/error.h>
 #include <mbedtls/md.h>
 
+#include <algorithm>
 #include <string.h>
 #include <type_traits>
 

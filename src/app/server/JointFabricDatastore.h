@@ -42,7 +42,7 @@
 namespace chip {
 
 // Forward declaration for friend class
-class JFAManager;
+class JFAManagerBase;
 
 namespace app {
 
@@ -758,7 +758,7 @@ private:
 
     Listener * mListeners = nullptr;
 
-    friend class chip::JFAManager;
+    friend class chip::JFAManagerBase;
 
     CHIP_ERROR
     ForceAddGroup(const Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType & commandData);

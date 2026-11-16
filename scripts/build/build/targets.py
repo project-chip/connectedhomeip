@@ -364,6 +364,7 @@ def BuildEsp32ZephyrTarget() -> BuildTarget:
     # boards
     target.AppendFixedTargets([
         TargetPart('c6devkitc', board=Esp32ZephyrBoard.C6_DEVKITC),
+        TargetPart('c3devkitm', board=Esp32ZephyrBoard.C3_DEVKITM),
     ])
 
     # applications
@@ -411,7 +412,6 @@ def BuildEfr32Target():
         TargetPart('switch', app=Efr32App.SWITCH),
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),
-        TargetPart('window-covering', app=Efr32App.WINDOW_COVERING),
     ]
 
     # Single-device subset builds for all-devices-app.
@@ -479,7 +479,6 @@ def BuildNrfTarget():
         TargetPart('shell', app=NrfApp.SHELL),
         TargetPart('pump', app=NrfApp.PUMP),
         TargetPart('pump-controller', app=NrfApp.PUMP_CONTROLLER),
-        TargetPart('window-covering', app=NrfApp.WINDOW_COVERING),
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -762,7 +761,6 @@ def BuildStm32Target():
 
     # board
     target.AppendFixedTargets([
-        TargetPart('STM32WB5MM-DK', board=stm32Board.STM32WB55XX),
         TargetPart('STM32WBA65I-DK1', board=stm32Board.STM32WBA6XX),
     ])
 
@@ -914,7 +912,6 @@ def BuildTelinkTarget():
         TargetPart('temperature-measurement',
                    app=TelinkApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
-        TargetPart('window-covering', app=TelinkApp.WINDOW_COVERING),
     ]
 
     # Single-device subset builds for all-devices-app.
@@ -963,7 +960,6 @@ def BuildRealtekTarget():
         TargetPart('lighting', app=RealtekApp.LIGHT),
         TargetPart('light-switch', app=RealtekApp.LIGHT_SWITCH),
         TargetPart('lock', app=RealtekApp.LOCK),
-        TargetPart('window', app=RealtekApp.WINDOW),
         TargetPart('all-clusters', app=RealtekApp.ALL_CLUSTERS),
         TargetPart('ota-requestor', app=RealtekApp.OTA_REQUESTOR),
         TargetPart('thermostat', app=RealtekApp.THERMOSTAT),

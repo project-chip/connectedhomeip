@@ -214,7 +214,7 @@ protected:
     {
         connHandle->ForceDisconnect();
         connHandle.Release();
-        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(1), [&]() { return false; });
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(1), [&]() { return !mTCP.HasActiveConnections(); });
     }
 };
 

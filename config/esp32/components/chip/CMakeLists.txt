@@ -195,6 +195,9 @@ elseif(CONFIG_CHIP_MEM_ALLOC_MODE_DEFAULT)
 endif()
 
 if(CONFIG_ENABLE_PW_RPC)
+    # ESP-IDF headers use GCC extensions such as #include_next that fail under
+    # -Wpedantic in pw_build.internal_strict_warnings.
+    set(pw_build_WARNINGS pw_build.strict_warnings CACHE STRING "" FORCE)
     string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
     chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:toolchain_cpp_standard\"]")
     chip_gn_arg_append("chip_build_pw_rpc_lib"              "true")
