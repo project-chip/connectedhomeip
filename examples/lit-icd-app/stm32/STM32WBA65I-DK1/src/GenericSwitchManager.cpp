@@ -43,8 +43,8 @@ GenericSwitchManager GenericSwitchManager::sSwitch;
 void GenericSwitchManager::GenericSwitchOnInitialPress()
 {
     GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
-    VerifyOrReturn (data != nullptr);
-    
+    VerifyOrReturn(data != nullptr);
+
     data->endpoint = mGenericSwitchEndpoint;
     data->event    = Switch::Events::InitialPress::Id;
 
@@ -57,8 +57,8 @@ void GenericSwitchManager::GenericSwitchOnInitialPress()
 void GenericSwitchManager::GenericSwitchOnLongPress()
 {
     GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
-    VerifyOrReturn (data != nullptr);
-    
+    VerifyOrReturn(data != nullptr);
+
     data->endpoint = mGenericSwitchEndpoint;
     data->event    = Switch::Events::LongPress::Id;
 
@@ -74,8 +74,8 @@ void GenericSwitchManager::GenericSwitchOnLongPress()
 void GenericSwitchManager::GenericSwitchOnShortRelease()
 {
     GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
-    VerifyOrReturn (data != nullptr);
-    
+    VerifyOrReturn(data != nullptr);
+
     data->endpoint = mGenericSwitchEndpoint;
     data->event    = Switch::Events::ShortRelease::Id;
 
@@ -91,8 +91,8 @@ void GenericSwitchManager::GenericSwitchOnShortRelease()
 void GenericSwitchManager::GenericSwitchOnLongRelease()
 {
     GenericSwitchEventData * data = Platform::New<GenericSwitchEventData>();
-    VerifyOrReturn (data != nullptr);
-    
+    VerifyOrReturn(data != nullptr);
+
     data->endpoint = mGenericSwitchEndpoint;
     data->event    = Switch::Events::LongRelease::Id;
 
