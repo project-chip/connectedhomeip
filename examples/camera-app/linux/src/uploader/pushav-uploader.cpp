@@ -19,9 +19,11 @@
 #include "pushav-uploader.h"
 #include <algorithm>
 #include <cctype>
+#include <cerrno>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <fcntl.h>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -30,6 +32,8 @@
 #include <openssl/pem.h>
 #include <openssl/x509.h>
 #include <sys/stat.h>
+#include <system_error>
+#include <unistd.h>
 #include <vector>
 
 PushAVUploader::PushAVUploader() : mIsRunning(false) {}
@@ -62,6 +66,7 @@ PushAVUploader::~PushAVUploader()
     }
 
     Stop();
+    RemoveTlsFiles();
 }
 
 // Helper function to convert certificate from DER format to PEM format
@@ -164,22 +169,152 @@ std::string readAndPrintFile(const std::string & filePath)
     return fileContent;
 }
 
-void SaveCertToFile(const std::string & certData, const std::string & filePath)
+// Creates the file with mode 0600 so the content is never visible with wider permissions.
+// O_EXCL and O_NOFOLLOW make the call fail instead of reusing or following an existing path.
+bool SaveCertToFile(const std::string & certData, const std::string & filePath)
 {
-    std::ofstream out(filePath, std::ios::binary);
-    if (!out)
+    int fd = open(filePath.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, S_IRUSR | S_IWUSR);
+    if (fd < 0)
     {
-        ChipLogDetail(Camera, "Failed to open file: %s", filePath.c_str());
+        ChipLogError(Camera, "Failed to create file %s: %s", filePath.c_str(), strerror(errno));
+        return false;
+    }
+
+    size_t written = 0;
+    while (written < certData.size())
+    {
+        ssize_t n = write(fd, certData.data() + written, certData.size() - written);
+        if (n < 0)
+        {
+            if (errno == EINTR)
+            {
+                continue;
+            }
+            ChipLogError(Camera, "Failed to write file %s: %s", filePath.c_str(), strerror(errno));
+            close(fd);
+            return false;
+        }
+        written += static_cast<size_t>(n);
+    }
+
+    if (close(fd) != 0)
+    {
+        ChipLogError(Camera, "Failed to close file %s: %s", filePath.c_str(), strerror(errno));
+        return false;
+    }
+    return true;
+}
+
+// Overwrites the file content with zeros so the key does not stay in freed disk blocks. Best effort.
+static void ZeroFile(const std::string & filePath)
+{
+    int fd = open(filePath.c_str(), O_WRONLY | O_NOFOLLOW | O_CLOEXEC);
+    if (fd < 0)
+    {
         return;
     }
-    out.write(certData.data(), certData.size());
-    out.close();
 
-    // Set file permissions to read/write for owner only (0600)
-    if (chmod(filePath.c_str(), S_IRUSR | S_IWUSR) != 0)
+    struct stat st;
+    if (fstat(fd, &st) == 0)
     {
-        ChipLogError(Camera, "Failed to set permissions for file: %s", filePath.c_str());
+        const std::vector<char> zeros(static_cast<size_t>(st.st_size), 0);
+        size_t written = 0;
+        while (written < zeros.size())
+        {
+            ssize_t n = write(fd, zeros.data() + written, zeros.size() - written);
+            if (n < 0 && errno == EINTR)
+            {
+                continue;
+            }
+            if (n <= 0)
+            {
+                break;
+            }
+            written += static_cast<size_t>(n);
+        }
+        fsync(fd);
     }
+    close(fd);
+}
+
+bool PushAVUploader::EnsureTlsFiles()
+{
+    std::lock_guard<std::mutex> lock(mTlsFilesMutex);
+    if (mTlsFilesReady)
+    {
+        return true;
+    }
+
+    std::error_code ec;
+    std::string dirTemplate = (std::filesystem::temp_directory_path(ec) / "pushav-tls-XXXXXX").string();
+    if (ec)
+    {
+        ChipLogError(Camera, "Failed to get temporary directory: %s", ec.message().c_str());
+        return false;
+    }
+    if (mkdtemp(dirTemplate.data()) == nullptr)
+    {
+        ChipLogError(Camera, "Failed to create TLS directory %s: %s", dirTemplate.c_str(), strerror(errno));
+        return false;
+    }
+    mTlsDir         = dirTemplate;
+    mTlsRootPath    = mTlsDir + "/root.pem";
+    mTlsDevCertPath = mTlsDir + "/dev.pem";
+    mTlsDevKeyPath  = mTlsDir + "/dev.key";
+
+    // TODO: The logic to provide DER-formatted certificates and keys in memory (blob) format to curl is currently unstable. As a
+    // temporary workaround, PEM-format files are being provided as input to curl.
+    const std::string rootCertPEM = DerCertToPem(mCertBuffer.mRootCertBuffer);
+    std::string clientCertPEM     = DerCertToPem(mCertBuffer.mClientCertBuffer);
+    bool converted                = !rootCertPEM.empty() && !clientCertPEM.empty();
+    for (const auto & intermediate : mCertBuffer.mIntermediateCertBuffer)
+    {
+        const std::string intermediatePEM = DerCertToPem(intermediate);
+        converted                         = converted && !intermediatePEM.empty();
+        clientCertPEM.append("\n" + intermediatePEM);
+    }
+    const std::string keyPEM = ConvertECDSAPrivateKey_DER_to_PEM(mCertBuffer.mClientKeyBuffer);
+    converted                = converted && !keyPEM.empty();
+
+    if (converted && SaveCertToFile(rootCertPEM, mTlsRootPath) && SaveCertToFile(clientCertPEM, mTlsDevCertPath) &&
+        SaveCertToFile(keyPEM, mTlsDevKeyPath))
+    {
+        mTlsFilesReady = true;
+        return true;
+    }
+
+    ChipLogError(Camera, "Failed to prepare TLS files in %s", mTlsDir.c_str());
+    RemoveTlsFilesLocked();
+    return false;
+}
+
+void PushAVUploader::RemoveTlsFiles()
+{
+    std::lock_guard<std::mutex> lock(mTlsFilesMutex);
+    RemoveTlsFilesLocked();
+}
+
+void PushAVUploader::RemoveTlsFilesLocked()
+{
+    if (mTlsDir.empty())
+    {
+        return;
+    }
+
+    ZeroFile(mTlsDevKeyPath);
+    for (const std::string & path : { mTlsRootPath, mTlsDevCertPath, mTlsDevKeyPath })
+    {
+        if (unlink(path.c_str()) != 0 && errno != ENOENT)
+        {
+            ChipLogError(Camera, "Failed to delete %s: %s", path.c_str(), strerror(errno));
+        }
+    }
+    if (rmdir(mTlsDir.c_str()) != 0)
+    {
+        ChipLogError(Camera, "Failed to remove directory %s: %s", mTlsDir.c_str(), strerror(errno));
+    }
+    mTlsDir.clear();
+    mTlsFilesReady = false;
 }
 
 void PushAVUploader::ProcessQueue()
@@ -456,9 +591,6 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     std::string fullUrl;
 
     // Declare all variables that are used after goto cleanup
-    std::string rootCertPEM;
-    std::string clientCertPEM;
-    std::string derKeyToPemstr;
     std::error_code ec;
     size_t sessionPos;
     CURLcode res;
@@ -493,30 +625,15 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, static_cast<curl_off_t>(size));
 #ifndef TLS_CLUSTER_NOT_ENABLED
 
-    // TODO: The logic to provide DER-formatted certificates and keys in memory (blob) format to curl is currently unstable. As a
-    // temporary workaround, PEM-format files are being provided as input to curl.
-
-    rootCertPEM   = DerCertToPem(mCertBuffer.mRootCertBuffer);
-    clientCertPEM = DerCertToPem(mCertBuffer.mClientCertBuffer);
-    if (!mCertBuffer.mIntermediateCertBuffer.empty())
+    if (!EnsureTlsFiles())
     {
-        clientCertPEM.append("\n"); // Add newline separator between certs in PEM format
+        ChipLogError(Camera, "TLS files are not available, skipping upload of %s", data.first.c_str());
+        goto cleanup;
     }
-    for (size_t i = 0; i < mCertBuffer.mIntermediateCertBuffer.size(); ++i)
-    {
-        clientCertPEM.append(DerCertToPem(mCertBuffer.mIntermediateCertBuffer[i]) + "\n");
-    }
-    derKeyToPemstr = ConvertECDSAPrivateKey_DER_to_PEM(mCertBuffer.mClientKeyBuffer);
 
-    SaveCertToFile(rootCertPEM, "/tmp/root.pem");
-    SaveCertToFile(clientCertPEM, "/tmp/dev.pem");
-
-    // Logic to save PEM format to file
-    SaveCertToFile(derKeyToPemstr, "/tmp/dev.key");
-
-    curl_easy_setopt(curl, CURLOPT_CAINFO, "/tmp/root.pem");
-    curl_easy_setopt(curl, CURLOPT_SSLCERT, "/tmp/dev.pem");
-    curl_easy_setopt(curl, CURLOPT_SSLKEY, "/tmp/dev.key");
+    curl_easy_setopt(curl, CURLOPT_CAINFO, mTlsRootPath.c_str());
+    curl_easy_setopt(curl, CURLOPT_SSLCERT, mTlsDevCertPath.c_str());
+    curl_easy_setopt(curl, CURLOPT_SSLKEY, mTlsDevKeyPath.c_str());
 
     //  curl_blob rootBlob   = { mCertBuffer.mRootCertBuffer.data(), mCertBuffer.mRootCertBuffer.size(), CURL_BLOB_COPY };
     //  curl_blob clientBlob = { mCertBuffer.mClientCertBuffer.data(), mCertBuffer.mClientCertBuffer.size(), CURL_BLOB_COPY };

@@ -72,6 +72,12 @@ public:
 private:
     void ProcessQueue();
     void UploadData(std::pair<std::string, std::string> data);
+
+    // Writes the PEM files curl reads, once per uploader, into a private 0700 directory.
+    // Returns false if the files could not be written.
+    bool EnsureTlsFiles();
+    void RemoveTlsFiles();
+    void RemoveTlsFilesLocked();
     PushAVCertPath mCertPath;
     PushAVCertBuffer mCertBuffer;
     std::queue<std::pair<std::string, std::string>> mAvData;
@@ -79,4 +85,11 @@ private:
     std::atomic<bool> mIsRunning;
     std::thread mUploaderThread;
     std::vector<std::string> mStreamIdNameMap;
+
+    std::mutex mTlsFilesMutex;
+    bool mTlsFilesReady = false;
+    std::string mTlsDir;
+    std::string mTlsRootPath;
+    std::string mTlsDevCertPath;
+    std::string mTlsDevKeyPath;
 };
