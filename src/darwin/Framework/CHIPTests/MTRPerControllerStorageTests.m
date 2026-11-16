@@ -2952,7 +2952,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     __block os_unfair_lock counterLock = OS_UNFAIR_LOCK_INIT;
     __block NSUInteger subscriptionRunningCount = 0;
     __block NSUInteger subscriptionDequeueCount = 0;
-    __block BOOL baseDeviceReadCompleted = NO;
+    NSNumber * baseDeviceNodeID = @(105);
+    __block BOOL baseDeviceSubscriptionDequeued = NO;
 
     for (NSNumber * deviceID in orderedDeviceIDs) {
         MTRDeviceTestDelegate * delegate = deviceDelegates[deviceID];
@@ -2970,6 +2971,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
             os_unfair_lock_lock(&counterLock);
             subscriptionRunningCount++;
             subscriptionDequeueCount++;
+            if ([deviceID isEqualToNumber:baseDeviceNodeID]) {
+                baseDeviceSubscriptionDequeued = YES;
+            }
             // At any given moment, only up to subscriptionPoolSize subcriptions can be going on
             XCTAssertLessThanOrEqual(subscriptionRunningCount, subscriptionPoolSize);
             os_unfair_lock_unlock(&counterLock);
@@ -2978,14 +2982,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
             // Stop counting subscribing right before calling work item completion
             os_unfair_lock_lock(&counterLock);
             subscriptionRunningCount--;
-
-            // Given the base device read is happening on the 5th device, at the completion
-            // time of the first [pool size] subscriptions, the BaseDevice's request to
-            // read can't have completed, as it should be gated on its call to
-            // MTRDeviceController_Concrete's getSessionForNode:.
-            if (subscriptionDequeueCount <= (orderedDeviceIDs.count - subscriptionPoolSize)) {
-                XCTAssertFalse(baseDeviceReadCompleted);
-            }
             os_unfair_lock_unlock(&counterLock);
         };
         __weak __auto_type weakDelegate = delegate;
@@ -3041,25 +3037,50 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         [device setDelegate:deviceDelegates[deviceID] queue:queue];
     }
 
+    // Fill every slot of the session attempt pool before the base device read. Unless the read can
+    // use the session its node's subscription sets up, it needs a new session to a Thread node and
+    // must wait for a free slot there, while the subscriptions, which do not use that pool, still
+    // get set up.
+    __block BOOL sessionAttemptSlotsReleased = NO;
+    NSMutableArray<MTRAsyncWorkCompletionBlock> * heldSessionAttemptSlots = [NSMutableArray array];
+    for (NSInteger i = 0; i < subscriptionPoolSize; i++) {
+        MTRAsyncWorkItem * holdSlotWorkItem = [[MTRAsyncWorkItem alloc] initWithQueue:queue];
+        [holdSlotWorkItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
+            [heldSessionAttemptSlots addObject:completion];
+        }];
+        [controller.sessionAttemptPool enqueueWorkItem:holdSlotWorkItem description:@"Holding a session attempt slot"];
+    }
+
     // Create the base device to attempt to read from the 5th device
     __auto_type * baseDeviceReadExpectation = [self expectationWithDescription:@"BaseDevice read"];
-    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:@(105) controller:controller];
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:baseDeviceNodeID controller:controller];
     __auto_type * onOffCluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice endpointID:@(1) queue:queue];
     [onOffCluster readAttributeOnOffWithCompletion:^(NSNumber * value, NSError * _Nullable error) {
         XCTAssertNil(error);
         // We expect the device to be off.
         XCTAssertEqualObjects(value, @(0));
-        [baseDeviceReadExpectation fulfill];
+        // While every session attempt slot is held, the read can only have used the session set up
+        // by its node's subscription.
         os_unfair_lock_lock(&counterLock);
-        baseDeviceReadCompleted = YES;
+        XCTAssertTrue(sessionAttemptSlotsReleased || baseDeviceSubscriptionDequeued);
         os_unfair_lock_unlock(&counterLock);
+        [baseDeviceReadExpectation fulfill];
     }];
 
     // Make the wait time depend on device count
-    NSArray * expectationsToWait = [subscriptionExpectations.allValues arrayByAddingObject:baseDeviceReadExpectation];
-    [self waitForExpectations:expectationsToWait timeout:(NSTimeInterval) (kSubscriptionPoolBaseTimeoutInSeconds * orderedDeviceIDs.count)];
+    [self waitForExpectations:subscriptionExpectations.allValues timeout:(NSTimeInterval) (kSubscriptionPoolBaseTimeoutInSeconds * orderedDeviceIDs.count)];
 
     XCTAssertEqual(subscriptionDequeueCount, orderedDeviceIDs.count);
+    XCTAssertEqual(heldSessionAttemptSlots.count, (NSUInteger) subscriptionPoolSize);
+
+    // Free the session attempt slots; the base device read can now get its session.
+    os_unfair_lock_lock(&counterLock);
+    sessionAttemptSlotsReleased = YES;
+    os_unfair_lock_unlock(&counterLock);
+    for (MTRAsyncWorkCompletionBlock completion in heldSessionAttemptSlots) {
+        completion(MTRAsyncWorkComplete);
+    }
+    [self waitForExpectations:@[ baseDeviceReadExpectation ] timeout:kTimeoutInSeconds];
 
     // Reset our commissionees.
     for (NSNumber * deviceID in orderedDeviceIDs) {
