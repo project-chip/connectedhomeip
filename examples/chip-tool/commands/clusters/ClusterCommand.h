@@ -257,10 +257,10 @@ protected:
         AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
         AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
         AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
-        AddArgument("delay-report-min-ms", 0, UINT16_MAX, &mDelayReportMinMs,
-                    "If provided, sets DelayReportData.delayMinMs in InvokeRequestMessage.");
-        AddArgument("delay-report-jitter-ms", 0, UINT16_MAX, &mDelayReportJitterWindowMs,
-                    "If provided, sets DelayReportData.delayJitterWindowMs in InvokeRequestMessage.");
+        AddArgument("report-delay-min-ms", 0, UINT16_MAX, &mReportDelayMinMs,
+                    "If provided, sets ReportDelayMinMs in InvokeRequestMessage.");
+        AddArgument("report-delay-jitter-window-ms", 0, UINT16_MAX, &mReportDelayJitterWindowMs,
+                    "If provided, sets ReportDelayJitterWindowMs in InvokeRequestMessage.");
         ModelCommand::AddArguments();
     }
 

@@ -359,10 +359,11 @@ public:
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
-    void SetDelayReportData(const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
-    {
-        mDelayReportData = aDelayReportData;
-    }
+    /**
+     * Sets the ReportDelayMinMs and ReportDelayJitterWindowMs fields to send with the Invoke
+     * Request. A field with no value is not sent, and the receiver uses its default for it.
+     */
+    void SetReportDelay(const InvokeRequestMessage::ReportDelay & aReportDelay) { mReportDelay = aReportDelay; }
 
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, PrepareCommandParameters & aPrepareCommandParams);
 
@@ -681,7 +682,7 @@ private:
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;
     bool mAllowLargePayload     = false;
-    std::optional<InvokeRequestMessage::DelayReportData> mDelayReportData;
+    InvokeRequestMessage::ReportDelay mReportDelay;
 };
 
 } // namespace app

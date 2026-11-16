@@ -1926,6 +1926,31 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_GROUPCAST_REPORT_DELAY_MIN_MS
+ *
+ * @brief The minimum delay, in milliseconds, before the next report on subscriptions involving the endpoints targeted by a
+ * groupcast Invoke Request that has no ReportDelayMinMs field.  The specification recommends 0.
+ */
+#ifndef CHIP_CONFIG_GROUPCAST_REPORT_DELAY_MIN_MS
+#define CHIP_CONFIG_GROUPCAST_REPORT_DELAY_MIN_MS 0
+#endif
+
+/**
+ * @def CHIP_CONFIG_GROUPCAST_REPORT_DELAY_JITTER_WINDOW_MS
+ *
+ * @brief The window, in milliseconds, of random jitter added to the report delay for a groupcast Invoke Request that has no
+ * ReportDelayJitterWindowMs field.  The specification recommends 1000.
+ */
+#ifndef CHIP_CONFIG_GROUPCAST_REPORT_DELAY_JITTER_WINDOW_MS
+#define CHIP_CONFIG_GROUPCAST_REPORT_DELAY_JITTER_WINDOW_MS 1000
+#endif
+
+#if CHIP_CONFIG_GROUPCAST_REPORT_DELAY_MIN_MS < 0 || CHIP_CONFIG_GROUPCAST_REPORT_DELAY_MIN_MS > 65535 ||                          \
+    CHIP_CONFIG_GROUPCAST_REPORT_DELAY_JITTER_WINDOW_MS < 0 || CHIP_CONFIG_GROUPCAST_REPORT_DELAY_JITTER_WINDOW_MS > 65535
+#error "CHIP_CONFIG_GROUPCAST_REPORT_DELAY_MIN_MS and CHIP_CONFIG_GROUPCAST_REPORT_DELAY_JITTER_WINDOW_MS must fit in a uint16_t"
+#endif
+
+/**
  * @def CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
  *
  * @brief Defines the entry iterator delegate pool size of the ICDObserver object pool in ICDManager.h.

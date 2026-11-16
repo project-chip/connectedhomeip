@@ -474,18 +474,22 @@ public:
         mLastTargetedEndpoints.assign(targetedEndpoints.begin(), targetedEndpoints.end());
     }
 
+    bool IsReportDeferralActive() override { return mReportDeferralActive; }
+
     void ResetCounter()
     {
         onFinalCalledTimes       = 0;
         onDelayReportCalledTimes = 0;
         mLastDelayReport         = System::Clock::Timeout::zero();
         mLastTargetedEndpoints.clear();
+        mReportDeferralActive = false;
     }
 
     int onFinalCalledTimes                  = 0;
     int onDelayReportCalledTimes            = 0;
     System::Clock::Timeout mLastDelayReport = System::Clock::Timeout::zero();
     std::vector<EndpointId> mLastTargetedEndpoints;
+    bool mReportDeferralActive = false;
 } mockCommandHandlerDelegate;
 
 class TestCommandInteractionModel : public TestImCustomDataModel
@@ -579,15 +583,24 @@ public:
     void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponse();
     void TestCommandHandler_ReleaseWithExchangeClosed();
     void TestCommandHandler_GetExchangeContextWhenAsync();
-    void TestCommandHandler_DelayReportData();
-    void TestCommandHandler_DelayReportData_Deduplication();
+    void TestCommandHandler_ReportDelay();
+    void TestCommandHandler_ReportDelay_Deduplication();
 #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
-    void TestCommandHandler_DelayReportData_MultipleEndpoints();
+    void TestCommandHandler_ReportDelay_MultipleEndpoints();
 #endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
-    void TestCommandHandler_DelayReportData_InvalidCommandPath();
-    void TestCommandHandler_DelayReportData_Groupcast();
-    void TestInteractionModelCommands_SendCommand_DelayReportData();
-    void TestInteractionModelCommands_SendGroupCommand_DelayReportData();
+    void TestCommandHandler_ReportDelay_InvalidCommandPath();
+    void TestCommandHandler_ReportDelay_Groupcast();
+    void TestCommandHandler_ReportDelay_UnicastDefaults();
+    void TestCommandHandler_ReportDelay_GroupcastDefaults();
+    void TestInteractionModelCommands_SendCommand_ReportDelay();
+    void TestInteractionModelCommands_SendGroupCommand_ReportDelay();
+
+    // Sends one command carrying aReportDelay through a CommandHandlerImpl, unicast to kTestEndpointId or, given aGroupId,
+    // groupcast, while mockCommandHandlerDelegate reports aReportDeferralActive.  mockCommandHandlerDelegate records the
+    // resulting OnDelayReport call, if any.
+    Protocols::InteractionModel::Status ProcessCommandWithReportDelay(const InvokeRequestMessage::ReportDelay & aReportDelay,
+                                                                      bool aReportDeferralActive,
+                                                                      std::optional<GroupId> aGroupId = std::nullopt);
 
     /**
      * With the introduction of batch invoke commands, CommandHandler keeps track of incoming
@@ -2310,7 +2323,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GetExchangeContex
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData)
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReportDelay)
 {
     isCommandDispatched = false;
     mockCommandSenderExtendedDelegate.ResetCounter();
@@ -2322,10 +2335,10 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData)
     configParameters.SetRemoteMaxPathsPerInvoke(1);
     EXPECT_EQ(CHIP_NO_ERROR, commandSender.SetCommandSenderConfig(configParameters));
 
-    InvokeRequestMessage::DelayReportData delayReportData;
-    delayReportData.delayMinMs          = 1000;
-    delayReportData.delayJitterWindowMs = 500;
-    commandSender.SetDelayReportData(delayReportData);
+    InvokeRequestMessage::ReportDelay reportDelay;
+    reportDelay.minMs          = 1000;
+    reportDelay.jitterWindowMs = 500;
+    commandSender.SetReportDelay(reportDelay);
 
     // Prepare a command
     {
@@ -2362,7 +2375,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData)
     EXPECT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints[0], kTestEndpointId);
 }
 
-TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_Deduplication)
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReportDelay_Deduplication)
 {
     isCommandDispatched = false;
     mockCommandSenderExtendedDelegate.ResetCounter();
@@ -2374,10 +2387,10 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_D
     configParameters.SetRemoteMaxPathsPerInvoke(2);
     EXPECT_EQ(CHIP_NO_ERROR, commandSender.SetCommandSenderConfig(configParameters));
 
-    InvokeRequestMessage::DelayReportData delayReportData;
-    delayReportData.delayMinMs          = 1000;
-    delayReportData.delayJitterWindowMs = 500;
-    commandSender.SetDelayReportData(delayReportData);
+    InvokeRequestMessage::ReportDelay reportDelay;
+    reportDelay.minMs          = 1000;
+    reportDelay.jitterWindowMs = 500;
+    commandSender.SetReportDelay(reportDelay);
 
     // Prepare 2 commands targeting the SAME endpoint (kTestEndpointId) with different command IDs
     {
@@ -2421,7 +2434,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_D
 }
 
 #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
-TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_MultipleEndpoints)
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReportDelay_MultipleEndpoints)
 {
     isCommandDispatched = false;
     mockCommandSenderExtendedDelegate.ResetCounter();
@@ -2433,10 +2446,10 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_M
     configParameters.SetRemoteMaxPathsPerInvoke(2);
     EXPECT_EQ(CHIP_NO_ERROR, commandSender.SetCommandSenderConfig(configParameters));
 
-    InvokeRequestMessage::DelayReportData delayReportData;
-    delayReportData.delayMinMs          = 1000;
-    delayReportData.delayJitterWindowMs = 500;
-    commandSender.SetDelayReportData(delayReportData);
+    InvokeRequestMessage::ReportDelay reportDelay;
+    reportDelay.minMs          = 1000;
+    reportDelay.jitterWindowMs = 500;
+    commandSender.SetReportDelay(reportDelay);
 
     // Command 1 on Endpoint 1
     {
@@ -2482,7 +2495,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_M
 }
 #endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
 
-TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_InvalidCommandPath)
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReportDelay_InvalidCommandPath)
 {
     isCommandDispatched = false;
     mockCommandSenderExtendedDelegate.ResetCounter();
@@ -2494,10 +2507,10 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_I
     configParameters.SetRemoteMaxPathsPerInvoke(1);
     EXPECT_EQ(CHIP_NO_ERROR, commandSender.SetCommandSenderConfig(configParameters));
 
-    InvokeRequestMessage::DelayReportData delayReportData;
-    delayReportData.delayMinMs          = 1000;
-    delayReportData.delayJitterWindowMs = 500;
-    commandSender.SetDelayReportData(delayReportData);
+    InvokeRequestMessage::ReportDelay reportDelay;
+    reportDelay.minMs          = 1000;
+    reportDelay.jitterWindowMs = 500;
+    commandSender.SetReportDelay(reportDelay);
 
     // Command with non-existent / unsupported command ID
     {
@@ -2530,7 +2543,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_I
     EXPECT_TRUE(mockCommandHandlerDelegate.mLastTargetedEndpoints.empty());
 }
 
-TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_Groupcast)
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReportDelay_Groupcast)
 {
     isCommandDispatched = false;
     mockCommandSenderExtendedDelegate.ResetCounter();
@@ -2538,10 +2551,10 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_G
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
                                      &pendingResponseTracker);
 
-    InvokeRequestMessage::DelayReportData delayReportData;
-    delayReportData.delayMinMs          = 1000;
-    delayReportData.delayJitterWindowMs = 500;
-    commandSender.SetDelayReportData(delayReportData);
+    InvokeRequestMessage::ReportDelay reportDelay;
+    reportDelay.minMs          = 1000;
+    reportDelay.jitterWindowMs = 500;
+    commandSender.SetReportDelay(reportDelay);
 
     constexpr GroupId kTestGroupId = 0x0101; // Group 1 in GroupTesting::InitData maps to endpoint 1
 
@@ -2576,6 +2589,148 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_G
     EXPECT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints[0], kTestEndpointId);
 }
 
+Protocols::InteractionModel::Status
+TestCommandInteraction::ProcessCommandWithReportDelay(const InvokeRequestMessage::ReportDelay & aReportDelay,
+                                                      bool aReportDeferralActive, std::optional<GroupId> aGroupId)
+{
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
+    commandSender.SetReportDelay(aReportDelay);
+
+    CommandPathParams commandPath = aGroupId.has_value()
+        ? MakeTestGroupCommandPath(*aGroupId, kTestClusterId, kTestCommandIdWithData)
+        : MakeTestCommandPath(kTestCommandIdWithData);
+    app::CommandSender::PrepareCommandParameters prepareCommandParams;
+    prepareCommandParams.SetStartDataStruct(true);
+    EXPECT_EQ(CHIP_NO_ERROR, commandSender.PrepareCommand(commandPath, prepareCommandParams));
+    EXPECT_EQ(CHIP_NO_ERROR, commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+    app::CommandSender::FinishCommandParameters finishCommandParams;
+    finishCommandParams.SetEndDataStruct(true);
+    EXPECT_EQ(CHIP_NO_ERROR, commandSender.FinishCommand(finishCommandParams));
+
+    System::PacketBufferHandle commandDatabuf;
+    EXPECT_EQ(commandSender.Finalize(commandDatabuf), CHIP_NO_ERROR);
+
+    BasicCommandPathRegistry<4> basicCommandPathRegistry;
+    MockCommandResponder mockCommandResponder;
+    MockGroupCommandResponder mockGroupCommandResponder(aGroupId.value_or(0), GetBobFabricIndex());
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry,
+                                                             aGroupId.has_value() ? &mockGroupCommandResponder
+                                                                                  : &mockCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+
+    mockCommandHandlerDelegate.ResetCounter();
+    mockCommandHandlerDelegate.mReportDeferralActive = aReportDeferralActive;
+    Protocols::InteractionModel::Status status       = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    mockCommandHandlerDelegate.mReportDeferralActive = false;
+    return status;
+}
+
+namespace {
+
+uint64_t LastDelayReportMs()
+{
+    return static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::milliseconds>(mockCommandHandlerDelegate.mLastDelayReport).count());
+}
+
+// Enough requests that a jitter window of 2 ms or more all but certainly adds nonzero jitter to at least one of them, and that a
+// wrongly applied window of 1000 ms all but certainly shows up in at least one of them.
+constexpr int kReportDelayRequestCount = 20;
+
+} // namespace
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReportDelay_UnicastDefaults)
+{
+    using Protocols::InteractionModel::Status;
+
+    // With neither field, a unicast request's delay is 0, which changes nothing when no deferral is active...
+    EXPECT_EQ(ProcessCommandWithReportDelay({}, /* aReportDeferralActive = */ false), Status::Success);
+    EXPECT_EQ(mockCommandHandlerDelegate.onDelayReportCalledTimes, 0);
+
+    // ...and ends one that is.
+    EXPECT_EQ(ProcessCommandWithReportDelay({}, /* aReportDeferralActive = */ true), Status::Success);
+    EXPECT_EQ(mockCommandHandlerDelegate.onDelayReportCalledTimes, 1);
+    EXPECT_EQ(LastDelayReportMs(), 0u);
+    ASSERT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints.size(), 1u);
+    EXPECT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints[0], kTestEndpointId);
+
+    InvokeRequestMessage::ReportDelay minOnly;
+    minOnly.minMs = 700;
+    for (int i = 0; i < kReportDelayRequestCount; ++i)
+    {
+        EXPECT_EQ(ProcessCommandWithReportDelay(minOnly, /* aReportDeferralActive = */ false), Status::Success);
+        ASSERT_EQ(mockCommandHandlerDelegate.onDelayReportCalledTimes, 1);
+        // A missing ReportDelayJitterWindowMs adds no jitter to a unicast request.
+        EXPECT_EQ(LastDelayReportMs(), 700u);
+    }
+
+    InvokeRequestMessage::ReportDelay jitterOnly;
+    jitterOnly.jitterWindowMs = 300;
+    for (int i = 0; i < kReportDelayRequestCount; ++i)
+    {
+        // The deferral is active so that a random jitter of 0 is still passed on.
+        EXPECT_EQ(ProcessCommandWithReportDelay(jitterOnly, /* aReportDeferralActive = */ true), Status::Success);
+        ASSERT_EQ(mockCommandHandlerDelegate.onDelayReportCalledTimes, 1);
+        // A missing ReportDelayMinMs is 0 for a unicast request, and the jitter is less than its window.
+        EXPECT_LT(LastDelayReportMs(), 300u);
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReportDelay_GroupcastDefaults)
+{
+    using Protocols::InteractionModel::Status;
+    constexpr GroupId kTestGroupId            = 0x0101; // Group 1 in GroupTesting::InitData maps to endpoint 1
+    constexpr uint64_t kDefaultMinMs          = CHIP_CONFIG_GROUPCAST_REPORT_DELAY_MIN_MS;
+    constexpr uint64_t kDefaultJitterWindowMs = CHIP_CONFIG_GROUPCAST_REPORT_DELAY_JITTER_WINDOW_MS;
+    constexpr uint64_t kMaxDefaultJitterMs    = kDefaultJitterWindowMs > 0 ? kDefaultJitterWindowMs - 1 : 0;
+
+    uint64_t maxDelayMs = 0;
+    for (int i = 0; i < kReportDelayRequestCount; ++i)
+    {
+        // The deferral is active so that a default delay of 0 is still passed on.
+        EXPECT_EQ(ProcessCommandWithReportDelay({}, /* aReportDeferralActive = */ true, kTestGroupId), Status::Success);
+        ASSERT_EQ(mockCommandHandlerDelegate.onDelayReportCalledTimes, 1);
+        // With neither field, a groupcast request gets the configured default delay and jitter.
+        EXPECT_GE(LastDelayReportMs(), kDefaultMinMs);
+        EXPECT_LE(LastDelayReportMs(), kDefaultMinMs + kMaxDefaultJitterMs);
+        maxDelayMs = std::max(maxDelayMs, LastDelayReportMs());
+    }
+    ASSERT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints.size(), 1u);
+    EXPECT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints[0], kTestEndpointId);
+    if constexpr (kDefaultJitterWindowMs >= 2)
+    {
+        // The default jitter really is added, rather than only being allowed for by the bounds above.
+        EXPECT_GT(maxDelayMs, kDefaultMinMs);
+    }
+
+    InvokeRequestMessage::ReportDelay minOnly;
+    minOnly.minMs = 500;
+    maxDelayMs    = 0;
+    for (int i = 0; i < kReportDelayRequestCount; ++i)
+    {
+        EXPECT_EQ(ProcessCommandWithReportDelay(minOnly, /* aReportDeferralActive = */ false, kTestGroupId), Status::Success);
+        ASSERT_EQ(mockCommandHandlerDelegate.onDelayReportCalledTimes, 1);
+        // A missing ReportDelayJitterWindowMs takes the groupcast default.
+        EXPECT_GE(LastDelayReportMs(), 500u);
+        EXPECT_LE(LastDelayReportMs(), 500u + kMaxDefaultJitterMs);
+        maxDelayMs = std::max(maxDelayMs, LastDelayReportMs());
+    }
+    if constexpr (kDefaultJitterWindowMs >= 2)
+    {
+        EXPECT_GT(maxDelayMs, 500u);
+    }
+
+    InvokeRequestMessage::ReportDelay noJitter;
+    noJitter.jitterWindowMs = 0;
+    // The deferral is active so that a default minimum of 0 is still passed on.
+    EXPECT_EQ(ProcessCommandWithReportDelay(noJitter, /* aReportDeferralActive = */ true, kTestGroupId), Status::Success);
+    EXPECT_EQ(mockCommandHandlerDelegate.onDelayReportCalledTimes, 1);
+    // A missing ReportDelayMinMs takes the groupcast default, and an explicit window of 0 adds no jitter.
+    EXPECT_EQ(LastDelayReportMs(), kDefaultMinMs);
+}
+
 namespace {
 
 class TestInteractionModelCommands : public InteractionModelCommands
@@ -2584,14 +2739,14 @@ public:
     TestInteractionModelCommands(CommandSender::Callback * callback) : InteractionModelCommands(callback) {}
     ~TestInteractionModelCommands() { Shutdown(); }
 
-    void SetDelayReportMinMs(const Optional<uint16_t> & delayReportMinMs) { mDelayReportMinMs = delayReportMinMs; }
-    void SetDelayReportJitterWindowMs(const Optional<uint16_t> & delayReportJitterWindowMs)
+    void SetReportDelayMinMs(const Optional<uint16_t> & reportDelayMinMs) { mReportDelayMinMs = reportDelayMinMs; }
+    void SetReportDelayJitterWindowMs(const Optional<uint16_t> & reportDelayJitterWindowMs)
     {
-        mDelayReportJitterWindowMs = delayReportJitterWindowMs;
+        mReportDelayJitterWindowMs = reportDelayJitterWindowMs;
     }
 
-    Optional<uint16_t> GetDelayReportMinMs() const { return mDelayReportMinMs; }
-    Optional<uint16_t> GetDelayReportJitterWindowMs() const { return mDelayReportJitterWindowMs; }
+    Optional<uint16_t> GetReportDelayMinMs() const { return mReportDelayMinMs; }
+    Optional<uint16_t> GetReportDelayJitterWindowMs() const { return mReportDelayJitterWindowMs; }
 
     using InteractionModelCommands::ResetOptions;
     using InteractionModelCommands::SendCommand;
@@ -2599,28 +2754,28 @@ public:
     using InteractionModelCommands::Shutdown;
 };
 
-CHIP_ERROR ParseDelayReportDataFromMessage(const System::PacketBufferHandle & payload,
-                                           std::optional<InvokeRequestMessage::DelayReportData> & outDelayReportData)
+CHIP_ERROR ParseReportDelayFromMessage(const System::PacketBufferHandle & payload,
+                                       InvokeRequestMessage::ReportDelay & outReportDelay)
 {
     System::PacketBufferTLVReader reader;
     reader.Init(payload.Retain());
     InvokeRequestMessage::Parser invokeRequestMessageParser;
     ReturnErrorOnFailure(invokeRequestMessageParser.Init(reader));
-    return invokeRequestMessageParser.GetDelayReportData(outDelayReportData);
+    return invokeRequestMessageParser.GetReportDelay(outReportDelay);
 }
 
 } // namespace
 
-TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendCommand_DelayReportData)
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendCommand_ReportDelay)
 {
     mockCommandSenderDelegate.ResetCounter();
     TestInteractionModelCommands commands(&mockCommandSenderDelegate);
     OperationalDeviceProxy device(&GetExchangeManager(), GetSessionBobToAlice());
 
-    EXPECT_FALSE(commands.GetDelayReportMinMs().HasValue());
-    EXPECT_FALSE(commands.GetDelayReportJitterWindowMs().HasValue());
+    EXPECT_FALSE(commands.GetReportDelayMinMs().HasValue());
+    EXPECT_FALSE(commands.GetReportDelayJitterWindowMs().HasValue());
 
-    // 1. Neither delay-report-min-ms nor delay-report-jitter-ms set: DelayReportData is omitted.
+    // 1. Neither report-delay-min-ms nor report-delay-jitter-window-ms set: neither field is sent.
     {
         chip::Testing::MessageCapturer messageLog(*this);
         messageLog.mCaptureStandaloneAcks = false;
@@ -2632,15 +2787,16 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendCom
         ASSERT_GE(messageLog.MessageCount(), 1u);
         ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest));
 
-        std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-        EXPECT_EQ(ParseDelayReportDataFromMessage(messageLog.MessagePayload(0), delayReportData), CHIP_NO_ERROR);
-        EXPECT_FALSE(delayReportData.has_value());
+        InvokeRequestMessage::ReportDelay reportDelay;
+        EXPECT_EQ(ParseReportDelayFromMessage(messageLog.MessagePayload(0), reportDelay), CHIP_NO_ERROR);
+        EXPECT_FALSE(reportDelay.minMs.has_value());
+        EXPECT_FALSE(reportDelay.jitterWindowMs.has_value());
     }
 
-    // 2. Only delay-report-min-ms set: delayJitterWindowMs defaults to 0.
+    // 2. Only report-delay-min-ms set: only ReportDelayMinMs is sent.
     {
-        commands.SetDelayReportMinMs(MakeOptional<uint16_t>(static_cast<uint16_t>(1000)));
-        commands.SetDelayReportJitterWindowMs(NullOptional);
+        commands.SetReportDelayMinMs(MakeOptional<uint16_t>(static_cast<uint16_t>(1000)));
+        commands.SetReportDelayJitterWindowMs(NullOptional);
 
         chip::Testing::MessageCapturer messageLog(*this);
         messageLog.mCaptureStandaloneAcks = false;
@@ -2652,17 +2808,17 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendCom
         ASSERT_GE(messageLog.MessageCount(), 1u);
         ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest));
 
-        std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-        EXPECT_EQ(ParseDelayReportDataFromMessage(messageLog.MessagePayload(0), delayReportData), CHIP_NO_ERROR);
-        ASSERT_TRUE(delayReportData.has_value());
-        EXPECT_EQ(delayReportData->delayMinMs, 1000u);
-        EXPECT_EQ(delayReportData->delayJitterWindowMs, 0u);
+        InvokeRequestMessage::ReportDelay reportDelay;
+        EXPECT_EQ(ParseReportDelayFromMessage(messageLog.MessagePayload(0), reportDelay), CHIP_NO_ERROR);
+        ASSERT_TRUE(reportDelay.minMs.has_value());
+        EXPECT_EQ(*reportDelay.minMs, 1000u);
+        EXPECT_FALSE(reportDelay.jitterWindowMs.has_value());
     }
 
-    // 3. Only delay-report-jitter-ms set: delayMinMs defaults to 0.
+    // 3. Only report-delay-jitter-window-ms set: only ReportDelayJitterWindowMs is sent.
     {
-        commands.SetDelayReportMinMs(NullOptional);
-        commands.SetDelayReportJitterWindowMs(MakeOptional<uint16_t>(static_cast<uint16_t>(500)));
+        commands.SetReportDelayMinMs(NullOptional);
+        commands.SetReportDelayJitterWindowMs(MakeOptional<uint16_t>(static_cast<uint16_t>(500)));
 
         chip::Testing::MessageCapturer messageLog(*this);
         messageLog.mCaptureStandaloneAcks = false;
@@ -2674,17 +2830,17 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendCom
         ASSERT_GE(messageLog.MessageCount(), 1u);
         ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest));
 
-        std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-        EXPECT_EQ(ParseDelayReportDataFromMessage(messageLog.MessagePayload(0), delayReportData), CHIP_NO_ERROR);
-        ASSERT_TRUE(delayReportData.has_value());
-        EXPECT_EQ(delayReportData->delayMinMs, 0u);
-        EXPECT_EQ(delayReportData->delayJitterWindowMs, 500u);
+        InvokeRequestMessage::ReportDelay reportDelay;
+        EXPECT_EQ(ParseReportDelayFromMessage(messageLog.MessagePayload(0), reportDelay), CHIP_NO_ERROR);
+        EXPECT_FALSE(reportDelay.minMs.has_value());
+        ASSERT_TRUE(reportDelay.jitterWindowMs.has_value());
+        EXPECT_EQ(*reportDelay.jitterWindowMs, 500u);
     }
 
-    // 4. Both delay-report-min-ms and delay-report-jitter-ms set: both fields are encoded and processed by CommandHandlerImpl.
+    // 4. Both report-delay-min-ms and report-delay-jitter-window-ms set: both fields are sent and processed by CommandHandlerImpl.
     {
-        commands.SetDelayReportMinMs(MakeOptional<uint16_t>(static_cast<uint16_t>(1000)));
-        commands.SetDelayReportJitterWindowMs(MakeOptional<uint16_t>(static_cast<uint16_t>(500)));
+        commands.SetReportDelayMinMs(MakeOptional<uint16_t>(static_cast<uint16_t>(1000)));
+        commands.SetReportDelayJitterWindowMs(MakeOptional<uint16_t>(static_cast<uint16_t>(500)));
 
         chip::Testing::MessageCapturer messageLog(*this);
         messageLog.mCaptureStandaloneAcks = false;
@@ -2696,11 +2852,12 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendCom
         ASSERT_GE(messageLog.MessageCount(), 1u);
         ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest));
 
-        std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-        EXPECT_EQ(ParseDelayReportDataFromMessage(messageLog.MessagePayload(0), delayReportData), CHIP_NO_ERROR);
-        ASSERT_TRUE(delayReportData.has_value());
-        EXPECT_EQ(delayReportData->delayMinMs, 1000u);
-        EXPECT_EQ(delayReportData->delayJitterWindowMs, 500u);
+        InvokeRequestMessage::ReportDelay reportDelay;
+        EXPECT_EQ(ParseReportDelayFromMessage(messageLog.MessagePayload(0), reportDelay), CHIP_NO_ERROR);
+        ASSERT_TRUE(reportDelay.minMs.has_value());
+        EXPECT_EQ(*reportDelay.minMs, 1000u);
+        ASSERT_TRUE(reportDelay.jitterWindowMs.has_value());
+        EXPECT_EQ(*reportDelay.jitterWindowMs, 500u);
 
         BasicCommandPathRegistry<4> basicCommandPathRegistry;
         MockCommandResponder mockCommandResponder;
@@ -2720,11 +2877,11 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendCom
         EXPECT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints[0], kTestEndpointId);
     }
 
-    // 5. ResetOptions() clears both delay report options so subsequent commands omit DelayReportData.
+    // 5. ResetOptions() clears both report delay options so subsequent commands send neither field.
     {
         commands.ResetOptions();
-        EXPECT_FALSE(commands.GetDelayReportMinMs().HasValue());
-        EXPECT_FALSE(commands.GetDelayReportJitterWindowMs().HasValue());
+        EXPECT_FALSE(commands.GetReportDelayMinMs().HasValue());
+        EXPECT_FALSE(commands.GetReportDelayJitterWindowMs().HasValue());
 
         chip::Testing::MessageCapturer messageLog(*this);
         messageLog.mCaptureStandaloneAcks = false;
@@ -2736,20 +2893,21 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendCom
         ASSERT_GE(messageLog.MessageCount(), 1u);
         ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest));
 
-        std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-        EXPECT_EQ(ParseDelayReportDataFromMessage(messageLog.MessagePayload(0), delayReportData), CHIP_NO_ERROR);
-        EXPECT_FALSE(delayReportData.has_value());
+        InvokeRequestMessage::ReportDelay reportDelay;
+        EXPECT_EQ(ParseReportDelayFromMessage(messageLog.MessagePayload(0), reportDelay), CHIP_NO_ERROR);
+        EXPECT_FALSE(reportDelay.minMs.has_value());
+        EXPECT_FALSE(reportDelay.jitterWindowMs.has_value());
     }
 }
 
-TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendGroupCommand_DelayReportData)
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendGroupCommand_ReportDelay)
 {
     mockCommandSenderDelegate.ResetCounter();
     TestInteractionModelCommands commands(&mockCommandSenderDelegate);
     constexpr GroupId kTestGroupId = 0x0101;
     GetSecureSessionManager().FabricRemoved(GetBobFabricIndex());
 
-    // 1. Neither delay-report-min-ms nor delay-report-jitter-ms set: DelayReportData is omitted.
+    // 1. Neither report-delay-min-ms nor report-delay-jitter-window-ms set: neither field is sent.
     {
         chip::Testing::MessageCapturer messageLog(*this);
         messageLog.mCaptureStandaloneAcks = false;
@@ -2761,15 +2919,16 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendGro
         ASSERT_GE(messageLog.MessageCount(), 1u);
         ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest));
 
-        std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-        EXPECT_EQ(ParseDelayReportDataFromMessage(messageLog.MessagePayload(0), delayReportData), CHIP_NO_ERROR);
-        EXPECT_FALSE(delayReportData.has_value());
+        InvokeRequestMessage::ReportDelay reportDelay;
+        EXPECT_EQ(ParseReportDelayFromMessage(messageLog.MessagePayload(0), reportDelay), CHIP_NO_ERROR);
+        EXPECT_FALSE(reportDelay.minMs.has_value());
+        EXPECT_FALSE(reportDelay.jitterWindowMs.has_value());
     }
 
-    // 2. Only delay-report-min-ms set: delayJitterWindowMs defaults to 0.
+    // 2. Only report-delay-min-ms set: only ReportDelayMinMs is sent.
     {
-        commands.SetDelayReportMinMs(MakeOptional<uint16_t>(static_cast<uint16_t>(1200)));
-        commands.SetDelayReportJitterWindowMs(NullOptional);
+        commands.SetReportDelayMinMs(MakeOptional<uint16_t>(static_cast<uint16_t>(1200)));
+        commands.SetReportDelayJitterWindowMs(NullOptional);
 
         chip::Testing::MessageCapturer messageLog(*this);
         messageLog.mCaptureStandaloneAcks = false;
@@ -2781,17 +2940,17 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendGro
         ASSERT_GE(messageLog.MessageCount(), 1u);
         ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest));
 
-        std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-        EXPECT_EQ(ParseDelayReportDataFromMessage(messageLog.MessagePayload(0), delayReportData), CHIP_NO_ERROR);
-        ASSERT_TRUE(delayReportData.has_value());
-        EXPECT_EQ(delayReportData->delayMinMs, 1200u);
-        EXPECT_EQ(delayReportData->delayJitterWindowMs, 0u);
+        InvokeRequestMessage::ReportDelay reportDelay;
+        EXPECT_EQ(ParseReportDelayFromMessage(messageLog.MessagePayload(0), reportDelay), CHIP_NO_ERROR);
+        ASSERT_TRUE(reportDelay.minMs.has_value());
+        EXPECT_EQ(*reportDelay.minMs, 1200u);
+        EXPECT_FALSE(reportDelay.jitterWindowMs.has_value());
     }
 
-    // 3. Only delay-report-jitter-ms set: delayMinMs defaults to 0.
+    // 3. Only report-delay-jitter-window-ms set: only ReportDelayJitterWindowMs is sent.
     {
-        commands.SetDelayReportMinMs(NullOptional);
-        commands.SetDelayReportJitterWindowMs(MakeOptional<uint16_t>(static_cast<uint16_t>(400)));
+        commands.SetReportDelayMinMs(NullOptional);
+        commands.SetReportDelayJitterWindowMs(MakeOptional<uint16_t>(static_cast<uint16_t>(400)));
 
         chip::Testing::MessageCapturer messageLog(*this);
         messageLog.mCaptureStandaloneAcks = false;
@@ -2803,17 +2962,17 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendGro
         ASSERT_GE(messageLog.MessageCount(), 1u);
         ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest));
 
-        std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-        EXPECT_EQ(ParseDelayReportDataFromMessage(messageLog.MessagePayload(0), delayReportData), CHIP_NO_ERROR);
-        ASSERT_TRUE(delayReportData.has_value());
-        EXPECT_EQ(delayReportData->delayMinMs, 0u);
-        EXPECT_EQ(delayReportData->delayJitterWindowMs, 400u);
+        InvokeRequestMessage::ReportDelay reportDelay;
+        EXPECT_EQ(ParseReportDelayFromMessage(messageLog.MessagePayload(0), reportDelay), CHIP_NO_ERROR);
+        EXPECT_FALSE(reportDelay.minMs.has_value());
+        ASSERT_TRUE(reportDelay.jitterWindowMs.has_value());
+        EXPECT_EQ(*reportDelay.jitterWindowMs, 400u);
     }
 
-    // 4. Both delay-report-min-ms and delay-report-jitter-ms set: both fields are encoded and processed by CommandHandlerImpl.
+    // 4. Both report-delay-min-ms and report-delay-jitter-window-ms set: both fields are sent and processed by CommandHandlerImpl.
     {
-        commands.SetDelayReportMinMs(MakeOptional<uint16_t>(static_cast<uint16_t>(1200)));
-        commands.SetDelayReportJitterWindowMs(MakeOptional<uint16_t>(static_cast<uint16_t>(400)));
+        commands.SetReportDelayMinMs(MakeOptional<uint16_t>(static_cast<uint16_t>(1200)));
+        commands.SetReportDelayJitterWindowMs(MakeOptional<uint16_t>(static_cast<uint16_t>(400)));
 
         chip::Testing::MessageCapturer messageLog(*this);
         messageLog.mCaptureStandaloneAcks = false;
@@ -2825,11 +2984,12 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendGro
         ASSERT_GE(messageLog.MessageCount(), 1u);
         ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest));
 
-        std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-        EXPECT_EQ(ParseDelayReportDataFromMessage(messageLog.MessagePayload(0), delayReportData), CHIP_NO_ERROR);
-        ASSERT_TRUE(delayReportData.has_value());
-        EXPECT_EQ(delayReportData->delayMinMs, 1200u);
-        EXPECT_EQ(delayReportData->delayJitterWindowMs, 400u);
+        InvokeRequestMessage::ReportDelay reportDelay;
+        EXPECT_EQ(ParseReportDelayFromMessage(messageLog.MessagePayload(0), reportDelay), CHIP_NO_ERROR);
+        ASSERT_TRUE(reportDelay.minMs.has_value());
+        EXPECT_EQ(*reportDelay.minMs, 1200u);
+        ASSERT_TRUE(reportDelay.jitterWindowMs.has_value());
+        EXPECT_EQ(*reportDelay.jitterWindowMs, 400u);
 
         BasicCommandPathRegistry<4> basicCommandPathRegistry;
         MockGroupCommandResponder mockGroupCommandResponder(kTestGroupId, GetBobFabricIndex());
@@ -2849,11 +3009,11 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendGro
         EXPECT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints[0], kTestEndpointId);
     }
 
-    // 5. ResetOptions() clears both delay report options so subsequent group commands omit DelayReportData.
+    // 5. ResetOptions() clears both report delay options so subsequent group commands send neither field.
     {
         commands.ResetOptions();
-        EXPECT_FALSE(commands.GetDelayReportMinMs().HasValue());
-        EXPECT_FALSE(commands.GetDelayReportJitterWindowMs().HasValue());
+        EXPECT_FALSE(commands.GetReportDelayMinMs().HasValue());
+        EXPECT_FALSE(commands.GetReportDelayJitterWindowMs().HasValue());
 
         chip::Testing::MessageCapturer messageLog(*this);
         messageLog.mCaptureStandaloneAcks = false;
@@ -2865,9 +3025,10 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendGro
         ASSERT_GE(messageLog.MessageCount(), 1u);
         ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest));
 
-        std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-        EXPECT_EQ(ParseDelayReportDataFromMessage(messageLog.MessagePayload(0), delayReportData), CHIP_NO_ERROR);
-        EXPECT_FALSE(delayReportData.has_value());
+        InvokeRequestMessage::ReportDelay reportDelay;
+        EXPECT_EQ(ParseReportDelayFromMessage(messageLog.MessagePayload(0), reportDelay), CHIP_NO_ERROR);
+        EXPECT_FALSE(reportDelay.minMs.has_value());
+        EXPECT_FALSE(reportDelay.jitterWindowMs.has_value());
     }
 }
 

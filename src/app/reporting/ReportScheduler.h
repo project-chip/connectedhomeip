@@ -181,7 +181,8 @@ public:
     /**
      * @brief Defer report emission for active subscriptions interested in the targeted endpoints.
      *
-     * This method is called when an Invoke Request containing a report delay parameter is processed.
+     * This method is called when an Invoke Request is processed, with the delay its ReportDelayMinMs and
+     * ReportDelayJitterWindowMs fields (or their defaults) call for.  A zero delay ends any active deferral.
      * It scans all registered subscription nodes (ReadHandlerNode) and, for any node whose monitored
      * paths (attributes or events) match the targeted endpoints, schedules a one-time report deferral.
      *
@@ -216,6 +217,22 @@ public:
      *       started or rescheduled to fire at the new timeout.
      */
     virtual void RescheduleAllReports() = 0;
+
+    /// @brief Check whether any subscription has a report deferral from DeferReports that has not expired yet.
+    bool HasActiveDeferral()
+    {
+        Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+        bool found    = false;
+        mNodesPool.ForEachActiveObject([now, &found](ReadHandlerNode * node) {
+            if (node->GetDeferralEndTimestamp() > now)
+            {
+                found = true;
+                return Loop::Break;
+            }
+            return Loop::Continue;
+        });
+        return found;
+    }
 
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check
