@@ -23,6 +23,8 @@ namespace chip::app {
 class OnOffPlugInUnit : public OnOffLoad
 {
 public:
+    using Context = OnOffLoad::Context;
+
     OnOffPlugInUnit(Clusters::OnOffDelegate & onOffDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
                     Clusters::IdentifyDelegate & identifyDelegate, const Context & context);
     ~OnOffPlugInUnit() override = default;

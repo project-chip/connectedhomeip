@@ -23,6 +23,8 @@ namespace chip::app {
 class MountedOnOffControl : public OnOffLoad
 {
 public:
+    using Context = OnOffLoad::Context;
+
     MountedOnOffControl(Clusters::OnOffDelegate & onOffDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
                         Clusters::IdentifyDelegate & identifyDelegate, const Context & context);
     ~MountedOnOffControl() override = default;
