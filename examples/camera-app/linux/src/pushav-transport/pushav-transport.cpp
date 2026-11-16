@@ -177,10 +177,11 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
     }
     if (transportOptions.containerOptions.CMAFContainerOptions.HasValue())
     {
-        mClipInfo.mTrackName = std::string(transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.Value().data(),
-                                           transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.Value().size());
-        mClipInfo.mChunkDurationMs   = transportOptions.containerOptions.CMAFContainerOptions.Value().chunkDuration;
-        mClipInfo.mSegmentDurationMs = transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration;
+        const auto & cmafOptions     = transportOptions.containerOptions.CMAFContainerOptions.Value();
+        mClipInfo.mTrackName         = std::string(cmafOptions.trackName.Value().data(), cmafOptions.trackName.Value().size());
+        mClipInfo.mChunkDurationMs   = cmafOptions.chunkDuration;
+        mClipInfo.mSegmentDurationMs = cmafOptions.segmentDuration;
+        mClipInfo.mUploadManifest    = cmafOptions.CMAFInterface != CMAFInterfaceEnum::kInterface1;
     }
 
     mTransportTriggerType = transportOptions.triggerOptions.triggerType;
@@ -428,15 +429,18 @@ void PushAVTransport::StartRecordingAndStreaming()
 
 void PushAVTransport::GeneratePushTransportBeginEvent()
 {
+    const TransportTriggerTypeEnum reportedTriggerType =
+        mCurrentActivationByManualTrigger ? TransportTriggerTypeEnum::kCommand : mTransportTriggerType;
+
     ChipLogProgress(
         Camera, "GeneratePushTransportBeginEvent: connectionID=%u, triggerType=%u, mCurrentActivationByManualTrigger=%s",
-        mConnectionID, static_cast<uint16_t>(mTransportTriggerType), mCurrentActivationByManualTrigger ? "true" : "false");
+        mConnectionID, static_cast<uint16_t>(reportedTriggerType), mCurrentActivationByManualTrigger ? "true" : "false");
 
     if (mPushAvStreamTransportServer != nullptr)
     {
         ChipLogProgress(Camera, "GeneratePushTransportBeginEvent: Calling NotifyTransportStarted for connection %u", mConnectionID);
         // mActivationReason is optional - if not set, it defaults to empty value
-        mPushAvStreamTransportServer->NotifyTransportStarted(mConnectionID, mTransportTriggerType, mActivationReason);
+        mPushAvStreamTransportServer->NotifyTransportStarted(mConnectionID, reportedTriggerType, mActivationReason);
     }
     else
     {
@@ -515,9 +519,6 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
         }
     }
 
-    mCurrentActivationByManualTrigger = hasManualTrigger;
-    mActivationReason                 = chip::MakeOptional(activationReason);
-
     // Check if trigger should be processed based on transport type
     if ((mTransportTriggerType == TransportTriggerTypeEnum::kCommand) ||
         (mTransportTriggerType == TransportTriggerTypeEnum::kAmbientContext))
@@ -553,6 +554,12 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
     // Process the trigger if conditions are met
     if (shouldProcessTrigger)
     {
+        const bool previousActivationByManualTrigger = mCurrentActivationByManualTrigger;
+        const auto previousActivationReason          = mActivationReason;
+
+        mCurrentActivationByManualTrigger = hasManualTrigger;
+        mActivationReason                 = chip::MakeOptional(activationReason);
+
         if (HandleTriggerDetected())
         {
             // Event generation is handled differently based on trigger type:
@@ -561,6 +568,8 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
         }
         else
         {
+            mCurrentActivationByManualTrigger = previousActivationByManualTrigger;
+            mActivationReason                 = previousActivationReason;
             ChipLogError(Camera, "PushAVTransport trigger detection ignored or failed for connection %u", mConnectionID);
         }
     }

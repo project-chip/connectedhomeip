@@ -109,6 +109,7 @@ public:
         std::string mTrackName;                                ///< Track name for segmented files
         std::string mUrl;                                      ///< URL for uploading clips;
         int mTriggerType;                                      ///< Recording trigger type
+        bool mUploadManifest = true;                           ///< Upload index.mpd (false for CMAF Interface-1)
         std::chrono::steady_clock::time_point mActivationTime; ///< Time when the recording started
         uint16_t mMotionDetectedDurationS;                     ///< Current motion detected duration
         uint16_t mPreviousMotionDetectedDurationS;             ///< Previous duration before augmentation
