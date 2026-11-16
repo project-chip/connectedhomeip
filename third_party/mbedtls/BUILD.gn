@@ -25,5 +25,15 @@ if (mbedtls_target != "") {
   import("mbedtls.gni")
 
   mbedtls_target("mbedtls") {
+    # Files added after 3.6.4 (the version mbedtls.gni lists).
+    sources = [
+      "${mbedtls_repo}/repo/library/chacha20_internal.h",
+      "${mbedtls_repo}/repo/library/psa_crypto_random.c",
+      "${mbedtls_repo}/repo/library/psa_crypto_random.h",
+      "${mbedtls_repo}/repo/library/threading_internal.h",
+    ]
+
+    output_name = "libmbedtls"
+    output_dir = "${root_out_dir}/lib"
   }
 }
