@@ -113,12 +113,12 @@ stm32_executable("lighting_app") {
   defines = []
 
   sources = [
+    "${stm32_app_common}/App/Src/app_entry.cpp",
     "src/AppTask.cpp",
     "src/IdentifierEffect.cpp",
     "src/LightingManager.cpp",
     "src/SoftwareDiagnosticsTestEventTriggerHandler.cpp",
     "src/ZclCallbacks.cpp",
-    "${stm32_app_common}/App/Src/app_entry.cpp",
   ]
 
   deps = [
@@ -157,10 +157,10 @@ stm32_executable("lighting_app") {
       "${stm32_oemirot_ns_app}/Core/Src/stm32wbaxx_it.c",
       "${stm32_oemirot_ns_app}/Core/Src/syscalls.c",
       "${stm32_oemirot_ns_app}/Core/Src/sysmem.c",
-      "${stm32_oemirot_ns_app}/Core/Src/system_stm32wbaxx.c",   
+      "${stm32_oemirot_ns_app}/Core/Src/system_stm32wbaxx.c",
       "src/ota.cpp",
     ]
-  } else  {
+  } else {
     sources += [
       "${stm32_app_src}/Src/main.c",
       "${stm32_app_src}/Src/stm32wbaxx_hal_msp.c",
@@ -169,7 +169,6 @@ stm32_executable("lighting_app") {
       "${stm32_app_src}/Src/sysmem.c",
       "${stm32_app_src}/Src/system_stm32wbaxx.c",
     ]
-
   }
 
   # OEMiROT TrustZone NonSecure configuration

@@ -17,8 +17,8 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/freertos.gni")
 import("//build_overrides/lwip.gni")
 import("//build_overrides/mbedtls.gni")
-import("${chip_root}/third_party/st/stm32_sdk.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/st/stm32_sdk.gni")
 
 declare_args() {
   # CSMSIS PATHS #
@@ -326,13 +326,13 @@ INCLUDE_DIRS = [
   "${stm32_wb_sdk}/CMSIS/RTOS2/Include",
 ]
 
-if(stm32_app == "lit-icd-app") {
-  INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Generic-Switch-App/Core/Inc"]
-}else if (stm32_app == "lighting-app") {
+if (stm32_app == "lit-icd-app") {
+  INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Generic-Switch-App/Core/Inc" ]
+} else if (stm32_app == "lighting-app") {
   if (chip_enable_ota_requestor) {
-      INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Appli_TrustZone/NonSecure/Core/Inc"]
+    INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Appli_TrustZone/NonSecure/Core/Inc" ]
   } else {
-      INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Lighting-App/Core/Inc"]
+    INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Lighting-App/Core/Inc" ]
   }
 }
 

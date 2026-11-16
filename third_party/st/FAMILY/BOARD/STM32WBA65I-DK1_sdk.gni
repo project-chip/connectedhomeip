@@ -25,7 +25,6 @@ declare_args() {
 
   ## PATHS FOR ST UTILITIES ##
   stm32_util = "${chip_root}/third_party/st/x-cube-matter/Utilities"
-
 }
 
 # Common sources (used by both standard and OEMiROT builds)
@@ -83,27 +82,26 @@ INCLUDE_DIRS = [
   "${stm32_project_dir_common_wba}/Application/App/Inc",
 ]
 
-if(stm32_app == "lit-icd-app") {
-  INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Generic-Switch-App/Core/Inc"]
-}else if (stm32_app == "lighting-app") {
+if (stm32_app == "lit-icd-app") {
+  INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Generic-Switch-App/Core/Inc" ]
+} else if (stm32_app == "lighting-app") {
   if (chip_enable_ota_requestor) {
-      SOURCES += [
+    SOURCES += [
       "${stm32_project_dir_common_wba}/Application/OTA/low_level_spi_device.c",
       "${stm32_project_dir_common_wba}/Application/OTA/low_level_spi_flash.c",
       "${stm32_project_dir_common_wba}/Application/OTA/stm_ota_spi_flash.c",
       "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery_eeprom.c",
       "${stm32_wb_bsp}/Components/m95p32/m95p32.c",
-
-                    ]
-      INCLUDE_DIRS += [ 
-                        "${stm32_wb_bsp}/Components/m95p32",
-                        "${stm32_project_dir_common_wba}/Application/OTA",
-                        "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Appli_TrustZone/NonSecure/Core/Inc",
-                        "${chip_root}/third_party/st/x-cube-matter/Middlewares/Third_Party/mcuboot/platform/ext/driver",
-                        "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/oemirot/Secure_nsclib"
-                       ]
+    ]
+    INCLUDE_DIRS += [
+      "${stm32_wb_bsp}/Components/m95p32",
+      "${stm32_project_dir_common_wba}/Application/OTA",
+      "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Appli_TrustZone/NonSecure/Core/Inc",
+      "${chip_root}/third_party/st/x-cube-matter/Middlewares/Third_Party/mcuboot/platform/ext/driver",
+      "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/oemirot/Secure_nsclib",
+    ]
   } else {
-      INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Lighting-App/Core/Inc"]
+    INCLUDE_DIRS += [ "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Lighting-App/Core/Inc" ]
   }
 }
 
