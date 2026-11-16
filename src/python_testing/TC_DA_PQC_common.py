@@ -45,13 +45,12 @@ import io
 import json
 import logging
 import os
-import qrcode
 import threading
 
+import qrcode
 from mobly import asserts
 
 from matter import ChipDeviceCtrl
-from matter.setup_payload.setup_payload import SetupPayload
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import MatterTestCommissioner, SetupParameters
 
@@ -95,11 +94,9 @@ class PQCCommissioneeApp(AppServerSubprocess):
             return self._counts[needle]
 
 
-
 class PQCDACommissionerTestBase(MatterTestCommissioner):
     """Common setup and row runner for TC-DA-1.11 and TC-DA-1.13."""
     disable_wildcard_subscription = True
-
 
     # Distinct per subclass so parallel-ish reruns never collide on discovery.
     kDiscriminatorBase = 0x700
