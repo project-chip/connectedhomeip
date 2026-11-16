@@ -21,7 +21,6 @@
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationDelegate.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/api/SingleEndpoint.h>
-#include <functional>
 #include <lib/support/TimerDelegate.h>
 #include <string>
 
