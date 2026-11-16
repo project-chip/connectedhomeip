@@ -193,6 +193,11 @@ CHIP_ERROR PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(con
         {
             LogErrorOnFailure(MutateTLSEndpointReferenceCount(removedValue.GetFabricIndex(), removedOptions->TLSEndpointID, -1));
         }
+        else
+        {
+            ChipLogError(Zcl, "Push AV Stream Transport[ep=%d]: Connection %u has no transport options, TLS endpoint not released",
+                         mEndpointId, transportConnectionId);
+        }
     }
     return CHIP_NO_ERROR;
 }

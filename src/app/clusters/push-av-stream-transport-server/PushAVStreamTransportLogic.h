@@ -90,6 +90,12 @@ public:
         uint16_t connectionID;
     };
 
+    /**
+     * Timer callback that deallocates the transport in the PushAVStreamTransportDeallocateCallbackContext when its
+     * ExpiryTime elapses. Public so tests can run it without waiting for the timer.
+     */
+    static void PushAVStreamTransportDeallocateCallback(chip::System::Layer *, void * callbackContext);
+
     EndpointId mEndpointId = kInvalidEndpointId;
 
     std::vector<std::shared_ptr<PushAVStreamTransportDeallocateCallbackContext>> mTimerContexts;
@@ -219,8 +225,6 @@ private:
      * effect once the counts are high enough.
      */
     void RaiseTLSEndpointReferenceCounts();
-
-    static void PushAVStreamTransportDeallocateCallback(chip::System::Layer *, void * callbackContext);
 
     void RemoveTimerAppState(const uint16_t connectionID);
 

@@ -651,6 +651,57 @@ static void AllocateTransportUsingTLSEndpoint(PushAvStreamTransportServer & serv
     EXPECT_TRUE(handler.HasResponse());
 }
 
+// The expiry timer removes the transport through the same path as DeallocatePushTransport and releases the reference.
+TEST_F(TestPushAVStreamTransportServerLogic, ExpiredTransportReleasesTLSEndpointReference)
+{
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegateReportingCounts tlsClientManagementDelegate;
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    AllocateTransportUsingTLSEndpoint(mServer, 1);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 1);
+
+    PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallbackContext context{
+        &mServer.GetLogic(), mServer.GetLogic().mCurrentConnections[0].connectionID
+    };
+    PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(nullptr, &context);
+
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 0);
+}
+
+// A transport whose connection cannot be stored is not allocated, so it must not keep its reference.
+TEST_F(TestPushAVStreamTransportServerLogic, FailedStoreOfNewTransportReleasesTLSEndpointReference)
+{
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegateReportingCounts tlsClientManagementDelegate;
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    mClusterTester.GetTestContext().StorageDelegate().SetRejectWrites(true);
+
+    Commands::AllocatePushTransport::DecodableType commandData;
+    commandData.transportOptions = MakeContinuousTransportOptions(1);
+    Testing::MockCommandHandler handler;
+    handler.SetFabricIndex(1);
+    ConcreteCommandPath kAllocatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(handler, kAllocatePath, commandData), std::nullopt);
+
+    EXPECT_FALSE(handler.HasResponse());
+    ASSERT_TRUE(handler.HasStatus());
+    EXPECT_FALSE(handler.GetLastStatus().status.IsSuccess());
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 0);
+}
+
 // The two tests below cover upgrading from firmware that did not count push transports in the ReferenceCount of their
 // TLS endpoint. That firmware persisted CurrentConnections, but the TLS endpoints those transports use kept a stored
 // ReferenceCount of 0. The first boot of the upgraded firmware must give the restored transports their references, and
