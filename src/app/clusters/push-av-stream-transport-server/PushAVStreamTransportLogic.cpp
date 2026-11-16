@@ -884,10 +884,9 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadTLSCertsIntoDelegate(FabricInde
     // Note: TLS clusters are always on EP0, per spec
     return mTLSClientManagementDelegate->FindProvisionedEndpointByID(
         kRootEndpointId, fabricIndex, tlsEndpointID, [&](auto & TLSEndpoint) -> CHIP_ERROR {
-            // The spec requires a push transport's TLS endpoint to carry a non-null ccdid; a null one means no
-            // client certificate is associated with the endpoint, which the caller reports as an invalid TLS endpoint.
+            // The spec requires a push transport's TLS endpoint to have a non-null ccdid.
             VerifyOrReturnError(!TLSEndpoint.ccdid.IsNull(), CHIP_ERROR_INVALID_ARGUMENT,
-                                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLS endpoint %u has no client certificate",
+                                ChipLogError(Zcl, "LoadTLSCertsIntoDelegate[ep=%d]: TLS endpoint %u has no client certificate",
                                              mEndpointId, tlsEndpointID));
 
             // Use heap allocation for large certificate buffers to reduce stack usage

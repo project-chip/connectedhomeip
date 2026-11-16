@@ -143,6 +143,9 @@ private:
 
     CHIP_ERROR IsAnyPrivacyModeActive(bool & isActive);
 
+    /// Zeroes the private key and clears all certificate buffers.
+    void ClearTLSCertBuffers();
+
     /**
      * @brief Checks if the specified CMAF interface type is supported.
      * @param cmafInterface The CMAF interface enum to validate.

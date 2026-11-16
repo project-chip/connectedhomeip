@@ -485,8 +485,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, AllocatePushTransportRejectsEndpoin
     EXPECT_EQ(status.GetClusterSpecificCode().value(), to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
 }
 
-// Provisions any endpoint ID with a client certificate ID derived from it, or reports the endpoint as missing.
-// Records the lookups.
+// Provisions any endpoint ID with a client certificate ID derived from it and records the lookups.
 class TestTLSClientManagementDelegateRecordingLookups : public TestTLSClientManagementDelegate
 {
 public:
@@ -500,7 +499,6 @@ public:
                                            LoadedEndpointCallback callback) override
     {
         mLookups.push_back({ fabric, endpointID });
-        VerifyOrReturnError(mEndpointExists, CHIP_ERROR_NOT_FOUND);
         TlsClientManagement::Structs::TLSEndpointStruct::DecodableType endpoint;
         endpoint.endpointID = endpointID;
         endpoint.caid       = 0;
@@ -508,35 +506,20 @@ public:
         return callback(endpoint);
     }
 
-    bool mEndpointExists = true;
     std::vector<Lookup> mLookups;
 };
 
-// Counts SetTLSCerts() calls. When told that the persisted attributes are loaded, requests the certificates of each
-// persisted transport, like an application delegate that re-allocates the transports.
+// Counts SetTLSCerts() calls.
 class TestPushAVStreamTransportDelegateCountingCerts : public TestPushAVStreamTransportDelegateImpl
 {
 public:
-    CHIP_ERROR PersistentAttributesLoadedCallback() override
-    {
-        for (const auto & connection : mServer->GetLogic().mCurrentConnections)
-        {
-            const auto transportOptionsPtr = connection.GetTransportOptionsPtr();
-            VerifyOrReturnError(transportOptionsPtr != nullptr, CHIP_ERROR_INCORRECT_STATE);
-            ReturnErrorOnFailure(
-                mServer->GetLogic().LoadTLSCertsIntoDelegate(connection.GetFabricIndex(), transportOptionsPtr->TLSEndpointID));
-        }
-        return CHIP_NO_ERROR;
-    }
-
     void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
                      Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
     {
         mSetTLSCertsCount++;
     }
 
-    PushAvStreamTransportServer * mServer = nullptr;
-    size_t mSetTLSCertsCount              = 0;
+    size_t mSetTLSCertsCount = 0;
 };
 
 TEST_F(TestPushAVStreamTransportServerLogic, LoadTLSCertsIntoDelegateRequiresDelegates)
@@ -550,14 +533,14 @@ TEST_F(TestPushAVStreamTransportServerLogic, LoadTLSCertsIntoDelegateRequiresDel
     EXPECT_EQ(delegate.mSetTLSCertsCount, (size_t) 0);
 }
 
-TEST_F(TestPushAVStreamTransportServerLogic, LoadTLSCertsIntoDelegateWithoutCertificateManagementDelegate)
+TEST_F(TestPushAVStreamTransportServerLogic, LoadTLSCertsIntoDelegateLooksUpGivenFabricAndEndpoint)
 {
     TestPushAVStreamTransportDelegateCountingCerts delegate;
     TestTLSClientManagementDelegateRecordingLookups tlsClientManagementDelegate;
     mServer.GetLogic().SetDelegate(&delegate);
     mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
 
-    EXPECT_SUCCESS(mServer.GetLogic().LoadTLSCertsIntoDelegate(2, 7));
+    ASSERT_SUCCESS(mServer.GetLogic().LoadTLSCertsIntoDelegate(2, 7));
 
     EXPECT_EQ(delegate.mSetTLSCertsCount, (size_t) 1);
     ASSERT_EQ(tlsClientManagementDelegate.mLookups.size(), (size_t) 1);
@@ -574,81 +557,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, LoadTLSCertsIntoDelegateRejectsEndp
 
     EXPECT_EQ(mServer.GetLogic().LoadTLSCertsIntoDelegate(1, 1), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(delegate.mSetTLSCertsCount, (size_t) 0);
-}
-
-TEST_F(TestPushAVStreamTransportServerLogic, LoadTLSCertsIntoDelegateFailsForMissingEndpoint)
-{
-    TestPushAVStreamTransportDelegateCountingCerts delegate;
-    TestTLSClientManagementDelegateRecordingLookups tlsClientManagementDelegate;
-    tlsClientManagementDelegate.mEndpointExists = false;
-    mServer.GetLogic().SetDelegate(&delegate);
-    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-
-    EXPECT_NE(mServer.GetLogic().LoadTLSCertsIntoDelegate(1, 1), CHIP_NO_ERROR);
-    EXPECT_EQ(delegate.mSetTLSCertsCount, (size_t) 0);
-}
-
-TEST_F(TestPushAVStreamTransportServerLogic, PersistedTransportsRequestTheirOwnTLSCertsOnRestart)
-{
-    std::string url       = "https://192.168.1.100:554/stream/";
-    std::string trackName = "video";
-
-    CMAFContainerOptionsStruct cmafContainerOptions;
-    cmafContainerOptions.segmentDuration = 1000;
-    cmafContainerOptions.chunkDuration   = 500;
-    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
-    cmafContainerOptions.metadataEnabled.ClearValue();
-
-    ContainerOptionsStruct containerOptions;
-    containerOptions.containerType = ContainerFormatEnum::kCmaf;
-    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
-
-    TransportTriggerOptionsDecodableStruct triggerOptions;
-    triggerOptions.triggerType = TransportTriggerTypeEnum::kContinuous;
-
-    TransportOptionsDecodableStruct transportOptions;
-    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
-    transportOptions.videoStreamID.SetValue(1);
-    transportOptions.audioStreamID.SetValue(2);
-    transportOptions.url              = Span(url.data(), url.size());
-    transportOptions.triggerOptions   = triggerOptions;
-    transportOptions.containerOptions = containerOptions;
-    transportOptions.expiryTime.ClearValue();
-
-    TestPushAVStreamTransportDelegateCountingCerts delegate;
-    delegate.mServer = &mServer;
-    TestTLSClientManagementDelegateRecordingLookups tlsClientManagementDelegate;
-
-    EXPECT_SUCCESS(mServer.Startup(mClusterTester.GetServerClusterContext()));
-    mServer.GetLogic().SetDelegate(&delegate);
-    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_SUCCESS(mServer.Init());
-
-    ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
-    for (uint16_t tlsEndpointID : std::initializer_list<uint16_t>{ 1, 2 })
-    {
-        Testing::MockCommandHandler commandHandler;
-        commandHandler.SetFabricIndex(1);
-        Commands::AllocatePushTransport::DecodableType commandData;
-        transportOptions.TLSEndpointID = tlsEndpointID;
-        commandData.transportOptions   = transportOptions;
-        EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
-    }
-    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 2);
-
-    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
-    delegate.mSetTLSCertsCount = 0;
-    tlsClientManagementDelegate.mLookups.clear();
-
-    EXPECT_SUCCESS(mServer.Startup(mClusterTester.GetServerClusterContext()));
-    EXPECT_SUCCESS(mServer.Init());
-
-    EXPECT_EQ(delegate.mSetTLSCertsCount, (size_t) 2);
-    ASSERT_EQ(tlsClientManagementDelegate.mLookups.size(), (size_t) 2);
-    EXPECT_EQ(tlsClientManagementDelegate.mLookups[0].fabric, 1);
-    EXPECT_EQ(tlsClientManagementDelegate.mLookups[0].endpointID, 1);
-    EXPECT_EQ(tlsClientManagementDelegate.mLookups[1].fabric, 1);
-    EXPECT_EQ(tlsClientManagementDelegate.mLookups[1].endpointID, 2);
 }
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)

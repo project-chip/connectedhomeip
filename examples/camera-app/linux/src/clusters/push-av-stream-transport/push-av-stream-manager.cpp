@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <fstream>
 #include <iostream>
+#include <lib/support/Defer.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -72,11 +73,24 @@ Protocols::InteractionModel::Status
 PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
                                                     FabricIndex accessingFabricIndex)
 {
+#ifndef TLS_CLUSTER_NOT_ENABLED
+    // The buffers are filled by SetTLSCerts() right before this call and are not kept after it.
+    auto clearCertBuffers = MakeDefer([this] { ClearTLSCertBuffers(); });
+#endif
+
     if (mCameraDevice == nullptr)
     {
         ChipLogError(Camera, "CameraDeviceInterface not initialized for AllocatePushTransport");
         return Status::Failure;
     }
+
+#ifndef TLS_CLUSTER_NOT_ENABLED
+    if (mBufferClientCert.empty() || mBufferClientCertKey.empty())
+    {
+        ChipLogError(Camera, "PushAvStreamTransportManager: No TLS client certificate or key for Connection: [%u]", connectionID);
+        return Status::Failure;
+    }
+#endif
 
     if (transportOptions.containerOptions.CMAFContainerOptions.HasValue())
     {
@@ -103,6 +117,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     {
         ChipLogError(Camera, "PushAvStreamTransportManager, failed to configure recorder settings for Connection: [%u], error: %s",
                      connectionID, ErrorStr(err));
+        mTransportOptionsMap.erase(connectionID);
         return Status::Failure;
     }
     mTransportMap[connectionID] = std::move(transport);
@@ -114,6 +129,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     {
         ChipLogError(Camera, "PushAvStreamTransportManager: MediaController is not set");
         mTransportMap.erase(connectionID);
+        mTransportOptionsMap.erase(connectionID);
         return Status::NotFound;
     }
 
@@ -188,8 +204,12 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePush
 {
     if (mTransportMap.find(connectionID) == mTransportMap.end())
     {
-        ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
-        return Status::NotFound;
+        // A persisted connection has no runtime transport if restoring it failed. Reporting success lets the
+        // cluster remove the persisted connection, also when its expiry timer fires.
+        ChipLogProgress(Camera, "PushAvStreamTransportManager, no runtime transport for Connection :[%u], nothing to deallocate",
+                        connectionID);
+        mTransportOptionsMap.erase(connectionID);
+        return Status::Success;
     }
     mTotalUsedBandwidthbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthbps();
     mMediaController->UnregisterTransport(mTransportMap[connectionID].get());
@@ -271,6 +291,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
         }
     }
 
+    bool anyTransportUpdated = false;
     for (uint16_t connectionID : connectionIDList)
     {
         if (mTransportMap.find(connectionID) == mTransportMap.end())
@@ -279,9 +300,12 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
             continue;
         }
         mTransportMap[connectionID]->SetTransportStatus(transportStatus);
+        anyTransportUpdated = true;
     }
 
-    return Status::Success;
+    // Connections without a runtime transport are skipped, which keeps a command for all connections working.
+    // Report an error if no transport was updated, so the cluster does not store a status nothing is running for.
+    return anyTransportUpdated ? Status::Success : Status::NotFound;
 }
 
 Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTriggerTransport(
@@ -658,12 +682,38 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
                     continue;
                 }
 
+                // PushAVTransport uses the manager's stream parameters, which SetVideoStream/SetAudioStream fill from
+                // the allocated streams. The persisted options hold the selected stream IDs.
+                if (transportOptionsPtr->videoStreamID.HasValue() && !transportOptionsPtr->videoStreamID.Value().IsNull() &&
+                    SetVideoStream(transportOptionsPtr->videoStreamID.Value().Value()) != Status::Success)
+                {
+                    ChipLogError(Zcl, "Video stream of connection ID: %u not found, not re-allocating", connectionID);
+                    continue;
+                }
+                if (transportOptionsPtr->audioStreamID.HasValue() && !transportOptionsPtr->audioStreamID.Value().IsNull() &&
+                    SetAudioStream(transportOptionsPtr->audioStreamID.Value().Value()) != Status::Success)
+                {
+                    ChipLogError(Zcl, "Audio stream of connection ID: %u not found, not re-allocating", connectionID);
+                    continue;
+                }
+
                 Protocols::InteractionModel::Status status =
                     this->AllocatePushTransport(*transportOptionsPtr, connectionID, transportConfig.GetFabricIndex());
                 if (status != Protocols::InteractionModel::Status::Success)
                 {
                     ChipLogError(Zcl, "Failed to re-allocate transport for connection ID: %u, status: %u", connectionID,
                                  to_underlying(status));
+                    continue;
+                }
+
+                if (transportConfig.transportStatus == TransportStatusEnum::kActive)
+                {
+                    status = this->SetTransportStatus({ connectionID }, TransportStatusEnum::kActive);
+                    if (status != Protocols::InteractionModel::Status::Success)
+                    {
+                        ChipLogError(Zcl, "Failed to restart transport for connection ID: %u, status: %u", connectionID,
+                                     to_underlying(status));
+                    }
                 }
             }
             else
@@ -726,18 +776,32 @@ void PushAvStreamTransportManager::HandleAmbientContextTrigger(uint8_t namespace
     }
 }
 
-void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
-                                               Tls::CertificateTable::BufferedRootCert & rootCertEntry)
+void PushAvStreamTransportManager::ClearTLSCertBuffers()
 {
+    Crypto::ClearSecretData(mBufferClientCertKey.data(), mBufferClientCertKey.size());
     mBufferRootCert.clear();
     mBufferClientCert.clear();
     mBufferClientCertKey.clear();
     mBufferIntermediateCerts.clear();
+}
 
-    auto rootSpan = rootCertEntry.GetCert().certificate.Value();
+void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                                               Tls::CertificateTable::BufferedRootCert & rootCertEntry)
+{
+    ClearTLSCertBuffers();
+
+    const auto & rootCert   = rootCertEntry.GetCert().certificate;
+    const auto & clientCert = clientCertEntry.GetCert().clientCertificate;
+    if (!rootCert.HasValue() || !clientCert.HasValue() || clientCert.Value().IsNull())
+    {
+        ChipLogError(Camera, "TLS certificate entry has no root or client certificate");
+        return;
+    }
+
+    auto rootSpan = rootCert.Value();
     mBufferRootCert.assign(rootSpan.data(), rootSpan.data() + rootSpan.size());
 
-    auto clientSpan = clientCertEntry.GetCert().clientCertificate.Value().Value();
+    auto clientSpan = clientCert.Value().Value();
     mBufferClientCert.assign(clientSpan.data(), clientSpan.data() + clientSpan.size());
 
     mBufferIntermediateCerts.clear();
