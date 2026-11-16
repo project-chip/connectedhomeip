@@ -114,13 +114,14 @@ bool LockEndpoint::SetUser(UserIndex userIndex, chip::FabricIndex creator, chip:
                            const chip::CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
                            CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
-    ChipLogProgress(
-        Zcl,
-        "Lock App: LockEndpoint::SetUser "
-        "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%s\",uniqueId=%" PRIx32 ",userStatus=%u,userType=%u,"
-        "credentialRule=%u,credentials=%p,totalCredentials=%u]",
-        mEndpointId, userIndex.OneBased(), creator, modifier, chip::NullTerminated(userName).c_str(), uniqueId, to_underlying(userStatus),
-        to_underlying(usertype), to_underlying(credentialRule), credentials, static_cast<unsigned int>(totalCredentials));
+    ChipLogProgress(Zcl,
+                    "Lock App: LockEndpoint::SetUser "
+                    "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%s\",uniqueId=%" PRIx32
+                    ",userStatus=%u,userType=%u,"
+                    "credentialRule=%u,credentials=%p,totalCredentials=%u]",
+                    mEndpointId, userIndex.OneBased(), creator, modifier, chip::NullTerminated(userName).c_str(), uniqueId,
+                    to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
+                    static_cast<unsigned int>(totalCredentials));
 
     if (!userIndex.IsWithin(static_cast<uint16_t>(mLockUsers.size())))
     {
@@ -209,8 +210,7 @@ bool LockEndpoint::GetCredential(CredentialIndex credentialIndex, CredentialType
         (0 == credentialIndex.OneBased() && CredentialTypeEnum::kProgrammingPIN != credentialType))
     {
         ChipLogError(Zcl, "Cannot get the credential - index out of range [endpoint=%d,index=%d]: %d", mEndpointId,
-                     credentialIndex.OneBased(),
-                     static_cast<int>(mLockCredentials.at(to_underlying(credentialType)).size()));
+                     credentialIndex.OneBased(), static_cast<int>(mLockCredentials.at(to_underlying(credentialType)).size()));
         return false;
     }
 
@@ -288,7 +288,8 @@ bool LockEndpoint::SetCredential(CredentialIndex credentialIndex, chip::FabricIn
     return true;
 }
 
-DlStatus LockEndpoint::GetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule) const
+DlStatus LockEndpoint::GetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex,
+                                   EmberAfPluginDoorLockWeekDaySchedule & schedule) const
 {
     if (!userIndex.IsWithin(static_cast<uint16_t>(mWeekDaySchedules.size())))
     {
@@ -336,7 +337,8 @@ DlStatus LockEndpoint::SetSchedule(ScheduleIndex weekDayIndex, UserIndex userInd
     return DlStatus::kSuccess;
 }
 
-DlStatus LockEndpoint::GetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule) const
+DlStatus LockEndpoint::GetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex,
+                                   EmberAfPluginDoorLockYearDaySchedule & schedule) const
 {
     if (!userIndex.IsWithin(static_cast<uint16_t>(mYearDaySchedules.size())))
     {
@@ -359,8 +361,8 @@ DlStatus LockEndpoint::GetSchedule(ScheduleIndex yearDayIndex, UserIndex userInd
     return DlStatus::kSuccess;
 }
 
-DlStatus LockEndpoint::SetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, DlScheduleStatus status, uint32_t localStartTime,
-                                   uint32_t localEndTime)
+DlStatus LockEndpoint::SetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, DlScheduleStatus status,
+                                   uint32_t localStartTime, uint32_t localEndTime)
 {
     if (!userIndex.IsWithin(static_cast<uint16_t>(mYearDaySchedules.size())))
     {
@@ -397,8 +399,8 @@ DlStatus LockEndpoint::GetSchedule(ScheduleIndex holidayIndex, EmberAfPluginDoor
     return DlStatus::kSuccess;
 }
 
-DlStatus LockEndpoint::SetSchedule(ScheduleIndex holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
-                                   OperatingModeEnum operatingMode)
+DlStatus LockEndpoint::SetSchedule(ScheduleIndex holidayIndex, DlScheduleStatus status, uint32_t localStartTime,
+                                   uint32_t localEndTime, OperatingModeEnum operatingMode)
 {
     if (!holidayIndex.IsWithin(static_cast<uint8_t>(mHolidaySchedules.size())))
     {

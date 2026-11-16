@@ -264,7 +264,8 @@ public:
      * @param[in] credentialIndex credential index as on the wire; 1-based for
      *            all credential types except kProgrammingPIN, which uses 0.
      */
-    virtual bool GetCredential(CredentialIndex credentialIndex, CredentialTypeEnum credentialType, CredentialInfo & credential) const
+    virtual bool GetCredential(CredentialIndex credentialIndex, CredentialTypeEnum credentialType,
+                               CredentialInfo & credential) const
     {
         return false;
     }
@@ -312,8 +313,8 @@ public:
      * @param[in] userIndex index of the user.
      * @param[in] status kAvailable clears the slot; kOccupied sets it.
      */
-    virtual DlStatus SetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, DlScheduleStatus status,
-                                 DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+    virtual DlStatus SetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, DlScheduleStatus status, DaysMaskMap daysMask,
+                                 uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
     {
         return DlStatus::kFailure;
     }
@@ -341,8 +342,8 @@ public:
      * @param[in] userIndex index of the user.
      * @param[in] status kAvailable clears the slot; kOccupied sets it.
      */
-    virtual DlStatus SetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, DlScheduleStatus status,
-                                 uint32_t localStartTime, uint32_t localEndTime)
+    virtual DlStatus SetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, DlScheduleStatus status, uint32_t localStartTime,
+                                 uint32_t localEndTime)
     {
         return DlStatus::kFailure;
     }

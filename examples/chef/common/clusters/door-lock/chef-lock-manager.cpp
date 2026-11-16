@@ -258,9 +258,8 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
         ChipLogError(Zcl, "Unable to set the user - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
-    return lockEndpoint->SetUser(UserIndex::FromOneBased(userIndex), creator, modifier, userName, uniqueId, userStatus,
-                                 usertype, credentialRule,
-                                 credentials, totalCredentials);
+    return lockEndpoint->SetUser(UserIndex::FromOneBased(userIndex), creator, modifier, userName, uniqueId, userStatus, usertype,
+                                 credentialRule, credentials, totalCredentials);
 }
 
 bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,

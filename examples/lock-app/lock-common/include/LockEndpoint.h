@@ -117,12 +117,14 @@ public:
                        DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
                        const chip::ByteSpan & credentialData) override;
 
-    DlStatus GetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule) const override;
-    DlStatus GetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule) const override;
+    DlStatus GetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex,
+                         EmberAfPluginDoorLockWeekDaySchedule & schedule) const override;
+    DlStatus GetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex,
+                         EmberAfPluginDoorLockYearDaySchedule & schedule) const override;
     DlStatus GetSchedule(ScheduleIndex holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule) const override;
 
-    DlStatus SetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour,
-                         uint8_t startMinute, uint8_t endHour, uint8_t endMinute) override;
+    DlStatus SetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, DlScheduleStatus status, DaysMaskMap daysMask,
+                         uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute) override;
     DlStatus SetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, DlScheduleStatus status, uint32_t localStartTime,
                          uint32_t localEndTime) override;
     DlStatus SetSchedule(ScheduleIndex holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
