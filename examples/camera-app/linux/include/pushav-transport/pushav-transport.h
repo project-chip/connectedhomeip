@@ -160,6 +160,8 @@ private:
     // Starts the next CMAF session: increments and persists mSessionNumber, sets mSessionStartedTimestamp and gives the
     // recorder the new number. Returns the new SessionNumber.
     uint64_t StartNewSession();
+    // False when the transport has no endpoint, because the storage key needs one.
+    bool CanPersistSessionNumber() const { return mEndpointId != chip::kInvalidEndpointId; }
     bool ValidateZoneAndSensitivity(
         const std::vector<std::pair<chip::app::DataModel::Nullable<uint16_t>, uint8_t>> & zoneSensitivityList, int zoneId,
         int sensitivity);

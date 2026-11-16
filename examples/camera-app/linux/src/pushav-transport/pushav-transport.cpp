@@ -85,6 +85,12 @@ PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions
     std::filesystem::path outputPath = std::filesystem::path("/tmp") / uniqueDirName;
     mClipInfo.mOutputPath            = outputPath.string();
 
+    if (!CanPersistSessionNumber())
+    {
+        ChipLogError(Camera, "Transport[%u] has no endpoint, SessionNumber is not persisted", connectionID);
+        return;
+    }
+
     uint64_t storedSessionNumber = 0;
 
     CHIP_ERROR err = KeyValueStoreMgr().Get(SessionNumberKey(endpointId, connectionID).KeyName(), &storedSessionNumber);
@@ -478,11 +484,16 @@ uint64_t PushAVTransport::StartNewSession()
     mClipInfo.mSessionNumber            = sessionNumber;
     mRecorder->mClipInfo.mSessionNumber = sessionNumber;
 
-    CHIP_ERROR err = KeyValueStoreMgr().Put(SessionNumberKey(mEndpointId, mConnectionID).KeyName(), sessionNumber);
-    if (err != CHIP_NO_ERROR)
+    if (CanPersistSessionNumber())
     {
-        ChipLogError(Camera, "Transport[%u] Failed to persist SessionNumber %" PRIu64 ": %" CHIP_ERROR_FORMAT, mConnectionID,
-                     sessionNumber, err.Format());
+        // A failed write is only logged. After a reboot the transport then starts from the last stored number, or from 1 if
+        // none was stored, so output folders and session numbers from before the reboot can be reused.
+        CHIP_ERROR err = KeyValueStoreMgr().Put(SessionNumberKey(mEndpointId, mConnectionID).KeyName(), sessionNumber);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Camera, "Transport[%u] Failed to persist SessionNumber %" PRIu64 ": %" CHIP_ERROR_FORMAT, mConnectionID,
+                         sessionNumber, err.Format());
+        }
     }
 
     ChipLogProgress(Camera, "Transport[%u] Session[%" PRIu64 "] SESSION_STARTED Track=%s", mConnectionID, sessionNumber,
@@ -492,6 +503,8 @@ uint64_t PushAVTransport::StartNewSession()
 
 void PushAVTransport::ClearPersistedSessionNumber()
 {
+    VerifyOrReturn(CanPersistSessionNumber());
+
     CHIP_ERROR err = KeyValueStoreMgr().Delete(SessionNumberKey(mEndpointId, mConnectionID).KeyName());
     if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
