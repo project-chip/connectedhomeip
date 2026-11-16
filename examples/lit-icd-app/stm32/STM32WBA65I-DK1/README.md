@@ -1,7 +1,7 @@
 # Matter STM32 LIT ICD Generic Switch Example over Thread
 
 This example describes a Matter Long Idle Time Intermittently Connected Device
-(LIT ICD) with a Generic Switch on the STM32WBA65I-DK1 board. The device joins a
+(LIT ICD) with a Generic Switch on the `STM32WBA65I-DK1` board. The device joins a
 Thread network as a Sleepy End Device and reports physical button actions using
 the Matter Switch cluster.
 
@@ -12,7 +12,7 @@ and Matter OTA image generation are not part of this build or provisioning flow.
 
 Follow the
 [STM32 getting started guide](../../../../docs/platforms/stm32/stm32_getting_started_guide.md)
-to prepare the Matter build environment and the STM32WBA65I-DK1 board.
+to prepare the Matter build environment and the `STM32WBA65I-DK1` board.
 
 Build the LIT ICD application with:
 
@@ -122,7 +122,7 @@ both part of the application, not pending data-model work.
 
 | Item                       | Value                     |
 | -------------------------- | ------------------------- |
-| Board                      | STM32WBA65I-DK1           |
+| Board                      | `STM32WBA65I-DK1`          |
 | Network                    | Thread                    |
 | Thread role                | Sleepy End Device         |
 | Application                | LIT ICD + Generic Switch  |
