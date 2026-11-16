@@ -3325,7 +3325,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                                    }
 
                                    // _getAttributesToReportWithReportedValues logs each attribute.
-                                   MTR_LOG("%@ got attribute report (%p) with %lu attributes", self, value, static_cast<unsigned long>(value.count));
+                                   MTR_LOG("node 0x%016llX got attribute report (%p) with %lu attributes", self->_nodeID.unsignedLongLongValue, value, static_cast<unsigned long>(value.count));
                                    dispatch_async(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription attribute report async to device queue called back with nil MTRDevice"));
@@ -3347,7 +3347,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                                    }
 
                                    // _handleEventReport logs each event.
-                                   MTR_LOG("%@ got event report (%p) with %lu events", self, value, static_cast<unsigned long>(value.count));
+                                   MTR_LOG("node 0x%016llX got event report (%p) with %lu events", self->_nodeID.unsignedLongLongValue, value, static_cast<unsigned long>(value.count));
                                    dispatch_async(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription event report async to device queue called back with nil MTRDevice"));
@@ -4590,7 +4590,7 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
         }
         _clusterDataToPersist[clusterPath] = clusterData;
 
-        MTR_LOG("%@ updated DataVersion for %@ to %@", self, clusterPath, dataVersion);
+        MTR_LOG("node 0x%016llX updated DataVersion for %@ to %@", _nodeID.unsignedLongLongValue, clusterPath, dataVersion);
     }
 }
 
@@ -4948,10 +4948,10 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     // Log each changed path on a separate line, so log line truncation does not
     // hide which attributes actually changed in this report.
     for (MTRAttributePath * path in attributePathsToReport) {
-        MTR_LOG("%@ report from reported values %@", self, path);
+        MTR_LOG("node 0x%016llX report from reported values %@", _nodeID.unsignedLongLongValue, path);
     }
 
-    MTR_LOG("%@ report of %lu attributes: %lu values, %lu errors, %lu same as read cache, %lu expected value still present, %lu no data", self,
+    MTR_LOG("node 0x%016llX report of %lu attributes: %lu values, %lu errors, %lu same as read cache, %lu expected value still present, %lu no data", _nodeID.unsignedLongLongValue,
         static_cast<unsigned long>(reportedAttributeValues.count), static_cast<unsigned long>(valueCount), static_cast<unsigned long>(errorCount), static_cast<unsigned long>(sameAsReadCacheCount),
         static_cast<unsigned long>(expectedValuePresentCount), static_cast<unsigned long>(noDataCount));
 
