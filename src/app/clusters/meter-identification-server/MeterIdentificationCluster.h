@@ -35,9 +35,7 @@ public:
     using Feature       = MeterIdentification::Feature;
     using MeterTypeEnum = MeterIdentification::MeterTypeEnum;
 
-    // Optional attributes are tracked as a compile-time bitset.
-    using OptionalAttributeSet = app::OptionalAttributeSet<MeterIdentification::Attributes::ProtocolVersion::Id,
-                                                           MeterIdentification::Attributes::PowerThreshold::Id>;
+    using OptionalAttributeSet = app::OptionalAttributeSet<MeterIdentification::Attributes::ProtocolVersion::Id>;
 
     static constexpr size_t kMaximumStringSize = 64;
 
@@ -95,6 +93,7 @@ public:
 
         Config & WithPowerThreshold(DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> val)
         {
+            mFeatureMap.Set(Feature::kPowerThreshold);
             mPowerThreshold = val;
             return *this;
         }
@@ -139,11 +138,9 @@ private:
     const BitFlags<Feature> mFeatureMap;
     const OptionalAttributeSet mOptionalAttributeSet;
 
-    // +1 for the null terminator that Platform::CopyString always writes; kMaximumStringSize is the
-    // spec max data length, not the buffer size.
-    char mPointOfDeliveryBuf[kMaximumStringSize + 1]   = {};
-    char mMeterSerialNumberBuf[kMaximumStringSize + 1] = {};
-    char mProtocolVersionBuf[kMaximumStringSize + 1]   = {};
+    char mPointOfDeliveryBuf[kMaximumStringSize]   = {};
+    char mMeterSerialNumberBuf[kMaximumStringSize] = {};
+    char mProtocolVersionBuf[kMaximumStringSize]   = {};
 
     DataModel::Nullable<MeterTypeEnum> mMeterType;
     DataModel::Nullable<CharSpan> mPointOfDelivery;

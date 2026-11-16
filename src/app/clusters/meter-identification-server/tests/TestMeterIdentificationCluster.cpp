@@ -87,7 +87,7 @@ TEST_F(TestMeterIdentificationCluster, AttributeListTest)
     {
         const DataModel::AttributeEntry optionalAttributes[] = { ProtocolVersion::kMetadataEntry, PowerThreshold::kMetadataEntry };
         MeterIdentificationCluster::OptionalAttributeSet optionalAttributeSet;
-        optionalAttributeSet.Set<PowerThreshold::Id>();
+        optionalAttributeSet.ForceSet<PowerThreshold::Id>();
 
         MeterIdentificationCluster cluster(kRootEndpointId,
                                            MeterIdentificationCluster::Config{}.WithFeature(Feature::kPowerThreshold));
@@ -109,7 +109,7 @@ TEST_F(TestMeterIdentificationCluster, AttributeListTest)
         const DataModel::AttributeEntry optionalAttributes[] = { ProtocolVersion::kMetadataEntry, PowerThreshold::kMetadataEntry };
         MeterIdentificationCluster::OptionalAttributeSet optionalAttributeSet;
         optionalAttributeSet.Set<ProtocolVersion::Id>();
-        optionalAttributeSet.Set<PowerThreshold::Id>();
+        optionalAttributeSet.ForceSet<PowerThreshold::Id>();
 
         MeterIdentificationCluster cluster(
             kRootEndpointId, MeterIdentificationCluster::Config{}.WithProtocolVersion().WithFeature(Feature::kPowerThreshold));
@@ -398,11 +398,45 @@ TEST_F(TestMeterIdentificationCluster, SetPowerThreshold)
     }
 }
 
+TEST_F(TestMeterIdentificationCluster, ConfigWithPowerThresholdEnablesFeature)
+{
+    // Config::WithPowerThreshold(value) alone, without a separate WithFeature() call, must enable
+    // Feature::kPowerThreshold and make PowerThreshold appear in Attributes() with the given value -
+    // the constructor silently nulls it out and omits it from Attributes() otherwise.
+    Globals::Structs::PowerThresholdStruct::Type threshold;
+    threshold.powerThreshold.SetValue(2000);
+
+    MeterIdentificationCluster cluster(kRootEndpointId,
+                                       MeterIdentificationCluster::Config{}.WithPowerThreshold(DataModel::MakeNullable(threshold)));
+    ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
+    ClusterTester tester(cluster);
+
+    EXPECT_TRUE(cluster.HasFeature(Feature::kPowerThreshold));
+
+    const DataModel::AttributeEntry optionalAttributes[] = { PowerThreshold::kMetadataEntry };
+    MeterIdentificationCluster::OptionalAttributeSet optionalAttributeSet;
+    optionalAttributeSet.ForceSet<PowerThreshold::Id>();
+
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
+    ASSERT_SUCCESS(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, MeterIdentification::Id), attributes));
+
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
+    AttributeListBuilder listBuilder(expected);
+    ASSERT_SUCCESS(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet));
+    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+
+    DataModel::Nullable<Globals::Structs::PowerThresholdStruct::DecodableType> readVal;
+    ASSERT_SUCCESS(tester.ReadAttribute(PowerThreshold::Id, readVal));
+    ASSERT_FALSE(readVal.IsNull());
+    ASSERT_TRUE(readVal.Value().powerThreshold.HasValue());
+    EXPECT_EQ(readVal.Value().powerThreshold.Value(), 2000);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestMeterIdentificationCluster, ConfigInitialization)
 {
     MeterIdentificationCluster::Config config;
-    config.WithFeature(Feature::kPowerThreshold);
-    config.WithProtocolVersion();
     config.WithMeterType(DataModel::MakeNullable(MeterTypeEnum::kPrivate));
     config.WithPointOfDelivery(DataModel::MakeNullable("POD-INITIAL"_span));
     config.WithMeterSerialNumber(DataModel::MakeNullable("SN-INITIAL"_span));
@@ -410,7 +444,7 @@ TEST_F(TestMeterIdentificationCluster, ConfigInitialization)
 
     Globals::Structs::PowerThresholdStruct::Type threshold;
     threshold.powerThreshold.SetValue(5000);
-    config.mPowerThreshold = DataModel::MakeNullable(threshold);
+    config.WithPowerThreshold(DataModel::MakeNullable(threshold));
 
     MeterIdentificationCluster cluster(kRootEndpointId, config);
     ASSERT_SUCCESS(cluster.Startup(testContext.Get()));

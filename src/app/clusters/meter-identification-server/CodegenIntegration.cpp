@@ -48,11 +48,6 @@ public:
         config.WithFeatures(BitFlags<Feature>(featureMap));
         config.WithOptionalAttributes(MeterIdentificationCluster::OptionalAttributeSet(optionalAttributeBits));
 
-        if (config.mOptionalAttributes.IsSet(PowerThreshold::Id))
-        {
-            config.WithFeature(Feature::kPowerThreshold);
-        }
-
         MeterType::GetDefaultOr(endpointId, config.mMeterType, DataModel::NullNullable);
         PointOfDelivery::GetDefaultOr(endpointId, config.mPointOfDelivery, DataModel::NullNullable);
         MeterSerialNumber::GetDefaultOr(endpointId, config.mMeterSerialNumber, DataModel::NullNullable);

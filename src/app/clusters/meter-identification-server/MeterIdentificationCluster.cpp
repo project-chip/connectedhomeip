@@ -19,11 +19,11 @@
 #include "MeterIdentificationCluster.h"
 
 #include <algorithm>
+#include <cstring>
 
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/MeterIdentification/Metadata.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 
@@ -52,6 +52,22 @@ bool NullableCharSpanEqual(const DataModel::Nullable<CharSpan> & a, const DataMo
     return a.Value().data_equal(b.Value());
 }
 
+// Copies `value` into `buf` (clamped to kMaximumStringSize) and stores the resulting span in `dest`,
+// or nulls `dest` if `value` is null. Uses memmove since `buf` may alias `value` (e.g. a caller
+// passing back a span obtained from this same cluster's Get*() accessor).
+void SetNullableString(char * buf, DataModel::Nullable<CharSpan> & dest, const DataModel::Nullable<CharSpan> & value)
+{
+    if (value.IsNull())
+    {
+        dest.SetNull();
+        return;
+    }
+
+    const size_t len = std::min(value.Value().size(), MeterIdentificationCluster::kMaximumStringSize);
+    memmove(buf, value.Value().data(), len);
+    dest.SetNonNull(CharSpan(buf, len));
+}
+
 } // namespace
 
 namespace chip::app::Clusters {
@@ -66,36 +82,30 @@ MeterIdentificationCluster::MeterIdentificationCluster(EndpointId endpointId, co
         }
         if (config.mFeatureMap.Has(Feature::kPowerThreshold))
         {
-            attrs.Set<PowerThreshold::Id>();
+            // PowerThreshold is not part of OptionalAttributeSet's template pack: its presence is
+            // forced by the feature, not independently settable via Config::mOptionalAttributes.
+            attrs.ForceSet<PowerThreshold::Id>();
         }
         return attrs;
-    }()),
-    mMeterType(config.mMeterType), mPowerThreshold(config.mPowerThreshold)
+    }())
 {
-    if (!config.mPointOfDelivery.IsNull())
-    {
-        // CopyString truncates to kMaximumStringSize if the config value is oversized; the stored
-        // span length must match what was actually copied, not the untruncated input size.
-        const size_t len = std::min(config.mPointOfDelivery.Value().size(), kMaximumStringSize);
-        Platform::CopyString(mPointOfDeliveryBuf, config.mPointOfDelivery.Value());
-        mPointOfDelivery.SetNonNull(CharSpan(mPointOfDeliveryBuf, len));
-    }
-    if (!config.mMeterSerialNumber.IsNull())
-    {
-        const size_t len = std::min(config.mMeterSerialNumber.Value().size(), kMaximumStringSize);
-        Platform::CopyString(mMeterSerialNumberBuf, config.mMeterSerialNumber.Value());
-        mMeterSerialNumber.SetNonNull(CharSpan(mMeterSerialNumberBuf, len));
-    }
-    if (!config.mProtocolVersion.IsNull() && mOptionalAttributeSet.IsSet(ProtocolVersion::Id))
-    {
-        const size_t len = std::min(config.mProtocolVersion.Value().size(), kMaximumStringSize);
-        Platform::CopyString(mProtocolVersionBuf, config.mProtocolVersion.Value());
-        mProtocolVersion.SetNonNull(CharSpan(mProtocolVersionBuf, len));
-    }
+    // Route initial values through the real setters so construction gets the same validation
+    // (enum checks, length limits) as runtime writes, instead of storing unvalidated Config data
+    // directly. An invalid initial value is logged and left null rather than failing construction.
+    LogErrorOnFailure(SetMeterType(config.mMeterType));
+    LogErrorOnFailure(SetPointOfDelivery(config.mPointOfDelivery));
+    LogErrorOnFailure(SetMeterSerialNumber(config.mMeterSerialNumber));
 
-    if (!config.mPowerThreshold.IsNull() && !HasFeature(Feature::kPowerThreshold))
+    // SetProtocolVersion/SetPowerThreshold reject any call (even with a null value) when their
+    // attribute/feature isn't enabled, so only call them when applicable to avoid logging a
+    // spurious error for the common case of an unconfigured optional attribute.
+    if (mOptionalAttributeSet.IsSet(ProtocolVersion::Id))
     {
-        mPowerThreshold.SetNull(); // Ensure it is null if feature is not present
+        LogErrorOnFailure(SetProtocolVersion(config.mProtocolVersion));
+    }
+    if (HasFeature(Feature::kPowerThreshold))
+    {
+        LogErrorOnFailure(SetPowerThreshold(config.mPowerThreshold));
     }
 }
 
@@ -158,13 +168,9 @@ CHIP_ERROR MeterIdentificationCluster::SetPointOfDelivery(const DataModel::Nulla
     if (!value.IsNull())
     {
         VerifyOrReturnError(value.Value().size() <= kMaximumStringSize, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        Platform::CopyString(mPointOfDeliveryBuf, value.Value());
-        mPointOfDelivery.SetNonNull(CharSpan(mPointOfDeliveryBuf, value.Value().size()));
     }
-    else
-    {
-        mPointOfDelivery.SetNull();
-    }
+
+    SetNullableString(mPointOfDeliveryBuf, mPointOfDelivery, value);
 
     NotifyAttributeChanged(PointOfDelivery::Id);
     return CHIP_NO_ERROR;
@@ -180,13 +186,9 @@ CHIP_ERROR MeterIdentificationCluster::SetMeterSerialNumber(const DataModel::Nul
     if (!value.IsNull())
     {
         VerifyOrReturnError(value.Value().size() <= kMaximumStringSize, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        Platform::CopyString(mMeterSerialNumberBuf, value.Value());
-        mMeterSerialNumber.SetNonNull(CharSpan(mMeterSerialNumberBuf, value.Value().size()));
     }
-    else
-    {
-        mMeterSerialNumber.SetNull();
-    }
+
+    SetNullableString(mMeterSerialNumberBuf, mMeterSerialNumber, value);
 
     NotifyAttributeChanged(MeterSerialNumber::Id);
     return CHIP_NO_ERROR;
@@ -204,13 +206,9 @@ CHIP_ERROR MeterIdentificationCluster::SetProtocolVersion(const DataModel::Nulla
     if (!value.IsNull())
     {
         VerifyOrReturnError(value.Value().size() <= kMaximumStringSize, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        Platform::CopyString(mProtocolVersionBuf, value.Value());
-        mProtocolVersion.SetNonNull(CharSpan(mProtocolVersionBuf, value.Value().size()));
     }
-    else
-    {
-        mProtocolVersion.SetNull();
-    }
+
+    SetNullableString(mProtocolVersionBuf, mProtocolVersion, value);
 
     NotifyAttributeChanged(ProtocolVersion::Id);
     return CHIP_NO_ERROR;
