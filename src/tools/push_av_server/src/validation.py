@@ -333,11 +333,6 @@ class MatterCMAFUploadValidator:
                         if track.state == TrackState.NOT_STARTED:
                             errors.append(f"Media segment for track '{track_name_in_path}' uploaded before init segment")
 
-                        # Update segment count and state
-                        track.segment_count += 1
-                        if track.state != TrackState.SEGMENTS_UPLOADING:
-                            track.state = TrackState.SEGMENTS_UPLOADING
-
                 elif stream.interface == SupportedIngestInterface.hls:
                     if ext == "init":
                         # For HLS, init must be uploaded after initial media playlist
@@ -361,10 +356,10 @@ class MatterCMAFUploadValidator:
                         elif track.state == TrackState.COMPLETED:
                             errors.append(f"Media segment for track '{track_name_in_path}' uploaded after track was completed")
 
-                        # Update segment count and state
-                        track.segment_count += 1
-                        if track.state != TrackState.SEGMENTS_UPLOADING:
-                            track.state = TrackState.SEGMENTS_UPLOADING
+                # Count every m4s upload, including rejected ones, so the next expected segment number follows it.
+                if ext == "m4s":
+                    track.segment_count += 1
+                    track.state = TrackState.SEGMENTS_UPLOADING
 
             # HLS-specific validation for media segments
             if stream.interface == SupportedIngestInterface.hls and ext == "m4s":
