@@ -40,12 +40,12 @@ and discriminator above must match the values configured in the firmware.
 
 ### LIT ICD
 
-- The Thread interface is configured as a Sleepy End Device.
-- ICD Management is enabled. The device supports the ICD client-management and
-  stay-active interactions exposed by the Matter ICD Management cluster.
-- On first boot, the device opens a BLE commissioning window. After
-  commissioning, it reconnects to its saved Thread network and retains its
-  fabric and network data in non-volatile storage.
+-   The Thread interface is configured as a Sleepy End Device.
+-   ICD Management is enabled. The device supports the ICD client-management and
+    stay-active interactions exposed by the Matter ICD Management cluster.
+-   On first boot, the device opens a BLE commissioning window. After
+    commissioning, it reconnects to its saved Thread network and retains its
+    fabric and network data in non-volatile storage.
 
 The LIT ICD timing values documented for this example are:
 
