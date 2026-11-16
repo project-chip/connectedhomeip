@@ -201,8 +201,8 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 int shift = aDeltaX.Value();
                 // Limit the shift so x1 >= 0 and x2 stays within the sensor; both edges
                 // move by the same clamped shift, preserving the viewport width.
-                shift = std::max<int>(shift, -static_cast<int>(viewport.x1));
-                shift = std::min<int>(shift, static_cast<int>(sensorParms.sensorWidth) - static_cast<int>(viewport.x2));
+                shift       = std::max<int>(shift, -static_cast<int>(viewport.x1));
+                shift       = std::min<int>(shift, static_cast<int>(sensorParms.sensorWidth) - static_cast<int>(viewport.x2));
                 viewport.x1 = static_cast<uint16_t>(viewport.x1 + shift);
                 viewport.x2 = static_cast<uint16_t>(viewport.x2 + shift);
             }
@@ -212,8 +212,8 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 int shift = aDeltaY.Value();
                 // Limit the shift so y1 >= 0 and y2 stays within the sensor; both edges
                 // move by the same clamped shift, preserving the viewport height.
-                shift = std::max<int>(shift, -static_cast<int>(viewport.y1));
-                shift = std::min<int>(shift, static_cast<int>(sensorParms.sensorHeight) - static_cast<int>(viewport.y2));
+                shift       = std::max<int>(shift, -static_cast<int>(viewport.y1));
+                shift       = std::min<int>(shift, static_cast<int>(sensorParms.sensorHeight) - static_cast<int>(viewport.y2));
                 viewport.y1 = static_cast<uint16_t>(viewport.y1 + shift);
                 viewport.y2 = static_cast<uint16_t>(viewport.y2 + shift);
             }
