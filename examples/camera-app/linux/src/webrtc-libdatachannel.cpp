@@ -362,6 +362,7 @@ public:
         {
             mPeerConnection->close();
         }
+        mHeldRemoteCandidates.clear();
     }
 
     void CreateOffer() override { mPeerConnection->setLocalDescription(); }
@@ -372,7 +373,28 @@ public:
     {
         rtc::Description::Type rtcType = SDPTypeToRtcType(type);
         mPeerConnection->setRemoteDescription(rtc::Description(sdp, rtcType));
+
+        std::vector<rtc::Candidate> heldCandidates;
+        heldCandidates.swap(mHeldRemoteCandidates);
+        if (heldCandidates.empty())
+        {
+            return;
+        }
+        if (!HasRemoteDescription())
+        {
+            ChipLogError(Camera, "No remote description (peer connection closed); dropping %zu held remote candidate(s)",
+                         heldCandidates.size());
+            return;
+        }
+        ChipLogProgress(Camera, "Applying %zu remote candidate(s) held until the remote description was set",
+                        heldCandidates.size());
+        for (auto & candidate : heldCandidates)
+        {
+            mPeerConnection->addRemoteCandidate(std::move(candidate));
+        }
     }
+
+    bool HasRemoteDescription() override { return mPeerConnection->remoteDescription().has_value(); }
 
     int GetPayloadType(const std::string & sdp, SDPType type, const std::string & codec) override
     {
@@ -422,14 +444,13 @@ public:
 
     void AddRemoteCandidate(const std::string & candidate, const std::string & mid) override
     {
-        if (mid.empty())
+        rtc::Candidate remoteCandidate = mid.empty() ? rtc::Candidate(candidate) : rtc::Candidate(candidate, mid);
+        if (!HasRemoteDescription())
         {
-            mPeerConnection->addRemoteCandidate(rtc::Candidate(candidate));
+            mHeldRemoteCandidates.push_back(std::move(remoteCandidate));
+            return;
         }
-        else
-        {
-            mPeerConnection->addRemoteCandidate(rtc::Candidate(candidate, mid));
-        }
+        mPeerConnection->addRemoteCandidate(std::move(remoteCandidate));
     }
 
     std::shared_ptr<WebRTCTrack> AddTrack(MediaType mediaType, const std::string & mid, int payloadType) override
@@ -460,6 +481,9 @@ public:
 
 private:
     std::shared_ptr<rtc::PeerConnection> mPeerConnection;
+
+    // libdatachannel rejects a remote candidate while no remote description is set.
+    std::vector<rtc::Candidate> mHeldRemoteCandidates;
 };
 
 } // namespace
