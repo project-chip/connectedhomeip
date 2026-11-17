@@ -272,3 +272,35 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
 }
 
 @end
+
+@interface MTRTestCase (ServerAppRunnerPayloads)
+// Private to MTRTestCase+ServerAppRunner.m.
++ (NSString *)_payloadWithRandomDiscriminatorAndPasscode;
+@end
+
+// The server app runner derives each app's port from its discriminator, so
+// random payloads must not repeat a discriminator within a process.
+@interface MTRServerAppRunnerPayloadTests : MTRTestCase
+@end
+
+@implementation MTRServerAppRunnerPayloadTests
+
+- (void)testRandomPayloadsHaveDistinctDiscriminators
+{
+    // There are 2985 possible discriminators.  If draws could repeat, 200 of
+    // them would include a repeat about 99.9% of the time.
+    const NSUInteger kDraws = 200;
+    NSMutableSet<NSNumber *> * seen = [NSMutableSet set];
+    for (NSUInteger i = 0; i < kDraws; ++i) {
+        NSError * error;
+        NSString * payloadString = [MTRTestCase _payloadWithRandomDiscriminatorAndPasscode];
+        __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:payloadString error:&error];
+        XCTAssertNil(error);
+        XCTAssertNotNil(payload);
+        XCTAssertFalse([seen containsObject:payload.discriminator], @"discriminator %@ repeated", payload.discriminator);
+        [seen addObject:payload.discriminator];
+    }
+    XCTAssertEqual(seen.count, kDraws);
+}
+
+@end

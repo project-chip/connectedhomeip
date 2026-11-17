@@ -16,6 +16,7 @@
 
 #include <device/types/thermostat/impl/LoggingThermostat.h>
 
+#include <app/MessageDef/StatusIB.h>
 #include <app/persistence/AttributePersistence.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -805,8 +806,8 @@ void LoggingThermostat::UpdateSimulatedRunningState()
 
     if (HasThermostatCluster())
     {
-        ThermostatCluster().SetRunningMode(newRunningMode);
-        ThermostatCluster().SetRunningState(newRunningState);
+        LogErrorOnFailure(StatusIB(ThermostatCluster().SetRunningMode(newRunningMode)).ToChipError());
+        LogErrorOnFailure(StatusIB(ThermostatCluster().SetRunningState(newRunningState)).ToChipError());
     }
     else
     {
