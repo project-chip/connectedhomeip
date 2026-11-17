@@ -68,6 +68,18 @@ CIRQUE_TESTS=(
     "TvCastingTest"
 )
 
+# Android emulator tests, run by run_android_tests. They need /dev/kvm, the
+# cirque-android-runner image (third_party/cirque/repo/cirque/nodes/
+# Dockerfile.android_runner), an Android SDK with a Pixel_6_API_34 AVD
+# (ANDROID_HOME, ANDROID_AVD_HOME) and the APKs built by
+# scripts/build/build_examples.py (android-x64-chip-tool, android-x64-tv-server,
+# android-x64-tv-casting-app).
+CIRQUE_ANDROID_TESTS=(
+    "AndroidBleWiFiMobileDeviceTest"
+    "AndroidBleThreadMobileDeviceTest"
+    "AndroidTvCastingTest"
+)
+
 BOLD_GREEN_TEXT="\033[1;32m"
 BOLD_YELLOW_TEXT="\033[1;33m"
 BOLD_RED_TEXT="\033[1;31m"
@@ -414,13 +426,13 @@ function cirquetest_run_test() {
     return "$exitcode"
 }
 
-function cirquetest_run_all_tests() {
+function __cirquetest_run_tests() {
     # shellharden requires quotes around variables, which will break for-each loops
     # This is the workaround
     echo "Logs will be stored at $LOG_DIR"
     test_pass=1
     mkdir -p "$LOG_DIR"
-    for test_name in "${CIRQUE_TESTS[@]}"; do
+    for test_name in "$@"; do
         echo "[ RUN] $test_name"
         if cirquetest_run_test "$test_name" >"$LOG_DIR/${test_name//:/_}.log" 2>&1; then
             echo -e "[$BOLD_GREEN_TEXT""PASS""$RESET_COLOR] $test_name"
@@ -441,6 +453,14 @@ function cirquetest_run_all_tests() {
         echo -e "[$BOLD_RED_TEXT""FAIL""$RESET_COLOR] Test failed, test log can be found at $LOG_DIR"
         return 1
     fi
+}
+
+function cirquetest_run_all_tests() {
+    __cirquetest_run_tests "${CIRQUE_TESTS[@]}"
+}
+
+function cirquetest_run_android_tests() {
+    __cirquetest_run_tests "${CIRQUE_ANDROID_TESTS[@]}"
 }
 
 subcommand=$1

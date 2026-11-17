@@ -37,7 +37,8 @@ public class MatterServantService extends Service {
   public int onStartCommand(Intent intent, int flags, int startId) {
     createNotificationChannel();
     Intent notificationIntent = new Intent(this, MainActivity.class);
-    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+    PendingIntent pendingIntent =
+        PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
     Notification notification =
         new NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("MatterServant Service")
@@ -45,7 +46,11 @@ public class MatterServantService extends Service {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(pendingIntent)
             .build();
-    startForeground(1, notification);
+    if (android.os.Build.VERSION.SDK_INT >= 29) {
+      startForeground(1, notification, 16); // FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
+    } else {
+      startForeground(1, notification);
+    }
     return super.onStartCommand(intent, flags, startId);
   }
 

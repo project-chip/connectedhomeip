@@ -210,8 +210,8 @@ public class ContentAppAgentService extends Service {
     ackBackIntent.setClass(context, ContentAppAgentService.class);
     ackBackIntent.putExtra(EXTRA_RESPONSE_RECEIVING_PACKAGE, targetPackage);
     ackBackIntent.putExtra(EXTRA_RESPONSE_ID, responseId);
-
-    return PendingIntent.getService(context, 0, ackBackIntent, PendingIntent.FLAG_ONE_SHOT);
+    return PendingIntent.getService(
+        context, 0, ackBackIntent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_MUTABLE);
   }
 
   @Override

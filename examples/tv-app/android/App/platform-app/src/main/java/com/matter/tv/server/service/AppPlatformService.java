@@ -150,12 +150,18 @@ public class AppPlatformService {
             }
           }
         };
+    int flags = 0;
+    if (android.os.Build.VERSION.SDK_INT >= 34) { // Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+      flags = 2; // Context.RECEIVER_EXPORTED
+    }
     context.registerReceiver(
         mBroadcastReceiver,
-        new IntentFilter(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_ADD));
+        new IntentFilter(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_ADD),
+        flags);
     context.registerReceiver(
         mBroadcastReceiver,
-        new IntentFilter(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_REMOVE));
+        new IntentFilter(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_REMOVE),
+        flags);
   }
 
   public void setActivity(Activity activity) {

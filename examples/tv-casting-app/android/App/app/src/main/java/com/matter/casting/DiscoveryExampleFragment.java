@@ -42,7 +42,7 @@ import java.util.Optional;
 public class DiscoveryExampleFragment extends Fragment {
   private static final String TAG = DiscoveryExampleFragment.class.getSimpleName();
   // 35 represents device type of Matter Casting Player
-  private static final Long DISCOVERY_TARGET_DEVICE_TYPE = 35L;
+  private static final Long DISCOVERY_TARGET_DEVICE_TYPE = null;
   private static final int DISCOVERY_RUNTIME_SEC = 15;
   private TextView matterDiscoveryMessageTextView;
   public static TextView matterDiscoveryErrorMessageTextView;

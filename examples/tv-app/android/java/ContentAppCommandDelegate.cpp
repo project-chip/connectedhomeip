@@ -318,7 +318,7 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
     }
 }
 
-LaunchResponseType ContentAppCommandDelegate::FormatContentLauncherResponse(Json::Value value, Status & status)
+LaunchResponseType ContentAppCommandDelegate::FormatContentLauncherResponse(const Json::Value & value, Status & status)
 {
     status = chip::Protocols::InteractionModel::Status::Success;
     LaunchResponseType launchResponse;
@@ -334,7 +334,7 @@ LaunchResponseType ContentAppCommandDelegate::FormatContentLauncherResponse(Json
         launchResponse.status = static_cast<app::Clusters::ContentLauncher::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::ContentLauncher::Commands::LauncherResponse::Fields::kData));
-        if (!value[dataFieldId].empty())
+        if (!value[dataFieldId].empty() && value[dataFieldId].isString())
         {
             launchResponse.data = chip::MakeOptional(CharSpan::fromCharString(value[dataFieldId].asCString()));
         }
@@ -342,7 +342,7 @@ LaunchResponseType ContentAppCommandDelegate::FormatContentLauncherResponse(Json
     return launchResponse;
 }
 
-NavigateTargetResponseType ContentAppCommandDelegate::FormatNavigateTargetResponse(Json::Value value, Status & status)
+NavigateTargetResponseType ContentAppCommandDelegate::FormatNavigateTargetResponse(const Json::Value & value, Status & status)
 {
     status = chip::Protocols::InteractionModel::Status::Success;
     NavigateTargetResponseType navigateTargetResponse;
@@ -358,7 +358,7 @@ NavigateTargetResponseType ContentAppCommandDelegate::FormatNavigateTargetRespon
         navigateTargetResponse.status = static_cast<app::Clusters::TargetNavigator::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Fields::kData));
-        if (!value[dataFieldId].empty())
+        if (!value[dataFieldId].empty() && value[dataFieldId].isString())
         {
             navigateTargetResponse.data = chip::MakeOptional(CharSpan::fromCharString(value[dataFieldId].asCString()));
         }
@@ -366,7 +366,7 @@ NavigateTargetResponseType ContentAppCommandDelegate::FormatNavigateTargetRespon
     return navigateTargetResponse;
 }
 
-PlaybackResponseType ContentAppCommandDelegate::FormatMediaPlaybackResponse(Json::Value value, Status & status)
+PlaybackResponseType ContentAppCommandDelegate::FormatMediaPlaybackResponse(const Json::Value & value, Status & status)
 {
     status = chip::Protocols::InteractionModel::Status::Success;
     PlaybackResponseType playbackResponse;
@@ -382,7 +382,7 @@ PlaybackResponseType ContentAppCommandDelegate::FormatMediaPlaybackResponse(Json
         playbackResponse.status = static_cast<app::Clusters::MediaPlayback::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::MediaPlayback::Commands::PlaybackResponse::Fields::kData));
-        if (!value[dataFieldId].empty())
+        if (!value[dataFieldId].empty() && value[dataFieldId].isString())
         {
             playbackResponse.data = chip::MakeOptional(CharSpan::fromCharString(value[dataFieldId].asCString()));
         }
@@ -390,13 +390,13 @@ PlaybackResponseType ContentAppCommandDelegate::FormatMediaPlaybackResponse(Json
     return playbackResponse;
 }
 
-GetSetupPINResponseType ContentAppCommandDelegate::FormatGetSetupPINResponse(Json::Value value, Status & status)
+GetSetupPINResponseType ContentAppCommandDelegate::FormatGetSetupPINResponse(const Json::Value & value, Status & status)
 {
     status = chip::Protocols::InteractionModel::Status::Success;
     GetSetupPINResponseType getSetupPINresponse;
     std::string setupPINFieldId =
         std::to_string(to_underlying(app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Fields::kSetupPIN));
-    if (!value[setupPINFieldId].empty())
+    if (!value[setupPINFieldId].empty() && value[setupPINFieldId].isString())
     {
         getSetupPINresponse.setupPIN = CharSpan::fromCharString(value[setupPINFieldId].asCString());
     }
@@ -407,7 +407,7 @@ GetSetupPINResponseType ContentAppCommandDelegate::FormatGetSetupPINResponse(Jso
     return getSetupPINresponse;
 }
 
-Status ContentAppCommandDelegate::FormatStatusResponse(Json::Value value)
+Status ContentAppCommandDelegate::FormatStatusResponse(const Json::Value & value)
 {
     // check if JSON has "Status" key
     if (!value[RESPONSE_STATUS_KEY].empty() && !value[RESPONSE_STATUS_KEY].isUInt())

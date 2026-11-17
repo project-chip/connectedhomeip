@@ -146,6 +146,7 @@ public class MatterServant {
 
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
+    mTvApp.postServerInit(null);
   }
 
   public void initCommissioner() {
@@ -155,6 +156,7 @@ public class MatterServant {
   public void restart() {
     chipAppServer.stopApp();
     chipAppServer.startApp();
+    mTvApp.postServerInit(null);
   }
 
   public void toggleOnOff() {

@@ -166,7 +166,11 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
   private void registerPackageAction(final Context context, final String action) {
     IntentFilter intent = new IntentFilter(action);
     intent.addDataScheme("package");
-    context.registerReceiver(this, intent);
+    int flags = 0;
+    if (android.os.Build.VERSION.SDK_INT >= 34) { // Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+      flags = 2; // Context.RECEIVER_EXPORTED
+    }
+    context.registerReceiver(this, intent, flags);
   }
 
   private void initializeMatterApps(Context context) {

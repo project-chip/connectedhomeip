@@ -53,6 +53,38 @@ logs).
 > Note: The container (as well as the networks) will be preserved for debugging.
 > You may need to clean it by yourself.
 
+### Android emulator tests
+
+The Android emulator tests (`AndroidBleWiFiMobileDeviceTest`,
+`AndroidBleThreadMobileDeviceTest`, `AndroidTvCastingTest`) need:
+
+-   KVM hardware acceleration (`/dev/kvm`)
+-   the `cirque-android-runner:latest` image:
+
+    ```bash
+    docker build -t cirque-android-runner:latest \
+        -f third_party/cirque/repo/cirque/nodes/Dockerfile.android_runner \
+        third_party/cirque/repo/cirque/nodes
+    ```
+
+-   an Android SDK with a `Pixel_6_API_34` AVD (`ANDROID_HOME`,
+    `ANDROID_AVD_HOME`)
+-   the APKs built by `scripts/build/build_examples.py` for the
+    `android-x64-chip-tool`, `android-x64-tv-server` and
+    `android-x64-tv-casting-app` targets
+
+They are not part of `run_all_tests`. Run them with:
+
+```bash
+scripts/tests/cirque_tests.sh run_android_tests
+```
+
+or one at a time:
+
+```bash
+scripts/tests/cirque_tests.sh run_test AndroidBleWiFiMobileDeviceTest
+```
+
 ## Run specific test
 
 You can run a single cirque test by:
