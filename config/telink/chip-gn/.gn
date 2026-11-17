@@ -25,5 +25,6 @@ default_args = {
   target_cpu = "riscv"
   target_os = "zephyr"
 
+  import("${chip_root}/config/pigweed_backends.gni")
   import("${chip_root}/config/telink/chip-gn/args.gni")
 }

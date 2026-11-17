@@ -33,14 +33,21 @@ declare_args() {
 
   # Set to true to code-generate CodgenProcessingConfig.h
   #
-  # This is to allow cmake-based systems to have a CodegenProcessingConfig available
-  # since the build config headers are processed as part of gn processing.
+  # This is to allow cmake-based systems to have a CodegenProcessingConfig
+  # available since the build config headers are processed as part of gn
+  # processing.
   chip_build_enable_codegen_configuration = true
 
-  # Default value for libchip_enable_*_cluster arguments that control whether clusters
-  # with external dependencies get built. The default (via matter_enable_recommended)
-  # is true. Setting this to false allows individual required clusters to be enabled via opt-in.
+  # Default value for libchip_enable_*_cluster arguments that control whether
+  # clusters with external dependencies get built. The default (via
+  # matter_enable_recommended) is true. Setting this to false allows individual
+  # required clusters to be enabled via opt-in.
   chip_enable_all_clusters = matter_enable_recommended
+
+  # Link Pigweed backend implementations (pw_build_LINK_DEPS) into libCHIP.
+  # Disable when an external build system (e.g. CMake with Pigweed RPC or
+  # unit-test drivers) provides and links those backend implementations.
+  chip_link_pw_build_deps = true
 }
 
 declare_args() {

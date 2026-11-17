@@ -13,18 +13,11 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
+import("${chip_root}/config/pigweed_backends.gni")
 
 # Options from standalone-chip.mk that differ from configure defaults. These
 # options are used from examples/.
 chip_build_tests = false
-
-pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
-pw_log_BACKEND = "${chip_root}/src/pw_backends/log"
-pw_build_LINK_DEPS = [
-  "$dir_pw_assert:impl",
-  "$dir_pw_log:impl",
-]
 
 pw_build_PIP_CONSTRAINTS =
     [ "${chip_root}/scripts/setup/requirements.constraints.txt" ]

@@ -26,4 +26,5 @@ default_args = {
   target_os = "nuttx"
 
   import("${chip_root}/config/nuttx/chip-gn/args.gni")
+  import("${chip_root}/config/pigweed_backends.gni")
 }

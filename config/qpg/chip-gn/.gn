@@ -26,4 +26,5 @@ default_args = {
   target_os = "freertos"
 
   import("//config/qpg/chip-gn/args.gni")
+  import("${chip_root}/config/pigweed_backends.gni")
 }
