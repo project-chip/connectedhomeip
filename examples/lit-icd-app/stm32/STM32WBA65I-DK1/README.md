@@ -51,10 +51,10 @@ The LIT ICD timing values documented for this example are:
 
 | Parameter                                   | Value    | Meaning                   |
 | ------------------------------------------- | -------- | ------------------------- |
-| `CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL` | 300 s    | Thread slow-poll interval |
+| `CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL` | 2,100 s  | Thread slow-poll interval |
 | `CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL` | 200 ms   | Thread fast-poll interval |
-| `CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC`    | 450 s    | ICD idle-mode duration    |
-| `CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS`   | 2,000 ms | ICD active-mode duration  |
+| `CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC`    | 1,800 s  | ICD idle-mode duration    |
+| `CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS`   | 5,000 ms | ICD active-mode duration  |
 | `CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS`  | 5,000 ms | Active-mode threshold     |
 
 In the STM32 project, these timing macros are defined in
