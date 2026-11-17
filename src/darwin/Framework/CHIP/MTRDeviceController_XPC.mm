@@ -512,7 +512,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
         return;
     }
 
-    // The report runs in the server's flow for it; the key is not passed on to delegates.
     MTRMetricsScope metricsScope([MTRMetrics _flowIDWithString:MTRFlowIDFromResponseValues(attributeReport)]);
     attributeReport = MTRResponseValuesByRemovingFlowID(attributeReport);
 
@@ -533,7 +532,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
         return;
     }
 
-    // The report runs in the server's flow for it; the key is not passed on to delegates.
     MTRMetricsScope metricsScope([MTRMetrics _flowIDWithString:MTRFlowIDFromResponseValues(eventReport)]);
     eventReport = MTRResponseValuesByRemovingFlowID(eventReport);
 

@@ -41,11 +41,6 @@ static os_unfair_lock sFlowLock = OS_UNFAIR_LOCK_INIT;
 static id sIssuerFlow;
 static NSMutableArray * sNOCChainResultFlows;
 
-static BOOL OnMatterQueue(void)
-{
-    return strcmp(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL), "org.csa-iot.matter.workqueue") == 0;
-}
-
 // The issuer fails with this error.  The framework reads it on the Matter queue, in the handling of the
 // result, so what it records is the flow that handling runs in.
 @interface MTRFlowProbeNOCError : NSError
@@ -54,7 +49,7 @@ static BOOL OnMatterQueue(void)
 @implementation MTRFlowProbeNOCError
 - (void)_note
 {
-    if (OnMatterQueue()) {
+    if (MTRTestIsOnMatterQueue()) {
         id flow = MTRMetrics.currentFlowID ?: NSNull.null;
         os_unfair_lock_lock(&sFlowLock);
         [sNOCChainResultFlows addObject:flow];

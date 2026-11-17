@@ -64,14 +64,15 @@ static void StartCapturingLogLines(void)
     });
 }
 
-static NSArray<NSString *> * LogLinesContaining(NSString * first, NSString * second)
+// The captured log lines that contain needle and, unless it is empty, alsoContaining.
+static NSArray<NSString *> * LogLinesContaining(NSString * needle, NSString * alsoContaining)
 {
     os_unfair_lock_lock(&sLogLinesLock);
     NSArray<NSString *> * lines = [sLogLines copy];
     os_unfair_lock_unlock(&sLogLinesLock);
     NSMutableArray<NSString *> * matching = [NSMutableArray array];
     for (NSString * line in lines) {
-        if ([line containsString:first] && (second.length == 0 || [line containsString:second])) {
+        if ([line containsString:needle] && (alsoContaining.length == 0 || [line containsString:alsoContaining])) {
             [matching addObject:line];
         }
     }
@@ -81,14 +82,9 @@ static NSArray<NSString *> * LogLinesContaining(NSString * first, NSString * sec
 // Reports the current flow each time the framework touches it on the Matter queue.  The framework reads
 // these objects only inside the completion it was handed, after the application calls the completion
 // later from another queue, so what they record is the flow the completion runs in.
-static BOOL OnMatterQueue(void)
-{
-    return strcmp(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL), "org.csa-iot.matter.workqueue") == 0;
-}
-
 static void NoteMatterQueueFlow(os_unfair_lock_t lock, NSMutableArray * flows)
 {
-    if (OnMatterQueue()) {
+    if (MTRTestIsOnMatterQueue()) {
         id flow = MTRMetrics.currentFlowID ?: NSNull.null;
         os_unfair_lock_lock(lock);
         [flows addObject:flow];

@@ -1295,11 +1295,6 @@ static MTRDeviceController * sFlowWireController;
 
 #pragma mark - Report decoding
 
-static BOOL OnMatterQueue(void)
-{
-    return strcmp(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL), "org.csa-iot.matter.workqueue") == 0;
-}
-
 // Records the flow that is current on the Matter queue each time the replaced method runs there.
 @interface MTRFlowMatterQueueProbe : NSObject
 - (instancetype)initWithMethod:(Method)method block:(id)block;
@@ -1329,7 +1324,7 @@ static BOOL OnMatterQueue(void)
 
 - (void)note
 {
-    if (!OnMatterQueue()) {
+    if (!MTRTestIsOnMatterQueue()) {
         return;
     }
     id flow = CurrentFlowIDOrNull();
@@ -1680,7 +1675,7 @@ static NSMutableDictionary<NSString *, NSMutableArray *> * sFlowProbes;
 // later from another queue, so the flow current at that read is the flow the completion runs in.
 static void NoteResponseFlow(NSString * name)
 {
-    if (strcmp(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL), "org.csa-iot.matter.workqueue") != 0) {
+    if (!MTRTestIsOnMatterQueue()) {
         return;
     }
     id flow = CurrentFlowIDOrNull();
