@@ -183,9 +183,9 @@ InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::TimedRequest(cons
     return *this;
 }
 
-InvokeRequestMessage::Builder &
-InvokeRequestMessage::Builder::RequestFlags(const bool aSuppressResponse, const bool aTimedRequest,
-                                            const std::optional<uint16_t> & aPeerRevision, const bool aIsGroupcast)
+InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::RequestFlags(const bool aSuppressResponse, const bool aTimedRequest,
+                                                                            const std::optional<uint16_t> & aPeerRevision,
+                                                                            const bool aIsGroupcast)
 {
     if (aIsGroupcast)
     {

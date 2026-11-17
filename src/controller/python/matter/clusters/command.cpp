@@ -244,10 +244,9 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
     std::unique_ptr<CommandSenderCallback> callback =
         std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
 
-    bool isTimedRequest = timedRequestTimeoutMs != 0 || testOnlySuppressTimedRequestMessage;
-    std::unique_ptr<CommandSender> sender =
-        std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(), device->GetSecureSession().Value(),
-                                        isTimedRequest, suppressResponse);
+    bool isTimedRequest                   = timedRequestTimeoutMs != 0 || testOnlySuppressTimedRequestMessage;
+    std::unique_ptr<CommandSender> sender = std::make_unique<CommandSender>(
+        callback.get(), device->GetExchangeManager(), device->GetSecureSession().Value(), isTimedRequest, suppressResponse);
 
     if (delayMinMs > 0 || delayJitterWindowMs > 0)
     {

@@ -606,7 +606,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     //
     // TODO: That's not technically InvalidAction, and we should probably make
     // our callees hand out Status as well.
-    Status status = Status::InvalidAction;
+    Status status                = Status::InvalidAction;
     mLastSuccessfullyWrittenPath = std::nullopt;
 
     reader.Init(std::move(aPayload));

@@ -804,10 +804,12 @@ TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
     ByteSpan list[kTestListLength2];
 
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, std::nullopt, NullOptional, static_cast<uint16_t>(kReserveSize));
+    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, std::nullopt, NullOptional,
+                                  static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, std::nullopt, NullOptional, static_cast<uint16_t>(kReserveSize));
+    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, std::nullopt, NullOptional,
+                                  static_cast<uint16_t>(kReserveSize));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -949,10 +951,12 @@ TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
     constexpr uint8_t kTestListLength2 = 10;
 
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, std::nullopt, NullOptional, static_cast<uint16_t>(kReserveSize));
+    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, std::nullopt, NullOptional,
+                                  static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, std::nullopt, NullOptional, static_cast<uint16_t>(kReserveSize));
+    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, std::nullopt, NullOptional,
+                                  static_cast<uint16_t>(kReserveSize));
 
     ByteSpan list[kTestListLength2];
 

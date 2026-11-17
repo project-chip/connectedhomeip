@@ -152,9 +152,9 @@ WriteRequestMessage::Builder & WriteRequestMessage::Builder::TimedRequest(const 
     return *this;
 }
 
-WriteRequestMessage::Builder &
-WriteRequestMessage::Builder::RequestFlags(const bool aSuppressResponse, const bool aTimedRequest,
-                                           const std::optional<uint16_t> & aPeerRevision, const bool aIsGroupcast)
+WriteRequestMessage::Builder & WriteRequestMessage::Builder::RequestFlags(const bool aSuppressResponse, const bool aTimedRequest,
+                                                                          const std::optional<uint16_t> & aPeerRevision,
+                                                                          const bool aIsGroupcast)
 {
     if (aIsGroupcast)
     {
