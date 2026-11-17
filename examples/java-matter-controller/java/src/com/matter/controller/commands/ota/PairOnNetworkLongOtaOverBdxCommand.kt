@@ -215,7 +215,11 @@ class PairOnNetworkLongOtaOverBdxCommand(
       bufferedInputStream?.close()
       inputStream = null
       bufferedInputStream = null
-      setSuccess()
+      if (errorCode == 0L) {
+        setSuccess()
+      } else {
+        setFailure("BDX transfer failed with error $errorCode")
+      }
     }
 
     override fun handleBDXQuery(
