@@ -564,6 +564,15 @@ private:
     // Returns CHIP_ERROR_INVALID_ARGUMENT if a session was passed at construction and `session` is not that session.
     CHIP_ERROR CheckMatchesSessionInfo(const SessionHandle & session) const;
 
+    // Keeps mConstructionSession on the session passed at construction when a newer CASE session
+    // to the same peer is established (plain SessionHolder would shift).
+    class ConstructionSessionDelegate final : public SessionDelegate
+    {
+    public:
+        NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
+        void OnSessionReleased() override {}
+    };
+
     /**
      * Finalize Write Request Message TLV Builder and retrieve final data from tlv builder for later sending
      */
@@ -586,8 +595,10 @@ private:
 
     // Values read from the session passed at construction.
     // mPeerInteractionModelRevision is std::nullopt when no session was passed or the peer revision is unknown.
-    // mConstructionSession holds that session for send-time identity checks; it clears if the session is released.
-    SessionHolder mConstructionSession;
+    // mConstructionSession holds that session for send-time identity checks; it clears if the session is released,
+    // and does not shift when a newer session to the same peer is established.
+    ConstructionSessionDelegate mConstructionSessionDelegate;
+    SessionHolderWithDelegate mConstructionSession{ mConstructionSessionDelegate };
     std::optional<uint16_t> mPeerInteractionModelRevision;
     bool mHasSessionInfo = false;
     bool mSessionIsGroup = false;

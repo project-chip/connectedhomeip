@@ -704,7 +704,7 @@ void TestAclAttribute::ExpectSecondWriteDeniedAfterRevoke(const AttributePathPar
     auto * engine = InteractionModelEngine::GetInstance();
 
     TestWriteClientCallback callback;
-    WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+    WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
     EXPECT_SUCCESS(writeClient.EncodeAttribute(firstPath, static_cast<uint8_t>(1)));
     EXPECT_SUCCESS(writeClient.EncodeAttribute(secondPath, static_cast<uint8_t>(2)));
     EXPECT_SUCCESS(writeClient.SendWriteRequest(GetSessionBobToAlice()));
@@ -743,7 +743,7 @@ TEST_F(TestAclAttribute, WriteCacheReusesGrantForSamePathScalarWrite)
 
     const AttributePathParams path(kTestEndpointId, kTestClusterId, kTestAttributeId);
     TestWriteClientCallback callback;
-    WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+    WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
     EXPECT_SUCCESS(writeClient.EncodeAttribute(path, static_cast<uint8_t>(1)));
     EXPECT_SUCCESS(writeClient.EncodeAttribute(path, static_cast<uint8_t>(2)));
     EXPECT_SUCCESS(writeClient.SendWriteRequest(GetSessionBobToAlice()));
