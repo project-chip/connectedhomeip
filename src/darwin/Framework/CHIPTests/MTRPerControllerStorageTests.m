@@ -4817,7 +4817,7 @@ static uint64_t MTRTestPhysFootprint(void)
     // A row no node index reaches, as left behind when a node's index entries were lost.
     NSString * orphanKey = [controller.controllerDataStore _clusterDataKeyForNodeID:@(9) endpointID:@(0) clusterID:@(6)];
     [storageDelegate controller:controller
-                     storeValue:[[MTRDeviceClusterData alloc] initWithDataVersion:@(91) attributes:@{ }]
+                     storeValue:[[MTRDeviceClusterData alloc] initWithDataVersion:@(91) attributes:@{}]
                          forKey:orphanKey
                   securityLevel:MTRStorageSecurityLevelSecure
                     sharingType:MTRStorageSharingTypeNotShared];
