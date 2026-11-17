@@ -206,6 +206,25 @@ TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicates)
     ASSERT_EQ(results.count, 3);
 }
 
+// test requires at least 2 slots
+TEST(TestAddressResolveDefaultImpl, UpdateResultsOrdersByTheScoresItWasGiven)
+{
+    Impl::NodeLookupResults results;
+
+    // ScoreIpAddress() would give this link-local address kLinkLocal, the highest score.
+    ResolveResult linkLocalResult;
+    linkLocalResult.address = GetAddressWithHighScore();
+    ASSERT_TRUE(results.UpdateResults(linkLocalResult, IpScore::kUniqueLocal));
+
+    ResolveResult uniqueLocalResult;
+    uniqueLocalResult.address = GetAddressWithLowScore();
+    ASSERT_TRUE(results.UpdateResults(uniqueLocalResult, IpScore::kGlobalUnicast));
+
+    // kGlobalUnicast is higher than kUniqueLocal, so the second entry comes first.
+    EXPECT_EQ(results.ConsumeResult().address, uniqueLocalResult.address);
+    EXPECT_EQ(results.ConsumeResult().address, linkLocalResult.address);
+}
+
 #endif
 
 TEST(TestAddressResolveDefaultImpl, TestLookupResult)

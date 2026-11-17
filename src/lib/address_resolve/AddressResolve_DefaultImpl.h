@@ -37,10 +37,13 @@ enum class NodeLookupResult
 
 struct NodeLookupResults
 {
-    ResolveResult results[kNodeLookupResultsLen] = {};
-    uint8_t count                                = 0; // number of valid ResolveResult
-    uint8_t consumed                             = 0; // number of already read ResolveResult
+    ResolveResult results[kNodeLookupResultsLen]                  = {};
+    Dnssd::IPAddressSorter::IpScore scores[kNodeLookupResultsLen] = {}; // score each ResolveResult was inserted with
+    uint8_t count                                                 = 0;  // number of valid ResolveResult
+    uint8_t consumed                                              = 0;  // number of already read ResolveResult
 
+    /// Inserts `result` in order of the scores entries were inserted with, highest first. When all slots are
+    /// full, inserting drops the last entry. Returns whether `result` was inserted.
     bool UpdateResults(const ResolveResult & result, Dnssd::IPAddressSorter::IpScore score);
 
     bool HasValidResult() const { return count > consumed; }

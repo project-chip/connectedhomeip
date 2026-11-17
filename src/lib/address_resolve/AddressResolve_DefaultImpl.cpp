@@ -157,8 +157,7 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
             return false;
         }
 
-        auto oldScore = Dnssd::IPAddressSorter::ScoreIpAddress(oldAddress.GetIPAddress(), oldAddress.GetInterface());
-        if (newScore > oldScore)
+        if (newScore > scores[insertAtIndex])
         {
             // This is a score update, it will replace a previous entry.
             break;
@@ -183,6 +182,7 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
         }
 
         results[i] = results[i - 1];
+        scores[i]  = scores[i - 1];
     }
 
     // If the number of valid entries is less than the size of the array there is an additional entry.
@@ -194,6 +194,7 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
     auto & updatedResult  = results[insertAtIndex];
     updatedResult         = result;
     updatedResult.address = addressWithAdjustedInterface;
+    scores[insertAtIndex] = newScore;
 
     return true;
 }
