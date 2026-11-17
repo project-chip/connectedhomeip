@@ -80,14 +80,6 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void Unregister(CodeDrivenDataModelProvider & provider) override
-    {
-        // Features hold references to base clusters (e.g. GeneralCommissioning), so
-        // they must be torn down before the base clusters are destroyed.
-        UnregisterFeaturesImpl(provider, std::index_sequence_for<Features...>{});
-        RootNode::Unregister(provider);
-    }
-
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override
     {
         if constexpr (kClientClustersStorage.size() == 0)
@@ -122,6 +114,13 @@ private:
         };
         (attempt(std::get<I>(mFeatures)), ...);
         return err;
+    }
+
+    // Features hold references to base clusters (e.g. GeneralCommissioning), so they are removed
+    // before RootNode destroys those clusters, but only after the endpoint is unregistered.
+    void UnregisterExtraClusters(CodeDrivenDataModelProvider & provider) override
+    {
+        UnregisterFeaturesImpl(provider, std::index_sequence_for<Features...>{});
     }
 
     template <std::size_t... I>

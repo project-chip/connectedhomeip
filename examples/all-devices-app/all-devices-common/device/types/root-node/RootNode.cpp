@@ -153,6 +153,8 @@ void RootNode::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
 
+    UnregisterExtraClusters(provider);
+
     // De-init in reverse order as init, in case there were data dependencies.
     if (mOperationalCredentialsCluster.IsConstructed())
     {

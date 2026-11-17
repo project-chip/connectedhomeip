@@ -85,8 +85,7 @@ public:
 
     RootNode(const Context & context,
              Span<const DataModel::DeviceTypeEntry> deviceTypes = Span<const DataModel::DeviceTypeEntry>(kDefaultDeviceTypes)) :
-        SingleEndpoint(deviceTypes),
-        mContext(context)
+        SingleEndpoint(deviceTypes), mContext(context)
     {}
     ~RootNode() override = default;
 
@@ -103,6 +102,11 @@ protected:
     /// CodeDrivenDataModelProvider requires once it has been started.
     CHIP_ERROR RegisterRootClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                     EndpointComposition composition = {});
+
+    /// Called after the endpoint has been unregistered and before the base clusters are removed,
+    /// so subclasses can remove the extra clusters they registered. The provider rejects cluster
+    /// removal while the endpoint is still registered, so this cannot run any earlier.
+    virtual void UnregisterExtraClusters(CodeDrivenDataModelProvider & provider) {}
 
     Context mContext;
 
