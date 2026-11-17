@@ -27,8 +27,8 @@ namespace app {
 
 SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate,
                            const Config & config) :
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
-    mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mConfig(config)
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
+    mTimerDelegate(timerDelegate), mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mConfig(config)
 {}
 
 CHIP_ERROR SmokeCoAlarm::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
