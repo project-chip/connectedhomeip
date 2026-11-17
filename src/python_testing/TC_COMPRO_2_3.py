@@ -145,8 +145,9 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
                      "Timeout=0, WiFiBands=valid_bands if WI supported)",
                      "DUT responds with SUCCESS"),
             TestStep(7, "TH monitors for 40 s while ED is NOT commissionable",
-                     "No CachedResults entry has the ED's Discriminator; NumCachedResults equals "
-                     "the number of CachedResults entries; CachedResults is null when NumCachedResults is 0"),
+                     "No CachedResults entry has the ED's Discriminator; in every subscription report and "
+                     "in a final read NumCachedResults equals the number of CachedResults entries; in the "
+                     "final read CachedResults is null when NumCachedResults is 0"),
             TestStep(8, "Ensure ED IS commissionable"),
             TestStep(9, "TH monitors until CachedResults has the ED's entry (up to 40 s)",
                      "A subscription report carries the ED's entry and the reported NumCachedResults "
@@ -340,7 +341,23 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
         # A direct read at the end confirms the final state.
         self.step(7)
         logger.info("Monitoring subscription for 40 s (ED not commissionable)...")
+        step7_reports = []
+
+        def _record_report(transaction):
+            # Runs on the Matter thread once the whole report is applied, so it records
+            # both values for the test to check rather than asserting.
+            values = transaction.GetAttributes()[self.cp_endpoint][cp]
+            step7_reports.append((values[cp.Attributes.NumCachedResults], values[cp.Attributes.CachedResults]))
+
+        subscription.SetReportEndCallback(_record_report)
         _monitor_no_ed_entry(40)
+        subscription.SetReportEndCallback(None)
+        logger.info("Step 7: %d subscription reports checked", len(step7_reports))
+        for reported_count, reported_list in list(step7_reports):
+            reported_entries = 0 if reported_list is NullValue else len(reported_list)
+            asserts.assert_equal(reported_count, reported_entries,
+                                 f"Step 7: a subscription report has NumCachedResults={reported_count} but "
+                                 f"{reported_entries} CachedResults entries")
         num_cached, cached_results = await self.read_cached_results()
         logger.info("After 40 s (no ED): NumCachedResults=%d", num_cached)
         _assert_no_ed_entry(cached_results, "Step 7")
