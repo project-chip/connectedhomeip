@@ -109,7 +109,7 @@ low-power operation.
 
 The LIT ICD data model is already provided by
 [`generic-switch-app.zap`](../data_model/generic-switch-app.zap) and selected by
-the `stm32-lit-icd-app` GN data-model target. The STM32WBA65I-DK1 application
+the `stm32-lit-icd-app` GN data-model target. The `STM32WBA65I-DK1` application
 target depends on this model, which includes ICD Management and the Generic
 Switch device type with its Switch cluster.
 
