@@ -414,10 +414,9 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     case TransferSession::OutputEventType::kNone:
         break;
     case TransferSession::OutputEventType::kAcceptReceived:
-        // A ReceiveAccept has no start offset field, so accepting the transfer means accepting the requested start offset. The
-        // StartOffset of the accept data is not checked: a provider that follows the specification leaves it out (it parses as
-        // 0), and an SDK provider echoes the request whether or not it serves data from there. A provider that serves data from
-        // elsewhere is caught by the check of the first block below, or by the size and digest in the image header.
+        // A ReceiveAccept has no start offset field, so accepting the transfer means accepting the requested start offset. A
+        // provider that serves data from elsewhere is caught by the check of the first block below, or by the size and digest in
+        // the image header.
         mCheckFirstBlock = mRequestedOffset > 0;
         ReturnErrorOnFailure(mBdxTransfer.PrepareBlockQuery());
         break;

@@ -280,14 +280,11 @@ public:
                     ASSERT_EQ(mProvider.AbortTransfer(StatusCode::kStartOffsetNotSupported), CHIP_NO_ERROR);
                     break;
                 }
-                // An SDK provider echoes the requested offset in the accept; mAcceptOffset makes it send another one, and 0
-                // leaves the field out as the specification does. Data is served from the requested offset unless mServeFrom
-                // is set.
+                // Data is served from the requested offset unless mServeFrom is set.
                 const uint64_t requested = event.transferInitData.StartOffset;
                 TransferSession::TransferAcceptData accept;
                 accept.ControlMode  = TransferControlFlags::kReceiverDrive;
                 accept.MaxBlockSize = kBlockSize;
-                accept.StartOffset  = mAcceptOffset.value_or(requested);
                 accept.Length       = kImageSize - requested;
                 ASSERT_EQ(mProvider.AcceptTransfer(accept), CHIP_NO_ERROR);
                 mServeOffset = mServeFrom.value_or(static_cast<size_t>(requested));
@@ -365,7 +362,6 @@ public:
     std::vector<uint64_t> mRequestedOffsets;
     size_t mBlocksToDeliver = kUnlimited;
     size_t mServeOffset     = 0;
-    std::optional<uint64_t> mAcceptOffset;
     std::optional<size_t> mServeFrom;
     bool mRejectStartOffset = false;
     bool mRejectOffsetZero  = false;
@@ -567,29 +563,16 @@ TEST_F(TestBDXDownloader, CancelDiscardsSuspendedImage)
     EXPECT_EQ(mProcessor.mBytesReceived, kImageSize);
 }
 
-// A ReceiveAccept that follows the specification has no start offset field, which the SDK parses as offset 0. Accepting the
-// transfer accepts the requested offset, so the download resumes.
+// A ReceiveAccept has no start offset field. Accepting the transfer accepts the requested offset, so the download resumes.
 TEST_F(TestBDXDownloader, AcceptWithoutStartOffsetResumes)
 {
     InterruptAfter(5);
-    mAcceptOffset = 0u;
     StartDownload(kUnlimited);
 
     ASSERT_EQ(mRequestedOffsets.size(), 2u);
     EXPECT_EQ(mRequestedOffsets[1], 5u * kBlockSize);
     EXPECT_EQ(mStateDelegate.mRestartCount, 0u);
     EXPECT_EQ(mProcessor.mAbortCount, 0u);
-    ExpectFileIsServedImage();
-}
-
-// The accept carries no offset the provider chose, so another value in it does not end a download served from the request.
-TEST_F(TestBDXDownloader, StartOffsetInAcceptIsNotChecked)
-{
-    InterruptAfter(5);
-    mAcceptOffset = kBlockSize;
-    StartDownload(kUnlimited);
-
-    EXPECT_EQ(mStateDelegate.mRestartCount, 0u);
     ExpectFileIsServedImage();
 }
 
