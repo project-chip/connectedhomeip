@@ -35,6 +35,7 @@
 #include <clusters/PowerSource/ClusterId.h>
 #include <clusters/PowerTopology/ClusterId.h>
 #include <clusters/TemperatureMeasurement/ClusterId.h>
+#include <clusters/UserLabel/Attributes.h>
 #include <clusters/UserLabel/ClusterId.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/Types.h>
@@ -78,6 +79,12 @@ class SolarPowerTestFixture : public ::testing::Test
 public:
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+    void SetUp() override
+    {
+        ::testing::Test::SetUp();
+        mDeviceInfoProvider.SetStorageDelegate(&mContext.StorageDelegate());
+    }
 
 protected:
     SolarPower::Context MakeContext()
@@ -311,10 +318,21 @@ TEST_F(SolarPowerTestFixture, AllVariantsRegisterWithoutGlobalDeviceInfoProvider
         ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
 
         EXPECT_TRUE(device.IdentifyCluster().PathsContains({ device.GetEndpointId(), Clusters::Identify::Id }));
+
+        ProviderAttributeReader reader(mProvider);
+
+        DataModel::DecodableList<Clusters::UserLabel::Structs::LabelStruct::DecodableType> outputLabels;
+        ASSERT_SUCCESS(reader.Read(device.GetOutputElectricalSensor().GetEndpointId(), Clusters::UserLabel::Id,
+                                   Clusters::UserLabel::Attributes::LabelList::Id, outputLabels));
+
         for (size_t index = 0; index < device.GetPanelCount(); ++index)
         {
             auto & panel = device.GetPanelSensor(index);
             EXPECT_TRUE(panel.UserLabelCluster().PathsContains({ panel.GetEndpointId(), Clusters::UserLabel::Id }));
+
+            DataModel::DecodableList<Clusters::UserLabel::Structs::LabelStruct::DecodableType> panelLabels;
+            ASSERT_SUCCESS(reader.Read(panel.GetEndpointId(), Clusters::UserLabel::Id,
+                                       Clusters::UserLabel::Attributes::LabelList::Id, panelLabels));
         }
 
         device.Unregister(mProvider);
