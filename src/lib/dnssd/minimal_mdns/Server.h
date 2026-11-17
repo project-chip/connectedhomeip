@@ -166,6 +166,21 @@ public:
 private:
     CHIP_ERROR BroadcastImpl(chip::System::PacketBufferHandle && data, uint16_t port, BroadcastSendDelegate * delegate);
 
+    const chip::Inet::IPAddress & BroadcastAddress(chip::Inet::IPAddressType addressType) const
+    {
+#if INET_CONFIG_ENABLE_IPV4
+        if (addressType == chip::Inet::IPAddressType::kIPv4)
+        {
+            return mIpv4BroadcastAddress;
+        }
+#endif
+        return mIpv6BroadcastAddress;
+    }
+
+    /// Returns true if the packet described by `info` came from the local link
+    /// of the interface it was received on (see PacketSourceFilter.h).
+    bool IsFromLocalLink(const chip::Inet::IPPacketInfo & info) const;
+
     static void OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::System::PacketBufferHandle && buffer,
                                     const chip::Inet::IPPacketInfo * info);
 

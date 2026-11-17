@@ -23,6 +23,7 @@
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/minimal_mdns/PacketSourceFilter.h>
+#include <lib/dnssd/minimal_mdns/Server.h>
 #include <lib/support/Span.h>
 
 namespace {
@@ -80,6 +81,11 @@ IPPacketInfo MakePacketInfo(const char * source, const char * destination, Inter
     return info;
 }
 
+bool IsAccepted(const IPPacketInfo & info, FakeAddressIterator & addresses)
+{
+    return IsLinkScoped(info, BroadcastIpAddresses::Get(info.DestAddress.Type())) || IsFromAttachedSubnet(info, addresses);
+}
+
 const FakeInterfaceAddress kIPv6Addresses[] = {
     { kInterfaceA, "fe80::1", 64 },
     { kInterfaceA, "2001:db8:1::10", 64 },
@@ -91,7 +97,7 @@ TEST(TestPacketSourceFilter, AcceptsMdnsGroupDestinationWithoutCheckingSubnets)
     FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(kIPv6Addresses) };
     IPPacketInfo info = MakePacketInfo("2001:db8:ffff::1", "ff02::fb", kInterfaceA);
 
-    EXPECT_TRUE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_TRUE(IsAccepted(info, addresses));
     EXPECT_EQ(addresses.VisitedCount(), 0u);
 }
 
@@ -102,7 +108,7 @@ TEST(TestPacketSourceFilter, RejectsOffSubnetSourceSentToOtherMulticastGroup)
     FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(kIPv6Addresses) };
     IPPacketInfo info = MakePacketInfo("2001:db8:ffff::1", "ff05::fb", kInterfaceA);
 
-    EXPECT_FALSE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_FALSE(IsAccepted(info, addresses));
 }
 
 TEST(TestPacketSourceFilter, AcceptsOnSubnetSourceSentToOtherMulticastGroup)
@@ -110,7 +116,7 @@ TEST(TestPacketSourceFilter, AcceptsOnSubnetSourceSentToOtherMulticastGroup)
     FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(kIPv6Addresses) };
     IPPacketInfo info = MakePacketInfo("2001:db8:1::20", "ff05::fb", kInterfaceA);
 
-    EXPECT_TRUE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_TRUE(IsAccepted(info, addresses));
 }
 
 TEST(TestPacketSourceFilter, AcceptsIPv6LinkLocalSourceWithoutCheckingSubnets)
@@ -118,7 +124,7 @@ TEST(TestPacketSourceFilter, AcceptsIPv6LinkLocalSourceWithoutCheckingSubnets)
     FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(kIPv6Addresses) };
     IPPacketInfo info = MakePacketInfo("fe80::abcd", "2001:db8:1::10", kInterfaceA);
 
-    EXPECT_TRUE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_TRUE(IsAccepted(info, addresses));
     EXPECT_EQ(addresses.VisitedCount(), 0u);
 }
 
@@ -127,7 +133,7 @@ TEST(TestPacketSourceFilter, AcceptsIPv6SourceInReceivingInterfaceSubnet)
     FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(kIPv6Addresses) };
     IPPacketInfo info = MakePacketInfo("2001:db8:1::20", "2001:db8:1::10", kInterfaceA);
 
-    EXPECT_TRUE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_TRUE(IsAccepted(info, addresses));
 }
 
 TEST(TestPacketSourceFilter, RejectsIPv6SourceOutsideInterfaceSubnets)
@@ -135,7 +141,7 @@ TEST(TestPacketSourceFilter, RejectsIPv6SourceOutsideInterfaceSubnets)
     FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(kIPv6Addresses) };
     IPPacketInfo info = MakePacketInfo("2001:db8:ffff::1", "2001:db8:1::10", kInterfaceA);
 
-    EXPECT_FALSE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_FALSE(IsAccepted(info, addresses));
 }
 
 TEST(TestPacketSourceFilter, RejectsSourceInSubnetOfAnotherInterface)
@@ -143,7 +149,7 @@ TEST(TestPacketSourceFilter, RejectsSourceInSubnetOfAnotherInterface)
     FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(kIPv6Addresses) };
     IPPacketInfo info = MakePacketInfo("2001:db8:2::20", "2001:db8:1::10", kInterfaceA);
 
-    EXPECT_FALSE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_FALSE(IsAccepted(info, addresses));
 }
 
 TEST(TestPacketSourceFilter, ChecksAllInterfacesWhenReceivingInterfaceIsUnknown)
@@ -151,26 +157,64 @@ TEST(TestPacketSourceFilter, ChecksAllInterfacesWhenReceivingInterfaceIsUnknown)
     FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(kIPv6Addresses) };
     IPPacketInfo info = MakePacketInfo("2001:db8:2::20", "2001:db8:1::10", InterfaceId::Null());
 
-    EXPECT_TRUE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_TRUE(IsAccepted(info, addresses));
 }
 
-TEST(TestPacketSourceFilter, IgnoresZeroLengthPrefix)
+TEST(TestPacketSourceFilter, IgnoresZeroAndFullLengthPrefixes)
 {
-    const FakeInterfaceAddress zeroPrefix[] = {
+    const FakeInterfaceAddress addressList[] = {
         { kInterfaceA, "2001:db8:1::10", 0 },
+        { kInterfaceA, "2001:db8:1::11", 128 },
+        { kInterfaceA, "2001:db8:2::10", 64 },
     };
-    FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(zeroPrefix) };
-    IPPacketInfo info = MakePacketInfo("2001:db8:ffff::1", "2001:db8:1::10", kInterfaceA);
+    FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(addressList) };
+    IPPacketInfo info = MakePacketInfo("2001:db8:1::20", "2001:db8:1::10", kInterfaceA);
 
-    EXPECT_FALSE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_FALSE(IsAccepted(info, addresses));
 }
 
-TEST(TestPacketSourceFilter, RejectsWhenInterfaceHasNoAddresses)
+// Without a subnet to compare against, the source cannot be checked, so the
+// packet is accepted rather than breaking discovery.
+TEST(TestPacketSourceFilter, AcceptsWhenInterfaceHasNoAddresses)
 {
     FakeAddressIterator addresses(Span<const FakeInterfaceAddress>{});
     IPPacketInfo info = MakePacketInfo("2001:db8:1::20", "2001:db8:1::10", kInterfaceA);
 
-    EXPECT_FALSE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_TRUE(IsAccepted(info, addresses));
+}
+
+TEST(TestPacketSourceFilter, AcceptsWhenOnlyFullLengthPrefixesAreReported)
+{
+    const FakeInterfaceAddress hostRoutes[] = {
+        { kInterfaceA, "2001:db8:1::10", 128 },
+    };
+    FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(hostRoutes) };
+    IPPacketInfo info = MakePacketInfo("2001:db8:1::20", "2001:db8:1::10", kInterfaceA);
+
+    EXPECT_TRUE(IsAccepted(info, addresses));
+}
+
+TEST(TestPacketSourceFilter, AcceptsWhenOnlyAnotherInterfaceHasASubnet)
+{
+    const FakeInterfaceAddress otherInterface[] = {
+        { kInterfaceB, "2001:db8:2::10", 64 },
+    };
+    FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(otherInterface) };
+    IPPacketInfo info = MakePacketInfo("2001:db8:ffff::1", "2001:db8:1::10", kInterfaceA);
+
+    EXPECT_TRUE(IsAccepted(info, addresses));
+}
+
+TEST(TestPacketSourceFilter, ChecksSourceWhenDestinationIsUnknown)
+{
+    IPPacketInfo onSubnet  = MakePacketInfo("2001:db8:1::20", "::", kInterfaceA);
+    IPPacketInfo offSubnet = MakePacketInfo("2001:db8:ffff::1", "::", kInterfaceA);
+
+    FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(kIPv6Addresses) };
+    EXPECT_TRUE(IsAccepted(onSubnet, addresses));
+
+    FakeAddressIterator addressesAgain{ Span<const FakeInterfaceAddress>(kIPv6Addresses) };
+    EXPECT_FALSE(IsAccepted(offSubnet, addressesAgain));
 }
 
 #if INET_CONFIG_ENABLE_IPV4
@@ -185,7 +229,7 @@ TEST(TestPacketSourceFilter, AcceptsIPv4MdnsGroupDestination)
     FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(kIPv4Addresses) };
     IPPacketInfo info = MakePacketInfo("198.51.100.7", "224.0.0.251", kInterfaceA);
 
-    EXPECT_TRUE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_TRUE(IsAccepted(info, addresses));
 }
 
 // 239.0.0.0/8 is administratively scoped and can be routed.
@@ -194,7 +238,7 @@ TEST(TestPacketSourceFilter, RejectsOffSubnetIPv4SourceSentToOtherMulticastGroup
     FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(kIPv4Addresses) };
     IPPacketInfo info = MakePacketInfo("198.51.100.7", "239.1.2.3", kInterfaceA);
 
-    EXPECT_FALSE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_FALSE(IsAccepted(info, addresses));
 }
 
 TEST(TestPacketSourceFilter, AcceptsIPv4SourceInInterfaceSubnet)
@@ -202,7 +246,7 @@ TEST(TestPacketSourceFilter, AcceptsIPv4SourceInInterfaceSubnet)
     FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(kIPv4Addresses) };
     IPPacketInfo info = MakePacketInfo("192.168.1.200", "192.168.1.10", kInterfaceA);
 
-    EXPECT_TRUE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_TRUE(IsAccepted(info, addresses));
 }
 
 TEST(TestPacketSourceFilter, RejectsIPv4SourceOutsideInterfaceSubnet)
@@ -211,23 +255,43 @@ TEST(TestPacketSourceFilter, RejectsIPv4SourceOutsideInterfaceSubnet)
     IPPacketInfo neighbourSubnet = MakePacketInfo("192.168.2.1", "192.168.1.10", kInterfaceA);
     IPPacketInfo remote          = MakePacketInfo("198.51.100.7", "192.168.1.10", kInterfaceA);
 
-    EXPECT_FALSE(IsFromAttachedSubnet(neighbourSubnet, addresses));
+    EXPECT_FALSE(IsAccepted(neighbourSubnet, addresses));
 
     FakeAddressIterator addressesAgain{ Span<const FakeInterfaceAddress>(kIPv4Addresses) };
-    EXPECT_FALSE(IsFromAttachedSubnet(remote, addressesAgain));
+    EXPECT_FALSE(IsAccepted(remote, addressesAgain));
 }
 
 TEST(TestPacketSourceFilter, IPv6PrefixDoesNotMatchIPv4Source)
 {
     // ::/0 is skipped as zero-length, so use ::/64, which covers the
     // IPv4-mapped form (::ffff:a.b.c.d) of every IPv4 address.
-    const FakeInterfaceAddress ipv6Only[] = {
+    const FakeInterfaceAddress addressList[] = {
         { kInterfaceA, "::1:2:3:4", 64 },
+        { kInterfaceA, "192.168.1.10", 24 },
     };
-    FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(ipv6Only) };
+    FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(addressList) };
     IPPacketInfo info = MakePacketInfo("198.51.100.7", "192.168.1.10", kInterfaceA);
 
-    EXPECT_FALSE(IsFromAttachedSubnet(info, addresses));
+    EXPECT_FALSE(IsAccepted(info, addresses));
+}
+
+TEST(TestPacketSourceFilter, AcceptsIPv4SourceWhenNoIPv4SubnetIsReported)
+{
+    FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(kIPv6Addresses) };
+    IPPacketInfo info = MakePacketInfo("192.168.1.200", "192.168.1.10", kInterfaceA);
+
+    EXPECT_TRUE(IsAccepted(info, addresses));
+}
+
+TEST(TestPacketSourceFilter, AcceptsIPv4SourceWhenOnlyFullLengthPrefixIsReported)
+{
+    const FakeInterfaceAddress hostRoute[] = {
+        { kInterfaceA, "192.168.1.10", 32 },
+    };
+    FakeAddressIterator addresses{ Span<const FakeInterfaceAddress>(hostRoute) };
+    IPPacketInfo info = MakePacketInfo("192.168.1.200", "192.168.1.10", kInterfaceA);
+
+    EXPECT_TRUE(IsAccepted(info, addresses));
 }
 
 #endif // INET_CONFIG_ENABLE_IPV4
