@@ -184,28 +184,20 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
                             "Viewport not moved down as requested by DPTZRelativeMove")
 
         self.step(12)
-        # Send a dptzrelativemove based on the new viewport, zoom to beyond sensor size
-        currentsize = (myViewport.x2-myViewport.x1) * (myViewport.y2-myViewport.y1)
-        sensorsize = sensordimensions.sensorWidth * sensordimensions.sensorHeight
-        zoomedsize = currentsize * 2
-
-        await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=-100)
-
-        while True:
-            if zoomedsize < sensorsize:
-                zoomedsize = zoomedsize * 2
-                await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=-100)
-            else:
-                break
-
-        # Verify that the viewport is at sensor max
+        # Repeatedly zoom out until the viewport reaches the sensor max. The zoom results are
+        # rounded, so the viewport is read after each command; a zoom can land just short of
+        # the sensor bounds on the previous pass.
         maxviewport = Globals.Structs.ViewportStruct(x1=0,
                                                      y1=0,
                                                      x2=sensordimensions.sensorWidth,
                                                      y2=sensordimensions.sensorHeight)
 
-        asserts.assert_true(await self.dptzstreamentryvalid(endpoint, videoStreamID, maxviewport),
-                            "Viewport not at the sensor limits, as expected after Zoom max out")
+        for _ in range(20):
+            await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=-100)
+            if await self.dptzstreamentryvalid(endpoint, videoStreamID, maxviewport):
+                break
+        else:
+            asserts.assert_fail("Viewport did not reach the sensor max after repeated zoom-out")
 
         self.step(13)
         # Current viewport is at the sensor max, any movement will leave the cartesian plane
