@@ -196,6 +196,10 @@ static bool IsValidCATNumber(id _Nullable value)
     }
 
     for (NSNumber * nodeID in nodeIndex) {
+        // The stored index is only checked to be an array, so skip any entry that is not a node ID.
+        if (![nodeID isKindOfClass:[NSNumber class]]) {
+            continue;
+        }
         @autoreleasepool {
             NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterData = [self getStoredClusterDataForNodeID:nodeID];
             if (clusterData.count) {

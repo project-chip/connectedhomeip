@@ -4831,6 +4831,16 @@ static uint64_t MTRTestPhysFootprint(void)
                   securityLevel:MTRStorageSecurityLevelSecure
                     sharingType:MTRStorageSharingTypeNotShared];
 
+    // A node index holding an entry that is not a node ID, as a corrupted store can.
+    dispatch_sync(_storageQueue, ^{
+        [storageDelegate controller:controller
+                         storeValue:@[ @[], @(1), @(2) ]
+                             forKey:@"attrCacheNodeIndex"
+                      securityLevel:MTRStorageSecurityLevelSecure
+                        sharingType:MTRStorageSharingTypeNotShared];
+    });
+    [controller.controllerDataStore unitTestRereadNodeIndex];
+
     [storageDelegate resetReads];
     NSMutableDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * delivered = [NSMutableDictionary dictionary];
     __block NSUInteger calls = 0;
