@@ -68,7 +68,7 @@ PushAVUploader::~PushAVUploader()
         }
         if (!uploadJob.first.empty() && !uploadJob.second.empty())
         {
-            UploadData(uploadJob);
+            UploadData(uploadJob, deadline);
         }
     }
 }
@@ -386,7 +386,25 @@ std::string ProcessM4SUploadPath(std::string path, const std::vector<std::string
     return result;
 }
 
-void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
+CURLcode PushAVUploader::PerformUpload(CURL * curl, std::optional<std::chrono::steady_clock::time_point> deadline)
+{
+    if (deadline.has_value())
+    {
+        const auto remainingMs =
+            std::chrono::duration_cast<std::chrono::milliseconds>(*deadline - std::chrono::steady_clock::now()).count();
+        if (remainingMs <= 0)
+        {
+            ChipLogError(Camera, "Uploader drain deadline passed, skipping upload attempt");
+            return CURLE_OPERATION_TIMEDOUT;
+        }
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, static_cast<long>(remainingMs));
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, static_cast<long>(remainingMs));
+    }
+    return curl_easy_perform(curl);
+}
+
+void PushAVUploader::UploadData(std::pair<std::string, std::string> data,
+                                std::optional<std::chrono::steady_clock::time_point> deadline)
 {
     CURL * curl = curl_easy_init();
     if (!curl)
@@ -552,12 +570,12 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, PushAvUploadCb);
     curl_easy_setopt(curl, CURLOPT_READDATA, &upload);
 
-    res = curl_easy_perform(curl);
+    res = PerformUpload(curl, deadline);
 
     if (res != CURLE_OK)
     {
         ChipLogError(Camera, "CURL upload failed [%s] %s, retrying...", data.first.c_str(), curl_easy_strerror(res));
-        res = curl_easy_perform(curl);
+        res = PerformUpload(curl, deadline);
 
         if (res != CURLE_OK)
         {
