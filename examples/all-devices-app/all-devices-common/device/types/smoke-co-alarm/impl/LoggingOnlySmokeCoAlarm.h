@@ -52,8 +52,9 @@ public:
     void TimerFired() override;
 
 protected:
-    CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) override;
-    void UnregisterParts(CodeDrivenDataModelProvider & provider) override;
+    CHIP_ERROR RegisterPowerSource(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                   EndpointId parentId) override;
+    void UnregisterPowerSource(CodeDrivenDataModelProvider & provider) override;
 
 private:
     static const std::array<Clusters::SmokeCoAlarm::ExpressedStateEnum, Clusters::SmokeCoAlarmCluster::kPriorityOrderLength>
