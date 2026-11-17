@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/target_types.gni")
 import("${chip_root}/src/platform/device.gni")
 import("lib.gni")
 
@@ -77,6 +79,7 @@ static_library("lib") {
     ":without-logging",
     "${chip_root}/src/platform/logging:default",
   ]
+  public_deps += pw_build_LINK_DEPS
 
   output_name = "libCHIP"
 
@@ -96,6 +99,7 @@ static_library("with-stdio-logging") {
     ":without-logging",
     "${chip_root}/src/platform/logging:stdio",
   ]
+  public_deps += pw_build_LINK_DEPS
 
   output_name = "libCHIPWithStdioLogging"
 

@@ -26,49 +26,12 @@
 
 #include <ctype.h>
 #include <stdint.h>
+#include <string_view>
+
+#include <pw_base64/base64.h>
+#include <pw_span/span.h>
 
 namespace chip {
-
-// Convert a value in the range 0..63 to its equivalent base64 character.
-// Return '=' for any value >= 64.
-static char Base64ValToChar(uint8_t val)
-{
-    if (val < 26)
-        return static_cast<char>('A' + val);
-    val = static_cast<uint8_t>(val - 26);
-    if (val < 26)
-        return static_cast<char>('a' + val);
-    val = static_cast<uint8_t>(val - 26);
-    if (val < 10)
-        return static_cast<char>('0' + val);
-    if (val == 10)
-        return '+';
-    if (val == 11)
-        return '/';
-    return '=';
-}
-
-// Convert a base64 character to a value in the range 0..63, or UINT8_MAX if the character is invalid.
-static uint8_t Base64CharToVal(uint8_t c)
-{
-    if (c == 43)
-        return 62;
-    if (c == 47)
-        return 63;
-    // NOTE: c < 48 will fall through to return UINT8_MAX below.
-    c = static_cast<uint8_t>(c - 48);
-    if (c < 10)
-        return static_cast<uint8_t>(c + 52);
-    // NOTE: c < 17 here will fall through to return UINT8_MAX below.
-    c = static_cast<uint8_t>(c - 17);
-    if (c < 26)
-        return c;
-    // NOTE: c < 32 here will fall through to return UINT8_MAX below.
-    c = static_cast<uint8_t>(c - 32);
-    if (c < 26)
-        return static_cast<uint8_t>(c + 26);
-    return UINT8_MAX;
-}
 
 // Convert a value in the range 0..63 to its equivalent base64url character (see RFC-4648, section 5).
 // Return '=' for any value >= 64.
@@ -153,7 +116,12 @@ uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, char * out, Base64ValT
 
 uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, char * out)
 {
-    return Base64Encode(in, inLen, out, Base64ValToChar);
+    if (inLen == 0)
+    {
+        return 0;
+    }
+    pw::base64::Encode(pw::as_bytes(pw::span(in, inLen)), out);
+    return static_cast<uint16_t>(pw::base64::EncodedSize(inLen));
 }
 
 uint16_t Base64URLEncode(const uint8_t * in, uint16_t inLen, char * out)
@@ -194,7 +162,12 @@ uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, char * out, Base64Va
 
 uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, char * out)
 {
-    return Base64Encode32(in, inLen, out, Base64ValToChar);
+    if (inLen == 0)
+    {
+        return 0;
+    }
+    pw::base64::Encode(pw::as_bytes(pw::span(in, inLen)), out);
+    return static_cast<uint32_t>(pw::base64::EncodedSize(inLen));
 }
 
 uint16_t Base64Decode(const char * in, uint16_t inLen, uint8_t * out, Base64CharToValFunct charToValFunct)
@@ -247,7 +220,16 @@ fail:
 
 uint16_t Base64Decode(const char * in, uint16_t inLen, uint8_t * out)
 {
-    return Base64Decode(in, inLen, out, Base64CharToVal);
+    if (inLen == 0)
+    {
+        return 0;
+    }
+    std::string_view input(in, inLen);
+    if (!pw::base64::IsValid(input))
+    {
+        return UINT16_MAX;
+    }
+    return static_cast<uint16_t>(pw::base64::Decode(input, out));
 }
 
 uint16_t Base64URLDecode(const char * in, uint16_t inLen, uint8_t * out)
@@ -289,7 +271,16 @@ uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out, Base64Ch
 
 uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out)
 {
-    return Base64Decode32(in, inLen, out, Base64CharToVal);
+    if (inLen == 0)
+    {
+        return 0;
+    }
+    std::string_view input(in, inLen);
+    if (!pw::base64::IsValid(input))
+    {
+        return UINT32_MAX;
+    }
+    return static_cast<uint32_t>(pw::base64::Decode(input, out));
 }
 
 } // namespace chip

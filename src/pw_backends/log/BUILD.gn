@@ -69,7 +69,7 @@ pw_source_set("log.impl") {
     "$dir_pw_log:config",
     "$dir_pw_preprocessor",
     "$dir_pw_string:builder",
-    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:codeutils",
   ]
   sources = []
 }
