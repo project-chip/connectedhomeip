@@ -14,8 +14,7 @@
  *    limitations under the License.
  */
 
-// Drives a BdxTransfer through the start of a transfer that the peer initiates with a ReceiveInit, and checks where in the data
-// it starts sending.
+// Drives a BdxTransfer that sends data in answer to a ReceiveInit, and checks which part of the data each block carries.
 
 #include <controller/python/matter/bdx/bdx-transfer.h>
 
@@ -26,6 +25,7 @@
 #include <protocols/secure_channel/StatusReport.h>
 #include <pw_unit_test/framework.h>
 
+#include <cstdint>
 #include <cstring>
 #include <vector>
 
@@ -59,7 +59,7 @@ public:
     bool mInitReceived = false;
 };
 
-class TestBdxTransferStartOffset : public chip::Testing::LoopbackMessagingContext
+class TestBdxTransferSend : public chip::Testing::LoopbackMessagingContext
 {
 public:
     void SetUp() override
@@ -140,7 +140,27 @@ protected:
         ASSERT_EQ(event.EventType, TransferSession::OutputEventType::kQueryReceived);
         mTransfer.HandleTransferSessionOutput(event);
 
-        event = NextOutput();
+        TakeBlock(blockData, isEof);
+    }
+
+    // Asks for block blockCounter after skipping bytesToSkip, and returns the data it carries.
+    void QueryBlockWithSkip(uint32_t blockCounter, uint64_t bytesToSkip, std::vector<uint8_t> & blockData, bool & isEof)
+    {
+        BlockQueryWithSkip query;
+        query.BlockCounter = blockCounter;
+        query.BytesToSkip  = bytesToSkip;
+        ASSERT_SUCCESS(Deliver(MessageType::BlockQueryWithSkip, query));
+        TransferSession::OutputEvent event = NextOutput();
+        ASSERT_EQ(event.EventType, TransferSession::OutputEventType::kQueryWithSkipReceived);
+        mTransfer.HandleTransferSessionOutput(event);
+
+        TakeBlock(blockData, isEof);
+    }
+
+    // Takes the Block or BlockEOF the transfer prepared and returns the data it carries.
+    void TakeBlock(std::vector<uint8_t> & blockData, bool & isEof)
+    {
+        TransferSession::OutputEvent event = NextOutput();
         ASSERT_EQ(event.EventType, TransferSession::OutputEventType::kMsgToSend);
         isEof = event.msgTypeData.HasMessageType(MessageType::BlockEOF);
         ASSERT_TRUE(isEof || event.msgTypeData.HasMessageType(MessageType::Block));
@@ -156,7 +176,7 @@ protected:
     SessionHolder mSession;
 };
 
-TEST_F(TestBdxTransferStartOffset, ServesTheFirstBlockFromTheStartOffset)
+TEST_F(TestBdxTransferSend, ServesTheFirstBlockFromTheStartOffset)
 {
     constexpr uint64_t kStartOffset = 100;
     ReceiveInit(kStartOffset);
@@ -170,7 +190,7 @@ TEST_F(TestBdxTransferStartOffset, ServesTheFirstBlockFromTheStartOffset)
     EXPECT_EQ(blockData, std::vector<uint8_t>(&mData[kStartOffset], &mData[kStartOffset + kBlockSize]));
 }
 
-TEST_F(TestBdxTransferStartOffset, StartOffsetAtTheEndSendsAnEmptyBlockEOF)
+TEST_F(TestBdxTransferSend, StartOffsetAtTheEndSendsAnEmptyBlockEOF)
 {
     ReceiveInit(kDataSize);
     ASSERT_SUCCESS(mTransfer.AcceptAndSendData(ByteSpan(mData)));
@@ -183,7 +203,7 @@ TEST_F(TestBdxTransferStartOffset, StartOffsetAtTheEndSendsAnEmptyBlockEOF)
     EXPECT_TRUE(blockData.empty());
 }
 
-TEST_F(TestBdxTransferStartOffset, RejectsAStartOffsetPastTheEnd)
+TEST_F(TestBdxTransferSend, RejectsAStartOffsetPastTheEnd)
 {
     ReceiveInit(kDataSize + 1);
     EXPECT_NE(mTransfer.AcceptAndSendData(ByteSpan(mData)), CHIP_NO_ERROR);
@@ -194,6 +214,24 @@ TEST_F(TestBdxTransferStartOffset, RejectsAStartOffsetPastTheEnd)
     Protocols::SecureChannel::StatusReport report;
     ASSERT_SUCCESS(report.Parse(std::move(event.MsgData)));
     EXPECT_EQ(report.GetProtocolCode(), to_underlying(StatusCode::kStartOffsetNotSupported));
+}
+
+TEST_F(TestBdxTransferSend, ASkipThatWouldWrapAroundSendsAnEmptyBlockEOF)
+{
+    ReceiveInit(0);
+    ASSERT_SUCCESS(mTransfer.AcceptAndSendData(ByteSpan(mData)));
+
+    std::vector<uint8_t> blockData;
+    bool isEof = true;
+    QueryFirstBlock(blockData, isEof);
+    ASSERT_FALSE(isEof);
+
+    // Added to the kBlockSize bytes already sent, this skip wraps around to a position inside the data.
+    constexpr uint64_t kWrappingSkip = UINT64_MAX - 10;
+    QueryBlockWithSkip(1, kWrappingSkip, blockData, isEof);
+
+    EXPECT_TRUE(isEof);
+    EXPECT_TRUE(blockData.empty());
 }
 
 } // namespace

@@ -135,10 +135,13 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
     case TransferSession::OutputEventType::kAckEOFReceived:
         EndSession(CHIP_NO_ERROR);
         break;
-    case TransferSession::OutputEventType::kQueryWithSkipReceived:
-        mDataTransferredCount = std::min<size_t>(mDataTransferredCount + event.bytesToSkip.BytesToSkip, mDataCount);
+    case TransferSession::OutputEventType::kQueryWithSkipReceived: {
+        // Compared with what is left rather than added first, so that a huge skip cannot wrap around into the data.
+        const uint64_t dataRemaining = mDataCount - mDataTransferredCount;
+        mDataTransferredCount += static_cast<size_t>(std::min<uint64_t>(event.bytesToSkip.BytesToSkip, dataRemaining));
         TEMPORARY_RETURN_IGNORED SendBlock();
         break;
+    }
     case TransferSession::OutputEventType::kQueryReceived:
         TEMPORARY_RETURN_IGNORED SendBlock();
         break;
