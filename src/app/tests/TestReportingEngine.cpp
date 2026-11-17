@@ -101,6 +101,12 @@ public:
     void TestBuildAndSendSingleReportDataLargePayload();
     void TestMergeOverlappedAttributePath();
     void TestMergeAttributePathWhenDirtySetPoolExhausted();
+    void TestScheduledRunExecutes();
+    void TestScheduleRunWhileScheduledSchedulesOnce();
+    void TestRunDroppedAtShutdownDoesNotBlockLaterRuns();
+
+    // Removes the pending run the way the system layer does when it shuts down with work still queued.
+    void DropScheduledRun(Engine & engine) { GetSystemLayer().CancelTimer(Engine::Run, &engine); }
 
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
@@ -493,6 +499,55 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeAttributePathWhenDirtySetPoolE
                                       AttributePathParams(kTestEndpointId + 1, kTestClusterId + 1, 1)));
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Shutdown();
+}
+
+TEST_F_FROM_FIXTURE(TestReportingEngine, TestScheduledRunExecutes)
+{
+    auto * imEngine = InteractionModelEngine::GetInstance();
+    EXPECT_EQ(imEngine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+    Engine & engine = imEngine->GetReportingEngine();
+
+    EXPECT_EQ(engine.ScheduleRun(), CHIP_NO_ERROR);
+    EXPECT_TRUE(engine.IsRunScheduled());
+    DrainAndServiceIO();
+    EXPECT_FALSE(engine.IsRunScheduled());
+
+    imEngine->Shutdown();
+}
+
+TEST_F_FROM_FIXTURE(TestReportingEngine, TestScheduleRunWhileScheduledSchedulesOnce)
+{
+    auto * imEngine = InteractionModelEngine::GetInstance();
+    EXPECT_EQ(imEngine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+    Engine & engine = imEngine->GetReportingEngine();
+
+    EXPECT_EQ(engine.ScheduleRun(), CHIP_NO_ERROR);
+    EXPECT_EQ(engine.ScheduleRun(), CHIP_NO_ERROR);
+    // One run is queued, so dropping it leaves nothing that would clear the flag.
+    DropScheduledRun(engine);
+    DrainAndServiceIO();
+    EXPECT_TRUE(engine.IsRunScheduled());
+
+    imEngine->Shutdown();
+}
+
+TEST_F_FROM_FIXTURE(TestReportingEngine, TestRunDroppedAtShutdownDoesNotBlockLaterRuns)
+{
+    auto * imEngine = InteractionModelEngine::GetInstance();
+    EXPECT_EQ(imEngine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+    Engine & engine = imEngine->GetReportingEngine();
+
+    EXPECT_EQ(engine.ScheduleRun(), CHIP_NO_ERROR);
+    DropScheduledRun(engine);
+    imEngine->Shutdown();
+
+    EXPECT_EQ(imEngine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+    EXPECT_FALSE(engine.IsRunScheduled());
+    EXPECT_EQ(engine.ScheduleRun(), CHIP_NO_ERROR);
+    DrainAndServiceIO();
+    EXPECT_FALSE(engine.IsRunScheduled());
+
+    imEngine->Shutdown();
 }
 
 } // namespace reporting

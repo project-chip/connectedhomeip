@@ -322,6 +322,20 @@ void Engine::Shutdown()
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
     mGlobalDirtySet.ReleaseAll();
+
+    // If a run is still queued when the system layer shuts down, it is dropped without running,
+    // and mRunScheduled (which only Run() clears) stays set. If the stack is then started again
+    // in this process, every later ScheduleRun() sees the flag and returns early.
+    if (mRunScheduled)
+    {
+        Messaging::ExchangeManager * exchangeManager = mpImEngine->GetExchangeManager();
+        if (exchangeManager != nullptr && exchangeManager->GetSessionManager() != nullptr &&
+            exchangeManager->GetSessionManager()->SystemLayer() != nullptr)
+        {
+            exchangeManager->GetSessionManager()->SystemLayer()->CancelTimer(Run, this);
+        }
+        mRunScheduled = false;
+    }
 }
 
 bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFilter> * aDataVersionFilterList,
