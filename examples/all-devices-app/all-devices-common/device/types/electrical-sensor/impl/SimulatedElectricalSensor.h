@@ -133,7 +133,8 @@ private:
     FakeReadings mFakeReadings;
     TestEventTriggerDelegate & mTestEventTriggerDelegate;
 
-    ElectricalPowerMeasurement::Structs::MeasurementAccuracyRangeStruct::Type mAccuracyRange = { .rangeMin = 0, .rangeMax = 10 };
+    Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyRangeStruct::Type mAccuracyRange = { .rangeMin = 0,
+                                                                                                           .rangeMax = 10 };
 };
 
 class SimulatedElectricalSensor : public SimulatedElectricalSensorDelegate, public ElectricalSensor
