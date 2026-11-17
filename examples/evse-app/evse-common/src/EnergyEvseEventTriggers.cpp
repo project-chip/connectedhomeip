@@ -21,6 +21,8 @@
 #include <app/clusters/energy-evse-server/CodegenIntegration.h>
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 
+#include <lib/support/CodeUtils.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -66,7 +68,7 @@ void SetTestEventTrigger_BasicFunctionality()
     dg->HwSetMaxHardwareDischargeCurrentLimit(32000);
     // Via the delegate, so the charge and discharge current limits are recomputed
     dg->HwSetCircuitCapacity(32000);
-    TEMPORARY_RETURN_IGNORED instance->SetUserMaximumChargeCurrent(32000);
+    LogErrorOnFailure(instance->SetUserMaximumChargeCurrent(32000));
     dg->HwSetState(StateEnum::kNotPluggedIn);
 }
 void SetTestEventTrigger_BasicFunctionalityClear()
@@ -78,7 +80,7 @@ void SetTestEventTrigger_BasicFunctionalityClear()
     dg->HwSetMaxHardwareChargeCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareChargeCurrentLimit);
     dg->HwSetMaxHardwareDischargeCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareDischargeCurrentLimit);
     dg->HwSetCircuitCapacity(sEVSETestEventSaveData.mOldCircuitCapacity);
-    TEMPORARY_RETURN_IGNORED instance->SetUserMaximumChargeCurrent(sEVSETestEventSaveData.mOldUserMaximumChargeCurrent);
+    LogErrorOnFailure(instance->SetUserMaximumChargeCurrent(sEVSETestEventSaveData.mOldUserMaximumChargeCurrent));
     dg->HwSetState(sEVSETestEventSaveData.mOldHwStateBasic);
 }
 void SetTestEventTrigger_EVPluggedIn()
@@ -154,8 +156,8 @@ void SetTestEventTrigger_EVSESetSoCLow()
     EnergyEvse::Instance * instance = dg->GetInstance();
     VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
 
-    TEMPORARY_RETURN_IGNORED instance->SetStateOfCharge(DataModel::MakeNullable(static_cast<Percent>(20)));
-    TEMPORARY_RETURN_IGNORED instance->SetBatteryCapacity(DataModel::MakeNullable(static_cast<int64_t>(70000000)));
+    LogErrorOnFailure(instance->SetStateOfCharge(DataModel::MakeNullable(static_cast<Percent>(20))));
+    LogErrorOnFailure(instance->SetBatteryCapacity(DataModel::MakeNullable(static_cast<int64_t>(70000000))));
 }
 void SetTestEventTrigger_EVSESetSoCHigh()
 {
@@ -164,8 +166,8 @@ void SetTestEventTrigger_EVSESetSoCHigh()
     EnergyEvse::Instance * instance = dg->GetInstance();
     VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
 
-    TEMPORARY_RETURN_IGNORED instance->SetStateOfCharge(DataModel::MakeNullable(static_cast<Percent>(95)));
-    TEMPORARY_RETURN_IGNORED instance->SetBatteryCapacity(DataModel::MakeNullable(static_cast<int64_t>(70000000)));
+    LogErrorOnFailure(instance->SetStateOfCharge(DataModel::MakeNullable(static_cast<Percent>(95))));
+    LogErrorOnFailure(instance->SetBatteryCapacity(DataModel::MakeNullable(static_cast<int64_t>(70000000))));
 }
 void SetTestEventTrigger_EVSESetSoCClear()
 {
@@ -174,8 +176,8 @@ void SetTestEventTrigger_EVSESetSoCClear()
     EnergyEvse::Instance * instance = dg->GetInstance();
     VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
 
-    TEMPORARY_RETURN_IGNORED instance->SetStateOfCharge(DataModel::NullNullable);
-    TEMPORARY_RETURN_IGNORED instance->SetBatteryCapacity(DataModel::NullNullable);
+    LogErrorOnFailure(instance->SetStateOfCharge(DataModel::NullNullable));
+    LogErrorOnFailure(instance->SetBatteryCapacity(DataModel::NullNullable));
 }
 void SetTestEventTrigger_EVSESetVehicleID()
 {

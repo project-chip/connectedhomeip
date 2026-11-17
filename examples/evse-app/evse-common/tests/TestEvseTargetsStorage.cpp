@@ -29,6 +29,9 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
+
 #include "EnergyEvseTargetsStore.h"
 
 using namespace chip;
@@ -70,6 +73,11 @@ private:
     DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> mDecodableChargingTargetSchedulesList;
 
     TestPersistentStorageDelegate mStorageDelegate;
+
+    PersistentStorageOperationalKeystore mOpKeyStore;
+    Credentials::PersistentStorageOpCertStore mOpCertStore;
+    FabricTable mFabricTable;
+    bool mFabricTableInitialised = false;
 
     EvseTargetsDelegate mEtd;
     bool mEtdInitialised = false;
@@ -136,8 +144,60 @@ TEST_F(TestEvseTargetsStorage, TestEmptyDayOfWeekBitmaskWithSevenExistingSchedul
     err = DataModel::Decode(reader, decodableScheduleList);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    // Merging this schedule must not write past the seven-entry target array.
-    EXPECT_EQ(SetTargets(decodableScheduleList), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(SetTargets(decodableScheduleList), CHIP_ERROR_INVALID_ARGUMENT);
+
+    CheckTargets();
+}
+
+TEST_F(TestEvseTargetsStorage, TestSetTargetsRollbackAfterPartialMergeFailure)
+{
+    PopulateTargets(6, 1);
+    SetTargets();
+
+    EnergyEvse::Structs::ChargingTargetStruct::Type day6Target;
+    day6Target.targetTimeMinutesPastMidnight = 600;
+    day6Target.targetSoC.SetValue(70);
+
+    EnergyEvse::Structs::ChargingTargetScheduleStruct::Type scheduleAddDay6;
+    scheduleAddDay6.dayOfWeekForSequence = chip::BitMask<EnergyEvse::TargetDayOfWeekBitmap>(1 << 6);
+    scheduleAddDay6.chargingTargets = chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(&day6Target, 1);
+
+    EnergyEvse::Structs::ChargingTargetStruct::Type tooManyTargetsPerDay[ENERGY_EVSE_SET_TARGETS_MAX_CHARGING_TARGETS + 1];
+    for (uint16_t i = 0; i < ENERGY_EVSE_SET_TARGETS_MAX_CHARGING_TARGETS + 1; i++)
+    {
+        tooManyTargetsPerDay[i].targetTimeMinutesPastMidnight = i;
+        tooManyTargetsPerDay[i].targetSoC.SetValue(50);
+    }
+
+    EnergyEvse::Structs::ChargingTargetScheduleStruct::Type scheduleTooManyTargets;
+    scheduleTooManyTargets.dayOfWeekForSequence = chip::BitMask<EnergyEvse::TargetDayOfWeekBitmap>(1 << 0);
+    scheduleTooManyTargets.chargingTargets      = chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
+        tooManyTargetsPerDay, ENERGY_EVSE_SET_TARGETS_MAX_CHARGING_TARGETS + 1);
+
+    EnergyEvse::Structs::ChargingTargetScheduleStruct::Type failingCommandSchedules[2] = { scheduleAddDay6,
+                                                                                           scheduleTooManyTargets };
+
+    uint8_t store[2048];
+    TLV::TLVWriter writer;
+    writer.Init(store, sizeof(store));
+
+    chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> failingCommandList(failingCommandSchedules,
+                                                                                                           2);
+
+    CHIP_ERROR err = DataModel::Encode(writer, TLV::AnonymousTag(), failingCommandList);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    reader.Init(store);
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+
+    DataModel::DecodableList<EnergyEvse::Structs::ChargingTargetScheduleStruct::DecodableType> decodableFailingCommand;
+    err = DataModel::Decode(reader, decodableFailingCommand);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // First command entry merges successfully; second fails while copying targets. Live state must match pre-command data.
+    EXPECT_EQ(SetTargets(decodableFailingCommand), CHIP_ERROR_NO_MEMORY);
 
     CheckTargets();
 }
@@ -241,7 +301,19 @@ void TestEvseTargetsStorage::SetTargets()
 {
     if (!mEtdInitialised)
     {
-        EXPECT_SUCCESS(mEtd.Init(&mStorageDelegate));
+        if (!mFabricTableInitialised)
+        {
+            EXPECT_SUCCESS(mOpKeyStore.Init(&mStorageDelegate));
+            EXPECT_SUCCESS(mOpCertStore.Init(&mStorageDelegate));
+            FabricTable::InitParams initParams;
+            initParams.storage             = &mStorageDelegate;
+            initParams.operationalKeystore = &mOpKeyStore;
+            initParams.opCertStore         = &mOpCertStore;
+            EXPECT_SUCCESS(mFabricTable.Init(initParams));
+            mFabricTableInitialised = true;
+        }
+
+        EXPECT_SUCCESS(mEtd.Init(&mStorageDelegate, mFabricTable));
 
         mEtdInitialised = true;
     }

@@ -33,6 +33,7 @@
 #include <app/server/Server.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DefaultTimerDelegate.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -72,6 +73,7 @@ std::unique_ptr<EnergyEvseDelegate> gEvseDelegate;
 std::unique_ptr<EvseTargetsDelegate> gEvseTargetsDelegate;
 std::unique_ptr<EnergyEvseManager> gEvseInstance;
 std::unique_ptr<EVSEManufacturer> gEvseManufacturer;
+chip::app::DefaultTimerDelegate gEvseTimerDelegate;
 
 /*
  *  @brief  Creates a Delegate and Instance for Energy EVSE cluster
@@ -93,7 +95,7 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    gEvseDelegate = std::make_unique<EnergyEvseDelegate>(*gEvseTargetsDelegate);
+    gEvseDelegate = std::make_unique<EnergyEvseDelegate>(*gEvseTargetsDelegate, gEvseTimerDelegate);
     if (!gEvseDelegate)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EnergyEvseDelegate");

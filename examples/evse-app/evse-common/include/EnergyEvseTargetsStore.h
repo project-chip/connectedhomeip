@@ -29,6 +29,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <ChargingTargetsMemMgr.h>
+#include <lib/core/TLVReader.h>
 
 namespace chip {
 namespace app {
@@ -41,7 +42,8 @@ public:
     EvseTargetsDelegate();
     ~EvseTargetsDelegate();
 
-    CHIP_ERROR Init(PersistentStorageDelegate * targetStore);
+    CHIP_ERROR Init(PersistentStorageDelegate * targetStore, FabricTable & fabricTable);
+    CHIP_ERROR InitTargetsStorage(PersistentStorageDelegate * targetStore, FabricTable & fabricTable);
     void Shutdown();
 
     /**
@@ -85,6 +87,26 @@ private:
 
     CHIP_ERROR SaveTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedulesList);
 
+    CHIP_ERROR
+    ReplaceTargetsInMemory(const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedulesList);
+
+    struct LiveTargetsRollbackSnapshot
+    {
+        ChargingTargetsMemMgr memMgr;
+        Structs::ChargingTargetScheduleStruct::Type array[kEvseTargetsMaxNumberOfDays];
+        uint16_t count = 0;
+    };
+
+    CHIP_ERROR SnapshotLiveTargets(LiveTargetsRollbackSnapshot & snapshot);
+
+    void RestorePersistedTargetsIfLiveListWasModified(bool liveListWasModified, LiveTargetsRollbackSnapshot & rollbackSnapshot);
+
+    CHIP_ERROR ParseTargetsFromReader(TLV::TLVReader & reader, ChargingTargetsMemMgr & memMgr,
+                                      Structs::ChargingTargetScheduleStruct::Type * schedulesArray, uint16_t & outScheduleCount);
+
+    CHIP_ERROR CommitStagedTargets(const Structs::ChargingTargetScheduleStruct::Type * stagingArray, uint16_t stagedCount,
+                                   ChargingTargetsMemMgr & stagingMemMgr);
+
     // For debug purposes
     void PrintTargets(const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules);
 
@@ -113,6 +135,9 @@ private:
 
     // Pointer to the PeristentStorage
     PersistentStorageDelegate * mpTargetStore = nullptr;
+
+    FabricTable * mpFabricTable    = nullptr;
+    bool mFabricDelegateRegistered = false;
 
     // Need a key to store the Charging Preference Targets which is a TLV of list of lists
     static constexpr const char * spEvseTargetsKeyName = "g/ev/targ";
