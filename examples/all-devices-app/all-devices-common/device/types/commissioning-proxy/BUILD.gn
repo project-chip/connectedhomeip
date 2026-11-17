@@ -25,8 +25,8 @@ source_set("commissioning-proxy") {
   # depends on the transport drivers it has and composes them onto this device with
   # AddTransport().
   sources = [
-    "CommissioningProxyDevice.cpp",
-    "CommissioningProxyDevice.h",
+    "CommissioningProxy.cpp",
+    "CommissioningProxy.h",
   ]
 
   public_deps = [
