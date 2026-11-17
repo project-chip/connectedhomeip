@@ -859,7 +859,7 @@ void WpaSupplicantClient::NotifyWiFiConnectivityChange(const ConnectivityChange 
     PlatformMgr().PostEventOrDie(&event);
 }
 
-CHIP_ERROR WpaSupplicantClient::StartOnGLib(void)
+CHIP_ERROR WpaSupplicantClient::StartOnGLib()
 {
     // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
     // all D-Bus signals will be delivered to the GLib global default main context.
@@ -877,7 +877,7 @@ CHIP_ERROR WpaSupplicantClient::StartOnGLib(void)
     return CHIP_NO_ERROR;
 }
 
-void WpaSupplicantClient::Start(void)
+void WpaSupplicantClient::Start()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
@@ -888,7 +888,7 @@ void WpaSupplicantClient::Start(void)
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start WiFi management"));
 }
 
-CHIP_ERROR WpaSupplicantClient::StartSync(void)
+CHIP_ERROR WpaSupplicantClient::StartSync()
 {
     if (IsStarted())
     {
@@ -915,7 +915,7 @@ CHIP_ERROR WpaSupplicantClient::StartSync(void)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WpaSupplicantClient::StopAutoScan(void)
+CHIP_ERROR WpaSupplicantClient::StopAutoScan()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);

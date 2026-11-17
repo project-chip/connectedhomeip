@@ -287,7 +287,7 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, chip::FabricIndex cre
     return true;
 }
 
-DlStatus LockEndpoint::GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule)
+DlStatus LockEndpoint::GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule) const
 {
     if (0 == userIndex || userIndex > mWeekDaySchedules.size())
     {
@@ -335,7 +335,7 @@ DlStatus LockEndpoint::SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlS
     return DlStatus::kSuccess;
 }
 
-DlStatus LockEndpoint::GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule)
+DlStatus LockEndpoint::GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule) const
 {
     if (0 == userIndex || userIndex > mYearDaySchedules.size())
     {
@@ -379,7 +379,7 @@ DlStatus LockEndpoint::SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlS
     return DlStatus::kSuccess;
 }
 
-DlStatus LockEndpoint::GetSchedule(uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule)
+DlStatus LockEndpoint::GetSchedule(uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule) const
 {
     if (0 == holidayIndex || holidayIndex > mHolidaySchedules.size())
     {

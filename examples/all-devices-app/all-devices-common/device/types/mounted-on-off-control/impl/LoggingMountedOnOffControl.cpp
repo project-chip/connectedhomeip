@@ -1,7 +1,5 @@
 /*
- *
- *    Copyright (c) 2025 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,13 +14,12 @@
  *    limitations under the License.
  */
 
-#include "JFAManager.h"
+#include <device/types/mounted-on-off-control/impl/LoggingMountedOnOffControl.h>
 
-#include <lib/support/logging/CHIPLogging.h>
+namespace chip::app {
 
-JFAManager JFAManager::sJFA;
+LoggingMountedOnOffControl::LoggingMountedOnOffControl(const Context & context) :
+    MountedOnOffControl(*this, *this, context.identifyDelegate, context)
+{}
 
-CHIP_ERROR JFAManager::Init()
-{
-    return CHIP_NO_ERROR;
-}
+} // namespace chip::app

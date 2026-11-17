@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 109,
+  "featureLevel": 110,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -4324,7 +4324,6 @@
           "define": "GROUPCAST_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "JoinGroup",
@@ -4907,6 +4906,14 @@
             {
               "name": "Calibrate",
               "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "GroupedMoveTo",
+              "code": 3,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
