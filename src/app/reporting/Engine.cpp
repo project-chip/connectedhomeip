@@ -321,6 +321,8 @@ void Engine::Shutdown()
 
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
+    // A Run() scheduled before shutdown may never happen, so it must not block ScheduleRun() after the next Init().
+    mRunScheduled = false;
     mGlobalDirtySet.ReleaseAll();
 }
 
