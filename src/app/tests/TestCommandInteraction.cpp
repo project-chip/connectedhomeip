@@ -1947,14 +1947,12 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderConstructionSession
 
     using chip::Revision::kFirstRevisionWithOptionalRequestFlags;
 
-    // Fields omitted for one peer must not be sent on a session whose peer does not accept omission.
+    // A send session that is not the construction session is rejected, even when both are unicast.
     {
-        setPeerRevision(kFirstRevisionWithOptionalRequestFlags);
         SessionHandle session = GetSessionBobToAlice();
         app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), session);
         AddInvokeRequestData(&commandSender);
-        setPeerRevision(std::nullopt);
-        EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(commandSender.SendCommandRequest(GetSessionAliceToBob()), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // A handler on the peer accepts the message with the fields omitted.
@@ -1976,7 +1974,6 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderConstructionSession
         mockCommandSenderDelegate.ResetCounter();
         app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
         AddInvokeRequestData(&commandSender);
-        setPeerRevision(std::nullopt);
         EXPECT_SUCCESS(commandSender.SendCommandRequest(GetSessionBobToAlice()));
         DrainAndServiceIO();
         EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 1);

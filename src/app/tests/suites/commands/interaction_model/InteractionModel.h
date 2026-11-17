@@ -422,7 +422,8 @@ protected:
         while (repeat--)
         {
 
-            auto secureSession                  = device->GetSecureSession();
+            auto secureSession = device->GetSecureSession();
+            VerifyOrReturnError(secureSession.HasValue(), CHIP_ERROR_INCORRECT_STATE);
             const chip::SessionHandle & session = secureSession.Value();
             mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), &mChunkedWriteCallback, session,
                                                                     mTimedInteractionTimeoutMs, mSuppressResponse.ValueOr(false));

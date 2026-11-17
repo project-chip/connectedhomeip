@@ -460,6 +460,7 @@ void WriteClient::CaptureSessionInfo(const OptionalSessionHandleRef & aSession)
     VerifyOrReturn(aSession.has_value());
     const SessionHandle & session = aSession->get();
     mHasSessionInfo               = true;
+    mConstructionSession.Grab(session);
     mSessionIsGroup               = session->IsGroupSession();
     mPeerInteractionModelRevision = session->GetPeerInteractionModelRevision();
 }
@@ -467,8 +468,7 @@ void WriteClient::CaptureSessionInfo(const OptionalSessionHandleRef & aSession)
 CHIP_ERROR WriteClient::CheckMatchesSessionInfo(const SessionHandle & session) const
 {
     VerifyOrReturnError(mHasSessionInfo, CHIP_NO_ERROR);
-    VerifyOrReturnError(session->IsGroupSession() == mSessionIsGroup, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(session->GetPeerInteractionModelRevision() == mPeerInteractionModelRevision, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mConstructionSession.Contains(session), CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
 

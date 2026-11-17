@@ -625,7 +625,7 @@ private:
 
     void CaptureSessionInfo(const OptionalSessionHandleRef & aSession);
 
-    // Returns CHIP_ERROR_INVALID_ARGUMENT if a session was passed at construction and `session` does not match it.
+    // Returns CHIP_ERROR_INVALID_ARGUMENT if a session was passed at construction and `session` parameter is not that session.
     CHIP_ERROR CheckMatchesSessionInfo(const SessionHandle & session) const;
 
     void OnResponseCallback(const ResponseData & aResponseData)
@@ -694,6 +694,8 @@ private:
 
     // Values read from the session passed at construction.
     // mPeerInteractionModelRevision is std::nullopt when no session was passed or the peer revision is unknown.
+    // mConstructionSession holds that session for send-time identity checks; it clears if the session is released.
+    SessionHolder mConstructionSession;
     std::optional<uint16_t> mPeerInteractionModelRevision;
 
     State mState                = State::Idle;

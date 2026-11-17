@@ -792,15 +792,13 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientConstructionSessionIsEn
 
     using chip::Revision::kFirstRevisionWithOptionalRequestFlags;
 
-    // Fields omitted for one peer must not be sent on a session whose peer does not accept omission.
+    // A send session that is not the construction session is rejected, even when both are unicast.
     {
-        setPeerRevision(kFirstRevisionWithOptionalRequestFlags);
         TestWriteClientCallback callback;
         SessionHandle session = GetSessionBobToAlice();
         app::WriteClient writeClient(&GetExchangeManager(), &callback, session, /* aTimedWriteTimeoutMs = */ NullOptional);
         EXPECT_SUCCESS(writeClient.EncodeAttribute(path, true));
-        setPeerRevision(std::nullopt);
-        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionAliceToBob()), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Without a session at construction, the request can be sent on any session.
@@ -809,7 +807,6 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientConstructionSessionIsEn
         TestWriteClientCallback callback;
         app::WriteClient writeClient(&GetExchangeManager(), &callback, std::nullopt, /* aTimedWriteTimeoutMs = */ NullOptional);
         EXPECT_SUCCESS(writeClient.EncodeAttribute(path, true));
-        setPeerRevision(std::nullopt);
         ASSERT_SUCCESS(writeClient.SendWriteRequest(GetSessionBobToAlice()));
         DrainAndServiceIO();
         EXPECT_EQ(callback.mOnSuccessCalled, 1);
