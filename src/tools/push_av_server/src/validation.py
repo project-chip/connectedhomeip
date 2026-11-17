@@ -21,7 +21,6 @@ class MatterCMAFUploadValidator:
         self.hls_media_playlist_path_regex = re.compile(r"^session_(?P<sessionNumber>\d+)/(?P<trackName>[^/]+)/index$")
         self.segment_path_regex = re.compile(
             r"^session_(?P<sessionNumber>\d+)/(?P<trackName>[^/]+)/segment_(?P<segmentNumber>\d+)$")
-        self.cmaf_session_path_regex = re.compile(r"^session_(?P<sessionNumber>\d+)/")
         self.init_path_regex = re.compile(r"^session_(?P<sessionNumber>\d+)/(?P<trackName>[^/]+)/(?P<initName>[^/]+)$")
 
     def validate_upload(
@@ -246,17 +245,19 @@ class MatterCMAFUploadValidator:
         self,
         stream: Stream,
         session: Session | None,
-        file_path: str
+        file_path: str,
+        ext: str
     ) -> tuple[Session | None, str | None]:
-        """Return the session a cmaf-ingest upload belongs to, and an error if its session number is wrong.
+        """Return the session a cmaf-ingest upload belongs to, and an error if the upload must be rejected.
 
         A cmaf-ingest stream has no manifest and no completion signal, so the first upload of session_N
-        starts session N. Uploads for the current session reuse it. Any other session number is an error
-        and the caller must not update any state for that upload.
+        starts session N. Uploads for the current session reuse it. An invalid path or any other session
+        number is an error, and the caller must not update any state for that upload.
         """
-        match = self.cmaf_session_path_regex.match(file_path)
+        path_regex = self.segment_path_regex if ext == "m4s" else self.init_path_regex
+        match = path_regex.match(file_path)
         if not match:
-            return session, None
+            return session, "Path does not adhere to Matter's segment path format"
 
         session_number = int(match.group("sessionNumber"))
         next_session_id = len(stream.sessions) + 1
@@ -284,7 +285,7 @@ class MatterCMAFUploadValidator:
         errors = []
 
         if stream.interface == SupportedIngestInterface.cmaf:
-            session, session_error = self._select_cmaf_session(stream, session, file_path)
+            session, session_error = self._select_cmaf_session(stream, session, file_path, ext)
             if session_error:
                 return [session_error], session
 
@@ -366,7 +367,8 @@ class MatterCMAFUploadValidator:
                         elif track.state == TrackState.INIT_UPLOADED:
                             errors.append(
                                 f"Init segment for track '{track_name_in_path}' already uploaded, duplicate upload not allowed")
-                        else:
+                        elif stream.interface == SupportedIngestInterface.dash or not errors:
+                            # CMAF ingest only records the init when this upload has no error
                             track.state = TrackState.INIT_UPLOADED
                     elif ext == "m4s":
                         # For DASH and CMAF ingest, m4s segments must be uploaded after init
@@ -399,7 +401,10 @@ class MatterCMAFUploadValidator:
                 # Count every m4s upload, including rejected ones, so the next expected segment number follows it.
                 if ext == "m4s":
                     track.segment_count += 1
-                    track.state = TrackState.SEGMENTS_UPLOADING
+                    # CMAF ingest only moves on to segments once the init was accepted
+                    if stream.interface != SupportedIngestInterface.cmaf or track.state in (
+                            TrackState.INIT_UPLOADED, TrackState.SEGMENTS_UPLOADING):
+                        track.state = TrackState.SEGMENTS_UPLOADING
 
             # HLS-specific validation for media segments
             if stream.interface == SupportedIngestInterface.hls and ext == "m4s":

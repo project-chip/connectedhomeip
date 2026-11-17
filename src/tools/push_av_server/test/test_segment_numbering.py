@@ -212,3 +212,45 @@ class TestCmafIngestWithoutManifest:
         assert "audio" not in session_2.tracks
         assert len(session_2.uploaded_segments) == uploads_before
         assert _api_upload(validator, stream, "session_2/video/segment_1001", "m4s") == []
+
+    def test_invalid_path_creates_no_session(self):
+        """A rejected upload with an invalid path does not start a session, and session 2 can still start."""
+        validator = MatterCMAFUploadValidator()
+        stream = Stream(id=1, interface=SupportedIngestInterface.cmaf)
+        _api_upload(validator, stream, "session_1/video/video", "init")
+        _api_upload(validator, stream, "session_1/video/segment_1001", "m4s")
+
+        errors = _api_upload(validator, stream, "session_2/video/not_a_segment", "m4s")
+
+        assert any("Path does not adhere" in e for e in errors)
+        assert [s.id for s in stream.sessions] == [1]
+        assert stream.sessions[0].tracks["video"].segment_count == 1
+
+        assert _api_upload(validator, stream, "session_2/video/video", "init") == []
+        assert _api_upload(validator, stream, "session_2/video/segment_1001", "m4s") == []
+        assert [s.id for s in stream.sessions] == [1, 2]
+
+    def test_invalid_init_is_not_recorded(self):
+        """An init with the wrong name is rejected and does not count, so the corrected init is accepted."""
+        validator = MatterCMAFUploadValidator()
+        stream = Stream(id=1, interface=SupportedIngestInterface.cmaf)
+
+        errors = _api_upload(validator, stream, "session_1/video/wrong", "init")
+        assert any("Init file name must match track name" in e for e in errors)
+        errors = _api_upload(validator, stream, "session_1/video/segment_1001", "m4s")
+        assert any("uploaded before init segment" in e for e in errors)
+
+        assert stream.sessions[0].tracks["video"].state == TrackState.NOT_STARTED
+        assert _api_upload(validator, stream, "session_1/video/video", "init") == []
+
+    def test_segment_before_init_leaves_track_not_started(self):
+        """A media segment uploaded before init does not change the track state, so the init is still accepted."""
+        validator = MatterCMAFUploadValidator()
+        stream = Stream(id=1, interface=SupportedIngestInterface.cmaf)
+
+        errors = _api_upload(validator, stream, "session_1/video/segment_1001", "m4s")
+        assert any("uploaded before init segment" in e for e in errors)
+        assert stream.sessions[0].tracks["video"].state == TrackState.NOT_STARTED
+
+        assert _api_upload(validator, stream, "session_1/video/video", "init") == []
+        assert stream.sessions[0].tracks["video"].state == TrackState.INIT_UPLOADED
