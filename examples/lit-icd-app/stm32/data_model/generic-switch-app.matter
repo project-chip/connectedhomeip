@@ -2139,10 +2139,17 @@ endpoint 0 {
     callback attribute dataVersion;
     callback attribute stableDataVersion;
     callback attribute leaderRouterId;
+    callback attribute securityPolicy;
+    callback attribute channelPage0Mask;
+    callback attribute operationalDatasetComponents;
+    callback attribute activeNetworkFaultsList;
+    callback attribute extAddress;
+    callback attribute rloc16;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap default = 0x000F;
+    callback attribute clusterRevision;
   }
 
   server cluster AdministratorCommissioning {
@@ -2196,6 +2203,9 @@ endpoint 0 {
   }
 
   server cluster UserLabel {
+    callback attribute labelList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster IcdManagement {
