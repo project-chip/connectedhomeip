@@ -565,6 +565,7 @@ class ChipDeviceControllerBase:
         self._ChipStack = builtins.chipStack  # type: ignore[attr-defined]
         self._dmLib: typing.Any = None
         self._isActive = False
+        self._defaultThreadMeshCoPConfig: tuple[tuple[str, int], bytes] | None = None
 
         self._InitLib()
 
@@ -1598,6 +1599,48 @@ class ChipDeviceControllerBase:
 
         return self._Cluster
 
+    def SetThreadOperationalDataset(self, threadOperationalDataset: bytes) -> None:
+        '''
+        Set the Thread operational dataset for PASE over Thread MeshCoP and commissioning.
+
+        Args:
+            threadOperationalDataset (bytes): The Thread operational dataset for commissioning.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetThreadOperationalDataset(
+                threadOperationalDataset, len(threadOperationalDataset))
+        ).raise_on_error()
+
+    def SetDefaultThreadMeshCoPConfig(self, threadMeshCoPConfig: tuple[str, int] | None,
+                                    threadOperationalDataset: bytes | None = None) -> None:
+        """Set controller defaults for PASE establishment over Thread MeshCoP.
+
+        Args:
+            threadMeshCoPConfig: Border Agent host and port, or None to clear the defaults.
+            threadOperationalDataset: Dataset containing the PSKc for the Border Agent.
+                Required when configuring defaults. Applied when a new PASE session uses them.
+
+        Explicit threadMeshCoPConfig arguments to FindOrEstablishPASESession take precedence
+        and continue to use the dataset set by the caller.
+        """
+        self.CheckIsActive()
+        if threadMeshCoPConfig is None:
+            self._defaultThreadMeshCoPConfig = None
+            return
+
+        host, port = threadMeshCoPConfig
+        if not host or not 1 <= port <= 65535:
+            raise ValueError("Thread MeshCoP requires a border agent host and a port in the range 1..65535")
+        if not threadOperationalDataset:
+            raise ValueError("Thread MeshCoP requires a Thread operational dataset")
+
+        self._defaultThreadMeshCoPConfig = (threadMeshCoPConfig, bytes(threadOperationalDataset))
+
     async def FindOrEstablishPASESession(self, setupCode: str, nodeId: int, timeoutMs: int | None = None, threadMeshCoPConfig: tuple[str, int] | None = None) -> DeviceProxyWrapper | None:
         '''
         Find or establish a PASE session.
@@ -1607,6 +1650,7 @@ class ChipDeviceControllerBase:
             nodeId (int): The node ID of the device.
             timeoutMs (Optional[int]): Optional timeout in milliseconds.
             threadMeshCoPConfig (Optional[tuple[str, int]]): Optional Border Agent host and port for Thread MeshCoP PASE.
+                When None, uses the defaults configured by SetDefaultThreadMeshCoPConfig, if any.
 
         Returns:
             DeviceProxyWrapper on success, if not is None.
@@ -1617,6 +1661,10 @@ class ChipDeviceControllerBase:
             self.devCtrl, nodeId, byref(returnDevice)), timeoutMs)
         if res.is_success:
             return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
+
+        if threadMeshCoPConfig is None and self._defaultThreadMeshCoPConfig is not None:
+            threadMeshCoPConfig, dataset = self._defaultThreadMeshCoPConfig
+            self.SetThreadOperationalDataset(dataset)
 
         if threadMeshCoPConfig is None:
             await self.EstablishPASESession(setupCode, nodeId)
@@ -3345,23 +3393,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetWiFiCredentials(
                 ssid.encode("utf-8"), credentials.encode("utf-8"))
-        ).raise_on_error()
-
-    def SetThreadOperationalDataset(self, threadOperationalDataset):
-        '''
-        Set the Thread operational dataset to set during commissioning.
-
-        Args:
-            threadOperationalDataset (bytes): The Thread operational dataset for commissioning.
-
-        Raises:
-            ChipStackError: On failure.
-        '''
-        self.CheckIsActive()
-
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_SetThreadOperationalDataset(
-                threadOperationalDataset, len(threadOperationalDataset))
         ).raise_on_error()
 
     def ResetCommissioningParameters(self):

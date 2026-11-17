@@ -612,6 +612,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         super().setup_class()
 
+        self._configure_pase_session(self.default_controller)
+
         # Set a hook on FabricAdmin so every NewController() call during this test automatically
         # populates self._extra_controllers. This is used during cleanup in teardown_class.
         matter.FabricAdmin.FabricAdmin._new_controller_hook = self._on_new_controller_created
@@ -983,6 +985,18 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.cleanup_config.shutdown_extra_controllers:
             self._shutdown_extra_controllers()
 
+    def _configure_pase_session(self, controller: ChipDeviceCtrl.ChipDeviceController) -> None:
+        """Apply this test's default PASE transport to a controller."""
+        config = self.matter_test_config
+        method = config.in_test_commissioning_method or config.commissioning_method
+        if method == "thread-meshcop":
+            if not config.thread_ba_host or config.thread_ba_port is None:
+                raise ValueError("Thread MeshCoP PASE requires both border agent host and port")
+            controller.SetDefaultThreadMeshCoPConfig(
+                (config.thread_ba_host, config.thread_ba_port), config.thread_operational_dataset)
+        else:
+            controller.SetDefaultThreadMeshCoPConfig(None)
+
     def _on_new_controller_created(self, controller: ChipDeviceCtrl.ChipDeviceController) -> None:
         """Hook set and fired by FabricAdmin for every NewController() call.
 
@@ -993,6 +1007,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         Args:
             controller: The controller that was created.
         """
+        self._configure_pase_session(controller)
         if not getattr(controller, '_is_default_controller', False) and not getattr(controller, '_skip_cleanup_tracking', False):
 
             # Track controller for shutdown in teardown_class
