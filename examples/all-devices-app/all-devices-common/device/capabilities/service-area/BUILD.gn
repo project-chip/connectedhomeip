@@ -24,4 +24,8 @@ source_set("logging") {
     "${chip_root}/src/app/clusters/service-area-server",
     "${chip_root}/src/lib/support",
   ]
+
+  public_configs = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device:includes",
+  ]
 }
