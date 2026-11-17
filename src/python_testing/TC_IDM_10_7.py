@@ -24,12 +24,13 @@ import matter.testing.nfc
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
 from matter.testing.device_conformance_tests import DeviceConformanceTests
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_IDM_10_7(DeviceConformanceTests):
+class TC_IDM_10_7(MatterTestCommissioner, DeviceConformanceTests):
     disable_wildcard_subscription = True
 
     @async_test_body
