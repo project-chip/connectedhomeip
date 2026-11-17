@@ -72,24 +72,44 @@ public:
 private:
     void ProcessQueue();
     void UploadData(std::pair<std::string, std::string> data);
-
-    // Writes the PEM files curl reads, once per uploader, into a private 0700 directory.
-    // Returns false if the files could not be written.
-    bool EnsureTlsFiles();
-    void RemoveTlsFiles();
-    void RemoveTlsFilesLocked();
     PushAVCertPath mCertPath;
     PushAVCertBuffer mCertBuffer;
+
+    // PEM files curl reads, in a private 0700 directory owned by one uploader. Created on first use
+    // and removed (key zeroed first) in the destructor.
+    class TlsFiles
+    {
+    public:
+        TlsFiles() = default;
+        ~TlsFiles();
+        TlsFiles(const TlsFiles &)             = delete;
+        TlsFiles & operator=(const TlsFiles &) = delete;
+
+        // Writes the files on the first call. Returns false, and keeps no files, if any step fails.
+        bool EnsureCreated(const PushAVCertBuffer & certBuffer);
+
+        // Valid only after EnsureCreated() returned true.
+        const std::string & RootPath() const { return mRootPath; }
+        const std::string & DevCertPath() const { return mDevCertPath; }
+        const std::string & DevKeyPath() const { return mDevKeyPath; }
+
+    private:
+        void RemoveLocked();
+
+        std::mutex mMutex;
+        bool mReady = false;
+        std::string mDir;
+        std::string mRootPath;
+        std::string mDevCertPath;
+        std::string mDevKeyPath;
+    };
+
+    // Destroyed after ~PushAVUploader() has stopped and drained the uploader thread
+    TlsFiles mTlsFiles;
+
     std::queue<std::pair<std::string, std::string>> mAvData;
     std::mutex mQueueMutex;
     std::atomic<bool> mIsRunning;
     std::thread mUploaderThread;
     std::vector<std::string> mStreamIdNameMap;
-
-    std::mutex mTlsFilesMutex;
-    bool mTlsFilesReady = false;
-    std::string mTlsDir;
-    std::string mTlsRootPath;
-    std::string mTlsDevCertPath;
-    std::string mTlsDevKeyPath;
 };

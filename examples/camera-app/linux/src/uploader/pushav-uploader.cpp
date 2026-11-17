@@ -66,7 +66,6 @@ PushAVUploader::~PushAVUploader()
     }
 
     Stop();
-    RemoveTlsFiles();
 }
 
 // Helper function to convert certificate from DER format to PEM format
@@ -237,10 +236,10 @@ static void ZeroFile(const std::string & filePath)
     close(fd);
 }
 
-bool PushAVUploader::EnsureTlsFiles()
+bool PushAVUploader::TlsFiles::EnsureCreated(const PushAVCertBuffer & certBuffer)
 {
-    std::lock_guard<std::mutex> lock(mTlsFilesMutex);
-    if (mTlsFilesReady)
+    std::lock_guard<std::mutex> lock(mMutex);
+    if (mReady)
     {
         return true;
     }
@@ -257,64 +256,64 @@ bool PushAVUploader::EnsureTlsFiles()
         ChipLogError(Camera, "Failed to create TLS directory %s: %s", dirTemplate.c_str(), strerror(errno));
         return false;
     }
-    mTlsDir         = dirTemplate;
-    mTlsRootPath    = mTlsDir + "/root.pem";
-    mTlsDevCertPath = mTlsDir + "/dev.pem";
-    mTlsDevKeyPath  = mTlsDir + "/dev.key";
+    mDir         = dirTemplate;
+    mRootPath    = mDir + "/root.pem";
+    mDevCertPath = mDir + "/dev.pem";
+    mDevKeyPath  = mDir + "/dev.key";
 
     // TODO: The logic to provide DER-formatted certificates and keys in memory (blob) format to curl is currently unstable. As a
     // temporary workaround, PEM-format files are being provided as input to curl.
-    const std::string rootCertPEM = DerCertToPem(mCertBuffer.mRootCertBuffer);
-    std::string clientCertPEM     = DerCertToPem(mCertBuffer.mClientCertBuffer);
+    const std::string rootCertPEM = DerCertToPem(certBuffer.mRootCertBuffer);
+    std::string clientCertPEM     = DerCertToPem(certBuffer.mClientCertBuffer);
     bool converted                = !rootCertPEM.empty() && !clientCertPEM.empty();
-    for (const auto & intermediate : mCertBuffer.mIntermediateCertBuffer)
+    for (const auto & intermediate : certBuffer.mIntermediateCertBuffer)
     {
         const std::string intermediatePEM = DerCertToPem(intermediate);
         converted                         = converted && !intermediatePEM.empty();
         clientCertPEM.append("\n" + intermediatePEM);
     }
-    const std::string keyPEM = ConvertECDSAPrivateKey_DER_to_PEM(mCertBuffer.mClientKeyBuffer);
+    const std::string keyPEM = ConvertECDSAPrivateKey_DER_to_PEM(certBuffer.mClientKeyBuffer);
     converted                = converted && !keyPEM.empty();
 
-    if (converted && SaveCertToFile(rootCertPEM, mTlsRootPath) && SaveCertToFile(clientCertPEM, mTlsDevCertPath) &&
-        SaveCertToFile(keyPEM, mTlsDevKeyPath))
+    if (converted && SaveCertToFile(rootCertPEM, mRootPath) && SaveCertToFile(clientCertPEM, mDevCertPath) &&
+        SaveCertToFile(keyPEM, mDevKeyPath))
     {
-        mTlsFilesReady = true;
+        mReady = true;
         return true;
     }
 
-    ChipLogError(Camera, "Failed to prepare TLS files in %s", mTlsDir.c_str());
-    RemoveTlsFilesLocked();
+    ChipLogError(Camera, "Failed to prepare TLS files in %s", mDir.c_str());
+    RemoveLocked();
     return false;
 }
 
-void PushAVUploader::RemoveTlsFiles()
+PushAVUploader::TlsFiles::~TlsFiles()
 {
-    std::lock_guard<std::mutex> lock(mTlsFilesMutex);
-    RemoveTlsFilesLocked();
+    std::lock_guard<std::mutex> lock(mMutex);
+    RemoveLocked();
 }
 
-void PushAVUploader::RemoveTlsFilesLocked()
+void PushAVUploader::TlsFiles::RemoveLocked()
 {
-    if (mTlsDir.empty())
+    if (mDir.empty())
     {
         return;
     }
 
-    ZeroFile(mTlsDevKeyPath);
-    for (const std::string & path : { mTlsRootPath, mTlsDevCertPath, mTlsDevKeyPath })
+    ZeroFile(mDevKeyPath);
+    for (const std::string & path : { mRootPath, mDevCertPath, mDevKeyPath })
     {
         if (unlink(path.c_str()) != 0 && errno != ENOENT)
         {
             ChipLogError(Camera, "Failed to delete %s: %s", path.c_str(), strerror(errno));
         }
     }
-    if (rmdir(mTlsDir.c_str()) != 0)
+    if (rmdir(mDir.c_str()) != 0)
     {
-        ChipLogError(Camera, "Failed to remove directory %s: %s", mTlsDir.c_str(), strerror(errno));
+        ChipLogError(Camera, "Failed to remove directory %s: %s", mDir.c_str(), strerror(errno));
     }
-    mTlsDir.clear();
-    mTlsFilesReady = false;
+    mDir.clear();
+    mReady = false;
 }
 
 void PushAVUploader::ProcessQueue()
@@ -625,15 +624,15 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, static_cast<curl_off_t>(size));
 #ifndef TLS_CLUSTER_NOT_ENABLED
 
-    if (!EnsureTlsFiles())
+    if (!mTlsFiles.EnsureCreated(mCertBuffer))
     {
         ChipLogError(Camera, "TLS files are not available, skipping upload of %s", data.first.c_str());
         goto cleanup;
     }
 
-    curl_easy_setopt(curl, CURLOPT_CAINFO, mTlsRootPath.c_str());
-    curl_easy_setopt(curl, CURLOPT_SSLCERT, mTlsDevCertPath.c_str());
-    curl_easy_setopt(curl, CURLOPT_SSLKEY, mTlsDevKeyPath.c_str());
+    curl_easy_setopt(curl, CURLOPT_CAINFO, mTlsFiles.RootPath().c_str());
+    curl_easy_setopt(curl, CURLOPT_SSLCERT, mTlsFiles.DevCertPath().c_str());
+    curl_easy_setopt(curl, CURLOPT_SSLKEY, mTlsFiles.DevKeyPath().c_str());
 
     //  curl_blob rootBlob   = { mCertBuffer.mRootCertBuffer.data(), mCertBuffer.mRootCertBuffer.size(), CURL_BLOB_COPY };
     //  curl_blob clientBlob = { mCertBuffer.mClientCertBuffer.data(), mCertBuffer.mClientCertBuffer.size(), CURL_BLOB_COPY };
