@@ -16,7 +16,7 @@
 
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
-#include <device/types/solar-power/PanelElectricalSensor.h>
+#include <device/types/solar-power/impl/PanelElectricalSensor.h>
 #include <device/types/solar-power/impl/SimulatedSolarPower.h>
 #include <device/types/solar-power/impl/SolarPowerVariants.h>
 #include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>

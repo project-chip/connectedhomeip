@@ -45,9 +45,10 @@ Clusters::TemperatureMeasurementCluster::StartupConfiguration InverterTemperatur
 } // namespace
 
 SimulatedSolarPower::SimulatedSolarPower(const Context & context, const Config & config) :
-    SolarPower(context, Parameters{ .outputSensorRole = config.outputSensorRole }), mTimerDelegate(context.timerDelegate),
-    mTags(config.tags), mPanelCount(config.panels.size()),
-    mEnergyManagement(context.timerDelegate, SolarPowerEnergyManagementConfig()),
+    SolarPower(context), mTimerDelegate(context.timerDelegate), mTags(config.tags),
+    mOutputElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
+                            context.deviceInfoProvider, SolarPowerTags::GridConnectionTag(), config.outputSensorRole),
+    mPanelCount(config.panels.size()), mEnergyManagement(context.timerDelegate, SolarPowerEnergyManagementConfig()),
     mInverterTemperatureSensor(context.timerDelegate, InverterTemperatureConfig())
 {
     VerifyOrDie(mPanelCount <= kMaxPanelCount);
@@ -95,6 +96,8 @@ CHIP_ERROR SimulatedSolarPower::RegisterAdditionalComposedEndpoints(EndpointIdAl
                                                                     CodeDrivenDataModelProvider & provider, EndpointId parent)
 {
     ReturnErrorOnFailure(mEnergyManagement.Register(allocator.Allocate(), provider, EndpointComposition::WithParent(parent)));
+    ReturnErrorOnFailure(
+        mOutputElectricalSensor.Register(allocator.Allocate(), provider, EndpointComposition::WithParent(parent)));
     ReturnErrorOnFailure(mInverterTemperatureSensor.Register(
         allocator.Allocate(), provider,
         EndpointComposition(parent, DataModel::EndpointCompositionPattern::kTree, SolarPowerTags::InverterTemperatureTag())));
@@ -118,6 +121,10 @@ void SimulatedSolarPower::UnregisterAdditionalComposedEndpoints(CodeDrivenDataMo
     if (mInverterTemperatureSensor.GetEndpointId() != kInvalidEndpointId)
     {
         mInverterTemperatureSensor.Unregister(provider);
+    }
+    if (mOutputElectricalSensor.GetEndpointId() != kInvalidEndpointId)
+    {
+        mOutputElectricalSensor.Unregister(provider);
     }
     if (mEnergyManagement.GetEndpointId() != kInvalidEndpointId)
     {

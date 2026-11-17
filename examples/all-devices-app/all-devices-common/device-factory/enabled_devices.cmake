@@ -124,7 +124,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/SmokeCoAlarm.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/SoilSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/PanelElectricalSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/PanelElectricalSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/SolarPower.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/SolarPowerTags.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/SimulatedSolarPower.cpp"

@@ -17,8 +17,6 @@ import("//build_overrides/chip.gni")
 
 source_set("solar-power") {
   sources = [
-    "PanelElectricalSensor.cpp",
-    "PanelElectricalSensor.h",
     "SolarPower.cpp",
     "SolarPower.h",
     "SolarPowerTags.cpp",
@@ -27,9 +25,7 @@ source_set("solar-power") {
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:device-interface",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",
-    "${chip_root}/src/app/clusters/user-label-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
@@ -39,6 +35,8 @@ source_set("solar-power") {
 
 source_set("simulated") {
   sources = [
+    "impl/PanelElectricalSensor.cpp",
+    "impl/PanelElectricalSensor.h",
     "impl/SimulatedSolarPower.cpp",
     "impl/SimulatedSolarPower.h",
     "impl/SolarPowerVariants.cpp",
@@ -48,7 +46,9 @@ source_set("simulated") {
   public_deps = [
     ":solar-power",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management:device-energy-management",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor",
     "${chip_root}/src/app/clusters/identify-server",
+    "${chip_root}/src/app/clusters/user-label-server",
   ]
 }

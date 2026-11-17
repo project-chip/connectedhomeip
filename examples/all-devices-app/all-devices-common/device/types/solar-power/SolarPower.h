@@ -19,9 +19,7 @@
 #include <app/TestEventTriggerDelegate.h>
 #include <credentials/FabricTable.h>
 #include <device/api/Interface.h>
-#include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/power-source/WiredPowerSource.h>
-#include <device/types/solar-power/PanelElectricalSensor.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/DeviceInfoProvider.h>
 
@@ -39,11 +37,7 @@ public:
         DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
     };
 
-    struct Parameters
-    {
-        SimulatedElectricalSensor::Role outputSensorRole = SimulatedElectricalSensor::Role::kGrid;
-    };
-
+    explicit SolarPower(const Context & context);
     ~SolarPower() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
@@ -52,12 +46,9 @@ public:
 
     EndpointId GetEndpointId() const { return mEndpointId; }
 
-    SimulatedElectricalSensor & GetOutputElectricalSensor() { return mOutputElectricalSensor; }
     WiredPowerSource & GetGridPowerSource() { return mGridPowerSource; }
 
 protected:
-    SolarPower(const Context & context, Parameters parameters);
-
     virtual CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
     {
         return CHIP_NO_ERROR;
@@ -78,7 +69,6 @@ private:
 
     EndpointId mEndpointId = kInvalidEndpointId;
 
-    PanelElectricalSensor mOutputElectricalSensor;
     WiredPowerSource mGridPowerSource;
 };
 

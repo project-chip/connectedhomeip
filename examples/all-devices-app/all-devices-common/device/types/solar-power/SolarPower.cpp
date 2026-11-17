@@ -21,10 +21,8 @@
 
 namespace chip::app {
 
-SolarPower::SolarPower(const Context & context, Parameters parameters) :
+SolarPower::SolarPower(const Context & context) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSolarPower, 1)),
-    mOutputElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
-                            context.deviceInfoProvider, SolarPowerTags::GridConnectionTag(), parameters.outputSensorRole),
     mGridPowerSource("Solar power grid connection"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc, 0)
 {}
 
@@ -49,8 +47,6 @@ CHIP_ERROR SolarPower::Register(EndpointIdAllocator & allocator, CodeDrivenDataM
     ReturnErrorOnFailure(mGridPowerSource.Register(
         allocator.Allocate(), provider,
         EndpointComposition(mEndpointId, DataModel::EndpointCompositionPattern::kTree, SolarPowerTags::GridConnectionTag())));
-    ReturnErrorOnFailure(
-        mOutputElectricalSensor.Register(allocator.Allocate(), provider, EndpointComposition::WithParent(mEndpointId)));
 
     ReturnErrorOnFailure(RegisterAdditionalComposedEndpoints(allocator, provider, mEndpointId));
 
@@ -60,10 +56,6 @@ CHIP_ERROR SolarPower::Register(EndpointIdAllocator & allocator, CodeDrivenDataM
 
 void SolarPower::UnregisterMandatoryComposedEndpoints(CodeDrivenDataModelProvider & provider)
 {
-    if (mOutputElectricalSensor.GetEndpointId() != kInvalidEndpointId)
-    {
-        mOutputElectricalSensor.Unregister(provider);
-    }
     if (mGridPowerSource.GetEndpointId() != kInvalidEndpointId)
     {
         mGridPowerSource.Unregister(provider);

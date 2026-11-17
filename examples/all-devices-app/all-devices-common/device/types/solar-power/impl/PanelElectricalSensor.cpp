@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <device/types/solar-power/PanelElectricalSensor.h>
+#include <device/types/solar-power/impl/PanelElectricalSensor.h>
 
 #include <lib/support/logging/CHIPLogging.h>
 

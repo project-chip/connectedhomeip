@@ -19,6 +19,7 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/solar-power/SolarPower.h>
+#include <device/types/solar-power/impl/PanelElectricalSensor.h>
 #include <device/types/temperature-sensor/TemperatureSensor.h>
 #include <lib/support/CodeUtils.h>
 
@@ -66,6 +67,7 @@ public:
         return mIdentifyCluster.Cluster();
     }
     EnergyManagement & GetEnergyManagement() { return mEnergyManagement; }
+    PanelElectricalSensor & GetOutputElectricalSensor() { return mOutputElectricalSensor; }
     TemperatureSensor & GetInverterTemperatureSensor() { return mInverterTemperatureSensor; }
 
 protected:
@@ -79,6 +81,7 @@ protected:
 private:
     TimerDelegate & mTimerDelegate;
     Span<const EndpointComposition::SemanticTag> mTags;
+    PanelElectricalSensor mOutputElectricalSensor;
     std::array<std::unique_ptr<PanelElectricalSensor>, kMaxPanelCount> mPanels;
     const size_t mPanelCount;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
