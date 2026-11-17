@@ -285,7 +285,7 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 viewport.y1 = static_cast<uint16_t>(sensorParms.sensorHeight - (viewport.y2 - viewport.y1));
                 viewport.y2 = static_cast<uint16_t>(sensorParms.sensorHeight);
             }
-            
+
             // Is the requested viewport greater than the sensor size, if yes, scale to the sensor
             //
             if (((viewport.x2 - viewport.x1) > sensorParms.sensorWidth) || ((viewport.y2 - viewport.y1) > sensorParms.sensorHeight))
