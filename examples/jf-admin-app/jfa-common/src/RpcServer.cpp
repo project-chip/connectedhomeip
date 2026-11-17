@@ -1,5 +1,7 @@
 #include "pigweed/rpc_services/JointFabric.h"
 
+#include "JFAResponseSignal.h"
+
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -9,8 +11,6 @@ using namespace chip;
 namespace joint_fabric_service {
 
 constexpr uint32_t kRpcTimeoutMs = 1000;
-std::condition_variable responseCv;
-bool responseReceived = false;
 
 uint8_t icacCSRBuf[Crypto::kMIN_CSR_Buffer_Size] = { 0 };
 MutableByteSpan icacCSRSpan{ icacCSRBuf };
@@ -28,8 +28,8 @@ MutableByteSpan icacCSRSpan{ icacCSRBuf };
 
     if (request.jcm && request.peerAdminJFAdminClusterEndpointId == kInvalidEndpointId)
     {
-        return pw::Status::OutOfRange();
         ChipLogError(JointFabric, "Invalid Peer Admin Endpoint ID for the JF Administrator Cluster");
+        return pw::Status::OutOfRange();
     }
 
     OwnershipTransferContext * data = Platform::New<OwnershipTransferContext>(
@@ -56,17 +56,16 @@ void JointFabric::GetStream(const ::pw_protobuf_Empty & request, ServerWriter<::
     TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(ByteSpan(ICACCSRBytes.response_bytes.bytes, ICACCSRBytes.response_bytes.size),
                                                    icacCSRSpan);
 
-    responseReceived = true;
-    responseCv.notify_one();
+    JFASignalResponse();
 
     return pw::OkStatus();
 }
 
 CHIP_ERROR JointFabric::GetICACCSRForJF(MutableByteSpan & icacCSR)
 {
-    std::mutex responseMutex;
-    std::unique_lock<std::mutex> lock(responseMutex);
     ::pw::Status status;
+
+    JFAResetResponseSignal();
 
     // JFA requests an ICAC CSR from JFC
     RequestOptions requestOptions{ TransactionType::TransactionType_ICAC_CSR };
@@ -79,10 +78,9 @@ CHIP_ERROR JointFabric::GetICACCSRForJF(MutableByteSpan & icacCSR)
     }
 
     // wait for the ICAC CSR from JFC
-    if (responseCv.wait_for(lock, std::chrono::milliseconds(kRpcTimeoutMs), [] { return responseReceived; }))
+    if (JFAWaitResponse(kRpcTimeoutMs))
     {
         ReturnErrorOnFailure(CopySpanToMutableSpan(ByteSpan(icacCSRSpan.data(), icacCSRSpan.size()), icacCSR));
-        responseReceived = false;
 
         return CHIP_NO_ERROR;
     }

@@ -2305,6 +2305,7 @@ cluster ClosureDimension = 261 {
 
 endpoint 0 {
   device type ma_rootdevice = 22, version 5;
+  device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2662,6 +2663,7 @@ endpoint 1 {
     handle command Stop;
     handle command MoveTo;
     handle command Calibrate;
+    handle command GroupedMoveTo;
   }
 }
 endpoint 2 {

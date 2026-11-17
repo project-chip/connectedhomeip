@@ -67,7 +67,7 @@ bool NetworkIdentityManagementRegistrar::IsIdle() const
 void NetworkIdentityManagementRegistrar::WaitForIdle(OnIdleCallback::Owned onIdle)
 {
     VerifyOrReturn(!IsIdle(), onIdle.Invoke());
-    mIdleWaiters.Enqueue(onIdle.Take());
+    mIdleWaiters.Enqueue(std::move(onIdle));
 }
 
 void NetworkIdentityManagementRegistrar::OperationFinished()
@@ -82,13 +82,11 @@ void NetworkIdentityManagementRegistrar::OperationFinished()
     // all waiters have been called.
     bool recursed = false;
     OnIdleCallback sentinel([](void * context) { *static_cast<bool *>(context) = true; }, &recursed);
-    mIdleWaiters.Enqueue(sentinel.Cancel());
+    mIdleWaiters.Enqueue(sentinel);
 
-    while (!mIdleWaiters.IsEmpty())
+    while (auto * waiter = mIdleWaiters.Take())
     {
-        auto * waiter = mIdleWaiters.First();
-        Callback::CallbackDeque::Dequeue(waiter);
-        OnIdleCallback::FromCancelable(waiter)->Invoke();
+        waiter->Invoke();
         VerifyOrReturn(!recursed); // destructor recurses, so after this point we know we're still alive
         VerifyOrReturn(IsIdle());
     }
