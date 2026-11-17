@@ -273,6 +273,19 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 viewport.y2 = viewport.y1 + minResolution.height;
             }
 
+            // Move an enlarged viewport back inside the sensor edges. Dimensions larger than the sensor are handled below.
+            //
+            if ((viewport.x2 > sensorParms.sensorWidth) && ((viewport.x2 - viewport.x1) <= sensorParms.sensorWidth))
+            {
+                viewport.x1 = static_cast<uint16_t>(sensorParms.sensorWidth - (viewport.x2 - viewport.x1));
+                viewport.x2 = static_cast<uint16_t>(sensorParms.sensorWidth);
+            }
+            if ((viewport.y2 > sensorParms.sensorHeight) && ((viewport.y2 - viewport.y1) <= sensorParms.sensorHeight))
+            {
+                viewport.y1 = static_cast<uint16_t>(sensorParms.sensorHeight - (viewport.y2 - viewport.y1));
+                viewport.y2 = static_cast<uint16_t>(sensorParms.sensorHeight);
+            }
+            
             // Is the requested viewport greater than the sensor size, if yes, scale to the sensor
             //
             if (((viewport.x2 - viewport.x1) > sensorParms.sensorWidth) || ((viewport.y2 - viewport.y1) > sensorParms.sensorHeight))
