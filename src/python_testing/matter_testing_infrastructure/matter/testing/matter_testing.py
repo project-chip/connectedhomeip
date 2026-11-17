@@ -557,9 +557,15 @@ class MatterBaseTest(base_test.BaseTestClass):
       advertises and whose records carry nothing to tell the TH's apart from the DUT's
       (e.g. TC-SC-4.6: both advertise '_matterd._udp', and commissioner records have no
       mandatory DUT-identifying key to filter on). Default is True.
+
+    * Set class attribute use_device_pics = False for tests that validate the PICS file
+      against the device (TC-IDM-10.4). check_pics then answers every code from the PICS
+      file; otherwise device-element codes come from the device itself, and such a test
+      would compare the device with itself. Default is True.
     """
     requires_dut: bool = True
     enable_server_interactions: bool = True
+    use_device_pics: bool = True
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -2323,8 +2329,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         (see pseudo_pics) and override the PICS file: cluster server (<cluster>.S),
         attribute (.S.Axxxx), feature (.S.Fxx), accepted/generated command
         (.S.Cxx.Rsp/.Tx), IDM.S and MCORE.ROLE.COMMISSIONEE. The PICS file is used
-        for every other code, and for every code when the DUT has no generated
-        PICS or MatterTestConfig.use_device_pics is False.
+        for every other code, and for every code when the DUT has no generated PICS, or when
+        MatterTestConfig.use_device_pics or the test class's use_device_pics is False.
 
         PICS-file codes are stored as an endpoint-keyed tree {endpoint: {code: bool}}.
         The key is looked up in the endpoint's slice, falling back to endpoint 0
@@ -2346,7 +2352,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         key = pics_key.strip()
         if endpoint is None:
             endpoint = self.get_endpoint()
-        file_value = self.check_pics_file(key, endpoint)
+        codes = self.matter_test_config.pics.get(endpoint, {})
+        if key in codes:
+            file_value = codes[key]
+        else:
+            file_value = self.matter_test_config.pics.get(0, {}).get(key, False)
 
         device_value = self._device_pics_value(key, endpoint)
         if device_value is None:
@@ -2354,23 +2364,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         if device_value != file_value:
             self._log_pics_override(key, endpoint, file_value, device_value)
         return device_value
-
-    def check_pics_file(self, pics_key: str, endpoint: int | None = None) -> bool:
-        """Check a PICS key in the PICS file only, never in the PICS generated from the DUT.
-
-        For tests that validate the PICS file against the device (TC-IDM-10.4): with
-        check_pics, device-element codes come from the device itself, so such a test
-        would compare the device with itself and could never fail.
-
-        Uses the same endpoint lookup as check_pics: the endpoint's slice, then endpoint 0.
-        """
-        key = pics_key.strip()
-        if endpoint is None:
-            endpoint = self.get_endpoint()
-        codes = self.matter_test_config.pics.get(endpoint, {})
-        if key in codes:
-            return codes[key]
-        return self.matter_test_config.pics.get(0, {}).get(key, False)
 
     # Device-element codes as generate_device_element_pics_from_device_wildcard
     # writes them, matched in upper case:
@@ -2390,7 +2383,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         PICS, and for codes the generator does not produce: non device-element codes,
         event codes, and codes for clusters missing from the data model.
         """
-        if not self.matter_test_config.use_device_pics:
+        if not (self.use_device_pics and self.matter_test_config.use_device_pics):
             return None
         device_pics = self.pseudo_pics.get(self.dut_node_id)
         if device_pics is None:
