@@ -4772,10 +4772,19 @@ static uint64_t MTRTestPhysFootprint(void)
     double peakRise = ((double) atomic_load(&peak) - (double) before) / 1048576.0;
     double largestNode = (double) largestNodeBytes / 1048576.0;
     XCTAssertEqual(nodesLoaded, nodeCount);
+#if __has_feature(address_sanitizer) || __has_feature(thread_sanitizer)
+    // Sanitizer quarantine and shadow memory keep the process footprint up after each node's data is freed,
+    // so the bound below does not apply.
+    (void) peakRise;
+    (void) clusterRows;
+    (void) storedBytes;
+    (void) largestNode;
+#else
     // The handler keeps nothing, so loading every node should cost about one node's data at a time, not all of them at once.
     XCTAssertLessThanOrEqual(peakRise, 2.0 * largestNode + 2.0,
         @"peak footprint rise %.2f MB over %lu stored cluster rows (%.2f MB stored, largest node %.2f MB)", peakRise,
         (unsigned long) clusterRows, (double) storedBytes / 1048576.0, largestNode);
+#endif
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
