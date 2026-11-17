@@ -35,6 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import logging
+
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
 
@@ -44,6 +46,8 @@ from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
@@ -104,18 +108,31 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
         # Allocate the stream
         videoStreamID = await self.video_stream_allocate_command(endpoint)
 
+        # DPTZSetViewport requires the viewport to have the aspect ratio of the stream's MaxResolution, the viewports below
+        # have the aspect ratio of the sensor.
+        sensordimensions = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.VideoSensorParams)
+        sensorwidth = sensordimensions.sensorWidth
+        sensorheight = sensordimensions.sensorHeight
+        allocatedstreams = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.AllocatedVideoStreams)
+        maxresolution = next(stream.maxResolution for stream in allocatedstreams if stream.videoStreamID == videoStreamID)
+        asserts.assert_equal(maxresolution.width * sensorheight, maxresolution.height * sensorwidth,
+                             "The allocated stream's MaxResolution does not have the aspect ratio of the sensor, "
+                             "deallocate the stream so it can be allocated with MaxResolution equal to the sensor size")
+
         self.step(4)
         # Send a dptzrelativemove for the correct stream but with an invalid ZoomDelta
         await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=101, expected_status=Status.ConstraintError)
 
-        self.step(5)
-        # Set a viewport
-        sensordimensions = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.VideoSensorParams)
-        sensorwidth = sensordimensions.sensorWidth
-        sensorheight = sensordimensions.sensorHeight
-
         viewportwidth = sensorwidth // 2
         viewportheight = sensorheight // 2
+        minviewport = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.MinViewportResolution)
+        if viewportwidth < minviewport.width or viewportheight < minviewport.height:
+            log.info("Half the sensor size is smaller than MinViewportResolution, skipping the viewport movement steps")
+            self.mark_all_remaining_steps_skipped(5)
+            return
+
+        self.step(5)
+        # Set a viewport
         x1 = sensorwidth - viewportwidth
         passingviewport = Globals.Structs.ViewportStruct(x1=x1, y1=0, x2=sensorwidth, y2=viewportheight)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, passingviewport)
@@ -220,7 +237,6 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
         await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=100)
 
         self.step(19)
-        minviewport = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.MinViewportResolution)
         dptz_streams_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.DPTZStreams)
         match_found = False
         for streams in dptz_streams_dut:
