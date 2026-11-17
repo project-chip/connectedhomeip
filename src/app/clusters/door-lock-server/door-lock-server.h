@@ -45,6 +45,7 @@
 
 using chip::Optional;
 using chip::app::Clusters::DoorLock::AlarmCodeEnum;
+using chip::app::Clusters::DoorLock::CredentialIndex;
 using chip::app::Clusters::DoorLock::CredentialRuleEnum;
 using chip::app::Clusters::DoorLock::CredentialTypeEnum;
 using chip::app::Clusters::DoorLock::DataOperationTypeEnum;
@@ -57,6 +58,8 @@ using chip::app::Clusters::DoorLock::LockOperationTypeEnum;
 using chip::app::Clusters::DoorLock::OperatingModeEnum;
 using chip::app::Clusters::DoorLock::OperationErrorEnum;
 using chip::app::Clusters::DoorLock::OperationSourceEnum;
+using chip::app::Clusters::DoorLock::ScheduleIndex;
+using chip::app::Clusters::DoorLock::UserIndex;
 using chip::app::Clusters::DoorLock::UserStatusEnum;
 using chip::app::Clusters::DoorLock::UserTypeEnum;
 using chip::app::DataModel::List;
