@@ -627,7 +627,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     if (!mTlsFiles.EnsureCreated(mCertBuffer))
     {
         ChipLogError(Camera, "TLS files are not available, skipping upload of %s", data.first.c_str());
-        goto cleanup;
+        goto deleteSourceFile;
     }
 
     curl_easy_setopt(curl, CURLOPT_CAINFO, mTlsFiles.RootPath().c_str());
@@ -669,6 +669,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
         ChipLogDetail(Camera, "CURL uploaded file  %s size: %zu", data.first.c_str(), static_cast<size_t>(size));
     }
 
+deleteSourceFile:
     // Delete file after upload, except for .mpd files which are kept (FFmpeg may still be writing).
     // .upload files (modified MPD snapshots) are always deleted after upload.
     if (!isMpdExtension || isUploadMpd)
