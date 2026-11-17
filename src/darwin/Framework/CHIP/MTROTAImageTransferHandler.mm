@@ -273,7 +273,6 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
                 TransferSession::TransferAcceptData acceptData;
                 acceptData.ControlMode = bdx::TransferControlFlags::kReceiverDrive;
                 acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
-                acceptData.StartOffset = mTransfer.GetStartOffset();
                 acceptData.Length = mTransfer.GetTransferLength();
 
                 CHIP_ERROR err = mTransfer.AcceptTransfer(acceptData);
