@@ -1,7 +1,7 @@
 """Retained regression tests for the explicitly opted-in one-shot read contract."""
 
-import asyncio
 import argparse
+import asyncio
 import json
 import runpy
 import sys
@@ -235,8 +235,8 @@ class TestReadOperation(unittest.IsolatedAsyncioTestCase):
 
 
 async def exercise_native_read_operation_contract(
-    controller: ChipDeviceController, node: int, pause_dut: Callable[[], None], resume_dut: Callable[[], None],
-    inject_report: Callable[[AsyncReadTransaction], None]) -> list[dict[str, Any]]:
+        controller: ChipDeviceController, node: int, pause_dut: Callable[[], None], resume_dut: Callable[[], None],
+        inject_report: Callable[[AsyncReadTransaction], None]) -> list[dict[str, Any]]:
     """Exercise the public read API using an owned software DUT and a native report probe."""
     from unittest.mock import patch
 
@@ -426,8 +426,8 @@ async def exercise_native_session_acquisition_contract(
                 patch.object(controller_module.DeviceProxyWrapper, '__del__', delete), \
                 patch('matter.clusters.Attribute.Read') as native_read:
             operation = asyncio.create_task(controller.ReadAttribute(node,
-                [(0, Clusters.BasicInformation.Attributes.Location)],
-                readOperation=ReadOperationOptions(None if cancellation else 50)))
+                                                                     [(0, Clusters.BasicInformation.Attributes.Location)],
+                                                                     readOperation=ReadOperationOptions(None if cancellation else 50)))
             try:
                 await started.wait()
                 await asyncio.wait((operation,), timeout=0.1)
@@ -454,22 +454,23 @@ async def exercise_native_session_acquisition_contract(
                 assert len(released) == 1
                 native_read.assert_not_called()
                 rows.append({'case': 'native-case-acquisition-cancellation' if cancellation else 'native-case-acquisition-deadline',
-                    'done': 1, 'future_cancelled': False, 'native_session_callbacks': 1,
-                    'operational_proxy_released': 1, 'no_read_started': True})
+                             'done': 1, 'future_cancelled': False, 'native_session_callbacks': 1,
+                             'operational_proxy_released': 1, 'no_read_started': True})
             finally:
                 resume_dut()
     return rows
 
 
 async def exercise_native_idm_restoration_contract(checker: Any, pause_dut: Callable[[], None],
-                                                 resume_dut: Callable[[], None]) -> list[dict[str, Any]]:
+                                                   resume_dut: Callable[[], None]) -> list[dict[str, Any]]:
     """Run the retained IDM algorithm through real reads/writes and cancellation during native readback."""
     from unittest.mock import patch
+
+    from support_modules.idm_support import WritableAttributeInfo, spec_enum_values
 
     import matter.clusters as Clusters
     from matter.clusters import Attribute
     from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters
-    from support_modules.idm_support import WritableAttributeInfo, spec_enum_values
 
     xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
     cluster = Clusters.OnOff
@@ -477,9 +478,9 @@ async def exercise_native_idm_restoration_contract(checker: Any, pause_dut: Call
     xml_cluster = xml_clusters[cluster.id]
     xml_attribute = xml_cluster.attributes[attribute.attribute_id]
     info = WritableAttributeInfo(endpoint_id=1, cluster_id=cluster.id, cluster_name=xml_cluster.name,
-        attribute_id=attribute.attribute_id, attribute_name=xml_attribute.name, attribute=attribute,
-        cluster_class=cluster, datatype=xml_attribute.datatype, constraints=xml_attribute.constraints,
-        enum_values=spec_enum_values(xml_cluster, xml_attribute.datatype))
+                                 attribute_id=attribute.attribute_id, attribute_name=xml_attribute.name, attribute=attribute,
+                                 cluster_class=cluster, datatype=xml_attribute.datatype, constraints=xml_attribute.constraints,
+                                 enum_values=spec_enum_values(xml_cluster, xml_attribute.datatype))
     original_readback = checker.read_single_attribute
     original_verified = checker.read_single_attribute_check_success
     original_write = checker.default_controller.WriteAttribute
@@ -573,21 +574,21 @@ async def exercise_native_idm_restoration_contract(checker: Any, pause_dut: Call
         restored = await original_verified(endpoint=1, cluster=cluster, attribute=attribute)
         assert restored == original
         results.append({'case': 'native-idm-verification-deadline' if stall_verification else 'native-idm-readback-cancellation',
-            'done': 1, 'future_cancelled': False, 'original_cancellation_identity': True,
-            'restoration_diagnostic_retained': stall_verification, 'baseline_verified': True,
-            'no_subsequent_violating_probe': True, 'native_read_transactions_settled_once': len(transactions)})
+                        'done': 1, 'future_cancelled': False, 'original_cancellation_identity': True,
+                        'restoration_diagnostic_retained': stall_verification, 'baseline_verified': True,
+                        'no_subsequent_violating_probe': True, 'native_read_transactions_settled_once': len(transactions)})
     return results
 
 
 async def run_native_read_regressions(checker: Any, pause_dut: Callable[[], None], resume_dut: Callable[[], None],
-                                     inject_report: Callable[[AsyncReadTransaction], None]) -> list[dict[str, Any]]:
+                                      inject_report: Callable[[AsyncReadTransaction], None]) -> list[dict[str, Any]]:
     """Run both retained native groups against an already commissioned, fixture-owned software DUT.
 
     The fixture supplies its checker/controller, owned-process pause/resume callbacks,
     and test-only native report injection. These are not ordinary mock unit tests.
     """
     rows = await exercise_native_read_operation_contract(checker.default_controller, checker.dut_node_id,
-                                                        pause_dut, resume_dut, inject_report)
+                                                         pause_dut, resume_dut, inject_report)
     rows.extend(await exercise_native_idm_restoration_contract(checker, pause_dut, resume_dut))
     return rows
 
@@ -610,7 +611,7 @@ def main() -> None:
     async def run() -> None:
         async with fixture_factory() as fixture:
             rows = await run_native_read_regressions(fixture.checker, fixture.pause_dut,
-                                                    fixture.resume_dut, fixture.inject_report)
+                                                     fixture.resume_dut, fixture.inject_report)
             print(json.dumps({'native_read_regressions': rows}), flush=True)
 
     asyncio.run(run())

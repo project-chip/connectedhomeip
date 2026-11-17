@@ -855,7 +855,7 @@ void TestReadInteraction::TestReadExchangeClosed()
             MockInteractionModelApp::OnError(error);
             lastError = error;
         }
-        uint32_t doneCount = 0;
+        uint32_t doneCount   = 0;
         CHIP_ERROR lastError = CHIP_NO_ERROR;
     } delegate;
     ReadClient client(InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate, ReadClient::InteractionType::Read);

@@ -994,8 +994,9 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         """A stalled opted-in read settles before restoration and prevents later probes."""
         import asyncio
 
-        from matter.clusters.Attribute import AsyncReadTransaction
         from support_modules.idm_support import ConstraintProbeExecutionError
+
+        from matter.clusters.Attribute import AsyncReadTransaction
 
         info = self._prepare_writable_attribute()
         self.checker.constraint_read_timeout_ms = 10
@@ -1057,8 +1058,9 @@ class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
         """Timeout conversion must preserve abort diagnostics and stop subsequent probes."""
         import asyncio
 
-        from matter.clusters.Attribute import AsyncReadTransaction
         from support_modules.idm_support import ConstraintProbeExecutionError
+
+        from matter.clusters.Attribute import AsyncReadTransaction
 
         info = self._prepare_writable_attribute()
         self.checker.constraint_restoration_timeout_ms = 10
