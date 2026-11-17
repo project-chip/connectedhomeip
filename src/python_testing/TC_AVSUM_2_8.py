@@ -57,17 +57,17 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
             TestStep(2, "Send DPTZRelativeMove with an unknown stream ID, but valid Zoom Delta verify NotFound response"),
             TestStep(3, "Send a VideoStreamAllocate command to AVStreamManagement to allocate a video stream ID. Record the returned ID"),
             TestStep(4, "Send DPTZRelativeMove with the allocated stream ID, invalid Zoom Delta. Verify ConstraintError response"),
-            TestStep(5, "Create a viewport with a valid AR. Set this via DPTZSetViewport"),
-            TestStep(6, "Setup deltaX and deltaY to move beyond the cartesian plan, send via DPTZRelativeMove. Verify the viewport clamps at the sensor bounds for negative and positive deltas"),
+            TestStep(5, "Create a viewport with a valid AR that is half the sensor dimensions. Set this via DPTZSetViewport"),
+            TestStep(6, "Setup deltaX and deltaY to move beyond the cartesian plane, send via DPTZRelativeMove. Verify the viewport clamps at the sensor bounds for negative and positive deltas, then move the viewport back to the top left"),
             TestStep(7, "Read the DPTZStreams attribute, store the viewport associated with the allocated stream id"),
             TestStep(8, "Setup deltaX to move the viewport to the right, send via DPTZRelativeMove. Verify success"),
             TestStep(9, "Read the DPTZStreams attribute, verify that the new viewport is the old viewport + deltaX"),
             TestStep(10, "Setup deltaY to move the viewport down, send via DPTZRelativeMove. Verify success"),
             TestStep(11, "Read the DPTZStreams attribute, verify that the new viewport is the old viewport + deltaY"),
-            TestStep(12, "Repeatedly invoke DPTZRelativeMove with a Zoom Delta of 100%, verify no error on max out of sensor size"),
-            TestStep(13, "Read the MinViewport from the device, create values of deltaX and deltaY that would result in a viewport smaller than the minimum"),
+            TestStep(12, "Repeatedly invoke DPTZRelativeMove with a Zoom Delta of -100%, verify no error on max out of sensor size and that the viewport reaches the sensor max"),
+            TestStep(13, "Create values of deltaX and deltaY that would move the viewport beyond the sensors cartesian plane"),
             TestStep(14, "Via DPTZRelativeMove send the created values of deltaX and deltaY. Verify success"),
-            TestStep(15, "Read the DPTZStreams attribute, verify that the new viewport is set to the dimensions of MinViewport"),
+            TestStep(15, "Read the DPTZStreams attribute, verify that the new viewport is set to the sensor max"),
         ]
 
     def pics_TC_AVSUM_2_8(self) -> list[str]:
@@ -105,12 +105,12 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
         await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=101, expected_status=Status.ConstraintError)
 
         self.step(5)
-        # Set a viewport
-        viewport = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.Viewport)
+        # Set a viewport with a valid AR that is smaller than the sensor, so the relative moves
+        # in the following steps have room to move within the sensor bounds
         sensordimensions = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.VideoSensorParams)
 
-        viewportwidth = viewport.x2 - viewport.x1
-        viewportheight = viewport.y2 - viewport.y1
+        viewportwidth = sensordimensions.sensorWidth // 2
+        viewportheight = sensordimensions.sensorHeight // 2
         x1 = sensordimensions.sensorWidth - viewportwidth
         passingviewport = Globals.Structs.ViewportStruct(x1=x1, y1=0, x2=sensordimensions.sensorWidth, y2=viewportheight)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, passingviewport)
@@ -168,7 +168,8 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
         myViewport.x2 = myViewport.x2+100
 
         self.step(9)
-        self.dptzstreamentryvalid(endpoint, videoStreamID, myViewport)
+        asserts.assert_true(await self.dptzstreamentryvalid(endpoint, videoStreamID, myViewport),
+                            "Viewport not moved to the right as requested by DPTZRelativeMove")
 
         self.step(10)
         # Send a dptzrelativemove based on the new viewport, move down
@@ -177,29 +178,37 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
         myViewport.y2 = myViewport.y2+100
 
         self.step(11)
-        self.dptzstreamentryvalid(endpoint, videoStreamID, myViewport)
+        asserts.assert_true(await self.dptzstreamentryvalid(endpoint, videoStreamID, myViewport),
+                            "Viewport not moved down as requested by DPTZRelativeMove")
 
         self.step(12)
         # Send a dptzrelativemove based on the new viewport, zoom to beyond sensor size
-        currentsize = (viewport.x2-viewport.x1) * (viewport.y2-viewport.y1)
+        currentsize = (myViewport.x2-myViewport.x1) * (myViewport.y2-myViewport.y1)
         sensorsize = sensordimensions.sensorWidth * sensordimensions.sensorHeight
         zoomedsize = currentsize * 2
 
-        await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=100)
+        await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=-100)
 
         while True:
             if zoomedsize < sensorsize:
                 zoomedsize = zoomedsize * 2
-                await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=100)
+                await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=-100)
             else:
                 break
+        
+        # Verify that the viewport is at sensor max
+        maxviewport = Globals.Structs.ViewportStruct(x1=0,
+                                                     y1=0,
+                                                     x2=sensordimensions.sensorWidth,
+                                                     y2=sensordimensions.sensorHeight)
 
+        asserts.assert_true(await self.dptzstreamentryvalid(endpoint, videoStreamID, maxviewport),
+                            "Viewport not at the sensor limits, as expected after Zoom max out")
+        
         self.step(13)
-        minviewport = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.MinViewportResolution)
-
-        # Current viewport is at the sensor max
-        deltaX = -(sensordimensions.sensorWidth - minviewport.width + 1)
-        deltaY = -(sensordimensions.sensorHeight - minviewport.height + 1)
+        # Current viewport is at the sensor max, any movement will leave the cartesian plane
+        deltaX = -(sensordimensions.sensorWidth // 2)
+        deltaY = -(sensordimensions.sensorHeight // 2)
 
         self.step(14)
         await self.send_dptz_relative_move_command(endpoint, videoStreamID, deltaX, deltaY)
@@ -212,10 +221,10 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
                 # verify the viewport dimensions
                 viewportwidth = streams.viewport.x2 - streams.viewport.x1
                 viewportheight = streams.viewport.y2 - streams.viewport.y1
-                asserts.assert_equal(viewportwidth, minviewport.width,
-                                     "Viewport not set to the same width as MinViewportResolution")
-                asserts.assert_equal(viewportheight, minviewport.height,
-                                     "Viewport not set to the same height as MinViewportResolution")
+                asserts.assert_equal(viewportwidth, sensordimensions.sensorWidth,
+                                     "Viewport not set to the same width as the sensor")
+                asserts.assert_equal(viewportheight, sensordimensions.sensorHeight,
+                                     "Viewport not set to the same height as the sensor")
                 match_found = True
                 break
 

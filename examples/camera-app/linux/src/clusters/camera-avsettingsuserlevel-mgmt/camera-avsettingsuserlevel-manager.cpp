@@ -229,7 +229,7 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                     uint16_t originalHeight    = viewport.y2 - viewport.y1;
                     uint32_t originalSize      = originalWidth * originalHeight;
                     uint32_t zoomDeltaInPixels = originalSize * static_cast<uint32_t>(abs(zoomDelta)) / 100;
-                    uint32_t newSize = (zoomDelta < 0) ? originalSize - zoomDeltaInPixels : originalSize + zoomDeltaInPixels;
+                    uint32_t newSize = (zoomDelta < 0) ? originalSize + zoomDeltaInPixels : originalSize - zoomDeltaInPixels;
 
                     // If the new viewport after zoom would be less than the min, scale it to the min
                     //
@@ -243,13 +243,26 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                     //
                     double viewportAR = floorf((static_cast<float>(originalWidth) / originalHeight) * 100) / 100;
 
-                    uint16_t newWidth  = static_cast<uint16_t>(round(sqrt(newSize * viewportAR)));
-                    uint16_t newHeight = static_cast<uint16_t>(newWidth / viewportAR);
+                    int newWidth  = static_cast<int>(round(sqrt(newSize * viewportAR)));
+                    int newHeight = static_cast<int>(newWidth / viewportAR);
 
-                    viewport.x1 = static_cast<uint16_t>(viewport.x1 - (newWidth - originalWidth));
-                    viewport.x2 = static_cast<uint16_t>(viewport.x2 + (newWidth - originalWidth));
-                    viewport.y1 = static_cast<uint16_t>(viewport.y1 - (newHeight - originalHeight));
-                    viewport.y2 = static_cast<uint16_t>(viewport.y2 + (newHeight - originalHeight));
+                    // Cap the zoomed viewport at the sensor dimensions
+                    if (newWidth > sensorParms.sensorWidth || newHeight > sensorParms.sensorHeight)
+                    {
+                        newWidth  = sensorParms.sensorWidth;
+                        newHeight = sensorParms.sensorHeight;
+                    }
+
+                    // Center the zoomed viewport on the old viewport's center, clamped to the
+                    // sensor bounds so a zoom near an edge cannot move it outside the sensor.
+                    int centerX = (static_cast<int>(viewport.x1) + static_cast<int>(viewport.x2)) / 2;
+                    int centerY = (static_cast<int>(viewport.y1) + static_cast<int>(viewport.y2)) / 2;
+                    int newX1   = std::clamp(centerX - newWidth / 2, 0, sensorParms.sensorWidth - newWidth);
+                    int newY1   = std::clamp(centerY - newHeight / 2, 0, sensorParms.sensorHeight - newHeight);
+                    viewport.x1 = static_cast<uint16_t>(newX1);
+                    viewport.y1 = static_cast<uint16_t>(newY1);
+                    viewport.x2 = static_cast<uint16_t>(newX1 + newWidth);
+                    viewport.y2 = static_cast<uint16_t>(newY1 + newHeight);
                 }
             }
             // Is the requested viewport smaller than the minimum, if yes scale to the minimum size, starting at x1, y1.
@@ -266,8 +279,8 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
             {
                 viewport.x1 = 0;
                 viewport.y1 = 0;
-                viewport.x2 = sensorParms.sensorWidth - 1;
-                viewport.y2 = sensorParms.sensorHeight - 1;
+                viewport.x2 = sensorParms.sensorWidth;
+                viewport.y2 = sensorParms.sensorHeight;
             }
             mCameraDeviceHAL->GetCameraHALInterface().SetViewport(stream, viewport);
             aViewport = viewport;
