@@ -43,15 +43,14 @@ const EndpointComposition::SemanticTag kFourParallelPanelsTag[] = {
       .tag         = 2 },
 };
 
-const PanelConfig kParallelPanels[] = {
-    { .tags = Span(SolarPowerTags::kParallelPanel1Tag), .role = Role::kBattery },
-    { .tags = Span(SolarPowerTags::kParallelPanel2Tag), .role = Role::kBattery },
-    { .tags = Span(SolarPowerTags::kParallelPanel3Tag), .role = Role::kBattery },
-    { .tags = Span(SolarPowerTags::kParallelPanel4Tag), .role = Role::kBattery },
-};
-
 SimulatedSolarPower::Config FourParallelPanelsConfig()
 {
+    static const PanelConfig kParallelPanels[] = {
+        { .tags = SolarPowerTags::ParallelPanel1Tag(), .role = Role::kBattery },
+        { .tags = SolarPowerTags::ParallelPanel2Tag(), .role = Role::kBattery },
+        { .tags = SolarPowerTags::ParallelPanel3Tag(), .role = Role::kBattery },
+        { .tags = SolarPowerTags::ParallelPanel4Tag(), .role = Role::kBattery },
+    };
     return {
         .panels = Span(kParallelPanels),
         .tags   = Span(kFourParallelPanelsTag),
@@ -64,13 +63,12 @@ const EndpointComposition::SemanticTag kTwoStringsTag[] = {
       .tag         = 3 },
 };
 
-const PanelConfig kStrings[] = {
-    { .tags = Span(SolarPowerTags::kString1Tag), .role = Role::kBattery },
-    { .tags = Span(SolarPowerTags::kString2Tag), .role = Role::kBattery },
-};
-
 SimulatedSolarPower::Config TwoStringsConfig()
 {
+    static const PanelConfig kStrings[] = {
+        { .tags = SolarPowerTags::String1Tag(), .role = Role::kBattery },
+        { .tags = SolarPowerTags::String2Tag(), .role = Role::kBattery },
+    };
     return {
         .panels = Span(kStrings),
         .tags   = Span(kTwoStringsTag),
@@ -83,15 +81,14 @@ const EndpointComposition::SemanticTag kTwoStringsFourPanelsTag[] = {
       .tag         = 4 },
 };
 
-const PanelConfig kStringPanels[] = {
-    { .tags = Span(SolarPowerTags::kString1Panel1Tags), .role = Role::kBattery },
-    { .tags = Span(SolarPowerTags::kString1Panel2Tags), .role = Role::kBattery },
-    { .tags = Span(SolarPowerTags::kString2Panel1Tags), .role = Role::kBattery },
-    { .tags = Span(SolarPowerTags::kString2Panel2Tags), .role = Role::kBattery },
-};
-
 SimulatedSolarPower::Config TwoStringsFourPanelsConfig()
 {
+    static const PanelConfig kStringPanels[] = {
+        { .tags = SolarPowerTags::String1Panel1Tags(), .role = Role::kBattery },
+        { .tags = SolarPowerTags::String1Panel2Tags(), .role = Role::kBattery },
+        { .tags = SolarPowerTags::String2Panel1Tags(), .role = Role::kBattery },
+        { .tags = SolarPowerTags::String2Panel2Tags(), .role = Role::kBattery },
+    };
     return {
         .panels = Span(kStringPanels),
         .tags   = Span(kTwoStringsFourPanelsTag),
@@ -104,14 +101,13 @@ const EndpointComposition::SemanticTag kThreePhaseTag[] = {
       .tag         = 5 },
 };
 
-const PanelConfig kPhaseSensors[] = {
-    { .tags = Span(SolarPowerTags::kPhaseATag), .role = Role::kGrid },
-    { .tags = Span(SolarPowerTags::kPhaseBTag), .role = Role::kGrid },
-    { .tags = Span(SolarPowerTags::kPhaseCTag), .role = Role::kGrid },
-};
-
 SimulatedSolarPower::Config ThreePhaseConfig()
 {
+    static const PanelConfig kPhaseSensors[] = {
+        { .tags = SolarPowerTags::PhaseATag(), .role = Role::kGrid },
+        { .tags = SolarPowerTags::PhaseBTag(), .role = Role::kGrid },
+        { .tags = SolarPowerTags::PhaseCTag(), .role = Role::kGrid },
+    };
     return {
         .outputSensorRole = Role::kAcPolyphaseOutput,
         .panels           = Span(kPhaseSensors),

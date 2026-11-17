@@ -97,7 +97,7 @@ CHIP_ERROR SimulatedSolarPower::RegisterAdditionalComposedEndpoints(EndpointIdAl
     ReturnErrorOnFailure(mEnergyManagement.Register(allocator.Allocate(), provider, EndpointComposition::WithParent(parent)));
     ReturnErrorOnFailure(mInverterTemperatureSensor.Register(
         allocator.Allocate(), provider,
-        EndpointComposition(parent, DataModel::EndpointCompositionPattern::kTree, Span(SolarPowerTags::kInverterTemperatureTag))));
+        EndpointComposition(parent, DataModel::EndpointCompositionPattern::kTree, SolarPowerTags::InverterTemperatureTag())));
     for (size_t index = 0; index < mPanelCount; ++index)
     {
         ReturnErrorOnFailure(mPanels[index]->Register(allocator.Allocate(), provider, EndpointComposition::WithParent(parent)));

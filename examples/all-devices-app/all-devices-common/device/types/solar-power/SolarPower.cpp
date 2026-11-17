@@ -24,7 +24,7 @@ namespace chip::app {
 SolarPower::SolarPower(const Context & context, Parameters parameters) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSolarPower, 1)),
     mOutputElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
-                            context.deviceInfoProvider, Span(SolarPowerTags::kGridConnectionTag), parameters.outputSensorRole),
+                            context.deviceInfoProvider, SolarPowerTags::GridConnectionTag(), parameters.outputSensorRole),
     mGridPowerSource("Solar power grid connection"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc, 0)
 {}
 
@@ -48,7 +48,7 @@ CHIP_ERROR SolarPower::Register(EndpointIdAllocator & allocator, CodeDrivenDataM
 
     ReturnErrorOnFailure(mGridPowerSource.Register(
         allocator.Allocate(), provider,
-        EndpointComposition(mEndpointId, DataModel::EndpointCompositionPattern::kTree, Span(SolarPowerTags::kGridConnectionTag))));
+        EndpointComposition(mEndpointId, DataModel::EndpointCompositionPattern::kTree, SolarPowerTags::GridConnectionTag())));
     ReturnErrorOnFailure(
         mOutputElectricalSensor.Register(allocator.Allocate(), provider, EndpointComposition::WithParent(mEndpointId)));
 

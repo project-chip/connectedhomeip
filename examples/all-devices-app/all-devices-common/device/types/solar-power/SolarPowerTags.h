@@ -17,23 +17,24 @@
 #pragma once
 
 #include <device/api/Interface.h>
+#include <lib/support/Span.h>
 
 namespace chip::app::SolarPowerTags {
 
-extern const EndpointComposition::SemanticTag kGridConnectionTag[1];
-extern const EndpointComposition::SemanticTag kInverterTemperatureTag[1];
-extern const EndpointComposition::SemanticTag kParallelPanel1Tag[1];
-extern const EndpointComposition::SemanticTag kParallelPanel2Tag[1];
-extern const EndpointComposition::SemanticTag kParallelPanel3Tag[1];
-extern const EndpointComposition::SemanticTag kParallelPanel4Tag[1];
-extern const EndpointComposition::SemanticTag kString1Tag[1];
-extern const EndpointComposition::SemanticTag kString2Tag[1];
-extern const EndpointComposition::SemanticTag kString1Panel1Tags[2];
-extern const EndpointComposition::SemanticTag kString1Panel2Tags[2];
-extern const EndpointComposition::SemanticTag kString2Panel1Tags[2];
-extern const EndpointComposition::SemanticTag kString2Panel2Tags[2];
-extern const EndpointComposition::SemanticTag kPhaseATag[1];
-extern const EndpointComposition::SemanticTag kPhaseBTag[1];
-extern const EndpointComposition::SemanticTag kPhaseCTag[1];
+Span<const EndpointComposition::SemanticTag> GridConnectionTag();
+Span<const EndpointComposition::SemanticTag> InverterTemperatureTag();
+Span<const EndpointComposition::SemanticTag> ParallelPanel1Tag();
+Span<const EndpointComposition::SemanticTag> ParallelPanel2Tag();
+Span<const EndpointComposition::SemanticTag> ParallelPanel3Tag();
+Span<const EndpointComposition::SemanticTag> ParallelPanel4Tag();
+Span<const EndpointComposition::SemanticTag> String1Tag();
+Span<const EndpointComposition::SemanticTag> String2Tag();
+Span<const EndpointComposition::SemanticTag> String1Panel1Tags();
+Span<const EndpointComposition::SemanticTag> String1Panel2Tags();
+Span<const EndpointComposition::SemanticTag> String2Panel1Tags();
+Span<const EndpointComposition::SemanticTag> String2Panel2Tags();
+Span<const EndpointComposition::SemanticTag> PhaseATag();
+Span<const EndpointComposition::SemanticTag> PhaseBTag();
+Span<const EndpointComposition::SemanticTag> PhaseCTag();
 
 } // namespace chip::app::SolarPowerTags
