@@ -239,8 +239,9 @@ class TC_COMPRO_2_2(MatterTestCommissionedDevice, COMPROBaseTest):
                                  f"ScanResultStruct.Transport 0x{result.transport:02x} must have exactly "
                                  "one bit set (single transport)")
             if has_wi and (result.transport & wifipaf_bit):
-                asserts.assert_not_equal(result.wiFiBand, NullValue,
-                                         "ScanResultStruct.WiFiBand must be populated for PAFTP results when WI is supported")
+                asserts.assert_true(
+                    result.wiFiBand not in (None, NullValue, 0),
+                    "ScanResultStruct.WiFiBand must be populated for PAFTP results when WI is supported")
         self.assert_entries_unique_and_in_range(response.proxyScanResult, "Step 8 ProxyScanResult")
 
         # Step 9 — defined but unsupported transport → INVALID_TRANSPORT_TYPE
@@ -368,6 +369,9 @@ class TC_COMPRO_2_2(MatterTestCommissionedDevice, COMPROBaseTest):
                     "simultaneously (e.g. BLE and WiFiPAF), then press Enter to continue."))
             response = await self._send_scan_request(valid_transports, valid_bands if has_wi else None,
                                                      timeout_sec=response_deadline)
+            asserts.assert_equal(response.numberOfResults, len(response.proxyScanResult),
+                                 "NumberOfResults must equal the number of ProxyScanResult entries")
+            self.assert_entries_unique_and_in_range(response.proxyScanResult, "Step 13 ProxyScanResult")
             ed_entries, other_results = self.split_ed_entries(response.proxyScanResult)
             logger.info("Step 13: %d ProxyScanResult entries for the ED: %s; other devices listed: %s",
                         len(ed_entries), self.describe_entries(ed_entries),

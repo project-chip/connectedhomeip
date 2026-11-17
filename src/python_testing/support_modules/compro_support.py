@@ -876,7 +876,8 @@ class COMPROBaseTest(MatterBaseTest):
     async def read_cached_results(self, attempts: int = 3) -> tuple[int, list]:
         """Read NumCachedResults and CachedResults in one interaction, retrying while they disagree.
 
-        Other devices' entries can be added or expire between the two values.
+        Other devices' entries can be added or expire between the two values.  Fails unless the
+        two values agree and CachedResults is null (not an empty list) when NumCachedResults is 0.
         """
         cp = self.cp
         paths = [(self.cp_endpoint, cp.Attributes.NumCachedResults),
@@ -896,6 +897,8 @@ class COMPROBaseTest(MatterBaseTest):
             await asyncio.sleep(1)
         asserts.assert_equal(num_cached, len(entries),
                              "NumCachedResults must equal the number of CachedResults entries")
+        if num_cached == 0:
+            asserts.assert_equal(cached, NullValue, "CachedResults must be null when NumCachedResults is 0")
         return num_cached, entries
 
     # ------------------------------------------------------------------

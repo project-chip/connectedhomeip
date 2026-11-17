@@ -146,7 +146,7 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
                      "DUT responds with SUCCESS"),
             TestStep(7, "TH monitors for 40 s while ED is NOT commissionable",
                      "No CachedResults entry has the ED's Discriminator; NumCachedResults equals "
-                     "the number of CachedResults entries"),
+                     "the number of CachedResults entries; CachedResults is null when NumCachedResults is 0"),
             TestStep(8, "Ensure ED IS commissionable"),
             TestStep(9, "TH monitors until CachedResults has the ED's entry (up to 40 s)",
                      "A subscription report carries the ED's entry and the reported NumCachedResults "
@@ -157,7 +157,7 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
             TestStep(11, "Ensure ED is NOT commissionable"),
             TestStep(12, "TH monitors until the ED's entry expires (up to cache_timeout + 10 s)",
                      "A subscription report shows the ED's entry removed from CachedResults and the "
-                     "reported NumCachedResults matches it"),
+                     "reported NumCachedResults matches it; CachedResults is null when NumCachedResults is 0"),
             TestStep(13, "Ensure ED IS commissionable again"),
             TestStep(14, "TH monitors until CachedResults has the ED's entry again (up to 40 s)",
                      "A subscription report carries the ED's entry again and the reported "
@@ -374,8 +374,9 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
                                  f"CachedResult entry Transport 0x{result.transport:02x} must have exactly "
                                  "one bit set (single transport)")
             if has_wi and (result.transport & wifipaf_bit):
-                asserts.assert_not_equal(result.wiFiBand, NullValue,
-                                         "CachedResult entry WiFiBand must be populated for PAFTP results when WI is supported")
+                asserts.assert_true(
+                    result.wiFiBand not in (None, NullValue, 0),
+                    "CachedResult entry WiFiBand must be populated for PAFTP results when WI is supported")
         self.assert_entries_unique_and_in_range(cached_results, "Step 9 CachedResults")
 
         # Step 10 — read CacheTimeout
@@ -423,6 +424,7 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
         logger.info("Waiting up to 40 s for the ED's entry to re-appear...")
         reported = _wait_for_ed_entry(True, 40, "step 14")
         num_cached, cached_results = await self.read_cached_results()
+        self.assert_entries_unique_and_in_range(cached_results, "Step 14 CachedResults")
         ed_results, other_results = self.split_ed_entries(cached_results)
         logger.info("Step 14: NumCachedResults=%d; other devices cached: %s",
                     num_cached, self.describe_entries(other_results))
