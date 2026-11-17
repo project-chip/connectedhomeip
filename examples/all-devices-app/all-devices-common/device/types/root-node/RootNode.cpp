@@ -66,15 +66,15 @@ CHIP_ERROR RootNode::RegisterRootClusters(EndpointId endpointId, CodeDrivenDataM
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(
-        GeneralCommissioningCluster::Context{
+        GeneralCommissioningCluster::Context {
             .commissioningWindowManager = mContext.commissioningWindowManager, //
-            .configurationManager       = mContext.configurationManager,       //
-            .deviceControlServer        = mContext.deviceControlServer,        //
-            .fabricTable                = mContext.fabricTable,                //
-            .failSafeContext            = mContext.failSafeContext,            //
-            .platformManager            = mContext.platformManager,            //
+                .configurationManager   = mContext.configurationManager,       //
+                .deviceControlServer    = mContext.deviceControlServer,        //
+                .fabricTable            = mContext.fabricTable,                //
+                .failSafeContext        = mContext.failSafeContext,            //
+                .platformManager        = mContext.platformManager,            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         GeneralCommissioningCluster::OptionalAttributes());

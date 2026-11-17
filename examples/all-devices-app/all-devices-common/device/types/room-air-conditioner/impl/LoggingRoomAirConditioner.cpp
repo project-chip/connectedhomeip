@@ -28,8 +28,8 @@ using Protocols::InteractionModel::Status;
 
 LoggingRoomAirConditioner::LoggingRoomAirConditioner(TimerDelegate & timerDelegate, FabricTable & fabricTable,
                                                      std::optional<EndpointComposition::SemanticTag> tag) :
-    RoomAirConditioner(RoomAirConditioner::Context{ timerDelegate, *this, *this, *this, *this }), mTimerDelegate(timerDelegate),
-    mFabricTable(fabricTable), mTag(tag)
+    RoomAirConditioner(RoomAirConditioner::Context{ timerDelegate, *this, *this, *this, *this }),
+    mTimerDelegate(timerDelegate), mFabricTable(fabricTable), mTag(tag)
 {}
 
 LoggingRoomAirConditioner::~LoggingRoomAirConditioner()

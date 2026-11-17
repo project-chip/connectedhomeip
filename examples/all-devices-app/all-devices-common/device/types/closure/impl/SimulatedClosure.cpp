@@ -49,8 +49,9 @@ namespace app {
 SimulatedClosure::SimulatedClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Config config,
                                    Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
                                    TestEventTriggerDelegate & testEventTriggerDelegate) :
-    Closure(config.closure, Tdelegate, Idelegate, *this), OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }),
-    mPanelList(std::move(config.panels)), mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
+    Closure(config.closure, Tdelegate, Idelegate, *this),
+    OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }), mPanelList(std::move(config.panels)),
+    mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
 {}
 
 SimulatedClosure::~SimulatedClosure()
@@ -101,8 +102,8 @@ SimulatedClosure::HandleMoveToCommand(const Optional<Clusters::ClosureControl::T
         ? MakeOptional(DataModel::MakeNullable(MapToCurrentPosition(position.Value())))
         : fallback.position;
     auto newLatch    = (latch.HasValue() && featureMap.Has(Clusters::ClosureControl::Feature::kMotionLatching))
-        ? MakeOptional(DataModel::MakeNullable(latch.Value()))
-        : fallback.latch;
+           ? MakeOptional(DataModel::MakeNullable(latch.Value()))
+           : fallback.latch;
     auto newSpeed    = (speed.HasValue() && featureMap.Has(Clusters::ClosureControl::Feature::kSpeed)) ? MakeOptional(speed.Value())
                                                                                                        : fallback.speed;
 

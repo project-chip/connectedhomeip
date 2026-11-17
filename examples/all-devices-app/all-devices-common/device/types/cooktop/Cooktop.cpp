@@ -25,8 +25,8 @@ namespace chip::app {
 
 CookSurfacePart::CookSurfacePart(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & onOffDelegate,
                                  Clusters::IdentifyDelegate & identifyDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCookSurface, 1)), mTimerDelegate(timerDelegate),
-    mOnOffDelegate(onOffDelegate), mIdentifyDelegate(identifyDelegate)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCookSurface, 1)),
+    mTimerDelegate(timerDelegate), mOnOffDelegate(onOffDelegate), mIdentifyDelegate(identifyDelegate)
 {}
 
 CHIP_ERROR CookSurfacePart::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
