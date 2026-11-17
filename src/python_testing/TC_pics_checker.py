@@ -46,11 +46,13 @@ class TC_PICS_Checker(BasicCompositionTests):
         # inputs that carry no endpoint labels (a CI-format text file, or a
         # directory of XMLs for a single endpoint) are attributed to the endpoint
         # under test when they are read, so they are reachable here too.
-        if required and not self.check_pics(pics, endpoint=self.endpoint_id):
+        # check_pics_file, not check_pics: this test validates the PICS file, and check_pics
+        # would answer device-element codes from the device itself.
+        if required and not self.check_pics_file(pics, endpoint=self.endpoint_id):
             self.record_error("PICS check", location=location,
                               problem=f"An element found on the device, but the corresponding PICS {pics} was not found in pics list")
             self.success = False
-        elif not required and self.check_pics(pics, endpoint=self.endpoint_id):
+        elif not required and self.check_pics_file(pics, endpoint=self.endpoint_id):
             self.record_error("PICS check", location=location, problem=f"PICS {pics} found in PICS list, but not on device")
             self.success = False
 
@@ -222,7 +224,7 @@ class TC_PICS_Checker(BasicCompositionTests):
                         [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
         # TODO: Getting this from an in-code reference would be good. See https://github.com/project-chip/matter-test-scripts/issues/689
         root_node_device_type_id = 0x0016
-        if root_node_device_type_id in device_types and not self.check_pics('MCORE.ROLE.COMMISSIONEE'):
+        if root_node_device_type_id in device_types and not self.check_pics_file('MCORE.ROLE.COMMISSIONEE'):
             self.record_error("PICS check", location=UnknownProblemLocation(),
                               problem="Root node found on endpoint, but MCORE.ROLE.COMMISSIONEE pics is not marked")
             self.success = False
@@ -236,7 +238,8 @@ class TC_PICS_Checker(BasicCompositionTests):
             # The only way a commissionable device can opt not to have these is if it is an in-field upgrade,
             # in which case, there is no packaged onboarding code of any type. Subsequent codes generated from
             # opening a commissioning window are tested as a part of the administrator commissioning test.
-            if (self.check_pics('MCORE.DD.QR') or self.check_pics('MCORE.DD.NFC')) and not self.check_pics('MCORE.DD.MANUAL_PC'):
+            has_onboarding_payload = self.check_pics_file('MCORE.DD.QR') or self.check_pics_file('MCORE.DD.NFC')
+            if has_onboarding_payload and not self.check_pics_file('MCORE.DD.MANUAL_PC'):
                 self.record_error("PICS check", location=UnknownProblemLocation(),
                                   problem="Devices that support onboarding payloads must support a manual code")
                 self.success = False

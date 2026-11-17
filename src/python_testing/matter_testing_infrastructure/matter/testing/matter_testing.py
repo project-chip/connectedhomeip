@@ -2346,11 +2346,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         key = pics_key.strip()
         if endpoint is None:
             endpoint = self.get_endpoint()
-        codes = self.matter_test_config.pics.get(endpoint, {})
-        if key in codes:
-            file_value = codes[key]
-        else:
-            file_value = self.matter_test_config.pics.get(0, {}).get(key, False)
+        file_value = self.check_pics_file(key, endpoint)
 
         device_value = self._device_pics_value(key, endpoint)
         if device_value is None:
@@ -2358,6 +2354,23 @@ class MatterBaseTest(base_test.BaseTestClass):
         if device_value != file_value:
             self._log_pics_override(key, endpoint, file_value, device_value)
         return device_value
+
+    def check_pics_file(self, pics_key: str, endpoint: int | None = None) -> bool:
+        """Check a PICS key in the PICS file only, never in the PICS generated from the DUT.
+
+        For tests that validate the PICS file against the device (TC-IDM-10.4): with
+        check_pics, device-element codes come from the device itself, so such a test
+        would compare the device with itself and could never fail.
+
+        Uses the same endpoint lookup as check_pics: the endpoint's slice, then endpoint 0.
+        """
+        key = pics_key.strip()
+        if endpoint is None:
+            endpoint = self.get_endpoint()
+        codes = self.matter_test_config.pics.get(endpoint, {})
+        if key in codes:
+            return codes[key]
+        return self.matter_test_config.pics.get(0, {}).get(key, False)
 
     # Device-element codes as generate_device_element_pics_from_device_wildcard
     # writes them, matched in upper case:
