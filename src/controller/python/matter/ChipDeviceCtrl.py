@@ -81,6 +81,7 @@ SubscriptionTargetList: typing.TypeAlias = list[tuple[int, ClusterObjects.Cluste
 
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
 CHIP_ERROR_TIMEOUT: int = 50
+CHIP_ERROR_INCORRECT_STATE: int = 3
 
 _RCACCallbackType = CFUNCTYPE(None, POINTER(c_uint8), c_size_t)
 

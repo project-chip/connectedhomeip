@@ -18,9 +18,10 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     factory-reset: true
 #     quiet: true
+#     tags: [ble-thread]
 #     app-ready-pattern: "APP STATUS: Starting event loop"
 #     app-args: --discriminator 3840 --KVS /tmp/cnet_4_16_kvs --ble-controller 0 --thread-arg=--log-file=/tmp/chip_ot_node2.log --thread-arg=2
 #     script-args: >

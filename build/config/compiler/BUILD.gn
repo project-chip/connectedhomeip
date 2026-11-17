@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/pigweed.gni")
 import("//build_overrides/pigweed_environment.gni")
+import("$dir_pw_toolchain/toolchain_args.gni")
 import("${build_root}/chip/java/config.gni")
 import("${build_root}/config/compiler/compiler.gni")
 import("${build_root}/config/sysroot.gni")
@@ -61,6 +62,14 @@ declare_args() {
 
   # Disable this to allow for overriding built-in defines, such as __FILE__.
   warn_builtin_macro_redefined = true
+
+  # Record the out dir in debug info as "." instead of its absolute path.
+  # Debuggers then resolve source paths relative to their working directory,
+  # so they need to be started from the out dir (or given a source map).
+  #
+  # Defaults to true when using a compiler launcher like ccache, which can
+  # return an object that was compiled in a different out dir or checkout.
+  strip_absolute_paths_from_debug_symbols = pw_command_launcher != ""
 }
 
 if (current_cpu == "arm" || current_cpu == "arm64") {
@@ -699,6 +708,9 @@ config("stack_protector_default") {
 
 config("prefix_mappings_default") {
   cflags = []
+  if (strip_absolute_paths_from_debug_symbols) {
+    cflags += [ "-fdebug-prefix-map=" + rebase_path(root_build_dir) + "=." ]
+  }
   foreach(prefix_mapping, prefix_mappings) {
     cflags += [ "-fdebug-prefix-map=${prefix_mapping}" ]
   }

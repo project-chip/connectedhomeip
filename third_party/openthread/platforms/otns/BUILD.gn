@@ -17,6 +17,11 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
 
 static_library("otns") {
+  # The Matter app owns process-wide state (signal handlers and syslog), so
+  # otSysInit() must not install its own SIGTERM/SIGHUP handlers or call
+  # openlog()/setlogmask().
+  defines = [ "OPENTHREAD_RFSIM_CONFIG_LIBRARY_MODE_ENABLE=1" ]
+
   include_dirs = [ "${chip_root}/third_party/ot-ns/repo/ot-rfsim/src" ]
 
   public = [

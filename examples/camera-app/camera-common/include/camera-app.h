@@ -54,7 +54,6 @@ private:
     // SDK cluster servers
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster>
         mWebRTCTransportProviderServer;
-    std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::MigrateCameraAvSettingsUserLevelManagementCluster>
         mAVSettingsUserLevelMgmtServer;
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvStreamManagement::MigrationCameraAVStreamManagementCluster>

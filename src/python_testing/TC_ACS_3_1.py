@@ -154,6 +154,9 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
                 "AmbientContextType": [{"TypeId": 73, "TagId": 3}, {"TypeId": 74, "TagId": 4}, {"TypeId": 75, "TagId": 3}]
             })
             await asyncio.sleep(ci_wait_time)
+        else:
+            self.wait_for_user_input(
+                prompt_msg="Input DUT supporting AmbientContextTypeSupported attribute values (ex. SetAmbientContextSupport function execution), and Press ENTER after done.")
 
         # check the SimultaneousDetectLimit
         simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)

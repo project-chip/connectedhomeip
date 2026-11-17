@@ -40,13 +40,13 @@ int main(void)
     char ** argv;
     nsi_get_test_cmd_line_args(&argc, &argv);
 
-    std::vector<std::string_view> suites_to_run;
+    std::vector<pw::unit_test::TestCaseFilter> test_filters;
     for (int i = 0; i < argc; ++i)
     {
-        suites_to_run.push_back(argv[i]);
+        test_filters.push_back({ argv[i], "*" });
     }
 
-    pw::unit_test::SetTestSuitesToRun(suites_to_run);
+    pw::unit_test::SetTestFilters(test_filters);
 
     LOG_INF("Starting CHIP tests!");
     int status = 0;

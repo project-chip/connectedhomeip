@@ -867,6 +867,10 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
 	default 8192 if SOC_SERIES_MCXW7XX # 8 kB
 	default 28672 # 28 kB
 
+# Enable heap watermarks support for SoftwareDiagnostics cluster
+config CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT
+	default y if CHIP_MALLOC_SYS_HEAP
+
 config SYSTEM_WORKQUEUE_STACK_SIZE
 	default 1536 if SOC_MCXW70AC
 	default 4096 if OPENTHREAD_BORDER_ROUTER

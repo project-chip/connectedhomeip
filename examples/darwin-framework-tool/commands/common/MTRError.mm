@@ -31,7 +31,7 @@ CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
         return CHIP_NO_ERROR;
     }
 
-    if (error.domain == MTRInteractionErrorDomain) {
+    if ([error.domain isEqualToString:MTRInteractionErrorDomain]) {
         chip::app::StatusIB status(static_cast<chip::Protocols::InteractionModel::Status>(error.code));
         if (error.userInfo != nil && error.userInfo[@"clusterStatus"] != nil) {
             status.mClusterStatus.emplace([error.userInfo[@"clusterStatus"] unsignedCharValue]);
@@ -39,7 +39,7 @@ CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
         return status.ToChipError();
     }
 
-    if (error.domain != MTRErrorDomain) {
+    if (![error.domain isEqualToString:MTRErrorDomain]) {
         return CHIP_ERROR_INTERNAL;
     }
 

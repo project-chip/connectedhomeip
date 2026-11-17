@@ -43,6 +43,7 @@ source_set("device-instances") {
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/binding-handler",
+    "${chip_root}/examples/all-devices-app/all-devices-common/bridged-device-manager/oob-accessors",
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier",
@@ -106,6 +107,7 @@ source_set("device-instances") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/room-air-conditioner:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:posix",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:thread",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/smoke-co-alarm",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor",

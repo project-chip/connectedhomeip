@@ -49,6 +49,12 @@ IdentifyCluster::IdentifyCluster(const Config & config) :
     mTimerDelegate(config.timerDelegate)
 {}
 
+void IdentifyCluster::Shutdown(ClusterShutdownType type)
+{
+    StopIdentifying();
+    DefaultServerCluster::Shutdown(type);
+}
+
 DataModel::ActionReturnStatus IdentifyCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                              AttributeValueEncoder & encoder)
 {

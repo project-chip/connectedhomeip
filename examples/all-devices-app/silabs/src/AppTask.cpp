@@ -23,6 +23,7 @@
 #include "AppKeys.h"
 #include "SilabsIdentifyDelegate.h"
 
+#include "delegates/SilabsColorLight.h"
 #include "delegates/SilabsDimmableLight.h"
 #include "delegates/SilabsHumiditySensor.h"
 #include "delegates/SilabsTemperatureSensor.h"
@@ -185,7 +186,7 @@ CHIP_ERROR AppTask::AppInit()
     sl_status_t si70xxStatus = Si70xxSensor::Init();
     if (si70xxStatus != SL_STATUS_OK)
     {
-        ChipLogError(AppServer, "Si70xxSensor::Init failed: %x", si70xxStatus);
+        ChipLogError(AppServer, "Si70xxSensor::Init failed: %lx", si70xxStatus);
     }
 #endif
     return CHIP_NO_ERROR;
@@ -404,6 +405,24 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
                 chip::app::DimmableLoad::Config{
                     .levelControl = chip::app::DimmableLoad::LevelControlConfig::CiPicsDefaults(),
                 });
+        });
+    }
+
+    if constexpr (ALL_DEVICES_ENABLE_EXTENDED_COLOR_LIGHT)
+    {
+        deviceFactory.RegisterCreator("extended-color-light", [groupDataProvider]() {
+            return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsColorLight>(
+                chip::app::SilabsColorLight::Context{
+                    .groupDataProvider = *groupDataProvider,
+                    .fabricTable       = chip::Server::GetInstance().GetFabricTable(),
+                    .timerDelegate     = sTimerDelegate,
+                },
+                sIdentifyDelegate
+#if SL_MATTER_DISPLAY_ENABLED
+                ,
+                BaseApplication::GetLCD()
+#endif
+            );
         });
     }
 

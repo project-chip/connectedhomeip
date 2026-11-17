@@ -74,7 +74,7 @@ enum
     kDeviceOption_BleDevice = 0x1000,
     kDeviceOption_WiFi,
     kDeviceOption_Thread,
-    kDeviceOption_ThreadArgs,
+    kDeviceOption_ThreadArg,
     kDeviceOption_Version,
     kDeviceOption_VendorID,
     kDeviceOption_ProductID,
@@ -184,12 +184,12 @@ OptionDef sDeviceOptionDefs[] = {
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    // "thread-args" may be repeated; each value is appended, in order, to the argv passed to otSysInit().
+    // "thread-arg" may be repeated; each value is appended, in order, to the argv passed to otSysInit().
     // The option name is used outside this file and must be kept in sync with:
     // - OpenThread Network Simulator (third_party/ot-ns/repo/simulation/node.go), which launches Matter nodes
-    //   with --thread-args=<node id> --thread-args=<socket> [--thread-args=<random seed>].
+    //   with --thread-arg=<node id> --thread-arg=<socket> [--thread-arg=<random seed>].
     // - scripts/tests/chiptest/test_definition.py, which runs Thread simulation tests.
-    { "thread-args", kArgumentRequired, kDeviceOption_ThreadArgs },
+    { "thread-arg", kArgumentRequired, kDeviceOption_ThreadArg },
 #else
     { "thread", kNoArgument, kDeviceOption_Thread },
 #endif
@@ -309,8 +309,8 @@ const char * sDeviceOptionHelp =
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     "\n"
-    "  --thread-args <arg>\n"
-    "       Enable Thread with the specified arguments.\n"
+    "  --thread-arg <arg>\n"
+    "       Enable Thread and pass <arg> to the OpenThread platform. May be repeated.\n"
 #else
     "  --thread\n"
     "       Enable Thread management via ot-agent.\n"
@@ -600,7 +600,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    case kDeviceOption_ThreadArgs:
+    case kDeviceOption_ThreadArg:
         LinuxDeviceOptions::GetInstance().mThreadArgs.push_back(aValue);
         break;
 #else

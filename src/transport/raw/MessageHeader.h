@@ -84,6 +84,10 @@ static_assert(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve >
               "CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES must exceed the PacketBuffer header reserve "
               "plus the TCP and IP header size");
 
+static_assert(System::PacketBuffer::kLargeBufMaxSize >= detail::kMaxApplicationPayloadAndMICSizeBytes,
+              "CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES must be large enough to hold a regular application payload, MIC, "
+              "and header reserve");
+
 // Max space for the Application Payload and MIC for large packet buffers
 // This is the size _excluding_ the header reserve.
 // A large message is never smaller than a regular one; a regular message already fits in kMaxSize.

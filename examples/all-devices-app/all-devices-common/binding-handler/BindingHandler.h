@@ -91,13 +91,12 @@ public:
      * Custom commands are passed as a base pointer, e.g.
      * `Platform::UniquePtr<BindingCommand>(Platform::New<MyCommand>(...))`.
      *
-     * Ownership of @p command:
-     *  - If this handler is not initialized, or the internal context cannot be allocated, an error is
-     *    returned (CHIP_ERROR_INCORRECT_STATE or CHIP_ERROR_NO_MEMORY) and @p command is destroyed
-     *    before returning.
-     *  - Otherwise ownership is transferred to the Binding::Manager, even if an error is returned
-     *    (the command may have been queued for a unicast peer before the failure). The command is
-     *    destroyed once the manager no longer needs it.
+     * Ownership of @p command is always transferred to this handler:
+     *  - If an error is returned, @p command was neither sent nor queued, and it is destroyed before
+     *    returning.
+     *  - If CHIP_NO_ERROR is returned, @p command is destroyed once the Binding::Manager no longer
+     *    needs it (possibly before returning). A unicast command whose CASE session could not be
+     *    started stays queued and is sent if a session to the peer is established later.
      */
     CHIP_ERROR Dispatch(EndpointId localEndpointId, Platform::UniquePtr<BindingCommand> command);
 

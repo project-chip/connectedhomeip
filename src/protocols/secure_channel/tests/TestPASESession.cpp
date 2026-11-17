@@ -32,8 +32,10 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <stdarg.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -736,6 +738,189 @@ TEST_F(TestPASESession, SecurePairingHandshakeTCPParamsTest)
     EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
               accessorySessionParams.GetMaxTCPPayloadSize());
     EXPECT_EQ(pairingCommissioner.GetRemoteMRPConfig(), GetDefaultMRPConfig());
+}
+
+// Fields that a commissioner leaves out of the initiatorSessionParams struct in its PBKDFParamRequest
+// must take their default values, not the ones from the previous handshake on the same PASESession.
+TEST_F(TestPASESession, PBKDFParamRequestWithoutTCPParametersUsesDefaults)
+{
+    TemporarySessionManager sessionManager(*this);
+
+    TestSecurePairingDelegate delegateAccessory;
+    PASESession pairingAccessory;
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
+
+    SessionParameters tcpCommissionerSessionParams;
+    tcpCommissionerSessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient));
+    tcpCommissionerSessionParams.SetMaxTCPPayloadSize(40000);
+
+    // The second commissioner sends neither SUPPORTED_TRANSPORTS nor MAX_TCP_MESSAGE_SIZE.
+    for (const SessionParameters & commissionerSessionParams : { tcpCommissionerSessionParams, SessionParameters() })
+    {
+        TestSecurePairingDelegate delegateCommissioner;
+        PASESession pairingCommissioner;
+        pairingCommissioner.SetLocalSessionParameters(commissionerSessionParams);
+
+        ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+        EXPECT_EQ(pairingAccessory.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                                  ByteSpan(sTestSpake2p01_Salt), Optional<ReliableMessageProtocolConfig>::Missing(),
+                                                  &delegateAccessory),
+                  CHIP_NO_ERROR);
+        DrainAndServiceIO();
+
+        EXPECT_EQ(pairingCommissioner.Pair(sessionManager, sTestSpake2p01_PinCode,
+                                           Optional<ReliableMessageProtocolConfig>::Missing(), contextCommissioner,
+                                           &delegateCommissioner),
+                  CHIP_NO_ERROR);
+        DrainAndServiceIO();
+
+        EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+        EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetSupportedTransports(),
+                  commissionerSessionParams.GetSupportedTransports());
+        EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+                  commissionerSessionParams.GetMaxTCPPayloadSize());
+    }
+
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 2u);
+
+    EXPECT_EQ(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest),
+              CHIP_NO_ERROR);
+}
+
+namespace {
+
+class MockInitiatorDelegate : public ExchangeDelegate
+{
+public:
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override
+    {
+        mNumResponses++;
+        mLastMessageType = payloadHeader.GetMessageType();
+        return CHIP_NO_ERROR;
+    }
+
+    void OnResponseTimeout(ExchangeContext * ec) override {}
+
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
+
+    uint32_t mNumResponses   = 0;
+    uint8_t mLastMessageType = 0;
+};
+
+// Encodes a PBKDFParamRequest that omits the optional initiatorSessionParams.
+CHIP_ERROR EncodePBKDFParamRequestWithoutSessionParameters(System::PacketBufferHandle & msg)
+{
+    using namespace TLV;
+
+    constexpr uint8_t kInitiatorRandomTag    = 1;
+    constexpr uint8_t kInitiatorSessionIdTag = 2;
+    constexpr uint8_t kPasscodeIdTag         = 3;
+    constexpr uint8_t kHasPBKDFParametersTag = 4;
+
+    uint8_t initiatorRandom[kPBKDFParamRandomNumberSize];
+    memset(initiatorRandom, 0xA5, sizeof(initiatorRandom));
+
+    msg = System::PacketBufferHandle::New(
+        EstimateStructOverhead(sizeof(initiatorRandom), sizeof(uint16_t), sizeof(uint16_t), sizeof(bool)));
+    VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+    System::PacketBufferTLVWriter tlvWriter;
+    tlvWriter.Init(std::move(msg));
+
+    TLVType outerContainerType = kTLVType_NotSpecified;
+    ReturnErrorOnFailure(tlvWriter.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.Put(ContextTag(kInitiatorRandomTag), ByteSpan(initiatorRandom)));
+    ReturnErrorOnFailure(tlvWriter.Put(ContextTag(kInitiatorSessionIdTag), static_cast<uint16_t>(1)));
+    ReturnErrorOnFailure(tlvWriter.Put(ContextTag(kPasscodeIdTag), kDefaultCommissioningPasscodeId));
+    ReturnErrorOnFailure(tlvWriter.PutBoolean(ContextTag(kHasPBKDFParametersTag), false));
+    ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
+    return tlvWriter.Finalize(&msg);
+}
+
+} // namespace
+
+// A PBKDFParamRequest without the initiatorSessionParams struct must leave the accessory PASESession with the
+// default parameters, not the ones from the previous handshake on the same session.
+TEST_F(TestPASESession, PBKDFParamRequestWithoutSessionParametersUsesDefaults)
+{
+    TemporarySessionManager sessionManager(*this);
+
+    TestSecurePairingDelegate delegateAccessory;
+    PASESession pairingAccessory;
+
+    EXPECT_SUCCESS(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
+        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory));
+
+    // Phase 1: a full handshake that stores custom MRP and TCP parameters on the accessory.
+    // Scoped so the first commissioner and its exchange are gone before the second request.
+    {
+        TestSecurePairingDelegate delegateCommissioner;
+        PASESession pairingCommissioner;
+
+        SessionParameters commissionerSessionParams;
+        commissionerSessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient));
+        commissionerSessionParams.SetMaxTCPPayloadSize(40000);
+        pairingCommissioner.SetLocalSessionParameters(commissionerSessionParams);
+
+        ReliableMessageProtocolConfig commissionerMrpConfig(5000_ms32, 300_ms32, 4000_ms16);
+
+        ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+        EXPECT_SUCCESS(pairingAccessory.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                                       ByteSpan(sTestSpake2p01_Salt),
+                                                       Optional<ReliableMessageProtocolConfig>::Missing(), &delegateAccessory));
+        DrainAndServiceIO();
+
+        EXPECT_SUCCESS(pairingCommissioner.Pair(sessionManager, sTestSpake2p01_PinCode, MakeOptional(commissionerMrpConfig),
+                                                contextCommissioner, &delegateCommissioner));
+        DrainAndServiceIO();
+
+        EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+        EXPECT_EQ(delegateAccessory.mNumPairingComplete, 1u);
+        EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetSupportedTransports(),
+                  commissionerSessionParams.GetSupportedTransports());
+        EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+                  commissionerSessionParams.GetMaxTCPPayloadSize());
+        EXPECT_EQ(pairingAccessory.GetRemoteMRPConfig(), commissionerMrpConfig);
+    }
+
+    // Phase 2: a request without the struct must reset every remote parameter to its default.
+    {
+        EXPECT_SUCCESS(pairingAccessory.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                                       ByteSpan(sTestSpake2p01_Salt),
+                                                       Optional<ReliableMessageProtocolConfig>::Missing(), &delegateAccessory));
+        DrainAndServiceIO();
+
+        System::PacketBufferHandle request;
+        ASSERT_SUCCESS(EncodePBKDFParamRequestWithoutSessionParameters(request));
+
+        MockInitiatorDelegate initiatorDelegate;
+        ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&initiatorDelegate);
+        EXPECT_SUCCESS(contextInitiator->SendMessage(Protocols::SecureChannel::MsgType::PBKDFParamRequest, std::move(request),
+                                                     SendMessageFlags::kExpectResponse));
+        DrainAndServiceIO();
+        if (initiatorDelegate.mNumResponses == 0)
+        {
+            contextInitiator->Close();
+        }
+
+        // A PBKDFParamResponse shows that the accessory accepted this request.
+        EXPECT_EQ(initiatorDelegate.mNumResponses, 1u);
+        EXPECT_EQ(initiatorDelegate.mLastMessageType, to_underlying(Protocols::SecureChannel::MsgType::PBKDFParamResponse));
+
+        const SessionParameters & remoteSessionParams = pairingAccessory.GetRemoteSessionParameters();
+        EXPECT_EQ(remoteSessionParams.GetSupportedTransports(), 0u);
+        EXPECT_EQ(remoteSessionParams.GetMaxTCPPayloadSize(), 0u);
+        EXPECT_EQ(remoteSessionParams.GetMRPConfig(), GetDefaultMRPConfig());
+    }
+
+    EXPECT_SUCCESS(
+        GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest));
 }
 
 TEST_F(TestPASESession, SecurePairingFailedHandshake)
