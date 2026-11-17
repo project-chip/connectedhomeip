@@ -8202,12 +8202,13 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     const NSUInteger attributeCount = 20;
     __auto_type * clusterPath = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID)];
     NSString * deviceTag = [NSString stringWithFormat:@"%p", device];
+    NSString * nodeTag = [NSString stringWithFormat:@"node 0x%016llX", (unsigned long long) kDeviceId1];
 
     __block os_unfair_lock linesLock = OS_UNFAIR_LOCK_INIT;
     NSMutableArray<NSString *> * defaultLines = [NSMutableArray array];
     NSMutableArray<NSString *> * detailLines = [NSMutableArray array];
     MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
-        if (![message containsString:deviceTag]) {
+        if (![message containsString:deviceTag] && ![message containsString:nodeTag]) {
             return;
         }
         os_unfair_lock_lock(&linesLock);
@@ -8392,6 +8393,117 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertEqual(linesContaining(defaultLines, injectedLine).count, 1);
 }
 
+- (void)test049g_ReportPathDefaultLogsCarryNodeIDNotDeviceDescription
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device setDelegate:delegate queue:queue];
+
+    NSString * deviceTag = [NSString stringWithFormat:@"%p", device];
+    NSString * nodeTag = [NSString stringWithFormat:@"node 0x%016llX", (unsigned long long) kDeviceId1];
+    NSString * descriptionMarker = @"<MTRDevice_Concrete: ";
+    // The NSString form of MTRClusterPath and MTRAttributePath, which carries the cluster and attribute names.
+    NSString * pathObjectMarker = @"<MTRClusterPath endpoint ";
+    NSString * attributePathObjectMarker = @"<MTRAttributePath endpoint ";
+
+    __block os_unfair_lock linesLock = OS_UNFAIR_LOCK_INIT;
+    NSMutableArray<NSString *> * defaultLines = [NSMutableArray array];
+    NSMutableArray<NSString *> * detailLines = [NSMutableArray array];
+    MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if (![message containsString:deviceTag] && ![message containsString:nodeTag]) {
+            return;
+        }
+        os_unfair_lock_lock(&linesLock);
+        [(type == MTRLogTypeDetail ? detailLines : defaultLines) addObject:message];
+        os_unfair_lock_unlock(&linesLock);
+    });
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(MTRLogTypeError, nil);
+    }];
+    NSArray<NSString *> * (^linesContaining)(NSArray<NSString *> *, NSString *) = ^(NSArray<NSString *> * lines, NSString * text) {
+        os_unfair_lock_lock(&linesLock);
+        NSArray * matching = [lines filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF CONTAINS %@", text]];
+        os_unfair_lock_unlock(&linesLock);
+        return matching;
+    };
+
+    const NSUInteger attributeCount = 4;
+    const NSUInteger changedIndex = 2;
+    XCTestExpectation * primed = [self expectationWithDescription:@"priming report end"];
+    delegate.onReportEnd = ^{
+        [primed fulfill];
+    };
+    [device unitTestInjectAttributeReport:[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:1 changedAttributeIndex:NSNotFound] fromSubscription:YES];
+    [self waitForExpectations:@[ primed ] timeout:kTimeoutInSeconds];
+
+    os_unfair_lock_lock(&linesLock);
+    [defaultLines removeAllObjects];
+    [detailLines removeAllObjects];
+    os_unfair_lock_unlock(&linesLock);
+
+    // A new data version and one changed value. DataVersion is noted once per reported attribute (each compares
+    // against the committed version), so there is one DataVersion line per attribute, one reported-values line
+    // and one summary.
+    XCTestExpectation * changedEnd = [self expectationWithDescription:@"changed report end"];
+    delegate.onReportEnd = ^{
+        [changedEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:2 changedAttributeIndex:changedIndex] fromSubscription:YES];
+    [self waitForExpectations:@[ changedEnd ] timeout:kTimeoutInSeconds];
+
+    NSArray<NSString *> * dataVersionLines = linesContaining(defaultLines, @"updated DataVersion");
+    NSArray<NSString *> * reportedLines = linesContaining(defaultLines, @"report from reported values");
+    NSArray<NSString *> * summaryLines = linesContaining(defaultLines, [NSString stringWithFormat:@"report of %lu attributes", (unsigned long) attributeCount]);
+    XCTAssertEqual(dataVersionLines.count, attributeCount);
+    XCTAssertEqual(reportedLines.count, 1);
+    XCTAssertEqual(summaryLines.count, 1);
+
+    for (NSString * line in [[dataVersionLines arrayByAddingObjectsFromArray:reportedLines] arrayByAddingObjectsFromArray:summaryLines]) {
+        XCTAssertTrue([line containsString:nodeTag], @"%@", line);
+        XCTAssertFalse([line containsString:descriptionMarker], @"%@", line);
+    }
+    // DataVersion and reported-values lines keep the full path, so the cluster and attribute names stay in the log.
+    NSString * clusterName = MTRClusterNameForID(MTRClusterIDTypeUnitTestingID);
+    NSString * attributeName = MTRAttributeNameForID(MTRClusterIDTypeUnitTestingID, (MTRAttributeIDType) changedIndex);
+    for (NSString * name in @[ clusterName, attributeName ]) {
+        XCTAssertGreaterThan(name.length, 0);
+        XCTAssertFalse([name hasPrefix:@"<Unknown"], @"%@", name);
+    }
+    NSString * clusterPair = [NSString stringWithFormat:@"(%llu, %@)", (unsigned long long) MTRClusterIDTypeUnitTestingID, clusterName];
+    NSString * attributePair = [NSString stringWithFormat:@"(%llu, %@)", (unsigned long long) changedIndex, attributeName];
+    NSString * reportedLine = reportedLines.firstObject;
+    NSString * changedAttribute = [NSString stringWithFormat:@"attribute 0x%llx %@", (unsigned long long) changedIndex, attributePair];
+    // The tests stop at the first failed assertion, so the name checks run first and together: one failure lists
+    // every line that lost a name.
+    NSMutableArray<NSString *> * missingNames = [NSMutableArray array];
+    for (NSString * line in dataVersionLines) {
+        if (![line containsString:clusterPair]) {
+            [missingNames addObject:[NSString stringWithFormat:@"DataVersion line lacks %@: %@", clusterPair, line]];
+        }
+    }
+    if (![reportedLine containsString:clusterPair]) {
+        [missingNames addObject:[NSString stringWithFormat:@"reported-values line lacks %@: %@", clusterPair, reportedLine]];
+    }
+    if (![reportedLine containsString:changedAttribute]) {
+        [missingNames addObject:[NSString stringWithFormat:@"reported-values line lacks %@: %@", changedAttribute, reportedLine]];
+    }
+    XCTAssertEqual(missingNames.count, 0, @"%@", [missingNames componentsJoinedByString:@"\n"]);
+
+    NSString * clusterPathPrefix = [NSString stringWithFormat:@"%@1 cluster 0x%llx ", pathObjectMarker, (unsigned long long) MTRClusterIDTypeUnitTestingID];
+    for (NSString * line in dataVersionLines) {
+        XCTAssertTrue([line containsString:clusterPathPrefix], @"%@", line);
+        XCTAssertTrue([line hasSuffix:@"to 2"], @"%@", line);
+    }
+    NSString * attributePathPrefix = [NSString stringWithFormat:@"%@1 cluster 0x%llx ", attributePathObjectMarker, (unsigned long long) MTRClusterIDTypeUnitTestingID];
+    XCTAssertTrue([reportedLine containsString:attributePathPrefix], @"%@", reportedLine);
+    NSString * summaryLine = summaryLines.firstObject;
+    XCTAssertFalse([summaryLine containsString:pathObjectMarker], @"%@", summaryLine);
+    XCTAssertFalse([summaryLine containsString:attributePathObjectMarker], @"%@", summaryLine);
+}
+
 - (void)test049f_SubscriptionAndReadReportsLogCountsNotValuesAtDefault
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -8511,16 +8623,25 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 
     XCTAssertEqual(linesMatching(defaultLines, containing(subscriptionToken)).count, 0);
     XCTAssertGreaterThan(linesMatching(detailLines, containing(subscriptionToken)).count, 0);
-    NSArray<NSString *> * attributeLines = linesMatching(defaultLines, [NSPredicate predicateWithFormat:@"SELF CONTAINS %@ AND SELF CONTAINS %@", deviceTag, @"got attribute report ("]);
+    NSString * subscribedNodeTag = [NSString stringWithFormat:@"node 0x%016llX", (unsigned long long) kDeviceId1];
+    NSArray<NSString *> * attributeLines = linesMatching(defaultLines, [NSPredicate predicateWithFormat:@"(SELF CONTAINS %@ OR SELF CONTAINS %@) AND SELF CONTAINS %@", deviceTag, subscribedNodeTag, @"got attribute report ("]);
     NSArray<NSString *> * attributeCountLines = [attributeLines filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @".* got attribute report \\(0x[0-9a-f]+\\) with [0-9]+ attributes"]];
     XCTAssertGreaterThan(attributeLines.count, 0);
     XCTAssertEqual(attributeCountLines.count, attributeLines.count);
-    NSArray<NSString *> * eventLines = linesMatching(defaultLines, [NSPredicate predicateWithFormat:@"SELF CONTAINS %@ AND SELF CONTAINS %@", deviceTag, @"got event report ("]);
+    NSArray<NSString *> * eventLines = linesMatching(defaultLines, [NSPredicate predicateWithFormat:@"(SELF CONTAINS %@ OR SELF CONTAINS %@) AND SELF CONTAINS %@", deviceTag, subscribedNodeTag, @"got event report ("]);
     NSArray<NSString *> * eventCountLines = [eventLines filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @".* got event report \\(0x[0-9a-f]+\\) with [0-9]+ events"]];
     XCTAssertGreaterThan(eventLines.count, 0);
     XCTAssertEqual(eventCountLines.count, eventLines.count);
     XCTAssertEqual(linesMatching(defaultLines, containing(@"eventNumber = ")).count, 0);
     XCTAssertGreaterThan(linesMatching(detailLines, containing(@"eventNumber = ")).count, 0);
+
+    NSString * nodeTag = [NSString stringWithFormat:@"node 0x%016llX", (unsigned long long) kDeviceId1];
+    NSArray<NSString *> * nodeAttributeLines = linesMatching(defaultLines, [NSPredicate predicateWithFormat:@"SELF CONTAINS %@ AND SELF CONTAINS %@", nodeTag, @"got attribute report ("]);
+    NSArray<NSString *> * nodeEventLines = linesMatching(defaultLines, [NSPredicate predicateWithFormat:@"SELF CONTAINS %@ AND SELF CONTAINS %@", nodeTag, @"got event report ("]);
+    XCTAssertGreaterThan(nodeAttributeLines.count, 0);
+    XCTAssertGreaterThan(nodeEventLines.count, 0);
+    NSPredicate * reportLineWithDescription = [NSPredicate predicateWithFormat:@"(SELF CONTAINS %@ OR SELF CONTAINS %@) AND SELF CONTAINS %@", @"got attribute report (", @"got event report (", @"<MTRDevice_Concrete: "];
+    XCTAssertEqual(linesMatching(defaultLines, reportLineWithDescription).count, 0);
 }
 
 - (void)test050_readAttributePaths_withWildCardPath

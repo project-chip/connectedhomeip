@@ -17,18 +17,16 @@
 #pragma once
 
 #include <device/capabilities/on-off-load/OnOffLoad.h>
-#include <device/capabilities/on-off-load/impl/LoggingOnOffDelegate.h>
 
 namespace chip::app {
 
-class MountedOnOffControl : private LoggingOnOffDelegate, public OnOffLoad
+class MountedOnOffControl : public OnOffLoad
 {
 public:
     using Context = OnOffLoad::Context;
 
-    explicit MountedOnOffControl(const Context & context, Clusters::OnOffDelegate * customOnOff = nullptr,
-                                 Clusters::OnOffEffectDelegate * customEffect = nullptr,
-                                 Clusters::IdentifyDelegate * customIdentify  = nullptr);
+    MountedOnOffControl(Clusters::OnOffDelegate & onOffDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
+                        Clusters::IdentifyDelegate & identifyDelegate, const Context & context);
     ~MountedOnOffControl() override = default;
 };
 

@@ -116,8 +116,10 @@ advertisement while the device stays on Thread, so no factory reset is needed.
 **Note**: This configuration requires `CONFIG_PM=y` (the teardown relies on
 `tlx_bt_802154_dual_mode_suspend()`/`resume()`, which are built only under
 `CONFIG_PM`). For line-powered (`CONFIG_PM=n`) devices that only need to stop
-advertising after commissioning but keep BLE available on demand, use
-`CONFIG_CHIP_CONCURRENT_BLE_IDLE=y` instead.
+advertising after commissioning, keep this option disabled (default) to leave
+BLE idle with on-demand advertising, or enable
+`CONFIG_CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING=y` to re-enable BLE
+advertising automatically after commissioning.
 
 **Build**:
 
