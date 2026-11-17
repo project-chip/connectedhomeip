@@ -47,12 +47,25 @@ LoggingOnlySmokeCoAlarm::~LoggingOnlySmokeCoAlarm()
     mTimerDelegate.CancelTimer(this);
 }
 
-CHIP_ERROR LoggingOnlySmokeCoAlarm::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)
+CHIP_ERROR LoggingOnlySmokeCoAlarm::RegisterPowerSource(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                                        EndpointId parentId)
 {
-    return mPowerSource.Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId()));
+    // Tagged with PositionTag::kMiddle to disambiguate from the standalone power-source (PositionTag::kTop)
+    // and power-source-simulated (PositionTag::kBottom) devices under wildcard allocation (*).
+    static const EndpointComposition::SemanticTag kSmokeCoBatteryTag = {
+        .mfgCode     = DataModel::NullNullable,
+        .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+        .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kMiddle),
+    };
+    EndpointComposition composition(parentId, DataModel::EndpointCompositionPattern::kTree, Span(&kSmokeCoBatteryTag, 1));
+
+    ReturnErrorOnFailure(mPowerSource.Register(allocator, provider, composition));
+    // PowerSourceCluster::SetEndpointList stores the Span by view; mEndpointId remains valid
+    // for the lifetime of the registered SmokeCoAlarm endpoint.
+    return mPowerSource.SetEndpointList(Span<const EndpointId>(&mEndpointId, 1));
 }
 
-void LoggingOnlySmokeCoAlarm::UnregisterParts(CodeDrivenDataModelProvider & provider)
+void LoggingOnlySmokeCoAlarm::UnregisterPowerSource(CodeDrivenDataModelProvider & provider)
 {
     if (mPowerSource.GetEndpointId() != kInvalidEndpointId)
     {

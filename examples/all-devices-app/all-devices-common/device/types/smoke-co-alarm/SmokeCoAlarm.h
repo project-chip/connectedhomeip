@@ -32,6 +32,18 @@ namespace app {
 /// Generic smoke + CO alarm device. It wires up the clusters but is agnostic about behavior: the
 /// SmokeCoAlarmDelegate is injected, so concrete subclasses decide how the alarm actually behaves
 /// (see LoggingOnlySmokeCoAlarm for the example/no-hardware implementation).
+///
+/// ### Power Source Requirement
+/// Per the Matter Smoke CO Alarm device type specification, a Smoke CO Alarm node SHALL support at
+/// least one instance of a Power Source cluster on some endpoint (`count="min 1"`). Additionally,
+/// per the Power Source cluster specification (Dependencies), the Power Source cluster SHOULD reside
+/// on an endpoint whose device type requires it (such as `Device::Type::kPowerSource`, `0x0011`) and
+/// SHOULD NOT be added as an extra cluster to another endpoint.
+///
+/// Therefore, concrete subclasses MUST implement `RegisterPowerSource` and `UnregisterPowerSource`
+/// (they cannot be left empty) to register a separate Power Source endpoint and configure its
+/// `PowerSource::EndpointList` attribute to reference `GetEndpointId()`. The Power Source endpoint
+/// is registered as a separate sibling endpoint (not a child part in this endpoint's `PartsList`).
 class SmokeCoAlarm : public DeviceInterface
 {
 public:
@@ -73,8 +85,16 @@ public:
     Clusters::IdentifyCluster & GetIdentifyCluster();
 
 protected:
-    virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) = 0;
-    virtual void UnregisterParts(CodeDrivenDataModelProvider & provider)                                      = 0;
+    /// Called during `Register` after the Smoke CO Alarm endpoint has been registered and `GetEndpointId()`
+    /// is valid. Subclasses MUST register a separate Power Source endpoint as a sibling under `parentId`
+    /// (not as a child in this endpoint's `PartsList`) and set its `EndpointList` attribute to include
+    /// `GetEndpointId()`.
+    virtual CHIP_ERROR RegisterPowerSource(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                           EndpointId parentId) = 0;
+
+    /// Called during `Unregister` (and on partial registration rollback) to unregister the Power Source
+    /// endpoint registered by `RegisterPowerSource`.
+    virtual void UnregisterPowerSource(CodeDrivenDataModelProvider & provider) = 0;
 
     EndpointId mEndpointId = kInvalidEndpointId;
     TimerDelegate & mTimerDelegate;

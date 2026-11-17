@@ -27,8 +27,8 @@ namespace app {
 
 SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate,
                            const Config & config) :
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
-    mTimerDelegate(timerDelegate), mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mConfig(config)
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
+    mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mConfig(config)
 {}
 
 CHIP_ERROR SmokeCoAlarm::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
@@ -52,9 +52,7 @@ CHIP_ERROR SmokeCoAlarm::Register(EndpointIdAllocator & allocator, CodeDrivenDat
 
     DeviceRegistrationTransaction transaction(*this, provider);
 
-    ReturnErrorOnFailure(RegisterDescriptor(
-        endpoint, provider,
-        EndpointComposition(composition.parentId, DataModel::EndpointCompositionPattern::kTree, composition.tagList)));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
     mEndpointId = endpoint;
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -77,7 +75,7 @@ CHIP_ERROR SmokeCoAlarm::Register(EndpointIdAllocator & allocator, CodeDrivenDat
     }
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
-    ReturnErrorOnFailure(RegisterParts(allocator, provider));
+    ReturnErrorOnFailure(RegisterPowerSource(allocator, provider, composition.parentId));
 
     transaction.Commit();
     return CHIP_NO_ERROR;
@@ -85,7 +83,7 @@ CHIP_ERROR SmokeCoAlarm::Register(EndpointIdAllocator & allocator, CodeDrivenDat
 
 void SmokeCoAlarm::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    UnregisterParts(provider);
+    UnregisterPowerSource(provider);
     if (mEndpointId != kInvalidEndpointId)
     {
         UnregisterDescriptor(mEndpointId, provider);

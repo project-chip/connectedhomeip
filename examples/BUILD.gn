@@ -51,6 +51,7 @@ if (chip_build_tests) {
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-sensor/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/pressure-sensor/tests",
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/smoke-co-alarm/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/solar-power/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-heater/tests",
