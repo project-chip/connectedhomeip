@@ -467,12 +467,17 @@ CHIP_ERROR JsonBackend::OpenFile(const char * path)
 {
     CloseFile();
 
-    std::error_code ec;
-    std::filesystem::path filePath(path);
-    // Create directories if they don't exist
-    if (!std::filesystem::create_directories(filePath.remove_filename(), ec))
+    // Create the leading directories if they don't exist. create_directories() returns false
+    // when they already exist, so only the error code signals a failure.
+    std::filesystem::path directory = std::filesystem::path(path).parent_path();
+    if (!directory.empty())
     {
-        return CHIP_ERROR_POSIX(ec.value());
+        std::error_code ec;
+        std::filesystem::create_directories(directory, ec);
+        if (ec)
+        {
+            return CHIP_ERROR_POSIX(ec.value());
+        }
     }
 
     mOutputFile.open(path, std::ios_base::out);

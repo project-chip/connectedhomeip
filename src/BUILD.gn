@@ -298,7 +298,10 @@ if (chip_build_tests) {
     }
 
     if (chip_device_platform == "linux") {
-      tests += [ "${chip_root}/src/platform/Linux/tests" ]
+      tests += [
+        "${chip_root}/src/platform/Linux/tests",
+        "${chip_root}/src/tracing/json/tests",
+      ]
     }
 
     if (chip_config_network_layer_ble) {
