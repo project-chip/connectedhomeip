@@ -1,7 +1,7 @@
 """Retained regression tests for the explicitly opted-in one-shot read contract."""
 
-import argparse
 import asyncio
+import argparse
 import json
 import runpy
 import sys
@@ -72,10 +72,63 @@ class TestReadOperation(unittest.IsolatedAsyncioTestCase):
             return await operation()
 
         controller = SimpleNamespace(CheckIsActive=Mock(), GetConnectedDevice=connect, _run_with_session_retry=retry)
+        operation = asyncio.create_task(ChipDeviceController.Read(controller, 1, readOperation=ReadOperationOptions(1)))
+        await started.wait()
         with self.assertRaises(TimeoutError):
-            await ChipDeviceController.Read(controller, 1, readOperation=ReadOperationOptions(1))
-        self.assertTrue(started.is_set())
-        self.assertTrue(gate.cancelled())
+            await asyncio.wait_for(asyncio.shield(operation), 0.03)
+        self.assertFalse(operation.done())
+        self.assertFalse(gate.cancelled())
+        gate.set_result(SimpleNamespace(deviceProxy=None))
+        with self.assertRaises(TimeoutError):
+            await operation
+
+    async def test_ready_session_after_deadline_does_not_start_native_read(self):
+        loop = asyncio.get_running_loop()
+        clock = [0.0]
+        controller_loop = SimpleNamespace(time=lambda: clock[0], create_future=loop.create_future)
+
+        async def connect(*args, **kwargs):
+            clock[0] = 1.0
+            return SimpleNamespace(deviceProxy=None)
+
+        async def retry(node, operation):
+            return await operation()
+
+        controller = SimpleNamespace(CheckIsActive=Mock(), GetConnectedDevice=connect, _run_with_session_retry=retry)
+        with patch('matter.ChipDeviceCtrl.asyncio.get_running_loop', return_value=controller_loop), \
+                patch('matter.clusters.Attribute.Read', side_effect=AssertionError('Native read started after deadline')) as native_read:
+            with self.assertRaises(TimeoutError):
+                await ChipDeviceController.Read(controller, 1, readOperation=ReadOperationOptions(1))
+            native_read.assert_not_called()
+
+    async def test_session_startup_repeated_cancellation_settles_before_propagating(self):
+        started = asyncio.Event()
+        loop = asyncio.get_running_loop()
+        gate = loop.create_future()
+
+        async def connect(*args, **kwargs):
+            started.set()
+            return await gate
+
+        async def retry(node, operation):
+            return await operation()
+
+        controller = SimpleNamespace(CheckIsActive=Mock(), GetConnectedDevice=connect, _run_with_session_retry=retry)
+        with patch('matter.clusters.Attribute.Read') as native_read:
+            operation = asyncio.create_task(ChipDeviceController.Read(controller, 1, readOperation=ReadOperationOptions()))
+            await started.wait()
+            for message in ('original', 'repeated'):
+                operation.cancel(message)
+                delivered = loop.create_future()
+                loop.call_soon(delivered.set_result, None)
+                await delivered
+                self.assertFalse(operation.done())
+                self.assertFalse(gate.cancelled())
+            gate.set_result(SimpleNamespace(deviceProxy=None))
+            with self.assertRaises(asyncio.CancelledError) as result:
+                await operation
+            self.assertEqual(result.exception.args, ('original',))
+            native_read.assert_not_called()
 
     async def test_cancellation_keeps_future_alive_until_completion(self):
         transaction = self.transaction()
@@ -182,8 +235,8 @@ class TestReadOperation(unittest.IsolatedAsyncioTestCase):
 
 
 async def exercise_native_read_operation_contract(
-        controller: ChipDeviceController, node: int, pause_dut: Callable[[], None], resume_dut: Callable[[], None],
-        inject_report: Callable[[AsyncReadTransaction], None]) -> list[dict[str, Any]]:
+    controller: ChipDeviceController, node: int, pause_dut: Callable[[], None], resume_dut: Callable[[], None],
+    inject_report: Callable[[AsyncReadTransaction], None]) -> list[dict[str, Any]]:
     """Exercise the public read API using an owned software DUT and a native report probe."""
     from unittest.mock import patch
 
@@ -241,7 +294,7 @@ async def exercise_native_read_operation_contract(
         assert row['pointer_cleared_before_done'] and not row['future_cancelled'], row
         return {'case': case, 'done': 1, 'future_cancelled': False, **details}
 
-    results = []
+    results = await exercise_native_session_acquisition_contract(controller, node, pause_dut, resume_dut)
     with patch.object(Attribute, 'Read', capture), patch.object(Attribute.AsyncReadTransaction, '_handleDone', complete), \
             patch.object(Attribute.AsyncReadTransaction, 'AwaitCompletion', settle), \
             patch.object(Attribute.AsyncReadTransaction, 'handleReportBegin', report_begin):
@@ -309,7 +362,7 @@ async def exercise_native_read_operation_contract(
                     await operation
                 except TimeoutError as error:
                     assert error is row['primary_error']
-                    assert any('Native read abort failed' in note for note in error.__notes__)
+                    assert any('Native read abort failed' in note for note in getattr(error, '__notes__', ()))
                 else:
                     raise AssertionError('Failed abort must retain the original deadline error')
                 results.append(evidence('public-native-abort-failure-safe-settlement', row))
@@ -333,16 +386,90 @@ async def exercise_native_read_operation_contract(
     return results
 
 
+async def exercise_native_session_acquisition_contract(
+    controller: ChipDeviceController, node: int, pause_dut: Callable[[], None], resume_dut: Callable[[], None]
+) -> list[dict[str, Any]]:
+    """Settle interrupted real CASE acquisition before releasing its callback-owned proxy."""
+    import matter.clusters as Clusters
+    from matter import ChipDeviceCtrl as controller_module
+
+    loop = asyncio.get_running_loop()
+    connect = controller.GetConnectedDevice
+    proxy = await connect(node, allowPASE=False)
+    proxy = None
+    rows = []
+    for cancellation in (False, True):
+        controller.ExpireSessions(node)
+        pause_dut()
+        started = asyncio.Event()
+        callbacks = []
+        released = []
+        original_callback = controller_module._DeviceAvailableCallback
+        original_delete = controller_module.DeviceProxyWrapper.__del__
+
+        @controller_module._DeviceAvailableCallbackFunct
+        def callback(closure, device, error):
+            callbacks.append(closure._future)
+            original_callback(closure, device, error)
+
+        def delete(device):
+            if device._proxyType == controller_module.DeviceProxyWrapper.DeviceProxyType.OPERATIONAL:
+                released.append(device.deviceProxy.value)
+            original_delete(device)
+
+        async def case_connect(*args, **kwargs):
+            started.set()
+            return await connect(*args, **kwargs, allowPASE=False)
+
+        with patch.object(controller, 'GetConnectedDevice', case_connect), \
+                patch.object(controller_module, '_DeviceAvailableCallback', callback), \
+                patch.object(controller_module.DeviceProxyWrapper, '__del__', delete), \
+                patch('matter.clusters.Attribute.Read') as native_read:
+            operation = asyncio.create_task(controller.ReadAttribute(node,
+                [(0, Clusters.BasicInformation.Attributes.Location)],
+                readOperation=ReadOperationOptions(None if cancellation else 50)))
+            try:
+                await started.wait()
+                await asyncio.wait((operation,), timeout=0.1)
+                assert not operation.done() and not callbacks
+                if cancellation:
+                    for message in ('original CASE cancellation', 'repeated CASE cancellation'):
+                        operation.cancel(message)
+                        delivered = loop.create_future()
+                        loop.call_soon(delivered.set_result, None)
+                        await delivered
+                        assert not operation.done()
+                resume_dut()
+                expected = asyncio.CancelledError if cancellation else TimeoutError
+                try:
+                    completed, pending = await asyncio.wait((operation,), timeout=30)
+                    assert operation in completed and not pending
+                    await operation
+                except expected as error:
+                    if cancellation:
+                        assert error.args == ('original CASE cancellation',)
+                else:
+                    raise AssertionError('Interrupted CASE acquisition must preserve the original error')
+                assert len(callbacks) == 1 and callbacks[0].done() and not callbacks[0].cancelled()
+                assert len(released) == 1
+                native_read.assert_not_called()
+                rows.append({'case': 'native-case-acquisition-cancellation' if cancellation else 'native-case-acquisition-deadline',
+                    'done': 1, 'future_cancelled': False, 'native_session_callbacks': 1,
+                    'operational_proxy_released': 1, 'no_read_started': True})
+            finally:
+                resume_dut()
+    return rows
+
+
 async def exercise_native_idm_restoration_contract(checker: Any, pause_dut: Callable[[], None],
-                                                   resume_dut: Callable[[], None]) -> list[dict[str, Any]]:
+                                                 resume_dut: Callable[[], None]) -> list[dict[str, Any]]:
     """Run the retained IDM algorithm through real reads/writes and cancellation during native readback."""
     from unittest.mock import patch
-
-    from support_modules.idm_support import WritableAttributeInfo, spec_enum_values
 
     import matter.clusters as Clusters
     from matter.clusters import Attribute
     from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters
+    from support_modules.idm_support import WritableAttributeInfo, spec_enum_values
 
     xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
     cluster = Clusters.OnOff
@@ -350,9 +477,9 @@ async def exercise_native_idm_restoration_contract(checker: Any, pause_dut: Call
     xml_cluster = xml_clusters[cluster.id]
     xml_attribute = xml_cluster.attributes[attribute.attribute_id]
     info = WritableAttributeInfo(endpoint_id=1, cluster_id=cluster.id, cluster_name=xml_cluster.name,
-                                 attribute_id=attribute.attribute_id, attribute_name=xml_attribute.name, attribute=attribute,
-                                 cluster_class=cluster, datatype=xml_attribute.datatype, constraints=xml_attribute.constraints,
-                                 enum_values=spec_enum_values(xml_cluster, xml_attribute.datatype))
+        attribute_id=attribute.attribute_id, attribute_name=xml_attribute.name, attribute=attribute,
+        cluster_class=cluster, datatype=xml_attribute.datatype, constraints=xml_attribute.constraints,
+        enum_values=spec_enum_values(xml_cluster, xml_attribute.datatype))
     original_readback = checker.read_single_attribute
     original_verified = checker.read_single_attribute_check_success
     original_write = checker.default_controller.WriteAttribute
@@ -446,21 +573,21 @@ async def exercise_native_idm_restoration_contract(checker: Any, pause_dut: Call
         restored = await original_verified(endpoint=1, cluster=cluster, attribute=attribute)
         assert restored == original
         results.append({'case': 'native-idm-verification-deadline' if stall_verification else 'native-idm-readback-cancellation',
-                        'done': 1, 'future_cancelled': False, 'original_cancellation_identity': True,
-                        'restoration_diagnostic_retained': stall_verification, 'baseline_verified': True,
-                        'no_subsequent_violating_probe': True, 'native_read_transactions_settled_once': len(transactions)})
+            'done': 1, 'future_cancelled': False, 'original_cancellation_identity': True,
+            'restoration_diagnostic_retained': stall_verification, 'baseline_verified': True,
+            'no_subsequent_violating_probe': True, 'native_read_transactions_settled_once': len(transactions)})
     return results
 
 
 async def run_native_read_regressions(checker: Any, pause_dut: Callable[[], None], resume_dut: Callable[[], None],
-                                      inject_report: Callable[[Any, int, bool], None]) -> list[dict[str, Any]]:
+                                     inject_report: Callable[[AsyncReadTransaction], None]) -> list[dict[str, Any]]:
     """Run both retained native groups against an already commissioned, fixture-owned software DUT.
 
     The fixture supplies its checker/controller, owned-process pause/resume callbacks,
     and test-only native report injection. These are not ordinary mock unit tests.
     """
     rows = await exercise_native_read_operation_contract(checker.default_controller, checker.dut_node_id,
-                                                         pause_dut, resume_dut, inject_report)
+                                                        pause_dut, resume_dut, inject_report)
     rows.extend(await exercise_native_idm_restoration_contract(checker, pause_dut, resume_dut))
     return rows
 
@@ -483,7 +610,7 @@ def main() -> None:
     async def run() -> None:
         async with fixture_factory() as fixture:
             rows = await run_native_read_regressions(fixture.checker, fixture.pause_dut,
-                                                     fixture.resume_dut, fixture.inject_report)
+                                                    fixture.resume_dut, fixture.inject_report)
             print(json.dumps({'native_read_regressions': rows}), flush=True)
 
     asyncio.run(run())

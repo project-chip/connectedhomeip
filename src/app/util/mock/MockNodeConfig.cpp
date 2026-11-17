@@ -192,7 +192,10 @@ MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<Moc
 
 {
 
-    memcpy(endpointUniqueIdBuffer, aEndpointUniqueId.data(), aEndpointUniqueId.size());
+    if (!aEndpointUniqueId.empty())
+    {
+        memcpy(endpointUniqueIdBuffer, aEndpointUniqueId.data(), aEndpointUniqueId.size());
+    }
     endpointUniqueIdSize = static_cast<uint8_t>(aEndpointUniqueId.size());
     VerifyOrDie(aClusters.size() < UINT8_MAX);
 

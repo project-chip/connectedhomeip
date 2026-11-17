@@ -2456,11 +2456,33 @@ class ChipDeviceControllerBase:
 
         async def _read_impl():
             future = eventLoop.create_future()
-            if deadline is None:
+            if readOperation is None:
                 device = await self.GetConnectedDevice(nodeId, payloadCapability=payloadCapability)
             else:
-                async with asyncio.timeout_at(deadline):
-                    device = await self.GetConnectedDevice(nodeId, payloadCapability=payloadCapability)
+                connection = asyncio.create_task(self.GetConnectedDevice(nodeId, payloadCapability=payloadCapability))
+                interruption = None
+                while not connection.done():
+                    try:
+                        remaining = (max(0, deadline - eventLoop.time())
+                                     if deadline is not None and interruption is None else None)
+                        completed, pending = await asyncio.wait((connection,), timeout=remaining)
+                        if not completed and interruption is None:
+                            interruption = TimeoutError("Overall read deadline expired during session acquisition")
+                        completed = pending = None
+                    except asyncio.CancelledError as error:
+                        if not isinstance(interruption, asyncio.CancelledError):
+                            interruption = error.with_traceback(None)
+                if interruption is not None:
+                    completed = pending = None
+                    try:
+                        device = connection.result()
+                        device = None
+                    except Exception as error:
+                        interruption.add_note(f"Session acquisition failed while settling interrupted read: {error}")
+                    connection = None
+                    raise interruption
+                device = connection.result()
+                connection = None
             attributePaths = [self._parseAttributePathTuple(
                 v) for v in attributes] if attributes else None
             clusterDataVersionFilters = [self._parseDataVersionFilterTuple(
@@ -2485,6 +2507,9 @@ class ChipDeviceControllerBase:
 
             allowLargePayload = payloadCapability in (TransportPayloadCapability.LARGE_PAYLOAD,
                                                       TransportPayloadCapability.MRP_OR_TCP_PAYLOAD)
+            if readOperation is not None and deadline is not None and eventLoop.time() >= deadline:
+                device = None
+                raise TimeoutError("Overall read deadline expired before native read startup")
             transaction = ClusterAttribute.AsyncReadTransaction(future, eventLoop, self, returnClusterObject, nodeId=nodeId)
             ClusterAttribute.Read(transaction, device=device.deviceProxy,
                                   attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths,

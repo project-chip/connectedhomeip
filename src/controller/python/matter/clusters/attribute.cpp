@@ -31,6 +31,7 @@
 #include <controller/python/matter/native/PyChipError.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
 
@@ -543,7 +544,7 @@ exit:
     return ToPyChipError(err);
 }
 
-PyChipError pychip_ReadClient_AbortRead(ReadClient * apReadClient)
+DLL_EXPORT PyChipError pychip_ReadClient_AbortRead(ReadClient * apReadClient)
 {
     return ToPyChipError(apReadClient == nullptr ? CHIP_NO_ERROR : apReadClient->AbortRead());
 }
