@@ -187,6 +187,7 @@ class TC_COMPRO_2_2(MatterTestCommissionedDevice, COMPROBaseTest):
                                                  timeout_sec=response_deadline)
         asserts.assert_equal(response.numberOfResults, len(response.proxyScanResult),
                              "NumberOfResults must equal the number of ProxyScanResult entries")
+        self.assert_entries_unique_and_in_range(response.proxyScanResult, "Step 6 ProxyScanResult")
         ed_results, other_results = self.split_ed_entries(response.proxyScanResult)
         logger.info("Step 6: other devices listed: %s", self.describe_entries(other_results))
         asserts.assert_false(
@@ -240,19 +241,7 @@ class TC_COMPRO_2_2(MatterTestCommissionedDevice, COMPROBaseTest):
             if has_wi and (result.transport & wifipaf_bit):
                 asserts.assert_not_equal(result.wiFiBand, NullValue,
                                          "ScanResultStruct.WiFiBand must be populated for PAFTP results when WI is supported")
-        # Each device is reported once per (Discriminator, VendorID, ProductID, Transport)
-        # — the ProxyScanResponse must not contain duplicate tuples.
-        seen_keys = set()
-        for r in response.proxyScanResult:
-            asserts.assert_less_equal(r.discriminator, 4095,
-                                      "ScanResultStruct.Discriminator must be <= 4095")
-            key = (r.discriminator, r.vendorID, r.productID, r.transport)
-            asserts.assert_true(
-                key not in seen_keys,
-                f"Duplicate scan result for (discriminator={r.discriminator}, vendorID={r.vendorID}, "
-                f"productID={r.productID}, transport=0x{r.transport:02x}); each device must be "
-                "reported once per discriminator/VendorID/ProductID/transport")
-            seen_keys.add(key)
+        self.assert_entries_unique_and_in_range(response.proxyScanResult, "Step 8 ProxyScanResult")
 
         # Step 9 — defined but unsupported transport → INVALID_TRANSPORT_TYPE
         # The spec returns INVALID_TRANSPORT_TYPE for defined transport bits not supported

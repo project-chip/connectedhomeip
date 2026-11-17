@@ -839,6 +839,24 @@ class COMPROBaseTest(MatterBaseTest):
         return ", ".join(f"disc={r.discriminator} vid=0x{r.vendorID:04x} pid=0x{r.productID:04x} "
                          f"transport=0x{r.transport:02x}" for r in entries) or "none"
 
+    @classmethod
+    def assert_entries_unique_and_in_range(cls, results, label: str) -> None:
+        """Fail if ScanResultStruct entries (a list, or NullValue) hold a Discriminator above 4095 or a repeated key.
+
+        ProxyScanResult and CachedResults list each device once per
+        (Discriminator, VendorID, ProductID, Transport), whichever device it is.
+        """
+        seen_keys = set()
+        for r in ([] if results is NullValue else results):
+            asserts.assert_less_equal(r.discriminator, 4095,
+                                      f"{label}: Discriminator must be <= 4095: {cls.describe_entries([r])}")
+            key = (r.discriminator, r.vendorID, r.productID, r.transport)
+            asserts.assert_true(
+                key not in seen_keys,
+                f"{label}: duplicate entry {cls.describe_entries([r])}; each device must be listed "
+                "once per Discriminator/VendorID/ProductID/Transport")
+            seen_keys.add(key)
+
     async def fail_ed_missing(self, label: str, other_entries: list, has_bgs: bool = True) -> None:
         """Fail because no entry has the ED's discriminator, naming a list full of other devices."""
         message = f"{label}: no entry with the ED's discriminator {self.ed_discriminator}"

@@ -260,7 +260,8 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
         ed_discriminator = self.ed_discriminator
 
         def _assert_no_ed_entry(cached_results, label: str):
-            """Fail if the ED has an entry; other devices' entries are only logged."""
+            """Fail if the ED has an entry or the list breaks the duplicate or Discriminator range rules."""
+            self.assert_entries_unique_and_in_range(cached_results, f"{label} CachedResults")
             ed_results, other_results = self.split_ed_entries(cached_results)
             logger.info("%s: other devices cached: %s", label, self.describe_entries(other_results))
             asserts.assert_false(
@@ -375,19 +376,7 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
             if has_wi and (result.transport & wifipaf_bit):
                 asserts.assert_not_equal(result.wiFiBand, NullValue,
                                          "CachedResult entry WiFiBand must be populated for PAFTP results when WI is supported")
-        # Cache holds one entry per unique device (CommissioningProxy.adoc CachedResults:
-        # "each unique device based on discriminator, VendorID, ProductID and Transport").
-        seen_keys = set()
-        for r in cached_results:
-            asserts.assert_less_equal(r.discriminator, 4095,
-                                      "CachedResult entry Discriminator must be <= 4095")
-            key = (r.discriminator, r.vendorID, r.productID, r.transport)
-            asserts.assert_true(
-                key not in seen_keys,
-                f"Duplicate cached result for (discriminator={r.discriminator}, vendorID={r.vendorID}, "
-                f"productID={r.productID}, transport=0x{r.transport:02x}); CachedResults must hold one "
-                "entry per unique discriminator/VendorID/ProductID/Transport")
-            seen_keys.add(key)
+        self.assert_entries_unique_and_in_range(cached_results, "Step 9 CachedResults")
 
         # Step 10 — read CacheTimeout
         self.step(10)
@@ -414,6 +403,7 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
         logger.info("Waiting up to %d s for the ED's entry to expire via subscription...", expiry_deadline)
         reported = _wait_for_ed_entry(False, expiry_deadline, "step 12")
         num_cached, cached_results = await self.read_cached_results()
+        self.assert_entries_unique_and_in_range(cached_results, "Step 12 CachedResults")
         ed_results, other_results = self.split_ed_entries(cached_results)
         logger.info("Step 12: NumCachedResults=%d; other devices cached: %s",
                     num_cached, self.describe_entries(other_results))
