@@ -189,12 +189,13 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for all the state changes i.e. Querying, Downloading, Applying, Idle (optional)."
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnApply."),
             TestStep(10, "DUT sends the NotifyUpdateApplied Command to the OTA-P after installing the software update.", "Verify that the NotifyUpdateApplied message received on the OTA-P has the following fields."
-                        "UpdateToken - verify that it is the same as the one provided by the OTA provider in the QueryImageResponse."
-                        "SoftwareVersion - verify the software version on the DUT to match the version downloaded for the software update."),
-            TestStep(11, "TH reads BootReason in General Diagnostics cluster from the DUT.", "Verify that the returned value of BootReason is SoftwareUpdateCompleted"),
+                     "UpdateToken - verify that it is the same as the one provided by the OTA provider in the QueryImageResponse."
+                     "SoftwareVersion - verify the software version on the DUT to match the version downloaded for the software update."),
+            TestStep(11, "TH reads BootReason in General Diagnostics cluster from the DUT.",
+                     "Verify that the returned value of BootReason is SoftwareUpdateCompleted"),
             TestStep(12, "OTA-Subscriber sends a read request to read the VersionApplied event from the DUT.", "Verify that the VersionApplied event is generated whenever a new version starts executing after being applied due to a software update.Verify that the data in this event has the following"
-                                 "SoftwareVersion - Same as the one available in the SoftwareVersion attribute of the Basic Information Cluster for the newly executing version"
-                                 "ProductID - Same as what is available in the ProductID attribute of the Basic Information Cluster"),
+                     "SoftwareVersion - Same as the one available in the SoftwareVersion attribute of the Basic Information Cluster for the newly executing version"
+                     "ProductID - Same as what is available in the ProductID attribute of the Basic Information Cluster"),
             TestStep(13, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable' "
                      "and SoftwareVersion is set to the same version the DUT just applied (V2), which is numerically equal to the current version.",
                      "Verify that the DUT does not start transferring the software image."),
@@ -1779,8 +1780,6 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             controller=controller, node_id=requestor_node_id, target_version=ota_image_version)
         logger.info('%s: Step #9.6 - DUT confirmed running software version %s.', step_number_s9, ota_image_version)
 
-        
-        
         self.step(10)
         step_number_s10 = "[STEP_10]"
         notify_command = {"Name": "GetNotifyUpdateAppliedStatus", "Cluster": "OtaSoftwareUpdateProvider",
@@ -1800,7 +1799,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         asserts.assert_equal(
             received_software_version, ota_image_version,
             f"{step_number_s10}: NotifyUpdateApplied SoftwareVersion does not match the downloaded software version.")
-        logger.info("%s NofityUpdateApplied data from named_pipe: UpdateToken %s, SoftwareVersion: %s ", step_number_s10, expected_update_token, ota_image_version)
+        logger.info("%s NofityUpdateApplied data from named_pipe: UpdateToken %s, SoftwareVersion: %s ",
+                    step_number_s10, expected_update_token, ota_image_version)
 
         # Terminate the provider at this point as is no longer needed.
         self.terminate_provider()
@@ -1815,8 +1815,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             endpoint=self.get_endpoint(),
         )
         logger.info("%s Device BootReason value: %d", step_number_s11, boot_reason)
-        asserts.assert_equal(boot_reason, Clusters.GeneralDiagnostics.Enums.BootReasonEnum.kSoftwareUpdateCompleted, "BootReason is not SoftwareUpdateCompleted")
-
+        asserts.assert_equal(boot_reason, Clusters.GeneralDiagnostics.Enums.BootReasonEnum.kSoftwareUpdateCompleted,
+                             "BootReason is not SoftwareUpdateCompleted")
 
         self.step(12)
         # Read the VersionApplied event: once the device is back and idle, it must be in the
@@ -1850,7 +1850,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             attribute=Clusters.BasicInformation.Attributes.ProductID)
         asserts.assert_equal(version_applied_event_data.productID, product_id,
                              "ProductID from BasicInformationCluster is not the same from the VersionAppliedEvent")
-        
+
         self.step(13)
         # ------------------------------------------------------------------------------------
         # [STEP_13]: Prerequisites - Setup Provider
