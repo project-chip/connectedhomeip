@@ -19,17 +19,38 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <device/types/battery-storage/BatteryStorage.h>
+#include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 
 namespace chip::app {
 
+class SimulatedBatteryStorageDelegates
+{
+protected:
+    SimulatedBatteryStorageDelegates(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate) :
+        mGridSensorDelegate(timerDelegate, testEventTriggerDelegate, SimulatedElectricalSensorDelegate::Role::kGrid),
+        mBatterySensorDelegate(timerDelegate, testEventTriggerDelegate, SimulatedElectricalSensorDelegate::Role::kBattery)
+    {}
+
+    SimulatedElectricalSensorDelegate mGridSensorDelegate;
+    SimulatedElectricalSensorDelegate mBatterySensorDelegate;
+};
+
 /// Simulated Battery Storage with optional Identify on the parent endpoint.
-class SimulatedBatteryStorage : public BatteryStorage
+class SimulatedBatteryStorage : private SimulatedBatteryStorageDelegates, public BatteryStorage
 {
 public:
-    using Context = BatteryStorage::Context;
+    struct Context
+    {
+        TimerDelegate & timerDelegate;
+        TestEventTriggerDelegate & testEventTriggerDelegate;
+    };
 
     explicit SimulatedBatteryStorage(const Context & context);
     ~SimulatedBatteryStorage() override = default;
+
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
 

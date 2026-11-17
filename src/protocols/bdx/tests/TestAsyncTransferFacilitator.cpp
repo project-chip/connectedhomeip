@@ -206,7 +206,6 @@ TEST_F(TestAsyncResponder, ChipErrorOverloadWithNoErrorContinuesTransfer)
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode  = TransferControlFlags::kReceiverDrive;
     acceptData.MaxBlockSize = responder.Transfer().GetTransferBlockSize();
-    acceptData.StartOffset  = responder.Transfer().GetStartOffset();
     acceptData.Length       = responder.Transfer().GetTransferLength();
     ASSERT_SUCCESS(responder.Transfer().AcceptTransfer(acceptData));
 

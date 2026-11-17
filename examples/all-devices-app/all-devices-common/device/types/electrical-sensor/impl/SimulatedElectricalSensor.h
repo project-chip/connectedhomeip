@@ -25,12 +25,11 @@
 namespace chip::app {
 
 /**
- * Simulated electrical sensor that supports test event triggers
+ * Simulated measurements and test event triggers for an electrical sensor.
  */
-class SimulatedElectricalSensor : public ElectricalSensor,
-                                  public Clusters::ElectricalEnergyMeasurement::Delegate,
-                                  public Clusters::ElectricalPowerMeasurement::Delegate,
-                                  public Clusters::PowerTopology::Delegate
+class SimulatedElectricalSensorDelegate : public Clusters::ElectricalEnergyMeasurement::Delegate,
+                                          public Clusters::ElectricalPowerMeasurement::Delegate,
+                                          public Clusters::PowerTopology::Delegate
 {
 public:
     enum class Role : uint8_t
@@ -40,14 +39,16 @@ public:
         kBattery,
     };
 
-    explicit SimulatedElectricalSensor(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate,
-                                       Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {},
-                                       Role role                                                               = Role::kGeneric);
-    ~SimulatedElectricalSensor() override = default;
+    SimulatedElectricalSensorDelegate(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate,
+                                      Role role = Role::kGeneric);
 
-    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
-    void Unregister(CodeDrivenDataModelProvider & provider) override;
+    /// The delegate and tag list must outlive the configured sensor.
+    ElectricalSensor::Config GetConfig(TimerDelegate & timerDelegate,
+                                       Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {});
+
+    /// Attach event triggers after sensor registration; call Unregister() before sensor teardown.
+    CHIP_ERROR Register(ElectricalSensor & sensor);
+    void Unregister();
 
     // Clusters::ElectricalEnergyMeasurement::Delegate implementation
 
@@ -131,6 +132,18 @@ private:
     Role mRole;
     FakeReadings mFakeReadings;
     TestEventTriggerDelegate & mTestEventTriggerDelegate;
+};
+
+class SimulatedElectricalSensor : public SimulatedElectricalSensorDelegate, public ElectricalSensor
+{
+public:
+    explicit SimulatedElectricalSensor(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate,
+                                       Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {},
+                                       Role role                                                               = Role::kGeneric);
+    ~SimulatedElectricalSensor() override = default;
+
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
 };
 
 } // namespace chip::app
