@@ -143,10 +143,8 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
     auto client = Platform::MakeUnique<app::WriteClient>(app::InteractionModelEngine::GetInstance()->GetExchangeManager(),
-                                                         callback->GetChunkedCallback(), aTimedWriteTimeoutMs);
+                                                         callback->GetChunkedCallback(), sessionHandle, aTimedWriteTimeoutMs);
     VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    ReturnErrorOnFailure(client->PrepareForSession(sessionHandle));
 
     if (sessionHandle->IsGroupSession())
     {

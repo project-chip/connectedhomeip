@@ -340,7 +340,7 @@ TEST_F(TestAclAttribute, AccessDeniedPrecedenceOverUnsupportedEndpoint_Write)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         AttributePathParams attributePathParams;
         attributePathParams.mEndpointId  = kTestUnsupportedEndpointId;
@@ -380,7 +380,7 @@ TEST_F(TestAclAttribute, AccessDeniedPrecedenceOverUnsupportedEndpoint_Write)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         AttributePathParams attributePathParams;
         attributePathParams.mEndpointId  = kTestUnsupportedEndpointId;
@@ -423,7 +423,7 @@ TEST_F(TestAclAttribute, AccessDeniedPrecedenceOverUnsupportedCluster_Write)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         AttributePathParams attributePathParams;
         attributePathParams.mEndpointId  = kTestDeniedEndpointId;
@@ -463,7 +463,7 @@ TEST_F(TestAclAttribute, AccessDeniedPrecedenceOverUnsupportedCluster_Write)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         AttributePathParams attributePathParams;
         attributePathParams.mEndpointId  = kTestEndpointId;
@@ -506,7 +506,7 @@ TEST_F(TestAclAttribute, AccessDeniedPrecedenceOverUnsupportedAttribute_Write)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         AttributePathParams attributePathParams;
         attributePathParams.mEndpointId  = kTestDeniedEndpointId;
@@ -546,7 +546,7 @@ TEST_F(TestAclAttribute, AccessDeniedPrecedenceOverUnsupportedAttribute_Write)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         AttributePathParams attributePathParams;
         attributePathParams.mEndpointId  = kTestEndpointId;
@@ -626,7 +626,7 @@ TEST_F(TestAclAttribute, LegacyEncodingCacheReuseDuringWrite)
     auto * engine = InteractionModelEngine::GetInstance();
 
     TestWriteClientCallback callback;
-    WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+    WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
     // Encode Attribute
     uint8_t tlvBuf[64];

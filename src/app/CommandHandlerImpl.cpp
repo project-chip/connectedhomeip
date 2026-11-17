@@ -328,15 +328,14 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     }
 
     // When updating these checks, please remember to make corresponding changes to TestOnlyInvokeCommandRequestWithFaultsInjected.
-    // A missing SuppressResponse or TimedRequest is FALSE (both members start as false).
-    CHIP_ERROR fieldErr = invokeRequestMessage.GetSuppressResponse(&mSuppressResponse);
-    VerifyOrReturnError(fieldErr == CHIP_NO_ERROR || fieldErr == CHIP_END_OF_TLV, Status::InvalidAction);
-    fieldErr = invokeRequestMessage.GetTimedRequest(&mTimedRequest);
-    VerifyOrReturnError(fieldErr == CHIP_NO_ERROR || fieldErr == CHIP_END_OF_TLV, Status::InvalidAction);
-    if (IsGroupRequest())
-    {
-        mSuppressResponse = true;
-    }
+    // A missing SuppressResponse or TimedRequest is FALSE.
+    mSuppressResponse   = false;
+    CHIP_ERROR fieldErr = invokeRequestMessage.GetSuppressResponse(&mSuppressResponse).NoErrorIf(CHIP_END_OF_TLV);
+    VerifyOrReturnError(fieldErr == CHIP_NO_ERROR, Status::InvalidAction);
+
+    mTimedRequest = false;
+    fieldErr      = invokeRequestMessage.GetTimedRequest(&mTimedRequest).NoErrorIf(CHIP_END_OF_TLV);
+    VerifyOrReturnError(fieldErr == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
     std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
     VerifyOrReturnError(invokeRequestMessage.GetDelayReportData(delayReportData) == CHIP_NO_ERROR, Status::InvalidAction);
@@ -1167,12 +1166,13 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
     TEMPORARY_RETURN_IGNORED invokeRequestMessage.PrettyPrint();
 #endif
 
-    CHIP_ERROR fieldErr = invokeRequestMessage.GetSuppressResponse(&mSuppressResponse);
-    VerifyOrDieWithMsg(fieldErr == CHIP_NO_ERROR || fieldErr == CHIP_END_OF_TLV, DataManagement,
-                       "DUT Failure: Invalid SuppressResponse field");
-    fieldErr = invokeRequestMessage.GetTimedRequest(&mTimedRequest);
-    VerifyOrDieWithMsg(fieldErr == CHIP_NO_ERROR || fieldErr == CHIP_END_OF_TLV, DataManagement,
-                       "DUT Failure: Invalid TimedRequest field");
+    mSuppressResponse   = false;
+    CHIP_ERROR fieldErr = invokeRequestMessage.GetSuppressResponse(&mSuppressResponse).NoErrorIf(CHIP_END_OF_TLV);
+    VerifyOrDieWithMsg(fieldErr == CHIP_NO_ERROR, DataManagement, "DUT Failure: Invalid SuppressResponse field");
+
+    mTimedRequest = false;
+    fieldErr      = invokeRequestMessage.GetTimedRequest(&mTimedRequest).NoErrorIf(CHIP_END_OF_TLV);
+    VerifyOrDieWithMsg(fieldErr == CHIP_NO_ERROR, DataManagement, "DUT Failure: Invalid TimedRequest field");
     VerifyOrDieWithMsg(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: Mandatory InvokeRequests field missing");
     std::optional<InvokeRequestMessage::DelayReportData> delayReportData;

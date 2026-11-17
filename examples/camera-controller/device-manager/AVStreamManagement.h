@@ -95,7 +95,8 @@ private:
     {
         chip::app::CommandPathParams commandPath = { endpointId, clusterId, commandId,
                                                      (chip::app::CommandPathFlags::kEndpointIdValid) };
-        mCommandSender = std::make_unique<chip::app::CommandSender>(this, device->GetExchangeManager(), false, false,
+        mCommandSender = std::make_unique<chip::app::CommandSender>(this, device->GetExchangeManager(),
+                                                                    device->GetSecureSession().Value(), false, false,
                                                                     device->GetSecureSession().Value()->AllowsLargePayload());
 
         VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);

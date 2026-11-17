@@ -25,7 +25,6 @@
 #include "lib/core/CHIPError.h"
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
-#include <app/OptionalRequestFlags.h>
 #include <app/TimedRequest.h>
 #include <app/WriteClient.h>
 
@@ -178,6 +177,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
     // false when the request is chunked.
     VerifyOrReturnError(!((mTimedWriteTimeoutMs.HasValue() || mSuppressResponse) && !mChunks.IsNull()),
                         CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrReturnError(!(mSessionIsGroup && mTimedWriteTimeoutMs.HasValue()), CHIP_ERROR_INVALID_ARGUMENT);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -205,18 +205,8 @@ CHIP_ERROR WriteClient::StartNewMessage()
     ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(reservedSize));
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
-    if (!mGroupcastRequest)
-    {
-        if (mSuppressResponse || !mOmitFalseRequestFlags)
-        {
-            mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
-        }
-        if (mTimedRequestFieldValue || !mOmitFalseRequestFlags)
-        {
-            mWriteRequestBuilder.TimedRequest(mTimedRequestFieldValue);
-        }
-        ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
-    }
+    mWriteRequestBuilder.RequestFlags(mSuppressResponse, mTimedRequestFieldValue, mPeerInteractionModelRevision, mSessionIsGroup);
+    ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     mWriteRequestBuilder.CreateWriteRequests();
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
 
@@ -465,13 +455,20 @@ void WriteClient::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "WriteClient moving to [%10.10s]", GetStateStr());
 }
 
-CHIP_ERROR WriteClient::PrepareForSession(const SessionHandle & session)
+void WriteClient::CaptureSessionInfo(const OptionalSessionHandleRef & aSession)
 {
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-    const bool isGroupSession = session->IsGroupSession();
-    VerifyOrReturnError(!(isGroupSession && mTimedWriteTimeoutMs.HasValue()), CHIP_ERROR_INVALID_ARGUMENT);
-    mGroupcastRequest      = isGroupSession;
-    mOmitFalseRequestFlags = PeerAcceptsOmittedRequestFlags(session);
+    VerifyOrReturn(aSession.has_value());
+    const SessionHandle & session = aSession->get();
+    mHasSessionInfo               = true;
+    mSessionIsGroup               = session->IsGroupSession();
+    mPeerInteractionModelRevision = session->GetPeerInteractionModelRevision();
+}
+
+CHIP_ERROR WriteClient::CheckMatchesSessionInfo(const SessionHandle & session) const
+{
+    VerifyOrReturnError(mHasSessionInfo, CHIP_NO_ERROR);
+    VerifyOrReturnError(session->IsGroupSession() == mSessionIsGroup, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(session->GetPeerInteractionModelRevision() == mPeerInteractionModelRevision, CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
 
@@ -479,15 +476,9 @@ CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (session->IsGroupSession())
-    {
-        VerifyOrReturnError(!mTimedWriteTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-    }
-    else
-    {
-        VerifyOrReturnError(!mGroupcastRequest, CHIP_ERROR_INVALID_MESSAGE_TYPE);
-    }
-    VerifyOrReturnError(!mOmitFalseRequestFlags || PeerAcceptsOmittedRequestFlags(session), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(CheckMatchesSessionInfo(session));
+    // Also needed when no session was passed at construction, since nothing rejected the timed write earlier.
+    VerifyOrReturnError(!(session->IsGroupSession() && mTimedWriteTimeoutMs.HasValue()), CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrExit(mState == State::AddAttribute, err = CHIP_ERROR_INCORRECT_STATE);
 

@@ -246,7 +246,8 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
 
     bool isTimedRequest = timedRequestTimeoutMs != 0 || testOnlySuppressTimedRequestMessage;
     std::unique_ptr<CommandSender> sender =
-        std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(), isTimedRequest, suppressResponse);
+        std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(), device->GetSecureSession().Value(),
+                                        isTimedRequest, suppressResponse);
 
     if (delayMinMs > 0 || delayJitterWindowMs > 0)
     {
@@ -257,7 +258,6 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
     }
 
     SuccessOrExit(err = sender->SetCommandSenderConfig(config));
-    SuccessOrExit(err = sender->PrepareForSession(device->GetSecureSession().Value()));
 
     for (size_t i = 0; i < length; i++)
     {
@@ -376,7 +376,7 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
     std::unique_ptr<CommandSenderCallback> callback =
         std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
     std::unique_ptr<CommandSender> sender =
-        std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
+        std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(), device->GetSecureSession().Value(),
                                         /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse, allowLargePayload);
 
     if (delayMinMs > 0 || delayJitterWindowMs > 0)
@@ -390,7 +390,6 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
     app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId, commandId,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = sender->PrepareForSession(device->GetSecureSession().Value()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams, false));
 
     {
@@ -463,8 +462,9 @@ PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
     bool callTestOnlyOnDone = false;
     std::unique_ptr<CommandSenderCallback> callback =
         std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
-    std::unique_ptr<CommandSender> sender = std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
-                                                                            /* is timed request */ true, suppressResponse);
+    std::unique_ptr<CommandSender> sender =
+        std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(), device->GetSecureSession().Value(),
+                                        /* is timed request */ true, suppressResponse);
 
     app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId, commandId,
                                          (app::CommandPathFlags::kEndpointIdValid) };
@@ -513,11 +513,11 @@ PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::C
     chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
     VerifyOrReturnError(exchangeManager != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
 
-    std::unique_ptr<CommandSender> sender = std::make_unique<CommandSender>(nullptr /* callback */, exchangeManager);
-
     chip::Transport::OutgoingGroupSession session(groupId, devCtrl->GetFabricIndex());
+    chip::SessionHandle sessionHandle(session);
+    std::unique_ptr<CommandSender> sender = std::make_unique<CommandSender>(nullptr /* callback */, exchangeManager, sessionHandle);
+
     app::CommandPathParams cmdParams = { groupId, clusterId, commandId, (app::CommandPathFlags::kGroupIdValid) };
-    SuccessOrExit(err = sender->PrepareForSession(chip::SessionHandle(session)));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams, false));
 
     {
@@ -531,7 +531,7 @@ PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::C
 
     SuccessOrExit(err = sender->FinishCommand(Optional<uint16_t>::Missing()));
 
-    SuccessOrExit(err = sender->SendGroupCommandRequest(chip::SessionHandle(session)));
+    SuccessOrExit(err = sender->SendGroupCommandRequest(sessionHandle));
 
     // TODO(#30985): Reconsider the purpose of busyWait and if it can be broken out into it's
     // own method/primitive.

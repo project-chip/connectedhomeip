@@ -82,10 +82,10 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
     decoder->SetOnDoneCallback(onDone);
 
     auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(
-        decoder.get(), aExchangeMgr, timedInvokeTimeoutMs.HasValue(), /* SuppressResponse = */ false, aAllowLargePayload);
+        decoder.get(), aExchangeMgr, sessionHandle, timedInvokeTimeoutMs.HasValue(), /* SuppressResponse = */ false,
+        aAllowLargePayload);
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(commandSender->PrepareForSession(sessionHandle));
     ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData, timedInvokeTimeoutMs));
     ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle, responseTimeout));
 
@@ -127,13 +127,13 @@ CHIP_ERROR InvokeGroupCommandRequest(Messaging::ExchangeManager * exchangeMgr, c
     app::CommandPathParams commandPath = { groupId, RequestObjectT::GetClusterId(), RequestObjectT::GetCommandId(),
                                            app::CommandPathFlags::kGroupIdValid };
     Transport::OutgoingGroupSession session(groupId, fabric);
+    SessionHandle sessionHandle(session);
 
-    auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(nullptr, exchangeMgr);
+    auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(nullptr, exchangeMgr, sessionHandle);
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(commandSender->PrepareForSession(SessionHandle(session)));
     ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData));
-    return commandSender->SendGroupCommandRequest(SessionHandle(session));
+    return commandSender->SendGroupCommandRequest(sessionHandle);
 }
 
 template <typename RequestObjectT>

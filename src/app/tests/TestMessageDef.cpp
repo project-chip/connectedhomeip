@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <optional>
+
 #include <app/AppConfig.h>
 #include <app/MessageDef/EventFilterIBs.h>
 #include <app/MessageDef/EventStatusIB.h>
@@ -28,6 +30,7 @@
 #include <app/MessageDef/TimedRequestMessage.h>
 #include <app/MessageDef/WriteRequestMessage.h>
 #include <app/MessageDef/WriteResponseMessage.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CHIPMem.h>
@@ -2205,6 +2208,102 @@ TEST_F(TestMessageDef, TestWriteRequestMessage)
 
     reader.Init(std::move(buf));
     ParseWriteRequestMessage(reader);
+}
+
+struct RequestFlagsCase
+{
+    bool suppressResponse;
+    bool timedRequest;
+    std::optional<uint16_t> peerRevision;
+    bool isGroupcast;
+    bool expectSuppressResponseEncoded;
+    bool expectTimedRequestEncoded;
+};
+
+constexpr uint16_t kRevisionWithOptionalFlags = chip::Revision::kFirstRevisionWithOptionalRequestFlags;
+
+const RequestFlagsCase kRequestFlagsCases[] = {
+    // Groupcast never encodes either field, whatever the values.
+    { false, false, std::nullopt, true, false, false },
+    { true, false, std::nullopt, true, false, false },
+    // Peer at the first revision with optional flags: only TRUE fields are encoded.
+    { false, false, kRevisionWithOptionalFlags, false, false, false },
+    { true, false, kRevisionWithOptionalFlags, false, true, false },
+    { false, true, kRevisionWithOptionalFlags, false, false, true },
+    { true, true, static_cast<uint16_t>(kRevisionWithOptionalFlags + 1), false, true, true },
+    // Older or unknown peer revision: both fields are always encoded.
+    { false, false, static_cast<uint16_t>(kRevisionWithOptionalFlags - 1), false, true, true },
+    { false, false, std::nullopt, false, true, true },
+};
+
+template <typename Parser>
+void CheckRequestFlags(const Parser & parser, const RequestFlagsCase & testCase)
+{
+    bool value = !testCase.suppressResponse;
+    if (testCase.expectSuppressResponseEncoded)
+    {
+        EXPECT_SUCCESS(parser.GetSuppressResponse(&value));
+        EXPECT_EQ(value, testCase.suppressResponse);
+    }
+    else
+    {
+        EXPECT_EQ(parser.GetSuppressResponse(&value), CHIP_END_OF_TLV);
+    }
+
+    value = !testCase.timedRequest;
+    if (testCase.expectTimedRequestEncoded)
+    {
+        EXPECT_SUCCESS(parser.GetTimedRequest(&value));
+        EXPECT_EQ(value, testCase.timedRequest);
+    }
+    else
+    {
+        EXPECT_EQ(parser.GetTimedRequest(&value), CHIP_END_OF_TLV);
+    }
+}
+
+TEST_F(TestMessageDef, TestInvokeRequestMessageRequestFlags)
+{
+    for (const auto & testCase : kRequestFlagsCases)
+    {
+        chip::System::PacketBufferTLVWriter writer;
+        writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+        InvokeRequestMessage::Builder builder;
+        ASSERT_SUCCESS(builder.Init(&writer));
+        builder.RequestFlags(testCase.suppressResponse, testCase.timedRequest, testCase.peerRevision, testCase.isGroupcast);
+        EXPECT_SUCCESS(builder.CreateInvokeRequests().EndOfInvokeRequests());
+        ASSERT_SUCCESS(builder.EndOfInvokeRequestMessage());
+        chip::System::PacketBufferHandle buf;
+        ASSERT_SUCCESS(writer.Finalize(&buf));
+
+        chip::System::PacketBufferTLVReader reader;
+        reader.Init(std::move(buf));
+        InvokeRequestMessage::Parser parser;
+        ASSERT_SUCCESS(parser.Init(reader));
+        CheckRequestFlags(parser, testCase);
+    }
+}
+
+TEST_F(TestMessageDef, TestWriteRequestMessageRequestFlags)
+{
+    for (const auto & testCase : kRequestFlagsCases)
+    {
+        chip::System::PacketBufferTLVWriter writer;
+        writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+        WriteRequestMessage::Builder builder;
+        ASSERT_SUCCESS(builder.Init(&writer));
+        builder.RequestFlags(testCase.suppressResponse, testCase.timedRequest, testCase.peerRevision, testCase.isGroupcast);
+        EXPECT_SUCCESS(builder.CreateWriteRequests().EndOfAttributeDataIBs());
+        ASSERT_SUCCESS(builder.EndOfWriteRequestMessage());
+        chip::System::PacketBufferHandle buf;
+        ASSERT_SUCCESS(writer.Finalize(&buf));
+
+        chip::System::PacketBufferTLVReader reader;
+        reader.Init(std::move(buf));
+        WriteRequestMessage::Parser parser;
+        ASSERT_SUCCESS(parser.Init(reader));
+        CheckRequestFlags(parser, testCase);
+    }
 }
 
 TEST_F(TestMessageDef, TestWriteResponseMessage)

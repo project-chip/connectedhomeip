@@ -107,6 +107,21 @@ public:
     InvokeRequestMessage::Builder & TimedRequest(const bool aTimedRequest);
 
     /**
+     *  @brief Encode SuppressResponse and TimedRequest as allowed for the destination of the request.
+     *
+     *  Groupcast requests carry neither field. Unicast requests to a peer at an interaction model revision of
+     *  at least Revision::kFirstRevisionWithOptionalRequestFlags carry only the fields that are true.
+     *  Requests to any other peer carry both fields.
+     *
+     *  @param [in] aSuppressResponse  true if no response is to be sent back
+     *  @param [in] aTimedRequest      true if this action is part of a timed invoke transaction
+     *  @param [in] aPeerRevision      peer interaction model revision from session parameters, std::nullopt if unknown
+     *  @param [in] aIsGroupcast       true if the request is sent on a group session
+     */
+    InvokeRequestMessage::Builder & RequestFlags(const bool aSuppressResponse, const bool aTimedRequest,
+                                                 const std::optional<uint16_t> & aPeerRevision, const bool aIsGroupcast);
+
+    /**
      *  @brief Encode DelayReportData structure.
      */
     InvokeRequestMessage::Builder & DelayReport(const DelayReportData & aDelayReportData);

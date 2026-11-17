@@ -315,22 +315,34 @@ public:
      *
      * The callback passed in has to outlive this CommandSender object.
      * If used in a groups setting, callbacks do not need to be passed.
-     * If callbacks are passed the only one that will be called in a group sesttings is the onDone
+     * If callbacks are passed the only one that will be called in a group settings is the onDone
+     *
+     * aSession is the session the invoke will be sent on. It is only read during construction.
+     *   - Passing the session allows CommandSender to optimize the encoding of the request based on
+     *     the information available from the session.
+     *   - Passing std::nullopt keeps an encoding that every receiver accepts. Use it when the session is not
+     *     known at construction time.
+     *   - When a session is passed, the session later given to SendCommandRequest or SendGroupCommandRequest
+     *     must be that same session. Otherwise the send fails with CHIP_ERROR_INVALID_ARGUMENT.
+     *   - A timed invoke cannot be sent on a group session: adding a command to a timed CommandSender created
+     *     for a group session fails with CHIP_ERROR_INVALID_ARGUMENT.
      */
-    CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false, bool aAllowLargePayload = false);
-    CommandSender(std::nullptr_t, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false, bool aAllowLargePayload = false) :
-        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
+    CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, const OptionalSessionHandleRef & aSession,
+                  bool aIsTimedRequest = false, bool aSuppressResponse = false, bool aAllowLargePayload = false);
+    CommandSender(std::nullptr_t, Messaging::ExchangeManager * apExchangeMgr, const OptionalSessionHandleRef & aSession,
+                  bool aIsTimedRequest = false, bool aSuppressResponse = false, bool aAllowLargePayload = false) :
+        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aSession, aIsTimedRequest, aSuppressResponse,
+                      aAllowLargePayload)
     {}
-    CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false, bool aAllowLargePayload = false);
+    CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
+                  const OptionalSessionHandleRef & aSession, bool aIsTimedRequest = false, bool aSuppressResponse = false,
+                  bool aAllowLargePayload = false);
     // TODO(#32138): After there is a macro that is always defined for all unit tests, the constructor with
     // TestOnlyMarker should only be compiled if that macro is defined.
     CommandSender(TestOnlyMarker aTestMarker, ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
-                  PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false,
-                  bool aAllowLargePayload = false) :
-        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
+                  const OptionalSessionHandleRef & aSession, PendingResponseTracker * apPendingResponseTracker,
+                  bool aIsTimedRequest = false, bool aSuppressResponse = false, bool aAllowLargePayload = false) :
+        CommandSender(apCallback, apExchangeMgr, aSession, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
     {
         mpPendingResponseTracker = apPendingResponseTracker;
     }
@@ -506,21 +518,6 @@ public:
     //
     CHIP_ERROR SendCommandRequest(const SessionHandle & session, Optional<System::Clock::Timeout> timeout = NullOptional);
 
-    /**
-     * Declare the session this invoke will be sent on, so the encoding of SuppressResponse and TimedRequest
-     * can be chosen before the first command is encoded:
-     *   - Group session: Neither field is encoded.
-     *                    Fails with CHIP_ERROR_INVALID_ARGUMENT if this CommandSender was created for a timed invoke.
-     *   - Other sessions: A field is not encoded when FALSE and the peer reported InteractionModelRevision >= 14
-     *                     during session establishment.
-     *                     Otherwise both fields are encoded.
-     *
-     * To presever callers' compatibility, Calling PrepareForSession before encoding commands is optional for all sessions.
-     * Without PrepareForSession, both fields are encoded.
-     * When PrepareForSession is used, it must be called before the first command is added.
-     */
-    CHIP_ERROR PrepareForSession(const SessionHandle & session);
-
     // Sends a queued up group command request to the target encapsulated by the secureSession handle.
     // Timed invokes are rejected with CHIP_ERROR_INVALID_ARGUMENT.
     //
@@ -626,6 +623,11 @@ private:
 
     CHIP_ERROR SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout);
 
+    void CaptureSessionInfo(const OptionalSessionHandleRef & aSession);
+
+    // Returns CHIP_ERROR_INVALID_ARGUMENT if a session was passed at construction and `session` does not match it.
+    CHIP_ERROR CheckMatchesSessionInfo(const SessionHandle & session) const;
+
     void OnResponseCallback(const ResponseData & aResponseData)
     {
         // mpExtendableCallback and mpCallback are mutually exclusive.
@@ -690,11 +692,15 @@ private:
     uint16_t mFinishedCommandCount       = 0;
     uint16_t mRemoteMaxPathsPerInvoke    = 1;
 
+    // Values read from the session passed at construction.
+    // mPeerInteractionModelRevision is std::nullopt when no session was passed or the peer revision is unknown.
+    std::optional<uint16_t> mPeerInteractionModelRevision;
+
     State mState                = State::Idle;
     bool mSuppressResponse      = false;
     bool mTimedRequest          = false;
-    bool mGroupcastRequest      = false;
-    bool mOmitFalseRequestFlags = false;
+    bool mHasSessionInfo        = false;
+    bool mSessionIsGroup        = false;
     bool mBufferAllocated       = false;
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;

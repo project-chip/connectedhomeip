@@ -31,6 +31,7 @@
 #include <app/CommandHandlerImpl.h>
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Encode.h>
 #include <app/tests/AppTestContext.h>
@@ -590,7 +591,7 @@ public:
     void TestInteractionModelCommands_SendGroupCommand_DelayReportData();
     void TestCommandHandler_UnicastMissingSuppressResponseAndTimedRequestAreFalse();
     void TestCommandSenderUnicastOmitsFalseRequestFlags();
-    void TestCommandSenderUnicastPreparationIsEnforced();
+    void TestCommandSenderConstructionSessionIsEnforced();
     void TestCommandHandler_GroupcastOmitsSuppressResponseAndTimedRequest();
     void TestCommandHandler_GroupcastWithLegacySuppressResponseAndTimedRequest();
 
@@ -896,7 +897,7 @@ void TestCommandInteraction::ValidateCommandHandlerEncodeInvokeResponseMessage(b
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage1)
 {
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     AddInvokeRequestData(&commandSender);
     asyncCommand = false;
@@ -967,7 +968,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage1)
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage2)
 {
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     AddInvokeRequestData(&commandSender);
     asyncCommand = false;
@@ -1036,7 +1037,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage2)
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage3)
 {
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     AddInvokeRequestData(&commandSender);
     asyncCommand = false;
@@ -1104,7 +1105,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage3)
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage4)
 {
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     AddInvokeRequestData(&commandSender);
     asyncCommand = false;
@@ -1169,7 +1170,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage4)
 TEST_F(TestCommandInteraction, TestCommandSender_WithWrongState)
 {
 
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_ERROR_INCORRECT_STATE);
 }
@@ -1196,7 +1197,7 @@ TEST_F(TestCommandInteraction, TestCommandHandler_WithWrongState)
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_WithSendCommand)
 {
 
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
@@ -1215,7 +1216,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_WithSendCommand)
 // Large payloads are only carried over TCP.
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_LargePayloadBufferFitsLargeMessage)
 {
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ false,
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt, /* aIsTimedRequest = */ false,
                                      /* aSuppressResponse = */ false, /* aAllowLargePayload = */ true);
 
     ASSERT_EQ(commandSender.AllocateBuffer(), CHIP_NO_ERROR);
@@ -1251,7 +1252,7 @@ TEST_F(TestCommandInteraction, TestCommandHandler_WithSendEmptyCommand)
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_WithProcessReceivedMsg)
 {
 
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
@@ -1268,7 +1269,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ExtendableApiWithP
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     uint16_t mockCommandRef = 1;
     EXPECT_SUCCESS(pendingResponseTracker.Add(mockCommandRef));
@@ -1295,7 +1296,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ExtendableApiWithP
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     uint16_t mockCommandRef = 1;
     EXPECT_SUCCESS(pendingResponseTracker.Add(mockCommandRef));
@@ -1324,7 +1325,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ValidateSecondLarg
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     app::CommandSender::AddRequestDataParameters addRequestDataParams;
 
@@ -1365,7 +1366,7 @@ TEST_F(TestCommandInteraction, TestCommandSender_FillUpRequest)
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     app::CommandSender::AddRequestDataParameters addRequestDataParams;
 
@@ -1393,7 +1394,7 @@ TEST_F(TestCommandInteraction, TestCommandHandler_CommandHandlerFillsUpResponse)
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     app::CommandSender::AddRequestDataParameters addRequestDataParams;
 
@@ -1460,7 +1461,7 @@ TEST_F(TestCommandInteraction, TestCommandHandlerInvalidMessageSync)
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     chip::isCommandDispatched = false;
     AddInvalidInvokeRequestData(&commandSender);
@@ -1602,7 +1603,7 @@ TEST_F(TestCommandInteraction, TestCommandSenderLegacyCallbackUnsupportedCommand
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     AddInvokeRequestData(&commandSender, kTestNonExistCommandId);
     EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
@@ -1621,7 +1622,7 @@ TEST_F(TestCommandInteraction, TestCommandSender_ExtendableCallbackUnsupportedCo
 {
 
     mockCommandSenderExtendedDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderExtendedDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderExtendedDelegate, &GetExchangeManager(), std::nullopt);
 
     AddInvokeRequestData(&commandSender, kTestNonExistCommandId);
     EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
@@ -1639,7 +1640,7 @@ TEST_F(TestCommandInteraction, TestCommandSender_ExtendableCallbackUnsupportedCo
 TEST_F(TestCommandInteraction, TestCommandSenderLegacyCallbackBuildingBatchCommandFails)
 {
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
     app::CommandSender::PrepareCommandParameters prepareCommandParams;
     app::CommandSender::FinishCommandParameters finishCommandParams;
     prepareCommandParams.SetStartDataStruct(true).SetCommandRef(0);
@@ -1669,7 +1670,7 @@ TEST_F(TestCommandInteraction, TestCommandSender_ExtendableCallbackBuildingBatch
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
     app::CommandSender::PrepareCommandParameters prepareCommandParams;
     app::CommandSender::FinishCommandParameters finishCommandParams;
 
@@ -1697,7 +1698,7 @@ TEST_F(TestCommandInteraction, TestCommandSender_ExtendableCallbackBuildingBatch
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
     app::CommandSender::PrepareCommandParameters prepareCommandParams;
     app::CommandSender::FinishCommandParameters finishCommandParams;
 
@@ -1732,7 +1733,7 @@ TEST_F(TestCommandInteraction, TestCommandSenderCommandSuccessResponseFlow)
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     AddInvokeRequestData(&commandSender);
     EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
@@ -1752,15 +1753,12 @@ TEST_F(TestCommandInteraction, TestCommandSenderCommandSuccessResponseFlow)
 
 TEST_F(TestCommandInteraction, TestCommandSenderGroupCommandNoResponseFlow)
 {
-    for (bool prepare : { false, true })
+    for (bool passSessionAtConstruction : { false, true })
     {
         mockCommandSenderDelegate.ResetCounter();
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
         SessionHandle groupSession = GetSessionBobToFriends();
-        if (prepare)
-        {
-            ASSERT_SUCCESS(commandSender.PrepareForSession(groupSession));
-        }
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(),
+                                         passSessionAtConstruction ? OptionalSessionHandleRef(groupSession) : std::nullopt);
 
         AddInvokeRequestData(&commandSender);
         chip::Testing::MessageCapturer messageLog(*this);
@@ -1775,7 +1773,7 @@ TEST_F(TestCommandInteraction, TestCommandSenderGroupCommandNoResponseFlow)
         InvokeRequestMessage::Parser parser;
         ASSERT_SUCCESS(parser.Init(reader));
         bool flag = true;
-        if (prepare)
+        if (passSessionAtConstruction)
         {
             EXPECT_EQ(parser.GetSuppressResponse(&flag), CHIP_END_OF_TLV);
             EXPECT_EQ(parser.GetTimedRequest(&flag), CHIP_END_OF_TLV);
@@ -1801,24 +1799,36 @@ TEST_F(TestCommandInteraction, TestCommandSenderGroupCommandNoResponseFlow)
 
 TEST_F(TestCommandInteraction, TestCommandSenderGroupcastEncodingIsEnforced)
 {
-    // A CommandSender prepared for groupcast does not encode the fields a unicast peer may require, so it cannot send unicast.
+    // A CommandSender constructed for a group session does not encode the fields a unicast peer may require,
+    // so it cannot send unicast.
     {
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
-        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToFriends()), CHIP_NO_ERROR);
+        SessionHandle groupSession = GetSessionBobToFriends();
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), groupSession);
         AddInvokeRequestData(&commandSender);
-        EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+        EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    // Groupcast cannot be timed, and the fields are written with the first command.
+    // A CommandSender constructed for a unicast session cannot send groupcast.
     {
-        app::CommandSender timedSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ true);
-        EXPECT_EQ(timedSender.PrepareForSession(GetSessionBobToFriends()), CHIP_ERROR_INVALID_ARGUMENT);
+        SessionHandle unicastSession = GetSessionBobToAlice();
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), unicastSession);
+        AddInvokeRequestData(&commandSender);
+        EXPECT_EQ(commandSender.SendGroupCommandRequest(GetSessionBobToFriends()), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Groupcast cannot be timed: the first command is rejected when the group session is passed at construction,
+    // and the send is rejected otherwise.
+    {
+        SessionHandle groupSession = GetSessionBobToFriends();
+        app::CommandSender timedSender(&mockCommandSenderDelegate, &GetExchangeManager(), groupSession,
+                                       /* aIsTimedRequest = */ true);
+        EXPECT_EQ(timedSender.PrepareCommand(MakeTestCommandPath(kTestCommandIdWithData)), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    {
+        app::CommandSender timedSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt,
+                                       /* aIsTimedRequest = */ true);
         AddInvokeRequestData(&timedSender);
         EXPECT_EQ(timedSender.SendGroupCommandRequest(GetSessionBobToFriends()), CHIP_ERROR_INVALID_ARGUMENT);
-
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
-        AddInvokeRequestData(&commandSender);
-        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToFriends()), CHIP_ERROR_INCORRECT_STATE);
     }
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
@@ -1868,22 +1878,22 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderUnicastOmitsFalseRe
         SessionHandle session = GetSessionBobToAlice();
         session->AsSecureSession()->SetRemoteSessionParameters(peerParameters);
 
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), aIsTimedRequest, aSuppressResponse);
-        EXPECT_EQ(commandSender.PrepareForSession(session), CHIP_NO_ERROR);
-        EXPECT_EQ(commandSender.PrepareCommand(MakeTestCommandPath(kTestCommandIdWithData)), CHIP_NO_ERROR);
-        EXPECT_EQ(commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true), CHIP_NO_ERROR);
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), session, aIsTimedRequest,
+                                         aSuppressResponse);
+        EXPECT_SUCCESS(commandSender.PrepareCommand(MakeTestCommandPath(kTestCommandIdWithData)));
+        EXPECT_SUCCESS(commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
         app::CommandSender::FinishCommandParameters finishCommandParams(aIsTimedRequest ? Optional<uint16_t>(1000)
                                                                                         : Optional<uint16_t>::Missing());
         finishCommandParams.SetEndDataStruct(true);
-        EXPECT_EQ(commandSender.FinishCommand(finishCommandParams), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(commandSender.FinishCommand(finishCommandParams));
 
         System::PacketBufferHandle commandDatabuf;
-        EXPECT_EQ(commandSender.Finalize(commandDatabuf), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(commandSender.Finalize(commandDatabuf));
 
         System::PacketBufferTLVReader reader;
         reader.Init(commandDatabuf.CloneData());
         InvokeRequestMessage::Parser parser;
-        EXPECT_EQ(parser.Init(reader), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(parser.Init(reader));
 
         EncodedFlags flags{ CHIP_NO_ERROR, true, CHIP_NO_ERROR, true };
         flags.suppressResponseError = parser.GetSuppressResponse(&flags.suppressResponse);
@@ -1891,33 +1901,39 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderUnicastOmitsFalseRe
         return flags;
     };
 
+    using chip::Revision::kFirstRevisionWithOptionalRequestFlags;
+
     // The peer accepts omission: only a TRUE value is encoded.
-    EncodedFlags flags = encodeUnicastInvoke(14, /* aIsTimedRequest = */ false, /* aSuppressResponse = */ false);
+    EncodedFlags flags =
+        encodeUnicastInvoke(kFirstRevisionWithOptionalRequestFlags, /* aIsTimedRequest = */ false, /* aSuppressResponse = */ false);
     EXPECT_EQ(flags.suppressResponseError, CHIP_END_OF_TLV);
     EXPECT_EQ(flags.timedRequestError, CHIP_END_OF_TLV);
 
-    flags = encodeUnicastInvoke(14, /* aIsTimedRequest = */ true, /* aSuppressResponse = */ false);
+    flags =
+        encodeUnicastInvoke(kFirstRevisionWithOptionalRequestFlags, /* aIsTimedRequest = */ true, /* aSuppressResponse = */ false);
     EXPECT_EQ(flags.suppressResponseError, CHIP_END_OF_TLV);
-    EXPECT_EQ(flags.timedRequestError, CHIP_NO_ERROR);
+    EXPECT_SUCCESS(flags.timedRequestError);
     EXPECT_TRUE(flags.timedRequest);
 
-    flags = encodeUnicastInvoke(14, /* aIsTimedRequest = */ false, /* aSuppressResponse = */ true);
-    EXPECT_EQ(flags.suppressResponseError, CHIP_NO_ERROR);
+    flags =
+        encodeUnicastInvoke(kFirstRevisionWithOptionalRequestFlags, /* aIsTimedRequest = */ false, /* aSuppressResponse = */ true);
+    EXPECT_SUCCESS(flags.suppressResponseError);
     EXPECT_TRUE(flags.suppressResponse);
     EXPECT_EQ(flags.timedRequestError, CHIP_END_OF_TLV);
 
     // An older or unknown peer revision requires both fields.
-    for (std::optional<uint16_t> peerRevision : { std::optional<uint16_t>(13), std::optional<uint16_t>() })
+    for (std::optional<uint16_t> peerRevision :
+         { std::optional<uint16_t>(kFirstRevisionWithOptionalRequestFlags - 1), std::optional<uint16_t>() })
     {
         flags = encodeUnicastInvoke(peerRevision, /* aIsTimedRequest = */ false, /* aSuppressResponse = */ false);
-        EXPECT_EQ(flags.suppressResponseError, CHIP_NO_ERROR);
+        EXPECT_SUCCESS(flags.suppressResponseError);
         EXPECT_FALSE(flags.suppressResponse);
-        EXPECT_EQ(flags.timedRequestError, CHIP_NO_ERROR);
+        EXPECT_SUCCESS(flags.timedRequestError);
         EXPECT_FALSE(flags.timedRequest);
     }
 }
 
-TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderUnicastPreparationIsEnforced)
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderConstructionSessionIsEnforced)
 {
     auto setPeerRevision = [this](std::optional<uint16_t> aPeerRevision) {
         SessionParameters peerParameters;
@@ -1929,31 +1945,13 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderUnicastPreparationI
         GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(peerParameters);
     };
 
-    // The session passed to the last call decides between groupcast and unicast encoding.
-    {
-        mockCommandSenderDelegate.ResetCounter();
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
-        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToFriends()), CHIP_NO_ERROR);
-        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToAlice()), CHIP_NO_ERROR);
-        AddInvokeRequestData(&commandSender);
-        ASSERT_SUCCESS(commandSender.SendCommandRequest(GetSessionBobToAlice()));
-        DrainAndServiceIO();
-        EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 1);
-        EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
-    }
-
-    // The fields are written with the first command.
-    {
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
-        AddInvokeRequestData(&commandSender);
-        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToAlice()), CHIP_ERROR_INCORRECT_STATE);
-    }
+    using chip::Revision::kFirstRevisionWithOptionalRequestFlags;
 
     // Fields omitted for one peer must not be sent on a session whose peer does not accept omission.
     {
-        setPeerRevision(14);
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
-        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToAlice()), CHIP_NO_ERROR);
+        setPeerRevision(kFirstRevisionWithOptionalRequestFlags);
+        SessionHandle session = GetSessionBobToAlice();
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), session);
         AddInvokeRequestData(&commandSender);
         setPeerRevision(std::nullopt);
         EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1961,12 +1959,25 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderUnicastPreparationI
 
     // A handler on the peer accepts the message with the fields omitted.
     {
-        setPeerRevision(14);
+        setPeerRevision(kFirstRevisionWithOptionalRequestFlags);
         mockCommandSenderDelegate.ResetCounter();
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
-        EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToAlice()), CHIP_NO_ERROR);
+        SessionHandle session = GetSessionBobToAlice();
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), session);
         AddInvokeRequestData(&commandSender);
-        EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(commandSender.SendCommandRequest(GetSessionBobToAlice()));
+        DrainAndServiceIO();
+        EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 1);
+        EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+    }
+
+    // Without a session at construction, the request can be sent on any session.
+    {
+        setPeerRevision(kFirstRevisionWithOptionalRequestFlags);
+        mockCommandSenderDelegate.ResetCounter();
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
+        AddInvokeRequestData(&commandSender);
+        setPeerRevision(std::nullopt);
+        EXPECT_SUCCESS(commandSender.SendCommandRequest(GetSessionBobToAlice()));
         DrainAndServiceIO();
         EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 1);
         EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
@@ -1980,30 +1991,30 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GroupcastOmitsSup
 {
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
+    SessionHandle groupSession = GetSessionBobToFriends();
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
-    EXPECT_EQ(commandSender.PrepareForSession(GetSessionBobToFriends()), CHIP_NO_ERROR);
+                                     groupSession, &pendingResponseTracker);
 
     constexpr GroupId kTestGroupId = 0x0101;
     {
         CommandPathParams commandPath = MakeTestGroupCommandPath(kTestGroupId, kTestClusterId, kTestCommandIdWithData);
         app::CommandSender::PrepareCommandParameters prepareCommandParams;
         prepareCommandParams.SetStartDataStruct(true);
-        EXPECT_EQ(CHIP_NO_ERROR, commandSender.PrepareCommand(commandPath, prepareCommandParams));
-        EXPECT_EQ(CHIP_NO_ERROR, commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+        EXPECT_SUCCESS(commandSender.PrepareCommand(commandPath, prepareCommandParams));
+        EXPECT_SUCCESS(commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
         app::CommandSender::FinishCommandParameters finishCommandParams;
         finishCommandParams.SetEndDataStruct(true);
-        EXPECT_EQ(CHIP_NO_ERROR, commandSender.FinishCommand(finishCommandParams));
+        EXPECT_SUCCESS(commandSender.FinishCommand(finishCommandParams));
     }
 
     System::PacketBufferHandle commandDatabuf;
-    EXPECT_EQ(commandSender.Finalize(commandDatabuf), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(commandSender.Finalize(commandDatabuf));
 
     {
         System::PacketBufferTLVReader reader;
         reader.Init(commandDatabuf.CloneData());
         InvokeRequestMessage::Parser parser;
-        EXPECT_EQ(parser.Init(reader), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(parser.Init(reader));
         bool flag = true;
         EXPECT_EQ(parser.GetSuppressResponse(&flag), CHIP_END_OF_TLV);
         EXPECT_EQ(parser.GetTimedRequest(&flag), CHIP_END_OF_TLV);
@@ -2029,20 +2040,20 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GroupcastWithLega
         mockCommandSenderExtendedDelegate.ResetCounter();
         PendingResponseTrackerImpl pendingResponseTracker;
         app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                         &pendingResponseTracker, aIsTimedRequest, /* aSuppressResponse = */ false);
+                                         std::nullopt, &pendingResponseTracker, aIsTimedRequest, /* aSuppressResponse = */ false);
         {
             CommandPathParams commandPath = MakeTestGroupCommandPath(kTestGroupId, kTestClusterId, kTestCommandIdWithData);
             app::CommandSender::PrepareCommandParameters prepareCommandParams;
             prepareCommandParams.SetStartDataStruct(true);
-            EXPECT_EQ(CHIP_NO_ERROR, commandSender.PrepareCommand(commandPath, prepareCommandParams));
-            EXPECT_EQ(CHIP_NO_ERROR, commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+            EXPECT_SUCCESS(commandSender.PrepareCommand(commandPath, prepareCommandParams));
+            EXPECT_SUCCESS(commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
             app::CommandSender::FinishCommandParameters finishCommandParams;
             finishCommandParams.SetEndDataStruct(true);
-            EXPECT_EQ(CHIP_NO_ERROR, commandSender.FinishCommand(finishCommandParams));
+            EXPECT_SUCCESS(commandSender.FinishCommand(finishCommandParams));
         }
 
         System::PacketBufferHandle commandDatabuf;
-        EXPECT_EQ(commandSender.Finalize(commandDatabuf), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(commandSender.Finalize(commandDatabuf));
 
         BasicCommandPathRegistry<4> basicCommandPathRegistry;
         MockGroupCommandResponder mockGroupCommandResponder(kTestGroupId, GetBobFabricIndex());
@@ -2065,7 +2076,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GroupcastWithLega
 TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseFlow)
 {
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ false,
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt, /* aIsTimedRequest = */ false,
                                      /* aSuppressResponse = */ true);
 
     AddInvokeRequestData(&commandSender);
@@ -2087,7 +2098,7 @@ TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseSuppressStatusRe
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ false,
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt, /* aIsTimedRequest = */ false,
                                      /* aSuppressResponse = */ true);
 
     chip::isCommandDispatched = false;
@@ -2111,7 +2122,7 @@ TEST_F(TestCommandInteraction, TestCommandSenderCommandAsyncSuccessResponseFlow)
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     AddInvokeRequestData(&commandSender);
     asyncCommand = true;
@@ -2143,12 +2154,13 @@ TEST_F(TestCommandInteraction, CommandSenderDeletedWhenResponseIsPending)
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender * commandSender = Platform::New<app::CommandSender>(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender * commandSender =
+        Platform::New<app::CommandSender>(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     AddInvokeRequestData(commandSender);
     asyncCommand = true;
 
-    EXPECT_EQ(commandSender->SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(commandSender->SendCommandRequest(GetSessionBobToAlice()));
 
     DrainAndServiceIO();
 
@@ -2180,7 +2192,7 @@ TEST_F(TestCommandInteraction, TestCommandSenderCommandSpecificResponseFlow)
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     AddInvokeRequestData(&commandSender, kTestCommandIdCommandSpecificResponse);
     EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
@@ -2198,7 +2210,7 @@ TEST_F(TestCommandInteraction, TestCommandSenderCommandFailureResponseFlow)
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     AddInvokeRequestData(&commandSender, kTestNonExistCommandId);
 
@@ -2225,7 +2237,7 @@ TEST_F(TestCommandInteraction, TestCommandSenderAbruptDestruction)
     mockCommandSenderDelegate.ResetCounter();
 
     {
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
         AddInvokeRequestData(&commandSender, kTestCommandIdCommandSpecificResponse);
 
@@ -2258,7 +2270,7 @@ TEST_F(TestCommandInteraction, TestCommandHandler_RejectMultipleIdenticalCommand
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     app::CommandSender::ConfigParameters configParameters;
     configParameters.SetRemoteMaxPathsPerInvoke(2);
@@ -2303,11 +2315,11 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_RejectsMultipleCo
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     app::CommandSender::ConfigParameters configParameters;
     configParameters.SetRemoteMaxPathsPerInvoke(2);
-    EXPECT_EQ(CHIP_NO_ERROR, commandSender.SetCommandSenderConfig(configParameters));
+    EXPECT_SUCCESS(commandSender.SetCommandSenderConfig(configParameters));
 
     uint16_t numberOfCommandsToSend = 2;
     {
@@ -2363,7 +2375,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_RejectMultipleCom
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     app::CommandSender::ConfigParameters configParameters;
     configParameters.SetRemoteMaxPathsPerInvoke(2);
@@ -2416,7 +2428,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_AcceptMultipleCom
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     app::CommandSender::ConfigParameters configParameters;
     configParameters.SetRemoteMaxPathsPerInvoke(2);
@@ -2555,7 +2567,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_FillUpInvokeRespo
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReleaseWithExchangeClosed)
 {
 
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     AddInvokeRequestData(&commandSender);
     asyncCommandHandle = nullptr;
@@ -2578,7 +2590,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReleaseWithExchan
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GetExchangeContextWhenAsync)
 {
 
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt);
 
     AddInvokeRequestData(&commandSender);
     asyncCommandHandle = nullptr;
@@ -2613,7 +2625,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData)
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     app::CommandSender::ConfigParameters configParameters;
     configParameters.SetRemoteMaxPathsPerInvoke(1);
@@ -2665,7 +2677,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_D
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     app::CommandSender::ConfigParameters configParameters;
     configParameters.SetRemoteMaxPathsPerInvoke(2);
@@ -2724,7 +2736,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_M
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     app::CommandSender::ConfigParameters configParameters;
     configParameters.SetRemoteMaxPathsPerInvoke(2);
@@ -2785,7 +2797,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_I
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     app::CommandSender::ConfigParameters configParameters;
     configParameters.SetRemoteMaxPathsPerInvoke(1);
@@ -2833,7 +2845,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_G
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
     app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
-                                     &pendingResponseTracker);
+                                     std::nullopt, &pendingResponseTracker);
 
     InvokeRequestMessage::DelayReportData delayReportData;
     delayReportData.delayMinMs          = 1000;

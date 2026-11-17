@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include "AttributeDataIBs.h"
 #include "MessageBuilder.h"
 #include "MessageParser.h"
@@ -105,6 +107,22 @@ public:
      *  @return A reference to *this
      */
     WriteRequestMessage::Builder & TimedRequest(const bool aTimedRequest);
+
+    /**
+     *  @brief Encode SuppressResponse and TimedRequest as allowed for the destination of the request.
+     *
+     *  Groupcast requests carry neither field. Unicast requests to a peer at an interaction model revision of
+     *  at least Revision::kFirstRevisionWithOptionalRequestFlags carry only the fields that are true.
+     *  Requests to any other peer carry both fields.
+     *
+     *  @param [in] aSuppressResponse  true if client need to signal suppress response
+     *  @param [in] aTimedRequest      true if client need to signal this is a timed request
+     *  @param [in] aPeerRevision      peer interaction model revision from session parameters, std::nullopt if unknown
+     *  @param [in] aIsGroupcast       true if the request is sent on a group session
+     *  @return A reference to *this
+     */
+    WriteRequestMessage::Builder & RequestFlags(const bool aSuppressResponse, const bool aTimedRequest,
+                                                const std::optional<uint16_t> & aPeerRevision, const bool aIsGroupcast);
 
     /**
      *  @brief Initialize a AttributeDataIBs::Builder for writing into the TLV stream

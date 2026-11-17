@@ -19,7 +19,6 @@
 #include "CommandSender.h"
 #include "StatusResponse.h"
 #include <app/InteractionModelTimeout.h>
-#include <app/OptionalRequestFlags.h>
 #include <app/TimedRequest.h>
 #include <platform/LockTracker.h>
 #include <protocols/Protocols.h>
@@ -55,22 +54,26 @@ CHIP_ERROR GetRef(ParserT aParser, Optional<uint16_t> & aRef, bool commandRefReq
 
 } // namespace
 
-CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest,
-                             bool aSuppressResponse, bool aAllowLargePayload) :
+CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
+                             const OptionalSessionHandleRef & aSession, bool aIsTimedRequest, bool aSuppressResponse,
+                             bool aAllowLargePayload) :
     mExchangeCtx(*this),
     mCallbackHandle(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest),
     mAllowLargePayload(aAllowLargePayload)
 {
     assertChipStackLockedByCurrentThread();
+    CaptureSessionInfo(aSession);
 }
 
 CommandSender::CommandSender(ExtendableCallback * apExtendableCallback, Messaging::ExchangeManager * apExchangeMgr,
-                             bool aIsTimedRequest, bool aSuppressResponse, bool aAllowLargePayload) :
+                             const OptionalSessionHandleRef & aSession, bool aIsTimedRequest, bool aSuppressResponse,
+                             bool aAllowLargePayload) :
     mExchangeCtx(*this),
     mCallbackHandle(apExtendableCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse),
     mTimedRequest(aIsTimedRequest), mUseExtendableCallback(true), mAllowLargePayload(aAllowLargePayload)
 {
     assertChipStackLockedByCurrentThread();
+    CaptureSessionInfo(aSession);
 #if CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
     mpPendingResponseTracker = &mNonTestPendingResponseTracker;
 #endif // CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
@@ -81,10 +84,28 @@ CommandSender::~CommandSender()
     assertChipStackLockedByCurrentThread();
 }
 
+void CommandSender::CaptureSessionInfo(const OptionalSessionHandleRef & aSession)
+{
+    VerifyOrReturn(aSession.has_value());
+    const SessionHandle & session = aSession->get();
+    mHasSessionInfo               = true;
+    mSessionIsGroup               = session->IsGroupSession();
+    mPeerInteractionModelRevision = session->GetPeerInteractionModelRevision();
+}
+
+CHIP_ERROR CommandSender::CheckMatchesSessionInfo(const SessionHandle & session) const
+{
+    VerifyOrReturnError(mHasSessionInfo, CHIP_NO_ERROR); // Return early if no session was passed at construction.
+    VerifyOrReturnError(session->IsGroupSession() == mSessionIsGroup, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(session->GetPeerInteractionModelRevision() == mPeerInteractionModelRevision, CHIP_ERROR_INVALID_ARGUMENT);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CommandSender::AllocateBuffer()
 {
     if (!mBufferAllocated)
     {
+        VerifyOrReturnError(!(mSessionIsGroup && mTimedRequest), CHIP_ERROR_INVALID_ARGUMENT);
         mCommandMessageWriter.Reset();
 
         System::PacketBufferHandle commandPacket;
@@ -111,20 +132,8 @@ CHIP_ERROR CommandSender::AllocateBuffer()
         ReturnErrorOnFailure(
             mInvokeRequestBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
-        // Groupcast never encodes SuppressResponse or TimedRequest.
-        // For unicast sessions, they are only encoded if true or the peer reported InteractionModelRevision is unknown or < 14.
-        if (!mGroupcastRequest)
-        {
-            if (mSuppressResponse || !mOmitFalseRequestFlags)
-            {
-                mInvokeRequestBuilder.SuppressResponse(mSuppressResponse);
-            }
-            if (mTimedRequest || !mOmitFalseRequestFlags)
-            {
-                mInvokeRequestBuilder.TimedRequest(mTimedRequest);
-            }
-            ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
-        }
+        mInvokeRequestBuilder.RequestFlags(mSuppressResponse, mTimedRequest, mPeerInteractionModelRevision, mSessionIsGroup);
+        ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
 
         mInvokeRequestBuilder.CreateInvokeRequests(/* aReserveEndBuffer = */ true);
         ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
@@ -135,20 +144,9 @@ CHIP_ERROR CommandSender::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::PrepareForSession(const SessionHandle & session)
-{
-    VerifyOrReturnError(!mBufferAllocated, CHIP_ERROR_INCORRECT_STATE);
-    const bool isGroupSession = session->IsGroupSession();
-    VerifyOrReturnError(!(isGroupSession && mTimedRequest), CHIP_ERROR_INVALID_ARGUMENT);
-    mGroupcastRequest      = isGroupSession;
-    mOmitFalseRequestFlags = PeerAcceptsOmittedRequestFlags(session);
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout)
 {
-    VerifyOrReturnError(!mGroupcastRequest, CHIP_ERROR_INVALID_MESSAGE_TYPE);
-    VerifyOrReturnError(!mOmitFalseRequestFlags || PeerAcceptsOmittedRequestFlags(session), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(CheckMatchesSessionInfo(session));
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(Finalize(mPendingInvokeData));
@@ -216,7 +214,10 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
 
 CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session)
 {
+    ReturnErrorOnFailure(CheckMatchesSessionInfo(session));
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    // Needed when no session was passed at construction.
+    VerifyOrReturnError(session->IsGroupSession(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!mTimedRequest && !mTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(Finalize(mPendingInvokeData));
