@@ -1427,7 +1427,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_9]: Prerequisites - Setup Provider
         # The provider is started with updateAvailable args and kept running through the DUT
-        # reboot so Step 10 can inspect the NotifyUpdateApplied command.
+        # reboot so Step 10 can inspect the NotifyUpdateApplied command and Step 12 read VersionAppliedEvent
         # ------------------------------------------------------------------------------------
         step_number_s9 = "[STEP_9]"
         logger.info('%s: Prerequisite #1.0 - Requestor (DUT), NodeID: %s, FabricId: %s',
@@ -1935,7 +1935,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # transitions — is what makes the cycle observed below prove the same-version rejection
         # actually happened against this provider.
         # ------------------------------------------------------------------------------------
-        logger.info('%s: Step #10.2 - Controller sends AnnounceOTAProvider command', step_number_s13)
+        logger.info('%s: Step #13.2 - Controller sends AnnounceOTAProvider command', step_number_s13)
         await self._announce_until_provider_queried(
             controller=controller,
             provider_node_id=provider_node_id,
@@ -1965,7 +1965,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # a kQuerying report coalesced away entirely — into a prompt, clear failure rather than
         # an indefinite wait.
         # ------------------------------------------------------------------------------------
-        logger.info('%s: Step #10.3 - Phase A — waiting for kQuerying (DUT queries the provider after announce).',
+        logger.info('%s: Step #13.3 - Phase A — waiting for kQuerying (DUT queries the provider after announce).',
                     step_number_s13)
         subscription_s13.await_first_value_asserting_no_forbidden(
             target_value=kQuerying_s6,
@@ -1986,7 +1986,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info('%s: kIdle after query observed — cycle completed without download.', step_number_s13)
 
         subscription_s13.cancel()
-        logger.info('%s: Step #10.4 - Query cycle fully completed after announce.', step_number_s13)
+        logger.info('%s: Step #13.4 - Query cycle fully completed after announce.', step_number_s13)
         logger.info("%s: No image transfer occurred (expected — DUT already on V2).", step_number_s13)
 
 
