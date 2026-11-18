@@ -155,7 +155,8 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
         }
 
         // Remove the old entry; the insertion below puts the address back with its higher score.
-        for (uint8_t j = i; j + 1 < count; j++)
+        // count never exceeds kNodeLookupResultsLen, but GCC's -Warray-bounds needs the second bound to see that.
+        for (uint8_t j = i; j + 1 < count && j + 1 < kNodeLookupResultsLen; j++)
         {
             results[j] = results[j + 1];
         }
