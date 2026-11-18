@@ -4726,8 +4726,7 @@ void DeviceCommissioner::CommissioningInitialPhaseComplete(DeviceProxy * proxy)
     {
         mPairingDelegate->OnInitialPhaseComplete(
             PeerId(GetCompressedFabricId(), proxy->GetDeviceId()),
-            proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType(),
-            mInitialPhaseIsUnpowered);
+            proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType(), mInitialPhaseIsUnpowered);
         VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
     }
     CommissioningStageComplete(CHIP_NO_ERROR);
