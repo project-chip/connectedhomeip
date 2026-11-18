@@ -147,6 +147,8 @@ class TC_MEDIAPLAYBACK_6_12(MatterTestCommissionedDevice, MEDIAPLAYBACKTestBase)
 
         self.step(2)
         await self.switch_content(endpoint, presets, 0)
+        if presets is not None:
+            self.confirm_playback_started("first")
 
         self.step(3)
         first_info = await self.read_single_attribute_check_success(
@@ -155,6 +157,8 @@ class TC_MEDIAPLAYBACK_6_12(MatterTestCommissionedDevice, MEDIAPLAYBACKTestBase)
 
         self.step(4)
         await self.switch_content(endpoint, presets, 1)
+        if presets is not None:
+            self.confirm_playback_started("second")
 
         self.step(5)
         second_info = await self.read_single_attribute_check_success(
