@@ -1781,18 +1781,28 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info('%s: Step #9.6 - DUT confirmed running software version %s.', step_number_s9, ota_image_version)
 
         self.step(10)
-        step_number_s10 = "[STEP_10]"
         notify_command = {"Name": "GetNotifyUpdateAppliedStatus", "Cluster": "OtaSoftwareUpdateProvider",
-                          "Endpoint": self.get_endpoint()}
-        self.write_to_app_pipe(notify_command, self.provider_app_pipe)
-        notify_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info("%s Provider NotifyUpdateApplied snapshot: %s", step_number_s10, notify_response_data)
+                                    "Endpoint": self.get_endpoint()}
+        step_number_s10 = "[STEP_10]"
+        pool_command_timeout_sec = self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC)
+        poll_command_interval_sec = 5
+        attempt = 0
+        pool_command_start = time.time()
+        received_software_version = None
+        received_update_token = None
+        while time.time() - pool_command_start < pool_command_timeout_sec:
+            attempt += 1
+            self.write_to_app_pipe(notify_command, self.provider_app_pipe)
+            notify_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+            received_update_token = notify_response_data["Payload"]["UpdateToken"]
+            received_software_version = notify_response_data["Payload"]["SoftwareVersion"]
+            logger.info("%s Provider NotifyUpdateApplied snapshot retrieved: %s at Attempt # %d", step_number_s10, notify_response_data, attempt)
+            # Check if the NamedPipe was able to retrieve the data if not continue.
+            if len(received_update_token) > 0  and received_software_version > 0:
+                break
+            await asyncio.sleep(poll_command_interval_sec)
 
-        received_update_token = notify_response_data["Payload"]["UpdateToken"]
-        received_software_version = notify_response_data["Payload"]["SoftwareVersion"]
-        asserts.assert_true(
-            len(received_update_token) > 0,
-            f"{step_number_s10}: Provider did not record a NotifyUpdateApplied command from the DUT.")
+        # Compare the UpdateToken and Software Version with previously stored values.
         asserts.assert_equal(
             received_update_token, expected_update_token,
             f"{step_number_s10}: NotifyUpdateApplied UpdateToken does not match the QueryImageResponse UpdateToken.")
