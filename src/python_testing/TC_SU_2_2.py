@@ -132,7 +132,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         return 7200
 
     def desc_TC_SU_2_2(self) -> str:
-        return "[TC-SU-2.2] Handling Different QueryImageResponse Scenarios on Requestor and Verifying Events on OTA-R(DUT)"
+        return "[TC-SU-2.2] Handling Different QueryImageResponse Scenarios on Requestor, Verify NotifyUpdateApplied Command from DUT to OTA-P and Verifying Events on OTA-R(DUT)"
 
     def pics_TC_SU_2_2(self):
         """Return the PICS definitions associated with this test."""
