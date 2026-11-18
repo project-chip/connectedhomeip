@@ -29,6 +29,7 @@
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <devices/Types.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <algorithm>
 #include <memory>
