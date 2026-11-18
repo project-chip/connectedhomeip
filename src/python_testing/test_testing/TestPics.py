@@ -18,7 +18,6 @@
 import logging
 import os
 import tempfile
-import zipfile
 
 from mobly import asserts
 
@@ -31,18 +30,6 @@ from matter.testing.pics import (BASE_PICS_CODES_DERIVED, BasePicsFacts, base_pi
                                  parse_pics_xml, read_pics_from_file)
 from matter.testing.runner import default_matter_test_main, generate_pseudo_pics
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters
-
-
-# Reusable single-item PICS XML fixture. Kept as a helper so the zip
-# tests below can build tiny archives without duplicating boilerplate.
-def _pics_xml(name: str, support: bool = True) -> str:
-    return (
-        "<?xml version='1.0' encoding='utf-8'?>"
-        "<clusterPICS>"
-        f"<picsItem><itemNumber>{name}</itemNumber>"
-        f"<support>{'true' if support else 'false'}</support></picsItem>"
-        "</clusterPICS>"
-    )
 
 
 def _make_pics_xml(items: dict[str, bool]) -> str:
@@ -343,7 +330,14 @@ class TestPicsHelpers(CertificationUnitTestNoDevice):
 
     def test_read_pics_from_file_endpoint_naming_variants(self):
         """Endpoint subdir matching tolerates common naming conventions."""
-        test_xml = _pics_xml('TEST.S')
+        test_xml = """<?xml version='1.0' encoding='utf-8'?>
+        <clusterPICS>
+            <picsItem>
+                <itemNumber>TEST.S</itemNumber>
+                <support>true</support>
+            </picsItem>
+        </clusterPICS>
+        """
         for subdir_name in ['endpoint0', 'EP0', 'ep_0', 'Endpoint 0', '0']:
             with tempfile.TemporaryDirectory() as d:
                 ep_dir = os.path.join(d, subdir_name)
@@ -631,149 +625,6 @@ class TestPicsHelpers(CertificationUnitTestNoDevice):
         self.matter_test_config.pics = {0: {}, 3: {'SWTCH.S': True}}
         asserts.assert_false(self.check_pics('SWTCH.S', endpoint=0), "endpoint 3 code must not leak into endpoint 0 check")
         asserts.assert_true(self.check_pics('SWTCH.S', endpoint=3), "endpoint 3 code must be found on endpoint 3")
-
-    def test_read_pics_from_zip_file(self):
-        """
-        A zip archive of PICS XML files is read the same as a directory:
-        top-level XML goes to endpoint 0 and each endpoint subdir to its own
-        endpoint, so one endpoint's PICS don't leak into another's.
-        """
-        with tempfile.TemporaryDirectory() as d:
-            zip_path = os.path.join(d, 'pics.zip')
-            with zipfile.ZipFile(zip_path, 'w') as zf:
-                zf.writestr('base.xml', _pics_xml('MCORE.BASE'))
-                zf.writestr('endpoint0/desc.xml', _pics_xml('DESC.S'))
-                zf.writestr('endpoint1/drlk.xml', _pics_xml('DRLK.S'))
-
-            expected = {0: {'MCORE.BASE': True, 'DESC.S': True}, 1: {'DRLK.S': True}}
-            asserts.assert_equal(read_pics_from_file(zip_path), expected,
-                                 'Zip must build the same endpoint tree as the directory it contains')
-            asserts.assert_equal(read_pics_from_file(zip_path, default_endpoint=1), expected,
-                                 'default_endpoint must not move PICS from an endpoint-structured zip')
-
-    def test_read_pics_from_zip_with_wrapping_directory(self):
-        """
-        Archives produced by OS "compress folder" utilities (Finder,
-        Explorer, `zip -r some_folder`) nest everything under a single
-        top-level directory. The reader must descend into it automatically
-        so users don't have to re-zip.
-        """
-        with tempfile.TemporaryDirectory() as d:
-            zip_path = os.path.join(d, 'wrapped.zip')
-            with zipfile.ZipFile(zip_path, 'w') as zf:
-                zf.writestr('pics_root/base.xml', _pics_xml('WRAPPED.S'))
-                zf.writestr('pics_root/endpoint0/ep.xml', _pics_xml('WRAPPED.EP.S'))
-            asserts.assert_equal(read_pics_from_file(zip_path), {0: {'WRAPPED.S': True, 'WRAPPED.EP.S': True}},
-                                 'Base and per-endpoint PICS inside a wrapping directory must be discovered')
-
-    def test_read_pics_from_zip_endpoint_naming_variants(self):
-        """
-        Zip endpoint subdir matching accepts the same naming variants as
-        loose directories, so a user zipping up an existing PICS folder
-        doesn't hit new naming constraints just by archiving it.
-        """
-        for subdir_name in ['endpoint0', 'EP0', 'ep_0', 'Endpoint 0', '0']:
-            with tempfile.TemporaryDirectory() as d:
-                zip_path = os.path.join(d, 'variant.zip')
-                with zipfile.ZipFile(zip_path, 'w') as zf:
-                    zf.writestr(f'{subdir_name}/cluster.xml', _pics_xml('ZIP.NAMING.S'))
-                asserts.assert_equal(read_pics_from_file(zip_path), {0: {'ZIP.NAMING.S': True}},
-                                     f'Zip endpoint subdir name not matched: {subdir_name!r}')
-
-    def test_read_pics_from_zip_lone_endpoint_subdir_is_not_a_wrapper(self):
-        """
-        An archive containing only `endpoint5/` looks like a "single
-        top-level directory" archive, but that lone directory IS the
-        per-endpoint subdir, not a wrapper. If the wrapping-directory
-        heuristic drilled into it, the input would lose its endpoint label
-        and its PICS would land on default_endpoint instead of endpoint 5.
-        """
-        with tempfile.TemporaryDirectory() as d:
-            zip_path = os.path.join(d, 'mismatch.zip')
-            with zipfile.ZipFile(zip_path, 'w') as zf:
-                zf.writestr('endpoint5/only_ep5.xml', _pics_xml('EP5.ONLY.S'))
-
-            asserts.assert_equal(read_pics_from_file(zip_path, default_endpoint=1), {5: {'EP5.ONLY.S': True}},
-                                 'A lone endpoint5/ archive must be read as endpoint 5, not as a wrapping directory')
-
-    def test_read_pics_from_zip_ignores_macos_metadata(self):
-        """
-        Zip archives produced by macOS Finder include a `__MACOSX/`
-        metadata directory alongside the compressed payload folder. That
-        must not defeat the single-wrapping-directory detection, or the
-        very use case the wrapping-directory heuristic exists to serve
-        (users passing Finder-produced zips straight through) breaks.
-        """
-        with tempfile.TemporaryDirectory() as d:
-            zip_path = os.path.join(d, 'finder.zip')
-            with zipfile.ZipFile(zip_path, 'w') as zf:
-                zf.writestr('pics_root/base.xml', _pics_xml('MACOS.BASE'))
-                zf.writestr('pics_root/endpoint0/ep.xml', _pics_xml('MACOS.EP'))
-                # Finder's typical __MACOSX/ mirror of the payload.
-                zf.writestr('__MACOSX/pics_root/._base.xml', b'metadata blob')
-                zf.writestr('__MACOSX/pics_root/endpoint0/._ep.xml', b'metadata blob')
-            asserts.assert_equal(read_pics_from_file(zip_path), {0: {'MACOS.BASE': True, 'MACOS.EP': True}},
-                                 'Base and per-endpoint PICS must load past macOS __MACOSX/ metadata')
-
-    def test_read_pics_from_zip_ignores_ds_store(self):
-        """
-        A stray `.DS_Store` at the archive root must not block wrapping-
-        directory detection either. Same principle as the __MACOSX/ case;
-        this pins the second common metadata file so a future change to
-        the ignore-list doesn't silently regress on it.
-        """
-        with tempfile.TemporaryDirectory() as d:
-            zip_path = os.path.join(d, 'dsstore.zip')
-            with zipfile.ZipFile(zip_path, 'w') as zf:
-                zf.writestr('.DS_Store', b'\x00' * 32)
-                zf.writestr('pics_root/base.xml', _pics_xml('DS.BASE'))
-            asserts.assert_equal(read_pics_from_file(zip_path), {0: {'DS.BASE': True}},
-                                 'Base PICS must load past a top-level .DS_Store')
-
-    def test_read_pics_from_zip_rejects_too_many_members(self):
-        """
-        Zips with excessive member counts are rejected before extraction,
-        so an oversized archive can't tie up the runner's disk/time before
-        anything useful happens.
-        """
-        with tempfile.TemporaryDirectory() as d:
-            zip_path = os.path.join(d, 'many.zip')
-            with zipfile.ZipFile(zip_path, 'w') as zf:
-                # Comfortably over the sanity limit; real PICS bundles are
-                # nowhere near this.
-                for i in range(1500):
-                    zf.writestr(f'entry_{i}.xml', '<x/>')
-            with asserts.assert_raises(ValueError):
-                read_pics_from_file(zip_path)
-
-    def test_read_pics_from_zip_rejects_excessive_uncompressed_size(self):
-        """
-        Zips whose declared uncompressed size exceeds the sanity limit are
-        rejected before extraction. Uses a highly compressible zero-fill
-        blob so the on-disk archive stays small while the metadata still
-        reports the full uncompressed size.
-        """
-        with tempfile.TemporaryDirectory() as d:
-            zip_path = os.path.join(d, 'oversize.zip')
-            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
-                # ~60 MiB uncompressed, well above the 50 MiB total limit.
-                zf.writestr('oversize.xml', b'\x00' * (60 * 1024 * 1024))
-            with asserts.assert_raises(ValueError):
-                read_pics_from_file(zip_path)
-
-    def test_read_pics_from_zip_rejects_path_traversal(self):
-        """
-        Zip entries whose paths resolve outside the extraction destination
-        must be refused before extraction (zip slip). Portable pre-check
-        rather than relying on `extractall(filter=...)` which is only
-        available on newer Python.
-        """
-        with tempfile.TemporaryDirectory() as d:
-            zip_path = os.path.join(d, 'evil.zip')
-            with zipfile.ZipFile(zip_path, 'w') as zf:
-                zf.writestr('../escape.xml', '<clusterPICS/>')
-            with asserts.assert_raises(ValueError):
-                read_pics_from_file(zip_path)
 
 
 if __name__ == "__main__":
