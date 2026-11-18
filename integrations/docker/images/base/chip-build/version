@@ -1,1 +1,1 @@
-220 : [NXP] Revert to pre-installed zephyr and pin nxp zephyr to commit SHA
+221 : [Ameba] Update Docker image for C++ libc macro conflict
