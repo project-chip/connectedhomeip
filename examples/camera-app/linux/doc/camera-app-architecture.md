@@ -526,8 +526,8 @@ Audio capture and playback use dedicated pipelines (`CreateAudioPipeline`,
 -   **Snapshot Stream Branch (`CreateSnapshotBranchBin`):**
 
     -   **Scaling & Rate Control:** `queue` -> `videoscale` -> `videorate` ->
-        `capsfilter` (`I420` at the snapshot stream resolution, capped to a
-        low continuous rate to minimize idle CPU).
+        `capsfilter` (`I420` at the snapshot stream resolution, capped to a low
+        continuous rate to minimize idle CPU).
     -   **Encoding:** `jpegenc` with privacy-zone pad probes.
     -   **Sink:** `appsink` (`max-buffers=1`, `drop=TRUE`, `sync=FALSE`,
         `async=FALSE`) from which `CameraDevice::CaptureSnapshot` pulls JPEG
