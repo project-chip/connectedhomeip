@@ -85,19 +85,31 @@ class TC_CONTENTLAUNCHER_10_9(MatterTestCommissionedDevice):
         return response
 
     async def _playing_now(self, endpoint) -> bool | None:
-        """Read MediaPlayback.CurrentState, or None if the DUT has no MediaPlayback cluster.
+        """Whether MediaPlayback reports content playing, or None if the DUT cannot report it.
 
         Used to establish that setup content is still playing at the instant a queue
         command is sent. The operator confirms what they saw afterwards, which cannot
         distinguish "interrupted playing content" from "started while nothing played".
+
+        None is returned only when the DUT does not expose MediaPlayback.CurrentState,
+        decided from ServerList and AttributeList. A read that fails for any other
+        reason - a wrong-type value, a wildcard-subscription mismatch - propagates, so a
+        detected validation failure can never be waved through by an operator answer.
         """
         mp = Clusters.MediaPlayback
-        try:
-            state = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=mp, attribute=mp.Attributes.CurrentState)
-        except Exception as e:  # noqa: BLE001 - any read failure means we cannot assert on state
-            log.info("MediaPlayback.CurrentState unavailable (%s); relying on operator confirmation alone", e)
+        server_list = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.ServerList)
+        if mp.Attributes.CurrentState.cluster_id not in server_list:
+            log.info("Endpoint %d does not implement MediaPlayback; relying on operator confirmation alone", endpoint)
             return None
+        attribute_list = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=mp, attribute=mp.Attributes.AttributeList)
+        if mp.Attributes.CurrentState.attribute_id not in attribute_list:
+            log.info("MediaPlayback on endpoint %d does not implement CurrentState; "
+                     "relying on operator confirmation alone", endpoint)
+            return None
+        state = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=mp, attribute=mp.Attributes.CurrentState)
         log.info("MediaPlayback.CurrentState before the queue command: %s", state)
         return state == mp.Enums.PlaybackStateEnum.kPlaying
 
