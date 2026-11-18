@@ -45,7 +45,7 @@ namespace app {
  * Adding a technology is a transport driver plus one more AddTransport() call, with no
  * new device type and nothing here that knows which technologies exist.
  */
-class CommissioningProxyDevice : public SingleEndpoint
+class CommissioningProxy : public SingleEndpoint
 {
 public:
     struct Context
@@ -62,17 +62,16 @@ public:
     ///               rather than fixed here because which features a proxy offers
     ///               follows from the transports the platform built in, which only the
     ///               caller knows.
-    CommissioningProxyDevice(const Context & context,
-                             const Clusters::CommissioningProxy::CommissioningProxyCluster::Config & config);
-    ~CommissioningProxyDevice() override = default;
+    CommissioningProxy(const Context & context, const Clusters::CommissioningProxy::CommissioningProxyCluster::Config & config);
+    ~CommissioningProxy() override = default;
 
     // Non-copyable / non-movable: the device holds pointers to transports it does not
     // own, and a registered transport holds a pointer back to the cluster this device
     // creates.
-    CommissioningProxyDevice(const CommissioningProxyDevice &)             = delete;
-    CommissioningProxyDevice & operator=(const CommissioningProxyDevice &) = delete;
-    CommissioningProxyDevice(CommissioningProxyDevice &&)                  = delete;
-    CommissioningProxyDevice & operator=(CommissioningProxyDevice &&)      = delete;
+    CommissioningProxy(const CommissioningProxy &)             = delete;
+    CommissioningProxy & operator=(const CommissioningProxy &) = delete;
+    CommissioningProxy(CommissioningProxy &&)                  = delete;
+    CommissioningProxy & operator=(CommissioningProxy &&)      = delete;
 
     /**
      * Add a transport this device will expose. Call at least once, and once per

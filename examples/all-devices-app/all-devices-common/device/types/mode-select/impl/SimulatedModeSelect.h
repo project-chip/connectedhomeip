@@ -22,7 +22,7 @@
 namespace chip {
 namespace app {
 
-class SimulatedModeSelect : public ModeSelect, public Clusters::ModeSelectCluster::Delegate
+class SimulatedModeSelect : public Clusters::ModeSelectCluster::Delegate, public ModeSelect
 {
 public:
     explicit SimulatedModeSelect(DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider);

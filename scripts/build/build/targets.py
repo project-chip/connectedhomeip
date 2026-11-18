@@ -284,6 +284,8 @@ def BuildHostTarget():
     target.AppendModifier('disable-dnssd-tests', enable_dnssd_tests=False).OnlyIfRe('-tests')
     target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
+    target.AppendModifier('no-tcp', enable_tcp=False).OnlyIfRe('-tests')
+    target.AppendModifier('packetbuffer-pool', packetbuffer_pool=True).OnlyIfRe('-tests')
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
     target.AppendModifier('webrtc', enable_webrtc=True)
     target.AppendModifier('endpoint-unique-id', chip_enable_endpoint_unique_id=True)
@@ -671,6 +673,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="log-none", log_level=NxpLogLevel.NONE).ExceptIfRe("-log-(progress|error|all)")
     target.AppendModifier(name="mtd", enable_mtd=True).OnlyIfRe("thread").OnlyIfRe("mcxw72")
     target.AppendModifier(name="no-ble", disable_ble=True)
+    target.AppendModifier(name="build-only-no-blobs", build_only_no_blobs=True).OnlyIfRe('zephyr')
     target.AppendModifier(name="se05x", se05x_enable=True).OnlyIfRe('cmake').OnlyIfRe('rw61x')
     target.AppendModifier(name="iw610", iw610_transceiver=True).OnlyIfRe('rt1060').OnlyIfRe('evkc').OnlyIfRe('cmake')
 

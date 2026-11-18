@@ -22,8 +22,30 @@
 namespace chip::app {
 
 SimulatedBatteryStorage::SimulatedBatteryStorage(const Context & context) :
-    BatteryStorage(context), mTimerDelegate(context.timerDelegate)
+    SimulatedBatteryStorageDelegates(context.timerDelegate, context.testEventTriggerDelegate),
+    BatteryStorage({ .timerDelegate           = context.timerDelegate,
+                     .gridElectricalSensor    = mGridSensorDelegate.GetConfig(context.timerDelegate),
+                     .batteryElectricalSensor = mBatterySensorDelegate.GetConfig(context.timerDelegate) }),
+    mTimerDelegate(context.timerDelegate)
 {}
+
+CHIP_ERROR SimulatedBatteryStorage::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                             EndpointComposition composition)
+{
+    ReturnErrorOnFailure(BatteryStorage::Register(allocator, provider, composition));
+    DeviceRegistrationTransaction transaction(*this, provider);
+    ReturnErrorOnFailure(mGridSensorDelegate.Register(GetGridElectricalSensor()));
+    ReturnErrorOnFailure(mBatterySensorDelegate.Register(GetBatteryElectricalSensor()));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
+}
+
+void SimulatedBatteryStorage::Unregister(CodeDrivenDataModelProvider & provider)
+{
+    mBatterySensorDelegate.Unregister();
+    mGridSensorDelegate.Unregister();
+    BatteryStorage::Unregister(provider);
+}
 
 CHIP_ERROR SimulatedBatteryStorage::RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
 {
