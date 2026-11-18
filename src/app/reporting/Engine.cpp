@@ -307,7 +307,8 @@ Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
 CHIP_ERROR Engine::Init(EventManagement * apEventManagement)
 {
     VerifyOrReturnError(apEventManagement != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mpEventManagement == nullptr || mpEventManagement == apEventManagement, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mpEventManagement != apEventManagement, CHIP_NO_ERROR);
+    VerifyOrReturnError(mpEventManagement == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mpEventManagement = apEventManagement;
 
     return CHIP_NO_ERROR;
