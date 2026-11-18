@@ -162,6 +162,7 @@ public:
         }
 
         System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
+        VerifyOrReturnError(!receivedMessage.IsNull(), CHIP_ERROR_NO_MEMORY);
         mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
         return mSystemLayer->ScheduleWork(OnMessageReceived, this);
     }

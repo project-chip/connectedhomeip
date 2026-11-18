@@ -229,20 +229,22 @@ config CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
 	depends on CHIP_ENABLE_CONCURRENT_CONNECTION
 	default n
 	help
-	  Automatically enable BLE advertising after commissioning and on reboot
-	  when the device is already commissioned.
+	  Automatically re-enable BLE advertising after commissioning and on
+	  reboot when the device is already commissioned. This keeps BLE
+	  discoverable alongside Thread (e.g. for Channel Sounding) on
+	  line-powered devices.
 
-	  Note: this option keeps the BLE stack initialized, so it is suitable
-	  for line-powered (CONFIG_PM=n) devices that only need to stop
-	  advertising after commissioning but keep BLE available on demand.
-	  Battery-powered SED/ICD devices should prefer
-	  CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING instead, as BLE_IDLE keeps
-	  the BLE/802.15.4 RF time-sharing running and therefore consumes more
-	  power.
+	  When disabled (default), BLE stays initialized but does not
+	  auto-advertise after commissioning; advertising can be re-enabled on
+	  demand via the button. Battery-powered SED/ICD devices should prefer
+	  CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING instead, which fully
+	  disables BLE and hands the RF to 802.15.4 for the lowest power. Keeping
+	  BLE advertising (or even BLE idle) leaves the BLE/802.15.4 RF
+	  time-sharing running and therefore consumes more power.
 
 config CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING
 	bool "Fully disable BLE after Thread commissioning in concurrent mode"
-	depends on CHIP_CONCURRENT_MODE && !CHIP_CONCURRENT_BLE_IDLE
+	depends on CHIP_ENABLE_CONCURRENT_CONNECTION && !CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING && PM
 	default n
 	help
 	  After Matter commissioning completes (and on reboot of an already
@@ -255,9 +257,10 @@ config CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING
 
 	  Requires CONFIG_PM=y: the teardown relies on the hal_telink
 	  tlx_bt_802154_dual_mode_suspend()/resume() helpers, which are currently
-	  only built under CONFIG_PM. For line-powered (CONFIG_PM=n) devices that
-	  only need to stop advertising after commissioning but keep BLE
-	  resumable, use CHIP_CONCURRENT_BLE_IDLE instead.
+	  only built under CONFIG_PM. This option targets battery-powered SED/ICD
+	  devices. Line-powered (CONFIG_PM=n) devices should keep it disabled and
+	  instead leave BLE idle (default) or enable
+	  CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING to auto-advertise.
 
 	  Currently validated on TL721X only. Other Telink SoCs (e.g. TL321X,
 	  TL322X, TL323X, TL521X) are not yet tested.
@@ -274,8 +277,8 @@ config CHIP_CONCURRENT_BLE_RESUME_AFTER_COMMISSIONING
 	  commissioned device remains attached to the Thread network while
 	  BLE becomes available again e.g. as an OTA transport. Matter
 	  commissioning data is untouched. The application is responsible
-	  for stopping BLE again when done (the teardown sequence is
-	  available to be re-armed).
+	  for stopping BLE again when done (call RearmBleTeardown() to
+          re-arm the teardown sequence).
 
 	  Requires CONFIG_PM=y (inherited from
 	  CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING).

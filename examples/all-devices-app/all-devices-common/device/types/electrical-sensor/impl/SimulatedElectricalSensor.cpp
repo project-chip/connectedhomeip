@@ -38,16 +38,16 @@ const static Clusters::detail::Structs::MeasurementAccuracyStruct::Type kAccurac
 
 namespace {
 
-BitMask<ElectricalPowerMeasurement::Feature> PowerMeasurementFeaturesForRole(SimulatedElectricalSensor::Role role)
+BitMask<ElectricalPowerMeasurement::Feature> PowerMeasurementFeaturesForRole(SimulatedElectricalSensorDelegate::Role role)
 {
     using Feature = ElectricalPowerMeasurement::Feature;
     switch (role)
     {
-    case SimulatedElectricalSensor::Role::kGrid:
+    case SimulatedElectricalSensorDelegate::Role::kGrid:
         return BitMask<Feature>(Feature::kAlternatingCurrent);
-    case SimulatedElectricalSensor::Role::kBattery:
+    case SimulatedElectricalSensorDelegate::Role::kBattery:
         return BitMask<Feature>(Feature::kDirectCurrent);
-    case SimulatedElectricalSensor::Role::kGeneric:
+    case SimulatedElectricalSensorDelegate::Role::kGeneric:
     default:
         return BitMask<Feature>(Feature::kAlternatingCurrent, Feature::kPolyphasePower, Feature::kDirectCurrent,
                                 Feature::kHarmonics, Feature::kPowerQuality);
@@ -55,25 +55,25 @@ BitMask<ElectricalPowerMeasurement::Feature> PowerMeasurementFeaturesForRole(Sim
 }
 
 ElectricalPowerMeasurement::ElectricalPowerMeasurementCluster::OptionalAttributesSet
-PowerMeasurementOptionalAttributesForRole(SimulatedElectricalSensor::Role role)
+PowerMeasurementOptionalAttributesForRole(SimulatedElectricalSensorDelegate::Role role)
 {
     using OptionalAttributesSet = ElectricalPowerMeasurement::ElectricalPowerMeasurementCluster::OptionalAttributesSet;
 
     switch (role)
     {
-    case SimulatedElectricalSensor::Role::kGrid: {
+    case SimulatedElectricalSensorDelegate::Role::kGrid: {
         OptionalAttributesSet attributes(OptionalAttributesSet::All());
         attributes.Set<ElectricalPowerMeasurement::Attributes::NeutralCurrent::Id>(false);
         return attributes;
     }
-    case SimulatedElectricalSensor::Role::kBattery: {
+    case SimulatedElectricalSensorDelegate::Role::kBattery: {
         OptionalAttributesSet attributes;
         attributes.Set<ElectricalPowerMeasurement::Attributes::Ranges::Id>();
         attributes.Set<ElectricalPowerMeasurement::Attributes::Voltage::Id>();
         attributes.Set<ElectricalPowerMeasurement::Attributes::ActiveCurrent::Id>();
         return attributes;
     }
-    case SimulatedElectricalSensor::Role::kGeneric:
+    case SimulatedElectricalSensorDelegate::Role::kGeneric:
     default:
         return OptionalAttributesSet(OptionalAttributesSet::All());
     }
@@ -81,34 +81,48 @@ PowerMeasurementOptionalAttributesForRole(SimulatedElectricalSensor::Role role)
 
 } // namespace
 
+SimulatedElectricalSensorDelegate::SimulatedElectricalSensorDelegate(TimerDelegate & timerDelegate,
+                                                                     TestEventTriggerDelegate & testEventTriggerDelegate,
+                                                                     Role role) :
+    mRole(role),
+    mFakeReadings(timerDelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
+{}
+
+ElectricalSensor::Config
+SimulatedElectricalSensorDelegate::GetConfig(TimerDelegate & timerDelegate,
+                                             Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList)
+{
+    return { .electricalEnergyDelegate                = *this,
+             .electricalEnergyMeasurementFeatureFlags = BitMask<ElectricalEnergyMeasurement::Feature>(
+                 ElectricalEnergyMeasurement::Feature::kImportedEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy,
+                 ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
+                 ElectricalEnergyMeasurement::Feature::kApparentEnergy, ElectricalEnergyMeasurement::Feature::kReactiveEnergy),
+             .electricalEnergyMeasurementOptionalAttributes =
+                 ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster::OptionalAttributesSet(
+                     ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster::OptionalAttributesSet::All()),
+             .electricalEnergyMeasurementAccuracyStruct = kAccuracy,
+
+             .electricalPowerDelegate                      = *this,
+             .electricalPowerMeasurementFeatureFlags       = PowerMeasurementFeaturesForRole(mRole),
+             .electricalPowerMeasurementOptionalAttributes = PowerMeasurementOptionalAttributesForRole(mRole),
+
+             .powerTopologyDelegate = *this,
+             .powerTopologyFeatures =
+                 BitMask<PowerTopology::Feature>(PowerTopology::Feature::kSetTopology, PowerTopology::Feature::kDynamicPowerFlow),
+
+             .timerDelegate = timerDelegate,
+             .tagList       = tagList };
+}
+
 SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelegate,
                                                      TestEventTriggerDelegate & testEventTriggerDelegate,
                                                      Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList,
                                                      Role role) :
-    ElectricalSensor(
-        { .electricalEnergyDelegate                = *this,
-          .electricalEnergyMeasurementFeatureFlags = BitMask<ElectricalEnergyMeasurement::Feature>(
-              ElectricalEnergyMeasurement::Feature::kImportedEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy,
-              ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
-              ElectricalEnergyMeasurement::Feature::kApparentEnergy, ElectricalEnergyMeasurement::Feature::kReactiveEnergy),
-          .electricalEnergyMeasurementOptionalAttributes = ElectricalEnergyMeasurementClusterT::OptionalAttributesSet(
-              ElectricalEnergyMeasurementClusterT::OptionalAttributesSet::All()),
-          .electricalEnergyMeasurementAccuracyStruct = kAccuracy,
-
-          .electricalPowerDelegate                      = *this,
-          .electricalPowerMeasurementFeatureFlags       = PowerMeasurementFeaturesForRole(role),
-          .electricalPowerMeasurementOptionalAttributes = PowerMeasurementOptionalAttributesForRole(role),
-
-          .powerTopologyDelegate = *this,
-          .powerTopologyFeatures =
-              BitMask<PowerTopology::Feature>(PowerTopology::Feature::kSetTopology, PowerTopology::Feature::kDynamicPowerFlow),
-
-          .timerDelegate = timerDelegate,
-          .tagList       = tagList }),
-    mRole(role), mFakeReadings(timerDelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
+    SimulatedElectricalSensorDelegate(timerDelegate, testEventTriggerDelegate, role),
+    ElectricalSensor(GetConfig(timerDelegate, tagList))
 {}
 
-Clusters::ElectricalPowerMeasurement::PowerModeEnum SimulatedElectricalSensor::GetPowerMode()
+Clusters::ElectricalPowerMeasurement::PowerModeEnum SimulatedElectricalSensorDelegate::GetPowerMode()
 {
     return mRole == Role::kBattery ? Clusters::ElectricalPowerMeasurement::PowerModeEnum::kDc
                                    : Clusters::ElectricalPowerMeasurement::PowerModeEnum::kAc;
@@ -118,23 +132,37 @@ CHIP_ERROR SimulatedElectricalSensor::Register(chip::EndpointId endpoint, CodeDr
                                                EndpointComposition composition)
 {
     ReturnErrorOnFailure(ElectricalSensor::Register(endpoint, provider, composition));
-    ReturnErrorOnFailure(mTestEventTriggerDelegate.AddHandler(&mFakeReadings));
-    mFakeReadings.SetEndpointId(endpoint);
-    mFakeReadings.SetEEMCluster(&ElectricalEnergyMeasurementCluster());
+    DeviceRegistrationTransaction transaction(*this, provider);
+    ReturnErrorOnFailure(SimulatedElectricalSensorDelegate::Register(*this));
+    transaction.Commit();
     return CHIP_NO_ERROR;
 }
 
 void SimulatedElectricalSensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
+    SimulatedElectricalSensorDelegate::Unregister();
+    ElectricalSensor::Unregister(provider);
+}
+
+CHIP_ERROR SimulatedElectricalSensorDelegate::Register(ElectricalSensor & sensor)
+{
+    ReturnErrorOnFailure(mTestEventTriggerDelegate.AddHandler(&mFakeReadings));
+    mFakeReadings.SetEndpointId(sensor.GetEndpointId());
+    mFakeReadings.SetEEMCluster(&sensor.ElectricalEnergyMeasurementCluster());
+    return CHIP_NO_ERROR;
+}
+
+void SimulatedElectricalSensorDelegate::Unregister()
+{
     mFakeReadings.StopFakeReadings();
     mFakeReadings.SetEEMCluster(nullptr);
     mFakeReadings.SetEndpointId(kInvalidEndpointId);
     mTestEventTriggerDelegate.RemoveHandler(&mFakeReadings);
-    ElectricalSensor::Unregister(provider);
 }
 
-CHIP_ERROR SimulatedElectricalSensor::GetAccuracyByIndex(uint8_t index,
-                                                         ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val)
+CHIP_ERROR
+SimulatedElectricalSensorDelegate::GetAccuracyByIndex(uint8_t index,
+                                                      ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val)
 {
     static ElectricalPowerMeasurement::Structs::MeasurementAccuracyRangeStruct::Type accuracyRange = { .rangeMin = 0,
                                                                                                        .rangeMax = 10 };
