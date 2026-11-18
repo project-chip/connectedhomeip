@@ -3892,11 +3892,11 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         XCTAssertEqual(controller.devices.count, 1);
 
         // Blocks on the device queue hold the device while they run.
-        [device unitTestSyncRunOnDeviceQueue:^ { }];
+        [device unitTestSyncRunOnDeviceQueue:^ {}];
     }
 
     // Delegate callbacks already queued to `queue` hold the device until they run.
-    dispatch_sync(queue, ^ { });
+    dispatch_sync(queue, ^ {});
     deviceDelegate.onReportBeginOnMatterQueue = nil;
     dispatch_semaphore_signal(deviceReleased);
 
