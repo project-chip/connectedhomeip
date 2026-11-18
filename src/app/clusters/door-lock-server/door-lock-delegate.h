@@ -17,7 +17,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include "OneBasedIndex.h"
+#include "door-lock-types.h"
+#include <clusters/DoorLock/Structs.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 #include <system/SystemClock.h>
@@ -220,6 +223,166 @@ public:
      * @param[in] lockoutEndTimestamp timestamp at which the lockout window ends
      */
     virtual void OnLockoutStarted(chip::System::Clock::Timestamp lockoutEndTimestamp) {}
+
+    // ---- User management ([USR] feature) ---------------------------------------
+
+    /**
+     * @brief Read a user record from the application's user database.
+     *
+     * Must succeed even for unoccupied slots (userStatus == kAvailable), the
+     * slot content is only populated for occupied ones.
+     *
+     * @param[in] userIndex user index as on the wire (0 is the invalid index),
+     *            guaranteed within NumberOfTotalUsersSupported when valid
+     * @param[out] user the user record
+     * @retval true if the user index is within the application database
+     */
+    virtual bool GetUser(UserIndex userIndex, UserInfo & user) const { return false; }
+
+    /**
+     * @brief Create, modify or clear a user record.
+     *
+     * A clear request passes kUndefinedFabricIndex for creator and modifier,
+     * an empty name, 0 uniqueId, kAvailable status, kUnrestrictedUser type,
+     * kSingle credential rule and no credentials.
+     *
+     * @param[in] userIndex user index as on the wire (0 is the invalid index).
+     */
+    virtual bool SetUser(UserIndex userIndex, FabricIndex creator, FabricIndex modifier, const CharSpan & userName,
+                         uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum userType, CredentialRuleEnum credentialRule,
+                         const CredentialStruct * credentials, size_t totalCredentials)
+    {
+        return false;
+    }
+
+    // ---- Credential storage ------------------------------------------------------
+
+    /**
+     * @brief Read a credential record. Must succeed even for unoccupied slots;
+     * only populated for occupied ones.
+     *
+     * @param[in] credentialIndex credential index as on the wire; 1-based for
+     *            all credential types except kProgrammingPIN, which uses 0.
+     */
+    virtual bool GetCredential(CredentialIndex credentialIndex, CredentialTypeEnum credentialType,
+                               CredentialInfo & credential) const
+    {
+        return false;
+    }
+
+    /**
+     * @brief Create/modify/clear a credential. A status of kAvailable deletes
+     * the credential (credential data may be an empty span then).
+     */
+    virtual bool SetCredential(CredentialIndex credentialIndex, FabricIndex creator, FabricIndex modifier,
+                               DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                               const ByteSpan & credentialData)
+    {
+        return false;
+    }
+
+    // ---- Schedules -----------------------------------------------------------------
+    //
+    // Schedule indices are carried by ScheduleIndex, user indices by UserIndex
+    // (both as on the wire, 0 means the invalid index). GetSchedule must return
+    // DlStatus::kNotFound when the requested slot is not occupied, and
+    // SetSchedule clears the slot when called with DlScheduleStatus::kAvailable.
+
+    /**
+     * @brief Access the Week Day schedule in the schedules database.
+     *
+     * @param[in] weekDayIndex index of the week day schedule to access.
+     *            Guaranteed within NumberOfWeekDaySchedulesSupportedPerUser.
+     * @param[in] userIndex index of the user to get the week day
+     *            schedule for. Guaranteed within NumberOfTotalUsersSupported.
+     * @param[out] schedule Resulting week day schedule.
+     *
+     * @retval DlStatus::kSuccess if schedule was retrieved successfully
+     * @retval DlStatus::kNotFound if the schedule or user does not exist
+     * @retval DlStatus::kFailure in case of any other failure
+     */
+    virtual DlStatus GetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, WeekDaySchedule & schedule) const
+    {
+        return DlStatus::kFailure;
+    }
+
+    /**
+     * @brief Set the Week Day schedule in the schedules database.
+     *
+     * @param[in] weekDayIndex index of the week day schedule to set.
+     * @param[in] userIndex index of the user.
+     * @param[in] status kAvailable clears the slot; kOccupied sets it.
+     */
+    virtual DlStatus SetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, DlScheduleStatus status, DaysMaskMap daysMask,
+                                 uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+    {
+        return DlStatus::kFailure;
+    }
+
+    /**
+     * @brief Access the Year Day schedule in the schedules database.
+     *
+     * @param[in] yearDayIndex index of the year day schedule to access.
+     *            Guaranteed within NumberOfYearDaySchedulesSupportedPerUser.
+     * @param[in] userIndex index of the user.
+     * @param[out] schedule Resulting year day schedule.
+     *
+     * @retval DlStatus::kSuccess / kNotFound / kFailure, same semantics as the
+     *         week day schedule getter.
+     */
+    virtual DlStatus GetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, YearDaySchedule & schedule) const
+    {
+        return DlStatus::kFailure;
+    }
+
+    /**
+     * @brief Set the Year Day schedule in the schedules database.
+     *
+     * @param[in] yearDayIndex index of the year day schedule to set.
+     * @param[in] userIndex index of the user.
+     * @param[in] status kAvailable clears the slot; kOccupied sets it.
+     */
+    virtual DlStatus SetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, DlScheduleStatus status, uint32_t localStartTime,
+                                 uint32_t localEndTime)
+    {
+        return DlStatus::kFailure;
+    }
+
+    /**
+     * @brief Access the Holiday schedule in the schedules database.
+     *
+     * @param[in] holidayIndex index of the holiday schedule to access.
+     *            Guaranteed within NumberOfHolidaySchedulesSupported.
+     * @param[out] schedule Resulting holiday schedule.
+     *
+     * @retval DlStatus::kSuccess / kNotFound / kFailure, same semantics as the
+     *         week day schedule getter.
+     */
+    virtual DlStatus GetSchedule(ScheduleIndex holidayIndex, HolidaySchedule & schedule) const { return DlStatus::kFailure; }
+
+    /**
+     * @brief Set the Holiday schedule in the schedules database.
+     *
+     * @param[in] holidayIndex index of the holiday schedule to set.
+     * @param[in] status kAvailable clears the slot; kOccupied sets it.
+     */
+    virtual DlStatus SetSchedule(ScheduleIndex holidayIndex, DlScheduleStatus status, uint32_t localStartTime,
+                                 uint32_t localEndTime, OperatingModeEnum operatingMode)
+    {
+        return DlStatus::kFailure;
+    }
+
+    /**
+     * @brief Called by the code-driven cluster after it has unstamped the
+     * fabric from all users and credentials of this endpoint, so the
+     * application can purge app-local per-fabric state.
+     *
+     * NOTE: while applications still run the legacy ember implementation,
+     * this hook is not invoked (the legacy path keeps its own custom
+     * callback). The migration to the code-driven cluster will replace that
+     * path with this hook.
+     */
+    virtual void OnFabricRemoved(FabricIndex fabricIndex) {}
 };
 
 } // namespace DoorLock

@@ -402,7 +402,8 @@ CHIP_ERROR TLVWriter::VPutStringF(Tag tag, const char * fmt, va_list ap)
 
     dataLen = static_cast<size_t>(vsnprintf(nullptr, 0, fmt, aq));
 
-    va_end(aq);
+    // The analyzer loses track of the va_copy above when va_list is a struct passed by value (e.g. AArch64 Linux).
+    va_end(aq); // NOLINT(clang-analyzer-security.VAList)
 
     if (!CanCastTo<uint32_t>(dataLen))
     {

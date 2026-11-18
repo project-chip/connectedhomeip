@@ -70,7 +70,7 @@ public:
         mWiFiPAFTransport = nullptr;
     }
 
-    CHIP_ERROR WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg) override { return mRxError; }
     CHIP_ERROR WiFiPAFMessageSend(WiFiPAFSession & TxInfo, System::PacketBufferHandle && msg) override { return CHIP_NO_ERROR; }
     CHIP_ERROR WiFiPAFCloseSession(WiFiPAFSession & SessionInfo) override { return CHIP_NO_ERROR; }
     bool WiFiPAFResourceAvailable() override { return mResourceAvailable; }
@@ -84,6 +84,9 @@ public:
     void EpSetRxNextSeqNum(SequenceNumber_t seq) { mEndPoint->mPafTP.mRxNextSeqNum = seq; }
     WiFiPAFTP::State_t EpGetTxState() { return mEndPoint->mPafTP.mTxState; }
     bool mResourceAvailable = true;
+    CHIP_ERROR mRxError     = CHIP_NO_ERROR;
+    uint8_t EpGetItemsInReorderQueue() { return mEndPoint->ItemsInReorderQueue; }
+    void EpSetItemsInReorderQueue(uint8_t count) { mEndPoint->ItemsInReorderQueue = count; }
     bool isSendQueueNull() { return mEndPoint->mSendQueue.IsNull(); }
     uint8_t GetResourceWaitCount() { return mEndPoint->mResourceWaitCount; }
     CHIP_ERROR EpStartReceiveConnectionTimer() { return mEndPoint->StartReceiveConnectionTimer(); }
@@ -489,6 +492,93 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
     EpDoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
 }
+
+// A message completed from the reorder queue that the transport rejects closes the endpoint,
+// which empties the queue. The drain must stop there: decrementing the count afterwards wrapped
+// it to 255, and the endpoint went back to the pool with that count.
+TEST_F(TestWiFiPAFLayer, RejectedMessageFromReorderQueueLeavesQueueEmpty)
+{
+    WiFiPAFSession sessionInfo = {
+        .role          = kWiFiPafRole_Publisher,
+        .id            = 1,
+        .peer_id       = 1,
+        .peer_addr     = { 0xd0, 0x17, 0x69, 0xee, 0x7f, 0x3c },
+        .nodeId        = 1,
+        .discriminator = 0xF00,
+    };
+
+    WiFiPAFEndPoint * newEndPoint = nullptr;
+    ASSERT_EQ(NewEndPoint(&newEndPoint, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
+    ASSERT_NE(newEndPoint, nullptr);
+    SetEndPoint(newEndPoint);
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+    newEndPoint->mState = WiFiPAFEndPoint::kState_Ready;
+
+    // Complete the PAFTP handshake.
+    constexpr uint8_t bufCapReq[] = { 0x65, 0x6c, 0x04, 0x00, 0x00, 0x00, 0x5e, 0x01, 0x06 };
+    auto packetCapReq             = System::PacketBufferHandle::NewWithData(bufCapReq, sizeof(bufCapReq));
+    EXPECT_EQ(OnWiFiPAFMessageReceived(sessionInfo, std::move(packetCapReq)), true);
+    constexpr uint8_t bufCapResp[] = { 0x65, 0x6c, 0x04, 0x5b, 0x01, 0x06 };
+    auto packetCapResp             = System::PacketBufferHandle::NewWithData(bufCapResp, sizeof(bufCapResp));
+    EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
+    EXPECT_EQ(SendMessage(sessionInfo, std::move(packetCapResp)), CHIP_NO_ERROR);
+    EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
+
+    // Two one-fragment messages: header flags, sequence number, message length, payload.
+    constexpr uint8_t kStartEnd =
+        to_underlying(WiFiPAFTP::HeaderFlags::kStartMessage) | to_underlying(WiFiPAFTP::HeaderFlags::kEndMessage);
+    constexpr uint8_t bufSn2[] = { kStartEnd, 0x02, 0x01, 0x00, 0xaa };
+    constexpr uint8_t bufSn3[] = { kStartEnd, 0x03, 0x01, 0x00, 0xbb };
+    EpSetRxNextSeqNum(2);
+
+    // sn#3 arrives first and waits in the reorder queue for sn#2.
+    EXPECT_EQ(newEndPoint->Receive(System::PacketBufferHandle::NewWithData(bufSn3, sizeof(bufSn3))), CHIP_NO_ERROR);
+    EXPECT_EQ(EpGetItemsInReorderQueue(), 1);
+
+    // sn#2 completes a message the transport rejects, which closes the endpoint.
+    mRxError = CHIP_ERROR_INVALID_MESSAGE_LENGTH;
+    EXPECT_EQ(newEndPoint->Receive(System::PacketBufferHandle::NewWithData(bufSn2, sizeof(bufSn2))),
+              CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    EXPECT_EQ(EpGetWiFiPafLayer(), nullptr);
+    EXPECT_EQ(EpGetItemsInReorderQueue(), 0);
+
+    // The next session on this endpoint starts with an empty reorder queue.
+    WiFiPAFEndPoint * reused = nullptr;
+    ASSERT_EQ(NewEndPoint(&reused, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
+    ASSERT_EQ(reused, newEndPoint);
+    EXPECT_EQ(EpGetItemsInReorderQueue(), 0);
+}
+
+// Endpoints are reused from a pool through Init(), so a reorder-queue count left behind by an
+// earlier session must not carry over to the next one.
+TEST_F(TestWiFiPAFLayer, InitResetsReorderQueueCount)
+{
+    WiFiPAFSession sessionInfo = {
+        .role          = kWiFiPafRole_Publisher,
+        .id            = 1,
+        .peer_id       = 1,
+        .peer_addr     = { 0xd0, 0x17, 0x69, 0xee, 0x7f, 0x3c },
+        .nodeId        = 1,
+        .discriminator = 0xF00,
+    };
+
+    WiFiPAFEndPoint * ep = nullptr;
+    ASSERT_EQ(NewEndPoint(&ep, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
+    ASSERT_NE(ep, nullptr);
+    SetEndPoint(ep);
+    ep->mState = WiFiPAFEndPoint::kState_Connected;
+    EpDoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
+    ASSERT_EQ(EpGetWiFiPafLayer(), nullptr);
+
+    // The value the wrap used to leave on a freed endpoint.
+    EpSetItemsInReorderQueue(255);
+
+    WiFiPAFEndPoint * reused = nullptr;
+    ASSERT_EQ(NewEndPoint(&reused, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
+    ASSERT_EQ(reused, ep);
+    EXPECT_EQ(EpGetItemsInReorderQueue(), 0);
+}
+
 // TODO: Currently, chip::System::Layer lacks a unified virtual test abstraction
 // (such as `ServiceScheduledTimers()` or `StepEventLoop()`) allowing standalone unit
 // test runners to synchronously dispatch expired timer callbacks across diverse platform

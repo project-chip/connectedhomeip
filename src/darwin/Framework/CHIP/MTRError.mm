@@ -31,6 +31,8 @@ NSString * const MTRErrorDomain = @"MTRErrorDomain";
 
 NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
+NSString * const MTRBDXErrorDomain = @"MTRBDXErrorDomain";
+
 // Class for holding on to a CHIP_ERROR that we can use as the value
 // in a dictionary.
 @interface MTRErrorHolder : NSObject

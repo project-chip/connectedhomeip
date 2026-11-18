@@ -101,6 +101,7 @@ public:
     void TestBuildAndSendSingleReportDataLargePayload();
     void TestMergeOverlappedAttributePath();
     void TestMergeAttributePathWhenDirtySetPoolExhausted();
+    void TestShutdownForgetsScheduledRun();
 
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
@@ -493,6 +494,24 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeAttributePathWhenDirtySetPoolE
                                       AttributePathParams(kTestEndpointId + 1, kTestClusterId + 1, 1)));
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Shutdown();
+}
+
+TEST_F_FROM_FIXTURE(TestReportingEngine, TestShutdownForgetsScheduledRun)
+{
+    InteractionModelEngine * imEngine = InteractionModelEngine::GetInstance();
+    Engine & engine                   = imEngine->GetReportingEngine();
+
+    EXPECT_SUCCESS(engine.ScheduleRun());
+    EXPECT_TRUE(engine.IsRunScheduled());
+
+    imEngine->Shutdown();
+    EXPECT_FALSE(engine.IsRunScheduled());
+
+    ASSERT_SUCCESS(imEngine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()));
+    EXPECT_SUCCESS(engine.ScheduleRun());
+    EXPECT_TRUE(engine.IsRunScheduled());
+    DrainAndServiceIO();
+    EXPECT_FALSE(engine.IsRunScheduled());
 }
 
 } // namespace reporting

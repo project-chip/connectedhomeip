@@ -21053,7 +21053,7 @@ typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurityBitmap) {
     MTRNetworkCommissioningWiFiSecurityBitmapWPAPersonal MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x4,
     MTRNetworkCommissioningWiFiSecurityBitmapWPA2Personal MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x8,
     MTRNetworkCommissioningWiFiSecurityBitmapWPA3Personal MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x10,
-    MTRNetworkCommissioningWiFiSecurityBitmapWPA3MatterPDC MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRNetworkCommissioningWiFiSecurityBitmapIEEE8021X MTR_PROVISIONALLY_AVAILABLE = 0x20,
 } MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurity) {

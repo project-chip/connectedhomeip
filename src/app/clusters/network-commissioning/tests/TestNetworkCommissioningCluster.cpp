@@ -37,6 +37,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Defer.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/NetworkCommissioning.h>
 #include <system/SystemClock.h>
 
@@ -268,6 +269,7 @@ TEST_F(TestNetworkCommissioningCluster, TestConnectNetworkWithDisconnectedEthern
     // instance's null wireless driver.
     auto result = wifiTester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
     EXPECT_EQ(result.response.value().networkingStatus, NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess);
 
     // The Ethernet instance is untouched: its one network is still listed, and still not connected.
@@ -342,6 +344,7 @@ TEST_F(TestNetworkCommissioningCluster, TestAddOrUpdateWiFiNetworkWithPDC)
     EXPECT_TRUE(driver.GetLastNetworkIdentity().data_equal(networkIdentity));
     EXPECT_FALSE(driver.GetLastClientIdentityNetworkIndex().HasValue());
 
+    ASSERT_TRUE(result.response.has_value());
     const auto & response = result.response.value();
     EXPECT_EQ(response.networkingStatus, NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess);
     ASSERT_TRUE(response.networkIndex.HasValue());
