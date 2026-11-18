@@ -119,18 +119,20 @@ class TC_CONTENTLAUNCHER_10_9(MatterTestCommissionedDevice):
         # manufacturer specific, so the operator does it and confirms. A "n" answer
         # fails the test: the DUT claims ContentQueueing, so being unable to start
         # content at all is a failure of that claim, not a reason to skip.
-        response = self.wait_for_user_input(
-            prompt_msg="Start content playing on the DUT using any method the manufacturer provides "
-                       "(for example a PlayPreset command).\n"
-                       "Enter 'y' once content is playing, or 'n' if it could not be started.\n",
-            prompt_msg_placeholder="y", default_value="y")
-        answer = response.lower().strip() if response is not None else None
-        while answer not in ("y", "n"):
-            response = self.wait_for_user_input(
-                prompt_msg="Please answer 'y' if content is now playing on the DUT, or 'n' if it could not "
-                           "be started.\n",
-                prompt_msg_placeholder="y", default_value="y")
-            answer = response.lower().strip() if response is not None else None
+        prompt = ("Start content playing on the DUT using any method the manufacturer provides "
+                  "(for example a PlayPreset command).\n"
+                  "Enter 'y' once content is playing, or 'n' if it could not be started.\n")
+        while True:
+            response = self.wait_for_user_input(prompt_msg=prompt, prompt_msg_placeholder="y", default_value="y")
+            # None means the prompt could not be answered at all (closed stdin, timeout).
+            # That is terminal: re-prompting would spin without ever reaching teardown.
+            asserts.assert_is_not_none(
+                response, "No response to the content-start prompt; cannot confirm whether content is playing on the DUT.")
+            answer = response.lower().strip()
+            if answer in ("y", "n"):
+                break
+            prompt = ("Please answer 'y' if content is now playing on the DUT, or 'n' if it could not "
+                      "be started.\n")
         asserts.assert_equal(
             answer, "y",
             "Operator reported that content could not be started on the DUT. Steps 1-3 verify "
