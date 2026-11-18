@@ -27,7 +27,6 @@ config("config") {
   include_dirs = [
     "include",
     "include/clusters/ambient-context-sensing",
-    "include/clusters/chime",
     "include/clusters/webrtc-provider",
     "include/clusters/camera-avstream-mgmt",
     "include/clusters/camera-avsettingsuserlevel-mgmt",
@@ -60,6 +59,7 @@ pkg_config("gstreamer") {
   packages = [
     "gstreamer-1.0",
     "gstreamer-app-1.0",
+    "gstreamer-video-1.0",
     "gobject-2.0",
   ]
 }
@@ -81,7 +81,6 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/src/clusters/av-analysis/av-analysis-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avsettingsuserlevel-mgmt/camera-avsettingsuserlevel-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avstream-mgmt/camera-av-stream-manager.cpp",
-    "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/push-av-stream-transport/push-av-stream-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/webrtc-provider/webrtc-provider-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/zone-mgmt/zone-manager.cpp",

@@ -40,12 +40,12 @@
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
-#include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
+#include <device/types/dimmable-plug-in-unit/impl/LoggingDimmablePlugInUnit.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
 #include <device/types/doorbell/Doorbell.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/extended-color-light/impl/LoggingExtendedColorLight.h>
-#include <device/types/extractor-hood/ExtractorHood.h>
+#include <device/types/extractor-hood/impl/LoggingExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
 #include <device/types/flow-sensor/FlowSensor.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
@@ -60,13 +60,13 @@
 #include <device/types/light-sensor/impl/IncreasingLightSensor.h>
 #include <device/types/microwave-oven/impl/EmulatedMicrowaveOven.h>
 #include <device/types/mode-select/impl/SimulatedModeSelect.h>
-#include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
-#include <device/types/mounted-on-off-control/MountedOnOffControl.h>
+#include <device/types/mounted-dimmable-load-control/impl/LoggingMountedDimmableLoadControl.h>
+#include <device/types/mounted-on-off-control/impl/LoggingMountedOnOffControl.h>
 #include <device/types/network-infrastructure-manager/impl/SimulatedNetworkInfrastructureManager.h>
 #include <device/types/occupancy-sensor/impl/LoggingOccupancySensor.h>
 #include <device/types/on-off-light-switch/OnOffLightSwitch.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
-#include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
+#include <device/types/on-off-plug-in-unit/impl/LoggingOnOffPlugInUnit.h>
 #include <device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.h>
 #include <device/types/oven/impl/LoggingOven.h>
 #include <device/types/power-source/BatteryPowerSource.h>
@@ -613,14 +613,14 @@ private:
         {
             RegisterCreator("dimmable-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<DimmablePlugInUnit>(
-                    DimmablePlugInUnit::Context{
+                return MakeDevice<LoggingDimmablePlugInUnit>(
+                    LoggingDimmablePlugInUnit::Context{
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                         .identifyDelegate  = mContext->identifyDelegate,
                     },
-                    DimmablePlugInUnit::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
+                    LoggingDimmablePlugInUnit::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DISHWASHER)
@@ -649,14 +649,15 @@ private:
         {
             RegisterCreator("mounted-dimmable-load-control", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<MountedDimmableLoadControl>(
-                    MountedDimmableLoadControl::Context{
+                return MakeDevice<LoggingMountedDimmableLoadControl>(
+                    LoggingMountedDimmableLoadControl::Context{
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                         .identifyDelegate  = mContext->identifyDelegate,
                     },
-                    MountedDimmableLoadControl::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
+                    LoggingMountedDimmableLoadControl::Config{ .levelControl =
+                                                                   DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DOORBELL)
@@ -677,7 +678,7 @@ private:
         {
             RegisterCreator("mounted-on-off-control", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<MountedOnOffControl>(MountedOnOffControl::Context{
+                return MakeDevice<LoggingMountedOnOffControl>(LoggingMountedOnOffControl::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -735,7 +736,7 @@ private:
                     .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
-                return MakeDevice<OnOffPlugInUnit>(OnOffPlugInUnit::Context{
+                return MakeDevice<LoggingOnOffPlugInUnit>(LoggingOnOffPlugInUnit::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -984,7 +985,7 @@ private:
         {
             RegisterCreator("extractor-hood", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<ExtractorHood>(ExtractorHood::Context{
+                return MakeDevice<LoggingExtractorHood>(LoggingExtractorHood::Context{
                     .groupDataProvider   = mContext->groupDataProvider,
                     .fabricTable         = mContext->fabricTable,
                     .timerDelegate       = mContext->timerDelegate,
