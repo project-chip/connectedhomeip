@@ -70,7 +70,7 @@ class MEDIAPLAYBACKTestBase:
             return
         response = self.wait_for_user_input(
             prompt_msg=f"Confirm the DUT is playing the {ordinal} content now (audio or on-screen).\n"
-                       "Enter 'y' if playback started, or 'n' if it did not.\n",
+            "Enter 'y' if playback started, or 'n' if it did not.\n",
             prompt_msg_placeholder="y", default_value="y")
         asserts.assert_is_not_none(response, f"No response to the {ordinal} playback prompt, expected 'y' or 'n'")
         response = response.lower()

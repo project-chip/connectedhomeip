@@ -34,11 +34,10 @@
 
 import logging
 
+from mobly import asserts
 from TC_MESSTestBase import MESSAGE_ID_1, MESSAGE_ID_2, MESSTestBase
 
 import matter.clusters as Clusters
-from mobly import asserts
-
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterTestCommissionedDevice
