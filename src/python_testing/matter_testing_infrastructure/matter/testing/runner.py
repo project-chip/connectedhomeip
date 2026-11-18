@@ -412,41 +412,42 @@ _CASE_PROBE_TIMEOUT_MS = 5000
 
 
 async def _prepopulate_wildcard_via_case(
-        default_controller, node_id, test_config) -> Attribute.AsyncReadTransaction.ReadResponse | None:
+        default_controller, node_id, test_config, stash: bool) -> Attribute.AsyncReadTransaction.ReadResponse | None:
     """Device is already on this fabric — read via CASE, no side effects.
 
     Any downstream setup_class_helper will also reach the device via CASE.
 
     Returns:
-        The wildcard that was read and stashed, or None if the read failed.
+        The wildcard that was read (and stashed when stash is True), or None if the read failed.
     """
     try:
         stored_global_wildcard = await read_global_wildcard_async(default_controller, node_id)
-        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
-            stored_global_wildcard)
+        if stash:
+            test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
+                stored_global_wildcard)
         return stored_global_wildcard
     except Exception:
-        LOGGER.warning("Could not pre-populate global wildcard via CASE", exc_info=True)
+        LOGGER.warning("Could not pre-populate global wildcard via CASE for node %s", node_id, exc_info=True)
         return None
 
 
 async def _prepopulate_wildcard_via_pase(
-        default_controller, node_id, matter_test_config, test_config) -> Attribute.AsyncReadTransaction.ReadResponse | None:
+        default_controller, node_id, setup_code: str | None, test_config,
+        stash: bool) -> Attribute.AsyncReadTransaction.ReadResponse | None:
     """Device is not commissioned — attempt PASE if credentials are available.
 
     The session is kept alive afterwards so that downstream consumers
     (CommissionDeviceTest or BasicCompositionTests.setup_class_helper)
     reuse it via FindOrEstablishPASESession instead of forcing the device
-    to reopen its commissioning window.
+    to reopen its commissioning window. FindOrEstablishPASESession keys
+    sessions by node ID, so each DUT keeps its own session.
+
+    Args:
+        setup_code: The setup code of this DUT, or None when none was given.
 
     Returns:
-        The wildcard that was read and stashed, or None if it was not possible.
+        The wildcard that was read (and stashed when stash is True), or None if it was not possible.
     """
-    # Local import: matter_testing imports runner at module level, so a top-level
-    # import here would form a real cycle.
-    from matter.testing.matter_testing import get_first_setup_code
-
-    setup_code = get_first_setup_code(default_controller, matter_test_config)
     if setup_code is None:
         LOGGER.info(
             "No setup code available for PASE — skipping global wildcard pre-population; "
@@ -463,24 +464,25 @@ async def _prepopulate_wildcard_via_pase(
             return None
 
         stored_global_wildcard = await read_global_wildcard_async(default_controller, node_id)
-        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
-            stored_global_wildcard)
+        if stash:
+            test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
+                stored_global_wildcard)
         LOGGER.info(
-            "Keeping PASE session alive for downstream reuse "
-            "(CommissionDeviceTest or setup_class_helper)"
+            "Keeping PASE session to node %s alive for downstream reuse "
+            "(CommissionDeviceTest or setup_class_helper)", node_id
         )
         return stored_global_wildcard
     except Exception:
         LOGGER.warning(
-            "Could not pre-populate global wildcard before commissioning",
+            "Could not pre-populate global wildcard for node %s before commissioning", node_id,
             exc_info=True
         )
         return None
 
 
 async def _prepopulate_global_wildcard(
-        test_class, default_controller, node_id, matter_test_config,
-        test_config) -> Attribute.AsyncReadTransaction.ReadResponse | None:
+        test_class, default_controller, node_id, setup_code: str | None, matter_test_config,
+        test_config, stash: bool = True) -> Attribute.AsyncReadTransaction.ReadResponse | None:
     """Pre-populate the global wildcard over CASE or PASE without DNS-SD browsing.
 
     The previous implementation called is_commissioned(), whose operational and
@@ -502,8 +504,13 @@ async def _prepopulate_global_wildcard(
     Every failure path is non-fatal: if nothing is stashed here, guards and framework
     cleanup read the wildcard on demand via MatterBaseTest._populate_wildcard().
 
+    Args:
+        setup_code: The setup code of this DUT, used for the PASE route; None skips PASE.
+        stash: Store the read as stored_global_wildcard. Only the first DUT's read is
+            stored there, because guards and framework cleanup read it as the DUT under test.
+
     Returns:
-        The wildcard that was read and stashed, or None.
+        The wildcard that was read, or None.
     """
     if not getattr(test_class, "requires_dut", True):
         LOGGER.info(
@@ -522,7 +529,7 @@ async def _prepopulate_global_wildcard(
     if expects_uncommissioned:
         path = "pase"
         wildcard = await _prepopulate_wildcard_via_pase(
-            default_controller, node_id, matter_test_config, test_config)
+            default_controller, node_id, setup_code, test_config, stash)
     else:
         try:
             await default_controller.GetConnectedDevice(
@@ -534,39 +541,19 @@ async def _prepopulate_global_wildcard(
             )
             path = "pase-fallback"
             wildcard = await _prepopulate_wildcard_via_pase(
-                default_controller, node_id, matter_test_config, test_config)
+                default_controller, node_id, setup_code, test_config, stash)
         else:
             path = "case"
             wildcard = await _prepopulate_wildcard_via_case(
-                default_controller, node_id, test_config)
+                default_controller, node_id, test_config, stash)
 
     elapsed_ms = int((time.monotonic() - start) * 1000)
     LOGGER.info(
-        "[WILDCARD] Pre-population %s in %dms (path=%s)",
-        "done" if wildcard is not None else "skipped (will populate on demand)",
+        "[WILDCARD] Pre-population for node %s %s in %dms (path=%s)",
+        node_id, "done" if wildcard is not None else "skipped (will populate on demand)",
         elapsed_ms, path,
     )
     return wildcard
-
-
-async def _read_secondary_dut_wildcard(
-        default_controller, node_id) -> Attribute.AsyncReadTransaction.ReadResponse | None:
-    """Read the global wildcard of a DUT other than the first one, over CASE only.
-
-    Uses the same bounded CASE probe as _prepopulate_global_wildcard. There is no PASE
-    fallback: get_first_setup_code() only has the first DUT's setup code. The read is
-    not stashed as stored_global_wildcard, which always describes the first DUT.
-
-    Returns:
-        The wildcard, or None if the DUT is not reachable over CASE or the read fails.
-    """
-    try:
-        await default_controller.GetConnectedDevice(
-            nodeId=node_id, allowPASE=False, timeoutMs=_CASE_PROBE_TIMEOUT_MS)
-        return await read_global_wildcard_async(default_controller, node_id)
-    except Exception as e:
-        LOGGER.info("[WILDCARD] No global wildcard for node %s over CASE: %s", node_id, e)
-        return None
 
 
 def generate_pseudo_pics(
@@ -624,6 +611,7 @@ def run_tests_no_exit(
 
     from matter.testing.CommissioningPreTest import CommissionDeviceTest
     from matter.testing.matter_stack_state import MatterStackState
+    from matter.testing.matter_testing import get_setup_codes
 
     # Mobly deep-copies user_params, so the asyncio event loop cannot be passed
     # through TestRunConfig. Attach it directly to the test classes instead.
@@ -710,8 +698,6 @@ def run_tests_no_exit(
             if matter_test_config.commissioning_method is not None:
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
 
-            node_id = matter_test_config.dut_node_ids[0]
-
             # Decide whether to pre-populate the global wildcard from the runner.
             #
             #  1. CLI escape hatch --skip-global-wildcard-population is set. Used for
@@ -723,9 +709,8 @@ def run_tests_no_exit(
             #     route from requires_dut, the commissioning flags and a bounded CASE
             #     probe (no DNS-SD browsing). Any failure falls back to on-demand.
             #
-            # Pseudo-PICS are generated from these reads. Other DUTs are read over CASE
-            # only when no commissioning method is set: otherwise they are not on the
-            # fabric yet and each CASE probe would just wait for its timeout.
+            # Every DUT is read with its own setup code, and pseudo-PICS are generated from
+            # these reads. Only the first DUT's read is stashed as stored_global_wildcard.
             wildcards: dict[int, Attribute.AsyncReadTransaction.ReadResponse] = {}
             if getattr(matter_test_config, "skip_global_wildcard_population", False):
                 LOGGER.info(
@@ -733,24 +718,16 @@ def run_tests_no_exit(
                     "Guards will populate the global wildcard on-demand when first called."
                 )
             else:
-                wildcard = event_loop.run_until_complete(
-                    _prepopulate_global_wildcard(
-                        test_class, default_controller, node_id, matter_test_config, test_config)
-                )
-                if wildcard is not None:
-                    wildcards[node_id] = wildcard
-
-                reads_other_duts = (
-                    getattr(test_class, "requires_dut", True)
-                    and matter_test_config.commissioning_method is None
-                    and matter_test_config.in_test_commissioning_method is None
-                )
-                if reads_other_duts:
-                    for other_node_id in matter_test_config.dut_node_ids[1:]:
-                        wildcard = event_loop.run_until_complete(
-                            _read_secondary_dut_wildcard(default_controller, other_node_id))
-                        if wildcard is not None:
-                            wildcards[other_node_id] = wildcard
+                setup_codes = get_setup_codes(default_controller, matter_test_config)
+                for index, dut_node_id in enumerate(matter_test_config.dut_node_ids):
+                    setup_code = setup_codes[index] if index < len(setup_codes) else None
+                    wildcard = event_loop.run_until_complete(
+                        _prepopulate_global_wildcard(
+                            test_class, default_controller, dut_node_id, setup_code,
+                            matter_test_config, test_config, stash=(index == 0))
+                    )
+                    if wildcard is not None:
+                        wildcards[dut_node_id] = wildcard
 
             pseudo_pics: dict[int, dict[int, list[str]]] = {}
             if data_model is not None:
