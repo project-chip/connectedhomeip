@@ -127,12 +127,23 @@ def compute_mrp_retransmission_timeout_sec(dev_ctrl: ChipDeviceCtrl.ChipDeviceCo
     return base_interval_ms * backoff_sum * 1.375 / 1000.0
 
 
-def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> str | None:
+def get_setup_codes(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> list[str]:
+    """Return the setup code of every configured DUT, in dut_node_ids order.
+
+    QR codes come first, then manual codes, then codes built from the discriminator and
+    passcode pairs. populate_commissioning_args assigns dut_node_ids in this same order,
+    so setup_codes[i] belongs to dut_node_ids[i]. The list is shorter than dut_node_ids,
+    or empty, when no codes were given (for example NFC in-test commissioning).
+    """
     created_codes = []
     for idx, discriminator in enumerate(matter_test_config.discriminators):
         created_codes.append(dev_ctrl.CreateManualCode(discriminator, matter_test_config.setup_passcodes[idx]))
 
-    setup_codes = matter_test_config.qr_code_content + matter_test_config.manual_code + created_codes
+    return matter_test_config.qr_code_content + matter_test_config.manual_code + created_codes
+
+
+def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> str | None:
+    setup_codes = get_setup_codes(dev_ctrl, matter_test_config)
     if not setup_codes:
         return None
     return setup_codes[0]
