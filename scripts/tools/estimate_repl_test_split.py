@@ -44,7 +44,11 @@ import sys
 from pathlib import Path
 
 import click
+import python_path
 import yaml
+
+with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
+    from matter.testing.metadata import extract_runs_args, script_runs_in_pull_requests
 
 log = logging.getLogger(__name__)
 
@@ -60,13 +64,20 @@ AGGREGATES = {
 
 
 def load_durations(timing_files: tuple[Path, ...], aggregate: str) -> dict[str, float]:
-    """Return test script name -> aggregated duration in seconds."""
+    """Return test script name -> aggregated duration in seconds.
+
+    A script called once per run reports "<script>::<run>" results; their durations in one job add up to the script's.
+    """
     samples: dict[str, list[float]] = {}
     for path in timing_files:
         for run in json.loads(path.read_text())["runs"]:
             for job in run["jobs"]:
+                job_seconds: dict[str, float] = {}
                 for t in job["tests"]:
-                    samples.setdefault(t["name"], []).append(t["duration_seconds"])
+                    script = t["name"].split("::")[0]
+                    job_seconds[script] = job_seconds.get(script, 0.0) + t["duration_seconds"]
+                for script, seconds in job_seconds.items():
+                    samples.setdefault(script, []).append(seconds)
     return {name: AGGREGATES[aggregate](values) for name, values in samples.items()}
 
 
@@ -76,17 +87,18 @@ def load_workflow_filters(workflow: Path) -> list[str]:
 
 
 def list_ci_test_scripts() -> list[str]:
-    """List test script paths the same way execute_python_tests.py does (non-nightly run).
+    """List test script paths the same way execute_python_tests.py does for PR CI (the default tag filter).
 
     Paths are relative to CHIP_ROOT (e.g. "src/python_testing/TC_ACE_1_2.py"), matching
     what the CI regex filters are applied to.
     """
     with open(CHIP_ROOT / SEARCH_DIRECTORY / "test_metadata.yaml") as f:
         metadata = yaml.safe_load(f)
-    excluded = {item["name"] for item in metadata["not_automated"]} | {item["name"] for item in metadata["nightly"]}
+    excluded = {item["name"] for item in metadata["not_automated"]}
 
     scripts = sorted(glob.glob(os.path.join(SEARCH_DIRECTORY, "*.py"), root_dir=CHIP_ROOT))
-    return [s for s in scripts if os.path.basename(s) not in excluded]
+    return [s for s in scripts if os.path.basename(s) not in excluded
+            and script_runs_in_pull_requests(extract_runs_args(str(CHIP_ROOT / s)))]
 
 
 def filter_matches(pattern: str, path: str) -> bool:

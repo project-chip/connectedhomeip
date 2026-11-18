@@ -57,8 +57,12 @@ class EndpointInspectorViewModel(
   val operationStatus: StateFlow<String?> = _operationStatus.asStateFlow()
 
   /** Recent IM events from every endpoint of this node, newest first, whichever tab is selected. */
-  private val _recentEvents = MutableStateFlow(HomeStateCache.getRecentNodeEvents(nodeId))
+  private val _recentEvents = MutableStateFlow(recentImEvents())
   val recentEvents: StateFlow<List<CachedEvent>> = _recentEvents.asStateFlow()
+
+  /** Dedicated Check-Ins timeline. */
+  private val _checkInRecords = MutableStateFlow(HomeStateCache.getCheckInRecords(nodeId))
+  val checkInRecords: StateFlow<List<CheckInRecord>> = _checkInRecords.asStateFlow()
 
   init {
     reloadEndpoints()
@@ -75,11 +79,16 @@ class EndpointInspectorViewModel(
     coroutineScope.launch {
       HomeStateCache.recentEventsFlow.collectLatest { key ->
         if (key.startsWith("$nodeId:")) {
-          _recentEvents.value = HomeStateCache.getRecentNodeEvents(nodeId)
+          _recentEvents.value = recentImEvents()
+          _checkInRecords.value = HomeStateCache.getCheckInRecords(nodeId)
         }
       }
     }
   }
+
+  /** Check-Ins have their own timeline; leave them out before the row limit is applied. */
+  private fun recentImEvents(): List<CachedEvent> =
+    HomeStateCache.getRecentNodeEvents(nodeId, includeCheckIns = false)
 
   fun reloadEndpoints() {
     val currentNode = nodeRegistry.getNode(nodeId)

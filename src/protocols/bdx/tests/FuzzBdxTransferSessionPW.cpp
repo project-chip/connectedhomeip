@@ -222,7 +222,6 @@ void HandleStep(TransferSession & session, const Step & step)
         msg.TransferCtlFlags.Set(kDriveModes[u16 % 3]);
         msg.Version      = 0;
         msg.MaxBlockSize = static_cast<uint16_t>(u16);
-        msg.StartOffset  = static_cast<uint64_t>(u32);
         msg.Length       = u64;
         Inject(session, Protocols::BDX::Id, to_underlying(MessageType::ReceiveAccept), EncodeBdxMessage(msg));
         break;
@@ -294,7 +293,6 @@ void HandleStep(TransferSession & session, const Step & step)
         TransferSession::TransferAcceptData acceptData;
         acceptData.ControlMode  = kDriveModes[u16 % 3];
         acceptData.MaxBlockSize = static_cast<uint16_t>(u16);
-        acceptData.StartOffset  = static_cast<uint64_t>(u32);
         acceptData.Length       = u64;
         RETURN_SAFELY_IGNORED session.AcceptTransfer(acceptData);
         break;

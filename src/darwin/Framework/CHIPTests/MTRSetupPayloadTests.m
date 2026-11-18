@@ -18,6 +18,20 @@
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
 
+// Archives like NSKeyedArchiver, but writes replacementValue in place of the object for replacedKey,
+// to simulate an archive that was corrupted after it was written.
+@interface MTRSetupPayloadReplacingArchiver : NSKeyedArchiver
+@property (nonatomic, copy) NSString * replacedKey;
+@property (nonatomic, strong) id replacementValue;
+@end
+
+@implementation MTRSetupPayloadReplacingArchiver
+- (void)encodeObject:(id)object forKey:(NSString *)key
+{
+    [super encodeObject:([key isEqualToString:self.replacedKey] ? self.replacementValue : object) forKey:key];
+}
+@end
+
 @interface MTRSetupPayloadTests : XCTestCase
 
 @end
@@ -451,6 +465,35 @@
         // output from the decoded and original objects.
         XCTAssertEqualObjects([decoded qrCodeString:NULL], [payload qrCodeString:NULL]);
         XCTAssertEqualObjects(decoded.manualEntryCode, payload.manualEntryCode);
+    }
+}
+
+- (void)testSecureCodingRejectsCorruptedQRCode
+{
+    // encodeWithCoder: always writes a QR code that initWithCoder: can parse, so one that doesn't parse
+    // means the archive was corrupted. Decoding it fails instead of producing a payload.
+    for (NSString * string in @[
+             @"MT:M5L90MP500K64J00000",
+             @"MT:M5L90MP500K64J00000*M5L90MP500OC8010000",
+         ]) {
+        NSError * error;
+        MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:string error:&error];
+        XCTAssertNotNil(payload, @"Error: %@", error);
+
+        for (NSString * corruptedQRCode in @[ @"MT:not a setup payload", @"MT:not a setup payload*nor is this" ]) {
+            MTRSetupPayloadReplacingArchiver * archiver = [[MTRSetupPayloadReplacingArchiver alloc] initRequiringSecureCoding:YES];
+            archiver.replacedKey = @"qr";
+            archiver.replacementValue = corruptedQRCode;
+            [archiver encodeObject:payload forKey:NSKeyedArchiveRootObjectKey];
+            [archiver finishEncoding];
+
+            error = nil;
+            MTRSetupPayload * decoded = [NSKeyedUnarchiver unarchivedObjectOfClass:MTRSetupPayload.class fromData:archiver.encodedData error:&error];
+            XCTAssertNil(decoded, @"%@ archived with QR code %@", string, corruptedQRCode);
+            XCTAssertNotNil(error, @"%@ archived with QR code %@", string, corruptedQRCode);
+            XCTAssertEqualObjects(error.domain, NSCocoaErrorDomain);
+            XCTAssertEqual(error.code, NSCoderReadCorruptError);
+        }
     }
 }
 

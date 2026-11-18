@@ -36,6 +36,19 @@ chip_test_suite("tests") {
     "${chip_root}/src/protocols/bdx",
   ]
 
+  # The ESP32 test driver cannot run tests that use the messaging test helpers;
+  # see src/test_driver/esp32/CMakeLists.txt.
+  if (chip_device_platform != "esp32") {
+    test_sources += [
+      "TestAsyncTransferFacilitator.cpp",
+      "TestBusyResponder.cpp",
+    ]
+    public_deps += [
+      "${chip_root}/src/messaging",
+      "${chip_root}/src/messaging/tests:helpers",
+    ]
+  }
+
   cflags = [ "-Wconversion" ]
 }
 

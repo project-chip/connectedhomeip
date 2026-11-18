@@ -35,6 +35,7 @@
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     tags: [openssl-3.5]
 # === END CI TEST ARGUMENTS ===
 
 import logging

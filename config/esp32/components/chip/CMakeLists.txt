@@ -195,6 +195,9 @@ elseif(CONFIG_CHIP_MEM_ALLOC_MODE_DEFAULT)
 endif()
 
 if(CONFIG_ENABLE_PW_RPC)
+    # ESP-IDF headers use GCC extensions such as #include_next that fail under
+    # -Wpedantic in pw_build.internal_strict_warnings.
+    set(pw_build_WARNINGS pw_build.strict_warnings CACHE STRING "" FORCE)
     string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
     chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:toolchain_cpp_standard\"]")
     chip_gn_arg_append("chip_build_pw_rpc_lib"              "true")
@@ -392,6 +395,12 @@ set(filter_out "-DHAVE_CONFIG_H" "-DIDF_VER=\\\"${idf_ver}\\\"" )
 list(APPEND filter_out "-Iconfig")
 idf_build_get_property(config_dir CONFIG_DIR)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-I${config_dir}")
+
+# GN generates dependencies with -MMD. Some ESP-IDF system headers include
+# sdkconfig.h before Matter's platform configuration headers do, which causes
+# GCC to omit sdkconfig.h from the dependency file. Force it to be included
+# first so Kconfig changes rebuild the affected Matter sources.
+target_compile_options(${COMPONENT_LIB} PRIVATE "-include${config_dir}/sdkconfig.h")
 
 if (CONFIG_CHIP_USE_OT_ENDPOINT)
     idf_component_get_property(openthread_dir openthread COMPONENT_DIR)

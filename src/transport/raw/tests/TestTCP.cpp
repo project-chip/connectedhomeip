@@ -1033,7 +1033,7 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 2);
 
     // Test a single packet buffer that is larger than kMaxSizeWithoutReserve but not larger than
-    // kMaxAllocSize. No such size exists on internal-pool builds, where the two are equal.
+    // kMaxAllocSize. Skipped on internal-pool and LwIP standard-pool builds, where the two are asserted equal.
     if constexpr (System::PacketBuffer::kMaxAllocSize > System::PacketBuffer::kMaxSizeWithoutReserve)
     {
         gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;

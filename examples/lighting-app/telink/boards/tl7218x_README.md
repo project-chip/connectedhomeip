@@ -48,9 +48,9 @@ build_tl7218x_default/zephyr/zephyr.bin          -> flash this
 **Build Software Version 1:**
 
 ```bash
-west build -p -b tl7218x -d build_tl7218x_lzma_v1 -- \
+west build -p -b tl7218x -d build_tl7218x_2m_flash_lzma_v1 -- \
 -DCONF_FILE="prj.conf boards/tl7218x_2m_flash_ota_lzma.conf" \
--DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=1 > build_tl7218x_lzma_v1.log
+-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=1 > build_tl7218x_2m_flash_lzma_v1.log
 # Kconfig: explicitly specified (-DCONF_FILE="prj.conf boards/tl7218x_2m_flash_ota_lzma.conf")
 # DTS Overlay: default (src/platform/telink/tl7218x_2m_flash_lzma.overlay)
 ```
@@ -58,9 +58,9 @@ west build -p -b tl7218x -d build_tl7218x_lzma_v1 -- \
 **Build Software Version 2:**
 
 ```bash
-west build -p -b tl7218x -d build_tl7218x_lzma_v2 -- \
+west build -p -b tl7218x -d build_tl7218x_2m_flash_lzma_v2 -- \
 -DCONF_FILE="prj.conf boards/tl7218x_2m_flash_ota_lzma.conf" \
--DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 > build_tl7218x_lzma_v2.log
+-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 > build_tl7218x_2m_flash_lzma_v2.log
 # Kconfig: explicitly specified (-DCONF_FILE="prj.conf boards/tl7218x_2m_flash_ota_lzma.conf")
 # DTS Overlay: default (src/platform/telink/tl7218x_2m_flash_lzma.overlay)
 ```
@@ -68,9 +68,9 @@ west build -p -b tl7218x -d build_tl7218x_lzma_v2 -- \
 **Output:**
 
 ```bash
-build_tl7218x_lzma_v1/zephyr/merged.bin          -> flash this
-build_tl7218x_lzma_v2/zephyr/merged_dfu.lzma.bin -> DFU over BLE SMP
-build_tl7218x_lzma_v2/zephyr/matter.ota          -> OTA upgrade
+build_tl7218x_2m_flash_lzma_v1/zephyr/merged.bin          -> flash this
+build_tl7218x_2m_flash_lzma_v2/zephyr/merged_dfu.lzma.bin -> DFU over BLE SMP
+build_tl7218x_2m_flash_lzma_v2/zephyr/matter.ota          -> OTA upgrade
 ```
 
 ## 3. WARNING: 2MB Flash with OTA but NO LZMA (NOT RECOMMENDED)

@@ -25,6 +25,7 @@ unit test. Each test function is defined using `TEST(NameOfFunction)`. The set
 of test functions in a given source file is called a "suite".
 
 ```cpp
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 TEST(YourTestFunction1)
@@ -66,6 +67,7 @@ following example demonstrates how to use pw_unit_test to write a unit test that
 uses fixtures and setup/teardown behavior.
 
 ```cpp
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 class YourTestContext : public ::testing::Test
@@ -222,6 +224,29 @@ type alias: `using YourTestContext = Test::AppContext;` instead of defining your
 own text context class.
 
 ## Best practices
+
+-   Include `<lib/support/tests/ExtraPwTestMacros.h>` in test sources.
+    `chip_test_suite` already depends on it, so this normally adds no
+    dependency. The header provides:
+
+    -   `ASSERT_SUCCESS(expr)` and `EXPECT_SUCCESS(expr)`, shorthand for
+        comparing a `CHIP_ERROR` against `CHIP_NO_ERROR`.
+    -   Versions of `ASSERT_TRUE` / `ASSERT_FALSE` that clang-tidy understands
+        as guards.
+
+    clang-tidy's `bugprone-unchecked-optional-access` check needs to see that an
+    optional has a value before it is accessed. Any guard it can follow works,
+    for example:
+
+    -   `ASSERT_TRUE(x.has_value())` in a test body.
+    -   `if (!x.has_value())` or `VerifyOrDie(x.has_value())` in a helper that
+        returns a value and so can't use `ASSERT_*`.
+    -   Comparing the optional directly, which avoids the access altogether,
+        e.g.
+        `EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success))`.
+
+    Tests shouldn't need `NOLINT` comments for this check, and CI rejects them
+    under `tests/` directories.
 
 -   Try to use as specific an assertion as possible. For example use these
 

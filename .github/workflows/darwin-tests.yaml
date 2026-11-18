@@ -178,6 +178,19 @@ jobs:
              --ota-destination-file /tmp/downloadedImage \
              --ota-candidate-file /tmp/otaCandidateJSON \
           "
+      - name: Run OTA Test With BlockQueryWithSkip
+        run: |
+          ./scripts/run_in_build_env.sh \
+          "./scripts/tests/run_darwin_framework_ota_test.py \
+             run \
+             --darwin-framework-tool ./out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
+             --ota-requestor-app ./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+             --ota-data-file /tmp/rawImageSkip \
+             --ota-image-file /tmp/otaImageSkip \
+             --ota-destination-file /tmp/downloadedImageSkip \
+             --ota-candidate-file /tmp/otaCandidateJSONSkip \
+             --bdx-skip-after-first-block 1500 \
+          "
       - name: Uploading core files
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: ${{ failure() && !env.ACT }}

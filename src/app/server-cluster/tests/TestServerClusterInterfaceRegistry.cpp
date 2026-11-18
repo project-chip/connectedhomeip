@@ -333,10 +333,48 @@ TEST_F(TestServerClusterInterfaceRegistry, RegisterErrors)
     // Can't register an interface with an invalid path
     EXPECT_EQ(registry.Register(invalidPathRegistration), CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Can't register a duplicate cluster
+    // Can't register the same registration twice, or a duplicate cluster
     EXPECT_EQ(registry.Register(registration1), CHIP_NO_ERROR);
-    EXPECT_EQ(registry.Register(registration1), CHIP_ERROR_DUPLICATE_KEY_ID);
+    EXPECT_EQ(registry.Register(registration1), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(registry.Register(anotherRegistration1), CHIP_ERROR_DUPLICATE_KEY_ID);
+
+    // Can't register a registration that is part of another registry
+    ServerClusterInterfaceRegistry otherRegistry;
+    EXPECT_EQ(otherRegistry.Register(registration1), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestServerClusterInterfaceRegistry, IsRegistered)
+{
+    FakeServerClusterInterface cluster1(kEp1, kCluster1);
+    FakeServerClusterInterface cluster2(kEp1, kCluster2);
+    ServerClusterRegistration registration1(cluster1);
+    ServerClusterRegistration registration2(cluster2);
+
+    EXPECT_FALSE(registration1.IsRegistered());
+    EXPECT_FALSE(registration2.IsRegistered());
+
+    {
+        ServerClusterInterfaceRegistry registry;
+
+        // registration1 is the last entry in the list
+        EXPECT_EQ(registry.Register(registration1), CHIP_NO_ERROR);
+        EXPECT_TRUE(registration1.IsRegistered());
+
+        EXPECT_EQ(registry.Register(registration2), CHIP_NO_ERROR);
+        EXPECT_TRUE(registration1.IsRegistered());
+        EXPECT_TRUE(registration2.IsRegistered());
+
+        EXPECT_EQ(registry.Unregister(&cluster1), CHIP_NO_ERROR);
+        EXPECT_FALSE(registration1.IsRegistered());
+        EXPECT_TRUE(registration2.IsRegistered());
+
+        EXPECT_EQ(registry.Register(registration1), CHIP_NO_ERROR);
+        EXPECT_TRUE(registration1.IsRegistered());
+    }
+
+    // Destroying the registry unregisters all entries
+    EXPECT_FALSE(registration1.IsRegistered());
+    EXPECT_FALSE(registration2.IsRegistered());
 }
 
 TEST_F(TestServerClusterInterfaceRegistry, UnregisterErrors)

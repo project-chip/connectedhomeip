@@ -62,8 +62,6 @@ class CHIPToolActivity :
     super.onCreate(savedInstanceState)
     setContentView(R.layout.top_activity)
 
-    ChipClient.startDnssd(this)
-
     if (savedInstanceState == null) {
       val fragment =
         if (intent?.getBooleanExtra("open_scan", false) == true) {
@@ -121,16 +119,14 @@ class CHIPToolActivity :
   }
 
   override fun onCommissioningComplete(code: Long, nodeId: Long) {
-    DeviceIdUtil.setCommissionedNodeId(this, nodeId)
     ChipClient.getDeviceController(this).close()
 
     if (code == 0L && nodeId > 0L) {
+      DeviceIdUtil.setCommissionedNodeId(this, nodeId)
       val registry =
         CenterConnectionManager.registry(this).also { reg ->
-          reg.autoRegisterCommissionedNode(nodeId)
-          reg.saveFabricToPreferences(this)
+          PostCommissioningDialogHelper.autoRegisterNode(reg, nodeId, deviceInfo, this)
         }
-      CenterConnectionManager.onNodeCommissioned(nodeId)
       runOnUiThread {
         Toast.makeText(this, getString(R.string.commissioning_completed, code), Toast.LENGTH_SHORT)
           .show()

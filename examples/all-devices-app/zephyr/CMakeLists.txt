@@ -147,6 +147,10 @@ endif()
 
 target_compile_definitions(app PRIVATE ALL_DEVICES_ENABLED_DEVICE_COUNT=${ALL_DEVICES_ENABLED_DEVICE_COUNT})
 
+if (CONFIG_SOC_FAMILY_NXP_RW OR CONFIG_SOC_FAMILY_MCXW)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/nxp/app_common.cmake)
+endif()    
+
 if(NOT APP_TASK_IMPL_HEADER STREQUAL "")
     target_compile_definitions(app PRIVATE APP_TASK_IMPL_HEADER="${APP_TASK_IMPL_HEADER}")
 endif()
@@ -221,7 +225,7 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
     endif()
 
     if(CONFIG_CHIP_OTA_IMAGE_BUILD)
-        chip_ota_image(chip-ota-image
+        chip_zephyr_ota_image(chip-ota-image
             INPUT_FILES ${PROJECT_BINARY_DIR}/zephyr/${ALL_DEVICES_OTA_BASE_NAME}.bin
             OUTPUT_FILE ${PROJECT_BINARY_DIR}/zephyr/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
         )

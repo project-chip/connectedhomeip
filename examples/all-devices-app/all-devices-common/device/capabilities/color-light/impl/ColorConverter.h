@@ -51,6 +51,9 @@ protected:
     void ConvertHueSatToXY(uint8_t hue, uint8_t sat, uint16_t & outX, uint16_t & outY) override;
     void ConvertHueSatToMireds(uint8_t hue, uint8_t sat, uint16_t & outMireds) override;
     void ConvertMiredsToHueSat(uint16_t mireds, uint8_t & outHue, uint8_t & outSat) override;
+
+    // sRGB channels in [0, 1] at full brightness (brightest channel is 1); degenerate xy yields white.
+    static void ConvertXYToRgb(uint16_t x, uint16_t y, float & outRed, float & outGreen, float & outBlue);
 };
 
 } // namespace app

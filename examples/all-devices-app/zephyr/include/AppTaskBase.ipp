@@ -55,7 +55,11 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <device/types/root-node/features/OtaFeature.h>
+#ifdef CHIP_ZEPHYR_OTA_IMAGE_PROCESSOR_HEADER
+#include CHIP_ZEPHYR_OTA_IMAGE_PROCESSOR_HEADER
+#else
 #include <platform/Zephyr/OTAImageProcessorImpl.h>
+#endif
 #endif
 
 namespace chip::app::AllDevices {
@@ -142,6 +146,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitPersistence()
     ReturnErrorOnFailure(mAttributePersistenceProvider.Init(mInitParams.persistentStorageDelegate));
 
     mInitParams.groupDataProvider = &mGroupDataProvider;
+    mGroupDataProvider.SetGroupcastEnabled(CHIP_CONFIG_ENABLE_GROUPCAST);
     mGroupDataProvider.SetStorageDelegate(mInitParams.persistentStorageDelegate);
     mGroupDataProvider.SetSessionKeystore(mInitParams.sessionKeystore);
     ReturnErrorOnFailure(mGroupDataProvider.Init());
@@ -319,7 +324,7 @@ CHIP_ERROR AppTaskBase<Derived>::PostServerInit()
 {
     // Runs before StartEventLoopTask(), so the Matter stack can be accessed without taking the stack lock.
     auto & server = Server::GetInstance();
-    LogErrorOnFailure(mBindingHandler.Init(
+    ReturnErrorOnFailure(mBindingHandler.Init(
         Clusters::Binding::Manager::GetInstance(),
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }, server.GetExchangeManager()));
     DeviceLayer::ConfigurationMgr().LogDeviceConfig();

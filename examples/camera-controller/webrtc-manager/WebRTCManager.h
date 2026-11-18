@@ -59,10 +59,12 @@ public:
 
     CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage,
                             chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
-                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
+                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId,
+                            WebRTCProviderClient::OfferOptions options = WebRTCProviderClient::OfferOptions());
 
     CHIP_ERROR SolicitOffer(StreamUsageEnum streamUsage, chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
-                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
+                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId,
+                            const WebRTCProviderClient::OfferOptions & options = WebRTCProviderClient::OfferOptions());
 
     CHIP_ERROR ProvideAnswer(uint16_t sessionId, const std::string & sdp);
 
@@ -80,6 +82,9 @@ private:
 
     // Close and reset the RTP sockets
     void CloseRTPSockets();
+
+    // Sets the remote description, then applies the remote ICE candidates held until it was set, in arrival order.
+    void SetRemoteDescription(const rtc::Description & description);
 
     // PeerConnection callback handlers. The handlers are executed on the Matter thread.
     void OnLocalDescriptionGenerated(const std::shared_ptr<rtc::PeerConnection> & connection, const rtc::Description & desc);
@@ -111,6 +116,7 @@ private:
         StreamUsageEnum streamUsage = {};
         chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId;
         chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId;
+        WebRTCProviderClient::OfferOptions offerOptions;
 
         void Reset() { *this = PendingSdpContext{}; }
     };
@@ -118,6 +124,10 @@ private:
 
     // Local vector to store the ICE Candidate info coming from the WebRTC stack
     std::vector<ICECandidateInfo> mLocalCandidates;
+
+    // Remote ICE candidates received before a remote description was set. libdatachannel rejects a remote candidate
+    // while no remote description is set, so these wait for SetRemoteDescription().
+    std::vector<rtc::Candidate> mHeldRemoteCandidates;
 
     std::shared_ptr<rtc::Track> mTrack;
     std::shared_ptr<rtc::Track> mAudioTrack;

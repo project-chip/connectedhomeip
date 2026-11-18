@@ -129,7 +129,6 @@ void MediaFileManagementBdxServer::HandleTransferSessionOutput(TransferSession::
         TransferSession::TransferAcceptData acceptData;
         acceptData.ControlMode  = TransferControlFlags::kReceiverDrive;
         acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
-        acceptData.StartOffset  = mTransfer.GetStartOffset();
         acceptData.Length       = mTransfer.GetTransferLength();
         VerifyOrReturn(mTransfer.AcceptTransfer(acceptData) == CHIP_NO_ERROR,
                        ChipLogError(BDX, "MediaFileManagementBdxServer: AcceptTransfer failed"));

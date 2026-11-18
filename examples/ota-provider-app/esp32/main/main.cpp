@@ -58,7 +58,7 @@ using namespace chip::DeviceManager;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace ::chip::Credentials;
 
-CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset);
+CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint64_t offset);
 void OnTransferComplete(void * context);
 void OnTransferFailed(void * context, BdxSenderErrorTypes status);
 
@@ -164,7 +164,7 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 } // namespace
 
-CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset)
+CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint64_t offset)
 {
     BdxOtaSender * bdxOtaSender = otaProvider.GetBdxOtaSender();
     VerifyOrReturnError(bdxOtaSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -194,18 +194,32 @@ CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & block
         otaTransferInProgress = true;
     }
 
+    if (offset >= otaImageLen)
+    {
+        size  = 0;
+        isEof = true;
+        return CHIP_NO_ERROR;
+    }
+
     uint16_t blockBufAvailableLength = blockBuf->AvailableDataLength();
     uint16_t transferBlockSize       = bdxOtaSender->GetTransferBlockSize();
 
     size = (blockBufAvailableLength < transferBlockSize) ? blockBufAvailableLength : transferBlockSize;
     if (offset + size >= otaImageLen)
     {
-        size  = otaImageLen - offset;
+        size  = static_cast<size_t>(otaImageLen - offset);
         isEof = true;
     }
     else
     {
         isEof = false;
+    }
+    if (fseek(otaImageFile, static_cast<long>(offset), SEEK_SET) != 0)
+    {
+        ESP_LOGE(TAG, "Failed to seek to offset %" PRIu64 " in %s", offset, otaFilename);
+        size  = 0;
+        isEof = false;
+        return CHIP_ERROR_READ_FAILED;
     }
     size_t size_read = fread(blockBuf->Start(), 1, size, otaImageFile);
     if (size_read != size)

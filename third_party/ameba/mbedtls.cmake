@@ -11,17 +11,19 @@ list(
     # mbedtls-chip
     ${dir}/net_sockets.c
     ${dir_mbedtlschip}/aes.c
+    ${dir_mbedtlschip}/aesce.c
     ${dir_mbedtlschip}/aesni.c
-    ${dir_mbedtlschip}/arc4.c
     ${dir_mbedtlschip}/aria.c
     ${dir_mbedtlschip}/asn1parse.c
     ${dir_mbedtlschip}/asn1write.c
     ${dir_mbedtlschip}/base64.c
     ${dir_mbedtlschip}/bignum.c
-    ${dir_mbedtlschip}/blowfish.c
+    ${dir_mbedtlschip}/bignum_core.c
+    ${dir_mbedtlschip}/bignum_mod.c
+    ${dir_mbedtlschip}/bignum_mod_raw.c
+    ${dir_mbedtlschip}/block_cipher.c
     ${dir_mbedtlschip}/camellia.c
     ${dir_mbedtlschip}/ccm.c
-    ${dir_mbedtlschip}/certs.c
     ${dir_mbedtlschip}/chacha20.c
     ${dir_mbedtlschip}/chachapoly.c
     ${dir_mbedtlschip}/cipher.c
@@ -37,15 +39,15 @@ list(
     ${dir_mbedtlschip}/ecjpake.c
     ${dir_mbedtlschip}/ecp.c
     ${dir_mbedtlschip}/ecp_curves.c
+    ${dir_mbedtlschip}/ecp_curves_new.c
     ${dir_mbedtlschip}/entropy.c
     ${dir_mbedtlschip}/entropy_poll.c
     ${dir_mbedtlschip}/error.c
     ${dir_mbedtlschip}/gcm.c
-    ${dir_mbedtlschip}/havege.c
     ${dir_mbedtlschip}/hkdf.c
     ${dir_mbedtlschip}/hmac_drbg.c
-    ${dir_mbedtlschip}/md2.c
-    ${dir_mbedtlschip}/md4.c
+    ${dir_mbedtlschip}/lmots.c
+    ${dir_mbedtlschip}/lms.c
     ${dir_mbedtlschip}/md5.c
     ${dir_mbedtlschip}/md.c
     ${dir_mbedtlschip}/memory_buffer_alloc.c
@@ -54,9 +56,10 @@ list(
     ${dir_mbedtlschip}/padlock.c
     ${dir_mbedtlschip}/pem.c
     ${dir_mbedtlschip}/pk.c
-    ${dir_mbedtlschip}/pkcs11.c
     ${dir_mbedtlschip}/pkcs12.c
     ${dir_mbedtlschip}/pkcs5.c
+    ${dir_mbedtlschip}/pkcs7.c
+    ${dir_mbedtlschip}/pk_ecc.c
     ${dir_mbedtlschip}/pkparse.c
     ${dir_mbedtlschip}/pk_wrap.c
     ${dir_mbedtlschip}/pkwrite.c
@@ -64,17 +67,20 @@ list(
     ${dir_mbedtlschip}/platform_util.c
     ${dir_mbedtlschip}/poly1305.c
     ${dir_mbedtlschip}/ripemd160.c
+    ${dir_mbedtlschip}/rsa_alt_helpers.c
     ${dir_mbedtlschip}/rsa.c
-    ${dir_mbedtlschip}/rsa_internal.c
     ${dir_mbedtlschip}/sha1.c
     ${dir_mbedtlschip}/sha256.c
+    ${dir_mbedtlschip}/sha3.c
     ${dir_mbedtlschip}/sha512.c
     ${dir_mbedtlschip}/ssl_cache.c
     ${dir_mbedtlschip}/ssl_ciphersuites.c
-    ${dir_mbedtlschip}/ssl_cli.c
+    ${dir_mbedtlschip}/ssl_client.c
     ${dir_mbedtlschip}/ssl_cookie.c
-    ${dir_mbedtlschip}/ssl_srv.c
+    ${dir_mbedtlschip}/ssl_debug_helpers_generated.c
     ${dir_mbedtlschip}/ssl_ticket.c
+    ${dir_mbedtlschip}/ssl_tls12_client.c
+    ${dir_mbedtlschip}/ssl_tls12_server.c
     ${dir_mbedtlschip}/ssl_tls.c
     ${dir_mbedtlschip}/threading.c
     ${dir_mbedtlschip}/timing.c
@@ -85,8 +91,8 @@ list(
     ${dir_mbedtlschip}/x509_crl.c
     ${dir_mbedtlschip}/x509_crt.c
     ${dir_mbedtlschip}/x509_csr.c
+    ${dir_mbedtlschip}/x509write.c
     ${dir_mbedtlschip}/x509write_crt.c
     ${dir_mbedtlschip}/x509write_csr.c
-    ${dir_mbedtlschip}/xtea.c
 )
 
