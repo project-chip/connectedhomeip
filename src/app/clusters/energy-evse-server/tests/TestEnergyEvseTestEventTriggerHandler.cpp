@@ -20,9 +20,13 @@
 
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
+#include <optional>
+
 using namespace chip;
 
 namespace {
+
+std::optional<uint64_t> gLastEventTrigger;
 
 uint64_t EventTriggerForEndpoint(EndpointId endpoint, EnergyEvseTrigger trigger)
 {
@@ -52,6 +56,12 @@ private:
 };
 
 } // namespace
+
+bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
+{
+    gLastEventTrigger = eventTrigger;
+    return eventTrigger == static_cast<uint64_t>(EnergyEvseTrigger::kEVPluggedIn);
+}
 
 TEST(EnergyEvseTestEventTriggerHandler, RoutesToMatchingInstance)
 {
@@ -110,8 +120,17 @@ TEST(EnergyEvseTestEventTriggerHandler, RejectsUnsupportedUnscopedTrigger)
 TEST(EnergyEvseTestEventTriggerHandler, GlobalHandlerClearsEndpoint)
 {
     EnergyEvseTestEventTriggerHandler handler;
-    EXPECT_SUCCESS(handler.HandleEventTrigger(static_cast<uint64_t>(EnergyEvseTrigger::kEVPluggedIn)));
+    constexpr uint64_t kPluggedIn = static_cast<uint64_t>(EnergyEvseTrigger::kEVPluggedIn);
+
+    gLastEventTrigger.reset();
+    EXPECT_SUCCESS(handler.HandleEventTrigger(kPluggedIn));
+    EXPECT_EQ(gLastEventTrigger, std::make_optional(kPluggedIn));
+
+    gLastEventTrigger.reset();
     EXPECT_SUCCESS(handler.HandleEventTrigger(EventTriggerForEndpoint(7, EnergyEvseTrigger::kEVPluggedIn)));
-    EXPECT_EQ(handler.HandleEventTrigger(EventTriggerForEndpoint(7, EnergyEvseTrigger::kBasicFunctionality)),
-              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(gLastEventTrigger, std::make_optional(kPluggedIn));
+
+    gLastEventTrigger.reset();
+    EXPECT_EQ(handler.HandleEventTrigger(0xABCD123489ABCDEF), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(gLastEventTrigger, std::make_optional<uint64_t>(0xABCD000089ABCDEF));
 }

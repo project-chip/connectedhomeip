@@ -82,8 +82,9 @@ enum class EnergyEvseTrigger : uint64_t
 };
 
 /// Adapter for the application's global HandleEnergyEvseTestEventTrigger().
-/// Object-owned EVSE devices should implement TestEventTriggerHandler directly and use
-/// TestEventTriggerHandler::GetEndpointIdFromEventTrigger() to match their endpoint before clearing the endpoint bits.
+/// Object-owned EVSE devices should implement TestEventTriggerHandler directly.
+/// Use GetEndpointIdFromEventTrigger() to accept their own endpoint or kRootEndpointId
+/// (0, unscoped) before clearing the endpoint bits.
 class EnergyEvseTestEventTriggerHandler : public TestEventTriggerHandler
 {
 public:

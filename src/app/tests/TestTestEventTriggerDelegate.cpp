@@ -21,7 +21,6 @@
 #include <app/TestEventTriggerDelegate.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Span.h>
-#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
