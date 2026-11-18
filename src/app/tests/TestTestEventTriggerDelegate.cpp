@@ -21,6 +21,7 @@
 #include <app/TestEventTriggerDelegate.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
@@ -65,6 +66,22 @@ public:
 private:
     ByteSpan mEnableKey;
 };
+
+TEST(TestTestEventTriggerDelegate, GetEndpointIdFromEventTrigger)
+{
+    EXPECT_EQ(TestEventTriggerHandler::GetEndpointIdFromEventTrigger(0xABCD123489ABCDEF), 0x1234);
+    EXPECT_EQ(TestEventTriggerHandler::GetEndpointIdFromEventTrigger(0xFFFF0000FFFFFFFF), 0);
+    EXPECT_EQ(TestEventTriggerHandler::GetEndpointIdFromEventTrigger(0x0000FFFF00000000), 0xFFFF);
+    EXPECT_EQ(TestEventTriggerHandler::GetEndpointIdFromEventTrigger(0), 0);
+}
+
+TEST(TestTestEventTriggerDelegate, ClearEndpointInEventTrigger)
+{
+    EXPECT_EQ(TestEventTriggerHandler::clearEndpointInEventTrigger(0xABCD123489ABCDEF), 0xABCD000089ABCDEF);
+    EXPECT_EQ(TestEventTriggerHandler::clearEndpointInEventTrigger(0xFFFF0000FFFFFFFF), 0xFFFF0000FFFFFFFF);
+    EXPECT_EQ(TestEventTriggerHandler::clearEndpointInEventTrigger(0x0000FFFF00000000), 0u);
+    EXPECT_EQ(TestEventTriggerHandler::clearEndpointInEventTrigger(0), 0u);
+}
 
 TEST(TestTestEventTriggerDelegate, TestKeyChecking)
 {

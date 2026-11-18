@@ -20,10 +20,7 @@
 
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
-#include <gtest/gtest.h>
-
 using namespace chip;
-using namespace chip::app::Clusters::EnergyEvse;
 
 namespace {
 
@@ -32,41 +29,89 @@ uint64_t EventTriggerForEndpoint(EndpointId endpoint, EnergyEvseTrigger trigger)
     return static_cast<uint64_t>(trigger) | (static_cast<uint64_t>(endpoint) << 32);
 }
 
-bool gInstanceHandlerCalled = false;
-
-bool TestInstanceHandler(uint64_t eventTrigger)
+class TestEvse : public TestEventTriggerHandler
 {
-    gInstanceHandlerCalled = (eventTrigger == static_cast<uint64_t>(EnergyEvseTrigger::kEVPluggedIn));
-    return gInstanceHandlerCalled;
-}
+public:
+    explicit TestEvse(EndpointId endpoint) : mEndpoint(endpoint) {}
+
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
+    {
+        const EndpointId endpoint = GetEndpointIdFromEventTrigger(eventTrigger);
+        VerifyOrReturnError(endpoint == 0 || endpoint == mEndpoint, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(clearEndpointInEventTrigger(eventTrigger) == static_cast<uint64_t>(EnergyEvseTrigger::kEVPluggedIn),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+        mPluggedIn = true;
+        return CHIP_NO_ERROR;
+    }
+
+    bool IsPluggedIn() const { return mPluggedIn; }
+
+private:
+    const EndpointId mEndpoint;
+    bool mPluggedIn = false;
+};
 
 } // namespace
 
-TEST(EnergyEvseTestEventTriggerHandler, InstanceModeFiltersByEndpoint)
+TEST(EnergyEvseTestEventTriggerHandler, RoutesToMatchingInstance)
 {
-    constexpr EndpointId kEndpoint = 7;
-    EnergyEvseTestEventTriggerHandler handler(kEndpoint, TestInstanceHandler);
+    SimpleTestEventTriggerDelegate delegate;
+    TestEvse first(7);
+    TestEvse second(8);
+    ASSERT_SUCCESS(delegate.AddHandler(&first));
+    ASSERT_SUCCESS(delegate.AddHandler(&second));
 
-    gInstanceHandlerCalled = false;
-    EXPECT_EQ(handler.HandleEventTrigger(EventTriggerForEndpoint(kEndpoint, EnergyEvseTrigger::kEVPluggedIn)), CHIP_NO_ERROR);
-    EXPECT_TRUE(gInstanceHandlerCalled);
-
-    gInstanceHandlerCalled = false;
-    EXPECT_EQ(handler.HandleEventTrigger(
-                  EventTriggerForEndpoint(static_cast<EndpointId>(kEndpoint + 1), EnergyEvseTrigger::kEVPluggedIn)),
+    EXPECT_EQ(delegate.HandleEventTriggers(EventTriggerForEndpoint(9, EnergyEvseTrigger::kEVPluggedIn)),
               CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_FALSE(gInstanceHandlerCalled);
+    EXPECT_FALSE(first.IsPluggedIn());
+    EXPECT_FALSE(second.IsPluggedIn());
 
-    gInstanceHandlerCalled = false;
-    EXPECT_EQ(handler.HandleEventTrigger(static_cast<uint64_t>(EnergyEvseTrigger::kEVPluggedIn)), CHIP_NO_ERROR);
-    EXPECT_TRUE(gInstanceHandlerCalled);
+    EXPECT_EQ(delegate.HandleEventTriggers(EventTriggerForEndpoint(8, EnergyEvseTrigger::kBasicFunctionality)),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_FALSE(first.IsPluggedIn());
+    EXPECT_FALSE(second.IsPluggedIn());
+
+    EXPECT_SUCCESS(delegate.HandleEventTriggers(EventTriggerForEndpoint(8, EnergyEvseTrigger::kEVPluggedIn)));
+    EXPECT_FALSE(first.IsPluggedIn());
+    EXPECT_TRUE(second.IsPluggedIn());
+
+    EXPECT_SUCCESS(delegate.HandleEventTriggers(EventTriggerForEndpoint(7, EnergyEvseTrigger::kEVPluggedIn)));
+    EXPECT_TRUE(first.IsPluggedIn());
+    EXPECT_TRUE(second.IsPluggedIn());
 }
 
-TEST(EnergyEvseTestEventTriggerHandler, GetEndpointIdFromEventTrigger)
+TEST(EnergyEvseTestEventTriggerHandler, UnscopedTriggerUsesFirstAcceptingInstance)
 {
-    constexpr EndpointId kEndpoint = 42;
-    const uint64_t encoded         = EventTriggerForEndpoint(kEndpoint, EnergyEvseTrigger::kBasicFunctionality);
-    EXPECT_EQ(GetEndpointIdFromEventTrigger(encoded), kEndpoint);
-    EXPECT_EQ(GetEndpointIdFromEventTrigger(static_cast<uint64_t>(EnergyEvseTrigger::kBasicFunctionality)),
-              static_cast<EndpointId>(0));
+    SimpleTestEventTriggerDelegate delegate;
+    TestEvse first(7);
+    TestEvse second(8);
+    ASSERT_SUCCESS(delegate.AddHandler(&first));
+    ASSERT_SUCCESS(delegate.AddHandler(&second));
+
+    EXPECT_SUCCESS(delegate.HandleEventTriggers(static_cast<uint64_t>(EnergyEvseTrigger::kEVPluggedIn)));
+    EXPECT_TRUE(first.IsPluggedIn());
+    EXPECT_FALSE(second.IsPluggedIn());
+}
+
+TEST(EnergyEvseTestEventTriggerHandler, RejectsUnsupportedUnscopedTrigger)
+{
+    SimpleTestEventTriggerDelegate delegate;
+    TestEvse first(7);
+    TestEvse second(8);
+    ASSERT_SUCCESS(delegate.AddHandler(&first));
+    ASSERT_SUCCESS(delegate.AddHandler(&second));
+
+    EXPECT_EQ(delegate.HandleEventTriggers(static_cast<uint64_t>(EnergyEvseTrigger::kBasicFunctionality)),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_FALSE(first.IsPluggedIn());
+    EXPECT_FALSE(second.IsPluggedIn());
+}
+
+TEST(EnergyEvseTestEventTriggerHandler, GlobalHandlerClearsEndpoint)
+{
+    EnergyEvseTestEventTriggerHandler handler;
+    EXPECT_SUCCESS(handler.HandleEventTrigger(static_cast<uint64_t>(EnergyEvseTrigger::kEVPluggedIn)));
+    EXPECT_SUCCESS(handler.HandleEventTrigger(EventTriggerForEndpoint(7, EnergyEvseTrigger::kEVPluggedIn)));
+    EXPECT_EQ(handler.HandleEventTrigger(EventTriggerForEndpoint(7, EnergyEvseTrigger::kBasicFunctionality)),
+              CHIP_ERROR_INVALID_ARGUMENT);
 }

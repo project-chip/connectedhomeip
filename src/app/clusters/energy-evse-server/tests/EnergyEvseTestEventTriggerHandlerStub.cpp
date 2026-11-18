@@ -20,6 +20,5 @@
 
 bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
 {
-    (void) eventTrigger;
-    return false;
+    return eventTrigger == static_cast<uint64_t>(chip::EnergyEvseTrigger::kEVPluggedIn);
 }

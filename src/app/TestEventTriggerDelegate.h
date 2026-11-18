@@ -18,6 +18,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/Span.h>
 
@@ -40,11 +41,16 @@ public:
      */
     virtual CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) = 0;
 
-    static constexpr uint64_t clearEndpointInEventTrigger(uint64_t eventTrigger)
+    /// Returns the endpoint encoded in bits 32-47 of the event trigger.
+    static constexpr EndpointId GetEndpointIdFromEventTrigger(uint64_t eventTrigger)
     {
-        constexpr uint64_t kEndpointMask = 0x0000FFFF00000000;
-        return eventTrigger & ~kEndpointMask;
+        return static_cast<EndpointId>((eventTrigger & kEndpointMask) >> 32);
     }
+
+    static constexpr uint64_t clearEndpointInEventTrigger(uint64_t eventTrigger) { return eventTrigger & ~kEndpointMask; }
+
+private:
+    static constexpr uint64_t kEndpointMask = 0x0000FFFF00000000;
 };
 
 class TestEventTriggerDelegate
