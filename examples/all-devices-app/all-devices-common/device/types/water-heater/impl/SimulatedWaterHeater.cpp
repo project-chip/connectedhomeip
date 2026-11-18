@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/MessageDef/StatusIB.h>
 #include <clusters/WaterHeaterMode/Enums.h>
 #include <device/types/water-heater/impl/SimulatedWaterHeater.h>
 #include <lib/support/CodeUtils.h>
@@ -147,7 +148,7 @@ void SimulatedWaterHeater::TimerFired()
         ChipLogProgress(AppServer, "WaterHeater: Startup in mode %u", currentMode);
 
         const auto initialSystemMode = (currentMode == kWaterHeaterModeManual) ? SystemModeEnum::kHeat : SystemModeEnum::kOff;
-        ThermostatCluster().SetSystemMode(initialSystemMode);
+        LogErrorOnFailure(StatusIB(ThermostatCluster().SetSystemMode(initialSystemMode)).ToChipError());
 
         EvaluateHeatingDemand();
 
@@ -187,7 +188,7 @@ void SimulatedWaterHeater::TimerFired()
     auto updateTemperature = [&](const char * phase, temperature newTemp) {
         VerifyOrReturn(newTemp != currentTemp);
         ChipLogProgress(AppServer, "WaterHeater: %s temperature=%" PRId16 "°C", phase, static_cast<int16_t>(newTemp / 100));
-        ThermostatCluster().SetLocalTemperature(DataModel::MakeNullable(newTemp));
+        LogErrorOnFailure(StatusIB(ThermostatCluster().SetLocalTemperature(DataModel::MakeNullable(newTemp))).ToChipError());
     };
 
     // Handle heating
@@ -395,7 +396,7 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetSystemMode(SystemMo
     {
         mIsSyncingMode           = true;
         const uint8_t targetMode = (systemMode == SystemModeEnum::kHeat) ? kWaterHeaterModeManual : kWaterHeaterModeOff;
-        WaterHeaterModeCluster().UpdateCurrentMode(targetMode);
+        LogErrorOnFailure(StatusIB(WaterHeaterModeCluster().UpdateCurrentMode(targetMode)).ToChipError());
         mIsSyncingMode = false;
 
         EvaluateHeatingDemand();

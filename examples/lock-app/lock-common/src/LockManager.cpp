@@ -183,7 +183,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
         ChipLogError(Zcl, "Unable to get the user - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
-    return lockEndpoint->GetUser(userIndex, user);
+    return lockEndpoint->GetUser(UserIndex::FromOneBased(userIndex), user);
 }
 
 bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
@@ -196,8 +196,8 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
         ChipLogError(Zcl, "Unable to set the user - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
-    return lockEndpoint->SetUser(userIndex, creator, modifier, userName, uniqueId, userStatus, usertype, credentialRule,
-                                 credentials, totalCredentials);
+    return lockEndpoint->SetUser(UserIndex::FromOneBased(userIndex), creator, modifier, userName, uniqueId, userStatus, usertype,
+                                 credentialRule, credentials, totalCredentials);
 }
 
 bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
@@ -209,7 +209,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
         ChipLogError(Zcl, "Unable to get the credential - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
-    return lockEndpoint->GetCredential(credentialIndex, credentialType, credential);
+    return lockEndpoint->GetCredential(CredentialIndex::FromOneBased(credentialIndex), credentialType, credential);
 }
 
 bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
@@ -222,7 +222,8 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
         ChipLogError(Zcl, "Unable to set the credential - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
-    return lockEndpoint->SetCredential(credentialIndex, creator, modifier, credentialStatus, credentialType, credentialData);
+    return lockEndpoint->SetCredential(CredentialIndex::FromOneBased(credentialIndex), creator, modifier, credentialStatus,
+                                       credentialType, credentialData);
 }
 
 DlStatus LockManager::GetSchedule(chip::EndpointId endpointId, uint8_t weekDayIndex, uint16_t userIndex,
@@ -235,7 +236,7 @@ DlStatus LockManager::GetSchedule(chip::EndpointId endpointId, uint8_t weekDayIn
                      endpointId);
         return DlStatus::kFailure;
     }
-    return lockEndpoint->GetSchedule(weekDayIndex, userIndex, schedule);
+    return lockEndpoint->GetSchedule(ScheduleIndex::FromOneBased(weekDayIndex), UserIndex::FromOneBased(userIndex), schedule);
 }
 
 DlStatus LockManager::SetSchedule(chip::EndpointId endpointId, uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status,
@@ -248,7 +249,8 @@ DlStatus LockManager::SetSchedule(chip::EndpointId endpointId, uint8_t weekDayIn
                      endpointId);
         return DlStatus::kFailure;
     }
-    return lockEndpoint->SetSchedule(weekDayIndex, userIndex, status, daysMask, startHour, startMinute, endHour, endMinute);
+    return lockEndpoint->SetSchedule(ScheduleIndex::FromOneBased(weekDayIndex), UserIndex::FromOneBased(userIndex), status,
+                                     daysMask, startHour, startMinute, endHour, endMinute);
 }
 
 DlStatus LockManager::GetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
@@ -261,7 +263,7 @@ DlStatus LockManager::GetSchedule(chip::EndpointId endpointId, uint8_t yearDayIn
                      endpointId);
         return DlStatus::kFailure;
     }
-    return lockEndpoint->GetSchedule(yearDayIndex, userIndex, schedule);
+    return lockEndpoint->GetSchedule(ScheduleIndex::FromOneBased(yearDayIndex), UserIndex::FromOneBased(userIndex), schedule);
 }
 
 DlStatus LockManager::SetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status,
@@ -274,7 +276,8 @@ DlStatus LockManager::SetSchedule(chip::EndpointId endpointId, uint8_t yearDayIn
                      endpointId);
         return DlStatus::kFailure;
     }
-    return lockEndpoint->SetSchedule(yearDayIndex, userIndex, status, localStartTime, localEndTime);
+    return lockEndpoint->SetSchedule(ScheduleIndex::FromOneBased(yearDayIndex), UserIndex::FromOneBased(userIndex), status,
+                                     localStartTime, localEndTime);
 }
 
 DlStatus LockManager::GetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex,
@@ -287,7 +290,7 @@ DlStatus LockManager::GetSchedule(chip::EndpointId endpointId, uint8_t holidayIn
                      endpointId);
         return DlStatus::kFailure;
     }
-    return lockEndpoint->GetSchedule(holidayIndex, schedule);
+    return lockEndpoint->GetSchedule(ScheduleIndex::FromOneBased(holidayIndex), schedule);
 }
 
 DlStatus LockManager::SetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
@@ -300,7 +303,8 @@ DlStatus LockManager::SetSchedule(chip::EndpointId endpointId, uint8_t holidayIn
                      endpointId);
         return DlStatus::kFailure;
     }
-    return lockEndpoint->SetSchedule(holidayIndex, status, localStartTime, localEndTime, operatingMode);
+    return lockEndpoint->SetSchedule(ScheduleIndex::FromOneBased(holidayIndex), status, localStartTime, localEndTime,
+                                     operatingMode);
 }
 
 LockEndpoint * LockManager::getEndpoint(chip::EndpointId endpointId)

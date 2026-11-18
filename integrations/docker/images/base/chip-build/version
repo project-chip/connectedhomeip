@@ -1,1 +1,1 @@
-219 : [Ameba] Update Docker image for supporting mbedtls 3.6.7
+220 : [NXP] Revert to pre-installed zephyr and pin nxp zephyr to commit SHA
