@@ -668,7 +668,8 @@ class OtaProviderClientFragment : Fragment() {
       if (skipped > 0) {
         remaining -= skipped
       } else if (stream.read() >= 0) {
-        // skip() may return 0 before end of stream; read() distinguishes the two cases.
+        // skip() may return 0 before end of stream; reading one byte skips it
+        // and detects end of stream.
         remaining--
       } else {
         return

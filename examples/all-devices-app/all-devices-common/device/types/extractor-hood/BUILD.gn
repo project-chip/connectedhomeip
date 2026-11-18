@@ -21,7 +21,19 @@ source_set("extractor-hood") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/fan-load:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/fan-load",
     "${chip_root}/zzz_generated/app-common/devices",
+  ]
+}
+
+source_set("logging") {
+  sources = [
+    "impl/LoggingExtractorHood.cpp",
+    "impl/LoggingExtractorHood.h",
+  ]
+
+  public_deps = [
+    ":extractor-hood",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/fan-load:logging",
   ]
 }

@@ -17,6 +17,7 @@
  */
 
 #include <app/clusters/zone-management-server/ZoneManagementCluster.h>
+#include <app/clusters/zone-management-server/zone-geometry.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -619,6 +620,158 @@ TEST_F(TestZoneManagementCluster, EventGenerationProducesTriggeredAndStoppedEven
     ASSERT_EQ(stoppedEvent->GetEventData(stoppedData), CHIP_NO_ERROR);
     ASSERT_EQ(stoppedData.zone, 7);
     ASSERT_EQ(stoppedData.reason, ZoneEventStoppedReasonEnum::kActionStopped);
+}
+
+TEST_F(TestZoneManagementCluster, CreateOrUpdateTriggerRejectedOnPrivacyZone)
+{
+    auto cluster = CreateCluster(BitFlags<Feature>(Feature::kUserDefined, Feature::kTwoDimensionalCartesianZone));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    const auto vertices        = MakeTriangle(0);
+    auto createPrivacyZone     = MakeCreateZoneRequest("Privacy Zone", vertices);
+    createPrivacyZone.zone.use = ZoneUseEnum::kPrivacy;
+
+    auto createResult = tester.Invoke(createPrivacyZone);
+    ASSERT_TRUE(createResult.IsSuccess());
+    if (!createResult.response.has_value())
+    {
+        FAIL() << "Expected createResult.response to have a value";
+        return;
+    }
+    ASSERT_EQ(createResult.response->zoneID, 1);
+
+    Commands::CreateOrUpdateTrigger::Type triggerReq;
+    triggerReq.trigger.zoneID               = 1;
+    triggerReq.trigger.initialDuration      = 5;
+    triggerReq.trigger.augmentationDuration = 2;
+    triggerReq.trigger.maxDuration          = 10;
+    triggerReq.trigger.blindDuration        = 1;
+    triggerReq.trigger.sensitivity          = NullOptional;
+
+    auto triggerResult = tester.Invoke(triggerReq);
+    ASSERT_EQ(triggerResult.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::ConstraintError));
+    ASSERT_TRUE(cluster.GetTriggers().empty());
+}
+
+TEST_F(TestZoneManagementCluster, UpdateTriggeredMotionZoneToPrivacyRejectedWithInvalidInState)
+{
+    auto cluster = CreateCluster(BitFlags<Feature>(Feature::kUserDefined, Feature::kTwoDimensionalCartesianZone));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    const auto createVertices = MakeTriangle(0);
+    auto createResult         = tester.Invoke(MakeCreateZoneRequest("Motion Zone", createVertices));
+    ASSERT_TRUE(createResult.IsSuccess());
+    if (!createResult.response.has_value())
+    {
+        FAIL() << "Expected createResult.response to have a value";
+        return;
+    }
+    const uint16_t zoneId = createResult.response->zoneID;
+
+    Commands::CreateOrUpdateTrigger::Type triggerReq;
+    triggerReq.trigger.zoneID               = zoneId;
+    triggerReq.trigger.initialDuration      = 5;
+    triggerReq.trigger.augmentationDuration = 2;
+    triggerReq.trigger.maxDuration          = 10;
+    triggerReq.trigger.blindDuration        = 1;
+    triggerReq.trigger.sensitivity          = NullOptional;
+    ASSERT_TRUE(tester.Invoke(triggerReq).IsSuccess());
+    ASSERT_EQ(cluster.GetTriggers().size(), 1u);
+
+    // Changing use from kMotion to kPrivacy while a trigger is active must fail with InvalidInState
+    const auto updateVertices = MakeTriangle(20);
+    Commands::UpdateTwoDCartesianZone::Type updateToPrivacyReq;
+    updateToPrivacyReq.zoneID    = zoneId;
+    updateToPrivacyReq.zone.name = "Attempt Privacy"_span;
+    updateToPrivacyReq.zone.use  = ZoneUseEnum::kPrivacy;
+    updateToPrivacyReq.zone.vertices =
+        DataModel::List<const TwoDCartesianVertexStruct>(updateVertices.data(), updateVertices.size());
+    updateToPrivacyReq.zone.color = NullOptional;
+
+    auto invalidUpdateResult = tester.Invoke(updateToPrivacyReq);
+    ASSERT_EQ(invalidUpdateResult.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidInState));
+    ASSERT_EQ(cluster.GetZones().front().twoDCartZoneStorage.Value().use, ZoneUseEnum::kMotion);
+
+    // Updating geometry/name while keeping use == kMotion must still succeed even with an active trigger
+    Commands::UpdateTwoDCartesianZone::Type updateMotionGeometryReq = updateToPrivacyReq;
+    updateMotionGeometryReq.zone.name                               = "Updated Motion"_span;
+    updateMotionGeometryReq.zone.use                                = ZoneUseEnum::kMotion;
+    ASSERT_TRUE(tester.Invoke(updateMotionGeometryReq).IsSuccess());
+
+    // After removing the trigger, updating the zone to kPrivacy must succeed
+    Commands::RemoveTrigger::Type removeTriggerReq;
+    removeTriggerReq.zoneID = zoneId;
+    ASSERT_TRUE(tester.Invoke(removeTriggerReq).IsSuccess());
+    ASSERT_TRUE(cluster.GetTriggers().empty());
+
+    ASSERT_TRUE(tester.Invoke(updateToPrivacyReq).IsSuccess());
+    ASSERT_EQ(cluster.GetZones().front().twoDCartZoneStorage.Value().use, ZoneUseEnum::kPrivacy);
+}
+
+TEST_F(TestZoneManagementCluster, UpdateZoneToFocusWithoutFocusZonesFeatureRejectedWithConstraintError)
+{
+    auto clusterWithoutFocus = CreateCluster(BitFlags<Feature>(Feature::kUserDefined, Feature::kTwoDimensionalCartesianZone));
+    ClusterTester testerWithoutFocus(clusterWithoutFocus);
+    ASSERT_EQ(clusterWithoutFocus.Startup(testerWithoutFocus.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    const auto createVertices = MakeTriangle(0);
+    auto createResult         = testerWithoutFocus.Invoke(MakeCreateZoneRequest("Motion Zone", createVertices));
+    ASSERT_TRUE(createResult.IsSuccess());
+    if (!createResult.response.has_value())
+    {
+        FAIL() << "Expected createResult.response to have a value";
+        return;
+    }
+    const uint16_t zoneId = createResult.response->zoneID;
+
+    const auto updateVertices = MakeTriangle(30);
+    Commands::UpdateTwoDCartesianZone::Type updateToFocusReq;
+    updateToFocusReq.zoneID        = zoneId;
+    updateToFocusReq.zone.name     = "Focus Zone"_span;
+    updateToFocusReq.zone.use      = ZoneUseEnum::kFocus;
+    updateToFocusReq.zone.vertices = DataModel::List<const TwoDCartesianVertexStruct>(updateVertices.data(), updateVertices.size());
+    updateToFocusReq.zone.color    = NullOptional;
+
+    auto rejectedResult = testerWithoutFocus.Invoke(updateToFocusReq);
+    ASSERT_EQ(rejectedResult.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::ConstraintError));
+    ASSERT_EQ(clusterWithoutFocus.GetZones().front().twoDCartZoneStorage.Value().use, ZoneUseEnum::kMotion);
+    clusterWithoutFocus.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    // With Feature::kFocusZones enabled, updating a triggered Motion zone to kFocus is rejected with InvalidInState,
+    // and succeeds once the trigger is removed.
+    mDelegate = MockDelegate();
+    auto clusterWithFocus =
+        CreateCluster(BitFlags<Feature>(Feature::kUserDefined, Feature::kTwoDimensionalCartesianZone, Feature::kFocusZones));
+    ClusterTester testerWithFocus(clusterWithFocus);
+    ASSERT_EQ(clusterWithFocus.Startup(testerWithFocus.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(testerWithFocus.Invoke(MakeCreateZoneRequest("Motion Zone", createVertices)).IsSuccess());
+
+    Commands::CreateOrUpdateTrigger::Type triggerReq;
+    triggerReq.trigger.zoneID               = zoneId;
+    triggerReq.trigger.initialDuration      = 5;
+    triggerReq.trigger.augmentationDuration = 2;
+    triggerReq.trigger.maxDuration          = 10;
+    triggerReq.trigger.blindDuration        = 1;
+    triggerReq.trigger.sensitivity          = NullOptional;
+    ASSERT_TRUE(testerWithFocus.Invoke(triggerReq).IsSuccess());
+
+    auto triggeredFocusUpdateResult = testerWithFocus.Invoke(updateToFocusReq);
+    ASSERT_EQ(triggeredFocusUpdateResult.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidInState));
+    ASSERT_EQ(clusterWithFocus.GetZones().front().twoDCartZoneStorage.Value().use, ZoneUseEnum::kMotion);
+
+    Commands::RemoveTrigger::Type removeTriggerReq;
+    removeTriggerReq.zoneID = zoneId;
+    ASSERT_TRUE(testerWithFocus.Invoke(removeTriggerReq).IsSuccess());
+
+    ASSERT_TRUE(testerWithFocus.Invoke(updateToFocusReq).IsSuccess());
+    ASSERT_EQ(clusterWithFocus.GetZones().front().twoDCartZoneStorage.Value().use, ZoneUseEnum::kFocus);
 }
 
 } // namespace
