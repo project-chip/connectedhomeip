@@ -50,9 +50,10 @@ class TC_CONTENTLAUNCHER_10_9(MatterTestCommissionedDevice):
                      "provides (a PlayPreset command, a physical control, an app, or similar).",
                      "Content is playing on the DUT, so that the QueueType behaviour exercised by the "
                      "following steps has something to interrupt or queue behind."),
-            TestStep(1, "TH sends a LaunchURL command to the DUT with a valid URL and QueueType=Replace (0).",
-                     "DUT replies with a success response and immediately interrupts any currently playing content "
-                     "to play the new content."),
+            TestStep(1, "TH confirms content is still playing, then sends a LaunchURL command to the DUT with a "
+                     "valid URL and QueueType=Replace (0).",
+                     "Content is playing when the command is sent, and the DUT replies with a success response and "
+                     "immediately interrupts that content to play the new content."),
             TestStep(2, "TH sends a LaunchURL command to the DUT with a valid URL and QueueType=Next (1).",
                      "DUT replies with a success response and queues the new content to play next after the current "
                      "content finishes."),
@@ -82,6 +83,23 @@ class TC_CONTENTLAUNCHER_10_9(MatterTestCommissionedDevice):
             asserts.assert_equal(response.status, cluster.Enums.StatusEnum.kSuccess,
                                  f"LaunchURL({kwargs}) should have succeeded")
         return response
+
+    async def _playing_now(self, endpoint) -> bool | None:
+        """Read MediaPlayback.CurrentState, or None if the DUT has no MediaPlayback cluster.
+
+        Used to establish that setup content is still playing at the instant a queue
+        command is sent. The operator confirms what they saw afterwards, which cannot
+        distinguish "interrupted playing content" from "started while nothing played".
+        """
+        mp = Clusters.MediaPlayback
+        try:
+            state = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=mp, attribute=mp.Attributes.CurrentState)
+        except Exception as e:  # noqa: BLE001 - any read failure means we cannot assert on state
+            log.info("MediaPlayback.CurrentState unavailable (%s); relying on operator confirmation alone", e)
+            return None
+        log.info("MediaPlayback.CurrentState before the queue command: %s", state)
+        return state == mp.Enums.PlaybackStateEnum.kPlaying
 
     def _confirm(self, description: str):
         """Ask the operator to confirm playback behaviour the TH cannot observe over the wire."""
@@ -139,8 +157,19 @@ class TC_CONTENTLAUNCHER_10_9(MatterTestCommissionedDevice):
             "QueueType behaviour against currently playing content, which cannot be exercised.")
 
         self.step(1)
+        # Replace only demonstrates anything if content is playing when it arrives. The
+        # step 0a answer was given earlier and the setup content may have ended since,
+        # so re-establish it here rather than inferring it from the replacement starting.
+        playing = await self._playing_now(endpoint)
+        if playing is None:
+            self._confirm("Content should have been playing when the LaunchURL(Replace) command was sent.")
+        else:
+            asserts.assert_true(
+                playing,
+                "The setup content was no longer playing when LaunchURL(Replace) was sent, so this step cannot "
+                "show that the DUT interrupted anything. Restart content on the DUT and re-run.")
         await self._launch_url(endpoint, contentURL=content_url, queueType=queue_types.kReplace)
-        self._confirm("The DUT should have interrupted any currently playing content and started the new content.")
+        self._confirm("The DUT should have interrupted the content that was playing and started the new content.")
 
         self.step(2)
         await self._launch_url(endpoint, contentURL=content_url, queueType=queue_types.kNext)
