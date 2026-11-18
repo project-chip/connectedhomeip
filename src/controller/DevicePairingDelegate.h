@@ -111,6 +111,11 @@ public:
      *   commissioning can be started for it without a new PASE session. This is called synchronously from the code that
      *   released the commissionee.
      *
+     *   When the reason is CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY, this runs inside the session's
+     *   SessionDelegate::OnSessionReleased(), which must not allocate a session synchronously. The delegate must therefore not
+     *   start a new PASE session (EstablishPASEConnection(), PairDevice()) or anything else that allocates a session from this
+     *   callback; it has to defer that, for example with ScheduleWork().
+     *
      *   Not called from DeviceCommissioner::Shutdown(), and not called for a commissionee that is still establishing PASE or
      *   that is being commissioned.
      *

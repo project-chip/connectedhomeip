@@ -651,6 +651,13 @@ public:
     CHIP_ERROR ContinueCommissioningAfterConnectNetworkRequest(NodeId remoteDeviceId);
 #endif
 
+    /**
+     * Looks up the commissionee for deviceId. The returned pointer is owned by the commissioner and is valid only until the
+     * commissionee is released, which can happen without any call from the application: when its PASE session is released
+     * (the peer closing it, or the session being evicted), when commissioning for it ends, on StopPairing() or a replacing
+     * EstablishPASEConnection() for it, and on Shutdown(). Do not keep it; look the commissionee up again for each use.
+     * DevicePairingDelegate::OnCommissioneeReleased() reports the release of an idle commissionee.
+     */
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
     /**
