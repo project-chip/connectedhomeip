@@ -22,8 +22,8 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
 #include <lib/support/ChunkSplitter.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/StringSplitter.h>
 #include <log_json/log_json_build_config.h>
