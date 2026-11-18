@@ -171,6 +171,70 @@ public:
      */
     CHIP_ERROR SendPreparedMessage(const SessionHandle & session, const EncryptedPacketBufferHandle & preparedMessage);
 
+    /**
+     * @brief
+     *   Returns true if the payload header identifies a non-initiator Secure Channel message
+     *   (whose message type is neither StatusReport nor StandaloneAck) that should trigger an
+     *   unauthenticated failure StatusReport when received as an orphaned unencrypted message.
+     *
+     * @details
+     *   These messages correspond to the payload-header predicate for Orphaned Session
+     *   Establishment Responses in the Matter specification (section "Orphaned Session
+     *   Establishment Responses", added by CHIP-Specifications/connectedhomeip-spec#13716). When
+     *   such a response arrives on an unauthenticated session and matches no initiator session or
+     *   exchange, the local side has already abandoned the handshake it belongs to. Rather than
+     *   leaving the peer to wait for a response timeout, the specification permits answering with
+     *   an unauthenticated failure StatusReport via SendUnauthenticatedErrorStatusReport.
+     */
+    static bool ShouldSendErrorStatusReportIfOrphaned(const PayloadHeader & payloadHeader);
+
+    /**
+     * @brief
+     *   Send an unauthenticated failure StatusReport in response to an orphan session establishment
+     *   response (see ShouldSendErrorStatusReportIfOrphaned), when no matching initiator session or
+     *   exchange context exists.
+     *
+     * @details
+     *   This follows the "Orphaned Session Establishment Responses" section of the Matter
+     *   specification (CHIP-Specifications/connectedhomeip-spec#13716), which amends Unsolicited
+     *   Message Processing (section 8.5.10.5.2) and Unsecured Session Context matching. Otherwise
+     *   an unmatched message without the initiator flag is only acknowledged (if it requests an
+     *   ack) and is otherwise ignored. For non-duplicate session establishment responses, sending a
+     *   failure StatusReport makes the peer abort its half-open handshake instead of waiting for a
+     *   response timeout.
+     *
+     *   Messages flagged as duplicates keep the ack-only behavior. Duplicate detection needs the
+     *   initiator's unauthenticated session, so once that session is released a late retransmission
+     *   is answered too; this is redundant but harmless, since the peer has already completed or
+     *   aborted the handshake that the message belonged to.
+     *
+     *   This deliberately bypasses the exchange layer and MRP: there is no ExchangeContext to send
+     *   on, and the report is not retransmitted. If the incoming message requested an ack, that ack
+     *   is piggybacked onto this report, so no separate StandaloneAck is required. The report always
+     *   carries {GeneralStatusCode::kFailure, kProtocolCodeInvalidParam}, which drives the peer's
+     *   PASESession or CASESession to abort and release its half-open session.
+     *
+     *   The report is sent with the initiator flag set, and only messages without the initiator
+     *   flag are answered, so a report can never itself trigger another report.
+     *
+     *   Called by SessionManager itself when no initiator session exists, and by ExchangeManager when
+     *   the unauthenticated session exists but no exchange matches. It is public for ExchangeManager
+     *   and for unit tests that exercise the guard clauses directly.
+     *
+     * @param[in] incomingPacketHeader  Header of the received message. Must carry a destination node
+     *                                  id, which is echoed back as the response's source node id.
+     * @param[in] incomingPayloadHeader Payload header of the received message. Must not be marked as
+     *                                  sent by the initiator.
+     * @param[in] peerAddress           Address to send the report to.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the headers fail the checks
+     *         above, CHIP_ERROR_INCORRECT_STATE if the manager is not initialized, or an error from
+     *         the underlying transport.
+     */
+    CHIP_ERROR SendUnauthenticatedErrorStatusReport(const PacketHeader & incomingPacketHeader,
+                                                    const PayloadHeader & incomingPayloadHeader,
+                                                    const Transport::PeerAddress & peerAddress);
+
     /// @brief Set the delegate for handling incoming messages. There can be only one message delegate (probably the
     /// ExchangeManager)
     void SetMessageDelegate(SessionMessageDelegate * cb) { mCB = cb; }
