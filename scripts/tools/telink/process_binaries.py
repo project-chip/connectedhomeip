@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2024-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,10 +16,13 @@
 # limitations under the License.
 #
 
+import argparse
 import lzma
 import os
+import struct
 import subprocess
 import sys
+import zlib
 
 ZEPHYR_BASE = os.environ.get('ZEPHYR_BASE')
 if ZEPHYR_BASE is None:
@@ -31,6 +34,31 @@ except ImportError:
     sys.path.append(os.path.abspath(os.path.join(ZEPHYR_BASE, 'scripts/west_commands/runners')))
     from core import BuildConfiguration
 
+def create_multi_image_payload(host, external_images, output):
+    header = struct.Struct('<4sII')
+    entry = struct.Struct('<IIII')
+    images = [host, *external_images]
+    offset = header.size + entry.size * len(images)
+    metadata = bytearray()
+    payloads = []
+    for index, path in enumerate(images):
+        with open(path, 'rb') as image:
+            data = image.read()
+        if not data or offset + len(data) > 0xffffffff:
+            raise ValueError(f'Invalid OTA image size: {path}')
+        image_type = 0 if index == 0 else 1
+        metadata.extend(entry.pack(image_type, len(data), offset, zlib.crc32(data)))
+        payloads.append(data)
+        offset += len(data)
+    with open(output, 'wb') as image:
+        image.write(header.pack(b'TLMI', 1, len(images)))
+        image.write(metadata)
+        for data in payloads:
+            image.write(data)
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--external-images', nargs='+', default=[])
+args = parser.parse_args()
 
 def merge_binaries(input_file1, input_file2, output_file, offset):
     with open(output_file, 'r+b' if os.path.exists(output_file) else 'wb') as outfile:
@@ -59,6 +87,9 @@ def merge_binaries(input_file1, input_file2, output_file, offset):
 # Obtain build configuration
 build_conf = BuildConfiguration(os.path.join(os.getcwd(), os.pardir))
 
+if args.external_images and not (build_conf.getboolean('CONFIG_CHIP_OTA_MULTI_IMAGE') and
+                                 build_conf.getboolean('CONFIG_CHIP_OTA_IMAGE_BUILD')):
+    raise ValueError('External images require multi-image Matter OTA support')
 
 def compress_lzma_firmware(input_file, output_file):
     # Read the input firmware binary
@@ -158,6 +189,10 @@ if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
             zephyr_image_name = build_conf['CONFIG_SIGNED_OTA_IMAGE_FILE_NAME']
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Error signing the image: {e}")
+
+    if args.external_images:
+        create_multi_image_payload(build_conf['CONFIG_SIGNED_OTA_IMAGE_FILE_NAME'],
+                                   args.external_images, 'ota_multi_image.bin')
 
     if build_conf.getboolean('CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD'):
         dfu_output_name = 'merged_dfu.bin'

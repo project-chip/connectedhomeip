@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2025 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,11 +24,17 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
 #include <system/SystemError.h>
-
 #include <zephyr/dfu/mcuboot.h>
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/storage/stream_flash.h>
 #include <zephyr/sys/reboot.h>
+
+#ifdef CONFIG_CHIP_OTA_MULTI_IMAGE
+#include <algorithm>
+#include <cstring>
+#include <zephyr/sys/byteorder.h>
+#include <zephyr/sys/crc.h>
+#endif
 
 static struct stream_flash_ctx stream;
 
@@ -37,21 +43,38 @@ using namespace ::chip::DeviceLayer::PersistedStorage;
 namespace chip {
 namespace {
 
+#ifdef CONFIG_CHIP_OTA_MULTI_IMAGE
+constexpr uint32_t kMultiImageMagic  = 0x494D4C54; // "TLMI"
+constexpr uint32_t kContainerVersion = 1;
+constexpr uint32_t kHostImage        = 0;
+constexpr uint32_t kExternalImage    = 1;
+constexpr uint32_t kMCUbootMagic     = 0x96F3B83D; // MCUboot image header
+#endif
+
 void PostOTAStateChangeEvent(DeviceLayer::OtaState newState)
 {
     DeviceLayer::ChipDeviceEvent otaChange;
     otaChange.Type                     = DeviceLayer::DeviceEventType::kOtaStateChanged;
     otaChange.OtaStateChanged.newState = newState;
     CHIP_ERROR error                   = DeviceLayer::PlatformMgr().PostEvent(&otaChange);
-
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Error while posting OtaChange event %" CHIP_ERROR_FORMAT, error.Format());
     }
 }
+
 } // namespace
 
 namespace DeviceLayer {
+
+#ifdef CONFIG_CHIP_OTA_MULTI_IMAGE
+ExternalOTAImageHandler * OTAImageProcessorImpl::sExternalImageHandler = nullptr;
+
+void OTAImageProcessorImpl::SetExternalImageHandler(ExternalOTAImageHandler * handler)
+{
+    sExternalImageHandler = handler;
+}
+#endif
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
@@ -65,6 +88,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
         }
     });
 }
+
 const struct device * flash_dev;
 
 CHIP_ERROR OTAImageProcessorImpl::InitFlashStream(size_t offset)
@@ -78,7 +102,6 @@ CHIP_ERROR OTAImageProcessorImpl::InitFlashStream(size_t offset)
 
     int err = stream_flash_init(&stream, flash_dev, mBuffer, sizeof(mBuffer), FIXED_PARTITION_OFFSET(slot1_partition) + offset,
                                 FIXED_PARTITION_SIZE(slot1_partition) - offset, NULL);
-
     if (err)
     {
         ChipLogError(SoftwareUpdate, "stream_flash_init failed (err %d)", err);
@@ -91,6 +114,13 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
 {
     mHeaderParser.Init();
     mParams = {};
+#ifdef CONFIG_CHIP_OTA_MULTI_IMAGE
+    ResetPayload();
+    mExternalImageHandler   = sExternalImageHandler;
+    mPayloadFailed          = false;
+    downloadedBytesRestored = 0;
+    ReturnErrorOnFailure(KeyValueStoreMgr().Put(kDownloadedBytes, &mParams.downloadedBytes, sizeof(mParams.downloadedBytes)));
+#endif
 
     CHIP_ERROR error = InitFlashStream(0);
 
@@ -100,12 +130,27 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
-    int err = stream_flash_buffered_write(&stream, NULL, 0, true);
+#ifdef CONFIG_CHIP_OTA_MULTI_IMAGE
+    if (mHeaderParser.IsInitialized() || mParams.downloadedBytes != mParams.totalFileBytes ||
+        (mPayloadState != PayloadState::kSingleImage && (mPayloadState != PayloadState::kImages || mImageIndex != mImageCount)))
+    {
+        return FailDownload(CHIP_ERROR_INVALID_ARGUMENT);
+    }
+#endif
 
+    int err = stream_flash_buffered_write(&stream, NULL, 0, true);
     if (err)
     {
         ChipLogError(SoftwareUpdate, "stream_flash_buffered_write failed (err %d)", err);
+#ifdef CONFIG_CHIP_OTA_MULTI_IMAGE
+        return FailDownload(System::MapErrorZephyr(err));
+#endif
     }
+
+#ifdef CONFIG_CHIP_OTA_MULTI_IMAGE
+    mDownloadReady = true;
+    mImageTable.Free();
+#endif
 
     PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadComplete);
     return System::MapErrorZephyr(err);
@@ -113,6 +158,9 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
+#ifdef CONFIG_CHIP_OTA_MULTI_IMAGE
+    ResetPayload();
+#endif
     ChipLogError(SoftwareUpdate, "Image upgrade aborted");
     PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadAborted);
     return CHIP_NO_ERROR;
@@ -120,6 +168,21 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
+#ifdef CONFIG_CHIP_OTA_MULTI_IMAGE
+    VerifyOrReturnError(mDownloadReady, CHIP_ERROR_INCORRECT_STATE);
+    if (mExternalImagesStarted)
+    {
+        CHIP_ERROR error = mExternalImageHandler->Apply();
+        if (error != CHIP_NO_ERROR)
+        {
+            ResetPayload();
+            PostOTAStateChangeEvent(DeviceLayer::kOtaApplyFailed);
+            return error;
+        }
+        mExternalImagesStarted = false;
+    }
+#endif
+
     // Schedule update of image
     int err = boot_request_upgrade(BOOT_UPGRADE_PERMANENT);
 
@@ -156,12 +219,195 @@ void OTAImageProcessorImpl::ResumeWatchdogHandler(System::Layer * systemLayer, v
     self->mDownloader->EndDownload(CHIP_ERROR_NOT_IMPLEMENTED);
 }
 
+#ifdef CONFIG_CHIP_OTA_MULTI_IMAGE
+void OTAImageProcessorImpl::ResetPayload()
+{
+    if (mExternalImagesStarted)
+    {
+        mExternalImageHandler->Abort();
+    }
+    mExternalImagesStarted = false;
+    mDownloadReady         = false;
+    mPayloadState          = PayloadState::kHeader;
+    mHeaderBytes           = 0;
+    mTableBytes            = 0;
+    mImageCount            = 0;
+    mImageIndex            = 0;
+    mImageBytes            = 0;
+    mImageCrc              = 0;
+    mImageTable.Free();
+}
+
+CHIP_ERROR OTAImageProcessorImpl::FailDownload(CHIP_ERROR error)
+{
+    ChipLogError(SoftwareUpdate, "OTA download failed: %" CHIP_ERROR_FORMAT, error.Format());
+    ResetPayload();
+    mPayloadFailed = true;
+    ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleLambda([this, error] {
+        mDownloader->EndDownload(error);
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
+    }));
+    return error;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ProcessImageTable()
+{
+    uint64_t offset = kContainerHeaderSize + static_cast<uint64_t>(mImageCount) * kImageInfoSize;
+    for (uint32_t i = 0; i < mImageCount; ++i)
+    {
+        const uint8_t * entry = mImageTable.Get() + i * kImageInfoSize;
+        const uint32_t type   = sys_get_le32(entry);
+        const uint32_t size   = sys_get_le32(entry + 4);
+        VerifyOrReturnError(type == (i == 0 ? kHostImage : kExternalImage) && size != 0 && sys_get_le32(entry + 8) == offset &&
+                                offset + size <= mParams.totalFileBytes,
+                            CHIP_ERROR_INVALID_ARGUMENT);
+        if (i == 0)
+        {
+            VerifyOrReturnError(size <= FIXED_PARTITION_SIZE(slot1_partition), CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        offset += size;
+    }
+    VerifyOrReturnError(offset == mParams.totalFileBytes, CHIP_ERROR_INVALID_ARGUMENT);
+    mPayloadState = PayloadState::kImages;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ProcessContainerHeader(ByteSpan & block)
+{
+    const size_t headerSize = mHeaderBytes < sizeof(kMultiImageMagic) ? sizeof(kMultiImageMagic) : kContainerHeaderSize;
+    const size_t count      = std::min(block.size(), headerSize - mHeaderBytes);
+    memcpy(mContainerHeader + mHeaderBytes, block.data(), count);
+    mHeaderBytes += count;
+    mParams.downloadedBytes += count;
+    block = block.SubSpan(count);
+    VerifyOrReturnError(mHeaderBytes == headerSize, CHIP_NO_ERROR);
+
+    if (mHeaderBytes == sizeof(kMultiImageMagic))
+    {
+        const uint32_t magic = sys_get_le32(mContainerHeader);
+        if (magic == kMCUbootMagic)
+        {
+            VerifyOrReturnError(mParams.totalFileBytes <= FIXED_PARTITION_SIZE(slot1_partition), CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorOnFailure(
+                System::MapErrorZephyr(stream_flash_buffered_write(&stream, mContainerHeader, mHeaderBytes, false)));
+            mPayloadState = PayloadState::kSingleImage;
+        }
+        else
+        {
+            VerifyOrReturnError(magic == kMultiImageMagic, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+            if (mExternalImageHandler == nullptr)
+            {
+                ChipLogError(SoftwareUpdate, "External OTA image handler is not registered");
+                return CHIP_ERROR_INCORRECT_STATE;
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(sys_get_le32(mContainerHeader + 4) == kContainerVersion, CHIP_ERROR_INVALID_ARGUMENT);
+    mImageCount = sys_get_le32(mContainerHeader + 8);
+    VerifyOrReturnError(mImageCount >= 2 && mParams.totalFileBytes >= kContainerHeaderSize &&
+                            mParams.totalFileBytes <= UINT32_MAX &&
+                            mImageCount <= (mParams.totalFileBytes - kContainerHeaderSize) / (kImageInfoSize + 1),
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mImageTable.Alloc(static_cast<size_t>(mImageCount) * kImageInfoSize), CHIP_ERROR_NO_MEMORY);
+    mPayloadState = PayloadState::kTable;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ProcessImageData(ByteSpan & block)
+{
+    VerifyOrReturnError(mImageIndex < mImageCount, CHIP_ERROR_INVALID_ARGUMENT);
+    const uint8_t * entry = mImageTable.Get() + mImageIndex * kImageInfoSize;
+    const uint32_t size   = sys_get_le32(entry + 4);
+    const size_t count    = std::min(block.size(), static_cast<size_t>(size - mImageBytes));
+
+    if (mImageIndex == 0)
+    {
+        ReturnErrorOnFailure(System::MapErrorZephyr(stream_flash_buffered_write(&stream, block.data(), count, false)));
+    }
+    else
+    {
+        if (mImageBytes == 0)
+        {
+            mExternalImagesStarted = true;
+            ReturnErrorOnFailure(mExternalImageHandler->Begin(mImageIndex, size));
+        }
+        ReturnErrorOnFailure(mExternalImageHandler->Write(block.SubSpan(0, count)));
+    }
+
+    mImageCrc = crc32_ieee_update(mImageCrc, block.data(), count);
+    mImageBytes += static_cast<uint32_t>(count);
+    mParams.downloadedBytes += count;
+    block = block.SubSpan(count);
+    if (mImageBytes == size)
+    {
+        VerifyOrReturnError(mImageCrc == sys_get_le32(entry + 12), CHIP_ERROR_INVALID_ARGUMENT);
+        if (mImageIndex != 0)
+        {
+            ReturnErrorOnFailure(mExternalImageHandler->End());
+        }
+        ++mImageIndex;
+        mImageBytes = 0;
+        mImageCrc   = 0;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ProcessPayload(ByteSpan block)
+{
+    VerifyOrReturnError(mParams.downloadedBytes <= mParams.totalFileBytes &&
+                            block.size() <= mParams.totalFileBytes - mParams.downloadedBytes,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    while (!block.empty())
+    {
+        switch (mPayloadState)
+        {
+        case PayloadState::kHeader:
+            ReturnErrorOnFailure(ProcessContainerHeader(block));
+            break;
+        case PayloadState::kTable: {
+            const size_t tableSize = static_cast<size_t>(mImageCount) * kImageInfoSize;
+            const size_t count     = std::min(block.size(), tableSize - mTableBytes);
+            memcpy(mImageTable.Get() + mTableBytes, block.data(), count);
+            mTableBytes += count;
+            mParams.downloadedBytes += count;
+            block = block.SubSpan(count);
+            if (mTableBytes == tableSize)
+            {
+                ReturnErrorOnFailure(ProcessImageTable());
+            }
+            break;
+        }
+        case PayloadState::kImages:
+            ReturnErrorOnFailure(ProcessImageData(block));
+            break;
+        case PayloadState::kSingleImage:
+            ReturnErrorOnFailure(System::MapErrorZephyr(stream_flash_buffered_write(&stream, block.data(), block.size(), false)));
+            mParams.downloadedBytes += block.size();
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+#endif
+
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR error = ProcessHeader(aBlock);
-
+#ifdef CONFIG_CHIP_OTA_MULTI_IMAGE
+    if (error == CHIP_NO_ERROR && !mHeaderParser.IsInitialized())
+    {
+        error = ProcessPayload(aBlock);
+    }
+    if (error != CHIP_NO_ERROR)
+    {
+        return FailDownload(error);
+    }
+#else
     if (error == CHIP_NO_ERROR)
     {
         if (downloadedBytesRestored)
@@ -175,9 +421,16 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
         }
         ReturnErrorOnFailure(KeyValueStoreMgr().Put(kDownloadedBytes, &mParams.downloadedBytes, sizeof(mParams.downloadedBytes)));
     }
+#endif
 
     // Report the result back to the downloader asynchronously.
     return DeviceLayer::SystemLayer().ScheduleLambda([this, error, aBlock] {
+#ifdef CONFIG_CHIP_OTA_MULTI_IMAGE
+        if (mPayloadFailed)
+        {
+            return;
+        }
+#endif
         if (error == CHIP_NO_ERROR)
         {
             ChipLogDetail(SoftwareUpdate, "Downloaded %u/%u bytes", static_cast<unsigned>(mParams.downloadedBytes),
@@ -293,12 +546,14 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
 
         mParams.totalFileBytes = header.mPayloadSize;
 
+#ifndef CONFIG_CHIP_OTA_MULTI_IMAGE
         // Restore interrupted OTA process
         error = RestoreBytes(header.mImageDigest);
         if (error != CHIP_NO_ERROR)
         {
             ChipLogError(SoftwareUpdate, "OTA restore err: %" CHIP_ERROR_FORMAT, error.Format());
         }
+#endif
 
         mHeaderParser.Clear();
     }

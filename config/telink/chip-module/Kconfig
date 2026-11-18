@@ -42,6 +42,26 @@ config CHIP_OTA_REQUESTOR
 	bool
 	select BOOTLOADER_MCUBOOT
 
+config CHIP_OTA_MULTI_IMAGE
+	bool "Enable multi-image Matter OTA"
+	depends on CHIP_OTA_REQUESTOR && !SOC_RISCV_TELINK_W91
+	select CRC
+	help
+	  Support OTA packages containing Matter and external MCU firmware.
+	  OTA download resume is not supported in this mode.
+
+config TELINK_OTA_MULTI_IMAGE_TEST
+	bool "Enable multi-image OTA test handler"
+	depends on CHIP_OTA_MULTI_IMAGE
+	default n
+	help
+	  Receive and check external firmware.
+
+config CHIP_OTA_EXTERNAL_IMAGES
+	string "External MCU firmware files"
+	depends on CHIP_OTA_MULTI_IMAGE
+	default ""
+
 config BOOTLOADER_MCUBOOT
 	bool
 	select IMG_MANAGER

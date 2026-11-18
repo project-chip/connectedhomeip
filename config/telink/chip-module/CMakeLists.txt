@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2022-2024 Project CHIP Authors
+#   Copyright (c) 2022-2026 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -204,10 +204,29 @@ endif()
 # Define 'process_binaries' target for collecting final binary to flash
 # ==============================================================================
 
+set(ota_input_file ${PROJECT_BINARY_DIR}/${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME})
+if (CONFIG_CHIP_OTA_EXTERNAL_IMAGES)
+    if (NOT CONFIG_CHIP_OTA_IMAGE_BUILD)
+        message(FATAL_ERROR "External MCU firmware requires CONFIG_CHIP_OTA_IMAGE_BUILD")
+    endif()
+    foreach(image IN LISTS CONFIG_CHIP_OTA_EXTERNAL_IMAGES)
+        get_filename_component(image "${image}" ABSOLUTE BASE_DIR ${APPLICATION_SOURCE_DIR})
+        if (NOT EXISTS "${image}" OR IS_DIRECTORY "${image}")
+            message(FATAL_ERROR "Invalid external OTA image: ${image}")
+        endif()
+        list(APPEND ota_external_images "${image}")
+    endforeach()
+    set(ota_input_file ${PROJECT_BINARY_DIR}/ota_multi_image.bin)
+    set(process_binaries_args --external-images ${ota_external_images})
+    set(process_binaries_byproducts BYPRODUCTS ${ota_input_file})
+endif()
+
 add_custom_target(
     process_binaries ALL
-    COMMAND ${Python3_EXECUTABLE} ${CHIP_ROOT}/scripts/tools/telink/process_binaries.py
+    COMMAND ${Python3_EXECUTABLE} ${CHIP_ROOT}/scripts/tools/telink/process_binaries.py ${process_binaries_args}
+    ${process_binaries_byproducts}
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+    VERBATIM
 )
 add_dependencies(process_binaries ${ZEPHYR_FINAL_EXECUTABLE})
 
@@ -240,7 +259,7 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     endif()
 
     chip_ota_image(chip-ota-image
-        INPUT_FILES ${PROJECT_BINARY_DIR}/${CONFIG_SIGNED_OTA_IMAGE_FILE_NAME}
+        INPUT_FILES ${ota_input_file}
         OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
     )
     add_dependencies(chip-ota-image process_binaries)
