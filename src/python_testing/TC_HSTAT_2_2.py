@@ -64,31 +64,31 @@ class TC_HSTAT_2_2(HSTATBase):
 
     def steps_TC_HSTAT_2_2(self):
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep(2, "TH reads from the DUT the SupportedModesMode attribute.", "Store the value as SupportedModes."),
             TestStep(3, "TH sends command Off to the On/Off cluster on the same endpoint as this cluster.",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(4, "TH reads from the DUT the SystemState attribute.",
+            TestStep(4, "TH reads from the DUT the HumidistatSystemState attribute.",
                      "Verify that the DUT response contains a value of Idle"),
             TestStep(5, "TH reads from the DUT the MistType attribute.",
-                     "Verify that the DUT response contains a value between 1 and 3 inclusive."),
+                     "Verify that the DUT response contains a value with at least 1 defined bit set."),
             TestStep(6, "TH sends command On to the On/Off cluster on the same endpoint as this cluster.",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep(7, "TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to False",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(8, "Establish a subscription to the Mode and SystemState attributes",
+            TestStep(8, "Establish a subscription to the HumidistatMode and HumidistatSystemState attributes",
                      "This will receive updates when these attributes change value."),
-            TestStep(9, "Iteratively write the value of the Mode attribute with the values in SupportedModes except for one.",
+            TestStep(9, "Iteratively write the value of the HumidistatMode attribute with the values in SupportedModes except for one.",
                      "For each update, the DUT shall return a SUCCESS status code."),
             TestStep(10, "Send the SetSettings command with the Mode field set to the remaining value from SupportedModes",
                      "Verify DUT responds w/ status SUCCESS(0x00) "
                      "After all updates have been performed, "
-                     "verify: The order of the values of the Mode attribute reports matches the order of the SupportedModes list. "
-                     "The order of the values of the SystemState attribute reports matches the order of the SupportedModes list. "
+                     "verify: The order of the values of the HumidistatMode attribute reports matches the order of the SupportedModes list. "
+                     "The order of the values of the HumidistatSystemState attribute reports matches the order of the SupportedModes list. "
                      "Where the value in the SupportedModes list is Humidifier, the value in associated report SHALL be Humidifying or Idle. "
                      "Where the value in the SupportedModes list is Dehumidifier, the value in associated report SHALL be Dehumidifying or Idle. "
                      "Where the value in the SupportedModes list is FanOnly, the value in associated report SHALL be Fan. "
-                     "Where the value in the SupportedModes list is Auto, there MAY be one fewer report than for the Mode attribute or the corresponding report value SHALL be Idle, Humidifying or Dehumidifying."),
+                     "Where the value in the SupportedModes list is Auto, there MAY be one fewer report than for the HumidistatMode attribute or the corresponding report value SHALL be Idle, Humidifying or Dehumidifying."),
             TestStep(11, "TH sends command SetSettings with the Mode field to Humidifier if supported or otherwise to Dehumidifier",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep(12, "TH sends command SetSettings with the Mode field set to Humidifier",
@@ -130,18 +130,17 @@ class TC_HSTAT_2_2(HSTATBase):
         await self.send_onoff_off_cmd_expect_success()
 
         self.step(4)
-        # TH reads from the DUT the SystemState attribute.
+        # TH reads from the DUT the HumidistatSystemState attribute.
         # Verify that the DUT response contains a value of Idle
-        dut_SystemState = await self.read_attribute_expect_success(attribute=self.attributes.SystemState)
-        asserts.assert_equal(dut_SystemState, self.stateIdle, "SystemState is not idle")
+        dut_SystemState = await self.read_attribute_expect_success(attribute=self.attributes.HumidistatSystemState)
+        asserts.assert_equal(dut_SystemState, self.stateIdle, "HumidistatSystemState is not idle")
 
         # TH reads from the DUT the MistType attribute.
         # Verify that the DUT response contains a value between 1 and 3 inclusive.
         if self.humidifierFeatureSupported:
             self.step(5)
             dut_MistType = await self.read_attribute_expect_success(attribute=self.attributes.MistType)
-            asserts.assert_greater_equal(dut_MistType, 1, "MistType is less than 1")
-            asserts.assert_less_equal(dut_MistType, 3, "MistType is greater than 3")
+            asserts.assert_true((dut_MistType & 1) | (dut_MistType & 2), "At least one defined bit must be set.")
         else:
             self.skip_step(5)
 
@@ -156,14 +155,14 @@ class TC_HSTAT_2_2(HSTATBase):
         await self.send_SetSettingsCommand_expect_success(continuous=False, sleep=False, optimal=False)
 
         self.step(8)
-        # Establish a subscription to the Mode and SystemState attributes
+        # Establish a subscription to the HumidistatMode and HumidistatSystemState attributes
         # This will receive updates when these attributes change value.
-        modeSubscription = AttributeSubscriptionHandler(self.cluster, self.attributes.Mode)
-        stateSubscription = AttributeSubscriptionHandler(self.cluster, self.attributes.SystemState)
+        modeSubscription = AttributeSubscriptionHandler(self.cluster, self.attributes.HumidistatMode)
+        stateSubscription = AttributeSubscriptionHandler(self.cluster, self.attributes.HumidistatSystemState)
         await modeSubscription.start(self.default_controller, self.dut_node_id, self.endpoint)
         await stateSubscription.start(self.default_controller, self.dut_node_id, self.endpoint)
-        dut_CurrentMode = await self.read_attribute_expect_success(attribute=self.attributes.Mode)
-        dut_CurrentState = await self.read_attribute_expect_success(attribute=self.attributes.SystemState)
+        dut_CurrentMode = await self.read_attribute_expect_success(attribute=self.attributes.HumidistatMode)
+        dut_CurrentState = await self.read_attribute_expect_success(attribute=self.attributes.HumidistatSystemState)
         log.info("Current mode: %s", dut_CurrentMode)
         log.info("Current state: %s", dut_CurrentState)
 
@@ -171,22 +170,22 @@ class TC_HSTAT_2_2(HSTATBase):
         modeReportsReceived = []
 
         self.step(9)
-        # Iteratively write the value of the Mode attribute with the values in SupportedModes except for one.
+        # Iteratively write the value of the HumidistatMode attribute with the values in SupportedModes except for one.
         # For each update, the DUT shall return a SUCCESS status code.
         *mostModes, lastMode = SupportedModes
         for mode in mostModes:
-            await self.write_single_attribute(attribute_value=self.attributes.Mode(mode), endpoint_id=self.endpoint, expect_success=True)
+            await self.write_single_attribute(attribute_value=self.attributes.HumidistatMode(mode), endpoint_id=self.endpoint, expect_success=True)
             if dut_CurrentMode != mode:
                 modeReportsReceived.append(modeSubscription.wait_for_attribute_report().value)
                 modeReportsExpected.append(mode)
-                dut_CurrentMode = await self.read_attribute_expect_success(attribute=self.attributes.Mode)
-                dut_CurrentState = await self.read_attribute_expect_success(attribute=self.attributes.SystemState)
+                dut_CurrentMode = await self.read_attribute_expect_success(attribute=self.attributes.HumidistatMode)
+                dut_CurrentState = await self.read_attribute_expect_success(attribute=self.attributes.HumidistatSystemState)
 
         self.step(10)
         # Send the SetSettings command with the Mode field set to the remaining value from SupportedModes
-        # Verify DUT responds w/ status SUCCESS(0x00) After all updates have been performed, verify: The order of the values of the Mode attribute reports matches the order of the SupportedModes list. The order of the values of the SystemState attribute reports matches the order of the SupportedModes list. Where the value in the SupportedModes list is Humidifier, the value in associated report SHALL be Humidifying or Idle. Where the value in the SupportedModes list is Dehumidifier, the value in associated report SHALL be Dehumidifying or Idle. Where the value in the SupportedModes list is FanOnly, the value in associated report SHALL be Fan. Where the value in the SupportedModes list is Auto, there MAY be one fewer report than for the Mode attribute or the corresponding report value SHALL be Idle, Humidifying or Dehumidifying.
-        dut_CurrentMode = await self.read_attribute_expect_success(attribute=self.attributes.Mode)
-        await self.send_SetSettingsCommand_expect_success(mode=lastMode)
+        # Verify DUT responds w/ status SUCCESS(0x00) After all updates have been performed, verify: The order of the values of the HumidistatMode attribute reports matches the order of the SupportedModes list. The order of the values of the HumidistatSystemState attribute reports matches the order of the SupportedModes list. Where the value in the SupportedModes list is Humidifier, the value in associated report SHALL be Humidifying or Idle. Where the value in the SupportedModes list is Dehumidifier, the value in associated report SHALL be Dehumidifying or Idle. Where the value in the SupportedModes list is FanOnly, the value in associated report SHALL be Fan. Where the value in the SupportedModes list is Auto, there MAY be one fewer report than for the HumidistatMode attribute or the corresponding report value SHALL be Idle, Humidifying or Dehumidifying.
+        dut_CurrentMode = await self.read_attribute_expect_success(attribute=self.attributes.HumidistatMode)
+        await self.send_SetSettingsCommand_expect_success(humidistatMode=lastMode)
         if dut_CurrentMode != lastMode:
             modeReportsReceived.append(modeSubscription.wait_for_attribute_report().value)
             modeReportsExpected.append(lastMode)
@@ -200,15 +199,15 @@ class TC_HSTAT_2_2(HSTATBase):
         # TH sends command SetSettings with the Mode field to Humidifier if supported or otherwise to Dehumidifier
         # Verify DUT responds w/ status SUCCESS(0x00)
         if self.humidifierFeatureSupported:
-            await self.send_SetSettingsCommand_expect_success(mode=self.modeHumidifier)
+            await self.send_SetSettingsCommand_expect_success(humidistatMode=self.modeHumidifier)
         else:
-            await self.send_SetSettingsCommand_expect_success(mode=self.modeDehumidifier)
+            await self.send_SetSettingsCommand_expect_success(humidistatMode=self.modeDehumidifier)
 
         # TH sends command SetSettings with the Mode field set to Humidifier
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if not self.humidifierFeatureSupported:
             self.step(12)
-            await self.send_SetSettingsCommand_expect_error(mode=self.modeHumidifier, error=Status.ConstraintError)
+            await self.send_SetSettingsCommand_expect_error(humidistatMode=self.modeHumidifier, error=Status.ConstraintError)
         else:
             self.skip_step(12)
 
@@ -216,7 +215,7 @@ class TC_HSTAT_2_2(HSTATBase):
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if not self.dehumidifierFeatureSupported:
             self.step(13)
-            await self.send_SetSettingsCommand_expect_error(mode=self.modeDehumidifier, error=Status.ConstraintError)
+            await self.send_SetSettingsCommand_expect_error(humidistatMode=self.modeDehumidifier, error=Status.ConstraintError)
         else:
             self.skip_step(13)
 
@@ -224,7 +223,7 @@ class TC_HSTAT_2_2(HSTATBase):
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if not self.fanOnlyFeatureSupported:
             self.step(14)
-            await self.send_SetSettingsCommand_expect_error(mode=self.modeFanOnly, error=Status.ConstraintError)
+            await self.send_SetSettingsCommand_expect_error(humidistatMode=self.modeFanOnly, error=Status.ConstraintError)
         else:
             self.skip_step(14)
 
@@ -232,7 +231,7 @@ class TC_HSTAT_2_2(HSTATBase):
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if not self.autoFeatureSupported:
             self.step(15)
-            await self.send_SetSettingsCommand_expect_error(mode=self.modeAuto, error=Status.ConstraintError)
+            await self.send_SetSettingsCommand_expect_error(humidistatMode=self.modeAuto, error=Status.ConstraintError)
         else:
             self.skip_step(15)
 

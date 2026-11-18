@@ -122,6 +122,11 @@ public:
 
     CommandType GetCommandType() { return mCommandType; }
 
+    // Set when the peer sends ICE candidates before the camera's Answer is sent: the camera then sends its own
+    // candidates right after the Answer.
+    void SetSendICECandidatesAfterAnswer(bool send) { mSendICECandidatesAfterAnswer = send; }
+    bool GetSendICECandidatesAfterAnswer() const { return mSendICECandidatesAfterAnswer; }
+
     // WebRTC Callbacks
     void OnLocalDescription(const std::string & sdp, SDPType type);
     void OnICECandidate(const ICECandidateInfo & candidateInfo);
@@ -134,6 +139,8 @@ public:
 private:
     CommandType mCommandType = CommandType::kUndefined;
     State mState             = State::Idle;
+
+    bool mSendICECandidatesAfterAnswer = false;
 
     std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
 

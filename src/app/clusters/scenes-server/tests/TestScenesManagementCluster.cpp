@@ -16,6 +16,7 @@
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
+#include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/clusters/scenes-server/ScenesManagementCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -32,6 +33,7 @@
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <lib/support/TypeTraits.h>
 
 namespace {
@@ -449,6 +451,105 @@ struct TestScenesManagementCluster : public ::testing::Test
     // endpoint iteration. Create a DMP that returns some endpoints.
     std::unique_ptr<ServerClusterContext> clusterContext;
 };
+
+struct TestScenesManagementOnOffCluster : public TestScenesManagementCluster
+{
+    void SetUp() override
+    {
+        TestScenesManagementCluster::SetUp();
+        ASSERT_FALSE(HasFailure());
+        ASSERT_EQ(onOffCluster.Startup(*clusterContext), CHIP_NO_ERROR);
+        sceneTableProvider.mSceneTable->RegisterHandler(&onOffCluster);
+    }
+
+    void TearDown() override
+    {
+        sceneTableProvider.mSceneTable->UnregisterHandler(&onOffCluster);
+        onOffCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+        TestScenesManagementCluster::TearDown();
+    }
+
+    TimerDelegateMock timerDelegate;
+    OnOffCluster onOffCluster{ kTestEndpointId, { .timerDelegate = timerDelegate } };
+};
+
+TEST_F(TestScenesManagementOnOffCluster, AddSceneCommandUnsupportedOnOffAttribute)
+{
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+
+    AttributeValuePairStruct::Type pairs[1];
+    pairs[0].attributeID = 0x4011;
+    pairs[0].valueUnsigned16.SetValue(1);
+
+    ExtensionFieldSetStruct::Type fieldSets[1];
+    fieldSets[0].clusterID          = OnOff::Id;
+    fieldSets[0].attributeValueList = List<AttributeValuePairStruct::Type>(pairs);
+
+    AddScene::Type request;
+    request.groupID                  = 0;
+    request.sceneID                  = kTestSceneId;
+    request.transitionTime           = 0;
+    request.sceneName                = "InvalidOnOff"_span;
+    request.extensionFieldSetStructs = List<ExtensionFieldSetStruct::Type>(fieldSets);
+
+    auto response = tester.Invoke<AddScene::Type, AddSceneResponse::DecodableType>(AddScene::Id, request);
+    ASSERT_TRUE(response.IsSuccess());
+    ASSERT_TRUE(response.response.has_value());
+    EXPECT_EQ(response.response->status, to_underlying(Status::InvalidCommand));
+    EXPECT_EQ(response.response->groupID, request.groupID);
+    EXPECT_EQ(response.response->sceneID, request.sceneID);
+
+    SceneTable<ExtensionFieldSetsImpl>::SceneStorageId sceneStorageId(request.sceneID, request.groupID);
+    SceneTable<ExtensionFieldSetsImpl>::SceneTableEntry sceneEntry(sceneStorageId);
+    EXPECT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(kFabricIndex, sceneStorageId, sceneEntry), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestScenesManagementOnOffCluster, AddSceneCommandOnOffAttributeSuccess)
+{
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+
+    AttributeValuePairStruct::Type pairs[1];
+    pairs[0].attributeID = OnOff::Attributes::OnOff::Id;
+    pairs[0].valueUnsigned8.SetValue(1);
+
+    ExtensionFieldSetStruct::Type fieldSets[1];
+    fieldSets[0].clusterID          = OnOff::Id;
+    fieldSets[0].attributeValueList = List<AttributeValuePairStruct::Type>(pairs);
+
+    AddScene::Type request;
+    request.groupID                  = 0;
+    request.sceneID                  = kTestSceneId;
+    request.transitionTime           = 0;
+    request.sceneName                = "OnOffScene"_span;
+    request.extensionFieldSetStructs = List<ExtensionFieldSetStruct::Type>(fieldSets);
+
+    auto response = tester.Invoke<AddScene::Type, AddSceneResponse::DecodableType>(AddScene::Id, request);
+    ASSERT_TRUE(response.IsSuccess());
+    ASSERT_TRUE(response.response.has_value());
+    EXPECT_EQ(response.response->status, to_underlying(Status::Success));
+    EXPECT_EQ(response.response->groupID, request.groupID);
+    EXPECT_EQ(response.response->sceneID, request.sceneID);
+
+    SceneTable<ExtensionFieldSetsImpl>::SceneStorageId sceneStorageId(request.sceneID, request.groupID);
+    SceneTable<ExtensionFieldSetsImpl>::SceneTableEntry sceneEntry(sceneStorageId);
+    ASSERT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(kFabricIndex, sceneStorageId, sceneEntry), CHIP_NO_ERROR);
+
+    ExtensionFieldSet storedFieldSet;
+    ASSERT_EQ(sceneEntry.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(storedFieldSet, 0), CHIP_NO_ERROR);
+    EXPECT_EQ(storedFieldSet.mID, OnOff::Id);
+    ExtensionFieldSetStruct::Type decodedFieldSet;
+    ASSERT_EQ(onOffCluster.Deserialize(kTestEndpointId, storedFieldSet.mID,
+                                       ByteSpan(storedFieldSet.mBytesBuffer, storedFieldSet.mUsedBytes), decodedFieldSet),
+              CHIP_NO_ERROR);
+    ASSERT_EQ(decodedFieldSet.attributeValueList.size(), 1u);
+    const auto & pair = decodedFieldSet.attributeValueList[0];
+    EXPECT_EQ(pair.attributeID, OnOff::Attributes::OnOff::Id);
+    ASSERT_TRUE(pair.valueUnsigned8.HasValue());
+    EXPECT_EQ(pair.valueUnsigned8.Value(), 1u);
+    EXPECT_FALSE(onOffCluster.GetOnOff());
+}
 
 TEST_F(TestScenesManagementCluster, AttributesTest)
 {

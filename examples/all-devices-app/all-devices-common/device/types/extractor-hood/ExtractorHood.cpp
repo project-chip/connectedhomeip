@@ -20,13 +20,10 @@
 namespace chip {
 namespace app {
 
-ExtractorHood::ExtractorHood(const Context & context) :
-    FanLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kExtractorHood, 1),
-            static_cast<Clusters::FanControl::Delegate &>(*this),
-            context.includeOnOffCluster ? static_cast<Clusters::OnOffDelegate *>(this) : nullptr, context)
-{
-    SetFanLoad(this);
-}
+ExtractorHood::ExtractorHood(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate,
+                             const Context & context) :
+    FanLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kExtractorHood, 1), fanDelegate, onOffDelegate, context)
+{}
 
 } // namespace app
 } // namespace chip

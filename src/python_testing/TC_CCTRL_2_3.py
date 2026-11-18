@@ -32,7 +32,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg th_server_app_path:${ALL_DEVICES_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -48,7 +48,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg th_server_app_path:${ALL_DEVICES_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -134,7 +134,7 @@ class TC_CCTRL_2_3(MatterTestCommissionedDevice):
         super().teardown_class()
 
     def steps_TC_CCTRL_2_3(self) -> list[TestStep]:
-        return [TestStep(1, "Get number of fabrics from TH_SERVER", is_commissioning=True),
+        return [TestStep(1, "Get number of fabrics from TH_SERVER"),
                 TestStep(2, "Reading Attribute VendorId from TH_SERVER"),
                 TestStep(3, "Reading Attribute ProductId from TH_SERVER"),
                 TestStep(4, "Send RequestCommissioningApproval command to DUT with CASE session with correct VendorId and ProductId"),

@@ -24,6 +24,8 @@ import com.google.gson.JsonObject
 import java.util.Base64
 import matter.tlv.*
 
+private const val MAX_TLV_NESTING_DEPTH = 32
+
 /**
  * Implements Matter TLV to JSON converter.
  *
@@ -53,14 +55,14 @@ fun TlvReader.toJsonString(): String {
   require(element.tag is AnonymousTag) {
     "The top level TLV Structure MUST have anonymous tag. The actual tag is ${element.tag}"
   }
-  return getStructJson().toString()
+  return getStructJson(depth = 1).toString()
 }
 /**
  * Encodes TLV Structure into Json Object. The TLV reader should be positioned at the start of a TLV
  * Structure (StructureValue element). After this call the TLV reader is positioned at the end of
  * the a TLV Structure (EndOfContainerValue element).
  */
-private fun TlvReader.getStructJson(): JsonObject {
+private fun TlvReader.getStructJson(depth: Int): JsonObject {
   var json = JsonObject()
   while (!isEndOfTlv()) {
     val element = nextElement()
@@ -95,9 +97,17 @@ private fun TlvReader.getStructJson(): JsonObject {
       is BooleanValue -> json.addProperty(key, value.value)
       is FloatValue -> json.addProperty(key, validateFloat(value.value))
       is DoubleValue -> json.addProperty(key, validateDouble(value.value))
-      is StructureValue -> json.add(key, getStructJson())
+      is StructureValue -> {
+        require(depth < MAX_TLV_NESTING_DEPTH) {
+          "TLV nesting depth exceeds maximum of $MAX_TLV_NESTING_DEPTH"
+        }
+        json.add(key, getStructJson(depth + 1))
+      }
       is ArrayValue -> {
-        val (array, type) = getArrayJsonWithElementsType()
+        require(depth < MAX_TLV_NESTING_DEPTH) {
+          "TLV nesting depth exceeds maximum of $MAX_TLV_NESTING_DEPTH"
+        }
+        val (array, type) = getArrayJsonWithElementsType(depth + 1)
         json.add("$key-$type", array)
       }
       is ListValue ->
@@ -115,7 +125,7 @@ private fun TlvReader.getStructJson(): JsonObject {
  * Structure (EndOfContainerValue element). This method returns Json encoded array and a String
  * specifying types of the elements in the array.
  */
-private fun TlvReader.getArrayJsonWithElementsType(): Pair<JsonArray, String> {
+private fun TlvReader.getArrayJsonWithElementsType(depth: Int): Pair<JsonArray, String> {
   var json = JsonArray()
   var lastValue: Value = ArrayValue
 
@@ -147,7 +157,12 @@ private fun TlvReader.getArrayJsonWithElementsType(): Pair<JsonArray, String> {
       is BooleanValue -> json.add(value.value)
       is FloatValue -> json.add(validateFloat(value.value))
       is DoubleValue -> json.add(validateDouble(value.value))
-      is StructureValue -> json.add(getStructJson())
+      is StructureValue -> {
+        require(depth < MAX_TLV_NESTING_DEPTH) {
+          "TLV nesting depth exceeds maximum of $MAX_TLV_NESTING_DEPTH"
+        }
+        json.add(getStructJson(depth + 1))
+      }
       is ArrayValue ->
         throw IllegalArgumentException(
           "Invalid TLV element: multi-dimensional TLV Array not supported"

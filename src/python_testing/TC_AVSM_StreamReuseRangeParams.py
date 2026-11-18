@@ -54,7 +54,7 @@ class TC_AVSM_StreamReuseRangeParams(MatterTestCommissionedDevice):
 
     def steps_TC_AVSM_StreamReuseRangeParams(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(
                 1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER", "Verify SNP is supported"
             ),

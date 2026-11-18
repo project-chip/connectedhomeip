@@ -25,10 +25,10 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Humidistat::
         {
         case SupportedModes::Id:
             return SupportedModes::kMetadataEntry;
-        case Mode::Id:
-            return Mode::kMetadataEntry;
-        case SystemState::Id:
-            return SystemState::kMetadataEntry;
+        case HumidistatMode::Id:
+            return HumidistatMode::kMetadataEntry;
+        case HumidistatSystemState::Id:
+            return HumidistatSystemState::kMetadataEntry;
         case UserSetpoint::Id:
             return UserSetpoint::kMetadataEntry;
         case MinSetpoint::Id:

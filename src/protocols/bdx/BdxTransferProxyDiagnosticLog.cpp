@@ -49,7 +49,6 @@ CHIP_ERROR BDXTransferProxyDiagnosticLog::Accept()
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode  = TransferControlFlags::kSenderDrive;
     acceptData.MaxBlockSize = mTransfer->GetTransferBlockSize();
-    acceptData.StartOffset  = mTransfer->GetStartOffset();
     acceptData.Length       = mTransfer->GetTransferLength();
 
     return mTransfer->AcceptTransfer(acceptData);

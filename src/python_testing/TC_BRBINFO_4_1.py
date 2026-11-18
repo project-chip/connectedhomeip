@@ -37,6 +37,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     tags: [nightly]
 #   run2:
 #     app: ${FABRIC_SYNC_APP}
 #     app-args: --discriminator=1234
@@ -54,6 +55,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     tags: [nightly]
 # === END CI TEST ARGUMENTS ===
 
 # This test requires a TH_ICD_SERVER application. Please specify with --string-arg th_icd_server_app_path:<path_to_app>
@@ -102,7 +104,7 @@ class TC_BRBINFO_4_1(MatterTestCommissionedDevice):
 
     def steps_TC_BRBINFO_4_1(self) -> list[TestStep]:
         return [
-            TestStep("0",  "DUT commissioned and preconditions", is_commissioning=True),
+            TestStep("0",  "DUT commissioned and preconditions"),
             TestStep("1", "TH reads from the ICD the A_IDLE_MODE_DURATION, A_ACTIVE_MODE_DURATION, and ACTIVE_MODE_THRESHOLD attributes"),
             TestStep("2", "Setting up subscribe to ActiveChange event"),
             TestStep("3", "Check TimeoutMs too low fails"),

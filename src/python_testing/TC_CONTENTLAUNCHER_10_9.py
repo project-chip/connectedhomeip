@@ -45,7 +45,7 @@ class TC_CONTENTLAUNCHER_10_9(MatterTestCommissionedDevice):
 
     def steps_TC_CONTENTLAUNCHER_10_9(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH sends a LaunchURL command to the DUT with a valid URL and QueueType=Replace (0).",
                      "DUT replies with a success response and immediately interrupts any currently playing content "
                      "to play the new content."),

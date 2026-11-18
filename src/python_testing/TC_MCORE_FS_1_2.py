@@ -31,7 +31,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP} dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --string-arg th_server_app_path:${ALL_DEVICES_APP} dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -47,7 +47,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --bool-arg unified_fabric_sync_app:true
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg th_server_app_path:${ALL_DEVICES_APP}
 #       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -162,7 +162,7 @@ class TC_MCORE_FS_1_2(MatterTestCommissionedDevice):
 
     def steps_TC_MCORE_FS_1_2(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commission DUT if not done", is_commissioning=True),
+            TestStep("precondition", "Commission DUT if not done"),
             TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
             TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
             TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),

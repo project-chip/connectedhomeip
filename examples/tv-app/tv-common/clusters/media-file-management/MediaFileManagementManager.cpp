@@ -194,7 +194,7 @@ CHIP_ERROR MediaFileManagementManager::GetFileAtIndex(size_t index, Structs::Fil
     file.name               = CharSpan(entry.name.data(), entry.name.size());
     file.size               = entry.size;
     file.mimeType           = CharSpan(entry.mimeType.data(), entry.mimeType.size());
-    file.imageUri           = CharSpan(entry.imageUri.data(), entry.imageUri.size());
+    file.imageURI           = CharSpan(entry.imageUri.data(), entry.imageUri.size());
     return CHIP_NO_ERROR;
 }
 
@@ -243,7 +243,7 @@ bool MediaFileManagementManager::GetFileById(uint64_t fileID, Structs::FileDescr
             file.name     = CharSpan(entry.name.data(), entry.name.size());
             file.size     = entry.size;
             file.mimeType = CharSpan(entry.mimeType.data(), entry.mimeType.size());
-            file.imageUri = CharSpan(entry.imageUri.data(), entry.imageUri.size());
+            file.imageURI = CharSpan(entry.imageUri.data(), entry.imageUri.size());
             return true;
         }
     }
@@ -336,11 +336,13 @@ Status MediaFileManagementManager::HandleDeleteFile(uint64_t fileID)
     return Status::NotFound;
 }
 
-Status MediaFileManagementManager::HandleRequestSharedFiles(
-    ScopedNodeId peer, const CharSpan & clientName, uint16_t requestID,
-    const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes)
+Status MediaFileManagementManager::HandleRequestSharedFiles(ScopedNodeId peer, const CharSpan & clientName, uint16_t requestID,
+                                                            const Optional<DataModel::DecodableList<CharSpan>> & supportedMimeTypes)
 {
     ChipLogProgress(Zcl, "MediaFileManagementManager: RequestSharedFiles requestID=%u", requestID);
+    // This example has no consent UI: the user is assumed to approve sharing every
+    // stored file that matches the request. A product would prompt here instead.
+    ChipLogProgress(Zcl, "MediaFileManagementManager: auto-granting consent to share stored files for requestID=%u", requestID);
 
     // Without a BDX coordinator this example cannot actually serve bytes, so it
     // accepts the request but shares nothing (no SharedFilesAdded events).
@@ -351,10 +353,10 @@ Status MediaFileManagementManager::HandleRequestSharedFiles(
     // only files whose MIME type the requester declared it can handle.
     std::vector<std::string> mimeFilter;
     bool haveFilter = false;
-    if (supportedMimeTypes.HasValue() && !supportedMimeTypes.Value().IsNull())
+    if (supportedMimeTypes.HasValue())
     {
         haveFilter    = true;
-        auto iterator = supportedMimeTypes.Value().Value().begin();
+        auto iterator = supportedMimeTypes.Value().begin();
         while (iterator.Next())
         {
             const CharSpan & mime = iterator.GetValue();
@@ -427,11 +429,11 @@ Status MediaFileManagementManager::HandleGetSharedFile(ScopedNodeId peer, uint16
     if (mBdxCoordinator->MakeSelfBdxUri(fileID, file.name, uri) == CHIP_NO_ERROR)
     {
         mSharedFileUri.assign(uri.data(), uri.size());
-        file.imageUri = CharSpan(mSharedFileUri.data(), mSharedFileUri.size());
+        file.imageURI = CharSpan(mSharedFileUri.data(), mSharedFileUri.size());
     }
 
     response.status = FileStatusEnum::kSuccess;
-    response.fileDescription.SetValue(DataModel::MakeNullable(file));
+    response.fileDescription.SetNonNull(file);
     return Status::Success;
 }
 
@@ -439,6 +441,9 @@ Status MediaFileManagementManager::HandleOfferFile(ScopedNodeId peer, const Char
                                                    uint64_t size, const CharSpan & mimeType, const CharSpan & imageUri)
 {
     ChipLogProgress(Zcl, "MediaFileManagementManager: OfferFile from client, size %llu", static_cast<unsigned long long>(size));
+    // This example has no consent UI: the user is assumed to accept every offered file.
+    // A product would prompt here before starting the download.
+    ChipLogProgress(Zcl, "MediaFileManagementManager: auto-granting consent to receive the offered file");
 
     // Reject files that would exceed the advertised capacity.
     VerifyOrReturnValue(size <= GetAvailableStorage(), Status::ResourceExhausted);

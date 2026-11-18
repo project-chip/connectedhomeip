@@ -49,7 +49,7 @@
 #     quiet: true
 #   run3:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device closure-no-lt:1 --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
+#     app-args: --device closure-cabinet:1 --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -125,7 +125,7 @@ class TC_CLCTRL_6_1(MatterTestCommissionedDevice):
 
     def steps_TC_CLCTRL_6_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute."),
             TestStep("2b", "TH reads TestEventTriggerEnabled attribute from General Diagnostics Cluster."),
             TestStep("2c", "TH reads from the DUT the (0xFFFB) AttributeList attribute."),

@@ -34,10 +34,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, supportedModes);
-    case Attributes::Mode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, mode);
-    case Attributes::SystemState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, systemState);
+    case Attributes::HumidistatMode::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, humidistatMode);
+    case Attributes::HumidistatSystemState::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, humidistatSystemState);
     case Attributes::UserSetpoint::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, userSetpoint);
     case Attributes::MinSetpoint::TypeInfo::GetAttributeId():

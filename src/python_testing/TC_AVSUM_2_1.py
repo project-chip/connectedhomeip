@@ -55,7 +55,7 @@ class TC_AVSUM_2_1(MatterTestCommissionedDevice, AVSUMTestBase):
 
     def steps_TC_AVSUM_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read and verify that one of MTILT, MPAN, MZOOM, or DPTZ is supported"),
             TestStep(3, "Read and verify ZoomMax attribute, if supported"),
             TestStep(4, "Read and verify TiltMin attribute, if supported"),

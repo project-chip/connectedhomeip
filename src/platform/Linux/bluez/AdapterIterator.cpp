@@ -17,8 +17,6 @@
 
 #include "AdapterIterator.h"
 
-#include <cstdio>
-
 #include <gio/gio.h>
 
 #include <lib/core/CHIPError.h>
@@ -54,12 +52,10 @@ bool AdapterIterator::Advance()
 
 uint32_t AdapterIterator::GetIndex() const
 {
-    // PATH is of the for  BLUEZ_PATH / hci<nr>, i.e. like '/org/bluez/hci0'
-    // Index represents the number after hci
     const char * path = g_dbus_proxy_get_object_path(G_DBUS_PROXY(mCurrentAdapter.get()));
     unsigned index    = 0;
 
-    if (sscanf(path, BLUEZ_PATH "/hci%u", &index) != 1)
+    if (!ParseAdapterObjectPath(path, index))
     {
         ChipLogError(DeviceLayer, "Failed to extract HCI index from '%s'", StringOrNullMarker(path));
         index = 0;

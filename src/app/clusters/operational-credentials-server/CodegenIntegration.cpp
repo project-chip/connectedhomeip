@@ -45,7 +45,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         auto & dacProvider = *Credentials::GetDeviceAttestationCredentialsProvider();
-        BitFlags<OperationalCredentials::Feature> configuredFeatureMap(featureMap);
+        BitFlags<OperationalCredentials::Feature> configuredFeatureMap;
         configuredFeatureMap.Set(OperationalCredentials::Feature::kPQCDeviceAttestation, dacProvider.HasRequiredPqcCredentials());
 
         OperationalCredentialsCluster::Context context = {
@@ -85,7 +85,7 @@ void MatterOperationalCredentialsClusterInitCallback(EndpointId endpointId)
             .clusterId                 = OperationalCredentials::Id,
             .fixedClusterInstanceCount = OperationalCredentials::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1,
-            .fetchFeatureMap           = true,
+            .fetchFeatureMap           = false,
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);

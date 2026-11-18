@@ -20,6 +20,7 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
 #include <clusters/HepaFilterMonitoring/Metadata.h>
+#include <clusters/WaterTankLevelMonitoring/Metadata.h>
 #include <platform/DeviceInfoProvider.h>
 #include <tracing/macros.h>
 

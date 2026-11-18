@@ -109,6 +109,7 @@ void MatterProxyConfigurationPluginServerInitCallback() {}
 void MatterFanControlPluginServerInitCallback() {}
 void MatterActivatedCarbonFilterMonitoringPluginServerInitCallback() {}
 void MatterHepaFilterMonitoringPluginServerInitCallback() {}
+void MatterWaterTankLevelMonitoringPluginServerInitCallback() {}
 void MatterAirQualityPluginServerInitCallback() {}
 void MatterCarbonMonoxideConcentrationMeasurementPluginServerInitCallback() {}
 void MatterCarbonDioxideConcentrationMeasurementPluginServerInitCallback() {}

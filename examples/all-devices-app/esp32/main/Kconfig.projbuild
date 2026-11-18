@@ -68,6 +68,9 @@ menu "Demo"
         config DEVICE_TYPE_ESP32_S31_DEVKITC
             bool "ESP32S31-DevKitC"
             depends on IDF_TARGET_ESP32S31
+        config DEVICE_TYPE_ESP_MOSAICO
+            bool "ESP-Mosaico"
+            depends on IDF_TARGET_ESP32S31
         config DEVICE_TYPE_ESP32_H2_DEVKITM
             bool "ESP32H2-DevKitM"
             depends on IDF_TARGET_ESP32H2
@@ -111,27 +114,27 @@ menu "Demo"
         int
         range 0 5
         default 0 if DEVICE_TYPE_ESP32_DEVKITC || DEVICE_TYPE_ESP32_H2_DEVKITM || DEVICE_TYPE_ESP32_H21_DEVKITM || DEVICE_TYPE_ESP32_H4_DEVKITM || DEVICE_TYPE_ESP32_P4_FUNCTION_EV_BOARD
-        default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC || DEVICE_TYPE_ESP32_S31_DEVKITC
+        default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC || DEVICE_TYPE_ESP32_S31_DEVKITC || DEVICE_TYPE_ESP_MOSAICO
         default 3 if DEVICE_TYPE_M5STACK
         default 4 if DEVICE_TYPE_ESP32_WROVER_KIT
 
     config HAVE_DISPLAY
         bool
-        default y if DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT || DEVICE_TYPE_M5STACK_CORES3
-        default n if !(DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT || DEVICE_TYPE_M5STACK_CORES3)
+        default y if DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT || DEVICE_TYPE_M5STACK_CORES3 || DEVICE_TYPE_ESP_MOSAICO
+        default n if !(DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT || DEVICE_TYPE_M5STACK_CORES3 || DEVICE_TYPE_ESP_MOSAICO)
 
     config DISPLAY_LVGL
         bool
         depends on HAVE_DISPLAY
-        default y if DEVICE_TYPE_M5STACK_CORES3
+        default y if DEVICE_TYPE_M5STACK_CORES3 || DEVICE_TYPE_ESP_MOSAICO
         help
             Selects the LVGL display implementation instead of the default one
             built on the vendored TFT library, which is ESP32-only.
 
     config HAVE_SPEAKER
         bool
-        default y if DEVICE_TYPE_M5STACK_CORES3
-        default n if !DEVICE_TYPE_M5STACK_CORES3
+        default y if DEVICE_TYPE_M5STACK_CORES3 || DEVICE_TYPE_ESP_MOSAICO
+        default n if !(DEVICE_TYPE_M5STACK_CORES3 || DEVICE_TYPE_ESP_MOSAICO)
 
     config CHIME_ATTENUATION_DB
         int "Chime attenuation (dB below maximum)"
@@ -141,8 +144,9 @@ menu "Demo"
         help
             Attenuation applied to the chime output, in decibels below the
             amplifier's maximum gain. 0 is full volume; each 6 dB halves the
-            amplitude. The value is programmed into the AW88298 volume
-            register, so digital resolution is unaffected.
+            amplitude. The value is applied in the codec or amplifier (AW88298
+            volume register on the CoreS3, ES8311 output volume on the
+            Mosaico), so digital resolution is unaffected.
 
 
 

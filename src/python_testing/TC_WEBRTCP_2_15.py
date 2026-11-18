@@ -59,7 +59,7 @@ class TC_WEBRTCP_2_15(MatterTestCommissionedDevice, WEBRTCPTestBase):
         Define the step-by-step sequence for the test.
         """
         return [
-            TestStep("precondition", "DUT commissioned", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned"),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
             TestStep(2, "TH sends the ProvideOffer command with null WebRTCSessionID from a specific endpoint ID",

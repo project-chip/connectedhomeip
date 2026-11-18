@@ -14,6 +14,17 @@
 
 name: 42.2.1. [TC-TSTAT-2.1] Attributes with server as DUT
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: "Test against all clusters app"
+      app: all-clusters
+    - name: "Test against all-devices/thermostat"
+      app: all-devices
+      args:
+          - --device
+          - thermostat
+
 PICS:
     - TSTAT.S
 
@@ -32,7 +43,7 @@ tests:
                 value: nodeId
 
     - label:
-          "Saving value for comparision in step 5 read AbsMinCoolSetpointLimit
+          "Saving value for comparison in step 5 read AbsMinCoolSetpointLimit
           attribute"
       PICS: TSTAT.S.A0005
       command: "readAttribute"
@@ -41,7 +52,7 @@ tests:
           saveAs: AbsMinCoolSetpointLimitStep5
 
     - label:
-          "Saving value for comparision in step 5 read attribute
+          "Saving value for comparison in step 5 read attribute
           MinSetpointDeadBand attribute"
       PICS: TSTAT.S.A0019
       command: "readAttribute"
@@ -50,7 +61,7 @@ tests:
           saveAs: MinSetpointDeadBandValue
 
     - label:
-          "Saving value for comparision in step 6 read AbsMaxCoolSetpointLimit
+          "Saving value for comparison in step 6 read AbsMaxCoolSetpointLimit
           attribute"
       PICS: TSTAT.S.A0006
       command: "readAttribute"
@@ -59,7 +70,7 @@ tests:
           saveAs: AbsMaxCoolSetpointLimitStep6
 
     - label:
-          "Saving value for comparision in step 17 read MinCoolSetpointLimit
+          "Saving value for comparison in step 17 read MinCoolSetpointLimit
           attribute"
       PICS: TSTAT.S.A0017
       command: "readAttribute"
@@ -68,7 +79,7 @@ tests:
           saveAs: MinCoolSetpointLimitValue
 
     - label:
-          "Saving value for comparision in step 17 read MaxCoolSetpointLimit
+          "Saving value for comparison in step 17 read MaxCoolSetpointLimit
           attribute"
       PICS: TSTAT.S.A0018
       command: "readAttribute"
@@ -76,7 +87,7 @@ tests:
       response:
           saveAs: MaxCoolSetpointLimitValue
 
-    - label: "Saving value for comparision in step 17 read MaxHeatSetpointLimit"
+    - label: "Saving value for comparison in step 17 read MaxHeatSetpointLimit"
       PICS: TSTAT.S.A0016
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
@@ -84,7 +95,7 @@ tests:
           saveAs: MaxHeatSetpointLimitValue
 
     - label:
-          "Saving value for comparision in step 13 read attribute
+          "Saving value for comparison in step 13 read attribute
           OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
       command: "readAttribute"
@@ -93,7 +104,7 @@ tests:
           saveAs: OccupiedCoolingSetpointValue
 
     - label:
-          "Saving value for comparision in step 15 read attribute
+          "Saving value for comparison in step 15 read attribute
           AbsMinHeatSetpointLimit"
       PICS: TSTAT.S.A0003
       command: "readAttribute"
@@ -102,7 +113,7 @@ tests:
           saveAs: AbsMinHeatValue
 
     - label:
-          "Saving value for comparision in step 15 read attribute
+          "Saving value for comparison in step 15 read attribute
           AbsMaxHeatSetpointLimit"
       PICS: TSTAT.S.A0004
       command: "readAttribute"
@@ -111,8 +122,8 @@ tests:
           saveAs: AbsMaxHeatValue
 
     - label:
-          "Saving value for comparision in step 16 read
-          UnoccupiedCoolingSetpoint attribute"
+          "Saving value for comparison in step 16 read UnoccupiedCoolingSetpoint
+          attribute"
       PICS: TSTAT.S.A0013
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
@@ -120,13 +131,21 @@ tests:
           saveAs: UnoccupiedCoolingSetpointValue
 
     - label:
-          "Saving value for comparision in step 58 read NumberOfPresets
-          attribute"
+          "Saving value for comparison in step 58 read NumberOfPresets attribute"
       PICS: TSTAT.S.F08
       command: "readAttribute"
       attribute: "NumberOfPresets"
       response:
           saveAs: NumberOfPresetsValue
+
+    - label:
+          "Saving value for comparison in step 47 read NumberOfSchedules
+          attribute"
+      PICS: TSTAT.S.F07
+      command: "readAttribute"
+      attribute: "NumberOfSchedules"
+      response:
+          saveAs: NumberOfSchedulesValue
 
     - label: "Step 2: TH reads the LocalTemperature attribute from the DUT"
       command: "readAttribute"
@@ -699,6 +718,7 @@ tests:
       response:
           constraints:
               type: list
+              maxLength: NumberOfSchedulesValue
 
     - label:
           "Step 48: TH reads the SetpointHoldExpiryTimestamp attribute from the

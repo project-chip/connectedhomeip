@@ -43,8 +43,8 @@ public:
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
     // HumidistatDelegate
-    void OnModeChanged(Clusters::Humidistat::ModeEnum newMode) override;
-    void OnSystemStateChanged(Clusters::Humidistat::SystemStateEnum newSystemState) override;
+    void OnModeChanged(Clusters::Humidistat::HumidistatModeEnum newMode) override;
+    void OnSystemStateChanged(Clusters::Humidistat::HumidistatSystemStateEnum newSystemState) override;
     void OnUserSetpointChanged(chip::Percent newUserSetpoint) override;
     void OnTargetSetpointChanged(chip::Percent newTargetSetpoint) override;
     void OnMistTypeChanged(chip::BitMask<Clusters::Humidistat::MistTypeBitmap> newMistType) override;

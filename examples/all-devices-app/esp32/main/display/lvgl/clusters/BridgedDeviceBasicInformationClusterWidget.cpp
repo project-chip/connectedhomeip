@@ -65,13 +65,11 @@ lv_obj_t * CreateBridgedDeviceBasicInformationClusterWidget(lv_obj_t * parent,
     lv_obj_set_style_text_color(uniqueIdText, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
 
     lv_obj_t * reachableRow = lv_obj_create(card);
+    lv_obj_remove_style_all(reachableRow);
     lv_obj_set_width(reachableRow, LV_PCT(100));
     lv_obj_set_height(reachableRow, 44);
     lv_obj_set_flex_flow(reachableRow, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(reachableRow, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_hor(reachableRow, 0, LV_PART_MAIN);
-    lv_obj_set_style_pad_ver(reachableRow, 0, LV_PART_MAIN);
-    lv_obj_set_style_border_width(reachableRow, 0, LV_PART_MAIN);
     lv_obj_clear_flag(reachableRow, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_t * stateLabel = lv_label_create(reachableRow);

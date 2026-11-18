@@ -19,13 +19,12 @@
 #include "AppDeviceFactory.h"
 #include "DeviceTypeSelection.h"
 #include <ESP32DimmableLight.h>
-#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <binding-handler/BindingHandler.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
@@ -112,6 +111,10 @@ static void SetActiveDeviceType(std::string deviceType)
 
 #include "DeviceFactoryPlatformOverride.h"
 
+#if CONFIG_DEVICE_TYPE_ESP_MOSAICO
+#include "MosaicoUsbConsole.h"
+#endif
+
 namespace {
 
 std::string KebabCaseToTitleCase(const std::string & input)
@@ -148,9 +151,9 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
-chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 LoggingIdentifyDelegate gIdentifyDelegate;
+BindingHandler gBindingHandler;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<RootNode> gRootNode;
 std::vector<std::unique_ptr<DeviceInterface>> gConstructedDevices;
@@ -250,15 +253,6 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    // Initialize the safe attribute persistence provider with the storage delegate
-    err = gSafeAttributePersistenceProvider.Init(delegate);
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Failed to init safe attribute persistence provider: %" CHIP_ERROR_FORMAT, err.Format());
-        return nullptr;
-    }
-    SetSafeAttributePersistenceProvider(&gSafeAttributePersistenceProvider);
-
     static chip::app::CodeDrivenDataModelProvider dataModelProvider =
         chip::app::CodeDrivenDataModelProvider(*delegate, gAttributePersistenceProvider);
 
@@ -326,6 +320,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         .breadcrumbTracker        = gRootNode->GeneralCommissioning(),
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
+        .bindingHandler           = gBindingHandler,
         .testEventTriggerDelegate = *testEventTriggerDelegate,
         .identifyDelegate         = gIdentifyDelegate,
     });
@@ -349,16 +344,11 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             EndpointId aggregatorEp = endpointIdAllocator.Allocate();
             endpointIdAllocator.ForceNext(aggregatorEp);
             ESP_LOGI(TAG, "Registering aggregator on endpoint %u", aggregatorEp);
-            err = aggregator.device->Register(endpointIdAllocator, dataModelProvider,
-                                              EndpointComposition::WithParent(kInvalidEndpointId));
+            err = aggregator.Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(kInvalidEndpointId));
             if (err != CHIP_NO_ERROR)
             {
                 ESP_LOGE(TAG, "Failed to register aggregator on endpoint %u: %" CHIP_ERROR_FORMAT, aggregatorEp, err.Format());
                 return nullptr;
-            }
-            if (aggregator.onDeviceRegistered)
-            {
-                aggregator.onDeviceRegistered();
             }
             gConstructedDevices.push_back(std::move(aggregator.device));
 
@@ -392,8 +382,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 endpointIdAllocator.ForceNext(bnEp);
                 ESP_LOGI(TAG, "Registering bridged-node for '%s' on endpoint %u (parent %u)", deviceType.c_str(), bnEp,
                          aggregatorEp);
-                err = bridgedNode.device->Register(endpointIdAllocator, dataModelProvider,
-                                                   EndpointComposition::WithParent(aggregatorEp));
+                err = bridgedNode.Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(aggregatorEp));
                 if (err != CHIP_NO_ERROR)
                 {
                     ESP_LOGE(TAG, "Failed to register bridged-node for '%s' on endpoint %u: %" CHIP_ERROR_FORMAT,
@@ -411,7 +400,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                     continue;
                 }
                 ESP_LOGI(TAG, "Registering device '%s' with parent %u", deviceType.c_str(), bnEp);
-                err = device.device->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(bnEp));
+                err = device.Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(bnEp));
                 if (err != CHIP_NO_ERROR)
                 {
                     ESP_LOGE(TAG, "Failed to register device '%s' with parent %u: %" CHIP_ERROR_FORMAT, deviceType.c_str(), bnEp,
@@ -419,15 +408,6 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                     bridgedNode.device->Unregister(dataModelProvider);
                     skippedCount++;
                     continue;
-                }
-
-                if (bridgedNode.onDeviceRegistered)
-                {
-                    bridgedNode.onDeviceRegistered();
-                }
-                if (device.onDeviceRegistered)
-                {
-                    device.onDeviceRegistered();
                 }
 
                 gConstructedDevices.push_back(std::move(bridgedNode.device));
@@ -465,15 +445,11 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             endpointIdAllocator.ForceNext(CONFIG_ALL_DEVICES_ENDPOINT);
             ESP_LOGI(TAG, "Registering default device '%s' on endpoint %u", defaultDevName.c_str(),
                      static_cast<unsigned int>(CONFIG_ALL_DEVICES_ENDPOINT));
-            err = defaultDevice.device->Register(endpointIdAllocator, dataModelProvider);
+            err = defaultDevice.Register(endpointIdAllocator, dataModelProvider);
             if (err != CHIP_NO_ERROR)
             {
                 ESP_LOGE(TAG, "Failed to register default device '%s': %" CHIP_ERROR_FORMAT, defaultDevName.c_str(), err.Format());
                 return nullptr;
-            }
-            if (defaultDevice.onDeviceRegistered)
-            {
-                defaultDevice.onDeviceRegistered();
             }
             gConstructedDevices.push_back(std::move(defaultDevice.device));
         }
@@ -507,15 +483,11 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         endpointIdAllocator.ForceNext(CONFIG_ALL_DEVICES_ENDPOINT);
         ESP_LOGI(TAG, "Registering device '%s' on endpoint %u", gDeviceType.c_str(),
                  static_cast<unsigned int>(CONFIG_ALL_DEVICES_ENDPOINT));
-        err = device.device->Register(endpointIdAllocator, dataModelProvider);
+        err = device.Register(endpointIdAllocator, dataModelProvider);
         if (err != CHIP_NO_ERROR)
         {
             ESP_LOGE(TAG, "Failed to register device '%s': %" CHIP_ERROR_FORMAT, gDeviceType.c_str(), err.Format());
             return nullptr;
-        }
-        if (device.onDeviceRegistered)
-        {
-            device.onDeviceRegistered();
         }
 
         gConstructedDevices.push_back(std::move(device.device));
@@ -587,6 +559,18 @@ void InitServer(intptr_t context)
         return;
     }
 
+    {
+        auto & server = Server::GetInstance();
+        if (CHIP_ERROR bindingErr =
+                gBindingHandler.Init(Clusters::Binding::Manager::GetInstance(),
+                                     { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                     server.GetExchangeManager());
+            bindingErr != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "BindingHandler::Init() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
+        }
+    }
+
 #if CONFIG_HAVE_DISPLAY
     InitDisplayDataModelListener();
 #endif
@@ -633,6 +617,10 @@ CHIP_ERROR SetDeviceTypeAndRestart(const std::string & deviceType)
 
 extern "C" void app_main()
 {
+#if CONFIG_DEVICE_TYPE_ESP_MOSAICO
+    ESP_ERROR_CHECK_WITHOUT_ABORT(InitMosaicoUsbConsole());
+#endif
+
     // Initialize the ESP NVS layer.
     esp_err_t err = nvs_flash_init();
     if (err != ESP_OK)

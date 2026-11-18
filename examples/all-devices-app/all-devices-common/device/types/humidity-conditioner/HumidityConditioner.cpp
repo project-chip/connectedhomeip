@@ -51,8 +51,8 @@ CHIP_ERROR HumidityConditioner::Register(EndpointId endpoint, CodeDrivenDataMode
 
     // Humidistat: all features enabled to support the full range of humidistat functionality for testing.
     HumidistatCluster::StartupConfiguration humidistatConfig;
-    humidistatConfig.mode           = Humidistat::ModeEnum::kHumidifier;
-    humidistatConfig.systemState    = Humidistat::SystemStateEnum::kIdle;
+    humidistatConfig.mode           = Humidistat::HumidistatModeEnum::kHumidifier;
+    humidistatConfig.systemState    = Humidistat::HumidistatSystemStateEnum::kIdle;
     humidistatConfig.userSetpoint   = 40;
     humidistatConfig.minSetpoint    = 30;
     humidistatConfig.maxSetpoint    = 60;

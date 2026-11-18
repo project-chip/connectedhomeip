@@ -91,10 +91,6 @@ DataModel::ActionReturnStatus ThermostatClusterBase::ReadAttribute(const DataMod
     case LocalTemperatureCalibration::Id:
         return encoder.Encode(mDelegate.GetLocalTemperatureCalibration());
 
-    case Schedules::Id: {
-        // TODO: Implement schedule list
-        return encoder.EncodeList([](const auto & enc) -> CHIP_ERROR { return CHIP_NO_ERROR; });
-    }
     default:
         ChipLogError(Zcl, "Unsupported Attribute:" ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));
         return Status::UnsupportedAttribute;

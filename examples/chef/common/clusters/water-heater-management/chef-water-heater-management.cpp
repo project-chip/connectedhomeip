@@ -24,7 +24,9 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <app/clusters/thermostat-server/AttributeAccessorShim.h>
+#if MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "thermostat/CodegenIntegration.h"
+#endif
 
 using namespace chip;
 using namespace chip::app;
@@ -129,26 +131,20 @@ void ChefDelegate::TimerTick()
 
 Energy_mWh ChefDelegate::GetEstimatedHeatRequired()
 {
-    int16_t occupiedHeatingSetpoint;
-    int16_t localTemperature;
+    int16_t occupiedHeatingSetpoint = kDefaultTemperatureHundredthsCelsius;
+    int16_t localTemperature        = kDefaultTemperatureHundredthsCelsius;
 
-    if (Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Get(mEndpointId, &occupiedHeatingSetpoint) !=
-        Protocols::InteractionModel::Status::Success)
+#if MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (auto * thermostat = Thermostat::Chef::FindClusterOnEndpoint(mEndpointId); thermostat != nullptr)
     {
-        occupiedHeatingSetpoint = kDefaultTemperatureHundredthsCelsius;
+        occupiedHeatingSetpoint           = thermostat->GetSetpoints().occupiedRange.heating.Temperature();
+        DataModel::Nullable<int16_t> temp = thermostat->GetLocalTemperature();
+        if (!temp.IsNull())
+        {
+            localTemperature = temp.Value();
+        }
     }
-
-    DataModel::Nullable<int16_t> temp;
-    if (Clusters::Thermostat::Attributes::LocalTemperature::Get(mEndpointId, temp) !=
-            Protocols::InteractionModel::Status::Success ||
-        temp.IsNull())
-    {
-        localTemperature = kDefaultTemperatureHundredthsCelsius;
-    }
-    else
-    {
-        localTemperature = temp.Value();
-    }
+#endif
 
     if (localTemperature >= occupiedHeatingSetpoint)
     {

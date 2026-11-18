@@ -21,6 +21,7 @@ source_set("electrical-protection-alarm-server") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/clusters/alarm-base-server",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",

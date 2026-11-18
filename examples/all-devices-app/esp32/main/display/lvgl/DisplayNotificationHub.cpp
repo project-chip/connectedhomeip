@@ -17,17 +17,16 @@
  */
 
 #include "DisplayNotificationHub.h"
+#include "DisplayBoard.h"
 
 #include <algorithm>
 #include <app/InteractionModelEngine.h>
-#include <bsp/esp-bsp.h>
 #include <esp_log.h>
 
 namespace chip::app {
 
 namespace {
-const char TAG[]                = "DisplayHub";
-constexpr uint32_t kWaitForever = 0;
+const char TAG[] = "DisplayHub";
 } // namespace
 
 DisplayNotificationHub & DisplayNotificationHub::Instance()
@@ -112,7 +111,7 @@ void DisplayNotificationHub::OnAttributeChanged(const ConcreteAttributePath & pa
         return;
     }
 
-    if (!bsp_display_lock(kWaitForever))
+    if (!DisplayBoard::Lock())
     {
         ESP_LOGE(TAG, "Could not acquire display lock for attribute change");
         return;
@@ -138,7 +137,7 @@ void DisplayNotificationHub::OnAttributeChanged(const ConcreteAttributePath & pa
         }
     }
 
-    bsp_display_unlock();
+    DisplayBoard::Unlock();
 }
 
 } // namespace chip::app

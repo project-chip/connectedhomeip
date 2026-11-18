@@ -34,10 +34,10 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #   run2:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     factory-reset: true
 #     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -55,6 +55,7 @@ from mdns_discovery.utils.asserts import (assert_txt_record_present, assert_vali
                                           assert_valid_ipv6_addresses, assert_valid_sai_key, assert_valid_sat_key,
                                           assert_valid_sii_key, assert_valid_t_key)
 from mdns_discovery.utils.network import is_dut_tcp_supported
+from mdns_discovery.utils.support import TCP_PICS_STR, DiscoverySupport
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -73,16 +74,10 @@ Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#343-tc-sc-43-discovery-dut_commissionee
 '''
 
-TCP_PICS_STR = "MCORE.SC.S.TCP"
-ONE_HOUR_IN_MS = 3600000
-MAX_SAT_VALUE = 65535
-MAX_T_VALUE = 6
 
-
-class TC_SC_4_3(MatterTestCommissionedDevice):
-
+class TC_SC_4_3(DiscoverySupport, MatterTestCommissionedDevice):
     def steps_TC_SC_4_3(self):
-        return [TestStep("precondition", "DUT is commissioned on the same fabric as TH.", is_commissioning=True),
+        return [TestStep("precondition", "DUT is commissioned on the same fabric as TH."),
                 TestStep(1, "TH reads ServerList attribute from the Descriptor cluster on EP0.",
                          "If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to True, otherwise set supports_icd to False."),
                 TestStep(2, "If supports_icd is true:",
@@ -112,62 +107,12 @@ class TC_SC_4_3(MatterTestCommissionedDevice):
                          "Verify DUT returns a PTR record with DNS-SD instance name set to instance_name"),
                 ]
 
-    async def get_descriptor_server_list(self):
-        return await self.read_single_attribute_check_success(
-            endpoint=0,
-            dev_ctrl=self.default_controller,
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.ServerList
-        )
-
-    async def get_idle_mode_threshhold_ms(self):
-        return await self.read_single_attribute_check_success(
-            endpoint=0,
-            dev_ctrl=self.default_controller,
-            cluster=Clusters.IcdManagement,
-            attribute=Clusters.IcdManagement.Attributes.ActiveModeThreshold
-        )
-
-    async def get_icd_feature_map(self):
-        return await self.read_single_attribute_check_success(
-            endpoint=0,
-            dev_ctrl=self.default_controller,
-            cluster=Clusters.IcdManagement,
-            attribute=Clusters.IcdManagement.Attributes.FeatureMap
-        )
-
-    def get_dut_instance_name(self, log_result: bool = False) -> str:
-        node_id = self.dut_node_id
-        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
-        instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
-        if log_result:
-            log.info("\n\n\tDUT Instance Name: %s\n", instance_name)
-        return instance_name
-
     def get_operational_subtype(self, log_result: bool = False) -> str:
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         operational_subtype = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
         if log_result:
             log.info("\n\n\tOperational Subtype: %s\n", operational_subtype)
         return operational_subtype
-
-    @staticmethod
-    def verify_decimal_value(input_value, max_value: int):
-        try:
-            input_float = float(input_value)
-            input_int = int(input_float)
-
-            if str(input_value).startswith("0") and input_int != 0:
-                return (False, f"Input ({input_value}) has leading zeros.")
-
-            if input_float != input_int:
-                return (False, f"Input ({input_value}) is not an integer.")
-
-            if input_int <= max_value:
-                return (True, f"Input ({input_value}) is valid.")
-            return (False, f"Input ({input_value}) exceeds the allowed value {max_value}.")
-        except ValueError:
-            return (False, f"Input ({input_value}) is not a valid decimal number.")
 
     def desc_TC_SC_4_3(self) -> str:
         return "[TC-SC-4.3] Discovery [DUT as Commissionee]"
@@ -198,7 +143,7 @@ class TC_SC_4_3(MatterTestCommissionedDevice):
         # feature is set, set supports_lit to true. Otherwise set supports_lit to false.
         self.step(2)
         if supports_icd:
-            active_mode_threshold_ms = await self.get_idle_mode_threshhold_ms()
+            active_mode_threshold_ms = await self.get_active_mode_threshold_ms()
         log.info("active_mode_threshold_ms: %s", active_mode_threshold_ms)
 
         if supports_icd:

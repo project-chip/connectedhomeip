@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -60,7 +60,7 @@ Davis, CA 95616, USA
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0090" name="Network Infrastructure Manager" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
-    <revision revision="2" summary="Added Thread Network Diagnostics requirement; extended &quot;Other Requirements&quot; section"/>
+    <revision revision="2" summary="Added Thread Network Diagnostics requirement; extended &quot;Other Requirements&quot; subclause"/>
     <revision revision="3" summary="Added optional Network Identity Management cluster. Added optional Commissioning Proxy Cluster."/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>

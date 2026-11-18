@@ -71,7 +71,7 @@ class TC_EEVSE_2_10(MatterTestCommissionedDevice, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_10(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("1a", "Set up a subscription to all EnergyEVSE cluster events"),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),

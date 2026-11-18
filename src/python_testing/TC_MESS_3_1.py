@@ -21,6 +21,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-stdin-pipe: dut-tv-app-stdin
 #     script-args: >
 #       --endpoint 1
 #       --storage-path admin_storage.json
@@ -68,8 +69,7 @@ class TC_MESS_3_1(MatterTestCommissionedDevice, MESSTestBase):
 
     def steps_TC_MESS_3_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done. TH subscribes to events on the DUT.",
-                     is_commissioning=True),
+            TestStep(0, "Commissioning, already done. TH subscribes to events on the DUT."),
             TestStep(1, "TH reads the SupportedLanguageCodes attribute.",
                      "Verify that at least one language tag is returned. Record the first supported language tag as "
                      "supportedLangCode."),

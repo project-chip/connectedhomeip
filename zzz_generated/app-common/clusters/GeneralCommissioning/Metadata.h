@@ -26,21 +26,24 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Breadcrumb::Id, BitFla
                                                           Access::Privilege::kView, Access::Privilege::kAdminister);
 } // namespace Breadcrumb
 namespace BasicCommissioningInfo {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BasicCommissioningInfo::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BasicCommissioningInfo::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BasicCommissioningInfo
 namespace RegulatoryConfig {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(RegulatoryConfig::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace RegulatoryConfig
 namespace LocationCapability {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(LocationCapability::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(LocationCapability::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace LocationCapability
 namespace SupportsConcurrentConnection {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportsConcurrentConnection::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportsConcurrentConnection::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace SupportsConcurrentConnection
 namespace TCAcceptedVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TCAcceptedVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),

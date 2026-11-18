@@ -62,7 +62,7 @@ class TC_ESALM_2_1(MatterTestCommissionedDevice):
         endpoint = self.get_endpoint()
         attrs = cluster.Attributes
 
-        self.step(1, "Commission DUT to TH", is_commissioning=True)
+        self.step(1, "Commission DUT to TH")
 
         self.step(2, "TH reads from the DUT the FeatureMap attribute.",
                   expectation="Verify that the DUT response contains a uint32 value. Store the value as FeatureMap.")

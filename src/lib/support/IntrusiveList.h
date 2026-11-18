@@ -133,6 +133,17 @@ private:
         mNext        = node;
     }
 
+    void SwapWithNext()
+    {
+        IntrusiveListNodePrivateBase * next = mNext;
+        mPrev->mNext                        = next;
+        next->mNext->mPrev                  = this;
+        mNext                               = next->mNext;
+        next->mPrev                         = mPrev;
+        next->mNext                         = this;
+        mPrev                               = next;
+    }
+
 protected:
     void Remove()
     {
@@ -325,6 +336,14 @@ protected:
     void InsertAfter(IteratorBase pos, IntrusiveListNodePrivateBase * node) { pos.mCurrent->Append(node); }
     void Remove(IntrusiveListNodePrivateBase * node) { node->Remove(); }
 
+    /// @brief Swap the node at `pos` with the node after it. `pos` keeps referring to the same node, which is
+    /// now one position further along. There must be a node after `pos`.
+    void SwapWithNext(IteratorBase pos)
+    {
+        VerifyOrDie(pos.mCurrent->IsInList() && pos.mCurrent != &mNode && pos.mCurrent->mNext != &mNode);
+        pos.mCurrent->SwapWithNext();
+    }
+
     /// @brief Replace an original node in list with a new node.
     void Replace(IntrusiveListNodePrivateBase * original, IntrusiveListNodePrivateBase * replacement)
     {
@@ -446,6 +465,7 @@ public:
     void PushBack(T * value) { IntrusiveListBase::PushBack(Hook::ToNode(value)); }
     void InsertBefore(Iterator pos, T * value) { IntrusiveListBase::InsertBefore(pos, Hook::ToNode(value)); }
     void InsertAfter(Iterator pos, T * value) { IntrusiveListBase::InsertAfter(pos, Hook::ToNode(value)); }
+    void SwapWithNext(Iterator pos) { IntrusiveListBase::SwapWithNext(pos); }
     void Remove(T * value) { IntrusiveListBase::Remove(Hook::ToNode(value)); }
     void Replace(T * original, T * replacement) { IntrusiveListBase::Replace(Hook::ToNode(original), Hook::ToNode(replacement)); }
     bool Contains(const T * value) const { return IntrusiveListBase::Contains(Hook::ToNode(value)); }

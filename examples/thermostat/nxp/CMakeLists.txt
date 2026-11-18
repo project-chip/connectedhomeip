@@ -73,6 +73,7 @@ project(chip-nxp-thermostat-app-example)
 
 # Add application definitions, include paths and source files
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+include(${CHIP_ROOT}/examples/thermostat/thermostat-common/thermostat-common.cmake)
 
 # Add NXP common application files
 include(${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_common.cmake)
@@ -92,6 +93,8 @@ target_sources(app
     ${NXP_EXAMPLE_DIR}/main/ZclCallbacks.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
 )
+
+chip_add_thermostat_common(app)
 
 if(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
     chip_configure_data_model(app

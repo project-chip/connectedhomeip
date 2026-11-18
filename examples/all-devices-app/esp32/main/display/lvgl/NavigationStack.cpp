@@ -17,11 +17,13 @@
  */
 
 #include "NavigationStack.h"
+#include "DisplayBoard.h"
+#include "Ui.h"
 
+#include <cstdio>
 #include <vector>
 
 namespace NavigationStack {
-
 namespace {
 
 struct StackEntry
@@ -30,9 +32,19 @@ struct StackEntry
     RenderScreenFn renderFn;
 };
 
+struct Indicators
+{
+    bool wifiConnected  = false;
+    bool bleConnected   = false;
+    uint8_t fabricCount = 0;
+};
+
 std::vector<StackEntry> sStack;
+Indicators sIndicators;
+
 lv_obj_t * sTopBar           = nullptr;
 lv_obj_t * sCrumbContainer   = nullptr;
+lv_obj_t * sStatusContainer  = nullptr;
 lv_obj_t * sContentContainer = nullptr;
 
 void OnCrumbClicked(lv_event_t * event)
@@ -41,67 +53,115 @@ void OnCrumbClicked(lv_event_t * event)
     PopTo(targetLevel);
 }
 
-void RefreshView()
+lv_obj_t * CreateIndicator(lv_obj_t * parent, const char * text, lv_color_t color)
+{
+    lv_obj_t * label = lv_label_create(parent);
+    lv_label_set_text(label, text);
+    lv_obj_set_style_text_font(label, Ui::CaptionFont(), LV_PART_MAIN);
+    lv_obj_set_style_text_color(label, color, LV_PART_MAIN);
+    return label;
+}
+
+void RenderIndicators()
+{
+    if (sStatusContainer == nullptr)
+    {
+        return;
+    }
+    lv_obj_clean(sStatusContainer);
+
+    if (sIndicators.bleConnected)
+    {
+        CreateIndicator(sStatusContainer, LV_SYMBOL_BLUETOOTH, Ui::Accent());
+    }
+
+    CreateIndicator(sStatusContainer, LV_SYMBOL_WIFI, sIndicators.wifiConnected ? Ui::Success() : Ui::TextMuted());
+
+    if (sIndicators.fabricCount > 0)
+    {
+        char text[16];
+        snprintf(text, sizeof(text), LV_SYMBOL_HOME " %u", static_cast<unsigned>(sIndicators.fabricCount));
+        CreateIndicator(sStatusContainer, text, Ui::Success());
+    }
+}
+
+void AddChevron(lv_obj_t * parent)
+{
+    lv_obj_t * chevron = lv_label_create(parent);
+    lv_label_set_text_static(chevron, LV_SYMBOL_RIGHT);
+    lv_obj_set_style_text_font(chevron, Ui::CaptionFont(), LV_PART_MAIN);
+    lv_obj_set_style_text_color(chevron, Ui::TextMuted(), LV_PART_MAIN);
+}
+
+void AddAncestorPill(lv_obj_t * parent, const StackEntry & entry, size_t level)
+{
+    lv_obj_t * pill = lv_button_create(parent);
+    lv_obj_set_height(pill, Ui::Px(36, 28));
+    lv_obj_set_style_radius(pill, LV_RADIUS_CIRCLE, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(pill, Ui::SurfaceRaised(), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(pill, Ui::Outline(), LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_pad_hor(pill, Ui::Px(14, 8), LV_PART_MAIN);
+    lv_obj_set_style_pad_ver(pill, 0, LV_PART_MAIN);
+    lv_obj_set_ext_click_area(pill, 8);
+    lv_obj_add_event_cb(pill, OnCrumbClicked, LV_EVENT_CLICKED, reinterpret_cast<void *>(static_cast<uintptr_t>(level)));
+
+    lv_obj_t * label = lv_label_create(pill);
+    if (level == 0)
+    {
+        lv_label_set_text_static(label, LV_SYMBOL_HOME);
+    }
+    else
+    {
+        lv_label_set_text(label, entry.title.c_str());
+    }
+    lv_obj_set_style_text_font(label, Ui::CaptionFont(), LV_PART_MAIN);
+    lv_obj_set_style_text_color(label, Ui::Text(), LV_PART_MAIN);
+    lv_obj_center(label);
+}
+
+void AddCurrentTitle(lv_obj_t * parent, const StackEntry & entry, bool isRoot)
+{
+    lv_obj_t * title = lv_label_create(parent);
+    if (isRoot)
+    {
+        lv_label_set_text_fmt(title, LV_SYMBOL_HOME "  %s", entry.title.c_str());
+    }
+    else
+    {
+        lv_label_set_text(title, entry.title.c_str());
+    }
+    lv_obj_set_style_text_font(title, Ui::HeadingFont(), LV_PART_MAIN);
+    lv_obj_set_style_text_color(title, Ui::Text(), LV_PART_MAIN);
+    lv_obj_set_style_pad_left(title, Ui::Px(6, 2), LV_PART_MAIN);
+    lv_obj_scroll_to_view(title, LV_ANIM_OFF);
+}
+
+void RefreshView(bool forward)
 {
     if (sStack.empty() || sContentContainer == nullptr || sTopBar == nullptr)
     {
         return;
     }
 
-    // Refresh breadcrumbs. The current page is not shown: its name is already in the page
-    // header and long names push the clickable ancestors off screen. At the root there is no
-    // ancestor, so that single entry is shown instead.
     lv_obj_clean(sCrumbContainer);
-    const size_t crumbCount = (sStack.size() == 1) ? 1 : sStack.size() - 1;
-    for (size_t i = 0; i < crumbCount; ++i)
+    for (size_t i = 0; i + 1 < sStack.size(); ++i)
     {
         if (i > 0)
         {
-            lv_obj_t * sep = lv_label_create(sCrumbContainer);
-            lv_label_set_text_static(sep, ">");
-            lv_obj_set_style_text_color(sep, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
+            AddChevron(sCrumbContainer);
         }
-
-        if (sStack.size() == 1)
-        {
-            // Root: nothing to navigate back to, so a static label rather than a pill.
-            lv_obj_t * rootLabel = lv_label_create(sCrumbContainer);
-            lv_label_set_text(rootLabel, sStack[i].title.c_str());
-            lv_obj_set_style_text_color(rootLabel, lv_color_white(), LV_PART_MAIN);
-            lv_obj_set_style_pad_left(rootLabel, 4, LV_PART_MAIN);
-            lv_obj_set_style_pad_right(rootLabel, 4, LV_PART_MAIN);
-        }
-        else
-        {
-            // Ancestor link: clickable pill button
-            lv_obj_t * crumbBtn = lv_button_create(sCrumbContainer);
-            lv_obj_set_height(crumbBtn, 30);
-            lv_obj_set_style_pad_top(crumbBtn, 2, LV_PART_MAIN);
-            lv_obj_set_style_pad_bottom(crumbBtn, 2, LV_PART_MAIN);
-            lv_obj_set_style_pad_left(crumbBtn, 8, LV_PART_MAIN);
-            lv_obj_set_style_pad_right(crumbBtn, 8, LV_PART_MAIN);
-            lv_obj_set_style_radius(crumbBtn, 4, LV_PART_MAIN);
-            lv_obj_set_style_bg_color(crumbBtn, lv_palette_darken(LV_PALETTE_GREY, 3), LV_PART_MAIN);
-            lv_obj_set_ext_click_area(crumbBtn, 6);
-
-            lv_obj_t * crumbLabel = lv_label_create(crumbBtn);
-            lv_label_set_text(crumbLabel, sStack[i].title.c_str());
-            lv_obj_set_style_text_color(crumbLabel, lv_palette_lighten(LV_PALETTE_BLUE, 2), LV_PART_MAIN);
-            lv_obj_center(crumbLabel);
-
-            lv_obj_add_event_cb(crumbBtn, OnCrumbClicked, LV_EVENT_CLICKED, reinterpret_cast<void *>(static_cast<uintptr_t>(i)));
-
-            // Keep the deepest crumb visible when the chain is wider than the bar.
-            if (i == crumbCount - 1)
-            {
-                lv_obj_scroll_to_view(crumbBtn, LV_ANIM_OFF);
-            }
-        }
+        AddAncestorPill(sCrumbContainer, sStack[i], i);
     }
+    if (sStack.size() > 1)
+    {
+        AddChevron(sCrumbContainer);
+    }
+    AddCurrentTitle(sCrumbContainer, sStack.back(), sStack.size() == 1);
 
-    // Render content
     lv_obj_clean(sContentContainer);
+    lv_obj_set_style_translate_x(sContentContainer, 0, LV_PART_MAIN);
     sStack.back().renderFn(sContentContainer);
+    Ui::AnimateEntrance(sContentContainer, forward);
 }
 
 } // namespace
@@ -112,51 +172,57 @@ void Init(lv_obj_t * rootScreen)
 
     lv_obj_clean(rootScreen);
     lv_obj_set_flex_flow(rootScreen, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_all(rootScreen, 0, LV_PART_MAIN);
-    lv_obj_set_style_pad_row(rootScreen, 0, LV_PART_MAIN);
+    lv_obj_set_style_pad_all(rootScreen, DisplayBoard::EdgeInset(), LV_PART_MAIN);
+    lv_obj_set_style_pad_row(rootScreen, Ui::Px(6, 0), LV_PART_MAIN);
     lv_obj_clear_flag(rootScreen, LV_OBJ_FLAG_SCROLLABLE);
 
-    // Top Bar (38px high)
     sTopBar = lv_obj_create(rootScreen);
-    lv_obj_set_size(sTopBar, LV_PCT(100), 38);
+    lv_obj_remove_style_all(sTopBar);
+    lv_obj_set_size(sTopBar, LV_PCT(100), Ui::Px(56, 38));
     lv_obj_set_flex_flow(sTopBar, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(sTopBar, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_top(sTopBar, 4, LV_PART_MAIN);
-    lv_obj_set_style_pad_bottom(sTopBar, 4, LV_PART_MAIN);
-    lv_obj_set_style_pad_left(sTopBar, 6, LV_PART_MAIN);
-    lv_obj_set_style_pad_right(sTopBar, 6, LV_PART_MAIN);
-    lv_obj_set_style_pad_column(sTopBar, 6, LV_PART_MAIN);
-    lv_obj_set_style_bg_color(sTopBar, lv_palette_darken(LV_PALETTE_GREY, 4), LV_PART_MAIN);
-    lv_obj_set_style_border_width(sTopBar, 0, LV_PART_MAIN);
-    lv_obj_set_style_radius(sTopBar, 0, LV_PART_MAIN);
+    lv_obj_set_flex_align(sTopBar, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_hor(sTopBar, Ui::Px(8, 6), LV_PART_MAIN);
+    lv_obj_set_style_pad_column(sTopBar, Ui::Px(10, 6), LV_PART_MAIN);
+    lv_obj_set_style_border_side(sTopBar, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN);
+    lv_obj_set_style_border_width(sTopBar, 1, LV_PART_MAIN);
+    lv_obj_set_style_border_color(sTopBar, Ui::Outline(), LV_PART_MAIN);
+    lv_obj_set_style_border_opa(sTopBar, LV_OPA_50, LV_PART_MAIN);
     lv_obj_clear_flag(sTopBar, LV_OBJ_FLAG_SCROLLABLE);
 
-    // Breadcrumb container (spans full top bar)
     sCrumbContainer = lv_obj_create(sTopBar);
-    lv_obj_set_size(sCrumbContainer, LV_PCT(100), LV_PCT(100));
+    lv_obj_remove_style_all(sCrumbContainer);
+    lv_obj_set_height(sCrumbContainer, LV_PCT(100));
+    lv_obj_set_flex_grow(sCrumbContainer, 1);
     lv_obj_set_flex_flow(sCrumbContainer, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(sCrumbContainer, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(sCrumbContainer, 0, LV_PART_MAIN);
-    lv_obj_set_style_pad_column(sCrumbContainer, 4, LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(sCrumbContainer, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_set_style_border_width(sCrumbContainer, 0, LV_PART_MAIN);
+    lv_obj_set_style_pad_column(sCrumbContainer, Ui::Px(8, 4), LV_PART_MAIN);
     lv_obj_add_flag(sCrumbContainer, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_scroll_dir(sCrumbContainer, LV_DIR_HOR);
     lv_obj_set_scrollbar_mode(sCrumbContainer, LV_SCROLLBAR_MODE_OFF);
 
-    // Content container (remaining height, ~202px)
+    sStatusContainer = lv_obj_create(sTopBar);
+    lv_obj_remove_style_all(sStatusContainer);
+    lv_obj_set_size(sStatusContainer, LV_SIZE_CONTENT, LV_PCT(100));
+    lv_obj_set_flex_flow(sStatusContainer, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(sStatusContainer, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_column(sStatusContainer, Ui::Px(12, 6), LV_PART_MAIN);
+    lv_obj_clear_flag(sStatusContainer, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(sStatusContainer, LV_OBJ_FLAG_CLICKABLE);
+    RenderIndicators();
+
     sContentContainer = lv_obj_create(rootScreen);
-    lv_obj_set_size(sContentContainer, LV_PCT(100), LV_PCT(100));
+    lv_obj_remove_style_all(sContentContainer);
+    lv_obj_set_width(sContentContainer, LV_PCT(100));
     lv_obj_set_flex_grow(sContentContainer, 1);
-    lv_obj_set_style_pad_all(sContentContainer, 0, LV_PART_MAIN);
-    lv_obj_set_style_border_width(sContentContainer, 0, LV_PART_MAIN);
-    lv_obj_set_style_radius(sContentContainer, 0, LV_PART_MAIN);
+    lv_obj_add_flag(sContentContainer, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scroll_dir(sContentContainer, LV_DIR_VER);
+    lv_obj_set_scrollbar_mode(sContentContainer, LV_SCROLLBAR_MODE_AUTO);
 }
 
 void Push(const std::string & title, RenderScreenFn renderFn)
 {
     sStack.push_back({ title, renderFn });
-    RefreshView();
+    RefreshView(true);
 }
 
 void Pop()
@@ -164,7 +230,7 @@ void Pop()
     if (sStack.size() > 1)
     {
         sStack.pop_back();
-        RefreshView();
+        RefreshView(false);
     }
 }
 
@@ -173,7 +239,7 @@ void PopTo(size_t level)
     if (level < sStack.size())
     {
         sStack.erase(sStack.begin() + level + 1, sStack.end());
-        RefreshView();
+        RefreshView(false);
     }
 }
 
@@ -182,8 +248,13 @@ void ResetToRoot()
     if (sStack.size() > 1)
     {
         sStack.erase(sStack.begin() + 1, sStack.end());
-        RefreshView();
+        RefreshView(false);
     }
+}
+
+void RefreshCurrent()
+{
+    RefreshView(false);
 }
 
 size_t GetDepth()
@@ -191,11 +262,18 @@ size_t GetDepth()
     return sStack.size();
 }
 
+void SetIndicators(bool wifiConnected, bool bleConnected, uint8_t fabricCount)
+{
+    sIndicators = { wifiConnected, bleConnected, fabricCount };
+    RenderIndicators();
+}
+
 void Detach()
 {
     sStack.clear();
     sTopBar           = nullptr;
     sCrumbContainer   = nullptr;
+    sStatusContainer  = nullptr;
     sContentContainer = nullptr;
 }
 

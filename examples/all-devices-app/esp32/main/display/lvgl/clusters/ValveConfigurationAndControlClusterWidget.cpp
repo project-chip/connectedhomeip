@@ -120,14 +120,12 @@ uint8_t SnapToLevelStep(uint8_t level, uint8_t levelStep)
 lv_obj_t * CreateButtonRow(lv_obj_t * card)
 {
     lv_obj_t * row = lv_obj_create(card);
+    lv_obj_remove_style_all(row);
     lv_obj_set_width(row, LV_PCT(100));
     lv_obj_set_height(row, 36);
     lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(row, 0, LV_PART_MAIN);
     lv_obj_set_style_pad_column(row, 6, LV_PART_MAIN);
-    lv_obj_set_style_border_width(row, 0, LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(row, LV_OPA_TRANSP, LV_PART_MAIN);
     lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLLABLE);
     return row;
 }
