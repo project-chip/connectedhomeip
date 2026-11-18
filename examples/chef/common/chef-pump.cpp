@@ -108,8 +108,6 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
 
     DataModel::Nullable<int16_t> capacity = onOff ? DataModel::Nullable<int16_t>(kMaxCapacity) : DataModel::Nullable<int16_t>(0);
     PumpConfigurationAndControl::Attributes::Capacity::Set(endpointId, capacity);
-    MatterReportingAttributeChangeCallback(endpointId, PumpConfigurationAndControl::Id,
-                                           PumpConfigurationAndControl::Attributes::Capacity::Id);
 }
 
 constexpr size_t kLevelControlCount = MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
@@ -175,8 +173,6 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
     DataModel::Nullable<int16_t> capacity =
         LevelToSetpoint(level, DataModel::Nullable<int16_t>(kMinCapacity), DataModel::Nullable<int16_t>(kMaxCapacity));
     PumpConfigurationAndControl::Attributes::Capacity::Set(endpointId, capacity);
-    MatterReportingAttributeChangeCallback(endpointId, PumpConfigurationAndControl::Id,
-                                           PumpConfigurationAndControl::Attributes::Capacity::Id);
 }
 
 CHIP_ERROR setPumpStatus(EndpointId endpoint, uint16_t status)
@@ -185,8 +181,6 @@ CHIP_ERROR setPumpStatus(EndpointId endpoint, uint16_t status)
     Status res = PumpConfigurationAndControl::Attributes::PumpStatus::Set(
         endpoint, BitMask<PumpConfigurationAndControl::PumpStatusBitmap>(status));
     VerifyOrReturnLogError(res == Status::Success, CHIP_ERROR_INTERNAL);
-    MatterReportingAttributeChangeCallback(endpoint, PumpConfigurationAndControl::Id,
-                                           PumpConfigurationAndControl::Attributes::PumpStatus::Id);
     return CHIP_NO_ERROR;
 }
 } // namespace
