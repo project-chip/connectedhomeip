@@ -189,6 +189,77 @@ TEST_F(TestPumpConfigurationAndControlCluster, ReadAttributes)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestPumpConfigurationAndControlCluster, SpecFallbackValues)
+{
+    // Every attribute enabled, nothing configured and nothing persisted: reads return the
+    // Fallback column of the spec attribute table.
+    PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures(
+        BitFlags<Feature>(Feature::kConstantPressure, Feature::kCompensatedPressure, Feature::kConstantFlow,
+                          Feature::kConstantSpeed, Feature::kConstantTemperature, Feature::kAutomatic, Feature::kLocalOperation));
+    config.optionalAttributes.pumpStatus             = true;
+    config.optionalAttributes.speed                  = true;
+    config.optionalAttributes.lifetimeRunningHours   = true;
+    config.optionalAttributes.power                  = true;
+    config.optionalAttributes.lifetimeEnergyConsumed = true;
+    config.optionalAttributes.controlMode            = true;
+
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+
+    // Fallback null. The read targets start non-null so that a read which does not update them fails.
+    for (AttributeId id : { MaxPressure::Id, MinConstPressure::Id, MaxConstPressure::Id, MinCompPressure::Id, MaxCompPressure::Id,
+                            MinConstTemp::Id, MaxConstTemp::Id, Capacity::Id })
+    {
+        DataModel::Nullable<int16_t> value = DataModel::MakeNullable(static_cast<int16_t>(1));
+        ASSERT_SUCCESS(tester.ReadAttribute(id, value));
+        EXPECT_TRUE(value.IsNull()) << "attribute " << id;
+    }
+    for (AttributeId id :
+         { MaxSpeed::Id, MaxFlow::Id, MinConstSpeed::Id, MaxConstSpeed::Id, MinConstFlow::Id, MaxConstFlow::Id, Speed::Id })
+    {
+        DataModel::Nullable<uint16_t> value = DataModel::MakeNullable(static_cast<uint16_t>(1));
+        ASSERT_SUCCESS(tester.ReadAttribute(id, value));
+        EXPECT_TRUE(value.IsNull()) << "attribute " << id;
+    }
+    {
+        DataModel::Nullable<uint32_t> power = DataModel::MakeNullable(static_cast<uint32_t>(1));
+        ASSERT_SUCCESS(tester.ReadAttribute(Power::Id, power));
+        EXPECT_TRUE(power.IsNull());
+    }
+
+    // Fallback 0.
+    PumpConfigurationAndControlCluster::PumpStatusBitMask pumpStatus(static_cast<uint16_t>(0xFFFF));
+    ASSERT_SUCCESS(tester.ReadAttribute(PumpStatus::Id, pumpStatus));
+    EXPECT_EQ(pumpStatus.Raw(), 0u);
+
+    for (AttributeId id : { LifetimeRunningHours::Id, LifetimeEnergyConsumed::Id })
+    {
+        DataModel::Nullable<uint32_t> value;
+        ASSERT_SUCCESS(tester.ReadAttribute(id, value));
+        EXPECT_EQ(value, DataModel::MakeNullable(static_cast<uint32_t>(0))) << "attribute " << id;
+    }
+
+    OperationModeEnum operationMode = OperationModeEnum::kLocal;
+    ASSERT_SUCCESS(tester.ReadAttribute(OperationMode::Id, operationMode));
+    EXPECT_EQ(operationMode, OperationModeEnum::kNormal);
+
+    ControlModeEnum controlMode = ControlModeEnum::kAutomatic;
+    ASSERT_SUCCESS(tester.ReadAttribute(ControlMode::Id, controlMode));
+    EXPECT_EQ(controlMode, ControlModeEnum::kConstantSpeed);
+
+    // The Effective* fallbacks are "desc": they follow OperationMode Normal and ControlMode ConstantSpeed.
+    operationMode = OperationModeEnum::kLocal;
+    ASSERT_SUCCESS(tester.ReadAttribute(EffectiveOperationMode::Id, operationMode));
+    EXPECT_EQ(operationMode, OperationModeEnum::kNormal);
+
+    controlMode = ControlModeEnum::kAutomatic;
+    ASSERT_SUCCESS(tester.ReadAttribute(EffectiveControlMode::Id, controlMode));
+    EXPECT_EQ(controlMode, ControlModeEnum::kConstantSpeed);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestPumpConfigurationAndControlCluster, OperationModeRequiresFeature)
 {
     {
