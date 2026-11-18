@@ -53,8 +53,8 @@ void CameraAVStreamManager::SyncCurrentFrameRateFromHAL()
 {
     if (GetCameraAVStreamManagementCluster() != nullptr && mCameraDeviceHAL != nullptr)
     {
-        TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()->SetCurrentFrameRate(
-            mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+        TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()
+            -> SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
     }
 }
 
@@ -408,8 +408,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
             mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamAllocated(outStreamID);
 
             // Set the current frame rate attribute from HAL
-            TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()->SetCurrentFrameRate(
-                mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+            TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()
+                -> SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
 
             return Status::Success;
         }
@@ -428,8 +428,8 @@ void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & all
         mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(allocatedStream);
 
         // Set the current frame rate attribute from HAL once stream has started
-        TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()->SetCurrentFrameRate(
-            mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+        TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()
+            -> SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
         break;
 
     case StreamAllocationAction::kModification:
@@ -442,15 +442,33 @@ void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & all
                 ChipLogProgress(Camera, "Restarting video stream with ID: %u due to modifications", allocatedStream.videoStreamID);
                 mCameraDeviceHAL->GetCameraHALInterface().StopVideoStream(allocatedStream.videoStreamID);
                 mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(allocatedStream);
-                TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()->SetCurrentFrameRate(
-                    mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+                TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()
+                    -> SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
                 break;
             }
         }
         break;
 
     case StreamAllocationAction::kReuse:
-        ChipLogProgress(Camera, "Reusing existing video stream with ID: %u without changes", allocatedStream.videoStreamID);
+        for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
+        {
+            if (stream.videoStreamParams.videoStreamID == allocatedStream.videoStreamID && stream.isAllocated)
+            {
+                if (stream.videoContext == nullptr)
+                {
+                    ChipLogProgress(Camera, "Restarting inactive allocated video stream with ID: %u on reuse",
+                                    allocatedStream.videoStreamID);
+                    mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(allocatedStream);
+                    SyncCurrentFrameRateFromHAL();
+                }
+                else
+                {
+                    ChipLogProgress(Camera, "Reusing existing video stream with ID: %u without changes",
+                                    allocatedStream.videoStreamID);
+                }
+                break;
+            }
+        }
         break;
     }
 }
@@ -490,8 +508,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate
         {
             // Stop the video stream
             mCameraDeviceHAL->GetCameraHALInterface().StopVideoStream(streamID);
-            TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()->SetCurrentFrameRate(
-                mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+            TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()
+                -> SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
 
             stream.isAllocated = false;
 
@@ -1049,6 +1067,12 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(const std::vector<uin
         {
             if (stream.videoStreamParams.videoStreamID == videoStreamID && stream.isAllocated)
             {
+                if (stream.videoContext == nullptr)
+                {
+                    ChipLogProgress(Camera, "Restarting inactive allocated video stream %u on transport acquire", videoStreamID);
+                    mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(stream.videoStreamParams);
+                    SyncCurrentFrameRateFromHAL();
+                }
                 if (stream.videoStreamParams.referenceCount < UINT8_MAX)
                 {
                     stream.videoStreamParams.referenceCount++;

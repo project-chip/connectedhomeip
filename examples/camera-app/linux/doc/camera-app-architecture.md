@@ -436,9 +436,10 @@ graph TD
     (`stream_tee`), creates a per-stream video branch bin
     (`CreateVideoBranchBin`), and dynamically attaches it via
     `AttachStreamBranch`:
-    -   Shared capture pipeline: captures raw frames from `v4l2src`,
-        `libcamerasrc`, or `videotestsrc`, applies source caps, converts to
-        `I420` (`videoconvert`), and fans out frames through `stream_tee`.
+    -   Shared capture pipeline: captures raw or MJPEG frames from `v4l2src` or
+        `libcamerasrc` (decoding via `decodebin` on hardware sources) or raw
+        frames from `videotestsrc`, applies source caps, converts to `I420`
+        (`videoconvert`), and fans out frames through `stream_tee`.
     -   Per-stream video branch bin: buffers and converts to the stream's target
         dimensions and frame rate (`queue` -> `videoscale` -> `videorate` ->
         `capsfilter`), applies privacy-zone `I420` masks on the encoder sink pad
@@ -458,9 +459,9 @@ graph TD
 ### Snapshot
 
 1.  A Matter client allocates a snapshot stream via `SnapshotStreamAllocate`
-    (which starts and attaches a `CreateSnapshotBranchBin` branch to the shared
-    capture `stream_tee`) and requests a snapshot via `CaptureSnapshot` on the
-    `CameraAVStreamManagement` cluster.
+    (which attempts to start and attach a `CreateSnapshotBranchBin` branch to
+    the shared capture `stream_tee`) and requests a snapshot via
+    `CaptureSnapshot` on the `CameraAVStreamManagement` cluster.
 2.  The `CameraAVStreamManagementCluster` receives the request and calls the
     `CaptureSnapshot` method on the `CameraAVStreamManager`.
 3.  `CameraAVStreamManager` delegates the call to

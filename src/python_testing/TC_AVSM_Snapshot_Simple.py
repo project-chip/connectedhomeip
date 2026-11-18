@@ -37,6 +37,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import sys
 
 from mobly import asserts
 
@@ -288,11 +289,12 @@ class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
                     s_args["OSDEnabled"] = False
                 return commands.SnapshotStreamAllocate(**s_args)
 
-            async def dealloc_quietly(cmd):
+            async def dealloc_quietly(cmd, cleanup_errors):
                 try:
                     await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
                 except InteractionModelError as e:
                     log.error("Cleanup command %s failed: %s", cmd, e)
+                    cleanup_errors.append((cmd, e))
 
             def extract_jpeg_dimensions(jpeg_bytes: bytes):
                 idx = 2
@@ -343,6 +345,7 @@ class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
             # Case 1: Allocate lower-res Video stream first, then higher-res Snapshot stream second; deallocate Video first, then Snapshot
             video_id = None
             snap_id = None
+            cleanup_errors = []
             try:
                 video_resp = await self.send_single_cmd(endpoint=endpoint, cmd=make_video_alloc_cmd(30))
                 video_id = video_resp.videoStreamID
@@ -356,25 +359,41 @@ class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
 
                 await assert_valid_snapshot_capture(snap_id, selected_cap)
                 await assert_valid_snapshot_capture(NullValue, selected_cap)
+                current_fps = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=attr.CurrentFrameRate
+                )
+                asserts.assert_equal(current_fps, 30, "Video stream stopped unexpectedly during concurrent snapshot capture")
 
                 # Stop Video stream while Snapshot stream stays active, and verify CaptureSnapshot still succeeds
                 await self.send_single_cmd(
                     endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=video_id)
                 )
                 video_id = None
+                current_fps = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=attr.CurrentFrameRate
+                )
+                asserts.assert_equal(current_fps, 0, "CurrentFrameRate did not return to 0 after video stream deallocation")
 
                 await assert_valid_snapshot_capture(snap_id, selected_cap)
+                await self.send_single_cmd(
+                    endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id)
+                )
+                snap_id = None
             finally:
+                has_active_exc = sys.exc_info()[0] is not None
                 if video_id is not None:
-                    await dealloc_quietly(commands.VideoStreamDeallocate(videoStreamID=video_id))
+                    await dealloc_quietly(commands.VideoStreamDeallocate(videoStreamID=video_id), cleanup_errors)
                 if snap_id is not None:
-                    await dealloc_quietly(commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id))
+                    await dealloc_quietly(commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id), cleanup_errors)
+                if not has_active_exc and cleanup_errors:
+                    asserts.fail(f"Case 1 stream cleanup failed: {cleanup_errors}")
 
             # Case 2: Allocate lower-res Snapshot stream first, then higher-fps Video stream second, then higher-res Snapshot stream;
             # deallocate Snapshot streams first, then Video
             video_id = None
             snap_id = None
             snap_hd_id = None
+            cleanup_errors = []
             try:
                 snap_resp = await self.send_single_cmd(endpoint=endpoint, cmd=make_snapshot_alloc_cmd(caps[0]))
                 snap_id = snap_resp.snapshotStreamID
@@ -411,17 +430,37 @@ class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
                     endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id)
                 )
                 snap_id = None
+                current_fps = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=attr.CurrentFrameRate
+                )
+                asserts.assert_equal(
+                    current_fps,
+                    target_fps,
+                    "Video stream stopped unexpectedly when concurrent snapshot stream was deallocated",
+                )
 
                 snap_resp = await self.send_single_cmd(endpoint=endpoint, cmd=make_snapshot_alloc_cmd(selected_cap))
                 snap_id = snap_resp.snapshotStreamID
                 await assert_valid_snapshot_capture(snap_id, selected_cap)
+
+                await self.send_single_cmd(
+                    endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id)
+                )
+                snap_id = None
+                await self.send_single_cmd(
+                    endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=video_id)
+                )
+                video_id = None
             finally:
+                has_active_exc = sys.exc_info()[0] is not None
                 if snap_hd_id is not None:
-                    await dealloc_quietly(commands.SnapshotStreamDeallocate(snapshotStreamID=snap_hd_id))
+                    await dealloc_quietly(commands.SnapshotStreamDeallocate(snapshotStreamID=snap_hd_id), cleanup_errors)
                 if snap_id is not None:
-                    await dealloc_quietly(commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id))
+                    await dealloc_quietly(commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id), cleanup_errors)
                 if video_id is not None:
-                    await dealloc_quietly(commands.VideoStreamDeallocate(videoStreamID=video_id))
+                    await dealloc_quietly(commands.VideoStreamDeallocate(videoStreamID=video_id), cleanup_errors)
+                if not has_active_exc and cleanup_errors:
+                    asserts.fail(f"Case 2 stream cleanup failed: {cleanup_errors}")
 
 
 if __name__ == "__main__":

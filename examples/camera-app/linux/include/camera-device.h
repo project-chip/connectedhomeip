@@ -393,6 +393,7 @@ public:
     bool ComputeVideoStreamPtsMs(uint16_t videoStreamID, GstClockTime rawPts, int64_t & outTimestampMs, int64_t & outFirstPtsMs);
     bool ComputeAudioStreamPtsMs(uint16_t audioStreamID, GstClockTime rawPts, int64_t & outTimestampMs, int64_t & outFirstPtsMs);
     void HandleCapturePipelineRuntimeError(GstElement * faultedPipeline);
+    void HandleBranchRuntimeError(GstElement * faultedPipeline, GstElement * faultedBranch);
 
 private:
     int videoDeviceFd            = -1;
