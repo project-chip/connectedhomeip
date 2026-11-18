@@ -14,6 +14,12 @@ protocols.
 openssl req -x509 -newkey rsa:2048 -keyout server.key -out server.crt -days 365 -nodes -subj "/C=US/ST= /L= /O= /OU= /CN=localhost"
 ```
 
+chip-tool validates the server certificate. To use chip-tool with this
+self-signed certificate, either run it with `SSL_CERT_FILE=server.crt` and pass
+`localhost` as the DCL hostname, or disable certificate validation with
+`--dcl-disable-https-validation 1` on the `pairing` commands
+(`--disable-https-validation 1` on the `dcl` commands).
+
 ## Features
 
 ### Server Functionality
