@@ -815,7 +815,7 @@ void DoorLockServer::setCredentialCommandHandler(
         return;
     }
     case DataOperationTypeEnum::kModify: {
-        // appclusters, 5.2.4.41.1: should send the INVALID_COMMAND in the response when the credential is in use
+        // appclusters: Modify requires the credential slot to be occupied; respond with INVALID_COMMAND otherwise.
         if (DlCredentialStatus::kAvailable == existingCredential.status)
         {
             ChipLogProgress(Zcl,
@@ -2474,12 +2474,6 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
             }
             memcpy(newCredentials.Get(), user.credentials.data(), sizeof(CredentialStruct) * user.credentials.size());
             newCredentials[i] = credential;
-
-            ChipLogProgress(
-                Zcl,
-                "[ModifyUserCredential] Unable to add credential to user: credential with this index is already associated "
-                "[endpointId=%d,userIndex=%d,credentialType=%d,credentialIndex=%d]",
-                endpointId, userIndex, to_underlying(credential.credentialType), credential.credentialIndex);
 
             if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, modifierFabricIdx, user.userName,
                                               user.userUniqueId, user.userStatus, user.userType, user.credentialRule,
