@@ -44,6 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSArray<NSNumber *> *)_fetchClusterIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
 - (nullable MTRDeviceClusterData *)_fetchClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 - (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID;
+- (void)storeDeviceData:(NSDictionary<NSString *, id> *)data forNodeID:(NSNumber *)nodeID;
 - (void)clearDeviceDataForNodeID:(NSNumber *)nodeID;
 
 @property (readonly, nonatomic) NSArray<NSNumber *> * nodesWithStoredData;
@@ -58,6 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable MTRDevice *)_existingDeviceForNodeID:(NSNumber *)nodeID;
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentWiFiSubscriptionPool;
 @property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
 @end
 
@@ -83,6 +85,12 @@ MTR_TESTABLE_DIRECT_MEMBERS
     expectedValueInterval:(NSNumber *)expectedValueInterval
           expectedValueID:(uint64_t *)expectedValueID;
 - (void)removeExpectedValuesForAttributePaths:(NSArray<MTRAttributePath *> *)attributePaths expectedValueID:(uint64_t)expectedValueID;
+// Link-layer classification used to decide subscription-pool throttling. Declared here so tests can
+// exercise the real classification path (rather than the DEBUG-only unitTestPretendThreadEnabled
+// short-circuit) against a cold cluster-data cache.
+- (BOOL)deviceUsesThread;
+// Load persisted per-device metadata (the same dictionary the data store hands back at device init).
+- (void)setPersistedDeviceData:(NSDictionary<NSString *, id> *)data;
 - (void)_handleSubscriptionReset:(NSNumber * _Nullable)retryDelay;
 
 @property (nonatomic) BOOL reattemptingSubscription;
@@ -139,6 +147,9 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (MTRDeviceClusterData *)unitTestGetClusterDataForPath:(MTRClusterPath *)path;
 - (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters;
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
+// The last-known root-endpoint NetworkCommissioning FeatureMap that gets persisted for the cold-cache
+// link-layer-classification fallback (see -_deviceUsesThread). Root-endpoint only, matching the live read.
+- (NSNumber * _Nullable)unitTestGetLastKnownNetworkFeatures;
 - (NSUInteger)unitTestAttributeCount;
 - (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block;
 @end

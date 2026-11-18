@@ -91,6 +91,12 @@
 
 static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
 static NSString * const sHighestObservedEventNumberKey = @"highestObservedEventNumber";
+// Last-known root-endpoint NetworkCommissioning FeatureMap, persisted so that link-layer
+// classification (Thread vs Wi-Fi) survives a cold cluster-data cache. This mirrors the exact value
+// the live -_deviceUsesThread read consults (the root endpoint only) so warm and cold caches
+// classify a device identically. See -_deviceUsesThread for why this fallback is needed on a
+// freshly-added accessory.
+static NSString * const sLastKnownNetworkFeaturesKey = @"lastKnownNetworkFeatures";
 
 static NSString * const sDeviceMayBeReachableReason = @"SPI client indicated the device may now be reachable";
 
@@ -360,6 +366,18 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 // Whether the highestObservedEventNumber value needs persisting to storage.
 @property (nonatomic, readwrite, assign) BOOL highestObservedEventNumberNeedsPersisting;
 
+// Last-known root-endpoint NetworkCommissioning FeatureMap observed from live cluster data, used as
+// a fallback for link-layer classification when the live cluster-data cache is cold. This is the
+// exact value the live -_deviceUsesThread read consults (root endpoint only), NOT the all-endpoint
+// bitwise-or in _allNetworkFeatures, so warm and cold caches classify a device identically. nil if
+// we have never observed a root-endpoint NetworkCommissioning FeatureMap for this device. This is
+// guarded by _lock (unlike _allNetworkFeatures, which is guarded by _descriptionLock) so that
+// -_deviceUsesThread can consult it without a second lock acquisition.
+@property (nonatomic, readwrite, nullable) NSNumber * lastKnownNetworkFeatures;
+
+// Whether the lastKnownNetworkFeatures value needs persisting to storage.
+@property (nonatomic, readwrite, assign) BOOL lastKnownNetworkFeaturesNeedsPersisting;
+
 // receivingReport is true if we are receving a subscription report.  In
 // particular, this will be false if we're just getting an attribute value from
 // a read-through.
@@ -442,6 +460,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
 - (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
+- (BOOL)unitTestPretendWiFiPoolEnabled:(MTRDevice *)device;
 - (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
 - (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device;
 - (void)unitTestClusterDataPersisted:(MTRDevice *)device;
@@ -593,6 +612,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         _persistedClusters = [NSMutableSet set];
         _highestObservedEventNumber = nil;
         _highestObservedEventNumberNeedsPersisting = NO;
+        _lastKnownNetworkFeatures = nil;
+        _lastKnownNetworkFeaturesNeedsPersisting = NO;
         _matterCPPObjectsHolder = [[MTRDeviceMatterCPPObjectsHolder alloc] init];
         _throttlingDeviceBecameActiveCallbacks = NO;
 
@@ -1159,38 +1180,33 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
             _initialSubscribeStart = [NSDate now];
         }
         mtr_weakify(self);
-        if ([self _deviceUsesThread]) {
+        BOOL deviceUsesThread = [self _deviceUsesThread];
+        if (deviceUsesThread) {
             MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
-            NSString * description = [NSString stringWithFormat:@"MTRDevice setDelegate first subscription / controller resume (%p)", self];
-            [self _scheduleSubscriptionPoolWork:^(MTRAsyncWorkCompletionBlock poolWorkCompletion) {
-                mtr_strongify(self);
-                VerifyOrReturn(self, MTR_LOG_DEBUG("_ensureSubscriptionForExistingDelegates _scheduleSubscriptionPoolWork called back with nil MTRDevice"));
-
-                [self->_deviceController asyncDispatchToMatterQueue:^{
-                    mtr_strongify(self);
-                    VerifyOrReturn(self, MTR_LOG_DEBUG("_ensureSubscriptionForExistingDelegates asyncDispatchToMatterQueue called back with nil MTRDevice"));
-
-                    std::lock_guard lock(self->_lock);
-                    [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
-                } errorHandler:^(NSError * _Nonnull error) {
-                    mtr_strongify(self);
-                    VerifyOrReturn(self, MTR_LOG_DEBUG("_ensureSubscriptionForExistingDelegates asyncDispatchToMatterQueue errored with nil MTRDevice"));
-
-                    // If controller is not running, clear work item from the subscription queue
-                    MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
-                    std::lock_guard lock(self->_lock);
-                    [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
-                }];
-            } skipIfResetSince:nil inNanoseconds:0 description:description];
         } else {
-            [_deviceController asyncDispatchToMatterQueue:^{
+            MTR_LOG(" => %@ - device is a Wi-Fi device, scheduling in Wi-Fi pool", self);
+        }
+        NSString * description = [NSString stringWithFormat:@"MTRDevice setDelegate first subscription / controller resume (%p)", self];
+        [self _scheduleSubscriptionPoolWork:^(MTRAsyncWorkCompletionBlock poolWorkCompletion) {
+            mtr_strongify(self);
+            VerifyOrReturn(self, MTR_LOG_DEBUG("_ensureSubscriptionForExistingDelegates _scheduleSubscriptionPoolWork called back with nil MTRDevice"));
+
+            [self->_deviceController asyncDispatchToMatterQueue:^{
                 mtr_strongify(self);
                 VerifyOrReturn(self, MTR_LOG_DEBUG("_ensureSubscriptionForExistingDelegates asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
                 std::lock_guard lock(self->_lock);
-                [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and subscription is allowed", reason]];
-            } errorHandler:nil];
-        }
+                [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
+            } errorHandler:^(NSError * _Nonnull error) {
+                mtr_strongify(self);
+                VerifyOrReturn(self, MTR_LOG_DEBUG("_ensureSubscriptionForExistingDelegates asyncDispatchToMatterQueue errored with nil MTRDevice"));
+
+                // If controller is not running, clear work item from the subscription queue
+                MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
+                std::lock_guard lock(self->_lock);
+                [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
+            }];
+        } skipIfResetSince:nil inNanoseconds:0 usesWiFiPool:!deviceUsesThread description:description];
     }
 }
 
@@ -1586,11 +1602,20 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 #ifdef DEBUG
     // Note: This is a hack to allow our unit tests to test the subscription pooling behavior we have implemented for thread, so we mock devices to be a thread device
     __block BOOL pretendThreadEnabled = NO;
+    __block BOOL pretendWiFiPoolEnabled = NO;
     [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
         if ([testDelegate respondsToSelector:@selector(unitTestPretendThreadEnabled:)]) {
             pretendThreadEnabled = [testDelegate unitTestPretendThreadEnabled:self];
         }
+        if ([testDelegate respondsToSelector:@selector(unitTestPretendWiFiPoolEnabled:)]) {
+            pretendWiFiPoolEnabled = [testDelegate unitTestPretendWiFiPoolEnabled:self];
+        }
     }];
+    // Forcing the Wi-Fi-pool path takes priority: report the device as not on Thread
+    // so its subscription work routes through the Wi-Fi subscription pool.
+    if (pretendWiFiPoolEnabled) {
+        return NO;
+    }
     if (pretendThreadEnabled) {
         return YES;
     }
@@ -1600,8 +1625,17 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     MTRDeviceClusterData * networkCommissioningClusterData = [self _clusterDataForPath:networkCommissioningClusterPath];
     NSNumber * networkCommissioningClusterFeatureMapValueNumber = networkCommissioningClusterData.attributes[@(MTRClusterGlobalAttributeFeatureMapID)][MTRValueKey];
 
-    if (networkCommissioningClusterFeatureMapValueNumber == nil)
+    if (networkCommissioningClusterFeatureMapValueNumber == nil) {
+        // The live cluster-data cache is cold (e.g. a freshly-added accessory that has not yet
+        // completed an initial subscription on this controller). Falling back to NO here would
+        // misclassify a Thread accessory as non-Thread during the pairing window, causing it to
+        // bypass the Thread subscription-establishment pool. Instead consult the last-known
+        // link-layer determination persisted from a prior observation, if we have one.
+        if (_lastKnownNetworkFeatures != nil) {
+            return (_lastKnownNetworkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface) != 0 ? YES : NO;
+        }
         return NO;
+    }
     if (![networkCommissioningClusterFeatureMapValueNumber isKindOfClass:[NSNumber class]]) {
         MTR_LOG_ERROR("%@ Unexpected NetworkCommissioning FeatureMap value %@", self, networkCommissioningClusterFeatureMapValueNumber);
         return NO;
@@ -1652,7 +1686,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     }
 }
 
-- (void)_scheduleSubscriptionPoolWork:(void (^)(MTRAsyncWorkCompletionBlock poolWorkCompletion))workBlock skipIfResetSince:(NSNumber * _Nullable)readClientGeneration inNanoseconds:(int64_t)inNanoseconds description:(NSString *)description
+- (void)_scheduleSubscriptionPoolWork:(void (^)(MTRAsyncWorkCompletionBlock poolWorkCompletion))workBlock skipIfResetSince:(NSNumber * _Nullable)readClientGeneration inNanoseconds:(int64_t)inNanoseconds usesWiFiPool:(BOOL)usesWiFiPool description:(NSString *)description
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -1714,8 +1748,9 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
             workBlock(completion);
         }];
-        [self._concreteController.concurrentSubscriptionPool enqueueWorkItem:workItem description:description];
-        MTR_LOG("%@ - enqueued in the subscription pool", self);
+        MTRAsyncWorkQueue<MTRDeviceController *> * targetPool = usesWiFiPool ? self._concreteController.concurrentWiFiSubscriptionPool : self._concreteController.concurrentSubscriptionPool;
+        [targetPool enqueueWorkItem:workItem description:description];
+        MTR_LOG("%@ - enqueued in the subscription pool (Wi-Fi: %@)", self, MTR_YES_NO(usesWiFiPool));
     };
 
     if (inNanoseconds > 0) {
@@ -1820,16 +1855,12 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     };
 
     int64_t resubscriptionDelayNs = static_cast<int64_t>(resubscriptionDelayMs.unsignedIntValue * NSEC_PER_MSEC);
-    if (deviceUsesThread) {
+    {
         std::lock_guard lock(_lock);
-        // For Thread-enabled devices, schedule the _triggerResubscribeWithReason call to run in the subscription pool
+        // Schedule the _triggerResubscribeWithReason call to run in the subscription
+        // pool, targeting the Thread pool or the Wi-Fi pool based on the transport.
         NSString * description = [NSString stringWithFormat:@"ReadClient resubscription (%p)", self];
-        [self _scheduleSubscriptionPoolWork:resubscriptionBlock skipIfResetSince:@(readClientGeneration) inNanoseconds:resubscriptionDelayNs description:description];
-    } else {
-        // For non-Thread-enabled devices, just call the resubscription block after the specified time
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, ^{
-            resubscriptionBlock(nil);
-        });
+        [self _scheduleSubscriptionPoolWork:resubscriptionBlock skipIfResetSince:@(readClientGeneration) inNanoseconds:resubscriptionDelayNs usesWiFiPool:!deviceUsesThread description:description];
     }
 
     // Set up connectivity monitoring in case network routability changes for the positive, to accelerate resubscription
@@ -1978,16 +2009,10 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     };
 
     int64_t resubscriptionDelayNs = static_cast<int64_t>(secondsToWait * NSEC_PER_SEC);
-    if (deviceUsesThread) {
-        // For Thread-enabled devices, schedule the _reattemptSubscriptionNowIfNeededWithReason call to run in the subscription pool
-        NSString * description = [NSString stringWithFormat:@"MTRDevice resubscription (%p)", self];
-        [self _scheduleSubscriptionPoolWork:resubscriptionBlock skipIfResetSince:nil inNanoseconds:resubscriptionDelayNs description:description];
-    } else {
-        // For non-Thread-enabled devices, just call the resubscription block after the specified time
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, ^{
-            resubscriptionBlock(nil);
-        });
-    }
+    // Schedule the _reattemptSubscriptionNowIfNeededWithReason call to run in the
+    // subscription pool, targeting the Thread pool or the Wi-Fi pool based on the transport.
+    NSString * description = [NSString stringWithFormat:@"MTRDevice resubscription (%p)", self];
+    [self _scheduleSubscriptionPoolWork:resubscriptionBlock skipIfResetSince:nil inNanoseconds:resubscriptionDelayNs usesWiFiPool:!deviceUsesThread description:description];
     [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
@@ -2122,7 +2147,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    return _clusterDataToPersist.count > 0 || self.highestObservedEventNumberNeedsPersisting;
+    return _clusterDataToPersist.count > 0 || self.highestObservedEventNumberNeedsPersisting || self.lastKnownNetworkFeaturesNeedsPersisting;
 }
 
 // Need an inner method for dealloc to call, so unit test callbacks don't re-capture self.
@@ -2140,7 +2165,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
     // No cluster data to persist; store the device data on its own if it changed.
     if (!_clusterDataToPersist.count) {
-        if (self.highestObservedEventNumberNeedsPersisting) {
+        if (self.highestObservedEventNumberNeedsPersisting || self.lastKnownNetworkFeaturesNeedsPersisting) {
             [self _storePersistedDeviceData];
         }
         return NO;
@@ -2149,7 +2174,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     // Device data that changed goes into the same storage write as the
     // cluster data, so that one persistence round is one write.
     NSDictionary<NSString *, id> * deviceData = nil;
-    if (self.highestObservedEventNumberNeedsPersisting) {
+    if (self.highestObservedEventNumberNeedsPersisting || self.lastKnownNetworkFeaturesNeedsPersisting) {
         // The datastore is known to exist here (checked above), so clearing the flag can't lose data.
         deviceData = [self _deviceDataToPersist];
     }
@@ -5075,6 +5100,12 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     if (highestObservedEventNumber != nil && [highestObservedEventNumber isKindOfClass:NSNumber.class]) {
         self.highestObservedEventNumber = highestObservedEventNumber;
     }
+
+    id lastKnownNetworkFeatures = data[sLastKnownNetworkFeaturesKey];
+    if (lastKnownNetworkFeatures != nil && [lastKnownNetworkFeatures isKindOfClass:NSNumber.class]) {
+        // This was loaded from storage; do not flag it as needing to be persisted again.
+        _lastKnownNetworkFeatures = lastKnownNetworkFeatures;
+    }
 }
 
 // Returns the device data to store, and marks it as no longer needing to be persisted.
@@ -5089,6 +5120,10 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     if (self.highestObservedEventNumber != nil) {
         data[sHighestObservedEventNumberKey] = self.highestObservedEventNumber;
         self.highestObservedEventNumberNeedsPersisting = NO;
+    }
+    if (_lastKnownNetworkFeatures != nil) {
+        data[sLastKnownNetworkFeaturesKey] = _lastKnownNetworkFeatures;
+        self.lastKnownNetworkFeaturesNeedsPersisting = NO;
     }
 
     MTR_LOG_DEBUG("%@ _storePersistedDeviceData: %@", self, data);
@@ -5129,6 +5164,13 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     std::lock_guard lock(_lock);
 
     return [_persistedClusters containsObject:path];
+}
+
+- (NSNumber * _Nullable)unitTestGetLastKnownNetworkFeatures
+{
+    std::lock_guard lock(_lock);
+
+    return _lastKnownNetworkFeatures;
 }
 #endif
 
@@ -5395,6 +5437,18 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     NSNumber * _Nullable pid = [self _informationalProductID];
     NSNumber * _Nullable networkFeatures = [self _networkFeatures];
 
+    // If we have observed a root-endpoint NetworkCommissioning FeatureMap from live cluster data,
+    // remember it as the last-known link-layer determination so that -_deviceUsesThread can fall
+    // back to it when the live cluster-data cache is cold (see -_deviceUsesThread). We persist the
+    // root-endpoint value -- the exact thing -_deviceUsesThread reads live -- NOT the all-endpoint
+    // bitwise-or, so warm and cold caches classify a device identically. Only update on a non-nil
+    // observation so a transient cold cache does not clobber a previously-known value.
+    NSNumber * _Nullable rootNetworkFeatures = [self _rootNetworkFeatures];
+    if (rootNetworkFeatures != nil && (_lastKnownNetworkFeatures == nil || ![rootNetworkFeatures isEqualToNumber:_lastKnownNetworkFeatures])) {
+        _lastKnownNetworkFeatures = rootNetworkFeatures;
+        self.lastKnownNetworkFeaturesNeedsPersisting = YES;
+    }
+
     std::lock_guard lock(_descriptionLock);
     _vid = vid;
     _pid = pid;
@@ -5477,6 +5531,25 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     }
 
     return result;
+}
+
+// Returns the root-endpoint NetworkCommissioning FeatureMap, reading the exact same cluster-data
+// path the live -_deviceUsesThread classification reads. This is what gets persisted as
+// lastKnownNetworkFeatures, so the cold-cache fallback in -_deviceUsesThread yields the same
+// answer as the warm-cache live read for every device -- including a dual-radio accessory that
+// exposes NetworkCommissioning on a non-root endpoint. It deliberately does NOT use the
+// all-endpoint bitwise-or from -_networkFeatures / _allNetworkFeatures.
+- (NSNumber * _Nullable)_rootNetworkFeatures
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    MTRClusterPath * networkCommissioningClusterPath = [MTRClusterPath clusterPathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeNetworkCommissioningID)];
+    MTRDeviceClusterData * networkCommissioningClusterData = [self _clusterDataForPath:networkCommissioningClusterPath];
+    NSNumber * featureMap = networkCommissioningClusterData.attributes[@(MTRClusterGlobalAttributeFeatureMapID)][MTRValueKey];
+    if (![featureMap isKindOfClass:[NSNumber class]]) {
+        return nil;
+    }
+    return featureMap;
 }
 
 - (void)controllerSuspended

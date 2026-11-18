@@ -55,6 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
                 otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
                         uniqueIdentifier:(NSUUID *)uniqueIdentifier
           concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+      concurrentWiFiSubscriptionPoolSize:(NSUInteger)concurrentWiFiSubscriptionPoolSize
             storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
                           startSuspended:(BOOL)startSuspended;
 
@@ -300,6 +301,12 @@ NS_ASSUME_NONNULL_BEGIN
  * subscription at the same time.
  */
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
+
+/**
+ * A queue with a fixed width that allows a number of MTRDevice objects that are
+ * not on Thread (that is, Wi-Fi devices) to perform subscription at the same time.
+ */
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentWiFiSubscriptionPool;
 
 /**
  * The per-controller data store this controller was initialized with, if any.

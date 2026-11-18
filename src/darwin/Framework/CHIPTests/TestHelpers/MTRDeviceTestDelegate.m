@@ -100,6 +100,11 @@
     return self.pretendThreadEnabled;
 }
 
+- (BOOL)unitTestPretendWiFiPoolEnabled:(MTRDevice *)device
+{
+    return self.pretendWiFiPoolEnabled;
+}
+
 - (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device
 {
     if (self.onSubscriptionPoolDequeue != nil) {

@@ -581,6 +581,42 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                                      fabricID:(NSNumber *)fabricID
                                                        nodeID:(NSNumber *)nodeID
                                                       storage:(MTRTestPerControllerStorage *)storage
+                                                        error:(NSError * __autoreleasing *)error
+                                            certificateIssuer:
+                                                (MTRPerControllerStorageTestsCertificateIssuer * __autoreleasing *)certificateIssuer
+                           concurrentWiFiSubscriptionPoolSize:(NSUInteger)concurrentWiFiSubscriptionPoolSize
+{
+    return [self startControllerWithRootKeys:rootKeys
+                             operationalKeys:operationalKeys
+                                    fabricID:fabricID
+                                      nodeID:nodeID
+                                     storage:storage
+                       caseAuthenticatedTags:nil
+                              paramsModifier:^(MTRDeviceControllerExternalCertificateParameters * params) {
+                                  __auto_type * ourCertificateIssuer = [[MTRPerControllerStorageTestsCertificateIssuer alloc] initWithRootCertificate:params.rootCertificate
+                                                                                                                              intermediateCertificate:nil
+                                                                                                                                           signingKey:rootKeys
+                                                                                                                                             fabricID:fabricID];
+                                  XCTAssertNotNil(ourCertificateIssuer);
+
+                                  if (certificateIssuer) {
+                                      *certificateIssuer = ourCertificateIssuer;
+                                  }
+
+                                  [params setOperationalCertificateIssuer:ourCertificateIssuer queue:dispatch_get_main_queue()];
+
+                                  if (concurrentWiFiSubscriptionPoolSize > 0) {
+                                      params.concurrentSubscriptionEstablishmentsAllowedOnWiFi = concurrentWiFiSubscriptionPoolSize;
+                                  }
+                              }
+                                       error:error];
+}
+
+- (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
+                                              operationalKeys:(MTRTestKeys *)operationalKeys
+                                                     fabricID:(NSNumber *)fabricID
+                                                       nodeID:(NSNumber *)nodeID
+                                                      storage:(MTRTestPerControllerStorage *)storage
                                         caseAuthenticatedTags:(nullable NSSet *)caseAuthenticatedTags
                                                         error:(NSError * __autoreleasing *)error
                                             certificateIssuer:
@@ -3164,6 +3200,408 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     }
 
     [self doTestSubscriptionPoolWithSize:3 deviceOnboardingPayloads:deviceOnboardingPayloads];
+}
+
+- (void)doTestWiFiSubscriptionPoolWithSize:(NSInteger)subscriptionPoolSize deviceOnboardingPayloads:(NSDictionary<NSNumber *, NSString *> *)deviceOnboardingPayloads
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSNumber * nodeID = @(555);
+    NSNumber * fabricID = @(555);
+
+    NSError * error;
+
+    // Test DeviceController with a Wi-Fi Subscription pool
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer
+                                      concurrentWiFiSubscriptionPoolSize:subscriptionPoolSize];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    NSArray<NSNumber *> * orderedDeviceIDs = [deviceOnboardingPayloads allKeys];
+
+    // Commission all devices
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        certificateIssuer.nextNodeID = deviceID;
+        [self commissionWithController:controller newNodeID:deviceID onboardingPayload:deviceOnboardingPayloads[deviceID]];
+    }
+
+    // Shutdown and restart, to reset all existing sessions, so that the subscriptions and base device usage start after
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    controller = [self startControllerWithRootKeys:rootKeys
+                                   operationalKeys:operationalKeys
+                                          fabricID:fabricID
+                                            nodeID:nodeID
+                                           storage:storageDelegate
+                                             error:&error
+                                 certificateIssuer:&certificateIssuer
+                concurrentWiFiSubscriptionPoolSize:subscriptionPoolSize];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Set up expectations and delegates
+
+    NSMutableDictionary<NSNumber *, XCTestExpectation *> * subscriptionExpectations = [NSMutableDictionary dictionary];
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        NSString * expectationDescription = [NSString stringWithFormat:@"Subscription 1 has been set up %@", deviceID];
+        subscriptionExpectations[deviceID] = [self expectationWithDescription:expectationDescription];
+    }
+
+    NSMutableDictionary<NSNumber *, MTRDeviceTestDelegate *> * deviceDelegates = [NSMutableDictionary dictionary];
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        deviceDelegates[deviceID] = [[MTRDeviceTestDelegate alloc] init];
+    }
+
+    // Test with counters
+    __block os_unfair_lock counterLock = OS_UNFAIR_LOCK_INIT;
+    __block NSUInteger subscriptionRunningCount = 0;
+    __block NSUInteger subscriptionDequeueCount = 0;
+
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        MTRDeviceTestDelegate * delegate = deviceDelegates[deviceID];
+        // Force the Wi-Fi-pool code path (rather than the Thread pool).
+        delegate.pretendWiFiPoolEnabled = YES;
+        // By default MTRDeviceTestDelegate sets a 2s MaxInterval.  But for this test, we don't
+        // really want that.  We don't care about getting incremental updates in this test, nor do
+        // we care about detecting subscription drops (and in fact, a subscription drop would mess
+        // up the counts in this test).
+        //
+        // Just use a 1 hour MaxInterval, for simplicity.
+        delegate.subscriptionMaxIntervalOverride = @(3600); // seconds
+
+        delegate.onSubscriptionPoolDequeue = ^{
+            // Count subscribing when dequeued from the subscription pool
+            os_unfair_lock_lock(&counterLock);
+            subscriptionRunningCount++;
+            subscriptionDequeueCount++;
+            // At any given moment, only up to subscriptionPoolSize subcriptions can be going on
+            XCTAssertLessThanOrEqual(subscriptionRunningCount, subscriptionPoolSize);
+            os_unfair_lock_unlock(&counterLock);
+        };
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            // Stop counting subscribing right before calling work item completion
+            os_unfair_lock_lock(&counterLock);
+            subscriptionRunningCount--;
+            os_unfair_lock_unlock(&counterLock);
+        };
+        __weak __auto_type weakDelegate = delegate;
+        delegate.onReportEnd = ^{
+            [subscriptionExpectations[deviceID] fulfill];
+            // reset callback so expectation not fulfilled twice, given the run time of this can be long due to subscription pool
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReportEnd = nil;
+        };
+    }
+
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+        [device setDelegate:deviceDelegates[deviceID] queue:queue];
+    }
+
+    // Make the wait time depend on device count
+    [self waitForExpectations:subscriptionExpectations.allValues timeout:(NSTimeInterval) (kSubscriptionPoolBaseTimeoutInSeconds * orderedDeviceIDs.count)];
+
+    XCTAssertEqual(subscriptionDequeueCount, orderedDeviceIDs.count);
+
+    // Reset our commissionees.
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+        ResetCommissioneeWithNodeID(baseDevice, queue, self, kTimeoutInSeconds, deviceID);
+    }
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (void)testWiFiSubscriptionPool
+{
+    // QRCodes generated for discriminators 1111~1115 and passcodes 1001~1005
+    NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
+        @(101) : @"MT:00000UZ427U0D900000",
+        @(102) : @"MT:00000CQM00BED900000",
+        @(103) : @"MT:00000K0V01TRD900000",
+        @(104) : @"MT:00000SC11293E900000",
+        @(105) : @"MT:00000-O913RGE900000",
+    };
+
+    // Start our helper apps.
+    __auto_type * sortedKeys = [[deviceOnboardingPayloads allKeys] sortedArrayUsingSelector:@selector(compare:)];
+    for (NSNumber * deviceID in sortedKeys) {
+        BOOL started = [self startAppWithName:@"all-clusters"
+                                    arguments:@[]
+                                      payload:deviceOnboardingPayloads[deviceID]];
+        XCTAssertTrue(started);
+    }
+
+    // With a Wi-Fi pool of width 1, at most one Wi-Fi subscription establishment
+    // may be running at any moment. Before the Wi-Fi pool exists, all 5 run
+    // concurrently and the runningCount <= poolSize assertion fails.
+    [self doTestWiFiSubscriptionPoolWithSize:1 deviceOnboardingPayloads:deviceOnboardingPayloads];
+}
+
+// Regression test for the cold-cache half of the subscription-pool link-layer classification bug.
+//
+// -[MTRDevice_Concrete _deviceUsesThread] decides Thread-vs-Wi-Fi by reading the NetworkCommissioning
+// FeatureMap out of the device's live cluster-data cache. On a COLD cache (a freshly-added accessory
+// that has never completed a subscription on this controller yet) that cache is empty, so before the
+// fix the method returned NO and a Thread accessory was misclassified as non-Thread during the
+// pairing window -- causing it to bypass the Thread subscription-establishment pool.
+//
+// This test deliberately does NOT use unitTestPretendThreadEnabled: that DEBUG hook short-circuits
+// _deviceUsesThread and therefore cannot model the cold-cache case. Instead it drives the real
+// classification path against a genuinely cold cluster-data cache, with and without a persisted
+// last-known link-layer value present.
+//
+// The persisted last-known value is the ROOT-endpoint NetworkCommissioning FeatureMap (the exact
+// value the live -_deviceUsesThread read consults), so warm and cold caches classify a device
+// identically. testDeviceUsesThreadPersistsRootEndpointFeaturesForColdCacheConsistency below covers
+// the derivation side of that invariant for a device that also exposes NetworkCommissioning on a
+// non-root endpoint.
+//
+// Persisted device data is a flat NSString-keyed dictionary managed by MTRDeviceControllerDataStore;
+// the key below mirrors the private sLastKnownNetworkFeaturesKey constant in MTRDevice_Concrete.mm.
+- (void)testDeviceUsesThreadFromPersistedFeaturesOnColdCache
+{
+    // Key must match sLastKnownNetworkFeaturesKey in MTRDevice_Concrete.mm.
+    NSString * lastKnownNetworkFeaturesKey = @"lastKnownNetworkFeatures";
+
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(123);
+    NSNumber * fabricID = @(456);
+
+    NSError * error;
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    // Root-endpoint NetworkCommissioning cluster path -- this is what _deviceUsesThread consults.
+    __auto_type * networkCommissioningPath = [MTRClusterPath clusterPathWithEndpointID:@(0)
+                                                                             clusterID:@(MTRClusterIDTypeNetworkCommissioningID)];
+
+    uint32_t threadFeatureMap = MTRNetworkCommissioningFeatureThreadNetworkInterface;
+    uint32_t wifiFeatureMap = MTRNetworkCommissioningFeatureWiFiNetworkInterface;
+
+    // --- Cold cache, NO persisted value: classification stays NO (unchanged behavior). ---
+    NSNumber * coldDeviceID = @(11);
+    __auto_type * coldDevice = [MTRDevice deviceWithNodeID:coldDeviceID controller:controller];
+    // Confirm the live cluster-data cache is genuinely cold: no NetworkCommissioning cluster data.
+    XCTAssertNil([coldDevice unitTestGetClusterDataForPath:networkCommissioningPath]);
+    XCTAssertFalse([coldDevice deviceUsesThread]);
+
+    // --- Cold cache, persisted Thread value present: classification must be YES. ---
+    // This is the assertion that FAILS on pre-fix code (which returns NO on a cold cache regardless
+    // of the persisted value) and PASSES after the fix (which consults the persisted last-known
+    // features when the live cluster-data cache is cold).
+    NSNumber * threadDeviceID = @(12);
+    __auto_type * threadDevice = [MTRDevice deviceWithNodeID:threadDeviceID controller:controller];
+    [threadDevice setPersistedDeviceData:@{ lastKnownNetworkFeaturesKey : @(threadFeatureMap) }];
+    // Cache is still cold -- setPersistedDeviceData: loads device-level metadata, not cluster data.
+    XCTAssertNil([threadDevice unitTestGetClusterDataForPath:networkCommissioningPath]);
+    XCTAssertTrue([threadDevice deviceUsesThread]);
+
+    // --- Cold cache, persisted Wi-Fi-only value present: classification stays NO. ---
+    // Negative control: proves the fallback actually reads the Thread bit rather than treating any
+    // persisted value as Thread.
+    NSNumber * wifiDeviceID = @(13);
+    __auto_type * wifiDevice = [MTRDevice deviceWithNodeID:wifiDeviceID controller:controller];
+    [wifiDevice setPersistedDeviceData:@{ lastKnownNetworkFeaturesKey : @(wifiFeatureMap) }];
+    XCTAssertNil([wifiDevice unitTestGetClusterDataForPath:networkCommissioningPath]);
+    XCTAssertFalse([wifiDevice deviceUsesThread]);
+
+    // --- The persisted last-known value survives a cold controller restart. ---
+    // Persist the Thread bit through the real data store, tear the controller down, bring a new one
+    // up on the SAME storage, and confirm the bit is read back -- this is the persistence that lets
+    // a fresh MTRDevice classify correctly before its first subscription re-primes the cluster cache.
+    NSDictionary<NSString *, id> * persistedThreadData = @{ lastKnownNetworkFeaturesKey : @(threadFeatureMap) };
+    [controller.controllerDataStore storeDeviceData:persistedThreadData forNodeID:threadDeviceID];
+
+    // storeDeviceData: dispatches asynchronously onto the data store's serial storage queue. A
+    // synchronous read on that same serial queue is FIFO-ordered behind the write, so this both
+    // confirms the write landed and forces it to complete before we tear the controller down.
+    NSDictionary<NSString *, id> * storedBeforeShutdown = [controller.controllerDataStore getStoredDeviceDataForNodeID:threadDeviceID];
+    XCTAssertEqualObjects(storedBeforeShutdown[lastKnownNetworkFeaturesKey], @(threadFeatureMap));
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    MTRDeviceController * restartedController = [self startControllerWithRootKeys:rootKeys
+                                                                  operationalKeys:operationalKeys
+                                                                         fabricID:fabricID
+                                                                           nodeID:nodeID
+                                                                          storage:storageDelegate
+                                                                            error:&error
+                                                                certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(restartedController);
+    XCTAssertTrue([restartedController isRunning]);
+
+    NSDictionary<NSString *, id> * reloadedData = [restartedController.controllerDataStore getStoredDeviceDataForNodeID:threadDeviceID];
+    XCTAssertNotNil(reloadedData);
+    XCTAssertEqualObjects(reloadedData[lastKnownNetworkFeaturesKey], @(threadFeatureMap));
+
+    // A fresh MTRDevice built after restart comes up on a cold cluster cache but with the persisted
+    // device data loaded, so it classifies as Thread from the fallback.
+    __auto_type * reloadedThreadDevice = [MTRDevice deviceWithNodeID:threadDeviceID controller:restartedController];
+    XCTAssertNil([reloadedThreadDevice unitTestGetClusterDataForPath:networkCommissioningPath]);
+    XCTAssertTrue([reloadedThreadDevice deviceUsesThread]);
+
+    [restartedController shutdown];
+    XCTAssertFalse([restartedController isRunning]);
+}
+
+// Regression test for the cold-cache/warm-cache consistency half of the subscription-pool link-layer
+// classification bug, for a device that exposes NetworkCommissioning on a NON-root endpoint.
+//
+// -[MTRDevice_Concrete _deviceUsesThread] reads the NetworkCommissioning FeatureMap from the ROOT
+// endpoint only. The persisted last-known value it falls back to on a cold cache must therefore be
+// the ROOT-endpoint FeatureMap too, otherwise a dual-radio accessory (WiFi on the root endpoint,
+// Thread on a non-root endpoint) would classify NO (WiFi) on a warm cache but YES (Thread) on a cold
+// cache -- the same device flipping subscription pools depending on cache warmth.
+//
+// This drives the real derivation path: it injects a live attribute report with a WiFi FeatureMap on
+// the root endpoint and a Thread FeatureMap on a non-root endpoint (with that endpoint present in the
+// root PartsList, so the all-endpoint bitwise-or WOULD pick up the Thread bit), then asserts that the
+// value remembered for the cold-cache fallback is the ROOT-endpoint value (WiFi only). Before the fix
+// the persisted value was the all-endpoint bitwise-or (WiFi|Thread) and this assertion FAILS; with
+// the fix it is the root-endpoint value and it PASSES. Runs entirely on the sim -- it injects reports
+// into a bare (uncommissioned) MTRDevice on a running controller, no server-app harness needed.
+- (void)testDeviceUsesThreadPersistsRootEndpointFeaturesForColdCacheConsistency
+{
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(123);
+    NSNumber * fabricID = @(456);
+
+    NSError * error;
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    NSNumber * rootEndpoint = @(0);
+    NSNumber * nonRootEndpoint = @(1);
+    uint32_t threadFeatureMap = MTRNetworkCommissioningFeatureThreadNetworkInterface;
+    uint32_t wifiFeatureMap = MTRNetworkCommissioningFeatureWiFiNetworkInterface;
+
+    NSNumber * deviceID = @(21);
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+
+    // Skip real subscription setup so this stays a pure in-memory injection test on the sim.
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+
+    XCTestExpectation * reportEndExpectation = [self expectationWithDescription:@"Injected report ended"];
+    delegate.onReportEnd = ^{
+        [reportEndExpectation fulfill];
+    };
+    [device setDelegate:delegate queue:queue];
+
+    // Root PartsList advertises the non-root endpoint, so the all-endpoint scan in -_networkFeatures
+    // would OR in the non-root Thread FeatureMap. -_rootNetworkFeatures (what we persist) does not.
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[
+        @{
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:rootEndpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)],
+            MTRDataKey : @ {
+                MTRDataVersionKey : @(1),
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[ @{ MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : nonRootEndpoint } } ],
+            }
+        },
+        @{
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:rootEndpoint clusterID:@(MTRClusterIDTypeNetworkCommissioningID) attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)],
+            MTRDataKey : @ {
+                MTRDataVersionKey : @(1),
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(wifiFeatureMap),
+            }
+        },
+        @{
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:nonRootEndpoint clusterID:@(MTRClusterIDTypeNetworkCommissioningID) attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)],
+            MTRDataKey : @ {
+                MTRDataVersionKey : @(1),
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(threadFeatureMap),
+            }
+        },
+    ];
+
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [self waitForExpectations:@[ reportEndExpectation ] timeout:kTimeoutInSeconds];
+
+    // The value remembered for the cold-cache fallback must be the ROOT-endpoint FeatureMap (WiFi),
+    // NOT the all-endpoint bitwise-or (WiFi|Thread). This is the RED->GREEN assertion.
+    NSNumber * lastKnownNetworkFeatures = [device unitTestGetLastKnownNetworkFeatures];
+    XCTAssertNotNil(lastKnownNetworkFeatures);
+    XCTAssertEqual(lastKnownNetworkFeatures.unsignedIntValue, wifiFeatureMap);
+    XCTAssertEqual(lastKnownNetworkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface, 0ULL,
+        @"Persisted features must not carry the non-root Thread bit, or a cold cache would classify this WiFi device as Thread");
+
+    // Warm-cache classification (live root-endpoint read): WiFi device -> not Thread.
+    XCTAssertFalse([device deviceUsesThread]);
+
+    // Cold-cache classification uses lastKnownNetworkFeatures. Since that now equals the root-endpoint
+    // value the warm read consults, warm and cold agree for this non-root device: both classify NO.
+    XCTAssertEqual((lastKnownNetworkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface) != 0,
+        [device deviceUsesThread], @"Warm and cold classification must agree for a non-root-endpoint NetworkCommissioning device");
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
 }
 
 - (MTRDevice *)getMTRDevice:(NSNumber *)deviceID

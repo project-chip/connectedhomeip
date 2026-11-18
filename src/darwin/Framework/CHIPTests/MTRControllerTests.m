@@ -23,6 +23,7 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
+#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestOTAProvider.h"
 #import "MTRTestStorage.h"
@@ -115,6 +116,53 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
     controller = [factory createControllerOnExistingFabric:params error:nil];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    [factory stopControllerFactory];
+    XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testWiFiSubscriptionPoolIsNotSerializedWithStartupParams
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[MTRTestStorage alloc] init];
+    __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startControllerFactory:factoryParams error:nil]);
+
+    __auto_type * testKeys = [[MTRTestKeys alloc] init];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
+    params.vendorID = @(kTestVendorId);
+
+    MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:nil];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    // Before the Wi-Fi pool existed, subscriptions for devices that are not on
+    // Thread were not throttled at all. A controller started with
+    // MTRDeviceControllerStartupParams has no way to configure the pool, so it
+    // must not end up with one that runs a single subscription at a time.
+    __block NSUInteger readyCount = 0;
+    NSMutableArray<MTRAsyncWorkCompletionBlock> * completions = [NSMutableArray array];
+    XCTestExpectation * twoRunning = [self expectationWithDescription:@"Two Wi-Fi pool items run at once"];
+    for (int i = 0; i < 2; i++) {
+        MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_main_queue()];
+        [workItem setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+            [completions addObject:completion];
+            if (++readyCount == 2) {
+                [twoRunning fulfill];
+            }
+        }];
+        [controller.concurrentWiFiSubscriptionPool enqueueWorkItem:workItem description:@"Wi-Fi pool width check"];
+    }
+    [self waitForExpectations:@[ twoRunning ] timeout:5];
+    XCTAssertEqual(readyCount, 2);
+    for (MTRAsyncWorkCompletionBlock completion in completions) {
+        completion(MTRAsyncWorkComplete);
+    }
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);

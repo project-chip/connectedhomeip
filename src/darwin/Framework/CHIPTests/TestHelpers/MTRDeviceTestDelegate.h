@@ -35,6 +35,7 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic) BOOL forceAttributeReportsIfMatchingCache;
 @property (atomic, copy, nullable) dispatch_block_t onDeviceConfigurationChanged;
 @property (atomic) BOOL pretendThreadEnabled;
+@property (atomic) BOOL pretendWiFiPoolEnabled;
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionPoolDequeue;
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionPoolWorkComplete;
 @property (atomic, copy, nullable) dispatch_block_t onClusterDataPersisted;
