@@ -23,8 +23,8 @@ store.
 | LifetimeRunningHours, LifetimeEnergyConsumed     | Writable by clients and the application. Persisted.                           |
 | PumpStatus, Capacity, Speed, Power               | Set by the application.                                                       |
 
-Optional attributes are enabled with the `Config::optionalAttributes` bitmask. A
-bitmask of `OptionalAttributes` is used instead of `OptionalAttributeSet`
+Optional attributes are enabled with the `Config::optionalAttributes`.
+`OptionalAttributes` is used instead of `OptionalAttributeSet`
 because the ControlMode attribute ID (0x21) does not fit in its 32-bit mask.
 
 The Min/Max limit attributes follow their conformance: an attribute is present
