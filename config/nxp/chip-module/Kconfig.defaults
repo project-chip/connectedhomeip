@@ -864,7 +864,7 @@ config HEAP_MEM_POOL_SIZE
 	default 122880
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
-	default 8192 if SOC_SERIES_MCXW7XX # 8 kB
+	default 9216 if SOC_SERIES_MCXW7XX # 9 kB
 	default 28672 # 28 kB
 
 # Enable heap watermarks support for SoftwareDiagnostics cluster
