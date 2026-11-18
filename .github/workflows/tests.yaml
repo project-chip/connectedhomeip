@@ -841,6 +841,14 @@ jobs:
                   --out-prefix out/openssl-3.5/apps
                   --target linux-x64-network-manager-${BUILD_VARIANT}
                   --pw-command-launcher=ccache build"
+            # TC-DA-1.11/1.13 use all-clusters-app as the TH commissionee: it is the app
+            # implementing the SetPQCDeviceAttestationProfileReadMode pipe command.
+            - name: Build all-clusters with OpenSSL 3.5
+              run: >-
+                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --out-prefix out/openssl-3.5/apps
+                  --target linux-x64-all-clusters-${BUILD_VARIANT}
+                  --pw-command-launcher=ccache build"
             - name: Set ASAN symbolizer path
               run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
             - name: Set up a IPV6 known environment
@@ -850,6 +858,7 @@ jobs:
                   mkdir -p out/openssl-3.5/traces
                   cat >out/openssl-3.5/test_env.yaml <<EOF
                   ALL_DEVICES_APP: out/openssl-3.5/apps/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app
+                  ALL_CLUSTERS_APP: out/openssl-3.5/apps/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app
                   NETWORK_MANAGEMENT_APP: out/openssl-3.5/apps/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app
                   TRACE_APP: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-app
                   TRACE_TEST_JSON: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-test

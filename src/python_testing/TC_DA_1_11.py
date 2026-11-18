@@ -15,6 +15,24 @@
 #    limitations under the License.
 #
 
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     script-args: >
+#       --storage-path admin_storage-TC_DA_1_11.json
+#       --PICS src/app/tests/suites/certification/ci-pics-values-pqc
+#       --string-arg app_path:${ALL_CLUSTERS_APP}
+#       --string-arg pqc_dac_provider_ml_dsa_44:credentials/development/attestation/TestCredentials-FFF1-8001-ML-DSA-44.json
+#       --string-arg pqc_dac_provider_ml_dsa_65:credentials/development/attestation/TestCredentials-FFF1-8001-ML-DSA-65.json
+#       --paa-trust-store-path credentials/development/paa-root-certs
+#       --bool-arg dut_supports_pqc_profiles:true
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#     tags: [openssl-3.5]
+# === END CI TEST ARGUMENTS ===
+
 # See TC_DA_PQC_common.py for the required arguments and fixture generation.
 #
 # dut_supports_pqc_profiles selects the matrix column: when true, the PQC rows must show
@@ -22,7 +40,8 @@
 # CI controller builds use a crypto backend without ML-DSA, so negotiation falls back),
 # every row must fall back to legacy retrieval and still commission successfully, which
 # is the matrix row for a DUT supporting only EcdsaMatterLegacy. Run the true column
-# with a controller built with chip_crypto="openssl" against OpenSSL 3.5+.
+# with a controller built with chip_crypto="openssl" against OpenSSL 3.5+, which is what
+# the openssl_3_5_tests CI job provides (the CI arguments above are written for it).
 
 from mobly import asserts
 from TC_DA_PQC_common import PQCDACommissionerTestBase

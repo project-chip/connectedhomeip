@@ -1,5 +1,10 @@
-# PQC development DAC-provider fixtures used by TC_OPCREDS_3_9, TC_DA_1_10 and TC_DA_1_12.
+# PQC development DAC-provider fixtures used by TC_OPCREDS_3_9, TC_DA_1_10,
+# TC_DA_1_11, TC_DA_1_12 and TC_DA_1_13.
 MCORE.ROLE.COMMISSIONEE=1
+MCORE.ROLE.COMMISSIONER=1
+# The CI commissioner (the openssl_3_5_tests controller) supports the PQC profiles.
+MCORE.ROLE.COMMISSIONER_PQC=1
+PICS_SDK_CI_ONLY=1
 OPCREDS.S=1
 OPCREDS.S.F00=1
 OPCREDS.S.C00.Rsp=1
