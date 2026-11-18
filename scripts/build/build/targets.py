@@ -283,6 +283,8 @@ def BuildHostTarget():
     target.AppendModifier('disable-dnssd-tests', enable_dnssd_tests=False).OnlyIfRe('-tests')
     target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
+    target.AppendModifier('no-tcp', enable_tcp=False).OnlyIfRe('-tests')
+    target.AppendModifier('packetbuffer-pool', packetbuffer_pool=True).OnlyIfRe('-tests')
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
     target.AppendModifier('webrtc', enable_webrtc=True)
     target.AppendModifier('endpoint-unique-id', chip_enable_endpoint_unique_id=True)
