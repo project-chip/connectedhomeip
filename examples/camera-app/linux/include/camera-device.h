@@ -390,9 +390,9 @@ public:
     CameraError StartAudioPlaybackStream();
     CameraError StopAudioPlaybackStream();
 
-    // Timestamp handling for video and audio streams
-    std::map<uint16_t, int64_t> mVideoStreamPtsOffsetMs;
-    std::map<uint16_t, int64_t> mAudioStreamPtsOffsetMs;
+    bool ComputeVideoStreamPtsMs(uint16_t videoStreamID, GstClockTime rawPts, int64_t & outTimestampMs, int64_t & outFirstPtsMs);
+    bool ComputeAudioStreamPtsMs(uint16_t audioStreamID, GstClockTime rawPts, int64_t & outTimestampMs, int64_t & outFirstPtsMs);
+    void HandleCapturePipelineRuntimeError(GstElement * faultedPipeline);
 
 private:
     int videoDeviceFd            = -1;
@@ -409,21 +409,18 @@ private:
                                snapshotStreamAllocateArgs,
                            uint16_t & outStreamID);
 
-    GstElement * CreateCameraCapturePipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
+    GstElement * CreateCameraCapturePipeline(const std::string & device, CameraError & error);
     GstElement * CreateVideoBranchBin(uint16_t streamID, int width, int height, int framerate, CameraError & error);
     GstElement * CreateSnapshotBranchBin(uint16_t streamID, int width, int height, int quality, int frameRate, CameraError & error);
-    CameraError AttachStreamBranch(GstElement * branchBin, int width, int height, int framerate, CameraError startFailedError);
+    CameraError AttachStreamBranch(GstElement * branchBin, CameraError startFailedError);
     CameraError DetachStreamBranch(GstElement * branchBin, CameraError stopFailedError);
-    void UpdateCameraCaptureCaps(int minWidth, int minHeight, int minFramerate);
     bool HasActiveStreamBranches() const;
     CameraError StopCameraCapturePipeline(CameraError stopFailedError = CameraError::SUCCESS);
+    void UpdateCurrentVideoFrameRate();
 
-    GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
     GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, int bitRate, CameraError & error);
     GstElement * CreateAudioPlaybackPipeline(CameraError & error);
 
-    GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
-                                        CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
 
     bool MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & outResolution,
@@ -445,11 +442,12 @@ private:
     uint8_t mZoom = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
     // Use a standard 1080p aspect ratio
     chip::app::Clusters::Globals::Structs::ViewportStruct::Type mViewport = { 0, 0, 1920, 1080 };
-    uint16_t mCurrentVideoFrameRate                                       = k30fpsVideoFrameRate;
-    bool mHDREnabled                                                      = false;
-    bool mSpeakerMuted                                                    = false;
-    bool mMicrophoneMuted                                                 = false;
-    bool mHardPrivacyModeOn                                               = false;
+    uint16_t mCurrentVideoFrameRate                                       = 0;
+    std::map<uint16_t, uint16_t> mActiveVideoStreamFrameRates;
+    bool mHDREnabled        = false;
+    bool mSpeakerMuted      = false;
+    bool mMicrophoneMuted   = false;
+    bool mHardPrivacyModeOn = false;
     chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum mNightVision =
         chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum::kOff;
     bool mSoftRecordingPrivacyModeEnabled  = false;
@@ -479,6 +477,11 @@ private:
 
     // Audio playback pipeline specific members
     GstElement * mAudioPlaybackPipeline = nullptr;
+
+    // Timestamp handling for video and audio streams (guarded by mPtsOffsetMutex, never acquired before mPipelineMutex)
+    std::mutex mPtsOffsetMutex;
+    std::map<uint16_t, int64_t> mVideoStreamPtsOffsetMs;
+    std::map<uint16_t, int64_t> mAudioStreamPtsOffsetMs;
 
     mutable std::mutex mPrivacyZonesMutex;
     std::map<uint16_t, chip::app::Clusters::ZoneManagement::TwoDCartesianZoneStorage> mPrivacyZones;

@@ -49,6 +49,15 @@ void CameraAVStreamManager::SetCameraDeviceHAL(CameraDeviceInterface * aCameraDe
     mCameraDeviceHAL = aCameraDeviceHAL;
 }
 
+void CameraAVStreamManager::SyncCurrentFrameRateFromHAL()
+{
+    if (GetCameraAVStreamManagementCluster() != nullptr && mCameraDeviceHAL != nullptr)
+    {
+        TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()
+            -> SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+    }
+}
+
 CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<std::vector<uint16_t>> & videoStreams,
                                                       Optional<std::vector<uint16_t>> & audioStreams)
 {
@@ -399,8 +408,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
             mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamAllocated(outStreamID);
 
             // Set the current frame rate attribute from HAL
-            TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()->SetCurrentFrameRate(
-                mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+            TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()
+                -> SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
 
             return Status::Success;
         }
@@ -419,8 +428,8 @@ void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & all
         mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(allocatedStream);
 
         // Set the current frame rate attribute from HAL once stream has started
-        TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()->SetCurrentFrameRate(
-            mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+        TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()
+            -> SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
         break;
 
     case StreamAllocationAction::kModification:
@@ -433,6 +442,8 @@ void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & all
                 ChipLogProgress(Camera, "Restarting video stream with ID: %u due to modifications", allocatedStream.videoStreamID);
                 mCameraDeviceHAL->GetCameraHALInterface().StopVideoStream(allocatedStream.videoStreamID);
                 mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(allocatedStream);
+                TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()
+                    -> SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
                 break;
             }
         }
@@ -479,6 +490,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate
         {
             // Stop the video stream
             mCameraDeviceHAL->GetCameraHALInterface().StopVideoStream(streamID);
+            TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()
+                -> SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
 
             stream.isAllocated = false;
 
@@ -906,9 +919,7 @@ CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
         if (it != persistedStreams.end())
         {
             // Found in persisted streams, mark as allocated in HAL
-            halStream.snapshotStreamParams.minResolution = it->minResolution;
-            halStream.snapshotStreamParams.maxResolution = it->maxResolution;
-            halStream.isAllocated                        = true;
+            halStream.isAllocated = true;
 
             ChipLogProgress(Camera, "HAL Snapshot Stream ID %u marked as allocated from persisted state.",
                             halStream.snapshotStreamParams.snapshotStreamID);

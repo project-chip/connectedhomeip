@@ -19,9 +19,11 @@
 #include "camera-device.h"
 #include <AppMain.h>
 #include <Options.h>
+#include <algorithm>
 #include <app/clusters/zone-management-server/zone-geometry.h>
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <fcntl.h> // For file descriptor operations
 #include <filesystem>
 #include <fstream>
@@ -33,11 +35,9 @@
 #include <limits.h>          // For PATH_MAX
 #include <linux/videodev2.h> // For V4L2 definitions
 #include <memory>
+#include <platform/CHIPDeviceLayer.h>
 #include <sys/ioctl.h>
 
-// File used to store snapshot from stream and return for CaptureSnapshot
-// command.
-#define SNAPSHOT_FILE_PATH "./capture_snapshot.jpg"
 // Timeout for video pipeline to go to playing state.
 #define VIDEO_PIPELINE_PLAY_TIMEOUT 5
 // Framesize for audio pipeline
@@ -191,46 +191,108 @@ void AttachEncoderPrivacyMaskProbes(GstElement * encoder, CameraDevice * device,
     }
 }
 
-void GetBranchDimensionsAndFrameRate(GstElement * branchBin, int & width, int & height, int & framerate)
+constexpr int kMaxSnapshotBranchFrameRate = 5;
+
+struct CapturePipelineBusContext
 {
-    if (branchBin == nullptr)
+    CameraDevice * device = nullptr;
+    GstElement * pipeline = nullptr;
+    std::atomic<bool> active{ true };
+};
+
+void DestroyCaptureBusContextHolder(gpointer data)
+{
+    delete static_cast<std::shared_ptr<CapturePipelineBusContext> *>(data);
+}
+
+GstBusSyncReply OnCapturePipelineBusSyncMessage(GstBus * bus, GstMessage * msg, gpointer user_data)
+{
+    auto * holder = static_cast<std::shared_ptr<CapturePipelineBusContext> *>(user_data);
+    if (holder == nullptr || *holder == nullptr || msg == nullptr || !(*holder)->active.load(std::memory_order_acquire))
     {
-        return;
+        return GST_BUS_PASS;
     }
 
-    GstElement * capsfilter = gst_bin_get_by_name(GST_BIN(branchBin), "capsfilter");
-    if (capsfilter == nullptr)
+    if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_WARNING)
     {
-        return;
+        GError * err       = nullptr;
+        gchar * debug_info = nullptr;
+        gst_message_parse_warning(msg, &err, &debug_info);
+        ChipLogProgress(Camera, "Capture pipeline warning: %s", err != nullptr ? err->message : "unknown");
+        if (debug_info != nullptr)
+        {
+            ChipLogProgress(Camera, "Capture pipeline warning debug: %s", debug_info);
+        }
+        g_clear_error(&err);
+        g_free(debug_info);
+    }
+    else if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_ERROR)
+    {
+        GError * err       = nullptr;
+        gchar * debug_info = nullptr;
+        gst_message_parse_error(msg, &err, &debug_info);
+        ChipLogError(Camera, "Capture pipeline error: %s", err != nullptr ? err->message : "unknown");
+        if (debug_info != nullptr)
+        {
+            ChipLogError(Camera, "Capture pipeline error debug: %s", debug_info);
+        }
+        g_clear_error(&err);
+        g_free(debug_info);
+
+        if ((*holder)->active.exchange(false, std::memory_order_acq_rel) && (*holder)->device != nullptr &&
+            (*holder)->pipeline != nullptr)
+        {
+            CameraDevice * device        = (*holder)->device;
+            GstElement * faultedPipeline = static_cast<GstElement *>(gst_object_ref((*holder)->pipeline));
+            const CHIP_ERROR scheduleErr = DeviceLayer::SystemLayer().ScheduleLambda([device, faultedPipeline]() {
+                device->HandleCapturePipelineRuntimeError(faultedPipeline);
+                gst_object_unref(faultedPipeline);
+            });
+            if (scheduleErr != CHIP_NO_ERROR)
+            {
+                gst_object_unref(faultedPipeline);
+            }
+        }
     }
 
-    GstCaps * caps = nullptr;
-    g_object_get(capsfilter, "caps", &caps, nullptr);
-    if (caps != nullptr && gst_caps_get_size(caps) > 0)
+    return GST_BUS_PASS;
+}
+
+struct TeeUnlinkProbeContext
+{
+    GstPad * sinkPad = nullptr;
+    std::mutex mutex;
+    std::condition_variable cv;
+    bool unlinked = false;
+
+    ~TeeUnlinkProbeContext()
     {
-        const GstStructure * structure = gst_caps_get_structure(caps, 0);
-        int branchWidth                = 0;
-        int branchHeight               = 0;
-        int fpsNum                     = 0;
-        int fpsDen                     = 1;
-        if (gst_structure_get_int(structure, "width", &branchWidth))
+        if (sinkPad != nullptr)
         {
-            width = std::max(width, branchWidth);
-        }
-        if (gst_structure_get_int(structure, "height", &branchHeight))
-        {
-            height = std::max(height, branchHeight);
-        }
-        if (gst_structure_get_fraction(structure, "framerate", &fpsNum, &fpsDen) && fpsDen > 0)
-        {
-            framerate = std::max(framerate, fpsNum / fpsDen);
+            gst_object_unref(sinkPad);
         }
     }
-    if (caps != nullptr)
+};
+
+void DestroyTeeUnlinkProbeHolder(gpointer data)
+{
+    delete static_cast<std::shared_ptr<TeeUnlinkProbeContext> *>(data);
+}
+
+GstPadProbeReturn OnTeeSrcPadIdleUnlinkProbe(GstPad * pad, GstPadProbeInfo * info, gpointer user_data)
+{
+    auto * holder = static_cast<std::shared_ptr<TeeUnlinkProbeContext> *>(user_data);
+    if (holder != nullptr && *holder != nullptr)
     {
-        gst_caps_unref(caps);
+        std::lock_guard<std::mutex> lock((*holder)->mutex);
+        if (!(*holder)->unlinked && (*holder)->sinkPad != nullptr)
+        {
+            gst_pad_unlink(pad, (*holder)->sinkPad);
+            (*holder)->unlinked = true;
+        }
+        (*holder)->cv.notify_all();
     }
-    gst_object_unref(capsfilter);
+    return GST_PAD_PROBE_REMOVE;
 }
 
 // Callback function for GStreamer app sink
@@ -273,16 +335,9 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
                 rawPts = 0;
             }
         }
-        auto firstPtsIt = self->mVideoStreamPtsOffsetMs.find(videoStreamID);
-        if (firstPtsIt == self->mVideoStreamPtsOffsetMs.end())
-        {
-            auto now                                     = std::chrono::steady_clock::now().time_since_epoch();
-            int64_t nowMs                                = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
-            int64_t rawMs                                = static_cast<int64_t>(rawPts / 1000000);
-            self->mVideoStreamPtsOffsetMs[videoStreamID] = nowMs - rawMs;
-        }
-        int64_t ts = self->mVideoStreamPtsOffsetMs[videoStreamID] + (rawPts / 1000000);
-        if (ts >= self->mVideoStreamPtsOffsetMs[videoStreamID])
+        int64_t ts         = 0;
+        int64_t firstPtsMs = 0;
+        if (self->ComputeVideoStreamPtsMs(videoStreamID, rawPts, ts, firstPtsMs))
         {
             // Forward raw H.264 encoded frames to media controller with timestamp,
             // serialized with privacy zone generation updates and pre-roll buffer clearing.
@@ -292,8 +347,8 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
         else
         {
             ChipLogError(Camera,
-                         "Dropping video frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
-                         rawPts, self->mVideoStreamPtsOffsetMs[videoStreamID], videoStreamID);
+                         "Dropping video frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GINT64_FORMAT " for stream %u",
+                         rawPts, firstPtsMs, videoStreamID);
         }
         gst_buffer_unmap(buffer, &map);
     }
@@ -344,16 +399,9 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
                 rawPts = 0;
             }
         }
-        auto firstPtsIt = self->mAudioStreamPtsOffsetMs.find(audioStreamID);
-        if (firstPtsIt == self->mAudioStreamPtsOffsetMs.end())
-        {
-            auto now                                     = std::chrono::steady_clock::now().time_since_epoch();
-            int64_t nowMs                                = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
-            int64_t rawMs                                = static_cast<int64_t>(rawPts / 1000000);
-            self->mAudioStreamPtsOffsetMs[audioStreamID] = nowMs - rawMs;
-        }
-        int64_t ts = self->mAudioStreamPtsOffsetMs[audioStreamID] + (rawPts / 1000000);
-        if (ts >= self->mAudioStreamPtsOffsetMs[audioStreamID])
+        int64_t ts         = 0;
+        int64_t firstPtsMs = 0;
+        if (self->ComputeAudioStreamPtsMs(audioStreamID, rawPts, ts, firstPtsMs))
         {
             // Forward raw Opus encoded frames to media controller with timestamp
             // The PreRollBuffer will distribute to ALL transports registered for this audioStreamID
@@ -363,8 +411,8 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
         else
         {
             ChipLogError(Camera,
-                         "Dropping audio frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
-                         rawPts, self->mAudioStreamPtsOffsetMs[audioStreamID], audioStreamID);
+                         "Dropping audio frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GINT64_FORMAT " for stream %u",
+                         rawPts, firstPtsMs, audioStreamID);
         }
         gst_buffer_unmap(buffer, &map);
     }
@@ -488,7 +536,13 @@ CameraDevice::~CameraDevice()
 
 void CameraDevice::Init()
 {
-    InitializeCameraDevice();
+    CameraError initErr = InitializeCameraDevice();
+    if (initErr != CameraError::SUCCESS)
+    {
+        // Continue initializing logical stream tables so headless cluster tests without physical camera hardware still function.
+        ChipLogError(Camera, "Camera hardware initialization failed (err=%d); media capture will fail until a device is available",
+                     static_cast<int>(initErr));
+    }
     InitializeStreams();
     mWebRTCProviderManager.Init();
     mPushAVTransportManager.Init();
@@ -554,18 +608,17 @@ CameraError CameraDevice::InitializeStreams()
     return CameraError::SUCCESS;
 }
 
-GstElement * CameraDevice::CreateCameraCapturePipeline(const std::string & device, int width, int height, int framerate,
-                                                       CameraError & error)
+GstElement * CameraDevice::CreateCameraCapturePipeline(const std::string & device, CameraError & error)
 {
     GstElement * pipeline     = gst_pipeline_new("camera-capture-pipeline");
+    GstElement * sourceCaps   = gst_element_factory_make("capsfilter", "source_caps");
     GstElement * videoconvert = gst_element_factory_make("videoconvert", "capture_videoconvert");
-    GstElement * videoscale   = gst_element_factory_make("videoscale", "capture_videoscale");
-    GstElement * videorate    = gst_element_factory_make("videorate", "capture_videorate");
-    GstElement * captureCaps  = gst_element_factory_make("capsfilter", "capture_caps");
+    GstElement * formatCaps   = gst_element_factory_make("capsfilter", "format_caps");
     GstElement * streamTee    = gst_element_factory_make("tee", "stream_tee");
     GstElement * source       = nullptr;
 
-    if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
+    const bool useTestVideoSrc = LinuxDeviceOptions::GetInstance().cameraTestVideosrc;
+    if (useTestVideoSrc)
     {
         source = gst_element_factory_make("videotestsrc", "source");
         if (source != nullptr)
@@ -605,14 +658,10 @@ GstElement * CameraDevice::CreateCameraCapturePipeline(const std::string & devic
             }
             else
             {
-                ChipLogProgress(Camera,
-                                "Physical camera device %s not found; falling back to test video source for capture pipeline",
-                                device.c_str());
-                source = gst_element_factory_make("videotestsrc", "source");
-                if (source != nullptr)
-                {
-                    g_object_set(source, "pattern", kBallAnimationPattern, "is-live", TRUE, nullptr);
-                }
+                ChipLogError(Camera, "Unsupported camera type or device not found: %s", device.c_str());
+                GstreamerPipepline::unrefGstElements(pipeline, sourceCaps, videoconvert, formatCaps, streamTee);
+                error = CameraError::ERROR_INIT_FAILED;
+                return nullptr;
             }
             break;
         }
@@ -621,35 +670,66 @@ GstElement * CameraDevice::CreateCameraCapturePipeline(const std::string & devic
     const std::vector<std::pair<GstElement *, const char *>> elements = {
         { pipeline, "pipeline" },         //
         { source, "source" },             //
+        { sourceCaps, "source_caps" },    //
         { videoconvert, "videoconvert" }, //
-        { videoscale, "videoscale" },     //
-        { videorate, "videorate" },       //
-        { captureCaps, "capture_caps" },  //
+        { formatCaps, "format_caps" },    //
         { streamTee, "stream_tee" }       //
     };
     if (GstreamerPipepline::isGstElementsNull(elements))
     {
         ChipLogError(Camera, "Not all camera capture pipeline elements could be created.");
-        GstreamerPipepline::unrefGstElements(pipeline, source, videoconvert, videoscale, videorate, captureCaps, streamTee);
+        GstreamerPipepline::unrefGstElements(pipeline, source, sourceCaps, videoconvert, formatCaps, streamTee);
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
 
-    g_object_set(videorate, "skip-to-first", TRUE, nullptr);
     g_object_set(streamTee, "allow-not-linked", TRUE, nullptr);
 
-    GstCaps * caps = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "I420", "width", G_TYPE_INT, width, "height",
-                                         G_TYPE_INT, height, "framerate", GST_TYPE_FRACTION, framerate, 1, nullptr);
-    g_object_set(captureCaps, "caps", caps, nullptr);
-    gst_caps_unref(caps);
+    GstCaps * srcCaps = nullptr;
+    if (useTestVideoSrc)
+    {
+        const uint16_t captureFps =
+            std::clamp<uint16_t>(LinuxDeviceOptions::GetInstance().cameraFramerate.ValueOr(k30fpsVideoFrameRate),
+                                 kMinVideoFrameRate, kMaxVideoFrameRate);
+        srcCaps = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "I420", "width", G_TYPE_INT,
+                                      static_cast<int>(k720pResolutionWidth), "height", G_TYPE_INT,
+                                      static_cast<int>(k720pResolutionHeight), "framerate", GST_TYPE_FRACTION,
+                                      static_cast<int>(captureFps), 1, nullptr);
+    }
+    else
+    {
+        // Constrain hardware capture directly after source so multi-mode cameras select a streaming-rate raw mode rather than a
+        // low-fps multi-megapixel mode while per-branch videoscale/videorate handles exact stream resolutions.
+        srcCaps =
+            gst_caps_new_simple("video/x-raw", "width", GST_TYPE_INT_RANGE, 1, static_cast<int>(kMaxResolutionWidth), "height",
+                                GST_TYPE_INT_RANGE, 1, static_cast<int>(kMaxResolutionHeight), "framerate", GST_TYPE_FRACTION_RANGE,
+                                static_cast<int>(kMinVideoFrameRate), 1, static_cast<int>(kMaxVideoFrameRate), 1, nullptr);
+    }
+    g_object_set(sourceCaps, "caps", srcCaps, nullptr);
+    gst_caps_unref(srcCaps);
 
-    gst_bin_add_many(GST_BIN(pipeline), source, videoconvert, videoscale, videorate, captureCaps, streamTee, nullptr);
-    if (!gst_element_link_many(source, videoconvert, videoscale, videorate, captureCaps, streamTee, nullptr))
+    GstCaps * i420Caps = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "I420", nullptr);
+    g_object_set(formatCaps, "caps", i420Caps, nullptr);
+    gst_caps_unref(i420Caps);
+
+    gst_bin_add_many(GST_BIN(pipeline), source, sourceCaps, videoconvert, formatCaps, streamTee, nullptr);
+    if (!gst_element_link_many(source, sourceCaps, videoconvert, formatCaps, streamTee, nullptr))
     {
         ChipLogError(Camera, "CreateCameraCapturePipeline: link failed");
         gst_object_unref(pipeline);
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
+    }
+
+    GstBus * bus = gst_element_get_bus(pipeline);
+    if (bus != nullptr)
+    {
+        auto busCtx      = std::make_shared<CapturePipelineBusContext>();
+        busCtx->device   = this;
+        busCtx->pipeline = pipeline;
+        gst_bus_set_sync_handler(bus, OnCapturePipelineBusSyncMessage, new std::shared_ptr<CapturePipelineBusContext>(busCtx),
+                                 DestroyCaptureBusContextHolder);
+        gst_object_unref(bus);
     }
 
     return pipeline;
@@ -687,8 +767,10 @@ GstElement * CameraDevice::CreateSnapshotBranchBin(uint16_t streamID, int width,
     g_object_set(queue, "max-size-buffers", 1, "leaky", 2 /* downstream */, nullptr);
     g_object_set(videorate, "skip-to-first", TRUE, nullptr);
 
+    // SnapshotStreamAllocate's maxFrameRate is an upper bound; cap continuous JPEG encoding rate to save idle CPU.
+    const int effectiveFrameRate = std::clamp(framerate, 1, kMaxSnapshotBranchFrameRate);
     GstCaps * caps = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "I420", "width", G_TYPE_INT, width, "height",
-                                         G_TYPE_INT, height, "framerate", GST_TYPE_FRACTION, framerate, 1, nullptr);
+                                         G_TYPE_INT, height, "framerate", GST_TYPE_FRACTION, effectiveFrameRate, 1, nullptr);
     g_object_set(capsfilter, "caps", caps, nullptr);
     gst_caps_unref(caps);
 
@@ -828,6 +910,13 @@ CameraError CameraDevice::StopCameraCapturePipeline(CameraError stopFailedError)
     }
     if (mCameraPipeline != nullptr)
     {
+        GstBus * bus = gst_element_get_bus(mCameraPipeline);
+        if (bus != nullptr)
+        {
+            gst_bus_set_sync_handler(bus, nullptr, nullptr, nullptr);
+            gst_object_unref(bus);
+        }
+
         GstStateChangeReturn result = gst_element_set_state(mCameraPipeline, GST_STATE_NULL);
         gst_object_unref(mCameraPipeline);
         mCameraPipeline = nullptr;
@@ -839,77 +928,42 @@ CameraError CameraDevice::StopCameraCapturePipeline(CameraError stopFailedError)
     return CameraError::SUCCESS;
 }
 
-void CameraDevice::UpdateCameraCaptureCaps(int minWidth, int minHeight, int minFramerate)
+void CameraDevice::HandleCapturePipelineRuntimeError(GstElement * faultedPipeline)
 {
-    std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
-    if (mCameraPipeline == nullptr)
+    bool stoppedAnyVideoStream = false;
     {
-        return;
-    }
-
-    int targetWidth     = minWidth;
-    int targetHeight    = minHeight;
-    int targetFramerate = minFramerate;
-
-    for (const auto & stream : mVideoStreams)
-    {
-        GetBranchDimensionsAndFrameRate(reinterpret_cast<GstElement *>(stream.videoContext), targetWidth, targetHeight,
-                                        targetFramerate);
-    }
-    for (const auto & stream : mSnapshotStreams)
-    {
-        GetBranchDimensionsAndFrameRate(reinterpret_cast<GstElement *>(stream.snapshotContext), targetWidth, targetHeight,
-                                        targetFramerate);
-    }
-
-    if (targetWidth <= 0 || targetHeight <= 0 || targetFramerate <= 0)
-    {
-        return;
-    }
-
-    GstElement * captureCaps = gst_bin_get_by_name(GST_BIN(mCameraPipeline), "capture_caps");
-    if (captureCaps == nullptr)
-    {
-        return;
-    }
-
-    int currentWidth       = 0;
-    int currentHeight      = 0;
-    int currentFramerate   = 0;
-    GstCaps * existingCaps = nullptr;
-    g_object_get(captureCaps, "caps", &existingCaps, nullptr);
-    if (existingCaps != nullptr && gst_caps_get_size(existingCaps) > 0)
-    {
-        const GstStructure * structure = gst_caps_get_structure(existingCaps, 0);
-        int fpsNum                     = 0;
-        int fpsDen                     = 1;
-        gst_structure_get_int(structure, "width", &currentWidth);
-        gst_structure_get_int(structure, "height", &currentHeight);
-        if (gst_structure_get_fraction(structure, "framerate", &fpsNum, &fpsDen) && fpsDen > 0)
+        std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
+        if (faultedPipeline == nullptr || mCameraPipeline != faultedPipeline)
         {
-            currentFramerate = fpsNum / fpsDen;
+            return;
         }
-    }
-    if (existingCaps != nullptr)
-    {
-        gst_caps_unref(existingCaps);
+
+        ChipLogError(Camera, "Stopping active streams and shared camera capture pipeline after runtime error");
+        for (auto & stream : mVideoStreams)
+        {
+            if (stream.videoContext != nullptr)
+            {
+                StopVideoStream(stream.videoStreamParams.videoStreamID);
+                stoppedAnyVideoStream = true;
+            }
+        }
+        for (auto & stream : mSnapshotStreams)
+        {
+            if (stream.snapshotContext != nullptr)
+            {
+                StopSnapshotStream(stream.snapshotStreamParams.snapshotStreamID);
+            }
+        }
+        StopCameraCapturePipeline();
     }
 
-    if (currentWidth != targetWidth || currentHeight != targetHeight || currentFramerate != targetFramerate)
+    if (stoppedAnyVideoStream)
     {
-        ChipLogProgress(Camera, "Updating shared camera capture caps to %dx%d @ %dfps", targetWidth, targetHeight, targetFramerate);
-        GstCaps * newCaps =
-            gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "I420", "width", G_TYPE_INT, targetWidth, "height",
-                                G_TYPE_INT, targetHeight, "framerate", GST_TYPE_FRACTION, targetFramerate, 1, nullptr);
-        g_object_set(captureCaps, "caps", newCaps, nullptr);
-        gst_caps_unref(newCaps);
+        mCameraAVStreamManager.SyncCurrentFrameRateFromHAL();
     }
-
-    gst_object_unref(captureCaps);
 }
 
-CameraError CameraDevice::AttachStreamBranch(GstElement * branchBin, int width, int height, int framerate,
-                                             CameraError startFailedError)
+CameraError CameraDevice::AttachStreamBranch(GstElement * branchBin, CameraError startFailedError)
 {
     std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
     if (branchBin == nullptr)
@@ -921,7 +975,7 @@ CameraError CameraDevice::AttachStreamBranch(GstElement * branchBin, int width, 
     if (createdPipeline)
     {
         CameraError error = CameraError::SUCCESS;
-        mCameraPipeline   = CreateCameraCapturePipeline(mVideoDevicePath, width, height, framerate, error);
+        mCameraPipeline   = CreateCameraCapturePipeline(mVideoDevicePath, error);
         if (mCameraPipeline == nullptr)
         {
             ChipLogError(Camera, "Failed to create shared camera capture pipeline.");
@@ -954,7 +1008,6 @@ CameraError CameraDevice::AttachStreamBranch(GstElement * branchBin, int width, 
 
     if (!createdPipeline)
     {
-        UpdateCameraCaptureCaps(width, height, framerate);
         gst_element_sync_state_with_parent(branchBin);
     }
 
@@ -980,7 +1033,6 @@ CameraError CameraDevice::AttachStreamBranch(GstElement * branchBin, int width, 
         {
             gst_element_set_state(branchBin, GST_STATE_NULL);
             gst_bin_remove(GST_BIN(mCameraPipeline), branchBin);
-            UpdateCameraCaptureCaps(0, 0, 0);
         }
         return startFailedError;
     }
@@ -1075,7 +1127,31 @@ CameraError CameraDevice::DetachStreamBranch(GstElement * branchBin, CameraError
         GstPad * teeSrcPad = gst_pad_get_peer(branchSinkPad);
         if (teeSrcPad != nullptr)
         {
-            gst_pad_unlink(teeSrcPad, branchSinkPad);
+            auto probeCtx     = std::make_shared<TeeUnlinkProbeContext>();
+            probeCtx->sinkPad = static_cast<GstPad *>(gst_object_ref(branchSinkPad));
+            const gulong probeId =
+                gst_pad_add_probe(teeSrcPad, GST_PAD_PROBE_TYPE_IDLE, OnTeeSrcPadIdleUnlinkProbe,
+                                  new std::shared_ptr<TeeUnlinkProbeContext>(probeCtx), DestroyTeeUnlinkProbeHolder);
+
+            bool unlinkedInProbe = false;
+            {
+                std::unique_lock<std::mutex> probeLock(probeCtx->mutex);
+                unlinkedInProbe =
+                    probeCtx->cv.wait_for(probeLock, std::chrono::milliseconds(500), [&probeCtx]() { return probeCtx->unlinked; });
+                if (!unlinkedInProbe)
+                {
+                    probeCtx->unlinked = true;
+                }
+            }
+            if (!unlinkedInProbe)
+            {
+                if (probeId != 0)
+                {
+                    gst_pad_remove_probe(teeSrcPad, probeId);
+                }
+                gst_pad_unlink(teeSrcPad, branchSinkPad);
+            }
+
             if (mCameraTee != nullptr)
             {
                 gst_element_release_request_pad(mCameraTee, teeSrcPad);
@@ -1099,30 +1175,12 @@ CameraError CameraDevice::DetachStreamBranch(GstElement * branchBin, CameraError
         return CameraError::SUCCESS;
     }
 
-    UpdateCameraCaptureCaps(0, 0, 0);
-
     if (result == GST_STATE_CHANGE_FAILURE)
     {
         return stopFailedError;
     }
 
     return CameraError::SUCCESS;
-}
-
-// Function to create the GStreamer pipeline
-GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int framerate,
-                                                  CameraError & error)
-{
-    return CreateSnapshotBranchBin(0, width, height, quality, framerate, error);
-}
-
-// Helper function to create a GStreamer pipeline that captures raw video frames from
-// the camera, converts them to I420 format, encodes to H.264, and sends the encoded
-// stream to the media controller via app sink.
-GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int width, int height, int framerate,
-                                               CameraError & error)
-{
-    return CreateVideoBranchBin(0, width, height, framerate, error);
 }
 
 // Helper function to create a GStreamer pipeline
@@ -1333,7 +1391,7 @@ bool CameraDevice::MatchClosestSnapshotParams(const VideoResolutionStruct & requ
 CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
                                           const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot)
 {
-    std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
+    std::unique_lock<std::recursive_mutex> lock(mPipelineMutex);
     VideoResolutionStruct matchedRes;
     ImageCodecEnum matchedCodec;
     uint16_t streamId               = 0;
@@ -1404,9 +1462,13 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
-    auto stopOnDemandStream = [this, streamId, startedOnDemand]() {
+    auto stopOnDemandStream = [this, streamId, startedOnDemand, &lock]() {
         if (startedOnDemand)
         {
+            if (!lock.owns_lock())
+            {
+                lock.lock();
+            }
             ChipLogProgress(Camera, "Stopping snapshot stream that was started on demand");
             if (StopSnapshotStream(streamId) != CameraError::SUCCESS)
             {
@@ -1415,7 +1477,7 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
         }
     };
 
-    // Get the appsink
+    // Get the appsink (returns a new owned reference, safe to hold while mPipelineMutex is unlocked)
     GstElement * appsink = gst_bin_get_by_name(GST_BIN(snapshotPipeline), "sink");
     if (!appsink)
     {
@@ -1423,6 +1485,8 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
         stopOnDemandStream();
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
+
+    lock.unlock();
 
     // Pull sample from appsink whose privacy mask generation is at least requiredGen so pre-update frames are never returned.
     ChipLogProgress(Camera, "Pulling sample from appsink...");
@@ -1501,6 +1565,57 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
     return CameraError::SUCCESS;
 }
 
+void CameraDevice::UpdateCurrentVideoFrameRate()
+{
+    uint16_t maxFrameRate = 0;
+    for (const auto & stream : mVideoStreams)
+    {
+        if (stream.videoContext != nullptr)
+        {
+            auto rateIt = mActiveVideoStreamFrameRates.find(stream.videoStreamParams.videoStreamID);
+            if (rateIt != mActiveVideoStreamFrameRates.end())
+            {
+                maxFrameRate = std::max(maxFrameRate, rateIt->second);
+            }
+        }
+    }
+    mCurrentVideoFrameRate = maxFrameRate;
+}
+
+bool CameraDevice::ComputeVideoStreamPtsMs(uint16_t videoStreamID, GstClockTime rawPts, int64_t & outTimestampMs,
+                                           int64_t & outFirstPtsMs)
+{
+    std::lock_guard<std::mutex> lock(mPtsOffsetMutex);
+    auto firstPtsIt = mVideoStreamPtsOffsetMs.find(videoStreamID);
+    if (firstPtsIt == mVideoStreamPtsOffsetMs.end())
+    {
+        const auto now      = std::chrono::steady_clock::now().time_since_epoch();
+        const int64_t nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+        const int64_t rawMs = static_cast<int64_t>(rawPts / 1000000);
+        firstPtsIt          = mVideoStreamPtsOffsetMs.emplace(videoStreamID, nowMs - rawMs).first;
+    }
+    outFirstPtsMs  = firstPtsIt->second;
+    outTimestampMs = outFirstPtsMs + static_cast<int64_t>(rawPts / 1000000);
+    return outTimestampMs >= outFirstPtsMs;
+}
+
+bool CameraDevice::ComputeAudioStreamPtsMs(uint16_t audioStreamID, GstClockTime rawPts, int64_t & outTimestampMs,
+                                           int64_t & outFirstPtsMs)
+{
+    std::lock_guard<std::mutex> lock(mPtsOffsetMutex);
+    auto firstPtsIt = mAudioStreamPtsOffsetMs.find(audioStreamID);
+    if (firstPtsIt == mAudioStreamPtsOffsetMs.end())
+    {
+        const auto now      = std::chrono::steady_clock::now().time_since_epoch();
+        const int64_t nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+        const int64_t rawMs = static_cast<int64_t>(rawPts / 1000000);
+        firstPtsIt          = mAudioStreamPtsOffsetMs.emplace(audioStreamID, nowMs - rawMs).first;
+    }
+    outFirstPtsMs  = firstPtsIt->second;
+    outTimestampMs = outFirstPtsMs + static_cast<int64_t>(rawPts / 1000000);
+    return outTimestampMs >= outFirstPtsMs;
+}
+
 CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedStream)
 {
     std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
@@ -1521,8 +1636,6 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
     const uint16_t framerate = std::clamp(LinuxDeviceOptions::GetInstance().cameraFramerate.ValueOr(k30fpsVideoFrameRate),
                                           allocatedStream.minFrameRate, allocatedStream.maxFrameRate);
 
-    mCurrentVideoFrameRate = 0;
-
     CameraError error = CameraError::SUCCESS;
     GstElement * videoBranchBin =
         CreateVideoBranchBin(streamID, allocatedStream.minResolution.width, allocatedStream.minResolution.height, framerate, error);
@@ -1530,23 +1643,25 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
     {
         ChipLogError(Camera, "Failed to create video branch bin.");
         it->videoContext = nullptr;
+        UpdateCurrentVideoFrameRate();
         return error;
     }
 
     ChipLogProgress(Camera, "Starting video stream (id=%u): %u×%u @ %ufps", streamID, allocatedStream.minResolution.width,
                     allocatedStream.minResolution.height, framerate);
 
-    error = AttachStreamBranch(videoBranchBin, allocatedStream.minResolution.width, allocatedStream.minResolution.height, framerate,
-                               CameraError::ERROR_VIDEO_STREAM_START_FAILED);
+    error = AttachStreamBranch(videoBranchBin, CameraError::ERROR_VIDEO_STREAM_START_FAILED);
     if (error != CameraError::SUCCESS)
     {
         ChipLogError(Camera, "Failed to attach and start video stream branch (id=%u).", streamID);
         it->videoContext = nullptr;
+        UpdateCurrentVideoFrameRate();
         return error;
     }
 
-    it->videoContext       = videoBranchBin;
-    mCurrentVideoFrameRate = framerate;
+    it->videoContext                       = videoBranchBin;
+    mActiveVideoStreamFrameRates[streamID] = framerate;
+    UpdateCurrentVideoFrameRate();
 
     ChipLogProgress(Camera, "Video is PLAYING …");
 
@@ -1572,7 +1687,12 @@ CameraError CameraDevice::StopVideoStream(uint16_t streamID)
         it->videoContext = nullptr;
         error            = DetachStreamBranch(videoBranchBin, CameraError::ERROR_VIDEO_STREAM_STOP_FAILED);
     }
-    mVideoStreamPtsOffsetMs.erase(streamID);
+    mActiveVideoStreamFrameRates.erase(streamID);
+    UpdateCurrentVideoFrameRate();
+    {
+        std::lock_guard<std::mutex> ptsLock(mPtsOffsetMutex);
+        mVideoStreamPtsOffsetMs.erase(streamID);
+    }
 
     return error;
 }
@@ -1691,7 +1811,10 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
         }
     }
 
-    mAudioStreamPtsOffsetMs.erase(streamID);
+    {
+        std::lock_guard<std::mutex> ptsLock(mPtsOffsetMutex);
+        mAudioStreamPtsOffsetMs.erase(streamID);
+    }
 
     return CameraError::SUCCESS;
 }
@@ -1799,9 +1922,7 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
         return error;
     }
 
-    error = AttachStreamBranch(snapshotBranchBin, it->snapshotStreamParams.minResolution.width,
-                               it->snapshotStreamParams.minResolution.height, it->snapshotStreamParams.frameRate,
-                               CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED);
+    error = AttachStreamBranch(snapshotBranchBin, CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED);
     if (error != CameraError::SUCCESS)
     {
         ChipLogError(Camera, "Failed to attach and start snapshot stream branch (id=%u).", streamID);

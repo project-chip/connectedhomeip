@@ -431,16 +431,23 @@ graph TD
     `OnVideoStreamAllocated`.
 6.  `CameraAVStreamManager` calls `StartVideoStream` on the `CameraDevice`'s
     `CameraHALInterface`.
-7.  The `CameraDevice` creates and starts a GStreamer pipeline to handle the
-    video stream. The pipeline is configured to:
-    -   Read raw video frames from the V4L2 device (`v4l2src`).
-    -   Convert the video frames to the I420 format (`videoconvert`).
-    -   Encode the frames to H.264 (`x264enc`).
-    -   Send the encoded frames to an `appsink`.
+7.  The `CameraDevice` creates (if not already running) the shared camera
+    capture pipeline (`CreateCameraCapturePipeline`) ending in a `tee` element
+    (`stream_tee`), creates a per-stream video branch bin
+    (`CreateVideoBranchBin`), and dynamically attaches it via
+    `AttachStreamBranch`:
+    -   Shared capture pipeline: captures raw frames from `v4l2src`,
+        `libcamerasrc`, or `videotestsrc`, applies source caps, converts to
+        `I420` (`videoconvert`), and fans out frames through `stream_tee`.
+    -   Per-stream video branch bin: buffers and converts to the stream's target
+        dimensions and frame rate (`queue` -> `videoscale` -> `videorate` ->
+        `capsfilter`), applies privacy-zone `I420` masks on the encoder sink pad
+        probe, encodes to H.264 (`x264enc`), and delivers encoded samples to an
+        `appsink`.
 8.  The `appsink` has a callback function (`OnNewVideoSampleFromAppSink`) that
     is called for each new frame.
 9.  In the callback, the encoded H.264 data is retrieved and passed to the
-    `DefaultMediaController`.
+    `DefaultMediaController` (via `DistributeVideoIfCurrentGeneration`).
 10. The `DefaultMediaController` pushes the frame to its pre-roll buffer, which
     then distributes it to all registered transports.
 11. For a live stream, the `WebRTCTransport` receives the frame and sends it
@@ -450,43 +457,59 @@ graph TD
 
 ### Snapshot
 
-1.  A Matter client requests a snapshot from the `CameraAVStreamManagement`
-    cluster.
+1.  A Matter client allocates a snapshot stream via `SnapshotStreamAllocate`
+    (which starts and attaches a `CreateSnapshotBranchBin` branch to the shared
+    capture `stream_tee`) and requests a snapshot via `CaptureSnapshot` on the
+    `CameraAVStreamManagement` cluster.
 2.  The `CameraAVStreamManagementCluster` receives the request and calls the
     `CaptureSnapshot` method on the `CameraAVStreamManager`.
 3.  `CameraAVStreamManager` delegates the call to
     `CameraDevice::CaptureSnapshot`.
-4.  The `CameraDevice` (if a snapshot stream is not running) creates a GStreamer
-    pipeline to capture a single frame. The pipeline is configured to:
-    -   Read a frame from the V4L2 device (`v4l2src` or `libcamerasrc`).
-    -   Encode the frame as a JPEG (`jpegenc`).
-    -   Save the JPEG to a file (`multifilesink`).
-5.  The `CameraDevice` then reads the JPEG file from disk and sends the data
-    back to the client as the response to the snapshot request.
+4.  If the matched allocated snapshot stream's branch is not yet active,
+    `CameraDevice::CaptureSnapshot` starts it on demand via
+    `StartSnapshotStream`. Each snapshot branch bin scales and rate-limits raw
+    `I420` frames from `stream_tee`, applies privacy-zone masks on the `jpegenc`
+    sink pad probe, encodes JPEG frames (`jpegenc`), and retains the latest
+    sample in an `appsink` (`max-buffers=1`, `drop=TRUE`).
+5.  `CameraDevice::CaptureSnapshot` pulls a current-generation JPEG `GstSample`
+    directly from the branch's `appsink` in memory and returns the encoded bytes
+    in `CaptureSnapshotResponse`.
 
 ## GStreamer Integration
 
 GStreamer is used extensively in the `CameraDevice` to handle all media
-processing. The `CameraDevice` class contains helper methods
-(`CreateVideoPipeline`, `CreateAudioPipeline`, `CreateSnapshotPipeline`,
-`CreateAudioPlaybackPipeline`) that construct these GStreamer pipelines.
-Pipelines are dynamically created, started, and stopped based on requests from
-the Matter clusters, as orchestrated by the various managers (especially
-`CameraAVStreamManager`).
+processing. Video and snapshot streams share a single camera capture pipeline
+(`CreateCameraCapturePipeline`) fanned out through a `tee` element
+(`stream_tee`) into dynamically attached per-stream `GstBin` branches
+(`CreateVideoBranchBin`, `CreateSnapshotBranchBin`), allowing concurrent video
+streaming and snapshot capture from a single physical V4L2/CSI camera device.
+Audio capture and playback use dedicated pipelines (`CreateAudioPipeline`,
+`CreateAudioPlaybackPipeline`).
 
--   **Video Streaming (`CreateVideoPipeline`):**
+-   **Shared Camera Capture (`CreateCameraCapturePipeline`):**
 
-    -   **Source:** `v4l2src` (or `videotestsrc` for testing) to capture from
-        the camera device.
-    -   **Caps Negotiation:** `capsfilter` to set resolution and framerate.
-    -   **Format Conversion:** `videoconvert` to ensure the format is suitable
-        for the encoder (e.g., I420).
-    -   **Encoding:** `x264enc` for H.264 encoding.
-    -   **Sink:** `appsink` with the `OnNewVideoSampleFromAppSink` callback.
-        This callback receives the encoded H.264 buffers and passes them to
-        `DefaultMediaController::DistributeVideo`.
-    -   **Lifecycle:** Started by `CameraDevice::StartVideoStream`, stopped by
-        `CameraDevice::StopVideoStream`.
+    -   **Source:** `v4l2src` (USB/V4L2), `libcamerasrc` (CSI), or
+        `videotestsrc` (when `--camera-test-videosrc` is enabled).
+    -   **Caps & Format Conversion:** `source_caps` directly after the source to
+        constrain sensor capture bounds, followed by `videoconvert` and
+        `format_caps` (`video/x-raw, format=I420`) feeding `stream_tee`.
+    -   **Error Handling & Lifecycle:** Started when the first video or snapshot
+        branch attaches (`AttachStreamBranch`), monitored via a bus sync handler
+        for runtime device errors, and stopped automatically when the last
+        active branch detaches (`DetachStreamBranch` /
+        `StopCameraCapturePipeline`).
+
+-   **Video Stream Branch (`CreateVideoBranchBin`):**
+
+    -   **Scaling & Rate Control:** `queue` -> `videoscale` -> `videorate` ->
+        `capsfilter` (`I420` at the allocated stream resolution and frame rate).
+    -   **Encoding:** `x264enc` (`tune=zerolatency`, `speed-preset=ultrafast`)
+        with privacy-zone pad probes.
+    -   **Sink:** `appsink` (`sync=FALSE`, `async=FALSE`) invoking
+        `OnNewVideoSampleFromAppSink` to forward encoded H.264 frames to
+        `DefaultMediaController`.
+    -   **Lifecycle:** Attached by `CameraDevice::StartVideoStream`, detached
+        via an `IDLE` tee pad probe by `CameraDevice::StopVideoStream`.
 
 -   **Audio Streaming (`CreateAudioPipeline`):**
 
@@ -500,16 +523,18 @@ the Matter clusters, as orchestrated by the various managers (especially
     -   **Lifecycle:** Started by `CameraDevice::StartAudioStream`, stopped by
         `CameraDevice::StopAudioStream`.
 
--   **Snapshots (`CreateSnapshotPipeline`):**
+-   **Snapshot Stream Branch (`CreateSnapshotBranchBin`):**
 
-    -   **Source:** `v4l2src` or `libcamerasrc` depending on camera type.
-    -   **Caps Negotiation:** `capsfilter` for resolution/format.
-    -   **Encoding:** `jpegenc` to create a JPEG image.
-    -   **Sink:** `multifilesink` to save the JPEG to a temporary file
-        (`SNAPSHOT_FILE_PATH`). The `CameraDevice::CaptureSnapshot` method then
-        reads this file.
-    -   **Lifecycle:** Created on-demand when `CameraDevice::CaptureSnapshot` is
-        called and a snapshot stream is active.
+    -   **Scaling & Rate Control:** `queue` -> `videoscale` -> `videorate` ->
+        `capsfilter` (`I420` at the snapshot stream resolution, capped to a
+        low continuous rate to minimize idle CPU).
+    -   **Encoding:** `jpegenc` with privacy-zone pad probes.
+    -   **Sink:** `appsink` (`max-buffers=1`, `drop=TRUE`, `sync=FALSE`,
+        `async=FALSE`) from which `CameraDevice::CaptureSnapshot` pulls JPEG
+        samples directly in memory.
+    -   **Lifecycle:** Attached by `CameraDevice::StartSnapshotStream` (at
+        allocation or on demand) and detached by
+        `CameraDevice::StopSnapshotStream`.
 
 -   **Audio Playback (`CreateAudioPlaybackPipeline`):**
     -   **Source:** `udpsrc` to receive RTP Opus packets from the network (e.g.,
