@@ -76,11 +76,12 @@ project(AllChipTests)
 enable_testing()
 
 target_sources(app PRIVATE main/runner.cpp)
+# pw_sys_io_stdio and its default_putget_bytes object are already linked
+# via --whole-archive libCHIP_tests.a; linking them here duplicates symbols.
 target_link_libraries(app PUBLIC
   chip
   $<TARGET_FILE:kernel>
   pw_unit_test
-  pw_sys_io_stdio
 )
 target_compile_definitions(app PUBLIC CHIP_HAVE_CONFIG_H)
 
