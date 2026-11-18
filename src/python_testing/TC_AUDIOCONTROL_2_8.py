@@ -23,6 +23,7 @@
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     app-stdin-pipe: dut-tv-app-stdin
 #     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --endpoint 2
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -437,13 +438,17 @@ class TC_AUDIOCONTROL_2_8(MatterTestCommissionedDevice, AUDIOCONTROLTestBase):
 
         # PhysicallyMuted is read-only, so only an operator can change it. A DUT with no such
         # control cannot exercise this dependency, which is distinct from failing it.
+        # In CI the TH cannot physically mute the DUT, which is the same as answering 'n'.
         muted = False
-        if supported:
+        if supported and not self.is_pics_sdk_ci_only:
             response = self.wait_for_user_input(
                 prompt_msg="Physically mute the DUT, per the manufacturer's documentation.\n"
                            "Enter 'y' once done, or 'n' if the DUT provides no way to physically mute it.\n",
                 prompt_msg_placeholder="y", default_value="y")
-            muted = response is not None and response.lower() == "y"
+            asserts.assert_is_not_none(response, "No response to the physical mute prompt, expected 'y' or 'n'")
+            response = response.lower()
+            asserts.assert_in(response, ["y", "n"], "Invalid response to the physical mute prompt, expected 'y' or 'n'")
+            muted = response == "y"
             if not muted:
                 log.info("Operator reported that the DUT cannot be physically muted; skipping steps 5c-5f")
 
