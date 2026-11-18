@@ -1373,28 +1373,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (BOOL)_cancelCommissioning:(MTRCommissioningOperation *)commissioning forNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
-    BOOL isWaitingAfterPASEEstablished = commissioning.isWaitingAfterPASEEstablished;
     auto block = ^BOOL {
         self->_operationalCredentialsDelegate->ResetDeviceID();
         auto errorCode = self->_cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
         // Emit metric on status of cancel
         MATTER_LOG_METRIC(kMetricCancelCommissioning, errorCode);
-        if (errorCode == CHIP_NO_ERROR && isWaitingAfterPASEEstablished && [nodeID isEqual:commissioning.commissioningID]) {
-            // StopPairing reported the release, which reaches the commissioning on the commissioning queue after this
-            // returns. Take its metrics now, before a new commissioning can reset the shared collector.
-            MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, CHIP_ERROR_CANCELLED);
-            commissioning.cancelMetrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCommissioning:YES];
-        }
         return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorStopPairing error:error];
     };
 
-    BOOL ok = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
-    if (ok && isWaitingAfterPASEEstablished && [nodeID isEqual:commissioning.commissioningID]) {
-        // StopPairing has released the commissionee, which ends the commissioning. Free the controller now so a new
-        // commissioning can be started as soon as this returns.
-        [self _commissioningDone:commissioning];
-    }
-    return ok;
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
 - (BOOL)startBrowseForCommissionables:(id<MTRCommissionableBrowserDelegate>)delegate queue:(dispatch_queue_t)queue
@@ -2343,8 +2330,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     } else {
         MTR_LOG_ERROR("%@ commissionee for %@ was released while waiting for commissionNodeWithID: %@", self, commissioning, error);
     }
+    // Not freed here: the commissioning stays current until its failure is delivered, which frees it just before the
+    // client's completion callback, so that callback can start a new commissioning.
     commissioning.isWaitingAfterPASEEstablished = NO;
-    [self _commissioningDone:commissioning];
     return YES;
 }
 
@@ -2375,7 +2363,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)commissioning:(MTRCommissioningOperation *)commissioning
       failedWithError:(NSError *)error
-          forDeviceID:(NSNumber *)deviceID
+          forDeviceID:(NSNumber * _Nullable)deviceID
               metrics:(MTRMetrics *)metrics
 {
     // Don't check whether commissioning matches self.currentCommissioning.

@@ -206,7 +206,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     [self _dispatchCommissioningError:error forCommissioningID:_commissioningID withMetrics:metrics];
 }
 
-- (void)_dispatchCommissioningError:(NSError *)error forCommissioningID:(NSNumber *)commissioningID withMetrics:(MTRMetrics *)metrics
+- (void)_dispatchCommissioningError:(NSError *)error forCommissioningID:(NSNumber * _Nullable)commissioningID withMetrics:(MTRMetrics *)metrics
 {
     MTRDeviceController_Concrete * strongController = _controller;
 
@@ -444,13 +444,10 @@ static inline void emitMetricForSetupPayload(NSString * payload)
 
     // Only a commissioning that is waiting after PASE has an idle commissionee to lose.
     if ([_controller commissioneeReleasedWhileWaitingAfterPASE:self error:error]) {
-        MTRMetrics * cancelMetrics = self.cancelMetrics;
-        if (cancelMetrics) {
-            // A cancel already took this commissioning's metrics; the shared collector may belong to a newer one.
-            [self _dispatchCommissioningError:error withMetrics:cancelMetrics];
-        } else {
-            [self _dispatchCommissioningError:error];
-        }
+        // No node was commissioned, so report a nil node ID with the error.
+        MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, [MTRError errorToCHIPErrorCode:error]);
+        MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCommissioning:YES];
+        [self _dispatchCommissioningError:error forCommissioningID:nil withMetrics:metrics];
     }
 }
 
