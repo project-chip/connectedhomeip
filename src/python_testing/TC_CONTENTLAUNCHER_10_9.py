@@ -46,6 +46,10 @@ class TC_CONTENTLAUNCHER_10_9(MatterTestCommissionedDevice):
     def steps_TC_CONTENTLAUNCHER_10_9(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done"),
+            TestStep("0a", "Operator starts content playing on the DUT by whatever means the manufacturer "
+                     "provides (a PlayPreset command, a physical control, an app, or similar).",
+                     "Content is playing on the DUT, so that the QueueType behaviour exercised by the "
+                     "following steps has something to interrupt or queue behind."),
             TestStep(1, "TH sends a LaunchURL command to the DUT with a valid URL and QueueType=Replace (0).",
                      "DUT replies with a success response and immediately interrupts any currently playing content "
                      "to play the new content."),
@@ -108,6 +112,31 @@ class TC_CONTENTLAUNCHER_10_9(MatterTestCommissionedDevice):
         accept_header = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AcceptHeader)
         log.info("DUT AcceptHeader: %s", accept_header)
+
+        self.step("0a")
+        # Steps 1-3 verify QueueType behaviour (Replace / Next / Last), which is only
+        # meaningful when something is already playing. Starting that content is
+        # manufacturer specific, so the operator does it and confirms. A "n" answer
+        # means the precondition does not hold, so the rest of the test is skipped
+        # rather than failed - it would be asserting against an untested state.
+        response = self.wait_for_user_input(
+            prompt_msg="Start content playing on the DUT using any method the manufacturer provides "
+                       "(for example a PlayPreset command).\n"
+                       "Enter 'y' once content is playing, or 'n' if it could not be started.\n",
+            prompt_msg_placeholder="y", default_value="y")
+        answer = response.lower().strip() if response is not None else None
+        while answer not in ("y", "n"):
+            response = self.wait_for_user_input(
+                prompt_msg="Please answer 'y' if content is now playing on the DUT, or 'n' if it could not "
+                           "be started.\n",
+                prompt_msg_placeholder="y", default_value="y")
+            answer = response.lower().strip() if response is not None else None
+        if answer == "n":
+            log.info("Operator reported that content could not be started on the DUT; "
+                     "skipping the remaining steps, which all depend on content already playing")
+            self.mark_current_step_skipped()
+            self.mark_all_remaining_steps_skipped(1)
+            return
 
         self.step(1)
         await self._launch_url(endpoint, contentURL=content_url, queueType=queue_types.kReplace)
