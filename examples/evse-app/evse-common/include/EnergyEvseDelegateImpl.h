@@ -179,10 +179,6 @@ public:
      */
     Status ClearTargets() override;
 
-    /* Helper functions for managing targets*/
-    Status
-    ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
-
     /**
      * @brief    Called by EVSE Hardware to register a single callback handler
      */

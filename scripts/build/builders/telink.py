@@ -38,6 +38,7 @@ class TelinkApp(Enum):
     ALL_CLUSTERS_MINIMAL = auto()
     ALL_DEVICES = auto()
     BRIDGE = auto()
+    CLOSURE = auto()
     CONTACT_SENSOR = auto()
     LIGHT = auto()
     SWITCH = auto()
@@ -61,6 +62,8 @@ class TelinkApp(Enum):
             return 'all-devices-app'
         if self == TelinkApp.BRIDGE:
             return 'bridge-app'
+        if self == TelinkApp.CLOSURE:
+            return 'closure-app'
         if self == TelinkApp.CONTACT_SENSOR:
             return 'contact-sensor-app'
         if self == TelinkApp.LIGHT:
@@ -96,6 +99,8 @@ class TelinkApp(Enum):
             return 'all-devices-app'
         if self == TelinkApp.BRIDGE:
             return 'chip-telink-bridge-example'
+        if self == TelinkApp.CLOSURE:
+            return 'chip-telink-closure-example'
         if self == TelinkApp.CONTACT_SENSOR:
             return 'chip-telink-contact-sensor-example'
         if self == TelinkApp.LIGHT:

@@ -56,11 +56,11 @@ jobs:
                       build_dir: all-devices-zephyr-xg26
                       extra_args: -DFILE_SUFFIX=debug
                       sysbuild: --sysbuild
-                    # Uncomment after #74530
-                    # - board: siwx917_rb4338a
-                    #   toolchain: zephyr
-                    #   build_dir: all-devices-zephyr-siwx917
-                    #   sysbuild: ""
+
+                    - board: siwx917_rb4338a
+                      toolchain: zephyr
+                      build_dir: all-devices-zephyr-siwx917
+                      sysbuild: ""
 
         steps:
             - name: Checkout Matter
@@ -70,12 +70,12 @@ jobs:
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   repository: "zephyrproject-rtos/zephyr"
-                  ref: "fa4f8fb0e470210aee0ae6fb069a281bc6ac887a"
+                  ref: "v4.5.0"
                   path: "zephyrproject/zephyr"
                   persist-credentials: false
 
             - name: Set up Zephyr workspace and SDK
-              uses: zephyrproject-rtos/action-zephyr-setup@be8136a8bba01580485d98b7ad2d32477c36a49a # v1.0.15
+              uses: zephyrproject-rtos/action-zephyr-setup@cc223fe61661d8573c1cd3f95f72f90cce729ae9 # v1.0.16
               with:
                   app-path: zephyr
                   base-path: zephyrproject
