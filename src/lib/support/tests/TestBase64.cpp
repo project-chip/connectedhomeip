@@ -56,30 +56,9 @@ const TestVector kValidVectors[] = {
 };
 
 const char * kInvalidInputs[] = {
-    "Z",
-    "A",
-    "Zm9vY",
-    "AA!A",
-    "AB!A",
-    "Zm9vAA!A",
-    "AB!",
-    "!AAA",
-    "A!AA",
-    "AAA!",
-    "=",
-    "==",
-    "===",
-    "====",
-    "A===",
-    "AA=A",
-    "AA==Zg",
-    "Zg=",
-    "Zm9v=",
-    "Z\x019vYmFy",
-    "Zm9vY;",
-    "Zm9 vYg",
-    "Zm9v ",
-    "QmFzZTY0D-8xMjM0D_8=",
+    "Z",      "A",    "Zm9vY", "AA!A",        "AB!A",   "Zm9vAA!A", "AB!",   "!AAA",
+    "A!AA",   "AAA!", "=",     "==",          "===",    "====",     "A===",  "AA=A",
+    "AA==Zg", "Zg=",  "Zm9v=", "Z\x019vYmFy", "Zm9vY;", "Zm9 vYg",  "Zm9v ", "QmFzZTY0D-8xMjM0D_8=",
 };
 
 TEST(TestBase64, EncodeValidVectors)
