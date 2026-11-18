@@ -711,6 +711,14 @@ void DoorLockServer::setCredentialCommandHandler(
         return;
     }
 
+    if (!userIndex.IsNull() && !userIndexValid(commandPath.mEndpointId, userIndex.Value()))
+    {
+        ChipLogProgress(Zcl, "[SetCredential] User index is out of range [endpointId=%d,userIndex=%d]", commandPath.mEndpointId,
+                        userIndex.Value());
+        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
+        return;
+    }
+
     // appclusters, 5.2.4.40.3: If the credential data length is out of bounds we should return INVALID_COMMAND
     auto status = credentialLengthWithinRange(commandPath.mEndpointId, credentialType, credentialData);
     if (DlStatus::kSuccess != status)
