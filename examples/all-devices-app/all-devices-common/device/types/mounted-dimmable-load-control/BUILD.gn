@@ -23,8 +23,20 @@ source_set("mounted-dimmable-load-control") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/dimmable-load:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/dimmable-load",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:on-off",
+  ]
+}
+
+source_set("logging") {
+  sources = [
+    "impl/LoggingMountedDimmableLoadControl.cpp",
+    "impl/LoggingMountedDimmableLoadControl.h",
+  ]
+
+  public_deps = [
+    ":mounted-dimmable-load-control",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/dimmable-load:logging",
   ]
 }
 

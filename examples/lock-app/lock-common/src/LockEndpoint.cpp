@@ -68,17 +68,16 @@ bool LockEndpoint::Unbolt(const Nullable<chip::FabricIndex> & fabricIdx, const N
     return setLockState(fabricIdx, nodeId, DlLockState::kUnlocked, pin, err, opSource);
 }
 
-bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
+bool LockEndpoint::GetUser(UserIndex userIndex, EmberAfPluginDoorLockUserInfo & user) const
 {
-    ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetUser [endpoint=%d,userIndex=%hu]", mEndpointId, userIndex);
+    ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetUser [endpoint=%d,userIndex=%hu]", mEndpointId, userIndex.OneBased());
 
-    auto adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
-    if (adjustedUserIndex > mLockUsers.size())
+    if (!userIndex.IsWithin(static_cast<uint16_t>(mLockUsers.size())))
     {
-        ChipLogError(Zcl, "Cannot get user - index out of range [endpoint=%d,index=%hu,adjustedIndex=%d]", mEndpointId, userIndex,
-                     adjustedUserIndex);
+        ChipLogError(Zcl, "Cannot get user - index out of range [endpoint=%d,index=%hu]", mEndpointId, userIndex.OneBased());
         return false;
     }
+    auto adjustedUserIndex = userIndex.ZeroBased();
 
     const auto & userInDb = mLockUsers[adjustedUserIndex];
     user.userStatus       = userInDb.userStatus;
@@ -111,31 +110,31 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
     return true;
 }
 
-bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
+bool LockEndpoint::SetUser(UserIndex userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
                            const chip::CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
                            CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
-    ChipLogProgress(
-        Zcl,
-        "Lock App: LockEndpoint::SetUser "
-        "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%s\",uniqueId=%" PRIx32 ",userStatus=%u,userType=%u,"
-        "credentialRule=%u,credentials=%p,totalCredentials=%u]",
-        mEndpointId, userIndex, creator, modifier, chip::NullTerminated(userName).c_str(), uniqueId, to_underlying(userStatus),
-        to_underlying(usertype), to_underlying(credentialRule), credentials, static_cast<unsigned int>(totalCredentials));
+    ChipLogProgress(Zcl,
+                    "Lock App: LockEndpoint::SetUser "
+                    "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%s\",uniqueId=%" PRIx32
+                    ",userStatus=%u,userType=%u,"
+                    "credentialRule=%u,credentials=%p,totalCredentials=%u]",
+                    mEndpointId, userIndex.OneBased(), creator, modifier, chip::NullTerminated(userName).c_str(), uniqueId,
+                    to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
+                    static_cast<unsigned int>(totalCredentials));
 
-    auto adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
-    if (adjustedUserIndex > mLockUsers.size())
+    if (!userIndex.IsWithin(static_cast<uint16_t>(mLockUsers.size())))
     {
-        ChipLogError(Zcl, "Cannot set user - index out of range [endpoint=%d,index=%d,adjustedUserIndex=%u]", mEndpointId,
-                     userIndex, adjustedUserIndex);
+        ChipLogError(Zcl, "Cannot set user - index out of range [endpoint=%d,index=%d]", mEndpointId, userIndex.OneBased());
         return false;
     }
+    auto adjustedUserIndex = userIndex.ZeroBased();
 
     auto & userInStorage = mLockUsers[adjustedUserIndex];
     if (userName.size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
     {
         ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d,adjustedUserIndex=%u]", mEndpointId,
-                     userIndex, adjustedUserIndex);
+                     userIndex.OneBased(), adjustedUserIndex);
         return false;
     }
 
@@ -144,7 +143,7 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
         ChipLogError(Zcl,
                      "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,adjustedUserIndex=%u"
                      ",totalCredentials=%u,maxNumberOfCredentials=%u]",
-                     mEndpointId, userIndex, adjustedUserIndex, static_cast<unsigned int>(totalCredentials),
+                     mEndpointId, userIndex.OneBased(), adjustedUserIndex, static_cast<unsigned int>(totalCredentials),
                      static_cast<unsigned int>(userInStorage.credentials.capacity()));
         return false;
     }
@@ -164,7 +163,7 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
         userInStorage.credentials.push_back(credentials[i]);
     }
 
-    ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d,adjustedIndex=%d]", mEndpointId, userIndex,
+    ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d,adjustedIndex=%d]", mEndpointId, userIndex.OneBased(),
                     adjustedUserIndex);
 
     return true;
@@ -194,32 +193,33 @@ bool LockEndpoint::SendLockAlarm(AlarmCodeEnum alarmCode) const
     return DoorLockServer::Instance().SendLockAlarmEvent(mEndpointId, alarmCode);
 }
 
-bool LockEndpoint::GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
+bool LockEndpoint::GetCredential(CredentialIndex credentialIndex, CredentialTypeEnum credentialType,
                                  EmberAfPluginDoorLockCredentialInfo & credential) const
 {
     ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetCredential [endpoint=%d,credentialIndex=%u,credentialType=%u]", mEndpointId,
-                    credentialIndex, to_underlying(credentialType));
+                    credentialIndex.OneBased(), to_underlying(credentialType));
 
     if (to_underlying(credentialType) >= mLockCredentials.size())
     {
-        ChipLogError(Zcl, "Cannot get the credential - index out of range [endpoint=%d,index=%d]", mEndpointId, credentialIndex);
+        ChipLogError(Zcl, "Cannot get the credential - index out of range [endpoint=%d,index=%d]", mEndpointId,
+                     credentialIndex.OneBased());
         return false;
     }
 
-    if (credentialIndex >= mLockCredentials.at(to_underlying(credentialType)).size() ||
-        (0 == credentialIndex && CredentialTypeEnum::kProgrammingPIN != credentialType))
+    if (credentialIndex.OneBased() >= mLockCredentials.at(to_underlying(credentialType)).size() ||
+        (0 == credentialIndex.OneBased() && CredentialTypeEnum::kProgrammingPIN != credentialType))
     {
-        ChipLogError(Zcl, "Cannot get the credential - index out of range [endpoint=%d,index=%d]: %d", mEndpointId, credentialIndex,
-                     static_cast<int>(mLockCredentials.at(to_underlying(credentialType)).size()));
+        ChipLogError(Zcl, "Cannot get the credential - index out of range [endpoint=%d,index=%d]: %d", mEndpointId,
+                     credentialIndex.OneBased(), static_cast<int>(mLockCredentials.at(to_underlying(credentialType)).size()));
         return false;
     }
 
-    const auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
+    const auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex.OneBased()];
 
     credential.status = credentialInStorage.status;
     if (DlCredentialStatus::kAvailable == credential.status)
     {
-        ChipLogDetail(Zcl, "Found unoccupied credential [endpoint=%d,index=%u]", mEndpointId, credentialIndex);
+        ChipLogDetail(Zcl, "Found unoccupied credential [endpoint=%d,index=%u]", mEndpointId, credentialIndex.OneBased());
         return true;
     }
     credential.credentialType = credentialInStorage.credentialType;
@@ -232,13 +232,13 @@ bool LockEndpoint::GetCredential(uint16_t credentialIndex, CredentialTypeEnum cr
     credential.lastModifiedBy     = credentialInStorage.modifiedBy;
 
     ChipLogDetail(Zcl, "Found occupied credential [endpoint=%d,index=%u,type=%u,dataSize=%u,createdBy=%u,modifiedBy=%u]",
-                  mEndpointId, credentialIndex, to_underlying(credential.credentialType),
+                  mEndpointId, credentialIndex.OneBased(), to_underlying(credential.credentialType),
                   static_cast<unsigned int>(credential.credentialData.size()), credential.createdBy, credential.lastModifiedBy);
 
     return true;
 }
 
-bool LockEndpoint::SetCredential(uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
+bool LockEndpoint::SetCredential(CredentialIndex credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
                                  DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
                                  const chip::ByteSpan & credentialData)
 {
@@ -246,7 +246,7 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, chip::FabricIndex cre
         Zcl,
         "Lock App: LockEndpoint::SetCredential "
         "[endpoint=%d,credentialIndex=%u,credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%u,modifier=%u]",
-        mEndpointId, credentialIndex, to_underlying(credentialStatus), to_underlying(credentialType),
+        mEndpointId, credentialIndex.OneBased(), to_underlying(credentialStatus), to_underlying(credentialType),
         static_cast<unsigned int>(credentialData.size()), creator, modifier);
 
     if (to_underlying(credentialType) >= mLockCredentials.capacity())
@@ -256,20 +256,21 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, chip::FabricIndex cre
         return false;
     }
 
-    if (credentialIndex >= mLockCredentials.at(to_underlying(credentialType)).size() ||
-        (0 == credentialIndex && CredentialTypeEnum::kProgrammingPIN != credentialType))
+    if (credentialIndex.OneBased() >= mLockCredentials.at(to_underlying(credentialType)).size() ||
+        (0 == credentialIndex.OneBased() && CredentialTypeEnum::kProgrammingPIN != credentialType))
     {
-        ChipLogError(Zcl, "Cannot set the credential - index out of range [endpoint=%d,index=%d]", mEndpointId, credentialIndex);
+        ChipLogError(Zcl, "Cannot set the credential - index out of range [endpoint=%d,index=%d]", mEndpointId,
+                     credentialIndex.OneBased());
         return false;
     }
 
-    auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
+    auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex.OneBased()];
     if (credentialData.size() > DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE)
     {
         ChipLogError(Zcl,
                      "Cannot get the credential - data size exceeds limit "
                      "[endpoint=%d,index=%d,dataSize=%u,maxDataSize=%u]",
-                     mEndpointId, credentialIndex, static_cast<unsigned int>(credentialData.size()),
+                     mEndpointId, credentialIndex.OneBased(), static_cast<unsigned int>(credentialData.size()),
                      static_cast<unsigned int>(DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE));
         return false;
     }
@@ -281,25 +282,26 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, chip::FabricIndex cre
     credentialInStorage.credentialDataSize = credentialData.size();
 
     ChipLogProgress(Zcl, "Successfully set the credential [mEndpointId=%d,index=%d,credentialType=%u,creator=%u,modifier=%u]",
-                    mEndpointId, credentialIndex, to_underlying(credentialType), credentialInStorage.createdBy,
+                    mEndpointId, credentialIndex.OneBased(), to_underlying(credentialType), credentialInStorage.createdBy,
                     credentialInStorage.modifiedBy);
 
     return true;
 }
 
-DlStatus LockEndpoint::GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule) const
+DlStatus LockEndpoint::GetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex,
+                                   EmberAfPluginDoorLockWeekDaySchedule & schedule) const
 {
-    if (0 == userIndex || userIndex > mWeekDaySchedules.size())
+    if (!userIndex.IsWithin(static_cast<uint16_t>(mWeekDaySchedules.size())))
     {
         return DlStatus::kFailure;
     }
 
-    if (0 == weekDayIndex || weekDayIndex > mWeekDaySchedules.at(userIndex - 1).size())
+    if (!weekDayIndex.IsWithin(static_cast<uint8_t>(mWeekDaySchedules.at(userIndex.ZeroBased()).size())))
     {
         return DlStatus::kFailure;
     }
 
-    const auto & scheduleInStorage = mWeekDaySchedules.at(userIndex - 1).at(weekDayIndex - 1);
+    const auto & scheduleInStorage = mWeekDaySchedules.at(userIndex.ZeroBased()).at(weekDayIndex.ZeroBased());
     if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
     {
         return DlStatus::kNotFound;
@@ -310,20 +312,20 @@ DlStatus LockEndpoint::GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, Emb
     return DlStatus::kSuccess;
 }
 
-DlStatus LockEndpoint::SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status, DaysMaskMap daysMask,
+DlStatus LockEndpoint::SetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, DlScheduleStatus status, DaysMaskMap daysMask,
                                    uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
-    if (0 == userIndex || userIndex > mWeekDaySchedules.size())
+    if (!userIndex.IsWithin(static_cast<uint16_t>(mWeekDaySchedules.size())))
     {
         return DlStatus::kFailure;
     }
 
-    if (0 == weekDayIndex || weekDayIndex > mWeekDaySchedules.at(userIndex - 1).size())
+    if (!weekDayIndex.IsWithin(static_cast<uint8_t>(mWeekDaySchedules.at(userIndex.ZeroBased()).size())))
     {
         return DlStatus::kFailure;
     }
 
-    auto & scheduleInStorage = mWeekDaySchedules.at(userIndex - 1).at(weekDayIndex - 1);
+    auto & scheduleInStorage = mWeekDaySchedules.at(userIndex.ZeroBased()).at(weekDayIndex.ZeroBased());
 
     scheduleInStorage.schedule.daysMask    = daysMask;
     scheduleInStorage.schedule.startHour   = startHour;
@@ -335,19 +337,20 @@ DlStatus LockEndpoint::SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlS
     return DlStatus::kSuccess;
 }
 
-DlStatus LockEndpoint::GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule) const
+DlStatus LockEndpoint::GetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex,
+                                   EmberAfPluginDoorLockYearDaySchedule & schedule) const
 {
-    if (0 == userIndex || userIndex > mYearDaySchedules.size())
+    if (!userIndex.IsWithin(static_cast<uint16_t>(mYearDaySchedules.size())))
     {
         return DlStatus::kFailure;
     }
 
-    if (0 == yearDayIndex || yearDayIndex > mYearDaySchedules.at(userIndex - 1).size())
+    if (!yearDayIndex.IsWithin(static_cast<uint8_t>(mYearDaySchedules.at(userIndex.ZeroBased()).size())))
     {
         return DlStatus::kFailure;
     }
 
-    const auto & scheduleInStorage = mYearDaySchedules.at(userIndex - 1).at(yearDayIndex - 1);
+    const auto & scheduleInStorage = mYearDaySchedules.at(userIndex.ZeroBased()).at(yearDayIndex.ZeroBased());
     if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
     {
         return DlStatus::kNotFound;
@@ -358,20 +361,20 @@ DlStatus LockEndpoint::GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, Emb
     return DlStatus::kSuccess;
 }
 
-DlStatus LockEndpoint::SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status, uint32_t localStartTime,
-                                   uint32_t localEndTime)
+DlStatus LockEndpoint::SetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, DlScheduleStatus status,
+                                   uint32_t localStartTime, uint32_t localEndTime)
 {
-    if (0 == userIndex || userIndex > mYearDaySchedules.size())
+    if (!userIndex.IsWithin(static_cast<uint16_t>(mYearDaySchedules.size())))
     {
         return DlStatus::kFailure;
     }
 
-    if (0 == yearDayIndex || yearDayIndex > mYearDaySchedules.at(userIndex - 1).size())
+    if (!yearDayIndex.IsWithin(static_cast<uint8_t>(mYearDaySchedules.at(userIndex.ZeroBased()).size())))
     {
         return DlStatus::kFailure;
     }
 
-    auto & scheduleInStorage                  = mYearDaySchedules.at(userIndex - 1).at(yearDayIndex - 1);
+    auto & scheduleInStorage                  = mYearDaySchedules.at(userIndex.ZeroBased()).at(yearDayIndex.ZeroBased());
     scheduleInStorage.schedule.localStartTime = localStartTime;
     scheduleInStorage.schedule.localEndTime   = localEndTime;
     scheduleInStorage.status                  = status;
@@ -379,14 +382,14 @@ DlStatus LockEndpoint::SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlS
     return DlStatus::kSuccess;
 }
 
-DlStatus LockEndpoint::GetSchedule(uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule) const
+DlStatus LockEndpoint::GetSchedule(ScheduleIndex holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule) const
 {
-    if (0 == holidayIndex || holidayIndex > mHolidaySchedules.size())
+    if (!holidayIndex.IsWithin(static_cast<uint8_t>(mHolidaySchedules.size())))
     {
         return DlStatus::kFailure;
     }
 
-    const auto & scheduleInStorage = mHolidaySchedules[holidayIndex - 1];
+    const auto & scheduleInStorage = mHolidaySchedules[holidayIndex.ZeroBased()];
     if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
     {
         return DlStatus::kNotFound;
@@ -396,15 +399,15 @@ DlStatus LockEndpoint::GetSchedule(uint8_t holidayIndex, EmberAfPluginDoorLockHo
     return DlStatus::kSuccess;
 }
 
-DlStatus LockEndpoint::SetSchedule(uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
-                                   OperatingModeEnum operatingMode)
+DlStatus LockEndpoint::SetSchedule(ScheduleIndex holidayIndex, DlScheduleStatus status, uint32_t localStartTime,
+                                   uint32_t localEndTime, OperatingModeEnum operatingMode)
 {
-    if (0 == holidayIndex || holidayIndex > mHolidaySchedules.size())
+    if (!holidayIndex.IsWithin(static_cast<uint8_t>(mHolidaySchedules.size())))
     {
         return DlStatus::kFailure;
     }
 
-    auto & scheduleInStorage                  = mHolidaySchedules[holidayIndex - 1];
+    auto & scheduleInStorage                  = mHolidaySchedules[holidayIndex.ZeroBased()];
     scheduleInStorage.schedule.localStartTime = localStartTime;
     scheduleInStorage.schedule.localEndTime   = localEndTime;
     scheduleInStorage.schedule.operatingMode  = operatingMode;
