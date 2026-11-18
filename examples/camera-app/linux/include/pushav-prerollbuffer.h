@@ -52,6 +52,28 @@ public:
     void PushFrameToBuffer(const std::string & streamKey, const uint8_t * data, size_t size, int64_t timestampMs);
     void RegisterTransportToBuffer(BufferSink * sink, const std::unordered_set<std::string> & streamKeys);
     void DeregisterTransportFromBuffer(BufferSink * sink);
+    void ClearVideoBuffers()
+    {
+        std::lock_guard<std::mutex> lock(mBufferMutex);
+        for (auto & [streamKey, queue] : mBuffers)
+        {
+            if (!streamKey.empty() && streamKey[0] == 'v')
+            {
+                for (const auto & frame : queue)
+                {
+                    if (mContentBufferSize >= frame->size)
+                    {
+                        mContentBufferSize -= frame->size;
+                    }
+                    else
+                    {
+                        mContentBufferSize = 0;
+                    }
+                }
+                queue.clear();
+            }
+        }
+    }
     void SetMaxTotalBytes(size_t size);
     int64_t NowMs() const;
 
