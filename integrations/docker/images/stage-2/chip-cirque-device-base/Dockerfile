@@ -39,6 +39,8 @@ RUN apt-get update \
   python3-pip \
   python3 \
   sudo \
+  tcpdump \
+  tshark \
   wireless-tools \
   wpasupplicant \
   && ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
