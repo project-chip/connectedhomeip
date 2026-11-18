@@ -17,10 +17,12 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <tracing/json/json_tracing.h>
 
 #include <unistd.h>
 
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -52,7 +54,7 @@ protected:
     static std::string TraceToFile(const std::filesystem::path & path)
     {
         JsonBackend backend;
-        EXPECT_EQ(backend.OpenFile(path.c_str()), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(backend.OpenFile(path.c_str()));
         backend.TraceInstant("TestLabel", "TestGroup");
         backend.CloseFile();
 
@@ -111,6 +113,23 @@ TEST_F(TestJsonTracing, TestOpenFileUnderRegularFileFails)
 
     JsonBackend backend;
     EXPECT_NE(backend.OpenFile((regularFile / "trace.json").c_str()), CHIP_NO_ERROR);
+}
+
+TEST_F(TestJsonTracing, TestOpenFileRejectsEmptyPathWithoutClosingOpenFile)
+{
+    std::filesystem::path path = mTempDir / "trace.json";
+
+    JsonBackend backend;
+    ASSERT_SUCCESS(backend.OpenFile(path.c_str()));
+    EXPECT_EQ(backend.OpenFile(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(backend.OpenFile(""), CHIP_ERROR_INVALID_ARGUMENT);
+    backend.TraceInstant("TestLabel", "TestGroup");
+    backend.CloseFile();
+
+    std::ifstream file(path);
+    std::stringstream content;
+    content << file.rdbuf();
+    EXPECT_NE(content.str().find("TestLabel"), std::string::npos);
 }
 
 } // namespace

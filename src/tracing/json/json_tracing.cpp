@@ -22,6 +22,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/ChunkSplitter.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/StringSplitter.h>
@@ -465,6 +466,9 @@ void JsonBackend::CloseFile()
 
 CHIP_ERROR JsonBackend::OpenFile(const char * path)
 {
+    VerifyOrReturnError(path != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(*path != '\0', CHIP_ERROR_INVALID_ARGUMENT);
+
     CloseFile();
 
     // Create the leading directories if they don't exist. create_directories() returns false
