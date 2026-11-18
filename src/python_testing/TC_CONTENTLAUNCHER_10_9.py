@@ -162,7 +162,7 @@ class TC_CONTENTLAUNCHER_10_9(MatterTestCommissionedDevice):
         # so re-establish it here rather than inferring it from the replacement starting.
         playing = await self._playing_now(endpoint)
         if playing is None:
-            self._confirm("Content should have been playing when the LaunchURL(Replace) command was sent.")
+            self._confirm("Content should be playing on the DUT now, before the LaunchURL(Replace) command is sent.")
         else:
             asserts.assert_true(
                 playing,
