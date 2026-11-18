@@ -29,6 +29,7 @@
 
 #include <app/AppConfig.h>
 #include <app/CommandHandlerImpl.h>
+#include <app/CommandResponseSender.h>
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/SpecificationDefinedRevisions.h>
@@ -55,6 +56,7 @@
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
+#include <transport/GroupSession.h>
 
 using namespace chip::Protocols;
 
@@ -594,6 +596,7 @@ public:
     void TestCommandSenderConstructionSessionIsEnforced();
     void TestCommandHandler_GroupcastOmitsSuppressResponseAndTimedRequest();
     void TestCommandHandler_GroupcastWithLegacySuppressResponseAndTimedRequest();
+    void TestCommandResponseSender_GroupcastValidationFailureSendsNoStatusResponse();
 
     /**
      * With the introduction of batch invoke commands, CommandHandler keeps track of incoming
@@ -2068,6 +2071,54 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GroupcastWithLega
     commandDispatchedCount = 0;
     EXPECT_EQ(processGroupInvoke(/* aIsTimedRequest = */ true), Protocols::InteractionModel::Status::TimedRequestMismatch);
     EXPECT_EQ(commandDispatchedCount, 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandResponseSender_GroupcastValidationFailureSendsNoStatusResponse)
+{
+    // Groupcast Invokes omit SuppressResponse, so mSuppressResponse stays false. A validation failure
+    // (TimedRequestMismatch) must still not send a StatusResponse on the incoming group exchange.
+    constexpr GroupId kTestGroupId = 0x0101;
+
+    SessionHandle groupSession = GetSessionBobToFriends();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), groupSession);
+    {
+        CommandPathParams commandPath = MakeTestGroupCommandPath(kTestGroupId, kTestClusterId, kTestCommandIdWithData);
+        app::CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.SetStartDataStruct(true);
+        EXPECT_SUCCESS(commandSender.PrepareCommand(commandPath, prepareCommandParams));
+        EXPECT_SUCCESS(commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+        app::CommandSender::FinishCommandParameters finishCommandParams;
+        finishCommandParams.SetEndDataStruct(true);
+        EXPECT_SUCCESS(commandSender.FinishCommand(finishCommandParams));
+    }
+
+    System::PacketBufferHandle commandDatabuf;
+    EXPECT_SUCCESS(commandSender.Finalize(commandDatabuf));
+
+    class CommandResponseSenderDoneCallback : public CommandResponseSender::Callback
+    {
+    public:
+        void OnDone(CommandResponseSender &) override { mOnDoneCalled = true; }
+        bool mOnDoneCalled = false;
+    } doneCallback;
+
+    chip::Testing::MessageCapturer messageLog(*this);
+    {
+        CommandResponseSender responseSender(&doneCallback, &mockCommandHandlerDelegate);
+        TestExchangeDelegate exchangeDelegate;
+        Transport::IncomingGroupSession incomingSession(kTestGroupId, GetBobFabricIndex(), GetBobFabric()->GetNodeId());
+        SessionHandle incomingGroupSession(incomingSession);
+        Messaging::ExchangeContext * exchange = GetExchangeManager().NewContext(incomingGroupSession, &exchangeDelegate);
+        ASSERT_NE(exchange, nullptr);
+
+        // TimedRequest is omitted (false) on the wire, but the exchange is marked timed → TimedRequestMismatch.
+        responseSender.OnInvokeCommandRequest(exchange, std::move(commandDatabuf), /* isTimedInvoke = */ true);
+        DrainAndServiceIO();
+        EXPECT_TRUE(doneCallback.mOnDoneCalled);
+        EXPECT_EQ(messageLog.MessageCount(), 0u);
+    }
+
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseFlow)
