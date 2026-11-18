@@ -100,11 +100,11 @@ constexpr const char * kErrorSSLObjectCreate     = "Failed to create SSL object"
 constexpr const char * kErrorSSLHandshake        = "SSL handshake failed";
 constexpr const char * kErrorSSLTrustStore       = "Failed to load the system trusted certificates";
 constexpr const char * kErrorSSLHostName         = "Failed to set the expected server name";
-constexpr const char * kErrorSSLCertificateHint  =
+constexpr const char * kErrorSSLCertificateHint =
     "To trust a server with a private or self-signed certificate, set SSL_CERT_FILE to its CA certificate. The certificate "
     "must be issued for the requested hostname. Certificate validation can also be disabled from the command line.";
-constexpr const char * kSSLValidationDisabled    = "Validation of the server certificate is disabled";
-constexpr const char * kErrorDigestMismatch      = "The response digest does not match the expected digest";
+constexpr const char * kSSLValidationDisabled = "Validation of the server certificate is disabled";
+constexpr const char * kErrorDigestMismatch   = "The response digest does not match the expected digest";
 class AddressInfoHolder
 {
 public:
@@ -250,8 +250,7 @@ private:
             auto error = ERR_peek_last_error();
             if (ERR_GET_LIB(error) == ERR_LIB_SSL && ERR_GET_REASON(error) == SSL_R_CERTIFICATE_VERIFY_FAILED)
             {
-                ChipLogError(chipTool, "%s: %s", kErrorSSLHandshake,
-                             X509_verify_cert_error_string(SSL_get_verify_result(mSSL)));
+                ChipLogError(chipTool, "%s: %s", kErrorSSLHandshake, X509_verify_cert_error_string(SSL_get_verify_result(mSSL)));
                 ChipLogError(chipTool, "%s", kErrorSSLCertificateHint);
             }
             else
