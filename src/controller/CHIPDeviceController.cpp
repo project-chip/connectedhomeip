@@ -705,6 +705,12 @@ bool DeviceCommissioner::IsBeingCommissioned(const CommissioneeDeviceProxy & dev
         (mDeviceBeingCommissioned == &device || mDeviceBeingCommissioned->GetDeviceId() == device.GetDeviceId());
 }
 
+bool DeviceCommissioner::HasLivePASESession(NodeId nodeId)
+{
+    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
+    return commissionee != nullptr && commissionee->IsSecureConnected();
+}
+
 void DeviceCommissioner::OnCommissioneeSessionReleased(CommissioneeDeviceProxy & device)
 {
     // A commissionee in PASE establishment or being commissioned has its own failure path.
@@ -2376,6 +2382,14 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
             ChipLogError(Controller, "Failed to send command to disarm fail-safe: %" CHIP_ERROR_FORMAT, err.Format());
         }
 
+        CleanupDoneAfterError();
+    }
+    else if (completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup &&
+             !HasLivePASESession(nodeId))
+    {
+        // The PASE session was lost during commissioning, so there is nothing to keep for a retry, and no session to disarm
+        // the failsafe over. End as the disarm path does: release the commissionee and send the completion callbacks.
+        ChipLogProgress(Controller, "No PASE session left to keep for node 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
         CleanupDoneAfterError();
     }
     else if (completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup)

@@ -906,6 +906,9 @@ private:
     // True while commissioning is running for this commissionee, whichever proxy the commissioning stage is using.
     bool IsBeingCommissioned(const CommissioneeDeviceProxy & device) const;
 
+    // True if the commissionee for this node ID still has a PASE session.
+    bool HasLivePASESession(NodeId nodeId);
+
     Optional<System::Clock::Timeout> mCommissioningStepTimeout; // Note: For multi-interaction steps this is per interaction
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     uint8_t mReadCommissioningInfoProgress = 0; // see ContinueReadingCommissioningInfo()

@@ -471,6 +471,34 @@ TEST_F(TestCommissioneeSessionLoss, CommissioneeKeptAfterFailedCommissioningIsRe
     EXPECT_EQ(Delegate().commissioningCompletes.size(), 1u);
 }
 
+// A failure at or after network setup keeps the PASE session for a retry only if there is one. When the session was
+// released during commissioning (not reported then, because the commissionee was being commissioned), cleanup has
+// nothing to keep: it releases the commissionee and ends with OnCommissioningComplete, and nothing is left in the pool.
+TEST_F(TestCommissioneeSessionLoss, FailedCommissioningWithoutPASESessionDoesNotKeepCommissionee)
+{
+    Testing::DeviceCommissionerTestAccess access(&state->commissioner);
+    auto * device = PairIdle(kNodeA, kPortA, 0x1001);
+    ASSERT_NE(device, nullptr);
+
+    access.SetDeviceBeingCommissioned(device);
+    access.GetSessionManager()->ExpireAllPASESessions();
+    ASSERT_EQ(access.FindCommissioneeDevice(kNodeA), device);
+    ASSERT_FALSE(device->IsSecureConnected());
+    ASSERT_TRUE(Delegate().released.empty());
+
+    CompletionStatus failure;
+    failure.err = CHIP_ERROR_TIMEOUT;
+    failure.failedStage.SetValue(CommissioningStage::kWiFiNetworkSetup);
+    access.CleanupCommissioning(device, kNodeA, failure);
+
+    EXPECT_EQ(access.FindCommissioneeDevice(kNodeA), nullptr);
+    ASSERT_EQ(Delegate().commissioningCompletes.size(), 1u);
+    EXPECT_EQ(Delegate().commissioningCompletes[0].deviceId, kNodeA);
+    EXPECT_EQ(Delegate().commissioningCompletes[0].error, CHIP_ERROR_TIMEOUT);
+    // The completion is the report; the release is not reported again.
+    EXPECT_TRUE(Delegate().released.empty());
+}
+
 // CleanupCommissioning releases the proxy after mDeviceBeingCommissioned is cleared; that release is the end of
 // commissioning (OnCommissioningComplete), not of the Idle state, so it must not be reported.
 TEST_F(TestCommissioneeSessionLoss, SuccessfulCommissioningCleanupDoesNotReportRelease)
