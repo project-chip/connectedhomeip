@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -146,10 +146,15 @@ private:
 class TestSecurePairingDelegate : public SessionEstablishmentDelegate
 {
 public:
-    void OnSessionEstablishmentError(CHIP_ERROR error) override { mNumPairingErrors++; }
+    void OnSessionEstablishmentError(CHIP_ERROR error) override
+    {
+        mLastPairingError = error;
+        mNumPairingErrors++;
+    }
 
     void OnSessionEstablished(const SessionHandle & session) override { mNumPairingComplete++; }
 
+    CHIP_ERROR mLastPairingError = CHIP_NO_ERROR;
     uint32_t mNumPairingErrors   = 0;
     uint32_t mNumPairingComplete = 0;
 };
@@ -968,6 +973,8 @@ TEST_F(TestPASESession, SecurePairingFailedHandshake)
     EXPECT_EQ(delegateAccessory.mNumPairingErrors, 1u);
     EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
     EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 1u);
+    EXPECT_EQ(delegateAccessory.mLastPairingError, CHIP_ERROR_INVALID_PASE_PARAMETER);
+    EXPECT_EQ(delegateCommissioner.mLastPairingError, CHIP_ERROR_INVALID_PASE_PARAMETER);
 }
 
 TEST_F(TestPASESession, PASEVerifierSerializeTest)

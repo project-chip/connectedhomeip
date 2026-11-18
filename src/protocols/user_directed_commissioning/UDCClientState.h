@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ enum class UDCClientProcessingState : uint8_t
     kUserDeclined,
     kObtainingOnboardingPayload,
     kWaitingForCommissionerPasscodeReady,
+    kWaitingForFixedPasscodeCommissioningReady,
     kCommissioningNode,
     kCommissioningFailed,
 };
@@ -188,6 +189,12 @@ public:
     void SetPasscodeLength(uint8_t newValue) { mPasscodeLength = newValue; };
     uint8_t GetPasscodeLength() const { return mPasscodeLength; };
 
+    void SetFixedPasscodeCommissioningSupported(bool newValue) { mFixedPasscodeCommissioningSupported = newValue; };
+    bool GetFixedPasscodeCommissioningSupported() const { return mFixedPasscodeCommissioningSupported; };
+
+    void SetFixedPasscodeCommissioningReady(bool newValue) { mFixedPasscodeCommissioningReady = newValue; };
+    bool GetFixedPasscodeCommissioningReady() const { return mFixedPasscodeCommissioningReady; };
+
     void SetCachedCommissionerPasscode(uint32_t newValue) { mCachedCommissionerPasscode = newValue; };
     uint32_t GetCachedCommissionerPasscode() const { return mCachedCommissionerPasscode; };
 
@@ -196,25 +203,27 @@ public:
      */
     void Reset()
     {
-        mPeerAddress                = PeerAddress::Uninitialized();
-        mLongDiscriminator          = 0;
-        mVendorId                   = 0;
-        mProductId                  = 0;
-        mRotatingIdLen              = 0;
-        mCdPort                     = 0;
-        mDeviceName[0]              = '\0';
-        mPairingInst[0]             = '\0';
-        mPairingHint                = 0;
-        mNoPasscode                 = false;
-        mCdUponPasscodeDialog       = false;
-        mCommissionerPasscode       = false;
-        mCommissionerPasscodeReady  = false;
-        mCancelPasscode             = false;
-        mExpirationTime             = System::Clock::kZero;
-        mUDCClientProcessingState   = UDCClientProcessingState::kNotInitialized;
-        mCachedCommissionerPasscode = 0;
-        mNumTargetAppInfos          = 0;
-        mPasscodeLength             = 0;
+        mPeerAddress                         = PeerAddress::Uninitialized();
+        mLongDiscriminator                   = 0;
+        mVendorId                            = 0;
+        mProductId                           = 0;
+        mRotatingIdLen                       = 0;
+        mCdPort                              = 0;
+        mDeviceName[0]                       = '\0';
+        mPairingInst[0]                      = '\0';
+        mPairingHint                         = 0;
+        mNoPasscode                          = false;
+        mCdUponPasscodeDialog                = false;
+        mCommissionerPasscode                = false;
+        mCommissionerPasscodeReady           = false;
+        mCancelPasscode                      = false;
+        mExpirationTime                      = System::Clock::kZero;
+        mUDCClientProcessingState            = UDCClientProcessingState::kNotInitialized;
+        mCachedCommissionerPasscode          = 0;
+        mNumTargetAppInfos                   = 0;
+        mPasscodeLength                      = 0;
+        mFixedPasscodeCommissioningSupported = false;
+        mFixedPasscodeCommissioningReady     = false;
     }
 
 private:
@@ -234,12 +243,14 @@ private:
     uint8_t mNumTargetAppInfos                        = 0; // number of vendor Ids
     TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos] = {};
 
-    bool mNoPasscode                = false;
-    bool mCdUponPasscodeDialog      = false;
-    bool mCommissionerPasscode      = false;
-    bool mCommissionerPasscodeReady = false;
-    bool mCancelPasscode            = false;
-    uint8_t mPasscodeLength         = 0;
+    bool mNoPasscode                          = false;
+    bool mCdUponPasscodeDialog                = false;
+    bool mCommissionerPasscode                = false;
+    bool mCommissionerPasscodeReady           = false;
+    bool mCancelPasscode                      = false;
+    uint8_t mPasscodeLength                   = 0;
+    bool mFixedPasscodeCommissioningSupported = false;
+    bool mFixedPasscodeCommissioningReady     = false;
 
     UDCClientProcessingState mUDCClientProcessingState = UDCClientProcessingState::kNotInitialized;
     System::Clock::Timestamp mExpirationTime           = System::Clock::kZero;

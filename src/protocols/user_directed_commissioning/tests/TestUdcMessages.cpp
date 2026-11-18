@@ -48,6 +48,8 @@ public:
 
     void OnCommissionerPasscodeReady(UDCClientState state) {}
 
+    void OnFixedPasscodeCommissioningReady(UDCClientState state) {}
+
     void FindCommissionableNode(const char * instanceName)
     {
         mFindCommissionableNodeCalled = true;
@@ -138,6 +140,8 @@ TEST_F(TestUdcMessages, TestUDCServerUserConfirmationProvider)
     EXPECT_STREQ(state->GetInstanceName(), instanceName2);
     EXPECT_STREQ(state->GetDeviceName(), deviceName2);
     EXPECT_EQ(state->GetLongDiscriminator(), disc2);
+    EXPECT_EQ(state->GetCdPort(), nodeData2.port);
+    EXPECT_EQ(state->GetPeerAddress().GetPort(), nodeData2.port);
 
     // test non-empty UserConfirmationProvider
     udcServer.SetUserConfirmationProvider(&testCallback);
@@ -426,6 +430,8 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     id.SetCommissionerPasscode(true);
     id.SetCommissionerPasscodeReady(true);
     id.SetPasscodeLength(passcodeLength);
+    id.SetFixedPasscodeCommissioningSupported(true);
+    id.SetFixedPasscodeCommissioningReady(true);
 
     EXPECT_TRUE(id.HasDiscoveryInfo());
     EXPECT_STREQ(id.GetInstanceName(), instanceName);
@@ -447,6 +453,8 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     EXPECT_EQ(id.GetCommissionerPasscode(), true);
     EXPECT_EQ(id.GetCommissionerPasscodeReady(), true);
     EXPECT_EQ(id.GetPasscodeLength(), passcodeLength);
+    EXPECT_TRUE(id.GetFixedPasscodeCommissioningSupported());
+    EXPECT_TRUE(id.GetFixedPasscodeCommissioningReady());
 
     // TODO: add an ip
 
@@ -477,6 +485,8 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     EXPECT_EQ(id.GetCommissionerPasscode(), idOut.GetCommissionerPasscode());
     EXPECT_EQ(id.GetCommissionerPasscodeReady(), idOut.GetCommissionerPasscodeReady());
     EXPECT_EQ(id.GetPasscodeLength(), idOut.GetPasscodeLength());
+    EXPECT_EQ(id.GetFixedPasscodeCommissioningSupported(), idOut.GetFixedPasscodeCommissioningSupported());
+    EXPECT_EQ(id.GetFixedPasscodeCommissioningReady(), idOut.GetFixedPasscodeCommissioningReady());
 
     // TODO: remove following "force-fail" debug line
     // NL_TEST_ASSERT(inSuite, rotatingIdLen != id.GetRotatingIdLength());
@@ -662,6 +672,7 @@ TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
     id.SetCommissionerPasscode(true);
     id.SetQRCodeDisplayed(true);
     id.SetPasscodeLength(8);
+    id.SetFixedPasscodeCommissioningSelected(true);
 
     EXPECT_EQ(errorCode, id.GetErrorCode());
     EXPECT_EQ(id.GetNeedsPasscode(), true);
@@ -670,6 +681,7 @@ TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
     EXPECT_EQ(id.GetCommissionerPasscode(), true);
     EXPECT_EQ(id.GetQRCodeDisplayed(), true);
     EXPECT_EQ(id.GetPasscodeLength(), 8);
+    EXPECT_TRUE(id.GetFixedPasscodeCommissioningSelected());
 
     uint8_t idBuffer[500];
     id.WritePayload(idBuffer, sizeof(idBuffer));
@@ -684,4 +696,5 @@ TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
     EXPECT_EQ(id.GetCommissionerPasscode(), idOut.GetCommissionerPasscode());
     EXPECT_EQ(id.GetQRCodeDisplayed(), idOut.GetQRCodeDisplayed());
     EXPECT_EQ(id.GetPasscodeLength(), idOut.GetPasscodeLength());
+    EXPECT_EQ(id.GetFixedPasscodeCommissioningSelected(), idOut.GetFixedPasscodeCommissioningSelected());
 }

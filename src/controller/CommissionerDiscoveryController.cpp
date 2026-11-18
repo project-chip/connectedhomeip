@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -28,6 +28,7 @@
 #include <controller/CommissionerDiscoveryController.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
@@ -36,11 +37,12 @@ using namespace chip::Protocols::UserDirectedCommissioning;
 
 void CommissionerDiscoveryController::ResetState()
 {
-    mCurrentInstance[0] = '\0';
-    mVendorId           = 0;
-    mProductId          = 0;
-    mNodeId             = 0;
-    mReady              = true;
+    mCurrentInstance[0]                 = '\0';
+    mVendorId                           = 0;
+    mProductId                          = 0;
+    mNodeId                             = 0;
+    mFixedPasscodeCommissioningPasscode = 0;
+    mReady                              = true;
 }
 
 void CommissionerDiscoveryController::ValidateSession()
@@ -144,6 +146,53 @@ void CommissionerDiscoveryController::OnCommissionerPasscodeReady(UDCClientState
         CommissionWithPasscode(passcode);
         return;
     }
+}
+
+void CommissionerDiscoveryController::OnFixedPasscodeCommissioningReady(UDCClientState state)
+{
+    if (mReady)
+    {
+        // if state was ready for a new session,
+        // then we have lost our discovery controller context and can't perform the commissioning request
+        ChipLogDetail(Controller,
+                      "CommissionerDiscoveryController::OnFixedPasscodeCommissioningReady received when no current "
+                      "instance.");
+        return;
+    }
+
+    if (strncmp(mCurrentInstance, state.GetInstanceName(), sizeof(mCurrentInstance)) != 0)
+    {
+        // if the instance doesn't match the one in our discovery controller context,
+        // then we can't perform the commissioning request
+        ChipLogDetail(Controller,
+                      "CommissionerDiscoveryController::OnFixedPasscodeCommissioningReady received mismatched instance. "
+                      "Current instance=%s",
+                      mCurrentInstance);
+        return;
+    }
+
+    if (mFixedPasscodeCommissioningPasscode == 0)
+    {
+        ChipLogError(AppServer, "CommissionerDiscoveryController::OnFixedPasscodeCommissioningReady no passcode");
+        if (mUdcServer != nullptr)
+        {
+            CommissionerDeclaration cd;
+            cd.SetErrorCode(CommissionerDeclaration::CdError::kConfigurationFailed);
+            TEMPORARY_RETURN_IGNORED mUdcServer->SendCDCMessage(
+                cd, Transport::PeerAddress::UDP(state.GetPeerAddress().GetIPAddress(), state.GetCdPort()));
+
+            UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
+            if (client != nullptr)
+            {
+                client->Reset();
+            }
+        }
+        ResetState();
+        return;
+    }
+
+    ChipLogDetail(AppServer, "On UDC: fixed passcode commissioning ready with passcode - commissioning");
+    CommissionWithPasscode(mFixedPasscodeCommissioningPasscode);
 }
 
 void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClientState state)
@@ -438,6 +487,37 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
         return;
     }
 
+    mFixedPasscodeCommissioningPasscode = 0;
+
+    if (passcode == 0 && client->GetFixedPasscodeCommissioningSupported() && mPasscodeService != nullptr &&
+        client->GetCdPort() != 0)
+    {
+        uint32_t fixedPasscode = mPasscodeService->GetFixedPasscodeCommissioningPasscode();
+        if (fixedPasscode != 0 && SetupPayload::IsValidSetupPIN(fixedPasscode))
+        {
+            CommissionerDeclaration cd;
+            cd.SetFixedPasscodeCommissioningSelected(true);
+            CHIP_ERROR err = mUdcServer->SendCDCMessage(
+                cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+            if (err == CHIP_NO_ERROR)
+            {
+                mFixedPasscodeCommissioningPasscode = fixedPasscode;
+                client->SetUDCClientProcessingState(UDCClientProcessingState::kWaitingForFixedPasscodeCommissioningReady);
+                mUdcServer->GetUDCClients().MarkUDCClientActive(client);
+                return;
+            }
+
+            ChipLogError(AppServer,
+                         "UX Ok - HandleContentAppPasscodeResponse: failed to send Fixed Passcode Commissioning selection: "
+                         "%" CHIP_ERROR_FORMAT,
+                         err.Format());
+        }
+        else if (fixedPasscode != 0)
+        {
+            ChipLogError(AppServer, "UX Ok - HandleContentAppPasscodeResponse: Fixed Passcode Commissioning passcode is invalid");
+        }
+    }
+
     if (mPasscodeService != nullptr)
     {
         ChipLogDetail(AppServer, "UX Ok: have a passcodeService");
@@ -627,7 +707,8 @@ void CommissionerDiscoveryController::Cancel()
 
     bool isCancelableState =
         (state == UDCClientProcessingState::kPromptingUser || state == UDCClientProcessingState::kObtainingOnboardingPayload ||
-         state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady);
+         state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady ||
+         state == UDCClientProcessingState::kWaitingForFixedPasscodeCommissioningReady);
 
     if (!isCancelableState)
     {
@@ -638,7 +719,8 @@ void CommissionerDiscoveryController::Cancel()
     client->SetUDCClientProcessingState(UDCClientProcessingState::kUserDeclined);
 
     if (state == UDCClientProcessingState::kObtainingOnboardingPayload ||
-        state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady)
+        state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady ||
+        state == UDCClientProcessingState::kWaitingForFixedPasscodeCommissioningReady)
     {
         ChipLogDetail(AppServer, "UX Cancel: user cancelled entering PIN code, sending CDC");
         CommissionerDeclaration cd;
@@ -655,6 +737,18 @@ void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, 
                                                              Messaging::ExchangeManager & exchangeMgr,
                                                              const SessionHandle & sessionHandle)
 {
+    if (mFixedPasscodeCommissioningPasscode != 0 && mPasscodeService != nullptr)
+    {
+        CHIP_ERROR error = mPasscodeService->ResetFixedPasscodeCommissioningAuthenticationFailures();
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(
+                AppServer,
+                "UX CommissioningSucceeded: failed to clear Fixed Passcode Commissioning failure count: %" CHIP_ERROR_FORMAT,
+                error.Format());
+        }
+    }
+
     mVendorId  = vendorId;
     mProductId = productId;
     mNodeId    = nodeId;
@@ -695,6 +789,40 @@ void CommissionerDiscoveryController::CommissioningFailed(CHIP_ERROR error)
         ChipLogError(AppServer, "UX CommissioningFailed: invalid state");
         return;
     }
+
+    if (mFixedPasscodeCommissioningPasscode != 0 && error == CHIP_ERROR_INVALID_PASE_PARAMETER)
+    {
+        if (mPasscodeService != nullptr)
+        {
+            bool failureLimitReached = false;
+            CHIP_ERROR storageError  = mPasscodeService->RecordFixedPasscodeCommissioningAuthenticationFailure(failureLimitReached);
+            if (storageError != CHIP_NO_ERROR)
+            {
+                ChipLogError(
+                    AppServer,
+                    "UX CommissioningFailed: failed to update Fixed Passcode Commissioning failure count: %" CHIP_ERROR_FORMAT,
+                    storageError.Format());
+            }
+            else if (failureLimitReached && mUserPrompter != nullptr)
+            {
+                ChipLogDetail(Controller, "------PROMPT USER: Fixed Passcode Commissioning disabled after repeated failures");
+                mUserPrompter->PromptFixedPasscodeCommissioningLockout(GetCommissioneeName());
+            }
+        }
+
+        CommissionerDeclaration cd;
+        cd.SetErrorCode(CommissionerDeclaration::CdError::kPaseAuthFailed);
+        CHIP_ERROR sendError = mUdcServer->SendCDCMessage(
+            cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        if (sendError != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer,
+                         "UX CommissioningFailed: failed to report Fixed Passcode Commissioning PASE authentication failure: "
+                         "%" CHIP_ERROR_FORMAT,
+                         sendError.Format());
+        }
+    }
+
     client->SetUDCClientProcessingState(UDCClientProcessingState::kCommissioningFailed);
     client->Reset();
 

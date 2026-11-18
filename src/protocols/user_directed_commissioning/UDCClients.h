@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
-// UDC client state times out after 1 hour. This may need to be tweaked.
+// UDC client state times out after 30 seconds. This may need to be tweaked.
 inline constexpr const System::Clock::Timestamp kUDCClientTimeout = System::Clock::Milliseconds64(30 * 1000);
 
 /**
