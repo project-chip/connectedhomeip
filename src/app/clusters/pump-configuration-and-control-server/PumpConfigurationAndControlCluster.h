@@ -33,31 +33,32 @@ namespace chip::app::Clusters {
 class PumpConfigurationAndControlCluster : public DefaultServerCluster
 {
 public:
-    /// Optional attributes enabled for a cluster instance.
+    /// Optional attributes that can be enabled for a cluster instance.
     ///
-    /// A struct of flags is used instead of `OptionalAttributeSet` because the ControlMode
-    /// attribute id (0x21) exceeds the 32-bit mask range supported by `OptionalAttributeSet`.
-    struct OptionalAttributes
+    /// A bitmask is used instead of `OptionalAttributeSet` because the ControlMode attribute id
+    /// (0x21) exceeds the 32-bit mask range supported by `OptionalAttributeSet`.
+    ///
+    /// The Min/Max limit attributes have "<Feature>, [AUTO]" conformance: they are always present
+    /// when their own feature is enabled, and present with the Automatic feature only when the
+    /// corresponding bit is set.
+    enum class OptionalAttributes : uint32_t
     {
-        bool pumpStatus             = false;
-        bool speed                  = false;
-        bool lifetimeRunningHours   = false;
-        bool power                  = false;
-        bool lifetimeEnergyConsumed = false;
-        bool controlMode            = false;
-
-        // Limit attributes with "<Feature>, [AUTO]" conformance: always present when their own
-        // feature is enabled, and present with the Automatic feature only when the flag is set.
-        bool minConstPressure = false;
-        bool maxConstPressure = false;
-        bool minCompPressure  = false;
-        bool maxCompPressure  = false;
-        bool minConstSpeed    = false;
-        bool maxConstSpeed    = false;
-        bool minConstFlow     = false;
-        bool maxConstFlow     = false;
-        bool minConstTemp     = false;
-        bool maxConstTemp     = false;
+        kPumpStatus             = 0x0001,
+        kSpeed                  = 0x0002,
+        kLifetimeRunningHours   = 0x0004,
+        kPower                  = 0x0008,
+        kLifetimeEnergyConsumed = 0x0010,
+        kControlMode            = 0x0020,
+        kMinConstPressure       = 0x0040,
+        kMaxConstPressure       = 0x0080,
+        kMinCompPressure        = 0x0100,
+        kMaxCompPressure        = 0x0200,
+        kMinConstSpeed          = 0x0400,
+        kMaxConstSpeed          = 0x0800,
+        kMinConstFlow           = 0x1000,
+        kMaxConstFlow           = 0x2000,
+        kMinConstTemp           = 0x4000,
+        kMaxConstTemp           = 0x8000,
     };
 
     using PumpStatusBitMask = BitMask<PumpConfigurationAndControl::PumpStatusBitmap>;
@@ -83,8 +84,13 @@ public:
 
     struct Config
     {
+        explicit Config(PumpConfigurationAndControl::Delegate & delegateIn) : delegate(delegateIn) {}
+
+        /// Must outlive the cluster.
+        PumpConfigurationAndControl::Delegate & delegate;
+
         BitFlags<PumpConfigurationAndControl::Feature> features;
-        OptionalAttributes optionalAttributes;
+        BitMask<OptionalAttributes> optionalAttributes;
         FixedAttributes fixedAttributes;
 
         /// OperationMode value used when no value is persisted.
@@ -92,10 +98,10 @@ public:
 
         /// ControlMode value used when no value is persisted. When ControlMode is not enabled,
         /// this is the control mode used to compute EffectiveControlMode.
-        PumpConfigurationAndControl::ControlModeEnum controlMode = PumpConfigurationAndControl::ControlModeEnum::kConstantSpeed;
-
-        /// Optional. Must outlive the cluster.
-        PumpConfigurationAndControl::Delegate * delegate = nullptr;
+        ///
+        /// If unset, or if the mode requires a feature that is not enabled, the first supported
+        /// mode in ControlModeEnum order is used.
+        std::optional<PumpConfigurationAndControl::ControlModeEnum> controlMode;
     };
 
     PumpConfigurationAndControlCluster(EndpointId endpointId, const Config & config);
@@ -108,10 +114,10 @@ public:
                                                  AttributeValueDecoder & decoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    void SetDelegate(PumpConfigurationAndControl::Delegate * delegate) { mDelegate = delegate; }
-    PumpConfigurationAndControl::Delegate * GetDelegate() const { return mDelegate; }
-
     BitFlags<PumpConfigurationAndControl::Feature> GetFeatures() const { return mFeatures; }
+
+    /// Returns whether `attributeId` is in the attribute list of this instance.
+    bool IsAttributeEnabled(AttributeId attributeId) const;
     const FixedAttributes & GetFixedAttributes() const { return mFixedAttributes; }
 
     /// Sets OperationMode and updates EffectiveOperationMode, EffectiveControlMode and
@@ -124,17 +130,28 @@ public:
     /// Sets ControlMode and updates the effective modes, same as SetOperationMode.
     ///
     /// Returns ConstraintError if the mode requires a feature that is not enabled.
+    /// Returns UnsupportedAttribute if ControlMode is not enabled.
     CHIP_ERROR SetControlMode(PumpConfigurationAndControl::ControlModeEnum controlMode);
     PumpConfigurationAndControl::ControlModeEnum GetControlMode() const { return mControlMode; }
 
+    /// Asks the delegate for the remote sensor again and updates EffectiveControlMode and the
+    /// remote sensor bits of PumpStatus. Call it when the value returned by
+    /// Delegate::GetRemoteSensorType changes.
+    ///
+    /// Has no effect unless OperationMode is Normal: a remote sensor only applies in Normal mode.
+    void OnRemoteSensorChanged();
+
     /// Overrides EffectiveControlMode. The application owns EffectiveControlMode while
-    /// OperationMode is Local. The next OperationMode or ControlMode change recomputes it.
+    /// OperationMode is Local. The next recompute (an OperationMode or ControlMode change, or
+    /// OnRemoteSensorChanged in Normal mode) overwrites it.
     CHIP_ERROR SetEffectiveControlMode(PumpConfigurationAndControl::ControlModeEnum controlMode);
     PumpConfigurationAndControl::ControlModeEnum GetEffectiveControlMode() const { return mEffectiveControlMode; }
     PumpConfigurationAndControl::OperationModeEnum GetEffectiveOperationMode() const { return mEffectiveOperationMode; }
 
     /// The remote sensor bits (RemotePressure, RemoteFlow, RemoteTemperature) are also updated
     /// by the cluster when the effective modes are computed.
+    ///
+    /// Returns ConstraintError if a bit outside of PumpStatusBitmap is set.
     CHIP_ERROR SetPumpStatus(PumpStatusBitMask pumpStatus);
     PumpStatusBitMask GetPumpStatus() const { return mPumpStatus; }
 
@@ -190,17 +207,29 @@ private:
         >;
 
     static EnabledAttributeSet BuildEnabledAttributes(BitFlags<PumpConfigurationAndControl::Feature> features,
-                                                      const OptionalAttributes & optionalAttributes);
+                                                      BitMask<OptionalAttributes> optionalAttributes);
+
+    /// Assigns `value` to `dest` and, if the value changed, reports the change and calls
+    /// Delegate::OnAttributeChanged. Returns true if the value changed.
+    template <typename T, typename U>
+    bool UpdateAttribute(T & dest, const U & value, AttributeId attributeId)
+    {
+        VerifyOrReturnValue(SetAttributeValue(dest, value, attributeId), false);
+        mDelegate.OnAttributeChanged(mPath.mEndpointId, attributeId);
+        return true;
+    }
 
     bool IsOperationModeSupported(PumpConfigurationAndControl::OperationModeEnum operationMode) const;
     bool IsControlModeSupported(PumpConfigurationAndControl::ControlModeEnum controlMode) const;
+    PumpConfigurationAndControl::ControlModeEnum
+    SelectInitialControlMode(std::optional<PumpConfigurationAndControl::ControlModeEnum> configured) const;
     void UpdateEffectiveModes();
 
     const BitFlags<PumpConfigurationAndControl::Feature> mFeatures;
     const EnabledAttributeSet mEnabledOptionalAttributes;
     const bool mControlModeEnabled;
     const FixedAttributes mFixedAttributes;
-    PumpConfigurationAndControl::Delegate * mDelegate;
+    PumpConfigurationAndControl::Delegate & mDelegate;
 
     PumpConfigurationAndControl::OperationModeEnum mOperationMode;
     PumpConfigurationAndControl::ControlModeEnum mControlMode;

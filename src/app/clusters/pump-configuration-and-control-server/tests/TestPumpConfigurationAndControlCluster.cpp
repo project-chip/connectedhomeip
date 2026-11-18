@@ -15,6 +15,7 @@
  */
 
 #include <app/clusters/pump-configuration-and-control-server/PumpConfigurationAndControlCluster.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
@@ -23,6 +24,7 @@
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
+#include <algorithm>
 #include <vector>
 
 namespace {
@@ -37,6 +39,8 @@ using chip::Protocols::InteractionModel::Status;
 
 constexpr EndpointId kTestEndpointId = 1;
 
+using OptionalAttributes = PumpConfigurationAndControlCluster::OptionalAttributes;
+
 class TestDelegate : public PumpConfigurationAndControl::Delegate
 {
 public:
@@ -45,23 +49,32 @@ public:
     {
         mMinMaxCalls.push_back(operationMode);
     }
+    void OnAttributeChanged(EndpointId endpointId, AttributeId attributeId) override { mChangedAttributes.push_back(attributeId); }
+
+    bool WasChanged(AttributeId attributeId) const
+    {
+        return std::find(mChangedAttributes.begin(), mChangedAttributes.end(), attributeId) != mChangedAttributes.end();
+    }
 
     RemoteSensorType mRemoteSensorType = RemoteSensorType::kNoSensor;
     std::vector<OperationModeEnum> mMinMaxCalls;
+    std::vector<AttributeId> mChangedAttributes;
 };
 
 struct TestPumpConfigurationAndControlCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_SUCCESS(chip::Platform::MemoryInit()); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-};
 
-PumpConfigurationAndControlCluster::Config ConfigWithFeatures(BitFlags<Feature> features)
-{
-    PumpConfigurationAndControlCluster::Config config;
-    config.features = features;
-    return config;
-}
+    PumpConfigurationAndControlCluster::Config ConfigWithFeatures(BitFlags<Feature> features = {})
+    {
+        PumpConfigurationAndControlCluster::Config config(mDelegate);
+        config.features = features;
+        return config;
+    }
+
+    TestDelegate mDelegate;
+};
 
 const std::vector<DataModel::AttributeEntry> kMandatoryAttributes(kMandatoryMetadata.begin(), kMandatoryMetadata.end());
 
@@ -79,7 +92,7 @@ std::vector<DataModel::AttributeEntry> MandatoryPlus(std::initializer_list<DataM
 
 TEST_F(TestPumpConfigurationAndControlCluster, AttributeListWithoutFeatures)
 {
-    PumpConfigurationAndControlCluster cluster(kTestEndpointId, {});
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, ConfigWithFeatures());
     EXPECT_TRUE(IsAttributesListEqualTo(cluster, kMandatoryAttributes));
 }
 
@@ -98,14 +111,12 @@ TEST_F(TestPumpConfigurationAndControlCluster, AttributeListFeatureLimitsAreMand
 
 TEST_F(TestPumpConfigurationAndControlCluster, AttributeListLimitsOptionalWithAutomatic)
 {
-    PumpConfigurationAndControlCluster::OptionalAttributes requested;
-    requested.minConstFlow = true;
-    requested.maxConstFlow = true;
+    const BitMask<OptionalAttributes> requested(OptionalAttributes::kMinConstFlow, OptionalAttributes::kMaxConstFlow);
 
     {
         // Without the Automatic feature (or the Flow feature), the flow limits are disallowed.
-        PumpConfigurationAndControlCluster::Config config;
-        config.optionalAttributes = requested;
+        PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures();
+        config.optionalAttributes                         = requested;
         PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
         EXPECT_TRUE(IsAttributesListEqualTo(cluster, kMandatoryAttributes));
     }
@@ -121,13 +132,13 @@ TEST_F(TestPumpConfigurationAndControlCluster, AttributeListLimitsOptionalWithAu
 
 TEST_F(TestPumpConfigurationAndControlCluster, AttributeListOptionalAttributes)
 {
-    PumpConfigurationAndControlCluster::Config config;
-    config.optionalAttributes.pumpStatus             = true;
-    config.optionalAttributes.speed                  = true;
-    config.optionalAttributes.lifetimeRunningHours   = true;
-    config.optionalAttributes.power                  = true;
-    config.optionalAttributes.lifetimeEnergyConsumed = true;
-    config.optionalAttributes.controlMode            = true;
+    PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures();
+    config.optionalAttributes.Set(OptionalAttributes::kPumpStatus);
+    config.optionalAttributes.Set(OptionalAttributes::kSpeed);
+    config.optionalAttributes.Set(OptionalAttributes::kLifetimeRunningHours);
+    config.optionalAttributes.Set(OptionalAttributes::kPower);
+    config.optionalAttributes.Set(OptionalAttributes::kLifetimeEnergyConsumed);
+    config.optionalAttributes.Set(OptionalAttributes::kControlMode);
 
     PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
@@ -196,12 +207,12 @@ TEST_F(TestPumpConfigurationAndControlCluster, SpecFallbackValues)
     PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures(
         BitFlags<Feature>(Feature::kConstantPressure, Feature::kCompensatedPressure, Feature::kConstantFlow,
                           Feature::kConstantSpeed, Feature::kConstantTemperature, Feature::kAutomatic, Feature::kLocalOperation));
-    config.optionalAttributes.pumpStatus             = true;
-    config.optionalAttributes.speed                  = true;
-    config.optionalAttributes.lifetimeRunningHours   = true;
-    config.optionalAttributes.power                  = true;
-    config.optionalAttributes.lifetimeEnergyConsumed = true;
-    config.optionalAttributes.controlMode            = true;
+    config.optionalAttributes.Set(OptionalAttributes::kPumpStatus);
+    config.optionalAttributes.Set(OptionalAttributes::kSpeed);
+    config.optionalAttributes.Set(OptionalAttributes::kLifetimeRunningHours);
+    config.optionalAttributes.Set(OptionalAttributes::kPower);
+    config.optionalAttributes.Set(OptionalAttributes::kLifetimeEnergyConsumed);
+    config.optionalAttributes.Set(OptionalAttributes::kControlMode);
 
     PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
     ClusterTester tester(cluster);
@@ -263,7 +274,7 @@ TEST_F(TestPumpConfigurationAndControlCluster, SpecFallbackValues)
 TEST_F(TestPumpConfigurationAndControlCluster, OperationModeRequiresFeature)
 {
     {
-        PumpConfigurationAndControlCluster cluster(kTestEndpointId, {});
+        PumpConfigurationAndControlCluster cluster(kTestEndpointId, ConfigWithFeatures());
         ClusterTester tester(cluster);
         ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
 
@@ -312,9 +323,9 @@ TEST_F(TestPumpConfigurationAndControlCluster, ControlModeRequiresFeature)
     for (const auto & entry : kModeFeatures)
     {
         {
-            PumpConfigurationAndControlCluster::Config config;
-            config.optionalAttributes.controlMode = true;
-            config.controlMode                    = ControlModeEnum::kAutomatic;
+            PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures();
+            config.optionalAttributes.Set(OptionalAttributes::kControlMode);
+            config.controlMode = ControlModeEnum::kAutomatic;
             PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
             ClusterTester tester(cluster);
             ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
@@ -323,7 +334,7 @@ TEST_F(TestPumpConfigurationAndControlCluster, ControlModeRequiresFeature)
         }
         {
             PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures(BitFlags<Feature>(entry.feature));
-            config.optionalAttributes.controlMode             = true;
+            config.optionalAttributes.Set(OptionalAttributes::kControlMode);
             PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
             ClusterTester tester(cluster);
             ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
@@ -340,7 +351,7 @@ TEST_F(TestPumpConfigurationAndControlCluster, RejectsUndefinedControlModeWithin
     PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures(
         BitFlags<Feature>(Feature::kConstantPressure, Feature::kCompensatedPressure, Feature::kConstantFlow,
                           Feature::kConstantSpeed, Feature::kConstantTemperature, Feature::kAutomatic, Feature::kLocalOperation));
-    config.optionalAttributes.controlMode = true;
+    config.optionalAttributes.Set(OptionalAttributes::kControlMode);
     PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
     ClusterTester tester(cluster);
     ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
@@ -354,12 +365,11 @@ TEST_F(TestPumpConfigurationAndControlCluster, RejectsUndefinedControlModeWithin
 
 TEST_F(TestPumpConfigurationAndControlCluster, EffectiveModesFollowOperationMode)
 {
-    TestDelegate delegate;
+    TestDelegate & delegate = mDelegate;
     PumpConfigurationAndControlCluster::Config config =
         ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantFlow, Feature::kLocalOperation));
-    config.optionalAttributes.controlMode = true;
-    config.controlMode                    = ControlModeEnum::kConstantFlow;
-    config.delegate                       = &delegate;
+    config.optionalAttributes.Set(OptionalAttributes::kControlMode);
+    config.controlMode = ControlModeEnum::kConstantFlow;
 
     PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
     ClusterTester tester(cluster);
@@ -404,14 +414,13 @@ TEST_F(TestPumpConfigurationAndControlCluster, EffectiveModesFollowOperationMode
 
 TEST_F(TestPumpConfigurationAndControlCluster, RemoteSensorOverridesControlModeInNormalMode)
 {
-    TestDelegate delegate;
+    TestDelegate & delegate    = mDelegate;
     delegate.mRemoteSensorType = RemoteSensorType::kPressureSensor;
 
     PumpConfigurationAndControlCluster::Config config =
         ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantPressure));
-    config.optionalAttributes.controlMode = true;
-    config.optionalAttributes.pumpStatus  = true;
-    config.delegate                       = &delegate;
+    config.optionalAttributes.Set(OptionalAttributes::kControlMode);
+    config.optionalAttributes.Set(OptionalAttributes::kPumpStatus);
 
     PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
     ClusterTester tester(cluster);
@@ -441,9 +450,9 @@ TEST_F(TestPumpConfigurationAndControlCluster, RemoteSensorOverridesControlModeI
 
 TEST_F(TestPumpConfigurationAndControlCluster, LifetimeAttributesWrite)
 {
-    PumpConfigurationAndControlCluster::Config config;
-    config.optionalAttributes.lifetimeRunningHours   = true;
-    config.optionalAttributes.lifetimeEnergyConsumed = true;
+    PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures();
+    config.optionalAttributes.Set(OptionalAttributes::kLifetimeRunningHours);
+    config.optionalAttributes.Set(OptionalAttributes::kLifetimeEnergyConsumed);
     PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
     ClusterTester tester(cluster);
     ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
@@ -474,9 +483,9 @@ TEST_F(TestPumpConfigurationAndControlCluster, AttributesPersistAcrossRestart)
 {
     PumpConfigurationAndControlCluster::Config config =
         ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantFlow, Feature::kLocalOperation));
-    config.optionalAttributes.controlMode            = true;
-    config.optionalAttributes.lifetimeRunningHours   = true;
-    config.optionalAttributes.lifetimeEnergyConsumed = true;
+    config.optionalAttributes.Set(OptionalAttributes::kControlMode);
+    config.optionalAttributes.Set(OptionalAttributes::kLifetimeRunningHours);
+    config.optionalAttributes.Set(OptionalAttributes::kLifetimeEnergyConsumed);
 
     PumpConfigurationAndControlCluster firstCluster(kTestEndpointId, config);
     ClusterTester tester(firstCluster);
@@ -502,9 +511,9 @@ TEST_F(TestPumpConfigurationAndControlCluster, AttributesPersistAcrossRestart)
 
 TEST_F(TestPumpConfigurationAndControlCluster, SettersValidateAndReportChanges)
 {
-    PumpConfigurationAndControlCluster::Config config;
-    config.optionalAttributes.speed = true;
-    config.optionalAttributes.power = true;
+    PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures();
+    config.optionalAttributes.Set(OptionalAttributes::kSpeed);
+    config.optionalAttributes.Set(OptionalAttributes::kPower);
     PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
     ClusterTester tester(cluster);
     ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
@@ -536,7 +545,7 @@ TEST_F(TestPumpConfigurationAndControlCluster, SettersValidateAndReportChanges)
 
 TEST_F(TestPumpConfigurationAndControlCluster, GenerateAlarmEvent)
 {
-    PumpConfigurationAndControlCluster cluster(kTestEndpointId, {});
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, ConfigWithFeatures());
     ClusterTester tester(cluster);
 
     EXPECT_FALSE(cluster.GenerateAlarmEvent(Events::GeneralFault::Type{}).has_value());
@@ -550,4 +559,196 @@ TEST_F(TestPumpConfigurationAndControlCluster, GenerateAlarmEvent)
               ConcreteEventPath(kTestEndpointId, PumpConfigurationAndControl::Id, Events::GeneralFault::Id));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, OnRemoteSensorChangedOnlyAppliesInNormalMode)
+{
+    PumpConfigurationAndControlCluster::Config config =
+        ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantPressure, Feature::kLocalOperation));
+    config.optionalAttributes.Set(OptionalAttributes::kPumpStatus).Set(OptionalAttributes::kControlMode);
+
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+
+    mDelegate.mRemoteSensorType = RemoteSensorType::kPressureSensor;
+    cluster.OnRemoteSensorChanged();
+    EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantPressure);
+    EXPECT_TRUE(cluster.GetPumpStatus().Has(PumpStatusBitmap::kRemotePressure));
+
+    mDelegate.mRemoteSensorType = RemoteSensorType::kNoSensor;
+    cluster.OnRemoteSensorChanged();
+    EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantSpeed);
+    EXPECT_FALSE(cluster.GetPumpStatus().Has(PumpStatusBitmap::kRemotePressure));
+
+    // In Local mode, the EffectiveControlMode set by the application is kept.
+    EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kLocal), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(cluster.SetEffectiveControlMode(ControlModeEnum::kConstantPressure));
+    mDelegate.mRemoteSensorType = RemoteSensorType::kPressureSensor;
+    cluster.OnRemoteSensorChanged();
+    EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantPressure);
+    EXPECT_FALSE(cluster.GetPumpStatus().Has(PumpStatusBitmap::kRemotePressure));
+
+    // In Maximum mode, the Minimum/Maximum hook is not called again.
+    EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kMaximum), CHIP_NO_ERROR);
+    ASSERT_EQ(mDelegate.mMinMaxCalls.size(), 1u);
+    cluster.OnRemoteSensorChanged();
+    EXPECT_EQ(mDelegate.mMinMaxCalls.size(), 1u);
+    EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantSpeed);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, DelegateNotifiedOfAttributeChanges)
+{
+    PumpConfigurationAndControlCluster::Config config =
+        ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantFlow));
+    config.optionalAttributes.Set(OptionalAttributes::kControlMode);
+    config.controlMode = ControlModeEnum::kConstantFlow;
+
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+
+    mDelegate.mChangedAttributes.clear();
+    EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kMaximum), CHIP_NO_ERROR);
+    EXPECT_TRUE(mDelegate.WasChanged(OperationMode::Id));
+    EXPECT_TRUE(mDelegate.WasChanged(EffectiveOperationMode::Id));
+    EXPECT_TRUE(mDelegate.WasChanged(EffectiveControlMode::Id));
+
+    mDelegate.mChangedAttributes.clear();
+    EXPECT_SUCCESS(cluster.SetCapacity(DataModel::MakeNullable(static_cast<int16_t>(5))));
+    EXPECT_TRUE(mDelegate.WasChanged(Capacity::Id));
+
+    // Setting the same value is not a change.
+    mDelegate.mChangedAttributes.clear();
+    EXPECT_SUCCESS(cluster.SetCapacity(DataModel::MakeNullable(static_cast<int16_t>(5))));
+    EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kMaximum), CHIP_NO_ERROR);
+    EXPECT_TRUE(mDelegate.mChangedAttributes.empty());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, SettersRejectDisabledAttributes)
+{
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed)));
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+
+    const CHIP_ERROR kUnsupported = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+    EXPECT_EQ(cluster.SetPumpStatus(PumpConfigurationAndControlCluster::PumpStatusBitMask(PumpStatusBitmap::kRunning)),
+              kUnsupported);
+    EXPECT_EQ(cluster.SetSpeed(DataModel::MakeNullable(static_cast<uint16_t>(1))), kUnsupported);
+    EXPECT_EQ(cluster.SetPower(DataModel::MakeNullable(static_cast<uint32_t>(1))), kUnsupported);
+    EXPECT_EQ(cluster.SetLifetimeRunningHours(DataModel::MakeNullable(static_cast<uint32_t>(1))), kUnsupported);
+    EXPECT_EQ(cluster.SetLifetimeEnergyConsumed(DataModel::MakeNullable(static_cast<uint32_t>(1))), kUnsupported);
+    EXPECT_EQ(cluster.SetControlMode(ControlModeEnum::kConstantSpeed), kUnsupported);
+
+    EXPECT_TRUE(cluster.IsAttributeEnabled(Capacity::Id));
+    EXPECT_TRUE(cluster.IsAttributeEnabled(FeatureMap::Id));
+    EXPECT_TRUE(cluster.IsAttributeEnabled(MinConstSpeed::Id));
+    EXPECT_FALSE(cluster.IsAttributeEnabled(MinConstPressure::Id));
+    EXPECT_FALSE(cluster.IsAttributeEnabled(Speed::Id));
+    EXPECT_FALSE(cluster.IsAttributeEnabled(ControlMode::Id));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, PumpStatusRejectsUndefinedBits)
+{
+    PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed));
+    config.optionalAttributes.Set(OptionalAttributes::kPumpStatus);
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+
+    // PumpStatusBitmap defines bits 0 to 8.
+    EXPECT_EQ(cluster.SetPumpStatus(PumpConfigurationAndControlCluster::PumpStatusBitMask(static_cast<uint16_t>(0x0200))),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_SUCCESS(cluster.SetPumpStatus(PumpConfigurationAndControlCluster::PumpStatusBitMask(static_cast<uint16_t>(0x01FF))));
+    EXPECT_EQ(cluster.GetPumpStatus().Raw(), 0x01FFu);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, ControlModeFallsBackToFirstSupportedMode)
+{
+    {
+        // ControlMode disabled and no configured value: ConstantPressure is the only supported mode.
+        PumpConfigurationAndControlCluster cluster(kTestEndpointId,
+                                                   ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantPressure)));
+        ClusterTester tester(cluster);
+        ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+        EXPECT_EQ(cluster.GetControlMode(), ControlModeEnum::kConstantPressure);
+        EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantPressure);
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+    {
+        // A configured mode whose feature is not enabled is replaced.
+        PumpConfigurationAndControlCluster::Config config =
+            ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantFlow, Feature::kAutomatic));
+        config.controlMode = ControlModeEnum::kConstantSpeed;
+        PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+        ClusterTester tester(cluster);
+        ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+        EXPECT_EQ(cluster.GetControlMode(), ControlModeEnum::kConstantFlow);
+        EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantFlow);
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, LifetimeEnergyConsumedRejectsNullValue)
+{
+    PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed));
+    config.optionalAttributes.Set(OptionalAttributes::kLifetimeEnergyConsumed);
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+
+    // 0xFFFFFFFF is the null value of a nullable uint32.
+    EXPECT_EQ(tester.WriteAttribute(LifetimeEnergyConsumed::Id, DataModel::MakeNullable(static_cast<uint32_t>(0xFFFFFFFF))),
+              Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(LifetimeEnergyConsumed::Id, DataModel::MakeNullable(static_cast<uint32_t>(0xFFFFFFFE))),
+              CHIP_NO_ERROR);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, StartupRecoversFromInvalidPersistedValues)
+{
+    PumpConfigurationAndControlCluster::Config config =
+        ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantPressure));
+    config.optionalAttributes.Set(OptionalAttributes::kControlMode).Set(OptionalAttributes::kLifetimeRunningHours);
+
+    struct
+    {
+        uint8_t operationMode;
+        uint8_t controlMode;
+    } const kInvalidModes[] = {
+        // Local and ConstantFlow are valid values, but their features are not enabled.
+        { to_underlying(OperationModeEnum::kLocal), to_underlying(ControlModeEnum::kConstantFlow) },
+        // Values outside of the enums.
+        { 9, 6 },
+    };
+
+    for (const auto & modes : kInvalidModes)
+    {
+        PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+        ClusterTester tester(cluster);
+
+        AttributePersistence persistence(tester.GetServerClusterContext().attributeStorage);
+        ASSERT_SUCCESS(persistence.StoreNativeEndianValue({ kTestEndpointId, PumpConfigurationAndControl::Id, OperationMode::Id },
+                                                          modes.operationMode));
+        ASSERT_SUCCESS(persistence.StoreNativeEndianValue({ kTestEndpointId, PumpConfigurationAndControl::Id, ControlMode::Id },
+                                                          modes.controlMode));
+        // LifetimeRunningHours is a 24-bit value.
+        ASSERT_SUCCESS(persistence.StoreNativeEndianValue(
+            { kTestEndpointId, PumpConfigurationAndControl::Id, LifetimeRunningHours::Id }, static_cast<uint32_t>(0x01000000)));
+
+        ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+        EXPECT_EQ(cluster.GetOperationMode(), OperationModeEnum::kNormal);
+        EXPECT_EQ(cluster.GetControlMode(), ControlModeEnum::kConstantSpeed);
+        EXPECT_EQ(cluster.GetLifetimeRunningHours(), DataModel::MakeNullable(static_cast<uint32_t>(0)));
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
 }

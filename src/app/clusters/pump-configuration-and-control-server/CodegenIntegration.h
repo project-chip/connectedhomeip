@@ -19,6 +19,7 @@
 #include <app/clusters/pump-configuration-and-control-server/PumpConfigurationAndControlDelegate.h>
 #include <app/data-model/Nullable.h>
 #include <clusters/PumpConfigurationAndControl/Enums.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/BitMask.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -26,20 +27,32 @@
 
 namespace chip::app::Clusters::PumpConfigurationAndControl {
 
-/// Delegate installed by default on clusters created from the ZAP configuration.
+/// Optional application hooks for a cluster created from the ZAP configuration.
 ///
-/// It reports no remote sensor. While OperationMode is Minimum or Maximum it sets the Level Control
-/// CurrentLevel on the same endpoint to MinLevel (at least 1) or MaxLevel, if the application
-/// includes the Level Control cluster.
-///
-/// Applications that detect remote sensors can subclass it and override GetRemoteSensorType,
-/// then install their instance with `FindClusterOnEndpoint(endpointId)->SetDelegate(...)`.
-class CodegenDelegate : public Delegate
+/// The integration always gives the cluster its own Delegate. That delegate forwards the calls below
+/// to the ApplicationDelegate installed with SetApplicationDelegate. While OperationMode is Minimum or
+/// Maximum, it also sets the Level Control CurrentLevel on the same endpoint to MinLevel (at least 1)
+/// or MaxLevel, if the application includes the Level Control cluster.
+class ApplicationDelegate
 {
 public:
-    RemoteSensorType GetRemoteSensorType(EndpointId endpointId) override { return RemoteSensorType::kNoSensor; }
-    void OnOperationModeMinMax(EndpointId endpointId, OperationModeEnum operationMode) override;
+    virtual ~ApplicationDelegate() = default;
+
+    /// See Delegate::GetRemoteSensorType. Without an ApplicationDelegate, no remote sensor is reported.
+    virtual RemoteSensorType GetRemoteSensorType(EndpointId endpointId) { return RemoteSensorType::kNoSensor; }
+
+    /// See Delegate::OnAttributeChanged.
+    virtual void OnAttributeChanged(EndpointId endpointId, AttributeId attributeId) {}
 };
+
+/// Installs `delegate` for the cluster on `endpointId`, or removes it if `delegate` is nullptr.
+///
+/// Can be called before or after the cluster is created. If the cluster already exists, the remote
+/// sensor is queried again (see PumpConfigurationAndControlCluster::OnRemoteSensorChanged). The
+/// delegate is removed when the cluster shuts down, and must outlive its installation.
+///
+/// Returns CHIP_ERROR_NOT_FOUND if the endpoint has no Pump Configuration and Control server.
+CHIP_ERROR SetApplicationDelegate(EndpointId endpointId, ApplicationDelegate * delegate);
 
 /// Returns the cluster instance registered on the given endpoint, nullptr otherwise.
 PumpConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
@@ -48,8 +61,10 @@ PumpConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointId
 ///
 /// They keep the signatures of the generated accessors that existed before the cluster became
 /// code-driven, so that application code keeps compiling. Each call forwards to the cluster returned
-/// by FindClusterOnEndpoint and returns UnsupportedEndpoint if there is none. Setters return the
-/// status of the cluster setter, e.g. ConstraintError for a mode whose feature is not enabled.
+/// by FindClusterOnEndpoint. They return UnsupportedEndpoint if there is no cluster,
+/// UnsupportedAttribute if the attribute is not enabled on the endpoint, and Failure if a getter
+/// receives a null pointer. Setters return the status of the cluster setter, e.g. ConstraintError
+/// for a mode whose feature is not enabled.
 ///
 /// Fixed attributes (MaxPressure, Min/Max limits) only have getters: their values come from the
 /// ZAP defaults. For the configured ZAP default values, use the generated `GetDefault` functions in

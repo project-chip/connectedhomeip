@@ -31,8 +31,7 @@ enum class RemoteSensorType : uint8_t
     kTemperatureSensor,
 };
 
-/// Application hooks used by PumpConfigurationAndControlCluster when it computes
-/// EffectiveOperationMode and EffectiveControlMode.
+/// Application hooks used by PumpConfigurationAndControlCluster.
 ///
 /// Methods are called from the Matter thread with the stack lock held.
 class Delegate
@@ -45,6 +44,8 @@ public:
     /// While OperationMode is Normal, a remote sensor overrides ControlMode:
     /// a flow sensor selects ConstantFlow, a pressure sensor selects ConstantPressure
     /// and a temperature sensor selects ConstantTemperature.
+    ///
+    /// Call PumpConfigurationAndControlCluster::OnRemoteSensorChanged when the returned value changes.
     virtual RemoteSensorType GetRemoteSensorType(EndpointId endpointId) = 0;
 
     /// Called after the effective modes are updated while OperationMode is Minimum or Maximum.
@@ -52,6 +53,10 @@ public:
     /// The application is expected to run the pump at its minimum or maximum speed
     /// (e.g. by updating the Level Control cluster on the same endpoint).
     virtual void OnOperationModeMinMax(EndpointId endpointId, OperationModeEnum operationMode) = 0;
+
+    /// Called after the value of `attributeId` changed, whether the change came from a client
+    /// write, an application setter or a value computed by the cluster.
+    virtual void OnAttributeChanged(EndpointId endpointId, AttributeId attributeId) = 0;
 };
 
 } // namespace chip::app::Clusters::PumpConfigurationAndControl

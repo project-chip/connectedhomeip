@@ -32,6 +32,9 @@ namespace {
 /// Largest non-null value of a nullable int24u attribute (0xFFFFFF is the null value).
 constexpr uint32_t kMaxNullableInt24u = 0xFFFFFE;
 
+/// Bits defined by PumpStatusBitmap.
+constexpr uint16_t kPumpStatusDefinedBits = 0x01FF;
+
 bool IsValidNullableInt24u(const DataModel::Nullable<uint32_t> & value)
 {
     return value.IsNull() || value.Value() <= kMaxNullableInt24u;
@@ -103,7 +106,7 @@ void StoreAttribute(ServerClusterContext * context, const ConcreteClusterPath & 
 
 PumpConfigurationAndControlCluster::EnabledAttributeSet
 PumpConfigurationAndControlCluster::BuildEnabledAttributes(BitFlags<Feature> features,
-                                                           const OptionalAttributes & optionalAttributes)
+                                                           BitMask<OptionalAttributes> optionalAttributes)
 {
     // Limit attributes are mandatory with their feature, optional with the Automatic feature
     // and disallowed otherwise.
@@ -117,31 +120,31 @@ PumpConfigurationAndControlCluster::BuildEnabledAttributes(BitFlags<Feature> fea
     const bool constantTemperature = features.Has(Feature::kConstantTemperature);
 
     EnabledAttributeSet enabled;
-    enabled.Set<MinConstPressure::Id>(limitEnabled(constantPressure, optionalAttributes.minConstPressure))
-        .Set<MaxConstPressure::Id>(limitEnabled(constantPressure, optionalAttributes.maxConstPressure))
-        .Set<MinCompPressure::Id>(limitEnabled(compensatedPressure, optionalAttributes.minCompPressure))
-        .Set<MaxCompPressure::Id>(limitEnabled(compensatedPressure, optionalAttributes.maxCompPressure))
-        .Set<MinConstSpeed::Id>(limitEnabled(constantSpeed, optionalAttributes.minConstSpeed))
-        .Set<MaxConstSpeed::Id>(limitEnabled(constantSpeed, optionalAttributes.maxConstSpeed))
-        .Set<MinConstFlow::Id>(limitEnabled(constantFlow, optionalAttributes.minConstFlow))
-        .Set<MaxConstFlow::Id>(limitEnabled(constantFlow, optionalAttributes.maxConstFlow))
-        .Set<MinConstTemp::Id>(limitEnabled(constantTemperature, optionalAttributes.minConstTemp))
-        .Set<MaxConstTemp::Id>(limitEnabled(constantTemperature, optionalAttributes.maxConstTemp))
-        .Set<PumpStatus::Id>(optionalAttributes.pumpStatus)
-        .Set<Speed::Id>(optionalAttributes.speed)
-        .Set<LifetimeRunningHours::Id>(optionalAttributes.lifetimeRunningHours)
-        .Set<Power::Id>(optionalAttributes.power)
-        .Set<LifetimeEnergyConsumed::Id>(optionalAttributes.lifetimeEnergyConsumed);
+    enabled.Set<MinConstPressure::Id>(limitEnabled(constantPressure, optionalAttributes.Has(OptionalAttributes::kMinConstPressure)))
+        .Set<MaxConstPressure::Id>(limitEnabled(constantPressure, optionalAttributes.Has(OptionalAttributes::kMaxConstPressure)))
+        .Set<MinCompPressure::Id>(limitEnabled(compensatedPressure, optionalAttributes.Has(OptionalAttributes::kMinCompPressure)))
+        .Set<MaxCompPressure::Id>(limitEnabled(compensatedPressure, optionalAttributes.Has(OptionalAttributes::kMaxCompPressure)))
+        .Set<MinConstSpeed::Id>(limitEnabled(constantSpeed, optionalAttributes.Has(OptionalAttributes::kMinConstSpeed)))
+        .Set<MaxConstSpeed::Id>(limitEnabled(constantSpeed, optionalAttributes.Has(OptionalAttributes::kMaxConstSpeed)))
+        .Set<MinConstFlow::Id>(limitEnabled(constantFlow, optionalAttributes.Has(OptionalAttributes::kMinConstFlow)))
+        .Set<MaxConstFlow::Id>(limitEnabled(constantFlow, optionalAttributes.Has(OptionalAttributes::kMaxConstFlow)))
+        .Set<MinConstTemp::Id>(limitEnabled(constantTemperature, optionalAttributes.Has(OptionalAttributes::kMinConstTemp)))
+        .Set<MaxConstTemp::Id>(limitEnabled(constantTemperature, optionalAttributes.Has(OptionalAttributes::kMaxConstTemp)))
+        .Set<PumpStatus::Id>(optionalAttributes.Has(OptionalAttributes::kPumpStatus))
+        .Set<Speed::Id>(optionalAttributes.Has(OptionalAttributes::kSpeed))
+        .Set<LifetimeRunningHours::Id>(optionalAttributes.Has(OptionalAttributes::kLifetimeRunningHours))
+        .Set<Power::Id>(optionalAttributes.Has(OptionalAttributes::kPower))
+        .Set<LifetimeEnergyConsumed::Id>(optionalAttributes.Has(OptionalAttributes::kLifetimeEnergyConsumed));
     return enabled;
 }
 
 PumpConfigurationAndControlCluster::PumpConfigurationAndControlCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster({ endpointId, PumpConfigurationAndControl::Id }), mFeatures(config.features),
     mEnabledOptionalAttributes(BuildEnabledAttributes(config.features, config.optionalAttributes)),
-    mControlModeEnabled(config.optionalAttributes.controlMode), mFixedAttributes(config.fixedAttributes),
-    mDelegate(config.delegate), mOperationMode(config.operationMode), mControlMode(config.controlMode),
+    mControlModeEnabled(config.optionalAttributes.Has(OptionalAttributes::kControlMode)), mFixedAttributes(config.fixedAttributes),
+    mDelegate(config.delegate), mOperationMode(config.operationMode), mControlMode(SelectInitialControlMode(config.controlMode)),
     mEffectiveOperationMode(config.operationMode),
-    mEffectiveControlMode(ComputeEffectiveControlMode(config.operationMode, config.controlMode, RemoteSensorType::kNoSensor)),
+    mEffectiveControlMode(ComputeEffectiveControlMode(config.operationMode, mControlMode, RemoteSensorType::kNoSensor)),
     mLifetimeRunningHours(0), mLifetimeEnergyConsumed(0)
 {}
 
@@ -164,7 +167,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
     {
         const ControlModeEnum defaultControlMode = mControlMode;
         persistence.LoadNativeEndianValue({ endpointId, clusterId, ControlMode::Id }, mControlMode, defaultControlMode);
-        if (EnsureKnownEnumValue(mControlMode) == ControlModeEnum::kUnknownEnumValue)
+        if (!IsControlModeSupported(mControlMode))
         {
             mControlMode = defaultControlMode;
         }
@@ -330,7 +333,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Attributes(const ConcreteClusterP
 CHIP_ERROR PumpConfigurationAndControlCluster::SetOperationMode(OperationModeEnum operationMode)
 {
     VerifyOrReturnError(IsOperationModeSupported(operationMode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    VerifyOrReturnError(SetAttributeValue(mOperationMode, operationMode, OperationMode::Id), CHIP_NO_ERROR);
+    VerifyOrReturnError(UpdateAttribute(mOperationMode, operationMode, OperationMode::Id), CHIP_NO_ERROR);
     StoreAttribute(mContext, mPath, OperationMode::Id, mOperationMode);
     UpdateEffectiveModes();
     return CHIP_NO_ERROR;
@@ -338,8 +341,9 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetOperationMode(OperationModeEnu
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetControlMode(ControlModeEnum controlMode)
 {
+    VerifyOrReturnError(mControlModeEnabled, CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(IsControlModeSupported(controlMode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    VerifyOrReturnError(SetAttributeValue(mControlMode, controlMode, ControlMode::Id), CHIP_NO_ERROR);
+    VerifyOrReturnError(UpdateAttribute(mControlMode, controlMode, ControlMode::Id), CHIP_NO_ERROR);
     StoreAttribute(mContext, mPath, ControlMode::Id, mControlMode);
     UpdateEffectiveModes();
     return CHIP_NO_ERROR;
@@ -349,7 +353,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetEffectiveControlMode(ControlMo
 {
     VerifyOrReturnError(EnsureKnownEnumValue(controlMode) != ControlModeEnum::kUnknownEnumValue,
                         CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (SetAttributeValue(mEffectiveControlMode, controlMode, EffectiveControlMode::Id))
+    if (UpdateAttribute(mEffectiveControlMode, controlMode, EffectiveControlMode::Id))
     {
         StoreAttribute(mContext, mPath, EffectiveControlMode::Id, mEffectiveControlMode);
     }
@@ -358,35 +362,40 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetEffectiveControlMode(ControlMo
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetPumpStatus(PumpStatusBitMask pumpStatus)
 {
-    SetAttributeValue(mPumpStatus, pumpStatus, PumpStatus::Id);
+    VerifyOrReturnError(mEnabledOptionalAttributes.IsSet(PumpStatus::Id), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    VerifyOrReturnError((pumpStatus.Raw() & ~kPumpStatusDefinedBits) == 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    UpdateAttribute(mPumpStatus, pumpStatus, PumpStatus::Id);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetCapacity(DataModel::Nullable<int16_t> capacity)
 {
     VerifyOrReturnError(IsValidNullable(capacity), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    SetAttributeValue(mCapacity, capacity, Capacity::Id);
+    UpdateAttribute(mCapacity, capacity, Capacity::Id);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetSpeed(DataModel::Nullable<uint16_t> speed)
 {
+    VerifyOrReturnError(mEnabledOptionalAttributes.IsSet(Speed::Id), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(IsValidNullable(speed), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    SetAttributeValue(mSpeed, speed, Speed::Id);
+    UpdateAttribute(mSpeed, speed, Speed::Id);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetPower(DataModel::Nullable<uint32_t> power)
 {
+    VerifyOrReturnError(mEnabledOptionalAttributes.IsSet(Power::Id), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(IsValidNullableInt24u(power), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    SetAttributeValue(mPower, power, Power::Id);
+    UpdateAttribute(mPower, power, Power::Id);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetLifetimeRunningHours(DataModel::Nullable<uint32_t> hours)
 {
+    VerifyOrReturnError(mEnabledOptionalAttributes.IsSet(LifetimeRunningHours::Id), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(IsValidNullableInt24u(hours), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (SetAttributeValue(mLifetimeRunningHours, hours, LifetimeRunningHours::Id))
+    if (UpdateAttribute(mLifetimeRunningHours, hours, LifetimeRunningHours::Id))
     {
         StoreAttribute(mContext, mPath, LifetimeRunningHours::Id, mLifetimeRunningHours);
     }
@@ -395,8 +404,9 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetLifetimeRunningHours(DataModel
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetLifetimeEnergyConsumed(DataModel::Nullable<uint32_t> energy)
 {
+    VerifyOrReturnError(mEnabledOptionalAttributes.IsSet(LifetimeEnergyConsumed::Id), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(IsValidNullable(energy), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (SetAttributeValue(mLifetimeEnergyConsumed, energy, LifetimeEnergyConsumed::Id))
+    if (UpdateAttribute(mLifetimeEnergyConsumed, energy, LifetimeEnergyConsumed::Id))
     {
         StoreAttribute(mContext, mPath, LifetimeEnergyConsumed::Id, mLifetimeEnergyConsumed);
     }
@@ -440,14 +450,62 @@ bool PumpConfigurationAndControlCluster::IsControlModeSupported(ControlModeEnum 
     }
 }
 
+ControlModeEnum PumpConfigurationAndControlCluster::SelectInitialControlMode(std::optional<ControlModeEnum> configured) const
+{
+    if (configured.has_value() && IsControlModeSupported(*configured))
+    {
+        return *configured;
+    }
+    for (ControlModeEnum mode :
+         { ControlModeEnum::kConstantSpeed, ControlModeEnum::kConstantPressure, ControlModeEnum::kProportionalPressure,
+           ControlModeEnum::kConstantFlow, ControlModeEnum::kConstantTemperature, ControlModeEnum::kAutomatic })
+    {
+        if (IsControlModeSupported(mode))
+        {
+            return mode;
+        }
+    }
+    // No mode feature is enabled, which the spec does not allow. Use the spec fallback value.
+    return ControlModeEnum::kConstantSpeed;
+}
+
+bool PumpConfigurationAndControlCluster::IsAttributeEnabled(AttributeId attributeId) const
+{
+    if (attributeId == ControlMode::Id)
+    {
+        return mControlModeEnabled;
+    }
+    if (attributeId < 32 && (EnabledAttributeSet::All() & (1u << attributeId)) != 0)
+    {
+        return mEnabledOptionalAttributes.IsSet(attributeId);
+    }
+    if (attributeId == FeatureMap::Id || attributeId == ClusterRevision::Id)
+    {
+        return true;
+    }
+    for (const auto & entry : kMandatoryMetadata)
+    {
+        if (entry.attributeId == attributeId)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void PumpConfigurationAndControlCluster::OnRemoteSensorChanged()
+{
+    VerifyOrReturn(mOperationMode == OperationModeEnum::kNormal);
+    UpdateEffectiveModes();
+}
+
 void PumpConfigurationAndControlCluster::UpdateEffectiveModes()
 {
-    const EndpointId endpointId       = mPath.mEndpointId;
-    const RemoteSensorType sensorType = (mOperationMode == OperationModeEnum::kNormal && mDelegate != nullptr)
-        ? mDelegate->GetRemoteSensorType(endpointId)
-        : RemoteSensorType::kNoSensor;
+    const EndpointId endpointId = mPath.mEndpointId;
+    const RemoteSensorType sensorType =
+        (mOperationMode == OperationModeEnum::kNormal) ? mDelegate.GetRemoteSensorType(endpointId) : RemoteSensorType::kNoSensor;
 
-    if (SetAttributeValue(mEffectiveOperationMode, mOperationMode, EffectiveOperationMode::Id))
+    if (UpdateAttribute(mEffectiveOperationMode, mOperationMode, EffectiveOperationMode::Id))
     {
         StoreAttribute(mContext, mPath, EffectiveOperationMode::Id, mEffectiveOperationMode);
     }
@@ -460,12 +518,12 @@ void PumpConfigurationAndControlCluster::UpdateEffectiveModes()
             .Clear(PumpStatusBitmap::kRemoteFlow)
             .Clear(PumpStatusBitmap::kRemoteTemperature)
             .Set(RemoteSensorStatusBits(sensorType));
-        SetAttributeValue(mPumpStatus, pumpStatus, PumpStatus::Id);
+        UpdateAttribute(mPumpStatus, pumpStatus, PumpStatus::Id);
     }
 
-    if (mDelegate != nullptr && (mOperationMode == OperationModeEnum::kMinimum || mOperationMode == OperationModeEnum::kMaximum))
+    if (mOperationMode == OperationModeEnum::kMinimum || mOperationMode == OperationModeEnum::kMaximum)
     {
-        mDelegate->OnOperationModeMinMax(endpointId, mOperationMode);
+        mDelegate.OnOperationModeMinMax(endpointId, mOperationMode);
     }
 }
 

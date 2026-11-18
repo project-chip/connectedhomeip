@@ -30,13 +30,64 @@ using namespace chip::app::Clusters::PumpConfigurationAndControl::Attributes;
 
 namespace {
 
+using OptionalAttributes = PumpConfigurationAndControlCluster::OptionalAttributes;
+
 constexpr size_t kPumpConfigurationAndControlFixedClusterCount =
     PumpConfigurationAndControl::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kPumpConfigurationAndControlMaxClusterCount =
     kPumpConfigurationAndControlFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
+/// Delegate of each cluster created from the ZAP configuration.
+///
+/// It forwards the remote sensor query and the attribute change notifications to the
+/// ApplicationDelegate, if one is installed. While OperationMode is Minimum or Maximum it sets the
+/// Level Control CurrentLevel on the same endpoint to MinLevel (at least 1) or MaxLevel.
+class CodegenDelegate : public PumpConfigurationAndControl::Delegate
+{
+public:
+    void SetApplicationDelegate(ApplicationDelegate * delegate) { mApplicationDelegate = delegate; }
+
+    RemoteSensorType GetRemoteSensorType(EndpointId endpointId) override
+    {
+        VerifyOrReturnValue(mApplicationDelegate != nullptr, RemoteSensorType::kNoSensor);
+        return mApplicationDelegate->GetRemoteSensorType(endpointId);
+    }
+
+    void OnOperationModeMinMax(EndpointId endpointId, OperationModeEnum operationMode) override
+    {
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
+        uint8_t level = 0;
+        if (operationMode == OperationModeEnum::kMaximum)
+        {
+            VerifyOrReturn(LevelControl::Attributes::MaxLevel::Get(endpointId, &level) ==
+                           Protocols::InteractionModel::Status::Success);
+        }
+        else
+        {
+            VerifyOrReturn(LevelControl::Attributes::MinLevel::Get(endpointId, &level) ==
+                           Protocols::InteractionModel::Status::Success);
+            // A level of 0 stops the pump.
+            if (level == 0)
+            {
+                level = 1;
+            }
+        }
+        LevelControl::Attributes::CurrentLevel::Set(endpointId, level);
+#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL
+    }
+
+    void OnAttributeChanged(EndpointId endpointId, AttributeId attributeId) override
+    {
+        VerifyOrReturn(mApplicationDelegate != nullptr);
+        mApplicationDelegate->OnAttributeChanged(endpointId, attributeId);
+    }
+
+private:
+    ApplicationDelegate * mApplicationDelegate = nullptr;
+};
+
 LazyRegisteredServerCluster<PumpConfigurationAndControlCluster> gServers[kPumpConfigurationAndControlMaxClusterCount];
-CodegenDelegate gCodegenDelegate;
+CodegenDelegate gDelegates[kPumpConfigurationAndControlMaxClusterCount];
 
 PumpConfigurationAndControlCluster::FixedAttributes ReadFixedAttributeDefaults(EndpointId endpointId)
 {
@@ -57,28 +108,41 @@ PumpConfigurationAndControlCluster::FixedAttributes ReadFixedAttributeDefaults(E
     return fixed;
 }
 
-PumpConfigurationAndControlCluster::OptionalAttributes ReadOptionalAttributes(EndpointId endpointId, uint32_t optionalAttributeBits)
+BitMask<OptionalAttributes> ReadOptionalAttributes(EndpointId endpointId, uint32_t optionalAttributeBits)
 {
     const AttributeSet enabled(optionalAttributeBits);
-    PumpConfigurationAndControlCluster::OptionalAttributes attributes;
-    attributes.pumpStatus             = enabled.IsSet(PumpStatus::Id);
-    attributes.speed                  = enabled.IsSet(Speed::Id);
-    attributes.lifetimeRunningHours   = enabled.IsSet(LifetimeRunningHours::Id);
-    attributes.power                  = enabled.IsSet(Power::Id);
-    attributes.lifetimeEnergyConsumed = enabled.IsSet(LifetimeEnergyConsumed::Id);
-    attributes.minConstPressure       = enabled.IsSet(MinConstPressure::Id);
-    attributes.maxConstPressure       = enabled.IsSet(MaxConstPressure::Id);
-    attributes.minCompPressure        = enabled.IsSet(MinCompPressure::Id);
-    attributes.maxCompPressure        = enabled.IsSet(MaxCompPressure::Id);
-    attributes.minConstSpeed          = enabled.IsSet(MinConstSpeed::Id);
-    attributes.maxConstSpeed          = enabled.IsSet(MaxConstSpeed::Id);
-    attributes.minConstFlow           = enabled.IsSet(MinConstFlow::Id);
-    attributes.maxConstFlow           = enabled.IsSet(MaxConstFlow::Id);
-    attributes.minConstTemp           = enabled.IsSet(MinConstTemp::Id);
-    attributes.maxConstTemp           = enabled.IsSet(MaxConstTemp::Id);
+    BitMask<OptionalAttributes> attributes;
+    attributes.Set(OptionalAttributes::kPumpStatus, enabled.IsSet(PumpStatus::Id));
+    attributes.Set(OptionalAttributes::kSpeed, enabled.IsSet(Speed::Id));
+    attributes.Set(OptionalAttributes::kLifetimeRunningHours, enabled.IsSet(LifetimeRunningHours::Id));
+    attributes.Set(OptionalAttributes::kPower, enabled.IsSet(Power::Id));
+    attributes.Set(OptionalAttributes::kLifetimeEnergyConsumed, enabled.IsSet(LifetimeEnergyConsumed::Id));
+    attributes.Set(OptionalAttributes::kMinConstPressure, enabled.IsSet(MinConstPressure::Id));
+    attributes.Set(OptionalAttributes::kMaxConstPressure, enabled.IsSet(MaxConstPressure::Id));
+    attributes.Set(OptionalAttributes::kMinCompPressure, enabled.IsSet(MinCompPressure::Id));
+    attributes.Set(OptionalAttributes::kMaxCompPressure, enabled.IsSet(MaxCompPressure::Id));
+    attributes.Set(OptionalAttributes::kMinConstSpeed, enabled.IsSet(MinConstSpeed::Id));
+    attributes.Set(OptionalAttributes::kMaxConstSpeed, enabled.IsSet(MaxConstSpeed::Id));
+    attributes.Set(OptionalAttributes::kMinConstFlow, enabled.IsSet(MinConstFlow::Id));
+    attributes.Set(OptionalAttributes::kMaxConstFlow, enabled.IsSet(MaxConstFlow::Id));
+    attributes.Set(OptionalAttributes::kMinConstTemp, enabled.IsSet(MinConstTemp::Id));
+    attributes.Set(OptionalAttributes::kMaxConstTemp, enabled.IsSet(MaxConstTemp::Id));
     // ControlMode (0x21) is above the 31 attribute ids covered by optionalAttributeBits.
-    attributes.controlMode = emberAfContainsAttribute(endpointId, PumpConfigurationAndControl::Id, ControlMode::Id);
+    attributes.Set(OptionalAttributes::kControlMode,
+                   emberAfContainsAttribute(endpointId, PumpConfigurationAndControl::Id, ControlMode::Id));
     return attributes;
+}
+
+std::optional<ControlModeEnum> ReadControlModeDefault(EndpointId endpointId, bool controlModeEnabled)
+{
+    ControlModeEnum controlMode;
+    // Without a ControlMode attribute, the configured EffectiveControlMode default is the control
+    // mode of the pump.
+    const Protocols::InteractionModel::Status status = controlModeEnabled
+        ? ControlMode::GetDefault(endpointId, controlMode)
+        : EffectiveControlMode::GetDefault(endpointId, controlMode);
+    VerifyOrReturnValue(status == Protocols::InteractionModel::Status::Success, std::nullopt);
+    return controlMode;
 }
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -87,23 +151,12 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        PumpConfigurationAndControlCluster::Config config;
+        PumpConfigurationAndControlCluster::Config config(gDelegates[clusterInstanceIndex]);
         config.features           = BitFlags<Feature>(featureMap);
         config.optionalAttributes = ReadOptionalAttributes(endpointId, optionalAttributeBits);
         config.fixedAttributes    = ReadFixedAttributeDefaults(endpointId);
-        config.delegate           = &gCodegenDelegate;
-
+        config.controlMode = ReadControlModeDefault(endpointId, config.optionalAttributes.Has(OptionalAttributes::kControlMode));
         OperationMode::GetDefaultOr(endpointId, config.operationMode, OperationModeEnum::kNormal);
-        if (config.optionalAttributes.controlMode)
-        {
-            ControlMode::GetDefaultOr(endpointId, config.controlMode, ControlModeEnum::kConstantSpeed);
-        }
-        else
-        {
-            // Without a ControlMode attribute, the configured EffectiveControlMode default is the
-            // control mode of the pump.
-            EffectiveControlMode::GetDefaultOr(endpointId, config.controlMode, ControlModeEnum::kConstantSpeed);
-        }
 
         gServers[clusterInstanceIndex].Create(endpointId, config);
         return gServers[clusterInstanceIndex].Registration();
@@ -115,7 +168,11 @@ public:
         return &gServers[clusterInstanceIndex].Cluster();
     }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override
+    {
+        gServers[clusterInstanceIndex].Destroy();
+        gDelegates[clusterInstanceIndex].SetApplicationDelegate(nullptr);
+    }
 };
 
 } // namespace
@@ -155,27 +212,6 @@ void MatterPumpConfigurationAndControlPluginServerShutdownCallback() {}
 
 namespace chip::app::Clusters::PumpConfigurationAndControl {
 
-void CodegenDelegate::OnOperationModeMinMax(EndpointId endpointId, OperationModeEnum operationMode)
-{
-#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
-    uint8_t level = 0;
-    if (operationMode == OperationModeEnum::kMaximum)
-    {
-        VerifyOrReturn(LevelControl::Attributes::MaxLevel::Get(endpointId, &level) == Protocols::InteractionModel::Status::Success);
-    }
-    else
-    {
-        VerifyOrReturn(LevelControl::Attributes::MinLevel::Get(endpointId, &level) == Protocols::InteractionModel::Status::Success);
-        // A level of 0 stops the pump.
-        if (level == 0)
-        {
-            level = 1;
-        }
-    }
-    LevelControl::Attributes::CurrentLevel::Set(endpointId, level);
-#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL
-}
-
 PumpConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
@@ -192,17 +228,39 @@ PumpConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointId
     return static_cast<PumpConfigurationAndControlCluster *>(cluster);
 }
 
+CHIP_ERROR SetApplicationDelegate(EndpointId endpointId, ApplicationDelegate * delegate)
+{
+    const uint16_t index = emberAfGetClusterServerEndpointIndex(endpointId, PumpConfigurationAndControl::Id,
+                                                                kPumpConfigurationAndControlFixedClusterCount);
+    VerifyOrReturnError(index < kPumpConfigurationAndControlMaxClusterCount, CHIP_ERROR_NOT_FOUND);
+
+    gDelegates[index].SetApplicationDelegate(delegate);
+    if (PumpConfigurationAndControlCluster * cluster = FindClusterOnEndpoint(endpointId); cluster != nullptr)
+    {
+        cluster->OnRemoteSensorChanged();
+    }
+    return CHIP_NO_ERROR;
+}
+
 namespace {
 
 using Protocols::InteractionModel::Status;
 
 template <typename T, typename Getter>
-Status GetFromCluster(EndpointId endpoint, T & value, Getter && getter)
+Status GetFromCluster(EndpointId endpoint, AttributeId attributeId, T & value, Getter && getter)
 {
     PumpConfigurationAndControlCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnValue(cluster != nullptr, Status::UnsupportedEndpoint);
+    VerifyOrReturnValue(cluster->IsAttributeEnabled(attributeId), Status::UnsupportedAttribute);
     value = getter(*cluster);
     return Status::Success;
+}
+
+template <typename T, typename Getter>
+Status GetFromCluster(EndpointId endpoint, AttributeId attributeId, T * value, Getter && getter)
+{
+    VerifyOrReturnValue(value != nullptr, Status::Failure);
+    return GetFromCluster(endpoint, attributeId, *value, getter);
 }
 
 template <typename Setter>
@@ -220,98 +278,98 @@ namespace Attributes {
 namespace MaxPressure {
 Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxPressure; });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxPressure; });
 }
 } // namespace MaxPressure
 
 namespace MaxSpeed {
 Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxSpeed; });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxSpeed; });
 }
 } // namespace MaxSpeed
 
 namespace MaxFlow {
 Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxFlow; });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxFlow; });
 }
 } // namespace MaxFlow
 
 namespace MinConstPressure {
 Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetFixedAttributes().minConstPressure; });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFixedAttributes().minConstPressure; });
 }
 } // namespace MinConstPressure
 
 namespace MaxConstPressure {
 Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxConstPressure; });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxConstPressure; });
 }
 } // namespace MaxConstPressure
 
 namespace MinCompPressure {
 Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetFixedAttributes().minCompPressure; });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFixedAttributes().minCompPressure; });
 }
 } // namespace MinCompPressure
 
 namespace MaxCompPressure {
 Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxCompPressure; });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxCompPressure; });
 }
 } // namespace MaxCompPressure
 
 namespace MinConstSpeed {
 Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetFixedAttributes().minConstSpeed; });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFixedAttributes().minConstSpeed; });
 }
 } // namespace MinConstSpeed
 
 namespace MaxConstSpeed {
 Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxConstSpeed; });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxConstSpeed; });
 }
 } // namespace MaxConstSpeed
 
 namespace MinConstFlow {
 Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetFixedAttributes().minConstFlow; });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFixedAttributes().minConstFlow; });
 }
 } // namespace MinConstFlow
 
 namespace MaxConstFlow {
 Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxConstFlow; });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxConstFlow; });
 }
 } // namespace MaxConstFlow
 
 namespace MinConstTemp {
 Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetFixedAttributes().minConstTemp; });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFixedAttributes().minConstTemp; });
 }
 } // namespace MinConstTemp
 
 namespace MaxConstTemp {
 Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxConstTemp; });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFixedAttributes().maxConstTemp; });
 }
 } // namespace MaxConstTemp
 
 namespace Capacity {
 Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetCapacity(); });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetCapacity(); });
 }
 Status Set(EndpointId endpoint, int16_t value)
 {
@@ -330,7 +388,7 @@ Status Set(EndpointId endpoint, const DataModel::Nullable<int16_t> & value)
 namespace Speed {
 Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetSpeed(); });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetSpeed(); });
 }
 Status Set(EndpointId endpoint, uint16_t value)
 {
@@ -349,7 +407,7 @@ Status Set(EndpointId endpoint, const DataModel::Nullable<uint16_t> & value)
 namespace LifetimeRunningHours {
 Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetLifetimeRunningHours(); });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetLifetimeRunningHours(); });
 }
 Status Set(EndpointId endpoint, uint32_t value)
 {
@@ -368,7 +426,7 @@ Status Set(EndpointId endpoint, const DataModel::Nullable<uint32_t> & value)
 namespace Power {
 Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetPower(); });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetPower(); });
 }
 Status Set(EndpointId endpoint, uint32_t value)
 {
@@ -387,7 +445,7 @@ Status Set(EndpointId endpoint, const DataModel::Nullable<uint32_t> & value)
 namespace LifetimeEnergyConsumed {
 Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
-    return GetFromCluster(endpoint, value, [](auto & cluster) { return cluster.GetLifetimeEnergyConsumed(); });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetLifetimeEnergyConsumed(); });
 }
 Status Set(EndpointId endpoint, uint32_t value)
 {
@@ -406,7 +464,7 @@ Status Set(EndpointId endpoint, const DataModel::Nullable<uint32_t> & value)
 namespace PumpStatus {
 Status Get(EndpointId endpoint, BitMask<PumpStatusBitmap> * value)
 {
-    return GetFromCluster(endpoint, *value, [](auto & cluster) { return cluster.GetPumpStatus(); });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetPumpStatus(); });
 }
 Status Set(EndpointId endpoint, BitMask<PumpStatusBitmap> value)
 {
@@ -417,14 +475,14 @@ Status Set(EndpointId endpoint, BitMask<PumpStatusBitmap> value)
 namespace EffectiveOperationMode {
 Status Get(EndpointId endpoint, OperationModeEnum * value)
 {
-    return GetFromCluster(endpoint, *value, [](auto & cluster) { return cluster.GetEffectiveOperationMode(); });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetEffectiveOperationMode(); });
 }
 } // namespace EffectiveOperationMode
 
 namespace EffectiveControlMode {
 Status Get(EndpointId endpoint, ControlModeEnum * value)
 {
-    return GetFromCluster(endpoint, *value, [](auto & cluster) { return cluster.GetEffectiveControlMode(); });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetEffectiveControlMode(); });
 }
 Status Set(EndpointId endpoint, ControlModeEnum value)
 {
@@ -435,7 +493,7 @@ Status Set(EndpointId endpoint, ControlModeEnum value)
 namespace OperationMode {
 Status Get(EndpointId endpoint, OperationModeEnum * value)
 {
-    return GetFromCluster(endpoint, *value, [](auto & cluster) { return cluster.GetOperationMode(); });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetOperationMode(); });
 }
 Status Set(EndpointId endpoint, OperationModeEnum value)
 {
@@ -446,7 +504,7 @@ Status Set(EndpointId endpoint, OperationModeEnum value)
 namespace ControlMode {
 Status Get(EndpointId endpoint, ControlModeEnum * value)
 {
-    return GetFromCluster(endpoint, *value, [](auto & cluster) { return cluster.GetControlMode(); });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetControlMode(); });
 }
 Status Set(EndpointId endpoint, ControlModeEnum value)
 {
@@ -457,7 +515,7 @@ Status Set(EndpointId endpoint, ControlModeEnum value)
 namespace FeatureMap {
 Status Get(EndpointId endpoint, uint32_t * value)
 {
-    return GetFromCluster(endpoint, *value, [](auto & cluster) { return cluster.GetFeatures().Raw(); });
+    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFeatures().Raw(); });
 }
 } // namespace FeatureMap
 
