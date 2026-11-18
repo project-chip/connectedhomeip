@@ -47,6 +47,181 @@ using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
 
+#if CHIP_APP_FAILSAFE_EARLY_EXPIRY
+namespace {
+constexpr uint32_t kMaxAttachAttemptsAfterBleLoss = 3;
+constexpr System::Clock::Seconds32 kAttachPollInterval(1);
+
+bool sConnectNetworkReceived = false;
+bool sAttachWatch            = false;
+uint32_t sAttachBaseline     = 0;
+
+bool IsAttachedRole(otDeviceRole role)
+{
+    return role == OT_DEVICE_ROLE_CHILD || role == OT_DEVICE_ROLE_ROUTER || role == OT_DEVICE_ROLE_LEADER;
+}
+
+// Reads the OT role and attach-attempt counter under a single Thread stack lock,
+// so the expiry decision is made on a consistent snapshot.
+bool GetAttachSnapshot(uint32_t & attempts)
+{
+    ThreadStackMgr().LockThreadStack();
+    otInstance * instance = ThreadStackMgrImpl().OTInstance();
+    bool attached         = IsAttachedRole(otThreadGetDeviceRole(instance));
+    attempts              = otThreadGetMleCounters(instance)->mAttachAttempts;
+    ThreadStackMgr().UnlockThreadStack();
+    return attached;
+}
+
+void PollAttach(System::Layer *, void *);
+
+void ResetEarlyExpiry()
+{
+    SystemLayer().CancelTimer(PollAttach, nullptr);
+    sConnectNetworkReceived = false;
+    sAttachWatch            = false;
+    sAttachBaseline         = 0;
+}
+
+void ExpireFailSafe(const char * reason)
+{
+    ChipLogProgress(AppServer, "Fail-safe early expiry: %s", reason);
+    Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+    ResetEarlyExpiry();
+}
+
+void PollAttach(System::Layer *, void *)
+{
+    VerifyOrReturn(sAttachWatch);
+
+    uint32_t current = 0;
+    if (!Server::GetInstance().GetFailSafeContext().IsFailSafeArmed() || GetAttachSnapshot(current))
+    {
+        ResetEarlyExpiry();
+        return;
+    }
+
+    if (current < sAttachBaseline)
+    {
+        sAttachBaseline = current; // counter reset by the stack, re-baseline
+    }
+
+    if (current - sAttachBaseline >= kMaxAttachAttemptsAfterBleLoss)
+    {
+        ExpireFailSafe("Thread attach failed after CHIPoBLE loss");
+        return;
+    }
+
+    TEMPORARY_RETURN_IGNORED SystemLayer().StartTimer(kAttachPollInterval, PollAttach, nullptr);
+}
+
+// Fail-safe armed for a PASE commissioning session carried over BLE
+// (excludes CASE/UpdateNOC fail-safes and on-network PASE such as ECM/JCM).
+bool IsBleCommissioningFailSafe()
+{
+    auto & failSafe = Server::GetInstance().GetFailSafeContext();
+    VerifyOrReturnValue(failSafe.IsFailSafeArmed() && !failSafe.UpdateNocCommandHasBeenInvoked(), false);
+
+    auto pase = Server::GetInstance().GetCommissioningWindowManager().GetPASESession();
+    VerifyOrReturnValue(pase.HasValue(), false);
+    const Transport::SecureSession * session = pase.Value()->AsSecureSession();
+    VerifyOrReturnValue(session != nullptr, false);
+    return session->GetPeerAddress().GetTransportType() == Transport::Type::kBle;
+}
+
+void StartAttachWatch()
+{
+    otInstance * instance = ThreadStackMgrImpl().OTInstance();
+
+    // Restart the attacher so that the OT attach backoff starts again from its minimum.
+    // The OT API is used directly: the dataset and the Matter InterfaceEnabled state are untouched.
+    ThreadStackMgr().LockThreadStack();
+    if (IsAttachedRole(otThreadGetDeviceRole(instance)))
+    {
+        // Attached between the caller's check and this lock: nothing to do.
+        ThreadStackMgr().UnlockThreadStack();
+        return;
+    }
+    otThreadSetEnabled(instance, false);
+    otError otErr   = otThreadSetEnabled(instance, true);
+    sAttachBaseline = otThreadGetMleCounters(instance)->mAttachAttempts;
+    ThreadStackMgr().UnlockThreadStack();
+
+    if (otErr != OT_ERROR_NONE)
+    {
+        // Thread was disabled above but could not be re-enabled: with no BLE bearer and no Thread,
+        // waiting for natural expiry is pointless. Expire now so the revert path can recover.
+        ChipLogError(AppServer, "Fail-safe early expiry: Thread restart failed (%d)", otErr);
+        ExpireFailSafe("Thread restart failed");
+        return;
+    }
+
+    sAttachWatch = true;
+    ChipLogProgress(AppServer, "Fail-safe early expiry: CHIPoBLE closed after ConnectNetwork, Thread restarted");
+    TEMPORARY_RETURN_IGNORED SystemLayer().StartTimer(kAttachPollInterval, PollAttach, nullptr);
+}
+
+void HandleFailSafeEarlyExpiry(const ChipDeviceEvent * event)
+{
+    switch (event->Type)
+    {
+    case DeviceEventType::kThreadStateChange:
+        // ConnectNetwork is the first commissioning step that writes the OT active dataset
+        // (AddOrUpdateThreadNetwork only stages it). The fail-safe revert also writes it,
+        // but only after the fail-safe has been disarmed.
+        // Assumption: nothing else writes the active dataset while a BLE commissioning fail-safe
+        // is armed. A manual write (e.g. "otcli dataset commit active") would select case (ii)
+        // instead of (i); the fail-safe is still expired, just after the attach attempts.
+        if ((event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_ACTIVE_DATASET) &&
+            Server::GetInstance().GetFailSafeContext().IsFailSafeArmed())
+        {
+            sConnectNetworkReceived = true;
+        }
+        break;
+
+    case DeviceEventType::kCHIPoBLEConnectionClosed: {
+        auto & ble    = chip::DeviceLayer::Internal::BLEMgrImpl();
+        uint8_t conId = static_cast<uint8_t>(event->CHIPoBLEConnectionError.ConId);
+
+        VerifyOrReturn(ble.IsChipoBleConId(conId)); // ignore proprietary GATT links
+        ble.ClearChipobleConId();
+        VerifyOrReturn(IsBleCommissioningFailSafe());
+
+        if (!sConnectNetworkReceived)
+        {
+            // Case (i): PASE over BLE was the only bearer, so it cannot be recovered.
+            ExpireFailSafe("CHIPoBLE closed before ConnectNetwork");
+            return;
+        }
+
+        // Already on the operational network: the commissioner may continue over CASE.
+        // StartAttachWatch() re-checks this undet the Thread stack lock.
+        VerifyOrReturn(!ConnectivityMgr().IsThreadAttached());
+
+        // Case (ii)
+        StartAttachWatch();
+        break;
+    }
+    case DeviceEventType::kThreadConnectivityChange:
+        if (sAttachWatch && event->ThreadConnectivityChange.Result == kConnectivity_Established)
+        {
+            ChipLogProgress(AppServer, "Fail-safe early expiry: Thread attached, cancelled");
+            ResetEarlyExpiry();
+        }
+        break;
+
+    case DeviceEventType::kFailSafeTimerExpired:
+    case DeviceEventType::kCommissioningComplete:
+        ResetEarlyExpiry();
+        break;
+
+    default:
+        break;
+    }
+}
+} // namespace
+#endif // CHIP_APP_FAILSAFE_EARLY_EXPIRY
+
 void chip::NXP::App::CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
     ChipLogDetail(DeviceLayer, "DeviceEventCallback: 0x%04x", event->Type);
