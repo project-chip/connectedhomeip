@@ -117,8 +117,8 @@ class TC_CONTENTLAUNCHER_10_9(MatterTestCommissionedDevice):
         # Steps 1-3 verify QueueType behaviour (Replace / Next / Last), which is only
         # meaningful when something is already playing. Starting that content is
         # manufacturer specific, so the operator does it and confirms. A "n" answer
-        # means the precondition does not hold, so the rest of the test is skipped
-        # rather than failed - it would be asserting against an untested state.
+        # fails the test: the DUT claims ContentQueueing, so being unable to start
+        # content at all is a failure of that claim, not a reason to skip.
         response = self.wait_for_user_input(
             prompt_msg="Start content playing on the DUT using any method the manufacturer provides "
                        "(for example a PlayPreset command).\n"
@@ -131,12 +131,10 @@ class TC_CONTENTLAUNCHER_10_9(MatterTestCommissionedDevice):
                            "be started.\n",
                 prompt_msg_placeholder="y", default_value="y")
             answer = response.lower().strip() if response is not None else None
-        if answer == "n":
-            log.info("Operator reported that content could not be started on the DUT; "
-                     "skipping the remaining steps, which all depend on content already playing")
-            self.mark_current_step_skipped()
-            self.mark_all_remaining_steps_skipped(1)
-            return
+        asserts.assert_equal(
+            answer, "y",
+            "Operator reported that content could not be started on the DUT. Steps 1-3 verify "
+            "QueueType behaviour against currently playing content, which cannot be exercised.")
 
         self.step(1)
         await self._launch_url(endpoint, contentURL=content_url, queueType=queue_types.kReplace)
