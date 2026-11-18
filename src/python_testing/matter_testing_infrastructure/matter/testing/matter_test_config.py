@@ -70,6 +70,9 @@ class MatterTestConfig:
     # Endpoint-keyed PICS tree: {endpoint: {pics_code: supported}}. Device-wide
     # codes (e.g. MCORE.*) live under endpoint 0.
     pics: dict[int, dict[str, bool]] = field(default_factory=dict)
+    # When True, check_pics answers device-element PICS codes from the PICS generated
+    # from the DUT instead of the PICS file. MockTestRunner turns it off by default.
+    use_device_pics: bool = True
 
     # Node ID for basic DUT
     dut_node_ids: list[int] = field(default_factory=list)

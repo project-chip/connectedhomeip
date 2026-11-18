@@ -165,7 +165,8 @@ class TC_MWOCTRL_2_1(MatterTestCommissionedDevice):
         await self.read_and_check_cook_time_value(endpoint, maxCookTime)
 
         self.step(10)
-        if self.pics_guard(self.check_pics("MWOCTRL.S.F01")):
+        # WattRating is optional and not tied to the WATTS feature (F01), so gate on the attribute itself.
+        if self.pics_guard(self.check_pics("MWOCTRL.S.A0008")):
             await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.WattRating)
 
         self.step(11)
