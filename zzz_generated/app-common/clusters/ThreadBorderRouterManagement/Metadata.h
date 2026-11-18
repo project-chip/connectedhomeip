@@ -30,8 +30,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(BorderAgentID::Id, Bit
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace BorderAgentID
 namespace ThreadVersion {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ThreadVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ThreadVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ThreadVersion
 namespace InterfaceEnabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(InterfaceEnabled::Id, BitFlags<DataModel::AttributeQualityFlags>(),

@@ -118705,8 +118705,8 @@ public:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SupportedModes                                                    | 0x0000 |
-| * Mode                                                              | 0x0001 |
-| * SystemState                                                       | 0x0002 |
+| * HumidistatMode                                                    | 0x0001 |
+| * HumidistatSystemState                                             | 0x0002 |
 | * UserSetpoint                                                      | 0x0003 |
 | * MinSetpoint                                                       | 0x0004 |
 | * MaxSetpoint                                                       | 0x0005 |
@@ -118740,7 +118740,7 @@ public:
         AddArgument("UserSetpoint", 0, UINT8_MAX, &mRequest.userSetpoint);
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        AddArgument("Mode", 0, UINT8_MAX, &mRequest.mode);
+        AddArgument("HumidistatMode", 0, UINT8_MAX, &mRequest.humidistatMode);
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         AddArgument("MistType", 0, UINT8_MAX, &mRequest.mistType);
@@ -118776,10 +118776,10 @@ public:
         }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        if (mRequest.mode.HasValue()) {
-            params.mode = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.mode.Value())];
+        if (mRequest.humidistatMode.HasValue()) {
+            params.humidistatMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.humidistatMode.Value())];
         } else {
-            params.mode = nil;
+            params.humidistatMode = nil;
         }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
@@ -118923,34 +118923,34 @@ public:
 #if MTR_ENABLE_PROVISIONAL
 
 /*
- * Attribute Mode
+ * Attribute HumidistatMode
  */
-class ReadHumidistatMode : public ReadAttribute {
+class ReadHumidistatHumidistatMode : public ReadAttribute {
 public:
-    ReadHumidistatMode()
-        : ReadAttribute("mode")
+    ReadHumidistatHumidistatMode()
+        : ReadAttribute("humidistat-mode")
     {
     }
 
-    ~ReadHumidistatMode()
+    ~ReadHumidistatHumidistatMode()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Humidistat::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::Humidistat::Attributes::Mode::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::Humidistat::Attributes::HumidistatMode::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         __auto_type * cluster = [[MTRBaseClusterHumidistat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        [cluster readAttributeModeWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"Humidistat.Mode response %@", [value description]);
+        [cluster readAttributeHumidistatModeWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Humidistat.HumidistatMode response %@", [value description]);
             if (error == nil) {
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
             } else {
-                LogNSError("Humidistat Mode read Error", error);
+                LogNSError("Humidistat HumidistatMode read Error", error);
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
@@ -118959,24 +118959,24 @@ public:
     }
 };
 
-class WriteHumidistatMode : public WriteAttribute {
+class WriteHumidistatHumidistatMode : public WriteAttribute {
 public:
-    WriteHumidistatMode()
-        : WriteAttribute("mode")
+    WriteHumidistatHumidistatMode()
+        : WriteAttribute("humidistat-mode")
     {
-        AddArgument("attr-name", "mode");
+        AddArgument("attr-name", "humidistat-mode");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteHumidistatMode()
+    ~WriteHumidistatHumidistatMode()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Humidistat::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::Humidistat::Attributes::Mode::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::Humidistat::Attributes::HumidistatMode::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") WriteAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
@@ -118986,9 +118986,9 @@ public:
         params.dataVersion = mDataVersion.HasValue() ? [NSNumber numberWithUnsignedInt:mDataVersion.Value()] : nil;
         NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
 
-        [cluster writeAttributeModeWithValue:value params:params completion:^(NSError * _Nullable error) {
+        [cluster writeAttributeHumidistatModeWithValue:value params:params completion:^(NSError * _Nullable error) {
             if (error != nil) {
-                LogNSError("Humidistat Mode write Error", error);
+                LogNSError("Humidistat HumidistatMode write Error", error);
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
@@ -119000,21 +119000,21 @@ private:
     uint8_t mValue;
 };
 
-class SubscribeAttributeHumidistatMode : public SubscribeAttribute {
+class SubscribeAttributeHumidistatHumidistatMode : public SubscribeAttribute {
 public:
-    SubscribeAttributeHumidistatMode()
-        : SubscribeAttribute("mode")
+    SubscribeAttributeHumidistatHumidistatMode()
+        : SubscribeAttribute("humidistat-mode")
     {
     }
 
-    ~SubscribeAttributeHumidistatMode()
+    ~SubscribeAttributeHumidistatHumidistatMode()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Humidistat::Id;
-        constexpr chip::CommandId attributeId = chip::app::Clusters::Humidistat::Attributes::Mode::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::Humidistat::Attributes::HumidistatMode::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
@@ -119029,10 +119029,10 @@ public:
         if (mAutoResubscribe.HasValue()) {
             params.resubscribeAutomatically = mAutoResubscribe.Value();
         }
-        [cluster subscribeAttributeModeWithParams:params
+        [cluster subscribeAttributeHumidistatModeWithParams:params
             subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Humidistat.Mode response %@", [value description]);
+                NSLog(@"Humidistat.HumidistatMode response %@", [value description]);
                 if (error == nil) {
                     TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
                 } else {
@@ -119049,34 +119049,34 @@ public:
 #if MTR_ENABLE_PROVISIONAL
 
 /*
- * Attribute SystemState
+ * Attribute HumidistatSystemState
  */
-class ReadHumidistatSystemState : public ReadAttribute {
+class ReadHumidistatHumidistatSystemState : public ReadAttribute {
 public:
-    ReadHumidistatSystemState()
-        : ReadAttribute("system-state")
+    ReadHumidistatHumidistatSystemState()
+        : ReadAttribute("humidistat-system-state")
     {
     }
 
-    ~ReadHumidistatSystemState()
+    ~ReadHumidistatHumidistatSystemState()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Humidistat::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::Humidistat::Attributes::SystemState::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::Humidistat::Attributes::HumidistatSystemState::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         __auto_type * cluster = [[MTRBaseClusterHumidistat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        [cluster readAttributeSystemStateWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"Humidistat.SystemState response %@", [value description]);
+        [cluster readAttributeHumidistatSystemStateWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Humidistat.HumidistatSystemState response %@", [value description]);
             if (error == nil) {
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
             } else {
-                LogNSError("Humidistat SystemState read Error", error);
+                LogNSError("Humidistat HumidistatSystemState read Error", error);
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
@@ -119085,21 +119085,21 @@ public:
     }
 };
 
-class SubscribeAttributeHumidistatSystemState : public SubscribeAttribute {
+class SubscribeAttributeHumidistatHumidistatSystemState : public SubscribeAttribute {
 public:
-    SubscribeAttributeHumidistatSystemState()
-        : SubscribeAttribute("system-state")
+    SubscribeAttributeHumidistatHumidistatSystemState()
+        : SubscribeAttribute("humidistat-system-state")
     {
     }
 
-    ~SubscribeAttributeHumidistatSystemState()
+    ~SubscribeAttributeHumidistatHumidistatSystemState()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Humidistat::Id;
-        constexpr chip::CommandId attributeId = chip::app::Clusters::Humidistat::Attributes::SystemState::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::Humidistat::Attributes::HumidistatSystemState::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
@@ -119114,10 +119114,10 @@ public:
         if (mAutoResubscribe.HasValue()) {
             params.resubscribeAutomatically = mAutoResubscribe.Value();
         }
-        [cluster subscribeAttributeSystemStateWithParams:params
+        [cluster subscribeAttributeHumidistatSystemStateWithParams:params
             subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Humidistat.SystemState response %@", [value description]);
+                NSLog(@"Humidistat.HumidistatSystemState response %@", [value description]);
                 if (error == nil) {
                     TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
                 } else {
@@ -224163,13 +224163,13 @@ void registerClusterHumidistat(Commands & commands)
         make_unique<SubscribeAttributeHumidistatSupportedModes>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        make_unique<ReadHumidistatMode>(), //
-        make_unique<WriteHumidistatMode>(), //
-        make_unique<SubscribeAttributeHumidistatMode>(), //
+        make_unique<ReadHumidistatHumidistatMode>(), //
+        make_unique<WriteHumidistatHumidistatMode>(), //
+        make_unique<SubscribeAttributeHumidistatHumidistatMode>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        make_unique<ReadHumidistatSystemState>(), //
-        make_unique<SubscribeAttributeHumidistatSystemState>(), //
+        make_unique<ReadHumidistatHumidistatSystemState>(), //
+        make_unique<SubscribeAttributeHumidistatHumidistatSystemState>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         make_unique<ReadHumidistatUserSetpoint>(), //

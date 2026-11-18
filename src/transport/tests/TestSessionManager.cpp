@@ -21,7 +21,9 @@
  *      This file implements unit tests for the SessionManager implementation.
  */
 
+#include <algorithm>
 #include <errno.h>
+#include <functional>
 
 #include <pw_unit_test/framework.h>
 
@@ -975,6 +977,190 @@ TEST_F(TestSessionManager, SessionShiftingTest)
     sessionManager.Shutdown();
 }
 
+class HangRecordingDelegate : public SessionDelegate
+{
+public:
+    void OnSessionReleased() override
+    {
+        mReleasedCount++;
+        if (mOnReleased)
+        {
+            mOnReleased();
+        }
+    }
+    void OnSessionHang() override
+    {
+        mHangCount++;
+        if (mOnHang)
+        {
+            mOnHang();
+        }
+    }
+
+    std::function<void()> mOnHang;
+    std::function<void()> mOnReleased;
+    int mHangCount     = 0;
+    int mReleasedCount = 0;
+};
+
+TEST_F(TestSessionManager, HangNotificationWithHolderChanges)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    SessionHolder session;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectCaseSessionWithTestKey(session, 1, 2, 0x11223344ull, 0x12344321ull, 1, peer,
+                                                          CryptoContext::SessionRole::kInitiator));
+
+    HangRecordingDelegate delegateA, delegateB, delegateC;
+    SessionHolderWithDelegate holderA(session.Get().Value(), delegateA);
+    SessionHolderWithDelegate holderB(session.Get().Value(), delegateB);
+    SessionHolderWithDelegate holderC(session.Get().Value(), delegateC);
+
+    // Whichever of A and B is notified first releases the other, then grabs the session again, which must
+    // not notify it a second time.
+    delegateA.mOnHang = [&] {
+        holderB.Release();
+        holderA.Grab(session.Get().Value());
+    };
+    delegateB.mOnHang = [&] {
+        holderA.Release();
+        holderB.Grab(session.Get().Value());
+    };
+    session.Get().Value()->NotifySessionHang();
+
+    EXPECT_EQ(delegateA.mHangCount + delegateB.mHangCount, 1);
+    EXPECT_EQ(delegateC.mHangCount, 1);
+    EXPECT_NE(static_cast<bool>(holderA), static_cast<bool>(holderB));
+    EXPECT_TRUE(holderC);
+
+    // A holder that grabs the session during a nested walk is notified by neither walk.
+    holderA.Grab(session.Get().Value());
+    holderB.Grab(session.Get().Value());
+    HangRecordingDelegate delegateN;
+    SessionHolderWithDelegate holderN(delegateN);
+    bool nested = false;
+    for (auto * delegate : { &delegateA, &delegateB, &delegateC })
+    {
+        delegate->mHangCount = 0;
+        delegate->mOnHang    = [&] {
+            if (!nested)
+            {
+                nested = true;
+                session->NotifySessionHang();
+            }
+            else if (!holderN)
+            {
+                holderN.Grab(session.Get().Value());
+            }
+        };
+    }
+    session.Get().Value()->NotifySessionHang();
+
+    EXPECT_EQ(delegateA.mHangCount, 2);
+    EXPECT_EQ(delegateB.mHangCount, 2);
+    EXPECT_EQ(delegateC.mHangCount, 2);
+    EXPECT_EQ(delegateN.mHangCount, 0);
+    EXPECT_TRUE(holderN);
+
+    // Evicting the session from a hang callback releases every holder, including the ones the hang
+    // notification has not reached, and ends the hang notification. SessionHolder::operator-> takes no
+    // reference, so only the holders keep the session alive.
+    holderN.Release();
+    for (auto * delegate : { &delegateA, &delegateB, &delegateC })
+    {
+        delegate->mHangCount = 0;
+        delegate->mOnHang    = [&] { session->AsSecureSession()->MarkForEviction(); };
+    }
+    holderC->NotifySessionHang();
+
+    EXPECT_EQ(delegateA.mHangCount + delegateB.mHangCount + delegateC.mHangCount, 1);
+    EXPECT_EQ(delegateA.mReleasedCount, 1);
+    EXPECT_EQ(delegateB.mReleasedCount, 1);
+    EXPECT_EQ(delegateC.mReleasedCount, 1);
+    EXPECT_FALSE(session);
+    EXPECT_FALSE(holderA);
+    EXPECT_FALSE(holderB);
+    EXPECT_FALSE(holderC);
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, ReleaseRefusesNewHolders)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    SessionHolder session;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectCaseSessionWithTestKey(session, 1, 2, 0x11223344ull, 0x12344321ull, 1, peer,
+                                                          CryptoContext::SessionRole::kInitiator));
+    Transport::Session * rawSession = session.operator->();
+
+    HangRecordingDelegate delegateA, delegateB;
+    SessionHolderWithDelegate holderA(session.Get().Value(), delegateA);
+    SessionHolderWithDelegate holderB(session.Get().Value(), delegateB);
+
+    // Whichever holder is released first copies all holders, including ones that are not released yet,
+    // and grabs the session. None of that may attach to the session being released.
+    SessionHolder copyA, copyB, copySession, moved, grabbed;
+    bool copied = false;
+    for (auto * delegate : { &delegateA, &delegateB })
+    {
+        delegate->mOnReleased = [&] {
+            VerifyOrReturn(!copied);
+            copied      = true;
+            copyA       = holderA;
+            copyB       = holderB;
+            copySession = session;
+            moved       = SessionHolder(session);
+            EXPECT_FALSE(grabbed.Grab(SessionHandle(*rawSession)));
+        };
+    }
+    rawSession->AsSecureSession()->MarkForEviction();
+
+    EXPECT_TRUE(copied);
+    EXPECT_EQ(delegateA.mReleasedCount, 1);
+    EXPECT_EQ(delegateB.mReleasedCount, 1);
+    EXPECT_FALSE(session);
+    EXPECT_FALSE(holderA);
+    EXPECT_FALSE(holderB);
+    EXPECT_FALSE(copyA);
+    EXPECT_FALSE(copyB);
+    EXPECT_FALSE(copySession);
+    EXPECT_FALSE(moved);
+    EXPECT_FALSE(grabbed);
+
+    sessionManager.Shutdown();
+}
+
 TEST_F(TestSessionManager, TestFindSecureSessionForNode)
 {
     IPAddress addr;
@@ -1157,7 +1343,9 @@ TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
                                                           aliceFabricIndex, tcpPeer, CryptoContext::SessionRole::kInitiator));
     EXPECT_TRUE(tcpSessionLegacy->AllowsLargePayload());
     EXPECT_EQ(tcpSessionLegacy->GetRemoteSessionParameters().GetMaxTCPPayloadSize(), 0u);
-    EXPECT_EQ(tcpSessionLegacy->GetMaxAppMessageLen(), kLegacyDefaultMaxLargeAppMessageLen);
+    // kMaxLargeAppMessageLen follows the largest PacketBuffer allocation, so it may be the tighter bound.
+    EXPECT_EQ(tcpSessionLegacy->GetMaxAppMessageLen(),
+              std::min<size_t>(kLegacyDefaultMaxLargeAppMessageLen, kMaxLargeAppMessageLen));
 
     // 3. TCP session with an explicitly negotiated MaxTCPPayloadSize. 1200 keeps the encrypted
     //    message within every build's single packet buffer and AEAD single-part limit.
@@ -1174,7 +1362,9 @@ TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
     // MaxTCPPayloadSize is the size of the whole Matter message the peer can receive; the
     // application payload budget has to leave room for the message headers and the MIC.
     const size_t negotiatedAppLen = tcpSessionNegotiated->GetMaxAppMessageLen();
-    EXPECT_EQ(negotiatedAppLen, static_cast<size_t>(kNegotiatedMaxMessageSize) - kMaxMessageOverheadBytes);
+    // kMaxLargeAppMessageLen follows the largest PacketBuffer allocation, so it may be the tighter bound.
+    EXPECT_EQ(negotiatedAppLen,
+              std::min<size_t>(static_cast<size_t>(kNegotiatedMaxMessageSize) - kMaxMessageOverheadBytes, kMaxLargeAppMessageLen));
 
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
@@ -1257,5 +1447,19 @@ TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
 
     sessionManager.Shutdown();
 }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+// The MaxTCPPayloadSize a node advertises in its session parameters (see Server.cpp) must be a
+// message size the TCP transport can receive. A received message is copied into one PacketBuffer.
+TEST_F(TestSessionManager, AdvertisedMaxTCPPayloadSizeIsReceivable)
+{
+    constexpr size_t kAdvertisedMaxTCPPayloadSize =
+        CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES - SessionParameters::kTCPFramingHeaderSize;
+
+    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kAdvertisedMaxTCPPayloadSize, 0);
+    ASSERT_FALSE(buffer.IsNull());
+    EXPECT_GE(buffer->MaxDataLength(), kAdvertisedMaxTCPPayloadSize);
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 } // namespace

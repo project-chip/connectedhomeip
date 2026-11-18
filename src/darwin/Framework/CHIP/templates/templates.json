@@ -309,6 +309,16 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeSpecifiedCheck_Private.mm"
         },
         {
+            "path": "MTRAttributeChangesOmittedCheck-src.zapt",
+            "name": "Function to check if attribute has the Changes Omitted quality",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeChangesOmittedCheck.mm"
+        },
+        {
+            "path": "MTRAttributeChangesOmittedCheck_Private-src.zapt",
+            "name": "Function to check if attribute has the Changes Omitted quality Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeChangesOmittedCheck_Private.mm"
+        },
+        {
             "path": "MTRCommandTimedCheck-src.zapt",
             "name": "Function to check if command needs timed invoke",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandTimedCheck.mm"

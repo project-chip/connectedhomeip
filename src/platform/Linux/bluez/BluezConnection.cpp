@@ -147,15 +147,18 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
 CHIP_ERROR BluezConnection::CloseConnectionImpl(BluezConnection * conn)
 {
-    GAutoPtr<GError> error;
-    gboolean success;
-
     ChipLogDetail(DeviceLayer, "Close BLE connection: peer=%s", conn->GetPeerAddress());
-
-    success = bluez_device1_call_disconnect_sync(conn->mDevice.get(), nullptr, &error.GetReceiver());
-    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: Disconnect: %s", error->message));
-
-exit:
+    bluez_device1_call_disconnect(
+        conn->mDevice.get(), nullptr,
+        +[](GObject * device, GAsyncResult * result, void *) {
+            GAutoPtr<GError> error;
+            if (!bluez_device1_call_disconnect_finish(reinterpret_cast<BluezDevice1 *>(device), result, &error.GetReceiver()) &&
+                !g_error_matches(error.get(), G_IO_ERROR, G_IO_ERROR_CANCELLED))
+            {
+                ChipLogError(DeviceLayer, "FAIL: Disconnect: %s", error->message);
+            }
+        },
+        nullptr);
     return CHIP_NO_ERROR;
 }
 

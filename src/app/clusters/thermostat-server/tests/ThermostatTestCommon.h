@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
+#include <access/examples/ExampleAccessControlDelegate.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -403,6 +405,10 @@ public:
 
     CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override
     {
+        if (mGetPresetAtIndexError.has_value())
+        {
+            return *mGetPresetAtIndexError;
+        }
         if (index >= mPresets.size())
         {
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -413,6 +419,10 @@ public:
 
     CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override
     {
+        if (mGetPendingPresetAtIndexError.has_value())
+        {
+            return *mGetPendingPresetAtIndexError;
+        }
         if (index >= mPendingPresets.size())
         {
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -491,6 +501,8 @@ public:
     CHIP_ERROR mSetActivePresetHandleError                              = CHIP_NO_ERROR;
     CHIP_ERROR mCommitPendingPresetsError                               = CHIP_NO_ERROR;
     std::optional<System::Clock::Milliseconds16> mMaxAtomicWriteTimeout = System::Clock::Milliseconds16(10000);
+    std::optional<CHIP_ERROR> mGetPresetAtIndexError;
+    std::optional<CHIP_ERROR> mGetPendingPresetAtIndexError;
 };
 
 class MockSuggestionsDelegate : public ThermostatSuggestions::Delegate
@@ -628,6 +640,7 @@ public:
 
     CHIP_ERROR GetActiveScheduleHandle(DataModel::Nullable<MutableByteSpan> & activeScheduleHandle) override
     {
+        ReturnErrorOnFailure(mGetActiveScheduleHandleError);
         if (mActiveScheduleHandle.IsNull())
         {
             activeScheduleHandle.SetNull();
@@ -717,6 +730,7 @@ public:
     uint8_t mActiveScheduleHandleBuffer[kScheduleHandleSize]            = { 0 };
     DataModel::Nullable<ByteSpan> mActiveScheduleHandle                 = DataModel::NullNullable;
     uint8_t mNextHandleValue                                            = 100;
+    CHIP_ERROR mGetActiveScheduleHandleError                            = CHIP_NO_ERROR;
     CHIP_ERROR mSetActiveScheduleHandleError                            = CHIP_NO_ERROR;
     CHIP_ERROR mCommitPendingSchedulesError                             = CHIP_NO_ERROR;
     std::optional<System::Clock::Milliseconds16> mMaxAtomicWriteTimeout = System::Clock::Milliseconds16(9000);
@@ -935,10 +949,27 @@ inline bool HasAttribute(ServerClusterInterface & cluster, AttributeId attrId)
                        [attrId](const app::DataModel::AttributeEntry & entry) { return entry.attributeId == attrId; });
 }
 
+class TestDeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return false; }
+};
+
+inline TestDeviceTypeResolver gTestDeviceTypeResolver;
+
 struct ThermostatTestFixture : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+        Access::AccessControl::Delegate * delegate = Access::Examples::GetAccessControlDelegate();
+        ASSERT_EQ(Access::GetAccessControl().Init(delegate, gTestDeviceTypeResolver), CHIP_NO_ERROR);
+    }
+    static void TearDownTestSuite()
+    {
+        Access::GetAccessControl().Finish();
+        Platform::MemoryShutdown();
+    }
 
     ::chip::Testing::TestServerClusterContext mTestContext;
     ::chip::Testing::FabricTestFixture mFabricHelper{ &mTestContext.StorageDelegate() };
@@ -961,10 +992,31 @@ struct ThermostatTestFixture : public ::testing::Test
         mThermostatDelegate.SetFabricTable(&mFabricHelper.GetFabricTable());
         FabricIndex fabricIndex = kTestFabricIndex;
         ASSERT_EQ(mFabricHelper.SetUpTestFabric(fabricIndex), CHIP_NO_ERROR);
+
+        for (FabricIndex idx : { kTestFabricIndex, static_cast<FabricIndex>(kTestFabricIndex + 1) })
+        {
+            Access::AccessControl::Entry entry;
+            ASSERT_EQ(Access::GetAccessControl().PrepareEntry(entry), CHIP_NO_ERROR);
+            ASSERT_EQ(entry.SetFabricIndex(idx), CHIP_NO_ERROR);
+            ASSERT_EQ(entry.SetPrivilege(Access::Privilege::kAdminister), CHIP_NO_ERROR);
+            ASSERT_EQ(entry.SetAuthMode(Access::AuthMode::kCase), CHIP_NO_ERROR);
+            ASSERT_EQ(Access::GetAccessControl().CreateEntry(nullptr, entry), CHIP_NO_ERROR);
+        }
     }
 
     void TearDown() override
     {
+        for (FabricIndex idx : { kTestFabricIndex, static_cast<FabricIndex>(kTestFabricIndex + 1) })
+        {
+            size_t count = 0;
+            if (Access::GetAccessControl().GetEntryCount(idx, count) == CHIP_NO_ERROR)
+            {
+                for (size_t i = 0; i < count; ++i)
+                {
+                    EXPECT_EQ(Access::GetAccessControl().DeleteEntry(0, &idx), CHIP_NO_ERROR);
+                }
+            }
+        }
         mSensorsDelegate.Reset();
         FabricIndex fabricIndex = kTestFabricIndex;
         EXPECT_EQ(mFabricHelper.TearDownTestFabric(fabricIndex), CHIP_NO_ERROR);

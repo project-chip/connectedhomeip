@@ -21,33 +21,28 @@ import("//build_overrides/mbedtls.gni")
 
 declare_args() {
   # CSMSIS PATHS #
-  cmsis = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/CMSIS"
+  cmsis = "${chip_root}/third_party/st/x-cube-matter/Drivers/CMSIS"
 
   ## PATHS FOR STM32WB FAMILY ##
-  stm32_wb_sdk = "${chip_root}/third_party/st/STM32CubeWBA/Drivers"
+  stm32_wb_sdk = "${chip_root}/third_party/st/x-cube-matter/Drivers"
   stm32_wb_hal =
-      "${chip_root}/third_party/st/STM32CubeWBA/Drivers/STM32WBAxx_HAL_Driver"
-  cmsis_device_wb = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/CMSIS/Device/ST/STM32WBAxx"
+      "${chip_root}/third_party/st/x-cube-matter/Drivers/STM32WBAxx_HAL_Driver"
+  cmsis_device_wb = "${chip_root}/third_party/st/x-cube-matter/Drivers/CMSIS/Device/ST/STM32WBAxx"
   stm32_wpan_sdk =
-      "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/ST/STM32_WPAN"
+      "${chip_root}/third_party/st/x-cube-matter/Middlewares/ST/STM32WBA_WPAN"
   stm32_config_files =
       "${chip_root}/examples/platform/stm32/config_files/STM32WBA6"
-  stm32_system =
-      "${chip_root}/third_party/st/STM32CubeWBA/Projects/Common/WPAN/Modules"
-  stm32_system_interfaces =
-      "${chip_root}/third_party/st/STM32CubeWBA/Projects/Common/WPAN/Interfaces"
-  stm32_system_Config =
-      "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/Common/WPAN/Config"
-  stm32_wpan_ot_platform =
-      "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/STM32_WPAN/App"
-  stm32_system_App =
-      "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/Common/WPAN/"
-  stm32_mbedtls_alt = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/ST/mbedtls_alt/interfaces/patterns"
+  stm32_system = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/WPAN/Modules"
+  stm32_system_interfaces = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/WPAN/Interfaces"
+  stm32_system_App = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/Application/System"
+  stm32_wpan_ot_platform = "${chip_root}/third_party/st/x-cube-matter/Middlewares/ST/STM32WBA_WPAN/thread/openthread/stack/src/core/crypto"
+  stm32_project_dir_common = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/"
+  stm32_mbedtls_alt = "${chip_root}/third_party/st/x-cube-matter/Middlewares/ST/STM32WBA_WPAN/mbedtls_alt/source/hal"
+  stm32_mbedtls_alt_inc = "${chip_root}/third_party/st/x-cube-matter/Middlewares/ST/STM32WBA_WPAN/mbedtls_alt/include/hal"
 
   ## PATHS FOR FREERTOS ##
-  freertos_st = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/Third_Party/FreeRTOS/Source"
-  mbedtls_st =
-      "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/Third_Party/mbedtls"
+  freertos_st = "${chip_root}/third_party/st/x-cube-matter/Middlewares/Third_Party/FreeRTOS/Source"
+  mbedtls_st = "${chip_root}/third_party/st/x-cube-matter/Middlewares/Third_Party/mbedtls"
 }
 
 SOURCES = [
@@ -102,6 +97,7 @@ SOURCES = [
   "${stm32_wpan_sdk}/thread/openthread/platform/misc.c",
   "${stm32_wpan_sdk}/thread/openthread/platform/spi-stubs.c",
   "${stm32_wpan_sdk}/thread/openthread/platform/system.c",
+  "${stm32_wpan_sdk}/thread/openthread/platform/flash.c",
   "${stm32_wpan_sdk}/ble/svc/Src/svc_ctl.c",
   "${stm32_wpan_ot_platform}/crypto_platform.cpp",
 
@@ -142,8 +138,6 @@ SOURCES = [
   "${stm32_system}/BasicAES/baes_ccm.c",
   "${stm32_system}/BasicAES/baes_cmac.c",
   "${stm32_system}/BasicAES/baes_ecb.c",
-  "${stm32_system_App}/ble_timer/ble_timer.c",
-  "${stm32_system_App}/stm32_lpm_if.c",
   "${stm32_system}/Flash/flash_driver.c",
   "${stm32_system}/Flash/flash_manager.c",
   "${stm32_system}/Flash/rf_timing_synchro.c",
@@ -163,12 +157,14 @@ SOURCES = [
   "${stm32_system_interfaces}/timer_if.c",
   "${stm32_system_interfaces}/adv_trace_usart_if.c",
   "${stm32_system_interfaces}/app_bsp.c",
-  "${stm32_system_Config}/ADC_Ctrl/adc_ctrl_conf.c",
-  "${stm32_system_Config}/CRC_Ctrl/crc_ctrl_conf.c",
-  "${stm32_system_Config}/Debug_GPIO/app_debug.c",
-  "${stm32_system_Config}/Flash/simple_nvm_arbiter_conf.c",
-  "${stm32_system_Config}/LowPower/peripheral_init.c",
-  "${stm32_system_Config}/LowPower/user_low_power_config.c",
+  "${stm32_system_App}/Modules/ble_timer.c",
+  "${stm32_system_App}/Interfaces/stm32_lpm_if.c",
+  "${stm32_system_App}/Config/ADC_Ctrl/adc_ctrl_conf.c",
+  "${stm32_system_App}/Config/CRC_Ctrl/crc_ctrl_conf.c",
+  "${stm32_system_App}/Config/Debug_GPIO/app_debug.c",
+  "${stm32_system_App}/Config/Flash/simple_nvm_arbiter_conf.c",
+  "${stm32_system_App}/Config/LowPower/peripheral_init.c",
+  "${stm32_system_App}/Config/LowPower/user_low_power_config.c",
 
   #mbedtls
   "${mbedtls_st}/library/aes.c",
@@ -271,7 +267,6 @@ INCLUDE_DIRS = [
   "${stm32_wb_hal}/Inc",
   "${stm32_wb_hal}/Inc/Legacy",
   "${chip_root}/src/platform/stm32/stm32wba",
-  "${chip_root}/src/include/",
   "${mbedtls_st}/include",
   "${mbedtls_st}/library",
 
@@ -294,11 +289,12 @@ INCLUDE_DIRS = [
   "${stm32_wpan_sdk}/thread/openthread/stack/include/openthread",
   "${stm32_wpan_sdk}/thread/openthread/config",
   "${stm32_wpan_sdk}/thread/openthread/platform",
-  "${stm32_mbedtls_alt}/",
+  "${stm32_mbedtls_alt_inc}/",
 
   #SYSTEM
   "${stm32_system_App}/",
-  "${stm32_system_App}/ble_timer",
+  "${stm32_system_App}/Interfaces/",
+  "${stm32_system_App}/Modules/",
   "${stm32_system}/",
   "${stm32_system}/BasicAES",
   "${stm32_system}/Flash",
@@ -308,14 +304,16 @@ INCLUDE_DIRS = [
   "${stm32_system}/SerialCmdInterpreter",
   "${stm32_system}/Log",
   "${stm32_system_interfaces}",
-  "${stm32_system_Config}",
-  "${stm32_system_Config}/ADC_Ctrl",
-  "${stm32_system_Config}/CRC_Ctrl",
-  "${stm32_system_Config}/Debug_GPIO",
-  "${stm32_system_Config}/Flash",
-  "${stm32_system_Config}/Log",
-  "${stm32_system_Config}/LowPower",
-  "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/STM32_WPAN/Target",
+  "${stm32_system_App}/Config",
+  "${stm32_system_App}/Config/ADC_Ctrl",
+  "${stm32_system_App}/Config/CRC_Ctrl",
+  "${stm32_system_App}/Config/Debug_GPIO",
+  "${stm32_system_App}/Config/Flash",
+  "${stm32_system_App}/Config/Log",
+  "${stm32_system_App}/Config/LowPower",
+  "${stm32_project_dir_common}/Application/STM32_WPAN/Target",
+  "${stm32_project_dir_common}/Application/STM32_WPAN/App",
+  "${stm32_project_dir_common}/Application/App/Inc",
 
   #FREERTOS INCLUDES
   "${freertos_st}/include",
@@ -332,8 +330,8 @@ DEFINES = [
 
   #"CHIP_PLATFORM_CONFIG_INCLUDE=<CHIPPlatformConfig.h>",
   "CHIP_HAVE_CONFIG_H",
-  "OPENTHREAD_PROJECT_CORE_CONFIG_FILE=<stm32wba-openthread-light-no-tcp-config.h>",
-  "OPENTHREAD_CONFIG_FILE=<openthread_api_config_light_no_tcp.h>",
+  "OPENTHREAD_PROJECT_CORE_CONFIG_FILE=<stm32wba-openthread-matter-config.h>",
+  "OPENTHREAD_CONFIG_FILE=<openthread_api_config_matter.h>",
   "MBEDTLS_CONFIG_FILE=<matter_config.h>",
   "USE_FULL_LL_DRIVER",
   "MAC",
@@ -352,7 +350,7 @@ LIBS = [
   # add any .o/.a library here
   "${stm32_wpan_sdk}/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Thread_lib.a",
   "${stm32_wpan_sdk}/ble/stack/lib/stm32wba_ble_stack_basic.a",
-  "${stm32_wpan_sdk}/thread/openthread/openthread_lib/stm32wba_mtd_light_no_tcp_matter_lib.a",
+  "${stm32_wpan_sdk}/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib_matter.a",
 ]
 
 FLAGS = []

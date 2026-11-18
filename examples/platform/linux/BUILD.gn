@@ -301,9 +301,6 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_NETWORK_IDENTITY_MANAGEMENT_TRIGGER=${chip_enable_network_identity_management_trigger}",
   ]
 
-  if (chip_system_config_use_openthread_inet_endpoints) {
-    deps += [ "${chip_root}/third_party/openthread/platforms/simulation" ]
-  }
   public_configs = [ ":app-main-config" ]
 }
 

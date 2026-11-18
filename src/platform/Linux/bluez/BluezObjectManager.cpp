@@ -18,6 +18,7 @@
 #include "BluezObjectManager.h"
 
 #include <algorithm>
+#include <cstring>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -28,6 +29,7 @@
 
 #include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ParseDecimal.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/GLibTypeDeleter.h>
@@ -143,16 +145,18 @@ CHIP_ERROR BluezObjectManager::SetupAdapter(BluezAdapter1 * aAdapter)
 
 void BluezObjectManager::NotifyAdapterAdded(BluezAdapter1 * aAdapter)
 {
-    unsigned int adapterId = 0;
-    sscanf(GetAdapterObjectPath(aAdapter), BLUEZ_PATH "/hci%u", &adapterId);
+    unsigned int adapterId;
+    VerifyOrReturn(ParseAdapterObjectPath(GetAdapterObjectPath(aAdapter), adapterId),
+                   ChipLogError(DeviceLayer, "Unexpected adapter object path '%s'", GetAdapterObjectPath(aAdapter)));
     // Notify the application that new adapter has been just added
     BLEManagerImpl::NotifyBLEAdapterAdded(adapterId, bluez_adapter1_get_address(aAdapter));
 }
 
 void BluezObjectManager::NotifyAdapterRemoved(BluezAdapter1 * aAdapter)
 {
-    unsigned int adapterId = 0;
-    sscanf(GetAdapterObjectPath(aAdapter), BLUEZ_PATH "/hci%u", &adapterId);
+    unsigned int adapterId;
+    VerifyOrReturn(ParseAdapterObjectPath(GetAdapterObjectPath(aAdapter), adapterId),
+                   ChipLogError(DeviceLayer, "Unexpected adapter object path '%s'", GetAdapterObjectPath(aAdapter)));
     // Notify the application that the adapter is no longer available
     BLEManagerImpl::NotifyBLEAdapterRemoved(adapterId, bluez_adapter1_get_address(aAdapter));
 }
@@ -299,6 +303,13 @@ CHIP_ERROR BluezObjectManager::SetupObjectManager()
                      this);
 
     return CHIP_NO_ERROR;
+}
+
+bool ParseAdapterObjectPath(const char * aPath, unsigned int & aAdapterId)
+{
+    constexpr char kPrefix[] = BLUEZ_PATH "/hci";
+    VerifyOrReturnValue(aPath != nullptr && strncmp(aPath, kPrefix, sizeof(kPrefix) - 1) == 0, false);
+    return ParseDecimal(aPath + sizeof(kPrefix) - 1, aAdapterId);
 }
 
 CHIP_ERROR BluezCallToChipError(const GError * aError)

@@ -24,7 +24,8 @@ namespace Attributes {
 namespace AvailableEndpoints {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(AvailableEndpoints::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace AvailableEndpoints
 namespace ActiveEndpoints {

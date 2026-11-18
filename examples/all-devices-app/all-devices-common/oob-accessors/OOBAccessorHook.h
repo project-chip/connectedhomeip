@@ -30,9 +30,12 @@
 #include <device/types/mounted-dimmable-load-control/OOBAccessors.h>
 #include <device/types/mounted-on-off-control/OOBAccessors.h>
 #include <device/types/occupancy-sensor/OOBAccessors.h>
+#include <device/types/on-off-light-switch/OOBAccessors.h>
 #include <device/types/on-off-light/OOBAccessors.h>
 #include <device/types/on-off-plug-in-unit/OOBAccessors.h>
+#include <device/types/on-off-plug-in-unit/impl/OOBAccessors.h>
 #include <device/types/power-source/OOBAccessors.h>
+#include <device/types/proximity-ranger/OOBAccessors.h>
 #include <device/types/robotic-vacuum-cleaner/OOBAccessors.h>
 #include <device/types/root-node/OOBAccessors.h>
 #include <device/types/soil-sensor/OOBAccessors.h>

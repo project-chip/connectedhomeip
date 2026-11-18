@@ -163,12 +163,17 @@ esp_err_t set_openthread_platform_config(esp_openthread_platform_config_t * conf
 
 esp_err_t openthread_init_stack(void)
 {
-    // Used eventfds:
-    // * netif
-    // * ot task queue
-    // * radio driver
+    // eventfds used by the ESP OpenThread port: netif, task queue, radio driver
+    // (native 15.4 or SPI spinel; a UART RCP uses none, the spare slot is harmless).
+    size_t max_fds = 3;
+#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+    max_fds++; // border router discovery delegate
+#endif
+#ifdef CONFIG_OPENTHREAD_RADIO_TREL
+    max_fds++; // TREL reception
+#endif
     esp_vfs_eventfd_config_t eventfd_config = {
-        .max_fds = 3,
+        .max_fds = max_fds,
     };
 
     esp_err_t err          = ESP_OK;

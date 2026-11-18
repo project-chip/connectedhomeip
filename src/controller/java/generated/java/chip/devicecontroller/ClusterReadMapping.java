@@ -13271,28 +13271,28 @@ public class ClusterReadMapping {
           readHumidistatSupportedModesCommandParams
         );
         result.put("readSupportedModesAttribute", readHumidistatSupportedModesAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readHumidistatModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readHumidistatModeAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readHumidistatHumidistatModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readHumidistatHumidistatModeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.HumidistatCluster) cluster).readModeAttribute(
+            ((ChipClusters.HumidistatCluster) cluster).readHumidistatModeAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readHumidistatModeCommandParams
+          readHumidistatHumidistatModeCommandParams
         );
-        result.put("readModeAttribute", readHumidistatModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readHumidistatSystemStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readHumidistatSystemStateAttributeInteractionInfo = new InteractionInfo(
+        result.put("readHumidistatModeAttribute", readHumidistatHumidistatModeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readHumidistatHumidistatSystemStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readHumidistatHumidistatSystemStateAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.HumidistatCluster) cluster).readSystemStateAttribute(
+            ((ChipClusters.HumidistatCluster) cluster).readHumidistatSystemStateAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readHumidistatSystemStateCommandParams
+          readHumidistatHumidistatSystemStateCommandParams
         );
-        result.put("readSystemStateAttribute", readHumidistatSystemStateAttributeInteractionInfo);
+        result.put("readHumidistatSystemStateAttribute", readHumidistatHumidistatSystemStateAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readHumidistatUserSetpointCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readHumidistatUserSetpointAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

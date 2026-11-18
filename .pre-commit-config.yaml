@@ -40,6 +40,21 @@ repos:
           - id: clang-format
             files: \.(c|cc|cpp|ipp|cxx|c\+\+|C|cs|h|hh|hpp|hxx|h\+\+|H|js|m|mm)$
 
+    - repo: https://github.com/scop/pre-commit-shfmt
+      rev: 05c1426671b9237fb5e1444dd63aa5731bec0dfb # v3.13.1-1
+      hooks:
+          - id: shfmt
+            args: [-w, -i, "4", -ci]
+            exclude: |
+                (?x)^(
+                    examples/android/CHIPTool/gradlew|
+                    integrations/compute_engine/.*\.sh|
+                    integrations/docker/build-all\.sh|
+                    scripts/run_codegen_targets\.sh|
+                    scripts/setup/bootstrap\.sh|
+                    .*\.zsh
+                )$
+
     # Validates that .github/workflows/*.{yml,yaml} parse and conform to the
     # GitHub Actions schema. Catches the silent-skip class where a workflow
     # with a YAML/schema error never runs and never posts a check.

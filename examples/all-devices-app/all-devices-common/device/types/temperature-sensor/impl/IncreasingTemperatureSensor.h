@@ -33,7 +33,9 @@ class IncreasingTemperatureSensor : public TemperatureSensor,
                                     public Clusters::ThermostatUserInterfaceConfiguration::Delegate
 {
 public:
-    IncreasingTemperatureSensor();
+    IncreasingTemperatureSensor(TimerDelegate & timerDelegate,
+                                Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig,
+                                Clusters::TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes = {});
     ~IncreasingTemperatureSensor() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -51,7 +53,6 @@ protected:
     void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override;
 
 private:
-    DefaultTimerDelegate mTimerDelegate;
     DataModel::Nullable<int16_t> mTemperatureMeasuredValue;
     LazyRegisteredServerCluster<Clusters::ThermostatUserInterfaceConfigurationCluster> mUserInterfaceCluster;
 };

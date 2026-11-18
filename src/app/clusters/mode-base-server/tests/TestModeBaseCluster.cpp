@@ -156,6 +156,32 @@ struct TestModeBaseCluster : public ::testing::Test
     ModeBaseCluster::OptionalAttributeSet optionalAttributeSet;
 };
 
+TEST_F(TestModeBaseCluster, OrdinaryModeClustersReportOperateMetadata)
+{
+    for (const auto & clusterEntry :
+         { kDeviceEnergyManagementMode, kDishwasherMode, kEnergyEvseMode, kLaundryWasherMode, kOvenMode,
+           kRefrigeratorAndTemperatureControlledCabinetMode, kRvcCleanMode, kRvcRunMode, kWaterHeaterMode })
+    {
+        for (const bool coreModes : { false, true })
+        {
+            ModeBaseCluster cluster(kRootEndpointId, clusterEntry,
+                                    MakeConfig(coreModes ? BitMask<Feature>(Feature::kCoreModes) : BitMask<Feature>()));
+            if (coreModes)
+            {
+                EXPECT_TRUE(
+                    IsAcceptedCommandsListEqualTo(cluster,
+                                                  { DeviceEnergyManagementMode::Commands::ChangeToMode::kMetadataEntry,
+                                                    DeviceEnergyManagementMode::Commands::ChangeToModeByCoreTag::kMetadataEntry }));
+            }
+            else
+            {
+                EXPECT_TRUE(
+                    IsAcceptedCommandsListEqualTo(cluster, { DeviceEnergyManagementMode::Commands::ChangeToMode::kMetadataEntry }));
+            }
+        }
+    }
+}
+
 TEST_F(TestModeBaseCluster, StartupInitializesCurrentModeToFirstSupportedMode)
 {
     ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
@@ -202,8 +228,22 @@ TEST_F(TestModeBaseCluster, AcceptedAndGeneratedCommands)
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster, { Commands::ChangeToMode::kMetadataEntry }));
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster, { DishwasherMode::Commands::ChangeToMode::kMetadataEntry }));
     EXPECT_TRUE(IsGeneratedCommandsListEqualTo(cluster, { Commands::ChangeToModeResponse::Id }));
+}
+
+TEST_F(TestModeBaseCluster, MicrowaveModeCommandsExcludeCoreModes)
+{
+    for (const bool coreModes : { false, true })
+    {
+        ModeBaseCluster cluster(kRootEndpointId, kMicrowaveOvenMode,
+                                MakeConfig(coreModes ? BitMask<Feature>(Feature::kCoreModes) : BitMask<Feature>()));
+        ClusterTester tester(cluster);
+        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+        EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
+        EXPECT_TRUE(IsGeneratedCommandsListEqualTo(cluster, {}));
+    }
 }
 
 TEST_F(TestModeBaseCluster, ReadMandatoryAttributes)
@@ -507,8 +547,8 @@ TEST_F(TestModeBaseCluster, AcceptedCommandsWithCoreModesFeature)
 
     EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
                                               {
-                                                  Commands::ChangeToMode::kMetadataEntry,
-                                                  Commands::ChangeToModeByCoreTag::kMetadataEntry,
+                                                  DishwasherMode::Commands::ChangeToMode::kMetadataEntry,
+                                                  DishwasherMode::Commands::ChangeToModeByCoreTag::kMetadataEntry,
                                               }));
 }
 
@@ -736,6 +776,32 @@ TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagMultiModeSelection)
     ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
     ASSERT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kSuccess));
     EXPECT_EQ(cluster.GetCurrentMode(), 2u);
+}
+
+TEST_F(TestModeBaseCluster, ThermostatModeCoreModesSelection)
+{
+    for (const bool coreModes : { false, true })
+    {
+        ModeBaseCluster cluster(kRootEndpointId, kThermostatMode,
+                                MakeConfig(coreModes ? BitMask<Feature>(Feature::kCoreModes) : BitMask<Feature>()));
+        ClusterTester tester(cluster);
+        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+        uint32_t featureMap = 0;
+        ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+        EXPECT_EQ(featureMap, coreModes ? to_underlying(Feature::kCoreModes) : 0u);
+        EXPECT_TRUE(IsGeneratedCommandsListEqualTo(cluster, { Commands::ChangeToModeResponse::Id }));
+        if (coreModes)
+        {
+            EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                      { ThermostatMode::Commands::ChangeToMode::kMetadataEntry,
+                                                        ThermostatMode::Commands::ChangeToModeByCoreTag::kMetadataEntry }));
+        }
+        else
+        {
+            EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster, { ThermostatMode::Commands::ChangeToMode::kMetadataEntry }));
+        }
+    }
 }
 
 TEST_F(TestModeBaseCluster, ThermostatModeClusterIntegration)

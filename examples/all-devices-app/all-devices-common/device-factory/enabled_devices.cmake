@@ -41,12 +41,14 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/air-quality-sensor/AirQualitySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/ambient-context-sensor/AmbientContextSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/ambient-context-sensor/impl/LoggingAmbientContextSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/battery-storage/BatteryStorage.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/battery-storage/impl/SimulatedBatteryStorage.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/boolean-state-sensor/BooleanStateSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/bridged-node/BridgedNode.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/chime/Chime.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/Closure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/ClosureVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/SimulatedClosure.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/ThreePanelCabinetClosure.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/ClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/impl/SimulatedClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/color-temperature-light/ColorTemperatureLight.cpp"
@@ -57,6 +59,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-light/DimmableLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-light/impl/LoggingDimmableLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-plug-in-unit/DimmablePlugInUnit.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-plug-in-unit/impl/LoggingDimmablePlugInUnit.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/Dishwasher.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/impl/EmulatedDishwasher.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/doorbell/Doorbell.cpp"
@@ -66,6 +69,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/extended-color-light/ExtendedColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extended-color-light/impl/LoggingExtendedColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extractor-hood/ExtractorHood.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/extractor-hood/impl/LoggingExtractorHood.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/fan/Fan.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/fan/impl/LoggingFan.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/FlowSensor.cpp"
@@ -89,7 +93,9 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/mode-select/ModeSelect.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/mode-select/impl/SimulatedModeSelect.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-dimmable-load-control/impl/LoggingMountedDimmableLoadControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-on-off-control/MountedOnOffControl.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-on-off-control/impl/LoggingMountedOnOffControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/NetworkInfrastructureManager.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/impl/SimulatedNetworkInfrastructureManager.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/OccupancySensor.cpp"
@@ -98,9 +104,12 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/impl/LoggingOnOffLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light-switch/OnOffLightSwitch.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/OnOffPlugInUnit.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/impl/LoggingOnOffPlugInUnit.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/Oven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/impl/LoggingOven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/BatteryPowerSource.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/WiredPowerSource.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/impl/DecreasingBatteryPowerSource.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/pressure-sensor/PressureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/pressure-sensor/impl/IncreasingPressureSensor.cpp"
@@ -135,11 +144,13 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValve.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/impl/LoggingWaterValve.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/WindowCovering.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/WindowCoveringVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/impl/SimulatedWindowCovering.cpp"
     # keep-sorted: end
 
     # Baseline for devices (not real device types)
     # keep-sorted: start
+    "${ALL_DEVICES_COMMON_DIR}/binding-handler/BindingHandler.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/color-light/ColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/color-light/impl/LoggingLightDriver.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/color-light/impl/ColorConverter.cpp"
@@ -188,6 +199,7 @@ foreach(_key
         air-purifier
         air-quality-sensor
         ambient-context-sensor
+        battery-storage
         bridged-node
         chime
         closure

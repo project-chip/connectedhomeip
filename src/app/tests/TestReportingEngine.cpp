@@ -22,6 +22,7 @@
  *
  */
 
+#include <algorithm>
 #include <cinttypes>
 
 #include <pw_unit_test/framework.h>
@@ -318,7 +319,9 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportDataLargePa
 
         app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
                                      app::reporting::GetDefaultReportScheduler());
-        EXPECT_EQ(readHandler.GetReportBufferMaxSize(), kLegacyDefaultMaxLargeAppMessageLen + kMaxTagLen);
+        // The chunk is also bounded by kMaxLargeAppMessageLen, which follows the largest PacketBuffer allocation.
+        EXPECT_EQ(readHandler.GetReportBufferMaxSize(),
+                  std::min<size_t>(kLegacyDefaultMaxLargeAppMessageLen, kMaxLargeAppMessageLen) + kMaxTagLen);
         readHandler.OnInitialRequest(std::move(readRequestbuf));
 
         EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),
@@ -341,8 +344,9 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportDataLargePa
         app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
                                      app::reporting::GetDefaultReportScheduler());
         // The advertised size covers the whole message, so the report (payload + MIC) must leave
-        // room for the message headers.
-        EXPECT_EQ(readHandler.GetReportBufferMaxSize(), kNegotiatedMaxPayload - kMaxMessageOverheadBytes + kMaxTagLen);
+        // room for the message headers; kMaxLargeAppMessageLen can be the tighter bound on pool builds.
+        EXPECT_EQ(readHandler.GetReportBufferMaxSize(),
+                  std::min<size_t>(kNegotiatedMaxPayload - kMaxMessageOverheadBytes, kMaxLargeAppMessageLen) + kMaxTagLen);
         readHandler.OnInitialRequest(std::move(readRequestbuf));
 
         EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),

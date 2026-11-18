@@ -60,6 +60,16 @@ config CHIP_APP_LOG_LEVEL
 config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 	imply REBOOT
 
+config CHIP_OTA_BACKEND_CUSTOM
+	bool
+	help
+	  Selected by a platform that provides its own OTA image processor and
+	  OTA image packaging instead of MCUboot.
+
+# Default: MCUboot slot-based DFU.
+config CHIP_OTA_BACKEND_MCUBOOT
+	def_bool CHIP_OTA_REQUESTOR && !CHIP_OTA_BACKEND_CUSTOM
+
 # See config/common/cmake/Kconfig for full definition
 config CHIP_LIB_SHELL
 	imply SHELL
@@ -70,6 +80,11 @@ config CHIP_DATA_MODEL_CODEDRIVEN
 	  Builds the code-driven data model provider into the Matter library. Select
 	  this when the application registers clusters and endpoints at run time
 	  instead of using the ZAP generated data model.
+
+config CHIP_ENABLE_GROUPCAST
+	bool "Enable groupcast support"
+	help
+	  Enables Groupcast and auxiliary access control support.
 
 if OPENTHREAD
 

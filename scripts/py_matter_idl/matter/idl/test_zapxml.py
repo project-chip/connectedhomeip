@@ -156,6 +156,46 @@ class TestXmlParser(unittest.TestCase):
                                  ])
                          ]))
 
+    def testAttributeQualities(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <cluster>
+                <name>Test</name>
+                <code>0x1234</code>
+
+                <attribute side="server" code="1" type="INT8U" writable="false">
+                    <description>ChangesOmitted</description>
+                    <quality changeOmitted="true"/>
+                </attribute>
+                <attribute side="server" code="2" type="INT8U" writable="false">
+                    <description>Fixed</description>
+                    <quality persistence="fixed"/>
+                </attribute>
+                <attribute side="server" code="3" type="INT8U" writable="false">
+                    <description>NonVolatile</description>
+                    <quality changeOmitted="false" persistence="nonVolatile"/>
+                </attribute>
+              </cluster>
+            </configurator>
+        ''')
+        self.assertEqual(idl,
+                         Idl(clusters=[
+                             Cluster(
+                                 name='Test',
+                                 code=0x1234,
+                                 attributes=[
+                                     Attribute(definition=Field(data_type=DataType(name='INT8U'), code=1, name='ChangesOmitted'),
+                                               qualities=AttributeQuality.READABLE | AttributeQuality.CHANGES_OMITTED,
+                                               readacl=AccessPrivilege.VIEW, writeacl=AccessPrivilege.OPERATE),
+                                     Attribute(definition=Field(data_type=DataType(name='INT8U'), code=2, name='Fixed'),
+                                               qualities=AttributeQuality.READABLE | AttributeQuality.FIXED,
+                                               readacl=AccessPrivilege.VIEW, writeacl=AccessPrivilege.OPERATE),
+                                     Attribute(definition=Field(data_type=DataType(name='INT8U'), code=3, name='NonVolatile'),
+                                               qualities=AttributeQuality.READABLE,
+                                               readacl=AccessPrivilege.VIEW, writeacl=AccessPrivilege.OPERATE),
+                                 ])
+                         ]))
+
     def testBitmap(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
             <configurator>

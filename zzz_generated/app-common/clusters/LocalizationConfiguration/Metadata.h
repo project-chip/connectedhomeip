@@ -28,7 +28,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ActiveLocale::Id, BitF
 namespace SupportedLocales {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedLocales::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedLocales
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {

@@ -192,6 +192,7 @@ public:
     Protocols::InteractionModel::Status PrecommitSchedules();
 
     CHIP_ERROR IsScheduleHandlePresentInSchedules(const ByteSpan & scheduleHandleToMatch, bool & found);
+    CHIP_ERROR IsPresetHandleInUse(const ByteSpan & presetHandleToMatch, bool & inUse);
 
 private:
     ThermostatClusterBase & mCluster;

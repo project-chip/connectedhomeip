@@ -64,14 +64,14 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                       --target stm32-STM32WB5MM-DK-light build \
+                       --target stm32-STM32WBA65I-DK1-light build \
                      "
 
             - name: Gather size reports
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    stm32 STM32WB5MM-DK light \
-                    out/stm32-stm32wb5mm-dk-light/STM32WB5MM-DK-lighting.elf \
+                    stm32 STM32WBA65I-DK1 light \
+                    out/stm32-stm32wba65i-dk1-light/STM32WBA65I-DK1-lighting.elf \
                     /tmp/bloat_reports/
 
             - name: Uploading Size Reports

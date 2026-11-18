@@ -1,1 +1,1 @@
-217 : [NXP] Replace pre-installed NXP ZSDK with upstream Zephyr in docker image
+220 : [NXP] Revert to pre-installed zephyr and pin nxp zephyr to commit SHA

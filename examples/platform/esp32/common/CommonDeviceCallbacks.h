@@ -45,4 +45,5 @@ public:
     DeviceCallbacksDelegate * mDelegate = nullptr;
     void SetAppDelegate(DeviceCallbacksDelegate * delegate) { mDelegate = delegate; }
     DeviceCallbacksDelegate * GetAppDelegate() { return mDelegate; }
+    virtual ~DeviceCallbacksDelegate() = default;
 };

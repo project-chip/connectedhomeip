@@ -38,7 +38,8 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
     };
 
-    SimulatedWindowCovering(const WindowCovering::Context & context, const Context & simulatedContext);
+    SimulatedWindowCovering(const WindowCovering::Context & context, const Context & simulatedContext,
+                            const WindowCovering::Config & config);
     ~SimulatedWindowCovering() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -68,6 +69,11 @@ protected:
     void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) override;
 
 private:
+    // Set the position of every axis whose position-aware feature (PA_LF / PA_TL) is enabled.
+    // The position attributes of a disabled axis do not exist and must not be written.
+    void SetCurrentPositions(DataModel::Nullable<Percent100ths> position);
+    void SetTargetPositions(DataModel::Nullable<Percent100ths> position);
+
     // Lift and tilt can move independently and simultaneously, but neither can be in progress
     // while calibrating (motion is locked - see GetMotionLockStatus()). MovementState and
     // CalibratingState are kept as a variant rather than three independent bools so that

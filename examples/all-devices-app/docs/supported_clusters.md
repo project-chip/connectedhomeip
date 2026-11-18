@@ -200,7 +200,7 @@ To update or validate this list manually, follow these steps:
 | 154       | WebRTC Transport Requestor                                 | 1364 (0x0554) | Yes                | No                  |                                                      |
 | 155       | Wi-Fi Network Diagnostics                                  | 54 (0x0036)   | Yes                | Yes                 |                                                      |
 | 156       | Wi-Fi Network Management                                   | 1105 (0x0451) | Yes                | Yes                 |                                                      |
-| 157       | Window Covering                                            | 258 (0x0102)  | Yes                | Yes                 | window-covering                                      |
+| 157       | Window Covering                                            | 258 (0x0102)  | Yes                | Yes                 | window-covering-\*                                   |
 | 158       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                                      |
 | 159       | Smoke Concentration Measurement                            | 1076 (0x0434) | Yes                | Yes                 | Instance of Concentration Measurement                |
 | **Total** | **159**                                                    |               | **109**            | **74**              |                                                      |
