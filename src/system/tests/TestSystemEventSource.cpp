@@ -33,6 +33,14 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_LIBEV && CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+#include <atomic>
+#include <chrono>
+#include <sys/socket.h>
+#include <thread>
+#include <unistd.h>
+#endif
+
 using namespace chip;
 using namespace chip::System;
 using namespace chip::System::Clock::Literals;
@@ -219,5 +227,175 @@ TEST_F(TestSystemEventSource, MultipleEventSourcesOfDifferentTimeout)
 
     impl.EventSourceClear();
 }
+
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_LIBEV && CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+namespace {
+void DrainPendingWakeEvents(LayerImplSelect & impl)
+{
+    // Drain any retained wake byte (e.g. from InitChipStack or a prior test) so
+    // WaitForEvents() blocks until the test's worker thread calls Signal().
+    TestSource zeroTimeout;
+    zeroTimeout.delaySeconds = 0;
+    impl.EventSourceAdd(&zeroTimeout);
+    impl.PrepareEvents();
+    impl.WaitForEvents();
+    impl.HandleEvents();
+    impl.EventSourceRemove(&zeroTimeout);
+}
+} // namespace
+
+TEST_F(TestSystemEventSource, RequestCallbackOnPendingReadWakesSelect)
+{
+    auto & impl = static_cast<LayerImplSelect &>(chip::DeviceLayer::SystemLayer());
+
+    int fds[2] = { -1, -1 };
+    ASSERT_EQ(::socketpair(AF_UNIX, SOCK_STREAM, 0, fds), 0);
+
+    struct SocketCleanup
+    {
+        int * pair;
+        ~SocketCleanup()
+        {
+            if (pair[0] >= 0)
+            {
+                ::close(pair[0]);
+            }
+            if (pair[1] >= 0)
+            {
+                ::close(pair[1]);
+            }
+        }
+    } cleanup{ fds };
+
+    const char payload = 'x';
+    ASSERT_EQ(::write(fds[1], &payload, sizeof(payload)), static_cast<ssize_t>(sizeof(payload)));
+
+    std::atomic<int> readCallbacks{ 0 };
+    struct ReadCtx
+    {
+        int fd;
+        std::atomic<int> * counter;
+    } ctx{ fds[0], &readCallbacks };
+
+    SocketWatchToken token = impl.InvalidSocketWatchToken();
+    ASSERT_EQ(impl.StartWatchingSocket(fds[0], &token), CHIP_NO_ERROR);
+    ASSERT_EQ(impl.SetCallback(
+                  token,
+                  [](SocketEvents events, intptr_t data) {
+                      if (events.Has(SocketEventFlags::kRead))
+                      {
+                          auto * c = reinterpret_cast<ReadCtx *>(data);
+                          char buf = 0;
+                          if (::read(c->fd, &buf, sizeof(buf)) == static_cast<ssize_t>(sizeof(buf)))
+                          {
+                              c->counter->fetch_add(1);
+                          }
+                      }
+                  },
+                  reinterpret_cast<intptr_t>(&ctx)),
+              CHIP_NO_ERROR);
+
+    DrainPendingWakeEvents(impl);
+
+    // Bound select() at 5s so a missing wakeup fails quickly instead of hanging.
+    TestSource timeoutCap;
+    timeoutCap.delaySeconds = 5;
+    impl.EventSourceAdd(&timeoutCap);
+
+    // PrepareEvents() builds mSelected.mReadSet before RequestCallbackOnPendingRead is called.
+    impl.PrepareEvents();
+
+    std::thread worker([&impl, token]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        EXPECT_EQ(impl.RequestCallbackOnPendingRead(token), CHIP_NO_ERROR);
+    });
+
+    const auto start = System::SystemClock().GetMonotonicTimestamp();
+    impl.WaitForEvents();
+    const auto elapsed = System::SystemClock().GetMonotonicTimestamp() - start;
+    impl.HandleEvents();
+
+    worker.join();
+
+    EXPECT_LT(elapsed, 2000_ms);
+
+    // The next iteration must include fds[0] in mSelected.mReadSet and dispatch the read callback.
+    impl.PrepareEvents();
+    impl.WaitForEvents();
+    impl.HandleEvents();
+    EXPECT_EQ(readCallbacks.load(), 1);
+
+    EXPECT_EQ(impl.StopWatchingSocket(&token), CHIP_NO_ERROR);
+    impl.EventSourceClear();
+}
+
+TEST_F(TestSystemEventSource, RequestCallbackOnPendingWriteWakesSelect)
+{
+    auto & impl = static_cast<LayerImplSelect &>(chip::DeviceLayer::SystemLayer());
+
+    int fds[2] = { -1, -1 };
+    ASSERT_EQ(::socketpair(AF_UNIX, SOCK_STREAM, 0, fds), 0);
+
+    struct SocketCleanup
+    {
+        int * pair;
+        ~SocketCleanup()
+        {
+            if (pair[0] >= 0)
+            {
+                ::close(pair[0]);
+            }
+            if (pair[1] >= 0)
+            {
+                ::close(pair[1]);
+            }
+        }
+    } cleanup{ fds };
+
+    std::atomic<int> writeCallbacks{ 0 };
+    SocketWatchToken token = impl.InvalidSocketWatchToken();
+    ASSERT_EQ(impl.StartWatchingSocket(fds[0], &token), CHIP_NO_ERROR);
+    ASSERT_EQ(impl.SetCallback(
+                  token,
+                  [](SocketEvents events, intptr_t data) {
+                      if (events.Has(SocketEventFlags::kWrite))
+                      {
+                          reinterpret_cast<std::atomic<int> *>(data)->fetch_add(1);
+                      }
+                  },
+                  reinterpret_cast<intptr_t>(&writeCallbacks)),
+              CHIP_NO_ERROR);
+
+    DrainPendingWakeEvents(impl);
+
+    TestSource timeoutCap;
+    timeoutCap.delaySeconds = 5;
+    impl.EventSourceAdd(&timeoutCap);
+
+    impl.PrepareEvents();
+
+    std::thread worker([&impl, token]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        EXPECT_EQ(impl.RequestCallbackOnPendingWrite(token), CHIP_NO_ERROR);
+    });
+
+    const auto start = System::SystemClock().GetMonotonicTimestamp();
+    impl.WaitForEvents();
+    const auto elapsed = System::SystemClock().GetMonotonicTimestamp() - start;
+    impl.HandleEvents();
+
+    worker.join();
+
+    EXPECT_LT(elapsed, 2000_ms);
+
+    impl.PrepareEvents();
+    impl.WaitForEvents();
+    impl.HandleEvents();
+    EXPECT_EQ(writeCallbacks.load(), 1);
+
+    EXPECT_EQ(impl.StopWatchingSocket(&token), CHIP_NO_ERROR);
+    impl.EventSourceClear();
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_LIBEV && CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #endif // !CHIP_DEVICE_LAYER_TARGET_FAKE
 #endif // !CHIP_SYSTEM_CONFIG_USE_DISPATCH

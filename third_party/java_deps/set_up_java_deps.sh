@@ -24,11 +24,16 @@ function download_jar() {
     _HOST=$1
     _MAVEN_PATH=$2
     _JAR_NAME=$3
+    _OUTPUT_NAME=${4:-$_JAR_NAME}
 
-    if [ ! -f "third_party/java_deps/artifacts/$_JAR_NAME" ]; then
+    if [ ! -f "third_party/java_deps/artifacts/$_OUTPUT_NAME" ]; then
+        _TMP_JAR="third_party/java_deps/artifacts/${_OUTPUT_NAME}.tmp"
+        rm -f "$_TMP_JAR"
         curl --fail --location --silent --show-error \
+            --retry 5 --retry-delay 2 --retry-connrefused \
             "https://$_HOST/maven2/$_MAVEN_PATH/$_JAR_NAME" \
-            -o "third_party/java_deps/artifacts/$_JAR_NAME"
+            -o "$_TMP_JAR"
+        mv -f "$_TMP_JAR" "third_party/java_deps/artifacts/$_OUTPUT_NAME"
     fi
 }
 
@@ -44,4 +49,4 @@ download_jar "repo1.maven.org" "org/json/json/20220924" "json-20220924.jar"
 
 # Unit test requirements
 download_jar "repo1.maven.org" "org/hamcrest/hamcrest-all/1.3" "hamcrest-all-1.3.jar"
-download_jar "dist.wso2.org" "com/google/common/google-collect/1.0-rc1/" "google-collect-1.0-rc1.jar"
+download_jar "repo1.maven.org" "com/google/collections/google-collections/1.0-rc1" "google-collections-1.0-rc1.jar" "google-collect-1.0-rc1.jar"
