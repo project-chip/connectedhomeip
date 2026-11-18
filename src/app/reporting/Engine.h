@@ -208,9 +208,13 @@ private:
      * If the provided path is a superset of our of our existing paths, update that existing path to match the
      * provided path.
      *
+     * An existing path that covers more endpoints, clusters or attributes than the provided path is only renewed
+     * when aRenewWiderPath is true. Otherwise the provided path is left to be recorded on its own, so that a
+     * change does not make every handler re-report everything the wider path covers.
+     *
      * Return whether one of our paths is now a superset of the provided path.
      */
-    bool MergeOverlappedAttributePath(const AttributePathParams & aAttributePath);
+    bool MergeOverlappedAttributePath(const AttributePathParams & aAttributePath, bool aRenewWiderPath = false);
 
     /**
      * If we are running out of ObjectPool for the global dirty set, we will try to merge the existing items by clusters.
