@@ -1747,7 +1747,7 @@ Status EnergyEvseDelegate::SendFaultEvent(FaultStateEnum newFaultState)
 
     VerifyOrReturnError(mCluster != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
     event.sessionID               = mCluster->GetSessionID(); // Note here the event sessionID can be Null!
-    event.state                   = GetState();                // This is the state prior to the fault being raised
+    event.state                   = GetState();               // This is the state prior to the fault being raised
     event.faultStatePreviousState = GetFaultState();
     event.faultStateCurrentState  = newFaultState;
 
