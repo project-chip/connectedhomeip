@@ -906,6 +906,10 @@ private:
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     uint8_t mReadCommissioningInfoProgress = 0; // see ContinueReadingCommissioningInfo()
 
+    // Whether the current commissionee is unpowered during the initial phase of commissioning. Only valid after reading the
+    // commissioning info (for CommissioningStage::kReadCommissioningInfo), and cleared if CleanupCommissioning() is called.
+    bool mInitialPhaseIsUnpowered = false;
+
     // Stores the PASE session address to use as fallback during operational discovery
     Optional<AddressResolve::ResolveResult> mFallbackOperationalResolveResult;
 

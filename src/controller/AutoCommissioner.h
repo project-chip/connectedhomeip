@@ -73,8 +73,6 @@ public:
 
     void SetNetworkSetupNeeded(bool needed) { mNeedsNetworkSetup = needed; }
 
-    bool IsCommissioningWithoutPower() const { return mDeviceCommissioningInfo.general.isCommissioningWithoutPower; }
-
 protected:
     virtual void CleanupCommissioning();
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
@@ -89,6 +87,8 @@ protected:
     CommissioningParameters mParams = CommissioningParameters();
 
 private:
+    bool IsCommissioningWithoutPower() const { return mDeviceCommissioningInfo.general.isCommissioningWithoutPower; }
+
     DeviceProxy * GetDeviceProxyForStep(CommissioningStage nextStage);
 
     // Adjust the failsafe timer if CommissioningDelegate GetCASEFailsafeTimerSeconds is set

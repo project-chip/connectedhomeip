@@ -2264,6 +2264,7 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
 {
     // At this point, proxy == mDeviceBeingCommissioned, nodeId == mDeviceBeingCommissioned->GetDeviceId()
 
+    mInitialPhaseIsUnpowered       = false;
     mCommissioningCompletionStatus = completionStatus;
     if (completionStatus.err == CHIP_NO_ERROR)
     {
@@ -2819,6 +2820,8 @@ void DeviceCommissioner::FinishReadingCommissioningInfo(const CommissioningParam
     AccumulateErrors(err, ParseFabrics(info));
     AccumulateErrors(err, ParseICDInfo(info));
     AccumulateErrors(err, ParseExtraCommissioningInfo(info, params));
+
+    mInitialPhaseIsUnpowered = info.general.isCommissioningWithoutPower;
 
     if (mPairingDelegate != nullptr && err == CHIP_NO_ERROR)
     {
@@ -4724,7 +4727,7 @@ void DeviceCommissioner::CommissioningInitialPhaseComplete(DeviceProxy * proxy)
         mPairingDelegate->OnInitialPhaseComplete(
             PeerId(GetCompressedFabricId(), proxy->GetDeviceId()),
             proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType(),
-            mAutoCommissioner.IsCommissioningWithoutPower());
+            mInitialPhaseIsUnpowered);
         VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
     }
     CommissioningStageComplete(CHIP_NO_ERROR);
