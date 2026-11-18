@@ -24,12 +24,17 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
+namespace {
+constexpr size_t kPredictionCapacity = 4;
+} // namespace
+
 LoggingOccupancySensor::LoggingOccupancySensor(TimerDelegate & timerDelegate) :
     OccupancySensor(
         // Initialize with kInvalidEndpointId. The actual endpoint ID will be set
         // when Register() is called by the application with a valid endpoint ID.
         OccupancySensingCluster::Config(kInvalidEndpointId)
-            .WithFeatures(BitFlags(OccupancySensing::Feature::kPassiveInfrared))
+            .WithFeatures(BitFlags(OccupancySensing::Feature::kPassiveInfrared, OccupancySensing::Feature::kPrediction))
+            .WithPredictedOccupancyCapacity(kPredictionCapacity)
             .WithHoldTime(10,
                           {
                               .holdTimeMin     = 1,
@@ -44,11 +49,37 @@ LoggingOccupancySensor::LoggingOccupancySensor(TimerDelegate & timerDelegate) :
 CHIP_ERROR LoggingOccupancySensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                             EndpointComposition composition)
 {
-    return OccupancySensor::Register(endpoint, provider, composition);
+    ReturnErrorOnFailure(OccupancySensor::Register(endpoint, provider, composition));
+
+    // The cluster only accepts predictions once started, which happens after Register(): push them from a timer.
+    return mTimerDelegate.StartTimer(this, System::Clock::Milliseconds32(1));
+}
+
+void LoggingOccupancySensor::TimerFired()
+{
+    // Example prediction: the cluster copies the list and reports PredictedOccupancy on change.
+    // Timestamps are epoch seconds; entries must be ordered and non-overlapping.
+    static constexpr OccupancySensing::Structs::PredictedOccupancyStruct::Type kExamplePredictions[] = {
+        { .startTimestamp = 1000,
+          .endTimestamp   = 1900,
+          .occupancy      = OccupancySensing::OccupancyBitmap::kOccupied,
+          .confidence     = 80 },
+        { .startTimestamp = 1901,
+          .endTimestamp   = 3600,
+          .occupancy      = BitMask<OccupancySensing::OccupancyBitmap>(),
+          .confidence     = 60 },
+    };
+    CHIP_ERROR err = OccupancySensingCluster().SetPredictedOccupancy(
+        Span<const OccupancySensing::Structs::PredictedOccupancyStruct::Type>(kExamplePredictions));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "LoggingOccupancySensor: SetPredictedOccupancy failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void LoggingOccupancySensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
+    mTimerDelegate.CancelTimer(this);
     OccupancySensor::Unregister(provider);
 }
 
