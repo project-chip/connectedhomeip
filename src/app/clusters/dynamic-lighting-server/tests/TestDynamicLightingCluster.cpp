@@ -40,10 +40,10 @@ namespace {
 using Protocols::InteractionModel::ClusterStatusCode;
 using Protocols::InteractionModel::Status;
 
-constexpr uint16_t kFireplaceId = 1;
-constexpr uint16_t kCycleId   = 2;
+constexpr uint16_t kFireplaceId       = 1;
+constexpr uint16_t kCycleId           = 2;
 constexpr uint16_t kFireplaceMaxSpeed = 10;
-constexpr uint16_t kCycleMaxSpeed   = 100;
+constexpr uint16_t kCycleMaxSpeed     = 100;
 constexpr uint16_t kCycleDefaultSpeed = 50;
 
 Structs::EffectStruct::Type MakeEffect(uint16_t id, CharSpan label, uint16_t maxSpeed, uint16_t defaultSpeed, bool supportsPalette)
@@ -61,7 +61,10 @@ Structs::EffectStruct::Type MakeEffect(uint16_t id, CharSpan label, uint16_t max
 class TestDelegate : public DynamicLightingDelegate
 {
 public:
-    Span<const Structs::EffectStruct::Type> GetAvailableEffects() override { return Span<const Structs::EffectStruct::Type>(effects.data(), effects.size()); }
+    Span<const Structs::EffectStruct::Type> GetAvailableEffects() override
+    {
+        return Span<const Structs::EffectStruct::Type>(effects.data(), effects.size());
+    }
 
     CHIP_ERROR StartEffect(const Structs::EffectStruct::Type & effect, uint16_t speed) override
     {
@@ -198,7 +201,7 @@ TEST_F(TestDynamicLightingCluster, StartupRejectsInvalidEffects)
         void (*mutate)(std::vector<Structs::EffectStruct::Type> &);
     };
     const Case cases[] = {
-        { "duplicate id", [](auto & e) { e[1].effectID = e[0].effectID; } },
+        { "duplicate id", [](auto & e) { e[1].effectID           = e[0].effectID; } },
         { "duplicate label", [](auto & e) { e[1].label = e[0].label; } },
         { "empty label", [](auto & e) { e[0].label = CharSpan(); } },
         { "label too long", [](auto & e) { e[0].label = "123456789012345678901234567890123"_span; } },
