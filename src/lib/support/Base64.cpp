@@ -25,6 +25,7 @@
 #include "Base64.h"
 
 #include <ctype.h>
+#include <optional>
 #include <stdint.h>
 #include <string_view>
 
@@ -218,18 +219,78 @@ fail:
     return UINT16_MAX;
 }
 
-uint16_t Base64Decode(const char * in, uint16_t inLen, uint8_t * out)
+namespace {
+
+bool IsValidStandardBase64Char(char c)
+{
+    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '+' || c == '/';
+}
+
+// Validate input and normalize unpadded final groups before delegating to pw::base64::Decode:
+// pw::base64::IsValid skips base64_size - 2, accepts URL-safe chars, and rejects unpadded input
+// (Base64.h allows omitted trailing '=' and in-place decoding).
+std::optional<size_t> DecodeStandardBase64(const char * in, size_t inLen, uint8_t * out)
 {
     if (inLen == 0)
     {
         return 0;
     }
-    std::string_view input(in, inLen);
-    if (!pw::base64::IsValid(input))
+
+    const size_t rem = inLen % 4;
+    if (rem == 1)
+    {
+        return std::nullopt;
+    }
+
+    char paddedTail[4] = { '=', '=', '=', '=' };
+    if (rem != 0)
+    {
+        const size_t prefixLen = inLen - rem;
+        for (size_t i = 0; i < rem; ++i)
+        {
+            paddedTail[i] = in[prefixLen + i];
+        }
+    }
+
+    size_t dataLen = inLen;
+    if (rem == 0 && in[inLen - 1] == '=')
+    {
+        --dataLen;
+        if (in[inLen - 2] == '=')
+        {
+            --dataLen;
+        }
+    }
+
+    for (size_t i = 0; i < dataLen; ++i)
+    {
+        if (!IsValidStandardBase64Char(in[i]))
+        {
+            return std::nullopt;
+        }
+    }
+
+    if (rem == 0)
+    {
+        return pw::base64::Decode(std::string_view(in, inLen), out);
+    }
+
+    const size_t prefixLen = inLen - rem;
+    size_t outLen          = (prefixLen > 0) ? pw::base64::Decode(std::string_view(in, prefixLen), out) : 0;
+    outLen += pw::base64::Decode(std::string_view(paddedTail, sizeof(paddedTail)), out + outLen);
+    return outLen;
+}
+
+} // namespace
+
+uint16_t Base64Decode(const char * in, uint16_t inLen, uint8_t * out)
+{
+    std::optional<size_t> outLen = DecodeStandardBase64(in, inLen, out);
+    if (!outLen.has_value())
     {
         return UINT16_MAX;
     }
-    return static_cast<uint16_t>(pw::base64::Decode(input, out));
+    return static_cast<uint16_t>(*outLen);
 }
 
 uint16_t Base64URLDecode(const char * in, uint16_t inLen, uint8_t * out)
@@ -271,16 +332,12 @@ uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out, Base64Ch
 
 uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out)
 {
-    if (inLen == 0)
-    {
-        return 0;
-    }
-    std::string_view input(in, inLen);
-    if (!pw::base64::IsValid(input))
+    std::optional<size_t> outLen = DecodeStandardBase64(in, inLen, out);
+    if (!outLen.has_value())
     {
         return UINT32_MAX;
     }
-    return static_cast<uint32_t>(pw::base64::Decode(input, out));
+    return static_cast<uint32_t>(*outLen);
 }
 
 } // namespace chip
