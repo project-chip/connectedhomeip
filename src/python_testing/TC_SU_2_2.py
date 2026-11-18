@@ -1782,7 +1782,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         self.step(10)
         notify_command = {"Name": "GetNotifyUpdateAppliedStatus", "Cluster": "OtaSoftwareUpdateProvider",
-                                    "Endpoint": self.get_endpoint()}
+                          "Endpoint": self.get_endpoint()}
         step_number_s10 = "[STEP_10]"
         pool_command_timeout_sec = self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC)
         poll_command_interval_sec = 5
@@ -1796,9 +1796,10 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             notify_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
             received_update_token = notify_response_data["Payload"]["UpdateToken"]
             received_software_version = notify_response_data["Payload"]["SoftwareVersion"]
-            logger.info("%s Provider NotifyUpdateApplied snapshot retrieved: %s at Attempt # %d", step_number_s10, notify_response_data, attempt)
+            logger.info("%s Provider NotifyUpdateApplied snapshot retrieved: %s at Attempt # %d",
+                        step_number_s10, notify_response_data, attempt)
             # Check if the NamedPipe was able to retrieve the data if not continue.
-            if len(received_update_token) > 0  and received_software_version > 0:
+            if len(received_update_token) > 0 and received_software_version > 0:
                 break
             await asyncio.sleep(poll_command_interval_sec)
 
