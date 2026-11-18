@@ -37,7 +37,6 @@ class TC_DA_1_13(PQCDACommissionerTestBase):
     # This is a commissioner test and therefore a subscription is not required.
     disable_wildcard_subscription = True
 
-
     @pics("MCORE.ROLE.COMMISSIONER")
     @async_test_body
     async def test_TC_DA_1_13(self):
