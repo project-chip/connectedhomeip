@@ -37,13 +37,18 @@ enum class NodeLookupResult
 
 struct NodeLookupResults
 {
-    ResolveResult results[kNodeLookupResultsLen]                  = {};
-    Dnssd::IPAddressSorter::IpScore scores[kNodeLookupResultsLen] = {}; // score each ResolveResult was inserted with
-    uint8_t count                                                 = 0;  // number of valid ResolveResult
-    uint8_t consumed                                              = 0;  // number of already read ResolveResult
+    // A ResolveResult and the score it was inserted with. Stored results can't be re-scored, because
+    // UpdateResults clears the interface of non-link-local results and a score can depend on the interface.
+    struct ScoredResult : public ResolveResult
+    {
+        Dnssd::IPAddressSorter::IpScore score = Dnssd::IPAddressSorter::IpScore::kInvalid;
+    };
+    static_assert(sizeof(ScoredResult) == sizeof(ResolveResult), "score must fit in the tail padding of ResolveResult");
 
-    /// Inserts `result` in order of the scores entries were inserted with, highest first. When all slots are
-    /// full, inserting drops the last entry. Returns whether `result` was inserted.
+    ScoredResult results[kNodeLookupResultsLen] = {};
+    uint8_t count                               = 0; // number of valid ResolveResult
+    uint8_t consumed                            = 0; // number of already read ResolveResult
+
     bool UpdateResults(const ResolveResult & result, Dnssd::IPAddressSorter::IpScore score);
 
     bool HasValidResult() const { return count > consumed; }

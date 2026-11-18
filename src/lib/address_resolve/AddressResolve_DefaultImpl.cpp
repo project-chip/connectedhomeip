@@ -129,49 +129,53 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
 
 bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd::IPAddressSorter::IpScore newScore)
 {
-    Transport::PeerAddress addressWithAdjustedInterface = result.address;
-    if (!addressWithAdjustedInterface.GetIPAddress().IsIPv6LinkLocal())
+    ScoredResult newResult{ result, newScore };
+    if (!newResult.address.GetIPAddress().IsIPv6LinkLocal())
     {
         // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
         // For all other addresses, we should rely on the device's routing table to route messages sent.
         // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
         // mDNS advertisements are not usually received on the same interface the peer is reachable on.
-        addressWithAdjustedInterface.SetInterface(Inet::InterfaceId::Null());
+        newResult.address.SetInterface(Inet::InterfaceId::Null());
         ChipLogDetail(Discovery, "Lookup clearing interface for non LL address");
     }
 
-    uint8_t insertAtIndex = 0;
-    for (; insertAtIndex < kNodeLookupResultsLen; insertAtIndex++)
+    // Ensure an address only appears once in our list
+    for (uint8_t i = 0; i < count; i++)
     {
-        if (insertAtIndex >= count)
+        if (results[i].address != newResult.address)
         {
-            // This is a new entry.
-            break;
+            continue;
         }
 
-        auto & oldAddress = results[insertAtIndex].address;
-
-        if (oldAddress == addressWithAdjustedInterface)
+        if (newScore <= results[i].score)
         {
-            // this address is already in our list.
+            // this address is already in our list, with at least as high a score.
             return false;
         }
 
-        if (newScore > scores[insertAtIndex])
+        // Remove the old entry; the insertion below puts the address back with its higher score.
+        for (uint8_t j = i; j + 1 < count; j++)
         {
-            // This is a score update, it will replace a previous entry.
-            break;
+            results[j] = results[j + 1];
         }
+        count--;
+
+        // We have each address in the list at most once, so we can stop looking
+        // now that we found our new address in the list.
+        break;
+    }
+
+    uint8_t insertAtIndex = 0;
+    while (insertAtIndex < count && newScore <= results[insertAtIndex].score)
+    {
+        insertAtIndex++;
     }
 
     if (insertAtIndex == kNodeLookupResultsLen)
     {
         return false;
     }
-
-    // we are guaranteed no duplicates here:
-    // - insertAtIndex MUST be with some score that is `< newScore`, so all
-    //   addresses with a `newScore` were duplicate-checked
 
     // Move the following valid entries one level down.
     for (auto i = count; i > insertAtIndex; i--)
@@ -182,7 +186,6 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
         }
 
         results[i] = results[i - 1];
-        scores[i]  = scores[i - 1];
     }
 
     // If the number of valid entries is less than the size of the array there is an additional entry.
@@ -191,10 +194,7 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
         count++;
     }
 
-    auto & updatedResult  = results[insertAtIndex];
-    updatedResult         = result;
-    updatedResult.address = addressWithAdjustedInterface;
-    scores[insertAtIndex] = newScore;
+    results[insertAtIndex] = newResult;
 
     return true;
 }

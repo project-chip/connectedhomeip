@@ -225,6 +225,78 @@ TEST(TestAddressResolveDefaultImpl, UpdateResultsOrdersByTheScoresItWasGiven)
     EXPECT_EQ(results.ConsumeResult().address, linkLocalResult.address);
 }
 
+// test requires at least 3 slots
+TEST(TestAddressResolveDefaultImpl, UpdateResultsMovesUpADuplicateWithAHigherScore)
+{
+    Impl::NodeLookupResults results;
+
+    ResolveResult movedResult;
+    movedResult.address = GetAddressWithLowScore(1);
+    ResolveResult lowResult;
+    lowResult.address = GetAddressWithLowScore(2);
+    ResolveResult mediumResult;
+    mediumResult.address = GetAddressWithMediumScore();
+
+    ASSERT_TRUE(results.UpdateResults(movedResult, IpScore::kUniqueLocal));
+    ASSERT_TRUE(results.UpdateResults(lowResult, IpScore::kUniqueLocal));
+    ASSERT_TRUE(results.UpdateResults(mediumResult, IpScore::kGlobalUnicast));
+
+    // The address scores higher when it arrives again, e.g. because the host gained an address with its prefix.
+    ASSERT_TRUE(results.UpdateResults(movedResult, IpScore::kUniqueLocalWithSharedPrefix));
+
+    ASSERT_EQ(results.count, 3);
+    EXPECT_EQ(results.ConsumeResult().address, movedResult.address);
+    EXPECT_EQ(results.ConsumeResult().address, mediumResult.address);
+    EXPECT_EQ(results.ConsumeResult().address, lowResult.address);
+}
+
+// test requires at least 3 slots
+TEST(TestAddressResolveDefaultImpl, UpdateResultsKeepsEveryOtherResultWhenADuplicateMovesUp)
+{
+    Impl::NodeLookupResults results;
+
+    ResolveResult result;
+    for (auto i = 0; i < kNumberOfAvailableSlots; i++)
+    {
+        result.address = GetAddressWithLowScore(static_cast<uint16_t>(i + 10));
+        ASSERT_TRUE(results.UpdateResults(result, IpScore::kUniqueLocal));
+    }
+
+    // Not the last entry, which inserting into a full list drops.
+    constexpr uint16_t kMovedIndex = kNumberOfAvailableSlots - 2;
+    result.address                 = GetAddressWithLowScore(kMovedIndex + 10);
+    ASSERT_TRUE(results.UpdateResults(result, IpScore::kGlobalUnicast));
+
+    ASSERT_EQ(results.count, kNumberOfAvailableSlots);
+    EXPECT_EQ(results.ConsumeResult().address, result.address);
+    for (auto i = 0; i < kNumberOfAvailableSlots; i++)
+    {
+        if (i != kMovedIndex)
+        {
+            EXPECT_EQ(results.ConsumeResult().address, GetAddressWithLowScore(static_cast<uint16_t>(i + 10)));
+        }
+    }
+}
+
+// test requires at least 2 slots
+TEST(TestAddressResolveDefaultImpl, UpdateResultsKeepsTheHigherScoreOfADuplicate)
+{
+    Impl::NodeLookupResults results;
+
+    ResolveResult mediumResult;
+    mediumResult.address = GetAddressWithMediumScore();
+    ResolveResult lowResult;
+    lowResult.address = GetAddressWithLowScore();
+
+    ASSERT_TRUE(results.UpdateResults(mediumResult, IpScore::kGlobalUnicast));
+    ASSERT_TRUE(results.UpdateResults(lowResult, IpScore::kUniqueLocal));
+    EXPECT_FALSE(results.UpdateResults(mediumResult, IpScore::kIpv4));
+
+    ASSERT_EQ(results.count, 2);
+    EXPECT_EQ(results.ConsumeResult().address, mediumResult.address);
+    EXPECT_EQ(results.ConsumeResult().address, lowResult.address);
+}
+
 #endif
 
 TEST(TestAddressResolveDefaultImpl, TestLookupResult)
