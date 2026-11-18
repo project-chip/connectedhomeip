@@ -17,6 +17,7 @@
  */
 
 #include <app/AppConfig.h>
+#include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/tests/MockReportScheduler.h>
@@ -877,6 +878,18 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestHasSubscriptionsToResumeHand
 }
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+TEST_F(TestInteractionModelEngine, TestInitFailsForADifferentEventManagement)
+{
+    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
+    EventManagement otherEventManagement;
+
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler(), nullptr, nullptr,
+                           &otherEventManagement),
+              CHIP_ERROR_INCORRECT_STATE);
+
+    EXPECT_SUCCESS(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()));
+}
 
 } // namespace app
 } // namespace chip

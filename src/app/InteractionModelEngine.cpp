@@ -236,8 +236,7 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
-    TEMPORARY_RETURN_IGNORED mReportingEngine.Init((eventManagement != nullptr) ? eventManagement
-                                                                                : &EventManagement::GetInstance());
+    ReturnErrorOnFailure(mReportingEngine.Init((eventManagement != nullptr) ? eventManagement : &EventManagement::GetInstance()));
 
     StatusIB::RegisterErrorFormatter();
 

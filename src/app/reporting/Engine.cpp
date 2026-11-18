@@ -307,9 +307,8 @@ Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
 CHIP_ERROR Engine::Init(EventManagement * apEventManagement)
 {
     VerifyOrReturnError(apEventManagement != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mNumReportsInFlight = 0;
-    mCurReadHandlerIdx  = 0;
-    mpEventManagement   = apEventManagement;
+    VerifyOrReturnError(mpEventManagement == nullptr || mpEventManagement == apEventManagement, CHIP_ERROR_INCORRECT_STATE);
+    mpEventManagement = apEventManagement;
 
     return CHIP_NO_ERROR;
 }
@@ -324,6 +323,7 @@ void Engine::Shutdown()
     // A Run() scheduled before shutdown may never happen, so it must not block ScheduleRun() after the next Init().
     mRunScheduled = false;
     mGlobalDirtySet.ReleaseAll();
+    mpEventManagement = nullptr;
 }
 
 bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFilter> * aDataVersionFilterList,
