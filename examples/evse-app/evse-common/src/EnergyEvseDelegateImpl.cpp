@@ -53,6 +53,8 @@ Status EnergyEvseDelegate::Disable()
         return Status::Failure;
     }
 
+    CancelActiveTimers();
+
     DataModel::Nullable<uint32_t> disableTime(0);
     /* Persist the zero deadlines explicitly (the attribute setters do not), as a deadline left in storage
      * would re-enable the EVSE on reboot */
@@ -488,11 +490,7 @@ Status EnergyEvseDelegate::StartEnableDeadlineTimer(System::Clock::Timeout timeo
 
 void EnergyEvseDelegate::EnableDeadlineTimerContext::TimerFired()
 {
-    if (mDelegate.ScheduleCheckOnEnabledTimeout() != Status::Success)
-    {
-        ChipLogError(AppServer, "EVSE: unable to reschedule enable deadline check, disabling");
-        mDelegate.Disable();
-    }
+    mDelegate.ScheduleDeadlineCheckOrDisable();
 }
 
 /**

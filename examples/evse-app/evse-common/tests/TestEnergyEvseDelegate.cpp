@@ -29,6 +29,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegateMock.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <vector>
 
 using namespace chip;
@@ -70,6 +71,27 @@ public:
 
 constexpr EventId kStarted = Events::EnergyTransferStarted::Id;
 constexpr EventId kStopped = Events::EnergyTransferStopped::Id;
+
+class PendingTimerDelegate : public TimerDelegateMock
+{
+public:
+    CriticalFailure StartTimer(TimerContext * context, System::Clock::Timeout timeout) override
+    {
+        mPendingContext = context;
+        return TimerDelegateMock::StartTimer(context, timeout);
+    }
+
+    void CancelTimer(TimerContext * context) override
+    {
+        mPendingContext = nullptr;
+        TimerDelegateMock::CancelTimer(context);
+    }
+
+    bool HasPendingTimer() const { return mPendingContext != nullptr; }
+
+private:
+    TimerContext * mPendingContext = nullptr;
+};
 
 class TestEnergyEvseDelegate : public ::testing::Test
 {
@@ -163,7 +185,7 @@ protected:
     TestPersistentStorageDelegate mStorage;
     DefaultSafeAttributePersistenceProvider mProvider;
     std::vector<StateEnum> mStateChanges; // declared before mDelegate so it outlives the registered callback
-    TimerDelegateMock mTimerDelegate;
+    PendingTimerDelegate mTimerDelegate;
     EvseTargetsDelegate mTargetsDelegate;
     EnergyEvseDelegate mDelegate;
     Instance mInstance;
@@ -348,6 +370,11 @@ TEST_F(TestEnergyEvseDelegate, EnableDischargingFailsWhenDeadlineCannotBePersist
 TEST_F(TestEnergyEvseDelegate, DisableReportsFailureWhenDeadlineCannotBePersisted)
 {
     StartCharging();
+    uint32_t now = 0;
+    ASSERT_SUCCESS(System::Clock::GetClock_MatterEpochS(now));
+    ASSERT_EQ(mDelegate.EnableCharging(DataModel::Nullable<uint32_t>(now + 60), kMinimumCurrent_mA, kMaximumChargeCurrent_mA),
+              Status::Success);
+    ASSERT_TRUE(mTimerDelegate.HasPendingTimer());
 
     mStorage.AddPoisonKey(PoisonKey(Attributes::ChargingEnabledUntil::Id));
     EXPECT_EQ(mDelegate.Disable(), Status::Failure);
@@ -357,6 +384,54 @@ TEST_F(TestEnergyEvseDelegate, DisableReportsFailureWhenDeadlineCannotBePersiste
     EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabled);
     EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInDemand);
     EXPECT_EQ(mInstance.GetMaximumChargeCurrent(), 0);
+    EXPECT_FALSE(mTimerDelegate.HasPendingTimer());
+}
+
+TEST_F(TestEnergyEvseDelegate, DisableCancelsPendingDeadline)
+{
+    uint32_t now = 0;
+    ASSERT_SUCCESS(System::Clock::GetClock_MatterEpochS(now));
+    ASSERT_EQ(mDelegate.EnableCharging(DataModel::Nullable<uint32_t>(now + 60), kMinimumCurrent_mA, kMaximumChargeCurrent_mA),
+              Status::Success);
+    ASSERT_TRUE(mTimerDelegate.HasPendingTimer());
+
+    ASSERT_EQ(mDelegate.Disable(), Status::Success);
+
+    EXPECT_FALSE(mTimerDelegate.HasPendingTimer());
+    mTimerDelegate.AdvanceClock(System::Clock::Seconds32(60));
+    EXPECT_FALSE(mTimerDelegate.HasPendingTimer());
+}
+
+TEST_F(TestEnergyEvseDelegate, DisableDuringFaultCancelsPendingDeadline)
+{
+    uint32_t now = 0;
+    ASSERT_SUCCESS(System::Clock::GetClock_MatterEpochS(now));
+    ASSERT_EQ(mDelegate.EnableDischarging(DataModel::Nullable<uint32_t>(now + 60), kMaximumDischargeCurrent_mA), Status::Success);
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kOther), Status::Success);
+    ASSERT_TRUE(mTimerDelegate.HasPendingTimer());
+
+    ASSERT_EQ(mDelegate.Disable(), Status::Success);
+
+    EXPECT_FALSE(mTimerDelegate.HasPendingTimer());
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
+    EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabled);
+}
+
+TEST_F(TestEnergyEvseDelegate, ExpiredDeadlineCancelsPendingTimer)
+{
+    uint32_t now = 0;
+    ASSERT_SUCCESS(System::Clock::GetClock_MatterEpochS(now));
+    ASSERT_EQ(mDelegate.EnableCharging(DataModel::Nullable<uint32_t>(now + 60), kMinimumCurrent_mA, kMaximumChargeCurrent_mA),
+              Status::Success);
+    ASSERT_TRUE(mTimerDelegate.HasPendingTimer());
+    ASSERT_SUCCESS(mInstance.SetChargingEnabledUntil(DataModel::Nullable<uint32_t>(1u)));
+
+    mTimerDelegate.AdvanceClock(System::Clock::Seconds32(60));
+
+    EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabled);
+    EXPECT_FALSE(mTimerDelegate.HasPendingTimer());
+    mTimerDelegate.AdvanceClock(System::Clock::Seconds32(1));
+    EXPECT_FALSE(mTimerDelegate.HasPendingTimer());
 }
 
 TEST_F(TestEnergyEvseDelegate, ExpiryOfOneDeadlineKeepsTheOtherModeEnabled)
