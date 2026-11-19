@@ -32964,7 +32964,7 @@ public class ClusterInfoMapping {
     channelrecordProgramCommandParams.put("shouldRecordSeries",channelrecordProgramshouldRecordSeriesCommandParameterInfo);
 
 
-    CommandParameterInfo channelrecordProgramdataCommandParameterInfo = new CommandParameterInfo("data", byte[].class, byte[].class);
+    CommandParameterInfo channelrecordProgramdataCommandParameterInfo = new CommandParameterInfo("data", Optional.class, byte[].class);
     channelrecordProgramCommandParams.put("data",channelrecordProgramdataCommandParameterInfo);
     InteractionInfo channelrecordProgramInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -32974,9 +32974,9 @@ public class ClusterInfoMapping {
         commandArguments.get("programIdentifier")
         , (Boolean)
         commandArguments.get("shouldRecordSeries")
-        , (ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct>)
+        , (Optional<ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct>>)
         commandArguments.get("externalIDList")
-        , (byte[])
+        , (Optional<byte[]>)
         commandArguments.get("data")
         );
       },
@@ -32994,7 +32994,7 @@ public class ClusterInfoMapping {
     channelcancelRecordProgramCommandParams.put("shouldRecordSeries",channelcancelRecordProgramshouldRecordSeriesCommandParameterInfo);
 
 
-    CommandParameterInfo channelcancelRecordProgramdataCommandParameterInfo = new CommandParameterInfo("data", byte[].class, byte[].class);
+    CommandParameterInfo channelcancelRecordProgramdataCommandParameterInfo = new CommandParameterInfo("data", Optional.class, byte[].class);
     channelcancelRecordProgramCommandParams.put("data",channelcancelRecordProgramdataCommandParameterInfo);
     InteractionInfo channelcancelRecordProgramInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -33004,9 +33004,9 @@ public class ClusterInfoMapping {
         commandArguments.get("programIdentifier")
         , (Boolean)
         commandArguments.get("shouldRecordSeries")
-        , (ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct>)
+        , (Optional<ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct>>)
         commandArguments.get("externalIDList")
-        , (byte[])
+        , (Optional<byte[]>)
         commandArguments.get("data")
         );
       },
