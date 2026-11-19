@@ -41,7 +41,7 @@ void NodeLookupHandle::LookupResult(const ResolveResult & result)
 {
     MATTER_LOG_NODE_DISCOVERED(Tracing::DiscoveryInfoType::kIntermediateResult, &GetRequest().GetPeerId(), &result);
 
-    auto score = Dnssd::IPAddressSorter::ScoreIpAddress(result.address.GetIPAddress(), result.address.GetInterface());
+    auto score = Dnssd::IPAddressSorter::ScoreIPAddress(result.address.GetIPAddress(), result.address.GetInterface());
     [[maybe_unused]] bool success = mResults.UpdateResults(result, score);
 
 #if CHIP_PROGRESS_LOGGING
@@ -51,13 +51,13 @@ void NodeLookupHandle::LookupResult(const ResolveResult & result)
     const PeerId peerId = GetRequest().GetPeerId();
     if (success)
     {
-        ChipLogProgress(Discovery, "%s: new best score: %u (for " ChipLogFormatPeerId ")", addr_string, to_underlying(score),
+        ChipLogProgress(Discovery, "%s: new best score: %u (for " ChipLogFormatPeerId ")", addr_string, score,
                         ChipLogValuePeerId(peerId));
     }
     else
     {
-        ChipLogProgress(Discovery, "%s: score has not improved: %u (for " ChipLogFormatPeerId ")", addr_string,
-                        to_underlying(score), ChipLogValuePeerId(peerId));
+        ChipLogProgress(Discovery, "%s: score has not improved: %u (for " ChipLogFormatPeerId ")", addr_string, score,
+                        ChipLogValuePeerId(peerId));
     }
 #endif
 }
@@ -127,7 +127,7 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
     return NodeLookupAction::KeepSearching();
 }
 
-bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd::IPAddressSorter::IpScore newScore)
+bool NodeLookupResults::UpdateResults(const ResolveResult & result, const uint8_t newScore)
 {
     ScoredResult newResult{ result, newScore };
     if (!newResult.address.GetIPAddress().IsIPv6LinkLocal())
