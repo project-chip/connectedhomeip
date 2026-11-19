@@ -2486,12 +2486,11 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
                                               user.userUniqueId, user.userStatus, user.userType, user.credentialRule,
                                               newCredentials.Get(), user.credentials.size()))
             {
-                ChipLogProgress(
-                    Zcl,
-                    "[ModifyUserCredential] Unable to modify user credential: app error "
-                    "[endpointId=%d,userIndex=%d,credentialType=%d,credentialIndex=%d,userTotalCredentials=%u]",
-                    endpointId, userIndex, to_underlying(credential.credentialType), credential.credentialIndex,
-                    static_cast<unsigned int>(user.credentials.size()));
+                ChipLogProgress(Zcl,
+                                "[ModifyUserCredential] Unable to modify user credential: app error "
+                                "[endpointId=%d,userIndex=%d,credentialType=%d,credentialIndex=%d,userTotalCredentials=%u]",
+                                endpointId, userIndex, to_underlying(credential.credentialType), credential.credentialIndex,
+                                static_cast<unsigned int>(user.credentials.size()));
                 return DlStatus::kFailure;
             }
 
