@@ -226,7 +226,7 @@ rm -rf /tmp/chip_*
 # Solar Power Figure 19 (Figure 17 plus two string-level DC sensors)
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device solar-power-two-strings:1
 
-# Solar Power Figure 19 literal (two strings × two panels — four per-panel DC sensors)
+# Solar Power two strings × two panels (four flat panel DC sensors with Number and Position tags)
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device solar-power-two-strings-four-panels:1
 
 # Solar Power three-phase AC export with per-phase sensors
