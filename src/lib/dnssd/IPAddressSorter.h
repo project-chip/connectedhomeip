@@ -20,6 +20,7 @@
 
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
+#include <inet/RouteLookup.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -32,7 +33,7 @@ namespace IPAddressSorter {
 //     checks MUST match in DefaultScore in IPAddressSorter.cpp.
 enum class IpScore : uint8_t
 {
-    kInvalid = 0, // No address available
+    kInvalid = 0, // No address available, or the host knows it has no route to the address
 
     // "Other" IPv6 include:
     //   - invalid addresses (have seen router bugs during interop testing)
@@ -59,10 +60,18 @@ public:
      * Returns the score of `address`, higher being more suitable. `interfaceId` is the interface the address
      * was resolved on, and may be InterfaceId::Null().
      *
-     * This implementation returns the IpScore value; an override can call it to use the default score for
-     * some addresses.
+     * This implementation returns IpScore::kInvalid if LookUpRouteTo(address, interfaceId) reports Inet::NoRoute, and
+     * the IpScore value otherwise; an override can call it to use the default score for some addresses.
      */
     virtual uint8_t ScoreIPAddress(const Inet::IPAddress & address, Inet::InterfaceId interfaceId);
+
+    /**
+     * Returns what the host knows about its route to `address`. `interfaceId` is the interface the address was
+     * resolved on, as for ScoreIPAddress.
+     *
+     * This implementation uses Inet::LookUpRouteTo.
+     */
+    virtual Inet::RouteLookupResult LookUpRouteTo(const Inet::IPAddress & address, Inet::InterfaceId interfaceId);
 };
 
 /**
@@ -80,7 +89,9 @@ void Sort(const Span<Inet::IPAddress> & addresses, Inet::InterfaceId interfaceId
 /**
  * Gives a score for an IP address, generally related to "how good" the address
  * is and how likely it is for it to be reachable. Higher is better. Uses the
- * installed IPAddressScorer if there is one, and the IpScore values otherwise.
+ * installed IPAddressScorer if there is one. Otherwise the score is
+ * IpScore::kInvalid if Inet::LookUpRouteTo(ip, interfaceId) reports Inet::NoRoute,
+ * and the IpScore value for the address if not.
  */
 uint8_t ScoreIPAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId);
 

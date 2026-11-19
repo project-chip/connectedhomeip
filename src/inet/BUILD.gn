@@ -130,6 +130,8 @@ static_library("inet") {
     "InetInterface.cpp",
     "InetInterface.h",
     "InetLayer.h",
+    "RouteLookup.cpp",
+    "RouteLookup.h",
     "arpa-inet-compatibility.h",
   ]
 
