@@ -100,6 +100,8 @@ class TC_HSTAT_2_3(HSTATBase):
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep(17, "If StepValue>1 then TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue+1, otherwise skip this step",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(18, "TH reads from the DUT the UserSetpoint attribute.",
+                     "Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive such that (SetpointValue - MinSetpointValue) % StepValue == 0."),
         ]
 
     @property
@@ -224,6 +226,16 @@ class TC_HSTAT_2_3(HSTATBase):
             await self.send_SetSettingsCommand_expect_success(userSetpoint=dut_MinSetpoint+1)
         else:
             self.skip_step(17)
+
+        self.step(18)
+        # TH reads from the DUT the UserSetpoint attribute.
+        # Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive
+        # such that (SetpointValue - MinSetpointValue) % StepValue == 0.
+        dut_UserSetpoint = await self.read_attribute_expect_success(attribute=self.attributes.UserSetpoint)
+        asserts.assert_greater_equal(dut_UserSetpoint, dut_MinSetpoint, "UserSetpoint attribute is less than MinSetpoint")
+        asserts.assert_less_equal(dut_UserSetpoint, dut_MaxSetpoint, "UserSetpoint attribute is greater than MaxSetpoint")
+        asserts.assert_equal((dut_UserSetpoint - dut_MinSetpoint) % dut_Step, 0,
+                             "(UserSetpoint - MinSetpoint) is not divisible by Step")
 
 
 if __name__ == '__main__':
