@@ -1725,7 +1725,8 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(struct ble_gap_event * gapEvent)
         ChipLogError(DeviceLayer, "ble_gattc_exchange_mtu failed: %d", rc);
         if (gapEvent->connect.status == 0)
         {
-            ble_gap_terminate(gapEvent->connect.conn_handle, BLE_ERR_REM_USER_CONN_TERM);
+            rc = ble_gap_terminate(gapEvent->connect.conn_handle, BLE_ERR_REM_USER_CONN_TERM);
+            VerifyOrDo(rc == 0, ChipLogError(DeviceLayer, "ble_gap_terminate failed: %d", rc));
         }
         // Report the failure but return no error: an error disables the service and deinitializes the host.
         HandleGAPConnectionFailed(gapEvent, CHIP_ERROR_INTERNAL);
