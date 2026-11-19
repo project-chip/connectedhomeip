@@ -46,6 +46,17 @@
 
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "JF Admin"
 
+// 1: the JFA runs a local DeviceCommissioner for outbound traffic to peers on
+//    the joint fabric. 0: the JFA uses the Server stack only.
+#ifndef CHIP_CONFIG_JFA_HAS_COMMISSIONER_ROLE
+#define CHIP_CONFIG_JFA_HAS_COMMISSIONER_ROLE 1
+#endif
+
+#if CHIP_CONFIG_JFA_HAS_COMMISSIONER_ROLE
 #define CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE 1
 
+// Required by CHIPDeviceConfig.h with BOTH_COMMISSIONER_AND_COMMISSIONEE.
+#define CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE 1
+
 #define CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT 0
+#endif

@@ -23,6 +23,10 @@
 // example platform (CommissionerMain.h / LinuxDeviceOptions). All other shared
 // files route through the JFAPlatform.h interface.
 
+#include "JFACaseSessionProvider.h"
+
+#if CHIP_CONFIG_JFA_HAS_COMMISSIONER_ROLE
+
 #include "JFAPlatform.h"
 
 #include <AppMain.h>
@@ -42,3 +46,5 @@ Controller::DeviceCommissioner * JFAGetDeviceCommissioner()
 }
 
 } // namespace chip
+
+#endif // CHIP_CONFIG_JFA_HAS_COMMISSIONER_ROLE

@@ -31,9 +31,11 @@ chip_data_model("jfa-common") {
 # provide their own implementation of the two JFAPlatform.h hooks.
 source_set("jfa-datastore-sync") {
   sources = [
+    "include/JFACaseSessionProvider.h",
     "include/JFADatastoreSync.h",
     "include/JFAPlatform.h",
     "include/JFARpc.h",
+    "src/JFACaseSessionProvider.cpp",
     "src/JFADatastoreSync.cpp",
   ]
 
@@ -41,6 +43,7 @@ source_set("jfa-datastore-sync") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/server",
     "${chip_root}/src/controller",
     "${chip_root}/src/lib",
   ]
