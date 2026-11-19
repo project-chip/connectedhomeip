@@ -206,9 +206,9 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/inet/tests:openthread_tests" ]
     }
 
-    # These suites link ember mocks (codegen data-model provider), so they cannot
-    # run in a "unified" single-binary test build. Restrict them to specific
-    # platforms only.
+    # These suites link ember mocks (codegen data-model provider), so they
+    # cannot run in a "unified" single-binary test build. Restrict them to
+    # specific platforms only.
     if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
       tests += [
         # keep-sorted: start
@@ -237,8 +237,17 @@ if (chip_build_tests) {
     # provide, notably <mutex>, <condition_variable> and <thread>, which
     # Zephyr's libstdc++ is built without.
     if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
+      tests += [
+        "${chip_root}/src/controller/python/matter/bdx/tests",
+        "${chip_root}/src/controller/python/matter/case_capture/tests",
+      ]
+    }
+
+    # camera-controller is a host tool. Its tests are listed here rather than
+    # in //examples:example_tests because only this group is run by "check".
+    if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
       tests +=
-          [ "${chip_root}/src/controller/python/matter/case_capture/tests" ]
+          [ "${chip_root}/examples/camera-controller/webrtc-manager/tests" ]
     }
 
     if (current_os != "zephyr") {
@@ -259,9 +268,9 @@ if (chip_build_tests) {
     }
 
     if (current_os != "zephyr" && chip_device_platform != "efr32") {
-      # Disabled from "one single binary" since the "mocks" contain duplicate sybmols
-      # with ember
-      # Disabled on EFR32 since "include <random>" fails with `::fabs` not defined
+      # Disabled from "one single binary" since the "mocks" contain duplicate
+      # sybmols with ember Disabled on EFR32 since "include <random>" fails with
+      # `::fabs` not defined
       tests += [
         "${chip_root}/src/data-model-providers/codedriven/tests",
         "${chip_root}/src/data-model-providers/codegen/tests",
@@ -299,6 +308,10 @@ if (chip_build_tests) {
 
     if (chip_device_platform == "linux") {
       tests += [ "${chip_root}/src/platform/Linux/tests" ]
+    }
+
+    if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
+      tests += [ "${chip_root}/src/tracing/json/tests" ]
     }
 
     if (chip_config_network_layer_ble) {

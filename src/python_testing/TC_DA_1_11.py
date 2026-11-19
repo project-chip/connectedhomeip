@@ -24,6 +24,7 @@
 # is the matrix row for a DUT supporting only EcdsaMatterLegacy. Run the true column
 # with a controller built with chip_crypto="openssl" against OpenSSL 3.5+.
 
+from mobly import asserts
 from TC_DA_PQC_common import PQCDACommissionerTestBase
 
 from matter.testing.decorators import async_test_body, pics
@@ -51,6 +52,9 @@ class TC_DA_1_11(PQCDACommissionerTestBase):
         counts = await self.run_pqc_da_row(2, 'advertises_ml_dsa_44', provider_path=self.provider_44,
                                            pipe_mode=None,
                                            expected_outcome='DUT commissions the device successfully')
+        if not self.is_pics_sdk_ci_only:
+            asserts.assert_equal(self.dut_supports_pqc, self.check_pics("MCORE.ROLE.COMMISSIONER_PQC"),
+                                 "PICS mismatch: MCORE.ROLE.COMMISSIONER_PQC should match dut_supports_pqc")
         if self.dut_supports_pqc:
             self.assert_segmented_retrieval(counts, 'advertises_ml_dsa_44')
         else:

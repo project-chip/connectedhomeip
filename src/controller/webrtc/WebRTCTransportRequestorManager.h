@@ -76,8 +76,11 @@ public:
 
     CHIP_ERROR HandleEnd(const WebRTCSessionStruct & session, WebRTCEndReasonEnum reasonCode) override;
 
-    // method to be called by provider client
+    // methods to be called by provider client
     void UpsertSession(const chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type & session);
+
+    void RecordOfferedSession(
+        const chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster::OfferedSession & offer);
 
 private:
     WebRTCTransportRequestorManager()  = default;

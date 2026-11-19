@@ -37,6 +37,7 @@
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/Types.h>
 #include <lib/support/TimerDelegateMock.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <algorithm>
@@ -198,7 +199,17 @@ void ExpectNoRegisteredEndpoints(CodeDrivenDataModelProvider & provider)
     EXPECT_TRUE(GetEndpoints(provider).empty());
 }
 
-void ExpectAllEndpointIdsInvalid(SimulatedBatteryStorage & device)
+void ExpectActivePowerSign(ElectricalSensor & sensor, int expectedSign)
+{
+    Testing::ClusterTester tester(sensor.ElectricalPowerMeasurementCluster());
+    DataModel::Nullable<int64_t> power;
+    ASSERT_SUCCESS(
+        tester.ReadAttribute(Clusters::ElectricalPowerMeasurement::Attributes::ActivePower::Id, power).GetUnderlyingError());
+    ASSERT_FALSE(power.IsNull());
+    EXPECT_EQ((power.Value() > 0) - (power.Value() < 0), expectedSign);
+}
+
+void ExpectAllEndpointIdsInvalid(BatteryStorage & device)
 {
     EXPECT_EQ(device.GetEndpointId(), kInvalidEndpointId);
     EXPECT_EQ(device.GetEnergyManagement().GetEndpointId(), kInvalidEndpointId);
@@ -213,6 +224,131 @@ StatusFromInvokeResult(const Testing::ClusterTester::InvokeResult<DataModel::Nul
 {
     EXPECT_TRUE(result.GetStatusCode().has_value());
     return result.GetStatusCode().has_value() ? result.GetStatusCode()->GetStatus() : Protocols::InteractionModel::Status::Failure;
+}
+
+class FixedElectricalReadings : public Clusters::ElectricalEnergyMeasurement::Delegate,
+                                public Clusters::ElectricalPowerMeasurement::Delegate,
+                                public Clusters::PowerTopology::Delegate
+{
+public:
+    using PowerMode = Clusters::ElectricalPowerMeasurement::PowerModeEnum;
+    FixedElectricalReadings(PowerMode mode, int64_t voltage) : mMode(mode), mVoltage(voltage) {}
+
+    DataModel::Nullable<int64_t> GetCumulativeEnergyImported() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetCumulativeEnergyExported() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetPeriodicEnergyImported() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetPeriodicEnergyExported() override { return DataModel::NullNullable; }
+    PowerMode GetPowerMode() override { return mMode; }
+    uint8_t GetNumberOfMeasurementTypes() override { return 0; }
+    CHIP_ERROR StartAccuracyRead() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetAccuracyByIndex(uint8_t,
+                                  Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type &) override
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    CHIP_ERROR EndAccuracyRead() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StartRangesRead() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetRangeByIndex(uint8_t, Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::Type &) override
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    CHIP_ERROR EndRangesRead() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StartHarmonicCurrentsRead() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetHarmonicCurrentsByIndex(uint8_t,
+                                          Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    CHIP_ERROR EndHarmonicCurrentsRead() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StartHarmonicPhasesRead() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetHarmonicPhasesByIndex(uint8_t,
+                                        Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    CHIP_ERROR EndHarmonicPhasesRead() override { return CHIP_NO_ERROR; }
+    DataModel::Nullable<int64_t> GetVoltage() override { return DataModel::MakeNullable(mVoltage); }
+    DataModel::Nullable<int64_t> GetActiveCurrent() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetReactiveCurrent() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetApparentCurrent() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetActivePower() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetReactivePower() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetApparentPower() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetRMSVoltage() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetRMSCurrent() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetRMSPower() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetFrequency() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetPowerFactor() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetNeutralCurrent() override { return DataModel::NullNullable; }
+    CHIP_ERROR GetAvailableEndpointAtIndex(size_t, EndpointId &) override { return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; }
+    CHIP_ERROR GetActiveEndpointAtIndex(size_t, EndpointId &) override { return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; }
+
+    ElectricalSensor::Config GetConfig(TimerDelegate & timerDelegate, Clusters::ElectricalPowerMeasurement::Feature feature)
+    {
+        return {
+            .electricalEnergyDelegate                = *this,
+            .electricalEnergyMeasurementFeatureFlags = BitMask<Clusters::ElectricalEnergyMeasurement::Feature>(
+                Clusters::ElectricalEnergyMeasurement::Feature::kImportedEnergy,
+                Clusters::ElectricalEnergyMeasurement::Feature::kCumulativeEnergy),
+            .electricalEnergyMeasurementOptionalAttributes = {},
+            .electricalEnergyMeasurementAccuracyStruct     = {},
+            .electricalPowerDelegate                       = *this,
+            .electricalPowerMeasurementFeatureFlags        = BitMask<Clusters::ElectricalPowerMeasurement::Feature>(feature),
+            .electricalPowerMeasurementOptionalAttributes =
+                Clusters::ElectricalPowerMeasurement::ElectricalPowerMeasurementCluster::OptionalAttributesSet()
+                    .Set<Clusters::ElectricalPowerMeasurement::Attributes::Voltage::Id>(),
+            .powerTopologyDelegate = *this,
+            .powerTopologyFeatures = BitMask<Clusters::PowerTopology::Feature>(Clusters::PowerTopology::Feature::kSetTopology),
+            .timerDelegate         = timerDelegate,
+        };
+    }
+
+    void SetVoltage(int64_t voltage) { mVoltage = voltage; }
+
+private:
+    PowerMode mMode;
+    int64_t mVoltage;
+};
+
+class ConfiguredBatteryStorage : public BatteryStorage
+{
+public:
+    explicit ConfiguredBatteryStorage(const Context & context) : BatteryStorage(context) {}
+};
+
+TEST_F(BatteryStorageTestFixture, UsesInjectedSensorConfigurationsAndDelegates)
+{
+    using namespace Clusters::ElectricalPowerMeasurement;
+    FixedElectricalReadings grid(PowerModeEnum::kAc, 230'000);
+    FixedElectricalReadings battery(PowerModeEnum::kDc, 48'000);
+    ConfiguredBatteryStorage device({ .timerDelegate           = mTimerDelegate,
+                                      .gridElectricalSensor    = grid.GetConfig(mTimerDelegate, Feature::kAlternatingCurrent),
+                                      .batteryElectricalSensor = battery.GetConfig(mTimerDelegate, Feature::kDirectCurrent) });
+    ConsecutiveEndpointIdAllocator allocator;
+    ASSERT_SUCCESS(device.Register(allocator, mProvider));
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
+
+    Testing::ClusterTester gridTester(device.GetGridElectricalSensor().ElectricalPowerMeasurementCluster());
+    Testing::ClusterTester batteryTester(device.GetBatteryElectricalSensor().ElectricalPowerMeasurementCluster());
+    uint32_t features = 0;
+    ASSERT_SUCCESS(gridTester.ReadAttribute(Attributes::FeatureMap::Id, features).GetUnderlyingError());
+    EXPECT_EQ(features, BitMask<Feature>(Feature::kAlternatingCurrent).Raw());
+    ASSERT_SUCCESS(batteryTester.ReadAttribute(Attributes::FeatureMap::Id, features).GetUnderlyingError());
+    EXPECT_EQ(features, BitMask<Feature>(Feature::kDirectCurrent).Raw());
+
+    DataModel::Nullable<int64_t> voltage;
+    ASSERT_SUCCESS(gridTester.ReadAttribute(Attributes::Voltage::Id, voltage).GetUnderlyingError());
+    EXPECT_EQ(voltage, DataModel::MakeNullable<int64_t>(230'000));
+    ASSERT_SUCCESS(batteryTester.ReadAttribute(Attributes::Voltage::Id, voltage).GetUnderlyingError());
+    EXPECT_EQ(voltage, DataModel::MakeNullable<int64_t>(48'000));
+    battery.SetVoltage(49'000);
+    ASSERT_SUCCESS(batteryTester.ReadAttribute(Attributes::Voltage::Id, voltage).GetUnderlyingError());
+    EXPECT_EQ(voltage, DataModel::MakeNullable<int64_t>(49'000));
+
+    device.Unregister(mProvider);
+    ExpectAllEndpointIdsInvalid(device);
+    ExpectNoRegisteredEndpoints(mProvider);
+    ASSERT_SUCCESS(mProvider.Shutdown());
 }
 
 TEST_F(BatteryStorageTestFixture, UnregistersCleanlyAfterProviderStartup)
@@ -353,7 +489,7 @@ TEST_F(BatteryStorageTestFixture, RegistersRequiredFeaturesAndAttributes)
 
     struct SensorExpectation
     {
-        SimulatedElectricalSensor & sensor;
+        ElectricalSensor & sensor;
         EpmFeature powerFeature;
         bool requiresImportedEnergy;
     };
@@ -445,11 +581,11 @@ TEST_F(BatteryStorageTestFixture, CanUnregisterAndRegisterAgain)
     EXPECT_NE(device.GetEndpointId(), firstParentEndpoint);
     EXPECT_EQ(GetEndpoints(mProvider).size(), 6u);
 
-    SimulatedElectricalSensor & batterySensor = device.GetBatteryElectricalSensor();
+    ElectricalSensor & batterySensor = device.GetBatteryElectricalSensor();
     ASSERT_EQ(mTestEventTriggerDelegate.HandleEventTriggers(
                   EventTriggerForEndpoint(kFakeReadingsGenStart, batterySensor.GetEndpointId())),
               CHIP_NO_ERROR);
-    EXPECT_LT(batterySensor.GetActivePower().Value(), 0);
+    ExpectActivePowerSign(batterySensor, -1);
 
     device.Unregister(mProvider);
     ExpectAllEndpointIdsInvalid(device);
@@ -571,6 +707,25 @@ TEST_F(BatteryStorageTestFixture, RejectsInvalidPowerAdjustmentCommands)
     EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
 }
 
+TEST_F(BatteryStorageTestFixture, StandaloneSimulatedSensorRetainsTriggerLifecycle)
+{
+    SimulatedElectricalSensor sensor(mTimerDelegate, mTestEventTriggerDelegate);
+    ASSERT_SUCCESS(sensor.Register(1, mProvider));
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
+    ASSERT_SUCCESS(mTestEventTriggerDelegate.HandleEventTriggers(EventTriggerForEndpoint(kFakeReadingsLoadStart, 1)));
+    ExpectActivePowerSign(sensor, 1);
+
+    sensor.Unregister(mProvider);
+    EXPECT_EQ(mTestEventTriggerDelegate.HandleEventTriggers(EventTriggerForEndpoint(kFakeReadingsLoadStart, 1)),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_SUCCESS(sensor.Register(2, mProvider));
+    ASSERT_SUCCESS(mTestEventTriggerDelegate.HandleEventTriggers(EventTriggerForEndpoint(kFakeReadingsGenStart, 2)));
+    ExpectActivePowerSign(sensor, -1);
+    sensor.Unregister(mProvider);
+    ExpectNoRegisteredEndpoints(mProvider);
+    ASSERT_SUCCESS(mProvider.Shutdown());
+}
+
 TEST_F(BatteryStorageTestFixture, RoutesEnergyReportingTriggersToTargetSensor)
 {
     ConsecutiveEndpointIdAllocator allocator;
@@ -579,20 +734,20 @@ TEST_F(BatteryStorageTestFixture, RoutesEnergyReportingTriggersToTargetSensor)
     ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
     ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
 
-    SimulatedElectricalSensor & gridSensor    = device.GetGridElectricalSensor();
-    SimulatedElectricalSensor & batterySensor = device.GetBatteryElectricalSensor();
+    ElectricalSensor & gridSensor    = device.GetGridElectricalSensor();
+    ElectricalSensor & batterySensor = device.GetBatteryElectricalSensor();
 
     ASSERT_EQ(
         mTestEventTriggerDelegate.HandleEventTriggers(EventTriggerForEndpoint(kFakeReadingsLoadStart, gridSensor.GetEndpointId())),
         CHIP_NO_ERROR);
-    EXPECT_GT(gridSensor.GetActivePower().Value(), 0);
-    EXPECT_EQ(batterySensor.GetActivePower().Value(), 0);
+    ExpectActivePowerSign(gridSensor, 1);
+    ExpectActivePowerSign(batterySensor, 0);
 
     ASSERT_EQ(mTestEventTriggerDelegate.HandleEventTriggers(
                   EventTriggerForEndpoint(kFakeReadingsGenStart, batterySensor.GetEndpointId())),
               CHIP_NO_ERROR);
-    EXPECT_GT(gridSensor.GetActivePower().Value(), 0);
-    EXPECT_LT(batterySensor.GetActivePower().Value(), 0);
+    ExpectActivePowerSign(gridSensor, 1);
+    ExpectActivePowerSign(batterySensor, -1);
 
     device.Unregister(mProvider);
     EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);

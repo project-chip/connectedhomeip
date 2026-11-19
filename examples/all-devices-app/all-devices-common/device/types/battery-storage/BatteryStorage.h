@@ -17,10 +17,9 @@
 
 #pragma once
 
-#include <app/TestEventTriggerDelegate.h>
 #include <device/api/Interface.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
-#include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
+#include <device/types/electrical-sensor/ElectricalSensor.h>
 #include <device/types/power-source/BatteryPowerSource.h>
 #include <device/types/power-source/WiredPowerSource.h>
 #include <lib/support/TimerDelegate.h>
@@ -31,10 +30,12 @@ namespace chip::app {
 class BatteryStorage : public DeviceInterface
 {
 public:
+    /// Sensor delegates and configuration spans must remain valid for the device lifetime.
     struct Context
     {
         TimerDelegate & timerDelegate;
-        TestEventTriggerDelegate & testEventTriggerDelegate;
+        ElectricalSensor::Config gridElectricalSensor;
+        ElectricalSensor::Config batteryElectricalSensor;
     };
 
     ~BatteryStorage() override = default;
@@ -46,8 +47,8 @@ public:
     EndpointId GetEndpointId() const { return mEndpointId; }
 
     EnergyManagement & GetEnergyManagement() { return mEnergyManagement; }
-    SimulatedElectricalSensor & GetGridElectricalSensor() { return mGridElectricalSensor; }
-    SimulatedElectricalSensor & GetBatteryElectricalSensor() { return mBatteryElectricalSensor; }
+    ElectricalSensor & GetGridElectricalSensor() { return mGridElectricalSensor; }
+    ElectricalSensor & GetBatteryElectricalSensor() { return mBatteryElectricalSensor; }
     WiredPowerSource & GetGridPowerSource() { return mGridPowerSource; }
     BatteryPowerSource & GetBatteryPowerSource() { return mBatteryPowerSource; }
 
@@ -67,8 +68,8 @@ private:
     EndpointId mEndpointId = kInvalidEndpointId;
 
     EnergyManagement mEnergyManagement;
-    SimulatedElectricalSensor mGridElectricalSensor;
-    SimulatedElectricalSensor mBatteryElectricalSensor;
+    ElectricalSensor mGridElectricalSensor;
+    ElectricalSensor mBatteryElectricalSensor;
     WiredPowerSource mGridPowerSource;
     BatteryPowerSource mBatteryPowerSource;
 };

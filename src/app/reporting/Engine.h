@@ -67,15 +67,19 @@ public:
     Engine(InteractionModelEngine * apImEngine);
 
     /**
-     * Initializes the reporting engine. Should only be called once.
+     * Initializes the reporting engine.  Calling Init() again before Shutdown() with the same EventManagement does nothing.
      *
-     * @param[in] A pointer to EventManagement, should not be a nullptr.
+     * @param[in] apEventManagement The EventManagement to report events from; must not be null.
      *
-     * @retval #CHIP_NO_ERROR On success.
-     * @retval other           Was unable to retrieve data and write it into the writer.
+     * @retval #CHIP_NO_ERROR               On success.
+     * @retval #CHIP_ERROR_INVALID_ARGUMENT If apEventManagement is null.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the engine is already initialized with a different EventManagement.
      */
     CHIP_ERROR Init(EventManagement * apEventManagement);
 
+    /**
+     * Shuts down the reporting engine.  Init() can then be called again, with any EventManagement.
+     */
     void Shutdown();
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -133,7 +137,7 @@ public:
 
     // DataModel::AttributeChangeListener implementation
     void OnAttributeChanged(const ConcreteAttributePath & path, DataModel::AttributeChangeType type) override;
-    void OnEndpointChanged(EndpointId endpointId, DataModel::EndpointChangeType type) override;
+    void OnEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, DataModel::EndpointChangeType type) override;
 
 private:
     /**

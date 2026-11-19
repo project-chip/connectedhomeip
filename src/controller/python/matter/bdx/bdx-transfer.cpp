@@ -59,8 +59,18 @@ CHIP_ERROR BdxTransfer::AcceptAndSendData(const ByteSpan & data_to_send)
 {
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
     mAwaitingAccept = false;
+
+    const uint64_t startOffset = mTransfer.GetStartOffset();
+    if (startOffset > data_to_send.size())
+    {
+        ReturnErrorOnFailure(mTransfer.RejectTransfer(StatusCode::kStartOffsetNotSupported));
+        mRejected = true;
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     mData.assign(data_to_send.begin(), data_to_send.end());
-    mDataCount = data_to_send.size();
+    mDataCount            = data_to_send.size();
+    mDataTransferredCount = static_cast<size_t>(startOffset);
 
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode  = TransferControlFlags::kReceiverDrive;
@@ -125,10 +135,13 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
     case TransferSession::OutputEventType::kAckEOFReceived:
         EndSession(CHIP_NO_ERROR);
         break;
-    case TransferSession::OutputEventType::kQueryWithSkipReceived:
-        mDataTransferredCount = std::min<size_t>(mDataTransferredCount + event.bytesToSkip.BytesToSkip, mDataCount);
+    case TransferSession::OutputEventType::kQueryWithSkipReceived: {
+        // Compared with what is left rather than added first, so that a huge skip cannot wrap around into the data.
+        const uint64_t dataRemaining = mDataCount - mDataTransferredCount;
+        mDataTransferredCount += static_cast<size_t>(std::min<uint64_t>(event.bytesToSkip.BytesToSkip, dataRemaining));
         TEMPORARY_RETURN_IGNORED SendBlock();
         break;
+    }
     case TransferSession::OutputEventType::kQueryReceived:
         TEMPORARY_RETURN_IGNORED SendBlock();
         break;

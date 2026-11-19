@@ -61,7 +61,7 @@ CHIP_ERROR DecodeSemanticTagList(TLV::TLVReader & reader, std::vector<Clusters::
         }
         VerifyOrReturnError(innerErr == CHIP_END_OF_TLV, innerErr);
         ReturnErrorOnFailure(reader.ExitContainer(tagStructType));
-        VerifyOrReturnError(hasNamespace && hasTag, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(hasNamespace && hasTag, CHIP_IM_GLOBAL_STATUS(ConstraintError));
         tags.push_back(tagStruct);
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
@@ -226,7 +226,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAddAmbientContextDete
     Clusters::AmbientContextSensing::Structs::AmbientContextTypeStruct::Type acsType = { .ambientContextSensed = tagList };
     if (hasConfidence)
     {
-        VerifyOrReturnError(confidence <= 100, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(confidence <= 100, CHIP_IM_GLOBAL_STATUS(ConstraintError));
         acsType.detectionConfidence.SetValue(static_cast<Percent>(confidence));
     }
 
@@ -308,7 +308,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetPredictedActivity(
                     case 6: {
                         uint8_t conf = 0;
                         ReturnErrorOnFailure(reader.Get(conf));
-                        VerifyOrReturnError(conf <= 100, CHIP_ERROR_INVALID_ARGUMENT);
+                        VerifyOrReturnError(conf <= 100, CHIP_IM_GLOBAL_STATUS(ConstraintError));
                         item.confidence = static_cast<Percent>(conf);
                         break;
                     }
