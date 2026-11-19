@@ -1470,6 +1470,55 @@ TEST_F(TestChipCryptoPAL, TestECDSA_ValidationFailIncorrectHashSignature)
     EXPECT_EQ(validation_error, CHIP_ERROR_INVALID_SIGNATURE);
 }
 
+// The vectors include signatures whose r or s starts with a zero byte, or has its top bit set. Those
+// take different paths when a backend converts the signature to DER before validating it.
+TEST_F(TestChipCryptoPAL, TestECDSA_ValidationTestVectors)
+{
+    HeapChecker heapChecker;
+
+    for (const auto & tv : ecdsa_det_test_vectors)
+    {
+        P256PublicKey public_key;
+        public_key.Bytes()[0] = 0x04;
+        memcpy(public_key.Bytes() + 1, tv.public_key_x, sizeof(tv.public_key_x));
+        memcpy(public_key.Bytes() + 1 + sizeof(tv.public_key_x), tv.public_key_y, sizeof(tv.public_key_y));
+
+        P256ECDSASignature signature;
+        memcpy(signature.Bytes(), tv.r, kP256_FE_Length);
+        memcpy(signature.Bytes() + kP256_FE_Length, tv.s, kP256_FE_Length);
+        ASSERT_SUCCESS(signature.SetLength(kP256_ECDSA_Signature_Length_Raw));
+
+        CharSpan message = CharSpan::fromCharString(tv.message);
+        EXPECT_SUCCESS(public_key.ECDSA_validate_msg_signature(Uint8::from_const_char(message.data()), message.size(), signature));
+
+        signature.Bytes()[kP256_ECDSA_Signature_Length_Raw - 1] ^= 0x01;
+        EXPECT_EQ(public_key.ECDSA_validate_msg_signature(Uint8::from_const_char(message.data()), message.size(), signature),
+                  CHIP_ERROR_INVALID_SIGNATURE);
+    }
+}
+
+TEST_F(TestChipCryptoPAL, TestECDSA_ValidationFailsPublicKeyNotOnCurve)
+{
+    HeapChecker heapChecker;
+    const char * msg  = "Hello World!";
+    size_t msg_length = strlen(msg);
+
+    P256Keypair keypair;
+    ASSERT_SUCCESS(keypair.Initialize(ECPKeyTarget::ECDSA));
+
+    P256ECDSASignature signature;
+    ASSERT_SUCCESS(keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_length, signature));
+    EXPECT_SUCCESS(keypair.Pubkey().ECDSA_validate_msg_signature(reinterpret_cast<const uint8_t *>(msg), msg_length, signature));
+
+    uint8_t offCurvePoint[kP256_PublicKey_Length];
+    memcpy(offCurvePoint, keypair.Pubkey().ConstBytes(), sizeof(offCurvePoint));
+    offCurvePoint[sizeof(offCurvePoint) - 1] ^= 0x01; // A changed Y coordinate no longer satisfies the curve equation.
+    P256PublicKey offCurveKey(offCurvePoint);
+
+    EXPECT_NE(offCurveKey.ECDSA_validate_msg_signature(reinterpret_cast<const uint8_t *>(msg), msg_length, signature),
+              CHIP_NO_ERROR);
+}
+
 TEST_F(TestChipCryptoPAL, TestECDSA_SigningMsgInvalidParams)
 {
     HeapChecker heapChecker;
@@ -1635,6 +1684,30 @@ TEST_F(TestChipCryptoPAL, TestECDH_EstablishSecret)
     bool signatures_match = (memcmp(out_secret1.ConstBytes(), out_secret2.ConstBytes(), out_secret1.Length()) == 0);
     EXPECT_TRUE(signatures_match);
 }
+
+// The PSA backend loads a serialized keypair for signing only, so that keypair cannot derive a secret.
+#if !CHIP_CRYPTO_PSA
+TEST_F(TestChipCryptoPAL, TestECDH_SampleInputVectors)
+{
+    HeapChecker heapChecker;
+
+    for (const auto & vector : ecdh_test_vectors)
+    {
+        P256Keypair keypair;
+        ASSERT_SUCCESS(keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(vector.local_pvt_key, vector.local_pvt_key_length),
+                                                                    ByteSpan(vector.local_pub_key, vector.local_pub_key_length)));
+
+        P256PublicKey remote_public_key;
+        ASSERT_EQ(vector.remote_pub_key_length, remote_public_key.Length());
+        memcpy(remote_public_key.Bytes(), vector.remote_pub_key, vector.remote_pub_key_length);
+
+        P256ECDHDerivedSecret secret;
+        ASSERT_SUCCESS(keypair.ECDH_derive_secret(remote_public_key, secret));
+        ASSERT_EQ(secret.Length(), vector.shared_secret_length);
+        EXPECT_EQ(memcmp(secret.ConstBytes(), vector.shared_secret, vector.shared_secret_length), 0);
+    }
+}
+#endif // !CHIP_CRYPTO_PSA
 
 TEST_F(TestChipCryptoPAL, TestECDH_RemotePublicKeyNotOnCurve)
 {

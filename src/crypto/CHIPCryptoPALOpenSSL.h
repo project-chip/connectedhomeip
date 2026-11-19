@@ -139,5 +139,13 @@ ECName MapECName(SupportedECPKeyTypes keyType);
  **/
 CHIP_ERROR P256PublicKeyFromECKey(EC_KEY * ec_key, P256PublicKey & pubkey);
 
+/**
+ * @brief Import a P256 public key into an EVP_PKEY
+ *
+ * Anything out_evp_pkey already held is released; on failure it is left empty. Fails if the key
+ * does not decode as a point on the P-256 curve. Does not run the library's public key validation.
+ **/
+CHIP_ERROR CreateEvpPkeyFromP256PublicKey(const P256PublicKey & key, ScopedEvpPkey & out_evp_pkey);
+
 } // namespace Crypto
 } // namespace chip
