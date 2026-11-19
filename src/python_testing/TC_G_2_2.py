@@ -288,7 +288,7 @@ class TC_G_2_2(MatterTestCommissionedDevice):
 
             self.step("7a")
             kGroupIdUnused = maxgroups + 1
-            groupKeyMapStructMaxGroup: list[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = groupKeyMapStruct + [
+            groupKeyMapStructMaxGroup: list[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = [
                 GroupKeyMapStruct(groupId=kGroupIdUnused, groupKeySetID=kGroupKeySetID)
             ]
             resp = await th1.WriteAttribute(
