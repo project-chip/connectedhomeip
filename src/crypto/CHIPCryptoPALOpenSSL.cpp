@@ -738,29 +738,13 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
     VerifyOrReturnError(out_length >= kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR error         = CHIP_ERROR_INTERNAL;
-    int error_openssl        = 0;
-    unsigned int mac_out_len = 0;
+    VerifyOrReturnError(CanCastTo<boringssl_size_t_openssl_int>(key_length), CHIP_ERROR_INVALID_ARGUMENT);
 
-    HMAC_CTX * mac_ctx = HMAC_CTX_new();
-    VerifyOrExit(mac_ctx != nullptr, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(HMAC(EVP_sha256(), Uint8::to_const_uchar(key), static_cast<boringssl_size_t_openssl_int>(key_length),
+                             Uint8::to_const_uchar(message), message_length, Uint8::to_uchar(out_buffer), nullptr) != nullptr,
+                        CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(CanCastTo<boringssl_size_t_openssl_int>(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
-    error_openssl = HMAC_Init_ex(mac_ctx, Uint8::to_const_uchar(key), static_cast<boringssl_size_t_openssl_int>(key_length),
-                                 EVP_sha256(), nullptr);
-    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
-
-    error_openssl = HMAC_Update(mac_ctx, Uint8::to_const_uchar(message), message_length);
-    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
-
-    mac_out_len   = static_cast<unsigned int>(CHIP_CRYPTO_HASH_LEN_BYTES);
-    error_openssl = HMAC_Final(mac_ctx, Uint8::to_uchar(out_buffer), &mac_out_len);
-    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
-
-    error = CHIP_NO_ERROR;
-exit:
-    HMAC_CTX_free(mac_ctx);
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR HMAC_sha::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length, uint8_t * out_buffer,
