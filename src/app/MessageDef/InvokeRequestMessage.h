@@ -107,19 +107,11 @@ public:
     InvokeRequestMessage::Builder & TimedRequest(const bool aTimedRequest);
 
     /**
-     *  @brief Encode SuppressResponse and TimedRequest as allowed for the destination of the request.
-     *
-     *  Groupcast requests carry neither field. Unicast requests to a peer at an interaction model revision of
-     *  at least Revision::kFirstRevisionWithOptionalRequestFlags carry only the fields that are true.
-     *  Requests to any other peer carry both fields.
-     *
-     *  @param [in] aSuppressResponse  true if no response is to be sent back
-     *  @param [in] aTimedRequest      true if this action is part of a timed invoke transaction
-     *  @param [in] aPeerRevision      peer interaction model revision from session parameters, std::nullopt if unknown
-     *  @param [in] aIsGroupcast       true if the request is sent on a group session
+     * Encode request flags for the destination. Groupcast omits both fields; peers at revision 14 or later
+     * omit false fields. Other peers require both fields.
+     * Setting TimedRequest to true on a group request sets CHIP_ERROR_INVALID_ARGUMENT.
      */
-    InvokeRequestMessage::Builder & RequestFlags(const bool aSuppressResponse, const bool aTimedRequest,
-                                                 const std::optional<uint16_t> & aPeerRevision, const bool aIsGroupcast);
+    InvokeRequestMessage::Builder & RequestFlags(const RequestFlagsOptions & options);
 
     /**
      *  @brief Encode DelayReportData structure.

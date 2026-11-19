@@ -29,6 +29,7 @@
 #include <app/MessageDef/AttributeStatusIB.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/MessageDef/WriteRequestMessage.h>
+#include <app/RequestSession.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/data-model/List.h>
@@ -124,12 +125,17 @@ public:
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apCallback       Callback set by application.
-     *  @param[in]    aSession         The session the write will be sent on, or std::nullopt. Only read during construction.
+     *  @param[in]    aSession         The destination used to encode the write, or std::nullopt. The SessionHandle
+     *                                 reference is read only during construction. A unicast session is retained until
+     *                                 completion or destruction. Group ID and fabric index are copied without retaining
+     *                                 the group session.
      *                                 Passing the session allows WriteClient to optimize the encoding of the request based
      *                                 on the information available from the session. Passing std::nullopt keeps an encoding
      *                                 that every receiver accepts; use it when the session is not known at construction time.
-     *                                 When a session is passed, the session later given to SendWriteRequest must be that
-     *                                 same session, otherwise SendWriteRequest fails with CHIP_ERROR_INVALID_ARGUMENT.
+     *                                 Unicast must use the construction session; groupcast must use the construction
+     *                                 group ID and fabric index. A different destination fails with CHIP_ERROR_INVALID_ARGUMENT.
+     *                                 An unavailable or released construction session causes encoding and sending to fail
+     *                                 with CHIP_ERROR_INCORRECT_STATE. A newer CASE session does not replace that session.
      *                                 A timed write cannot be sent on a group session: encoding an attribute in a timed
      *                                 WriteClient created for a group session fails with CHIP_ERROR_INVALID_ARGUMENT.
      *  @param[in]    aTimedWriteTimeoutMs If provided, do a timed write using this timeout.
@@ -137,23 +143,19 @@ public:
      */
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const OptionalSessionHandleRef & aSession,
                 const Optional<uint16_t> & aTimedWriteTimeoutMs, bool aSuppressResponse = false) :
-        mpExchangeMgr(apExchangeMgr),
-        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
-        mSuppressResponse(aSuppressResponse), mTimedRequestFieldValue(aTimedWriteTimeoutMs.HasValue())
+        mpExchangeMgr(apExchangeMgr), mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
+        mSuppressResponse(aSuppressResponse), mRequestSession(aSession), mTimedRequestFieldValue(aTimedWriteTimeoutMs.HasValue())
     {
         assertChipStackLockedByCurrentThread();
-        CaptureSessionInfo(aSession);
     }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const OptionalSessionHandleRef & aSession,
                 const Optional<uint16_t> & aTimedWriteTimeoutMs, uint16_t aReservedSize) :
-        mpExchangeMgr(apExchangeMgr),
-        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize),
-        mTimedRequestFieldValue(aTimedWriteTimeoutMs.HasValue())
+        mpExchangeMgr(apExchangeMgr), mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
+        mRequestSession(aSession), mReservedSize(aReservedSize), mTimedRequestFieldValue(aTimedWriteTimeoutMs.HasValue())
     {
         assertChipStackLockedByCurrentThread();
-        CaptureSessionInfo(aSession);
     }
 
     // Tag type to distinguish the test constructor from the normal constructor
@@ -195,12 +197,10 @@ public:
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const OptionalSessionHandleRef & aSession,
                 const Optional<uint16_t> & aTimedWriteTimeoutMs, bool aTimedRequestFieldValue,
                 TestOnlyOverrideTimedRequestFieldTag) :
-        mpExchangeMgr(apExchangeMgr),
-        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
-        mTimedRequestFieldValue(aTimedRequestFieldValue)
+        mpExchangeMgr(apExchangeMgr), mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
+        mRequestSession(aSession), mTimedRequestFieldValue(aTimedRequestFieldValue)
     {
         assertChipStackLockedByCurrentThread();
-        CaptureSessionInfo(aSession);
     }
 #endif
 
@@ -340,8 +340,9 @@ public:
      *  If SendWriteRequest is never called, or the call fails, the API
      *  consumer is responsible for calling Shutdown on the WriteClient.
      *  Timed writes on group sessions are rejected with CHIP_ERROR_INVALID_ARGUMENT.
-     *  If a session was passed at construction, `session` must be that same session, otherwise
-     *  CHIP_ERROR_INVALID_ARGUMENT is returned.
+     *  If a unicast session was passed at construction, `session` must be that session. Group requests must use
+     *  the construction group ID and fabric index. A different destination returns CHIP_ERROR_INVALID_ARGUMENT.
+     *  An unavailable or released construction session returns CHIP_ERROR_INCORRECT_STATE.
      */
     CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = System::Clock::kZero);
 
@@ -559,20 +560,6 @@ private:
      */
     CHIP_ERROR StartNewMessage();
 
-    void CaptureSessionInfo(const OptionalSessionHandleRef & aSession);
-
-    // Returns CHIP_ERROR_INVALID_ARGUMENT if a session was passed at construction and `session` is not that session.
-    CHIP_ERROR CheckMatchesSessionInfo(const SessionHandle & session) const;
-
-    // Keeps mConstructionSession on the session passed at construction when a newer CASE session
-    // to the same peer is established (plain SessionHolder would shift).
-    class ConstructionSessionDelegate final : public SessionDelegate
-    {
-    public:
-        NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
-        void OnSessionReleased() override {}
-    };
-
     /**
      * Finalize Write Request Message TLV Builder and retrieve final data from tlv builder for later sending
      */
@@ -593,15 +580,7 @@ private:
     Optional<uint16_t> mTimedWriteTimeoutMs;
     bool mSuppressResponse = false;
 
-    // Values read from the session passed at construction.
-    // mPeerInteractionModelRevision is std::nullopt when no session was passed or the peer revision is unknown.
-    // mConstructionSession holds that session for send-time identity checks; it clears if the session is released,
-    // and does not shift when a newer session to the same peer is established.
-    ConstructionSessionDelegate mConstructionSessionDelegate;
-    SessionHolderWithDelegate mConstructionSession{ mConstructionSessionDelegate };
-    std::optional<uint16_t> mPeerInteractionModelRevision;
-    bool mHasSessionInfo = false;
-    bool mSessionIsGroup = false;
+    RequestSession mRequestSession;
 
     // A list of buffers, one buffer for each chunk.
     System::PacketBufferHandle mChunks;

@@ -312,6 +312,9 @@ CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(Invo
 
 Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
+    VerifyOrDie(mpResponder);
+    SetGroupRequest(mpResponder->GetGroupId().HasValue());
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
     InvokeRequestMessage::Parser invokeRequestMessage;
@@ -321,12 +324,6 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     TEMPORARY_RETURN_IGNORED invokeRequestMessage.PrettyPrint();
 #endif
-    VerifyOrDie(mpResponder);
-    if (mpResponder->GetGroupId().HasValue())
-    {
-        SetGroupRequest(true);
-    }
-
     // When updating these checks, please remember to make corresponding changes to TestOnlyInvokeCommandRequestWithFaultsInjected.
     // A missing SuppressResponse or TimedRequest is FALSE.
     mSuppressResponse   = false;

@@ -199,6 +199,8 @@ static_library("interaction-model") {
     "ReadClient.h",  # TODO: cpp is only included conditionally. Needs logic
                      # fixing
     "ReadPrepareParams.h",
+    "RequestSession.cpp",
+    "RequestSession.h",
     "SubscriptionResumptionStorage.h",
     "SubscriptionStats.h",
     "TimedHandler.cpp",

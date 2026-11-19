@@ -201,6 +201,12 @@ public:
     void TestWriteHandlerOptionalRequestFlags();
     void TestWriteClientUnicastOmitsFalseRequestFlags();
     void TestWriteClientConstructionSessionIsEnforced();
+    void TestWriteClientConstructionSessionDoesNotShift();
+    void TestWriteClientReleasedConstructionSessionIsRejected();
+    void TestWriteClientInactiveConstructionSessionIsRejected();
+    void TestWriteClientRecreatedGroupSession();
+    void TestWriteClientCompletionReleasesConstructionSession();
+    void TestWriteClientRevision14ChunkedRequestFlags();
     static void GenerateSuppressResponseChunkedWriteRequest(System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(System::PacketBufferHandle & aPayload);
 
@@ -702,6 +708,22 @@ TEST_F(TestWriteInteraction, TestWriteClientGroupcastEncodingIsEnforced)
         EXPECT_EQ(timedClient.SendWriteRequest(GetSessionBobToFriends()), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
+    // The test-only flag override cannot make a timed group request valid.
+    {
+        TestWriteClientCallback callback;
+        SessionHandle groupSession = GetSessionBobToFriends();
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, groupSession, NullOptional,
+                                     /* aTimedRequestFieldValue = */ true, WriteClient::TestOnlyOverrideTimedRequestFieldTag{});
+        EXPECT_EQ(writeClient.EncodeAttribute(path, true), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    {
+        TestWriteClientCallback callback;
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, std::nullopt, NullOptional,
+                                     /* aTimedRequestFieldValue = */ true, WriteClient::TestOnlyOverrideTimedRequestFieldTag{});
+        ASSERT_SUCCESS(writeClient.EncodeAttribute(path, true));
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToFriends()), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -814,6 +836,166 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientConstructionSessionIsEn
         EXPECT_EQ(callback.mOnDoneCalled, 1);
     }
 
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientConstructionSessionDoesNotShift)
+{
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ASSERT_SUCCESS(CreateCASESessionBobToAlice());
+    ASSERT_SUCCESS(CreateCASESessionAliceToBob());
+
+    const AttributePathParams path(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    SessionHandle originalSession = GetSessionBobToAlice();
+    TestWriteClientCallback callback;
+    app::WriteClient originalClient(&GetExchangeManager(), &callback, originalSession, NullOptional);
+    app::WriteClient replacementClient(&GetExchangeManager(), &callback, originalSession, NullOptional);
+    ASSERT_SUCCESS(originalClient.EncodeAttribute(path, true));
+    ASSERT_SUCCESS(replacementClient.EncodeAttribute(path, true));
+
+    SessionHolder replacement;
+    ASSERT_SUCCESS(GetSecureSessionManager().InjectCaseSessionWithTestKey(
+        replacement, 0x1234, 0x2345, GetBobFabric()->GetNodeId(), GetAliceFabric()->GetNodeId(), GetBobFabricIndex(),
+        GetAliceAddress(), CryptoContext::SessionRole::kInitiator));
+    auto replacementSession = replacement.Get();
+    ASSERT_TRUE(replacementSession.HasValue());
+    EXPECT_EQ(originalSession->GetPeer(), replacementSession.Value()->GetPeer());
+    EXPECT_FALSE(originalSession == replacementSession.Value());
+    GetSecureSessionManager().GetSecureSessions().NewerSessionAvailable(replacementSession.Value()->AsSecureSession());
+
+    EXPECT_EQ(replacementClient.SendWriteRequest(replacementSession.Value()), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_SUCCESS(originalClient.SendWriteRequest(originalSession));
+    DrainAndServiceIO();
+    EXPECT_EQ(callback.mOnSuccessCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientReleasedConstructionSessionIsRejected)
+{
+    const AttributePathParams path(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    SessionHandle session = GetSessionBobToAlice();
+    TestWriteClientCallback callback;
+    app::WriteClient writeClient(&GetExchangeManager(), &callback, session, NullOptional);
+    ASSERT_SUCCESS(writeClient.EncodeAttribute(path, true));
+    ExpireSessionBobToAlice();
+
+    EXPECT_EQ(writeClient.EncodeAttribute(path, false), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(writeClient.SendWriteRequest(session), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(callback.mOnDoneCalled, 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientInactiveConstructionSessionIsRejected)
+{
+    const AttributePathParams path(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    SessionHandle session = GetSessionBobToAlice();
+    ExpireSessionBobToAlice();
+    ASSERT_FALSE(session->IsActiveSession());
+
+    TestWriteClientCallback callback;
+    app::WriteClient writeClient(&GetExchangeManager(), &callback, session, NullOptional);
+    EXPECT_EQ(writeClient.EncodeAttribute(path, true), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(writeClient.SendWriteRequest(session), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(callback.mOnDoneCalled, 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientRecreatedGroupSession)
+{
+    const AttributePathParams path(Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    TestWriteClientCallback callback;
+    std::unique_ptr<app::WriteClient> writeClient;
+    {
+        Transport::OutgoingGroupSession constructionSession(GetFriendsGroupId(), GetBobFabricIndex());
+        SessionHandle session(constructionSession);
+        writeClient = std::make_unique<app::WriteClient>(&GetExchangeManager(), &callback, session, NullOptional);
+    }
+    ASSERT_SUCCESS(writeClient->EncodeAttribute(path, true));
+
+    Transport::OutgoingGroupSession differentGroup(static_cast<GroupId>(GetFriendsGroupId() + 1), GetBobFabricIndex());
+    EXPECT_EQ(writeClient->SendWriteRequest(SessionHandle(differentGroup)), CHIP_ERROR_INVALID_ARGUMENT);
+    Transport::OutgoingGroupSession differentFabric(GetFriendsGroupId(), GetAliceFabricIndex());
+    EXPECT_EQ(writeClient->SendWriteRequest(SessionHandle(differentFabric)), CHIP_ERROR_INVALID_ARGUMENT);
+
+    Transport::OutgoingGroupSession equivalentSession(GetFriendsGroupId(), GetBobFabricIndex());
+    ASSERT_SUCCESS(writeClient->SendWriteRequest(SessionHandle(equivalentSession)));
+    DrainAndServiceIO();
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientCompletionReleasesConstructionSession)
+{
+    const AttributePathParams path(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    SessionHandle session     = GetSessionBobToAlice();
+    auto * secureSession      = session->AsSecureSession();
+    const auto referenceCount = secureSession->GetReferenceCount();
+    TestWriteClientCallback callback;
+    app::WriteClient writeClient(&GetExchangeManager(), &callback, session, NullOptional);
+    EXPECT_EQ(secureSession->GetReferenceCount(), referenceCount + 1);
+    ASSERT_SUCCESS(writeClient.EncodeAttribute(path, true));
+    ASSERT_SUCCESS(writeClient.SendWriteRequest(session));
+    DrainAndServiceIO();
+
+    EXPECT_EQ(callback.mOnSuccessCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(secureSession->GetReferenceCount(), referenceCount);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientRevision14ChunkedRequestFlags)
+{
+    SessionHandle session = GetSessionBobToAlice();
+    SessionParameters parameters;
+    parameters.SetMRPConfig(GetDefaultMRPConfig());
+    parameters.SetInteractionModelRevision(Revision::kFirstRevisionWithOptionalRequestFlags);
+    session->AsSecureSession()->SetRemoteSessionParameters(parameters);
+
+    TestWriteClientCallback callback;
+    app::WriteClient writeClient(&GetExchangeManager(), &callback, session, NullOptional,
+                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 128));
+    const AttributePathParams path(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    constexpr int kAttributeCount = 12;
+    for (int index = 0; index < kAttributeCount; ++index)
+    {
+        ASSERT_SUCCESS(writeClient.EncodeAttribute(path, true));
+    }
+    ASSERT_TRUE(writeClient.IsWriteRequestChunked());
+
+    chip::Testing::MessageCapturer messages(*this);
+    ASSERT_SUCCESS(writeClient.SendWriteRequest(session));
+    DrainAndServiceIO();
+    EXPECT_EQ(callback.mOnSuccessCalled, kAttributeCount);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_TRUE(callback.mStatus.IsSuccess());
+
+    size_t requestCount        = 0;
+    bool previousHasMoreChunks = true;
+    for (size_t index = 0; index < messages.MessageCount(); ++index)
+    {
+        if (!messages.IsMessageType(index, Protocols::InteractionModel::MsgType::WriteRequest))
+        {
+            continue;
+        }
+        EXPECT_TRUE(previousHasMoreChunks);
+        System::PacketBufferTLVReader reader;
+        reader.Init(messages.MessagePayload(index).Retain());
+        WriteRequestMessage::Parser parser;
+        ASSERT_SUCCESS(parser.Init(reader));
+        bool flag = true;
+        EXPECT_EQ(parser.GetSuppressResponse(&flag), CHIP_END_OF_TLV);
+        EXPECT_EQ(parser.GetTimedRequest(&flag), CHIP_END_OF_TLV);
+        ASSERT_SUCCESS(parser.GetMoreChunkedMessages(&previousHasMoreChunks));
+        ++requestCount;
+    }
+    EXPECT_GT(requestCount, 1u);
+    EXPECT_FALSE(previousHasMoreChunks);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 

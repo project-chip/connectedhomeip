@@ -594,9 +594,15 @@ public:
     void TestCommandHandler_UnicastMissingSuppressResponseAndTimedRequestAreFalse();
     void TestCommandSenderUnicastOmitsFalseRequestFlags();
     void TestCommandSenderConstructionSessionIsEnforced();
+    void TestCommandSenderConstructionSessionDoesNotShift();
+    void TestCommandSenderReleasedConstructionSessionIsRejected();
+    void TestCommandSenderInactiveConstructionSessionIsRejected();
+    void TestCommandSenderRecreatedGroupSession();
     void TestCommandHandler_GroupcastOmitsSuppressResponseAndTimedRequest();
     void TestCommandHandler_GroupcastWithLegacySuppressResponseAndTimedRequest();
     void TestCommandResponseSender_GroupcastValidationFailureSendsNoStatusResponse();
+    void TestCommandResponseSender_MalformedGroupcastSendsNoStatusResponse();
+    void TestInteractionModelCommands_SendCommandWithoutSession();
 
     /**
      * With the introduction of batch invoke commands, CommandHandler keeps track of incoming
@@ -1962,13 +1968,15 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderConstructionSession
     {
         setPeerRevision(kFirstRevisionWithOptionalRequestFlags);
         mockCommandSenderDelegate.ResetCounter();
-        SessionHandle session = GetSessionBobToAlice();
+        SessionHandle session     = GetSessionBobToAlice();
+        const auto referenceCount = session->AsSecureSession()->GetReferenceCount();
         app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), session);
         AddInvokeRequestData(&commandSender);
         EXPECT_SUCCESS(commandSender.SendCommandRequest(GetSessionBobToAlice()));
         DrainAndServiceIO();
         EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 1);
         EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+        EXPECT_EQ(session->AsSecureSession()->GetReferenceCount(), referenceCount);
     }
 
     // Without a session at construction, the request can be sent on any session.
@@ -1984,6 +1992,87 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderConstructionSession
     }
 
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderConstructionSessionDoesNotShift)
+{
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ASSERT_SUCCESS(CreateCASESessionBobToAlice());
+    ASSERT_SUCCESS(CreateCASESessionAliceToBob());
+
+    SessionHandle originalSession = GetSessionBobToAlice();
+    app::CommandSender originalSender(&mockCommandSenderDelegate, &GetExchangeManager(), originalSession);
+    app::CommandSender replacementSender(&mockCommandSenderDelegate, &GetExchangeManager(), originalSession);
+    AddInvokeRequestData(&originalSender);
+    AddInvokeRequestData(&replacementSender);
+
+    SessionHolder replacement;
+    ASSERT_SUCCESS(GetSecureSessionManager().InjectCaseSessionWithTestKey(
+        replacement, 0x1234, 0x2345, GetBobFabric()->GetNodeId(), GetAliceFabric()->GetNodeId(), GetBobFabricIndex(),
+        GetAliceAddress(), CryptoContext::SessionRole::kInitiator));
+    auto replacementSession = replacement.Get();
+    ASSERT_TRUE(replacementSession.HasValue());
+    EXPECT_EQ(originalSession->GetPeer(), replacementSession.Value()->GetPeer());
+    EXPECT_FALSE(originalSession == replacementSession.Value());
+
+    GetSecureSessionManager().GetSecureSessions().NewerSessionAvailable(replacementSession.Value()->AsSecureSession());
+
+    EXPECT_EQ(replacementSender.SendCommandRequest(replacementSession.Value()), CHIP_ERROR_INVALID_ARGUMENT);
+    mockCommandSenderDelegate.ResetCounter();
+    ASSERT_SUCCESS(originalSender.SendCommandRequest(originalSession));
+    DrainAndServiceIO();
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderReleasedConstructionSessionIsRejected)
+{
+    SessionHandle session = GetSessionBobToAlice();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), session);
+    AddInvokeRequestData(&commandSender);
+
+    ExpireSessionBobToAlice();
+
+    EXPECT_EQ(commandSender.SendCommandRequest(session), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderInactiveConstructionSessionIsRejected)
+{
+    SessionHandle session = GetSessionBobToAlice();
+    ExpireSessionBobToAlice();
+    ASSERT_FALSE(session->IsActiveSession());
+
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), session);
+    EXPECT_EQ(commandSender.PrepareCommand(MakeTestCommandPath(kTestCommandIdWithData)), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(commandSender.SendCommandRequest(session), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSenderRecreatedGroupSession)
+{
+    std::unique_ptr<app::CommandSender> commandSender;
+    {
+        Transport::OutgoingGroupSession constructionSession(GetFriendsGroupId(), GetBobFabricIndex());
+        SessionHandle session(constructionSession);
+        commandSender = std::make_unique<app::CommandSender>(&mockCommandSenderDelegate, &GetExchangeManager(), session);
+    }
+    AddInvokeRequestData(commandSender.get());
+
+    Transport::OutgoingGroupSession differentGroup(static_cast<GroupId>(GetFriendsGroupId() + 1), GetBobFabricIndex());
+    EXPECT_EQ(commandSender->SendGroupCommandRequest(SessionHandle(differentGroup)), CHIP_ERROR_INVALID_ARGUMENT);
+    Transport::OutgoingGroupSession differentFabric(GetFriendsGroupId(), GetAliceFabricIndex());
+    EXPECT_EQ(commandSender->SendGroupCommandRequest(SessionHandle(differentFabric)), CHIP_ERROR_INVALID_ARGUMENT);
+
+    Transport::OutgoingGroupSession equivalentSession(GetFriendsGroupId(), GetBobFabricIndex());
+    mockCommandSenderDelegate.ResetCounter();
+    ASSERT_SUCCESS(commandSender->SendGroupCommandRequest(SessionHandle(equivalentSession)));
+    DrainAndServiceIO();
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -2075,12 +2164,12 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GroupcastWithLega
 
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandResponseSender_GroupcastValidationFailureSendsNoStatusResponse)
 {
-    // Groupcast Invokes omit SuppressResponse, so mSuppressResponse stays false. A validation failure
-    // (TimedRequestMismatch) must still not send a StatusResponse on the incoming group exchange.
+    // Group requests suppress responses even when SuppressResponse is false.
+    // A forbidden TimedRequest flag must fail validation without sending a StatusResponse.
     constexpr GroupId kTestGroupId = 0x0101;
 
-    SessionHandle groupSession = GetSessionBobToFriends();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), groupSession);
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), std::nullopt,
+                                     /* aIsTimedRequest = */ true);
     {
         CommandPathParams commandPath = MakeTestGroupCommandPath(kTestGroupId, kTestClusterId, kTestCommandIdWithData);
         app::CommandSender::PrepareCommandParameters prepareCommandParams;
@@ -2111,13 +2200,54 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandResponseSender_GroupcastV
         Messaging::ExchangeContext * exchange = GetExchangeManager().NewContext(incomingGroupSession, &exchangeDelegate);
         ASSERT_NE(exchange, nullptr);
 
-        // TimedRequest is omitted (false) on the wire, but the exchange is marked timed → TimedRequestMismatch.
-        responseSender.OnInvokeCommandRequest(exchange, std::move(commandDatabuf), /* isTimedInvoke = */ true);
+        // A group exchange cannot be timed, so the true TimedRequest field is a mismatch.
+        responseSender.OnInvokeCommandRequest(exchange, std::move(commandDatabuf), /* isTimedInvoke = */ false);
         DrainAndServiceIO();
         EXPECT_TRUE(doneCallback.mOnDoneCalled);
         EXPECT_EQ(messageLog.MessageCount(), 0u);
     }
 
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandResponseSender_MalformedGroupcastSendsNoStatusResponse)
+{
+    constexpr GroupId kTestGroupId = 0x0101;
+    System::PacketBufferTLVWriter writer;
+    writer.Init(System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize));
+    ASSERT_SUCCESS(writer.PutBoolean(TLV::AnonymousTag(), false));
+    System::PacketBufferHandle malformedPayload;
+    ASSERT_SUCCESS(writer.Finalize(&malformedPayload));
+
+    BasicCommandPathRegistry<4> registry;
+    MockGroupCommandResponder groupResponder(kTestGroupId, GetBobFabricIndex());
+    CommandHandlerImpl::TestOnlyOverrides overrides{ &registry, &groupResponder };
+    CommandHandlerImpl handler(overrides, &mockCommandHandlerDelegate);
+    EXPECT_EQ(handler.ProcessInvokeRequest(malformedPayload.CloneData(), /* isTimedInvoke = */ false),
+              Protocols::InteractionModel::Status::InvalidAction);
+    EXPECT_TRUE(handler.IsGroupRequest());
+
+    class DoneCallback : public CommandResponseSender::Callback
+    {
+    public:
+        void OnDone(CommandResponseSender &) override { mCallCount++; }
+        unsigned mCallCount = 0;
+    } callback;
+
+    chip::Testing::MessageCapturer messageLog(*this);
+    {
+        CommandResponseSender responseSender(&callback, &mockCommandHandlerDelegate);
+        TestExchangeDelegate exchangeDelegate;
+        Transport::IncomingGroupSession incomingSession(kTestGroupId, GetBobFabricIndex(), GetBobFabric()->GetNodeId());
+        SessionHandle incomingGroupSession(incomingSession);
+        auto * exchange = GetExchangeManager().NewContext(incomingGroupSession, &exchangeDelegate);
+        ASSERT_NE(exchange, nullptr);
+
+        responseSender.OnInvokeCommandRequest(exchange, std::move(malformedPayload), /* isTimedInvoke = */ false);
+        DrainAndServiceIO();
+        EXPECT_EQ(callback.mCallCount, 1u);
+        EXPECT_EQ(messageLog.MessageCount(), 0u);
+    }
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -2967,6 +3097,18 @@ CHIP_ERROR ParseDelayReportDataFromMessage(const System::PacketBufferHandle & pa
 }
 
 } // namespace
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendCommandWithoutSession)
+{
+    TestInteractionModelCommands commands(&mockCommandSenderDelegate);
+    OperationalDeviceProxy device(&GetExchangeManager(), GetSessionBobToAlice());
+    ExpireSessionBobToAlice();
+    ASSERT_FALSE(device.GetSecureSession().HasValue());
+
+    EXPECT_EQ(commands.SendCommand(&device, kTestEndpointId, kTestClusterId, kTestCommandIdWithData, Fields()),
+              CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
 
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendCommand_DelayReportData)
 {

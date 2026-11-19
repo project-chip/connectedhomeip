@@ -34,6 +34,7 @@
 #include <app/MessageDef/InvokeResponseMessage.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/PendingResponseTrackerImpl.h>
+#include <app/RequestSession.h>
 #include <app/data-model/EncodableToTLV.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
@@ -314,16 +315,19 @@ public:
      * Constructor.
      *
      * The callback passed in has to outlive this CommandSender object.
-     * If used in a groups setting, callbacks do not need to be passed.
-     * If callbacks are passed the only one that will be called in a group settings is the onDone
+     * Group requests do not require callbacks. When provided, only OnDone is called for group requests.
      *
-     * aSession is the session the invoke will be sent on. It is only read during construction.
+     * aSession identifies the destination used to encode the invoke. The SessionHandle reference is read only
+     * during construction. A unicast session is retained until completion or destruction; group requests
+     * copy the group ID and fabric index without retaining the group session.
      *   - Passing the session allows CommandSender to optimize the encoding of the request based on
      *     the information available from the session.
      *   - Passing std::nullopt keeps an encoding that every receiver accepts. Use it when the session is not
      *     known at construction time.
-     *   - When a session is passed, the session later given to SendCommandRequest or SendGroupCommandRequest
-     *     must be that same session. Otherwise the send fails with CHIP_ERROR_INVALID_ARGUMENT.
+     *   - Unicast must be sent on the construction session. Groupcast must use the construction group ID
+     *     and fabric index. A different destination fails with CHIP_ERROR_INVALID_ARGUMENT.
+     *   - An unavailable or released construction session causes encoding and sending to fail with
+     *     CHIP_ERROR_INCORRECT_STATE. A newer CASE session does not replace the construction session.
      *   - A timed invoke cannot be sent on a group session: adding a command to a timed CommandSender created
      *     for a group session fails with CHIP_ERROR_INVALID_ARGUMENT.
      */
@@ -623,20 +627,6 @@ private:
 
     CHIP_ERROR SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout);
 
-    void CaptureSessionInfo(const OptionalSessionHandleRef & aSession);
-
-    // Returns CHIP_ERROR_INVALID_ARGUMENT if a session was passed at construction and `session` parameter is not that session.
-    CHIP_ERROR CheckMatchesSessionInfo(const SessionHandle & session) const;
-
-    // Keeps mConstructionSession on the session passed at construction when a newer CASE session
-    // to the same peer is established.
-    class ConstructionSessionDelegate final : public SessionDelegate
-    {
-    public:
-        NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
-        void OnSessionReleased() override {}
-    };
-
     void OnResponseCallback(const ResponseData & aResponseData)
     {
         // mpExtendableCallback and mpCallback are mutually exclusive.
@@ -701,19 +691,11 @@ private:
     uint16_t mFinishedCommandCount       = 0;
     uint16_t mRemoteMaxPathsPerInvoke    = 1;
 
-    // Values read from the session passed at construction.
-    // mPeerInteractionModelRevision is std::nullopt when no session was passed or the peer revision is unknown.
-    // mConstructionSession holds that session for send-time identity checks; it clears if the session is released,
-    // and does not shift when a newer session to the same peer is established.
-    ConstructionSessionDelegate mConstructionSessionDelegate;
-    SessionHolderWithDelegate mConstructionSession{ mConstructionSessionDelegate };
-    std::optional<uint16_t> mPeerInteractionModelRevision;
+    RequestSession mRequestSession;
 
     State mState                = State::Idle;
     bool mSuppressResponse      = false;
     bool mTimedRequest          = false;
-    bool mHasSessionInfo        = false;
-    bool mSessionIsGroup        = false;
     bool mBufferAllocated       = false;
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;

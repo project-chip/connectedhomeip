@@ -183,23 +183,9 @@ InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::TimedRequest(cons
     return *this;
 }
 
-InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::RequestFlags(const bool aSuppressResponse, const bool aTimedRequest,
-                                                                            const std::optional<uint16_t> & aPeerRevision,
-                                                                            const bool aIsGroupcast)
+InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::RequestFlags(const RequestFlagsOptions & options)
 {
-    if (aIsGroupcast)
-    {
-        return *this;
-    }
-    const bool omitFalseFlags = aPeerRevision.has_value() && *aPeerRevision >= Revision::kFirstRevisionWithOptionalRequestFlags;
-    if (aSuppressResponse || !omitFalseFlags)
-    {
-        SuppressResponse(aSuppressResponse);
-    }
-    if (aTimedRequest || !omitFalseFlags)
-    {
-        TimedRequest(aTimedRequest);
-    }
+    mError = EncodeRequestFlags(options, TLV::ContextTag(Tag::kSuppressResponse), TLV::ContextTag(Tag::kTimedRequest));
     return *this;
 }
 

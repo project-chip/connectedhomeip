@@ -252,8 +252,9 @@ protected:
             chip::app::CommandPathParams commandPath = { endpointId, clusterId, commandId,
                                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
             auto secureSession                       = device->GetSecureSession();
-            const chip::SessionHandle & session      = secureSession.Value();
-            auto commandSender                       = std::make_unique<chip::app::CommandSender>(
+            VerifyOrReturnError(secureSession.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+            const chip::SessionHandle & session = secureSession.Value();
+            auto commandSender                  = std::make_unique<chip::app::CommandSender>(
                 mCallback, device->GetExchangeManager(), session, mTimedInteractionTimeoutMs.HasValue(),
                 mSuppressResponse.ValueOr(false), session->AllowsLargePayload());
 
