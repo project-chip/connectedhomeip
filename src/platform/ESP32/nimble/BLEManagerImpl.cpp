@@ -1717,7 +1717,10 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(struct ble_gap_event * gapEvent)
     rc = ble_gattc_exchange_mtu(gapEvent->connect.conn_handle, NULL, NULL);
     if (rc != 0)
     {
-        return CHIP_ERROR_INTERNAL;
+        // Optional: BTP negotiates its own size, and a peripheral that already started the exchange makes this
+        // return BLE_HS_EALREADY. Returning here skipped the failure handling in HandleGAPCentralConnect(): no
+        // connection error was reported and the pending connect timer later fired against a disabled host.
+        ChipLogError(DeviceLayer, "ble_gattc_exchange_mtu failed: %d, continuing", rc);
     }
 
     return HandleGAPCentralConnect(gapEvent);

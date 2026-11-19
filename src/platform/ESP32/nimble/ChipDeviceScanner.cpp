@@ -19,6 +19,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ESP32/ChipDeviceScanner.h>
+#include <platform/PlatformManager.h>
 
 #define CHIPoBLE_SERVICE_UUID 0xFFF6
 
@@ -81,6 +82,11 @@ int ChipDeviceScanner::OnBleCentralEvent(struct ble_gap_event * event, void * ar
     {
     case BLE_GAP_EVENT_DISC_COMPLETE: {
         scanner->mIsScanning = false;
+        // The scan timed out: report it like StopScan() does, or the pending connection never completes.
+        // This runs on the NimBLE host task, so hand it to the CHIP thread.
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(
+            [](intptr_t arg) { reinterpret_cast<ChipDeviceScanner *>(arg)->mDelegate->OnScanComplete(); },
+            reinterpret_cast<intptr_t>(scanner)));
         return 0;
     }
 
