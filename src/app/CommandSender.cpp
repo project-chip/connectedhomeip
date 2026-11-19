@@ -136,6 +136,7 @@ CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & sessi
 {
     ReturnErrorOnFailure(mRequestSession.CheckSession(session));
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!session->IsGroupSession(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     ReturnErrorOnFailure(Finalize(mPendingInvokeData));
 
