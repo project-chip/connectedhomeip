@@ -80,6 +80,7 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
             if streams.videoStreamID == videoStreamID:
                 return streams.viewport
         asserts.assert_fail(f"Stream {videoStreamID} not found in DPTZStreams")
+        return None
 
     def pics_TC_AVSUM_2_8(self) -> list[str]:
         return [
@@ -91,7 +92,6 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
                              has_feature(Clusters.CameraAvStreamManagement,
                                          Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo))
     async def test_TC_AVSUM_2_8(self):
-        cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         clusterAVSTR = Clusters.Objects.CameraAvStreamManagement
         attributesAVSTR = clusterAVSTR.Attributes
         endpoint = self.get_endpoint()
