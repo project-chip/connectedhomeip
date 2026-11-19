@@ -51,7 +51,7 @@ ALARM_BIT = int(AlarmBitmap.kUnderCurrent)
 class TC_ESALM_3_8(ElectricalAlarmTestBaseHelper):
 
     def pics_TC_ESALM_3_8(self) -> list[str]:
-        return ["ESALM.S", "ESALM.S.F28", "ESALM.S.E0000"]
+        return ["ESALM.S", "ESALM.S.F1c", "ESALM.S.E00"]
 
     def steps_TC_ESALM_3_8(self) -> list[TestStep]:
         return self.alarm_lifecycle_steps(ALARM_NAME, ALARM_BIT)
