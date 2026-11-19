@@ -219,14 +219,14 @@ static bool ShouldRejectOrphanSessionEstablishmentResponse(const PacketHeader & 
     }
 
     // Duplicates keep the behavior of Matter spec section 8.5.10.5.2 ("Unsolicited Message
-    // Processing"): they are only acknowledged. A late retransmission of a message that was
-    // already processed before its exchange closed therefore falls through to
-    // SendStandaloneAckIfNeeded, and never gets a report.
+    // Processing"): they are only acknowledged. When an unauthenticated session remains in the
+    // table (for example on static pools after a completed handshake, or while another exchange or
+    // SessionHolder keeps it alive), a late retransmission of a message that was already processed
+    // before its exchange closed falls through to SendStandaloneAckIfNeeded and never gets a report.
     //
-    // Trade-off: if the report sent for the first copy is lost, its retransmission is also a duplicate, so
-    // the peer only gets an ack and waits for its handshake timeout, as it did before reports were sent.
-    // This only applies while the unauthenticated session is still in the table (static pools, or a
-    // retained SessionHolder). Otherwise SessionManager has no duplicate state and answers every copy.
+    // Conversely, when a non-duplicate orphan response is rejected below and its unauthenticated
+    // session has no open exchanges, OnMessageReceived marks that session for eviction so that a
+    // lost StatusReport does not cause the peer's retransmission to be treated as a duplicate.
     if (msgFlags.Has(MessageFlagValues::kDuplicateMessage))
     {
         return false;
@@ -353,6 +353,23 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             CHIP_ERROR err =
                 mSessionManager->SendUnauthenticatedErrorStatusReport(packetHeader, payloadHeader, unauthSession->GetPeerAddress());
             LogErrorOnFailure(err);
+
+            // Per "Orphaned Session Establishment Responses", remove the unsecured session context if
+            // it now has no open exchanges, so a lost StatusReport does not leave a committed peer
+            // message counter that turns the peer's retransmission into an ack-only duplicate.
+            bool hasOpenExchange = false;
+            mContextPool.ForEachActiveObject([&](const auto * ec) {
+                if (ec->mSession.Contains(session))
+                {
+                    hasOpenExchange = true;
+                    return Loop::Break;
+                }
+                return Loop::Continue;
+            });
+            if (!hasOpenExchange)
+            {
+                unauthSession->MarkForEviction();
+            }
             return;
         }
     }

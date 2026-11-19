@@ -74,7 +74,24 @@ public:
     void Retain() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSession, 0>::Retain(); }
     void Release() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSession, 0>::Release(); }
 
-    bool IsActiveSession() const override { return true; }
+    bool IsActiveSession() const override { return !mMarkedForEviction; }
+    bool IsMarkedForEviction() const { return mMarkedForEviction; }
+
+    /**
+     * Mark this unauthenticated session for eviction and detach any attached SessionHolders.
+     *
+     * Callers holding a stack SessionHandle must release that handle before the underlying pool
+     * entry is reclaimed (see UnauthenticatedSessionTable::ReleaseHandleAndEvictIfMarked).
+     */
+    void MarkForEviction()
+    {
+        if (mMarkedForEviction)
+        {
+            return;
+        }
+        mMarkedForEviction = true;
+        NotifySessionReleased();
+    }
 
     ScopedNodeId GetPeer() const override { return ScopedNodeId(GetPeerNodeId(), kUndefinedFabricIndex); }
     ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(kUndefinedNodeId, kUndefinedFabricIndex); }
@@ -182,6 +199,7 @@ public:
 private:
     const NodeId mEphemeralInitiatorNodeId;
     const SessionRole mSessionRole;
+    bool mMarkedForEviction = false;
     PeerAddress mPeerAddress;
     System::Clock::Timestamp mLastActivityTime;     ///< Timestamp of last tx or rx
     System::Clock::Timestamp mLastPeerActivityTime; ///< Timestamp of last rx
@@ -294,6 +312,29 @@ public:
         return Optional<SessionHandle>::Missing();
     }
 
+    /**
+     * Clear a stack SessionHandle and, on static pools where ReferenceCounted::Release() does not
+     * return entries to mEntries, immediately release the underlying entry if it was marked for
+     * eviction and has no remaining references.
+     */
+    void ReleaseHandleAndEvictIfMarked(Optional<SessionHandle> & sessionHandle)
+    {
+        VerifyOrReturn(sessionHandle.HasValue());
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        // On heap pools, dropping the last SessionHandle calls UnauthenticatedSession::Release()
+        // -> ReleaseSelfToPool(), which reclaims the entry immediately.
+        sessionHandle.ClearValue();
+#else
+        UnauthenticatedSession * session = sessionHandle.Value()->AsUnauthenticatedSession();
+        const bool markedForEviction     = session->IsMarkedForEviction();
+        sessionHandle.ClearValue();
+        if (markedForEviction && session->GetReferenceCount() == 0)
+        {
+            mEntries.ReleaseObject(static_cast<EntryType *>(session));
+        }
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    }
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     void MarkSessionOverTCPForEviction(Transport::ActiveTCPConnectionState & conn)
     {
@@ -362,7 +403,8 @@ private:
     {
         UnauthenticatedSession * result = nullptr;
         mEntries.ForEachActiveObject([&](UnauthenticatedSession * entry) {
-            if (entry->GetSessionRole() == sessionRole && entry->GetEphemeralInitiatorNodeID() == ephemeralInitiatorNodeID &&
+            if (entry->IsActiveSession() && entry->GetSessionRole() == sessionRole &&
+                entry->GetEphemeralInitiatorNodeID() == ephemeralInitiatorNodeID &&
                 entry->GetPeerAddress().GetTransportType() == peerAddress.GetTransportType())
             {
                 result = entry;
@@ -379,10 +421,18 @@ private:
         System::Clock::Timestamp oldestTime = System::Clock::Timestamp(std::numeric_limits<System::Clock::Timestamp::rep>::max());
 
         mEntries.ForEachActiveObject([&](EntryType * entry) {
-            if (entry->GetReferenceCount() == 0 && entry->GetLastActivityTime() < oldestTime)
+            if (entry->GetReferenceCount() == 0)
             {
-                result     = entry;
-                oldestTime = entry->GetLastActivityTime();
+                if (entry->IsMarkedForEviction())
+                {
+                    result = entry;
+                    return Loop::Break;
+                }
+                if (entry->GetLastActivityTime() < oldestTime)
+                {
+                    result     = entry;
+                    oldestTime = entry->GetLastActivityTime();
+                }
             }
             return Loop::Continue;
         });

@@ -1016,6 +1016,10 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
     {
         ChipLogError(Inet, "Received UNSECURED message was not processed.");
     }
+
+    // Release the stack SessionHandle before evicting any session marked by OnMessageReceived, so
+    // the pool entry is never destroyed while optionalSession still holds a reference to it.
+    mUnauthenticatedSessions.ReleaseHandleAndEvictIfMarked(optionalSession);
 }
 
 void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPacketHeader,

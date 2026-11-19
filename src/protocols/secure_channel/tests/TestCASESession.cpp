@@ -3233,8 +3233,10 @@ TEST_F(TestCASESession, DuplicateSigma2AfterInitiatorSessionReleasedDoesNotAffec
     // detected and SessionManager answers it with exactly one failure StatusReport.
     EXPECT_EQ(loopbackDelegate.mStatusReportCount, 1u);
 #else
-    // With static pools, the released UnauthenticatedSession stays in the table until its slot is
-    // reused, so the duplicate is still detected and only acknowledged.
+    // With static pools, a completed handshake's UnauthenticatedSession stays in the table until
+    // its slot is reused (unlike an orphan-rejected one, which is evicted when no exchanges remain
+    // open), so the late copy of the already-processed Sigma2 is still detected as a duplicate and
+    // only acknowledged.
     EXPECT_EQ(loopbackDelegate.mStatusReportCount, 0u);
     EXPECT_EQ(loopbackDelegate.mStandaloneAckCount, 1u);
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
@@ -3266,6 +3268,253 @@ TEST_F(TestCASESession, DuplicateSigma2AfterInitiatorSessionReleasedDoesNotAffec
     EXPECT_EQ(delegateCommissioner2.mNumPairingComplete, 1u);
     EXPECT_EQ(delegateCommissioner2.mNumPairingErrors, 0u);
 
+    gPairingServer.Shutdown();
+}
+
+// Captures and drops the responder's first CASE_Sigma2, optionally drops the first emitted
+// StatusReport, and validates that every emitted StatusReport carries
+// (GeneralStatusCode::kFailure, Protocols::SecureChannel::Id, kProtocolCodeInvalidParam).
+class OrphanSigma2StatusReportLossDelegate : public Testing::LoopbackTransportDelegate
+{
+public:
+    OrphanSigma2StatusReportLossDelegate(Testing::LoopbackTransport & loopback, bool dropFirstStatusReport) :
+        mLoopback(loopback), mDropFirstStatusReport(dropFirstStatusReport)
+    {}
+
+    void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+    {
+        System::PacketBufferHandle buf = message.CloneData();
+        VerifyOrReturn(!buf.IsNull());
+
+        PacketHeader packetHeader;
+        VerifyOrReturn(packetHeader.DecodeAndConsume(buf) == CHIP_NO_ERROR);
+        VerifyOrReturn(!packetHeader.IsEncrypted());
+
+        PayloadHeader payloadHeader;
+        VerifyOrReturn(payloadHeader.DecodeAndConsume(buf) == CHIP_NO_ERROR);
+        VerifyOrReturn(payloadHeader.HasProtocol(Protocols::SecureChannel::Id));
+
+        if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2))
+        {
+            ++mSigma2Count;
+            if (mSigma2Count == 1)
+            {
+                mFirstSigma2                                = message.CloneData();
+                mFirstSigma2Counter                         = packetHeader.GetMessageCounter();
+                mPeerAddress                                = Testing::LoopbackTransport::LoopbackPeer(peer);
+                mLoopback.mNumMessagesToAllowBeforeDropping = 0;
+                mLoopback.mNumMessagesToDrop                = 1;
+            }
+        }
+        else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
+        {
+            ++mStatusReportCount;
+            mLastStatusReportExchangeId = payloadHeader.GetExchangeID();
+
+            Protocols::SecureChannel::StatusReport report;
+            if (report.Parse(std::move(buf)) == CHIP_NO_ERROR &&
+                report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kFailure &&
+                report.GetProtocolId() == Protocols::SecureChannel::Id &&
+                report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeInvalidParam)
+            {
+                ++mValidFailureStatusReportCount;
+            }
+
+            if (mDropFirstStatusReport && mStatusReportCount == 1)
+            {
+                mLoopback.mNumMessagesToAllowBeforeDropping = 0;
+                mLoopback.mNumMessagesToDrop                = 1;
+            }
+        }
+        else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+        {
+            if (mInitiatorAbandoned)
+            {
+                ++mPostAbandonStandaloneAckCount;
+            }
+        }
+    }
+
+    System::PacketBufferHandle mFirstSigma2;
+    Transport::PeerAddress mPeerAddress;
+    uint32_t mFirstSigma2Counter            = 0;
+    uint32_t mSigma2Count                   = 0;
+    uint32_t mStatusReportCount             = 0;
+    uint32_t mValidFailureStatusReportCount = 0;
+    uint32_t mPostAbandonStandaloneAckCount = 0;
+    uint16_t mLastStatusReportExchangeId    = 0;
+    bool mInitiatorAbandoned                = false;
+
+private:
+    Testing::LoopbackTransport & mLoopback;
+    bool mDropFirstStatusReport = false;
+};
+
+// Verifies that when an orphaned CASE_Sigma2 hits ExchangeManager::OnMessageReceived while the
+// abandoned initiator UnauthenticatedSession is still in UnauthenticatedSessionTable (both via
+// static-pool retention and via an explicit SessionHolder), the unused UnauthenticatedSession is
+// evicted after sending the first failure StatusReport. Consequently, if that first StatusReport is
+// lost and the responder retransmits the exact same Sigma2 packet (same message counter), a second
+// failure StatusReport is sent instead of swallowing the retransmission as a duplicate StandaloneAck.
+TEST_F(TestCASESession, OrphanSigma2EvictsUnusedUnauthSessionAllowingLostStatusReportRetry)
+{
+    for (bool retainInitiatorSession : { false, true })
+    {
+        TestCASESecurePairingDelegate delegateCommissioner;
+        auto pairingCommissioner = chip::Platform::MakeUnique<CASESession>();
+        ASSERT_NE(pairingCommissioner, nullptr);
+        pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+        auto & loopback = GetLoopback();
+        OrphanSigma2StatusReportLossDelegate loopbackDelegate(loopback, /* dropFirstStatusReport = */ true);
+        loopback.SetLoopbackTransportDelegate(&loopbackDelegate);
+
+        EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                               nullptr, nullptr, &gDeviceGroupDataProvider),
+                  CHIP_NO_ERROR);
+
+        ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner.get());
+        ASSERT_NE(contextCommissioner, nullptr);
+
+        SessionHolder retainedSession;
+        if (retainInitiatorSession)
+        {
+            retainedSession.Grab(contextCommissioner->GetSessionHandle());
+        }
+
+        EXPECT_EQ(pairingCommissioner->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                        ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                        nullptr, nullptr, &delegateCommissioner,
+                                                        Optional<ReliableMessageProtocolConfig>::Missing()),
+                  CHIP_NO_ERROR);
+        ServiceEvents();
+
+        ASSERT_EQ(loopbackDelegate.mSigma2Count, 1u);
+        ASSERT_FALSE(loopbackDelegate.mFirstSigma2.IsNull());
+        EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kSentSigma2);
+
+        // Abandon the initiator handshake, closing its ExchangeContext.
+        loopbackDelegate.mInitiatorAbandoned = true;
+        pairingCommissioner.reset();
+        if (retainInitiatorSession)
+        {
+            EXPECT_TRUE(retainedSession);
+        }
+
+        // First orphaned Sigma2 arrives; its StatusReport is dropped on the wire, and the unused
+        // UnauthenticatedSession is evicted from UnauthenticatedSessionTable.
+        System::PacketBufferHandle retrySigma2First = loopbackDelegate.mFirstSigma2.CloneData();
+        ASSERT_FALSE(retrySigma2First.IsNull());
+        GetSecureSessionManager().OnMessageReceived(loopbackDelegate.mPeerAddress, std::move(retrySigma2First));
+        ServiceEvents();
+
+        EXPECT_FALSE(retainedSession);
+        EXPECT_EQ(loopbackDelegate.mStatusReportCount, 1u);
+        EXPECT_EQ(loopbackDelegate.mValidFailureStatusReportCount, 1u);
+        EXPECT_EQ(loopbackDelegate.mPostAbandonStandaloneAckCount, 0u);
+        EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kSentSigma2);
+
+        // Responder retransmits the exact same Sigma2 packet (identical message counter). Because
+        // the unused UnauthenticatedSession was evicted, it is answered with a second failure
+        // StatusReport rather than a duplicate StandaloneAck, aborting the half-open responder.
+        System::PacketBufferHandle retrySigma2Second = loopbackDelegate.mFirstSigma2.CloneData();
+        ASSERT_FALSE(retrySigma2Second.IsNull());
+        GetSecureSessionManager().OnMessageReceived(loopbackDelegate.mPeerAddress, std::move(retrySigma2Second));
+        ServiceEvents();
+
+        EXPECT_EQ(loopbackDelegate.mStatusReportCount, 2u);
+        EXPECT_EQ(loopbackDelegate.mValidFailureStatusReportCount, 2u);
+        EXPECT_EQ(loopbackDelegate.mPostAbandonStandaloneAckCount, 0u);
+        EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kInitialized);
+
+        loopback.SetLoopbackTransportDelegate(nullptr);
+        gPairingServer.Shutdown();
+    }
+}
+
+// Verifies that while an initiator has an active open ExchangeContext (X1) on an
+// UnauthenticatedSession (E1), an orphaned CASE_Sigma2 matching E1 on a different ExchangeId
+// (X2 != X1) is answered with a failure StatusReport on X2 WITHOUT evicting E1, allowing X1's
+// legitimate CASE handshake to complete.
+TEST_F(TestCASESession, OrphanSigma2OnDifferentExchangeDoesNotEvictLiveHandshakeSession)
+{
+    TestCASESecurePairingDelegate delegateCommissioner;
+    auto pairingCommissioner = chip::Platform::MakeUnique<CASESession>();
+    ASSERT_NE(pairingCommissioner, nullptr);
+    pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    auto & loopback = GetLoopback();
+    OrphanSigma2StatusReportLossDelegate loopbackDelegate(loopback, /* dropFirstStatusReport = */ false);
+    loopback.SetLoopbackTransportDelegate(&loopbackDelegate);
+
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner.get());
+    ASSERT_NE(contextCommissioner, nullptr);
+
+    const uint16_t liveExchangeId   = contextCommissioner->GetExchangeId();
+    const uint16_t orphanExchangeId = static_cast<uint16_t>(liveExchangeId ^ 0xFFFFu);
+    ASSERT_NE(orphanExchangeId, liveExchangeId);
+    const NodeId initiatorEphNodeId =
+        contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->GetEphemeralInitiatorNodeID();
+
+    ReliableMessageProtocolConfig fastMrpConfig(System::Clock::Milliseconds32(64), System::Clock::Milliseconds32(64));
+    EXPECT_EQ(pairingCommissioner->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                    ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                    nullptr, nullptr, &delegateCommissioner, MakeOptional(fastMrpConfig)),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    // First legitimate Sigma2 on X1 was dropped, keeping X1 open in State::kSentSigma1 on E1.
+    ASSERT_EQ(loopbackDelegate.mSigma2Count, 1u);
+    EXPECT_EQ(pairingCommissioner->GetState(), CASESession::State::kSentSigma1);
+    EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kSentSigma2);
+
+    // Inject an orphaned CASE_Sigma2 targeting E1 on a different exchange (X2 != X1). Use a
+    // counter 50 below the responder's Sigma2 counter so the responder's upcoming retransmission
+    // on X1 advances the unencrypted peer counter cleanly as a future counter.
+    {
+        System::PacketBufferHandle orphanSigma2 = System::PacketBufferHandle::New(64);
+        ASSERT_FALSE(orphanSigma2.IsNull());
+
+        PayloadHeader payloadHeader;
+        payloadHeader.SetExchangeID(orphanExchangeId)
+            .SetMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2)
+            .SetInitiator(false)
+            .SetNeedsAck(true);
+        ASSERT_EQ(payloadHeader.EncodeBeforeData(orphanSigma2), CHIP_NO_ERROR);
+
+        PacketHeader packetHeader;
+        packetHeader.SetSessionId(0)
+            .SetSessionType(Header::SessionType::kUnicastSession)
+            .SetMessageCounter(loopbackDelegate.mFirstSigma2Counter - 50u)
+            .SetDestinationNodeId(initiatorEphNodeId);
+        ASSERT_EQ(packetHeader.EncodeBeforeData(orphanSigma2), CHIP_NO_ERROR);
+
+        GetSecureSessionManager().OnMessageReceived(loopbackDelegate.mPeerAddress, std::move(orphanSigma2));
+        ServiceEvents();
+    }
+
+    // A failure StatusReport was sent on X2, while E1 remains active and bound to X1.
+    EXPECT_EQ(loopbackDelegate.mStatusReportCount, 1u);
+    EXPECT_EQ(loopbackDelegate.mValidFailureStatusReportCount, 1u);
+    EXPECT_EQ(loopbackDelegate.mLastStatusReportExchangeId, orphanExchangeId);
+    ASSERT_TRUE(contextCommissioner->HasSessionHandle());
+    EXPECT_TRUE(contextCommissioner->GetSessionHandle()->IsActiveSession());
+    EXPECT_FALSE(contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->IsMarkedForEviction());
+
+    // Allow the responder's MRP retransmission of X1's legitimate Sigma2 to complete the handshake.
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(5000), [&] { return delegateCommissioner.mNumPairingComplete >= 1; });
+    ServiceEvents();
+
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 0u);
+    ASSERT_TRUE(delegateCommissioner.GetSessionHolder());
+    EXPECT_TRUE(delegateCommissioner.GetSessionHolder()->AsSecureSession()->IsActiveSession());
+
+    loopback.SetLoopbackTransportDelegate(nullptr);
     gPairingServer.Shutdown();
 }
 

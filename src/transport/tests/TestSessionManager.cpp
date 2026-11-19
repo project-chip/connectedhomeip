@@ -1258,4 +1258,48 @@ TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
     sessionManager.Shutdown();
 }
 
+TEST_F(TestSessionManager, UnauthenticatedSessionTableEvictionLifecycle)
+{
+    IPAddress addr;
+    ASSERT_TRUE(IPAddress::FromString("::1", addr));
+    const Transport::PeerAddress peer = Transport::PeerAddress::UDP(addr, CHIP_PORT);
+
+    constexpr NodeId kEphNode1 = 0x1111;
+    constexpr NodeId kEphNode2 = 0x2222;
+    constexpr NodeId kEphNode3 = 0x3333;
+
+    Transport::UnauthenticatedSessionTable<2> sessionTable;
+
+    Optional<SessionHandle> dispatchHandle = sessionTable.AllocInitiator(kEphNode1, peer, GetDefaultMRPConfig());
+    ASSERT_TRUE(dispatchHandle.HasValue());
+
+    SessionHolder holder(dispatchHandle.Value());
+    EXPECT_TRUE(holder);
+
+    Optional<SessionHandle> extraStackHandle = sessionTable.FindInitiator(kEphNode1, peer);
+    ASSERT_TRUE(extraStackHandle.HasValue());
+
+    Optional<SessionHandle> secondSession = sessionTable.AllocInitiator(kEphNode2, peer, GetDefaultMRPConfig());
+    ASSERT_TRUE(secondSession.HasValue());
+
+    // Mark the first session for eviction while two stack SessionHandles still reference it.
+    dispatchHandle.Value()->AsUnauthenticatedSession()->MarkForEviction();
+    EXPECT_FALSE(holder);
+    EXPECT_FALSE(dispatchHandle.Value()->IsActiveSession());
+    EXPECT_TRUE(dispatchHandle.Value()->AsUnauthenticatedSession()->IsMarkedForEviction());
+    EXPECT_FALSE(sessionTable.FindInitiator(kEphNode1, peer).HasValue());
+
+    // Releasing the first stack handle must not destroy the entry while extraStackHandle still holds a reference.
+    sessionTable.ReleaseHandleAndEvictIfMarked(dispatchHandle);
+    EXPECT_FALSE(dispatchHandle.HasValue());
+    EXPECT_EQ(extraStackHandle.Value()->AsUnauthenticatedSession()->GetReferenceCount(), 1u);
+
+    // Releasing the final stack handle reclaims the entry immediately (including on static pools).
+    sessionTable.ReleaseHandleAndEvictIfMarked(extraStackHandle);
+    EXPECT_FALSE(extraStackHandle.HasValue());
+
+    Optional<SessionHandle> thirdSession = sessionTable.AllocInitiator(kEphNode3, peer, GetDefaultMRPConfig());
+    EXPECT_TRUE(thirdSession.HasValue());
+}
+
 } // namespace
