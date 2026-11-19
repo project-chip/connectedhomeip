@@ -19,8 +19,6 @@
 #include <app/clusters/general-commissioning-server/CodegenIntegration.h>
 #include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <app/clusters/thread-border-router-management-server/CodegenIntegration.h>
-#include <app/util/attribute-storage.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 namespace chip {
 namespace app {
@@ -51,32 +49,6 @@ ServerInstance::ServerInstance(EndpointId endpointId, Delegate * delegate, FailS
         endpointId,
         ThreadBorderRouterManagementCluster::Config(*delegate, failSafeContext, sBreadcrumbTracker, DeviceLayer::PlatformMgr()))
 {}
-
-ServerInstance::~ServerInstance()
-{
-    // Note: Unregister always errors out if Init() was never called.
-    // We expect Init() to essentially be always called if the instance is used.
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
-                     mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(Id), err.Format());
-    }
-}
-
-CHIP_ERROR ServerInstance::Init()
-{
-    // Check if the cluster has been selected in zap
-    VerifyOrDie(emberAfContainsServer(mCluster.Cluster().GetPaths()[0].mEndpointId, Id) == true);
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
-                     mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(Id), err.Format());
-    }
-    return err;
-}
 
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters

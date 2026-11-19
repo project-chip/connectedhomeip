@@ -18,6 +18,7 @@
 # NXP factory data providers.
 set(NXP_EXAMPLE_COMMON_DIR ${CHIP_ROOT}/examples/platform/nxp/common)
 set(NXP_EXAMPLE_ZEPHYR_DIR ${CHIP_ROOT}/examples/platform/nxp/zephyr)
+get_filename_component(NXP_MATTER_SUPPORT_DIR ${CHIP_ROOT}/third_party/nxp/nxp_matter_support REALPATH)
 # Use the NXP AppTask unless the user provides their own.
 if(APP_TASK_IMPL_HEADER STREQUAL "")
     set(APP_TASK_IMPL_HEADER "NxpAppTask.h")
@@ -36,7 +37,15 @@ if(CONFIG_CHIP_FACTORY_DATA)
     target_sources(app PRIVATE
         ${CHIP_ROOT}/src/platform/nxp/zephyr/FactoryDataProviderImpl.cpp
         ${CHIP_ROOT}/src/platform/nxp/common/factory_data/legacy/FactoryDataProvider.cpp
-    )   
+    )
+    if (CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION)
+        target_sources(app PRIVATE
+            ${NXP_MATTER_SUPPORT_DIR}/gn_build/rt_sdk/sdk_hook/els_pkc/ELSFactoryData.c
+        )
+        target_include_directories(app PRIVATE
+            ${NXP_MATTER_SUPPORT_DIR}/gn_build/rt_sdk/sdk_hook/els_pkc
+        )
+    endif()
 endif()
 
 include(${CHIP_ROOT}/config/nxp/chip-module/generate_factory_data.cmake)

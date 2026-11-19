@@ -1028,7 +1028,7 @@ cluster NetworkCommissioning = 49 {
     kWPAPersonal = 0x4 [spec_name = "WPA-PERSONAL"];
     kWPA2Personal = 0x8 [spec_name = "WPA2-PERSONAL"];
     kWPA3Personal = 0x10 [spec_name = "WPA3-PERSONAL"];
-    kWPA3MatterPDC = 0x20 [spec_name = "WPA3-Matter-PDC"];
+    kIEEE8021X = 0x20 [spec_name = "IEEE8021X"];
   }
 
   struct NetworkInfoStruct {
@@ -2068,7 +2068,7 @@ cluster TemperatureMeasurement = 1026 {
 
 /** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
 cluster RelativeHumidityMeasurement = 1029 {
-  revision 3;
+  revision 5;
 
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;

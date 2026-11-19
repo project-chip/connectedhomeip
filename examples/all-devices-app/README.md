@@ -79,6 +79,7 @@ The application supports the following device types (specified via the
 -   `chime`
 -   `closure-barrier`
 -   `closure-cabinet`
+-   `closure-controller`
 -   `closure-door`
 -   `closure-garage-door`
 -   `closure-gate`
@@ -185,6 +186,12 @@ Build the application using the following command:
 ```bash
 ./scripts/build/build_examples.py --target linux-x64-all-devices-boringssl-no-ble build
 ```
+
+[!NOTE] The `linux-x64-*` targets require a Linux build host (e.g. CI or a
+container). On macOS, use `darwin-arm64-all-devices-boringssl-no-ble` for Apple
+silicon, or `darwin-x64-all-devices-boringssl-no-ble` for Intel Macs. Run
+`./scripts/build/build_examples.py targets` to list the targets available on
+your host.
 
 ## Running the Application
 

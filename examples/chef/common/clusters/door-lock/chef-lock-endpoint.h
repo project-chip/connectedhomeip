@@ -95,8 +95,8 @@ public:
     bool Unbolt(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
                 const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
 
-    bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const;
-    bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
+    bool GetUser(UserIndex userIndex, EmberAfPluginDoorLockUserInfo & user) const;
+    bool SetUser(UserIndex userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
                  uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
                  const CredentialStruct * credentials, size_t totalCredentials);
 
@@ -106,22 +106,22 @@ public:
 
     bool SendLockAlarm(AlarmCodeEnum alarmCode) const;
 
-    bool GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
+    bool GetCredential(CredentialIndex credentialIndex, CredentialTypeEnum credentialType,
                        EmberAfPluginDoorLockCredentialInfo & credential) const;
 
-    bool SetCredential(uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
+    bool SetCredential(CredentialIndex credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
                        DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
                        const chip::ByteSpan & credentialData);
 
-    DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule);
-    DlStatus GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule);
-    DlStatus GetSchedule(uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule);
+    DlStatus GetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule);
+    DlStatus GetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule);
+    DlStatus GetSchedule(ScheduleIndex holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule);
 
-    DlStatus SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour,
-                         uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
-    DlStatus SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status, uint32_t localStartTime,
+    DlStatus SetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, DlScheduleStatus status, DaysMaskMap daysMask,
+                         uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+    DlStatus SetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, DlScheduleStatus status, uint32_t localStartTime,
                          uint32_t localEndTime);
-    DlStatus SetSchedule(uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
+    DlStatus SetSchedule(ScheduleIndex holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
                          OperatingModeEnum operatingMode);
 
 private:

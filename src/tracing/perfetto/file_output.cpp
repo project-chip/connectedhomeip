@@ -38,12 +38,17 @@ CHIP_ERROR FileTraceOutput::Open(const char * file_name)
     // Close any existing files
     Close();
 
-    std::error_code ec;
-    std::filesystem::path filePath(file_name);
-    // Create directories if they don't exist
-    if (!std::filesystem::create_directories(filePath.remove_filename(), ec))
+    // Create the leading directories if they don't exist. create_directories() returns false
+    // when they already exist, so only the error code signals a failure.
+    std::filesystem::path directory = std::filesystem::path(file_name).parent_path();
+    if (!directory.empty())
     {
-        return CHIP_ERROR_POSIX(ec.value());
+        std::error_code ec;
+        std::filesystem::create_directories(directory, ec);
+        if (ec)
+        {
+            return CHIP_ERROR_POSIX(ec.value());
+        }
     }
 
     // Create a trace file and start sending data to it
