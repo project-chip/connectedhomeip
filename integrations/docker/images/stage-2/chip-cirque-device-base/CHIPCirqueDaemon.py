@@ -174,7 +174,84 @@ def _wait_adopted_exit(pid: int, timeout: float = 1.0) -> None:
         time.sleep(0.05)
 
 
-def _cleanup_children():
+_CLEANUP_GRACE_SECONDS = 5.0
+_MAX_FOLLOWUP_WAVES = 2
+
+
+def _signal_adopted_children(
+    adopted: list[tuple[int, int]],
+    signaled_pids: set[int],
+    signaled_pgids: set[int],
+    already_hit_pgids: set[int] | None = None,
+) -> None:
+    """Forward SIGTERM to newly discovered adopted children."""
+    newly_signaled_pgids: set[int] = (
+        set(already_hit_pgids) if already_hit_pgids is not None else set()
+    )
+    for pid, pgid in adopted:
+        if pid in signaled_pids:
+            continue
+        if pgid not in signaled_pgids:
+            _signal_target(pid, pgid, signal.SIGTERM, signaled_pgids)
+            if pgid in signaled_pgids:
+                newly_signaled_pgids.add(pgid)
+        elif pgid not in newly_signaled_pgids:
+            # Group was already signaled in an earlier pass; target only this
+            # newly adopted descendant without re-signaling its group.
+            _signal_target(pid, None, signal.SIGTERM)
+        signaled_pids.add(pid)
+
+
+def _run_cleanup_wave(
+    terminating: list[subprocess.Popen],
+    adopted: list[tuple[int, int]],
+    signaled_pids: set[int],
+    signaled_pgids: set[int],
+    killed_pids: set[int],
+) -> None:
+    """Wait up to grace window for children to exit, then SIGKILL stragglers."""
+    deadline = time.monotonic() + _CLEANUP_GRACE_SECONDS
+    while (terminating or adopted) and time.monotonic() < deadline:
+        terminating, live_adopted = _collect_live_children(terminating)
+        adopted = [
+            (pid, pgid)
+            for pid, pgid in live_adopted
+            if pid not in killed_pids
+        ]
+        _signal_adopted_children(adopted, signaled_pids, signaled_pgids)
+        if terminating or adopted:
+            time.sleep(0.1)
+
+    terminating, live_adopted = _collect_live_children(terminating)
+    adopted = [
+        (pid, pgid) for pid, pgid in live_adopted if pid not in killed_pids
+    ]
+
+    # Fallback: SIGKILL any remaining signaled children that didn't terminate
+    # in time; unsignaled adoptees get a follow-up SIGTERM wave.
+    for proc in terminating:
+        log.warning(
+            "Child PID %s did not terminate in time; killing", proc.pid
+        )
+        _signal_target(proc.pid, proc.pid, signal.SIGKILL)
+        killed_pids.add(proc.pid)
+        try:
+            proc.wait(timeout=1.0)
+        except subprocess.TimeoutExpired:
+            log.debug("Timed out waiting for killed child %s", proc.pid)
+
+    for pid, pgid in adopted:
+        if pid not in signaled_pids:
+            continue
+        log.warning(
+            "Adopted child PID %s did not terminate in time; killing", pid
+        )
+        _signal_target(pid, pgid, signal.SIGKILL)
+        killed_pids.add(pid)
+        _wait_adopted_exit(pid)
+
+
+def _cleanup_children() -> None:
     """Forward SIGTERM to all child processes/groups and reap them."""
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
     signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -193,50 +270,50 @@ def _cleanup_children():
         len(adopted),
     )
 
-    signaled_pids: set[int] = set()
+    signaled_pids: set[int] = {proc.pid for proc in terminating}
     signaled_pgids: set[int] = set()
+    killed_pids: set[int] = set()
     still_terminating = []
     for proc in terminating:
         if _signal_target(proc.pid, proc.pid, signal.SIGTERM, signaled_pgids):
-            signaled_pids.add(proc.pid)
             still_terminating.append(proc)
         else:
             proc.poll()
     terminating = still_terminating
 
-    for pid, pgid in adopted:
-        if pid not in signaled_pids and pgid not in signaled_pgids:
-            _signal_target(pid, pgid, signal.SIGTERM, signaled_pgids)
-        signaled_pids.add(pid)
+    _signal_adopted_children(
+        adopted,
+        signaled_pids,
+        signaled_pgids,
+        already_hit_pgids=signaled_pgids,
+    )
 
-    # Wait up to 5 seconds for tracked and adopted children to exit cleanly
-    deadline = time.monotonic() + 5.0
-    while (terminating or adopted) and time.monotonic() < deadline:
-        terminating, adopted = _collect_live_children(terminating)
-        for pid, pgid in adopted:
-            if pid not in signaled_pids and pgid not in signaled_pgids:
-                _signal_target(pid, pgid, signal.SIGTERM, signaled_pgids)
-            signaled_pids.add(pid)
-        if terminating or adopted:
-            time.sleep(0.1)
-
-    terminating, adopted = _collect_live_children(terminating)
-
-    # Fallback: SIGKILL any remaining children that didn't terminate
-    for proc in terminating:
-        log.warning("Child PID %s did not terminate in time; killing", proc.pid)
-        _signal_target(proc.pid, proc.pid, signal.SIGKILL)
-        try:
-            proc.wait(timeout=1.0)
-        except subprocess.TimeoutExpired:
-            log.debug("Timed out waiting for killed child %s", proc.pid)
-
-    for pid, pgid in adopted:
-        log.warning(
-            "Adopted child PID %s did not terminate in time; killing", pid
+    for wave in range(_MAX_FOLLOWUP_WAVES + 1):
+        _run_cleanup_wave(
+            terminating,
+            adopted,
+            signaled_pids,
+            signaled_pgids,
+            killed_pids,
         )
-        _signal_target(pid, pgid, signal.SIGKILL)
-        _wait_adopted_exit(pid)
+
+        terminating = []
+        _, next_adopted = _collect_live_children([])
+        adopted = [
+            (pid, pgid)
+            for pid, pgid in next_adopted
+            if pid not in signaled_pids and pid not in killed_pids
+        ]
+        if not adopted or wave == _MAX_FOLLOWUP_WAVES:
+            break
+
+        log.info(
+            "Found %d newly reparented adopted child(ren) after cleanup "
+            "wave %d; forwarding SIGTERM...",
+            len(adopted),
+            wave + 1,
+        )
+        _signal_adopted_children(adopted, signaled_pids, signaled_pgids)
 
     _reap_children()
 

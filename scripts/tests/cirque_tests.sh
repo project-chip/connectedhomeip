@@ -136,21 +136,38 @@ function cirquetest_bootstrap() {
         have_base_image=true
     fi
 
-    if [[ -n "$(cd "$REPO_DIR" && git status --porcelain -- integrations/docker/images/stage-2/chip-cirque-device-base)" ]]; then
+    local dirty_status
+    dirty_status=$(cd "$REPO_DIR" && git status --porcelain -- integrations/docker/images/stage-2/chip-cirque-device-base)
+
+    if [[ -n "$dirty_status" ]]; then
         local dirty_hash
         dirty_hash=$({
             "$cirque_base_dir/cachekey.sh"
-            (cd "$REPO_DIR" && git status --porcelain -- integrations/docker/images/stage-2/chip-cirque-device-base)
+            printf '%s\n' "$dirty_status"
         } | shasum | awk '{ print substr($1, 1, 12) }')
         build_version="${base_version}-dirty-${dirty_hash}"
-        if [[ "$have_base_image" = true ]]; then
-            build_args+=(--cache-from "$image_ref:$base_version")
-        fi
     elif [[ "$have_base_image" = true ]]; then
         local baked_checkout
         baked_checkout=$(docker image inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$image_ref:$base_version" 2>/dev/null | sed -n 's/^OT_BR_POSIX_CHECKOUT=//p' | head -n 1 || true)
         if [[ "$baked_checkout" != "$OT_BR_POSIX_CHECKOUT" ]]; then
             build_version="${base_version}-${OT_BR_POSIX_CHECKOUT:0:12}"
+        fi
+    else
+        # Initial inspect/pull failed, so OT_BR_POSIX_CHECKOUT on
+        # $image_ref:$base_version could not be verified. Qualify the tag so
+        # build.sh rebuilds instead of reusing an unverified tag if a later pull
+        # succeeds.
+        build_version="${base_version}-${OT_BR_POSIX_CHECKOUT:0:12}"
+    fi
+
+    if [[ "$build_version" != "$base_version" ]]; then
+        if [[ "$have_base_image" = true ]]; then
+            build_args+=(--cache-from "$image_ref:$base_version")
+        elif [[ "$base_version" =~ ^[0-9]+$ ]] && ((10#$base_version > 0)); then
+            local prev_image="$image_ref:$((10#$base_version - 1))"
+            if docker image inspect "$prev_image" >/dev/null 2>&1 || docker pull "$prev_image" >/dev/null 2>&1; then
+                build_args+=(--cache-from "$prev_image")
+            fi
         fi
     fi
 
