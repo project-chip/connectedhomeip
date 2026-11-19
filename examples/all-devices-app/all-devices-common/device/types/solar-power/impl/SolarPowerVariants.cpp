@@ -16,13 +16,119 @@
 
 #include <device/types/solar-power/impl/SolarPowerVariants.h>
 
-#include <device/types/solar-power/SolarPowerTags.h>
+#include <clusters/shared/Enums.h>
 
 namespace chip::app {
 namespace {
 
 using Role        = SimulatedElectricalSensor::Role;
 using PanelConfig = SimulatedSolarPower::PanelConfig;
+using NS          = Clusters::Globals::SemanticTagNamespaceId;
+
+constexpr uint8_t kTagAcPhase1 = 0x02;
+constexpr uint8_t kTagAcPhase2 = 0x03;
+constexpr uint8_t kTagAcPhase3 = 0x04;
+
+Span<const EndpointComposition::SemanticTag> ParallelPanel1Tag()
+{
+    static const EndpointComposition::SemanticTag kTag[] = {
+        { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 1 },
+    };
+    return Span(kTag);
+}
+
+Span<const EndpointComposition::SemanticTag> ParallelPanel2Tag()
+{
+    static const EndpointComposition::SemanticTag kTag[] = {
+        { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 2 },
+    };
+    return Span(kTag);
+}
+
+Span<const EndpointComposition::SemanticTag> ParallelPanel3Tag()
+{
+    static const EndpointComposition::SemanticTag kTag[] = {
+        { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 3 },
+    };
+    return Span(kTag);
+}
+
+Span<const EndpointComposition::SemanticTag> ParallelPanel4Tag()
+{
+    static const EndpointComposition::SemanticTag kTag[] = {
+        { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 4 },
+    };
+    return Span(kTag);
+}
+
+// Figure 19: two strings of two panels — string index (Number) plus panel index within the string (Position).
+Span<const EndpointComposition::SemanticTag> String1Panel1Tags()
+{
+    static const EndpointComposition::SemanticTag kTags[] = {
+        { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 1 },
+        { .mfgCode     = DataModel::NullNullable,
+          .namespaceID = to_underlying(NS::kPosition),
+          .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft) },
+    };
+    return Span(kTags);
+}
+
+Span<const EndpointComposition::SemanticTag> String1Panel2Tags()
+{
+    static const EndpointComposition::SemanticTag kTags[] = {
+        { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 1 },
+        { .mfgCode     = DataModel::NullNullable,
+          .namespaceID = to_underlying(NS::kPosition),
+          .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight) },
+    };
+    return Span(kTags);
+}
+
+Span<const EndpointComposition::SemanticTag> String2Panel1Tags()
+{
+    static const EndpointComposition::SemanticTag kTags[] = {
+        { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 2 },
+        { .mfgCode     = DataModel::NullNullable,
+          .namespaceID = to_underlying(NS::kPosition),
+          .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft) },
+    };
+    return Span(kTags);
+}
+
+Span<const EndpointComposition::SemanticTag> String2Panel2Tags()
+{
+    static const EndpointComposition::SemanticTag kTags[] = {
+        { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kNumber), .tag = 2 },
+        { .mfgCode     = DataModel::NullNullable,
+          .namespaceID = to_underlying(NS::kPosition),
+          .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight) },
+    };
+    return Span(kTags);
+}
+
+Span<const EndpointComposition::SemanticTag> PhaseATag()
+{
+    static const EndpointComposition::SemanticTag kTag[] = {
+        { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = kTagAcPhase1 },
+    };
+    return Span(kTag);
+}
+
+Span<const EndpointComposition::SemanticTag> PhaseBTag()
+{
+    static const EndpointComposition::SemanticTag kTag[] = {
+        { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = kTagAcPhase2 },
+    };
+    return Span(kTag);
+}
+
+Span<const EndpointComposition::SemanticTag> PhaseCTag()
+{
+    static const EndpointComposition::SemanticTag kTag[] = {
+        { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = kTagAcPhase3 },
+    };
+    return Span(kTag);
+}
 
 const EndpointComposition::SemanticTag kBaselineTag[] = {
     { .mfgCode     = DataModel::NullNullable,
@@ -46,10 +152,10 @@ const EndpointComposition::SemanticTag kFourParallelPanelsTag[] = {
 SimulatedSolarPower::Config FourParallelPanelsConfig()
 {
     static const PanelConfig kParallelPanels[] = {
-        { .tags = SolarPowerTags::ParallelPanel1Tag(), .role = Role::kBattery },
-        { .tags = SolarPowerTags::ParallelPanel2Tag(), .role = Role::kBattery },
-        { .tags = SolarPowerTags::ParallelPanel3Tag(), .role = Role::kBattery },
-        { .tags = SolarPowerTags::ParallelPanel4Tag(), .role = Role::kBattery },
+        { .tags = ParallelPanel1Tag(), .role = Role::kBattery },
+        { .tags = ParallelPanel2Tag(), .role = Role::kBattery },
+        { .tags = ParallelPanel3Tag(), .role = Role::kBattery },
+        { .tags = ParallelPanel4Tag(), .role = Role::kBattery },
     };
     return {
         .panels = Span(kParallelPanels),
@@ -66,8 +172,8 @@ const EndpointComposition::SemanticTag kTwoStringsTag[] = {
 SimulatedSolarPower::Config TwoStringsConfig()
 {
     static const PanelConfig kStrings[] = {
-        { .tags = SolarPowerTags::String1Tag(), .role = Role::kBattery },
-        { .tags = SolarPowerTags::String2Tag(), .role = Role::kBattery },
+        { .tags = ParallelPanel1Tag(), .role = Role::kBattery },
+        { .tags = ParallelPanel2Tag(), .role = Role::kBattery },
     };
     return {
         .panels = Span(kStrings),
@@ -84,10 +190,10 @@ const EndpointComposition::SemanticTag kTwoStringsFourPanelsTag[] = {
 SimulatedSolarPower::Config TwoStringsFourPanelsConfig()
 {
     static const PanelConfig kStringPanels[] = {
-        { .tags = SolarPowerTags::String1Panel1Tags(), .role = Role::kBattery },
-        { .tags = SolarPowerTags::String1Panel2Tags(), .role = Role::kBattery },
-        { .tags = SolarPowerTags::String2Panel1Tags(), .role = Role::kBattery },
-        { .tags = SolarPowerTags::String2Panel2Tags(), .role = Role::kBattery },
+        { .tags = String1Panel1Tags(), .role = Role::kBattery },
+        { .tags = String1Panel2Tags(), .role = Role::kBattery },
+        { .tags = String2Panel1Tags(), .role = Role::kBattery },
+        { .tags = String2Panel2Tags(), .role = Role::kBattery },
     };
     return {
         .panels = Span(kStringPanels),
@@ -104,9 +210,9 @@ const EndpointComposition::SemanticTag kThreePhaseTag[] = {
 SimulatedSolarPower::Config ThreePhaseConfig()
 {
     static const PanelConfig kPhaseSensors[] = {
-        { .tags = SolarPowerTags::PhaseATag(), .role = Role::kGrid },
-        { .tags = SolarPowerTags::PhaseBTag(), .role = Role::kGrid },
-        { .tags = SolarPowerTags::PhaseCTag(), .role = Role::kGrid },
+        { .tags = PhaseATag(), .role = Role::kGrid },
+        { .tags = PhaseBTag(), .role = Role::kGrid },
+        { .tags = PhaseCTag(), .role = Role::kGrid },
     };
     return {
         .outputSensorRole = Role::kAcPolyphaseOutput,

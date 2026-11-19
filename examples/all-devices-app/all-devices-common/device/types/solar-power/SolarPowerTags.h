@@ -22,19 +22,5 @@
 namespace chip::app::SolarPowerTags {
 
 Span<const EndpointComposition::SemanticTag> GridConnectionTag();
-Span<const EndpointComposition::SemanticTag> InverterTemperatureTag();
-Span<const EndpointComposition::SemanticTag> ParallelPanel1Tag();
-Span<const EndpointComposition::SemanticTag> ParallelPanel2Tag();
-Span<const EndpointComposition::SemanticTag> ParallelPanel3Tag();
-Span<const EndpointComposition::SemanticTag> ParallelPanel4Tag();
-Span<const EndpointComposition::SemanticTag> String1Tag();
-Span<const EndpointComposition::SemanticTag> String2Tag();
-Span<const EndpointComposition::SemanticTag> String1Panel1Tags();
-Span<const EndpointComposition::SemanticTag> String1Panel2Tags();
-Span<const EndpointComposition::SemanticTag> String2Panel1Tags();
-Span<const EndpointComposition::SemanticTag> String2Panel2Tags();
-Span<const EndpointComposition::SemanticTag> PhaseATag();
-Span<const EndpointComposition::SemanticTag> PhaseBTag();
-Span<const EndpointComposition::SemanticTag> PhaseCTag();
 
 } // namespace chip::app::SolarPowerTags

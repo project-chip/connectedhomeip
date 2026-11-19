@@ -16,6 +16,7 @@
 
 #include <device/types/solar-power/impl/SimulatedSolarPower.h>
 
+#include <clusters/shared/Enums.h>
 #include <device/types/solar-power/SolarPowerTags.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -24,6 +25,17 @@ namespace chip::app {
 namespace {
 
 using DemFeature = Clusters::DeviceEnergyManagement::Feature;
+using NS         = Clusters::Globals::SemanticTagNamespaceId;
+
+Span<const EndpointComposition::SemanticTag> InverterTemperatureTag()
+{
+    static const EndpointComposition::SemanticTag kTag[] = {
+        { .mfgCode     = DataModel::NullNullable,
+          .namespaceID = to_underlying(NS::kLocation),
+          .tag         = static_cast<uint8_t>(Clusters::Globals::LocationTag::kOutdoor) },
+    };
+    return Span(kTag);
+}
 
 EnergyManagement::Config SolarPowerEnergyManagementConfig()
 {
@@ -99,7 +111,7 @@ CHIP_ERROR SimulatedSolarPower::RegisterAdditionalComposedEndpoints(EndpointIdAl
     ReturnErrorOnFailure(mOutputElectricalSensor.Register(allocator.Allocate(), provider, EndpointComposition::WithParent(parent)));
     ReturnErrorOnFailure(mInverterTemperatureSensor.Register(
         allocator.Allocate(), provider,
-        EndpointComposition(parent, DataModel::EndpointCompositionPattern::kTree, SolarPowerTags::InverterTemperatureTag())));
+        EndpointComposition(parent, DataModel::EndpointCompositionPattern::kTree, InverterTemperatureTag())));
     for (size_t index = 0; index < mPanelCount; ++index)
     {
         ReturnErrorOnFailure(mPanels[index]->Register(allocator.Allocate(), provider, EndpointComposition::WithParent(parent)));
