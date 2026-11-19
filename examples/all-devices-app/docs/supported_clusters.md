@@ -75,7 +75,7 @@ To update or validate this list manually, follow these steps:
 | 29        | Commissioner Control                                       | 1873 (0x0751) | Yes                | No                  |                                                      |
 | 30        | Commissioning Proxy                                        | 1109 (0x0455) | Yes                | Yes                 |                                                      |
 | 31        | Commodity Metering                                         | 2823 (0x0B07) | No                 | No                  |                                                      |
-| 32        | Commodity Price                                            | 149 (0x0095)  | No                 | No                  |                                                      |
+| 32        | Commodity Price                                            | 149 (0x0095)  | Yes                | Yes                 | electrical-energy-tariff                             |
 | 33        | Commodity Tariff                                           | 1792 (0x0700) | No                 | No                  |                                                      |
 | 34        | Content App Observer                                       | 1296 (0x0510) | No                 | No                  |                                                      |
 | 35        | Content Control                                            | 1295 (0x050F) | No                 | No                  |                                                      |
@@ -203,4 +203,4 @@ To update or validate this list manually, follow these steps:
 | 157       | Window Covering                                            | 258 (0x0102)  | Yes                | Yes                 | window-covering-\*                                   |
 | 158       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                                      |
 | 159       | Smoke Concentration Measurement                            | 1076 (0x0434) | Yes                | Yes                 | Instance of Concentration Measurement                |
-| **Total** | **159**                                                    |               | **109**            | **74**              |                                                      |
+| **Total** | **159**                                                    |               | **110**            | **77**              |                                                      |
