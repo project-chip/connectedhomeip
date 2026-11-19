@@ -125,7 +125,7 @@ function cirquetest_bootstrap() {
 
     git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
 
-    "$REPO_DIR"/integrations/docker/images/stage-2/chip-cirque-device-base/build.sh --build-arg OT_BR_POSIX_CHECKOUT="$OT_BR_POSIX_CHECKOUT"
+    "$REPO_DIR"/integrations/docker/images/stage-2/chip-cirque-device-base/build.sh --latest --build-arg OT_BR_POSIX_CHECKOUT="$OT_BR_POSIX_CHECKOUT"
 
     __cirquetest_build_ot_lazy
     pip3 install --break-system-packages -r requirements_nogrpc.txt

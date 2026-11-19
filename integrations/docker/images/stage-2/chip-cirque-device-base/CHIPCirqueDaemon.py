@@ -56,35 +56,56 @@ class CommandResponse:
 _SPAWNED_CHILDREN: list[subprocess.Popen] = []
 
 
-def _cleanup_children(signum=None, frame=None):
+def _handle_stop(signum, frame):
+    """Raise SystemExit so ServerMain's finally block cleans up once."""
+    raise SystemExit(0)
+
+
+def _cleanup_children():
     """Gracefully forwards SIGTERM to all child processes and waits for exit."""
-    log.info("CHIPCirqueDaemon terminating; forwarding SIGTERM to %d children...", len(_SPAWNED_CHILDREN))
-    alive = []
-    for proc in _SPAWNED_CHILDREN:
-        if proc.poll() is None:
-            alive.append(proc)
-            try:
-                proc.terminate()
-            except Exception as ex:
-                log.debug("Error sending SIGTERM to child %s: %s", proc.pid, ex)
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+
+    alive = [p for p in _SPAWNED_CHILDREN if p.poll() is None]
+    if not alive:
+        return
+
+    log.info(
+        "CHIPCirqueDaemon terminating; forwarding SIGTERM to %d children...",
+        len(alive),
+    )
+    terminating = []
+    for proc in alive:
+        try:
+            proc.terminate()
+            terminating.append(proc)
+        except ProcessLookupError:
+            log.debug("Child %s already exited", proc.pid)
+        except OSError as ex:
+            log.debug("Error sending SIGTERM to child %s: %s", proc.pid, ex)
 
     # Wait up to 5 seconds for children to exit cleanly
-    deadline = time.time() + 5.0
-    while alive and time.time() < deadline:
-        alive = [p for p in alive if p.poll() is None]
-        if alive:
+    deadline = time.monotonic() + 5.0
+    while terminating and time.monotonic() < deadline:
+        terminating = [p for p in terminating if p.poll() is None]
+        if terminating:
             time.sleep(0.1)
 
     # Fallback: SIGKILL any remaining children that didn't terminate
-    for proc in alive:
+    for proc in terminating:
+        log.warning("Child PID %s did not terminate in time; killing", proc.pid)
         try:
-            log.warning("Child PID %s did not terminate in time; killing", proc.pid)
             proc.kill()
-        except Exception:
-            pass
-
-    if signum is not None:
-        sys.exit(0)
+        except ProcessLookupError:
+            log.debug("Child %s already exited before SIGKILL", proc.pid)
+            continue
+        except OSError as ex:
+            log.debug("Error sending SIGKILL to child %s: %s", proc.pid, ex)
+            continue
+        try:
+            proc.wait(timeout=1.0)
+        except subprocess.TimeoutExpired:
+            log.debug("Timed out waiting for killed child %s", proc.pid)
 
 
 def _reap_children(signum=None, frame=None):
@@ -112,11 +133,24 @@ class ShellCommand:
             return CommandResponse(CommandStatus.INVALID_ARGUMENT, "Cannot spwan background process")
         log.info("Will run command: %s", self._args)
         try:
-            # As the command will be execued in background, we track the child so we can forward SIGTERM.
-            proc = subprocess.Popen(
-                self._args, stdout=sys.stdout, stderr=sys.stderr)
-            _SPAWNED_CHILDREN[:] = [p for p in _SPAWNED_CHILDREN if p.poll() is None]
-            _SPAWNED_CHILDREN.append(proc)
+            # Track background child so we can forward SIGTERM on shutdown.
+            blocked = {signal.SIGTERM, signal.SIGINT}
+            old_mask = signal.pthread_sigmask(signal.SIG_BLOCK, blocked)
+            try:
+                proc = subprocess.Popen(
+                    self._args,
+                    stdout=sys.stdout,
+                    stderr=sys.stderr,
+                    preexec_fn=lambda: signal.pthread_sigmask(
+                        signal.SIG_SETMASK, old_mask
+                    ),
+                )
+                _SPAWNED_CHILDREN[:] = [
+                    p for p in _SPAWNED_CHILDREN if p.poll() is None
+                ]
+                _SPAWNED_CHILDREN.append(proc)
+            finally:
+                signal.pthread_sigmask(signal.SIG_SETMASK, old_mask)
             return CommandResponse(CommandStatus.SUCCESS)
         except Exception as ex:
             return CommandResponse(CommandStatus.FAILURE, f"Failed to run command: {ex}")
@@ -143,27 +177,40 @@ def CommandFactory(args):
     return commands.get(args[0], InvalidCommand)(args[1:])
 
 
-def ServerMain(args):
-    signal.signal(signal.SIGTERM, _cleanup_children)
-    signal.signal(signal.SIGINT, _cleanup_children)
-    signal.signal(signal.SIGCHLD, _reap_children)
-
+def _serve_loop(args):
     extraOptions = {
-        "otbr-agent": ShellCommand(["otbr-agent", "-I", "wpan0", "-B", "eth0", "spinel+hdlc+uart:///dev/ttyUSB0"])
+        "otbr-agent": ShellCommand(
+            [
+                "otbr-agent",
+                "-I",
+                "wpan0",
+                "-B",
+                "eth0",
+                "spinel+hdlc+uart:///dev/ttyUSB0",
+            ]
+        )
     }
 
-    try:
-        with Listener(SERVER_ADDRESS) as listener:
-            log.info("Server running on %s", SERVER_ADDRESS)
-            for extraOption in args:
-                cmd = extraOptions.get(extraOption, InvalidCommand())
-                cmd()
+    with Listener(SERVER_ADDRESS) as listener:
+        log.info("Server running on %s", SERVER_ADDRESS)
+        for extraOption in args:
+            cmd = extraOptions.get(extraOption, InvalidCommand())
+            cmd()
 
-            while True:
-                with listener.accept() as conn:
-                    log.info("Received connection")
-                    cmd = CommandFactory(conn.recv())
-                    conn.send(cmd())
+        while True:
+            with listener.accept() as conn:
+                log.info("Received connection")
+                cmd = CommandFactory(conn.recv())
+                conn.send(cmd())
+
+
+def ServerMain(args):
+    signal.signal(signal.SIGTERM, _handle_stop)
+    signal.signal(signal.SIGINT, _handle_stop)
+    signal.signal(signal.SIGCHLD, _reap_children)
+
+    try:
+        _serve_loop(args)
     finally:
         _cleanup_children()
 
