@@ -31,6 +31,7 @@ if (chip_build_tests) {
       "${chip_root}/src/messaging/tests:helpers",
       "${chip_root}/src/platform",
       "${chip_root}/zzz_generated/app-common/clusters/Chime",
+      "${chip_root}/zzz_generated/app-common/clusters/ClosureControl",
       "${chip_root}/zzz_generated/app-common/clusters/Identify",
       "${chip_root}/zzz_generated/app-common/clusters/OnOff",
     ]

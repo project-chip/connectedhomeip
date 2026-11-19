@@ -79,6 +79,7 @@ The application supports the following device types (specified via the
 -   `chime`
 -   `closure-barrier`
 -   `closure-cabinet`
+-   `closure-controller`
 -   `closure-door`
 -   `closure-garage-door`
 -   `closure-gate`

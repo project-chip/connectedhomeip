@@ -83,6 +83,10 @@ _available_devices = [
     "CLOSURE",
   ],
   [
+    "closure-controller",
+    "CLOSURE_CONTROLLER",
+  ],
+  [
     "color-temperature-light",
     "COLOR_TEMPERATURE_LIGHT",
   ],

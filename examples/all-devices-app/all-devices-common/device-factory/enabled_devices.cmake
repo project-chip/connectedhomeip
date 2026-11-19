@@ -49,6 +49,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/Closure.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/ClosureVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/SimulatedClosure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure-controller/ClosureController.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/ClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/impl/SimulatedClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/color-temperature-light/ColorTemperatureLight.cpp"
@@ -119,7 +120,6 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/Refrigerator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/impl/LoggingRefrigerator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp"
@@ -163,6 +163,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/identify/LoggingIdentifyDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/OnOffLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/impl/LoggingOnOffDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/service-area/impl/LoggingServiceAreaStorageDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/allocator/DynamicEndpointIdAllocator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/Interface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/SingleEndpoint.cpp"
@@ -205,6 +206,7 @@ foreach(_key
         bridged-node
         chime
         closure
+        closure-controller
         color-temperature-light
         commissioning-proxy
         contact-sensor

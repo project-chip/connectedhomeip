@@ -436,6 +436,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 #ifdef DEBUG
 @protocol MTRDeviceUnitTestDelegate <MTRDeviceDelegate>
 - (void)unitTestReportBeginForDevice:(MTRDevice *)device;
+- (void)unitTestReportBeginOnMatterQueueForDevice:(MTRDevice *)device;
 - (void)unitTestReportEndForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
@@ -2070,24 +2071,37 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 {
     assertChipStackLockedByCurrentThread();
 
-    std::lock_guard lock(_lock);
+#ifdef DEBUG
+    id firstTestDelegate;
+#endif
+    {
+        std::lock_guard lock(_lock);
 
-    _receivingReport = YES;
-    if (_state != MTRDeviceStateReachable) {
-        [self _changeState:MTRDeviceStateReachable];
+        _receivingReport = YES;
+        if (_state != MTRDeviceStateReachable) {
+            [self _changeState:MTRDeviceStateReachable];
+        }
+
+        // If we currently don't have an established subscription, this must be a
+        // priming report.
+        _receivingPrimingReport = !HaveSubscriptionEstablishedRightNow(_internalDeviceState);
+
+        // For unit testing only
+#ifdef DEBUG
+        [self _callDelegatesWithBlock:^(id testDelegate) {
+            if ([testDelegate respondsToSelector:@selector(unitTestReportBeginForDevice:)]) {
+                [testDelegate unitTestReportBeginForDevice:self];
+            }
+        }];
+        firstTestDelegate = [_delegateManager firstDelegate];
+#endif
     }
 
-    // If we currently don't have an established subscription, this must be a
-    // priming report.
-    _receivingPrimingReport = !HaveSubscriptionEstablishedRightNow(_internalDeviceState);
-
-    // For unit testing only
 #ifdef DEBUG
-    [self _callDelegatesWithBlock:^(id testDelegate) {
-        if ([testDelegate respondsToSelector:@selector(unitTestReportBeginForDevice:)]) {
-            [testDelegate unitTestReportBeginForDevice:self];
-        }
-    }];
+    // Called without _lock held, because the test delegate may block here until other threads have run.
+    if ([firstTestDelegate respondsToSelector:@selector(unitTestReportBeginOnMatterQueueForDevice:)]) {
+        [firstTestDelegate unitTestReportBeginOnMatterQueueForDevice:self];
+    }
 #endif
 }
 

@@ -27,7 +27,7 @@ namespace app {
 /**
  * Concrete implementation of OccupancySensor that logs occupancy and hold time transitions.
  */
-class LoggingOccupancySensor : public OccupancySensor, public Clusters::OccupancySensingDelegate
+class LoggingOccupancySensor : public Clusters::OccupancySensingDelegate, public OccupancySensor
 {
 public:
     LoggingOccupancySensor(TimerDelegate & timerDelegate);

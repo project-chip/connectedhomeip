@@ -19,21 +19,29 @@
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/OperationalSessionSetupPool.h>
+#include <app/StatusResponse.h>
 #include <binding-handler/BindingCommand.h>
 #include <binding-handler/BindingHandler.h>
 #include <binding-handler/SimpleBindingCommand.h>
 #include <clusters/Chime/Commands.h>
 #include <clusters/Chime/Ids.h>
+#include <clusters/ClosureControl/Commands.h>
 #include <clusters/Identify/Commands.h>
 #include <clusters/Identify/Ids.h>
 #include <clusters/OnOff/Commands.h>
 #include <clusters/OnOff/Ids.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Defer.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/TypeTraits.h>
 #include <messaging/tests/MessagingContext.h>
+#include <protocols/interaction_model/Constants.h>
 #include <pw_unit_test/framework.h>
+
+#include <optional>
 
 using namespace chip;
 using namespace chip::app;
@@ -398,6 +406,98 @@ TEST_F(TestBindingHandlerWithManager, SimpleCommandSendsToGroupTarget)
     SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> chimeBindingCmd(chimeCmd);
     EXPECT_EQ(chimeBindingCmd.GetClusterId(), Clusters::Chime::Id);
     chimeBindingCmd.Dispatch(target);
+}
+
+/** Records the first Interaction Model message type the peer receives and rejects it with a failure status. */
+class InteractionModelMessageRecorder : public Messaging::UnsolicitedMessageHandler, public Messaging::ExchangeDelegate
+{
+public:
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
+    {
+        newDelegate = this;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override
+    {
+        if (!firstMessageType.has_value())
+        {
+            firstMessageType = payloadHeader.GetMessageType();
+        }
+        return StatusResponse::Send(Protocols::InteractionModel::Status::Failure, ec, false /* aExpectResponse */);
+    }
+
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
+
+    std::optional<uint8_t> firstMessageType;
+};
+
+TEST_F(TestBindingHandlerWithManager, TimedSimpleCommandSendsTimedRequestToUnicastTarget)
+{
+    InteractionModelMessageRecorder recorder;
+    ASSERT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, &recorder),
+              CHIP_NO_ERROR);
+    auto unregisterRecorder = MakeDefer([&] {
+        EXPECT_EQ(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id),
+                  CHIP_NO_ERROR);
+    });
+
+    const SessionHandle session = GetSessionBobToAlice();
+    const UnicastBindingTarget target{
+        .exchangeManager = GetExchangeManager(),
+        .session         = session,
+        .endpoint        = 1,
+    };
+
+    SimpleBindingCommand<Clusters::ClosureControl::Commands::Calibrate::Type> command(
+        Clusters::ClosureControl::Commands::Calibrate::Type{});
+    command.Dispatch(target);
+    DrainAndServiceIO();
+
+    EXPECT_EQ(recorder.firstMessageType, to_underlying(Protocols::InteractionModel::MsgType::TimedRequest));
+}
+
+TEST_F(TestBindingHandlerWithManager, TimedSimpleCommandSkipsGroupTarget)
+{
+    // Group keys let an untimed group command reach the transport, so a send count that stays unchanged
+    // means the timed command was skipped rather than failing later in the send path.
+    TestPersistentStorageDelegate groupStorage;
+    Crypto::DefaultSessionKeystore keystore;
+    Credentials::GroupDataProviderImpl groupDataProvider;
+    groupDataProvider.SetStorageDelegate(&groupStorage);
+    groupDataProvider.SetSessionKeystore(&keystore);
+    ASSERT_EQ(groupDataProvider.Init(), CHIP_NO_ERROR);
+    Credentials::SetGroupDataProvider(&groupDataProvider);
+    auto clearGroupDataProvider = MakeDefer([&] {
+        Credentials::SetGroupDataProvider(nullptr);
+        groupDataProvider.Finish();
+    });
+
+    uint8_t compressedFabricIdBuffer[sizeof(CompressedFabricId)];
+    MutableByteSpan compressedFabricId(compressedFabricIdBuffer);
+    ASSERT_EQ(GetBobFabric()->GetCompressedFabricIdBytes(compressedFabricId), CHIP_NO_ERROR);
+    ASSERT_EQ(GroupTesting::InitData(&groupDataProvider, GetBobFabricIndex(), compressedFabricId), CHIP_NO_ERROR);
+
+    const GroupBindingTarget target{
+        .exchangeManager = GetExchangeManager(),
+        .fabricIndex     = GetBobFabricIndex(),
+        .groupId         = GetFriendsGroupId(),
+    };
+    auto & loopback = GetLoopback();
+
+    SimpleBindingCommand<Clusters::OnOff::Commands::Toggle::Type> untimedCommand(Clusters::OnOff::Commands::Toggle::Type{});
+    const uint32_t sentBeforeUntimed = loopback.mSentMessageCount;
+    untimedCommand.Dispatch(target);
+    ASSERT_GT(loopback.mSentMessageCount, sentBeforeUntimed);
+
+    SimpleBindingCommand<Clusters::ClosureControl::Commands::Calibrate::Type> timedCommand(
+        Clusters::ClosureControl::Commands::Calibrate::Type{});
+    const uint32_t sentBeforeTimed = loopback.mSentMessageCount;
+    timedCommand.Dispatch(target);
+    EXPECT_EQ(loopback.mSentMessageCount, sentBeforeTimed);
+
+    DrainAndServiceIO();
 }
 
 } // namespace

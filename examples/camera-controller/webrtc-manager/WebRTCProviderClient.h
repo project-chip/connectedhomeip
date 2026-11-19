@@ -23,7 +23,9 @@
 #include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 #include <controller/CHIPDeviceController.h>
 
+#include <optional>
 #include <string>
+#include <vector>
 
 // Forward declaration
 struct ICECandidateInfo
@@ -45,7 +47,37 @@ class WebRTCProviderClient : public chip::app::CommandSender::Callback
 {
 public:
     using ICECandidateStruct = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+    using ICEServerStruct    = chip::app::Clusters::Globals::Structs::ICEServerStruct::Type;
     using StreamUsageEnum    = chip::app::Clusters::Globals::StreamUsageEnum;
+
+    /**
+     * Optional SolicitOffer / ProvideOffer fields beyond the single stream IDs. The struct owns its data, so it can be kept
+     * until the command is sent.
+     */
+    struct OfferOptions
+    {
+        struct ICEServer
+        {
+            std::vector<std::string> urls;
+            std::optional<std::string> username;
+            std::optional<std::string> credential;
+            std::optional<uint16_t> caid;
+        };
+
+        struct SFrameConfig
+        {
+            uint16_t cipherSuite = 0;
+            std::vector<uint8_t> baseKey;
+            std::vector<uint8_t> kid;
+        };
+
+        std::optional<std::vector<uint16_t>> videoStreams;
+        std::optional<std::vector<uint16_t>> audioStreams;
+        std::optional<bool> metadataEnabled;
+        std::optional<SFrameConfig> sFrameConfig;
+        std::optional<std::vector<ICEServer>> iceServers;
+        std::optional<std::string> iceTransportPolicy;
+    };
 
     /**
      * @brief Construct a new WebRTCProviderClient object. Also initializes callbacks
@@ -76,13 +108,15 @@ public:
      * @param originatingEndpointId  The endpoint ID that initiates the offer.
      * @param videoStreamId          Optional Video stream ID if relevant.
      * @param audioStreamId          Optional Audio stream ID if relevant.
+     * @param options                The other optional fields to send; copied by the client.
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
     CHIP_ERROR
     SolicitOffer(StreamUsageEnum streamUsage, chip::EndpointId originatingEndpointId,
                  chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
-                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
+                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId,
+                 const OfferOptions & options = OfferOptions());
 
     /**
      * @brief Sends a ProvideOffer command to the remote device.
@@ -97,13 +131,15 @@ public:
      * @param originatingEndpointId  The endpoint ID that initiates the offer.
      * @param videoStreamId          Optional Video stream ID if relevant.
      * @param audioStreamId          Optional Audio stream ID if relevant.
+     * @param options                The other optional fields to send; copied by the client.
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
     CHIP_ERROR
     ProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp, StreamUsageEnum streamUsage,
                  chip::EndpointId originatingEndpointId, chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
-                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
+                 chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId,
+                 const OfferOptions & options = OfferOptions());
 
     /**
      * @brief Sends a ProvideAnswer command to the remote device.
@@ -235,10 +271,15 @@ private:
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mProvideOfferData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Type mProvideAnswerData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mProvideICECandidatesData;
-    StreamUsageEnum mCurrentStreamUsage = StreamUsageEnum::kUnknownEnumValue;
 
     // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
     std::string mSdpString;
+
+    // Copy of the options of the offer being sent. The optional list and string fields of mSolicitOfferData /
+    // mProvideOfferData point into it and into mICEServers / mICEServerURLs.
+    OfferOptions mOfferOptions;
+    std::vector<ICEServerStruct> mICEServers;
+    std::vector<std::vector<chip::CharSpan>> mICEServerURLs; // URLs of each entry in mICEServers
 
     // Store the ICECandidates here to use to send asynchronously.
     std::vector<ICECandidateInfo> mClientICECandidates;

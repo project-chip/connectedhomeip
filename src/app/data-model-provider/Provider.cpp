@@ -84,7 +84,7 @@ void Provider::NotifyAttributeChanged(const ConcreteAttributePath & path, Attrib
     mActiveIterators = iter.nextIterator;
 }
 
-void Provider::NotifyEndpointChanged(EndpointId endpointId, EndpointChangeType type)
+void Provider::NotifyEndpointChanged(EndpointId endpointId, EndpointId parentEndpointId, EndpointChangeType type)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -99,7 +99,7 @@ void Provider::NotifyEndpointChanged(EndpointId endpointId, EndpointChangeType t
     {
         AttributeChangeListener * current = iter.expectedNext;
         iter.expectedNext                 = current->GetNextAttributeChangeListener();
-        current->OnEndpointChanged(endpointId, type);
+        current->OnEndpointChanged(endpointId, parentEndpointId, type);
     }
 
     mActiveIterators = iter.nextIterator;
