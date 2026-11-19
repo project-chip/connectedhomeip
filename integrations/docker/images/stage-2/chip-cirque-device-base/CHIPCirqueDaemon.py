@@ -57,55 +57,188 @@ _SPAWNED_CHILDREN: list[subprocess.Popen] = []
 
 
 def _handle_stop(signum, frame):
-    """Raise SystemExit so ServerMain's finally block cleans up once."""
+    """Ignore further stop signals and exit so ServerMain cleans up once."""
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
     raise SystemExit(0)
 
 
+def _scan_proc_children() -> tuple[list[tuple[int, int]], list[int]]:
+    """Return live (pid, pgid) pairs and zombie pids with ppid == getpid()."""
+    my_pid = os.getpid()
+    live: list[tuple[int, int]] = []
+    zombies: list[int] = []
+    proc_dir = Path("/proc")
+    if not proc_dir.is_dir():
+        return live, zombies
+
+    for entry in proc_dir.iterdir():
+        if not entry.name.isdigit():
+            continue
+        pid = int(entry.name)
+        if pid == my_pid:
+            continue
+        try:
+            stat = (entry / "stat").read_text(
+                encoding="utf-8", errors="replace"
+            )
+        except OSError:
+            continue
+        rparen = stat.rfind(")")
+        if rparen == -1:
+            continue
+        after = stat[rparen + 1:].split()
+        if len(after) < 3:
+            continue
+        state = after[0]
+        try:
+            ppid = int(after[1])
+            pgrp = int(after[2])
+        except ValueError:
+            continue
+        if ppid != my_pid:
+            continue
+        if state == "Z":
+            zombies.append(pid)
+        else:
+            live.append((pid, pgrp))
+    return live, zombies
+
+
+def _signal_target(
+    pid: int,
+    pgid: int | None,
+    sig: int,
+    signaled_pgids: set[int] | None = None,
+) -> bool:
+    """Signal process group (when distinct from ours) or fall back to pid."""
+    my_pgrp = os.getpgrp()
+    if pgid is not None and pgid > 0 and pgid != my_pgrp:
+        try:
+            os.killpg(pgid, sig)
+            if signaled_pgids is not None:
+                signaled_pgids.add(pgid)
+            return True
+        except ProcessLookupError:
+            # Group leader or process group may already be gone; try direct pid.
+            pass
+        except OSError as ex:
+            log.debug("Error sending signal %s to pgid %s: %s", sig, pgid, ex)
+
+    try:
+        os.kill(pid, sig)
+        return True
+    except ProcessLookupError:
+        log.debug("Child %s already exited", pid)
+        return False
+    except OSError as ex:
+        log.debug("Error sending signal %s to child %s: %s", sig, pid, ex)
+        return False
+
+
+def _reap_untracked_zombies(zombies: list[int], tracked_pids: set[int]) -> None:
+    """Reap zombie children not currently tracked by a live Popen handle."""
+    for zpid in zombies:
+        if zpid in tracked_pids:
+            continue
+        try:
+            os.waitpid(zpid, os.WNOHANG)
+        except ChildProcessError:
+            log.debug("Zombie child %s already reaped", zpid)
+
+
+def _collect_live_children(
+    procs: list[subprocess.Popen],
+) -> tuple[list[subprocess.Popen], list[tuple[int, int]]]:
+    """Return live Popen handles and adopted (pid, pgid) pairs."""
+    terminating = [p for p in procs if p.poll() is None]
+    tracked_pids = {p.pid for p in terminating}
+    live_proc, zombies = _scan_proc_children()
+    _reap_untracked_zombies(zombies, tracked_pids)
+    adopted = [
+        (pid, pgid) for pid, pgid in live_proc if pid not in tracked_pids
+    ]
+    return terminating, adopted
+
+
+def _wait_adopted_exit(pid: int, timeout: float = 1.0) -> None:
+    """Wait briefly for a killed adopted child to exit and reap it."""
+    kill_deadline = time.monotonic() + timeout
+    while time.monotonic() < kill_deadline:
+        try:
+            waited_pid, _ = os.waitpid(pid, os.WNOHANG)
+        except ChildProcessError:
+            return
+        if waited_pid == pid:
+            return
+        time.sleep(0.05)
+
+
 def _cleanup_children():
-    """Gracefully forwards SIGTERM to all child processes and waits for exit."""
+    """Forward SIGTERM to all child processes/groups and reap them."""
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
     signal.signal(signal.SIGINT, signal.SIG_IGN)
+    # Disable async SIGCHLD handler so poll() and explicit reaping never race.
+    signal.signal(signal.SIGCHLD, signal.SIG_DFL)
 
-    alive = [p for p in _SPAWNED_CHILDREN if p.poll() is None]
-    if not alive:
+    terminating, adopted = _collect_live_children(_SPAWNED_CHILDREN)
+    if not terminating and not adopted:
+        _reap_children()
         return
 
     log.info(
-        "CHIPCirqueDaemon terminating; forwarding SIGTERM to %d children...",
-        len(alive),
+        "CHIPCirqueDaemon terminating; forwarding SIGTERM to %d tracked "
+        "and %d adopted children...",
+        len(terminating),
+        len(adopted),
     )
-    terminating = []
-    for proc in alive:
-        try:
-            proc.terminate()
-            terminating.append(proc)
-        except ProcessLookupError:
-            log.debug("Child %s already exited", proc.pid)
-        except OSError as ex:
-            log.debug("Error sending SIGTERM to child %s: %s", proc.pid, ex)
 
-    # Wait up to 5 seconds for children to exit cleanly
+    signaled_pids: set[int] = set()
+    signaled_pgids: set[int] = set()
+    still_terminating = []
+    for proc in terminating:
+        if _signal_target(proc.pid, proc.pid, signal.SIGTERM, signaled_pgids):
+            signaled_pids.add(proc.pid)
+            still_terminating.append(proc)
+        else:
+            proc.poll()
+    terminating = still_terminating
+
+    for pid, pgid in adopted:
+        if pid not in signaled_pids and pgid not in signaled_pgids:
+            _signal_target(pid, pgid, signal.SIGTERM, signaled_pgids)
+        signaled_pids.add(pid)
+
+    # Wait up to 5 seconds for tracked and adopted children to exit cleanly
     deadline = time.monotonic() + 5.0
-    while terminating and time.monotonic() < deadline:
-        terminating = [p for p in terminating if p.poll() is None]
-        if terminating:
+    while (terminating or adopted) and time.monotonic() < deadline:
+        terminating, adopted = _collect_live_children(terminating)
+        for pid, pgid in adopted:
+            if pid not in signaled_pids and pgid not in signaled_pgids:
+                _signal_target(pid, pgid, signal.SIGTERM, signaled_pgids)
+            signaled_pids.add(pid)
+        if terminating or adopted:
             time.sleep(0.1)
+
+    terminating, adopted = _collect_live_children(terminating)
 
     # Fallback: SIGKILL any remaining children that didn't terminate
     for proc in terminating:
         log.warning("Child PID %s did not terminate in time; killing", proc.pid)
-        try:
-            proc.kill()
-        except ProcessLookupError:
-            log.debug("Child %s already exited before SIGKILL", proc.pid)
-            continue
-        except OSError as ex:
-            log.debug("Error sending SIGKILL to child %s: %s", proc.pid, ex)
-            continue
+        _signal_target(proc.pid, proc.pid, signal.SIGKILL)
         try:
             proc.wait(timeout=1.0)
         except subprocess.TimeoutExpired:
             log.debug("Timed out waiting for killed child %s", proc.pid)
+
+    for pid, pgid in adopted:
+        log.warning(
+            "Adopted child PID %s did not terminate in time; killing", pid
+        )
+        _signal_target(pid, pgid, signal.SIGKILL)
+        _wait_adopted_exit(pid)
+
+    _reap_children()
 
 
 def _reap_children(signum=None, frame=None):
@@ -134,13 +267,14 @@ class ShellCommand:
         log.info("Will run command: %s", self._args)
         try:
             # Track background child so we can forward SIGTERM on shutdown.
-            blocked = {signal.SIGTERM, signal.SIGINT}
+            blocked = {signal.SIGTERM, signal.SIGINT, signal.SIGCHLD}
             old_mask = signal.pthread_sigmask(signal.SIG_BLOCK, blocked)
             try:
                 proc = subprocess.Popen(
                     self._args,
                     stdout=sys.stdout,
                     stderr=sys.stderr,
+                    start_new_session=True,
                     preexec_fn=lambda: signal.pthread_sigmask(
                         signal.SIG_SETMASK, old_mask
                     ),

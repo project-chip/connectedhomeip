@@ -125,7 +125,36 @@ function cirquetest_bootstrap() {
 
     git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
 
-    "$REPO_DIR"/integrations/docker/images/stage-2/chip-cirque-device-base/build.sh --latest --build-arg OT_BR_POSIX_CHECKOUT="$OT_BR_POSIX_CHECKOUT"
+    local cirque_base_dir="$REPO_DIR/integrations/docker/images/stage-2/chip-cirque-device-base"
+    local base_version
+    base_version=${DOCKER_BUILD_VERSION:-$(sed 's/ .*//' "$cirque_base_dir/version")}
+    local image_ref="ghcr.io/${DOCKER_BUILD_ORG:-project-chip}/${DOCKER_BUILD_IMAGE:-chip-cirque-device-base}"
+    local build_args=(--latest --build-arg "OT_BR_POSIX_CHECKOUT=$OT_BR_POSIX_CHECKOUT")
+    local build_version="$base_version"
+    local have_base_image=false
+    if docker image inspect "$image_ref:$base_version" >/dev/null 2>&1 || docker pull "$image_ref:$base_version" >/dev/null 2>&1; then
+        have_base_image=true
+    fi
+
+    if [[ -n "$(cd "$REPO_DIR" && git status --porcelain -- integrations/docker/images/stage-2/chip-cirque-device-base)" ]]; then
+        local dirty_hash
+        dirty_hash=$({
+            "$cirque_base_dir/cachekey.sh"
+            (cd "$REPO_DIR" && git status --porcelain -- integrations/docker/images/stage-2/chip-cirque-device-base)
+        } | shasum | awk '{ print substr($1, 1, 12) }')
+        build_version="${base_version}-dirty-${dirty_hash}"
+        if [[ "$have_base_image" = true ]]; then
+            build_args+=(--cache-from "$image_ref:$base_version")
+        fi
+    elif [[ "$have_base_image" = true ]]; then
+        local baked_checkout
+        baked_checkout=$(docker image inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$image_ref:$base_version" 2>/dev/null | sed -n 's/^OT_BR_POSIX_CHECKOUT=//p' | head -n 1 || true)
+        if [[ "$baked_checkout" != "$OT_BR_POSIX_CHECKOUT" ]]; then
+            build_version="${base_version}-${OT_BR_POSIX_CHECKOUT:0:12}"
+        fi
+    fi
+
+    DOCKER_BUILD_VERSION="$build_version" "$cirque_base_dir/build.sh" "${build_args[@]}"
 
     __cirquetest_build_ot_lazy
     pip3 install --break-system-packages -r requirements_nogrpc.txt
