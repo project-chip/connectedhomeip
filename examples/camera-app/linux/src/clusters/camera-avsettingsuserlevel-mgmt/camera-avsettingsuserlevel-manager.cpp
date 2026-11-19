@@ -221,7 +221,7 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 //
                 uint32_t originalSize      = static_cast<uint32_t>(width) * static_cast<uint32_t>(height);
                 uint32_t zoomDeltaInPixels = originalSize * static_cast<uint32_t>(abs(zoomDelta)) / 100;
-                uint32_t newSize = (zoomDelta < 0) ? originalSize + zoomDeltaInPixels : originalSize - zoomDeltaInPixels;
+                uint32_t newSize           = (zoomDelta < 0) ? originalSize + zoomDeltaInPixels : originalSize - zoomDeltaInPixels;
 
                 // If the new viewport after zoom would be less than the min, scale it to the min
                 //
@@ -248,10 +248,10 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 // Scale the moved viewport about its centre
                 int centerX = x1 + width / 2;
                 int centerY = y1 + height / 2;
-                x1     = centerX - newWidth / 2;
-                y1     = centerY - newHeight / 2;
-                width  = newWidth;
-                height = newHeight;
+                x1          = centerX - newWidth / 2;
+                y1          = centerY - newHeight / 2;
+                width       = newWidth;
+                height      = newHeight;
             }
 
             // Move the upper-left corner inside the sensor. The size is capped to the sensor, so the
