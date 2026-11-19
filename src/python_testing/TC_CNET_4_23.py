@@ -325,13 +325,15 @@ class TC_CNET_4_23(MatterTestCommissioner):
         # the operation, which can take up to ConnectMaxTimeSeconds / ScanMaxTimeSeconds. The SDK's default
         # interaction timeout (transport round-trip + ~2s of expected processing) is not enough for that,
         # so compute the interaction timeouts from the values advertised by the DUT.
-        connect_max_time_s = await self.read_single_attribute(
+        connect_max_time_s = await self.read_single_attribute_check_success(
+            cluster=cnet,
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             endpoint=endpoint,
             attribute=cnet.Attributes.ConnectMaxTimeSeconds,
         )
-        scan_max_time_s = await self.read_single_attribute(
+        scan_max_time_s = await self.read_single_attribute_check_success(
+            cluster=cnet,
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             endpoint=endpoint,
