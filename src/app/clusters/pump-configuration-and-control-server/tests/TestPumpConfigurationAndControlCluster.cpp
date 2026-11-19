@@ -752,3 +752,64 @@ TEST_F(TestPumpConfigurationAndControlCluster, StartupRecoversFromInvalidPersist
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
+
+namespace {
+
+/// Changes the remote sensor and calls OnRemoteSensorChanged once, from the notification for
+/// `mTriggerAttribute`.
+class ReentrantSensorDelegate : public TestDelegate
+{
+public:
+    void OnAttributeChanged(EndpointId endpointId, AttributeId attributeId) override
+    {
+        TestDelegate::OnAttributeChanged(endpointId, attributeId);
+        if (mCluster != nullptr && attributeId == mTriggerAttribute)
+        {
+            PumpConfigurationAndControlCluster * cluster = mCluster;
+            mCluster                                     = nullptr;
+            mRemoteSensorType                            = mNextSensorType;
+            cluster->OnRemoteSensorChanged();
+        }
+    }
+
+    PumpConfigurationAndControlCluster * mCluster = nullptr;
+    AttributeId mTriggerAttribute                 = 0;
+    RemoteSensorType mNextSensorType              = RemoteSensorType::kNoSensor;
+};
+
+} // namespace
+
+TEST_F(TestPumpConfigurationAndControlCluster, ReentrantSensorChangeKeepsStateConsistent)
+{
+    // The delegate re-enters from each notification of a mode update. The final state must
+    // reflect the latest sensor, with EffectiveControlMode and the Remote* bits in agreement.
+    for (AttributeId trigger : { EffectiveOperationMode::Id, EffectiveControlMode::Id, PumpStatus::Id })
+    {
+        ReentrantSensorDelegate delegate;
+        delegate.mRemoteSensorType = RemoteSensorType::kPressureSensor;
+
+        PumpConfigurationAndControlCluster::Config config(delegate);
+        config.features = BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantPressure, Feature::kConstantFlow);
+        config.optionalAttributes.Set(OptionalAttributes::kPumpStatus).Set(OptionalAttributes::kControlMode);
+        config.operationMode = OperationModeEnum::kMaximum;
+
+        PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+        ClusterTester tester(cluster);
+        ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+
+        // Maximum -> Normal changes EffectiveOperationMode, EffectiveControlMode
+        // (ConstantSpeed -> ConstantPressure) and PumpStatus (RemotePressure).
+        delegate.mCluster          = &cluster;
+        delegate.mTriggerAttribute = trigger;
+        delegate.mNextSensorType   = RemoteSensorType::kFlowSensor;
+        EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kNormal), CHIP_NO_ERROR);
+
+        EXPECT_EQ(delegate.mCluster, nullptr) << "re-entry for attribute " << trigger;
+        EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kNormal);
+        EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantFlow) << "re-entry for attribute " << trigger;
+        EXPECT_TRUE(cluster.GetPumpStatus().Has(PumpStatusBitmap::kRemoteFlow)) << "re-entry for attribute " << trigger;
+        EXPECT_FALSE(cluster.GetPumpStatus().Has(PumpStatusBitmap::kRemotePressure)) << "re-entry for attribute " << trigger;
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}

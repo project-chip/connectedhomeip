@@ -333,9 +333,12 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Attributes(const ConcreteClusterP
 CHIP_ERROR PumpConfigurationAndControlCluster::SetOperationMode(OperationModeEnum operationMode)
 {
     VerifyOrReturnError(IsOperationModeSupported(operationMode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    VerifyOrReturnError(UpdateAttribute(mOperationMode, operationMode, OperationMode::Id), CHIP_NO_ERROR);
+    VerifyOrReturnError(SetAttributeValue(mOperationMode, operationMode, OperationMode::Id), CHIP_NO_ERROR);
     StoreAttribute(mContext, mPath, OperationMode::Id, mOperationMode);
-    UpdateEffectiveModes();
+
+    ChangedAttributes changed;
+    changed.Add(OperationMode::Id);
+    UpdateEffectiveModes(changed);
     return CHIP_NO_ERROR;
 }
 
@@ -343,9 +346,12 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetControlMode(ControlModeEnum co
 {
     VerifyOrReturnError(mControlModeEnabled, CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(IsControlModeSupported(controlMode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    VerifyOrReturnError(UpdateAttribute(mControlMode, controlMode, ControlMode::Id), CHIP_NO_ERROR);
+    VerifyOrReturnError(SetAttributeValue(mControlMode, controlMode, ControlMode::Id), CHIP_NO_ERROR);
     StoreAttribute(mContext, mPath, ControlMode::Id, mControlMode);
-    UpdateEffectiveModes();
+
+    ChangedAttributes changed;
+    changed.Add(ControlMode::Id);
+    UpdateEffectiveModes(changed);
     return CHIP_NO_ERROR;
 }
 
@@ -353,11 +359,18 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetEffectiveControlMode(ControlMo
 {
     VerifyOrReturnError(EnsureKnownEnumValue(controlMode) != ControlModeEnum::kUnknownEnumValue,
                         CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (UpdateAttribute(mEffectiveControlMode, controlMode, EffectiveControlMode::Id))
+    if (WriteEffectiveControlMode(controlMode))
     {
-        StoreAttribute(mContext, mPath, EffectiveControlMode::Id, mEffectiveControlMode);
+        mDelegate.OnAttributeChanged(mPath.mEndpointId, EffectiveControlMode::Id);
     }
     return CHIP_NO_ERROR;
+}
+
+bool PumpConfigurationAndControlCluster::WriteEffectiveControlMode(ControlModeEnum controlMode)
+{
+    VerifyOrReturnValue(SetAttributeValue(mEffectiveControlMode, controlMode, EffectiveControlMode::Id), false);
+    StoreAttribute(mContext, mPath, EffectiveControlMode::Id, mEffectiveControlMode);
+    return true;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetPumpStatus(PumpStatusBitMask pumpStatus)
@@ -395,9 +408,10 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetLifetimeRunningHours(DataModel
 {
     VerifyOrReturnError(mEnabledOptionalAttributes.IsSet(LifetimeRunningHours::Id), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(IsValidNullableInt24u(hours), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (UpdateAttribute(mLifetimeRunningHours, hours, LifetimeRunningHours::Id))
+    if (SetAttributeValue(mLifetimeRunningHours, hours, LifetimeRunningHours::Id))
     {
         StoreAttribute(mContext, mPath, LifetimeRunningHours::Id, mLifetimeRunningHours);
+        mDelegate.OnAttributeChanged(mPath.mEndpointId, LifetimeRunningHours::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -406,9 +420,10 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetLifetimeEnergyConsumed(DataMod
 {
     VerifyOrReturnError(mEnabledOptionalAttributes.IsSet(LifetimeEnergyConsumed::Id), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(IsValidNullable(energy), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    if (UpdateAttribute(mLifetimeEnergyConsumed, energy, LifetimeEnergyConsumed::Id))
+    if (SetAttributeValue(mLifetimeEnergyConsumed, energy, LifetimeEnergyConsumed::Id))
     {
         StoreAttribute(mContext, mPath, LifetimeEnergyConsumed::Id, mLifetimeEnergyConsumed);
+        mDelegate.OnAttributeChanged(mPath.mEndpointId, LifetimeEnergyConsumed::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -496,21 +511,25 @@ bool PumpConfigurationAndControlCluster::IsAttributeEnabled(AttributeId attribut
 void PumpConfigurationAndControlCluster::OnRemoteSensorChanged()
 {
     VerifyOrReturn(mOperationMode == OperationModeEnum::kNormal);
-    UpdateEffectiveModes();
+    ChangedAttributes changed;
+    UpdateEffectiveModes(changed);
 }
 
-void PumpConfigurationAndControlCluster::UpdateEffectiveModes()
+void PumpConfigurationAndControlCluster::UpdateEffectiveModes(ChangedAttributes & changed)
 {
     const EndpointId endpointId = mPath.mEndpointId;
     const RemoteSensorType sensorType =
         (mOperationMode == OperationModeEnum::kNormal) ? mDelegate.GetRemoteSensorType(endpointId) : RemoteSensorType::kNoSensor;
 
-    if (UpdateAttribute(mEffectiveOperationMode, mOperationMode, EffectiveOperationMode::Id))
+    if (SetAttributeValue(mEffectiveOperationMode, mOperationMode, EffectiveOperationMode::Id))
     {
         StoreAttribute(mContext, mPath, EffectiveOperationMode::Id, mEffectiveOperationMode);
+        changed.Add(EffectiveOperationMode::Id);
     }
-    LogErrorOnFailure(SetEffectiveControlMode(ComputeEffectiveControlMode(mOperationMode, mControlMode, sensorType)));
-
+    if (WriteEffectiveControlMode(ComputeEffectiveControlMode(mOperationMode, mControlMode, sensorType)))
+    {
+        changed.Add(EffectiveControlMode::Id);
+    }
     if (mEnabledOptionalAttributes.IsSet(PumpStatus::Id))
     {
         PumpStatusBitMask pumpStatus = mPumpStatus;
@@ -518,12 +537,20 @@ void PumpConfigurationAndControlCluster::UpdateEffectiveModes()
             .Clear(PumpStatusBitmap::kRemoteFlow)
             .Clear(PumpStatusBitmap::kRemoteTemperature)
             .Set(RemoteSensorStatusBits(sensorType));
-        UpdateAttribute(mPumpStatus, pumpStatus, PumpStatus::Id);
+        if (SetAttributeValue(mPumpStatus, pumpStatus, PumpStatus::Id))
+        {
+            changed.Add(PumpStatus::Id);
+        }
     }
 
+    // All values are written: delegate calls below may call back into the cluster.
     if (mOperationMode == OperationModeEnum::kMinimum || mOperationMode == OperationModeEnum::kMaximum)
     {
         mDelegate.OnOperationModeMinMax(endpointId, mOperationMode);
+    }
+    for (AttributeId attributeId : changed)
+    {
+        mDelegate.OnAttributeChanged(endpointId, attributeId);
     }
 }
 

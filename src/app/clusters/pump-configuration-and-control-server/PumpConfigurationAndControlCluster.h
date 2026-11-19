@@ -24,6 +24,7 @@
 #include <clusters/PumpConfigurationAndControl/Enums.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitMask.h>
+#include <lib/support/CodeUtils.h>
 
 #include <cstdint>
 #include <optional>
@@ -211,6 +212,9 @@ private:
 
     /// Assigns `value` to `dest` and, if the value changed, reports the change and calls
     /// Delegate::OnAttributeChanged. Returns true if the value changed.
+    ///
+    /// Only for setters where this is the last state change: the delegate may call back into
+    /// the cluster.
     template <typename T, typename U>
     bool UpdateAttribute(T & dest, const U & value, AttributeId attributeId)
     {
@@ -223,7 +227,41 @@ private:
     bool IsControlModeSupported(PumpConfigurationAndControl::ControlModeEnum controlMode) const;
     PumpConfigurationAndControl::ControlModeEnum
     SelectInitialControlMode(std::optional<PumpConfigurationAndControl::ControlModeEnum> configured) const;
-    void UpdateEffectiveModes();
+
+    /// Attributes changed by one mode update. The delegate is told about them only after all
+    /// values of the update are written.
+    class ChangedAttributes
+    {
+    public:
+        void Add(AttributeId attributeId)
+        {
+            VerifyOrDie(mCount < kMaxCount);
+            mAttributeIds[mCount++] = attributeId;
+        }
+        const AttributeId * begin() const { return mAttributeIds; }
+        const AttributeId * end() const { return mAttributeIds + mCount; }
+
+    private:
+        // The mode attribute that triggered the update, EffectiveOperationMode,
+        // EffectiveControlMode and PumpStatus.
+        static constexpr size_t kMaxCount = 4;
+        AttributeId mAttributeIds[kMaxCount];
+        size_t mCount = 0;
+    };
+
+    /// Recomputes EffectiveOperationMode, EffectiveControlMode and the remote sensor bits of
+    /// PumpStatus, then calls the delegate: OnOperationModeMinMax if applicable, then
+    /// OnAttributeChanged for `changed` and for every attribute changed here.
+    ///
+    /// The delegate is called only after all values are written, and the state is not modified
+    /// after the first delegate call. A delegate that calls back into the cluster (e.g.
+    /// OnRemoteSensorChanged from OnAttributeChanged) therefore starts from a consistent state,
+    /// and its update is not overwritten by this one.
+    void UpdateEffectiveModes(ChangedAttributes & changed);
+
+    /// Writes and persists EffectiveControlMode without calling the delegate. Returns true if the
+    /// value changed.
+    bool WriteEffectiveControlMode(PumpConfigurationAndControl::ControlModeEnum controlMode);
 
     const BitFlags<PumpConfigurationAndControl::Feature> mFeatures;
     const EnabledAttributeSet mEnabledOptionalAttributes;

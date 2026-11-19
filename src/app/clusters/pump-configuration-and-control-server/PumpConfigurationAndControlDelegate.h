@@ -33,7 +33,9 @@ enum class RemoteSensorType : uint8_t
 
 /// Application hooks used by PumpConfigurationAndControlCluster.
 ///
-/// Methods are called from the Matter thread with the stack lock held.
+/// Methods are called from the Matter thread with the stack lock held. The cluster calls
+/// OnOperationModeMinMax and OnAttributeChanged only after it has written all values of an update,
+/// so these methods may call back into the cluster (e.g. OnRemoteSensorChanged or a setter).
 class Delegate
 {
 public:
