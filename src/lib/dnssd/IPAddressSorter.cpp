@@ -17,6 +17,8 @@
 
 #include <lib/dnssd/IPAddressSorter.h>
 
+#include <utility>
+
 #include <lib/support/SortUtils.h>
 #include <lib/support/TypeTraits.h>
 
@@ -26,39 +28,39 @@ namespace IPAddressSorter {
 
 namespace {
 
-uint8_t DefaultScore(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
+IpScore DefaultScore(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
 {
     if (ip.IsIPv6())
     {
         if (ip.IsIPv6LinkLocal())
         {
-            return to_underlying(IpScore::kLinkLocal);
+            return IpScore::kLinkLocal;
         }
 
         if (interfaceId.MatchLocalIPv6Subnet(ip))
         {
             if (ip.IsIPv6GlobalUnicast())
             {
-                return to_underlying(IpScore::kGlobalUnicastWithSharedPrefix);
+                return IpScore::kGlobalUnicastWithSharedPrefix;
             }
             if (ip.IsIPv6ULA())
             {
-                return to_underlying(IpScore::kUniqueLocalWithSharedPrefix);
+                return IpScore::kUniqueLocalWithSharedPrefix;
             }
         }
         if (ip.IsIPv6GlobalUnicast())
         {
-            return to_underlying(IpScore::kGlobalUnicast);
+            return IpScore::kGlobalUnicast;
         }
 
         if (ip.IsIPv6ULA())
         {
-            return to_underlying(IpScore::kUniqueLocal);
+            return IpScore::kUniqueLocal;
         }
 
-        return to_underlying(IpScore::kOtherIpv6);
+        return IpScore::kOtherIpv6;
     }
-    return to_underlying(IpScore::kIpv4);
+    return IpScore::kIpv4;
 }
 
 IPAddressScorer * sScorer = nullptr;
@@ -67,12 +69,12 @@ IPAddressScorer * sScorer = nullptr;
 
 uint8_t IPAddressScorer::ScoreIPAddress(const Inet::IPAddress & address, Inet::InterfaceId interfaceId)
 {
-    return DefaultScore(address, interfaceId);
+    return to_underlying(DefaultScore(address, interfaceId));
 }
 
-void SetIPAddressScorer(IPAddressScorer * scorer)
+IPAddressScorer * SetIPAddressScorer(IPAddressScorer * scorer)
 {
-    sScorer = scorer;
+    return std::exchange(sScorer, scorer);
 }
 
 void Sort(Inet::IPAddress * addresses, size_t count, Inet::InterfaceId interfaceId)
@@ -89,7 +91,7 @@ void Sort(const Span<Inet::IPAddress> & addresses, Inet::InterfaceId interfaceId
 
 uint8_t ScoreIPAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
 {
-    return sScorer != nullptr ? sScorer->ScoreIPAddress(ip, interfaceId) : DefaultScore(ip, interfaceId);
+    return sScorer != nullptr ? sScorer->ScoreIPAddress(ip, interfaceId) : to_underlying(DefaultScore(ip, interfaceId));
 }
 
 } // namespace IPAddressSorter

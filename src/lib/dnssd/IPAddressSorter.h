@@ -66,11 +66,12 @@ public:
 };
 
 /**
- * Installs `scorer`, or restores the IpScore values when `scorer` is null. `scorer` must remain valid until
- * it is replaced. Call this before the Matter stack starts or with the Matter stack lock held, because
- * scoring reads the installed scorer without synchronization.
+ * Installs `scorer`, or restores the IpScore values when `scorer` is null, and returns the scorer it replaces
+ * (null if none was installed) so that the caller can restore it later. `scorer` must remain valid until it is
+ * replaced. Call this before the Matter stack starts or with the Matter stack lock held, because scoring reads
+ * the installed scorer without synchronization.
  */
-void SetIPAddressScorer(IPAddressScorer * scorer);
+IPAddressScorer * SetIPAddressScorer(IPAddressScorer * scorer);
 
 void Sort(Inet::IPAddress * addresses, size_t count, Inet::InterfaceId interfaceId);
 

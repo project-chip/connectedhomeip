@@ -320,10 +320,10 @@ TEST(TestAddressResolveDefaultImpl, LookupResultOrdersResultsByTheInstalledScore
     AddressResolve::NodeLookupHandle handle;
     handle.ResetForLookup(System::SystemClock().GetMonotonicTimestamp(), NodeLookupRequest(chip::PeerId(1, 2)));
 
-    Dnssd::IPAddressSorter::SetIPAddressScorer(&scorer);
+    Dnssd::IPAddressSorter::IPAddressScorer * previousScorer = Dnssd::IPAddressSorter::SetIPAddressScorer(&scorer);
     handle.LookupResult(linkLocalResult);
     handle.LookupResult(uniqueLocalResult);
-    Dnssd::IPAddressSorter::SetIPAddressScorer(nullptr);
+    Dnssd::IPAddressSorter::SetIPAddressScorer(previousScorer);
 
     EXPECT_EQ(handle.TakeLookupResult().address, uniqueLocalResult.address);
     EXPECT_EQ(handle.TakeLookupResult().address, linkLocalResult.address);
@@ -674,9 +674,18 @@ public:
 class TestAddressResolveDefaultImplWithSystemLayer : public ::testing::Test
 {
 public:
-    void SetUp() { EXPECT_SUCCESS(mSystemLayer.Init()); }
+    void SetUp()
+    {
+        EXPECT_SUCCESS(mSystemLayer.Init());
+        mPreviousResolver = &chip::Dnssd::Resolver::Instance();
+        chip::Dnssd::Resolver::SetInstance(mockResolver);
+    }
 
-    void TearDown() { mSystemLayer.Shutdown(); }
+    void TearDown()
+    {
+        chip::Dnssd::Resolver::SetInstance(*mPreviousResolver);
+        mSystemLayer.Shutdown();
+    }
 
     class MockSystemLayer : public chip::System::LayerImpl
     {
@@ -699,6 +708,7 @@ public:
 
     MockSystemLayer mSystemLayer;
     MockResolver mockResolver;
+    chip::Dnssd::Resolver * mPreviousResolver = nullptr;
 };
 
 class TestAddressResolveDefaultImplWithSystemLayerAndNodeListener : public TestAddressResolveDefaultImplWithSystemLayer
@@ -805,8 +815,6 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, TriesNextRes
 
 TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, CancellingLookupCallsOnNodeAddressResolutionFailed)
 {
-    chip::Dnssd::Resolver::SetInstance(mockResolver);
-
     chip::AddressResolve::Impl::Resolver resolver;
     auto r = resolver.Init(&mSystemLayer);
 
@@ -854,8 +862,6 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, CancellingLo
 
 TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, LooksUpFailsAndCallsFailureListenerWhenSystemStartTimerFails)
 {
-    chip::Dnssd::Resolver::SetInstance(mockResolver);
-
     chip::AddressResolve::Impl::Resolver resolver;
     auto r = resolver.Init(&mSystemLayer);
 
@@ -889,8 +895,6 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, LooksUpFails
 TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener,
        CallsSuccessAndFailureListenersWhenAppropriateLookupResultsAreFound)
 {
-    chip::Dnssd::Resolver::SetInstance(mockResolver);
-
     chip::AddressResolve::Impl::Resolver resolver;
     auto r = resolver.Init(&mSystemLayer);
 

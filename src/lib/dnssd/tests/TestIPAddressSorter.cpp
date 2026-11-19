@@ -77,8 +77,11 @@ public:
 class ScopedScorer
 {
 public:
-    explicit ScopedScorer(IPAddressScorer & scorer) { SetIPAddressScorer(&scorer); }
-    ~ScopedScorer() { SetIPAddressScorer(nullptr); }
+    explicit ScopedScorer(IPAddressScorer & scorer) : mPreviousScorer(SetIPAddressScorer(&scorer)) {}
+    ~ScopedScorer() { SetIPAddressScorer(mPreviousScorer); }
+
+private:
+    IPAddressScorer * mPreviousScorer;
 };
 
 Inet::IPAddress MakeAddress(const char * string)
@@ -128,10 +131,12 @@ TEST(TestIPAddressSorter, SortUsesTheInstalledScorer)
 TEST(TestIPAddressSorter, ClearingTheScorerRestoresTheDefaultScores)
 {
     UniqueLocalFirstScorer scorer;
-    SetIPAddressScorer(&scorer);
+    IPAddressScorer * previousScorer = SetIPAddressScorer(&scorer);
     SetIPAddressScorer(nullptr);
 
     EXPECT_EQ(ScoreIPAddress(LinkLocalAddress(), Inet::InterfaceId::Null()), to_underlying(IpScore::kLinkLocal));
+
+    SetIPAddressScorer(previousScorer);
 }
 
 TEST(TestIPAddressSorter, ScorerCanUseTheDefaultScores)
@@ -141,6 +146,16 @@ TEST(TestIPAddressSorter, ScorerCanUseTheDefaultScores)
 
     EXPECT_EQ(ScoreIPAddress(LinkLocalAddress(), Inet::InterfaceId::Null()), to_underlying(IpScore::kLinkLocal));
     EXPECT_EQ(ScoreIPAddress(UniqueLocalAddress(), Inet::InterfaceId::Null()), to_underlying(IpScore::kLinkLocal) + 1);
+}
+
+TEST(TestIPAddressSorter, SetIPAddressScorerReturnsTheScorerItReplaces)
+{
+    UniqueLocalFirstScorer firstScorer;
+    UniqueLocalBoostingScorer secondScorer;
+
+    IPAddressScorer * originalScorer = SetIPAddressScorer(&firstScorer);
+    EXPECT_EQ(SetIPAddressScorer(&secondScorer), &firstScorer);
+    EXPECT_EQ(SetIPAddressScorer(originalScorer), &secondScorer);
 }
 
 } // namespace
