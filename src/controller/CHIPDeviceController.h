@@ -916,6 +916,10 @@ private:
     // True if the commissionee for this node ID still has a PASE session.
     bool HasLivePASESession(NodeId nodeId);
 
+    // Ends a commissioning that failed at or after network setup: keeps the commissionee and its PASE session for a retry,
+    // or, when the session is gone, releases the commissionee. Either way, sends the completion callbacks.
+    void FinishKeepingPASESession(NodeId nodeId);
+
     Optional<System::Clock::Timeout> mCommissioningStepTimeout; // Note: For multi-interaction steps this is per interaction
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     uint8_t mReadCommissioningInfoProgress = 0; // see ContinueReadingCommissioningInfo()

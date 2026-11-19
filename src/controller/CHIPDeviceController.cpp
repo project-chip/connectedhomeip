@@ -2384,14 +2384,6 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
 
         CleanupDoneAfterError();
     }
-    else if (completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup &&
-             !HasLivePASESession(nodeId))
-    {
-        // The PASE session was lost during commissioning, so there is nothing to keep for a retry, and no session to disarm
-        // the failsafe over. End as the disarm path does: release the commissionee and send the completion callbacks.
-        ChipLogProgress(Controller, "No PASE session left to keep for node 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
-        CleanupDoneAfterError();
-    }
     else if (completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup)
     {
         // If we were already doing network setup, we need to retain the pase session and start again from network setup stage.
@@ -2412,8 +2404,7 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
             mOnNetworkClientUnregistrationFinishNodeId   = nodeId;
             return;
         }
-        CommissioningStageComplete(CHIP_NO_ERROR);
-        SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
+        FinishKeepingPASESession(nodeId);
     }
     else
     {
@@ -2436,9 +2427,21 @@ void DeviceCommissioner::OnClientUnregisteredFromCleanupFinishCommissioning(void
 {
     OnClientUnregistered(context, status); // call base variant first
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
-    commissioner->SendCommissioningCompleteCallbacks(commissioner->mOnNetworkClientUnregistrationFinishNodeId,
-                                                     commissioner->mCommissioningCompletionStatus);
+    commissioner->FinishKeepingPASESession(commissioner->mOnNetworkClientUnregistrationFinishNodeId);
+}
+
+void DeviceCommissioner::FinishKeepingPASESession(NodeId nodeId)
+{
+    if (!HasLivePASESession(nodeId))
+    {
+        // The PASE session was lost during commissioning, so there is nothing to keep for a retry, and no session to disarm
+        // the failsafe over. End as the disarm path does: release the commissionee and send the completion callbacks.
+        ChipLogProgress(Controller, "No PASE session left to keep for node 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+        CleanupDoneAfterError();
+        return;
+    }
+    CommissioningStageComplete(CHIP_NO_ERROR);
+    SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
 }
 
 void DeviceCommissioner::OnDisarmFailsafe(void * context,
