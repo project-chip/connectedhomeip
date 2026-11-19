@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -200,3 +200,8 @@ chip::AppPlatform::ContentAppFactoryImpl * GetContentAppFactoryImpl();
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 CHIP_ERROR AppTvInit(void);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+CHIP_ERROR SetExampleFixedPasscodeCommissioningPasscode(uint32_t passcode);
+CHIP_ERROR SetExampleFixedPasscodeCommissioningEnabled(bool enabled, bool & stateChanged);
+#endif

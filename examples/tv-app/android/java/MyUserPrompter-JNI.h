@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,14 +36,16 @@ public:
     void PromptCommissioningStarted(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override;
     void PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override;
     void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) override;
+    void PromptFixedPasscodeCommissioningLockout(const char * commissioneeName) override;
 
 private:
     chip::JniGlobalReference mJNIMyUserPrompterObject;
-    jmethodID mPromptForCommissionOKPermissionMethod = nullptr;
-    jmethodID mPromptForCommissionPincodeMethod      = nullptr;
-    jmethodID mHidePromptsOnCancelMethod             = nullptr;
-    jmethodID mPromptWithCommissionerPasscodeMethod  = nullptr;
-    jmethodID mPromptCommissioningStartedMethod      = nullptr;
-    jmethodID mPromptCommissioningSucceededMethod    = nullptr;
-    jmethodID mPromptCommissioningFailedMethod       = nullptr;
+    jmethodID mPromptForCommissionOKPermissionMethod         = nullptr;
+    jmethodID mPromptForCommissionPincodeMethod              = nullptr;
+    jmethodID mHidePromptsOnCancelMethod                     = nullptr;
+    jmethodID mPromptWithCommissionerPasscodeMethod          = nullptr;
+    jmethodID mPromptCommissioningStartedMethod              = nullptr;
+    jmethodID mPromptCommissioningSucceededMethod            = nullptr;
+    jmethodID mPromptCommissioningFailedMethod               = nullptr;
+    jmethodID mPromptFixedPasscodeCommissioningLockoutMethod = nullptr;
 };

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -190,6 +190,57 @@ exit:
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+static CHIP_ERROR PrintFixedPasscodeCommissioningCommands()
+{
+    streamer_t * sout = streamer_get();
+    streamer_printf(sout, "  fixed-passcode set <passcode>       Set the Fixed Passcode Commissioning passcode.\r\n");
+    streamer_printf(sout, "  fixed-passcode enable               Enable Fixed Passcode Commissioning.\r\n");
+    streamer_printf(sout, "  fixed-passcode disable              Disable Fixed Passcode Commissioning.\r\n");
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR FixedPasscodeCommissioningHandler(int argc, char ** argv)
+{
+    streamer_t * sout = streamer_get();
+
+    if (argc == 0 || strcmp(argv[0], "help") == 0)
+    {
+        return PrintFixedPasscodeCommissioningCommands();
+    }
+    if (strcmp(argv[0], "set") == 0)
+    {
+        uint32_t passcode;
+        if (argc != 2 || !ArgParser::ParseInt(argv[1], passcode))
+        {
+            return PrintFixedPasscodeCommissioningCommands();
+        }
+        ReturnErrorOnFailure(SetExampleFixedPasscodeCommissioningPasscode(passcode));
+        streamer_printf(sout, "Fixed Passcode Commissioning passcode updated and lockout cleared.\r\n");
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "enable") == 0)
+    {
+        VerifyOrReturnError(argc == 1, CHIP_ERROR_INVALID_ARGUMENT);
+        bool stateChanged = false;
+        ReturnErrorOnFailure(SetExampleFixedPasscodeCommissioningEnabled(true, stateChanged));
+        streamer_printf(sout,
+                        stateChanged ? "Fixed Passcode Commissioning enabled and lockout cleared.\r\n"
+                                     : "Fixed Passcode Commissioning already enabled.\r\n");
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "disable") == 0)
+    {
+        VerifyOrReturnError(argc == 1, CHIP_ERROR_INVALID_ARGUMENT);
+        bool stateChanged = false;
+        ReturnErrorOnFailure(SetExampleFixedPasscodeCommissioningEnabled(false, stateChanged));
+        streamer_printf(sout, "Fixed Passcode Commissioning disabled.\r\n");
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
 static CHIP_ERROR PrintAllCommands()
 {
     streamer_t * sout = streamer_get();
@@ -218,6 +269,8 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout,
                     "  commission <udc-entry>     Commission given udc-entry using given pincode from corresponding app. Usage: "
                     "app commission 0\r\n");
+    streamer_printf(sout,
+                    "  fixed-passcode <command>   Configure Fixed Passcode Commissioning. Usage: app fixed-passcode help\r\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     streamer_printf(sout, "\r\n");
 
@@ -457,6 +510,10 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         char * eptr;
         size_t index = (size_t) strtol(argv[1], &eptr, 10);
         return error = pairApp(true, index);
+    }
+    else if (strcmp(argv[0], "fixed-passcode") == 0)
+    {
+        return FixedPasscodeCommissioningHandler(argc - 1, argv + 1);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     else

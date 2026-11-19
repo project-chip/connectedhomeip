@@ -193,6 +193,18 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     mHandler.sendMessage(obtained);
   }
 
+  public void promptFixedPasscodeCommissioningLockout(String commissioneeName) {
+    Log.d(
+        TAG,
+        "Fixed Passcode Commissioning disabled after repeated authentication failures from "
+            + commissioneeName);
+
+    android.os.Message obtained = android.os.Message.obtain();
+    obtained.what = MsgHandler.MSG_FixedPasscodeCommissioningLockout;
+    obtained.obj = commissioneeName;
+    mHandler.sendMessage(obtained);
+  }
+
   public void promptWithMessage(Message message) {
     Log.d(TAG, "Received message prompt for " + message.messageText);
 
@@ -418,6 +430,23 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     notificationManager.notify(FAIL_ID, builder.build());
   }
 
+  private void handleFixedPasscodeCommissioningLockout(android.os.Message msg) {
+    String commissioneeName = (String) msg.obj;
+    String message =
+        "Fixed Passcode Commissioning was disabled after repeated authentication failures from "
+            + commissioneeName
+            + ". Update the fixed passcode or disable and re-enable the feature.";
+
+    NotificationCompat.Builder builder =
+        new NotificationCompat.Builder(getContext(), CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_baseline_clear_24)
+            .setContentTitle("Fixed Passcode Commissioning Disabled")
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+    notificationManager.notify(FAIL_ID, builder.build());
+  }
+
   private void handlePromptWithMessage(android.os.Message msg) {
     Message message = (Message) msg.obj;
 
@@ -500,6 +529,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     public static final int MSG_CommissioningSucceeded = 106;
     public static final int MSG_CommissioningFailed = 107;
     public static final int MSG_PromptWithMessage = 108;
+    public static final int MSG_FixedPasscodeCommissioningLockout = 109;
     public static final String KEY_PROMPT_COMMISSIONER_PASSCODE =
         "KEY_PROMPT_COMMISSIONER_PASSCODE";
     private final WeakReference<MatterCommissioningPrompter> mPrompterWeakReference;
@@ -529,6 +559,8 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
         commissioningPrompter.handleCommissioningSucceeded(msg);
       } else if (msg.what == MSG_CommissioningFailed) {
         commissioningPrompter.handleCommissioningFailed(msg);
+      } else if (msg.what == MSG_FixedPasscodeCommissioningLockout) {
+        commissioningPrompter.handleFixedPasscodeCommissioningLockout(msg);
       } else if (msg.what == MSG_PromptWithMessage) {
         commissioningPrompter.handlePromptWithMessage(msg);
       }
