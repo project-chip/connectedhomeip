@@ -101,7 +101,7 @@ class TC_HSTAT_2_3(HSTATBase):
             TestStep(17, "If StepValue>1 then TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue+1, otherwise skip this step",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep(18, "TH reads from the DUT the UserSetpoint attribute.",
-                        "Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive such that (SetpointValue - MinSetpointValue) % StepValue == 0."),
+                     "Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive such that (SetpointValue - MinSetpointValue) % StepValue == 0."),
         ]
 
     @property
@@ -235,7 +235,7 @@ class TC_HSTAT_2_3(HSTATBase):
         asserts.assert_greater_equal(dut_UserSetpoint, dut_MinSetpoint, "UserSetpoint attribute is less than MinSetpoint")
         asserts.assert_less_equal(dut_UserSetpoint, dut_MaxSetpoint, "UserSetpoint attribute is greater than MaxSetpoint")
         asserts.assert_equal((dut_UserSetpoint - dut_MinSetpoint) % dut_Step, 0,
-                                "(UserSetpoint - MinSetpoint) is not divisible by Step")
+                             "(UserSetpoint - MinSetpoint) is not divisible by Step")
 
 
 if __name__ == '__main__':
