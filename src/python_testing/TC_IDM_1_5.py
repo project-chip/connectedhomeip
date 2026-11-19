@@ -126,7 +126,8 @@ class TC_IDM_1_5(IDMBaseTest):
         failsafe_armed = False
         try:
             # Step 2: Establish subscription to Breadcrumb with MinIntervalFloor = 0s, MaxIntervalCeiling = 3600s
-            self.step(2, "TH establishes a subscription to the Breadcrumb attribute of the GeneralCommissioning cluster on Endpoint 0 of the DUT with MinIntervalFloor set to 0 seconds and MaxIntervalCeiling set to 3600 seconds. TH synchronously awaits the initial prime report from the subscription establishment, records the timestamp t_prime, and verifies the negotiated MaxInterval from the SubscribeResponseMessage is within [0, 3600] seconds and leaves sufficient window for DelayReportData.")
+            self.step(
+                2, "TH establishes a subscription to the Breadcrumb attribute of the GeneralCommissioning cluster on Endpoint 0 of the DUT with MinIntervalFloor set to 0 seconds and MaxIntervalCeiling set to 3600 seconds. TH synchronously awaits the initial prime report from the subscription establishment, records the timestamp t_prime, and verifies the negotiated MaxInterval from the SubscribeResponseMessage is within [0, 3600] seconds and leaves sufficient window for DelayReportData.")
             log.info("Establishing subscription to Breadcrumb attribute on Endpoint 0 with MinIntervalFloor=%ds, MaxIntervalCeiling=%ds",
                      min_interval_floor_sec, max_interval_ceiling_sec)
             subscription = await dev_ctrl.ReadAttribute(
