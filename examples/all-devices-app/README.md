@@ -217,21 +217,6 @@ rm -rf /tmp/chip_*
 
 # Battery Storage (composite): parent on endpoint 1 plus five child endpoints (DEM, grid/battery electrical-sensor, grid/battery power-source)
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device battery-storage:1
-
-# Solar Power Figure 17 (single-phase AC + DEM + inverter temperature)
-./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device solar-power:1
-
-# Solar Power Figure 18 (Figure 17 plus four parallel panel-group DC sensors)
-./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device solar-power-four-panels:1
-
-# Solar Power Figure 19 (Figure 17 plus two string-level DC sensors)
-./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device solar-power-two-strings:1
-
-# Solar Power two strings × two panels (four flat panel DC sensors with Number and Position tags)
-./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device solar-power-two-strings-four-panels:1
-
-# Solar Power three-phase AC export with per-phase sensors
-./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device solar-power-three-phase:1
 ```
 
 ## Bridging Support: Bridged Modifier (`,bridged`)

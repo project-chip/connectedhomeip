@@ -439,9 +439,10 @@ TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredSemanticTags)
     ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
 
     ProviderAttributeReader reader(mProvider);
-    const uint16_t powerSourceNs = to_underlying(NS::kPowerSource);
-    const uint16_t locationNs    = to_underlying(NS::kLocation);
-    ExpectSemanticTags(reader, device.GetOutputElectricalSensor().GetEndpointId(), { { powerSourceNs, 0x01 } });
+    const uint16_t powerSourceNs           = to_underlying(NS::kPowerSource);
+    const uint16_t electricalMeasurementNs = to_underlying(NS::kElectricalMeasurement);
+    const uint16_t locationNs              = to_underlying(NS::kLocation);
+    ExpectSemanticTags(reader, device.GetOutputElectricalSensor().GetEndpointId(), { { electricalMeasurementNs, 0x01 } });
     ExpectSemanticTags(reader, device.GetGridPowerSource().GetEndpointId(), { { powerSourceNs, 0x01 } });
     ExpectSemanticTags(reader, device.GetInverterTemperatureSensor().GetEndpointId(),
                        { { locationNs, to_underlying(Clusters::Globals::LocationTag::kOutdoor) } });

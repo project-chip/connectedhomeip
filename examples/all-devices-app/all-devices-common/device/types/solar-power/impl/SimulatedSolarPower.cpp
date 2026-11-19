@@ -17,7 +17,6 @@
 #include <device/types/solar-power/impl/SimulatedSolarPower.h>
 
 #include <clusters/shared/Enums.h>
-#include <device/types/solar-power/SolarPowerTags.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip::app {
@@ -26,6 +25,14 @@ namespace {
 
 using DemFeature = Clusters::DeviceEnergyManagement::Feature;
 using NS         = Clusters::Globals::SemanticTagNamespaceId;
+
+Span<const EndpointComposition::SemanticTag> AcOutputTag()
+{
+    static const EndpointComposition::SemanticTag kTag[] = {
+        { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kElectricalMeasurement), .tag = 0x01 },
+    };
+    return Span(kTag);
+}
 
 Span<const EndpointComposition::SemanticTag> InverterTemperatureTag()
 {
@@ -58,8 +65,7 @@ Clusters::TemperatureMeasurementCluster::StartupConfiguration InverterTemperatur
 
 SimulatedSolarPower::SimulatedSolarPower(const Context & context, const Config & config) :
     SolarPower(), mTimerDelegate(context.timerDelegate), mTags(config.tags),
-    mOutputElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, SolarPowerTags::GridConnectionTag(),
-                            config.outputSensorRole),
+    mOutputElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, AcOutputTag(), config.outputSensorRole),
     mPanelCount(config.panels.size()), mEnergyManagement(context.timerDelegate, SolarPowerEnergyManagementConfig()),
     mInverterTemperatureSensor(context.timerDelegate, InverterTemperatureConfig())
 {

@@ -21,7 +21,8 @@
 
 namespace chip::app {
 
-/// Solar Power device type (0x0017) rev 2 parent with mandatory composed endpoints.
+/// Solar Power device type (0x0017) rev 2 parent with mandatory grid Power Source;
+/// subclasses must register the mandatory Electrical Sensor (0x0510) endpoint.
 class SolarPower : public DeviceInterface
 {
 public:
