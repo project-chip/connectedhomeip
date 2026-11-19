@@ -2445,12 +2445,19 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
         return DlStatus::kFailure;
     }
 
+    if (user.userStatus == UserStatusEnum::kAvailable)
+    {
+        ChipLogProgress(Zcl, "[ModifyUserCredential] Unable to modify credential: user slot is empty [endpointId=%d,userIndex=%d]",
+                        endpointId, userIndex);
+        return DlStatus::kInvalidField;
+    }
+
     // return INVALID_COMMAND if the accessing fabric index doesn’t match the
     // CreatorFabricIndex in the user record pointed to by UserIndex
     if (user.createdBy != modifierFabricIdx)
     {
         ChipLogProgress(Zcl,
-                        "[createCredential] Unable to modify credential for user created by different fabric "
+                        "[ModifyUserCredential] Unable to modify credential for user created by different fabric "
                         "[endpointId=%d,userIndex=%d,creatorIdx=%d,fabricIdx=%d]",
                         endpointId, userIndex, user.createdBy, modifierFabricIdx);
         return DlStatus::kInvalidField;
@@ -2481,8 +2488,8 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
             {
                 ChipLogProgress(
                     Zcl,
-                    "[ModifyUserCredential] Unable to modify user credential: credential with this index is already associated "
-                    "with user [endpointId=%d,userIndex=%d,credentialType=%d,credentialIndex=%d,userTotalCredentials=%u]",
+                    "[ModifyUserCredential] Unable to modify user credential: app error "
+                    "[endpointId=%d,userIndex=%d,credentialType=%d,credentialIndex=%d,userTotalCredentials=%u]",
                     endpointId, userIndex, to_underlying(credential.credentialType), credential.credentialIndex,
                     static_cast<unsigned int>(user.credentials.size()));
                 return DlStatus::kFailure;
