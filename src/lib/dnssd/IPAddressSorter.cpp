@@ -16,65 +16,80 @@
  */
 
 #include <lib/dnssd/IPAddressSorter.h>
+
 #include <lib/support/SortUtils.h>
+#include <lib/support/TypeTraits.h>
 
 namespace chip {
 namespace Dnssd {
 namespace IPAddressSorter {
 
-void Sort(Inet::IPAddress * addresses, size_t count, Inet::InterfaceId interfaceId)
-{
-    Sorting::InsertionSort(addresses, count, [interfaceId](const Inet::IPAddress & a, const Inet::IPAddress & b) -> bool {
-        auto scoreA = to_underlying(ScoreIpAddress(a, interfaceId));
-        auto scoreB = to_underlying(ScoreIpAddress(b, interfaceId));
-        return scoreA > scoreB;
-    });
-}
+namespace {
 
-void Sort(const Span<Inet::IPAddress> & addresses, Inet::InterfaceId interfaceId)
-{
-    Sorting::InsertionSort(addresses.data(), addresses.size(),
-                           [interfaceId](const Inet::IPAddress & a, const Inet::IPAddress & b) -> bool {
-                               auto scoreA = to_underlying(ScoreIpAddress(a, interfaceId));
-                               auto scoreB = to_underlying(ScoreIpAddress(b, interfaceId));
-                               return scoreA > scoreB;
-                           });
-}
-
-IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
+uint8_t DefaultScore(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
 {
     if (ip.IsIPv6())
     {
         if (ip.IsIPv6LinkLocal())
         {
-            return IpScore::kLinkLocal;
+            return to_underlying(IpScore::kLinkLocal);
         }
 
         if (interfaceId.MatchLocalIPv6Subnet(ip))
         {
             if (ip.IsIPv6GlobalUnicast())
             {
-                return IpScore::kGlobalUnicastWithSharedPrefix;
+                return to_underlying(IpScore::kGlobalUnicastWithSharedPrefix);
             }
             if (ip.IsIPv6ULA())
             {
-                return IpScore::kUniqueLocalWithSharedPrefix;
+                return to_underlying(IpScore::kUniqueLocalWithSharedPrefix);
             }
         }
         if (ip.IsIPv6GlobalUnicast())
         {
-            return IpScore::kGlobalUnicast;
+            return to_underlying(IpScore::kGlobalUnicast);
         }
 
         if (ip.IsIPv6ULA())
         {
-            return IpScore::kUniqueLocal;
+            return to_underlying(IpScore::kUniqueLocal);
         }
 
-        return IpScore::kOtherIpv6;
+        return to_underlying(IpScore::kOtherIpv6);
     }
+    return to_underlying(IpScore::kIpv4);
+}
 
-    return IpScore::kIpv4;
+IPAddressScorer * sScorer = nullptr;
+
+} // namespace
+
+uint8_t IPAddressScorer::ScoreIPAddress(const Inet::IPAddress & address, Inet::InterfaceId interfaceId)
+{
+    return DefaultScore(address, interfaceId);
+}
+
+void SetIPAddressScorer(IPAddressScorer * scorer)
+{
+    sScorer = scorer;
+}
+
+void Sort(Inet::IPAddress * addresses, size_t count, Inet::InterfaceId interfaceId)
+{
+    Sorting::InsertionSort(addresses, count, [interfaceId](const Inet::IPAddress & a, const Inet::IPAddress & b) -> bool {
+        return ScoreIPAddress(a, interfaceId) > ScoreIPAddress(b, interfaceId);
+    });
+}
+
+void Sort(const Span<Inet::IPAddress> & addresses, Inet::InterfaceId interfaceId)
+{
+    Sort(addresses.data(), addresses.size(), interfaceId);
+}
+
+uint8_t ScoreIPAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
+{
+    return sScorer != nullptr ? sScorer->ScoreIPAddress(ip, interfaceId) : DefaultScore(ip, interfaceId);
 }
 
 } // namespace IPAddressSorter
