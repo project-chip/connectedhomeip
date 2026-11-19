@@ -55,8 +55,25 @@ void LoggingTemperatureControlledCabinetPart::StartEmulatedOperationTimer()
     SuccessOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kEmulatedOperationDurationSec)));
 }
 
+DataModel::Nullable<uint32_t> LoggingTemperatureControlledCabinetPart::GetCountdownTime()
+{
+    const uint8_t state = OperationalState().GetCurrentOperationalState();
+    if (state != to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning) &&
+        state != to_underlying(Clusters::OperationalState::OperationalStateEnum::kPaused))
+    {
+        return DataModel::NullNullable;
+    }
+    return mCountdownTime;
+}
+
 void LoggingTemperatureControlledCabinetPart::TimerFired()
 {
+    if (OperationalState().GetCurrentOperationalState() !=
+        to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning))
+    {
+        return;
+    }
+
     ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Emulated operation timer finished.", mName);
     mCountdownTime.SetNull();
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
@@ -108,16 +125,16 @@ void LoggingTemperatureControlledCabinetPart::HandlePauseStateCallback(Clusters:
 void LoggingTemperatureControlledCabinetPart::HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Resume command received.", mName);
-    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     StartEmulatedOperationTimer();
+    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
 }
 
 void LoggingTemperatureControlledCabinetPart::HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Start command received.", mName);
-    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     StartEmulatedOperationTimer();
+    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
 }
 

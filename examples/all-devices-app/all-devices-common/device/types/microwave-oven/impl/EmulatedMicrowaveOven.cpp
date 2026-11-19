@@ -46,10 +46,14 @@ void EmulatedMicrowaveOven::Unregister(CodeDrivenDataModelProvider & provider)
 
 DataModel::Nullable<uint32_t> EmulatedMicrowaveOven::GetCountdownTime()
 {
-    if (OperationalState().GetCurrentOperationalState() !=
-        to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning))
+    const uint8_t state = OperationalState().GetCurrentOperationalState();
+    if (state == to_underlying(Clusters::OperationalState::OperationalStateEnum::kPaused))
     {
         return mCountdownTime;
+    }
+    if (state != to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning))
+    {
+        return DataModel::NullNullable;
     }
 
     // Per Matter Operational State Specification Section 1.14.5.1 (CountdownTime Attribute):
@@ -81,6 +85,12 @@ void EmulatedMicrowaveOven::StartEmulatedOperationTimer(uint32_t durationSec)
 
 void EmulatedMicrowaveOven::TimerFired()
 {
+    if (OperationalState().GetCurrentOperationalState() !=
+        to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning))
+    {
+        return;
+    }
+
     ChipLogProgress(Zcl, "EmulatedMicrowaveOven: Emulated operation timer finished. Reverting state to Stopped.");
     mCountdownTime.SetNull();
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
@@ -133,17 +143,17 @@ void EmulatedMicrowaveOven::HandlePauseStateCallback(Clusters::OperationalState:
 void EmulatedMicrowaveOven::HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "EmulatedMicrowaveOven: Resume command received.");
-    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     uint32_t remainingSec = mCountdownTime.IsNull() ? kEmulatedOperationDurationSec : mCountdownTime.Value();
     StartEmulatedOperationTimer(remainingSec);
+    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
 }
 
 void EmulatedMicrowaveOven::HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "EmulatedMicrowaveOven: Start command received.");
-    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     StartEmulatedOperationTimer();
+    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
 }
 

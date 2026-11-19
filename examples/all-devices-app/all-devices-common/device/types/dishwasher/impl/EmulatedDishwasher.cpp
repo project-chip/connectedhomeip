@@ -45,10 +45,14 @@ void EmulatedDishwasher::Unregister(CodeDrivenDataModelProvider & provider)
 
 DataModel::Nullable<uint32_t> EmulatedDishwasher::GetCountdownTime()
 {
-    if (OperationalState().GetCurrentOperationalState() !=
-        to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning))
+    const uint8_t state = OperationalState().GetCurrentOperationalState();
+    if (state == to_underlying(Clusters::OperationalState::OperationalStateEnum::kPaused))
     {
         return mCountdownTime;
+    }
+    if (state != to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning))
+    {
+        return DataModel::NullNullable;
     }
 
     // Per Matter Operational State Specification Section 1.14.5.1 (CountdownTime Attribute):
@@ -80,6 +84,12 @@ void EmulatedDishwasher::StartEmulatedOperationTimer(uint32_t durationSec)
 
 void EmulatedDishwasher::TimerFired()
 {
+    if (OperationalState().GetCurrentOperationalState() !=
+        to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning))
+    {
+        return;
+    }
+
     ChipLogProgress(Zcl, "EmulatedDishwasher: Emulated operation timer finished. Reverting state to Stopped.");
     mCountdownTime.SetNull();
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
@@ -132,17 +142,17 @@ void EmulatedDishwasher::HandlePauseStateCallback(Clusters::OperationalState::Ge
 void EmulatedDishwasher::HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "EmulatedDishwasher: Resume command received.");
-    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     uint32_t remainingSec = mCountdownTime.IsNull() ? kEmulatedOperationDurationSec : mCountdownTime.Value();
     StartEmulatedOperationTimer(remainingSec);
+    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
 }
 
 void EmulatedDishwasher::HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "EmulatedDishwasher: Start command received.");
-    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     StartEmulatedOperationTimer();
+    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
 }
 

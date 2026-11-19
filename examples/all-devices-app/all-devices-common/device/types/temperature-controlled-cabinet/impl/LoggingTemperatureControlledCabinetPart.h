@@ -38,7 +38,7 @@ public:
     void TimerFired() override;
 
     // OperationalState::Delegate Interface
-    DataModel::Nullable<uint32_t> GetCountdownTime() override { return mCountdownTime; }
+    DataModel::Nullable<uint32_t> GetCountdownTime() override;
     CHIP_ERROR GetOperationalStateAtIndex(size_t index,
                                           Clusters::OperationalState::GenericOperationalState & operationalState) override;
     CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
