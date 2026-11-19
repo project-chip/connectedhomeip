@@ -250,7 +250,7 @@ public:
 private:
     WebRTCTransportRequestor::Delegate & mDelegate;
     FabricTable & mFabricTable;
-    std::vector<WebRTCSessionStruct> mCurrentSessions;
+    std::vector<WebRTCSessionStorage> mCurrentSessions;
 
     // Helper functions
     WebRTCSessionStruct * FindSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex);
