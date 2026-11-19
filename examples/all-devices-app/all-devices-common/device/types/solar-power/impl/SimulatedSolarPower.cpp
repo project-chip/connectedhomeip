@@ -69,14 +69,14 @@ SimulatedSolarPower::SimulatedSolarPower(const Context & context, const Config &
         const auto & panel = config.panels[index];
         if (panel.withUserLabel)
         {
-            mPanels[index] = std::make_unique<PanelElectricalSensor>(
-                context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable, context.deviceInfoProvider,
-                panel.tags, panel.role);
+            mPanels[index] =
+                std::make_unique<PanelElectricalSensor>(context.timerDelegate, context.testEventTriggerDelegate,
+                                                        context.fabricTable, context.deviceInfoProvider, panel.tags, panel.role);
         }
         else
         {
             mPanels[index] = std::make_unique<SimulatedElectricalSensor>(context.timerDelegate, context.testEventTriggerDelegate,
-                                                                        panel.tags, panel.role);
+                                                                         panel.tags, panel.role);
         }
     }
 }

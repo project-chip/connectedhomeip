@@ -413,8 +413,8 @@ TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredTopologyAndDeviceTypes)
                                Clusters::DeviceEnergyManagement::Attributes::FeatureMap::Id, featureMap));
     EXPECT_EQ(featureMap, BitMask<DemFeature>(DemFeature::kPowerAdjustment).Raw());
 
-    ASSERT_SUCCESS(reader.Read(gridSourceEndpoint, Clusters::PowerSource::Id,
-                               Clusters::PowerSource::Attributes::FeatureMap::Id, featureMap));
+    ASSERT_SUCCESS(
+        reader.Read(gridSourceEndpoint, Clusters::PowerSource::Id, Clusters::PowerSource::Attributes::FeatureMap::Id, featureMap));
     EXPECT_EQ(featureMap, BitMask<PsFeature>(PsFeature::kWired).Raw());
 
     ASSERT_SUCCESS(reader.Read(outputEndpoint, Clusters::ElectricalEnergyMeasurement::Id,

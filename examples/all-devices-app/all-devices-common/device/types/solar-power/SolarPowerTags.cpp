@@ -22,7 +22,7 @@ namespace chip::app::SolarPowerTags {
 
 Span<const EndpointComposition::SemanticTag> GridConnectionTag()
 {
-    using NS = Clusters::Globals::SemanticTagNamespaceId;
+    using NS                                             = Clusters::Globals::SemanticTagNamespaceId;
     static const EndpointComposition::SemanticTag kTag[] = {
         { .mfgCode = DataModel::NullNullable, .namespaceID = to_underlying(NS::kPowerSource), .tag = 0x01 },
     };
