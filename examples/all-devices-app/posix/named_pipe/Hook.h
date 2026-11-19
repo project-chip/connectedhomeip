@@ -22,6 +22,7 @@
 
 #include <device/types/ambient-context-sensor/NamedPipeTranslators.h>
 #include <device/types/boolean-state-sensor/NamedPipeTranslators.h>
+#include <device/types/closure-controller/NamedPipeTranslators.h>
 #include <device/types/dimmable-light/NamedPipeTranslators.h>
 #include <device/types/dimmable-plug-in-unit/NamedPipeTranslators.h>
 #include <device/types/doorbell/NamedPipeTranslators.h>
@@ -30,8 +31,11 @@
 #include <device/types/mounted-dimmable-load-control/NamedPipeTranslators.h>
 #include <device/types/mounted-on-off-control/NamedPipeTranslators.h>
 #include <device/types/occupancy-sensor/NamedPipeTranslators.h>
+#include <device/types/on-off-light-switch/NamedPipeTranslators.h>
 #include <device/types/on-off-light/NamedPipeTranslators.h>
 #include <device/types/on-off-plug-in-unit/NamedPipeTranslators.h>
+#include <device/types/on-off-plug-in-unit/impl/NamedPipeTranslators.h>
+#include <device/types/proximity-ranger/NamedPipeTranslators.h>
 #include <device/types/robotic-vacuum-cleaner/NamedPipeTranslators.h>
 #include <device/types/root-node/NamedPipeTranslators.h>
 

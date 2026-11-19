@@ -34,16 +34,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Volume::Id, BitFlags<D
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Volume
 namespace MinDeviceVolume {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinDeviceVolume::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MinDeviceVolume::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MinDeviceVolume
 namespace MaxDeviceVolume {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxDeviceVolume::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxDeviceVolume::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxDeviceVolume
 namespace MaxDeviceVolumeDB {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxDeviceVolumeDB::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxDeviceVolumeDB::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxDeviceVolumeDB
 namespace MaxUserVolume {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxUserVolume::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -93,12 +96,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Treble::Id, BitFlags<D
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Treble
 namespace MinCorrection {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinCorrection::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MinCorrection::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MinCorrection
 namespace MaxCorrection {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxCorrection::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxCorrection::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxCorrection
 constexpr std::array<DataModel::AttributeEntry, 9> kMandatoryMetadata = {
     SoftMuted::kMetadataEntry,

@@ -22,8 +22,9 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 namespace MaxRootCertificates {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxRootCertificates::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxRootCertificates::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxRootCertificates
 namespace ProvisionedRootCertificates {
 inline constexpr DataModel::AttributeEntry
@@ -33,8 +34,9 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace ProvisionedRootCertificates
 namespace MaxClientCertificates {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxClientCertificates::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxClientCertificates::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxClientCertificates
 namespace ProvisionedClientCertificates {
 inline constexpr DataModel::AttributeEntry

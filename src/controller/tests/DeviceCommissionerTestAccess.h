@@ -38,7 +38,26 @@ public:
         return mCommissioner->ParseOperationalCredentialsInfo(info);
     }
 
-    auto PaaAttestationIssuerProfile() const { return mCommissioner->mPaaAttestationIssuerProfile; }
+    CHIP_ERROR
+    PrepareCertificateChainRequest(Credentials::CertificateType type,
+                                   std::optional<Credentials::DeviceAttestationChainProfile> chain, Optional<uint16_t> segment,
+                                   app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type & request)
+    {
+        return mCommissioner->PrepareCertificateChainRequest(type, chain, segment, request);
+    }
+
+    auto & CertificateRequestTracker() { return mCommissioner->mCertificateChainRequestState.requestTracker; }
+
+    void OnCertificateChainFailureResponse(CHIP_ERROR error)
+    {
+        Controller::DeviceCommissioner::OnCertificateChainFailureResponse(mCommissioner, error);
+    }
+
+    void OnCertificateChainResponse(
+        const app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & response)
+    {
+        Controller::DeviceCommissioner::OnCertificateChainResponse(mCommissioner, response);
+    }
 
     void SetAttributeCache(Platform::UniquePtr<app::ClusterStateCache> cache) { mCommissioner->mAttributeCache = std::move(cache); }
 
@@ -50,6 +69,18 @@ public:
     }
 
     void SetDeviceBeingCommissioned(DeviceProxy * device) { mCommissioner->mDeviceBeingCommissioned = device; }
+
+    Controller::SetUpCodePairer & GetSetUpCodePairer() { return mCommissioner->mSetUpCodePairer; }
+
+    void FailPASE(CHIP_ERROR error) { mCommissioner->OnSessionEstablishmentError(error); }
+
+#if CONFIG_NETWORK_LAYER_BLE
+    BLE_CONNECTION_OBJECT GetPASEConnectionObject() const
+    {
+        const auto & parameters = mCommissioner->mRendezvousParametersForPASEEstablishment;
+        return parameters.has_value() ? parameters->GetConnectionObject() : BLE_CONNECTION_UNINITIALIZED;
+    }
+#endif
 
     static CHIP_ERROR VerifyNetworkClientIdentity(ByteSpan clientIdentity, ByteSpan possessionSignature, ByteSpan nonce,
                                                   Credentials::MutableCertificateKeyId outClientIdentifier)

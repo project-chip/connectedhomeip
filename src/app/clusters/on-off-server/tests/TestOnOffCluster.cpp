@@ -321,6 +321,63 @@ TEST_F(TestOnOffCluster, TestMultipleDelegates)
     EXPECT_TRUE(secondaryDelegate.mOnOff); // Should remain true (last state)
 }
 
+TEST_F(TestOnOffCluster, TestSceneSerializeAddUnsupportedAttribute)
+{
+    using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
+
+    AttributeValuePair pairs[1];
+    pairs[0].attributeID = 0x4011;
+    pairs[0].valueUnsigned16.SetValue(1);
+
+    uint8_t inputBuffer[128];
+    MutableByteSpan inputBytes(inputBuffer);
+    ASSERT_EQ(mCluster.EncodeAttributeValueList(DataModel::List<AttributeValuePair>(pairs), inputBytes), CHIP_NO_ERROR);
+
+    ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType fieldSet;
+    fieldSet.clusterID = Clusters::OnOff::Id;
+    ASSERT_EQ(mCluster.DecodeAttributeValueList(inputBytes, fieldSet.attributeValueList), CHIP_NO_ERROR);
+
+    uint8_t outputBuffer[128];
+    MutableByteSpan outputBytes(outputBuffer);
+    EXPECT_EQ(mCluster.SerializeAdd(kTestEndpointId, fieldSet, outputBytes), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+}
+
+TEST_F(TestOnOffCluster, TestSceneSerializeAddOnOffAttribute)
+{
+    using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
+
+    constexpr uint8_t kValues[] = { 0, 1 };
+    for (uint8_t value : kValues)
+    {
+        AttributeValuePair pairs[1];
+        pairs[0].attributeID = Attributes::OnOff::Id;
+        pairs[0].valueUnsigned8.SetValue(value);
+
+        uint8_t inputBuffer[128];
+        MutableByteSpan inputBytes(inputBuffer);
+        ASSERT_EQ(mCluster.EncodeAttributeValueList(DataModel::List<AttributeValuePair>(pairs), inputBytes), CHIP_NO_ERROR);
+
+        ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType fieldSet;
+        fieldSet.clusterID = Clusters::OnOff::Id;
+        ASSERT_EQ(mCluster.DecodeAttributeValueList(inputBytes, fieldSet.attributeValueList), CHIP_NO_ERROR);
+
+        uint8_t outputBuffer[128];
+        MutableByteSpan outputBytes(outputBuffer);
+        ASSERT_EQ(mCluster.SerializeAdd(kTestEndpointId, fieldSet, outputBytes), CHIP_NO_ERROR);
+        EXPECT_GT(outputBytes.size(), 0u);
+
+        ScenesManagement::Structs::ExtensionFieldSetStruct::Type decodedFieldSet;
+        ASSERT_EQ(mCluster.Deserialize(kTestEndpointId, Clusters::OnOff::Id, outputBytes, decodedFieldSet), CHIP_NO_ERROR);
+        EXPECT_EQ(decodedFieldSet.clusterID, Clusters::OnOff::Id);
+        ASSERT_EQ(decodedFieldSet.attributeValueList.size(), 1u);
+        const auto & pair = decodedFieldSet.attributeValueList[0];
+        EXPECT_EQ(pair.attributeID, Attributes::OnOff::Id);
+        ASSERT_TRUE(pair.valueUnsigned8.HasValue());
+        EXPECT_EQ(pair.valueUnsigned8.Value(), value);
+        EXPECT_FALSE(mCluster.GetOnOff());
+    }
+}
+
 TEST_F(TestOnOffCluster, TestSceneSupport)
 {
     // Step 1: Turn ON

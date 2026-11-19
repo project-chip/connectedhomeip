@@ -4,6 +4,7 @@ Usage:
 python -m unittest
 """
 
+import json
 import os
 import shutil
 import tempfile
@@ -64,6 +65,22 @@ class TestZapFileParser(unittest.TestCase):
             name = zap_file_parser.generate_name(_TEST_FILE)
             self.assertEqual(
                 name, "rootnode_dimmablelight_Xir1gEfjij", "Name incorrectly generated.")
+
+    def test_merge_zap_files(self):
+        """Tests merge_zap_files appends non-root endpoints and returns endpoint ID mappings."""
+        with tempfile.TemporaryDirectory(dir=os.path.dirname(_HERE)) as tmpdir:
+            zap_1 = os.path.join(tmpdir, "device1.zap")
+            zap_2 = os.path.join(tmpdir, "device2.zap")
+            shutil.copy(_TEST_FILE, zap_1)
+            shutil.copy(_TEST_FILE, zap_2)
+            merged_zap = os.path.join(tmpdir, "merged.zap")
+            mappings = zap_file_parser.merge_zap_files([zap_1, zap_2], merged_zap)
+            self.assertEqual(mappings, {zap_1: {0: 0, 1: 1}, zap_2: {0: 0, 1: 2}})
+            with open(merged_zap) as f:
+                merged_data = json.load(f)
+            endpoint_ids = [ep["endpointId"] for ep in merged_data["endpoints"]]
+            self.assertEqual(endpoint_ids, [0, 1, 2])
+            self.assertEqual(len(merged_data["endpointTypes"]), 3)
 
 
 if __name__ == "__main__":

@@ -44,7 +44,23 @@ using chip::Transport::ProxyTransportDelegate;
 constexpr uint16_t kSessionId      = 0x1234;
 constexpr uint16_t kOtherSessionId = 0x5678;
 
-const uint8_t kPayload[] = { 0xde, 0xad, 0xbe, 0xef };
+// An unsecured unicast message, as a commissionee sends before PASE: message header
+// (message flags, Session ID 0, security flags, message counter) and protocol header
+// (exchange flags, opcode, exchange ID, protocol ID).
+const uint8_t kPayload[] = { 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00 };
+
+// The same message header on secure unicast Session ID 1, and on group session 1, each
+// followed by a 6-byte encrypted protocol header and a 16-byte MIC.
+constexpr uint16_t kSecureSessionId   = 0x0001;
+const uint8_t kSecurePayload[]        = { 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00, 0x00,
+                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+const uint8_t kGroupPayload[]         = { 0x00, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00, 0x00,
+                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+constexpr size_t kMessageHeaderLength = 8;
+constexpr size_t kMicLength           = 16;
+
+// Version nibble 0xD in the message flags: not a Matter message.
+const uint8_t kNotMatterPayload[] = { 0xde, 0xad, 0xbe, 0xef };
 
 /**
  * Records the packets the transport asks to be forwarded to the proxy, and can
@@ -261,6 +277,95 @@ TEST_F(TestProxyTransport, ReceivedEmptyMessageIsRejected)
     ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
     EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan()), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(mRawDelegate.mCallCount, 0u);
+}
+
+// Spec, Device Discovery, Using Commissioning Proxy: "The Commissioner SHALL terminate the
+// proxy session if a ProxyMessageResponse carries a message that does not conform to the
+// Message Format, or a message whose Session ID identifies neither the Unsecured Session
+// nor the PASE session established through that proxy session." An error return is what
+// makes the caller terminate it.
+TEST_F(TestProxyTransport, ReceivedNonMatterMessageIsRejected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kNotMatterPayload)), CHIP_ERROR_VERSION_MISMATCH);
+    EXPECT_EQ(mRawDelegate.mCallCount, 0u);
+}
+
+// The Message Payload of a Matter message must contain a Protocol Message.
+TEST_F(TestProxyTransport, ReceivedHeaderOnlyMessageIsRejected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kPayload, kMessageHeaderLength)),
+              CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    EXPECT_EQ(mRawDelegate.mCallCount, 0u);
+}
+
+TEST_F(TestProxyTransport, ReceivedSecureMessageWithoutMicIsRejected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kSecurePayload, sizeof(kSecurePayload) - kMicLength)),
+              CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    EXPECT_EQ(mRawDelegate.mCallCount, 0u);
+}
+
+TEST_F(TestProxyTransport, ReceivedUnsecuredMessageAfterPaseIsInjected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kPayload)), CHIP_NO_ERROR);
+    EXPECT_EQ(mRawDelegate.mCallCount, 1u);
+}
+
+TEST_F(TestProxyTransport, ReceivedSecureMessageForThisProxyPaseSessionIsInjected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kSecurePayload)), CHIP_NO_ERROR);
+    EXPECT_EQ(mRawDelegate.mCallCount, 1u);
+}
+
+TEST_F(TestProxyTransport, ReceivedSecureMessageBeforePaseIsRejected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kSecurePayload)), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_EQ(mRawDelegate.mCallCount, 0u);
+}
+
+TEST_F(TestProxyTransport, ReceivedSecureMessageForAnotherSessionIsRejected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId + 1), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kSecurePayload)), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_EQ(mRawDelegate.mCallCount, 0u);
+}
+
+// Each proxy numbers its sessions independently, so the next proxy session can reuse
+// the Session ID of the last one while the old PASE session is still being evicted.
+TEST_F(TestProxyTransport, ReceivedSecureMessageForEarlierProxySessionsPaseIsRejected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId), CHIP_NO_ERROR);
+    mTransport.Deactivate();
+
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kSecurePayload)), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_EQ(mRawDelegate.mCallCount, 0u);
+}
+
+TEST_F(TestProxyTransport, ReceivedGroupMessageIsRejected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kGroupPayload)), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_EQ(mRawDelegate.mCallCount, 0u);
+}
+
+TEST_F(TestProxyTransport, PaseSessionIsNotRecordedForAnotherProxySession)
+{
+    EXPECT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId), CHIP_ERROR_INCORRECT_STATE);
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.SetPaseLocalSessionId(kOtherSessionId, kSecureSessionId), CHIP_ERROR_INCORRECT_STATE);
 }
 
 } // namespace

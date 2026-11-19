@@ -58,12 +58,12 @@ namespace Commands {
 namespace SetSettings {
 enum class Fields : uint8_t
 {
-    kUserSetpoint = 0,
-    kMode         = 1,
-    kMistType     = 2,
-    kContinuous   = 3,
-    kSleep        = 4,
-    kOptimal      = 5,
+    kUserSetpoint   = 0,
+    kHumidistatMode = 1,
+    kMistType       = 2,
+    kContinuous     = 3,
+    kSleep          = 4,
+    kOptimal        = 5,
 };
 
 struct Type
@@ -74,7 +74,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Humidistat::Id; }
 
     Optional<chip::Percent> userSetpoint;
-    Optional<ModeEnum> mode;
+    Optional<HumidistatModeEnum> humidistatMode;
     Optional<chip::BitMask<MistTypeBitmap>> mistType;
     Optional<bool> continuous;
     Optional<bool> sleep;
@@ -95,7 +95,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::Percent> userSetpoint;
-    Optional<ModeEnum> mode;
+    Optional<HumidistatModeEnum> humidistatMode;
     Optional<chip::BitMask<MistTypeBitmap>> mistType;
     Optional<bool> continuous;
     Optional<bool> sleep;

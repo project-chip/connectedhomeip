@@ -22,8 +22,9 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 namespace UTCTime {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(UTCTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(UTCTime::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace UTCTime
 namespace Granularity {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Granularity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -52,28 +53,33 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace DSTOffset
 namespace LocalTime {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(LocalTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(LocalTime::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace LocalTime
 namespace TimeZoneDatabase {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TimeZoneDatabase::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TimeZoneDatabase::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TimeZoneDatabase
 namespace NTPServerAvailable {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NTPServerAvailable::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace NTPServerAvailable
 namespace TimeZoneListMaxSize {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TimeZoneListMaxSize::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TimeZoneListMaxSize::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TimeZoneListMaxSize
 namespace DSTOffsetListMaxSize {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(DSTOffsetListMaxSize::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(DSTOffsetListMaxSize::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace DSTOffsetListMaxSize
 namespace SupportsDNSResolve {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportsDNSResolve::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportsDNSResolve::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace SupportsDNSResolve
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     UTCTime::kMetadataEntry,

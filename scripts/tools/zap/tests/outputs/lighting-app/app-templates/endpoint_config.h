@@ -1554,3 +1554,15 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 
 // Array of parent endpoints for each endpoint
 #define FIXED_PARENT_ENDPOINTS { kInvalidEndpointId, kInvalidEndpointId }
+
+// The attribute masks have no room for the Fixed and Changes Omitted qualities, so these lists give them for the
+// attributes of server clusters that are not code-driven, as comma-terminated { cluster, attribute } pairs.
+#define GENERATED_FIXED_ATTRIBUTES                                                                                                 \
+    { 0x00000008, 0x00000002 },     /* Cluster: Level Control, Attribute: MinLevel */                                              \
+        { 0x00000008, 0x00000003 }, /* Cluster: Level Control, Attribute: MaxLevel */                                              \
+        { 0x00000031, 0x00000000 }, /* Cluster: Network Commissioning, Attribute: MaxNetworks */                                   \
+        { 0x00000031, 0x00000002 }, /* Cluster: Network Commissioning, Attribute: ScanMaxTimeSeconds */                            \
+        { 0x00000031, 0x00000003 }, /* Cluster: Network Commissioning, Attribute: ConnectMaxTimeSeconds */                         \
+        { 0x00000300, 0x00000010 }, /* Cluster: Color Control, Attribute: NumberOfPrimaries */
+
+#define GENERATED_CHANGES_OMITTED_ATTRIBUTES

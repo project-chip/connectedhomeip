@@ -21,7 +21,7 @@
 
 namespace chip::app {
 
-class LoggingCookSurfacePart : public CookSurfacePart, public Clusters::OnOffDelegate, public Clusters::IdentifyDelegate
+class LoggingCookSurfacePart : public Clusters::OnOffDelegate, public Clusters::IdentifyDelegate, public CookSurfacePart
 {
 public:
     LoggingCookSurfacePart(TimerDelegate & timerDelegate, const char * name);

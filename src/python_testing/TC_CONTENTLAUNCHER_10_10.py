@@ -21,6 +21,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-stdin-pipe: dut-tv-app-stdin
 #     script-args: >
 #       --endpoint 1
 #       --storage-path admin_storage.json

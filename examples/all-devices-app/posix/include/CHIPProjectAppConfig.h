@@ -27,6 +27,10 @@
 
 #pragma once
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP && !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#define CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION 0
+#endif
+
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY 1
 
 // This proxy serves one commissioning session at a time, shared across every transport.

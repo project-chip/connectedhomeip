@@ -22,6 +22,7 @@
 #include <device/api/Interface.h>
 #include <device/types/ambient-context-sensor/OOBAccessors.h>
 #include <device/types/boolean-state-sensor/OOBAccessors.h>
+#include <device/types/closure-controller/OOBAccessors.h>
 #include <device/types/dimmable-light/OOBAccessors.h>
 #include <device/types/dimmable-plug-in-unit/OOBAccessors.h>
 #include <device/types/doorbell/OOBAccessors.h>
@@ -30,9 +31,12 @@
 #include <device/types/mounted-dimmable-load-control/OOBAccessors.h>
 #include <device/types/mounted-on-off-control/OOBAccessors.h>
 #include <device/types/occupancy-sensor/OOBAccessors.h>
+#include <device/types/on-off-light-switch/OOBAccessors.h>
 #include <device/types/on-off-light/OOBAccessors.h>
 #include <device/types/on-off-plug-in-unit/OOBAccessors.h>
+#include <device/types/on-off-plug-in-unit/impl/OOBAccessors.h>
 #include <device/types/power-source/OOBAccessors.h>
+#include <device/types/proximity-ranger/OOBAccessors.h>
 #include <device/types/robotic-vacuum-cleaner/OOBAccessors.h>
 #include <device/types/root-node/OOBAccessors.h>
 #include <device/types/soil-sensor/OOBAccessors.h>

@@ -23,32 +23,37 @@ namespace Attributes {
 
 namespace SupportedModes {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(SupportedModes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(SupportedModes::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedModes
-namespace Mode {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Mode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace HumidistatMode {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(HumidistatMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
-} // namespace Mode
-namespace SystemState {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SystemState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+} // namespace HumidistatMode
+namespace HumidistatSystemState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(HumidistatSystemState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace SystemState
+} // namespace HumidistatSystemState
 namespace UserSetpoint {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(UserSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace UserSetpoint
 namespace MinSetpoint {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MinSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MinSetpoint
 namespace MaxSetpoint {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxSetpoint
 namespace Step {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Step::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Step::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Step
 namespace TargetSetpoint {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TargetSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -80,8 +85,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CondRunCount::Id, BitF
 } // namespace CondRunCount
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     SupportedModes::kMetadataEntry,
-    Mode::kMetadataEntry,
-    SystemState::kMetadataEntry,
+    HumidistatMode::kMetadataEntry,
+    HumidistatSystemState::kMetadataEntry,
 
 };
 

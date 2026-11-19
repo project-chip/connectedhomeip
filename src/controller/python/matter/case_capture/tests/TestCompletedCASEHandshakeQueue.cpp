@@ -20,6 +20,7 @@
 
 #include <chrono>
 #include <thread>
+#include <vector>
 
 #include <controller/python/matter/case_capture/CompletedCASEHandshakeQueue.h>
 

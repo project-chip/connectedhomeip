@@ -181,7 +181,7 @@ def main(th_server_app: str):
     paa_path = get_default_paa_trust_store(root)
     print(f'paa = {paa_path}')
 
-    pics = {"PICS_SDK_CI_ONLY": True}
+    pics = {0: {"PICS_SDK_CI_ONLY": True}}
     test_runner = MyMock(Path(__file__).parent / '../TC_CCTRL_2_2.py',
                          'TC_CCTRL_2_2', 'test_TC_CCTRL_2_2', paa_trust_store_path=paa_path, pics=pics)
     config = MatterTestConfig()

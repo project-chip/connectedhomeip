@@ -653,6 +653,13 @@
             }
         ],
         "Joint Fabric Datastore": ["Status"],
+        "Keypad Input": [
+            "ClusterRevision",
+            {
+                "name": "FeatureMap",
+                "keepDefault": true
+            }
+        ],
         "Laundry Dryer Controls": [
             "ClusterRevision",
             "SelectedDrynessLevel",
@@ -1927,11 +1934,11 @@
         ],
         "Humidistat": [
             {
-                "name": "Mode",
+                "name": "HumidistatMode",
                 "keepDefault": true
             },
             {
-                "name": "SystemState",
+                "name": "HumidistatSystemState",
                 "keepDefault": true
             },
             {

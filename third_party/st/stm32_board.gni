@@ -26,15 +26,9 @@ if (stm32_board == "") {
 
 assert(stm32_board != "", "stm32_board must be specified")
 
-# Differentiate between boards
-# - STM32WB5MMG-DK / STM32WB55... / ZigBee-Thread 2.4GHz
-
 board_defines = []
 
-if (stm32_board == "STM32WB5MM-DK") {
-  stm32_family = "stm32wb5"
-  stm32_mcu = "STM32WB5MMGHX"
-} else if (stm32_board == "STM32WBA65I-DK1") {
+if (stm32_board == "STM32WBA65I-DK1") {
   stm32_family = "stm32wba6"
   stm32_mcu = "STM32WBA65I-DK1"
 } else {

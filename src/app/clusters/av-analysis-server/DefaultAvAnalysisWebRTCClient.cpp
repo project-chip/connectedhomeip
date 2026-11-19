@@ -571,17 +571,18 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessio
     slot->callback         = mRequest.PeekCallback();
     slot->cameraNode       = mRequest.CameraNode();
     slot->providerEndpoint = mRequest.WebRTCEndpoint();
-    slot->videoStreamId    = mRequest.VideoStreamId();
 
-    // The requestor cluster is the receiving end of this session
+    // The requestor cluster is the receiving end of this session. It copies the VideoStreams list, so videoStreamId only
+    // needs to outlive UpsertSession.
+    uint16_t videoStreamId = mRequest.VideoStreamId();
     Globals::Structs::WebRTCSessionStruct::Type session;
     session.id             = aWebRTCSessionId;
     session.peerNodeID     = mRequest.CameraNode().GetNodeId();
     session.fabricIndex    = mRequest.CameraNode().GetFabricIndex();
     session.peerEndpointID = mRequest.WebRTCEndpoint();
     session.streamUsage    = Globals::StreamUsageEnum::kAnalysis;
-    session.videoStreams   = MakeOptional(DataModel::List<const uint16_t>(&slot->videoStreamId, 1));
-    session.videoStreamID  = DataModel::MakeNullable(slot->videoStreamId);
+    session.videoStreams   = MakeOptional(DataModel::List<const uint16_t>(&videoStreamId, 1));
+    session.videoStreamID  = DataModel::MakeNullable(videoStreamId);
     session.audioStreamID.SetNull();
     mRequestorCluster->UpsertSession(session);
     return CHIP_NO_ERROR;

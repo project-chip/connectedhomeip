@@ -231,7 +231,9 @@ CHIP_ERROR CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec, Sys
     VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     ChipLogProgress(Inet, "Sending status report, exchange " ChipLogFormatExchange, ChipLogValueExchange(ec));
-    return ec->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(handle));
+    // The spec requires the Busy StatusReport to be sent with the R flag cleared.
+    return ec->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(handle),
+                           Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
 }
 
 } // namespace chip

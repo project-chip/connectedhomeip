@@ -210,7 +210,8 @@ bool WpaSupplicantClient::IsWiFiInterfaceEnabled() const noexcept
 {
     VerifyOrReturnValue(mWpaSupplicant.iface, false);
     // Check if the interface is not disabled (for example, due to rfkill or some other reasons).
-    return g_strcmp0(wpa_supplicant_1_interface_get_state(mWpaSupplicant.iface.get()), "interface_disabled") != 0;
+    GCharPtr state(wpa_supplicant_1_interface_dup_state(mWpaSupplicant.iface.get()));
+    return g_strcmp0(state.get(), "interface_disabled") != 0;
 }
 
 bool WpaSupplicantClient::GetBssInfo(const gchar * inBssPath,
@@ -858,7 +859,7 @@ void WpaSupplicantClient::NotifyWiFiConnectivityChange(const ConnectivityChange 
     PlatformMgr().PostEventOrDie(&event);
 }
 
-CHIP_ERROR WpaSupplicantClient::StartOnGLib(void)
+CHIP_ERROR WpaSupplicantClient::StartOnGLib()
 {
     // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
     // all D-Bus signals will be delivered to the GLib global default main context.
@@ -876,7 +877,7 @@ CHIP_ERROR WpaSupplicantClient::StartOnGLib(void)
     return CHIP_NO_ERROR;
 }
 
-void WpaSupplicantClient::Start(void)
+void WpaSupplicantClient::Start()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
@@ -887,7 +888,7 @@ void WpaSupplicantClient::Start(void)
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start WiFi management"));
 }
 
-CHIP_ERROR WpaSupplicantClient::StartSync(void)
+CHIP_ERROR WpaSupplicantClient::StartSync()
 {
     if (IsStarted())
     {
@@ -914,7 +915,7 @@ CHIP_ERROR WpaSupplicantClient::StartSync(void)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WpaSupplicantClient::StopAutoScan(void)
+CHIP_ERROR WpaSupplicantClient::StopAutoScan()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
@@ -925,6 +926,9 @@ CHIP_ERROR WpaSupplicantClient::StopAutoScan(void)
     if (!wpa_supplicant_1_interface_call_auto_scan_sync(mWpaSupplicant.iface.get(), "" /* empty string means disabling auto scan */,
                                                         nullptr, &err.GetReceiver()))
     {
+        // AutoScan only exists if wpa_supplicant was built with an autoscan module (CONFIG_AUTOSCAN_*),
+        // and without one there is no auto scan to disable.
+        VerifyOrReturnError(!g_error_matches(err.get(), G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD), CHIP_NO_ERROR);
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to stop auto network scan: %s",
                      err ? err->message : "unknown");
         return CHIP_ERROR_INTERNAL;

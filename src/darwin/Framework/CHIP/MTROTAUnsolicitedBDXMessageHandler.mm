@@ -84,11 +84,6 @@ CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::OnUnsolicitedMessageReceived(cons
     ChipLogDetail(BDX, "MTROTAUnsolicitedBDXMessageHandler: OnUnsolicitedMessageReceived: message " ChipLogFormatMessageType " protocol " ChipLogFormatProtocolId,
         payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()));
 
-    if (IsInAnOngoingTransfer()) {
-        ChipLogDetail(BDX, "Already in an ongoing transfer. Return");
-        return CHIP_ERROR_BUSY;
-    }
-
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Only proceed if there is a valid fabric index for the SessionHandle.
@@ -97,6 +92,14 @@ CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::OnUnsolicitedMessageReceived(cons
         // If we receive a ReceiveInit BDX message, create a new MTROTAImageTransferHandler and register it
         // as the handler for all BDX messages that will come over this exchange.
         if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
+            if (IsInAnOngoingTransfer()) {
+                ChipLogProgress(BDX, "Responding with RESPONDER_BUSY due to being in the middle of handling another BDX transfer");
+                // It's safe to use the same mBusyResponder as the delegate for multiple exchanges,
+                // because it does not do anything that depends on a specific message or exchange.
+                newDelegate = &mBusyResponder;
+                return CHIP_NO_ERROR;
+            }
+
             newDelegate = new MTROTAImageTransferHandler(mSystemLayer);
             return CHIP_NO_ERROR;
         }
@@ -107,6 +110,11 @@ CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::OnUnsolicitedMessageReceived(cons
 void MTROTAUnsolicitedBDXMessageHandler::OnExchangeCreationFailed(ExchangeDelegate * delegate)
 {
     assertChipStackLockedByCurrentThread();
+
+    // Make sure we don't try to treat our mBusyResponder as a MTROTAImageTransferHandler; it's a
+    // completely different type.
+    VerifyOrReturn(delegate != &mBusyResponder);
+
     auto * otaTransferHandler = static_cast<MTROTAImageTransferHandler *>(delegate);
     VerifyOrReturn(otaTransferHandler != nullptr);
 

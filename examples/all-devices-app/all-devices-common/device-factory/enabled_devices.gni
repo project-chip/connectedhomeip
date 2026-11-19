@@ -67,6 +67,10 @@ _available_devices = [
     "AMBIENT_CONTEXT_SENSOR",
   ],
   [
+    "battery-storage",
+    "BATTERY_STORAGE",
+  ],
+  [
     "bridged-node",
     "BRIDGED_NODE",
   ],
@@ -77,6 +81,10 @@ _available_devices = [
   [
     "closure",
     "CLOSURE",
+  ],
+  [
+    "closure-controller",
+    "CLOSURE_CONTROLLER",
   ],
   [
     "color-temperature-light",
@@ -257,6 +265,10 @@ _available_devices = [
   [
     "water-freeze-detector",
     "WATER_FREEZE_DETECTOR",
+  ],
+  [
+    "water-heater",
+    "WATER_HEATER",
   ],
   [
     "water-leak-detector",

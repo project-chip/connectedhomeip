@@ -18,6 +18,12 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
+# TODO:
+# In the camera-app run (run 3), IDM 10_2 is deliberatly omitted. This is because the camera-app includes "UpdateMotionZoneOptions (0x08)",
+# but it's still behind the "cameras-modify-zones-sensitivity" in-progress flag in the spec, so it isn't in the 1.7 DM files yet.
+# Unfortunately, there's no way to exclude just that command from the check, and DM errata doesn't support adding commands yet.
+# This is tracked by issue: https://github.com/project-chip/connectedhomeip/issues/73489.
+#
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
@@ -26,7 +32,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
-#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification:True allow_provisional_test_event_only_disallowed_for_certification:True
+#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification_and_sve:True allow_provisional_test_event_and_sve_only_disallowed_for_certification:True
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -45,7 +51,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
-#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification:True allow_provisional_test_event_only_disallowed_for_certification:True
+#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification_and_sve:True allow_provisional_test_event_and_sve_only_disallowed_for_certification:True
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -54,7 +60,24 @@
 #       --debug
 #     factory-reset: true
 #     quiet: true
-#   run3: # Every all-devices-app device. IDM_10_2, 10_3 and 10_5 still fail on "*", so they are left out.
+#   run3:
+#     app: ${CAMERA_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification_and_sve:True allow_provisional_test_event_and_sve_only_disallowed_for_certification:True
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --tests test_TC_IDM_10_6 test_TC_DESC_2_3 test_TC_IDM_14_1 test_TC_IDM_10_5 test_TC_IDM_10_3
+#       --enable-spec-errata-ci-only-disallowed-for-certification
+#       --debug
+#     factory-reset: true
+#     quiet: true
+#   run4: # Every all-devices-app device. IDM_10_2, 10_3 and 10_5 still fail on "*", so they are left out.
 #     app: ${ALL_DEVICES_APP}
 #     app-args: >
 #       --discriminator 1234
@@ -64,7 +87,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
-#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification:True allow_provisional_test_event_only_disallowed_for_certification:True
+#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification_and_sve:True allow_provisional_test_event_and_sve_only_disallowed_for_certification:True
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -91,31 +114,31 @@ class TC_DeviceConformance(DeviceConformanceTests):
     def test_TC_IDM_10_2(self):
         # TODO: Turn this off after TE2
         # https://github.com/project-chip/connectedhomeip/issues/34615
-        ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
-            "ignore_in_progress_test_event_only_disallowed_for_certification", True)
-        allow_provisional_test_event_only_disallowed_for_certification = self.user_params.get(
-            "allow_provisional_test_event_only_disallowed_for_certification", False)
-        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification,
+        ignore_in_progress_test_event_only_disallowed_for_certification_and_sve = self.user_params.get(
+            "ignore_in_progress_test_event_only_disallowed_for_certification_and_sve", True)
+        allow_provisional_test_event_and_sve_only_disallowed_for_certification = self.user_params.get(
+            "allow_provisional_test_event_and_sve_only_disallowed_for_certification", False)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification_and_sve,
                                                    self.is_pics_sdk_ci_only,
-                                                   allow_provisional_test_event_only_disallowed_for_certification)
+                                                   allow_provisional_test_event_and_sve_only_disallowed_for_certification)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with conformance")
 
     def test_TC_IDM_10_3(self):
-        ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
-            "ignore_in_progress_test_event_only_disallowed_for_certification", False)
-        success, problems = self.check_revisions(ignore_in_progress_test_event_only_disallowed_for_certification)
+        ignore_in_progress_test_event_only_disallowed_for_certification_and_sve = self.user_params.get(
+            "ignore_in_progress_test_event_only_disallowed_for_certification_and_sve", False)
+        success, problems = self.check_revisions(ignore_in_progress_test_event_only_disallowed_for_certification_and_sve)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with cluster revision on at least one cluster")
 
     def test_TC_IDM_10_5(self):
         fail_on_extra_clusters = self.user_params.get("fail_on_extra_clusters", True)
-        allow_provisional_test_event_only_disallowed_for_certification = self.user_params.get(
-            "allow_provisional_test_event_only_disallowed_for_certification", False)
+        allow_provisional_test_event_and_sve_only_disallowed_for_certification = self.user_params.get(
+            "allow_provisional_test_event_and_sve_only_disallowed_for_certification", False)
         success, problems = self.check_device_type(fail_on_extra_clusters,
-                                                   allow_provisional_test_event_only_disallowed_for_certification)
+                                                   allow_provisional_test_event_and_sve_only_disallowed_for_certification)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")

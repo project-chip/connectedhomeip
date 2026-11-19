@@ -289,7 +289,11 @@ public:
 
         return paseShouldBeOpen == paseIsOpen;
     }
-    bool CheckStageSuccessful(uint8_t stage) { return mReceivedStageSuccess[stage]; }
+    bool CheckStageSuccessful(uint8_t stage)
+    {
+        VerifyOrDie(stage < kNumCommissioningStages);
+        return mReceivedStageSuccess[stage];
+    }
     void Reset()
     {
         mTestCommissionerUsed              = false;
@@ -852,6 +856,13 @@ bool pychip_SetTestCommissionerSimulateFailureOnReport(uint8_t failStage)
 bool pychip_SetTestCommissionerPrematureCompleteAfter(uint8_t stage)
 {
     return sTestCommissioner.PrematureCompleteAfter(static_cast<chip::Controller::CommissioningStage>(stage));
+}
+
+// Used by src/python_testing/test_testing/TestCommissioningStage.py to check that the Python
+// CommissioningStage enum matches the C++ one.
+const char * pychip_CommissioningStageToString(uint8_t stage)
+{
+    return chip::Controller::StageToString(static_cast<chip::Controller::CommissioningStage>(stage));
 }
 
 PyChipError pychip_GetCompletionError()

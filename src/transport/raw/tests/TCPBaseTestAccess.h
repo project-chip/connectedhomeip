@@ -54,7 +54,8 @@ public:
         ActiveTCPConnectionState * allocated = tcp.AllocateConnection(endPoint, peerAddress);
         VerifyOrReturnValue(allocated != nullptr, result);
         allocated->mConnectionState = connectionState;
-        result.mHolder              = tcp.FindInUseConnection(peerAddress);
+        tcp.mUsedEndPointCount++;
+        result.mHolder = tcp.FindInUseConnection(peerAddress);
         return result;
     }
 

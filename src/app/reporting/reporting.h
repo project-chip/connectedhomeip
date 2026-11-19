@@ -35,6 +35,7 @@ void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::Clu
 void MatterReportingAttributeChangeCallback(const chip::app::ConcreteAttributePath & aPath);
 
 /*
- * Same but only with an EndpointId, this is used when adding / enabling an endpoint during runtime.
+ * Overload with an endpoint Id and parentEndpoint Id, this is used when adding / enabling an endpoint during runtime.
  */
-void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::app::DataModel::EndpointChangeType type);
+void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::EndpointId parentEndpoint,
+                                            chip::app::DataModel::EndpointChangeType type);

@@ -19,6 +19,7 @@ import("${chip_root}/src/inet/inet.gni")
 import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/fuzz_test.gni")
 static_library("helpers") {
   output_name = "libNetworkTestHelpers"
   output_dir = "${root_out_dir}/lib"
@@ -69,4 +70,22 @@ chip_test_suite("tests") {
   ]
 
   cflags = [ "-Wconversion" ]
+}
+
+if (pw_enable_fuzz_test_targets && chip_inet_config_enable_tcp_endpoint) {
+  # Fuzzes TCP message framing (TCPBase::ProcessReceivedBuffer) with the byte
+  # stream split across packet buffers at fuzzer-chosen points.
+  chip_pw_fuzz_target("fuzz-tcp-framing-pw") {
+    test_source = [ "FuzzTCPFramingPW.cpp" ]
+    public_deps = [
+      ":helpers",
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/core:string-builder-adapters",
+      "${chip_root}/src/lib/support",
+      "${chip_root}/src/platform",
+      "${chip_root}/src/platform/logging:default",
+      "${chip_root}/src/transport/raw",
+    ]
+  }
 }

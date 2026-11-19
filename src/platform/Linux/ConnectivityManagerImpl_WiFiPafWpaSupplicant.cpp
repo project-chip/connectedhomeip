@@ -46,6 +46,19 @@ namespace DeviceLayer {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 static const char srv_name[] = "_matterc._udp";
+
+// Parses a MAC address in the "aa:bb:cc:dd:ee:ff" form used by wpa_supplicant.
+static bool ParseMacAddress(const char * str, uint8_t (&addr)[kMACAddressLength])
+{
+    VerifyOrReturnValue(strlen(str) == kMACAddressLength * 3 - 1, false);
+    for (size_t i = 0; i < kMACAddressLength; i++)
+    {
+        VerifyOrReturnValue(i == 0 || str[i * 3 - 1] == ':', false);
+        VerifyOrReturnValue(Encoding::HexToBytes(&str[i * 3], 2, &addr[i], 1) == 1, false);
+    }
+    return true;
+}
+
 /*
     NAN-USD Service Protocol Type: ref: Table 58 of Wi-Fi Aware Specificaiton
 */
@@ -187,8 +200,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
-    VerifyOrReturn(sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2],
-                          &peer_addr[3], &peer_addr[4], &peer_addr[5]) == 6,
+    VerifyOrReturn(ParseMacAddress(addr_str, peer_addr),
                    ChipLogError(DeviceLayer, "WiFi-PAF: OnDiscoveryResult: malformed peer_addr '%s'", addr_str));
 
     value = g_variant_lookup_value(discov_info, "srv_proto_type", G_VARIANT_TYPE_UINT32);
@@ -303,8 +315,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
-    VerifyOrReturn(sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2],
-                          &peer_addr[3], &peer_addr[4], &peer_addr[5]) == 6,
+    VerifyOrReturn(ParseMacAddress(addr_str, peer_addr),
                    ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied: malformed peer_addr '%s'", addr_str));
 
     value = g_variant_lookup_value(reply_info, "srv_proto_type", G_VARIANT_TYPE_UINT32);
@@ -395,8 +406,7 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
-    VerifyOrReturn(sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &RxInfo.peer_addr[0], &RxInfo.peer_addr[1],
-                          &RxInfo.peer_addr[2], &RxInfo.peer_addr[3], &RxInfo.peer_addr[4], &RxInfo.peer_addr[5]) == 6,
+    VerifyOrReturn(ParseMacAddress(addr_str, RxInfo.peer_addr),
                    ChipLogError(DeviceLayer, "WiFi-PAF: OnNanReceive: malformed peer_addr '%s'", addr_str));
 
     // Read the rx_data
@@ -559,7 +569,18 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelSubscribe(uint32_t SubscribeId
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel subscribe_id: %d ! ", SubscribeId);
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-    wpa_supplicant_1_interface_call_nancancel_subscribe_sync(mWpaSupplicant.iface.get(), SubscribeId, nullptr, &err.GetReceiver());
+    if (!mWpaSupplicant.iface)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: Skip D-Bus 'cancel subscribe' call since wpa_supplicant is not ready");
+        return CHIP_ERROR_INTERNAL;
+    }
+    gboolean result = wpa_supplicant_1_interface_call_nancancel_subscribe_sync(mWpaSupplicant.iface.get(), SubscribeId, nullptr,
+                                                                               &err.GetReceiver());
+    if (!result)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: Failed to Cancel Subscribe with Error: %s", err ? err->message : "unknown error");
+        return CHIP_ERROR_INTERNAL;
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -767,8 +788,7 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
-    VerifyOrReturn(sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2],
-                          &peer_addr[3], &peer_addr[4], &peer_addr[5]) == 6,
+    VerifyOrReturn(ParseMacAddress(addr_str, peer_addr),
                    ChipLogError(DeviceLayer, "WiFi-PAF: ScanDiscoveryResult: malformed peer_addr '%s'", addr_str));
     value = g_variant_lookup_value(discov_info, "srv_proto_type", G_VARIANT_TYPE_UINT32);
     dataValue.reset(value);
@@ -1052,15 +1072,6 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
 {
     ChipLogProgress(DeviceLayer, "FinishWiFiPAFScan: subscribe_id %u", ctx->subscribe_id);
     DisconnectScanSignals();
-    TEMPORARY_RETURN_IGNORED _WiFiPAFCancelSubscribe(ctx->subscribe_id);
-    // NOTE: do not call _WiFiPAFCancelIncompleteSubscribe() here.  That clears the
-    // connect-path subscribe-complete/error callbacks (mOnPafSubscribe*), which may
-    // belong to a ProxyConnectRequest subscribe still in flight.  Cancelling this
-    // scan's subscribe_id above is sufficient to tear down the scan.
-
-    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = ctx->subscribe_id };
-    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
-    TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
 
     // Hold the mutex while collecting and clearing mNanScanPeers so that a
     // ScanDiscoveryResult running concurrently on the GLib/D-Bus thread cannot
@@ -1079,11 +1090,26 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
         mScanFreq              = 0;
     }
 
+    // Remove the session before the cancel below: the cancel emits nansubscribe-terminated,
+    // and OnNanSubscribeTerminated fails an in-flight connect for a session it still finds.
+    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = ctx->subscribe_id };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    LogErrorOnFailure(WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
+
     if (mScanCb != nullptr)
         mScanCb(mScanCbContext, results);
 
     mScanCb        = nullptr;
     mScanCbContext = nullptr;
+
+    // The cancel is a synchronous D-Bus call that can wait behind other radio work, so it
+    // runs after the results are delivered rather than delaying them. A background scan
+    // started from the callback above gets CHIP_ERROR_BUSY, because mScanCb is still set there.
+    LogErrorOnFailure(_WiFiPAFCancelSubscribe(ctx->subscribe_id));
+    // NOTE: do not call _WiFiPAFCancelIncompleteSubscribe() here.  That clears the
+    // connect-path subscribe-complete/error callbacks (mOnPafSubscribe*), which may
+    // belong to a ProxyConnectRequest subscribe still in flight.  Cancelling this
+    // scan's subscribe_id above is sufficient to tear down the scan.
 }
 
 CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCallback cb, void * cbCtx)

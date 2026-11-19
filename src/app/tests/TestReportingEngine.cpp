@@ -22,11 +22,13 @@
  *
  */
 
+#include <algorithm>
 #include <cinttypes>
 
 #include <pw_unit_test/framework.h>
 
 #include <app/ConcreteAttributePath.h>
+#include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/tests/MockReportScheduler.h>
@@ -100,6 +102,9 @@ public:
     void TestBuildAndSendSingleReportDataLargePayload();
     void TestMergeOverlappedAttributePath();
     void TestMergeAttributePathWhenDirtySetPoolExhausted();
+    void TestShutdownForgetsScheduledRun();
+    void TestInitRequiresTheSameEventManagementUntilShutdown();
+    void TestInitAgainLeavesReportsInFlight();
 
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
@@ -238,10 +243,13 @@ public:
             request.path.mAttributeId == kTestFieldId1)
         {
             return encoder.EncodeList([](const auto & listEncoder) -> CHIP_ERROR {
-                uint8_t buf[1024] = { 0 };
-                // 70 * 1024 = 71,680 bytes, exceeding kMaxLargeAppMessageLen (63,885)
-                // and kLegacyDefaultMaxLargeAppMessageLen (63,744) to force report chunking.
-                for (int i = 0; i < 70; i++)
+                uint8_t buf[1024]                = { 0 };
+                constexpr size_t kIterationCount = 70;
+                // Larger than both kMaxLargeAppMessageLen and kLegacyDefaultMaxLargeAppMessageLen, so the
+                // report is always split into chunks.
+                static_assert(sizeof(buf) * kIterationCount > kMaxLargeAppMessageLen);
+                static_assert(sizeof(buf) * kIterationCount > kLegacyDefaultMaxLargeAppMessageLen);
+                for (size_t i = 0; i < kIterationCount; i++)
                 {
                     ReturnErrorOnFailure(listEncoder.Encode(ByteSpan(buf, sizeof(buf))));
                 }
@@ -315,7 +323,9 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportDataLargePa
 
         app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
                                      app::reporting::GetDefaultReportScheduler());
-        EXPECT_EQ(readHandler.GetReportBufferMaxSize(), kLegacyDefaultMaxLargeAppMessageLen + kMaxTagLen);
+        // The chunk is also bounded by kMaxLargeAppMessageLen, which follows the largest PacketBuffer allocation.
+        EXPECT_EQ(readHandler.GetReportBufferMaxSize(),
+                  std::min<size_t>(kLegacyDefaultMaxLargeAppMessageLen, kMaxLargeAppMessageLen) + kMaxTagLen);
         readHandler.OnInitialRequest(std::move(readRequestbuf));
 
         EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),
@@ -337,7 +347,10 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportDataLargePa
 
         app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
                                      app::reporting::GetDefaultReportScheduler());
-        EXPECT_EQ(readHandler.GetReportBufferMaxSize(), kNegotiatedMaxPayload + kMaxTagLen);
+        // The advertised size covers the whole message, so the report (payload + MIC) must leave
+        // room for the message headers; kMaxLargeAppMessageLen can be the tighter bound on pool builds.
+        EXPECT_EQ(readHandler.GetReportBufferMaxSize(),
+                  std::min<size_t>(kNegotiatedMaxPayload - kMaxMessageOverheadBytes, kMaxLargeAppMessageLen) + kMaxTagLen);
         readHandler.OnInitialRequest(std::move(readRequestbuf));
 
         EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),
@@ -484,6 +497,50 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeAttributePathWhenDirtySetPoolE
                                       AttributePathParams(kTestEndpointId + 1, kTestClusterId + 1, 1)));
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Shutdown();
+}
+
+TEST_F_FROM_FIXTURE(TestReportingEngine, TestShutdownForgetsScheduledRun)
+{
+    InteractionModelEngine * imEngine = InteractionModelEngine::GetInstance();
+    Engine & engine                   = imEngine->GetReportingEngine();
+
+    EXPECT_SUCCESS(engine.ScheduleRun());
+    EXPECT_TRUE(engine.IsRunScheduled());
+
+    imEngine->Shutdown();
+    EXPECT_FALSE(engine.IsRunScheduled());
+
+    ASSERT_SUCCESS(imEngine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()));
+    EXPECT_SUCCESS(engine.ScheduleRun());
+    EXPECT_TRUE(engine.IsRunScheduled());
+    DrainAndServiceIO();
+    EXPECT_FALSE(engine.IsRunScheduled());
+}
+
+TEST_F_FROM_FIXTURE(TestReportingEngine, TestInitRequiresTheSameEventManagementUntilShutdown)
+{
+    Engine & engine = InteractionModelEngine::GetInstance()->GetReportingEngine();
+    EventManagement otherEventManagement;
+
+    EXPECT_SUCCESS(engine.Init(&EventManagement::GetInstance()));
+    EXPECT_EQ(engine.Init(&otherEventManagement), CHIP_ERROR_INCORRECT_STATE);
+
+    engine.Shutdown();
+    EXPECT_SUCCESS(engine.Init(&otherEventManagement));
+
+    engine.Shutdown();
+    EXPECT_SUCCESS(engine.Init(&EventManagement::GetInstance()));
+}
+
+TEST_F_FROM_FIXTURE(TestReportingEngine, TestInitAgainLeavesReportsInFlight)
+{
+    Engine & engine = InteractionModelEngine::GetInstance()->GetReportingEngine();
+
+    engine.mNumReportsInFlight++;
+    EXPECT_SUCCESS(engine.Init(&EventManagement::GetInstance()));
+    // OnReportConfirm() dies if it finds no report in flight.
+    ASSERT_EQ(engine.GetNumReportsInFlight(), 1u);
+    engine.OnReportConfirm();
 }
 
 } // namespace reporting
