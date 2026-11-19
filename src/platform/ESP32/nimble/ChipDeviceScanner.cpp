@@ -81,12 +81,14 @@ int ChipDeviceScanner::OnBleCentralEvent(struct ble_gap_event * event, void * ar
     switch (event->type)
     {
     case BLE_GAP_EVENT_DISC_COMPLETE: {
+        // The scan ended without a match (timeout, or preempted by the host): report it like StopScan() does,
+        // or the pending connection never completes. Hold the CHIP stack lock, as OnDeviceScanned() does, so a
+        // queued InitiateScan() cannot start the next scan before this one is reported.
+        ChipLogProgress(DeviceLayer, "BLE scan complete, reason %d", event->disc_complete.reason);
+        PlatformMgr().LockChipStack();
         scanner->mIsScanning = false;
-        // The scan timed out: report it like StopScan() does, or the pending connection never completes.
-        // This runs on the NimBLE host task, so hand it to the CHIP thread.
-        LogErrorOnFailure(PlatformMgr().ScheduleWork(
-            [](intptr_t arg) { reinterpret_cast<ChipDeviceScanner *>(arg)->mDelegate->OnScanComplete(); },
-            reinterpret_cast<intptr_t>(scanner)));
+        scanner->mDelegate->OnScanComplete();
+        PlatformMgr().UnlockChipStack();
         return 0;
     }
 
