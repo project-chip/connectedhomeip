@@ -219,7 +219,7 @@ TEST_F(TestEnergyEvseDelegate, EventSendersWithOnlyClusterBound)
     {
         Testing::TestServerClusterContext context;
         EvseTargetsDelegate targets;
-        EnergyEvseDelegate delegate(targets);
+        EnergyEvseDelegate delegate(targets, mTimerDelegate);
         BitMask<Feature> features(Feature::kChargingPreferences);
         features.Set(Feature::kV2x, v2x);
         EnergyEvseCluster cluster(EnergyEvseCluster::Config(kEndpointId, delegate, features, {}, {}));
