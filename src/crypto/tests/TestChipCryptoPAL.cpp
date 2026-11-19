@@ -1526,10 +1526,7 @@ TEST_F(TestChipCryptoPAL, TestECDSA_ValidationFailsSignatureOutOfRange)
         const uint8_t * r;
         const uint8_t * s;
     } const kCases[] = {
-        { kZero, tv.s },
-        { tv.r, kZero },
-        { kP256CurveOrder, tv.s },
-        { tv.r, kP256CurveOrder },
+        { kZero, kZero }, { kZero, tv.s }, { tv.r, kZero }, { kP256CurveOrder, tv.s }, { tv.r, kP256CurveOrder },
     };
 
     for (const auto & testCase : kCases)
