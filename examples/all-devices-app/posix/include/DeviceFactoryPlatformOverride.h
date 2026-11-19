@@ -29,7 +29,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #if defined(__linux__) && (CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF)
-#include <device/types/commissioning-proxy/CommissioningProxyDevice.h>
+#include <device/types/commissioning-proxy/CommissioningProxy.h>
 #endif
 #if defined(__linux__) && CONFIG_NETWORK_LAYER_BLE
 #include <CommissioningProxyBleAdapter.h>
@@ -117,7 +117,7 @@ void RegisterDeviceFactoryOverrides(Factory & factory, TimerDelegate & timerDele
 #if defined(__linux__) && (CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF)
     if constexpr (ALL_DEVICES_ENABLE_COMMISSIONING_PROXY)
     {
-        const CommissioningProxyDevice::Context proxyContext{ fabricTable, timerDelegate };
+        const CommissioningProxy::Context proxyContext{ fabricTable, timerDelegate };
 
         // The adapters and their transport drivers outlive every device the factory
         // creates, because a registered transport holds a pointer back to the device's
@@ -173,7 +173,7 @@ void RegisterDeviceFactoryOverrides(Factory & factory, TimerDelegate & timerDele
             LogErrorOnFailure(DeviceLayer::PlatformMgr().AddEventHandler(OnProxyDeviceEvent, 0));
 #endif
 
-            auto device = std::make_unique<CommissioningProxyDevice>(proxyContext, proxyConfig);
+            auto device = std::make_unique<CommissioningProxy>(proxyContext, proxyConfig);
 #if CONFIG_NETWORK_LAYER_BLE
             device->AddTransport(sBleProxyTransport);
 #endif
@@ -182,8 +182,8 @@ void RegisterDeviceFactoryOverrides(Factory & factory, TimerDelegate & timerDele
 #endif
             auto * rawDevice = device.get();
             return typename Factory::DeviceRegistrationEntry{
-                std::move(device), Factory::template MakeAfterDeviceRegistrationCallback<CommissioningProxyDevice>(rawDevice),
-                Factory::template MakeBeforeDeviceUnregistrationCallback<CommissioningProxyDevice>(rawDevice)
+                std::move(device), Factory::template MakeAfterDeviceRegistrationCallback<CommissioningProxy>(rawDevice),
+                Factory::template MakeBeforeDeviceUnregistrationCallback<CommissioningProxy>(rawDevice)
             };
         });
     }

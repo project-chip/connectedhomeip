@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <cstdint>
+
 #include <inet/IPAddress.h>
 #include <lib/support/Span.h>
 
@@ -27,7 +29,7 @@ namespace IPAddressSorter {
 //   - Larger value means "more suitable"
 //   - Enum ordered ascending for easier read. Note however that order of
 //     checks MUST match in ScoreIpAddress below.
-enum class IpScore : unsigned
+enum class IpScore : uint8_t
 {
     kInvalid = 0, // No address available
 

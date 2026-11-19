@@ -362,6 +362,10 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
     nodeData.resolutionData.port        = result->mPort;
     nodeData.operationalData.peerId     = peerId;
 
+    // We may not be able to fit all of addresses we have in the fixed-size array below; sort the
+    // addresses so we start by putting the best ones in first.
+    IPAddressSorter::Sort(addresses, result->mInterface);
+
     size_t addressesFound = 0;
     for (auto & ip : addresses)
     {
@@ -403,6 +407,8 @@ void DnssdService::ToDiscoveredCommissionNodeData(const Span<Inet::IPAddress> & 
     Platform::CopyString(discoveredData.hostName, mHostName);
     Platform::CopyString(discoveredData.instanceName, mName);
 
+    // We may not be able to fit all of addresses we have in the fixed-size array below; sort the
+    // addresses so we start by putting the best ones in first.
     IPAddressSorter::Sort(addresses, mInterface);
 
     size_t addressesFound = 0;

@@ -54,6 +54,13 @@
     }
 }
 
+- (void)unitTestReportBeginOnMatterQueueForDevice:(MTRDevice *)device
+{
+    if (self.onReportBeginOnMatterQueue != nil) {
+        self.onReportBeginOnMatterQueue();
+    }
+}
+
 - (void)unitTestReportEndForDevice:(MTRDevice *)device
 {
     if (self.onReportEnd != nil) {
