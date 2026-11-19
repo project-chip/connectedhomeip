@@ -37,6 +37,8 @@ class BatteryPowerSource : public SingleEndpoint
     constexpr static auto BatVoltageId            = Clusters::PowerSource::Attributes::BatVoltage::Id;
 
 public:
+    using SingleEndpoint::Register;
+
     enum class ChargingCapability : uint8_t
     {
         kNotRechargeable,
@@ -59,6 +61,11 @@ public:
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    /// Sets the list of endpoints powered by this battery power source.
+    /// The underlying storage of `endpoints` is referenced by view by `PowerSourceCluster` and must
+    /// remain valid while the cluster is registered (or until `SetEndpointList` is called again).
+    CHIP_ERROR SetEndpointList(Span<const EndpointId> endpoints);
 
     // Accessors for subclasses/implementations to interact with clusters
     SimpleBatteryPowerSourceCluster & BatteryPowerSourceCluster();

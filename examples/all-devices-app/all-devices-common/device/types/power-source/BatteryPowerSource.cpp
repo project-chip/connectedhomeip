@@ -91,4 +91,10 @@ BatteryPowerSource::SimpleBatteryPowerSourceCluster & BatteryPowerSource::Batter
     return mBatteryPowerSourceCluster.Cluster();
 }
 
+CHIP_ERROR BatteryPowerSource::SetEndpointList(Span<const EndpointId> endpoints)
+{
+    VerifyOrReturnError(mBatteryPowerSourceCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+    return mBatteryPowerSourceCluster.Cluster().SetEndpointList(endpoints);
+}
+
 } // namespace chip::app
