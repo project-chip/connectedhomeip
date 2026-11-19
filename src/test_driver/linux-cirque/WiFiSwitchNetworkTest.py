@@ -40,6 +40,8 @@ PSK_1 = "12345678"
 SSID_2 = "WIFI_2ND_AP"
 PSK_2 = "87654321"
 
+# Use kernel mac80211_hwsim radios instead of Cirque's default userspace virtual Wi-Fi
+# so hostapd and wpa_supplicant emulate real AP switching.
 DEVICE_CONFIG = {
     "device0": {
         "type": "MobileDevice",
@@ -47,6 +49,7 @@ DEVICE_CONFIG = {
         "capability": ["WiFi", "Mount"],
         "docker_network": "Ipv6",
         "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
+        "use_virtual_wifi_tcp": False,
     },
     "device1": {
         "type": "CHIPEndDevice",
@@ -54,16 +57,19 @@ DEVICE_CONFIG = {
         "capability": ["WiFi", "Mount"],
         "docker_network": "Ipv6",
         "mount_pairs": [[CHIP_REPO_STR, CHIP_REPO_STR]],
+        "use_virtual_wifi_tcp": False,
     },
     "ap0": {
         "type": "wifi_ap",
         "base_image": "mac80211_ap_image",
         "capability": [],
+        "use_virtual_wifi_tcp": False,
     },
     "ap1": {
         "type": "wifi_ap",
         "base_image": "mac80211_ap_image",
         "capability": [],
+        "use_virtual_wifi_tcp": False,
     },
 }
 
