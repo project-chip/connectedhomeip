@@ -361,7 +361,6 @@ private:
      */
     static void EvseCheckTimerExpiry(System::Layer * systemLayer, void * delegate);
 
-    /* Instance pointer for cluster feature checks; attributes use mCluster */
     Instance * mInstance         = nullptr;
     EnergyEvseCluster * mCluster = nullptr;
 

@@ -926,7 +926,7 @@ Status EnergyEvseDelegate::HwSetRFID(ByteSpan uid)
 {
     Events::Rfid::Type event{ .uid = uid };
     VerifyOrReturnValue(mCluster != nullptr, Status::Failure);
-    ReturnValueOnFailure(mCluster->LogRfidEvent(event) == CHIP_NO_ERROR, Status::Failure);
+    ReturnValueOnFailure(mCluster->LogRfidEvent(event), Status::Failure);
 
     return Status::Success;
 }
@@ -1650,7 +1650,7 @@ Status EnergyEvseDelegate::SendEVConnectedEvent()
 
     event.sessionID = sessionID.Value();
 
-    ReturnValueOnFailure(mCluster->LogEvConnectedEvent(event) == CHIP_NO_ERROR, Status::Failure);
+    ReturnValueOnFailure(mCluster->LogEvConnectedEvent(event), Status::Failure);
     return Status::Success;
 }
 
@@ -1668,7 +1668,7 @@ Status EnergyEvseDelegate::SendEVNotDetectedEvent()
     event.sessionEnergyCharged    = mCluster->GetSessionEnergyCharged().Value();
     event.sessionEnergyDischarged = MakeOptional(mCluster->GetSessionEnergyDischarged().Value());
 
-    ReturnValueOnFailure(mCluster->LogEvNotDetectedEvent(event) == CHIP_NO_ERROR, Status::Failure);
+    ReturnValueOnFailure(mCluster->LogEvNotDetectedEvent(event), Status::Failure);
     return Status::Success;
 }
 
@@ -1689,7 +1689,7 @@ Status EnergyEvseDelegate::SendEnergyTransferStartedEvent()
 
     /* For V2X we may switch between charging and discharging, but we don't
      * keep sending EnergyTransferStarted events */
-    if (mInstance->HasFeature(Feature::kV2x))
+    if (mCluster->Features().Has(Feature::kV2x))
     {
         /* Sample the energy meter for discharging */
         GetEVSEEnergyMeterValue(ChargingDischargingType::kDischarging, mExportedMeterValueAtEnergyTransferStart);
@@ -1702,7 +1702,7 @@ Status EnergyEvseDelegate::SendEnergyTransferStartedEvent()
         event.maximumDischargeCurrent.ClearValue();
     }
 
-    ReturnValueOnFailure(mCluster->LogEnergyTransferStartedEvent(event) == CHIP_NO_ERROR, Status::Failure);
+    ReturnValueOnFailure(mCluster->LogEnergyTransferStartedEvent(event), Status::Failure);
 
     return Status::Success;
 }
@@ -1727,7 +1727,7 @@ Status EnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedR
     GetEVSEEnergyMeterValue(ChargingDischargingType::kCharging, meterValueNow);
     event.energyTransferred = meterValueNow - mImportedMeterValueAtEnergyTransferStart;
 
-    if (mInstance->HasFeature(Feature::kV2x))
+    if (mCluster->Features().Has(Feature::kV2x))
     {
         GetEVSEEnergyMeterValue(ChargingDischargingType::kDischarging, meterValueNow);
         event.energyDischarged.SetValue(mExportedMeterValueAtEnergyTransferStart - meterValueNow);
@@ -1737,7 +1737,7 @@ Status EnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedR
         event.energyDischarged.ClearValue();
     }
 
-    ReturnValueOnFailure(mCluster->LogEnergyTransferStoppedEvent(event) == CHIP_NO_ERROR, Status::Failure);
+    ReturnValueOnFailure(mCluster->LogEnergyTransferStoppedEvent(event), Status::Failure);
     return Status::Success;
 }
 
@@ -1751,7 +1751,7 @@ Status EnergyEvseDelegate::SendFaultEvent(FaultStateEnum newFaultState)
     event.faultStatePreviousState = GetFaultState();
     event.faultStateCurrentState  = newFaultState;
 
-    ReturnValueOnFailure(mCluster->LogFaultEvent(event) == CHIP_NO_ERROR, Status::Failure);
+    ReturnValueOnFailure(mCluster->LogFaultEvent(event), Status::Failure);
     return Status::Success;
 }
 
