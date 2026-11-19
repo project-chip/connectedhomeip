@@ -1785,24 +1785,39 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         notify_command = {"Name": "GetNotifyUpdateAppliedStatus", "Cluster": "OtaSoftwareUpdateProvider",
                           "Endpoint": self.get_endpoint()}
         step_number_s10 = "[STEP_10]"
-        pool_command_timeout_sec = self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC)
+        # Pool the named pipe result in a acceptable time period.
+        pool_command_timeout_sec = 300
         poll_command_interval_sec = 5
+        pool_command_deadline = time.time() + pool_command_timeout_sec
         attempt = 0
-        pool_command_start = time.time()
         received_software_version = None
         received_update_token = None
-        while time.time() - pool_command_start < pool_command_timeout_sec:
+        while True:
             attempt += 1
             self.write_to_app_pipe(notify_command, self.provider_app_pipe)
-            notify_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-            received_update_token = notify_response_data["Payload"]["UpdateToken"]
-            received_software_version = notify_response_data["Payload"]["SoftwareVersion"]
-            logger.info("%s Provider NotifyUpdateApplied snapshot retrieved: %s at Attempt # %d",
-                        step_number_s10, notify_response_data, attempt)
+            try:
+                notify_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+                received_update_token = notify_response_data["Payload"]["UpdateToken"]
+                received_software_version = notify_response_data["Payload"]["SoftwareVersion"]
+                logger.info("%s Provider NotifyUpdateApplied snapshot retrieved: %s at Attempt # %d",
+                            step_number_s10, notify_response_data, attempt)
+            except TimeoutError:
+                # If was not able to read the pipe, just continue
+                logger.info("%s Not able to read from named pipe, retrying wait and then retry.", step_number_s10)
+            
             # Check if the NamedPipe was able to retrieve the data if not continue.
             if len(received_update_token) > 0 and received_software_version > 0:
                 break
-            await asyncio.sleep(poll_command_interval_sec)
+
+            # If the values read from the named pipe are not the appropiate wait some time until is ready.
+            remaining = pool_command_deadline - time.time()
+            if remaining <= 0:
+                logger.warning(
+                    '%s: Step #10.1 - 1%% has not been reached after %.0fs (last UpdateStateProgress=%s); '
+                    'continuing to kill the provider.',
+                    step_number_s10, progress_poll_timeout_sec, update_state_progress)
+                break
+            await asyncio.sleep(min(poll_command_interval_sec,remaining))
 
         # Compare the UpdateToken and Software Version with previously stored values.
         asserts.assert_equal(
@@ -1819,16 +1834,20 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         self.step(11)
         step_number_s11 = "[STEP_11]"
-        boot_reason = await self.read_single_attribute_check_success(
-            cluster=Clusters.GeneralDiagnostics,
-            attribute=Clusters.GeneralDiagnostics.Attributes.BootReason,
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=self.get_endpoint(),
-        )
-        logger.info("%s Device BootReason value: %d", step_number_s11, boot_reason)
-        asserts.assert_equal(boot_reason, Clusters.GeneralDiagnostics.Enums.BootReasonEnum.kSoftwareUpdateCompleted,
-                             "BootReason is not SoftwareUpdateCompleted")
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=Clusters.GeneralDiagnostics.Attributes.BootReason):
+            boot_reason = await self.read_single_attribute_check_success(
+                cluster=Clusters.GeneralDiagnostics,
+                attribute=Clusters.GeneralDiagnostics.Attributes.BootReason,
+                dev_ctrl=controller,
+                node_id=requestor_node_id,
+                endpoint=self.get_endpoint(),
+            )
+            logger.info("%s Device BootReason value: %d", step_number_s11, boot_reason)
+            asserts.assert_equal(boot_reason, Clusters.GeneralDiagnostics.Enums.BootReasonEnum.kSoftwareUpdateCompleted,
+                                "BootReason is not SoftwareUpdateCompleted")
+        else:
+            logger.info("%s Attribute BootReason (optional) from GeneralDiagnostics not found.", step_number_s11)
+            self.mark_current_step_skipped()
 
         self.step(12)
         # Read the VersionApplied event: once the device is back and idle, it must be in the
