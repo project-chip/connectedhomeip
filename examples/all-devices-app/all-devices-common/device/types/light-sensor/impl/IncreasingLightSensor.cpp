@@ -26,7 +26,9 @@ namespace app {
 namespace {
 
 constexpr System::Clock::Seconds16 kIncreaseLightIntervalSec = System::Clock::Seconds16(10);
-constexpr uint16_t kLightStepLux                             = 10;
+
+// MeasuredValue encodes 10000 * log10(lux) + 1, so the step is in log units, not lux.
+constexpr uint16_t kLightStepLogUnits = 10;
 
 } // namespace
 
@@ -61,15 +63,21 @@ void IncreasingLightSensor::Unregister(CodeDrivenDataModelProvider & provider)
 
 void IncreasingLightSensor::TimerFired()
 {
-    const uint16_t minLight     = mLightConfig.minMeasuredValue.ValueOr(1);
-    const uint16_t maxLight     = mLightConfig.maxMeasuredValue.ValueOr(static_cast<uint16_t>(UINT16_MAX - 1));
-    const uint16_t currentLight = mIlluminanceMeasurementCluster.Cluster().GetMeasuredValue().ValueOr(minLight);
-    const uint32_t nextLight    = static_cast<uint32_t>(currentLight) + kLightStepLux;
+    auto & cluster = mIlluminanceMeasurementCluster.Cluster();
 
-    const uint16_t nextLightValue = nextLight > maxLight ? minLight : static_cast<uint16_t>(nextLight);
+    const uint16_t minLight = cluster.GetMinMeasuredValue().ValueOr(1);
+    const uint16_t maxLight = cluster.GetMaxMeasuredValue().ValueOr(static_cast<uint16_t>(UINT16_MAX - 1));
+
+    const DataModel::Nullable<uint16_t> currentLight = cluster.GetMeasuredValue();
+    uint16_t nextLightValue                          = minLight;
+    if (!currentLight.IsNull() && currentLight.Value() >= minLight &&
+        static_cast<uint32_t>(currentLight.Value()) + kLightStepLogUnits <= maxLight)
+    {
+        nextLightValue = static_cast<uint16_t>(currentLight.Value() + kLightStepLogUnits);
+    }
 
     ChipLogProgress(AppServer, "IncreasingLightValue: Increasing to %u", static_cast<unsigned int>(nextLightValue));
-    LogErrorOnFailure(mIlluminanceMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(nextLightValue)));
+    LogErrorOnFailure(cluster.SetMeasuredValue(DataModel::MakeNullable(nextLightValue)));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreaseLightIntervalSec));
 }

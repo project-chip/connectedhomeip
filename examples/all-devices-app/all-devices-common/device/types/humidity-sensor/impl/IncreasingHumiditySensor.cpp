@@ -60,15 +60,21 @@ void IncreasingHumiditySensor::Unregister(CodeDrivenDataModelProvider & provider
 
 void IncreasingHumiditySensor::TimerFired()
 {
-    const uint16_t minHumidity     = mHumidityConfig.minMeasuredValue.ValueOr(0);
-    const uint16_t maxHumidity     = mHumidityConfig.maxMeasuredValue.ValueOr(10000);
-    const uint16_t currentHumidity = mRelativeHumidityMeasurementCluster.Cluster().GetMeasuredValue().ValueOr(minHumidity);
-    const uint32_t nextHumidity    = static_cast<uint32_t>(currentHumidity) + kHumidityStepHundredthsPercent;
+    auto & cluster = mRelativeHumidityMeasurementCluster.Cluster();
 
-    const uint16_t nextHumidityValue = nextHumidity > maxHumidity ? minHumidity : static_cast<uint16_t>(nextHumidity);
+    const uint16_t minHumidity = cluster.GetMinMeasuredValue().ValueOr(0);
+    const uint16_t maxHumidity = cluster.GetMaxMeasuredValue().ValueOr(10000);
+
+    const DataModel::Nullable<uint16_t> currentHumidity = cluster.GetMeasuredValue();
+    uint16_t nextHumidityValue                          = minHumidity;
+    if (!currentHumidity.IsNull() && currentHumidity.Value() >= minHumidity &&
+        static_cast<uint32_t>(currentHumidity.Value()) + kHumidityStepHundredthsPercent <= maxHumidity)
+    {
+        nextHumidityValue = static_cast<uint16_t>(currentHumidity.Value() + kHumidityStepHundredthsPercent);
+    }
 
     ChipLogProgress(AppServer, "IncreasingHumidityValue: Increasing to %u", static_cast<unsigned int>(nextHumidityValue));
-    LogErrorOnFailure(mRelativeHumidityMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(nextHumidityValue)));
+    LogErrorOnFailure(cluster.SetMeasuredValue(DataModel::MakeNullable(nextHumidityValue)));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreaseHumidityIntervalSec));
 }
