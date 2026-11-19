@@ -16,6 +16,7 @@
 
 # Vendor subdirectories containing board-specific application files.
 set(ALL_DEVICES_BOARD_VENDOR_SUBDIRECTORIES
+    espressif
     silabs
     nxp
     # Add other manufacturer folders here

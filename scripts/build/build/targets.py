@@ -372,6 +372,7 @@ def BuildEsp32ZephyrTarget() -> BuildTarget:
     # applications
     target.AppendFixedTargets([
         TargetPart('light', app=Esp32ZephyrApp.LIGHT),
+        TargetPart('all-devices', app=Esp32ZephyrApp.ALL_DEVICES),
     ])
 
     return target

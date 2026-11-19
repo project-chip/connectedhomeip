@@ -86,6 +86,69 @@ The app supports MCUboot through Zephyr sysbuild. For debugging, use
 OTA is supported through the Matter OTA Requestor and the Zephyr platform OTA
 integration.
 
+## Espressif ESP32
+
+| Board                            | SoC      | Transport                            |
+| -------------------------------- | -------- | ------------------------------------ |
+| `esp32c6_devkitc/esp32c6/hpcore` | ESP32-C6 | Wi-Fi (2.4 GHz) or Thread, BLE setup |
+| `esp32c3_devkitm`                | ESP32-C3 | Wi-Fi (2.4 GHz), BLE setup           |
+
+Board overlays live in `boards/espressif/`, SoC configuration in `socs/`; the
+values follow the ESP32 Zephyr lighting example. The On/Off light drives GPIO2
+on the ESP32-C6 and GPIO3 on the ESP32-C3 (`led0` alias); connect an external
+LED. The BOOT button (`sw0`, GPIO9) is the factory reset button.
+
+Set up the Zephyr v4.5.0 west workspace, Python venv and `hal_espressif` blobs
+as described in the
+[ESP32 Zephyr lighting example](../../lighting-app/esp32_zephyr/README.md). The
+workspace does not need a manifest entry for Matter: pass this repository as an
+extra Zephyr module instead. Build without sysbuild (Simple Boot, no MCUboot):
+
+```shell
+source "$CHIP/scripts/activate.sh"
+source "$ZEPHYR_WORKSPACE/.venv/bin/activate"
+source "$ZEPHYR_WORKSPACE/zephyr/zephyr-env.sh"
+export ZEPHYR_EXTRA_MODULES="$CHIP"
+
+cd "$CHIP"
+# ESP32-C6, Matter over Wi-Fi
+west build -p always -b esp32c6_devkitc/esp32c6/hpcore \
+	-d out/esp32-zephyr-c6-all-devices examples/all-devices-app/zephyr
+# ESP32-C6, Matter over Thread
+west build -p always -b esp32c6_devkitc/esp32c6/hpcore \
+	-d out/esp32-zephyr-c6-thread-all-devices examples/all-devices-app/zephyr \
+	-- -DEXTRA_CONF_FILE=overlay-thread.conf
+# ESP32-C3, Matter over Wi-Fi
+west build -p always -b esp32c3_devkitm \
+	-d out/esp32-zephyr-c3-all-devices examples/all-devices-app/zephyr
+```
+
+`build_examples.py` provides the same builds as
+`esp32-zephyr-c6devkitc-all-devices` and `esp32-zephyr-c3devkitm-all-devices`
+(set `ESP32_ZEPHYR_BASE` and `ESP32_ZEPHYR_VENV`, see the lighting example).
+
+Flash with:
+
+```shell
+west flash -d out/esp32-zephyr-c6-all-devices --esp-device /dev/ttyUSB0
+```
+
+`west flash` runs the build first, which always regenerates the Matter GN
+project even when nothing changed. Pass `--no-rebuild`, or turn the rebuild off
+for the whole workspace with `west config flash.rebuild false`, to flash the
+existing image only.
+
+The monitor reads the build configuration from the current directory, so run it
+from inside the build directory:
+
+```shell
+cd out/esp32-zephyr-c6-all-devices
+west espressif monitor -p /dev/ttyUSB0
+```
+
+As in the lighting example, the ESP32 default profile has no shell;
+`-DFILE_SUFFIX=debug` adds it.
+
 ## Build Profiles
 
 `prj.conf` is applied by default. Select another profile with `FILE_SUFFIX`:
