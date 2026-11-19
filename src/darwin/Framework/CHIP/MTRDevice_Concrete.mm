@@ -1965,11 +1965,9 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
             std::lock_guard lock(self->_lock);
             if (self->_subscriptionReattemptGeneration != reattemptGeneration) {
                 MTR_LOG("%@ ignoring superseded subscription reattempt timer before dispatch", self);
-                if (deviceUsesThread) {
-                    // The pool ready handler calls this block right after taking the slot on the device
-                    // queue, so the slot is ours or already cleared.
-                    [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
-                }
+                // Thread and Wi-Fi reattempts both run in a subscription pool. The pool ready handler calls this
+                // block right after taking the slot on the device queue, so the slot is ours or already cleared.
+                [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
                 return;
             }
         }
