@@ -45,7 +45,6 @@ using namespace chip::Tracing::DarwinFramework;
 
 @implementation MTRCommissioningOperation {
     MTRCommissioningParameters * _parameters;
-    NSNumber * _commissioningID;
     id<MTRCommissioningDelegate> __weak _delegate;
     dispatch_queue_t _delegateQueue;
     MTRDeviceController_Concrete * __weak _controller;
@@ -93,7 +92,7 @@ using namespace chip::Tracing::DarwinFramework;
 
     _parameters = [parameters copy];
     _setupPayload = payload;
-    _commissioningID = commissioningID;
+    _commissioningID = [commissioningID copy];
     _isInternallyCreated = isInternallyCreated;
     _delegate = delegate;
     _delegateQueue = queue;

@@ -35,14 +35,19 @@ namespace Controller {
  * A delegate that can be notified of progress as a "pairing" (which might mean
  * "PASE session establishment" or "commissioning") proceeds.
  *
- * A commissionee is in one of the following states. The end of each state is reported by exactly one call to the
- * callback listed for it, except that Commission() moves a commissionee from Idle to Commissioning without a callback:
+ * A commissionee is in one of the following states.
  *
- *  - PASE: entered on EstablishPASEConnection() or PairDevice(). Ends with OnPairingComplete().
+ *  - PASE: entered on EstablishPASEConnection() or PairDevice(). Normally ends with OnPairingComplete(), but not
+ *    always exactly once: StopPairing() during PASE establishment ends it with no callback, and
+ *    EstablishPASEConnection() for a commissionee that is already connected with the same ID calls
+ *    OnPairingComplete(CHIP_NO_ERROR) again.
  *  - Idle: entered on OnPairingComplete(CHIP_NO_ERROR) after EstablishPASEConnection(), or on an
- *    OnCommissioningComplete() failure after which the PASE session is kept. Ends with OnCommissioneeReleased().
- *  - Commissioning: entered on Commission(), or directly after PASE for PairDevice(). Ends with
- *    OnCommissioningComplete().
+ *    OnCommissioningComplete() failure after which the PASE session is kept. Ends with entry into the
+ *    Commissioning state if Commission() is called (no callback for this case) or with a single call to
+ *    OnCommissioneeReleased().
+ *  - Commissioning: entered on Commission(), or directly after PASE for PairDevice(). Ends with a single call to
+ *    OnCommissioningComplete(), once commissioning has started; PairDevice() calls OnPairingComplete(CHIP_NO_ERROR)
+ *    and then nothing else if commissioning fails to start.
  */
 class DLL_EXPORT DevicePairingDelegate
 {
@@ -105,23 +110,18 @@ public:
 
     /**
      * @brief
-     *   Called when a commissionee that has finished PASE establishment and is not being commissioned (the "Idle" state
-     *   described above) is released, because its PASE session was released, because StopPairing() was called for it, or
-     *   because EstablishPASEConnection() replaced it. The commissionee has already been released when this is called, so no
-     *   commissioning can be started for it without a new PASE session. This is called synchronously from the code that
-     *   released the commissionee.
+     *   Called when a commissionee in the "Idle" state described above is released (unless it's being released as part
+     *   of commissioner shutdown). The commissionee has already been released when this is called, so no commissioning can
+     *   be started for it without a new PASE session. This is called synchronously from the code that released the
+     *   commissionee.
      *
      *   When the reason is CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY, this runs inside the session's
      *   SessionDelegate::OnSessionReleased(), which must not allocate a session synchronously. The delegate must therefore not
      *   start a new PASE session (EstablishPASEConnection(), PairDevice()) or anything else that allocates a session from this
      *   callback; it has to defer that, for example with ScheduleWork().
      *
-     *   Not called from DeviceCommissioner::Shutdown(), and not called for a commissionee that is still establishing PASE or
-     *   that is being commissioned.
-     *
-     * @param deviceId The device ID of the commissionee (CommissioneeDeviceProxy::GetDeviceId()), which is the same ID
-     *                 OnCommissioningComplete() reports for it: the commissioning ID until an operational identity has
-     *                 been applied to the commissionee.
+     * @param deviceId The device ID of the commissionee, which is the same ID OnCommissioningComplete() reports for it:
+     *                 the commissioning ID until an operational identity has been applied to the commissionee.
      *
      * @param reason CHIP_ERROR_CANCELLED if StopPairing() was called for the commissionee; otherwise the reason the PASE
      *               session was released (CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY) or replaced

@@ -705,6 +705,11 @@ bool DeviceCommissioner::IsBeingCommissioned(const CommissioneeDeviceProxy & dev
         (mDeviceBeingCommissioned == &device || mDeviceBeingCommissioned->GetDeviceId() == device.GetDeviceId());
 }
 
+bool DeviceCommissioner::IsIdleCommissionee(const CommissioneeDeviceProxy & device) const
+{
+    return &device != mDeviceInPASEEstablishment && !IsBeingCommissioned(device);
+}
+
 bool DeviceCommissioner::HasLivePASESession(NodeId nodeId)
 {
     CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
@@ -714,11 +719,11 @@ bool DeviceCommissioner::HasLivePASESession(NodeId nodeId)
 void DeviceCommissioner::OnCommissioneeSessionReleased(CommissioneeDeviceProxy & device)
 {
     // A commissionee in PASE establishment or being commissioned has its own failure path.
-    VerifyOrReturn(&device != mDeviceInPASEEstablishment && !IsBeingCommissioned(device));
+    VerifyOrReturn(IsIdleCommissionee(device));
 
     // The proxy does not touch itself after calling us, so it can be released here.
     NodeId deviceId = device.GetDeviceId();
-    ChipLogProgress(Controller, "PASE session to commissionee 0x" ChipLogFormatX64 " was released; releasing it",
+    ChipLogProgress(Controller, "PASE session to commissionee 0x" ChipLogFormatX64 " was released; releasing the commissionee",
                     ChipLogValueX64(deviceId));
     ReleaseCommissioneeDevice(&device);
     if (mPairingDelegate != nullptr)
@@ -935,7 +940,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         // again.
         ChipLogError(Controller, "Found unconnected device, removing");
         NodeId currentId = current->GetDeviceId();
-        bool wasIdle     = current != mDeviceInPASEEstablishment && !IsBeingCommissioned(*current);
+        bool wasIdle     = IsIdleCommissionee(*current);
         ReleaseCommissioneeDevice(current);
         if (wasIdle && mPairingDelegate != nullptr)
         {

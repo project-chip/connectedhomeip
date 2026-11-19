@@ -913,6 +913,10 @@ private:
     // True while commissioning is running for this commissionee, whichever proxy the commissioning stage is using.
     bool IsBeingCommissioned(const CommissioneeDeviceProxy & device) const;
 
+    // True for a commissionee that has finished PASE establishment and is not being commissioned (the Idle state described
+    // in DevicePairingDelegate.h).
+    bool IsIdleCommissionee(const CommissioneeDeviceProxy & device) const;
+
     // True if the commissionee for this node ID still has a PASE session.
     bool HasLivePASESession(NodeId nodeId);
 
@@ -1179,8 +1183,7 @@ private:
     // Creates a commissionee in the pool that reports the loss of its session to this commissioner.
     CommissioneeDeviceProxy * CreateCommissioneeDevice();
 
-    // CommissioneeDeviceProxy::SessionReleaseDelegate: a commissionee that is idle (neither in PASE establishment nor being
-    // commissioned) and loses its session is released, and the pairing delegate's OnCommissioneeReleased is called.
+    // CommissioneeDeviceProxy::SessionReleaseDelegate implementation.
     void OnCommissioneeSessionReleased(CommissioneeDeviceProxy & device) override;
 
     bool ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,

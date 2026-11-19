@@ -58,7 +58,7 @@ class CommissioneeDeviceProxy : public DeviceProxy, public SessionDelegate
 {
 public:
     /**
-     * Told when the proxy's secure session is released, after the proxy has marked itself not connected.
+     * Notified when the proxy's secure session is released, after the proxy has marked itself not connected.
      */
     class SessionReleaseDelegate
     {
