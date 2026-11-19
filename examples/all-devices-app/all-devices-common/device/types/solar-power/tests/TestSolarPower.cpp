@@ -27,11 +27,15 @@
 #include <clusters/Descriptor/AttributeIds.h>
 #include <clusters/Descriptor/Attributes.h>
 #include <clusters/Descriptor/ClusterId.h>
+#include <clusters/DeviceEnergyManagement/Attributes.h>
 #include <clusters/DeviceEnergyManagement/ClusterId.h>
+#include <clusters/ElectricalEnergyMeasurement/AttributeIds.h>
 #include <clusters/ElectricalEnergyMeasurement/ClusterId.h>
+#include <clusters/ElectricalPowerMeasurement/AttributeIds.h>
 #include <clusters/ElectricalPowerMeasurement/Attributes.h>
 #include <clusters/ElectricalPowerMeasurement/ClusterId.h>
 #include <clusters/Identify/ClusterId.h>
+#include <clusters/PowerSource/AttributeIds.h>
 #include <clusters/PowerSource/ClusterId.h>
 #include <clusters/PowerTopology/ClusterId.h>
 #include <clusters/TemperatureMeasurement/ClusterId.h>
@@ -77,7 +81,7 @@ SimulatedSolarPower::Config VariantConfig(const char * name)
 class SolarPowerTestFixture : public ::testing::Test
 {
 public:
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void SetUpTestSuite() { ASSERT_SUCCESS(Platform::MemoryInit()); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
     void SetUp() override
@@ -155,7 +159,7 @@ private:
 std::vector<DataModel::EndpointEntry> GetEndpoints(CodeDrivenDataModelProvider & provider)
 {
     ReadOnlyBufferBuilder<DataModel::EndpointEntry> builder;
-    EXPECT_EQ(provider.Endpoints(builder), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(provider.Endpoints(builder));
     const auto buffer = builder.TakeBuffer();
     return std::vector<DataModel::EndpointEntry>(buffer.begin(), buffer.end());
 }
@@ -174,7 +178,7 @@ void ExpectSingleDeviceType(CodeDrivenDataModelProvider & provider, EndpointId e
                             const DataModel::DeviceTypeEntry & expected)
 {
     ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> builder;
-    ASSERT_EQ(provider.DeviceTypes(endpoint, builder), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(provider.DeviceTypes(endpoint, builder));
     const auto deviceTypes = builder.TakeBuffer();
     ASSERT_EQ(deviceTypes.size(), 1u);
     EXPECT_EQ(deviceTypes[0].deviceTypeId, expected.deviceTypeId);
@@ -185,7 +189,7 @@ void ExpectServerClusters(CodeDrivenDataModelProvider & provider, EndpointId end
                           std::initializer_list<ClusterId> expectedClusters)
 {
     ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> builder;
-    ASSERT_EQ(provider.ServerClusters(endpoint, builder), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(provider.ServerClusters(endpoint, builder));
     const auto clusterEntries = builder.TakeBuffer();
 
     std::vector<ClusterId> actual;
@@ -199,12 +203,33 @@ void ExpectServerClusters(CodeDrivenDataModelProvider & provider, EndpointId end
     EXPECT_EQ(actual, expected);
 }
 
+void ExpectAttributes(CodeDrivenDataModelProvider & provider, const ConcreteClusterPath & path,
+                      std::initializer_list<AttributeId> requiredAttributes,
+                      std::initializer_list<AttributeId> disallowedAttributes = {})
+{
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
+    ASSERT_SUCCESS(provider.Attributes(path, builder));
+    const auto attributes = builder.TakeBuffer();
+
+    for (AttributeId required : requiredAttributes)
+    {
+        EXPECT_NE(std::find_if(attributes.begin(), attributes.end(),
+                               [required](const auto & entry) { return entry.attributeId == required; }),
+                  attributes.end());
+    }
+    for (AttributeId disallowed : disallowedAttributes)
+    {
+        EXPECT_EQ(std::find_if(attributes.begin(), attributes.end(),
+                               [disallowed](const auto & entry) { return entry.attributeId == disallowed; }),
+                  attributes.end());
+    }
+}
+
 void ExpectSemanticTags(ProviderAttributeReader & reader, EndpointId endpoint,
                         std::initializer_list<std::pair<uint16_t, uint8_t>> expectedTags)
 {
     Clusters::Descriptor::Attributes::TagList::TypeInfo::DecodableType tagList;
-    ASSERT_EQ(reader.Read(endpoint, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::TagList::Id, tagList),
-              CHIP_NO_ERROR);
+    ASSERT_SUCCESS(reader.Read(endpoint, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::TagList::Id, tagList));
 
     std::vector<std::pair<uint16_t, uint8_t>> actual;
     auto iterator = tagList.begin();
@@ -213,7 +238,7 @@ void ExpectSemanticTags(ProviderAttributeReader & reader, EndpointId endpoint,
         const auto & tag = iterator.GetValue();
         actual.emplace_back(tag.namespaceID, tag.tag);
     }
-    ASSERT_EQ(iterator.GetStatus(), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(iterator.GetStatus());
 
     std::vector<std::pair<uint16_t, uint8_t>> expected(expectedTags);
     EXPECT_EQ(actual, expected);
@@ -287,22 +312,22 @@ void TestUnregisterAndRegisterAgain(CodeDrivenDataModelProvider & provider, Test
     ConsecutiveEndpointIdAllocator allocator;
     auto device = makeDevice();
 
-    ASSERT_EQ(device->Register(allocator, provider), CHIP_NO_ERROR);
-    ASSERT_EQ(provider.Startup(context.ImContext()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(device->Register(allocator, provider));
+    ASSERT_SUCCESS(provider.Startup(context.ImContext()));
     const EndpointId firstParentEndpoint = device->GetEndpointId();
 
     device->Unregister(provider);
     expectInvalid(*device);
     ExpectNoRegisteredEndpoints(provider);
 
-    ASSERT_EQ(device->Register(allocator, provider), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(device->Register(allocator, provider));
     EXPECT_NE(device->GetEndpointId(), firstParentEndpoint);
     EXPECT_EQ(GetEndpoints(provider).size(), endpointCount);
 
     device->Unregister(provider);
     expectInvalid(*device);
     ExpectNoRegisteredEndpoints(provider);
-    EXPECT_EQ(provider.Shutdown(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(provider.Shutdown());
 }
 
 TEST_F(SolarPowerTestFixture, AllVariantsRegisterWithoutGlobalDeviceInfoProvider)
@@ -342,11 +367,15 @@ TEST_F(SolarPowerTestFixture, AllVariantsRegisterWithoutGlobalDeviceInfoProvider
 
 TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredTopologyAndDeviceTypes)
 {
+    using DemFeature = Clusters::DeviceEnergyManagement::Feature;
+    using EemFeature = Clusters::ElectricalEnergyMeasurement::Feature;
+    using PsFeature  = Clusters::PowerSource::Feature;
+
     ConsecutiveEndpointIdAllocator allocator;
     SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power"));
 
-    ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
-    ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(device.Register(allocator, mProvider));
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
 
     const EndpointId parentEndpoint     = device.GetEndpointId();
     const EndpointId energyEndpoint     = device.GetEnergyManagement().GetEndpointId();
@@ -374,8 +403,27 @@ TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredTopologyAndDeviceTypes)
     EXPECT_EQ(device.GetEnergyManagement().GetESAType(), Clusters::DeviceEnergyManagement::ESATypeEnum::kSolarPV);
     EXPECT_TRUE(device.GetEnergyManagement().GetESACanGenerate());
 
+    ProviderAttributeReader reader(mProvider);
+    uint32_t featureMap = 0;
+    ASSERT_SUCCESS(reader.Read(energyEndpoint, Clusters::DeviceEnergyManagement::Id,
+                               Clusters::DeviceEnergyManagement::Attributes::FeatureMap::Id, featureMap));
+    EXPECT_EQ(featureMap, BitMask<DemFeature>(DemFeature::kPowerAdjustment).Raw());
+
+    ASSERT_SUCCESS(reader.Read(gridSourceEndpoint, Clusters::PowerSource::Id,
+                               Clusters::PowerSource::Attributes::FeatureMap::Id, featureMap));
+    EXPECT_EQ(featureMap, BitMask<PsFeature>(PsFeature::kWired).Raw());
+
+    ASSERT_SUCCESS(reader.Read(outputEndpoint, Clusters::ElectricalEnergyMeasurement::Id,
+                               Clusters::ElectricalEnergyMeasurement::Attributes::FeatureMap::Id, featureMap));
+    const BitMask<EemFeature> eemFeatures(featureMap);
+    EXPECT_TRUE(eemFeatures.Has(EemFeature::kExportedEnergy));
+
+    ExpectAttributes(mProvider, ConcreteClusterPath(outputEndpoint, Clusters::ElectricalPowerMeasurement::Id),
+                     { Clusters::ElectricalPowerMeasurement::Attributes::Voltage::Id,
+                       Clusters::ElectricalPowerMeasurement::Attributes::ActiveCurrent::Id });
+
     device.Unregister(mProvider);
-    EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(mProvider.Shutdown());
 }
 
 TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredSemanticTags)
@@ -383,8 +431,8 @@ TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredSemanticTags)
     ConsecutiveEndpointIdAllocator allocator;
     SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power"));
 
-    ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
-    ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(device.Register(allocator, mProvider));
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
 
     ProviderAttributeReader reader(mProvider);
     const uint16_t powerSourceNs = to_underlying(NS::kPowerSource);
@@ -395,7 +443,7 @@ TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredSemanticTags)
                        { { locationNs, to_underlying(Clusters::Globals::LocationTag::kOutdoor) } });
 
     device.Unregister(mProvider);
-    EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(mProvider.Shutdown());
 }
 
 TEST_F(SolarPowerTestFixture, FourParallelPanelsRegistersTopologyAndTags)
@@ -403,8 +451,8 @@ TEST_F(SolarPowerTestFixture, FourParallelPanelsRegistersTopologyAndTags)
     ConsecutiveEndpointIdAllocator allocator;
     SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power-four-panels"));
 
-    ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
-    ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(device.Register(allocator, mProvider));
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
 
     ASSERT_EQ(GetEndpoints(mProvider).size(), 9u);
 
@@ -418,7 +466,7 @@ TEST_F(SolarPowerTestFixture, FourParallelPanelsRegistersTopologyAndTags)
     }
 
     device.Unregister(mProvider);
-    EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(mProvider.Shutdown());
 }
 
 TEST_F(SolarPowerTestFixture, TwoStringsRegistersTopologyAndTags)
@@ -426,8 +474,8 @@ TEST_F(SolarPowerTestFixture, TwoStringsRegistersTopologyAndTags)
     ConsecutiveEndpointIdAllocator allocator;
     SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power-two-strings"));
 
-    ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
-    ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(device.Register(allocator, mProvider));
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
 
     ASSERT_EQ(GetEndpoints(mProvider).size(), 7u);
 
@@ -437,7 +485,7 @@ TEST_F(SolarPowerTestFixture, TwoStringsRegistersTopologyAndTags)
     ExpectSemanticTags(reader, device.GetPanelSensor(1).GetEndpointId(), { { numberNs, 2 } });
 
     device.Unregister(mProvider);
-    EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(mProvider.Shutdown());
 }
 
 TEST_F(SolarPowerTestFixture, TwoStringsFourPanelsRegistersTopologyAndTags)
@@ -445,8 +493,8 @@ TEST_F(SolarPowerTestFixture, TwoStringsFourPanelsRegistersTopologyAndTags)
     ConsecutiveEndpointIdAllocator allocator;
     SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power-two-strings-four-panels"));
 
-    ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
-    ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(device.Register(allocator, mProvider));
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
 
     ASSERT_EQ(GetEndpoints(mProvider).size(), 9u);
 
@@ -463,7 +511,7 @@ TEST_F(SolarPowerTestFixture, TwoStringsFourPanelsRegistersTopologyAndTags)
                        { { numberNs, 2 }, { positionNs, to_underlying(Clusters::Globals::PositionTag::kRight) } });
 
     device.Unregister(mProvider);
-    EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(mProvider.Shutdown());
 }
 
 TEST_F(SolarPowerTestFixture, ThreePhaseRegistersTopologyAndAcPhaseTags)
@@ -471,8 +519,8 @@ TEST_F(SolarPowerTestFixture, ThreePhaseRegistersTopologyAndAcPhaseTags)
     ConsecutiveEndpointIdAllocator allocator;
     SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power-three-phase"));
 
-    ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
-    ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(device.Register(allocator, mProvider));
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
 
     ASSERT_EQ(GetEndpoints(mProvider).size(), 8u);
 
@@ -488,7 +536,23 @@ TEST_F(SolarPowerTestFixture, ThreePhaseRegistersTopologyAndAcPhaseTags)
     }
 
     device.Unregister(mProvider);
-    EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(mProvider.Shutdown());
+}
+
+TEST_F(SolarPowerTestFixture, RejectsDuplicateRegistration)
+{
+    ConsecutiveEndpointIdAllocator allocator;
+    SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power"));
+
+    ASSERT_SUCCESS(device.Register(allocator, mProvider));
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
+
+    ConsecutiveEndpointIdAllocator duplicateAllocator(50);
+    EXPECT_EQ(device.Register(duplicateAllocator, mProvider), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(duplicateAllocator.Allocate(), 50);
+
+    device.Unregister(mProvider);
+    EXPECT_SUCCESS(mProvider.Shutdown());
 }
 
 TEST_F(SolarPowerTestFixture, AllVariantsRollBackPartialRegistrationFailures)
@@ -613,12 +677,12 @@ TEST_F(SolarPowerTestFixture, UnregistersCleanlyAfterProviderStartup)
     ConsecutiveEndpointIdAllocator allocator;
     SimulatedSolarPower device(MakeContext(), VariantConfig("solar-power"));
 
-    ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
-    ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(device.Register(allocator, mProvider));
+    ASSERT_SUCCESS(mProvider.Startup(mContext.ImContext()));
 
     device.Unregister(mProvider);
     ExpectBaselineEndpointIdsInvalid(device);
-    EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(mProvider.Shutdown());
 }
 
 } // namespace
