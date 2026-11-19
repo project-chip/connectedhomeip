@@ -176,17 +176,17 @@ class TC_IDM_10_7(DeviceConformanceTests):
         """
         Run conformance checks, store problems, and fail the test on errors.
         """
-        ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
-            "ignore_in_progress_test_event_only_disallowed_for_certification", False
+        ignore_in_progress_test_event_only_disallowed_for_certification_and_sve = self.user_params.get(
+            "ignore_in_progress_test_event_only_disallowed_for_certification_and_sve", False
         )
-        allow_provisional_test_event_only_disallowed_for_certification = self.user_params.get(
-            "allow_provisional_test_event_only_disallowed_for_certification", False
+        allow_provisional_test_event_and_sve_only_disallowed_for_certification = self.user_params.get(
+            "allow_provisional_test_event_and_sve_only_disallowed_for_certification", False
         )
 
         success, problems = self.check_conformance(
-            ignore_in_progress_test_event_only_disallowed_for_certification,
+            ignore_in_progress_test_event_only_disallowed_for_certification_and_sve,
             self.is_pics_sdk_ci_only,
-            allow_provisional_test_event_only_disallowed_for_certification
+            allow_provisional_test_event_and_sve_only_disallowed_for_certification
         )
 
         self.problems.extend(problems)
@@ -196,11 +196,11 @@ class TC_IDM_10_7(DeviceConformanceTests):
         """
         Run revision checks, store problems, and fail the test on errors.
         """
-        ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
-            "ignore_in_progress_test_event_only_disallowed_for_certification", False
+        ignore_in_progress_test_event_only_disallowed_for_certification_and_sve = self.user_params.get(
+            "ignore_in_progress_test_event_only_disallowed_for_certification_and_sve", False
         )
         success, problems = self.check_revisions(
-            ignore_in_progress_test_event_only_disallowed_for_certification
+            ignore_in_progress_test_event_only_disallowed_for_certification_and_sve
         )
         self.problems.extend(problems)
         asserts.assert_true(success, "Problems with cluster revision on at least one cluster")

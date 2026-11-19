@@ -32,7 +32,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
-#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification:True allow_provisional_test_event_only_disallowed_for_certification:True
+#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification_and_sve:True allow_provisional_test_event_and_sve_only_disallowed_for_certification:True
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -51,7 +51,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
-#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification:True allow_provisional_test_event_only_disallowed_for_certification:True
+#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification_and_sve:True allow_provisional_test_event_and_sve_only_disallowed_for_certification:True
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -68,7 +68,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
-#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification:True allow_provisional_test_event_only_disallowed_for_certification:True
+#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification_and_sve:True allow_provisional_test_event_and_sve_only_disallowed_for_certification:True
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -95,31 +95,31 @@ class TC_DeviceConformance(DeviceConformanceTests):
     def test_TC_IDM_10_2(self):
         # TODO: Turn this off after TE2
         # https://github.com/project-chip/connectedhomeip/issues/34615
-        ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
-            "ignore_in_progress_test_event_only_disallowed_for_certification", True)
-        allow_provisional_test_event_only_disallowed_for_certification = self.user_params.get(
-            "allow_provisional_test_event_only_disallowed_for_certification", False)
-        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification,
+        ignore_in_progress_test_event_only_disallowed_for_certification_and_sve = self.user_params.get(
+            "ignore_in_progress_test_event_only_disallowed_for_certification_and_sve", True)
+        allow_provisional_test_event_and_sve_only_disallowed_for_certification = self.user_params.get(
+            "allow_provisional_test_event_and_sve_only_disallowed_for_certification", False)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification_and_sve,
                                                    self.is_pics_sdk_ci_only,
-                                                   allow_provisional_test_event_only_disallowed_for_certification)
+                                                   allow_provisional_test_event_and_sve_only_disallowed_for_certification)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with conformance")
 
     def test_TC_IDM_10_3(self):
-        ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
-            "ignore_in_progress_test_event_only_disallowed_for_certification", False)
-        success, problems = self.check_revisions(ignore_in_progress_test_event_only_disallowed_for_certification)
+        ignore_in_progress_test_event_only_disallowed_for_certification_and_sve = self.user_params.get(
+            "ignore_in_progress_test_event_only_disallowed_for_certification_and_sve", False)
+        success, problems = self.check_revisions(ignore_in_progress_test_event_only_disallowed_for_certification_and_sve)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with cluster revision on at least one cluster")
 
     def test_TC_IDM_10_5(self):
         fail_on_extra_clusters = self.user_params.get("fail_on_extra_clusters", True)
-        allow_provisional_test_event_only_disallowed_for_certification = self.user_params.get(
-            "allow_provisional_test_event_only_disallowed_for_certification", False)
+        allow_provisional_test_event_and_sve_only_disallowed_for_certification = self.user_params.get(
+            "allow_provisional_test_event_and_sve_only_disallowed_for_certification", False)
         success, problems = self.check_device_type(fail_on_extra_clusters,
-                                                   allow_provisional_test_event_only_disallowed_for_certification)
+                                                   allow_provisional_test_event_and_sve_only_disallowed_for_certification)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")
