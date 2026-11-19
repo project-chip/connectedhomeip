@@ -48,6 +48,7 @@ public:
     {
         Span<const EndpointComposition::SemanticTag> tags;
         SimulatedElectricalSensor::Role role = SimulatedElectricalSensor::Role::kBattery;
+        bool withUserLabel                   = true;
     };
 
     static constexpr size_t kMaxPanelCount = 4;
@@ -69,7 +70,7 @@ public:
                         EndpointComposition composition = {}) override;
 
     size_t GetPanelCount() const { return mPanelCount; }
-    PanelElectricalSensor & GetPanelSensor(size_t index);
+    SimulatedElectricalSensor & GetPanelSensor(size_t index);
 
     Clusters::IdentifyCluster & IdentifyCluster()
     {
@@ -77,7 +78,7 @@ public:
         return mIdentifyCluster.Cluster();
     }
     EnergyManagement & GetEnergyManagement() { return mEnergyManagement; }
-    PanelElectricalSensor & GetOutputElectricalSensor() { return mOutputElectricalSensor; }
+    SimulatedElectricalSensor & GetOutputElectricalSensor() { return mOutputElectricalSensor; }
     TemperatureSensor & GetInverterTemperatureSensor() { return mInverterTemperatureSensor; }
 
 protected:
@@ -91,8 +92,8 @@ protected:
 private:
     TimerDelegate & mTimerDelegate;
     Span<const EndpointComposition::SemanticTag> mTags;
-    PanelElectricalSensor mOutputElectricalSensor;
-    std::array<std::unique_ptr<PanelElectricalSensor>, kMaxPanelCount> mPanels;
+    SimulatedElectricalSensor mOutputElectricalSensor;
+    std::array<std::unique_ptr<SimulatedElectricalSensor>, kMaxPanelCount> mPanels;
     const size_t mPanelCount;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     EnergyManagement mEnergyManagement;

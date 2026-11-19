@@ -58,8 +58,8 @@ Clusters::TemperatureMeasurementCluster::StartupConfiguration InverterTemperatur
 
 SimulatedSolarPower::SimulatedSolarPower(const Context & context, const Config & config) :
     SolarPower(), mTimerDelegate(context.timerDelegate), mTags(config.tags),
-    mOutputElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
-                            context.deviceInfoProvider, SolarPowerTags::GridConnectionTag(), config.outputSensorRole),
+    mOutputElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, SolarPowerTags::GridConnectionTag(),
+                            config.outputSensorRole),
     mPanelCount(config.panels.size()), mEnergyManagement(context.timerDelegate, SolarPowerEnergyManagementConfig()),
     mInverterTemperatureSensor(context.timerDelegate, InverterTemperatureConfig())
 {
@@ -67,9 +67,17 @@ SimulatedSolarPower::SimulatedSolarPower(const Context & context, const Config &
     for (size_t index = 0; index < mPanelCount; ++index)
     {
         const auto & panel = config.panels[index];
-        mPanels[index] =
-            std::make_unique<PanelElectricalSensor>(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
-                                                    context.deviceInfoProvider, panel.tags, panel.role);
+        if (panel.withUserLabel)
+        {
+            mPanels[index] = std::make_unique<PanelElectricalSensor>(
+                context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable, context.deviceInfoProvider,
+                panel.tags, panel.role);
+        }
+        else
+        {
+            mPanels[index] = std::make_unique<SimulatedElectricalSensor>(context.timerDelegate, context.testEventTriggerDelegate,
+                                                                        panel.tags, panel.role);
+        }
     }
 }
 
@@ -83,7 +91,7 @@ CHIP_ERROR SimulatedSolarPower::Register(EndpointIdAllocator & allocator, CodeDr
     return SolarPower::Register(allocator, provider, composition);
 }
 
-PanelElectricalSensor & SimulatedSolarPower::GetPanelSensor(size_t index)
+SimulatedElectricalSensor & SimulatedSolarPower::GetPanelSensor(size_t index)
 {
     VerifyOrDie(index < mPanelCount);
     return *mPanels[index];

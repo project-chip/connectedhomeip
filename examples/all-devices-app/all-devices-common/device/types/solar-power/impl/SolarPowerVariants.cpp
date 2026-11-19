@@ -210,9 +210,9 @@ const EndpointComposition::SemanticTag kThreePhaseTag[] = {
 SimulatedSolarPower::Config ThreePhaseConfig()
 {
     static const PanelConfig kPhaseSensors[] = {
-        { .tags = PhaseATag(), .role = Role::kGrid },
-        { .tags = PhaseBTag(), .role = Role::kGrid },
-        { .tags = PhaseCTag(), .role = Role::kGrid },
+        { .tags = PhaseATag(), .role = Role::kGrid, .withUserLabel = false },
+        { .tags = PhaseBTag(), .role = Role::kGrid, .withUserLabel = false },
+        { .tags = PhaseCTag(), .role = Role::kGrid, .withUserLabel = false },
     };
     return {
         .outputSensorRole = Role::kAcPolyphaseOutput,

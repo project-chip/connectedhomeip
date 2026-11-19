@@ -283,6 +283,13 @@ void ExpectParentChildTree(CodeDrivenDataModelProvider & provider, EndpointId pa
     }
 }
 
+void ExpectElectricalSensorClusters(CodeDrivenDataModelProvider & provider, EndpointId endpoint)
+{
+    ExpectServerClusters(provider, endpoint,
+                         { Clusters::Descriptor::Id, Clusters::ElectricalEnergyMeasurement::Id,
+                           Clusters::ElectricalPowerMeasurement::Id, Clusters::PowerTopology::Id });
+}
+
 void ExpectPanelSensorClusters(CodeDrivenDataModelProvider & provider, EndpointId endpoint)
 {
     ExpectServerClusters(provider, endpoint,
@@ -346,18 +353,15 @@ TEST_F(SolarPowerTestFixture, AllVariantsRegisterWithoutGlobalDeviceInfoProvider
 
         ProviderAttributeReader reader(mProvider);
 
-        DataModel::DecodableList<Clusters::UserLabel::Structs::LabelStruct::DecodableType> outputLabels;
-        ASSERT_SUCCESS(reader.Read(device.GetOutputElectricalSensor().GetEndpointId(), Clusters::UserLabel::Id,
-                                   Clusters::UserLabel::Attributes::LabelList::Id, outputLabels));
-
         for (size_t index = 0; index < device.GetPanelCount(); ++index)
         {
-            auto & panel = device.GetPanelSensor(index);
-            EXPECT_TRUE(panel.UserLabelCluster().PathsContains({ panel.GetEndpointId(), Clusters::UserLabel::Id }));
-
-            DataModel::DecodableList<Clusters::UserLabel::Structs::LabelStruct::DecodableType> panelLabels;
-            ASSERT_SUCCESS(reader.Read(panel.GetEndpointId(), Clusters::UserLabel::Id,
-                                       Clusters::UserLabel::Attributes::LabelList::Id, panelLabels));
+            if (variant.makeConfig().panels[index].withUserLabel)
+            {
+                auto & panel = device.GetPanelSensor(index);
+                DataModel::DecodableList<Clusters::UserLabel::Structs::LabelStruct::DecodableType> panelLabels;
+                ASSERT_SUCCESS(reader.Read(panel.GetEndpointId(), Clusters::UserLabel::Id,
+                                           Clusters::UserLabel::Attributes::LabelList::Id, panelLabels));
+            }
         }
 
         device.Unregister(mProvider);
@@ -395,7 +399,7 @@ TEST_F(SolarPowerTestFixture, BaselineRegistersRequiredTopologyAndDeviceTypes)
     ExpectServerClusters(mProvider, parentEndpoint, { Clusters::Descriptor::Id, Clusters::Identify::Id });
     ExpectServerClusters(mProvider, energyEndpoint,
                          { Clusters::Descriptor::Id, Clusters::Identify::Id, Clusters::DeviceEnergyManagement::Id });
-    ExpectPanelSensorClusters(mProvider, outputEndpoint);
+    ExpectElectricalSensorClusters(mProvider, outputEndpoint);
     ExpectServerClusters(mProvider, gridSourceEndpoint, { Clusters::Descriptor::Id, Clusters::PowerSource::Id });
     ExpectServerClusters(mProvider, inverterEndpoint,
                          { Clusters::Descriptor::Id, Clusters::Identify::Id, Clusters::TemperatureMeasurement::Id });
@@ -460,7 +464,7 @@ TEST_F(SolarPowerTestFixture, FourParallelPanelsRegistersTopologyAndTags)
     const uint16_t numberNs = to_underlying(NS::kNumber);
     for (size_t index = 0; index < device.GetPanelCount(); ++index)
     {
-        PanelElectricalSensor & panel = device.GetPanelSensor(index);
+        auto & panel = device.GetPanelSensor(index);
         ExpectPanelSensorClusters(mProvider, panel.GetEndpointId());
         ExpectSemanticTags(reader, panel.GetEndpointId(), { { numberNs, static_cast<uint8_t>(index + 1) } });
     }
@@ -532,7 +536,7 @@ TEST_F(SolarPowerTestFixture, ThreePhaseRegistersTopologyAndAcPhaseTags)
 
     for (size_t index = 0; index < 3; ++index)
     {
-        ExpectPanelSensorClusters(mProvider, device.GetPanelSensor(index).GetEndpointId());
+        ExpectElectricalSensorClusters(mProvider, device.GetPanelSensor(index).GetEndpointId());
     }
 
     device.Unregister(mProvider);
