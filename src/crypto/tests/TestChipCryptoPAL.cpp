@@ -261,6 +261,11 @@ void ExpectSignAndVerify(P256Keypair & signer, P256Keypair & verifier)
     EXPECT_SUCCESS(verifier.Pubkey().ECDSA_validate_msg_signature(msg.data(), msg.size(), signature));
 }
 
+constexpr uint8_t kP256CurveOrder[] = { 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
+                                        0xff, 0xff, 0xff, 0xff, 0xff, 0xbc, 0xe6, 0xfa, 0xad, 0xa7, 0x17,
+                                        0x9e, 0x84, 0xf3, 0xb9, 0xca, 0xc2, 0xfc, 0x63, 0x25, 0x51 };
+static_assert(sizeof(kP256CurveOrder) == kP256_PrivateKey_Length);
+
 } // namespace
   //
 
@@ -1497,6 +1502,48 @@ TEST_F(TestChipCryptoPAL, TestECDSA_ValidationTestVectors)
     }
 }
 
+// A signature with r or s equal to zero or to the curve order is never valid. These cases also cover the
+// ends of the raw to DER conversion: a zero integer, and the longest encoding.
+TEST_F(TestChipCryptoPAL, TestECDSA_ValidationFailsSignatureOutOfRange)
+{
+    HeapChecker heapChecker;
+
+    // Both halves of this signature have their top bit set, so replacing either with the curve order
+    // gives the longest DER encoding.
+    const auto & tv = ecdsa_det_test_vectors[0];
+    ASSERT_NE(tv.r[0] & 0x80, 0);
+    ASSERT_NE(tv.s[0] & 0x80, 0);
+
+    P256PublicKey public_key;
+    public_key.Bytes()[0] = 0x04;
+    memcpy(public_key.Bytes() + 1, tv.public_key_x, sizeof(tv.public_key_x));
+    memcpy(public_key.Bytes() + 1 + sizeof(tv.public_key_x), tv.public_key_y, sizeof(tv.public_key_y));
+    CharSpan message = CharSpan::fromCharString(tv.message);
+
+    static constexpr uint8_t kZero[kP256_FE_Length] = {};
+    struct
+    {
+        const uint8_t * r;
+        const uint8_t * s;
+    } const kCases[] = {
+        { kZero, tv.s },
+        { tv.r, kZero },
+        { kP256CurveOrder, tv.s },
+        { tv.r, kP256CurveOrder },
+    };
+
+    for (const auto & testCase : kCases)
+    {
+        P256ECDSASignature signature;
+        memcpy(signature.Bytes(), testCase.r, kP256_FE_Length);
+        memcpy(signature.Bytes() + kP256_FE_Length, testCase.s, kP256_FE_Length);
+        ASSERT_SUCCESS(signature.SetLength(kP256_ECDSA_Signature_Length_Raw));
+
+        EXPECT_EQ(public_key.ECDSA_validate_msg_signature(Uint8::from_const_char(message.data()), message.size(), signature),
+                  CHIP_ERROR_INVALID_SIGNATURE);
+    }
+}
+
 TEST_F(TestChipCryptoPAL, TestECDSA_ValidationFailsPublicKeyNotOnCurve)
 {
     HeapChecker heapChecker;
@@ -1883,11 +1930,6 @@ TEST_F(TestChipCryptoPAL, TestP256_InitializeFromBitsOrReject)
         ExpectSignAndVerify(keypair, reference);
         ExpectSignAndVerify(reference, keypair);
     }
-
-    static constexpr uint8_t kP256CurveOrder[] = { 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
-                                                   0xff, 0xff, 0xff, 0xff, 0xff, 0xbc, 0xe6, 0xfa, 0xad, 0xa7, 0x17,
-                                                   0x9e, 0x84, 0xf3, 0xb9, 0xca, 0xc2, 0xfc, 0x63, 0x25, 0x51 };
-    static_assert(sizeof(kP256CurveOrder) == kP256_PrivateKey_Length);
 
     // Test a few values around the curve order boundary. Values up to and including N-2 are valid.
     for (int ofs = -4; ofs < 2; ofs++)
