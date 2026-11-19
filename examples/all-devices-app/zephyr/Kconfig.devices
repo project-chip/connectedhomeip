@@ -47,6 +47,9 @@ config ALL_DEVICES_DEVICE_CHIME
 config ALL_DEVICES_DEVICE_CLOSURE
 	bool "Closure"
 
+config ALL_DEVICES_DEVICE_CLOSURE_CONTROLLER
+	bool "Closure controller"
+
 config ALL_DEVICES_DEVICE_COLOR_TEMPERATURE_LIGHT
 	bool "Color temperature light"
 

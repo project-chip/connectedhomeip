@@ -225,6 +225,8 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     VerifyOrReturnError(apFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(reportScheduler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    // Before anything else changes, so that a call rejected for a different EventManagement leaves a running engine as it was.
+    ReturnErrorOnFailure(mReportingEngine.Init((eventManagement != nullptr) ? eventManagement : &EventManagement::GetInstance()));
 
     mState                          = State::kInitializing;
     mpExchangeMgr                   = apExchangeMgr;
@@ -235,9 +237,6 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
-
-    TEMPORARY_RETURN_IGNORED mReportingEngine.Init((eventManagement != nullptr) ? eventManagement
-                                                                                : &EventManagement::GetInstance());
 
     StatusIB::RegisterErrorFormatter();
 
