@@ -66,6 +66,18 @@ changes. It only has an effect while OperationMode is Normal, so it never
 overwrites the EffectiveControlMode set by the application in Local mode and
 never calls `OnOperationModeMinMax`.
 
+At startup, the effective modes are rebuilt from the restored OperationMode and
+ControlMode instead of using the persisted values, which can be out of date
+after an interrupted update or a FeatureMap change:
+
+-   EffectiveOperationMode is set to OperationMode.
+-   In Normal mode, the delegate is asked for the remote sensor.
+-   In Local mode, the persisted EffectiveControlMode is kept if its feature is
+    enabled.
+
+Startup does not call `OnOperationModeMinMax` or `OnAttributeChanged`, because
+the application and the Level Control cluster may not be ready yet.
+
 ## ZAP based applications
 
 `CodegenIntegration.cpp` creates one cluster per endpoint from the ZAP

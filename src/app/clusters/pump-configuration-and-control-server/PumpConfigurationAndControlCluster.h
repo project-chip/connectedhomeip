@@ -117,7 +117,7 @@ public:
 
     BitFlags<PumpConfigurationAndControl::Feature> GetFeatures() const { return mFeatures; }
 
-    /// Returns whether `attributeId` is in the attribute list of this instance.
+    /// Returns whether a cluster-specific `attributeId` is enabled (does not cover global attributes).
     bool IsAttributeEnabled(AttributeId attributeId) const;
     const FixedAttributes & GetFixedAttributes() const { return mFixedAttributes; }
 

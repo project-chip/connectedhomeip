@@ -645,7 +645,6 @@ TEST_F(TestPumpConfigurationAndControlCluster, SettersRejectDisabledAttributes)
     EXPECT_EQ(cluster.SetControlMode(ControlModeEnum::kConstantSpeed), kUnsupported);
 
     EXPECT_TRUE(cluster.IsAttributeEnabled(Capacity::Id));
-    EXPECT_TRUE(cluster.IsAttributeEnabled(FeatureMap::Id));
     EXPECT_TRUE(cluster.IsAttributeEnabled(MinConstSpeed::Id));
     EXPECT_FALSE(cluster.IsAttributeEnabled(MinConstPressure::Id));
     EXPECT_FALSE(cluster.IsAttributeEnabled(Speed::Id));
@@ -741,6 +740,10 @@ TEST_F(TestPumpConfigurationAndControlCluster, StartupRecoversFromInvalidPersist
                                                           modes.operationMode));
         ASSERT_SUCCESS(persistence.StoreNativeEndianValue({ kTestEndpointId, PumpConfigurationAndControl::Id, ControlMode::Id },
                                                           modes.controlMode));
+        ASSERT_SUCCESS(persistence.StoreNativeEndianValue(
+            { kTestEndpointId, PumpConfigurationAndControl::Id, EffectiveOperationMode::Id }, modes.operationMode));
+        ASSERT_SUCCESS(persistence.StoreNativeEndianValue(
+            { kTestEndpointId, PumpConfigurationAndControl::Id, EffectiveControlMode::Id }, modes.controlMode));
         // LifetimeRunningHours is a 24-bit value.
         ASSERT_SUCCESS(persistence.StoreNativeEndianValue(
             { kTestEndpointId, PumpConfigurationAndControl::Id, LifetimeRunningHours::Id }, static_cast<uint32_t>(0x01000000)));
@@ -748,9 +751,97 @@ TEST_F(TestPumpConfigurationAndControlCluster, StartupRecoversFromInvalidPersist
         ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
         EXPECT_EQ(cluster.GetOperationMode(), OperationModeEnum::kNormal);
         EXPECT_EQ(cluster.GetControlMode(), ControlModeEnum::kConstantSpeed);
+        EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kNormal);
+        EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantSpeed);
         EXPECT_EQ(cluster.GetLifetimeRunningHours(), DataModel::MakeNullable(static_cast<uint32_t>(0)));
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, StartupQueriesRemoteSensorInNormalMode)
+{
+    // A delegate that reports a sensor before Startup (e.g. an ApplicationDelegate installed before
+    // the cluster is created) is applied at startup, without any delegate notification.
+    mDelegate.mRemoteSensorType = RemoteSensorType::kPressureSensor;
+
+    PumpConfigurationAndControlCluster::Config config =
+        ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantPressure));
+    config.optionalAttributes.Set(OptionalAttributes::kPumpStatus);
+
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+
+    EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantPressure);
+    EXPECT_TRUE(cluster.GetPumpStatus().Has(PumpStatusBitmap::kRemotePressure));
+    EXPECT_TRUE(mDelegate.mChangedAttributes.empty());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, StartupRebuildsEffectiveModesFromRestoredModes)
+{
+    PumpConfigurationAndControlCluster::Config config =
+        ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantFlow, Feature::kLocalOperation));
+    config.optionalAttributes.Set(OptionalAttributes::kControlMode);
+
+    auto store = [](ClusterTester & tester, AttributeId attributeId, uint8_t value) {
+        AttributePersistence persistence(tester.GetServerClusterContext().attributeStorage);
+        return persistence.StoreNativeEndianValue({ kTestEndpointId, PumpConfigurationAndControl::Id, attributeId }, value);
+    };
+
+    {
+        // Interrupted update: OperationMode was stored as Maximum, the effective modes were not.
+        PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+        ClusterTester tester(cluster);
+        ASSERT_SUCCESS(store(tester, OperationMode::Id, to_underlying(OperationModeEnum::kMaximum)));
+        ASSERT_SUCCESS(store(tester, EffectiveOperationMode::Id, to_underlying(OperationModeEnum::kNormal)));
+        ASSERT_SUCCESS(store(tester, EffectiveControlMode::Id, to_underlying(ControlModeEnum::kConstantFlow)));
+
+        ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+        EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kMaximum);
+        EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantSpeed);
+        // Startup does not repeat the Minimum/Maximum action.
+        EXPECT_TRUE(mDelegate.mMinMaxCalls.empty());
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        // Local mode keeps the EffectiveControlMode set by the application when it is supported.
+        PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+        ClusterTester tester(cluster);
+        ASSERT_SUCCESS(store(tester, OperationMode::Id, to_underlying(OperationModeEnum::kLocal)));
+        ASSERT_SUCCESS(store(tester, EffectiveControlMode::Id, to_underlying(ControlModeEnum::kConstantFlow)));
+
+        ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+        EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kLocal);
+        EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantFlow);
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        // A Local override that is no longer supported falls back to ControlMode.
+        PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+        ClusterTester tester(cluster);
+        ASSERT_SUCCESS(store(tester, OperationMode::Id, to_underlying(OperationModeEnum::kLocal)));
+        ASSERT_SUCCESS(store(tester, EffectiveControlMode::Id, to_underlying(ControlModeEnum::kConstantPressure)));
+
+        ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+        EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantSpeed);
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, UnsupportedConfiguredOperationModeFallsBackToNormal)
+{
+    PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantFlow));
+    config.operationMode                              = OperationModeEnum::kMaximum;
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+
+    // Before Startup, the state already follows the enabled features.
+    EXPECT_EQ(cluster.GetOperationMode(), OperationModeEnum::kNormal);
+    EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kNormal);
+    EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantFlow);
 }
 
 namespace {

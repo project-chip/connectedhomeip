@@ -235,9 +235,9 @@ CHIP_ERROR SetApplicationDelegate(EndpointId endpointId, ApplicationDelegate * d
     VerifyOrReturnError(index < kPumpConfigurationAndControlMaxClusterCount, CHIP_ERROR_NOT_FOUND);
 
     gDelegates[index].SetApplicationDelegate(delegate);
-    if (PumpConfigurationAndControlCluster * cluster = FindClusterOnEndpoint(endpointId); cluster != nullptr)
+    if (gServers[index].IsConstructed())
     {
-        cluster->OnRemoteSensorChanged();
+        gServers[index].Cluster().OnRemoteSensorChanged();
     }
     return CHIP_NO_ERROR;
 }
@@ -515,7 +515,11 @@ Status Set(EndpointId endpoint, ControlModeEnum value)
 namespace FeatureMap {
 Status Get(EndpointId endpoint, uint32_t * value)
 {
-    return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetFeatures().Raw(); });
+    VerifyOrReturnValue(value != nullptr, Status::Failure);
+    PumpConfigurationAndControlCluster * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(cluster != nullptr, Status::UnsupportedEndpoint);
+    *value = cluster->GetFeatures().Raw();
+    return Status::Success;
 }
 } // namespace FeatureMap
 

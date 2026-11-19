@@ -47,6 +47,7 @@ public:
     /// a flow sensor selects ConstantFlow, a pressure sensor selects ConstantPressure
     /// and a temperature sensor selects ConstantTemperature.
     ///
+    /// Also called from PumpConfigurationAndControlCluster::Startup while OperationMode is Normal.
     /// Call PumpConfigurationAndControlCluster::OnRemoteSensorChanged when the returned value changes.
     virtual RemoteSensorType GetRemoteSensorType(EndpointId endpointId) = 0;
 

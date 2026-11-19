@@ -142,9 +142,10 @@ PumpConfigurationAndControlCluster::PumpConfigurationAndControlCluster(EndpointI
     DefaultServerCluster({ endpointId, PumpConfigurationAndControl::Id }), mFeatures(config.features),
     mEnabledOptionalAttributes(BuildEnabledAttributes(config.features, config.optionalAttributes)),
     mControlModeEnabled(config.optionalAttributes.Has(OptionalAttributes::kControlMode)), mFixedAttributes(config.fixedAttributes),
-    mDelegate(config.delegate), mOperationMode(config.operationMode), mControlMode(SelectInitialControlMode(config.controlMode)),
-    mEffectiveOperationMode(config.operationMode),
-    mEffectiveControlMode(ComputeEffectiveControlMode(config.operationMode, mControlMode, RemoteSensorType::kNoSensor)),
+    mDelegate(config.delegate),
+    mOperationMode(IsOperationModeSupported(config.operationMode) ? config.operationMode : OperationModeEnum::kNormal),
+    mControlMode(SelectInitialControlMode(config.controlMode)), mEffectiveOperationMode(mOperationMode),
+    mEffectiveControlMode(ComputeEffectiveControlMode(mOperationMode, mControlMode, RemoteSensorType::kNoSensor)),
     mLifetimeRunningHours(0), mLifetimeEnergyConsumed(0)
 {}
 
@@ -173,20 +174,37 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
         }
     }
 
-    const OperationModeEnum defaultEffectiveOperationMode = mOperationMode;
-    const ControlModeEnum defaultEffectiveControlMode =
-        ComputeEffectiveControlMode(mOperationMode, mControlMode, RemoteSensorType::kNoSensor);
-    persistence.LoadNativeEndianValue({ endpointId, clusterId, EffectiveOperationMode::Id }, mEffectiveOperationMode,
-                                      defaultEffectiveOperationMode);
-    persistence.LoadNativeEndianValue({ endpointId, clusterId, EffectiveControlMode::Id }, mEffectiveControlMode,
-                                      defaultEffectiveControlMode);
-    if (EnsureKnownEnumValue(mEffectiveOperationMode) == OperationModeEnum::kUnknownEnumValue)
+    // The effective modes are rebuilt from the restored modes instead of trusting the persisted
+    // values, which can be out of date after an interrupted update or a FeatureMap change. Only the
+    // EffectiveControlMode set by the application in Local mode is kept. The delegate is not
+    // notified: it may not be ready yet, and Level Control may not be initialized.
+    OperationModeEnum storedEffectiveOperationMode = OperationModeEnum::kUnknownEnumValue;
+    ControlModeEnum storedEffectiveControlMode     = ControlModeEnum::kUnknownEnumValue;
+    persistence.LoadNativeEndianValue({ endpointId, clusterId, EffectiveOperationMode::Id }, storedEffectiveOperationMode,
+                                      OperationModeEnum::kUnknownEnumValue);
+    persistence.LoadNativeEndianValue({ endpointId, clusterId, EffectiveControlMode::Id }, storedEffectiveControlMode,
+                                      ControlModeEnum::kUnknownEnumValue);
+
+    const RemoteSensorType sensorType =
+        (mOperationMode == OperationModeEnum::kNormal) ? mDelegate.GetRemoteSensorType(endpointId) : RemoteSensorType::kNoSensor;
+    mEffectiveOperationMode = mOperationMode;
+    mEffectiveControlMode   = (mOperationMode == OperationModeEnum::kLocal && IsControlModeSupported(storedEffectiveControlMode))
+        ? storedEffectiveControlMode
+        : ComputeEffectiveControlMode(mOperationMode, mControlMode, sensorType);
+    if (mEnabledOptionalAttributes.IsSet(PumpStatus::Id))
     {
-        mEffectiveOperationMode = defaultEffectiveOperationMode;
+        mPumpStatus.Clear(PumpStatusBitmap::kRemotePressure)
+            .Clear(PumpStatusBitmap::kRemoteFlow)
+            .Clear(PumpStatusBitmap::kRemoteTemperature)
+            .Set(RemoteSensorStatusBits(sensorType));
     }
-    if (EnsureKnownEnumValue(mEffectiveControlMode) == ControlModeEnum::kUnknownEnumValue)
+    if (mEffectiveOperationMode != storedEffectiveOperationMode)
     {
-        mEffectiveControlMode = defaultEffectiveControlMode;
+        StoreAttribute(mContext, mPath, EffectiveOperationMode::Id, mEffectiveOperationMode);
+    }
+    if (mEffectiveControlMode != storedEffectiveControlMode)
+    {
+        StoreAttribute(mContext, mPath, EffectiveControlMode::Id, mEffectiveControlMode);
     }
 
     if (mEnabledOptionalAttributes.IsSet(LifetimeRunningHours::Id))
@@ -493,10 +511,6 @@ bool PumpConfigurationAndControlCluster::IsAttributeEnabled(AttributeId attribut
     if (attributeId < 32 && (EnabledAttributeSet::All() & (1u << attributeId)) != 0)
     {
         return mEnabledOptionalAttributes.IsSet(attributeId);
-    }
-    if (attributeId == FeatureMap::Id || attributeId == ClusterRevision::Id)
-    {
-        return true;
     }
     for (const auto & entry : kMandatoryMetadata)
     {
