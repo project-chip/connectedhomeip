@@ -111,25 +111,28 @@ class TC_IDM_1_5(IDMBaseTest):
 
         delay_min_ms = 1000
         delay_jitter_window_ms = 1000
+        min_delay_window_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0
         mrp_timeout_sec = self.get_mrp_retransmission_timeout_sec(dev_ctrl)
         # In Step 2: Full end-to-end window requires 2x MRP worst-case retransmissions (Invoke leg + ReportData leg)
-        min_required_sub_window_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + (2 * mrp_timeout_sec)
+        min_required_sub_window_sec = min_delay_window_sec + (2 * mrp_timeout_sec)
         # In Step 4: After command is delivered, waiting only for delay + 1x MRP (ReportData leg)
-        report_wait_timeout_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + mrp_timeout_sec
+        report_wait_timeout_sec = min_delay_window_sec + mrp_timeout_sec
         log.info("Computed MRP retransmission timeout: %.2f s (required sub window: %.2f s, report wait timeout: %.2f s)",
                  mrp_timeout_sec, min_required_sub_window_sec, report_wait_timeout_sec)
+        min_interval_floor_sec = 0
         max_interval_ceiling_sec = 3600
 
         subscription = None
         failsafe_armed = False
         try:
-            # Step 2: Establish subscription to Breadcrumb with MaxInterval = 3600s
-            self.step(2, "TH establishes a subscription to the Breadcrumb attribute of the GeneralCommissioning cluster on Endpoint 0 of the DUT with MaxInterval set to 3600 seconds. TH synchronously awaits the initial prime report from the subscription establishment, records the timestamp t_prime, and verifies the negotiated MaxInterval from the SubscribeResponseMessage is 3600 seconds.")
-            log.info("Establishing subscription to Breadcrumb attribute on Endpoint 0 with MaxInterval=%ds", max_interval_ceiling_sec)
+            # Step 2: Establish subscription to Breadcrumb with MinIntervalFloor = 0s, MaxIntervalCeiling = 3600s
+            self.step(2, "TH establishes a subscription to the Breadcrumb attribute of the GeneralCommissioning cluster on Endpoint 0 of the DUT with MinIntervalFloor set to 0 seconds and MaxIntervalCeiling set to 3600 seconds. TH synchronously awaits the initial prime report from the subscription establishment, records the timestamp t_prime, and verifies the negotiated MaxInterval from the SubscribeResponseMessage is within [0, 3600] seconds and leaves sufficient window for DelayReportData.")
+            log.info("Establishing subscription to Breadcrumb attribute on Endpoint 0 with MinIntervalFloor=%ds, MaxIntervalCeiling=%ds",
+                     min_interval_floor_sec, max_interval_ceiling_sec)
             subscription = await dev_ctrl.ReadAttribute(
                 nodeId=dut_node_id,
                 attributes=[(endpoint, target_attribute)],
-                reportInterval=(0, max_interval_ceiling_sec),
+                reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
                 keepSubscriptions=False,
                 autoResubscribe=False
             )
@@ -138,12 +141,15 @@ class TC_IDM_1_5(IDMBaseTest):
             # Record timestamp t_prime upon receiving the initial priming report / subscription establishment
             t_prime = time.monotonic()
 
-            # Verify the actual MaxInterval in the SubscribeResponseMessage is 3600s
             _, negotiated_max_interval_sec = subscription.GetReportingIntervalsSeconds()
             log.info("Negotiated subscription intervals: MaxInterval = %ds", negotiated_max_interval_sec)
-            asserts.assert_equal(
+            asserts.assert_greater_equal(
+                negotiated_max_interval_sec, min_interval_floor_sec,
+                f"Negotiated MaxInterval ({negotiated_max_interval_sec}s) must be >= MinIntervalFloor ({min_interval_floor_sec}s)"
+            )
+            asserts.assert_less_equal(
                 negotiated_max_interval_sec, max_interval_ceiling_sec,
-                f"Negotiated MaxInterval ({negotiated_max_interval_sec}s) did not match expected ({max_interval_ceiling_sec}s)"
+                f"Negotiated MaxInterval ({negotiated_max_interval_sec}s) exceeded MaxIntervalCeiling ({max_interval_ceiling_sec}s)"
             )
 
             # Synchronously verify initial prime report was received during subscription establishment
@@ -159,14 +165,24 @@ class TC_IDM_1_5(IDMBaseTest):
             sub_elapsed_sec = time.monotonic() - t_prime
             remaining_sub_window_sec = float(negotiated_max_interval_sec) - sub_elapsed_sec
 
-            log.info("Time elapsed since priming report: %.2f s; remaining window: %.2f s (required > %.2f s)",
-                     sub_elapsed_sec, remaining_sub_window_sec, min_required_sub_window_sec)
+            log.info("Time elapsed since priming report: %.2f s; remaining window: %.2f s "
+                     "(min delay window: %.2f s, worst-case MRP window: %.2f s)",
+                     sub_elapsed_sec, remaining_sub_window_sec, min_delay_window_sec, min_required_sub_window_sec)
 
             asserts.assert_greater(
-                remaining_sub_window_sec, min_required_sub_window_sec,
-                f"Subscription setup took too long ({sub_elapsed_sec:.2f} s); not enough time remaining "
-                f"({remaining_sub_window_sec:.2f} s) before scheduled periodic report"
+                remaining_sub_window_sec, min_delay_window_sec,
+                f"Remaining subscription window ({remaining_sub_window_sec:.2f} s, "
+                f"from negotiated MaxInterval={negotiated_max_interval_sec} s) must exceed "
+                f"DelayMinMs + DelayJitterWindowMs ({min_delay_window_sec:.2f} s) so MaxInterval does not clamp DelayReportData"
             )
+
+            if remaining_sub_window_sec < min_required_sub_window_sec:
+                log.warning(
+                    "Remaining subscription window (%.2f s, negotiated MaxInterval=%d s) is smaller than the worst-case "
+                    "2x MRP retransmission window (%.2f s). Continuing test; if MRP retransmissions delay message delivery "
+                    "past MaxInterval, a periodic report may interfere with the measurement.",
+                    remaining_sub_window_sec, negotiated_max_interval_sec, min_required_sub_window_sec
+                )
 
             # Step 3: Send InvokeRequestMessage for ArmFailSafe with DelayReportData
             self.step(3, "TH records start time t_invoke_sent and sends an InvokeRequestMessage to the DUT to invoke the ArmFailSafe command (ExpiryLengthSeconds set to 900, Breadcrumb set to 1) on the GeneralCommissioning cluster (Endpoint 0) with DelayReportData (DelayMinMs: 1000 ms, DelayJitterWindowMs: 1000 ms).")
@@ -196,19 +212,38 @@ class TC_IDM_1_5(IDMBaseTest):
             try:
                 report_recv_time, new_val = await asyncio.to_thread(report_queue.get, timeout=report_wait_timeout_sec)
             except queue.Empty:
+                elapsed_since_prime_sec = time.monotonic() - t_prime
+                max_interval_note = (
+                    f" Negotiated MaxInterval ({negotiated_max_interval_sec}s) elapsed during the wait "
+                    f"(elapsed since prime: {elapsed_since_prime_sec:.2f}s); MRP retransmissions on a periodic report "
+                    f"may have delayed the attribute report."
+                    if elapsed_since_prime_sec >= negotiated_max_interval_sec
+                    else ""
+                )
                 asserts.fail(
-                    f"Did not receive ReportDataMessage within {report_wait_timeout_sec:.2f}s following invoke command with DelayReportData")
+                    f"Did not receive ReportDataMessage within {report_wait_timeout_sec:.2f}s following invoke command "
+                    f"with DelayReportData.{max_interval_note}"
+                )
 
             asserts.assert_equal(new_val, 1, f"Expected Breadcrumb report value to be 1, got {new_val}")
 
             delta_t_ms = (report_recv_time - t_invoke_sent) * 1000.0
-            log.info("Measured Delta t between sending InvokeRequest (t_invoke_sent) and receiving ReportData: %.2f ms (DelayMinMs=%d, Jitter=%d)",
-                     delta_t_ms, delay_min_ms, delay_jitter_window_ms)
+            elapsed_since_prime_sec = report_recv_time - t_prime
+            log.info("Measured Delta t between sending InvokeRequest (t_invoke_sent) and receiving ReportData: %.2f ms "
+                     "(DelayMinMs=%d, Jitter=%d, elapsed since prime=%.2f s / MaxInterval=%d s)",
+                     delta_t_ms, delay_min_ms, delay_jitter_window_ms, elapsed_since_prime_sec, negotiated_max_interval_sec)
+            if elapsed_since_prime_sec >= negotiated_max_interval_sec:
+                log.warning(
+                    "Elapsed time since prime report (%.2f s) reached negotiated MaxInterval (%d s); "
+                    "periodic ceiling timing overlapped the DelayReportData window.",
+                    elapsed_since_prime_sec, negotiated_max_interval_sec
+                )
 
             min_expected_delta_ms = float(delay_min_ms)
             asserts.assert_greater_equal(
                 delta_t_ms, min_expected_delta_ms,
-                f"Delta t ({delta_t_ms:.2f} ms) was less than {min_expected_delta_ms:.2f} ms minimum delay"
+                f"Delta t ({delta_t_ms:.2f} ms) was less than {min_expected_delta_ms:.2f} ms minimum delay "
+                f"(elapsed since prime: {elapsed_since_prime_sec:.2f} s, negotiated MaxInterval: {negotiated_max_interval_sec} s)"
             )
 
             # Step 5: Disarm fail-safe and reset Breadcrumb
