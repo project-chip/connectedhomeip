@@ -25,17 +25,14 @@ include(${CHIP_ROOT}/config/nxp/app/pre-zephyr.cmake)
 # the crypto test's IsCertificateValidAtCurrentTime check cannot pass.
 list(APPEND CHIP_CFLAGS -DCURRENT_TIME_NOT_IMPLEMENTED=1)
 
-# Pigweed backends must be configured before find_package(Zephyr) because Zephyr
-# processes the Pigweed module during find_package(Zephyr) and binds each facade
-# to its backend at that point.
+# Pigweed's pw_log and pw_sys_io backends must be configured before find_package(Zephyr)
+# because Zephyr processes the Pigweed module during find_package(Zephyr) and binds
+# each facade to its backend at that point.
 include(${CHIP_ROOT}/third_party/pigweed/repo/pw_build/pigweed.cmake)
 include(${CHIP_ROOT}/third_party/pigweed/repo/pw_log/backend.cmake)
-include(${CHIP_ROOT}/third_party/pigweed/repo/pw_assert/backend.cmake)
 include(${CHIP_ROOT}/third_party/pigweed/repo/pw_sys_io/backend.cmake)
 
 pw_set_backend(pw_log pw_log_basic)
-pw_set_backend(pw_assert.check pw_assert_log.check_backend)
-pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
 pw_set_backend(pw_sys_io pw_sys_io_zephyr)
 
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)

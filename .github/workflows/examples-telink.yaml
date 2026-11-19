@@ -158,6 +158,20 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
+            - name: Build example Telink (tl3238x) Closure App with OTA (LZMA), Factory Data
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl3238x-closure-ota-compress-lzma-factory-data' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl3238x closure-app-ota-compress-lzma-factory-data \
+                    out/telink-tl3238x-closure-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
             - name: Build example Telink (B92 retention) Contact Sensor App
               # Run only for PRs from the Telink organization fork
               if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
