@@ -131,7 +131,7 @@ public:
     void TearDown() override
     {
         mDelegate.CancelActiveTimers();
-        mInstance.GetCluster().Shutdown();
+        mInstance.GetCluster().Shutdown(ClusterShutdownType::kClusterShutdown);
         mDelegate.SetInstance(nullptr);
         EventManagement::DestroyEventManagement();
     }
@@ -271,7 +271,7 @@ TEST_F(TestEnergyEvseDelegate, EventSendersWithOnlyClusterBound)
         }
 
         // A cluster without a runtime context rejects event logging.
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
         EXPECT_EQ(delegate.HwSetRFID(ByteSpan(uid)), Status::Failure);
         EXPECT_EQ(delegate.SendEVConnectedEvent(), Status::Failure);
         EXPECT_EQ(delegate.SendEVNotDetectedEvent(), Status::Failure);
@@ -729,7 +729,7 @@ public:
     void TearDown() override
     {
         mManagerDelegate.CancelActiveTimers();
-        mManager.GetCluster().Shutdown();
+        mManager.GetCluster().Shutdown(ClusterShutdownType::kClusterShutdown);
         mManagerDelegate.SetInstance(nullptr);
         TestEnergyEvseDelegate::TearDown();
     }
