@@ -309,21 +309,19 @@ TEST_F(TestClosureController, OOBAccessorDispatchesActions)
     AddGroupBinding(Identify::Id);
 
     EXPECT_EQ(mRegistry.HandleAction("ClosureMoveTo"_span, ActionPayload().Span()), CHIP_NO_ERROR);
-    EXPECT_EQ(mRegistry.HandleAction("ClosureGroupedMoveTo"_span,
-                                     ActionPayload({ .tag2 = 1, .tag3 = 2, .tag5 = true }).Span()),
+    EXPECT_EQ(mRegistry.HandleAction("ClosureGroupedMoveTo"_span, ActionPayload({ .tag2 = 1, .tag3 = 2, .tag5 = true }).Span()),
               CHIP_NO_ERROR);
     EXPECT_EQ(mRegistry.HandleAction("ClosureSetTarget"_span, ActionPayload({ .tag4 = 5000 }).Span()), CHIP_NO_ERROR);
-    EXPECT_EQ(mRegistry.HandleAction("ClosureGroupedSetTarget"_span,
-                                     ActionPayload({ .tag3 = 1, .tag4 = 10000, .tag5 = false }).Span()),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(
+        mRegistry.HandleAction("ClosureGroupedSetTarget"_span, ActionPayload({ .tag3 = 1, .tag4 = 10000, .tag5 = false }).Span()),
+        CHIP_NO_ERROR);
     EXPECT_EQ(mRegistry.HandleAction("ClosureStep"_span, ActionPayload({ .tag2 = 0, .tag4 = 2 }).Span()), CHIP_NO_ERROR);
     EXPECT_EQ(mRegistry.HandleAction("ClosureGroupedStep"_span, ActionPayload({ .tag2 = 1, .tag3 = 3, .tag4 = 1 }).Span()),
               CHIP_NO_ERROR);
     EXPECT_EQ(mRegistry.HandleAction("ClosureStop"_span, ActionPayload().Span()), CHIP_NO_ERROR);
     EXPECT_EQ(mRegistry.HandleAction("ClosureCalibrate"_span, ActionPayload().Span()), CHIP_NO_ERROR);
     EXPECT_EQ(mRegistry.HandleAction("ClosureIdentify"_span, ActionPayload({ .tag4 = 10 }).Span()), CHIP_NO_ERROR);
-    EXPECT_EQ(mRegistry.HandleAction("ClosureTriggerEffect"_span, ActionPayload({ .tag2 = 0, .tag3 = 0 }).Span()),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(mRegistry.HandleAction("ClosureTriggerEffect"_span, ActionPayload({ .tag2 = 0, .tag3 = 0 }).Span()), CHIP_NO_ERROR);
 
     controller.Unregister(mProvider);
 }
