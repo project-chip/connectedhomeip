@@ -316,10 +316,12 @@ import sys
 from collections.abc import Awaitable, Callable
 from typing import Any
 
-from mobly import asserts
+from mobly import asserts, signals
 
 import matter.clusters as Clusters
 import matter.discovery as discovery
+from matter.clusters.Types import NullValue
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import MatterBaseTest
@@ -811,6 +813,95 @@ class COMPROBaseTest(MatterBaseTest):
         return bool(feature_map & self.cp.Bitmaps.Feature.kBackgroundScan)
 
     # ------------------------------------------------------------------
+    # ED entry helpers: other commissionable devices in radio range may also
+    # be listed, so tests judge only the entries with the ED's discriminator.
+    # ------------------------------------------------------------------
+
+    @property
+    def ed_discriminator(self) -> int:
+        """Discriminator of the test's ED (``ed_discriminator``, default 3841)."""
+        params = getattr(self, 'user_params', {}) or {}
+        discriminator = int(params.get('ed_discriminator', 3841))
+        asserts.assert_true(0 <= discriminator <= 4095,
+                            f"ed_discriminator {discriminator} out of range (0-4095)")
+        return discriminator
+
+    def split_ed_entries(self, results) -> tuple[list, list]:
+        """Split ScanResultStruct entries (a list, or NullValue) into (the ED's, other devices')."""
+        entries = [] if results is NullValue else list(results)
+        discriminator = self.ed_discriminator
+        return ([r for r in entries if r.discriminator == discriminator],
+                [r for r in entries if r.discriminator != discriminator])
+
+    @staticmethod
+    def describe_entries(entries: list) -> str:
+        """One-line summary of ScanResultStruct entries for logs and failure messages."""
+        return ", ".join(f"disc={r.discriminator} vid=0x{r.vendorID:04x} pid=0x{r.productID:04x} "
+                         f"transport=0x{r.transport:02x}" for r in entries) or "none"
+
+    @classmethod
+    def assert_entries_unique_and_in_range(cls, results, label: str) -> None:
+        """Fail if ScanResultStruct entries (a list, or NullValue) hold a Discriminator above 4095 or a repeated key.
+
+        ProxyScanResult and CachedResults list each device once per
+        (Discriminator, VendorID, ProductID, Transport), whichever device it is.
+        """
+        seen_keys = set()
+        for r in ([] if results is NullValue else results):
+            asserts.assert_less_equal(r.discriminator, 4095,
+                                      f"{label}: Discriminator must be <= 4095: {cls.describe_entries([r])}")
+            key = (r.discriminator, r.vendorID, r.productID, r.transport)
+            asserts.assert_true(
+                key not in seen_keys,
+                f"{label}: duplicate entry {cls.describe_entries([r])}; each device must be listed "
+                "once per Discriminator/VendorID/ProductID/Transport")
+            seen_keys.add(key)
+
+    async def fail_ed_missing(self, label: str, other_entries: list, has_bgs: bool = True) -> None:
+        """Fail because no entry has the ED's discriminator, naming a list full of other devices."""
+        message = f"{label}: no entry with the ED's discriminator {self.ed_discriminator}"
+        if other_entries:
+            message += f"; other devices listed: {self.describe_entries(other_entries)}"
+            if has_bgs:
+                # This read only adds detail; its failure must not replace the ED failure.
+                try:
+                    max_cached = await self.read_cp_attribute(self.cp.Attributes.MaxCachedResults)
+                except (signals.TestFailure, ChipStackError, InteractionModelError, TimeoutError) as exc:
+                    message += f"; MaxCachedResults could not be read: {exc}"
+                else:
+                    if len(other_entries) >= max_cached:
+                        message += f"; the list is full (MaxCachedResults={max_cached})"
+        asserts.fail(message)
+
+    async def read_cached_results(self, attempts: int = 3) -> tuple[int, list]:
+        """Read NumCachedResults and CachedResults in one interaction, retrying while they disagree.
+
+        Other devices' entries can be added or expire between the two values.  Fails unless the
+        two values agree and CachedResults is null (not an empty list) when NumCachedResults is 0.
+        """
+        cp = self.cp
+        paths = [(self.cp_endpoint, cp.Attributes.NumCachedResults),
+                 (self.cp_endpoint, cp.Attributes.CachedResults)]
+        for attempt in range(1, attempts + 1):
+            values = (await self.default_controller.ReadAttribute(self.dut_node_id, paths))[self.cp_endpoint][cp]
+            num_cached = values[cp.Attributes.NumCachedResults]
+            cached = values[cp.Attributes.CachedResults]
+            for value in (num_cached, cached):
+                asserts.assert_false(isinstance(value, Clusters.Attribute.ValueDecodeFailure),
+                                     f"Error reading the cached results: {value}")
+            entries = [] if cached is NullValue else list(cached)
+            if num_cached == len(entries) or attempt == attempts:
+                break
+            logger.info("NumCachedResults=%d but %d CachedResults entries (attempt %d of %d)",
+                        num_cached, len(entries), attempt, attempts)
+            await asyncio.sleep(1)
+        asserts.assert_equal(num_cached, len(entries),
+                             "NumCachedResults must equal the number of CachedResults entries")
+        if num_cached == 0:
+            asserts.assert_equal(cached, NullValue, "CachedResults must be null when NumCachedResults is 0")
+        return num_cached, entries
+
+    # ------------------------------------------------------------------
     # ED fixture helpers
     # ------------------------------------------------------------------
 
@@ -839,7 +930,7 @@ class COMPROBaseTest(MatterBaseTest):
             return None
         return self.track_ed(EDFixture(
             app_path=app_path,
-            discriminator=int(params.get('ed_discriminator', 3841)),
+            discriminator=self.ed_discriminator,
             passcode=int(params.get('ed_passcode', 20202021)),
             extra_args=params.get('ed_extra_args', ''),
             ed_transport=params.get('ed_transport', 'wifipaf'),
