@@ -16,12 +16,8 @@
 
 #pragma once
 
-#include <app/TestEventTriggerDelegate.h>
-#include <credentials/FabricTable.h>
 #include <device/api/Interface.h>
 #include <device/types/power-source/WiredPowerSource.h>
-#include <lib/support/TimerDelegate.h>
-#include <platform/DeviceInfoProvider.h>
 
 namespace chip::app {
 
@@ -29,15 +25,6 @@ namespace chip::app {
 class SolarPower : public DeviceInterface
 {
 public:
-    struct Context
-    {
-        TimerDelegate & timerDelegate;
-        TestEventTriggerDelegate & testEventTriggerDelegate;
-        FabricTable & fabricTable;
-        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
-    };
-
-    explicit SolarPower(const Context & context);
     ~SolarPower() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
@@ -49,6 +36,8 @@ public:
     WiredPowerSource & GetGridPowerSource() { return mGridPowerSource; }
 
 protected:
+    SolarPower();
+
     virtual CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
     {
         return CHIP_NO_ERROR;

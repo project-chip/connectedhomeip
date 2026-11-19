@@ -91,7 +91,7 @@ public:
     }
 
 protected:
-    SolarPower::Context MakeContext()
+    SimulatedSolarPower::Context MakeContext()
     {
         return {
             .timerDelegate            = mTimerDelegate,

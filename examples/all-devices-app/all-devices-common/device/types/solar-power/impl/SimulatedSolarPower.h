@@ -16,12 +16,16 @@
 
 #pragma once
 
+#include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <credentials/FabricTable.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/solar-power/SolarPower.h>
 #include <device/types/solar-power/impl/PanelElectricalSensor.h>
 #include <device/types/temperature-sensor/TemperatureSensor.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TimerDelegate.h>
+#include <platform/DeviceInfoProvider.h>
 
 #include <array>
 #include <memory>
@@ -32,7 +36,13 @@ namespace chip::app {
 class SimulatedSolarPower : public SolarPower
 {
 public:
-    using Context = SolarPower::Context;
+    struct Context
+    {
+        TimerDelegate & timerDelegate;
+        TestEventTriggerDelegate & testEventTriggerDelegate;
+        FabricTable & fabricTable;
+        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
+    };
 
     struct PanelConfig
     {

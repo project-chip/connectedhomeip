@@ -57,7 +57,7 @@ Clusters::TemperatureMeasurementCluster::StartupConfiguration InverterTemperatur
 } // namespace
 
 SimulatedSolarPower::SimulatedSolarPower(const Context & context, const Config & config) :
-    SolarPower(context), mTimerDelegate(context.timerDelegate), mTags(config.tags),
+    SolarPower(), mTimerDelegate(context.timerDelegate), mTags(config.tags),
     mOutputElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
                             context.deviceInfoProvider, SolarPowerTags::GridConnectionTag(), config.outputSensorRole),
     mPanelCount(config.panels.size()), mEnergyManagement(context.timerDelegate, SolarPowerEnergyManagementConfig()),

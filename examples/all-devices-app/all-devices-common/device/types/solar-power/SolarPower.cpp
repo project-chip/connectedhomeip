@@ -21,7 +21,7 @@
 
 namespace chip::app {
 
-SolarPower::SolarPower(const Context & context) :
+SolarPower::SolarPower() :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSolarPower, 1)),
     mGridPowerSource("Solar power grid connection"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc, 0)
 {}
