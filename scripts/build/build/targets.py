@@ -50,6 +50,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'battery-storage',
     'bridged-node',
     'chime',
+    'closure-controller',
     'color-temperature-light',
     'contact-sensor',
     'cooktop',

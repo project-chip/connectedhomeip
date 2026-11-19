@@ -29,6 +29,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <vector>
 
@@ -72,6 +73,27 @@ public:
 constexpr EventId kStarted = Events::EnergyTransferStarted::Id;
 constexpr EventId kStopped = Events::EnergyTransferStopped::Id;
 
+class PendingTimerDelegate : public TimerDelegateMock
+{
+public:
+    CriticalFailure StartTimer(TimerContext * context, System::Clock::Timeout timeout) override
+    {
+        mPendingContext = context;
+        return TimerDelegateMock::StartTimer(context, timeout);
+    }
+
+    void CancelTimer(TimerContext * context) override
+    {
+        mPendingContext = nullptr;
+        TimerDelegateMock::CancelTimer(context);
+    }
+
+    bool HasPendingTimer() const { return mPendingContext != nullptr; }
+
+private:
+    TimerContext * mPendingContext = nullptr;
+};
+
 class TestEnergyEvseDelegate : public ::testing::Test
 {
 public:
@@ -79,7 +101,7 @@ public:
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     TestEnergyEvseDelegate() :
-        mDelegate(mTargetsDelegate),
+        mDelegate(mTargetsDelegate, mTimerDelegate),
         mInstance(kEndpointId, mDelegate, BitMask<Feature, uint32_t>(Feature::kChargingPreferences, Feature::kV2x),
                   BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent),
                   EnergyEvseCluster::OptionalCommandSet())
@@ -177,6 +199,7 @@ protected:
         .interactionContext = mInteractionContext,
     };
     std::vector<StateEnum> mStateChanges; // declared before mDelegate so it outlives the registered callback
+    PendingTimerDelegate mTimerDelegate;
     EvseTargetsDelegate mTargetsDelegate;
     EnergyEvseDelegate mDelegate;
     Instance mInstance;
@@ -439,6 +462,11 @@ TEST_F(TestEnergyEvseDelegate, EnableDischargingFailsWhenDeadlineCannotBePersist
 TEST_F(TestEnergyEvseDelegate, DisableReportsFailureWhenDeadlineCannotBePersisted)
 {
     StartCharging();
+    uint32_t now = 0;
+    ASSERT_SUCCESS(System::Clock::GetClock_MatterEpochS(now));
+    ASSERT_EQ(mDelegate.EnableCharging(DataModel::Nullable<uint32_t>(now + 60), kMinimumCurrent_mA, kMaximumChargeCurrent_mA),
+              Status::Success);
+    ASSERT_TRUE(mTimerDelegate.HasPendingTimer());
 
     mStorage.AddPoisonKey(PoisonKey(Attributes::ChargingEnabledUntil::Id));
     EXPECT_EQ(mDelegate.Disable(), Status::Failure);
@@ -448,6 +476,54 @@ TEST_F(TestEnergyEvseDelegate, DisableReportsFailureWhenDeadlineCannotBePersiste
     EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabled);
     EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInDemand);
     EXPECT_EQ(mInstance.GetMaximumChargeCurrent(), 0);
+    EXPECT_FALSE(mTimerDelegate.HasPendingTimer());
+}
+
+TEST_F(TestEnergyEvseDelegate, DisableCancelsPendingDeadline)
+{
+    uint32_t now = 0;
+    ASSERT_SUCCESS(System::Clock::GetClock_MatterEpochS(now));
+    ASSERT_EQ(mDelegate.EnableCharging(DataModel::Nullable<uint32_t>(now + 60), kMinimumCurrent_mA, kMaximumChargeCurrent_mA),
+              Status::Success);
+    ASSERT_TRUE(mTimerDelegate.HasPendingTimer());
+
+    ASSERT_EQ(mDelegate.Disable(), Status::Success);
+
+    EXPECT_FALSE(mTimerDelegate.HasPendingTimer());
+    mTimerDelegate.AdvanceClock(System::Clock::Seconds32(60));
+    EXPECT_FALSE(mTimerDelegate.HasPendingTimer());
+}
+
+TEST_F(TestEnergyEvseDelegate, DisableDuringFaultCancelsPendingDeadline)
+{
+    uint32_t now = 0;
+    ASSERT_SUCCESS(System::Clock::GetClock_MatterEpochS(now));
+    ASSERT_EQ(mDelegate.EnableDischarging(DataModel::Nullable<uint32_t>(now + 60), kMaximumDischargeCurrent_mA), Status::Success);
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kOther), Status::Success);
+    ASSERT_TRUE(mTimerDelegate.HasPendingTimer());
+
+    ASSERT_EQ(mDelegate.Disable(), Status::Success);
+
+    EXPECT_FALSE(mTimerDelegate.HasPendingTimer());
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
+    EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabled);
+}
+
+TEST_F(TestEnergyEvseDelegate, ExpiredDeadlineCancelsPendingTimer)
+{
+    uint32_t now = 0;
+    ASSERT_SUCCESS(System::Clock::GetClock_MatterEpochS(now));
+    ASSERT_EQ(mDelegate.EnableCharging(DataModel::Nullable<uint32_t>(now + 60), kMinimumCurrent_mA, kMaximumChargeCurrent_mA),
+              Status::Success);
+    ASSERT_TRUE(mTimerDelegate.HasPendingTimer());
+    ASSERT_SUCCESS(mInstance.SetChargingEnabledUntil(DataModel::Nullable<uint32_t>(1u)));
+
+    mTimerDelegate.AdvanceClock(System::Clock::Seconds32(60));
+
+    EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabled);
+    EXPECT_FALSE(mTimerDelegate.HasPendingTimer());
+    mTimerDelegate.AdvanceClock(System::Clock::Seconds32(1));
+    EXPECT_FALSE(mTimerDelegate.HasPendingTimer());
 }
 
 TEST_F(TestEnergyEvseDelegate, ExpiryOfOneDeadlineKeepsTheOtherModeEnabled)
@@ -600,7 +676,7 @@ TEST_F(TestEnergyEvseDelegate, UserMaximumChargeCurrentWriteCancelsPendingDefaul
     // Use a fresh delegate so CircuitCapacity has not been reported yet
     mDelegate.SetInstance(nullptr);
     EvseTargetsDelegate targets;
-    EnergyEvseDelegate delegate(targets);
+    EnergyEvseDelegate delegate(targets, mTimerDelegate);
     Instance instance(kEndpointId, delegate, BitMask<Feature, uint32_t>(Feature::kChargingPreferences),
                       BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent),
                       EnergyEvseCluster::OptionalCommandSet());
@@ -620,7 +696,7 @@ TEST_F(TestEnergyEvseDelegate, PendingDefaultAppliedWhenCircuitCapacityArrives)
 {
     mDelegate.SetInstance(nullptr);
     EvseTargetsDelegate targets;
-    EnergyEvseDelegate delegate(targets);
+    EnergyEvseDelegate delegate(targets, mTimerDelegate);
     Instance instance(kEndpointId, delegate, BitMask<Feature, uint32_t>(Feature::kChargingPreferences),
                       BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent),
                       EnergyEvseCluster::OptionalCommandSet());
@@ -680,7 +756,7 @@ protected:
     }
 
     EvseTargetsDelegate mManagerTargets;
-    EnergyEvseDelegate mManagerDelegate{ mManagerTargets };
+    EnergyEvseDelegate mManagerDelegate{ mManagerTargets, mTimerDelegate };
     EnergyEvseManager mManager;
 };
 
@@ -800,7 +876,7 @@ TEST_F(TestEnergyEvseManagerLoad, IndefiniteChargingEnableSurvivesReload)
 
     // Simulate a reboot with a new delegate and manager reading the same storage
     EvseTargetsDelegate targets;
-    EnergyEvseDelegate delegate(targets);
+    EnergyEvseDelegate delegate(targets, mTimerDelegate);
     EnergyEvseManager manager(kEndpointId, delegate, BitMask<Feature, uint32_t>(Feature::kChargingPreferences, Feature::kV2x),
                               BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent),
                               EnergyEvseCluster::OptionalCommandSet());
