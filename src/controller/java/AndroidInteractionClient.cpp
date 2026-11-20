@@ -183,9 +183,13 @@ exit:
         {
             Platform::Delete(readClient);
         }
+        // The Java *CallbackJni wrapper owns the native callback and frees it from its finalizer
+        // (deleteCallback), so deleting it here would free it twice. Release our global reference to
+        // the wrapper instead, as OnDone does, so the wrapper can be collected.
         if (callback != nullptr)
         {
-            Platform::Delete(callback);
+            callback->mWrapperCallbackRef.Reset();
+            callback = nullptr;
         }
     }
     return err;
@@ -253,9 +257,12 @@ exit:
             Platform::Delete(readClient);
             readClient = nullptr;
         }
+        // The Java *CallbackJni wrapper owns the native callback and frees it from its finalizer
+        // (deleteCallback), so deleting it here would free it twice. Release our global reference to
+        // the wrapper instead, as OnDone does, so the wrapper can be collected.
         if (callback != nullptr)
         {
-            Platform::Delete(callback);
+            callback->mWrapperCallbackRef.Reset();
             callback = nullptr;
         }
     }
@@ -426,9 +433,12 @@ exit:
             Platform::Delete(writeClient);
             writeClient = nullptr;
         }
+        // The Java *CallbackJni wrapper owns the native callback and frees it from its finalizer
+        // (deleteCallback), so deleting it here would free it twice. Release our global reference to
+        // the wrapper instead, as OnDone does, so the wrapper can be collected.
         if (callback != nullptr)
         {
-            Platform::Delete(callback);
+            callback->mWrapperCallbackRef.Reset();
             callback = nullptr;
         }
     }
@@ -624,9 +634,12 @@ exit:
             Platform::Delete(commandSender);
             commandSender = nullptr;
         }
+        // The Java *CallbackJni wrapper owns the native callback and frees it from its finalizer
+        // (deleteCallback), so deleting it here would free it twice. Release our global reference to
+        // the wrapper instead, as OnDone does, so the wrapper can be collected.
         if (callback != nullptr)
         {
-            Platform::Delete(callback);
+            callback->mWrapperCallbackRef.Reset();
             callback = nullptr;
         }
     }
@@ -800,9 +813,12 @@ exit:
             Platform::Delete(commandSender);
             commandSender = nullptr;
         }
+        // The Java *CallbackJni wrapper owns the native callback and frees it from its finalizer
+        // (deleteCallback), so deleting it here would free it twice. Release our global reference to
+        // the wrapper instead, as OnDone does, so the wrapper can be collected.
         if (callback != nullptr)
         {
-            Platform::Delete(callback);
+            callback->mWrapperCallbackRef.Reset();
             callback = nullptr;
         }
     }
