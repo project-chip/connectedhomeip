@@ -61,6 +61,11 @@ The cluster is listed in `CodeDrivenClusters`, so ZAP no longer generates
 `Attributes::FeatureMap::Get(endpoint, &featureMap)` should call
 `Attributes::FeatureMap::GetDefault(endpoint, featureMap)` instead.
 
+The cluster handles `SendKey` itself, so a `CommandHandlerInterface` registered
+for Keypad Input on the same endpoint is no longer called. Applications that
+forwarded `SendKey` that way (for example to a ContentApp) must forward it from
+the delegate's `HandleSendKey()` instead.
+
 ## Applications that construct the cluster directly
 
 Construct `KeypadInputCluster` with the endpoint and a delegate that outlives

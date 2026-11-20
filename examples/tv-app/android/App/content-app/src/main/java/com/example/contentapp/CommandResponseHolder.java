@@ -28,6 +28,14 @@ public class CommandResponseHolder {
         DEFAULT_COMMAND,
         "{\"0\":0, \"1\":\"custom response from content app for media playback\"}");
     setResponseValue(
+        Clusters.KeypadInput.Id,
+        Clusters.KeypadInput.Commands.SendKey.ID,
+        "{\""
+            + Clusters.KeypadInput.Commands.SendKeyResponse.Fields.Status
+            + "\":"
+            + Clusters.KeypadInput.Types.StatusEnum.Success
+            + "}");
+    setResponseValue(
         Clusters.AccountLogin.Id,
         Clusters.AccountLogin.Commands.GetSetupPIN.ID,
         "{\"0\":\"20202021\"}");
