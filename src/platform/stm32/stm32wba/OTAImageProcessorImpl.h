@@ -18,7 +18,9 @@
 
 #pragma once
 
-#include <app/clusters/ota-requestor/OTADownloader.h>
+#include "app_conf.h"
+#if (OTA_SUPPORT == 1)
+// #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <lib/core/OTAImageHeader.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
@@ -69,3 +71,4 @@ private:
 };
 
 } // namespace chip
+#endif

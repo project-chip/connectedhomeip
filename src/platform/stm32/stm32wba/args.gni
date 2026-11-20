@@ -22,10 +22,12 @@ chip_device_platform = "stm32wba"
 
 # add board protector for stm32wba
 chip_with_lwip = false
+
 mbedtls_target = "${stm32_sdk_build_root}:stm32_sdk"
 openthread_external_mbedtls = mbedtls_target
 chip_openthread_target = "${stm32_sdk_build_root}:stm32_sdk"
 openthread_external_platform = "${stm32_sdk_build_root}:stm32_sdk"
+openthread_root = "${chip_root}/third_party/openthread/ot-stm32"
 
 # GLOBAL CONFIG
 chip_monolithic_tests = false

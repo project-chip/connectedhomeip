@@ -23,20 +23,27 @@ from .gn import GnBuilder
 
 class stm32App(Enum):
     LIGHT = auto()
+    LIT = auto()
 
     def ExampleName(self):
         if self == stm32App.LIGHT:
             return 'lighting-app'
+        if self == stm32App.LIT:
+            return 'lit-icd-app'
         raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == stm32App.LIGHT:
             return 'chip-stm32-lighting-example'
+        if self == stm32App.LIT:
+            return 'chip-stm32-lit-example'
         raise Exception(f'Unknown app type: {self!r}')
 
     def FlashBundleName(self):
         if self == stm32App.LIGHT:
             return 'lighting_app.flashbundle.txt'
+        if self == stm32App.LIT:
+            return 'lit_icd_app.flashbundle.txt'
         raise Exception(f'Unknown app type: {self!r}')
 
     def BuildRoot(self, root, stm32_chip):
@@ -65,8 +72,10 @@ class stm32Builder(GnBuilder):
         self.board = board
         self.app = app
 
+        stm32App = self.app.ExampleName()
         stm32_chip = self.board.GetIC()
         self.extra_gn_options = [f'stm32_board="{stm32_chip}"']
+        self.extra_gn_options.append(f'stm32_app="{stm32App}"')
 
         self.extra_gn_options.append('chip_config_network_layer_ble=true')
         self.extra_gn_options.append('treat_warnings_as_errors=false')
