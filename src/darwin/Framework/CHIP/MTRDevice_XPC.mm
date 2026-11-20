@@ -510,6 +510,13 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
                           completion:(MTRDeviceResponseHandler)completion
 {
     NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
+    if (xpcConnection == nil) {
+        MTR_LOG_ERROR("%@ No XPC connection for %@", self, NSStringFromSelector(_cmd));
+        dispatch_async(queue, ^{
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+        });
+        return;
+    }
 
     @try {
         [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
@@ -570,6 +577,13 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
             completion:(MTRDeviceResponseHandler)completion
 {
     NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
+    if (xpcConnection == nil) {
+        MTR_LOG_ERROR("%@ No XPC connection for %@", self, NSStringFromSelector(_cmd));
+        dispatch_async(queue, ^{
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+        });
+        return;
+    }
 
     @try {
         [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
@@ -628,6 +642,13 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
     NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
+    if (xpcConnection == nil) {
+        MTR_LOG_ERROR("%@ No XPC connection for %@", self, NSStringFromSelector(_cmd));
+        dispatch_async(queue, ^{
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+        });
+        return;
+    }
 
     @try {
         [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
