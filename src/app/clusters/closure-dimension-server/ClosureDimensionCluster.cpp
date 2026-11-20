@@ -43,12 +43,22 @@ constexpr uint64_t kPositionQuietReportingInterval = 5000;
 
 } // namespace
 
+CHIP_ERROR ClosureDimensionCluster::Config::ValidatePositioning() const
+{
+    VerifyOrReturnError(mFeatureMap.Has(Feature::kPositioning), CHIP_NO_ERROR);
+    VerifyOrReturnError(mResolution >= 1 && mResolution <= kPercents100thsMaxValue && mStepValue >= 1 &&
+                            mStepValue <= kPercents100thsMaxValue,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mStepValue % mResolution == 0, CHIP_ERROR_INVALID_ARGUMENT);
+    return CHIP_NO_ERROR;
+}
+
 ClosureDimensionCluster::ClosureDimensionCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, ClosureDimension::Id }), mDelegate(config.mDelegate),
-    mResolution(config.mResolution), mStepValue(config.mStepValue), mUnit(config.mUnit), mUnitRange(config.mUnitRange),
-    mLimitRange(config.mLimitRange), mTranslationDirection(config.mTranslationDirection), mRotationAxis(config.mRotationAxis),
-    mOverflow(config.mOverflow), mModulationType(config.mModulationType), mLatchControlModes(config.mLatchControlModes),
-    mFeatureMap(config.mFeatureMap)
+    mPositioningConfigValid(config.ValidatePositioning() == CHIP_NO_ERROR), mResolution(config.mResolution),
+    mStepValue(config.mStepValue), mUnit(config.mUnit), mUnitRange(config.mUnitRange), mLimitRange(config.mLimitRange),
+    mTranslationDirection(config.mTranslationDirection), mRotationAxis(config.mRotationAxis), mOverflow(config.mOverflow),
+    mModulationType(config.mModulationType), mLatchControlModes(config.mLatchControlModes), mFeatureMap(config.mFeatureMap)
 {
     // Positioning or MotionLatching must be enabled
     VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kPositioning) || mFeatureMap.Has(Feature::kMotionLatching), AppServer,
@@ -79,6 +89,12 @@ ClosureDimensionCluster::ClosureDimensionCluster(const Config & config) :
 }
 
 ClosureDimensionCluster::~ClosureDimensionCluster() {}
+
+CHIP_ERROR ClosureDimensionCluster::Startup(ServerClusterContext & context)
+{
+    VerifyOrReturnError(mPositioningConfigValid, CHIP_ERROR_INVALID_ARGUMENT);
+    return DefaultServerCluster::Startup(context);
+}
 
 CHIP_ERROR ClosureDimensionCluster::Attributes(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
@@ -141,6 +157,8 @@ CHIP_ERROR ClosureDimensionCluster::AcceptedCommands(const ConcreteClusterPath &
 DataModel::ActionReturnStatus ClosureDimensionCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                      AttributeValueEncoder & encoder)
 {
+    VerifyOrReturnError(mPositioningConfigValid, CHIP_ERROR_INVALID_ARGUMENT);
+
     switch (request.path.mAttributeId)
     {
     case Attributes::CurrentState::Id:
@@ -180,6 +198,8 @@ std::optional<DataModel::ActionReturnStatus> ClosureDimensionCluster::InvokeComm
                                                                                     chip::TLV::TLVReader & input_arguments,
                                                                                     CommandHandler * handler)
 {
+    VerifyOrReturnError(mPositioningConfigValid, CHIP_ERROR_INVALID_ARGUMENT);
+
     switch (request.path.mCommandId)
     {
     case Commands::SetTarget::Id: {
@@ -223,6 +243,8 @@ std::optional<DataModel::ActionReturnStatus> ClosureDimensionCluster::InvokeComm
 CHIP_ERROR ClosureDimensionCluster::SetCurrentState(const DataModel::Nullable<GenericDimensionStateStruct> & incomingCurrentState)
 {
     assertChipStackLockedByCurrentThread();
+
+    VerifyOrReturnError(mPositioningConfigValid, CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrReturnError(mCurrentState != incomingCurrentState, CHIP_NO_ERROR);
 
@@ -327,6 +349,8 @@ CHIP_ERROR ClosureDimensionCluster::SetTargetState(const DataModel::Nullable<Gen
 {
     assertChipStackLockedByCurrentThread();
 
+    VerifyOrReturnError(mPositioningConfigValid, CHIP_ERROR_INVALID_ARGUMENT);
+
     VerifyOrReturnError(mTargetState != incomingTargetState, CHIP_NO_ERROR);
 
     if (!incomingTargetState.IsNull())
@@ -379,6 +403,8 @@ CHIP_ERROR ClosureDimensionCluster::SetTargetState(const DataModel::Nullable<Gen
 
 CHIP_ERROR ClosureDimensionCluster::SetUnitRange(const DataModel::Nullable<Structs::UnitRangeStruct::Type> & unitRange)
 {
+    VerifyOrReturnError(mPositioningConfigValid, CHIP_ERROR_INVALID_ARGUMENT);
+
     VerifyOrReturnError(mFeatureMap.Has(Feature::kUnit), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (unitRange.IsNull())
@@ -428,6 +454,8 @@ CHIP_ERROR ClosureDimensionCluster::SetUnitRange(const DataModel::Nullable<Struc
 
 CHIP_ERROR ClosureDimensionCluster::SetLimitRange(const Structs::RangePercent100thsStruct::Type & limitRange)
 {
+    VerifyOrReturnError(mPositioningConfigValid, CHIP_ERROR_INVALID_ARGUMENT);
+
     VerifyOrReturnError(mFeatureMap.Has(Feature::kLimitation), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     // If the limit range is invalid, we need to return an error

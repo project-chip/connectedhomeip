@@ -85,6 +85,7 @@ CHIP_ERROR Interface::Init()
         config.WithAccess();
     }
 
+    ReturnErrorOnFailure(config.ValidatePositioning());
     mCluster.Create(config);
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
