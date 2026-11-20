@@ -24,7 +24,7 @@ from matter.tlv import uint
 
 class ChoiceConformanceProblemNotice(ProblemNotice):
     def __init__(self, location: AttributePathLocation, choice: Choice, count: int):
-        problem = f'Problem with choice conformance {choice} - {count} selected'
+        problem = f'Problem with choice conformance {choice}: {count} selected'
         super().__init__(test_name='Choice conformance', location=location, severity=ProblemSeverity.ERROR, problem=problem, spec_location='')
         self.choice = choice
         self.count = count
@@ -42,7 +42,7 @@ def _add_to_counts_if_required(conformance_decision_with_choice: ConformanceDeci
 def _evaluate_choices(location: AttributePathLocation, counts: dict[Choice, int]) -> list[ChoiceConformanceProblemNotice]:
     problems: list[ChoiceConformanceProblemNotice] = []
     for choice, count in counts.items():
-        if count == 0 or (not choice.more and count > 1):
+        if not choice.is_met(count):
             problems.append(ChoiceConformanceProblemNotice(location, choice, count))
     return problems
 

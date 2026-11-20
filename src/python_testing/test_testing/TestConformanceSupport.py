@@ -964,7 +964,8 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
         # - disallowed X.a
         # - deprecated D.a
 
-        choices = [('a+', 'choice="a" more="true"', True), ('a', 'choice="a"', False)]
+        choices = [('a+', 'choice="a" more="true"', True), ('a', 'choice="a"', False),
+                   ('a2+', 'choice="a" more="true" min="2"', True), ('a-', 'choice="a" max="1"', False)]
         for suffix, xml_attrs, more in choices:
 
             AB = self.feature_names_to_bits['AB']
