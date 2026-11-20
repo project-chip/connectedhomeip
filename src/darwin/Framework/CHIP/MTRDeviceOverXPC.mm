@@ -38,6 +38,34 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
 
 - (void)fetchProxyHandleWithQueue:(dispatch_queue_t)queue completion:(MTRFetchProxyHandleCompletion)completion;
 
+// The XPC paths for writes and invokes.  requestWillBeSent, if not nil, is called when the request completes, right
+// before completion: the service does not tell the client when it sends the request.
+- (void)_writeAttributeOverXPCWithEndpointID:(NSNumber *)endpointID
+                                   clusterID:(NSNumber *)clusterID
+                                 attributeID:(NSNumber *)attributeID
+                                       value:(id)value
+                           timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                           requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
+                                       queue:(dispatch_queue_t)queue
+                                  completion:(MTRDeviceResponseHandler)completion;
+- (void)_invokeCommandOverXPCWithEndpointID:(NSNumber *)endpointID
+                                  clusterID:(NSNumber *)clusterID
+                                  commandID:(NSNumber *)commandID
+                              commandFields:(id)commandFields
+                         timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                          requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
+                                      queue:(dispatch_queue_t)queue
+                                 completion:(MTRDeviceResponseHandler)completion;
+- (void)_invokeCommandOverXPCWithEndpointID:(NSNumber *)endpointID
+                                  clusterID:(NSNumber *)clusterID
+                                  commandID:(NSNumber *)commandID
+                              commandFields:(id)commandFields
+                         timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                          requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
+                                      queue:(dispatch_queue_t)queue
+                                 completion:(MTRDeviceResponseHandler)completion;
+
 @end
 
 @implementation MTRDeviceOverXPC
@@ -202,6 +230,46 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                                 queue:(dispatch_queue_t)queue
                            completion:(MTRDeviceResponseHandler)completion
 {
+    [self _writeAttributeOverXPCWithEndpointID:endpointID
+                                     clusterID:clusterID
+                                   attributeID:attributeID
+                                         value:value
+                             timedWriteTimeout:timeoutMs
+                             requestWillBeSent:nil
+                                         queue:queue
+                                    completion:completion];
+}
+
+// MTRDevice writes through this selector, not the one above.  An XPC device must override the requestWillBeSent
+// selectors too, or MTRBaseDevice's local session path runs instead and writes stop forwarding over XPC.
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                    requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion
+{
+    [self _writeAttributeOverXPCWithEndpointID:endpointID
+                                     clusterID:clusterID
+                                   attributeID:attributeID
+                                         value:value
+                             timedWriteTimeout:timeoutMs
+                             requestWillBeSent:requestWillBeSent
+                                         queue:queue
+                                    completion:completion];
+}
+
+- (void)_writeAttributeOverXPCWithEndpointID:(NSNumber *)endpointID
+                                   clusterID:(NSNumber *)clusterID
+                                 attributeID:(NSNumber *)attributeID
+                                       value:(id)value
+                           timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                           requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
+                                       queue:(dispatch_queue_t)queue
+                                  completion:(MTRDeviceResponseHandler)completion
+{
     MTR_LOG_DEBUG("Writing attribute ...");
 
     __auto_type workBlock = ^(MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error) {
@@ -220,6 +288,11 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                                         completion:^(id _Nullable values, NSError * _Nullable error) {
                                             dispatch_async(queue, ^{
                                                 MTR_LOG_DEBUG("Attribute written");
+                                                // The client cannot see when the service sends the request, so the expected value
+                                                // interval starts here, when it completes, and cannot run out before the send.
+                                                if (requestWillBeSent) {
+                                                    requestWillBeSent();
+                                                }
                                                 completion([MTRDeviceController decodeXPCResponseValues:values], error);
                                                 // The following captures the proxy handle in the closure so that the
                                                 // handle won't be released prior to block call.
@@ -240,6 +313,25 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
+    [self _invokeCommandOverXPCWithEndpointID:endpointID
+                                    clusterID:clusterID
+                                    commandID:commandID
+                                commandFields:commandFields
+                           timedInvokeTimeout:timeoutMs
+                            requestWillBeSent:nil
+                                        queue:queue
+                                   completion:completion];
+}
+
+- (void)_invokeCommandOverXPCWithEndpointID:(NSNumber *)endpointID
+                                  clusterID:(NSNumber *)clusterID
+                                  commandID:(NSNumber *)commandID
+                              commandFields:(id)commandFields
+                         timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                          requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
+                                      queue:(dispatch_queue_t)queue
+                                 completion:(MTRDeviceResponseHandler)completion
+{
     MTR_LOG_DEBUG("Invoking command ...");
 
     __auto_type workBlock = ^(MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error) {
@@ -258,6 +350,11 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                                        completion:^(id _Nullable values, NSError * _Nullable error) {
                                            dispatch_async(queue, ^{
                                                MTR_LOG_DEBUG("Command invoked");
+                                               // The client cannot see when the service sends the request, so the expected value
+                                               // interval starts here, when it completes, and cannot run out before the send.
+                                               if (requestWillBeSent) {
+                                                   requestWillBeSent();
+                                               }
                                                completion([MTRDeviceController decodeXPCResponseValues:values], error);
                                                // The following captures the proxy handle in the closure so that the
                                                // handle won't be released prior to block call.
@@ -280,6 +377,51 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
+    [self _invokeCommandOverXPCWithEndpointID:endpointID
+                                    clusterID:clusterID
+                                    commandID:commandID
+                                commandFields:commandFields
+                           timedInvokeTimeout:timeoutMs
+                  serverSideProcessingTimeout:serverSideProcessingTimeout
+                            requestWillBeSent:nil
+                                        queue:queue
+                                   completion:completion];
+}
+
+// MTRDevice invokes through this selector, not the one above.  An XPC device must override the requestWillBeSent
+// selectors too, or MTRBaseDevice's local session path runs instead and invokes stop forwarding over XPC.
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                             logCall:(BOOL)logCall
+                   requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
+    [self _invokeCommandOverXPCWithEndpointID:endpointID
+                                    clusterID:clusterID
+                                    commandID:commandID
+                                commandFields:commandFields
+                           timedInvokeTimeout:timeoutMs
+                  serverSideProcessingTimeout:serverSideProcessingTimeout
+                            requestWillBeSent:requestWillBeSent
+                                        queue:queue
+                                   completion:completion];
+}
+
+- (void)_invokeCommandOverXPCWithEndpointID:(NSNumber *)endpointID
+                                  clusterID:(NSNumber *)clusterID
+                                  commandID:(NSNumber *)commandID
+                              commandFields:(id)commandFields
+                         timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                          requestWillBeSent:(dispatch_block_t _Nullable)requestWillBeSent
+                                      queue:(dispatch_queue_t)queue
+                                 completion:(MTRDeviceResponseHandler)completion
+{
     if (serverSideProcessingTimeout != nil) {
         MTR_LOG_ERROR("MTRBaseDevice doesn't support invokes with a server-side processing timeout over XPC");
         dispatch_async(queue, ^{
@@ -288,13 +430,14 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
         return;
     }
 
-    [self invokeCommandWithEndpointID:endpointID
-                            clusterID:clusterID
-                            commandID:commandID
-                        commandFields:commandFields
-                   timedInvokeTimeout:timeoutMs
-                                queue:queue
-                           completion:completion];
+    [self _invokeCommandOverXPCWithEndpointID:endpointID
+                                    clusterID:clusterID
+                                    commandID:commandID
+                                commandFields:commandFields
+                           timedInvokeTimeout:timeoutMs
+                            requestWillBeSent:requestWillBeSent
+                                        queue:queue
+                                   completion:completion];
 }
 
 - (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
