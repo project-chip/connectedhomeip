@@ -17,12 +17,15 @@
 
 #include <app/clusters/door-lock-server/DoorLockCluster.h>
 
+#include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <algorithm>
+#include <cinttypes>
 #include <cstring>
 
 using namespace chip::Protocols::InteractionModel;
@@ -89,7 +92,15 @@ DoorLockCluster::DoorLockCluster(EndpointId endpointId, Delegate & delegate, con
     mNumberOfCredentialsSupportedPerUser(config.numberOfCredentialsSupportedPerUser),
     mCredentialRulesSupport(config.credentialRulesSupport), mMaxPINCodeLength(config.maxPINCodeLength),
     mMinPINCodeLength(config.minPINCodeLength), mMaxRFIDCodeLength(config.maxRFIDCodeLength),
-    mMinRFIDCodeLength(config.minRFIDCodeLength), mLockState(config.lockState), mDoorState(config.doorState),
+    mMinRFIDCodeLength(config.minRFIDCodeLength),
+    mNumberOfFingerprintCredentialsSupported(config.numberOfFingerprintCredentialsSupported),
+    mNumberOfFingerVeinCredentialsSupported(config.numberOfFingerVeinCredentialsSupported),
+    mNumberOfFaceCredentialsSupported(config.numberOfFaceCredentialsSupported),
+    mMinFingerprintCredentialLength(config.minFingerprintCredentialLength),
+    mMaxFingerprintCredentialLength(config.maxFingerprintCredentialLength),
+    mMinFingerVeinCredentialLength(config.minFingerVeinCredentialLength),
+    mMaxFingerVeinCredentialLength(config.maxFingerVeinCredentialLength), mMinFaceCredentialLength(config.minFaceCredentialLength),
+    mMaxFaceCredentialLength(config.maxFaceCredentialLength), mLockState(config.lockState), mDoorState(config.doorState),
     mDoorOpenEvents(config.doorOpenEvents), mDoorClosedEvents(config.doorClosedEvents), mOpenPeriod(config.openPeriod),
     mActuatorEnabled(config.actuatorEnabled), mOperatingMode(config.operatingMode), mLEDSettings(config.ledSettings),
     mAutoRelockTime(config.autoRelockTime), mSoundVolume(config.soundVolume),
@@ -182,15 +193,33 @@ CHIP_ERROR DoorLockCluster::Attributes(const ConcreteClusterPath & path, ReadOnl
 CHIP_ERROR DoorLockCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    // UnboltDoor is last so the [UBOLT]-gated command list is a prefix-truncation
-    // of the same in-place array: no copy or heap allocation.
-    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+    // Feature-gated slices; assembled in ascending command-id order.
+    // clang-format off
+    static constexpr DataModel::AcceptedCommandEntry kLockCommands[] = {
         Commands::LockDoor::kMetadataEntry,
         Commands::UnlockDoor::kMetadataEntry,
         Commands::UnlockWithTimeout::kMetadataEntry,
+    };
+    static constexpr DataModel::AcceptedCommandEntry kUnboltCommand[] = {
         Commands::UnboltDoor::kMetadataEntry,
     };
-    return builder.ReferenceExisting(Span(kAcceptedCommands, mFeatures.Has(Feature::kUnbolt) ? 4u : 3u));
+    static constexpr DataModel::AcceptedCommandEntry kUserCommands[] = {
+        Commands::SetUser::kMetadataEntry,
+        Commands::GetUser::kMetadataEntry,
+        Commands::ClearUser::kMetadataEntry,
+    };
+    // clang-format on
+
+    ReturnErrorOnFailure(builder.AppendElements(Span(kLockCommands)));
+    if (mFeatures.Has(Feature::kUnbolt))
+    {
+        ReturnErrorOnFailure(builder.AppendElements(Span(kUnboltCommand)));
+    }
+    if (SupportsUSR())
+    {
+        ReturnErrorOnFailure(builder.AppendElements(Span(kUserCommands)));
+    }
+    return CHIP_NO_ERROR;
 }
 
 DataModel::ActionReturnStatus DoorLockCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -534,6 +563,24 @@ std::optional<DataModel::ActionReturnStatus> DoorLockCluster::InvokeCommand(cons
         }
         return status;
     }
+    case Commands::SetUser::Id: {
+        Commands::SetUser::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        HandleSetUser(request, commandData, handler, request.path);
+        return std::nullopt;
+    }
+    case Commands::GetUser::Id: {
+        Commands::GetUser::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        HandleGetUser(request, commandData.userIndex, handler, request.path);
+        return std::nullopt;
+    }
+    case Commands::ClearUser::Id: {
+        Commands::ClearUser::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        HandleClearUser(request, commandData.userIndex, handler, request.path);
+        return std::nullopt;
+    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
@@ -546,6 +593,7 @@ CHIP_ERROR DoorLockCluster::SetLockState(DlLockState newState, OperationSourceEn
                                          const DataModel::Nullable<NodeId> & nodeId)
 {
     SetAttributeValue(mLockState, newState, LockState::Id);
+    StoreLockState();
 
     // DlLockState::kNotFullyLocked has no appropriate event and unclear
     // auto-relocking semantics, so skip it.
@@ -642,6 +690,11 @@ bool DoorLockCluster::IsLockoutEngaged() const
     // A zero lockout end timestamp means no lockout was ever engaged. The
     // comparison is strict so that a (mock) clock that has not advanced past
     // its zero point yet does not report an engaged lockout.
+    // A zero lockout end timestamp means no lockout was ever engaged. The
+    // comparison is strict so that a (mock) clock that has not advanced past
+    // its zero point yet does not report an engaged lockout. Legacy compares
+    // with >=; the only behavioral difference is at the exact expiry second,
+    // where a mock clock would otherwise report a spurious lockout at boot.
     return mLockoutEndTimestamp > mTimerDelegate.GetCurrentMonotonicTimestamp();
 }
 
@@ -784,6 +837,791 @@ std::optional<DataModel::ActionReturnStatus> DoorLockCluster::HandleRemoteLockOp
     }
 
     return success ? DataModel::ActionReturnStatus(Status::Success) : DataModel::ActionReturnStatus(Status::Failure);
+}
+
+CHIP_ERROR DoorLockCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    LoadPersistentAttributes(context);
+    return CHIP_NO_ERROR;
+}
+
+void DoorLockCluster::LoadPersistentAttributes(ServerClusterContext & context)
+{
+    // The lockState attribute is persisted (`.matter` persist attribute): a
+    // stored value replaces the initial configuration value.
+    AttributePersistence attributePersistence(context.attributeStorage);
+    if (!attributePersistence.LoadNativeEndianValue<DlLockState>(ConcreteAttributePath(mPath.mEndpointId, Id, LockState::Id),
+                                                                 mLockState, mLockState))
+    {
+        ChipLogProgress(Zcl, "No persisted lock state; keep the initial value [endpoint=%d]", mPath.mEndpointId);
+    }
+}
+
+void DoorLockCluster::StoreLockState() const
+{
+    VerifyOrReturn(IsStarted());
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    TEMPORARY_RETURN_IGNORED attributePersistence.StoreNativeEndianValue<DlLockState>(
+        ConcreteAttributePath(mPath.mEndpointId, Id, LockState::Id), mLockState);
+}
+
+// =============================================================================
+// User / credential / schedule storage access (via the delegate)
+// =============================================================================
+
+namespace {
+
+// Wildcard index for the clear-all variant of ClearUser.
+constexpr uint16_t DOOR_LOCK_ALL_USERS_INDEX = 0xFFFE;
+
+bool IsValidUserStatusForSet(const DataModel::Nullable<UserStatusEnum> & userStatus)
+{
+    return userStatus.IsNull() || (userStatus.Value() == UserStatusEnum::kOccupiedEnabled) ||
+        (userStatus.Value() == UserStatusEnum::kOccupiedDisabled);
+}
+
+/// Fabric index of the invoking session or kUndefinedFabricIndex for local
+/// (group / PASE-adjacent) operations that can not run user management.
+FabricIndex CommandFabricIndex(const DataModel::InvokeRequest & request)
+{
+    return request.subjectDescriptor.fabricIndex;
+}
+
+/// Node id of the invoking session or kUndefinedNodeId when not a CASE session.
+NodeId CommandNodeId(const DataModel::InvokeRequest & request)
+{
+    if (request.subjectDescriptor.fabricIndex == kUndefinedFabricIndex ||
+        request.subjectDescriptor.authMode != Access::AuthMode::kCase)
+    {
+        return kUndefinedNodeId;
+    }
+    return request.subjectDescriptor.subject;
+}
+
+} // namespace
+
+// =============================================================================
+// Storage lookup helpers
+// =============================================================================
+
+bool DoorLockCluster::UserIndexValid(uint16_t userIndex, uint16_t & maxNumberOfUsers) const
+{
+    maxNumberOfUsers = mNumberOfTotalUsersSupported;
+
+    // appclusters, 5.2.4.34-37: user index changes from 1 to maxNumberOfUsers
+    return userIndex != 0 && userIndex <= maxNumberOfUsers;
+}
+
+bool DoorLockCluster::UserIndexValid(uint16_t userIndex) const
+{
+    uint16_t maxNumberOfUsers;
+    return UserIndexValid(userIndex, maxNumberOfUsers);
+}
+
+bool DoorLockCluster::UserExists(uint16_t userIndex) const
+{
+    UserInfo user;
+    if (!mDelegate.GetUser(userIndex, user))
+    {
+        ChipLogError(Zcl, "[UserExists] Unable to get the user - internal error [endpointId=%d,userIndex=%d]", mPath.mEndpointId,
+                     userIndex);
+        return false;
+    }
+    return UserStatusEnum::kAvailable != user.userStatus;
+}
+
+bool DoorLockCluster::FindOccupiedUserSlot(uint16_t startIndex, uint16_t & userIndex) const
+{
+    userIndex = 0;
+    for (uint16_t i = startIndex; i <= mNumberOfTotalUsersSupported; ++i)
+    {
+        UserInfo user;
+        if (!mDelegate.GetUser(i, user))
+        {
+            ChipLogError(Zcl, "Unable to get user to check if slot is occupied: app error [userIndex=%d]", i);
+            return false;
+        }
+
+        if (UserStatusEnum::kAvailable != user.userStatus)
+        {
+            userIndex = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool DoorLockCluster::FindUnoccupiedUserSlot(uint16_t & userIndex) const
+{
+    return FindUnoccupiedUserSlot(1, userIndex);
+}
+
+bool DoorLockCluster::FindUnoccupiedUserSlot(uint16_t startIndex, uint16_t & userIndex) const
+{
+    userIndex = 0;
+    for (uint16_t i = startIndex; i <= mNumberOfTotalUsersSupported; ++i)
+    {
+        UserInfo user;
+        if (!mDelegate.GetUser(i, user))
+        {
+            ChipLogError(Zcl, "Unable to get user to check if slot is occupied: app error [userIndex=%d]", i);
+            return false;
+        }
+
+        if (UserStatusEnum::kAvailable == user.userStatus)
+        {
+            userIndex = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool DoorLockCluster::WeekDayIndexValid(uint8_t weekDayIndex) const
+{
+    // appclusters, 5.2.4.14-17: weekday index changes from 1 to maxNumberOfUsers
+    return weekDayIndex != 0 && weekDayIndex <= mNumberOfWeekDaySchedulesPerUser;
+}
+
+bool DoorLockCluster::YearDayIndexValid(uint8_t yearDayIndex) const
+{
+    // appclusters, 5.2.4.18-21: year day index changes from 1 to maxNumberOfUsers
+    return yearDayIndex != 0 && yearDayIndex <= mNumberOfYearDaySchedulesPerUser;
+}
+
+bool DoorLockCluster::HolidayIndexValid(uint8_t holidayIndex) const
+{
+    // appclusters, 5.2.4.22-25: holiday index changes from 1 to maxNumberOfHolidaySchedules
+    return holidayIndex != 0 && holidayIndex <= mNumberOfHolidaySchedulesSupported;
+}
+
+bool DoorLockCluster::IsUserScheduleRestricted(const UserInfo & user) const
+{
+    return false;
+}
+
+void DoorLockCluster::SendRemoteLockUserChange(LockDataTypeEnum dataType, DataOperationTypeEnum operation, NodeId nodeId,
+                                               FabricIndex fabricIndex, uint16_t userIndex, uint16_t dataIndex) const
+{
+    Events::LockUserChange::Type event;
+    event.lockDataType      = dataType;
+    event.dataOperationType = operation;
+    event.operationSource   = OperationSourceEnum::kRemote;
+    if (0 != userIndex)
+    {
+        event.userIndex.SetNonNull(userIndex);
+    }
+    event.fabricIndex.SetNonNull(fabricIndex);
+    event.sourceNode.SetNonNull(nodeId);
+    if (0 != dataIndex)
+    {
+        event.dataIndex.SetNonNull(dataIndex);
+    }
+
+    SendEvent(event);
+}
+
+// =============================================================================
+// User management (create / modify / clear)
+// =============================================================================
+
+ClusterStatusCode DoorLockCluster::CreateUser(FabricIndex creatorFabricIdx, NodeId sourceNodeId, uint16_t userIndex,
+                                              const DataModel::Nullable<CharSpan> & userName,
+                                              const DataModel::Nullable<uint32_t> & userUniqueId,
+                                              const DataModel::Nullable<UserStatusEnum> & userStatus,
+                                              const DataModel::Nullable<UserTypeEnum> & userType,
+                                              const DataModel::Nullable<CredentialRuleEnum> & credentialRule,
+                                              const DataModel::Nullable<CredentialStruct> & credential)
+{
+    UserInfo user;
+    if (!mDelegate.GetUser(userIndex, user))
+    {
+        ChipLogError(Zcl, "[createUser] Unable to get the user from app [endpointId=%d,userIndex=%d]", mPath.mEndpointId,
+                     userIndex);
+        return ClusterStatusCode(Status::Failure);
+    }
+
+    // appclusters, 5.2.4.34: to modify user its status should be set to Available. If it is we should return OCCUPIED.
+    if (UserStatusEnum::kAvailable != user.userStatus)
+    {
+        ChipLogProgress(Zcl, "[createUser] Unable to overwrite existing user [endpointId=%d,userIndex=%d]", mPath.mEndpointId,
+                        userIndex);
+        return ClusterStatusCode::ClusterSpecificFailure(DlStatus::kOccupied);
+    }
+
+    const auto & newUserName                = !userName.IsNull() ? userName.Value() : ""_span;
+    auto newUserUniqueId                    = userUniqueId.IsNull() ? 0xFFFFFFFF : userUniqueId.Value();
+    auto newUserStatus                      = userStatus.IsNull() ? UserStatusEnum::kOccupiedEnabled : userStatus.Value();
+    auto newUserType                        = userType.IsNull() ? UserTypeEnum::kUnrestrictedUser : userType.Value();
+    auto newCredentialRule                  = credentialRule.IsNull() ? CredentialRuleEnum::kSingle : credentialRule.Value();
+    const CredentialStruct * newCredentials = nullptr;
+    size_t newTotalCredentials              = 0;
+    if (!credential.IsNull())
+    {
+        newCredentials      = &credential.Value();
+        newTotalCredentials = 1;
+    }
+
+    if (!mDelegate.SetUser(userIndex, creatorFabricIdx, creatorFabricIdx, newUserName, newUserUniqueId, newUserStatus, newUserType,
+                           newCredentialRule, newCredentials, newTotalCredentials))
+    {
+        ChipLogProgress(Zcl,
+                        "[createUser] Unable to create user: app error "
+                        "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userUniqueId=0x%" PRIx32 ",userStatus=%u,"
+                        "userType=%u,credentialRule=%u,totalCredentials=%u]",
+                        mPath.mEndpointId, creatorFabricIdx, userIndex, newUserUniqueId, to_underlying(newUserStatus),
+                        to_underlying(newUserType), to_underlying(newCredentialRule), static_cast<unsigned>(newTotalCredentials));
+        return ClusterStatusCode(Status::Failure);
+    }
+
+    ChipLogProgress(Zcl,
+                    "[createUser] User created "
+                    "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userUniqueId=0x%" PRIx32 ",userStatus=%u,userType=%u,"
+                    "credentialRule=%u,totalCredentials=%u]",
+                    mPath.mEndpointId, creatorFabricIdx, userIndex, newUserUniqueId, to_underlying(newUserStatus),
+                    to_underlying(newUserType), to_underlying(newCredentialRule), static_cast<unsigned>(newTotalCredentials));
+    SendRemoteLockUserChange(LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kAdd, sourceNodeId, creatorFabricIdx, userIndex,
+                             userIndex);
+
+    return ClusterStatusCode(Status::Success);
+}
+
+Status DoorLockCluster::ModifyUser(FabricIndex modifierFabricIndex, NodeId sourceNodeId, uint16_t userIndex,
+                                   const DataModel::Nullable<CharSpan> & userName,
+                                   const DataModel::Nullable<uint32_t> & userUniqueId,
+                                   const DataModel::Nullable<UserStatusEnum> & userStatus,
+                                   const DataModel::Nullable<UserTypeEnum> & userType,
+                                   const DataModel::Nullable<CredentialRuleEnum> & credentialRule)
+{
+    // We should get the user by that index first
+    UserInfo user;
+    if (!mDelegate.GetUser(userIndex, user))
+    {
+        ChipLogError(Zcl, "[modifyUser] Unable to get the user from app [endpointId=%d,userIndex=%d]", mPath.mEndpointId,
+                     userIndex);
+        return Status::Failure;
+    }
+
+    // appclusters, 5.2.4.34: to modify user its status should NOT be set to Available. If it is we should return INVALID_COMMAND.
+    if (UserStatusEnum::kAvailable == user.userStatus)
+    {
+        ChipLogProgress(Zcl, "[modifyUser] Unable to modify non-existing user [endpointId=%d,userIndex=%d]", mPath.mEndpointId,
+                        userIndex);
+        return Status::InvalidCommand;
+    }
+
+    // appclusters, 5.2.4.34: UserName SHALL be null if modifying a user record that was not created by the accessing fabric
+    if (user.createdBy != modifierFabricIndex && !userName.IsNull())
+    {
+        ChipLogProgress(Zcl,
+                        "[modifyUser] Unable to modify name of user created by different fabric "
+                        "[endpointId=%d,userIndex=%d,creatorIdx=%d,modifierIdx=%d]",
+                        mPath.mEndpointId, userIndex, user.createdBy, modifierFabricIndex);
+        return Status::InvalidCommand;
+    }
+
+    // appclusters, 5.2.4.34: UserUniqueID SHALL be null if modifying the user record that was not created by the accessing fabric.
+    if (user.createdBy != modifierFabricIndex && !userUniqueId.IsNull())
+    {
+        ChipLogProgress(Zcl,
+                        "[modifyUser] Unable to modify UUID of user created by different fabric "
+                        "[endpointId=%d,userIndex=%d,creatorIdx=%d,modifierIdx=%d]",
+                        mPath.mEndpointId, userIndex, user.createdBy, modifierFabricIndex);
+        return Status::InvalidCommand;
+    }
+
+    const auto & newUserName = !userName.IsNull() ? userName.Value() : user.userName;
+    auto newUserUniqueId     = userUniqueId.IsNull() ? user.userUniqueId : userUniqueId.Value();
+    auto newUserStatus       = userStatus.IsNull() ? user.userStatus : userStatus.Value();
+    auto newUserType         = userType.IsNull() ? user.userType : userType.Value();
+    auto newCredentialRule   = credentialRule.IsNull() ? user.credentialRule : credentialRule.Value();
+
+    if (!mDelegate.SetUser(userIndex, user.createdBy, modifierFabricIndex, newUserName, newUserUniqueId, newUserStatus, newUserType,
+                           newCredentialRule, user.credentials.data(), user.credentials.size()))
+    {
+        ChipLogError(Zcl,
+                     "[modifyUser] Unable to modify the user: app error "
+                     "[endpointId=%d,modifierFabric=%d,userIndex=%d,userUniqueId=0x%" PRIx32 ",userStatus=%u,userType=%u"
+                     ",credentialRule=%u]",
+                     mPath.mEndpointId, modifierFabricIndex, userIndex, newUserUniqueId, to_underlying(newUserStatus),
+                     to_underlying(newUserType), to_underlying(newCredentialRule));
+        return Status::Failure;
+    }
+
+    ChipLogProgress(Zcl,
+                    "[modifyUser] User modified "
+                    "[endpointId=%d,modifierFabric=%d,userIndex=%d,userUniqueId=0x%" PRIx32 ",userStatus=%u"
+                    ",userType=%u,credentialRule=%u]",
+                    mPath.mEndpointId, modifierFabricIndex, userIndex, newUserUniqueId, to_underlying(newUserStatus),
+                    to_underlying(newUserType), to_underlying(newCredentialRule));
+    SendRemoteLockUserChange(LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kModify, sourceNodeId, modifierFabricIndex,
+                             userIndex, userIndex);
+
+    return Status::Success;
+}
+
+Status DoorLockCluster::ClearUser(FabricIndex modifierFabricId, NodeId sourceNodeId, uint16_t userIndex, bool sendUserChangeEvent)
+{
+    UserInfo user;
+    if (!mDelegate.GetUser(userIndex, user))
+    {
+        return Status::Failure;
+    }
+
+    return ClearUser(modifierFabricId, sourceNodeId, userIndex, user, sendUserChangeEvent);
+}
+
+Status DoorLockCluster::ClearUser(FabricIndex modifierFabricId, NodeId sourceNodeId, uint16_t userIndex, const UserInfo & user,
+                                  bool sendUserChangeEvent)
+{
+    // appclusters, 5.2.4.37: all the credentials associated with user should be cleared when clearing the user
+    for (const auto & credential : user.credentials)
+    {
+        ChipLogProgress(
+            Zcl, "[ClearUser] Clearing associated credential [endpointId=%d,userIndex=%d,credentialType=%u,credentialIndex=%d]",
+            mPath.mEndpointId, userIndex, to_underlying(credential.credentialType), credential.credentialIndex);
+
+        if (!mDelegate.SetCredential(credential.credentialIndex, kUndefinedFabricIndex, kUndefinedFabricIndex,
+                                     DlCredentialStatus::kAvailable, credential.credentialType, ByteSpan()))
+        {
+            ChipLogError(Zcl,
+                         "[ClearUser] Unable to remove credentials associated with user - internal error "
+                         "[endpointId=%d,userIndex=%d,credentialIndex=%d,credentialType=%u]",
+                         mPath.mEndpointId, userIndex, credential.credentialIndex, to_underlying(credential.credentialType));
+            return Status::Failure;
+        }
+    }
+
+    // Clear all the user schedules
+    auto status = ClearSchedules(userIndex);
+    if (DlStatus::kSuccess != status)
+    {
+        ChipLogError(Zcl, "[ClearUser] Unable to delete schedules - internal error [endpointId=%d,userIndex=%d]", mPath.mEndpointId,
+                     userIndex);
+    }
+
+    // Remove the user entry
+    if (!mDelegate.SetUser(userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, ""_span, 0, UserStatusEnum::kAvailable,
+                           UserTypeEnum::kUnrestrictedUser, CredentialRuleEnum::kSingle, nullptr, 0))
+    {
+        return Status::Failure;
+    }
+
+    if (sendUserChangeEvent)
+    {
+        SendRemoteLockUserChange(LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kClear, sourceNodeId, modifierFabricId,
+                                 userIndex, userIndex);
+    }
+    return Status::Success;
+}
+
+bool DoorLockCluster::ClearFabricFromUsers(FabricIndex fabricIndex) const
+{
+    for (uint16_t userIndex = 1; userIndex <= mNumberOfTotalUsersSupported; ++userIndex)
+    {
+        UserInfo user;
+        if (!mDelegate.GetUser(userIndex, user))
+        {
+            ChipLogError(Zcl,
+                         "[OnFabricRemoved] Unable to get the user - internal error [endpointId=%d,fabricIndex=%d,userIndex=%d]",
+                         mPath.mEndpointId, fabricIndex, userIndex);
+            continue;
+        }
+
+        // Filter out unoccupied slots and users that don't have corresponding fabricIndex in the created/modified fields
+        if (UserStatusEnum::kAvailable == user.userStatus || (fabricIndex != user.createdBy && fabricIndex != user.lastModifiedBy))
+        {
+            continue;
+        }
+
+        if (user.createdBy == fabricIndex)
+        {
+            user.createdBy = kUndefinedFabricIndex;
+        }
+
+        if (user.lastModifiedBy == fabricIndex)
+        {
+            user.lastModifiedBy = kUndefinedFabricIndex;
+        }
+
+        if (!mDelegate.SetUser(userIndex, user.createdBy, user.lastModifiedBy, user.userName, user.userUniqueId, user.userStatus,
+                               user.userType, user.credentialRule, user.credentials.data(), user.credentials.size()))
+        {
+            ChipLogError(
+                Zcl,
+                "[OnFabricRemoved] Unable to update the user fabrics - internal error [endpointId=%d,fabricIndex=%d,userIndex=%d]",
+                mPath.mEndpointId, fabricIndex, userIndex);
+        }
+    }
+    return true;
+}
+
+// =============================================================================
+// Schedule clear helpers
+// =============================================================================
+
+DlStatus DoorLockCluster::ClearWeekDaySchedule(uint16_t userIndex, uint8_t weekDayIndex) const
+{
+    auto status = mDelegate.SetSchedule(weekDayIndex, userIndex, DlScheduleStatus::kAvailable, DaysMaskMap(0), 0, 0, 0, 0);
+    if (DlStatus::kSuccess != status && DlStatus::kNotFound != status)
+    {
+        ChipLogError(Zcl,
+                     "[ClearWeekDaySchedule] Unable to clear the schedule - internal error "
+                     "[endpointId=%d,userIndex=%d,scheduleIndex=%d,status=%u]",
+                     mPath.mEndpointId, userIndex, weekDayIndex, to_underlying(status));
+        return status;
+    }
+    return DlStatus::kSuccess;
+}
+
+DlStatus DoorLockCluster::ClearWeekDaySchedules(uint16_t userIndex) const
+{
+    for (uint8_t i = 1; i <= mNumberOfWeekDaySchedulesPerUser; ++i)
+    {
+        auto status = ClearWeekDaySchedule(userIndex, i);
+        if (DlStatus::kSuccess != status)
+        {
+            return status;
+        }
+    }
+    return DlStatus::kSuccess;
+}
+
+DlStatus DoorLockCluster::ClearSchedules(uint16_t userIndex) const
+{
+    auto status = ClearWeekDaySchedules(userIndex);
+    if (DlStatus::kSuccess != status)
+    {
+        ChipLogError(Zcl,
+                     "[ClearAllSchedules] Unable to clear week day schedules for user - internal error "
+                     "[endpointId=%d,userIndex=%d,status=%u]",
+                     mPath.mEndpointId, userIndex, to_underlying(status));
+        return status;
+    }
+
+    status = ClearYearDaySchedules(userIndex);
+    if (DlStatus::kSuccess != status)
+    {
+        ChipLogError(Zcl,
+                     "[ClearAllSchedules] Unable to clear year day schedules for user - internal error "
+                     "[endpointId=%d,userIndex=%d,status=%u]",
+                     mPath.mEndpointId, userIndex, to_underlying(status));
+        return status;
+    }
+
+    // No need to clear the holiday schedules here as they are not specific for user.
+    return DlStatus::kSuccess;
+}
+
+DlStatus DoorLockCluster::ClearYearDaySchedule(uint16_t userIndex, uint8_t yearDayIndex) const
+{
+    auto status = mDelegate.SetSchedule(yearDayIndex, userIndex, DlScheduleStatus::kAvailable, 0, 0);
+    if (DlStatus::kSuccess != status && DlStatus::kNotFound != status)
+    {
+        ChipLogError(Zcl,
+                     "[ClearYearDaySchedule] Unable to clear the schedule - internal error "
+                     "[endpointId=%d,userIndex=%d,scheduleIndex=%d,status=%u]",
+                     mPath.mEndpointId, userIndex, yearDayIndex, to_underlying(status));
+        return status;
+    }
+    return DlStatus::kSuccess;
+}
+
+DlStatus DoorLockCluster::ClearYearDaySchedules(uint16_t userIndex) const
+{
+    for (uint8_t i = 1; i <= mNumberOfYearDaySchedulesPerUser; ++i)
+    {
+        auto status = ClearYearDaySchedule(userIndex, i);
+        if (DlStatus::kSuccess != status)
+        {
+            return status;
+        }
+    }
+    return DlStatus::kSuccess;
+}
+
+DlStatus DoorLockCluster::ClearHolidaySchedule(uint8_t holidayIndex) const
+{
+    auto status = mDelegate.SetSchedule(holidayIndex, DlScheduleStatus::kAvailable, 0, 0, OperatingModeEnum::kNormal);
+    if (DlStatus::kSuccess != status && DlStatus::kNotFound != status)
+    {
+        ChipLogError(
+            Zcl, "[ClearHolidaySchedule] Unable to clear the schedule - internal error [endpointId=%d,scheduleIndex=%d,status=%u]",
+            mPath.mEndpointId, holidayIndex, to_underlying(status));
+        return status;
+    }
+    return DlStatus::kSuccess;
+}
+
+DlStatus DoorLockCluster::ClearHolidaySchedules() const
+{
+    for (uint8_t i = 1; i <= mNumberOfHolidaySchedulesSupported; ++i)
+    {
+        auto status = ClearHolidaySchedule(i);
+        if (DlStatus::kSuccess != status)
+        {
+            return status;
+        }
+    }
+    return DlStatus::kSuccess;
+}
+
+// =============================================================================
+// User management command handlers
+// =============================================================================
+
+void DoorLockCluster::HandleSetUser(const DataModel::InvokeRequest & request, const Commands::SetUser::DecodableType & commandData,
+                                    CommandHandler * handler, const ConcreteCommandPath & path)
+{
+    auto & userIndex = commandData.userIndex;
+    ChipLogProgress(Zcl, "[SetUser] Incoming command [endpointId=%d,userIndex=%d]", mPath.mEndpointId, userIndex);
+
+    if (!SupportsUSR())
+    {
+        ChipLogProgress(Zcl, "[SetUser] User management is not supported [endpointId=%d]", mPath.mEndpointId);
+        handler->AddStatus(path, Status::UnsupportedCommand);
+        return;
+    }
+
+    auto fabricIdx = CommandFabricIndex(request);
+    if (kUndefinedFabricIndex == fabricIdx)
+    {
+        ChipLogError(Zcl, "[SetUser] Unable to get the fabric IDX [endpointId=%d,userIndex=%d]", mPath.mEndpointId, userIndex);
+        handler->AddStatus(path, Status::Failure);
+        return;
+    }
+
+    auto sourceNodeId = CommandNodeId(request);
+    if (kUndefinedNodeId == sourceNodeId)
+    {
+        ChipLogError(Zcl, "[SetUser] Unable to get the source node index [endpointId=%d,userIndex=%d]", mPath.mEndpointId,
+                     userIndex);
+        handler->AddStatus(path, Status::Failure);
+        return;
+    }
+
+    auto & operationType  = commandData.operationType;
+    auto & userName       = commandData.userName;
+    auto & userUniqueId   = commandData.userUniqueID;
+    auto & userStatus     = commandData.userStatus;
+    auto & userType       = commandData.userType;
+    auto & credentialRule = commandData.credentialRule;
+
+    if (!UserIndexValid(userIndex))
+    {
+        ChipLogProgress(Zcl, "[SetUser] User index out of bounds [endpointId=%d,userIndex=%d]", mPath.mEndpointId, userIndex);
+        handler->AddStatus(path, Status::InvalidCommand);
+        return;
+    }
+
+    // appclusters, 5.2.4.34: UserName has maximum kDoorLockMaxUsernameSize (10) characters excluding NUL terminator in it.
+    if (!userName.IsNull() && userName.Value().size() > kDoorLockMaxUsernameSize)
+    {
+        ChipLogProgress(Zcl, "[SetUser] Unable to set user: userName too long [endpointId=%d,userIndex=%d,userNameSize=%u]",
+                        mPath.mEndpointId, userIndex, static_cast<unsigned>(userName.Value().size()));
+
+        handler->AddStatus(path, Status::InvalidCommand);
+        return;
+    }
+
+    if (!IsValidUserStatusForSet(userStatus))
+    {
+        ChipLogProgress(Zcl,
+                        "[SetUser] Unable to set the user: user status is out of range [endpointId=%d,userIndex=%d,userStatus=%u]",
+                        mPath.mEndpointId, userIndex, to_underlying(userStatus.Value()));
+
+        handler->AddStatus(path, Status::InvalidCommand);
+        return;
+    }
+
+    if (userType == UserTypeEnum::kUnknownEnumValue)
+    {
+        ChipLogProgress(Zcl, "[SetUser] Unable to set the user: user type is unknown [endpointId=%d,userIndex=%d,userType=%u]",
+                        mPath.mEndpointId, userIndex, to_underlying(userType.Value()));
+
+        handler->AddStatus(path, Status::InvalidCommand);
+        return;
+    }
+
+    ClusterStatusCode status(Status::Success);
+    switch (operationType)
+    {
+    case DataOperationTypeEnum::kAdd:
+        status = CreateUser(fabricIdx, sourceNodeId, userIndex, userName, userUniqueId, userStatus, userType, credentialRule);
+        break;
+    case DataOperationTypeEnum::kModify:
+        status = ClusterStatusCode(
+            ModifyUser(fabricIdx, sourceNodeId, userIndex, userName, userUniqueId, userStatus, userType, credentialRule));
+        break;
+    case DataOperationTypeEnum::kClear:
+    default:
+        // appclusters, 5.2.4.34: SetUser command allow only kAdd/kModify, we should respond with INVALID_COMMAND if we got kClear
+        // or anything else
+        status = ClusterStatusCode(Status::InvalidCommand);
+        ChipLogProgress(Zcl, "[SetUser] Invalid operation type [endpointId=%d,operationType=%u]", mPath.mEndpointId,
+                        to_underlying(operationType));
+        break;
+    }
+
+    if (const auto clusterStatus = status.GetClusterSpecificCode(); clusterStatus.has_value())
+    {
+        SuccessOrDie(handler->AddClusterSpecificFailure(path, *clusterStatus));
+        return;
+    }
+    handler->AddStatus(path, status.GetStatus());
+}
+
+void DoorLockCluster::HandleGetUser(const DataModel::InvokeRequest & request, uint16_t userIndex, CommandHandler * handler,
+                                    const ConcreteCommandPath & path)
+{
+    ChipLogProgress(Zcl, "[GetUser] Incoming command [endpointId=%d,userIndex=%d]", mPath.mEndpointId, userIndex);
+
+    if (!SupportsUSR())
+    {
+        ChipLogProgress(Zcl, "[GetUser] User management is not supported [endpointId=%d]", mPath.mEndpointId);
+        handler->AddStatus(path, Status::UnsupportedCommand);
+        return;
+    }
+
+    uint16_t maxNumberOfUsers = 0;
+    if (!UserIndexValid(userIndex, maxNumberOfUsers))
+    {
+        ChipLogProgress(Zcl, "[GetUser] User index out of bounds [userIndex=%d,numberOfTotalUsersSupported=%d]", userIndex,
+                        maxNumberOfUsers);
+        handler->AddStatus(path, Status::InvalidCommand);
+        return;
+    }
+
+    Commands::GetUserResponse::Type response;
+
+    // appclusters, 5.2.4.36.1: We need to add next occupied user after userIndex if any.
+    //
+    // We want to do this before we call mDelegate.GetUser, because the
+    // UserInfo might point into some application-static
+    // buffers (for its credentials and whatnot).
+    uint16_t nextAvailableUserIndex = 0;
+    if (FindOccupiedUserSlot(static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex))
+    {
+        response.nextUserIndex.SetNonNull(nextAvailableUserIndex);
+    }
+
+    UserInfo user;
+    if (!mDelegate.GetUser(userIndex, user))
+    {
+        ChipLogProgress(Zcl, "[GetUser] Could not get user info [userIndex=%d]", userIndex);
+        handler->AddStatus(path, Status::Failure);
+        return;
+    }
+
+    response.userIndex = userIndex;
+
+    // appclusters, 5.2.4.36: we should not set user-specific fields to non-null if the user status is set to Available
+    if (UserStatusEnum::kAvailable != user.userStatus)
+    {
+        ChipLogProgress(Zcl,
+                        "Found user in storage: "
+                        "[userIndex=%d,userStatus=%u,userType=%u,credentialRule=%u,createdBy=%u,modifiedBy=%u]",
+                        userIndex, to_underlying(user.userStatus), to_underlying(user.userType), to_underlying(user.credentialRule),
+                        user.createdBy, user.lastModifiedBy);
+
+        response.userName.SetNonNull(user.userName);
+        if (0xFFFFFFFFU != user.userUniqueId)
+        {
+            response.userUniqueID.SetNonNull(user.userUniqueId);
+        }
+        response.userStatus.SetNonNull(user.userStatus);
+        response.userType.SetNonNull(user.userType);
+        response.credentialRule.SetNonNull(user.credentialRule);
+        response.credentials.SetNonNull(user.credentials);
+        // Set fabric indices only if the user was created/modified by matter.
+        if (user.creationSource == DlAssetSource::kMatterIM)
+        {
+            response.creatorFabricIndex.SetNonNull(user.createdBy);
+        }
+        if (user.modificationSource == DlAssetSource::kMatterIM)
+        {
+            response.lastModifiedFabricIndex.SetNonNull(user.lastModifiedBy);
+        }
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "[GetUser] User not found [userIndex=%d]", userIndex);
+    }
+
+    handler->AddResponse(path, response);
+}
+
+void DoorLockCluster::HandleClearUser(const DataModel::InvokeRequest & request, uint16_t userIndex, CommandHandler * handler,
+                                      const ConcreteCommandPath & path)
+{
+    ChipLogProgress(Zcl, "[ClearUser] Incoming command [endpointId=%d,userIndex=%d]", mPath.mEndpointId, userIndex);
+
+    if (!SupportsUSR())
+    {
+        ChipLogProgress(Zcl, "[ClearUser] User management is not supported [endpointId=%d]", mPath.mEndpointId);
+        handler->AddStatus(path, Status::UnsupportedCommand);
+        return;
+    }
+
+    auto fabricIdx = CommandFabricIndex(request);
+    if (kUndefinedFabricIndex == fabricIdx)
+    {
+        ChipLogError(Zcl, "[ClearUser] Unable to get the fabric IDX [endpointId=%d,userIndex=%d]", mPath.mEndpointId, userIndex);
+        handler->AddStatus(path, Status::Failure);
+        return;
+    }
+
+    auto sourceNodeId = CommandNodeId(request);
+    if (kUndefinedNodeId == sourceNodeId)
+    {
+        ChipLogError(Zcl, "[ClearUser] Unable to get the source node index [endpointId=%d,userIndex=%d]", mPath.mEndpointId,
+                     userIndex);
+        handler->AddStatus(path, Status::Failure);
+        return;
+    }
+
+    uint16_t maxNumberOfUsers = 0;
+    if (!UserIndexValid(userIndex, maxNumberOfUsers) && userIndex != DOOR_LOCK_ALL_USERS_INDEX)
+    {
+        ChipLogProgress(Zcl, "[ClearUser] User index out of bounds [userIndex=%d,numberOfTotalUsersSupported=%d]", userIndex,
+                        maxNumberOfUsers);
+        handler->AddStatus(path, Status::InvalidCommand);
+        return;
+    }
+
+    if (DOOR_LOCK_ALL_USERS_INDEX != userIndex)
+    {
+        auto status = ClearUser(fabricIdx, sourceNodeId, userIndex, true);
+        if (Status::Success != status)
+        {
+            ChipLogError(Zcl, "[ClearUser] App reported failure when resetting the user [userIndex=%d,status=0x%x]", userIndex,
+                         to_underlying(status));
+        }
+        handler->AddStatus(path, status);
+        return;
+    }
+
+    ChipLogProgress(Zcl, "[ClearUser] Removing all users from storage");
+    for (uint16_t i = 1; i <= maxNumberOfUsers; ++i)
+    {
+        auto status = ClearUser(fabricIdx, sourceNodeId, i, false);
+        if (Status::Success != status)
+        {
+            ChipLogError(Zcl, "[ClearUser] App reported failure when resetting the user [userIndex=%d,status=0x%x]", i,
+                         to_underlying(status));
+
+            handler->AddStatus(path, Status::Failure);
+            return;
+        }
+    }
+    ChipLogProgress(Zcl, "[ClearUser] Removed all users from storage [users=%d]", maxNumberOfUsers);
+
+    SendRemoteLockUserChange(LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kClear, sourceNodeId, fabricIdx,
+                             DOOR_LOCK_ALL_USERS_INDEX, DOOR_LOCK_ALL_USERS_INDEX);
+
+    handler->AddStatus(path, Status::Success);
 }
 
 } // namespace DoorLock
