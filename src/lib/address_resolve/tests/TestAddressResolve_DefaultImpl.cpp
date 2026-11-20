@@ -20,6 +20,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/IPAddressSorter.h>
 #include <lib/support/StringBuilder.h>
+#include <lib/support/TypeTraits.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <system/RAIIMockClock.h>
 #include <system/SystemLayerImpl.h>
@@ -51,7 +52,7 @@ StatusWithSize ToString<Transport::PeerAddress>(const Transport::PeerAddress & a
 namespace {
 
 using chip::Dnssd::IPAddressSorter::IpScore;
-using chip::Dnssd::IPAddressSorter::ScoreIpAddress;
+using chip::Dnssd::IPAddressSorter::ScoreIPAddress;
 
 constexpr uint8_t kNumberOfAvailableSlots = CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS;
 
@@ -125,32 +126,32 @@ TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicatesWhenFull)
     {
         ResolveResult result;
         result.address = GetAddressWithLowScore(static_cast<uint16_t>(i + 10));
-        ASSERT_TRUE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kUniqueLocal));
+        ASSERT_TRUE(results.UpdateResults(result, to_underlying(Dnssd::IPAddressSorter::IpScore::kUniqueLocal)));
     }
     ASSERT_EQ(results.count, kNumberOfAvailableSlots);
 
     // Adding another one should fail as there is no more room
     ResolveResult result;
     result.address = GetAddressWithLowScore(static_cast<uint16_t>(5));
-    ASSERT_FALSE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kUniqueLocal));
+    ASSERT_FALSE(results.UpdateResults(result, to_underlying(Dnssd::IPAddressSorter::IpScore::kUniqueLocal)));
     ASSERT_EQ(results.count, kNumberOfAvailableSlots);
 
     // however one with higher priority should work
     result.address = GetAddressWithHighScore();
-    ASSERT_TRUE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast));
+    ASSERT_TRUE(results.UpdateResults(result, to_underlying(Dnssd::IPAddressSorter::IpScore::kGlobalUnicast)));
     ASSERT_EQ(results.count, kNumberOfAvailableSlots);
 
     // however not duplicate
-    ASSERT_FALSE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast));
+    ASSERT_FALSE(results.UpdateResults(result, to_underlying(Dnssd::IPAddressSorter::IpScore::kGlobalUnicast)));
     ASSERT_EQ(results.count, kNumberOfAvailableSlots);
 
     // another higher priority one
     result.address = GetAddressWithMediumScore();
-    ASSERT_TRUE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kLinkLocal));
+    ASSERT_TRUE(results.UpdateResults(result, to_underlying(Dnssd::IPAddressSorter::IpScore::kLinkLocal)));
     ASSERT_EQ(results.count, kNumberOfAvailableSlots);
 
     // however not duplicate
-    ASSERT_FALSE(results.UpdateResults(result, Dnssd::IPAddressSorter::IpScore::kLinkLocal));
+    ASSERT_FALSE(results.UpdateResults(result, to_underlying(Dnssd::IPAddressSorter::IpScore::kLinkLocal)));
     ASSERT_EQ(results.count, kNumberOfAvailableSlots);
 }
 
@@ -176,34 +177,156 @@ TEST(TestAddressResolveDefaultImpl, UpdateResultsDoesNotAddDuplicates)
     ResolveResult highResult;
     highResult.address = GetAddressWithHighScore();
 
-    results.UpdateResults(lowResult, Dnssd::IPAddressSorter::IpScore::kUniqueLocal);
+    results.UpdateResults(lowResult, to_underlying(Dnssd::IPAddressSorter::IpScore::kUniqueLocal));
     ASSERT_EQ(results.count, 1);
 
     // same address again. we should not actually insert it!
-    results.UpdateResults(lowResult, Dnssd::IPAddressSorter::IpScore::kUniqueLocal);
+    results.UpdateResults(lowResult, to_underlying(Dnssd::IPAddressSorter::IpScore::kUniqueLocal));
     ASSERT_EQ(results.count, 1);
 
     // we CAN insert a different one
-    results.UpdateResults(highResult, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast);
+    results.UpdateResults(highResult, to_underlying(Dnssd::IPAddressSorter::IpScore::kGlobalUnicast));
     ASSERT_EQ(results.count, 2);
 
     // extra insertions of the same address should NOT make a difference
-    results.UpdateResults(lowResult, Dnssd::IPAddressSorter::IpScore::kUniqueLocal);
+    results.UpdateResults(lowResult, to_underlying(Dnssd::IPAddressSorter::IpScore::kUniqueLocal));
     ASSERT_EQ(results.count, 2);
-    results.UpdateResults(highResult, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast);
+    results.UpdateResults(highResult, to_underlying(Dnssd::IPAddressSorter::IpScore::kGlobalUnicast));
     ASSERT_EQ(results.count, 2);
 
     // we CAN insert a different one
-    results.UpdateResults(mediumResult, Dnssd::IPAddressSorter::IpScore::kLinkLocal);
+    results.UpdateResults(mediumResult, to_underlying(Dnssd::IPAddressSorter::IpScore::kLinkLocal));
     ASSERT_EQ(results.count, 3);
 
     // re-insertin any of these should not make a difference
-    results.UpdateResults(lowResult, Dnssd::IPAddressSorter::IpScore::kUniqueLocal);
+    results.UpdateResults(lowResult, to_underlying(Dnssd::IPAddressSorter::IpScore::kUniqueLocal));
     ASSERT_EQ(results.count, 3);
-    results.UpdateResults(highResult, Dnssd::IPAddressSorter::IpScore::kGlobalUnicast);
+    results.UpdateResults(highResult, to_underlying(Dnssd::IPAddressSorter::IpScore::kGlobalUnicast));
     ASSERT_EQ(results.count, 3);
-    results.UpdateResults(mediumResult, Dnssd::IPAddressSorter::IpScore::kLinkLocal);
+    results.UpdateResults(mediumResult, to_underlying(Dnssd::IPAddressSorter::IpScore::kLinkLocal));
     ASSERT_EQ(results.count, 3);
+}
+
+// test requires at least 2 slots
+TEST(TestAddressResolveDefaultImpl, UpdateResultsOrdersByTheScoresItWasGiven)
+{
+    Impl::NodeLookupResults results;
+
+    // ScoreIPAddress() would give this link-local address kLinkLocal, the highest score.
+    ResolveResult linkLocalResult;
+    linkLocalResult.address = GetAddressWithHighScore();
+    ASSERT_TRUE(results.UpdateResults(linkLocalResult, to_underlying(IpScore::kUniqueLocal)));
+
+    ResolveResult uniqueLocalResult;
+    uniqueLocalResult.address = GetAddressWithLowScore();
+    ASSERT_TRUE(results.UpdateResults(uniqueLocalResult, to_underlying(IpScore::kGlobalUnicast)));
+
+    // kGlobalUnicast is higher than kUniqueLocal, so the second entry comes first.
+    EXPECT_EQ(results.ConsumeResult().address, uniqueLocalResult.address);
+    EXPECT_EQ(results.ConsumeResult().address, linkLocalResult.address);
+}
+
+// test requires at least 3 slots
+TEST(TestAddressResolveDefaultImpl, UpdateResultsMovesUpADuplicateWithAHigherScore)
+{
+    Impl::NodeLookupResults results;
+
+    ResolveResult movedResult;
+    movedResult.address = GetAddressWithLowScore(1);
+    ResolveResult lowResult;
+    lowResult.address = GetAddressWithLowScore(2);
+    ResolveResult mediumResult;
+    mediumResult.address = GetAddressWithMediumScore();
+
+    ASSERT_TRUE(results.UpdateResults(movedResult, to_underlying(IpScore::kUniqueLocal)));
+    ASSERT_TRUE(results.UpdateResults(lowResult, to_underlying(IpScore::kUniqueLocal)));
+    ASSERT_TRUE(results.UpdateResults(mediumResult, to_underlying(IpScore::kGlobalUnicast)));
+
+    // The address scores higher when it arrives again, e.g. because the host gained an address with its prefix.
+    ASSERT_TRUE(results.UpdateResults(movedResult, to_underlying(IpScore::kUniqueLocalWithSharedPrefix)));
+
+    ASSERT_EQ(results.count, 3);
+    EXPECT_EQ(results.ConsumeResult().address, movedResult.address);
+    EXPECT_EQ(results.ConsumeResult().address, mediumResult.address);
+    EXPECT_EQ(results.ConsumeResult().address, lowResult.address);
+}
+
+// test requires at least 3 slots
+TEST(TestAddressResolveDefaultImpl, UpdateResultsKeepsEveryOtherResultWhenADuplicateMovesUp)
+{
+    Impl::NodeLookupResults results;
+
+    ResolveResult result;
+    for (auto i = 0; i < kNumberOfAvailableSlots; i++)
+    {
+        result.address = GetAddressWithLowScore(static_cast<uint16_t>(i + 10));
+        ASSERT_TRUE(results.UpdateResults(result, to_underlying(IpScore::kUniqueLocal)));
+    }
+
+    // Not the last entry, which inserting into a full list drops.
+    constexpr uint16_t kMovedIndex = kNumberOfAvailableSlots - 2;
+    result.address                 = GetAddressWithLowScore(kMovedIndex + 10);
+    ASSERT_TRUE(results.UpdateResults(result, to_underlying(IpScore::kGlobalUnicast)));
+
+    ASSERT_EQ(results.count, kNumberOfAvailableSlots);
+    EXPECT_EQ(results.ConsumeResult().address, result.address);
+    for (auto i = 0; i < kNumberOfAvailableSlots; i++)
+    {
+        if (i != kMovedIndex)
+        {
+            EXPECT_EQ(results.ConsumeResult().address, GetAddressWithLowScore(static_cast<uint16_t>(i + 10)));
+        }
+    }
+}
+
+// test requires at least 2 slots
+TEST(TestAddressResolveDefaultImpl, UpdateResultsKeepsTheHigherScoreOfADuplicate)
+{
+    Impl::NodeLookupResults results;
+
+    ResolveResult mediumResult;
+    mediumResult.address = GetAddressWithMediumScore();
+    ResolveResult lowResult;
+    lowResult.address = GetAddressWithLowScore();
+
+    ASSERT_TRUE(results.UpdateResults(mediumResult, to_underlying(IpScore::kGlobalUnicast)));
+    ASSERT_TRUE(results.UpdateResults(lowResult, to_underlying(IpScore::kUniqueLocal)));
+    EXPECT_FALSE(results.UpdateResults(mediumResult, to_underlying(IpScore::kIpv4)));
+
+    ASSERT_EQ(results.count, 2);
+    EXPECT_EQ(results.ConsumeResult().address, mediumResult.address);
+    EXPECT_EQ(results.ConsumeResult().address, lowResult.address);
+}
+
+// test requires at least 2 slots
+TEST(TestAddressResolveDefaultImpl, LookupResultOrdersResultsByTheInstalledScorer)
+{
+    // The default scoring puts link-local addresses first.
+    class UniqueLocalFirstScorer : public Dnssd::IPAddressSorter::IPAddressScorer
+    {
+    public:
+        uint8_t ScoreIPAddress(const Inet::IPAddress & address, Inet::InterfaceId interfaceId) override
+        {
+            return address.IsIPv6ULA() ? 2 : 1;
+        }
+    };
+    UniqueLocalFirstScorer scorer;
+
+    ResolveResult linkLocalResult;
+    linkLocalResult.address = GetAddressWithHighScore();
+    ResolveResult uniqueLocalResult;
+    uniqueLocalResult.address = GetAddressWithLowScore();
+
+    AddressResolve::NodeLookupHandle handle;
+    handle.ResetForLookup(System::SystemClock().GetMonotonicTimestamp(), NodeLookupRequest(chip::PeerId(1, 2)));
+
+    Dnssd::IPAddressSorter::IPAddressScorer * previousScorer = Dnssd::IPAddressSorter::SetIPAddressScorer(&scorer);
+    handle.LookupResult(linkLocalResult);
+    handle.LookupResult(uniqueLocalResult);
+    Dnssd::IPAddressSorter::SetIPAddressScorer(previousScorer);
+
+    EXPECT_EQ(handle.TakeLookupResult().address, uniqueLocalResult.address);
+    EXPECT_EQ(handle.TakeLookupResult().address, linkLocalResult.address);
 }
 
 #endif
@@ -221,12 +344,12 @@ TEST(TestAddressResolveDefaultImpl, TestLookupResult)
 
     // Ensure test expectations regarding ordering is matched
 
-    IpScore lowScore    = ScoreIpAddress(lowResult.address.GetIPAddress(), Inet::InterfaceId::Null());
-    IpScore mediumScore = ScoreIpAddress(mediumResult.address.GetIPAddress(), Inet::InterfaceId::Null());
-    IpScore highScore   = ScoreIpAddress(highResult.address.GetIPAddress(), Inet::InterfaceId::Null());
+    uint8_t lowScore    = ScoreIPAddress(lowResult.address.GetIPAddress(), Inet::InterfaceId::Null());
+    uint8_t mediumScore = ScoreIPAddress(mediumResult.address.GetIPAddress(), Inet::InterfaceId::Null());
+    uint8_t highScore   = ScoreIPAddress(highResult.address.GetIPAddress(), Inet::InterfaceId::Null());
 
-    EXPECT_LT(to_underlying(lowScore), to_underlying(mediumScore));
-    EXPECT_LT(to_underlying(mediumScore), to_underlying(highScore));
+    EXPECT_LT(lowScore, mediumScore);
+    EXPECT_LT(mediumScore, highScore);
 
     ResolveResult outResult;
 
@@ -551,9 +674,18 @@ public:
 class TestAddressResolveDefaultImplWithSystemLayer : public ::testing::Test
 {
 public:
-    void SetUp() { EXPECT_SUCCESS(mSystemLayer.Init()); }
+    void SetUp()
+    {
+        EXPECT_SUCCESS(mSystemLayer.Init());
+        mPreviousResolver = &chip::Dnssd::Resolver::Instance();
+        chip::Dnssd::Resolver::SetInstance(mockResolver);
+    }
 
-    void TearDown() { mSystemLayer.Shutdown(); }
+    void TearDown()
+    {
+        chip::Dnssd::Resolver::SetInstance(*mPreviousResolver);
+        mSystemLayer.Shutdown();
+    }
 
     class MockSystemLayer : public chip::System::LayerImpl
     {
@@ -576,6 +708,7 @@ public:
 
     MockSystemLayer mSystemLayer;
     MockResolver mockResolver;
+    chip::Dnssd::Resolver * mPreviousResolver = nullptr;
 };
 
 class TestAddressResolveDefaultImplWithSystemLayerAndNodeListener : public TestAddressResolveDefaultImplWithSystemLayer
@@ -682,8 +815,6 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, TriesNextRes
 
 TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, CancellingLookupCallsOnNodeAddressResolutionFailed)
 {
-    chip::Dnssd::Resolver::SetInstance(mockResolver);
-
     chip::AddressResolve::Impl::Resolver resolver;
     auto r = resolver.Init(&mSystemLayer);
 
@@ -731,8 +862,6 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, CancellingLo
 
 TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, LooksUpFailsAndCallsFailureListenerWhenSystemStartTimerFails)
 {
-    chip::Dnssd::Resolver::SetInstance(mockResolver);
-
     chip::AddressResolve::Impl::Resolver resolver;
     auto r = resolver.Init(&mSystemLayer);
 
@@ -766,8 +895,6 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, LooksUpFails
 TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener,
        CallsSuccessAndFailureListenersWhenAppropriateLookupResultsAreFound)
 {
-    chip::Dnssd::Resolver::SetInstance(mockResolver);
-
     chip::AddressResolve::Impl::Resolver resolver;
     auto r = resolver.Init(&mSystemLayer);
 

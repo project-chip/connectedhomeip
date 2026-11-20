@@ -17,6 +17,7 @@
  */
 
 #include <app/AppConfig.h>
+#include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/tests/MockReportScheduler.h>
@@ -32,6 +33,7 @@
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
@@ -877,6 +879,20 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestHasSubscriptionsToResumeHand
 }
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+TEST_F(TestInteractionModelEngine, TestInitFailsForADifferentEventManagement)
+{
+    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
+    Messaging::ExchangeManager otherExchangeManager;
+    EventManagement otherEventManagement;
+
+    EXPECT_EQ(engine->Init(&otherExchangeManager, &GetFabricTable(), app::reporting::GetDefaultReportScheduler(), nullptr, nullptr,
+                           &otherEventManagement),
+              CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(engine->GetExchangeManager(), &GetExchangeManager());
+
+    EXPECT_SUCCESS(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()));
+}
 
 } // namespace app
 } // namespace chip

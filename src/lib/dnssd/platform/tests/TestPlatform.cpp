@@ -18,10 +18,17 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <algorithm>
+#include <array>
+#include <optional>
+
+#include <inet/IPAddress.h>
 #include <lib/core/PeerId.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/Discovery_ImplPlatform.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/fake/DnssdImpl.h>
 
@@ -153,6 +160,43 @@ test::ExpectedCall commissionableLargeEnhanced = test::ExpectedCall()
                                                      .AddSubtype("_T70000")
                                                      .AddSubtype("_CM");
 
+constexpr size_t kMaxIPs = CommonResolutionData::kMaxIPAddresses;
+
+Inet::IPAddress LinkLocalAddress()
+{
+    Inet::IPAddress address;
+    VerifyOrDie(Inet::IPAddress::FromString("fe80::1", address));
+    return address;
+}
+
+// One address more than resolution data can hold, worst first, so keeping the
+// first kMaxIPs addresses would drop the link-local one.
+std::array<Inet::IPAddress, kMaxIPs + 1> UniqueLocalAddressesThenLinkLocal()
+{
+    std::array<Inet::IPAddress, kMaxIPs + 1> addresses;
+    for (size_t i = 0; i < kMaxIPs; ++i)
+    {
+        addresses[i] = Inet::IPAddress::MakeULA(0x1234, 0, i + 1);
+    }
+    addresses[kMaxIPs] = LinkLocalAddress();
+    return addresses;
+}
+
+bool Contains(const CommonResolutionData & data, const Inet::IPAddress & address)
+{
+    const Inet::IPAddress * end = data.ipAddress + data.numIPs;
+    return std::find(data.ipAddress, end, address) != end;
+}
+
+class ResolvedNodeDataRecorder : public OperationalResolveDelegate
+{
+public:
+    void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) override { mResolved = nodeData; }
+    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}
+
+    std::optional<ResolvedNodeData> mResolved;
+};
+
 class TestDnssdPlatform : public ::testing::Test
 {
 public:
@@ -233,6 +277,36 @@ TEST_F(TestDnssdPlatform, TestCommissionableNode)
     EXPECT_EQ(mdnsPlatform.Advertise(commissionableNodeParamsLargeEnhanced), CHIP_NO_ERROR);
 
     EXPECT_EQ(mdnsPlatform.FinalizeServiceUpdate(), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDnssdPlatform, TestResolveNodeIdKeepsBestAddresses)
+{
+    auto addresses = UniqueLocalAddressesThenLinkLocal();
+    ASSERT_SUCCESS(test::SetResolvedAddresses(Span<const Inet::IPAddress>(addresses)));
+
+    DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
+    ResolvedNodeDataRecorder recorder;
+    mdnsPlatform.SetOperationalDelegate(&recorder);
+    EXPECT_SUCCESS(mdnsPlatform.ResolveNodeId(kPeerId1));
+    mdnsPlatform.SetOperationalDelegate(nullptr);
+
+    ASSERT_TRUE(recorder.mResolved.has_value());
+    const CommonResolutionData & resolution = recorder.mResolved->resolutionData;
+    EXPECT_EQ(resolution.numIPs, kMaxIPs);
+    EXPECT_TRUE(Contains(resolution, LinkLocalAddress()));
+}
+
+TEST_F(TestDnssdPlatform, TestCommissionNodeDataKeepsBestAddresses)
+{
+    auto addresses = UniqueLocalAddressesThenLinkLocal();
+    DnssdService service{};
+    DiscoveredNodeData nodeData;
+    service.ToDiscoveredCommissionNodeData(Span<Inet::IPAddress>(addresses), nodeData);
+
+    ASSERT_TRUE(nodeData.Is<CommissionNodeData>());
+    const CommissionNodeData & commissionData = nodeData.Get<CommissionNodeData>();
+    EXPECT_EQ(commissionData.numIPs, kMaxIPs);
+    EXPECT_TRUE(Contains(commissionData, LinkLocalAddress()));
 }
 
 } // namespace

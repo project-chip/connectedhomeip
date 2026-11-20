@@ -166,6 +166,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         chipDie();
     }
 
+    DeviceLayer::DeviceInfoProvider * deviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
+    VerifyOrDie(deviceInfoProvider != nullptr);
+
     // Set the global DAC provider before server/cluster init so any integration path that
     // snapshots the provider during construction sees a valid implementation.
     static DeviceLayer::AllDevicesExampleDACProvider sDacProvider;
@@ -181,6 +184,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .accessControl              = Server::GetInstance().GetAccessControl(),                //
             .failSafeContext            = Server::GetInstance().GetFailSafeContext(),              //
             .deviceInstanceInfoProvider = *provider,                                               //
+            .deviceInfoProvider         = *deviceInfoProvider,                                     //
             .platformManager            = DeviceLayer::PlatformMgr(),                              //
             .groupDataProvider          = gGroupDataProvider,                                      //
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),         //

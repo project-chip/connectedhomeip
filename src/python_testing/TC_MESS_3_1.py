@@ -28,12 +28,14 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
+from mobly import asserts
 from TC_MESSTestBase import MESSAGE_ID_1, MESSAGE_ID_2, MESSTestBase
 
 import matter.clusters as Clusters
@@ -131,6 +133,15 @@ class TC_MESS_3_1(MatterTestCommissionedDevice, MESSTestBase):
 
         self.step(4)
         self.wait_for_message_event(event_handler, events.MessagePresented, MESSAGE_ID_1, timeout_sec=timeout_sec)
+        if not self.is_pics_sdk_ci_only:
+            response = self.wait_for_user_input(
+                prompt_msg="Confirm the message was heard (or shown) on the DUT.\n"
+                           "Enter 'y' if it was, or 'n' if it was not.\n",
+                prompt_msg_placeholder="y", default_value="y")
+            asserts.assert_is_not_none(response, "No response to the message prompt, expected 'y' or 'n'")
+            response = response.lower()
+            asserts.assert_in(response, ["y", "n"], "Invalid response to the message prompt, expected 'y' or 'n'")
+            asserts.assert_equal(response, "y", "Operator reports the message was not heard or shown on the DUT")
 
         self.step(5)
         self.wait_for_message_event(event_handler, events.MessageComplete, MESSAGE_ID_1, timeout_sec=timeout_sec)

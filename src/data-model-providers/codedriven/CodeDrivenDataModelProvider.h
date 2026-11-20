@@ -51,10 +51,6 @@ namespace app {
  *       the Startup() method on each ServerClusterInterface will be called when the EndpointInterface is added (Step 4).
  *       If the provider hasn't been started, the Startup() method will be called when the provider is started (Step 5).
  *
- * TODO: Notify Descriptor cluster PartsList changes when endpoints are added/removed at runtime.
- *       Endpoint additions/removals notify registered listeners via NotifyEndpointChanged(), but
- *       Descriptor cluster PartsList attributes are not yet automatically marked dirty.
- *
  * Lifecycle:
  * - The CodeDrivenDataModelProvider stores raw pointers to EndpointInterface and ServerClusterInterface.
  *   It does NOT take ownership. Callers must ensure these instances outlive the provider.
