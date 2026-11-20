@@ -60,7 +60,7 @@ public:
     uint8_t mControlPeerCount = 0;
     uint8_t mDataPeerCount    = 0;
 
-    // GroupPeerTable manages these arrays as per-fabric LRU pools keyed by
+    // GroupPeerTable manages these arrays as per-fabric LRU pools indexed by
     // (mKeysetId, mNodeId), with the most recently used entry at index 0.
     // When full, insertion evicts the least-recently-used entry of whichever
     // keyset holds the most slots (preferring the incoming keyset on ties).

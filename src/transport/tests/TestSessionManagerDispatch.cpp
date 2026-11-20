@@ -1247,21 +1247,17 @@ TEST_F(TestSessionManagerDispatch, TestGroupSharedKeySetCounterAndRotation)
     ASSERT_SUCCESS(ctx->ReceivePacket(freshAfterDisjointReplacement));
     EXPECT_EQ(ctx->mDelegate.mReceivedCount, 4u);
 
-    // Cycling > CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC keyset additions and removals reclaims GroupPeerTable slots.
-    for (uint16_t step = 0; step < CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC + 3; step++)
-    {
-        const KeysetId tempKeyset = static_cast<KeysetId>(700 + step);
-        uint8_t tempKey[16]       = { static_cast<uint8_t>(0x90 + step), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-        ASSERT_SUCCESS(ctx->InstallGroupKeySet(tempKeyset, tempKey)) << "step " << step;
-        ASSERT_SUCCESS(ctx->mProvider.SetGroupKey(GroupKeySetDispatchContext::kFabric, kGroup1, tempKeyset));
+    // Before RemoveKeySet, replaying counter 203u is rejected as a duplicate.
+    ASSERT_SUCCESS(ctx->ReceivePacket(freshAfterDisjointReplacement));
+    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 4u);
 
-        System::PacketBufferHandle tempFrame;
-        ASSERT_SUCCESS(ctx->BuildEncryptedGroupPacket(kGroup1, kSenderNodeId, 1u + step, tempFrame));
-        ASSERT_SUCCESS(ctx->ReceivePacket(tempFrame));
-        EXPECT_EQ(ctx->mDelegate.mReceivedCount, 5u + step) << "step " << step;
-
-        ASSERT_SUCCESS(ctx->mProvider.RemoveKeySet(GroupKeySetDispatchContext::kFabric, tempKeyset));
-    }
+    // Explicit RemoveKeySet clears GroupPeerTable counter state via OnKeySetRemoved;
+    // re-installing the same keyset ID accepts counter 203u again.
+    ASSERT_SUCCESS(ctx->mProvider.RemoveKeySet(GroupKeySetDispatchContext::kFabric, kSharedKeySet));
+    ASSERT_SUCCESS(ctx->InstallGroupKeySet(kSharedKeySet, kDisjoint));
+    ASSERT_SUCCESS(ctx->mProvider.SetGroupKey(GroupKeySetDispatchContext::kFabric, kGroup1, kSharedKeySet));
+    ASSERT_SUCCESS(ctx->ReceivePacket(freshAfterDisjointReplacement));
+    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 5u);
 }
 
 } // namespace

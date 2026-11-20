@@ -37,7 +37,7 @@ public:
     using SecurityPolicy                                  = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum;
     static constexpr KeysetId kIdentityProtectionKeySetId = 0;
     // Concurrent listeners: Server::GroupDataProviderListener, GroupcastCluster,
-    // SessionManager's group peer counter listener, plus one spare slot.
+    // Transport::GroupPeerTable, plus one spare slot.
     static constexpr size_t kMaxListeners = 4;
 
     struct GroupInfo

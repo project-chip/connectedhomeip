@@ -645,6 +645,16 @@ TEST(TestGroupMessageCounter, KeySetIsolationAndRemovalTest)
         chip::Transport::PeerMessageCounter * churnCounter = nullptr;
         ASSERT_SUCCESS(table->FindOrAddPeer(kFabric, kKeySetB, 0x4000 + i, false, churnCounter));
     }
+    uint32_t keySetACount = 0;
+    for (uint8_t idx = 0; idx < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; idx++)
+    {
+        if (table->GetKeysetIdAt(0, idx, false) == kKeySetA)
+        {
+            keySetACount++;
+        }
+    }
+    EXPECT_GE(keySetACount, kThreeKeySetFairShare);
+
     for (uint32_t i = 0; i < kThreeKeySetFairShare; i++)
     {
         chip::Transport::PeerMessageCounter * peerCounter = nullptr;
@@ -661,6 +671,75 @@ TEST(TestGroupMessageCounter, KeySetIsolationAndRemovalTest)
     {
         EXPECT_NE(table->GetKeysetIdAt(0, idx, false), kKeySetC);
     }
+
+    // Removing the remaining keysets compacts the emptied fabric entry.
+    EXPECT_SUCCESS(table->KeySetRemoved(kFabric, kKeySetB));
+    EXPECT_SUCCESS(table->KeySetRemoved(kFabric, kKeySetA));
+    EXPECT_EQ(table->GetFabricIndexAt(0), kUndefinedFabricIndex);
+}
+
+TEST(TestGroupMessageCounter, FairShareEvictionTieBreakTest)
+{
+    static_assert(CHIP_CONFIG_MAX_GROUP_DATA_PEERS >= 4, "Test requires at least 4 group data peer slots");
+
+    auto table                                    = std::make_unique<TestGroupPeerTable>();
+    chip::Transport::PeerMessageCounter * counter = nullptr;
+
+    constexpr FabricIndex kFabric     = 1;
+    constexpr KeysetId kKeySetFiller  = 100;
+    constexpr KeysetId kKeySetA       = 200;
+    constexpr KeysetId kKeySetB       = 300;
+    constexpr KeysetId kKeySetC       = 400;
+    constexpr uint32_t kFillerCount   = CHIP_CONFIG_MAX_GROUP_DATA_PEERS % 2;
+    constexpr uint32_t kTiedSlotCount = CHIP_CONFIG_MAX_GROUP_DATA_PEERS / 2;
+
+    if (kFillerCount == 1)
+    {
+        ASSERT_SUCCESS(table->FindOrAddPeer(kFabric, kKeySetFiller, 0x9000, false, counter));
+    }
+
+    // Fill KeySet A then KeySet B with equal counts so KeySet A holds the older LRU index.
+    for (uint32_t i = 0; i < kTiedSlotCount; i++)
+    {
+        ASSERT_SUCCESS(table->FindOrAddPeer(kFabric, kKeySetA, 0x1000 + i, false, counter));
+    }
+    for (uint32_t i = 0; i < kTiedSlotCount; i++)
+    {
+        ASSERT_SUCCESS(table->FindOrAddPeer(kFabric, kKeySetB, 0x2000 + i, false, counter));
+    }
+
+    // Incoming KeySet C is not among the tied max-holders {A, B}; eviction picks the
+    // globally oldest entry among the tied max-holders (KeySet A's 0x1000), leaving
+    // KeySet B and the non-tied filler entry intact.
+    ASSERT_SUCCESS(table->FindOrAddPeer(kFabric, kKeySetC, 0x3000, false, counter));
+
+    EXPECT_EQ(table->GetKeysetIdAt(0, 0, false), kKeySetC);
+    EXPECT_EQ(table->GetNodeIdAt(0, 0, false), 0x3000u);
+
+    uint32_t countA      = 0;
+    uint32_t countB      = 0;
+    uint32_t countFiller = 0;
+    for (uint8_t idx = 0; idx < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; idx++)
+    {
+        const KeysetId ks = table->GetKeysetIdAt(0, idx, false);
+        const NodeId node = table->GetNodeIdAt(0, idx, false);
+        if (ks == kKeySetA)
+        {
+            EXPECT_NE(node, 0x1000u);
+            countA++;
+        }
+        else if (ks == kKeySetB)
+        {
+            countB++;
+        }
+        else if (ks == kKeySetFiller)
+        {
+            countFiller++;
+        }
+    }
+    EXPECT_EQ(countA, kTiedSlotCount - 1);
+    EXPECT_EQ(countB, kTiedSlotCount);
+    EXPECT_EQ(countFiller, kFillerCount);
 }
 
 TEST(TestGroupMessageCounter, RemovePeerIsolatesKeySetTest)

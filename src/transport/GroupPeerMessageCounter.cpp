@@ -20,6 +20,7 @@
  *
  */
 
+#include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <limits>
 #include <transport/GroupPeerMessageCounter.h>
@@ -53,7 +54,9 @@ void ShiftAndInsert(GroupSender * list, uint32_t oldIndex, GroupSender && newEnt
 ///   2. Otherwise, choosing the highest index (globally oldest) among tied keysets.
 uint32_t FindFairShareEvictionIndex(const GroupSender * list, uint32_t count, KeysetId incomingKeysetId)
 {
-    uint32_t evictIndex  = count - 1;
+    VerifyOrDie(count > 0);
+
+    uint32_t evictIndex  = 0;
     uint32_t maxCount    = 0;
     bool evictIsIncoming = false;
 
