@@ -22,7 +22,7 @@ commissionee with the row's attestation configuration and has the DUT commission
 The TH app log is the vendor-independent evidence channel: commissioning completion and
 the CertificateChainRequest count per certificate type are observed from the TH side.
 
-Common arguments (no CI test-arguments block: fixture JSONs are not checked in):
+Common arguments:
 
   --string-arg app_path:${ALL_CLUSTERS_APP}
   --string-arg pqc_dac_provider_ml_dsa_44:<provider json with dac/pai_cert_ml_dsa_44>
@@ -31,10 +31,12 @@ Common arguments (no CI test-arguments block: fixture JSONs are not checked in):
   --int-arg app_passcode:<passcode>  (default 20202021)
 
 app_path is passed by the test runner (see .github/workflows/tests.yaml for how other
-tests receive ${ALL_CLUSTERS_APP}); there is no built-in default. Generate the provider
-fixtures and the matching paa-root-certs trust-store directory with
-scripts/tools/gen_pqc_test_fixtures.sh; with dut_supports_pqc_profiles:true the SDK
-commissioner needs that directory as --paa-trust-store-path.
+tests receive ${ALL_CLUSTERS_APP}); there is no built-in default. The checked-in CI
+runs use the development fixtures credentials/development/attestation/
+TestCredentials-FFF1-8001-ML-DSA-{44,65}.json; alternative chains can be generated
+with scripts/tools/gen_pqc_test_fixtures.sh. With dut_supports_pqc_profiles:true the
+SDK commissioner needs a --paa-trust-store-path directory holding the matching ML-DSA
+PAAs (credentials/development/paa-root-certs for the development fixtures).
 
 The fallback rows use the app pipe command "SetPQCDeviceAttestationProfileReadMode" to
 keep the PQCDA feature bit set while making PQCDeviceAttestationProfile reads fail.
