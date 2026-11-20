@@ -79,7 +79,10 @@ expected to be rejected over PASE and are not exercised in phase 1.
 
 This test MUST run with ``--in-test-commissioning-method`` (not
 ``--commissioning-method``) against a factory-reset / uncommissioned DUT, so the
-PASE session in phase 1 exists before any fabric is provisioned.
+PASE session in phase 1 exists before any fabric is provisioned.  Supported
+methods: ``on-network`` (PASE over UDP; the DUT must be reachable over IP while
+uncommissioned) and ``ble-wifi`` (PASE over BLE; step 6 provisions the DUT onto
+Wi-Fi from ``--wifi-ssid`` and ``--wifi-passphrase``).
 
 Test plan reference: TC-COMPRO-2.6
 
@@ -277,7 +280,7 @@ class TC_COMPRO_2_6(MatterTestCommissioner, COMPROBaseTest):
         # Phase 2 — DUT commissioned to TH: error handling over CASE
         # ================================================================
 
-        # Step 6 — commission the DUT by reusing the on-network PASE from step 2
+        # Step 6 — commission the DUT by reusing the PASE from step 2
         # (do NOT expire it; commission_dut_in_test runs commissioning over it).
         self.step(6)
         await self.commission_dut_in_test()

@@ -37,6 +37,7 @@ public:
         kGeneric,
         kGrid,
         kBattery,
+        kAcPolyphaseOutput,
     };
 
     SimulatedElectricalSensorDelegate(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate,
