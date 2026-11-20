@@ -14,7 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#import "MTRDefines_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricsScope_Internal.h"
 #import "MTRMetrics_Internal.h"
 #include <Foundation/Foundation.h>
 #import <Matter/MTRDefines.h>
@@ -37,6 +39,38 @@
         _uniqueIdentifier = [NSUUID UUID];
     }
     return self;
+}
+
+// The current flow ID is held strongly by the MTRMetricsScope that set it.
+static thread_local __unsafe_unretained NSUUID * _Nullable sCurrentFlowID = nil;
+
++ (nullable NSUUID *)currentFlowID
+{
+    return sCurrentFlowID;
+}
+
++ (NSUUID *)_flowIDWithString:(id _Nullable)flowID
+{
+    NSString * flowIDString = MTR_SAFE_CAST(flowID, NSString);
+    NSUUID * uuid = flowIDString ? [[NSUUID alloc] initWithUUIDString:flowIDString] : nil;
+    if (uuid == nil) {
+        if (flowID != nil) {
+            MTR_LOG_ERROR("Ignoring invalid flow ID %@; using a new flow", flowID);
+        }
+        return [NSUUID UUID];
+    }
+    return uuid;
+}
+
++ (NSUUID *)_currentOrNewFlowID
+{
+    return sCurrentFlowID ?: [NSUUID UUID];
+}
+
++ (void)_runWithFlowID:(NSUUID * _Nullable)flowID block:(void(NS_NOESCAPE ^)(void))block
+{
+    MTRMetricsScope scope(flowID);
+    block();
 }
 
 - (NSArray<NSString *> *)allKeys
@@ -80,3 +114,12 @@
 }
 
 @end
+
+MTRMetricsScope::MTRMetricsScope(NSUUID * _Nullable flowID)
+    : mPrevious(sCurrentFlowID)
+    , mFlowID(flowID)
+{
+    sCurrentFlowID = mFlowID;
+}
+
+MTRMetricsScope::~MTRMetricsScope() { sCurrentFlowID = mPrevious; }

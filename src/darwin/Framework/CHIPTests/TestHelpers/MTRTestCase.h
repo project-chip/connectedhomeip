@@ -113,4 +113,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+// Whether the caller is running on the Matter work queue.
+static inline BOOL MTRTestIsOnMatterQueue(void)
+{
+    return strcmp(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL), "org.csa-iot.matter.workqueue") == 0;
+}
+
 NS_ASSUME_NONNULL_END

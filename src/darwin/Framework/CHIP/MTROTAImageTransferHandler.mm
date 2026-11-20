@@ -22,6 +22,7 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
+#import "MTRMetricsScope_Internal.h"
 #import "MTROTAUnsolicitedBDXMessageHandler.h"
 #import "NSStringSpanConversion.h"
 
@@ -216,6 +217,9 @@ MTROTAImageTransferHandler::~MTROTAImageTransferHandler()
 
 CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSession::OutputEventType eventType)
 {
+    // The delegate callback and its completion run in the flow of the message that began the transfer.
+    NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
+    MTRMetricsScope flowScope(flowID);
     assertChipStackLockedByCurrentThread();
 
     uint16_t fdl = 0;
@@ -243,6 +247,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
     auto completionHandler = ^(NSError * _Nullable error) {
         [controller
             asyncDispatchToMatterQueue:^() {
+                MTRMetricsScope responseScope(flowID);
                 assertChipStackLockedByCurrentThread();
 
                 // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
@@ -294,7 +299,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    dispatch_async(delegateQueue, ^{
+    MTRDispatchCallbackWithFlowID(delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector
                             (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
             [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
@@ -316,6 +321,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
 
 void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR error)
 {
+    MTRMetricsScope flowScope([MTRMetrics _currentOrNewFlowID]);
     assertChipStackLockedByCurrentThread();
 
     mNeedToCallTransferSessionEnd = false;
@@ -343,13 +349,13 @@ void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR err
     MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCategory:@("ota") removeMetrics:YES];
     NSError * nsError = (mBDXRejectionError != nil) ? mBDXRejectionError : [MTRError errorForCHIPErrorCode:error];
     if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:metrics:error:)]) {
-        dispatch_async(delegateQueue, ^{
+        MTRDispatchCallbackWithFlowID(delegateQueue, ^{
             [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId controller:controller
                                                          metrics:metrics
                                                            error:nsError];
         });
     } else if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:error:)]) {
-        dispatch_async(delegateQueue, ^{
+        MTRDispatchCallbackWithFlowID(delegateQueue, ^{
             [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId
                                                       controller:controller
                                                            error:nsError];
@@ -382,6 +388,9 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionEnd(const TransferSessio
 
 CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::OutputEventType eventType, uint64_t bytesToSkip)
 {
+    // The delegate callback and its completion run in the flow of this block query.
+    NSUUID * flowID = [MTRMetrics _currentOrNewFlowID];
+    MTRMetricsScope flowScope(flowID);
     assertChipStackLockedByCurrentThread();
 
     // For thread devices, we need to throttle sending the response to
@@ -402,6 +411,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
         }
         [controller
             asyncDispatchToMatterQueue:^() {
+                MTRMetricsScope responseScope(flowID);
                 assertChipStackLockedByCurrentThread();
 
                 // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
@@ -480,7 +490,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
         completionHandler = respondWithBlock;
     }
 
-    dispatch_async(delegateQueue, ^{
+    MTRDispatchCallbackWithFlowID(delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(handleBDXQueryForNodeID:
                                                                       controller:blockSize:blockIndex:bytesToSkip:completion:)]) {
             [strongDelegate handleBDXQueryForNodeID:nodeId
