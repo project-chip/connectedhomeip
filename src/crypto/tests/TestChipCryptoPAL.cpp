@@ -1244,7 +1244,7 @@ TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_RawKey)
         size_t out_length    = v.output_hash_length;
         chip::Platform::ScopedMemoryBuffer<uint8_t> out_buffer;
         out_buffer.Alloc(out_length);
-        EXPECT_TRUE(out_buffer);
+        ASSERT_TRUE(out_buffer);
         EXPECT_SUCCESS(mHMAC.HMAC_SHA256(v.key, v.key_length, v.message, v.message_length, out_buffer.Get(), v.output_hash_length));
         bool success = memcmp(v.output_hash, out_buffer.Get(), out_length) == 0;
         EXPECT_TRUE(success);
