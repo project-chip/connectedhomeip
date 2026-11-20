@@ -32,6 +32,8 @@
 #       --debug
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 13 seconds.
+#     tags: [slow]
 #   run2: # tests PASE connection using manual code (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
@@ -207,6 +209,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 16 seconds.
+#     tags: [slow]
 #   run19: # Tests against all-devices-app - bridged wildcard (all leaf devices bridged)
 #     app: ${ALL_DEVICES_APP}
 #     app-args: >
@@ -223,6 +227,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 18 seconds.
+#     tags: [slow]
 #   run20: # Tests against electrical-protection-app
 #     app: ${ELECTRICAL_PROTECTION_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json

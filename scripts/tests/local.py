@@ -40,7 +40,8 @@ import tabulate
 import yaml
 
 with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-    from matter.testing.metadata import TAG_OPTION_HELP, TagFilter, extract_runs_args, runs_in_pull_requests, unused_tag_values
+    from matter.testing.metadata import (SLOW_TAG, TAG_OPTION_HELP, TagFilter, extract_runs_args, runs_in_pull_requests,
+                                         unused_tag_values)
     from matter.testing.tasks import SubprocessKind
 
 
@@ -1044,11 +1045,6 @@ def python_tests(
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
     dedicated_runner_tests = {item["name"]: item["reason"] for item in metadata["dedicated_runner"]}
 
-    # NOTE: for slow tests. we add logs to not get impatient
-    slow_test_duration = {
-        item["name"]: item["duration"] for item in metadata["slow_tests"]
-    }
-
     if not os.path.isdir("src/python_testing"):
         raise NotADirectoryError("Script meant to be run from the CHIP checkout root (src/python_testing must exist).")
 
@@ -1109,10 +1105,11 @@ def python_tests(
 
             # Without --run or --tag, run_python_test.py executes the runs PR CI runs.
             default_runs = [name for name, run_config in runs.items() if runs_in_pull_requests(run_config['tags'])]
-            to_run.append((script, [] if selected_runs == default_runs else selected_runs))
+            has_slow_runs = any(SLOW_TAG in runs[name]['tags'] for name in selected_runs)
+            to_run.append((script, [] if selected_runs == default_runs else selected_runs, has_slow_runs))
 
         with alive_progress.alive_bar(len(to_run), title="Running tests") as bar:
-            for script, run_names in to_run:
+            for script, run_names, has_slow_runs in to_run:
                 bar.text(script)
                 cmd = [
                     "scripts/run_in_python_env.sh",
@@ -1126,12 +1123,8 @@ def python_tests(
                     continue
 
                 base_name = os.path.basename(script)
-                if base_name in slow_test_duration:
-                    log.warning(
-                        "SLOW test '%s' is executing (expect to take around %s). Be patient...",
-                        base_name,
-                        slow_test_duration[base_name],
-                    )
+                if has_slow_runs:
+                    log.warning("SLOW test '%s' is executing. Be patient...", base_name)
 
                 tstart = time.time()
                 result = subprocess.run(cmd, capture_output=True)
@@ -1169,7 +1162,7 @@ def python_tests(
                 )
                 execution_times.append(time_info)
 
-                if time_info.duration_sec > 20 and base_name not in slow_test_duration:
+                if time_info.duration_sec > 20 and not has_slow_runs:
                     log.warning("'%s' finished in %0.2f seconds", time_info.script, time_info.duration_sec)
                 bar()
     finally:

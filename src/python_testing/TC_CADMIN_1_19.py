@@ -29,6 +29,8 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 #     quiet: true
+#     # Takes about 69 seconds.
+#     tags: [slow]
 # === END CI TEST ARGUMENTS ===
 
 
