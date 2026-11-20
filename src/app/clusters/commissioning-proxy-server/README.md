@@ -420,9 +420,10 @@ without pulling in `src/ble`. It drives a BTP connection through
 `chip::Ble::BleLayer`:
 
 -   `Connect()` — on the first BLE connect the proxy flips its own BLE role from
-    peripheral to central, then calls
-    `BleLayer::NewBleConnectionByDiscriminator()` to open an L2CAP/BTP
-    connection to the commissionee.
+    peripheral to central, waiting within the request's Timeout while a
+    peripheral link (such as the one the proxy was commissioned over) is still
+    closing, then calls `BleLayer::NewBleConnectionByDiscriminator()` to open an
+    L2CAP/BTP connection to the commissionee.
 -   `SendMessage()` — calls `BLEEndPoint::Send()` to push the tunneled
     commissioning packet over BTP.
 -   `Disconnect()` — calls `BLEEndPoint::Close()` to drop the connection.
