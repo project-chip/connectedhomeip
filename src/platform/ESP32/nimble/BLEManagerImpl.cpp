@@ -1715,9 +1715,22 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(struct ble_gap_event * gapEvent)
     int rc;
 
     rc = ble_gattc_exchange_mtu(gapEvent->connect.conn_handle, NULL, NULL);
-    if (rc != 0)
+    if (rc == BLE_HS_EALREADY)
     {
-        return CHIP_ERROR_INTERNAL;
+        // Common: the peer sent its own Exchange MTU Request right after connecting.
+        ChipLogProgress(DeviceLayer, "ATT MTU already exchanged by the peer");
+    }
+    else if (rc != 0)
+    {
+        ChipLogError(DeviceLayer, "ble_gattc_exchange_mtu failed: %d", rc);
+        if (gapEvent->connect.status == 0)
+        {
+            rc = ble_gap_terminate(gapEvent->connect.conn_handle, BLE_ERR_REM_USER_CONN_TERM);
+            VerifyOrDo(rc == 0, ChipLogError(DeviceLayer, "ble_gap_terminate failed: %d", rc));
+        }
+        // Report the failure but return no error: an error disables the service and deinitializes the host.
+        HandleGAPConnectionFailed(gapEvent, CHIP_ERROR_INTERNAL);
+        return CHIP_NO_ERROR;
     }
 
     return HandleGAPCentralConnect(gapEvent);
@@ -1891,6 +1904,11 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+        // DriveBLEState() below deinitializes the host. Fail any pending connection first: the event is handled
+        // before DriveBLEState() and cancels HandleConnectTimeout, which would call ble_gap_conn_cancel() on that host.
+        HandleConnectFailed(err);
+#endif
         sInstance.mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 
@@ -2079,6 +2097,7 @@ void BLEManagerImpl::OnDeviceScanned(const ble_addr_t & addr, const chip::Ble::C
     else
     {
         ChipLogProgress(Ble, "Unknown discovery type. Ignoring");
+        return;
     }
 
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
@@ -2100,8 +2119,13 @@ void BLEManagerImpl::OnScanComplete()
         return;
     }
 
-    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_TIMEOUT);
+    // Report to the attempt that just ended, not to whichever one is current when the work runs. This can run on the
+    // NimBLE host task (scan timeout), so the delegate is called on the CHIP thread.
+    void * appState              = mBLEScanConfig.mAppState;
     mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(
+        [](intptr_t arg) { sInstance.BleConnectionDelegate::OnConnectionError(reinterpret_cast<void *>(arg), CHIP_ERROR_TIMEOUT); },
+        reinterpret_cast<intptr_t>(appState)));
 }
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)

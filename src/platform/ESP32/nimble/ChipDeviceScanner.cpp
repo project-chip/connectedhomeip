@@ -19,6 +19,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ESP32/ChipDeviceScanner.h>
+#include <platform/PlatformManager.h>
 
 #define CHIPoBLE_SERVICE_UUID 0xFFF6
 
@@ -80,7 +81,14 @@ int ChipDeviceScanner::OnBleCentralEvent(struct ble_gap_event * event, void * ar
     switch (event->type)
     {
     case BLE_GAP_EVENT_DISC_COMPLETE: {
+        // The scan ended without a match (timeout, or preempted by the host): report it like StopScan() does,
+        // or the pending connection never completes. Hold the CHIP stack lock, as OnDeviceScanned() does, so a
+        // queued InitiateScan() cannot start the next scan before this one is reported.
+        ChipLogProgress(DeviceLayer, "BLE scan complete, reason %d", event->disc_complete.reason);
+        PlatformMgr().LockChipStack();
         scanner->mIsScanning = false;
+        scanner->mDelegate->OnScanComplete();
+        PlatformMgr().UnlockChipStack();
         return 0;
     }
 
