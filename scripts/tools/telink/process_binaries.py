@@ -34,6 +34,7 @@ except ImportError:
     sys.path.append(os.path.abspath(os.path.join(ZEPHYR_BASE, 'scripts/west_commands/runners')))
     from core import BuildConfiguration
 
+
 def create_multi_image_payload(host, external_images, output):
     header = struct.Struct('<4sII')
     entry = struct.Struct('<IIII')
@@ -56,9 +57,11 @@ def create_multi_image_payload(host, external_images, output):
         for data in payloads:
             image.write(data)
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--external-images', nargs='+', default=[])
 args = parser.parse_args()
+
 
 def merge_binaries(input_file1, input_file2, output_file, offset):
     with open(output_file, 'r+b' if os.path.exists(output_file) else 'wb') as outfile:
@@ -90,6 +93,7 @@ build_conf = BuildConfiguration(os.path.join(os.getcwd(), os.pardir))
 if args.external_images and not (build_conf.getboolean('CONFIG_CHIP_OTA_MULTI_IMAGE') and
                                  build_conf.getboolean('CONFIG_CHIP_OTA_IMAGE_BUILD')):
     raise ValueError('External images require multi-image Matter OTA support')
+
 
 def compress_lzma_firmware(input_file, output_file):
     # Read the input firmware binary
