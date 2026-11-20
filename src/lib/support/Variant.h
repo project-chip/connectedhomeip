@@ -18,9 +18,11 @@
 
 #pragma once
 
-#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <new>
 #include <tuple>
 #include <type_traits>
