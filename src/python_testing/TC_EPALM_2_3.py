@@ -99,38 +99,38 @@ class TC_EPALM_2_3(MatterTestCommissionedDevice):
         log.info("Supported: 0x%08X", supported_val)
 
         self.step(4, "TH verifies SHORT (FM bit 20) / ShortCircuitFault (SUP bit 0) consistency: "
-                  "if EPALM.S.F20(SHORT) is true, SUP bit 0 MUST be set.",
-                  expectation="Consistency holds. If EPALM.S.F20(SHORT) is false, the step is skipped.")
+                  "if EPALM.S.F14(SHORT) is true, SUP bit 0 MUST be set.",
+                  expectation="Consistency holds. If EPALM.S.F14(SHORT) is false, the step is skipped.")
         self._check_feature(feature_map, supported_val, features.kShortCircuit, alarm_bits.kShortCircuitFault)
 
         self.step(5, "TH verifies OL (FM bit 21) / OverLoadFault (SUP bit 1) consistency: "
-                  "if EPALM.S.F21(OL) is true, SUP bit 1 MUST be set.",
-                  expectation="Consistency holds. If EPALM.S.F21(OL) is false, the step is skipped.")
+                  "if EPALM.S.F15(OL) is true, SUP bit 1 MUST be set.",
+                  expectation="Consistency holds. If EPALM.S.F15(OL) is false, the step is skipped.")
         self._check_feature(feature_map, supported_val, features.kOverLoad, alarm_bits.kOverLoadFault)
 
         self.step(6, "TH verifies OV (FM bit 22) / OverVoltageFault (SUP bit 2) consistency: "
-                  "if EPALM.S.F22(OV) is true, SUP bit 2 MUST be set.",
-                  expectation="Consistency holds. If EPALM.S.F22(OV) is false, the step is skipped.")
+                  "if EPALM.S.F16(OV) is true, SUP bit 2 MUST be set.",
+                  expectation="Consistency holds. If EPALM.S.F16(OV) is false, the step is skipped.")
         self._check_feature(feature_map, supported_val, features.kOverVoltage, alarm_bits.kOverVoltageFault)
 
         self.step(7, "TH verifies SP (FM bit 23) / VoltageSurgeFault (SUP bit 3) consistency: "
-                  "if EPALM.S.F23(SP) is true, SUP bit 3 MUST be set.",
-                  expectation="Consistency holds. If EPALM.S.F23(SP) is false, the step is skipped.")
+                  "if EPALM.S.F17(SP) is true, SUP bit 3 MUST be set.",
+                  expectation="Consistency holds. If EPALM.S.F17(SP) is false, the step is skipped.")
         self._check_feature(feature_map, supported_val, features.kSurgeProtection, alarm_bits.kVoltageSurgeFault)
 
         self.step(8, "TH verifies RC (FM bit 24) / ResidualCurrentFault (SUP bit 4) consistency: "
-                  "if EPALM.S.F24(RC) is true, SUP bit 4 MUST be set.",
-                  expectation="Consistency holds. If EPALM.S.F24(RC) is false, the step is skipped.")
+                  "if EPALM.S.F18(RC) is true, SUP bit 4 MUST be set.",
+                  expectation="Consistency holds. If EPALM.S.F18(RC) is false, the step is skipped.")
         self._check_feature(feature_map, supported_val, features.kResidualCurrent, alarm_bits.kResidualCurrentFault)
 
         self.step(9, "TH verifies ARC (FM bit 25) / ArcFault (SUP bit 5) consistency: "
-                  "if EPALM.S.F25(ARC) is true, SUP bit 5 MUST be set.",
-                  expectation="Consistency holds. If EPALM.S.F25(ARC) is false, the step is skipped.")
+                  "if EPALM.S.F19(ARC) is true, SUP bit 5 MUST be set.",
+                  expectation="Consistency holds. If EPALM.S.F19(ARC) is false, the step is skipped.")
         self._check_feature(feature_map, supported_val, features.kArcFault, alarm_bits.kArcFault)
 
         self.step(10, "TH verifies SELFTEST (FM bit 26) / SelfTest (SUP bit 6) consistency: "
-                      "if EPALM.S.F26(SELFTEST) is true, SUP bit 6 MUST be set.",
-                  expectation="Consistency holds. If EPALM.S.F26(SELFTEST) is false, the step is skipped.")
+                      "if EPALM.S.F1a(SELFTEST) is true, SUP bit 6 MUST be set.",
+                  expectation="Consistency holds. If EPALM.S.F1a(SELFTEST) is false, the step is skipped.")
         self._check_feature(feature_map, supported_val, features.kSelfTest, alarm_bits.kSelfTest)
 
         self.step(11, "TH verifies the reverse direction and orphan-bit absence: (a) no bits MAY be "
