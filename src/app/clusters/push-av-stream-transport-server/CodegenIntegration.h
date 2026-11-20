@@ -43,6 +43,8 @@ public:
 /// Sets the given delegate on an endpoint configured via code-generation
 void SetDelegate(chip::EndpointId endpointId, PushAvStreamTransportDelegate * delegate);
 
+CHIP_ERROR SetDelegateAndInit(chip::EndpointId endpointId, PushAvStreamTransportDelegate * delegate);
+
 /// Sets the given TLS Client Management delegate on an endpoint configured via code-generation
 void SetTLSClientManagementDelegate(chip::EndpointId endpointId, TLSClientManagementDelegate * delegate);
 

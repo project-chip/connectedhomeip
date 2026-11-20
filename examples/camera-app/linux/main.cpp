@@ -63,7 +63,7 @@ void ApplicationInit()
     }
 
     gCameraDevice.Init();
-    CameraAppInit(&gCameraDevice);
+    VerifyOrDie(CameraAppInit(&gCameraDevice) == CHIP_NO_ERROR);
 
     sCameraAppCommandDelegate.SetCameraDevice(&gCameraDevice);
 }
