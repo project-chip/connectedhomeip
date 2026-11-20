@@ -92,6 +92,19 @@ CHIP_ERROR AccessRestrictionProvider::SetCommissioningEntries(const std::vector<
     return CHIP_NO_ERROR;
 }
 
+void AccessRestrictionProvider::RemoveFabric(FabricIndex fabricIndex)
+{
+    if (mFabricEntries.erase(fabricIndex) == 0)
+    {
+        return;
+    }
+
+    for (Listener * listener = mListeners; listener != nullptr; listener = listener->mNext)
+    {
+        listener->MarkRestrictionListChanged(fabricIndex);
+    }
+}
+
 CHIP_ERROR AccessRestrictionProvider::SetEntries(const FabricIndex fabricIndex, const std::vector<Entry> & entries)
 {
     std::vector<Entry> updatedEntries;
