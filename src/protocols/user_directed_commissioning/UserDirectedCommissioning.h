@@ -438,6 +438,8 @@ private:
 
         kMaxNum = UINT8_MAX
     };
+    // TestUdcMessages encodes this wire tag directly.
+    static_assert(kNeedsPasscodeTag == 2, "CommissionerDeclaration NeedsPasscode tag changed");
 
     CdError mErrorCode            = CdError::kNoError;
     bool mNeedsPasscode           = false;
