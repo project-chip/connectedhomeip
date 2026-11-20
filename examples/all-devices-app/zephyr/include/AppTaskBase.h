@@ -26,6 +26,7 @@
 #include <device/api/Interface.h>
 #include <device/types/root-node/RootNode.h>
 #include <lib/core/CHIPError.h>
+#include <platform/CHIPDeviceEvent.h>
 #include <platform/DefaultTimerDelegate.h>
 #include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -111,6 +112,7 @@ public:
 
     CHIP_ERROR PostServerInit();
 
+    /// Called inside OnPlatformEvent when server is ready.
     CHIP_ERROR InitOTARequestor();
 
 protected:
@@ -118,6 +120,8 @@ protected:
     static constexpr EndpointId kFirstDeviceEndpointId = 1;
 
     Derived & Self() { return static_cast<Derived &>(*this); }
+
+    static void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t context);
 
     chip::CommonCaseDeviceServerInitParams mInitParams;
     Credentials::GroupDataProviderImpl mGroupDataProvider;
