@@ -189,6 +189,8 @@ public:
     BitFlags<Feature> GetFeatureMap() const { return mFeatureMap; }
 
 private:
+    CHIP_ERROR ValidateTargetState(const DataModel::Nullable<GenericDimensionStateStruct> & incomingTargetState) const;
+
     ClosureDimensionClusterDelegate & mDelegate;
     DataModel::Nullable<GenericDimensionStateStruct> mCurrentState{ DataModel::NullNullable };
     DataModel::Nullable<GenericDimensionStateStruct> mTargetState{ DataModel::NullNullable };
