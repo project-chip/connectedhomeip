@@ -68,6 +68,8 @@ class CommissionDeviceTest(MatterBaseTest):
         )):
             raise signals.TestAbortAll("Failed to commission node(s)")
 
+        self.matter_test_config._pre_test_commissioning_complete = True
+
         if self.matter_test_config.commission_only_re_open_window:
             for node_id, setup_payload in zip(self.dut_node_ids, self.setup_payloads):
                 logger.info("Re-opening commissioning window on DUT")
