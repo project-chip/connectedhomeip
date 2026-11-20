@@ -141,7 +141,8 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             setup_pincode=self.provider_setup_pincode,
             discriminator=self.provider_discriminator,
             port=self.provider_port,
-            extra_args=['--app-pipe', self.provider_app_pipe, '--app-pipe-out', self.provider_app_pipe_out, '--delayedApplyActionTimeSec', '60'],
+            extra_args=['--app-pipe', self.provider_app_pipe, '--app-pipe-out',
+                        self.provider_app_pipe_out, '--delayedApplyActionTimeSec', '60'],
             kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
             timeout=20
@@ -252,17 +253,18 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info('%s: UpdateState (updateAvailable sequence) matcher has completed.', step_number_s1)
 
         # Read the last QueryImageResponse the OTA-P sent, in order to capture the UpdateToken.
-        # Reads the QuerySnapshot when the Download is in progress to then retrieve the values for 
+        # Reads the QuerySnapshot when the Download is in progress to then retrieve the values for
         # ApplyUpdateRequest when transfer is complete.
         logger.info("About to read  the named pipe OtaSoftwareUpdateProvider from provider")
         query_command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider",
-                            "Endpoint": self.get_endpoint()}
+                         "Endpoint": self.get_endpoint()}
         self.write_to_app_pipe(query_command, self.provider_app_pipe)
         query_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
         logger.info("Provider QueryImageResponse snapshot: %s", query_response_data)
         expected_update_token = query_response_data['Payload']["UpdateToken"]
 
         last_progress_s1 = [None]
+
         def progress_liveness_s1(report):
             if report.attribute != Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress:
                 return False
@@ -298,7 +300,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Commands for named pipes
         apply_command = {"Name": "GetApplyUpdateRequestStatus", "Cluster": "OtaSoftwareUpdateProvider",
                                  "Endpoint": self.get_endpoint()}
-        
+
         while True:
             wait_poll = True
             attempt += 1
@@ -307,7 +309,8 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                 apply_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
                 received_update_token = apply_response_data["Payload"]["UpdateToken"]
                 received_new_version = int(apply_response_data["Payload"]["NewVersion"])
-                logger.info("Provider GetApplyUpdateRequestStatus retrieved from named pipe: %s at Attempt # %d", apply_response_data, attempt)
+                logger.info("Provider GetApplyUpdateRequestStatus retrieved from named pipe: %s at Attempt # %d",
+                            apply_response_data, attempt)
             except TimeoutError:
                 # Not able to read named pipe in the read_from_app_pipe timeout, do not wait more.
                 wait_poll = False
@@ -325,7 +328,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                     'Step #1 ApplyUpdateRequest has not been reached after %.0fs. Retrying', poll_command_interval_sec)
                 break
             if wait_poll:
-                await asyncio.sleep(min(poll_command_interval_sec,remaining))
+                await asyncio.sleep(min(poll_command_interval_sec, remaining))
 
         # UpdateToken in ApplyUpdateRequest must match the one the provider issued in QueryImageResponse.
         asserts.assert_equal(
@@ -337,10 +340,11 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         asserts.assert_equal(
             received_new_version, self.expected_software_version,
             f"NewVersion from ApplyUpdateRequest ({received_new_version}) does not match the expected software version ({self.expected_software_version}).")
-        
+
         # Once checks are completed clear the ota provider list to then terminate the provider.
         await self.clear_ota_providers(self.controller, self.requestor_node_id)
         self.terminate_provider()
+
 
 if __name__ == "__main__":
     default_matter_test_main()
