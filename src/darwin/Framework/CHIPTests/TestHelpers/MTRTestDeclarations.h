@@ -134,6 +134,12 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes;
 - (NSUInteger)unitTestNonnullDelegateCount;
 - (void)unitTestResetSubscription;
+// Must be called on the Matter queue.  Marks the session the last subscription used, which MTRDevice watches for recovery,
+// as defunct; returns NO if there is no such session.
+- (BOOL)unitTestMarkWatchedSessionDefunct;
+// Must be called on the Matter queue.  Handles that defunct session receiving a message from the peer, as the receive
+// path does; returns NO if there is no such session or it is not defunct.
+- (BOOL)unitTestReceiveOnWatchedSession;
 // Must be called on the Matter queue, with a subscription set up.
 - (void)unitTestEndSubscriptionAsReadClientGivingUp;
 - (MTRDeviceClusterData *)unitTestGetClusterDataForPath:(MTRClusterPath *)path;

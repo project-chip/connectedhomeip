@@ -71,6 +71,14 @@ public:
      */
     virtual void OnSessionHang() {}
 
+    /**
+     * @brief
+     *   Called when a defunct session recovers: a message from the peer arrives on it again. Not called on first establishment.
+     *   For example, MRP gave up on one of our messages while the peer, under congestion, kept sending, and the peer's next
+     *   message got through. Callees SHALL NOT make synchronous calls into SessionManager to allocate a new session.
+     */
+    virtual void OnSessionRecovered() {}
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     virtual void OnSessionConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR connErr) {}
     virtual void OnConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR connErr) {}
