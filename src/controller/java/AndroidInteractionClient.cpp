@@ -62,6 +62,17 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    if (!device->GetSecureSession().HasValue())
+    {
+        // The session can be gone (e.g. evicted after a network change). Fail like write() and invoke() do
+        // instead of aborting on Value() below. The Java wrapper's finalizer frees the callback; release
+        // our global reference to the wrapper, as OnDone does, so it can be collected.
+        err = CHIP_ERROR_MISSING_SECURE_SESSION;
+        ChipLogError(Controller, "JNI IM Subscribe Error: %s", err.AsString());
+        callback->OnError(err);
+        callback->mWrapperCallbackRef.Reset();
+        return err;
+    }
     app::ReadPrepareParams params(device->GetSecureSession().Value());
 
     uint16_t aImTimeoutMs             = static_cast<uint16_t>(imTimeoutMs);
@@ -207,6 +218,17 @@ CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePt
     {
         ChipLogProgress(Controller, "Could not cast device pointer to Device object");
         return CHIP_ERROR_INCORRECT_STATE;
+    }
+    if (!device->GetSecureSession().HasValue())
+    {
+        // The session can be gone (e.g. evicted after a network change). Fail like write() and invoke() do
+        // instead of aborting on Value() below. The Java wrapper's finalizer frees the callback; release
+        // our global reference to the wrapper, as OnDone does, so it can be collected.
+        err = CHIP_ERROR_MISSING_SECURE_SESSION;
+        ChipLogError(Controller, "JNI IM Read Error: %s", err.AsString());
+        callback->OnError(err);
+        callback->mWrapperCallbackRef.Reset();
+        return err;
     }
     app::ReadPrepareParams params(device->GetSecureSession().Value());
 
