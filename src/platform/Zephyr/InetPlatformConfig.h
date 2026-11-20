@@ -40,6 +40,12 @@
 #define INET_CONFIG_NUM_UDP_ENDPOINTS 4
 #endif // INET_CONFIG_NUM_UDP_ENDPOINTS
 
+// Zephyr does not provide the TIOCOUTQ ioctl that the TCP_USER_TIMEOUT
+// emulation needs.
+#ifndef INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+#define INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT 0
+#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+
 // Although Zephyr defines SO_BINDTODEVICE, it's currently unimplemented
 #ifdef HAVE_SO_BINDTODEVICE
 #undef HAVE_SO_BINDTODEVICE
