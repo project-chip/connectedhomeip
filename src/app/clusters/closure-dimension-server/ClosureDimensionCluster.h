@@ -204,6 +204,8 @@ private:
     BitFlags<LatchControlModesBitmap> mLatchControlModes;
     BitMask<Feature> mFeatureMap = BitMask<Feature>(0);
 
+    CHIP_ERROR ValidateTargetState(const DataModel::Nullable<GenericDimensionStateStruct> & targetState) const;
+
     /**
      *  @brief Calls delegate HandleSetTarget function after validating the parameters and conformance.
      *
