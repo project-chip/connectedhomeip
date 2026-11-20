@@ -271,6 +271,10 @@
 		51D10D2E2808E2CA00E8CA3D /* MTRTestStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 51D10D2D2808E2CA00E8CA3D /* MTRTestStorage.m */; };
 		51D9CB0B2BA37DCE0049D6DB /* MTRDSTOffsetTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51D9CB0A2BA37DCE0049D6DB /* MTRDSTOffsetTests.m */; };
 		C0DE0136770254000000A002 /* MTRDeviceReadThroughTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0136770254000000A001 /* MTRDeviceReadThroughTests.m */; };
+		C0DE0136770254000000D002 /* MTRDeviceAsyncReadOutcomeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0136770254000000D001 /* MTRDeviceAsyncReadOutcomeTests.m */; };
+		C0DE0136770254000000E002 /* MTRDeviceAsyncReadBatchingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0136770254000000E001 /* MTRDeviceAsyncReadBatchingTests.m */; };
+		C0DE0136770254000000F002 /* MTRDeviceAsyncReadCancellationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0136770254000000F001 /* MTRDeviceAsyncReadCancellationTests.m */; };
+		C0DE01367702540000001002 /* MTRDeviceAsyncReadContractTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DE01367702540000001001 /* MTRDeviceAsyncReadContractTests.m */; };
 		C0DE0136770254000000B002 /* MTRDeviceReportFilterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0136770254000000B001 /* MTRDeviceReportFilterTests.m */; };
 		C0DE0136770254000000C002 /* MTRTestResponseValues.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0136770254000000C001 /* MTRTestResponseValues.m */; };
 		51DA8F422E7B4236008B7A65 /* MTRNetworkInterfaceInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51DA8F402E7B4236008B7A65 /* MTRNetworkInterfaceInfo.mm */; };
@@ -930,6 +934,10 @@
 		51D10D2D2808E2CA00E8CA3D /* MTRTestStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestStorage.m; sourceTree = "<group>"; };
 		51D9CB0A2BA37DCE0049D6DB /* MTRDSTOffsetTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRDSTOffsetTests.m; sourceTree = "<group>"; };
 		C0DE0136770254000000A001 /* MTRDeviceReadThroughTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceReadThroughTests.m; sourceTree = "<group>"; };
+		C0DE0136770254000000D001 /* MTRDeviceAsyncReadOutcomeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceAsyncReadOutcomeTests.m; sourceTree = "<group>"; };
+		C0DE0136770254000000E001 /* MTRDeviceAsyncReadBatchingTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceAsyncReadBatchingTests.m; sourceTree = "<group>"; };
+		C0DE0136770254000000F001 /* MTRDeviceAsyncReadCancellationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceAsyncReadCancellationTests.m; sourceTree = "<group>"; };
+		C0DE01367702540000001001 /* MTRDeviceAsyncReadContractTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceAsyncReadContractTests.m; sourceTree = "<group>"; };
 		C0DE0136770254000000B001 /* MTRDeviceReportFilterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceReportFilterTests.m; sourceTree = "<group>"; };
 		C0DE0136770254000000C001 /* MTRTestResponseValues.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestResponseValues.m; sourceTree = "<group>"; };
 		C0DE0136770254000000C003 /* MTRTestResponseValues.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestResponseValues.h; sourceTree = "<group>"; };
@@ -2058,6 +2066,10 @@
 				51D9CB0A2BA37DCE0049D6DB /* MTRDSTOffsetTests.m */,
 				C0DE0136770254000000A001 /* MTRDeviceReadThroughTests.m */,
 				C0DE0136770254000000B001 /* MTRDeviceReportFilterTests.m */,
+				C0DE01367702540000001001 /* MTRDeviceAsyncReadContractTests.m */,
+				C0DE0136770254000000F001 /* MTRDeviceAsyncReadCancellationTests.m */,
+				C0DE0136770254000000E001 /* MTRDeviceAsyncReadBatchingTests.m */,
+				C0DE0136770254000000D001 /* MTRDeviceAsyncReadOutcomeTests.m */,
 				3D9F2FCF2D11FE90003CA2BB /* MTREndpointInfoTests.m */,
 				3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */,
 				51578AE82D0B9B1D001716FF /* MTRErrorMappingTests.m */,
@@ -2963,6 +2975,10 @@
 				51D9CB0B2BA37DCE0049D6DB /* MTRDSTOffsetTests.m in Sources */,
 				C0DE0136770254000000A002 /* MTRDeviceReadThroughTests.m in Sources */,
 				C0DE0136770254000000B002 /* MTRDeviceReportFilterTests.m in Sources */,
+				C0DE01367702540000001002 /* MTRDeviceAsyncReadContractTests.m in Sources */,
+				C0DE0136770254000000F002 /* MTRDeviceAsyncReadCancellationTests.m in Sources */,
+				C0DE0136770254000000E002 /* MTRDeviceAsyncReadBatchingTests.m in Sources */,
+				C0DE0136770254000000D002 /* MTRDeviceAsyncReadOutcomeTests.m in Sources */,
 				C0DE0136770254000000C002 /* MTRTestResponseValues.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
