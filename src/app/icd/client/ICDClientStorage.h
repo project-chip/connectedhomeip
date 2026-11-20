@@ -51,7 +51,8 @@ public:
 
     /**
      * Store updated ICD ClientInfo to storage when ICD registration completes or check-in message
-     * comes.
+     * comes. If an entry for the same peer node already exists and its key handles differ from
+     * those in clientInfo, the old keys are destroyed.
      *
      * @param[in] clientInfo the updated ICD Client Info.
      */
