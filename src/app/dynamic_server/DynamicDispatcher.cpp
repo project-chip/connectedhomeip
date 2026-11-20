@@ -278,7 +278,8 @@ Protocols::InteractionModel::Status emberAfWriteAttribute(const ConcreteAttribut
 
 Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord,
                                                              const EmberAfAttributeMetadata ** metadata, uint8_t * buffer,
-                                                             uint16_t readLength, bool write)
+                                                             uint16_t readLength, bool write,
+                                                             const chip::Access::SubjectDescriptor * subjectDescriptor)
 {
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
