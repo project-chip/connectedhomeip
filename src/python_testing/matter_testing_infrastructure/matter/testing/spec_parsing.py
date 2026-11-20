@@ -28,6 +28,7 @@ import zipfile
 from copy import deepcopy
 from dataclasses import dataclass, field, fields
 from enum import Enum, StrEnum, auto
+from graphlib import TopologicalSorter
 from importlib.resources.abc import Traversable
 
 import matter.clusters as Clusters
@@ -244,6 +245,7 @@ class XmlCommand:
     # XmlDataTypeComponent is reused here because command fields carry the same
     # shape as struct fields in the data model XML (id/name/type/quality/constraint).
     fields: dict[uint, XmlDataTypeComponent] = field(default_factory=dict)
+    conformance_is_explicit: bool = True
 
     def __str__(self):
         return f'{self.name} id:0x{self.id:02X} {self.id} conformance: {str(self.conformance)} privilege: {str(self.privilege)}'
@@ -1188,7 +1190,9 @@ class ClusterParser:
             if conformance is not None:
                 _, _, privilege = self.parse_access(element, access_xml, conformance)
                 commands.append(XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
-                                           privilege=get_access_privilege_or_unknown(privilege)))
+                                           privilege=get_access_privilege_or_unknown(privilege),
+                                           fields=self.parse_command_fields(element),
+                                           conformance_is_explicit=any(child.tag in TOP_LEVEL_CONFORMANCE_TAGS for child in element)))
         return commands
 
     def parse_command_fields(self, element: ElementTree.Element) -> dict[uint, XmlDataTypeComponent]:
@@ -1230,13 +1234,19 @@ class ClusterParser:
             conformance = self.parse_conformance(conformance_xml)
             if conformance is None:
                 continue
+            conformance_is_explicit = any(child.tag in TOP_LEVEL_CONFORMANCE_TAGS for child in element)
             if code in commands:
-                conformance = or_operation([conformance, commands[code].conformance])
+                if conformance_is_explicit == commands[code].conformance_is_explicit:
+                    conformance = or_operation([conformance, commands[code].conformance])
+                elif not conformance_is_explicit:
+                    conformance = commands[code].conformance
+                conformance_is_explicit = conformance_is_explicit or commands[code].conformance_is_explicit
 
             _, _, privilege = self.parse_access(element, access_xml, conformance)
             commands[uint(code)] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
                                               privilege=get_access_privilege_or_unknown(privilege),
-                                              fields=self.parse_command_fields(element))
+                                              fields=self.parse_command_fields(element),
+                                              conformance_is_explicit=conformance_is_explicit)
         return commands
 
     def parse_events(self) -> dict[uint, XmlEvent]:
@@ -1557,7 +1567,18 @@ def build_xml_clusters(data_model_directory: PrebuiltDataModelDirectory | Traver
 def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pure_base_clusters: dict[str, XmlCluster], ids_by_name: dict[str, uint], problems: list[ProblemNotice]) -> None:
     ''' Overrides base elements with the derived cluster values for derived clusters. '''
 
-    def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint, problems: list[ProblemNotice]) -> dict[uint, XmlAttribute]:
+    def combine_command(base: XmlCommand, override: XmlCommand) -> XmlCommand:
+        combined = deepcopy(override)
+        if not override.conformance_is_explicit:
+            combined.conformance = base.conformance
+            combined.conformance_is_explicit = base.conformance_is_explicit
+        if override.privilege == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
+            combined.privilege = base.privilege
+        combined.fields = deepcopy(base.fields)
+        combined.fields.update(deepcopy(override.fields))
+        return combined
+
+    def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint | None, problems: list[ProblemNotice]) -> dict[uint, XmlAttribute]:
         ret = deepcopy(base)
         extras = {k: v for k, v in derived.items() if k not in base}
         overrides = {k: v for k, v in derived.items() if k in base}
@@ -1570,6 +1591,8 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             if override.write_access:
                 ret[_id].write_access = override.write_access
 
+        if cluster_id is None:
+            return ret
         for attr_id, attribute in ret.items():
             if attribute.read_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue and attribute.write_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
                 location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=attr_id)
@@ -1579,7 +1602,15 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
 
     # We have the information now about which clusters are derived, so we need to fix them up. Apply first the base cluster,
     # then add the specific cluster overtop
-    for cid, c in xml_clusters.items():
+    clusters_by_key: dict[uint | str, XmlCluster] = {}
+    clusters_by_key.update(xml_clusters.items())
+    clusters_by_key.update(pure_base_clusters.items())
+    base_dependencies = {
+        cluster_key: [ids_by_name.get(cluster.derived, cluster.derived)] if cluster.derived else []
+        for cluster_key, cluster in clusters_by_key.items()
+    }
+    for cid in TopologicalSorter(base_dependencies).static_order():
+        c = clusters_by_key[cid]
         if c.derived:
             base_name = c.derived
             if base_name in ids_by_name:
@@ -1595,11 +1626,12 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             command_map.update(c.command_map)
             features = deepcopy(base.features)
             features.update(c.features)
-            attributes = combine_attributes(base.attributes, c.attributes, cid, problems)
+            attributes = combine_attributes(base.attributes, c.attributes, uint(cid) if isinstance(cid, int) else None, problems)
             accepted_commands = deepcopy(base.accepted_commands)
-            accepted_commands.update(c.accepted_commands)
             generated_commands = deepcopy(base.generated_commands)
-            generated_commands.update(c.generated_commands)
+            for commands, overrides in ((accepted_commands, c.accepted_commands), (generated_commands, c.generated_commands)):
+                for command_id, override in overrides.items():
+                    commands[command_id] = combine_command(commands[command_id], override) if command_id in commands else override
             events = deepcopy(base.events)
             events.update(c.events)
             structs = deepcopy(base.structs)
@@ -1611,9 +1643,9 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             unknown_commands = deepcopy(base.unknown_commands)
             for cmd in c.unknown_commands:
                 if cmd.id in accepted_commands and cmd.name == accepted_commands[uint(cmd.id)].name:
-                    accepted_commands[uint(cmd.id)].conformance = cmd.conformance
+                    accepted_commands[uint(cmd.id)] = combine_command(accepted_commands[uint(cmd.id)], cmd)
                 elif cmd.id in generated_commands and cmd.name == generated_commands[uint(cmd.id)].name:
-                    generated_commands[uint(cmd.id)].conformance = cmd.conformance
+                    generated_commands[uint(cmd.id)] = combine_command(generated_commands[uint(cmd.id)], cmd)
                 else:
                     unknown_commands.append(cmd)
             provisional = c.is_provisional or base.is_provisional
@@ -1624,7 +1656,11 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                              features=features, attributes=attributes, accepted_commands=accepted_commands,
                              generated_commands=generated_commands, unknown_commands=unknown_commands, events=events, structs=structs,
                              enums=enums, bitmaps=bitmaps, pics=c.pics, is_provisional=provisional, revision_desc=revision_desc)
-            xml_clusters[cid] = new
+            clusters_by_key[cid] = new
+            if isinstance(cid, str):
+                pure_base_clusters[cid] = new
+            else:
+                xml_clusters[cid] = new
 
 
 def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[ProblemNotice]]:
