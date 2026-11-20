@@ -22,18 +22,6 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-namespace {
-
-// Mirrors TestEventTriggerHandler::clearEndpointInEventTrigger's bit layout (bits 32-47).
-constexpr uint64_t kEndpointMask = 0x0000FFFF00000000;
-
-EndpointId GetEndpointIdFromEventTrigger(uint64_t eventTrigger)
-{
-    return static_cast<EndpointId>((eventTrigger & kEndpointMask) >> 32);
-}
-
-} // namespace
-
 // LoggingHumidityConditioner
 
 LoggingHumidityConditioner::LoggingHumidityConditioner(TimerDelegate & timerDelegate,

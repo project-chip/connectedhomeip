@@ -25,7 +25,7 @@
  *
  * @note If TestEventTrigger is enabled, it needs to be implemented in the app
  *
- * @param eventTrigger Event trigger to handle
+ * @param eventTrigger Event trigger to handle (endpoint bits cleared)
  *
  * @retval true on success
  * @retval false if error happened
@@ -81,15 +81,13 @@ enum class EnergyEvseTrigger : uint64_t
     kEVSETriggerRFID = 0x0099000000000050,
 };
 
+/// Adapter for the application's global HandleEnergyEvseTestEventTrigger().
+/// Object-owned EVSE devices should implement TestEventTriggerHandler directly.
+/// Use GetEndpointIdFromEventTrigger() to accept their own endpoint or kRootEndpointId
+/// (0, unscoped) before clearing the endpoint bits.
 class EnergyEvseTestEventTriggerHandler : public TestEventTriggerHandler
 {
 public:
-    explicit EnergyEvseTestEventTriggerHandler() {}
-
-    /** This function must return True if the eventTrigger is recognised and handled
-     *  It must return False to allow a higher level TestEvent handler to check other
-     *  clusters that may handle it.
-     */
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
     {
         eventTrigger = clearEndpointInEventTrigger(eventTrigger);
