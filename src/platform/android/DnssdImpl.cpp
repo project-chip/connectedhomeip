@@ -28,6 +28,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <cstddef>
+#include <cstdlib>
 #include <jni.h>
 #include <memory>
 #include <sstream>
@@ -456,6 +457,7 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, 
                 {
                     data[j] = static_cast<uint8_t>(jnidata[j]);
                 }
+                env->ReleaseByteArrayElements(datas, jnidata, JNI_ABORT);
                 entries[i].mDataSize = dataSize;
                 entries[i].mData     = data;
 
@@ -481,7 +483,7 @@ exit:
         size_t size = service.mTextEntrySize;
         for (size_t i = 0; i < size; i++)
         {
-            delete[] service.mTextEntries[i].mKey;
+            free(const_cast<char *>(service.mTextEntries[i].mKey));
             if (service.mTextEntries[i].mData != nullptr)
             {
                 delete[] service.mTextEntries[i].mData;
@@ -504,8 +506,8 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     JniUtfString jniServiceType(env, serviceType);
 
-    auto size              = env->GetArrayLength(instanceName);
-    DnssdService * service = new DnssdService[size];
+    auto size = env->GetArrayLength(instanceName);
+    std::unique_ptr<DnssdService[]> service(new DnssdService[size]);
     for (decltype(size) i = 0; i < size; i++)
     {
         JniUtfString jniInstanceName(env, (jstring) env->GetObjectArrayElement(instanceName, i));
@@ -517,8 +519,7 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
                        dispatch(CHIP_ERROR_INVALID_ARGUMENT));
     }
 
-    dispatch(CHIP_NO_ERROR, service, size);
-    delete[] service;
+    dispatch(CHIP_NO_ERROR, service.get(), size);
 }
 
 } // namespace Dnssd
