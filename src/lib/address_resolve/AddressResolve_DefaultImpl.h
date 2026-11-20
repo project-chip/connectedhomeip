@@ -41,7 +41,7 @@ struct NodeLookupResults
     // UpdateResults clears the interface of non-link-local results and a score can depend on the interface.
     struct ScoredResult : public ResolveResult
     {
-        Dnssd::IPAddressSorter::IpScore score = Dnssd::IPAddressSorter::IpScore::kInvalid;
+        uint8_t score = 0;
     };
     static_assert(sizeof(ScoredResult) == sizeof(ResolveResult), "score must fit in the tail padding of ResolveResult");
 
@@ -49,7 +49,7 @@ struct NodeLookupResults
     uint8_t count                               = 0; // number of valid ResolveResult
     uint8_t consumed                            = 0; // number of already read ResolveResult
 
-    bool UpdateResults(const ResolveResult & result, Dnssd::IPAddressSorter::IpScore score);
+    bool UpdateResults(const ResolveResult & result, uint8_t score);
 
     bool HasValidResult() const { return count > consumed; }
 
