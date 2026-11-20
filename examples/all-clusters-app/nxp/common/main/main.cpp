@@ -37,7 +37,11 @@ int main(int argc, char * argv[])
     TaskHandle_t taskHandle;
 
     PlatformMgrImpl().HardwareInit();
-    chip::NXP::App::GetAppTask().Start();
+    if (CHIP_NO_ERROR != chip::NXP::App::GetAppTask().Start())
+    {
+        ChipLogError(NotSpecified, "Failed to start AppTask");
+        chipDie();
+    }
     vTaskStartScheduler();
 }
 
