@@ -651,6 +651,8 @@ protected:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
+namespace {
+
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
 {
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
@@ -661,6 +663,8 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
 
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
+
+} // namespace
 
 CommandPathParams MakeTestCommandPath(CommandId aCommandId = kTestCommandIdWithData)
 {

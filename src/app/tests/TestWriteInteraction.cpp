@@ -214,6 +214,8 @@ private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
+namespace {
+
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
 {
 public:
@@ -244,6 +246,8 @@ private:
 
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
+
+} // namespace
 
 class TestWriteClientCallback : public chip::app::WriteClient::Callback
 {
