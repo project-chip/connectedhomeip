@@ -120,6 +120,23 @@ CHIP_ERROR BdxTransferDiagnosticLog::OnMessageReceived(Messaging::ExchangeContex
     return TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
 }
 
+bool BdxTransferDiagnosticLog::CanHandleOutput() const
+{
+    // Every BDX message except a StatusReport is sent with kExpectResponse, and an exchange can have only one unacknowledged
+    // outgoing message. Sending while the previous message (typically the last BlockAck) is still waiting for its ack fails with
+    // CHIP_ERROR_INCORRECT_STATE and would end the transfer without telling the peer, so hold the output back until the wait
+    // ends. The wait is bounded by MRP: it ends when the ack arrives or when MRP has exhausted its retransmissions of the
+    // message and dropped it.
+    const bool waitingForAck = mExchangeCtx != nullptr && mExchangeCtx->IsWaitingForAck();
+    if (waitingForAck && !mLoggedDeferral)
+    {
+        // Log once per wait, not on every poll tick.
+        ChipLogDetail(BDX, "Deferring BDX output until the previous message is acknowledged");
+    }
+    mLoggedDeferral = waitingForAck;
+    return !waitingForAck;
+}
+
 CHIP_ERROR BdxTransferDiagnosticLog::OnMessageToSend(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
@@ -191,6 +208,7 @@ void BdxTransferDiagnosticLog::Reset()
     }
 
     mTransferProxy.Reset();
+    mLoggedDeferral = false;
 }
 
 void BdxTransferDiagnosticLog::OnExchangeClosing(Messaging::ExchangeContext * ec)

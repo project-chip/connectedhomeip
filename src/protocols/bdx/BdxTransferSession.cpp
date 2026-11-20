@@ -64,7 +64,7 @@ TransferSession::TransferSession()
     mSuppportedXferOpts.ClearAll();
 }
 
-void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp curTime)
+void TransferSession::PollTimeout(OutputEvent & event, System::Clock::Timestamp curTime)
 {
     event = OutputEvent(OutputEventType::kNone);
 
@@ -79,8 +79,13 @@ void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp c
         event             = OutputEvent(OutputEventType::kTransferTimeout);
         mState            = TransferState::kErrorState;
         mAwaitingResponse = false;
-        return;
     }
+}
+
+void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp curTime)
+{
+    PollTimeout(event, curTime);
+    VerifyOrReturn(event.EventType == OutputEventType::kNone);
 
     switch (mPendingOutput)
     {
