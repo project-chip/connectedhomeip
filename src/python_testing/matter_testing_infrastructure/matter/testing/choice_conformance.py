@@ -24,7 +24,7 @@ from matter.tlv import uint
 
 class ChoiceConformanceProblemNotice(ProblemNotice):
     def __init__(self, location: AttributePathLocation, choice: Choice, count: int):
-        problem = f'Problem with choice conformance {choice} - {count} selected'
+        problem = f'Problem with choice conformance {choice}: {count} selected'
         super().__init__(test_name='Choice conformance', location=location, severity=ProblemSeverity.ERROR, problem=problem, spec_location='')
         self.choice = choice
         self.count = count
