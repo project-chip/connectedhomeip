@@ -71,10 +71,12 @@ public:
     Protocols::InteractionModel::Status
     NotifyTransportStarted(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
                            Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
-                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
+                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>(),
+                           Optional<uint64_t> cmafSessionNumber = Optional<uint64_t>());
 
     Protocols::InteractionModel::Status NotifyTransportStopped(uint16_t connectionID,
-                                                               PushAvStreamTransport::TransportTriggerTypeEnum triggerType);
+                                                               PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
+                                                               Optional<uint64_t> cmafSessionNumber = Optional<uint64_t>());
 
     enum class UpsertResultEnum : uint8_t
     {
@@ -152,7 +154,17 @@ public:
                                     const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason,
                                     const PushAvStreamTransport::ContainerFormatEnum containerType,
                                     const Optional<uint64_t> cmafSessionNumber = Optional<uint64_t>());
-    Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID);
+    Protocols::InteractionModel::Status
+    GeneratePushTransportEndEvent(const uint16_t connectionID, const Optional<uint64_t> cmafSessionNumber = Optional<uint64_t>());
+
+    /**
+     * @brief Returns the CMAFSessionNumber to report in a PushTransportBegin or PushTransportEnd event.
+     *
+     * @param cmafSessionNumber The session number supplied by the application, used if present.
+     * @return cmafSessionNumber if present, otherwise the delegate's GetCMAFSessionNumber() for connectionID, or an empty
+     *         Optional if the delegate cannot provide one.
+     */
+    Optional<uint64_t> ResolveCMAFSessionNumber(uint16_t connectionID, const Optional<uint64_t> & cmafSessionNumber);
 
 private:
     PushAvStreamTransportDelegate * mDelegate                            = nullptr;
