@@ -49,6 +49,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/Closure.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/ClosureVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/SimulatedClosure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure-controller/ClosureController.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/ClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/impl/SimulatedClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/color-temperature-light/ColorTemperatureLight.cpp"
@@ -128,6 +129,11 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/SmokeCoAlarm.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/SoilSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/SolarPower.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/SolarPowerTags.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/PanelElectricalSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/SimulatedSolarPower.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/SolarPowerVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/speaker/Speaker.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/speaker/impl/LoggingSpeaker.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-controlled-cabinet/TemperatureControlledCabinetPart.cpp"
@@ -203,6 +209,7 @@ foreach(_key
         bridged-node
         chime
         closure
+        closure-controller
         color-temperature-light
         commissioning-proxy
         contact-sensor
@@ -243,6 +250,7 @@ foreach(_key
         room-air-conditioner
         smoke-co-alarm
         soil-sensor
+        solar-power
         speaker
         temperature-sensor
         thermostat

@@ -3848,6 +3848,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     // controllers do not hold strong references to delegates.
     __auto_type * controllerDelegate = [[MTRPerControllerStorageTestsDeallocDelegate alloc] init];
     __auto_type * deviceDelegate = [[MTRDeviceTestDelegate alloc] init];
+    dispatch_semaphore_t deviceReleased = dispatch_semaphore_create(0);
     @autoreleasepool {
         // Expected the test device was added and removed
         __block NSUInteger lastDeviceCount = controller.devices.count;
@@ -3869,8 +3870,11 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
         XCTestExpectation * subscriptionReportBegin = [self expectationWithDescription:@"Subscription report begin"];
 
-        deviceDelegate.onReportBegin = ^{
+        // Hold the report at its start until the test has dropped every reference to the device, so
+        // the device deallocs when report-begin handling returns, before any report data is handled.
+        deviceDelegate.onReportBeginOnMatterQueue = ^{
             [subscriptionReportBegin fulfill];
+            dispatch_semaphore_wait(deviceReleased, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kTimeoutInSeconds * NSEC_PER_SEC)));
         };
 
         deviceDelegate.onReportEnd = ^{
@@ -3886,9 +3890,17 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         [self waitForExpectations:@[ subscriptionReportBegin ] timeout:60];
 
         XCTAssertEqual(controller.devices.count, 1);
+
+        // Blocks on the device queue hold the device while they run.
+        [device unitTestSyncRunOnDeviceQueue:^ {}];
     }
 
-    // Wait for the report processing to finish, so the MTRDevice object may dealloc
+    // Delegate callbacks already queued to `queue` hold the device until they run.
+    dispatch_sync(queue, ^ {});
+    deviceDelegate.onReportBeginOnMatterQueue = nil;
+    dispatch_semaphore_signal(deviceReleased);
+
+    // Wait for report-begin handling to return, which releases the last reference to the device.
     [controller syncRunOnWorkQueue:^{
         ;
     } error:nil];
@@ -4100,6 +4112,18 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                                                attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeNOCsID)];
 
     void (^checkNOCsReadIsNotFabricFiltered)(MTRReadParams * _Nullable) = ^(MTRReadParams * _Nullable params) {
+        // Ensure that MTRDevice does not coalesce our read with a previous read
+        // that's still in its work queue.  The queue runs one item at a time,
+        // so once a marker item runs, every earlier work item has completed.
+        XCTestExpectation * earlierWorkItemsCompletedExpectation = [self expectationWithDescription:@"Earlier work items completed"];
+        MTRAsyncWorkItem * markerWorkItem = [[MTRAsyncWorkItem alloc] initWithQueue:queue];
+        [markerWorkItem setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+            completion(MTRAsyncWorkComplete);
+            [earlierWorkItemsCompletedExpectation fulfill];
+        }];
+        [device.asyncWorkQueue enqueueWorkItem:markerWorkItem description:@"Marker before NOCs read"];
+        [self waitForExpectations:@[ earlierWorkItemsCompletedExpectation ] timeout:kTimeoutInSeconds];
+
         XCTestExpectation * readFromDeviceExpectation = [self expectationWithDescription:@"NOCs read from device"];
         __block NSArray * nocsReadFromDevice;
         delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {

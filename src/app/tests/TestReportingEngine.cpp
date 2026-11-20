@@ -28,6 +28,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/ConcreteAttributePath.h>
+#include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/tests/MockReportScheduler.h>
@@ -102,6 +103,8 @@ public:
     void TestMergeOverlappedAttributePath();
     void TestMergeAttributePathWhenDirtySetPoolExhausted();
     void TestShutdownForgetsScheduledRun();
+    void TestInitRequiresTheSameEventManagementUntilShutdown();
+    void TestInitAgainLeavesReportsInFlight();
 
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
@@ -512,6 +515,32 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestShutdownForgetsScheduledRun)
     EXPECT_TRUE(engine.IsRunScheduled());
     DrainAndServiceIO();
     EXPECT_FALSE(engine.IsRunScheduled());
+}
+
+TEST_F_FROM_FIXTURE(TestReportingEngine, TestInitRequiresTheSameEventManagementUntilShutdown)
+{
+    Engine & engine = InteractionModelEngine::GetInstance()->GetReportingEngine();
+    EventManagement otherEventManagement;
+
+    EXPECT_SUCCESS(engine.Init(&EventManagement::GetInstance()));
+    EXPECT_EQ(engine.Init(&otherEventManagement), CHIP_ERROR_INCORRECT_STATE);
+
+    engine.Shutdown();
+    EXPECT_SUCCESS(engine.Init(&otherEventManagement));
+
+    engine.Shutdown();
+    EXPECT_SUCCESS(engine.Init(&EventManagement::GetInstance()));
+}
+
+TEST_F_FROM_FIXTURE(TestReportingEngine, TestInitAgainLeavesReportsInFlight)
+{
+    Engine & engine = InteractionModelEngine::GetInstance()->GetReportingEngine();
+
+    engine.mNumReportsInFlight++;
+    EXPECT_SUCCESS(engine.Init(&EventManagement::GetInstance()));
+    // OnReportConfirm() dies if it finds no report in flight.
+    ASSERT_EQ(engine.GetNumReportsInFlight(), 1u);
+    engine.OnReportConfirm();
 }
 
 } // namespace reporting

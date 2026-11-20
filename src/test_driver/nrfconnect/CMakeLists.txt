@@ -57,8 +57,8 @@ include(${CHIP_ROOT}/third_party/pigweed/repo/pw_assert/backend.cmake)
 include(${CHIP_ROOT}/third_party/pigweed/repo/pw_sys_io/backend.cmake)
 
 pw_set_backend(pw_log pw_log_basic)
-pw_set_backend(pw_assert.check pw_assert_log.check_backend)
-pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
+pw_set_backend(pw_assert.check pw_assert.print_and_abort_check_backend)
+pw_set_backend(pw_assert.assert pw_assert.print_and_abort_assert_backend)
 # native_sim runs as a host process; stdio avoids pw_sys_io_zephyr's dependency on
 # Zephyr kernel headers (heap_constants.h build-order issue on Zephyr 4.4).
 pw_set_backend(pw_sys_io pw_sys_io_stdio)
@@ -76,11 +76,12 @@ project(AllChipTests)
 enable_testing()
 
 target_sources(app PRIVATE main/runner.cpp)
+# pw_sys_io_stdio and its default_putget_bytes object are already linked
+# via --whole-archive libCHIP_tests.a; linking them here duplicates symbols.
 target_link_libraries(app PUBLIC
   chip
   $<TARGET_FILE:kernel>
   pw_unit_test
-  pw_sys_io_stdio
 )
 target_compile_definitions(app PUBLIC CHIP_HAVE_CONFIG_H)
 

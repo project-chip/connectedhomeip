@@ -1,1 +1,1 @@
-221 : [Ameba] Update Docker image for C++ libc macro conflict
+222 : [CI] Publish chip-build and chip-build-minimal as multi-arch (amd64 + arm64) images

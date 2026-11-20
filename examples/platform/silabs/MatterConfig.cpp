@@ -391,6 +391,9 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // Initialize the remaining (not overridden) providers to the SDK example defaults
     ReturnErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
 
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
 #if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
     // App is using code-driven data model - initialize it
     CHIP_ERROR dmErr = AppTask::InitCodeDrivenDataModel(*initParams.persistentStorageDelegate, initParams.groupDataProvider,
@@ -412,9 +415,6 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #if !defined(SL_MATTER_CUSTOM_APPTASK) || !SL_MATTER_CUSTOM_APPTASK
     initParams.appDelegate = &BaseApplication::sAppDelegate;
 #endif // !SL_MATTER_CUSTOM_APPTASK
-    // This is needed by localization configuration cluster so we set it before the initialization
-    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
 #if defined(SL_MATTER_ENABLE_CODEGEN_TIME_SYNC)
     // Directly constructed clusters receive this delegate through their startup configuration instead.
