@@ -85,9 +85,10 @@
 
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 
-#ifndef CHIP_DEVICE_LAYER_TARGET_DARWIN
-// Increase memory pools for better attribute reading performance
-#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 500 // Default is 15
-// Include the CHIPProjectConfig from platform implementation config
+// CHIP_DEVICE_LAYER_TARGET_DARWIN is always defined (0 or 1), so test its value.
+// Darwin builds take these settings from src/platform/Darwin/CHIPPlatformConfig.h.
+#if !CHIP_DEVICE_LAYER_TARGET_DARWIN
+// Include the CHIPProjectConfig from config/standalone. It selects heap-allocated
+// PacketBuffers (CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0).
 #include <CHIPProjectConfig.h>
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+#endif // !CHIP_DEVICE_LAYER_TARGET_DARWIN

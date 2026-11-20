@@ -5,8 +5,10 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BufferReader.h>
+#include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <protocols/bdx/BdxTransferSession.h>
@@ -86,6 +88,25 @@ CHIP_ERROR AttachHeaderAndSend(TransferSession::MessageTypeData typeData, chip::
 
     ReturnErrorOnFailure(receiver.HandleMessageReceived(payloadHeader, std::move(msgBuf), kNoAdvanceTime));
     return CHIP_NO_ERROR;
+}
+
+// Serializes a BDX message struct and delivers it directly to `receiver`, bypassing the normal TransferSession
+// send path (which clamps/validates parameters). Used to inject messages the normal path would not emit -- e.g. an
+// Accept advertising a Max Block Size larger than the one we proposed.
+CHIP_ERROR SendRawBdxMessage(const BdxMessage & msg, MessageType type, TransferSession & receiver)
+{
+    TransferSession::MessageTypeData typeData;
+    typeData.ProtocolId  = Protocols::BDX::Id;
+    typeData.MessageType = static_cast<uint8_t>(type);
+
+    size_t msgSize = msg.MessageSize();
+    Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(msgSize));
+    VerifyOrReturnError(!bbuf.IsNull(), CHIP_ERROR_NO_MEMORY);
+    msg.WriteToBuffer(bbuf);
+    System::PacketBufferHandle msgBuf = bbuf.Finalize();
+    VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+    return AttachHeaderAndSend(typeData, std::move(msgBuf), receiver);
 }
 
 // Helper method for verifying that a PacketBufferHandle contains a valid BDX header and message type matches expected.
@@ -203,6 +224,7 @@ void SendAndVerifyAcceptMsg(TransferSession::OutputEvent & outEvent, TransferSes
 
     err = acceptSender.AcceptTransfer(acceptData);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(acceptSender.GetStartOffset(), initData.StartOffset);
 
     // Verify Sender emits ReceiveAccept message for sending
     acceptSender.PollOutput(outEvent, kNoAdvanceTime);
@@ -215,14 +237,14 @@ void SendAndVerifyAcceptMsg(TransferSession::OutputEvent & outEvent, TransferSes
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Verify received ReceiveAccept.
-    // Client may want to inspect TransferControl, MaxBlockSize, StartOffset, Length, and Metadata, and may choose to reject the
+    // Client may want to inspect TransferControl, MaxBlockSize, Length, and Metadata, and may choose to reject the
     // Transfer at this point.
     acceptReceiver.PollOutput(outEvent, kNoAdvanceTime);
     VerifyNoMoreOutput(acceptReceiver);
     EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kAcceptReceived);
     EXPECT_EQ(outEvent.transferAcceptData.ControlMode, acceptData.ControlMode);
     EXPECT_EQ(outEvent.transferAcceptData.MaxBlockSize, acceptData.MaxBlockSize);
-    EXPECT_EQ(outEvent.transferAcceptData.StartOffset, acceptData.StartOffset);
+    EXPECT_EQ(acceptReceiver.GetStartOffset(), initData.StartOffset);
     EXPECT_EQ(outEvent.transferAcceptData.Length, acceptData.Length);
     if (outEvent.transferAcceptData.Metadata != nullptr)
     {
@@ -386,6 +408,7 @@ TEST_F(TestBdxTransferSession, TestInitiatingReceiverReceiverDrive)
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = driveMode;
     initOptions.MaxBlockSize     = proposedBlockSize;
+    initOptions.StartOffset      = proposedOffset;
     char testFileDes[9]          = { "test.txt" };
     initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
     initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
@@ -408,7 +431,6 @@ TEST_F(TestBdxTransferSession, TestInitiatingReceiverReceiverDrive)
     // Compose ReceiveAccept parameters struct and give to respondingSender
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode    = respondingSender.GetControlMode();
-    acceptData.StartOffset    = proposedOffset;
     acceptData.Length         = proposedLength;
     acceptData.MaxBlockSize   = testSmallerBlockSize;
     acceptData.Metadata       = tlvBuf;
@@ -511,7 +533,6 @@ TEST_F(TestBdxTransferSession, TestInitiatingSenderSenderDrive)
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode    = respondingReceiver.GetControlMode();
     acceptData.MaxBlockSize   = proposedBlockSize;
-    acceptData.StartOffset    = 0; // not used in SendAccept
     acceptData.Length         = 0; // not used in SendAccept
     acceptData.Metadata       = nullptr;
     acceptData.MetadataLength = 0;
@@ -568,7 +589,6 @@ TEST_F(TestBdxTransferSession, TestBadAcceptMessageFields)
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode  = driveMode;
     acceptData.MaxBlockSize = static_cast<uint16_t>(maxBlockSize + 1); // invalid if larger than proposed
-    acceptData.StartOffset  = commonOffset;
     acceptData.Length       = commonLength;
     err                     = respondingSender.AcceptTransfer(acceptData);
     EXPECT_NE(err, CHIP_NO_ERROR);
@@ -578,10 +598,341 @@ TEST_F(TestBdxTransferSession, TestBadAcceptMessageFields)
     acceptData2.ControlMode  = (driveMode == TransferControlFlags::kReceiverDrive) ? TransferControlFlags::kSenderDrive
                                                                                    : TransferControlFlags::kReceiverDrive;
     acceptData2.MaxBlockSize = maxBlockSize;
-    acceptData2.StartOffset  = commonOffset;
     acceptData2.Length       = commonLength;
     err                      = respondingSender.AcceptTransfer(acceptData2);
     EXPECT_NE(err, CHIP_NO_ERROR);
+}
+
+// Regression test for the receiver-side initiator path: a ReceiveAccept whose Max Block Size exceeds the value we
+// proposed must be rejected. Per the BDX spec the chosen Max Block Size SHALL be <= the proposed Max Block Size;
+// HandleReceiveAccept previously copied it in unchecked, so it could adopt a Max Block Size larger than the one it
+// proposed. AcceptTransfer() enforces the clamp on the sending side, so this injects a raw ReceiveAccept to exercise
+// the receiving side.
+TEST_F(TestBdxTransferSession, TestReceiveAcceptRejectsOversizeBlockSize)
+{
+    TransferSession::OutputEvent outEvent;
+    TransferSession initiatingReceiver;
+    TransferSession respondingSender;
+
+    uint16_t proposedBlockSize     = 64;
+    uint16_t oversizeBlockSize     = 1024; // larger than proposed -> spec violation
+    TransferControlFlags driveMode = TransferControlFlags::kReceiverDrive;
+    System::Clock::Timeout timeout = System::Clock::Seconds16(24);
+
+    TransferSession::TransferInitData initOptions;
+    initOptions.TransferCtlFlags = driveMode;
+    initOptions.MaxBlockSize     = proposedBlockSize;
+    initOptions.StartOffset      = 0;
+    initOptions.Length           = 0;
+    char testFileDes[9]          = { "test.txt" };
+    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
+    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+    initOptions.Metadata         = nullptr;
+    initOptions.MetadataLength   = 0;
+
+    BitFlags<TransferControlFlags> responderControl;
+    responderControl.Set(driveMode);
+
+    SendAndVerifyTransferInit(outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions, respondingSender,
+                              responderControl, proposedBlockSize);
+
+    ReceiveAccept rcvAccept;
+    rcvAccept.TransferCtlFlags.Set(driveMode);
+    rcvAccept.Version        = 0;
+    rcvAccept.MaxBlockSize   = oversizeBlockSize;
+    rcvAccept.Length         = 0;
+    rcvAccept.Metadata       = nullptr;
+    rcvAccept.MetadataLength = 0;
+
+    EXPECT_EQ(SendRawBdxMessage(rcvAccept, MessageType::ReceiveAccept, initiatingReceiver), CHIP_NO_ERROR);
+
+    // The receiver must reject with a BadMessageContents StatusReport rather than accepting the oversize value.
+    initiatingReceiver.PollOutput(outEvent, kNoAdvanceTime);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
+    VerifyStatusReport(outEvent.MsgData, StatusCode::kBadMessageContents);
+    EXPECT_LE(initiatingReceiver.GetTransferBlockSize(), proposedBlockSize);
+}
+
+// Sets up a receiver-drive transfer whose ReceiveInit proposes `proposedOffset`, up to the point where the responding
+// sender has received the ReceiveInit and has not yet accepted it.
+void InitiateReceiveWithStartOffset(TransferSession::OutputEvent & outEvent, TransferSession & initiatingReceiver,
+                                    TransferSession & respondingSender, uint16_t proposedBlockSize, uint64_t proposedOffset)
+{
+    TransferControlFlags driveMode = TransferControlFlags::kReceiverDrive;
+
+    TransferSession::TransferInitData initOptions;
+    initOptions.TransferCtlFlags = driveMode;
+    initOptions.MaxBlockSize     = proposedBlockSize;
+    initOptions.StartOffset      = proposedOffset;
+    initOptions.Length           = 0;
+    char testFileDes[9]          = { "test.txt" };
+    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
+    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+    initOptions.Metadata         = nullptr;
+    initOptions.MetadataLength   = 0;
+
+    BitFlags<TransferControlFlags> responderControl;
+    responderControl.Set(driveMode);
+
+    SendAndVerifyTransferInit(outEvent, System::Clock::Seconds16(24), initiatingReceiver, TransferRole::kReceiver, initOptions,
+                              respondingSender, responderControl, proposedBlockSize);
+}
+
+// A ReceiveAccept has no Start Offset field: accepting a ReceiveInit accepts the start offset it proposed, so both sides of
+// the transfer use that offset.
+TEST_F(TestBdxTransferSession, TestReceiveAcceptKeepsProposedStartOffset)
+{
+    TransferSession::OutputEvent outEvent;
+    TransferSession initiatingReceiver;
+    TransferSession respondingSender;
+
+    uint16_t proposedBlockSize = 64;
+    uint64_t proposedOffset    = 128;
+
+    InitiateReceiveWithStartOffset(outEvent, initiatingReceiver, respondingSender, proposedBlockSize, proposedOffset);
+
+    TransferSession::TransferAcceptData acceptData;
+    acceptData.ControlMode    = TransferControlFlags::kReceiverDrive;
+    acceptData.MaxBlockSize   = proposedBlockSize;
+    acceptData.Length         = 0;
+    acceptData.Metadata       = nullptr;
+    acceptData.MetadataLength = 0;
+
+    EXPECT_EQ(respondingSender.AcceptTransfer(acceptData), CHIP_NO_ERROR);
+    EXPECT_EQ(respondingSender.GetStartOffset(), proposedOffset);
+
+    respondingSender.PollOutput(outEvent, kNoAdvanceTime);
+    ASSERT_EQ(outEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
+    VerifyBdxMessageToSend(outEvent, MessageType::ReceiveAccept);
+    // Transfer Control, Range Control and Max Block Size, with Range Control bit 1 (reserved in a ReceiveAccept) clear.
+    ASSERT_EQ(outEvent.MsgData->DataLength(), 4u);
+    EXPECT_EQ(outEvent.MsgData->Start()[1] & static_cast<uint8_t>(RangeControlFlags::kStartOffset), 0);
+
+    EXPECT_EQ(AttachHeaderAndSend(outEvent.msgTypeData, std::move(outEvent.MsgData), initiatingReceiver), CHIP_NO_ERROR);
+    initiatingReceiver.PollOutput(outEvent, kNoAdvanceTime);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kAcceptReceived);
+    EXPECT_EQ(initiatingReceiver.GetStartOffset(), proposedOffset);
+}
+
+// Older versions of this SDK put a start offset, flagged by Range Control bit 1, in a ReceiveAccept. The receiver skips it so
+// that the fields after it parse correctly, and the transfer keeps the start offset the receiver proposed.
+TEST_F(TestBdxTransferSession, TestReceiveAcceptWithStartOffsetFromOlderPeer)
+{
+    TransferSession::OutputEvent outEvent;
+    TransferSession initiatingReceiver;
+    TransferSession respondingSender;
+
+    uint16_t proposedBlockSize = 64;
+    uint64_t proposedOffset    = 128;
+    uint32_t peerStartOffset   = 256;
+    uint32_t peerLength        = 1000;
+
+    InitiateReceiveWithStartOffset(outEvent, initiatingReceiver, respondingSender, proposedBlockSize, proposedOffset);
+
+    uint8_t olderReceiveAccept[12];
+    Encoding::LittleEndian::BufferWriter writer(olderReceiveAccept, sizeof(olderReceiveAccept));
+    writer
+        .Put(static_cast<uint8_t>(TransferControlFlags::kReceiverDrive)) // Version 0
+        .Put(static_cast<uint8_t>(to_underlying(RangeControlFlags::kDefLen) | to_underlying(RangeControlFlags::kStartOffset)))
+        .Put16(proposedBlockSize)
+        .Put32(peerStartOffset)
+        .Put32(peerLength);
+    ASSERT_TRUE(writer.Fit());
+
+    TransferSession::MessageTypeData typeData;
+    typeData.ProtocolId               = Protocols::BDX::Id;
+    typeData.MessageType              = static_cast<uint8_t>(MessageType::ReceiveAccept);
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::NewWithData(olderReceiveAccept, writer.Needed());
+    ASSERT_FALSE(msgBuf.IsNull());
+
+    EXPECT_EQ(AttachHeaderAndSend(typeData, std::move(msgBuf), initiatingReceiver), CHIP_NO_ERROR);
+    initiatingReceiver.PollOutput(outEvent, kNoAdvanceTime);
+    ASSERT_EQ(outEvent.EventType, TransferSession::OutputEventType::kAcceptReceived);
+    EXPECT_EQ(outEvent.transferAcceptData.MaxBlockSize, proposedBlockSize);
+    EXPECT_EQ(outEvent.transferAcceptData.Length, peerLength);
+    EXPECT_EQ(initiatingReceiver.GetStartOffset(), proposedOffset);
+}
+
+// Regression test for the sender-side initiator path: a SendAccept advertising a Max Block Size larger than the
+// proposed value must likewise be rejected (same BDX SHALL as above, HandleSendAccept path).
+TEST_F(TestBdxTransferSession, TestSendAcceptRejectsOversizeBlockSize)
+{
+    TransferSession::OutputEvent outEvent;
+    TransferSession initiatingSender;
+    TransferSession respondingReceiver;
+
+    uint16_t proposedBlockSize     = 64;
+    uint16_t oversizeBlockSize     = 1024; // larger than proposed -> spec violation
+    TransferControlFlags driveMode = TransferControlFlags::kSenderDrive;
+    System::Clock::Timeout timeout = System::Clock::Seconds16(24);
+
+    TransferSession::TransferInitData initOptions;
+    initOptions.TransferCtlFlags = driveMode;
+    initOptions.MaxBlockSize     = proposedBlockSize;
+    initOptions.StartOffset      = 0;
+    initOptions.Length           = 0;
+    char testFileDes[9]          = { "test.txt" };
+    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
+    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+    initOptions.Metadata         = nullptr;
+    initOptions.MetadataLength   = 0;
+
+    BitFlags<TransferControlFlags> responderControl;
+    responderControl.Set(driveMode);
+
+    SendAndVerifyTransferInit(outEvent, timeout, initiatingSender, TransferRole::kSender, initOptions, respondingReceiver,
+                              responderControl, proposedBlockSize);
+
+    SendAccept sendAccept;
+    sendAccept.TransferCtlFlags.Set(driveMode);
+    sendAccept.Version        = 0;
+    sendAccept.MaxBlockSize   = oversizeBlockSize;
+    sendAccept.Metadata       = nullptr;
+    sendAccept.MetadataLength = 0;
+
+    EXPECT_EQ(SendRawBdxMessage(sendAccept, MessageType::SendAccept, initiatingSender), CHIP_NO_ERROR);
+
+    initiatingSender.PollOutput(outEvent, kNoAdvanceTime);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
+    VerifyStatusReport(outEvent.MsgData, StatusCode::kBadMessageContents);
+    EXPECT_LE(initiatingSender.GetTransferBlockSize(), proposedBlockSize);
+}
+
+// Regression test: when the transfer has a definite length, a BlockEOF carrying more data than the remaining length must
+// be rejected with a LengthMismatch StatusReport, the same way an over-long Block is. PrepareBlock() does not enforce the
+// definite length on the sending side, so this injects a raw BlockEOF to exercise the receiving side.
+TEST_F(TestBdxTransferSession, TestBlockEOFExceedingDefiniteLengthIsRejected)
+{
+    TransferSession::OutputEvent outEvent;
+    TransferSession initiatingReceiver;
+    TransferSession respondingSender;
+
+    uint16_t proposedBlockSize     = 64;
+    uint64_t definiteLength        = 16;
+    uint16_t oversizeBlockLength   = 32; // within Max Block Size, but beyond the definite transfer length
+    TransferControlFlags driveMode = TransferControlFlags::kReceiverDrive;
+    System::Clock::Timeout timeout = System::Clock::Seconds16(24);
+
+    TransferSession::TransferInitData initOptions;
+    initOptions.TransferCtlFlags = driveMode;
+    initOptions.MaxBlockSize     = proposedBlockSize;
+    initOptions.StartOffset      = 0;
+    initOptions.Length           = definiteLength;
+    char testFileDes[9]          = { "test.txt" };
+    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
+    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+    initOptions.Metadata         = nullptr;
+    initOptions.MetadataLength   = 0;
+
+    BitFlags<TransferControlFlags> senderOpts;
+    senderOpts.Set(driveMode);
+
+    SendAndVerifyTransferInit(outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions, respondingSender,
+                              senderOpts, proposedBlockSize);
+
+    TransferSession::TransferAcceptData acceptData;
+    acceptData.ControlMode    = respondingSender.GetControlMode();
+    acceptData.Length         = definiteLength;
+    acceptData.MaxBlockSize   = proposedBlockSize;
+    acceptData.Metadata       = nullptr;
+    acceptData.MetadataLength = 0;
+
+    SendAndVerifyAcceptMsg(outEvent, respondingSender, TransferRole::kSender, acceptData, initiatingReceiver, initOptions);
+
+    SendAndVerifyQuery(respondingSender, initiatingReceiver, outEvent);
+
+    uint8_t fakeBlockData[64] = { 0 };
+    BlockEOF blockEOF;
+    blockEOF.BlockCounter = 0;
+    blockEOF.Data         = fakeBlockData;
+    blockEOF.DataLength   = oversizeBlockLength;
+
+    EXPECT_EQ(SendRawBdxMessage(blockEOF, MessageType::BlockEOF, initiatingReceiver), CHIP_NO_ERROR);
+
+    initiatingReceiver.PollOutput(outEvent, kNoAdvanceTime);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
+    VerifyStatusReport(outEvent.MsgData, StatusCode::kLengthMismatch);
+    EXPECT_EQ(initiatingReceiver.GetNumBytesProcessed(), 0u);
+}
+
+// Test that an empty block can be sent only as a BlockEOF, and that an empty BlockEOF can be sent with a null data pointer,
+// which is what a sender with no data left to send typically has.
+TEST_F(TestBdxTransferSession, TestEmptyBlocks)
+{
+    TransferSession::OutputEvent outEvent;
+    TransferSession initiatingReceiver;
+    TransferSession respondingSender;
+
+    uint16_t proposedBlockSize     = 64;
+    TransferControlFlags driveMode = TransferControlFlags::kReceiverDrive;
+    System::Clock::Timeout timeout = System::Clock::Seconds16(24);
+
+    TransferSession::TransferInitData initOptions;
+    initOptions.TransferCtlFlags = driveMode;
+    initOptions.MaxBlockSize     = proposedBlockSize;
+    initOptions.StartOffset      = 0;
+    initOptions.Length           = 0;
+    char testFileDes[9]          = { "test.txt" };
+    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
+    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+    initOptions.Metadata         = nullptr;
+    initOptions.MetadataLength   = 0;
+
+    BitFlags<TransferControlFlags> senderOpts;
+    senderOpts.Set(driveMode);
+
+    SendAndVerifyTransferInit(outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions, respondingSender,
+                              senderOpts, proposedBlockSize);
+
+    TransferSession::TransferAcceptData acceptData;
+    acceptData.ControlMode    = respondingSender.GetControlMode();
+    acceptData.Length         = 0;
+    acceptData.MaxBlockSize   = proposedBlockSize;
+    acceptData.Metadata       = nullptr;
+    acceptData.MetadataLength = 0;
+
+    SendAndVerifyAcceptMsg(outEvent, respondingSender, TransferRole::kSender, acceptData, initiatingReceiver, initOptions);
+
+    SendAndVerifyQuery(respondingSender, initiatingReceiver, outEvent);
+
+    uint8_t blockBuffer[1] = { 0 };
+    TransferSession::BlockData emptyBlock;
+    emptyBlock.Data   = blockBuffer;
+    emptyBlock.Length = 0;
+    emptyBlock.IsEof  = false;
+    // Only a BlockEOF may be empty, whether or not it has a data pointer.
+    EXPECT_EQ(respondingSender.PrepareBlock(emptyBlock), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyNoMoreOutput(respondingSender);
+    emptyBlock.Data = nullptr;
+    EXPECT_EQ(respondingSender.PrepareBlock(emptyBlock), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyNoMoreOutput(respondingSender);
+
+    TransferSession::BlockData nullDataWithLength;
+    nullDataWithLength.Data   = nullptr;
+    nullDataWithLength.Length = 1;
+    nullDataWithLength.IsEof  = true;
+    // A null data pointer is only allowed for an empty block.
+    EXPECT_EQ(respondingSender.PrepareBlock(nullDataWithLength), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyNoMoreOutput(respondingSender);
+
+    TransferSession::BlockData emptyBlockEOF;
+    emptyBlockEOF.Data   = nullptr;
+    emptyBlockEOF.Length = 0;
+    emptyBlockEOF.IsEof  = true;
+    EXPECT_EQ(respondingSender.PrepareBlock(emptyBlockEOF), CHIP_NO_ERROR);
+    respondingSender.PollOutput(outEvent, kNoAdvanceTime);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
+    VerifyBdxMessageToSend(outEvent, MessageType::BlockEOF);
+    VerifyNoMoreOutput(respondingSender);
+
+    EXPECT_EQ(AttachHeaderAndSend(outEvent.msgTypeData, std::move(outEvent.MsgData), initiatingReceiver), CHIP_NO_ERROR);
+    initiatingReceiver.PollOutput(outEvent, kNoAdvanceTime);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kBlockReceived);
+    EXPECT_EQ(outEvent.blockdata.Length, 0u);
+    EXPECT_TRUE(outEvent.blockdata.IsEof);
+    VerifyNoMoreOutput(initiatingReceiver);
+
+    SendAndVerifyBlockAck(respondingSender, initiatingReceiver, outEvent, true);
 }
 
 // Test that a TransferSession will emit kTransferTimeout if the specified timeout is exceeded while waiting for a response.
@@ -650,6 +1001,7 @@ TEST_F(TestBdxTransferSession, TestDuplicateBlockError)
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = driveMode;
     initOptions.MaxBlockSize     = blockSize;
+    initOptions.StartOffset      = proposedOffset;
     char testFileDes[9]          = { "test.txt" };
     initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
     initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
@@ -664,7 +1016,6 @@ TEST_F(TestBdxTransferSession, TestDuplicateBlockError)
     // Compose ReceiveAccept parameters struct and give to respondingSender
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode    = respondingSender.GetControlMode();
-    acceptData.StartOffset    = proposedOffset;
     acceptData.Length         = proposedLength;
     acceptData.MaxBlockSize   = blockSize;
     acceptData.Metadata       = nullptr;

@@ -19,9 +19,10 @@
 #pragma once
 #include "camera-avstream-controller.h"
 #include "media-controller.h"
+#include <app/clusters/ambient-context-sensing-server/AmbientContextSensingDelegate.h>
+#include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
-#include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 #include <app/clusters/zone-management-server/zone-management-server.h>
@@ -119,9 +120,6 @@ class CameraDeviceInterface
 public:
     virtual ~CameraDeviceInterface() = default;
 
-    // Getter for Chime Delegate
-    virtual chip::app::Clusters::ChimeDelegate & GetChimeDelegate() = 0;
-
     // Getter for WebRTCProvider Delegate
     virtual chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() = 0;
 
@@ -146,6 +144,12 @@ public:
 
     // Getter for PushAVStreamTransport Delegate
     virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() = 0;
+
+    // Getter for the AVAnalysis Delegate
+    virtual chip::app::Clusters::AvAnalysisDelegate & GetAVAnalysisDelegate() = 0;
+
+    // Getter for the AmbientContextSensing Delegate
+    virtual chip::app::Clusters::AmbientContextSensing::AmbientContextSensingDelegate & GetAmbientContextSensingDelegate() = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface
@@ -366,6 +370,11 @@ public:
         virtual int16_t GetTiltMax() = 0;
         virtual uint8_t GetZoomMax() = 0;
 
+        // Get the maximum number of Analysis Streams supported by the camera.
+        virtual uint8_t GetMaxAnalysisStreams() = 0;
+
+        virtual std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> GetSupportedAmbientContexts() = 0;
+
         // Get the maximum number of zones supported by camera.
         virtual uint8_t GetMaxZones() = 0;
 
@@ -389,6 +398,22 @@ public:
 
         // Remove a zone trigger
         virtual CameraError RemoveZoneTrigger(uint16_t zoneId) = 0;
+
+        // Create or update a privacy zone in the HAL
+        virtual CameraError SetPrivacyZone(uint16_t zoneId,
+                                           const chip::app::Clusters::ZoneManagement::TwoDCartesianZoneStorage & zone) = 0;
+
+        // Remove a privacy zone from the HAL
+        virtual CameraError RemovePrivacyZone(uint16_t zoneId) = 0;
+
+        // Clear all privacy zones in the HAL
+        virtual CameraError ClearPrivacyZones() = 0;
+
+        // Does the camera support PerZone analysis for AV triggers
+        virtual bool GetCameraSupportsPerZoneDetect() = 0;
+
+        // Verify Zone presence
+        virtual bool IsValidAnalysisZone(uint16_t zoneId) = 0;
 
         class ZoneEventCallback
         {

@@ -20,13 +20,3 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/device-energy-management-server.h"
 )
-
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/DeviceEnergyManagementCluster.cpp"
-    "${CLUSTER_DIR}/DeviceEnergyManagementCluster.h"
-    "${CLUSTER_DIR}/DeviceEnergyManagementDelegate.h"
-    "${CLUSTER_DIR}/DeviceEnergyManagementTestEventTriggerHandler.h"
-)

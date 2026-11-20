@@ -41,6 +41,14 @@
 #include "OTARequestorInitiator.h"
 #endif
 
+#if CHIP_APP_FAILSAFE_EARLY_EXPIRY
+#include <app/server/Server.h>
+#include <openthread/thread.h>
+#include <platform/ThreadStackManager.h>
+#include <platform/internal/BLEManager.h>
+#include <transport/SecureSession.h>
+#endif
+
 using namespace chip::app;
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -225,6 +233,9 @@ void HandleFailSafeEarlyExpiry(const ChipDeviceEvent * event)
 void chip::NXP::App::CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
     ChipLogDetail(DeviceLayer, "DeviceEventCallback: 0x%04x", event->Type);
+#if CHIP_APP_FAILSAFE_EARLY_EXPIRY
+    HandleFailSafeEarlyExpiry(event);
+#endif
     switch (event->Type)
     {
     case DeviceEventType::kWiFiConnectivityChange:

@@ -39,6 +39,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kData), data);
     encoder.Encode(to_underlying(Fields::kPlaybackPreferences), playbackPreferences);
     encoder.Encode(to_underlying(Fields::kUseCurrentContext), useCurrentContext);
+    encoder.Encode(to_underlying(Fields::kContentAppVendorID), contentAppVendorID);
+    encoder.Encode(to_underlying(Fields::kContentAppProductID), contentAppProductID);
     return encoder.Finalize();
 }
 
@@ -72,6 +74,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, useCurrentContext);
         }
+        else if (__context_tag == to_underlying(Fields::kContentAppVendorID))
+        {
+            err = DataModel::Decode(reader, contentAppVendorID);
+        }
+        else if (__context_tag == to_underlying(Fields::kContentAppProductID))
+        {
+            err = DataModel::Decode(reader, contentAppProductID);
+        }
 
         ReturnErrorOnFailure(err);
     }
@@ -85,6 +95,12 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kContentURL), contentURL);
     encoder.Encode(to_underlying(Fields::kDisplayString), displayString);
     encoder.Encode(to_underlying(Fields::kBrandingInformation), brandingInformation);
+    encoder.Encode(to_underlying(Fields::kPlaybackPreferences), playbackPreferences);
+    encoder.Encode(to_underlying(Fields::kContentType), contentType);
+    encoder.Encode(to_underlying(Fields::kContentHeaders), contentHeaders);
+    encoder.Encode(to_underlying(Fields::kOffsetMillisecs), offsetMillisecs);
+    encoder.Encode(to_underlying(Fields::kQueueType), queueType);
+    encoder.Encode(to_underlying(Fields::kNextUrl), nextUrl);
     return encoder.Finalize();
 }
 
@@ -109,6 +125,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kBrandingInformation))
         {
             err = DataModel::Decode(reader, brandingInformation);
+        }
+        else if (__context_tag == to_underlying(Fields::kPlaybackPreferences))
+        {
+            err = DataModel::Decode(reader, playbackPreferences);
+        }
+        else if (__context_tag == to_underlying(Fields::kContentType))
+        {
+            err = DataModel::Decode(reader, contentType);
+        }
+        else if (__context_tag == to_underlying(Fields::kContentHeaders))
+        {
+            err = DataModel::Decode(reader, contentHeaders);
+        }
+        else if (__context_tag == to_underlying(Fields::kOffsetMillisecs))
+        {
+            err = DataModel::Decode(reader, offsetMillisecs);
+        }
+        else if (__context_tag == to_underlying(Fields::kQueueType))
+        {
+            err = DataModel::Decode(reader, queueType);
+        }
+        else if (__context_tag == to_underlying(Fields::kNextUrl))
+        {
+            err = DataModel::Decode(reader, nextUrl);
         }
 
         ReturnErrorOnFailure(err);
@@ -148,6 +188,89 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace LauncherResponse
+namespace ContentReplicationRequest {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ContentReplicationRequest
+namespace ContentReplicationResponse {
+
+CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStatus), status);
+    encoder.Encode(to_underlying(Fields::kReplicationInfo), replicationInfo);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kStatus))
+        {
+            err = DataModel::Decode(reader, status);
+        }
+        else if (__context_tag == to_underlying(Fields::kReplicationInfo))
+        {
+            err = DataModel::Decode(reader, replicationInfo);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ContentReplicationResponse
+namespace PlayPreset {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kPresetID), presetID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kPresetID))
+        {
+            err = DataModel::Decode(reader, presetID);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace PlayPreset
 } // namespace Commands
 } // namespace ContentLauncher
 } // namespace Clusters

@@ -34,9 +34,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/internal/BLEManager.h>
-#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-#include <platform/DeviceControlServer.h>
-#endif
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
@@ -44,14 +41,10 @@
 #include <zephyr/bluetooth/addr.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/bluetooth/hci.h>
+#include <zephyr/random/random.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
-#if defined(CONFIG_ZEPHYR_VERSION_3_3)
-#include <version.h>
-#else
-#include <zephyr/random/random.h>
 #include <zephyr/version.h>
-#endif
 
 #ifdef CONFIG_BT_BONDABLE
 #include <zephyr/settings/settings.h>
@@ -59,16 +52,6 @@
 
 #if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 #include <ncs_version.h>
-#elif CHIP_DEVICE_LAYER_TARGET_TELINK
-extern "C" {
-#if defined(CONFIG_BT_B9X)
-extern __attribute__((noinline)) int b9x_bt_blc_mac_init(uint8_t * bt_mac);
-#elif defined(CONFIG_BT_TLX)
-extern __attribute__((noinline)) int tlx_bt_blc_mac_init(uint8_t * bt_mac);
-#elif defined(CONFIG_BT_W91)
-extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac);
-#endif
-}
 #endif
 
 #include <array>
@@ -149,6 +132,21 @@ constexpr uint8_t kMatterBleIdentity = 1;
 constexpr uint8_t kMatterBleIdentity = 0;
 #endif // CONFIG_BT_BONDABLE
 
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
+bool IsMatterIdentity(const bt_conn * conn)
+{
+    VerifyOrReturnValue(conn, false);
+
+    bt_conn_info info{};
+    const int err = bt_conn_get_info(conn, &info);
+    VerifyOrReturnValue(err == 0, false);
+
+    return info.id == kMatterBleIdentity;
+}
+
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
 int InitRandomStaticAddress(bool idPresent, int & id)
 {
     // Generate a random static address for the default identity.
@@ -157,16 +155,8 @@ int InitRandomStaticAddress(bool idPresent, int & id)
     bt_addr_le_t addr;
 
     // generating the address
-#if CHIP_DEVICE_LAYER_TARGET_TELINK
-#if defined(CONFIG_BT_B9X)
-    b9x_bt_blc_mac_init(addr.a.val);
-#elif defined(CONFIG_BT_TLX)
-    tlx_bt_blc_mac_init(addr.a.val);
-#elif defined(CONFIG_BT_W91)
-    telink_bt_blc_mac_init(addr.a.val);
-#endif
-#else
-    error = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
+    addr.type = BT_ADDR_LE_RANDOM;
+    error     = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
 
     if (error)
     {
@@ -175,28 +165,22 @@ int InitRandomStaticAddress(bool idPresent, int & id)
     }
 
     BT_ADDR_SET_STATIC(&addr.a);
-#endif
 
-    if (BT_ADDR_IS_STATIC(&addr.a)) // in case of Random static address, create a new id
+    if (!idPresent)
     {
-        addr.type = BT_ADDR_LE_RANDOM;
-
-        if (!idPresent)
-        {
-            id = bt_id_create(&addr, nullptr);
-        }
+        id = bt_id_create(&addr, nullptr);
+    }
 #if CONFIG_BT_ID_MAX == 2
-        else
-        {
-            id = bt_id_reset(1, &addr, nullptr);
-        }
+    else
+    {
+        id = bt_id_reset(1, &addr, nullptr);
+    }
 #endif // CONFIG_BT_BONDABLE
 
-        if (id < 0)
-        {
-            ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", id);
-            return id;
-        }
+    if (id < 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", id);
+        return id;
     }
 
     ChipLogProgress(DeviceLayer, "BLE address: %02X:%02X:%02X:%02X:%02X:%02X", addr.a.val[5], addr.a.val[4], addr.a.val[3],
@@ -240,10 +224,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #else
     err = InitRandomStaticAddress(false, id);
     VerifyOrReturnError(err == 0 && id == kMatterBleIdentity, MapErrorZephyr(err));
-#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     err = bt_enable(nullptr);
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-#endif
 #endif // CONFIG_BT_BONDABLE
 
     TEMPORARY_RETURN_IGNORED BLEAdvertisingArbiter::Init(static_cast<uint8_t>(id));
@@ -888,21 +870,6 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     TEMPORARY_RETURN_IGNORED CloseConnection(conId);
 }
 
-void BLEManagerImpl::CheckNonConcurrentBleClosing()
-{
-#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    if (IsBleClosing())
-    {
-        CHIP_ERROR error =
-            DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
-        if (error != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "PostCloseAllBLEConnections failed: %" CHIP_ERROR_FORMAT, error.Format());
-        }
-    }
-#endif
-}
-
 bool BLEManagerImpl::IsSubscribed(bt_conn * conn)
 {
     return mSubscribedConns[bt_conn_index(conn)];
@@ -941,6 +908,10 @@ bool BLEManagerImpl::UnsetSubscribed(bt_conn * conn)
 ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr, const void * buf, uint16_t len,
                                       uint16_t offset, uint8_t flags)
 {
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    VerifyOrReturnValue(IsMatterIdentity(conId), BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED));
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     ChipDeviceEvent event;
     PacketBufferHandle packetBuf = PacketBufferHandle::NewWithData(buf, len);
 
@@ -965,6 +936,10 @@ ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_ga
 
 ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr, uint16_t value)
 {
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    VerifyOrReturnValue(IsMatterIdentity(conId), BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED));
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     ChipDeviceEvent event;
 
     if (value != BT_GATT_CCC_INDICATE && value != 0)
@@ -983,6 +958,10 @@ ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt
 
 void BLEManagerImpl::HandleTXIndicated(struct bt_conn * conId, bt_gatt_indicate_params *, uint8_t err)
 {
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    VerifyOrReturn(IsMatterIdentity(conId));
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     ChipDeviceEvent event;
 
     event.Type                              = DeviceEventType::kPlatformZephyrBleC2IndDoneEvent;
@@ -1003,6 +982,10 @@ void BLEManagerImpl::HandleConnect(struct bt_conn * conId, uint8_t err)
     ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", sInstance.mTotalConnNum, CONFIG_BT_MAX_CONN);
 
     VerifyOrExit(bt_conn_get_info(conId, &bt_info) == 0, );
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    // Drop all callbacks incoming for the identity other than the one used for advertising
+    VerifyOrExit(bt_info.id == kMatterBleIdentity, );
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
     // Drop all callbacks incoming for the role other than peripheral, required by the Matter accessory
     VerifyOrExit(bt_info.role == BT_CONN_ROLE_PERIPHERAL, );
     // Don't handle BLE connecting events when it is not related to CHIPoBLE
@@ -1033,6 +1016,10 @@ void BLEManagerImpl::HandleDisconnect(struct bt_conn * conId, uint8_t reason)
     ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", sInstance.mTotalConnNum, CONFIG_BT_MAX_CONN);
 
     VerifyOrExit(bt_conn_get_info(conId, &bt_info) == 0, );
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    // Drop all callbacks incoming for the identity other than the one used for advertising
+    VerifyOrExit(bt_info.id == kMatterBleIdentity, );
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
     // Drop all callbacks incoming for the role other than peripheral, required by the Matter accessory
     VerifyOrExit(bt_info.role == BT_CONN_ROLE_PERIPHERAL, );
     // Don't handle BLE disconnecting events when it is not related to CHIPoBLE
@@ -1052,6 +1039,10 @@ exit:
 ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gatt_attr * attr, void * buf, uint16_t len,
                                      uint16_t offset)
 {
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    VerifyOrReturnValue(IsMatterIdentity(conId), BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED));
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     ChipLogDetail(DeviceLayer, "Read request received for CHIPoBLE C3 (ConnId 0x%02x)", bt_conn_index(conId));
 
     if (sInstance.c3CharDataBufferHandle.IsNull())

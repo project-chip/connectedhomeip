@@ -153,6 +153,10 @@ public:
      * Error message returned by the invoked Trust Verification stage.
      */
     TrustVerificationError mError = TrustVerificationError::kInternalError;
+    /**
+     * Length of the root public key reported in the Fabrics attribute read.
+     */
+    size_t mRootPublicKeyLength = Crypto::kP256_PublicKey_Length;
 
 protected:
     void OnTrustVerificationComplete(TrustVerificationError error) override { mError = error; }
@@ -218,7 +222,7 @@ protected:
         ReturnErrorOnFailure(
             writer.Put(TLV::ContextTag(static_cast<uint8_t>(
                            Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kRootPublicKey)),
-                       ByteSpan(kDummyRootKey, sizeof(kDummyRootKey))));
+                       ByteSpan(kDummyRootKey, mRootPublicKeyLength)));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(static_cast<uint8_t>(
                                             Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kVendorID)),
                                         static_cast<uint16_t>(0x1234)));
@@ -372,10 +376,12 @@ protected:
     void TestReadCommissionerAdminFabricIndexError();
     void TestValidateAdministratorIdsMatch();
     void TestReadAdminFabricsPopulatesCommissionerInfo();
+    void TestReadAdminFabricsRejectsInvalidRootPublicKeyLength();
     void TestReadAdminCertsPopulatesCommissionerRcac();
     void TestReadAdminNOCsPopulatesCommissionerCerts();
     void TestPerformVendorIdVerificationCompletesOnceOnReadFailure();
     void TestPerformVendorIdVerificationDoesNotUseFreedCommissioneeOnReadFailure();
+    void FailSafeAsyncReadUseAfterFree();
 };
 
 TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestNextStageFollowsExpectedOrder)
@@ -576,6 +582,36 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminFabricsPopulatesCommission
     }
 }
 
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminFabricsRejectsInvalidRootPublicKeyLength)
+{
+    // A commissioner root public key that is not a P-256 public key length must be rejected
+    // and must not be stored.
+    for (size_t keyLength : { size_t{ 0 }, size_t{ 1 }, Crypto::kP256_PublicKey_Length - 1 })
+    {
+        FakeCommandHandler commandHandler;
+        CommandHandler::Handle handle(&commandHandler);
+        Messaging::ExchangeContext * exchangeCtx = NewExchangeToBob(nullptr, false);
+        commandHandler.SetExchangeContext(exchangeCtx);
+
+        SingleStageJCMCommissionee commissionee(handle, EndpointId{ 78 }, [](CHIP_ERROR) {});
+        commissionee.mInfo.adminFabricIndex = FabricIndex{ 1 };
+        commissionee.mRootPublicKeyLength   = keyLength;
+
+        bool callbackCalled      = false;
+        CHIP_ERROR callbackError = CHIP_NO_ERROR;
+
+        CHIP_ERROR readError = commissionee.ReadAdminFabrics([&](CHIP_ERROR err) {
+            callbackCalled = true;
+            callbackError  = err;
+        });
+
+        EXPECT_EQ(readError, CHIP_NO_ERROR);
+        EXPECT_TRUE(callbackCalled);
+        EXPECT_EQ(callbackError, CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(commissionee.mInfo.rootPublicKey.AllocatedSize(), 0u);
+    }
+}
+
 TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminCertsPopulatesCommissionerRcac)
 {
     FakeCommandHandler commandHandler;
@@ -762,6 +798,78 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestPerformVendorIdVerificationDoesNotU
     commissionee->mSessionHolder.Release();
 
     commissionee->VerifyTrustAgainstCommissionerAdmin();
+}
+// Regression for the JCMCommissionee heap use-after-free when a FailSafe teardown destroys the
+// commissionee while a Controller::ReadAttribute is in flight.
+//
+// MECHANISM: JCMCommissionee issues attribute reads whose [this]-capturing callbacks are owned by a
+// heap TypedReadAttributeCallback that adopts the ReadClient and outlives the commissionee. On
+// FailSafe expiry, OnFailSafeTimerExpired -> CleanupAnnounceJFA -> mActiveCommissionee.reset()
+// destroys the commissionee; a late OnAttributeData/OnError then runs the read callback through the
+// freed `this`. This test stashes the read's error callback, deletes the commissionee (standing in
+// for the failsafe-driven reset()), then delivers the late response.
+//
+//   Without the fix: ASan heap-use-after-free in TrustVerificationStageFinished.
+//   With the fix:    the read callbacks are wrapped by VendorIdVerificationClient::GuardWithLiveness,
+//                    so once the commissionee is destroyed the late callback is a no-op (the trust
+//                    verification completion is never re-entered).
+class DeferredReadJCMCommissionee : public JCMCommissionee
+{
+public:
+    using JCMCommissionee::JCMCommissionee;
+
+    ReadErrorHandler pendingError;
+    bool hasPending = false;
+
+protected:
+    // Drive verification straight into the AdministratorFabricIndex read stage.
+    TrustVerificationStage GetNextTrustVerificationStage(const TrustVerificationStage & currentStage) override
+    {
+        return (currentStage == TrustVerificationStage::kReadingCommissionerAdminFabricIndex)
+            ? TrustVerificationStage::kComplete
+            : TrustVerificationStage::kReadingCommissionerAdminFabricIndex;
+    }
+
+    // Model an in-flight ReadClient: stash the [this]-capturing error callback and return success,
+    // so the stage reports kAsync and the commissionee stays alive awaiting the response.
+    CHIP_ERROR
+    ReadAdminFabricIndexAttribute(std::function<void(const ConcreteAttributePath &, const FabricIndexAttr::DecodableType &)>,
+                                  ReadErrorHandler onError) override
+    {
+        pendingError = std::move(onError);
+        hasPending   = true;
+        return CHIP_NO_ERROR;
+    }
+};
+
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, FailSafeAsyncReadUseAfterFree)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx);
+
+    // Sentinel that the trust-verification completion would flip if the late callback re-entered the
+    // (destroyed) state machine. The liveness guard must prevent that, so it stays false.
+    bool completionInvoked = false;
+    auto * commissionee =
+        new DeferredReadJCMCommissionee(handle, EndpointId{ 42 }, [&completionInvoked](CHIP_ERROR) { completionInvoked = true; });
+
+    // Launch verification -> issues the (deferred) AdministratorFabricIndex read; object stays alive.
+    commissionee->VerifyTrustAgainstCommissionerAdmin();
+    ASSERT_TRUE(commissionee->hasPending);
+    ASSERT_FALSE(completionInvoked);
+
+    // Copy the in-flight callback out, then simulate OnFailSafeTimerExpired ->
+    // mActiveCommissionee.reset() destroying the commissionee mid-read.
+    auto savedError = commissionee->pendingError;
+    delete commissionee;
+
+    // Late ReadClient response. Without the fix this fires this->TrustVerificationStageFinished on the
+    // freed object (ASan heap-use-after-free). With the liveness guard it is a no-op.
+    savedError(nullptr, CHIP_ERROR_TIMEOUT);
+
+    EXPECT_FALSE(completionInvoked);
 }
 
 } // namespace JointFabricAdministrator

@@ -300,10 +300,15 @@ void ThreadBorderRouterManagementCluster::OnPlatformEventHandler(const DeviceLay
 
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
+        // Take the pending command and invalidate its sequence number before calling the delegate, so
+        // OnActivateDatasetComplete ignores a completion the delegate reports from RevertActiveDataset.
+        auto commandHandleRef = std::move(cluster->mAsyncCommandHandle);
+        cluster->mSetActiveDatasetSequenceNumber++;
+        cluster->mBreadcrumb.ClearValue();
+
         (void) cluster->mDelegate.RevertActiveDataset();
 
-        auto commandHandleRef = std::move(cluster->mAsyncCommandHandle);
-        auto commandHandle    = commandHandleRef.Get();
+        auto commandHandle = commandHandleRef.Get();
         if (commandHandle != nullptr)
         {
             commandHandle->AddStatus(ConcreteCommandPath(cluster->mPath.mEndpointId, cluster->mPath.mClusterId,

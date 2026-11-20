@@ -24,7 +24,7 @@
 set -e
 
 SUB_PATH="*"
-ALL_ARGS=""
+ALL_ARGS=()
 SKIP_BUILT=0
 
 for i in "$@"; do
@@ -43,7 +43,7 @@ for i in "$@"; do
         SKIP_BUILT=1
 	;;
     *)
-        ALL_ARGS="$ALL_ARGS ${i#*=}"
+        ALL_ARGS+=("$i")
         ;;
     esac
 done
@@ -55,10 +55,10 @@ echo "VERSION: $VERSION"
 
 function build_image() {
     PARSE_PATH=$1
-    ARGS_TO_PASS=$2
+    shift
 
     echo "PARSE_PATH: $PARSE_PATH"
-    echo "ARGS_TO_PASS: $ARGS_TO_PASS"
+    echo "ARGS_TO_PASS: $@"
 
     find "$(git rev-parse --show-toplevel)"/integrations/docker/images/$PARSE_PATH -name Dockerfile ! -path "*chip-cert-bins/*" | sort | while read -r dockerfile; do
         # Images are of the form `ghcr.io/project-chip/{name}` and tagged as "${VERSION}"
@@ -72,9 +72,9 @@ function build_image() {
 
         echo "BUILDING $(dirname "$dockerfile") (i.e. ${IMAGE_NAME})"
         pushd "$(dirname "$dockerfile")" >/dev/null
-        ./build.sh "$ARGS_TO_PASS"
+        ./build.sh "$@"
         popd >/dev/null
     done
 }
 
-build_image "$SUB_PATH" "$ALL_ARGS"
+build_image "$SUB_PATH" "${ALL_ARGS[@]}"

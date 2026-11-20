@@ -202,7 +202,7 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
 {
     if (!gCommonClustersInitialized)
     {
-        ReturnErrorOnFailure(DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, GetFeatureMapFromCmdLine()));
+        ReturnErrorOnFailure(DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, GetFeatureMap()));
 
         // Initialize ElectricalSensorManager (owns both EPM and EEM)
         gESManager = std::make_unique<ElectricalSensorManager>();

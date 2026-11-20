@@ -49,9 +49,9 @@ import fnmatch
 import logging
 import re
 import subprocess
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 from enum import Enum, auto
-from typing import Callable, Optional
 
 import click
 import coloredlogs
@@ -405,10 +405,10 @@ def build_treemap(
     symbols: list[Symbol],
     separator: str,
     figure_generator: Callable,
-    color: Optional[list[str]],
+    color: list[str] | None,
     max_depth: int,
-    zoom: Optional[str],
-    strip: Optional[str],
+    zoom: str | None,
+    strip: str | None,
 ):
     # A treemap is based on parents (with title)
 
@@ -729,7 +729,7 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
     return symbols
 
 
-def fetch_symbols(elf_file: str, fetch: FetchStyle, glob_filter: Optional[str]) -> tuple[list[Symbol], str]:
+def fetch_symbols(elf_file: str, fetch: FetchStyle, glob_filter: str | None) -> tuple[list[Symbol], str]:
     """Returns the sumbol list and the separator used to split symbols
     """
     match fetch:
@@ -872,10 +872,10 @@ def main(
     color: str,
     fetch_via: str,
     max_depth: int,
-    zoom: Optional[str],
-    strip: Optional[str],
-    diff: Optional[str],
-    glob_filter: Optional[str],
+    zoom: str | None,
+    strip: str | None,
+    diff: str | None,
+    glob_filter: str | None,
 ):
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)

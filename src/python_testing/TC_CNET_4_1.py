@@ -24,13 +24,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CNET_4_1(MatterBaseTest):
+class TC_CNET_4_1(MatterTestCommissionedDevice):
     """[TC-CNET-4.1] [Wi-Fi] Verification for attributes check [DUT-Server].
 
     Example usage:
@@ -50,7 +50,7 @@ class TC_CNET_4_1(MatterBaseTest):
 
     def steps_TC_CNET_4_1(self) -> list[TestStep]:
         return [
-            TestStep(0, test_plan_support.commission_if_required(), "", is_commissioning=True),
+            TestStep(0, test_plan_support.commission_if_required(), ""),
             TestStep(1, "TH reads the MaxNetworks attribute from the DUT",
                      "Verify that MaxNetworks attribute value is within a range of 1 to 255"),
             TestStep(2, "TH reads the SupportedWiFiBands attribute from the DUT",

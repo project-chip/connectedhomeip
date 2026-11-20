@@ -112,6 +112,8 @@ private:
  *    Managed session reference. The object is used to store a session, the stored session will be automatically
  *    released when the underlying session is released. One must verify it is available before use. The object can be
  *    created using SessionHandle.Grab()
+ *
+ *    While a session releases its holders, grabbing it or copying a holder of it leaves the new holder empty.
  */
 class SessionHolder : public IntrusiveListNodeBase<>
 {
@@ -161,9 +163,13 @@ public:
 
 protected:
     // Helper for use by the Grab methods.
-    void GrabUnchecked(const SessionHandle & session);
+    bool GrabUnchecked(const SessionHandle & session);
 
     Optional<ReferenceCountedHandle<Transport::Session>> mSession;
+
+private:
+    // Helper for the copy and move operations. Leaves this holder empty if the session refuses it.
+    void ShareSession(const SessionHolder & that);
 };
 
 /// @brief Extends SessionHolder to allow propagate SessionDelegate::* events to a given destination
@@ -218,11 +224,14 @@ public:
 
     virtual SessionType GetSessionType() const = 0;
 
-    void AddHolder(SessionHolder & holder)
+    // Returns false, without adding the holder, while NotifySessionReleased runs.
+    bool AddHolder(SessionHolder & holder)
     {
         assertChipStackLockedByCurrentThread();
         VerifyOrDie(!holder.IsInList());
-        mHolders.PushBack(&holder);
+        VerifyOrReturnValue(!mReleasing, false);
+        mHolders.PushFront(&holder); // In front of any ForEachHolder cursor, so running walks don't visit it.
+        return true;
     }
 
     void RemoveHolder(SessionHolder & holder)
@@ -244,6 +253,20 @@ public:
     virtual bool AllowsLargePayload() const                              = 0;
     virtual const SessionParameters & GetRemoteSessionParameters() const = 0;
     virtual System::Clock::Timestamp GetMRPBaseTimeout() const           = 0;
+
+    /**
+     * Returns the maximum application payload length (excluding MIC tag and header)
+     * that SessionManager::PrepareMessage will permit for this session.
+     *
+     * For sessions that allow large payloads, the returned length depends on the MaxTCPPayloadSize
+     * the peer advertised:
+     *   - not advertised -> kLegacyDefaultMaxLargeAppMessageLen, capped at kMaxLargeAppMessageLen
+     *   - 1 to kMaxMessageOverheadBytes -> 0
+     *   - larger -> the advertised size minus kMaxMessageOverheadBytes, capped at kMaxLargeAppMessageLen
+     *
+     * Other sessions get kMaxAppMessageLen.
+     */
+    size_t GetMaxAppMessageLen() const;
 
     // Returns true if `subjectDescriptor.IsCommissioning` (based on Core Specification
     // pseudocode in ACL Architecture chapter) should be true when computing a
@@ -308,14 +331,8 @@ public:
 
     void NotifySessionHang()
     {
-        // Holders might remove themselves when notified.
-        auto holder = mHolders.begin();
-        while (holder != mHolders.end())
-        {
-            auto cur = holder;
-            ++holder;
-            cur->OnSessionHang();
-        }
+        SessionHandle session(*this); // A holder may evict this session; keep it alive until the walk is done.
+        ForEachHolder([](SessionHolder & holder, void *) { holder.OnSessionHang(); });
     }
 
     // Return a session id that is usable for logging. This is the local session
@@ -329,11 +346,22 @@ protected:
     void NotifySessionReleased()
     {
         SessionHandle session(*this);
-        while (!mHolders.Empty())
-        {
-            mHolders.begin()->SessionReleased(); // SessionReleased must remove the item from the linked list
-        }
+        // Callbacks can't add holders while mReleasing is set, so this releases every holder.
+        // SessionReleased must release the holder.
+        VerifyOrDie(!mReleasing);
+        mReleasing = true;
+        ForEachHolder([](SessionHolder & holder, void *) { holder.SessionReleased(); });
+        mReleasing = false;
     }
+
+    using HolderVisitor = void (*)(SessionHolder & holder, void * context);
+
+    /**
+     * Calls `visitor` for each holder that holds this session when the call starts, unless that holder is released
+     * before the walk reaches it. The visitor may release or grab any holder; holders that grab this session during
+     * the walk are not visited. The order of the visits is unspecified.
+     */
+    void ForEachHolder(HolderVisitor visitor, void * context = nullptr);
 
     void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
 
@@ -341,10 +369,12 @@ protected:
     const IncomingGroupSession * AsConstIncomingGroupSession() const;
     const OutgoingGroupSession * AsConstOutgoingGroupSession() const;
 
+private:
+    // Each running ForEachHolder adds a cursor to mHolders. Cursors are the only elements that hold no session.
     IntrusiveList<SessionHolder> mHolders;
 
-private:
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
+    bool mReleasing          = false;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // The underlying TCP connection object over which the session is
     // established.

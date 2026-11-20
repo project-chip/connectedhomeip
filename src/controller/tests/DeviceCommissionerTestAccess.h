@@ -17,6 +17,9 @@
  */
 #pragma once
 
+#include <app/DeviceProxy.h>
+#include <clusters/IcdManagement/Commands.h>
+#include <clusters/NetworkCommissioning/Commands.h>
 #include <controller/CHIPDeviceController.h>
 
 namespace chip {
@@ -30,8 +33,99 @@ public:
     DeviceCommissionerTestAccess(Controller::DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
 
     CHIP_ERROR ParseICDInfo(Controller::ReadCommissioningInfo & info) { return mCommissioner->ParseICDInfo(info); }
+    CHIP_ERROR ParseOperationalCredentialsInfo(Controller::ReadCommissioningInfo & info)
+    {
+        return mCommissioner->ParseOperationalCredentialsInfo(info);
+    }
+
+    CHIP_ERROR
+    PrepareCertificateChainRequest(Credentials::CertificateType type,
+                                   std::optional<Credentials::DeviceAttestationChainProfile> chain, Optional<uint16_t> segment,
+                                   app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type & request)
+    {
+        return mCommissioner->PrepareCertificateChainRequest(type, chain, segment, request);
+    }
+
+    auto & CertificateRequestTracker() { return mCommissioner->mCertificateChainRequestState.requestTracker; }
+
+    void OnCertificateChainFailureResponse(CHIP_ERROR error)
+    {
+        Controller::DeviceCommissioner::OnCertificateChainFailureResponse(mCommissioner, error);
+    }
+
+    void OnCertificateChainResponse(
+        const app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & response)
+    {
+        Controller::DeviceCommissioner::OnCertificateChainResponse(mCommissioner, response);
+    }
 
     void SetAttributeCache(Platform::UniquePtr<app::ClusterStateCache> cache) { mCommissioner->mAttributeCache = std::move(cache); }
+
+    void SetCommissioningStage(Controller::CommissioningStage stage) { mCommissioner->mCommissioningStage = stage; }
+
+    void SetCommissioningDelegate(Controller::CommissioningDelegate * delegate)
+    {
+        mCommissioner->mCommissioningDelegate = delegate;
+    }
+
+    void SetDeviceBeingCommissioned(DeviceProxy * device) { mCommissioner->mDeviceBeingCommissioned = device; }
+
+    Controller::SetUpCodePairer & GetSetUpCodePairer() { return mCommissioner->mSetUpCodePairer; }
+
+    void FailPASE(CHIP_ERROR error) { mCommissioner->OnSessionEstablishmentError(error); }
+
+#if CONFIG_NETWORK_LAYER_BLE
+    BLE_CONNECTION_OBJECT GetPASEConnectionObject() const
+    {
+        const auto & parameters = mCommissioner->mRendezvousParametersForPASEEstablishment;
+        return parameters.has_value() ? parameters->GetConnectionObject() : BLE_CONNECTION_UNINITIALIZED;
+    }
+#endif
+
+    static CHIP_ERROR VerifyNetworkClientIdentity(ByteSpan clientIdentity, ByteSpan possessionSignature, ByteSpan nonce,
+                                                  Credentials::MutableCertificateKeyId outClientIdentifier)
+    {
+        return Controller::DeviceCommissioner::VerifyNetworkClientIdentity(clientIdentity, possessionSignature, nonce,
+                                                                           outClientIdentifier);
+    }
+
+    void SetNetworkClientRegistration(Controller::NetworkIdentityRegistrar * registrar, ByteSpan clientIdentifier)
+    {
+        mCommissioner->mNetworkClientRegistration.registrar = registrar;
+        VerifyOrDie(clientIdentifier.size() == mCommissioner->mNetworkClientRegistration.clientIdentifier.size());
+        memcpy(mCommissioner->mNetworkClientRegistration.clientIdentifier.data(), clientIdentifier.data(), clientIdentifier.size());
+    }
+
+    Controller::NetworkIdentityRegistrar * GetNetworkClientRegistrar() const
+    {
+        return mCommissioner->mNetworkClientRegistration.registrar;
+    }
+
+    // Returns true if the revocation is in flight, i.e. a continuation could be installed for it.
+    bool RollBackNetworkClientIdentity() { return mCommissioner->RollBackNetworkClientIdentity(); }
+
+    void CancelCommissioningInteractions() { mCommissioner->CancelCommissioningInteractions(); }
+
+    static void OnICDManagementRegisterClientResponse(
+        Controller::DeviceCommissioner * commissioner,
+        const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
+    {
+        Controller::DeviceCommissioner::OnICDManagementRegisterClientResponse(commissioner, data);
+    }
+
+    static void
+    OnICDManagementStayActiveResponse(Controller::DeviceCommissioner * commissioner,
+                                      const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data)
+    {
+        Controller::DeviceCommissioner::OnICDManagementStayActiveResponse(commissioner, data);
+    }
+
+    static void
+    OnNetworkConfigResponse(Controller::DeviceCommissioner * commissioner,
+                            const app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
+    {
+        Controller::DeviceCommissioner::OnNetworkConfigResponse(commissioner, data);
+    }
 
 private:
     Controller::DeviceCommissioner * mCommissioner = nullptr;

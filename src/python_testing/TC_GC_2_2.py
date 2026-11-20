@@ -44,19 +44,19 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
 logger = logging.getLogger(__name__)
 
 
-class TC_GC_2_2(MatterBaseTest):
+class TC_GC_2_2(MatterTestCommissionedDevice):
     def desc_TC_GC_2_2(self):
         return "[TC-GC-2.2] JoinGroup as Listener or Sender with DUT as Server - Provisional"
 
     def steps_TC_GC_2_2(self):
-        return [TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+        return [TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)"),
                 TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
                 TestStep("1c", "TH subscribes to Membership attribute of the Groupcast cluster on Endpoint 0 and to the AuxiliaryAccessUpdated event of the AccessControl cluster with a min interval of 0s and max interval of 30s. Accumulate all reports seen."),
                 TestStep("1d", "TH reads OperationalCredentials cluster's CurrentFabricIndex attribute on Endpoint 0"),

@@ -20,6 +20,8 @@
 #include <platform/NetworkCommissioning.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <vector>
+
 namespace chip {
 namespace Testing {
 
@@ -178,6 +180,47 @@ private:
 public:
     bool mRevertConfigurationCalled = false;
 };
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+/// A WiFi driver that claims Per-Device Credentials support and records what the cluster
+/// handed down to it. Whether the identities involved actually make sense is the real
+/// driver's problem, so this one just echoes back whatever it was told to return.
+class FakePDCWiFiDriver : public FakeWiFiDriver
+{
+public:
+    bool SupportsPerDeviceCredentials() override { return true; }
+
+    CHIP_ERROR AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan networkIdentity, Optional<uint8_t> clientIdentityNetworkIndex,
+                                         DeviceLayer::NetworkCommissioning::Status & outStatus, MutableCharSpan & outDebugText,
+                                         MutableByteSpan & outClientIdentity, uint8_t & outNetworkIndex) override
+    {
+        mSsid.assign(ssid.begin(), ssid.end());
+        mNetworkIdentity.assign(networkIdentity.begin(), networkIdentity.end());
+        mClientIdentityNetworkIndex = clientIdentityNetworkIndex;
+
+        ReturnErrorOnFailure(CopySpanToMutableSpan(ByteSpan(mClientIdentity.data(), mClientIdentity.size()), outClientIdentity));
+        outDebugText.reduce_size(0);
+        outStatus       = mAddOrUpdateWithPDCStatus;
+        outNetworkIndex = mNetworkIndex;
+        return CHIP_NO_ERROR;
+    }
+
+    /// The Client Identity the driver hands back on success.
+    void SetClientIdentity(ByteSpan identity) { mClientIdentity.assign(identity.begin(), identity.end()); }
+
+    ByteSpan GetLastSsid() const { return ByteSpan(mSsid.data(), mSsid.size()); }
+    ByteSpan GetLastNetworkIdentity() const { return ByteSpan(mNetworkIdentity.data(), mNetworkIdentity.size()); }
+    Optional<uint8_t> GetLastClientIdentityNetworkIndex() const { return mClientIdentityNetworkIndex; }
+
+private:
+    std::vector<uint8_t> mClientIdentity;
+    std::vector<uint8_t> mSsid;
+    std::vector<uint8_t> mNetworkIdentity;
+    Optional<uint8_t> mClientIdentityNetworkIndex;
+    NetworkCommissioningStatusEnum mAddOrUpdateWithPDCStatus = NetworkCommissioningStatusEnum::kSuccess;
+    uint8_t mNetworkIndex                                    = 0;
+};
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
 } // namespace Testing
 } // namespace chip

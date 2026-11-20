@@ -36,7 +36,6 @@ inline void RegisterGlobalHandler(EndpointId endpoint) {}
 
 void Store(FabricIndex fabricIndex, EndpointId endpoint);
 void Recall(FabricIndex fabricIndex, EndpointId endpoint);
-void MarkInvalid(EndpointId endpoint);
 
 } // namespace chip::app::Clusters::OnOff::Internal::Scenes
 
@@ -51,7 +50,6 @@ inline chip::scenes::SceneHandler * GlobalHandler()
 inline void RegisterGlobalHandler(EndpointId endpoint) {}
 inline void Store(FabricIndex fabricIndex, EndpointId endpoint) {}
 inline void Recall(FabricIndex fabricIndex, EndpointId endpoint) {}
-inline void MarkInvalid(EndpointId endpoint) {}
 
 } // namespace chip::app::Clusters::OnOff::Internal::Scenes
 

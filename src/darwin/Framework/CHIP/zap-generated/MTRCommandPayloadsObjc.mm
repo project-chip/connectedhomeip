@@ -8754,6 +8754,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
 
         _certificateType = @(0);
+
+        _cryptoProfile = nil;
+
+        _segmentID = nil;
+
+        _maxSegmentSize = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -8765,6 +8771,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     auto other = [[MTROperationalCredentialsClusterCertificateChainRequestParams alloc] init];
 
     other.certificateType = self.certificateType;
+    other.cryptoProfile = self.cryptoProfile;
+    other.segmentID = self.segmentID;
+    other.maxSegmentSize = self.maxSegmentSize;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -8773,7 +8782,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificateType:%@; >", NSStringFromClass([self class]), _certificateType];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificateType:%@; cryptoProfile:%@; segmentID:%@; maxSegmentSize:%@; >", NSStringFromClass([self class]), _certificateType, _cryptoProfile, _segmentID, _maxSegmentSize];
     return descriptionString;
 }
 
@@ -8787,6 +8796,32 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     ListFreer listFreer;
     {
         encodableStruct.certificateType = static_cast<std::remove_reference_t<decltype(encodableStruct.certificateType)>>(self.certificateType.unsignedCharValue);
+    }
+    {
+        if (self.cryptoProfile != nil) {
+            auto & definedValue_0 = encodableStruct.cryptoProfile.Emplace();
+#if MTR_ENABLE_PROVISIONAL
+            definedValue_0.PAACrypto = static_cast<std::remove_reference_t<decltype(definedValue_0.PAACrypto)>>(self.cryptoProfile.paaCrypto.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            definedValue_0.PAICrypto = static_cast<std::remove_reference_t<decltype(definedValue_0.PAICrypto)>>(self.cryptoProfile.paiCrypto.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            definedValue_0.DACCrypto = static_cast<std::remove_reference_t<decltype(definedValue_0.DACCrypto)>>(self.cryptoProfile.dacCrypto.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+        }
+    }
+    {
+        if (self.segmentID != nil) {
+            auto & definedValue_0 = encodableStruct.segmentID.Emplace();
+            definedValue_0 = self.segmentID.unsignedShortValue;
+        }
+    }
+    {
+        if (self.maxSegmentSize != nil) {
+            auto & definedValue_0 = encodableStruct.maxSegmentSize.Emplace();
+            definedValue_0 = self.maxSegmentSize.unsignedShortValue;
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -8833,6 +8868,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
 
         _certificate = [NSData data];
+
+        _totalDocumentSize = nil;
+
+        _nextSegmentID = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -8843,6 +8882,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     auto other = [[MTROperationalCredentialsClusterCertificateChainResponseParams alloc] init];
 
     other.certificate = self.certificate;
+    other.totalDocumentSize = self.totalDocumentSize;
+    other.nextSegmentID = self.nextSegmentID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -8850,7 +8891,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificate:%@; >", NSStringFromClass([self class]), [_certificate base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificate:%@; totalDocumentSize:%@; nextSegmentID:%@; >", NSStringFromClass([self class]), [_certificate base64EncodedStringWithOptions:0], _totalDocumentSize, _nextSegmentID];
     return descriptionString;
 }
 
@@ -8912,6 +8953,20 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     {
         self.certificate = AsData(decodableStruct.certificate);
+    }
+    {
+        if (decodableStruct.totalDocumentSize.HasValue()) {
+            self.totalDocumentSize = [NSNumber numberWithUnsignedShort:decodableStruct.totalDocumentSize.Value()];
+        } else {
+            self.totalDocumentSize = nil;
+        }
+    }
+    {
+        if (decodableStruct.nextSegmentID.HasValue()) {
+            self.nextSegmentID = [NSNumber numberWithUnsignedShort:decodableStruct.nextSegmentID.Value()];
+        } else {
+            self.nextSegmentID = nil;
+        }
     }
     return CHIP_NO_ERROR;
 }
@@ -11409,6 +11464,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @end
 
+@implementation MTROvenModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTROvenModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTROvenModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::OvenMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRModeSelectClusterChangeToModeParams
 - (instancetype)init
 {
@@ -11670,6 +11804,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @end
 
+@implementation MTRLaundryWasherModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRLaundryWasherModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRLaundryWasherModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeParams
 - (instancetype)init
 {
@@ -11850,6 +12063,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRRVCRunModeClusterChangeToModeParams
@@ -12034,6 +12326,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @end
 
+@implementation MTRRVCRunModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRVCRunModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRRVCRunModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::RvcRunMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRRVCCleanModeClusterChangeToModeParams
 - (instancetype)init
 {
@@ -12214,6 +12585,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRRVCCleanModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRVCCleanModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRRVCCleanModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRTemperatureControlClusterSetTemperatureParams
@@ -12487,6 +12937,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRDishwasherModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDishwasherModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDishwasherModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DishwasherMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRSmokeCOAlarmClusterSelfTestRequestParams
@@ -13722,7 +14251,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.extensionFieldSetStructs[i_0], NSStringFromClass(MTRScenesManagementClusterExtensionFieldSetStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_0->mList[i_0].clusterID = element_0.clusterID.unsignedIntValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     {
                         using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
                         using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
@@ -13739,45 +14271,64 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                     MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.attributeValueList[i_2], NSStringFromClass(MTRScenesManagementClusterAttributeValuePairStruct.class));
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
+#if MTR_ENABLE_PROVISIONAL
                                 listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                                 if (element_2.valueUnsigned8 != nil) {
                                     auto & definedValue_4 = listHolder_2->mList[i_2].valueUnsigned8.Emplace();
                                     definedValue_4 = element_2.valueUnsigned8.unsignedCharValue;
                                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                                 if (element_2.valueSigned8 != nil) {
                                     auto & definedValue_4 = listHolder_2->mList[i_2].valueSigned8.Emplace();
                                     definedValue_4 = element_2.valueSigned8.charValue;
                                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                                 if (element_2.valueUnsigned16 != nil) {
                                     auto & definedValue_4 = listHolder_2->mList[i_2].valueUnsigned16.Emplace();
                                     definedValue_4 = element_2.valueUnsigned16.unsignedShortValue;
                                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                                 if (element_2.valueSigned16 != nil) {
                                     auto & definedValue_4 = listHolder_2->mList[i_2].valueSigned16.Emplace();
                                     definedValue_4 = element_2.valueSigned16.shortValue;
                                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                                 if (element_2.valueUnsigned32 != nil) {
                                     auto & definedValue_4 = listHolder_2->mList[i_2].valueUnsigned32.Emplace();
                                     definedValue_4 = element_2.valueUnsigned32.unsignedIntValue;
                                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                                 if (element_2.valueSigned32 != nil) {
                                     auto & definedValue_4 = listHolder_2->mList[i_2].valueSigned32.Emplace();
                                     definedValue_4 = element_2.valueSigned32.intValue;
                                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                                 if (element_2.valueUnsigned64 != nil) {
                                     auto & definedValue_4 = listHolder_2->mList[i_2].valueUnsigned64.Emplace();
                                     definedValue_4 = element_2.valueUnsigned64.unsignedLongLongValue;
                                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                                 if (element_2.valueSigned64 != nil) {
                                     auto & definedValue_4 = listHolder_2->mList[i_2].valueSigned64.Emplace();
                                     definedValue_4 = element_2.valueSigned64.longLongValue;
                                 }
+#endif // MTR_ENABLE_PROVISIONAL
                             }
                             listHolder_0->mList[i_0].attributeValueList = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
                         } else {
                             listHolder_0->mList[i_0].attributeValueList = ListType_2();
                         }
                     }
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.extensionFieldSetStructs = ListType_0(listHolder_0->mList, self.extensionFieldSetStructs.count);
             } else {
@@ -14142,7 +14693,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     auto & entry_1 = iter_1.GetValue();
                     MTRScenesManagementClusterExtensionFieldSetStruct * newElement_1;
                     newElement_1 = [MTRScenesManagementClusterExtensionFieldSetStruct new];
+#if MTR_ENABLE_PROVISIONAL
                     newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     { // Scope for our temporary variables
                         auto * array_3 = [NSMutableArray new];
                         auto iter_3 = entry_1.attributeValueList.begin();
@@ -14150,47 +14704,65 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             auto & entry_3 = iter_3.GetValue();
                             MTRScenesManagementClusterAttributeValuePairStruct * newElement_3;
                             newElement_3 = [MTRScenesManagementClusterAttributeValuePairStruct new];
+#if MTR_ENABLE_PROVISIONAL
                             newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_3.valueUnsigned8.HasValue()) {
                                 newElement_3.valueUnsigned8 = [NSNumber numberWithUnsignedChar:entry_3.valueUnsigned8.Value()];
                             } else {
                                 newElement_3.valueUnsigned8 = nil;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_3.valueSigned8.HasValue()) {
                                 newElement_3.valueSigned8 = [NSNumber numberWithChar:entry_3.valueSigned8.Value()];
                             } else {
                                 newElement_3.valueSigned8 = nil;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_3.valueUnsigned16.HasValue()) {
                                 newElement_3.valueUnsigned16 = [NSNumber numberWithUnsignedShort:entry_3.valueUnsigned16.Value()];
                             } else {
                                 newElement_3.valueUnsigned16 = nil;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_3.valueSigned16.HasValue()) {
                                 newElement_3.valueSigned16 = [NSNumber numberWithShort:entry_3.valueSigned16.Value()];
                             } else {
                                 newElement_3.valueSigned16 = nil;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_3.valueUnsigned32.HasValue()) {
                                 newElement_3.valueUnsigned32 = [NSNumber numberWithUnsignedInt:entry_3.valueUnsigned32.Value()];
                             } else {
                                 newElement_3.valueUnsigned32 = nil;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_3.valueSigned32.HasValue()) {
                                 newElement_3.valueSigned32 = [NSNumber numberWithInt:entry_3.valueSigned32.Value()];
                             } else {
                                 newElement_3.valueSigned32 = nil;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_3.valueUnsigned64.HasValue()) {
                                 newElement_3.valueUnsigned64 = [NSNumber numberWithUnsignedLongLong:entry_3.valueUnsigned64.Value()];
                             } else {
                                 newElement_3.valueUnsigned64 = nil;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_3.valueSigned64.HasValue()) {
                                 newElement_3.valueSigned64 = [NSNumber numberWithLongLong:entry_3.valueSigned64.Value()];
                             } else {
                                 newElement_3.valueSigned64 = nil;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
                             [array_3 addObject:newElement_3];
                         }
                         CHIP_ERROR err = iter_3.GetStatus();
@@ -14199,6 +14771,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         }
                         newElement_1.attributeValueList = array_3;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
                     [array_1 addObject:newElement_1];
                 }
                 CHIP_ERROR err = iter_1.GetStatus();
@@ -15271,6 +15844,267 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRThermostatModeClusterChangeToModeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newMode = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatModeClusterChangeToModeParams alloc] init];
+
+    other.newMode = self.newMode;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newMode:%@; >", NSStringFromClass([self class]), _newMode];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatModeClusterChangeToModeParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ThermostatMode::Commands::ChangeToMode::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newMode = self.newMode.unsignedCharValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatModeClusterChangeToModeResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _statusText = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatModeClusterChangeToModeResponseParams alloc] init];
+
+    other.status = self.status;
+    other.statusText = self.statusText;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ThermostatMode::Commands::ChangeToModeResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    LogAndConvertDecodingError(err, error);
+    return nil;
+}
+
+@end
+
+@implementation MTRThermostatModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ThermostatMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ThermostatMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        if (decodableStruct.statusText.HasValue()) {
+            self.statusText = AsString(decodableStruct.statusText.Value());
+            if (self.statusText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        } else {
+            self.statusText = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRThermostatModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ThermostatMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRGroupcastClusterJoinGroupParams
@@ -16791,22 +17625,31 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             self.currentPrice = nil;
         } else {
             self.currentPrice = [MTRCommodityPriceClusterCommodityPriceStruct new];
+#if MTR_ENABLE_PROVISIONAL
             self.currentPrice.periodStart = [NSNumber numberWithUnsignedInt:decodableStruct.currentPrice.Value().periodStart];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.currentPrice.Value().periodEnd.IsNull()) {
                 self.currentPrice.periodEnd = nil;
             } else {
                 self.currentPrice.periodEnd = [NSNumber numberWithUnsignedInt:decodableStruct.currentPrice.Value().periodEnd.Value()];
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.currentPrice.Value().price.HasValue()) {
                 self.currentPrice.price = [NSNumber numberWithLongLong:decodableStruct.currentPrice.Value().price.Value()];
             } else {
                 self.currentPrice.price = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.currentPrice.Value().priceLevel.HasValue()) {
                 self.currentPrice.priceLevel = [NSNumber numberWithShort:decodableStruct.currentPrice.Value().priceLevel.Value()];
             } else {
                 self.currentPrice.priceLevel = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.currentPrice.Value().description.HasValue()) {
                 self.currentPrice.descriptionString = AsString(decodableStruct.currentPrice.Value().description.Value());
                 if (self.currentPrice.descriptionString == nil) {
@@ -16816,6 +17659,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             } else {
                 self.currentPrice.descriptionString = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.currentPrice.Value().components.HasValue()) {
                 { // Scope for our temporary variables
                     auto * array_3 = [NSMutableArray new];
@@ -16824,8 +17669,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         auto & entry_3 = iter_3.GetValue();
                         MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_3;
                         newElement_3 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
+#if MTR_ENABLE_PROVISIONAL
                         newElement_3.price = [NSNumber numberWithLongLong:entry_3.price];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_3.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3.source)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_3.description.HasValue()) {
                             newElement_3.descriptionString = AsString(entry_3.description.Value());
                             if (newElement_3.descriptionString == nil) {
@@ -16835,11 +17685,14 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         } else {
                             newElement_3.descriptionString = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_3.tariffComponentID.HasValue()) {
                             newElement_3.tariffComponentID = [NSNumber numberWithUnsignedInt:entry_3.tariffComponentID.Value()];
                         } else {
                             newElement_3.tariffComponentID = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                         [array_3 addObject:newElement_3];
                     }
                     CHIP_ERROR err = iter_3.GetStatus();
@@ -16851,6 +17704,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             } else {
                 self.currentPrice.components = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
         }
     }
     return CHIP_NO_ERROR;
@@ -17026,22 +17880,31 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 auto & entry_0 = iter_0.GetValue();
                 MTRCommodityPriceClusterCommodityPriceStruct * newElement_0;
                 newElement_0 = [MTRCommodityPriceClusterCommodityPriceStruct new];
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.periodStart = [NSNumber numberWithUnsignedInt:entry_0.periodStart];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.periodEnd.IsNull()) {
                     newElement_0.periodEnd = nil;
                 } else {
                     newElement_0.periodEnd = [NSNumber numberWithUnsignedInt:entry_0.periodEnd.Value()];
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.price.HasValue()) {
                     newElement_0.price = [NSNumber numberWithLongLong:entry_0.price.Value()];
                 } else {
                     newElement_0.price = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.priceLevel.HasValue()) {
                     newElement_0.priceLevel = [NSNumber numberWithShort:entry_0.priceLevel.Value()];
                 } else {
                     newElement_0.priceLevel = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.description.HasValue()) {
                     newElement_0.descriptionString = AsString(entry_0.description.Value());
                     if (newElement_0.descriptionString == nil) {
@@ -17051,6 +17914,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 } else {
                     newElement_0.descriptionString = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.components.HasValue()) {
                     { // Scope for our temporary variables
                         auto * array_3 = [NSMutableArray new];
@@ -17059,8 +17924,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             auto & entry_3 = iter_3.GetValue();
                             MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_3;
                             newElement_3 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
+#if MTR_ENABLE_PROVISIONAL
                             newElement_3.price = [NSNumber numberWithLongLong:entry_3.price];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             newElement_3.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3.source)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_3.description.HasValue()) {
                                 newElement_3.descriptionString = AsString(entry_3.description.Value());
                                 if (newElement_3.descriptionString == nil) {
@@ -17070,11 +17940,14 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             } else {
                                 newElement_3.descriptionString = nil;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_3.tariffComponentID.HasValue()) {
                                 newElement_3.tariffComponentID = [NSNumber numberWithUnsignedInt:entry_3.tariffComponentID.Value()];
                             } else {
                                 newElement_3.tariffComponentID = nil;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
                             [array_3 addObject:newElement_3];
                         }
                         CHIP_ERROR err = iter_3.GetStatus();
@@ -17086,6 +17959,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 } else {
                     newElement_0.components = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -17118,6 +17992,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _messageText = @"";
 
         _responses = nil;
+
+        _languageCode = nil;
+
+        _messageURI = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -17135,6 +18013,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.duration = self.duration;
     other.messageText = self.messageText;
     other.responses = self.responses;
+    other.languageCode = self.languageCode;
+    other.messageURI = self.messageURI;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -17143,7 +18023,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; priority:%@; messageControl:%@; startTime:%@; duration:%@; messageText:%@; responses:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0], _priority, _messageControl, _startTime, _duration, _messageText, _responses];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; priority:%@; messageControl:%@; startTime:%@; duration:%@; messageText:%@; responses:%@; languageCode:%@; messageURI:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0], _priority, _messageControl, _startTime, _duration, _messageText, _responses, _languageCode, _messageURI];
     return descriptionString;
 }
 
@@ -17216,6 +18096,18 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     definedValue_0 = ListType_1();
                 }
             }
+        }
+    }
+    {
+        if (self.languageCode != nil) {
+            auto & definedValue_0 = encodableStruct.languageCode.Emplace();
+            definedValue_0 = AsCharSpan(self.languageCode);
+        }
+    }
+    {
+        if (self.messageURI != nil) {
+            auto & definedValue_0 = encodableStruct.messageURI.Emplace();
+            definedValue_0 = AsCharSpan(self.messageURI);
         }
     }
 
@@ -18123,19 +19015,15 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::DeviceEnergyManagement::Commands::PowerRangeAdjustRequest::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.minPower == nil) {
-            encodableStruct.minPower.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.minPower.SetNonNull();
-            nonNullValue_0 = self.minPower.longLongValue;
+        if (self.minPower != nil) {
+            auto & definedValue_0 = encodableStruct.minPower.Emplace();
+            definedValue_0 = self.minPower.longLongValue;
         }
     }
     {
-        if (self.maxPower == nil) {
-            encodableStruct.maxPower.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.maxPower.SetNonNull();
-            nonNullValue_0 = self.maxPower.longLongValue;
+        if (self.maxPower != nil) {
+            auto & definedValue_0 = encodableStruct.maxPower.Emplace();
+            definedValue_0 = self.maxPower.longLongValue;
         }
     }
     {
@@ -19178,6 +20066,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @end
 
+@implementation MTREnergyEVSEModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTREnergyEVSEModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTREnergyEVSEModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::EnergyEvseMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRWaterHeaterModeClusterChangeToModeParams
 - (instancetype)init
 {
@@ -19360,6 +20327,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @end
 
+@implementation MTRWaterHeaterModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRWaterHeaterModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWaterHeaterModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::WaterHeaterMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRDeviceEnergyManagementModeClusterChangeToModeParams
 - (instancetype)init
 {
@@ -19540,6 +20586,85 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRDeviceEnergyManagementModeClusterChangeToModeByCoreTagParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newModeTag = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDeviceEnergyManagementModeClusterChangeToModeByCoreTagParams alloc] init];
+
+    other.newModeTag = self.newModeTag;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newModeTag:%@; >", NSStringFromClass([self class]), _newModeTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementModeClusterChangeToModeByCoreTagParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeByCoreTag::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.newModeTag = self.newModeTag.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRElectricalAlarmClusterResetParams
@@ -25408,8 +26533,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 auto & entry_0 = iter_0.GetValue();
                 MTRDataTypeAtomicAttributeStatusStruct * newElement_0;
                 newElement_0 = [MTRDataTypeAtomicAttributeStatusStruct new];
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.attributeID = [NSNumber numberWithUnsignedInt:entry_0.attributeID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.statusCode = [NSNumber numberWithUnsignedChar:entry_0.statusCode];
+#endif // MTR_ENABLE_PROVISIONAL
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -25651,7 +26780,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _userSetpoint = nil;
 
-        _mode = nil;
+        _humidistatMode = nil;
 
         _mistType = nil;
 
@@ -25671,7 +26800,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     auto other = [[MTRHumidistatClusterSetSettingsParams alloc] init];
 
     other.userSetpoint = self.userSetpoint;
-    other.mode = self.mode;
+    other.humidistatMode = self.humidistatMode;
     other.mistType = self.mistType;
     other.continuous = self.continuous;
     other.sleep = self.sleep;
@@ -25684,7 +26813,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: userSetpoint:%@; mode:%@; mistType:%@; continuous:%@; sleep:%@; optimal:%@; >", NSStringFromClass([self class]), _userSetpoint, _mode, _mistType, _continuous, _sleep, _optimal];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: userSetpoint:%@; humidistatMode:%@; mistType:%@; continuous:%@; sleep:%@; optimal:%@; >", NSStringFromClass([self class]), _userSetpoint, _humidistatMode, _mistType, _continuous, _sleep, _optimal];
     return descriptionString;
 }
 
@@ -25703,9 +26832,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         }
     }
     {
-        if (self.mode != nil) {
-            auto & definedValue_0 = encodableStruct.mode.Emplace();
-            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.mode.unsignedCharValue);
+        if (self.humidistatMode != nil) {
+            auto & definedValue_0 = encodableStruct.humidistatMode.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.humidistatMode.unsignedCharValue);
         }
     }
     {
@@ -27797,42 +28926,54 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.colorPalette[i_1], NSStringFromClass(MTRDynamicLightingClusterEffectColorStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.level == nil) {
                             listHolder_1->mList[i_1].level.SetNull();
                         } else {
                             auto & nonNullValue_3 = listHolder_1->mList[i_1].level.SetNonNull();
                             nonNullValue_3 = element_1.level.unsignedCharValue;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.x == nil) {
                             listHolder_1->mList[i_1].x.SetNull();
                         } else {
                             auto & nonNullValue_3 = listHolder_1->mList[i_1].x.SetNonNull();
                             nonNullValue_3 = element_1.x.unsignedShortValue;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.y == nil) {
                             listHolder_1->mList[i_1].y.SetNull();
                         } else {
                             auto & nonNullValue_3 = listHolder_1->mList[i_1].y.SetNonNull();
                             nonNullValue_3 = element_1.y.unsignedShortValue;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.hue == nil) {
                             listHolder_1->mList[i_1].hue.SetNull();
                         } else {
                             auto & nonNullValue_3 = listHolder_1->mList[i_1].hue.SetNonNull();
                             nonNullValue_3 = element_1.hue.unsignedCharValue;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.enhancedHue == nil) {
                             listHolder_1->mList[i_1].enhancedHue.SetNull();
                         } else {
                             auto & nonNullValue_3 = listHolder_1->mList[i_1].enhancedHue.SetNonNull();
                             nonNullValue_3 = element_1.enhancedHue.unsignedShortValue;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.saturation == nil) {
                             listHolder_1->mList[i_1].saturation.SetNull();
                         } else {
                             auto & nonNullValue_3 = listHolder_1->mList[i_1].saturation.SetNonNull();
                             nonNullValue_3 = element_1.saturation.unsignedCharValue;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                     }
                     nonNullValue_0 = ListType_1(listHolder_1->mList, self.colorPalette.count);
                 } else {
@@ -27970,8 +29111,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _bandwidth = nil;
 
-        _securityMode = @(0);
-
         _trigger = [MTRProximityRangingClusterRangingTriggerConditionStruct new];
 
         _reportingCondition = nil;
@@ -27991,7 +29130,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.bltChannelSoundingDeviceRoleConfig = self.bltChannelSoundingDeviceRoleConfig;
     other.frequencyBand = self.frequencyBand;
     other.bandwidth = self.bandwidth;
-    other.securityMode = self.securityMode;
     other.trigger = self.trigger;
     other.reportingCondition = self.reportingCondition;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -28002,7 +29140,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: technology:%@; wiFiRangingDeviceRoleConfig:%@; bleRangingDeviceRoleConfig:%@; bltChannelSoundingDeviceRoleConfig:%@; frequencyBand:%@; bandwidth:%@; securityMode:%@; trigger:%@; reportingCondition:%@; >", NSStringFromClass([self class]), _technology, _wiFiRangingDeviceRoleConfig, _bleRangingDeviceRoleConfig, _bltChannelSoundingDeviceRoleConfig, _frequencyBand, _bandwidth, _securityMode, _trigger, _reportingCondition];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: technology:%@; wiFiRangingDeviceRoleConfig:%@; bleRangingDeviceRoleConfig:%@; bltChannelSoundingDeviceRoleConfig:%@; frequencyBand:%@; bandwidth:%@; trigger:%@; reportingCondition:%@; >", NSStringFromClass([self class]), _technology, _wiFiRangingDeviceRoleConfig, _bleRangingDeviceRoleConfig, _bltChannelSoundingDeviceRoleConfig, _frequencyBand, _bandwidth, _trigger, _reportingCondition];
     return descriptionString;
 }
 
@@ -28020,38 +29158,58 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     {
         if (self.wiFiRangingDeviceRoleConfig != nil) {
             auto & definedValue_0 = encodableStruct.wiFiRangingDeviceRoleConfig.Emplace();
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.role = static_cast<std::remove_reference_t<decltype(definedValue_0.role)>>(self.wiFiRangingDeviceRoleConfig.role.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.peerWiFiDevIK = AsByteSpan(self.wiFiRangingDeviceRoleConfig.peerWiFiDevIK);
-            if (self.wiFiRangingDeviceRoleConfig.pmk != nil) {
-                auto & definedValue_2 = definedValue_0.pmk.Emplace();
-                definedValue_2 = AsByteSpan(self.wiFiRangingDeviceRoleConfig.pmk);
-            }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            definedValue_0.pmk = AsByteSpan(self.wiFiRangingDeviceRoleConfig.pmk);
+#endif // MTR_ENABLE_PROVISIONAL
         }
     }
     {
         if (self.bleRangingDeviceRoleConfig != nil) {
             auto & definedValue_0 = encodableStruct.BLERangingDeviceRoleConfig.Emplace();
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.role = static_cast<std::remove_reference_t<decltype(definedValue_0.role)>>(self.bleRangingDeviceRoleConfig.role.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.peerBLEDeviceID = self.bleRangingDeviceRoleConfig.peerBLEDeviceID.unsignedLongLongValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            definedValue_0.BLERBCSecurityMode = static_cast<std::remove_reference_t<decltype(definedValue_0.BLERBCSecurityMode)>>(self.bleRangingDeviceRoleConfig.blerbcSecurityMode.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            if (self.bleRangingDeviceRoleConfig.sessionKey != nil) {
+                auto & definedValue_2 = definedValue_0.sessionKey.Emplace();
+                definedValue_2 = AsByteSpan(self.bleRangingDeviceRoleConfig.sessionKey);
+            }
+#endif // MTR_ENABLE_PROVISIONAL
         }
     }
     {
         if (self.bltChannelSoundingDeviceRoleConfig != nil) {
             auto & definedValue_0 = encodableStruct.BLTChannelSoundingDeviceRoleConfig.Emplace();
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.role = static_cast<std::remove_reference_t<decltype(definedValue_0.role)>>(self.bltChannelSoundingDeviceRoleConfig.role.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.peerBLTDevIK = AsByteSpan(self.bltChannelSoundingDeviceRoleConfig.peerBLTDevIK);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (self.bltChannelSoundingDeviceRoleConfig.bltcsMode != nil) {
                 auto & definedValue_2 = definedValue_0.BLTCSMode.Emplace();
                 definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(self.bltChannelSoundingDeviceRoleConfig.bltcsMode.unsignedCharValue);
             }
-            if (self.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel != nil) {
-                auto & definedValue_2 = definedValue_0.BLTCSSecurityLevel.Emplace();
-                definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(self.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel.unsignedCharValue);
-            }
-            if (self.bltChannelSoundingDeviceRoleConfig.ltk != nil) {
-                auto & definedValue_2 = definedValue_0.ltk.Emplace();
-                definedValue_2 = AsByteSpan(self.bltChannelSoundingDeviceRoleConfig.ltk);
-            }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            definedValue_0.BLTCSSecurityLevel = static_cast<std::remove_reference_t<decltype(definedValue_0.BLTCSSecurityLevel)>>(self.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            definedValue_0.ltk = AsByteSpan(self.bltChannelSoundingDeviceRoleConfig.ltk);
+#endif // MTR_ENABLE_PROVISIONAL
         }
     }
     {
@@ -28067,31 +29225,40 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         }
     }
     {
-        encodableStruct.securityMode = static_cast<std::remove_reference_t<decltype(encodableStruct.securityMode)>>(self.securityMode.unsignedCharValue);
-    }
-    {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.trigger.startTime = self.trigger.startTime.unsignedIntValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.trigger.endTime = self.trigger.endTime.unsignedIntValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.trigger.rangingInstanceInterval != nil) {
             auto & definedValue_1 = encodableStruct.trigger.rangingInstanceInterval.Emplace();
             definedValue_1 = self.trigger.rangingInstanceInterval.unsignedIntValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
     {
         if (self.reportingCondition != nil) {
             auto & definedValue_0 = encodableStruct.reportingCondition.Emplace();
+#if MTR_ENABLE_PROVISIONAL
             if (self.reportingCondition.minDistanceCondition != nil) {
                 auto & definedValue_2 = definedValue_0.minDistanceCondition.Emplace();
                 definedValue_2 = self.reportingCondition.minDistanceCondition.unsignedShortValue;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (self.reportingCondition.maxDistanceCondition != nil) {
                 auto & definedValue_2 = definedValue_0.maxDistanceCondition.Emplace();
                 definedValue_2 = self.reportingCondition.maxDistanceCondition.unsignedShortValue;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (self.reportingCondition.errorMarginCondition != nil) {
                 auto & definedValue_2 = definedValue_0.errorMarginCondition.Emplace();
                 definedValue_2 = self.reportingCondition.errorMarginCondition.unsignedShortValue;
             }
+#endif // MTR_ENABLE_PROVISIONAL
         }
     }
 
@@ -28138,9 +29305,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _resultCode = @(0);
-
-        _sessionID = nil;
+        _sessionID = @(0);
     }
     return self;
 }
@@ -28149,7 +29314,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRProximityRangingClusterStartRangingResponseParams alloc] init];
 
-    other.resultCode = self.resultCode;
     other.sessionID = self.sessionID;
 
     return other;
@@ -28157,7 +29321,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: resultCode:%@; sessionID:%@; >", NSStringFromClass([self class]), _resultCode, _sessionID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; >", NSStringFromClass([self class]), _sessionID];
     return descriptionString;
 }
 
@@ -28218,14 +29382,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::DecodableType &)decodableStruct
 {
     {
-        self.resultCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.resultCode)];
-    }
-    {
-        if (decodableStruct.sessionID.IsNull()) {
-            self.sessionID = nil;
-        } else {
-            self.sessionID = [NSNumber numberWithUnsignedChar:decodableStruct.sessionID.Value()];
-        }
+        self.sessionID = [NSNumber numberWithUnsignedChar:decodableStruct.sessionID];
     }
     return CHIP_NO_ERROR;
 }
@@ -30378,25 +31535,39 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 auto & entry_0 = iter_0.GetValue();
                 MTRCommissioningProxyClusterScanResultStruct * newElement_0;
                 newElement_0 = [MTRCommissioningProxyClusterScanResultStruct new];
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.address.IsNull()) {
                     newElement_0.address = nil;
                 } else {
                     newElement_0.address = AsData(entry_0.address.Value());
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.transport = [NSNumber numberWithUnsignedChar:entry_0.transport.Raw()];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.discriminator = [NSNumber numberWithUnsignedShort:entry_0.discriminator];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.vendorID = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.vendorID)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.productID = [NSNumber numberWithUnsignedShort:entry_0.productID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.extendedData.IsNull()) {
                     newElement_0.extendedData = nil;
                 } else {
                     newElement_0.extendedData = AsData(entry_0.extendedData.Value());
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.wiFiBand.HasValue()) {
                     newElement_0.wiFiBand = [NSNumber numberWithUnsignedShort:entry_0.wiFiBand.Value().Raw()];
                 } else {
                     newElement_0.wiFiBand = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -31294,8 +32465,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.externalIDList[i_1], NSStringFromClass(MTRChannelClusterAdditionalInfoStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_1->mList[i_1].name = AsCharSpan(element_1.name);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_1->mList[i_1].value = AsCharSpan(element_1.value);
+#endif // MTR_ENABLE_PROVISIONAL
                     }
                     definedValue_0 = ListType_1(listHolder_1->mList, self.externalIDList.count);
                 } else {
@@ -31628,6 +32803,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 } else {
                     newElement_0.ratings = nil;
                 }
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.thumbnailUrl.HasValue()) {
                     newElement_0.thumbnailUrl = AsString(entry_0.thumbnailUrl.Value());
                     if (newElement_0.thumbnailUrl == nil) {
@@ -31637,6 +32813,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 } else {
                     newElement_0.thumbnailUrl = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.posterArtUrl.HasValue()) {
                     newElement_0.posterArtUrl = AsString(entry_0.posterArtUrl.Value());
                     if (newElement_0.posterArtUrl == nil) {
@@ -31646,6 +32824,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 } else {
                     newElement_0.posterArtUrl = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.dvbiUrl.HasValue()) {
                     newElement_0.dvbiUrl = AsString(entry_0.dvbiUrl.Value());
                     if (newElement_0.dvbiUrl == nil) {
@@ -31655,6 +32835,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 } else {
                     newElement_0.dvbiUrl = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
                 if (entry_0.releaseDate.HasValue()) {
                     newElement_0.releaseDate = AsString(entry_0.releaseDate.Value());
                     if (newElement_0.releaseDate == nil) {
@@ -31759,6 +32940,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 } else {
                     newElement_0.castList = nil;
                 }
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.externalIDList.HasValue()) {
                     { // Scope for our temporary variables
                         auto * array_3 = [NSMutableArray new];
@@ -31788,6 +32970,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 } else {
                     newElement_0.externalIDList = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -31871,8 +33054,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.externalIDList[i_0], NSStringFromClass(MTRChannelClusterAdditionalInfoStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_0->mList[i_0].name = AsCharSpan(element_0.name);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_0->mList[i_0].value = AsCharSpan(element_0.value);
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.externalIDList = ListType_0(listHolder_0->mList, self.externalIDList.count);
             } else {
@@ -31991,8 +33178,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.externalIDList[i_0], NSStringFromClass(MTRChannelClusterAdditionalInfoStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_0->mList[i_0].name = AsCharSpan(element_0.name);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_0->mList[i_0].value = AsCharSpan(element_0.value);
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.externalIDList = ListType_0(listHolder_0->mList, self.externalIDList.count);
             } else {
@@ -33988,6 +35179,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _playbackPreferences = nil;
 
         _useCurrentContext = nil;
+
+        _contentAppVendorID = nil;
+
+        _contentAppProductID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -34003,6 +35198,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.data = self.data;
     other.playbackPreferences = self.playbackPreferences;
     other.useCurrentContext = self.useCurrentContext;
+    other.contentAppVendorID = self.contentAppVendorID;
+    other.contentAppProductID = self.contentAppProductID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -34011,7 +35208,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: search:%@; autoPlay:%@; data:%@; playbackPreferences:%@; useCurrentContext:%@; >", NSStringFromClass([self class]), _search, _autoPlay, _data, _playbackPreferences, _useCurrentContext];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: search:%@; autoPlay:%@; data:%@; playbackPreferences:%@; useCurrentContext:%@; contentAppVendorID:%@; contentAppProductID:%@; >", NSStringFromClass([self class]), _search, _autoPlay, _data, _playbackPreferences, _useCurrentContext, _contentAppVendorID, _contentAppProductID];
     return descriptionString;
 }
 
@@ -34088,8 +35285,14 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     {
         if (self.playbackPreferences != nil) {
             auto & definedValue_0 = encodableStruct.playbackPreferences.Emplace();
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.playbackPosition = self.playbackPreferences.playbackPosition.unsignedLongLongValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.textTrack.languageCode = AsCharSpan(self.playbackPreferences.textTrack.languageCode);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (self.playbackPreferences.textTrack.characteristics != nil) {
                 auto & definedValue_3 = definedValue_0.textTrack.characteristics.Emplace();
                 {
@@ -34116,7 +35319,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     }
                 }
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.textTrack.audioOutputIndex = self.playbackPreferences.textTrack.audioOutputIndex.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (self.playbackPreferences.audioTracks != nil) {
                 auto & definedValue_2 = definedValue_0.audioTracks.Emplace();
                 {
@@ -34135,7 +35343,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.playbackPreferences.audioTracks[i_3], NSStringFromClass(MTRContentLauncherClusterTrackPreferenceStruct.class));
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
+#if MTR_ENABLE_PROVISIONAL
                             listHolder_3->mList[i_3].languageCode = AsCharSpan(element_3.languageCode);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (element_3.characteristics != nil) {
                                 auto & definedValue_5 = listHolder_3->mList[i_3].characteristics.Emplace();
                                 {
@@ -34162,7 +35373,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                     }
                                 }
                             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             listHolder_3->mList[i_3].audioOutputIndex = element_3.audioOutputIndex.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
                         }
                         definedValue_2 = ListType_3(listHolder_3->mList, self.playbackPreferences.audioTracks.count);
                     } else {
@@ -34170,12 +35384,35 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     }
                 }
             }
+#endif // MTR_ENABLE_PROVISIONAL
         }
     }
     {
         if (self.useCurrentContext != nil) {
             auto & definedValue_0 = encodableStruct.useCurrentContext.Emplace();
             definedValue_0 = self.useCurrentContext.boolValue;
+        }
+    }
+    {
+        if (self.contentAppVendorID != nil) {
+            auto & definedValue_0 = encodableStruct.contentAppVendorID.Emplace();
+            if (self.contentAppVendorID == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.contentAppVendorID.unsignedShortValue;
+            }
+        }
+    }
+    {
+        if (self.contentAppProductID != nil) {
+            auto & definedValue_0 = encodableStruct.contentAppProductID.Emplace();
+            if (self.contentAppProductID == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.contentAppProductID.unsignedShortValue;
+            }
         }
     }
 
@@ -34227,6 +35464,18 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _displayString = nil;
 
         _brandingInformation = nil;
+
+        _playbackPreferences = nil;
+
+        _contentType = nil;
+
+        _contentHeaders = nil;
+
+        _offsetMillisecs = nil;
+
+        _queueType = nil;
+
+        _nextUrl = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -34240,6 +35489,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.contentURL = self.contentURL;
     other.displayString = self.displayString;
     other.brandingInformation = self.brandingInformation;
+    other.playbackPreferences = self.playbackPreferences;
+    other.contentType = self.contentType;
+    other.contentHeaders = self.contentHeaders;
+    other.offsetMillisecs = self.offsetMillisecs;
+    other.queueType = self.queueType;
+    other.nextUrl = self.nextUrl;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -34248,7 +35503,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentURL:%@; displayString:%@; brandingInformation:%@; >", NSStringFromClass([self class]), _contentURL, _displayString, _brandingInformation];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentURL:%@; displayString:%@; brandingInformation:%@; playbackPreferences:%@; contentType:%@; contentHeaders:%@; offsetMillisecs:%@; queueType:%@; nextUrl:%@; >", NSStringFromClass([self class]), _contentURL, _displayString, _brandingInformation, _playbackPreferences, _contentType, _contentHeaders, _offsetMillisecs, _queueType, _nextUrl];
     return descriptionString;
 }
 
@@ -34357,6 +35612,188 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     definedValue_4.height = self.brandingInformation.waterMark.size.height.doubleValue;
                     definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(self.brandingInformation.waterMark.size.metric.unsignedCharValue);
                 }
+            }
+        }
+    }
+    {
+        if (self.playbackPreferences != nil) {
+            auto & definedValue_0 = encodableStruct.playbackPreferences.Emplace();
+#if MTR_ENABLE_PROVISIONAL
+            definedValue_0.playbackPosition = self.playbackPreferences.playbackPosition.unsignedLongLongValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            definedValue_0.textTrack.languageCode = AsCharSpan(self.playbackPreferences.textTrack.languageCode);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            if (self.playbackPreferences.textTrack.characteristics != nil) {
+                auto & definedValue_3 = definedValue_0.textTrack.characteristics.Emplace();
+                {
+                    using ListType_4 = std::remove_reference_t<decltype(definedValue_3)>;
+                    using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                    if (self.playbackPreferences.textTrack.characteristics.count != 0) {
+                        auto * listHolder_4 = new ListHolder<ListMemberType_4>(self.playbackPreferences.textTrack.characteristics.count);
+                        if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listFreer.add(listHolder_4);
+                        for (size_t i_4 = 0; i_4 < self.playbackPreferences.textTrack.characteristics.count; ++i_4) {
+                            auto element_4 = MTR_SAFE_CAST(self.playbackPreferences.textTrack.characteristics[i_4], NSNumber);
+                            if (!element_4) {
+                                // Wrong kind of value.
+                                MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.playbackPreferences.textTrack.characteristics[i_4], NSStringFromClass(NSNumber.class));
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            listHolder_4->mList[i_4] = static_cast<std::remove_reference_t<decltype(listHolder_4->mList[i_4])>>(element_4.unsignedCharValue);
+                        }
+                        definedValue_3 = ListType_4(listHolder_4->mList, self.playbackPreferences.textTrack.characteristics.count);
+                    } else {
+                        definedValue_3 = ListType_4();
+                    }
+                }
+            }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            definedValue_0.textTrack.audioOutputIndex = self.playbackPreferences.textTrack.audioOutputIndex.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            if (self.playbackPreferences.audioTracks != nil) {
+                auto & definedValue_2 = definedValue_0.audioTracks.Emplace();
+                {
+                    using ListType_3 = std::remove_reference_t<decltype(definedValue_2)>;
+                    using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+                    if (self.playbackPreferences.audioTracks.count != 0) {
+                        auto * listHolder_3 = new ListHolder<ListMemberType_3>(self.playbackPreferences.audioTracks.count);
+                        if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listFreer.add(listHolder_3);
+                        for (size_t i_3 = 0; i_3 < self.playbackPreferences.audioTracks.count; ++i_3) {
+                            auto element_3 = MTR_SAFE_CAST(self.playbackPreferences.audioTracks[i_3], MTRContentLauncherClusterTrackPreferenceStruct);
+                            if (!element_3) {
+                                // Wrong kind of value.
+                                MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.playbackPreferences.audioTracks[i_3], NSStringFromClass(MTRContentLauncherClusterTrackPreferenceStruct.class));
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+#if MTR_ENABLE_PROVISIONAL
+                            listHolder_3->mList[i_3].languageCode = AsCharSpan(element_3.languageCode);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+                            if (element_3.characteristics != nil) {
+                                auto & definedValue_5 = listHolder_3->mList[i_3].characteristics.Emplace();
+                                {
+                                    using ListType_6 = std::remove_reference_t<decltype(definedValue_5)>;
+                                    using ListMemberType_6 = ListMemberTypeGetter<ListType_6>::Type;
+                                    if (element_3.characteristics.count != 0) {
+                                        auto * listHolder_6 = new ListHolder<ListMemberType_6>(element_3.characteristics.count);
+                                        if (listHolder_6 == nullptr || listHolder_6->mList == nullptr) {
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        listFreer.add(listHolder_6);
+                                        for (size_t i_6 = 0; i_6 < element_3.characteristics.count; ++i_6) {
+                                            auto element_6 = MTR_SAFE_CAST(element_3.characteristics[i_6], NSNumber);
+                                            if (!element_6) {
+                                                // Wrong kind of value.
+                                                MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_3.characteristics[i_6], NSStringFromClass(NSNumber.class));
+                                                return CHIP_ERROR_INVALID_ARGUMENT;
+                                            }
+                                            listHolder_6->mList[i_6] = static_cast<std::remove_reference_t<decltype(listHolder_6->mList[i_6])>>(element_6.unsignedCharValue);
+                                        }
+                                        definedValue_5 = ListType_6(listHolder_6->mList, element_3.characteristics.count);
+                                    } else {
+                                        definedValue_5 = ListType_6();
+                                    }
+                                }
+                            }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+                            listHolder_3->mList[i_3].audioOutputIndex = element_3.audioOutputIndex.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
+                        }
+                        definedValue_2 = ListType_3(listHolder_3->mList, self.playbackPreferences.audioTracks.count);
+                    } else {
+                        definedValue_2 = ListType_3();
+                    }
+                }
+            }
+#endif // MTR_ENABLE_PROVISIONAL
+        }
+    }
+    {
+        if (self.contentType != nil) {
+            auto & definedValue_0 = encodableStruct.contentType.Emplace();
+            if (self.contentType == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = AsCharSpan(self.contentType);
+            }
+        }
+    }
+    {
+        if (self.contentHeaders != nil) {
+            auto & definedValue_0 = encodableStruct.contentHeaders.Emplace();
+            if (self.contentHeaders == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                {
+                    using ListType_2 = std::remove_reference_t<decltype(nonNullValue_1)>;
+                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                    if (self.contentHeaders.count != 0) {
+                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.contentHeaders.count);
+                        if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listFreer.add(listHolder_2);
+                        for (size_t i_2 = 0; i_2 < self.contentHeaders.count; ++i_2) {
+                            auto element_2 = MTR_SAFE_CAST(self.contentHeaders[i_2], NSString);
+                            if (!element_2) {
+                                // Wrong kind of value.
+                                MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.contentHeaders[i_2], NSStringFromClass(NSString.class));
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            listHolder_2->mList[i_2] = AsCharSpan(element_2);
+                        }
+                        nonNullValue_1 = ListType_2(listHolder_2->mList, self.contentHeaders.count);
+                    } else {
+                        nonNullValue_1 = ListType_2();
+                    }
+                }
+            }
+        }
+    }
+    {
+        if (self.offsetMillisecs != nil) {
+            auto & definedValue_0 = encodableStruct.offsetMillisecs.Emplace();
+            if (self.offsetMillisecs == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.offsetMillisecs.unsignedIntValue;
+            }
+        }
+    }
+    {
+        if (self.queueType != nil) {
+            auto & definedValue_0 = encodableStruct.queueType.Emplace();
+            if (self.queueType == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(self.queueType.unsignedCharValue);
+            }
+        }
+    }
+    {
+        if (self.nextUrl != nil) {
+            auto & definedValue_0 = encodableStruct.nextUrl.Emplace();
+            if (self.nextUrl == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = AsCharSpan(self.nextUrl);
             }
         }
     }
@@ -34510,6 +35947,399 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @dynamic timedInvokeTimeoutMs;
 @end
+@implementation MTRContentLauncherClusterContentReplicationRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRContentLauncherClusterContentReplicationRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentLauncherClusterContentReplicationRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRContentLauncherClusterContentReplicationResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _replicationInfo = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRContentLauncherClusterContentReplicationResponseParams alloc] init];
+
+    other.status = self.status;
+    other.replicationInfo = self.replicationInfo;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; replicationInfo:%@; >", NSStringFromClass([self class]), _status, _replicationInfo];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    LogAndConvertDecodingError(err, error);
+    return nil;
+}
+
+@end
+
+@implementation MTRContentLauncherClusterContentReplicationResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.replicationInfo.HasValue()) {
+            if (decodableStruct.replicationInfo.Value().IsNull()) {
+                self.replicationInfo = nil;
+            } else {
+                self.replicationInfo = [MTRContentLauncherClusterReplicationInfo new];
+#if MTR_ENABLE_PROVISIONAL
+                if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.HasValue()) {
+                    if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().IsNull()) {
+                        self.replicationInfo.launchUrlInfo = nil;
+                    } else {
+                        self.replicationInfo.launchUrlInfo = [MTRContentLauncherClusterLaunchUrlInfo new];
+#if MTR_ENABLE_PROVISIONAL
+                        self.replicationInfo.launchUrlInfo.url = AsString(decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().url);
+                        if (self.replicationInfo.launchUrlInfo.url == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            return err;
+                        }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+                        if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().data.HasValue()) {
+                            if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().data.Value().IsNull()) {
+                                self.replicationInfo.launchUrlInfo.data = nil;
+                            } else {
+                                self.replicationInfo.launchUrlInfo.data = AsString(decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().data.Value().Value());
+                                if (self.replicationInfo.launchUrlInfo.data == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    return err;
+                                }
+                            }
+                        } else {
+                            self.replicationInfo.launchUrlInfo.data = nil;
+                        }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+                        if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().contentType.HasValue()) {
+                            if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().contentType.Value().IsNull()) {
+                                self.replicationInfo.launchUrlInfo.contentType = nil;
+                            } else {
+                                self.replicationInfo.launchUrlInfo.contentType = AsString(decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().contentType.Value().Value());
+                                if (self.replicationInfo.launchUrlInfo.contentType == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    return err;
+                                }
+                            }
+                        } else {
+                            self.replicationInfo.launchUrlInfo.contentType = nil;
+                        }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+                        if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().contentHeaders.HasValue()) {
+                            if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().contentHeaders.Value().IsNull()) {
+                                self.replicationInfo.launchUrlInfo.contentHeaders = nil;
+                            } else {
+                                { // Scope for our temporary variables
+                                    auto * array_8 = [NSMutableArray new];
+                                    auto iter_8 = decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().contentHeaders.Value().Value().begin();
+                                    while (iter_8.Next()) {
+                                        auto & entry_8 = iter_8.GetValue();
+                                        NSString * newElement_8;
+                                        newElement_8 = AsString(entry_8);
+                                        if (newElement_8 == nil) {
+                                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                            return err;
+                                        }
+                                        [array_8 addObject:newElement_8];
+                                    }
+                                    CHIP_ERROR err = iter_8.GetStatus();
+                                    if (err != CHIP_NO_ERROR) {
+                                        return err;
+                                    }
+                                    self.replicationInfo.launchUrlInfo.contentHeaders = array_8;
+                                }
+                            }
+                        } else {
+                            self.replicationInfo.launchUrlInfo.contentHeaders = nil;
+                        }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+                        if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().offsetMillisecs.HasValue()) {
+                            if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().offsetMillisecs.Value().IsNull()) {
+                                self.replicationInfo.launchUrlInfo.offsetMillisecs = nil;
+                            } else {
+                                self.replicationInfo.launchUrlInfo.offsetMillisecs = [NSNumber numberWithUnsignedInt:decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().offsetMillisecs.Value().Value()];
+                            }
+                        } else {
+                            self.replicationInfo.launchUrlInfo.offsetMillisecs = nil;
+                        }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+                        if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().queueType.HasValue()) {
+                            if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().queueType.Value().IsNull()) {
+                                self.replicationInfo.launchUrlInfo.queueType = nil;
+                            } else {
+                                self.replicationInfo.launchUrlInfo.queueType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().queueType.Value().Value())];
+                            }
+                        } else {
+                            self.replicationInfo.launchUrlInfo.queueType = nil;
+                        }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+                        if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().nextUrl.HasValue()) {
+                            if (decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().nextUrl.Value().IsNull()) {
+                                self.replicationInfo.launchUrlInfo.nextUrl = nil;
+                            } else {
+                                self.replicationInfo.launchUrlInfo.nextUrl = AsString(decodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().nextUrl.Value().Value());
+                                if (self.replicationInfo.launchUrlInfo.nextUrl == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    return err;
+                                }
+                            }
+                        } else {
+                            self.replicationInfo.launchUrlInfo.nextUrl = nil;
+                        }
+#endif // MTR_ENABLE_PROVISIONAL
+                    }
+                } else {
+                    self.replicationInfo.launchUrlInfo = nil;
+                }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+                if (decodableStruct.replicationInfo.Value().Value().contentAppInfo.HasValue()) {
+                    if (decodableStruct.replicationInfo.Value().Value().contentAppInfo.Value().IsNull()) {
+                        self.replicationInfo.contentAppInfo = nil;
+                    } else {
+                        self.replicationInfo.contentAppInfo = [MTRContentLauncherClusterContentAppInfo new];
+#if MTR_ENABLE_PROVISIONAL
+                        self.replicationInfo.contentAppInfo.contentAppVendorID = [NSNumber numberWithUnsignedShort:decodableStruct.replicationInfo.Value().Value().contentAppInfo.Value().Value().contentAppVendorID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+                        self.replicationInfo.contentAppInfo.contentAppProductID = [NSNumber numberWithUnsignedShort:decodableStruct.replicationInfo.Value().Value().contentAppInfo.Value().Value().contentAppProductID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+                        self.replicationInfo.contentAppInfo.data = AsString(decodableStruct.replicationInfo.Value().Value().contentAppInfo.Value().Value().data);
+                        if (self.replicationInfo.contentAppInfo.data == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            return err;
+                        }
+#endif // MTR_ENABLE_PROVISIONAL
+                    }
+                } else {
+                    self.replicationInfo.contentAppInfo = nil;
+                }
+#endif // MTR_ENABLE_PROVISIONAL
+            }
+        } else {
+            self.replicationInfo = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRContentLauncherClusterPlayPresetParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRContentLauncherClusterPlayPresetParams alloc] init];
+
+    other.presetID = self.presetID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetID:%@; >", NSStringFromClass([self class]), _presetID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentLauncherClusterPlayPresetParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.presetID = self.presetID.unsignedCharValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRAudioOutputClusterSelectOutputParams
 - (instancetype)init
 {
@@ -35381,6 +37211,208 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     }
     return decodedObj;
 }
+@end
+
+@implementation MTRAccountLoginClusterGetDeviceAuthURIParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRAccountLoginClusterGetDeviceAuthURIParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccountLoginClusterGetDeviceAuthURIParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURI::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRAccountLoginClusterGetDeviceAuthURIResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userCode = @"";
+
+        _verificationURI = @"";
+
+        _verificationURIComplete = nil;
+
+        _expiresIn = @(0);
+
+        _interval = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRAccountLoginClusterGetDeviceAuthURIResponseParams alloc] init];
+
+    other.userCode = self.userCode;
+    other.verificationURI = self.verificationURI;
+    other.verificationURIComplete = self.verificationURIComplete;
+    other.expiresIn = self.expiresIn;
+    other.interval = self.interval;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: userCode:%@; verificationURI:%@; verificationURIComplete:%@; expiresIn:%@; interval:%@; >", NSStringFromClass([self class]), _userCode, _verificationURI, _verificationURIComplete, _expiresIn, _interval];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    LogAndConvertDecodingError(err, error);
+    return nil;
+}
+
+@end
+
+@implementation MTRAccountLoginClusterGetDeviceAuthURIResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::DecodableType &)decodableStruct
+{
+    {
+        self.userCode = AsString(decodableStruct.userCode);
+        if (self.userCode == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            return err;
+        }
+    }
+    {
+        self.verificationURI = AsString(decodableStruct.verificationURI);
+        if (self.verificationURI == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            return err;
+        }
+    }
+    {
+        if (decodableStruct.verificationURIComplete.HasValue()) {
+            self.verificationURIComplete = AsString(decodableStruct.verificationURIComplete.Value());
+            if (self.verificationURIComplete == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        } else {
+            self.verificationURIComplete = nil;
+        }
+    }
+    {
+        self.expiresIn = [NSNumber numberWithUnsignedShort:decodableStruct.expiresIn];
+    }
+    {
+        self.interval = [NSNumber numberWithUnsignedChar:decodableStruct.interval];
+    }
+    return CHIP_NO_ERROR;
+}
+
 @end
 
 @implementation MTRContentControlClusterUpdatePINParams
@@ -36305,18 +38337,26 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.channels[i_0], NSStringFromClass(MTRContentControlClusterBlockChannelStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
+#if MTR_ENABLE_PROVISIONAL
                     if (element_0.blockChannelIndex == nil) {
                         listHolder_0->mList[i_0].blockChannelIndex.SetNull();
                     } else {
                         auto & nonNullValue_2 = listHolder_0->mList[i_0].blockChannelIndex.SetNonNull();
                         nonNullValue_2 = element_0.blockChannelIndex.unsignedShortValue;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_0->mList[i_0].majorNumber = element_0.majorNumber.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_0->mList[i_0].minorNumber = element_0.minorNumber.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (element_0.identifier != nil) {
                         auto & definedValue_2 = listHolder_0->mList[i_0].identifier.Emplace();
                         definedValue_2 = AsCharSpan(element_0.identifier);
                     }
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.channels = ListType_0(listHolder_0->mList, self.channels.count);
             } else {
@@ -36518,8 +38558,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.applications[i_0], NSStringFromClass(MTRContentControlClusterAppInfoStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_0->mList[i_0].catalogVendorID = element_0.catalogVendorID.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_0->mList[i_0].applicationID = AsCharSpan(element_0.applicationID);
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.applications = ListType_0(listHolder_0->mList, self.applications.count);
             } else {
@@ -36620,8 +38664,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.applications[i_0], NSStringFromClass(MTRContentControlClusterAppInfoStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_0->mList[i_0].catalogVendorID = element_0.catalogVendorID.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_0->mList[i_0].applicationID = AsCharSpan(element_0.applicationID);
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.applications = ListType_0(listHolder_0->mList, self.applications.count);
             } else {
@@ -36706,13 +38754,18 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::ContentControl::Commands::SetBlockContentTimeWindow::Type encodableStruct;
     ListFreer listFreer;
     {
+#if MTR_ENABLE_PROVISIONAL
         if (self.timeWindow.timeWindowIndex == nil) {
             encodableStruct.timeWindow.timeWindowIndex.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.timeWindow.timeWindowIndex.SetNonNull();
             nonNullValue_1 = self.timeWindow.timeWindowIndex.unsignedShortValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.timeWindow.dayOfWeek = static_cast<std::remove_reference_t<decltype(encodableStruct.timeWindow.dayOfWeek)>>(self.timeWindow.dayOfWeek.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         {
             using ListType_1 = std::remove_reference_t<decltype(encodableStruct.timeWindow.timePeriod)>;
             using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
@@ -36729,16 +38782,25 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.timeWindow.timePeriod[i_1], NSStringFromClass(MTRContentControlClusterTimePeriodStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_1->mList[i_1].startHour = element_1.startHour.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_1->mList[i_1].startMinute = element_1.startMinute.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_1->mList[i_1].endHour = element_1.endHour.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_1->mList[i_1].endMinute = element_1.endMinute.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.timeWindow.timePeriod = ListType_1(listHolder_1->mList, self.timeWindow.timePeriod.count);
             } else {
                 encodableStruct.timeWindow.timePeriod = ListType_1();
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -37083,6 +39145,705 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRMediaFileManagementClusterAddFileParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _name = @"";
+
+        _size = @(0);
+
+        _mimeType = @"";
+
+        _imageURI = @"";
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRMediaFileManagementClusterAddFileParams alloc] init];
+
+    other.name = self.name;
+    other.size = self.size;
+    other.mimeType = self.mimeType;
+    other.imageURI = self.imageURI;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; size:%@; mimeType:%@; imageURI:%@; >", NSStringFromClass([self class]), _name, _size, _mimeType, _imageURI];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMediaFileManagementClusterAddFileParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::MediaFileManagement::Commands::AddFile::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.name = AsCharSpan(self.name);
+    }
+    {
+        encodableStruct.size = self.size.unsignedLongLongValue;
+    }
+    {
+        encodableStruct.mimeType = AsCharSpan(self.mimeType);
+    }
+    {
+        encodableStruct.imageURI = AsCharSpan(self.imageURI);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRMediaFileManagementClusterAddFileResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _fileID = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRMediaFileManagementClusterAddFileResponseParams alloc] init];
+
+    other.status = self.status;
+    other.fileID = self.fileID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; fileID:%@; >", NSStringFromClass([self class]), _status, _fileID];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::MediaFileManagement::Commands::AddFileResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    LogAndConvertDecodingError(err, error);
+    return nil;
+}
+
+@end
+
+@implementation MTRMediaFileManagementClusterAddFileResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::MediaFileManagement::Commands::AddFileResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MediaFileManagement::Commands::AddFileResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.fileID.IsNull()) {
+            self.fileID = nil;
+        } else {
+            self.fileID = [NSNumber numberWithUnsignedLongLong:decodableStruct.fileID.Value()];
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRMediaFileManagementClusterDeleteFileParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fileID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRMediaFileManagementClusterDeleteFileParams alloc] init];
+
+    other.fileID = self.fileID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fileID:%@; >", NSStringFromClass([self class]), _fileID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMediaFileManagementClusterDeleteFileParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.fileID = self.fileID.unsignedLongLongValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRMediaFileManagementClusterRequestSharedFilesParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientName = @"";
+
+        _requestID = @(0);
+
+        _supportedMimeTypes = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRMediaFileManagementClusterRequestSharedFilesParams alloc] init];
+
+    other.clientName = self.clientName;
+    other.requestID = self.requestID;
+    other.supportedMimeTypes = self.supportedMimeTypes;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientName:%@; requestID:%@; supportedMimeTypes:%@; >", NSStringFromClass([self class]), _clientName, _requestID, _supportedMimeTypes];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMediaFileManagementClusterRequestSharedFilesParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.clientName = AsCharSpan(self.clientName);
+    }
+    {
+        encodableStruct.requestID = self.requestID.unsignedShortValue;
+    }
+    {
+        if (self.supportedMimeTypes != nil) {
+            auto & definedValue_0 = encodableStruct.supportedMimeTypes.Emplace();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.supportedMimeTypes.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.supportedMimeTypes.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.supportedMimeTypes.count; ++i_1) {
+                        auto element_1 = MTR_SAFE_CAST(self.supportedMimeTypes[i_1], NSString);
+                        if (!element_1) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.supportedMimeTypes[i_1], NSStringFromClass(NSString.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_1->mList[i_1] = AsCharSpan(element_1);
+                    }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.supportedMimeTypes.count);
+                } else {
+                    definedValue_0 = ListType_1();
+                }
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRMediaFileManagementClusterGetSharedFileParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _responseID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRMediaFileManagementClusterGetSharedFileParams alloc] init];
+
+    other.responseID = self.responseID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: responseID:%@; >", NSStringFromClass([self class]), _responseID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMediaFileManagementClusterGetSharedFileParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.responseID = self.responseID.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRMediaFileManagementClusterGetSharedFileResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _fileDescription = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRMediaFileManagementClusterGetSharedFileResponseParams alloc] init];
+
+    other.status = self.status;
+    other.fileDescription = self.fileDescription;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; fileDescription:%@; >", NSStringFromClass([self class]), _status, _fileDescription];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::MediaFileManagement::Commands::GetSharedFileResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    LogAndConvertDecodingError(err, error);
+    return nil;
+}
+
+@end
+
+@implementation MTRMediaFileManagementClusterGetSharedFileResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::MediaFileManagement::Commands::GetSharedFileResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MediaFileManagement::Commands::GetSharedFileResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.fileDescription.IsNull()) {
+            self.fileDescription = nil;
+        } else {
+            self.fileDescription = [MTRMediaFileManagementClusterFileDescriptionStruct new];
+#if MTR_ENABLE_PROVISIONAL
+            self.fileDescription.fileID = [NSNumber numberWithUnsignedLongLong:decodableStruct.fileDescription.Value().fileID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            self.fileDescription.name = AsString(decodableStruct.fileDescription.Value().name);
+            if (self.fileDescription.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            self.fileDescription.size = [NSNumber numberWithUnsignedLongLong:decodableStruct.fileDescription.Value().size];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            self.fileDescription.mimeType = AsString(decodableStruct.fileDescription.Value().mimeType);
+            if (self.fileDescription.mimeType == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            self.fileDescription.imageURI = AsString(decodableStruct.fileDescription.Value().imageURI);
+            if (self.fileDescription.imageURI == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+#endif // MTR_ENABLE_PROVISIONAL
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRMediaFileManagementClusterOfferFileParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientName = @"";
+
+        _name = @"";
+
+        _size = @(0);
+
+        _mimeType = @"";
+
+        _imageURI = @"";
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRMediaFileManagementClusterOfferFileParams alloc] init];
+
+    other.clientName = self.clientName;
+    other.name = self.name;
+    other.size = self.size;
+    other.mimeType = self.mimeType;
+    other.imageURI = self.imageURI;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientName:%@; name:%@; size:%@; mimeType:%@; imageURI:%@; >", NSStringFromClass([self class]), _clientName, _name, _size, _mimeType, _imageURI];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMediaFileManagementClusterOfferFileParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.clientName = AsCharSpan(self.clientName);
+    }
+    {
+        encodableStruct.name = AsCharSpan(self.name);
+    }
+    {
+        encodableStruct.size = self.size.unsignedLongLongValue;
+    }
+    {
+        encodableStruct.mimeType = AsCharSpan(self.mimeType);
+    }
+    {
+        encodableStruct.imageURI = AsCharSpan(self.imageURI);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRAudioControlClusterMuteParams
@@ -37589,6 +40350,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (self = [super init]) {
 
         _zone = [MTRZoneManagementClusterTwoDCartesianZoneStruct new];
+
+        _nodeID = nil;
+
+        _endpointID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -37600,6 +40365,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     auto other = [[MTRZoneManagementClusterCreateTwoDCartesianZoneParams alloc] init];
 
     other.zone = self.zone;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -37608,7 +40375,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; >", NSStringFromClass([self class]), _zone];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zone, _nodeID, _endpointID];
     return descriptionString;
 }
 
@@ -37621,8 +40388,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::ZoneManagement::Commands::CreateTwoDCartesianZone::Type encodableStruct;
     ListFreer listFreer;
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.zone.name = AsCharSpan(self.zone.name);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.zone.use = static_cast<std::remove_reference_t<decltype(encodableStruct.zone.use)>>(self.zone.use.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         {
             using ListType_1 = std::remove_reference_t<decltype(encodableStruct.zone.vertices)>;
             using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
@@ -37639,17 +40411,46 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.zone.vertices[i_1], NSStringFromClass(MTRZoneManagementClusterTwoDCartesianVertexStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_1->mList[i_1].x = element_1.x.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_1->mList[i_1].y = element_1.y.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.zone.vertices = ListType_1(listHolder_1->mList, self.zone.vertices.count);
             } else {
                 encodableStruct.zone.vertices = ListType_1();
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.zone.color != nil) {
             auto & definedValue_1 = encodableStruct.zone.color.Emplace();
             definedValue_1 = AsCharSpan(self.zone.color);
+        }
+#endif // MTR_ENABLE_PROVISIONAL
+    }
+    {
+        if (self.nodeID != nil) {
+            auto & definedValue_0 = encodableStruct.nodeID.Emplace();
+            if (self.nodeID == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.nodeID.unsignedLongLongValue;
+            }
+        }
+    }
+    {
+        if (self.endpointID != nil) {
+            auto & definedValue_0 = encodableStruct.endpointID.Emplace();
+            if (self.endpointID == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.endpointID.unsignedShortValue;
+            }
         }
     }
 
@@ -37788,6 +40589,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _zoneID = @(0);
 
         _zone = [MTRZoneManagementClusterTwoDCartesianZoneStruct new];
+
+        _nodeID = nil;
+
+        _endpointID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -37800,6 +40605,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.zoneID = self.zoneID;
     other.zone = self.zone;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -37808,7 +40615,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zone:%@; >", NSStringFromClass([self class]), _zoneID, _zone];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zone:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zoneID, _zone, _nodeID, _endpointID];
     return descriptionString;
 }
 
@@ -37824,8 +40631,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.zoneID = self.zoneID.unsignedShortValue;
     }
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.zone.name = AsCharSpan(self.zone.name);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.zone.use = static_cast<std::remove_reference_t<decltype(encodableStruct.zone.use)>>(self.zone.use.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         {
             using ListType_1 = std::remove_reference_t<decltype(encodableStruct.zone.vertices)>;
             using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
@@ -37842,17 +40654,46 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.zone.vertices[i_1], NSStringFromClass(MTRZoneManagementClusterTwoDCartesianVertexStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_1->mList[i_1].x = element_1.x.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_1->mList[i_1].y = element_1.y.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.zone.vertices = ListType_1(listHolder_1->mList, self.zone.vertices.count);
             } else {
                 encodableStruct.zone.vertices = ListType_1();
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.zone.color != nil) {
             auto & definedValue_1 = encodableStruct.zone.color.Emplace();
             definedValue_1 = AsCharSpan(self.zone.color);
+        }
+#endif // MTR_ENABLE_PROVISIONAL
+    }
+    {
+        if (self.nodeID != nil) {
+            auto & definedValue_0 = encodableStruct.nodeID.Emplace();
+            if (self.nodeID == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.nodeID.unsignedLongLongValue;
+            }
+        }
+    }
+    {
+        if (self.endpointID != nil) {
+            auto & definedValue_0 = encodableStruct.endpointID.Emplace();
+            if (self.endpointID == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.endpointID.unsignedShortValue;
+            }
         }
     }
 
@@ -38011,15 +40852,27 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::ZoneManagement::Commands::CreateOrUpdateTrigger::Type encodableStruct;
     ListFreer listFreer;
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.trigger.zoneID = self.trigger.zoneID.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.trigger.initialDuration = self.trigger.initialDuration.unsignedIntValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.trigger.augmentationDuration = self.trigger.augmentationDuration.unsignedIntValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.trigger.maxDuration = self.trigger.maxDuration.unsignedIntValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.trigger.blindDuration = self.trigger.blindDuration.unsignedIntValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.trigger.sensitivity != nil) {
             auto & definedValue_1 = encodableStruct.trigger.sensitivity.Emplace();
             definedValue_1 = self.trigger.sensitivity.unsignedCharValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -38496,12 +41349,20 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.maxFrameRate = self.maxFrameRate.unsignedShortValue;
     }
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.minResolution.width = self.minResolution.width.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.minResolution.height = self.minResolution.height.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
     }
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.maxResolution.width = self.maxResolution.width.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.maxResolution.height = self.maxResolution.height.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
     }
     {
         encodableStruct.minBitRate = self.minBitRate.unsignedIntValue;
@@ -38890,12 +41751,20 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.maxFrameRate = self.maxFrameRate.unsignedShortValue;
     }
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.minResolution.width = self.minResolution.width.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.minResolution.height = self.minResolution.height.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
     }
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.maxResolution.width = self.maxResolution.width.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.maxResolution.height = self.maxResolution.height.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
     }
     {
         encodableStruct.quality = self.quality.unsignedCharValue;
@@ -39366,8 +42235,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         }
     }
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.requestedResolution.width = self.requestedResolution.width.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.requestedResolution.height = self.requestedResolution.height.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -39503,8 +42376,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     }
     {
         self.resolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
+#if MTR_ENABLE_PROVISIONAL
         self.resolution.width = [NSNumber numberWithUnsignedShort:decodableStruct.resolution.width];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         self.resolution.height = [NSNumber numberWithUnsignedShort:decodableStruct.resolution.height];
+#endif // MTR_ENABLE_PROVISIONAL
     }
     return CHIP_NO_ERROR;
 }
@@ -40001,10 +42878,18 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.videoStreamID = self.videoStreamID.unsignedShortValue;
     }
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.viewport.x1 = self.viewport.x1.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.viewport.y1 = self.viewport.y1.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.viewport.x2 = self.viewport.x2.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.viewport.y2 = self.viewport.y2.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -40262,6 +43147,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.iceServers[i_1], NSStringFromClass(MTRDataTypeICEServerStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
+#if MTR_ENABLE_PROVISIONAL
                         {
                             using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].URLs)>;
                             using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
@@ -40285,18 +43171,25 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 listHolder_1->mList[i_1].URLs = ListType_3();
                             }
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.username != nil) {
                             auto & definedValue_3 = listHolder_1->mList[i_1].username.Emplace();
                             definedValue_3 = AsCharSpan(element_1.username);
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.credential != nil) {
                             auto & definedValue_3 = listHolder_1->mList[i_1].credential.Emplace();
                             definedValue_3 = AsCharSpan(element_1.credential);
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.caid != nil) {
                             auto & definedValue_3 = listHolder_1->mList[i_1].caid.Emplace();
                             definedValue_3 = element_1.caid.unsignedShortValue;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                     }
                     definedValue_0 = ListType_1(listHolder_1->mList, self.iceServers.count);
                 } else {
@@ -40320,9 +43213,15 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     {
         if (self.sFrameConfig != nil) {
             auto & definedValue_0 = encodableStruct.SFrameConfig.Emplace();
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.cipherSuite = self.sFrameConfig.cipherSuite.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.baseKey = AsByteSpan(self.sFrameConfig.baseKey);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.kid = AsByteSpan(self.sFrameConfig.kid);
+#endif // MTR_ENABLE_PROVISIONAL
         }
     }
     {
@@ -40671,6 +43570,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.iceServers[i_1], NSStringFromClass(MTRDataTypeICEServerStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
+#if MTR_ENABLE_PROVISIONAL
                         {
                             using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].URLs)>;
                             using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
@@ -40694,18 +43594,25 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 listHolder_1->mList[i_1].URLs = ListType_3();
                             }
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.username != nil) {
                             auto & definedValue_3 = listHolder_1->mList[i_1].username.Emplace();
                             definedValue_3 = AsCharSpan(element_1.username);
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.credential != nil) {
                             auto & definedValue_3 = listHolder_1->mList[i_1].credential.Emplace();
                             definedValue_3 = AsCharSpan(element_1.credential);
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.caid != nil) {
                             auto & definedValue_3 = listHolder_1->mList[i_1].caid.Emplace();
                             definedValue_3 = element_1.caid.unsignedShortValue;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                     }
                     definedValue_0 = ListType_1(listHolder_1->mList, self.iceServers.count);
                 } else {
@@ -40729,9 +43636,15 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     {
         if (self.sFrameConfig != nil) {
             auto & definedValue_0 = encodableStruct.SFrameConfig.Emplace();
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.cipherSuite = self.sFrameConfig.cipherSuite.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.baseKey = AsByteSpan(self.sFrameConfig.baseKey);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.kid = AsByteSpan(self.sFrameConfig.kid);
+#endif // MTR_ENABLE_PROVISIONAL
         }
     }
     {
@@ -41091,19 +44004,25 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.iceCandidates[i_0], NSStringFromClass(MTRDataTypeICECandidateStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_0->mList[i_0].candidate = AsCharSpan(element_0.candidate);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (element_0.sdpMid == nil) {
                         listHolder_0->mList[i_0].SDPMid.SetNull();
                     } else {
                         auto & nonNullValue_2 = listHolder_0->mList[i_0].SDPMid.SetNonNull();
                         nonNullValue_2 = AsCharSpan(element_0.sdpMid);
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (element_0.sdpmLineIndex == nil) {
                         listHolder_0->mList[i_0].SDPMLineIndex.SetNull();
                     } else {
                         auto & nonNullValue_2 = listHolder_0->mList[i_0].SDPMLineIndex.SetNonNull();
                         nonNullValue_2 = element_0.sdpmLineIndex.unsignedShortValue;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.ICECandidates = ListType_0(listHolder_0->mList, self.iceCandidates.count);
             } else {
@@ -41306,6 +44225,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.iceServers[i_1], NSStringFromClass(MTRDataTypeICEServerStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
+#if MTR_ENABLE_PROVISIONAL
                         {
                             using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].URLs)>;
                             using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
@@ -41329,18 +44249,25 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 listHolder_1->mList[i_1].URLs = ListType_3();
                             }
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.username != nil) {
                             auto & definedValue_3 = listHolder_1->mList[i_1].username.Emplace();
                             definedValue_3 = AsCharSpan(element_1.username);
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.credential != nil) {
                             auto & definedValue_3 = listHolder_1->mList[i_1].credential.Emplace();
                             definedValue_3 = AsCharSpan(element_1.credential);
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.caid != nil) {
                             auto & definedValue_3 = listHolder_1->mList[i_1].caid.Emplace();
                             definedValue_3 = element_1.caid.unsignedShortValue;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                     }
                     definedValue_0 = ListType_1(listHolder_1->mList, self.iceServers.count);
                 } else {
@@ -41539,19 +44466,25 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.iceCandidates[i_0], NSStringFromClass(MTRDataTypeICECandidateStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
+#if MTR_ENABLE_PROVISIONAL
                     listHolder_0->mList[i_0].candidate = AsCharSpan(element_0.candidate);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (element_0.sdpMid == nil) {
                         listHolder_0->mList[i_0].SDPMid.SetNull();
                     } else {
                         auto & nonNullValue_2 = listHolder_0->mList[i_0].SDPMid.SetNonNull();
                         nonNullValue_2 = AsCharSpan(element_0.sdpMid);
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (element_0.sdpmLineIndex == nil) {
                         listHolder_0->mList[i_0].SDPMLineIndex.SetNull();
                     } else {
                         auto & nonNullValue_2 = listHolder_0->mList[i_0].SDPMLineIndex.SetNonNull();
                         nonNullValue_2 = element_0.sdpmLineIndex.unsignedShortValue;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.ICECandidates = ListType_0(listHolder_0->mList, self.iceCandidates.count);
             } else {
@@ -41721,7 +44654,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::Type encodableStruct;
     ListFreer listFreer;
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.transportOptions.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.streamUsage)>>(self.transportOptions.streamUsage.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.videoStreamID != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.videoStreamID.Emplace();
             if (self.transportOptions.videoStreamID == nil) {
@@ -41731,6 +44667,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 nonNullValue_2 = self.transportOptions.videoStreamID.unsignedShortValue;
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.audioStreamID != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.audioStreamID.Emplace();
             if (self.transportOptions.audioStreamID == nil) {
@@ -41740,9 +44678,18 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 nonNullValue_2 = self.transportOptions.audioStreamID.unsignedShortValue;
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.transportOptions.TLSEndpointID = self.transportOptions.tlsEndpointID.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.transportOptions.url = AsCharSpan(self.transportOptions.url);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.transportOptions.triggerOptions.triggerType = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.triggerOptions.triggerType)>>(self.transportOptions.triggerOptions.triggerType.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.triggerOptions.motionZones != nil) {
             auto & definedValue_2 = encodableStruct.transportOptions.triggerOptions.motionZones.Emplace();
             if (self.transportOptions.triggerOptions.motionZones == nil) {
@@ -41765,16 +44712,20 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.transportOptions.triggerOptions.motionZones[i_4], NSStringFromClass(MTRPushAVStreamTransportClusterTransportZoneOptionsStruct.class));
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
+#if MTR_ENABLE_PROVISIONAL
                             if (element_4.zone == nil) {
                                 listHolder_4->mList[i_4].zone.SetNull();
                             } else {
                                 auto & nonNullValue_6 = listHolder_4->mList[i_4].zone.SetNonNull();
                                 nonNullValue_6 = element_4.zone.unsignedShortValue;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (element_4.sensitivity != nil) {
                                 auto & definedValue_6 = listHolder_4->mList[i_4].sensitivity.Emplace();
                                 definedValue_6 = element_4.sensitivity.unsignedCharValue;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
                         }
                         nonNullValue_3 = ListType_4(listHolder_4->mList, self.transportOptions.triggerOptions.motionZones.count);
                     } else {
@@ -41783,6 +44734,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 }
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.triggerOptions.motionSensitivity != nil) {
             auto & definedValue_2 = encodableStruct.transportOptions.triggerOptions.motionSensitivity.Emplace();
             if (self.transportOptions.triggerOptions.motionSensitivity == nil) {
@@ -41792,41 +44745,78 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 nonNullValue_3 = self.transportOptions.triggerOptions.motionSensitivity.unsignedCharValue;
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.triggerOptions.motionTimeControl != nil) {
             auto & definedValue_2 = encodableStruct.transportOptions.triggerOptions.motionTimeControl.Emplace();
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.initialDuration = self.transportOptions.triggerOptions.motionTimeControl.initialDuration.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.augmentationDuration = self.transportOptions.triggerOptions.motionTimeControl.augmentationDuration.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.maxDuration = self.transportOptions.triggerOptions.motionTimeControl.maxDuration.unsignedIntValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.blindDuration = self.transportOptions.triggerOptions.motionTimeControl.blindDuration.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.triggerOptions.maxPreRollLen != nil) {
             auto & definedValue_2 = encodableStruct.transportOptions.triggerOptions.maxPreRollLen.Emplace();
             definedValue_2 = self.transportOptions.triggerOptions.maxPreRollLen.unsignedShortValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.transportOptions.ingestMethod = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.ingestMethod)>>(self.transportOptions.ingestMethod.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.transportOptions.containerOptions.containerType = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.containerOptions.containerType)>>(self.transportOptions.containerOptions.containerType.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.containerOptions.cmafContainerOptions != nil) {
             auto & definedValue_2 = encodableStruct.transportOptions.containerOptions.CMAFContainerOptions.Emplace();
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.CMAFInterface = static_cast<std::remove_reference_t<decltype(definedValue_2.CMAFInterface)>>(self.transportOptions.containerOptions.cmafContainerOptions.cmafInterface.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.segmentDuration = self.transportOptions.containerOptions.cmafContainerOptions.segmentDuration.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.chunkDuration = self.transportOptions.containerOptions.cmafContainerOptions.chunkDuration.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (self.transportOptions.containerOptions.cmafContainerOptions.sessionGroup != nil) {
                 auto & definedValue_4 = definedValue_2.sessionGroup.Emplace();
                 definedValue_4 = self.transportOptions.containerOptions.cmafContainerOptions.sessionGroup.unsignedCharValue;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (self.transportOptions.containerOptions.cmafContainerOptions.trackName != nil) {
                 auto & definedValue_4 = definedValue_2.trackName.Emplace();
                 definedValue_4 = AsCharSpan(self.transportOptions.containerOptions.cmafContainerOptions.trackName);
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled != nil) {
                 auto & definedValue_4 = definedValue_2.metadataEnabled.Emplace();
                 definedValue_4 = self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled.boolValue;
             }
+#endif // MTR_ENABLE_PROVISIONAL
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.expiryTime != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.expiryTime.Emplace();
             definedValue_1 = self.transportOptions.expiryTime.unsignedIntValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.videoStreams != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.videoStreams.Emplace();
             {
@@ -41845,8 +44835,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.transportOptions.videoStreams[i_2], NSStringFromClass(MTRPushAVStreamTransportClusterVideoStreamStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_2->mList[i_2].videoStreamName = AsCharSpan(element_2.videoStreamName);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_2->mList[i_2].videoStreamID = element_2.videoStreamID.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
                     }
                     definedValue_1 = ListType_2(listHolder_2->mList, self.transportOptions.videoStreams.count);
                 } else {
@@ -41854,6 +44848,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 }
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.audioStreams != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.audioStreams.Emplace();
             {
@@ -41872,8 +44868,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.transportOptions.audioStreams[i_2], NSStringFromClass(MTRPushAVStreamTransportClusterAudioStreamStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_2->mList[i_2].audioStreamName = AsCharSpan(element_2.audioStreamName);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_2->mList[i_2].audioStreamID = element_2.audioStreamID.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
                     }
                     definedValue_1 = ListType_2(listHolder_2->mList, self.transportOptions.audioStreams.count);
                 } else {
@@ -41881,6 +44881,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 }
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -42004,11 +45005,19 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     {
         self.transportConfiguration = [MTRPushAVStreamTransportClusterTransportConfigurationStruct new];
+#if MTR_ENABLE_PROVISIONAL
         self.transportConfiguration.connectionID = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.connectionID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         self.transportConfiguration.transportStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportStatus)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.transportConfiguration.transportOptions.HasValue()) {
             self.transportConfiguration.transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
+#if MTR_ENABLE_PROVISIONAL
             self.transportConfiguration.transportOptions.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().streamUsage)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.transportConfiguration.transportOptions.Value().videoStreamID.HasValue()) {
                 if (decodableStruct.transportConfiguration.transportOptions.Value().videoStreamID.Value().IsNull()) {
                     self.transportConfiguration.transportOptions.videoStreamID = nil;
@@ -42018,6 +45027,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             } else {
                 self.transportConfiguration.transportOptions.videoStreamID = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.transportConfiguration.transportOptions.Value().audioStreamID.HasValue()) {
                 if (decodableStruct.transportConfiguration.transportOptions.Value().audioStreamID.Value().IsNull()) {
                     self.transportConfiguration.transportOptions.audioStreamID = nil;
@@ -42027,14 +45038,23 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             } else {
                 self.transportConfiguration.transportOptions.audioStreamID = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             self.transportConfiguration.transportOptions.tlsEndpointID = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().TLSEndpointID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             self.transportConfiguration.transportOptions.url = AsString(decodableStruct.transportConfiguration.transportOptions.Value().url);
             if (self.transportConfiguration.transportOptions.url == nil) {
                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                 return err;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             self.transportConfiguration.transportOptions.triggerOptions = [MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct new];
+#if MTR_ENABLE_PROVISIONAL
             self.transportConfiguration.transportOptions.triggerOptions.triggerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.triggerType)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionZones.HasValue()) {
                 if (decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionZones.Value().IsNull()) {
                     self.transportConfiguration.transportOptions.triggerOptions.motionZones = nil;
@@ -42046,16 +45066,20 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             auto & entry_6 = iter_6.GetValue();
                             MTRPushAVStreamTransportClusterTransportZoneOptionsStruct * newElement_6;
                             newElement_6 = [MTRPushAVStreamTransportClusterTransportZoneOptionsStruct new];
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_6.zone.IsNull()) {
                                 newElement_6.zone = nil;
                             } else {
                                 newElement_6.zone = [NSNumber numberWithUnsignedShort:entry_6.zone.Value()];
                             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (entry_6.sensitivity.HasValue()) {
                                 newElement_6.sensitivity = [NSNumber numberWithUnsignedChar:entry_6.sensitivity.Value()];
                             } else {
                                 newElement_6.sensitivity = nil;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
                             [array_6 addObject:newElement_6];
                         }
                         CHIP_ERROR err = iter_6.GetStatus();
@@ -42068,6 +45092,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             } else {
                 self.transportConfiguration.transportOptions.triggerOptions.motionZones = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionSensitivity.HasValue()) {
                 if (decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionSensitivity.Value().IsNull()) {
                     self.transportConfiguration.transportOptions.triggerOptions.motionSensitivity = nil;
@@ -42077,33 +45103,62 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             } else {
                 self.transportConfiguration.transportOptions.triggerOptions.motionSensitivity = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionTimeControl.HasValue()) {
                 self.transportConfiguration.transportOptions.triggerOptions.motionTimeControl = [MTRPushAVStreamTransportClusterTransportMotionTriggerTimeControlStruct new];
+#if MTR_ENABLE_PROVISIONAL
                 self.transportConfiguration.transportOptions.triggerOptions.motionTimeControl.initialDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionTimeControl.Value().initialDuration];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 self.transportConfiguration.transportOptions.triggerOptions.motionTimeControl.augmentationDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionTimeControl.Value().augmentationDuration];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 self.transportConfiguration.transportOptions.triggerOptions.motionTimeControl.maxDuration = [NSNumber numberWithUnsignedInt:decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionTimeControl.Value().maxDuration];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 self.transportConfiguration.transportOptions.triggerOptions.motionTimeControl.blindDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.motionTimeControl.Value().blindDuration];
+#endif // MTR_ENABLE_PROVISIONAL
             } else {
                 self.transportConfiguration.transportOptions.triggerOptions.motionTimeControl = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.maxPreRollLen.HasValue()) {
                 self.transportConfiguration.transportOptions.triggerOptions.maxPreRollLen = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().triggerOptions.maxPreRollLen.Value()];
             } else {
                 self.transportConfiguration.transportOptions.triggerOptions.maxPreRollLen = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             self.transportConfiguration.transportOptions.ingestMethod = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().ingestMethod)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             self.transportConfiguration.transportOptions.containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
+#if MTR_ENABLE_PROVISIONAL
             self.transportConfiguration.transportOptions.containerOptions.containerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.containerType)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.HasValue()) {
                 self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions = [MTRPushAVStreamTransportClusterCMAFContainerOptionsStruct new];
+#if MTR_ENABLE_PROVISIONAL
                 self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.cmafInterface = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CMAFInterface)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.segmentDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().segmentDuration];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.chunkDuration = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().chunkDuration];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup.HasValue()) {
                     self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.sessionGroup = [NSNumber numberWithUnsignedChar:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup.Value()];
                 } else {
                     self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.sessionGroup = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName.HasValue()) {
                     self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.trackName = AsString(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName.Value());
                     if (self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.trackName == nil) {
@@ -42113,19 +45168,27 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 } else {
                     self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.trackName = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue()) {
                     self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = [NSNumber numberWithBool:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.Value()];
                 } else {
                     self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
             } else {
                 self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.transportConfiguration.transportOptions.Value().expiryTime.HasValue()) {
                 self.transportConfiguration.transportOptions.expiryTime = [NSNumber numberWithUnsignedInt:decodableStruct.transportConfiguration.transportOptions.Value().expiryTime.Value()];
             } else {
                 self.transportConfiguration.transportOptions.expiryTime = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.transportConfiguration.transportOptions.Value().videoStreams.HasValue()) {
                 { // Scope for our temporary variables
                     auto * array_4 = [NSMutableArray new];
@@ -42134,12 +45197,16 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         auto & entry_4 = iter_4.GetValue();
                         MTRPushAVStreamTransportClusterVideoStreamStruct * newElement_4;
                         newElement_4 = [MTRPushAVStreamTransportClusterVideoStreamStruct new];
+#if MTR_ENABLE_PROVISIONAL
                         newElement_4.videoStreamName = AsString(entry_4.videoStreamName);
                         if (newElement_4.videoStreamName == nil) {
                             CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                             return err;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_4.videoStreamID = [NSNumber numberWithUnsignedShort:entry_4.videoStreamID];
+#endif // MTR_ENABLE_PROVISIONAL
                         [array_4 addObject:newElement_4];
                     }
                     CHIP_ERROR err = iter_4.GetStatus();
@@ -42151,6 +45218,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             } else {
                 self.transportConfiguration.transportOptions.videoStreams = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.transportConfiguration.transportOptions.Value().audioStreams.HasValue()) {
                 { // Scope for our temporary variables
                     auto * array_4 = [NSMutableArray new];
@@ -42159,12 +45228,16 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         auto & entry_4 = iter_4.GetValue();
                         MTRPushAVStreamTransportClusterAudioStreamStruct * newElement_4;
                         newElement_4 = [MTRPushAVStreamTransportClusterAudioStreamStruct new];
+#if MTR_ENABLE_PROVISIONAL
                         newElement_4.audioStreamName = AsString(entry_4.audioStreamName);
                         if (newElement_4.audioStreamName == nil) {
                             CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                             return err;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_4.audioStreamID = [NSNumber numberWithUnsignedShort:entry_4.audioStreamID];
+#endif // MTR_ENABLE_PROVISIONAL
                         [array_4 addObject:newElement_4];
                     }
                     CHIP_ERROR err = iter_4.GetStatus();
@@ -42176,10 +45249,14 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             } else {
                 self.transportConfiguration.transportOptions.audioStreams = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
         } else {
             self.transportConfiguration.transportOptions = nil;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         self.transportConfiguration.fabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.transportConfiguration.fabricIndex];
+#endif // MTR_ENABLE_PROVISIONAL
     }
     return CHIP_NO_ERROR;
 }
@@ -42309,7 +45386,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.connectionID = self.connectionID.unsignedShortValue;
     }
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.transportOptions.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.streamUsage)>>(self.transportOptions.streamUsage.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.videoStreamID != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.videoStreamID.Emplace();
             if (self.transportOptions.videoStreamID == nil) {
@@ -42319,6 +45399,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 nonNullValue_2 = self.transportOptions.videoStreamID.unsignedShortValue;
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.audioStreamID != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.audioStreamID.Emplace();
             if (self.transportOptions.audioStreamID == nil) {
@@ -42328,9 +45410,18 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 nonNullValue_2 = self.transportOptions.audioStreamID.unsignedShortValue;
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.transportOptions.TLSEndpointID = self.transportOptions.tlsEndpointID.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.transportOptions.url = AsCharSpan(self.transportOptions.url);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.transportOptions.triggerOptions.triggerType = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.triggerOptions.triggerType)>>(self.transportOptions.triggerOptions.triggerType.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.triggerOptions.motionZones != nil) {
             auto & definedValue_2 = encodableStruct.transportOptions.triggerOptions.motionZones.Emplace();
             if (self.transportOptions.triggerOptions.motionZones == nil) {
@@ -42353,16 +45444,20 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.transportOptions.triggerOptions.motionZones[i_4], NSStringFromClass(MTRPushAVStreamTransportClusterTransportZoneOptionsStruct.class));
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
+#if MTR_ENABLE_PROVISIONAL
                             if (element_4.zone == nil) {
                                 listHolder_4->mList[i_4].zone.SetNull();
                             } else {
                                 auto & nonNullValue_6 = listHolder_4->mList[i_4].zone.SetNonNull();
                                 nonNullValue_6 = element_4.zone.unsignedShortValue;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                             if (element_4.sensitivity != nil) {
                                 auto & definedValue_6 = listHolder_4->mList[i_4].sensitivity.Emplace();
                                 definedValue_6 = element_4.sensitivity.unsignedCharValue;
                             }
+#endif // MTR_ENABLE_PROVISIONAL
                         }
                         nonNullValue_3 = ListType_4(listHolder_4->mList, self.transportOptions.triggerOptions.motionZones.count);
                     } else {
@@ -42371,6 +45466,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 }
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.triggerOptions.motionSensitivity != nil) {
             auto & definedValue_2 = encodableStruct.transportOptions.triggerOptions.motionSensitivity.Emplace();
             if (self.transportOptions.triggerOptions.motionSensitivity == nil) {
@@ -42380,41 +45477,78 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 nonNullValue_3 = self.transportOptions.triggerOptions.motionSensitivity.unsignedCharValue;
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.triggerOptions.motionTimeControl != nil) {
             auto & definedValue_2 = encodableStruct.transportOptions.triggerOptions.motionTimeControl.Emplace();
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.initialDuration = self.transportOptions.triggerOptions.motionTimeControl.initialDuration.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.augmentationDuration = self.transportOptions.triggerOptions.motionTimeControl.augmentationDuration.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.maxDuration = self.transportOptions.triggerOptions.motionTimeControl.maxDuration.unsignedIntValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.blindDuration = self.transportOptions.triggerOptions.motionTimeControl.blindDuration.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.triggerOptions.maxPreRollLen != nil) {
             auto & definedValue_2 = encodableStruct.transportOptions.triggerOptions.maxPreRollLen.Emplace();
             definedValue_2 = self.transportOptions.triggerOptions.maxPreRollLen.unsignedShortValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.transportOptions.ingestMethod = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.ingestMethod)>>(self.transportOptions.ingestMethod.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.transportOptions.containerOptions.containerType = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.containerOptions.containerType)>>(self.transportOptions.containerOptions.containerType.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.containerOptions.cmafContainerOptions != nil) {
             auto & definedValue_2 = encodableStruct.transportOptions.containerOptions.CMAFContainerOptions.Emplace();
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.CMAFInterface = static_cast<std::remove_reference_t<decltype(definedValue_2.CMAFInterface)>>(self.transportOptions.containerOptions.cmafContainerOptions.cmafInterface.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.segmentDuration = self.transportOptions.containerOptions.cmafContainerOptions.segmentDuration.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_2.chunkDuration = self.transportOptions.containerOptions.cmafContainerOptions.chunkDuration.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (self.transportOptions.containerOptions.cmafContainerOptions.sessionGroup != nil) {
                 auto & definedValue_4 = definedValue_2.sessionGroup.Emplace();
                 definedValue_4 = self.transportOptions.containerOptions.cmafContainerOptions.sessionGroup.unsignedCharValue;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (self.transportOptions.containerOptions.cmafContainerOptions.trackName != nil) {
                 auto & definedValue_4 = definedValue_2.trackName.Emplace();
                 definedValue_4 = AsCharSpan(self.transportOptions.containerOptions.cmafContainerOptions.trackName);
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled != nil) {
                 auto & definedValue_4 = definedValue_2.metadataEnabled.Emplace();
                 definedValue_4 = self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled.boolValue;
             }
+#endif // MTR_ENABLE_PROVISIONAL
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.expiryTime != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.expiryTime.Emplace();
             definedValue_1 = self.transportOptions.expiryTime.unsignedIntValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.videoStreams != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.videoStreams.Emplace();
             {
@@ -42433,8 +45567,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.transportOptions.videoStreams[i_2], NSStringFromClass(MTRPushAVStreamTransportClusterVideoStreamStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_2->mList[i_2].videoStreamName = AsCharSpan(element_2.videoStreamName);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_2->mList[i_2].videoStreamID = element_2.videoStreamID.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
                     }
                     definedValue_1 = ListType_2(listHolder_2->mList, self.transportOptions.videoStreams.count);
                 } else {
@@ -42442,6 +45580,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 }
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.transportOptions.audioStreams != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.audioStreams.Emplace();
             {
@@ -42460,8 +45600,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.transportOptions.audioStreams[i_2], NSStringFromClass(MTRPushAVStreamTransportClusterAudioStreamStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_2->mList[i_2].audioStreamName = AsCharSpan(element_2.audioStreamName);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_2->mList[i_2].audioStreamID = element_2.audioStreamID.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
                     }
                     definedValue_1 = ListType_2(listHolder_2->mList, self.transportOptions.audioStreams.count);
                 } else {
@@ -42469,6 +45613,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 }
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -42654,10 +45799,18 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     {
         if (self.timeControl != nil) {
             auto & definedValue_0 = encodableStruct.timeControl.Emplace();
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.initialDuration = self.timeControl.initialDuration.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.augmentationDuration = self.timeControl.augmentationDuration.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.maxDuration = self.timeControl.maxDuration.unsignedIntValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             definedValue_0.blindDuration = self.timeControl.blindDuration.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
         }
     }
     {
@@ -42878,11 +46031,19 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 auto & entry_0 = iter_0.GetValue();
                 MTRPushAVStreamTransportClusterTransportConfigurationStruct * newElement_0;
                 newElement_0 = [MTRPushAVStreamTransportClusterTransportConfigurationStruct new];
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.connectionID = [NSNumber numberWithUnsignedShort:entry_0.connectionID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.transportStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportStatus)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.transportOptions.HasValue()) {
                     newElement_0.transportOptions = [MTRPushAVStreamTransportClusterTransportOptionsStruct new];
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.transportOptions.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().streamUsage)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.transportOptions.Value().videoStreamID.HasValue()) {
                         if (entry_0.transportOptions.Value().videoStreamID.Value().IsNull()) {
                             newElement_0.transportOptions.videoStreamID = nil;
@@ -42892,6 +46053,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     } else {
                         newElement_0.transportOptions.videoStreamID = nil;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.transportOptions.Value().audioStreamID.HasValue()) {
                         if (entry_0.transportOptions.Value().audioStreamID.Value().IsNull()) {
                             newElement_0.transportOptions.audioStreamID = nil;
@@ -42901,14 +46064,23 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     } else {
                         newElement_0.transportOptions.audioStreamID = nil;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.transportOptions.tlsEndpointID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().TLSEndpointID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.transportOptions.url = AsString(entry_0.transportOptions.Value().url);
                     if (newElement_0.transportOptions.url == nil) {
                         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                         return err;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.transportOptions.triggerOptions = [MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct new];
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.transportOptions.triggerOptions.triggerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().triggerOptions.triggerType)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.transportOptions.Value().triggerOptions.motionZones.HasValue()) {
                         if (entry_0.transportOptions.Value().triggerOptions.motionZones.Value().IsNull()) {
                             newElement_0.transportOptions.triggerOptions.motionZones = nil;
@@ -42920,16 +46092,20 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                     auto & entry_7 = iter_7.GetValue();
                                     MTRPushAVStreamTransportClusterTransportZoneOptionsStruct * newElement_7;
                                     newElement_7 = [MTRPushAVStreamTransportClusterTransportZoneOptionsStruct new];
+#if MTR_ENABLE_PROVISIONAL
                                     if (entry_7.zone.IsNull()) {
                                         newElement_7.zone = nil;
                                     } else {
                                         newElement_7.zone = [NSNumber numberWithUnsignedShort:entry_7.zone.Value()];
                                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                                     if (entry_7.sensitivity.HasValue()) {
                                         newElement_7.sensitivity = [NSNumber numberWithUnsignedChar:entry_7.sensitivity.Value()];
                                     } else {
                                         newElement_7.sensitivity = nil;
                                     }
+#endif // MTR_ENABLE_PROVISIONAL
                                     [array_7 addObject:newElement_7];
                                 }
                                 CHIP_ERROR err = iter_7.GetStatus();
@@ -42942,6 +46118,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     } else {
                         newElement_0.transportOptions.triggerOptions.motionZones = nil;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.transportOptions.Value().triggerOptions.motionSensitivity.HasValue()) {
                         if (entry_0.transportOptions.Value().triggerOptions.motionSensitivity.Value().IsNull()) {
                             newElement_0.transportOptions.triggerOptions.motionSensitivity = nil;
@@ -42951,33 +46129,62 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     } else {
                         newElement_0.transportOptions.triggerOptions.motionSensitivity = nil;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.transportOptions.Value().triggerOptions.motionTimeControl.HasValue()) {
                         newElement_0.transportOptions.triggerOptions.motionTimeControl = [MTRPushAVStreamTransportClusterTransportMotionTriggerTimeControlStruct new];
+#if MTR_ENABLE_PROVISIONAL
                         newElement_0.transportOptions.triggerOptions.motionTimeControl.initialDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().triggerOptions.motionTimeControl.Value().initialDuration];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_0.transportOptions.triggerOptions.motionTimeControl.augmentationDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().triggerOptions.motionTimeControl.Value().augmentationDuration];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_0.transportOptions.triggerOptions.motionTimeControl.maxDuration = [NSNumber numberWithUnsignedInt:entry_0.transportOptions.Value().triggerOptions.motionTimeControl.Value().maxDuration];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_0.transportOptions.triggerOptions.motionTimeControl.blindDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().triggerOptions.motionTimeControl.Value().blindDuration];
+#endif // MTR_ENABLE_PROVISIONAL
                     } else {
                         newElement_0.transportOptions.triggerOptions.motionTimeControl = nil;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.transportOptions.Value().triggerOptions.maxPreRollLen.HasValue()) {
                         newElement_0.transportOptions.triggerOptions.maxPreRollLen = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().triggerOptions.maxPreRollLen.Value()];
                     } else {
                         newElement_0.transportOptions.triggerOptions.maxPreRollLen = nil;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.transportOptions.ingestMethod = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().ingestMethod)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.transportOptions.containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
+#if MTR_ENABLE_PROVISIONAL
                     newElement_0.transportOptions.containerOptions.containerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerOptions.containerType)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.HasValue()) {
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions = [MTRPushAVStreamTransportClusterCMAFContainerOptionsStruct new];
+#if MTR_ENABLE_PROVISIONAL
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions.cmafInterface = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CMAFInterface)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions.segmentDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().segmentDuration];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions.chunkDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().chunkDuration];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup.HasValue()) {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.sessionGroup = [NSNumber numberWithUnsignedChar:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup.Value()];
                         } else {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.sessionGroup = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName.HasValue()) {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.trackName = AsString(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName.Value());
                             if (newElement_0.transportOptions.containerOptions.cmafContainerOptions.trackName == nil) {
@@ -42987,19 +46194,27 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         } else {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.trackName = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue()) {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = [NSNumber numberWithBool:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.Value()];
                         } else {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                     } else {
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions = nil;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.transportOptions.Value().expiryTime.HasValue()) {
                         newElement_0.transportOptions.expiryTime = [NSNumber numberWithUnsignedInt:entry_0.transportOptions.Value().expiryTime.Value()];
                     } else {
                         newElement_0.transportOptions.expiryTime = nil;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.transportOptions.Value().videoStreams.HasValue()) {
                         { // Scope for our temporary variables
                             auto * array_5 = [NSMutableArray new];
@@ -43008,12 +46223,16 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 auto & entry_5 = iter_5.GetValue();
                                 MTRPushAVStreamTransportClusterVideoStreamStruct * newElement_5;
                                 newElement_5 = [MTRPushAVStreamTransportClusterVideoStreamStruct new];
+#if MTR_ENABLE_PROVISIONAL
                                 newElement_5.videoStreamName = AsString(entry_5.videoStreamName);
                                 if (newElement_5.videoStreamName == nil) {
                                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                                     return err;
                                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                                 newElement_5.videoStreamID = [NSNumber numberWithUnsignedShort:entry_5.videoStreamID];
+#endif // MTR_ENABLE_PROVISIONAL
                                 [array_5 addObject:newElement_5];
                             }
                             CHIP_ERROR err = iter_5.GetStatus();
@@ -43025,6 +46244,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     } else {
                         newElement_0.transportOptions.videoStreams = nil;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                     if (entry_0.transportOptions.Value().audioStreams.HasValue()) {
                         { // Scope for our temporary variables
                             auto * array_5 = [NSMutableArray new];
@@ -43033,12 +46254,16 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 auto & entry_5 = iter_5.GetValue();
                                 MTRPushAVStreamTransportClusterAudioStreamStruct * newElement_5;
                                 newElement_5 = [MTRPushAVStreamTransportClusterAudioStreamStruct new];
+#if MTR_ENABLE_PROVISIONAL
                                 newElement_5.audioStreamName = AsString(entry_5.audioStreamName);
                                 if (newElement_5.audioStreamName == nil) {
                                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                                     return err;
                                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                                 newElement_5.audioStreamID = [NSNumber numberWithUnsignedShort:entry_5.audioStreamID];
+#endif // MTR_ENABLE_PROVISIONAL
                                 [array_5 addObject:newElement_5];
                             }
                             CHIP_ERROR err = iter_5.GetStatus();
@@ -43050,10 +46275,14 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     } else {
                         newElement_0.transportOptions.audioStreams = nil;
                     }
+#endif // MTR_ENABLE_PROVISIONAL
                 } else {
                     newElement_0.transportOptions = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+#endif // MTR_ENABLE_PROVISIONAL
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -43066,6 +46295,148 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _connectionID = @(0);
+
+        _motionZones = nil;
+
+        _motionSensitivity = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams alloc] init];
+
+    other.connectionID = self.connectionID;
+    other.motionZones = self.motionZones;
+    other.motionSensitivity = self.motionSensitivity;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; motionZones:%@; motionSensitivity:%@; >", NSStringFromClass([self class]), _connectionID, _motionZones, _motionSensitivity];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.connectionID = self.connectionID.unsignedShortValue;
+    }
+    {
+        if (self.motionZones != nil) {
+            auto & definedValue_0 = encodableStruct.motionZones.Emplace();
+            if (self.motionZones == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                {
+                    using ListType_2 = std::remove_reference_t<decltype(nonNullValue_1)>;
+                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                    if (self.motionZones.count != 0) {
+                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.motionZones.count);
+                        if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listFreer.add(listHolder_2);
+                        for (size_t i_2 = 0; i_2 < self.motionZones.count; ++i_2) {
+                            auto element_2 = MTR_SAFE_CAST(self.motionZones[i_2], MTRPushAVStreamTransportClusterTransportZoneOptionsStruct);
+                            if (!element_2) {
+                                // Wrong kind of value.
+                                MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.motionZones[i_2], NSStringFromClass(MTRPushAVStreamTransportClusterTransportZoneOptionsStruct.class));
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+#if MTR_ENABLE_PROVISIONAL
+                            if (element_2.zone == nil) {
+                                listHolder_2->mList[i_2].zone.SetNull();
+                            } else {
+                                auto & nonNullValue_4 = listHolder_2->mList[i_2].zone.SetNonNull();
+                                nonNullValue_4 = element_2.zone.unsignedShortValue;
+                            }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+                            if (element_2.sensitivity != nil) {
+                                auto & definedValue_4 = listHolder_2->mList[i_2].sensitivity.Emplace();
+                                definedValue_4 = element_2.sensitivity.unsignedCharValue;
+                            }
+#endif // MTR_ENABLE_PROVISIONAL
+                        }
+                        nonNullValue_1 = ListType_2(listHolder_2->mList, self.motionZones.count);
+                    } else {
+                        nonNullValue_1 = ListType_2();
+                    }
+                }
+            }
+        }
+    }
+    {
+        if (self.motionSensitivity != nil) {
+            auto & definedValue_0 = encodableStruct.motionSensitivity.Emplace();
+            if (self.motionSensitivity == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.motionSensitivity.unsignedCharValue;
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRChimeClusterPlayChimeSoundParams
@@ -43208,14 +46579,22 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.contextTriggers[i_1], NSStringFromClass(MTRAVAnalysisClusterContextTriggerStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
+#if MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.context.mfgCode == nil) {
                             listHolder_1->mList[i_1].context.mfgCode.SetNull();
                         } else {
                             auto & nonNullValue_4 = listHolder_1->mList[i_1].context.mfgCode.SetNonNull();
                             nonNullValue_4 = static_cast<std::remove_reference_t<decltype(nonNullValue_4)>>(element_1.context.mfgCode.unsignedShortValue);
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_1->mList[i_1].context.namespaceID = element_1.context.namespaceID.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_1->mList[i_1].context.tag = element_1.context.tag.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.context.label != nil) {
                             auto & definedValue_4 = listHolder_1->mList[i_1].context.label.Emplace();
                             if (element_1.context.label == nil) {
@@ -43225,6 +46604,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 nonNullValue_5 = AsCharSpan(element_1.context.label);
                             }
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.zoneIDs != nil) {
                             auto & definedValue_3 = listHolder_1->mList[i_1].zoneIDs.Emplace();
                             if (element_1.zoneIDs == nil) {
@@ -43256,6 +46638,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 }
                             }
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                     }
                     nonNullValue_0 = ListType_1(listHolder_1->mList, self.contextTriggers.count);
                 } else {
@@ -43361,14 +46744,22 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.contextTriggers[i_1], NSStringFromClass(MTRAVAnalysisClusterContextTriggerStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
+#if MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.context.mfgCode == nil) {
                             listHolder_1->mList[i_1].context.mfgCode.SetNull();
                         } else {
                             auto & nonNullValue_4 = listHolder_1->mList[i_1].context.mfgCode.SetNonNull();
                             nonNullValue_4 = static_cast<std::remove_reference_t<decltype(nonNullValue_4)>>(element_1.context.mfgCode.unsignedShortValue);
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_1->mList[i_1].context.namespaceID = element_1.context.namespaceID.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         listHolder_1->mList[i_1].context.tag = element_1.context.tag.unsignedCharValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.context.label != nil) {
                             auto & definedValue_4 = listHolder_1->mList[i_1].context.label.Emplace();
                             if (element_1.context.label == nil) {
@@ -43378,6 +46769,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 nonNullValue_5 = AsCharSpan(element_1.context.label);
                             }
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_1.zoneIDs != nil) {
                             auto & definedValue_3 = listHolder_1->mList[i_1].zoneIDs.Emplace();
                             if (element_1.zoneIDs == nil) {
@@ -43409,6 +46803,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 }
                             }
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                     }
                     nonNullValue_0 = ListType_1(listHolder_1->mList, self.contextTriggers.count);
                 } else {
@@ -44075,71 +47470,106 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     }
     {
         self.tariffComponent = [MTRCommodityTariffClusterTariffComponentStruct new];
+#if MTR_ENABLE_PROVISIONAL
         self.tariffComponent.tariffComponentID = [NSNumber numberWithUnsignedInt:decodableStruct.tariffComponent.tariffComponentID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.tariffComponent.price.HasValue()) {
             if (decodableStruct.tariffComponent.price.Value().IsNull()) {
                 self.tariffComponent.price = nil;
             } else {
                 self.tariffComponent.price = [MTRCommodityTariffClusterTariffPriceStruct new];
+#if MTR_ENABLE_PROVISIONAL
                 self.tariffComponent.price.priceType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.tariffComponent.price.Value().Value().priceType)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (decodableStruct.tariffComponent.price.Value().Value().price.HasValue()) {
                     self.tariffComponent.price.price = [NSNumber numberWithLongLong:decodableStruct.tariffComponent.price.Value().Value().price.Value()];
                 } else {
                     self.tariffComponent.price.price = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (decodableStruct.tariffComponent.price.Value().Value().priceLevel.HasValue()) {
                     self.tariffComponent.price.priceLevel = [NSNumber numberWithShort:decodableStruct.tariffComponent.price.Value().Value().priceLevel.Value()];
                 } else {
                     self.tariffComponent.price.priceLevel = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
             }
         } else {
             self.tariffComponent.price = nil;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.tariffComponent.friendlyCredit.HasValue()) {
             self.tariffComponent.friendlyCredit = [NSNumber numberWithBool:decodableStruct.tariffComponent.friendlyCredit.Value()];
         } else {
             self.tariffComponent.friendlyCredit = nil;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.tariffComponent.auxiliaryLoad.HasValue()) {
             self.tariffComponent.auxiliaryLoad = [MTRCommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct new];
+#if MTR_ENABLE_PROVISIONAL
             self.tariffComponent.auxiliaryLoad.number = [NSNumber numberWithUnsignedChar:decodableStruct.tariffComponent.auxiliaryLoad.Value().number];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             self.tariffComponent.auxiliaryLoad.requiredState = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.tariffComponent.auxiliaryLoad.Value().requiredState)];
+#endif // MTR_ENABLE_PROVISIONAL
         } else {
             self.tariffComponent.auxiliaryLoad = nil;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.tariffComponent.peakPeriod.HasValue()) {
             self.tariffComponent.peakPeriod = [MTRCommodityTariffClusterPeakPeriodStruct new];
+#if MTR_ENABLE_PROVISIONAL
             self.tariffComponent.peakPeriod.severity = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.tariffComponent.peakPeriod.Value().severity)];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             self.tariffComponent.peakPeriod.peakPeriod = [NSNumber numberWithUnsignedShort:decodableStruct.tariffComponent.peakPeriod.Value().peakPeriod];
+#endif // MTR_ENABLE_PROVISIONAL
         } else {
             self.tariffComponent.peakPeriod = nil;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.tariffComponent.powerThreshold.HasValue()) {
             self.tariffComponent.powerThreshold = [MTRDataTypePowerThresholdStruct new];
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.tariffComponent.powerThreshold.Value().powerThreshold.HasValue()) {
                 self.tariffComponent.powerThreshold.powerThreshold = [NSNumber numberWithLongLong:decodableStruct.tariffComponent.powerThreshold.Value().powerThreshold.Value()];
             } else {
                 self.tariffComponent.powerThreshold.powerThreshold = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.tariffComponent.powerThreshold.Value().apparentPowerThreshold.HasValue()) {
                 self.tariffComponent.powerThreshold.apparentPowerThreshold = [NSNumber numberWithLongLong:decodableStruct.tariffComponent.powerThreshold.Value().apparentPowerThreshold.Value()];
             } else {
                 self.tariffComponent.powerThreshold.apparentPowerThreshold = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.tariffComponent.powerThreshold.Value().powerThresholdSource.IsNull()) {
                 self.tariffComponent.powerThreshold.powerThresholdSource = nil;
             } else {
                 self.tariffComponent.powerThreshold.powerThresholdSource = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.tariffComponent.powerThreshold.Value().powerThresholdSource.Value())];
             }
+#endif // MTR_ENABLE_PROVISIONAL
         } else {
             self.tariffComponent.powerThreshold = nil;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.tariffComponent.threshold.IsNull()) {
             self.tariffComponent.threshold = nil;
         } else {
             self.tariffComponent.threshold = [NSNumber numberWithLongLong:decodableStruct.tariffComponent.threshold.Value()];
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.tariffComponent.label.HasValue()) {
             if (decodableStruct.tariffComponent.label.Value().IsNull()) {
                 self.tariffComponent.label = nil;
@@ -44153,11 +47583,15 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         } else {
             self.tariffComponent.label = nil;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.tariffComponent.predicted.HasValue()) {
             self.tariffComponent.predicted = [NSNumber numberWithBool:decodableStruct.tariffComponent.predicted.Value()];
         } else {
             self.tariffComponent.predicted = nil;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.tariffComponent.externalID.HasValue()) {
             self.tariffComponent.externalID = AsString(decodableStruct.tariffComponent.externalID.Value());
             if (self.tariffComponent.externalID == nil) {
@@ -44167,6 +47601,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         } else {
             self.tariffComponent.externalID = nil;
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
     return CHIP_NO_ERROR;
 }
@@ -44335,23 +47770,33 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     {
         self.dayEntry = [MTRCommodityTariffClusterDayEntryStruct new];
+#if MTR_ENABLE_PROVISIONAL
         self.dayEntry.dayEntryID = [NSNumber numberWithUnsignedInt:decodableStruct.dayEntry.dayEntryID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         self.dayEntry.startTime = [NSNumber numberWithUnsignedShort:decodableStruct.dayEntry.startTime];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.dayEntry.duration.HasValue()) {
             self.dayEntry.duration = [NSNumber numberWithUnsignedShort:decodableStruct.dayEntry.duration.Value()];
         } else {
             self.dayEntry.duration = nil;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.dayEntry.randomizationOffset.HasValue()) {
             self.dayEntry.randomizationOffset = [NSNumber numberWithShort:decodableStruct.dayEntry.randomizationOffset.Value()];
         } else {
             self.dayEntry.randomizationOffset = nil;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.dayEntry.randomizationType.HasValue()) {
             self.dayEntry.randomizationType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.dayEntry.randomizationType.Value())];
         } else {
             self.dayEntry.randomizationType = nil;
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
     return CHIP_NO_ERROR;
 }
@@ -44694,44 +48139,60 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::JointFabricDatastore::Commands::AddKeySet::Type encodableStruct;
     ListFreer listFreer;
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.groupKeySet.groupKeySetID = self.groupKeySet.groupKeySetID.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.groupKeySet.groupKeySecurityPolicy = static_cast<std::remove_reference_t<decltype(encodableStruct.groupKeySet.groupKeySecurityPolicy)>>(self.groupKeySet.groupKeySecurityPolicy.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.groupKeySet.epochKey0 == nil) {
             encodableStruct.groupKeySet.epochKey0.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochKey0.SetNonNull();
             nonNullValue_1 = AsByteSpan(self.groupKeySet.epochKey0);
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.groupKeySet.epochStartTime0 == nil) {
             encodableStruct.groupKeySet.epochStartTime0.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochStartTime0.SetNonNull();
             nonNullValue_1 = self.groupKeySet.epochStartTime0.unsignedLongLongValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.groupKeySet.epochKey1 == nil) {
             encodableStruct.groupKeySet.epochKey1.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochKey1.SetNonNull();
             nonNullValue_1 = AsByteSpan(self.groupKeySet.epochKey1);
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.groupKeySet.epochStartTime1 == nil) {
             encodableStruct.groupKeySet.epochStartTime1.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochStartTime1.SetNonNull();
             nonNullValue_1 = self.groupKeySet.epochStartTime1.unsignedLongLongValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.groupKeySet.epochKey2 == nil) {
             encodableStruct.groupKeySet.epochKey2.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochKey2.SetNonNull();
             nonNullValue_1 = AsByteSpan(self.groupKeySet.epochKey2);
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.groupKeySet.epochStartTime2 == nil) {
             encodableStruct.groupKeySet.epochStartTime2.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochStartTime2.SetNonNull();
             nonNullValue_1 = self.groupKeySet.epochStartTime2.unsignedLongLongValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -44810,44 +48271,60 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::JointFabricDatastore::Commands::UpdateKeySet::Type encodableStruct;
     ListFreer listFreer;
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.groupKeySet.groupKeySetID = self.groupKeySet.groupKeySetID.unsignedShortValue;
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.groupKeySet.groupKeySecurityPolicy = static_cast<std::remove_reference_t<decltype(encodableStruct.groupKeySet.groupKeySecurityPolicy)>>(self.groupKeySet.groupKeySecurityPolicy.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.groupKeySet.epochKey0 == nil) {
             encodableStruct.groupKeySet.epochKey0.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochKey0.SetNonNull();
             nonNullValue_1 = AsByteSpan(self.groupKeySet.epochKey0);
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.groupKeySet.epochStartTime0 == nil) {
             encodableStruct.groupKeySet.epochStartTime0.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochStartTime0.SetNonNull();
             nonNullValue_1 = self.groupKeySet.epochStartTime0.unsignedLongLongValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.groupKeySet.epochKey1 == nil) {
             encodableStruct.groupKeySet.epochKey1.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochKey1.SetNonNull();
             nonNullValue_1 = AsByteSpan(self.groupKeySet.epochKey1);
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.groupKeySet.epochStartTime1 == nil) {
             encodableStruct.groupKeySet.epochStartTime1.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochStartTime1.SetNonNull();
             nonNullValue_1 = self.groupKeySet.epochStartTime1.unsignedLongLongValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.groupKeySet.epochKey2 == nil) {
             encodableStruct.groupKeySet.epochKey2.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochKey2.SetNonNull();
             nonNullValue_1 = AsByteSpan(self.groupKeySet.epochKey2);
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.groupKeySet.epochStartTime2 == nil) {
             encodableStruct.groupKeySet.epochStartTime2.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochStartTime2.SetNonNull();
             nonNullValue_1 = self.groupKeySet.epochStartTime2.unsignedLongLongValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -46228,22 +49705,30 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.endpointID = self.endpointID.unsignedShortValue;
     }
     {
+#if MTR_ENABLE_PROVISIONAL
         if (self.binding.node != nil) {
             auto & definedValue_1 = encodableStruct.binding.node.Emplace();
             definedValue_1 = self.binding.node.unsignedLongLongValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.binding.group != nil) {
             auto & definedValue_1 = encodableStruct.binding.group.Emplace();
             definedValue_1 = self.binding.group.unsignedShortValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.binding.endpoint != nil) {
             auto & definedValue_1 = encodableStruct.binding.endpoint.Emplace();
             definedValue_1 = self.binding.endpoint.unsignedShortValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.binding.cluster != nil) {
             auto & definedValue_1 = encodableStruct.binding.cluster.Emplace();
             definedValue_1 = self.binding.cluster.unsignedIntValue;
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -46419,8 +49904,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.nodeID = self.nodeID.unsignedLongLongValue;
     }
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.ACLEntry.privilege = static_cast<std::remove_reference_t<decltype(encodableStruct.ACLEntry.privilege)>>(self.aclEntry.privilege.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.ACLEntry.authMode = static_cast<std::remove_reference_t<decltype(encodableStruct.ACLEntry.authMode)>>(self.aclEntry.authMode.unsignedCharValue);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.aclEntry.subjects == nil) {
             encodableStruct.ACLEntry.subjects.SetNull();
         } else {
@@ -46449,6 +49939,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 }
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.aclEntry.targets == nil) {
             encodableStruct.ACLEntry.targets.SetNull();
         } else {
@@ -46469,24 +49961,30 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                             MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.aclEntry.targets[i_2], NSStringFromClass(MTRJointFabricDatastoreClusterDatastoreAccessControlTargetStruct.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
+#if MTR_ENABLE_PROVISIONAL
                         if (element_2.cluster == nil) {
                             listHolder_2->mList[i_2].cluster.SetNull();
                         } else {
                             auto & nonNullValue_4 = listHolder_2->mList[i_2].cluster.SetNonNull();
                             nonNullValue_4 = element_2.cluster.unsignedIntValue;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_2.endpoint == nil) {
                             listHolder_2->mList[i_2].endpoint.SetNull();
                         } else {
                             auto & nonNullValue_4 = listHolder_2->mList[i_2].endpoint.SetNonNull();
                             nonNullValue_4 = element_2.endpoint.unsignedShortValue;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                         if (element_2.deviceType == nil) {
                             listHolder_2->mList[i_2].deviceType.SetNull();
                         } else {
                             auto & nonNullValue_4 = listHolder_2->mList[i_2].deviceType.SetNonNull();
                             nonNullValue_4 = element_2.deviceType.unsignedIntValue;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                     }
                     nonNullValue_1 = ListType_2(listHolder_2->mList, self.aclEntry.targets.count);
                 } else {
@@ -46494,6 +49992,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 }
             }
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -47728,13 +51227,19 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 auto & entry_0 = iter_0.GetValue();
                 MTRTLSCertificateManagementClusterTLSCertStruct * newElement_0;
                 newElement_0 = [MTRTLSCertificateManagementClusterTLSCertStruct new];
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.caid = [NSNumber numberWithUnsignedShort:entry_0.caid];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.certificate.HasValue()) {
                     newElement_0.certificate = AsData(entry_0.certificate.Value());
                 } else {
                     newElement_0.certificate = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+#endif // MTR_ENABLE_PROVISIONAL
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -48473,7 +51978,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 auto & entry_0 = iter_0.GetValue();
                 MTRTLSCertificateManagementClusterTLSClientCertificateDetailStruct * newElement_0;
                 newElement_0 = [MTRTLSCertificateManagementClusterTLSClientCertificateDetailStruct new];
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.ccdid = [NSNumber numberWithUnsignedShort:entry_0.ccdid];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.clientCertificate.HasValue()) {
                     if (entry_0.clientCertificate.Value().IsNull()) {
                         newElement_0.clientCertificate = nil;
@@ -48483,6 +51991,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 } else {
                     newElement_0.clientCertificate = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.intermediateCertificates.HasValue()) {
                     { // Scope for our temporary variables
                         auto * array_3 = [NSMutableArray new];
@@ -48502,7 +52012,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 } else {
                     newElement_0.intermediateCertificates = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+#endif // MTR_ENABLE_PROVISIONAL
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -49128,17 +52641,31 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     {
         self.endpoint = [MTRTLSClientManagementClusterTLSEndpointStruct new];
+#if MTR_ENABLE_PROVISIONAL
         self.endpoint.endpointID = [NSNumber numberWithUnsignedShort:decodableStruct.endpoint.endpointID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         self.endpoint.hostname = AsData(decodableStruct.endpoint.hostname);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         self.endpoint.port = [NSNumber numberWithUnsignedShort:decodableStruct.endpoint.port];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         self.endpoint.caid = [NSNumber numberWithUnsignedShort:decodableStruct.endpoint.caid];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.endpoint.ccdid.IsNull()) {
             self.endpoint.ccdid = nil;
         } else {
             self.endpoint.ccdid = [NSNumber numberWithUnsignedShort:decodableStruct.endpoint.ccdid.Value()];
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         self.endpoint.referenceCount = [NSNumber numberWithUnsignedChar:decodableStruct.endpoint.referenceCount];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         self.endpoint.fabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.endpoint.fabricIndex];
+#endif // MTR_ENABLE_PROVISIONAL
     }
     return CHIP_NO_ERROR;
 }
@@ -49945,11 +53472,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
                 newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
                 newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.c.i.HasValue()) {
                     newElement_0.c.i = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.i.Value())];
                 } else {
                     newElement_0.c.i = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
                     auto iter_2 = entry_0.d.begin();
@@ -49969,11 +53498,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
                         newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
                         newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
+#if MTR_ENABLE_PROVISIONAL
                         if (entry_2.i.HasValue()) {
                             newElement_2.i = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.i.Value())];
                         } else {
                             newElement_2.i = nil;
                         }
+#endif // MTR_ENABLE_PROVISIONAL
                         [array_2 addObject:newElement_2];
                     }
                     CHIP_ERROR err = iter_2.GetStatus();
@@ -50056,11 +53587,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
                 newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
                 newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
+#if MTR_ENABLE_PROVISIONAL
                 if (entry_0.i.HasValue()) {
                     newElement_0.i = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.i.Value())];
                 } else {
                     newElement_0.i = nil;
                 }
+#endif // MTR_ENABLE_PROVISIONAL
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -50594,10 +54127,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     listHolder_0->mList[i_0].c.f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.f)>>(element_0.c.f.unsignedCharValue);
                     listHolder_0->mList[i_0].c.g = element_0.c.g.floatValue;
                     listHolder_0->mList[i_0].c.h = element_0.c.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
                     if (element_0.c.i != nil) {
                         auto & definedValue_3 = listHolder_0->mList[i_0].c.i.Emplace();
                         definedValue_3 = static_cast<std::remove_reference_t<decltype(definedValue_3)>>(element_0.c.i.unsignedCharValue);
                     }
+#endif // MTR_ENABLE_PROVISIONAL
                     {
                         using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].d)>;
                         using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
@@ -50622,10 +54157,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 listHolder_2->mList[i_2].f = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].f)>>(element_2.f.unsignedCharValue);
                                 listHolder_2->mList[i_2].g = element_2.g.floatValue;
                                 listHolder_2->mList[i_2].h = element_2.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
                                 if (element_2.i != nil) {
                                     auto & definedValue_4 = listHolder_2->mList[i_2].i.Emplace();
                                     definedValue_4 = static_cast<std::remove_reference_t<decltype(definedValue_4)>>(element_2.i.unsignedCharValue);
                                 }
+#endif // MTR_ENABLE_PROVISIONAL
                             }
                             listHolder_0->mList[i_0].d = ListType_2(listHolder_2->mList, element_0.d.count);
                         } else {
@@ -50733,10 +54270,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     listHolder_0->mList[i_0].f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].f)>>(element_0.f.unsignedCharValue);
                     listHolder_0->mList[i_0].g = element_0.g.floatValue;
                     listHolder_0->mList[i_0].h = element_0.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
                     if (element_0.i != nil) {
                         auto & definedValue_2 = listHolder_0->mList[i_0].i.Emplace();
                         definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(element_0.i.unsignedCharValue);
                     }
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.arg2 = ListType_0(listHolder_0->mList, self.arg2.count);
             } else {
@@ -51029,10 +54568,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.arg1.f = static_cast<std::remove_reference_t<decltype(encodableStruct.arg1.f)>>(self.arg1.f.unsignedCharValue);
         encodableStruct.arg1.g = self.arg1.g.floatValue;
         encodableStruct.arg1.h = self.arg1.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
         if (self.arg1.i != nil) {
             auto & definedValue_1 = encodableStruct.arg1.i.Emplace();
             definedValue_1 = static_cast<std::remove_reference_t<decltype(definedValue_1)>>(self.arg1.i.unsignedCharValue);
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -51347,11 +54888,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             self.nullableStructValue.f = [NSNumber numberWithUnsignedChar:decodableStruct.nullableStructValue.Value().f.Raw()];
             self.nullableStructValue.g = [NSNumber numberWithFloat:decodableStruct.nullableStructValue.Value().g];
             self.nullableStructValue.h = [NSNumber numberWithDouble:decodableStruct.nullableStructValue.Value().h];
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.nullableStructValue.Value().i.HasValue()) {
                 self.nullableStructValue.i = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.nullableStructValue.Value().i.Value())];
             } else {
                 self.nullableStructValue.i = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
         } else {
             self.nullableStructValue = nil;
         }
@@ -51374,11 +54917,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             self.optionalStructValue.f = [NSNumber numberWithUnsignedChar:decodableStruct.optionalStructValue.Value().f.Raw()];
             self.optionalStructValue.g = [NSNumber numberWithFloat:decodableStruct.optionalStructValue.Value().g];
             self.optionalStructValue.h = [NSNumber numberWithDouble:decodableStruct.optionalStructValue.Value().h];
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.optionalStructValue.Value().i.HasValue()) {
                 self.optionalStructValue.i = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.optionalStructValue.Value().i.Value())];
             } else {
                 self.optionalStructValue.i = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
         } else {
             self.optionalStructValue = nil;
         }
@@ -51408,11 +54953,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             self.nullableOptionalStructValue.f = [NSNumber numberWithUnsignedChar:decodableStruct.nullableOptionalStructValue.Value().f.Raw()];
             self.nullableOptionalStructValue.g = [NSNumber numberWithFloat:decodableStruct.nullableOptionalStructValue.Value().g];
             self.nullableOptionalStructValue.h = [NSNumber numberWithDouble:decodableStruct.nullableOptionalStructValue.Value().h];
+#if MTR_ENABLE_PROVISIONAL
             if (decodableStruct.nullableOptionalStructValue.Value().i.HasValue()) {
                 self.nullableOptionalStructValue.i = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.nullableOptionalStructValue.Value().i.Value())];
             } else {
                 self.nullableOptionalStructValue.i = nil;
             }
+#endif // MTR_ENABLE_PROVISIONAL
         } else {
             self.nullableOptionalStructValue = nil;
         }
@@ -51581,29 +55128,36 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.arg1.c.f = static_cast<std::remove_reference_t<decltype(encodableStruct.arg1.c.f)>>(self.arg1.c.f.unsignedCharValue);
         encodableStruct.arg1.c.g = self.arg1.c.g.floatValue;
         encodableStruct.arg1.c.h = self.arg1.c.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
         if (self.arg1.c.i != nil) {
             auto & definedValue_2 = encodableStruct.arg1.c.i.Emplace();
             definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(self.arg1.c.i.unsignedCharValue);
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.arg1.d != nil) {
             auto & definedValue_1 = encodableStruct.arg1.d.Emplace();
+#if MTR_ENABLE_PROVISIONAL
             definedValue_1.name = AsCharSpan(self.arg1.d.name);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
             if (self.arg1.d.myBitmap == nil) {
                 definedValue_1.myBitmap.SetNull();
             } else {
                 auto & nonNullValue_3 = definedValue_1.myBitmap.SetNonNull();
                 nonNullValue_3 = static_cast<std::remove_reference_t<decltype(nonNullValue_3)>>(self.arg1.d.myBitmap.unsignedIntValue);
             }
-            if (self.arg1.d.myEnum != nil) {
-                auto & definedValue_3 = definedValue_1.myEnum.Emplace();
-                if (self.arg1.d.myEnum == nil) {
-                    definedValue_3.SetNull();
-                } else {
-                    auto & nonNullValue_4 = definedValue_3.SetNonNull();
-                    nonNullValue_4 = static_cast<std::remove_reference_t<decltype(nonNullValue_4)>>(self.arg1.d.myEnum.unsignedCharValue);
-                }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+            if (self.arg1.d.myEnum == nil) {
+                definedValue_1.myEnum.SetNull();
+            } else {
+                auto & nonNullValue_3 = definedValue_1.myEnum.SetNonNull();
+                nonNullValue_3 = static_cast<std::remove_reference_t<decltype(nonNullValue_3)>>(self.arg1.d.myEnum.unsignedCharValue);
             }
+#endif // MTR_ENABLE_PROVISIONAL
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -51808,10 +55362,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     listHolder_0->mList[i_0].f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].f)>>(element_0.f.unsignedCharValue);
                     listHolder_0->mList[i_0].g = element_0.g.floatValue;
                     listHolder_0->mList[i_0].h = element_0.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
                     if (element_0.i != nil) {
                         auto & definedValue_2 = listHolder_0->mList[i_0].i.Emplace();
                         definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(element_0.i.unsignedCharValue);
                     }
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.arg1 = ListType_0(listHolder_0->mList, self.arg1.count);
             } else {
@@ -51961,11 +55517,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         self.arg1.f = [NSNumber numberWithUnsignedChar:decodableStruct.arg1.f.Raw()];
         self.arg1.g = [NSNumber numberWithFloat:decodableStruct.arg1.g];
         self.arg1.h = [NSNumber numberWithDouble:decodableStruct.arg1.h];
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.arg1.i.HasValue()) {
             self.arg1.i = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.arg1.i.Value())];
         } else {
             self.arg1.i = nil;
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
     return CHIP_NO_ERROR;
 }
@@ -52228,10 +55786,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.arg1.c.f = static_cast<std::remove_reference_t<decltype(encodableStruct.arg1.c.f)>>(self.arg1.c.f.unsignedCharValue);
         encodableStruct.arg1.c.g = self.arg1.c.g.floatValue;
         encodableStruct.arg1.c.h = self.arg1.c.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
         if (self.arg1.c.i != nil) {
             auto & definedValue_2 = encodableStruct.arg1.c.i.Emplace();
             definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(self.arg1.c.i.unsignedCharValue);
         }
+#endif // MTR_ENABLE_PROVISIONAL
         {
             using ListType_1 = std::remove_reference_t<decltype(encodableStruct.arg1.d)>;
             using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
@@ -52256,10 +55816,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     listHolder_1->mList[i_1].f = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].f)>>(element_1.f.unsignedCharValue);
                     listHolder_1->mList[i_1].g = element_1.g.floatValue;
                     listHolder_1->mList[i_1].h = element_1.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
                     if (element_1.i != nil) {
                         auto & definedValue_3 = listHolder_1->mList[i_1].i.Emplace();
                         definedValue_3 = static_cast<std::remove_reference_t<decltype(definedValue_3)>>(element_1.i.unsignedCharValue);
                     }
+#endif // MTR_ENABLE_PROVISIONAL
                 }
                 encodableStruct.arg1.d = ListType_1(listHolder_1->mList, self.arg1.d.count);
             } else {
@@ -52541,10 +56103,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     listHolder_0->mList[i_0].c.f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.f)>>(element_0.c.f.unsignedCharValue);
                     listHolder_0->mList[i_0].c.g = element_0.c.g.floatValue;
                     listHolder_0->mList[i_0].c.h = element_0.c.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
                     if (element_0.c.i != nil) {
                         auto & definedValue_3 = listHolder_0->mList[i_0].c.i.Emplace();
                         definedValue_3 = static_cast<std::remove_reference_t<decltype(definedValue_3)>>(element_0.c.i.unsignedCharValue);
                     }
+#endif // MTR_ENABLE_PROVISIONAL
                     {
                         using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].d)>;
                         using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
@@ -52569,10 +56133,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                                 listHolder_2->mList[i_2].f = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].f)>>(element_2.f.unsignedCharValue);
                                 listHolder_2->mList[i_2].g = element_2.g.floatValue;
                                 listHolder_2->mList[i_2].h = element_2.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
                                 if (element_2.i != nil) {
                                     auto & definedValue_4 = listHolder_2->mList[i_2].i.Emplace();
                                     definedValue_4 = static_cast<std::remove_reference_t<decltype(definedValue_4)>>(element_2.i.unsignedCharValue);
                                 }
+#endif // MTR_ENABLE_PROVISIONAL
                             }
                             listHolder_0->mList[i_0].d = ListType_2(listHolder_2->mList, element_0.d.count);
                         } else {
@@ -53163,25 +56729,27 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     {
         self.field1 = [MTRDataTypeTestGlobalStruct new];
+#if MTR_ENABLE_PROVISIONAL
         self.field1.name = AsString(decodableStruct.field1.name);
         if (self.field1.name == nil) {
             CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
             return err;
         }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (decodableStruct.field1.myBitmap.IsNull()) {
             self.field1.myBitmap = nil;
         } else {
             self.field1.myBitmap = [NSNumber numberWithUnsignedInt:decodableStruct.field1.myBitmap.Value().Raw()];
         }
-        if (decodableStruct.field1.myEnum.HasValue()) {
-            if (decodableStruct.field1.myEnum.Value().IsNull()) {
-                self.field1.myEnum = nil;
-            } else {
-                self.field1.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.field1.myEnum.Value().Value())];
-            }
-        } else {
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        if (decodableStruct.field1.myEnum.IsNull()) {
             self.field1.myEnum = nil;
+        } else {
+            self.field1.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.field1.myEnum.Value())];
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
     {
         self.field2 = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.field2)];
@@ -53417,10 +56985,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             nonNullValue_0.f = static_cast<std::remove_reference_t<decltype(nonNullValue_0.f)>>(self.nullableStruct.f.unsignedCharValue);
             nonNullValue_0.g = self.nullableStruct.g.floatValue;
             nonNullValue_0.h = self.nullableStruct.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
             if (self.nullableStruct.i != nil) {
                 auto & definedValue_2 = nonNullValue_0.i.Emplace();
                 definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(self.nullableStruct.i.unsignedCharValue);
             }
+#endif // MTR_ENABLE_PROVISIONAL
         }
     }
     {
@@ -53434,10 +57004,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             definedValue_0.f = static_cast<std::remove_reference_t<decltype(definedValue_0.f)>>(self.optionalStruct.f.unsignedCharValue);
             definedValue_0.g = self.optionalStruct.g.floatValue;
             definedValue_0.h = self.optionalStruct.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
             if (self.optionalStruct.i != nil) {
                 auto & definedValue_2 = definedValue_0.i.Emplace();
                 definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(self.optionalStruct.i.unsignedCharValue);
             }
+#endif // MTR_ENABLE_PROVISIONAL
         }
     }
     {
@@ -53455,10 +57027,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 nonNullValue_1.f = static_cast<std::remove_reference_t<decltype(nonNullValue_1.f)>>(self.nullableOptionalStruct.f.unsignedCharValue);
                 nonNullValue_1.g = self.nullableOptionalStruct.g.floatValue;
                 nonNullValue_1.h = self.nullableOptionalStruct.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
                 if (self.nullableOptionalStruct.i != nil) {
                     auto & definedValue_3 = nonNullValue_1.i.Emplace();
                     definedValue_3 = static_cast<std::remove_reference_t<decltype(definedValue_3)>>(self.nullableOptionalStruct.i.unsignedCharValue);
                 }
+#endif // MTR_ENABLE_PROVISIONAL
             }
         }
     }
@@ -53655,10 +57229,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.arg1.f = static_cast<std::remove_reference_t<decltype(encodableStruct.arg1.f)>>(self.arg1.f.unsignedCharValue);
         encodableStruct.arg1.g = self.arg1.g.floatValue;
         encodableStruct.arg1.h = self.arg1.h.doubleValue;
+#if MTR_ENABLE_PROVISIONAL
         if (self.arg1.i != nil) {
             auto & definedValue_1 = encodableStruct.arg1.i.Emplace();
             definedValue_1 = static_cast<std::remove_reference_t<decltype(definedValue_1)>>(self.arg1.i.unsignedCharValue);
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -54357,22 +57933,25 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::UnitTesting::Commands::GlobalEchoRequest::Type encodableStruct;
     ListFreer listFreer;
     {
+#if MTR_ENABLE_PROVISIONAL
         encodableStruct.field1.name = AsCharSpan(self.field1.name);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         if (self.field1.myBitmap == nil) {
             encodableStruct.field1.myBitmap.SetNull();
         } else {
             auto & nonNullValue_1 = encodableStruct.field1.myBitmap.SetNonNull();
             nonNullValue_1 = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(self.field1.myBitmap.unsignedIntValue);
         }
-        if (self.field1.myEnum != nil) {
-            auto & definedValue_1 = encodableStruct.field1.myEnum.Emplace();
-            if (self.field1.myEnum == nil) {
-                definedValue_1.SetNull();
-            } else {
-                auto & nonNullValue_2 = definedValue_1.SetNonNull();
-                nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(self.field1.myEnum.unsignedCharValue);
-            }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        if (self.field1.myEnum == nil) {
+            encodableStruct.field1.myEnum.SetNull();
+        } else {
+            auto & nonNullValue_1 = encodableStruct.field1.myEnum.SetNonNull();
+            nonNullValue_1 = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(self.field1.myEnum.unsignedCharValue);
         }
+#endif // MTR_ENABLE_PROVISIONAL
     }
     {
         encodableStruct.field2 = static_cast<std::remove_reference_t<decltype(encodableStruct.field2)>>(self.field2.unsignedCharValue);

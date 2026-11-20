@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/fuzz_test.gni")
 
 chip_test_suite("tests") {
   output_name = "libBleLayerTests"
@@ -37,4 +38,31 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/platform",
   ]
+}
+
+if (pw_enable_fuzz_test_targets) {
+  chip_pw_fuzz_target("fuzz-btp-engine-pw") {
+    test_source = [ "FuzzBtpEnginePW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/ble",
+      "${chip_root}/src/platform",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+  chip_pw_fuzz_target("fuzz-ble-endpoint-pw") {
+    test_source = [ "FuzzBleEndPointPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/ble",
+      "${chip_root}/src/platform",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+  chip_pw_fuzz_target("fuzz-ble-layer-pw") {
+    test_source = [ "FuzzBleLayerPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/ble",
+      "${chip_root}/src/platform",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
 }

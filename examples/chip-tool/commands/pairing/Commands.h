@@ -219,6 +219,14 @@ public:
 };
 #endif
 
+class PairViaProxy : public PairingCommand
+{
+public:
+    PairViaProxy(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("proxy", PairingMode::Proxy, PairingNetworkType::WiFi, credsIssuerConfig)
+    {}
+};
+
 class PairAlreadyDiscovered : public PairingCommand
 {
 public:
@@ -288,6 +296,7 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         make_unique<PairWiFiPAF>(credsIssuerConfig),
 #endif
+        make_unique<PairViaProxy>(credsIssuerConfig),
 #if CHIP_SUPPORT_THREAD_MESHCOP
         make_unique<PairThreadMeshcop>(credsIssuerConfig),
 #endif

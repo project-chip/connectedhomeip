@@ -51,6 +51,8 @@ public:
                          const CharSpan & displayString, const BrandingInformationType & brandingInformation) override;
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
+    bool HandleGetMovable() override;
+    CHIP_ERROR HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder) override;
 
     void SetEndpointId(EndpointId epId) { mEndpointId = epId; };
 
@@ -64,8 +66,16 @@ protected:
 private:
     EndpointId mEndpointId;
 
-    // TODO: set this based upon meta data from app
-    static constexpr uint32_t kEndpointFeatureMap = 3;
-    static constexpr uint16_t kClusterRevision    = 2;
+    // All Content Launcher features enabled
+    static constexpr uint32_t kEndpointFeatureMap =
+        chip::BitFlags<chip::app::Clusters::ContentLauncher::Feature>(
+            chip::app::Clusters::ContentLauncher::Feature::kContentSearch,
+            chip::app::Clusters::ContentLauncher::Feature::kURLPlayback,
+            chip::app::Clusters::ContentLauncher::Feature::kAdvancedSeek,
+            chip::app::Clusters::ContentLauncher::Feature::kTextTracks, chip::app::Clusters::ContentLauncher::Feature::kAudioTracks,
+            chip::app::Clusters::ContentLauncher::Feature::kContentReplication,
+            chip::app::Clusters::ContentLauncher::Feature::kContentQueueing,
+            chip::app::Clusters::ContentLauncher::Feature::kPresets)
+            .Raw();
     ContentAppAttributeDelegate * mAttributeDelegate;
 };

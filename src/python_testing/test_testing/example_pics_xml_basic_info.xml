@@ -37,6 +37,15 @@ Draft
 			<status>O</status>
 			<support>true</support>
 		</picsItem>
+		<!-- Required by the Base/MCORE consistency check (test step 10). Any
+		     device exposing standard server clusters must have MCORE.IDM.S
+		     set; this mock device does (BasicInformation, Descriptor, etc.). -->
+		<picsItem>
+			<itemNumber>MCORE.IDM.S</itemNumber>
+			<feature>Does the device support the Interaction Data Model as a server?</feature>
+			<status>O</status>
+			<support>true</support>
+		</picsItem>
 		<picsItem>
 			<itemNumber>DESC.S.A0000</itemNumber>
 			<feature>Does the device implement the device type list attribute?</feature>

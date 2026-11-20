@@ -18,10 +18,14 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "TestGroupsCluster"
 
-  test_sources = [ "TestGroupsCluster.cpp" ]
+  test_sources = [
+    "TestGroupsCluster.cpp",
+    "TestStubbedGroupsCluster.cpp",
+  ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/groups-server",
+    "${chip_root}/src/app/clusters/groups-server:groups-cluster",
+    "${chip_root}/src/app/clusters/groups-server:stubbed-groups-cluster",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/support",

@@ -73,6 +73,11 @@ public:
 
     CASESession & GetSession() { return mPairingSession; }
 
+    void SetLocalSessionParameters(const SessionParameters & sessionParams)
+    {
+        mPairingSession.SetLocalSessionParameters(sessionParams);
+    }
+
 private:
     Messaging::ExchangeManager * mExchangeManager                       = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage                = nullptr;

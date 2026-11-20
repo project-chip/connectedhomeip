@@ -51,7 +51,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
@@ -68,7 +68,7 @@ class FakeReset(ClusterCommand):
     cluster_id: typing.ClassVar[int] = 0x00000057
     command_id: typing.ClassVar[int] = 0x00000000
     is_client: typing.ClassVar[bool] = True
-    response_type: typing.ClassVar[typing.Optional[str]] = None
+    response_type: typing.ClassVar[str | None] = None
 
     @ChipUtility.classproperty
     def descriptor(cls) -> ClusterObjectDescriptor:
@@ -85,7 +85,7 @@ class FakeModifyEnabledAlarms(ClusterCommand):
     cluster_id: typing.ClassVar[int] = 0x00000057
     command_id: typing.ClassVar[int] = 0x00000001
     is_client: typing.ClassVar[bool] = True
-    response_type: typing.ClassVar[typing.Optional[str]] = None
+    response_type: typing.ClassVar[str | None] = None
 
     @ChipUtility.classproperty
     def descriptor(cls) -> ClusterObjectDescriptor:
@@ -97,7 +97,7 @@ class FakeModifyEnabledAlarms(ClusterCommand):
     mask: uint = 0
 
 
-class TC_REFALM_2_2(MatterBaseTest):
+class TC_REFALM_2_2(MatterTestCommissionedDevice):
     """Implementation of test case TC_REFALM_2_2."""
 
     def desc_TC_REFALM_2_2(self) -> str:
@@ -112,7 +112,7 @@ class TC_REFALM_2_2(MatterBaseTest):
     def steps_TC_REFALM_2_2(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep(2, "Ensure that the door on the DUT is closed"),
             TestStep(3, "TH reads from the DUT the State attribute",
                      "Verify that the DUT response contains a 32-bit value with bit 0 set to 0"),

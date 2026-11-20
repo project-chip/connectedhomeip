@@ -16,7 +16,6 @@ import logging
 import typing
 import xml.sax.handler
 from dataclasses import dataclass
-from typing import Optional
 
 import click
 
@@ -99,7 +98,7 @@ class ParseSource:
     """
     source: str | typing.IO  # filename or stream
     # actual filename to use, None if the source is a filename already
-    name: Optional[str] = None
+    name: str | None = None
 
     @property
     def source_file_name(self):

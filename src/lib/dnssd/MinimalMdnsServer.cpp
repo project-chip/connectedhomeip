@@ -39,6 +39,7 @@ namespace chip {
 namespace Dnssd {
 
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 using chip::Platform::UniquePtr;
 
 GlobalMinimalMdnsServer::GlobalMinimalMdnsServer()

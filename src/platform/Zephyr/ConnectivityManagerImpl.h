@@ -36,9 +36,12 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/Zephyr/wifi/ConnectivityManagerImplWiFi.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <platform/Zephyr/wifi/ConnectivityManagerImplWiFiPAF.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -71,6 +74,9 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                                      public ConnectivityManagerImplWiFiPAF,
+#endif
                                       public ConnectivityManagerImplWiFi
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>

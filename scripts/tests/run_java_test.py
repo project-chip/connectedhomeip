@@ -60,8 +60,8 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
         kvs_match = re.search(r"--KVS (?P<kvs_path>[^ ]+)", app_args)
         if kvs_match:
             kvs_path_to_remove = kvs_match.group("kvs_path")
-            retcode = subprocess.call("rm -f %s" % kvs_path_to_remove, shell=True)
-            print("Trying to remove KVS path %s" % kvs_path_to_remove)
+            retcode = subprocess.call(f"rm -f {kvs_path_to_remove}", shell=True)
+            print(f"Trying to remove KVS path {kvs_path_to_remove}")
             if retcode != 0:
                 raise RuntimeError(f"Failed to remove {kvs_path_to_remove} for factory reset.")
 
@@ -89,7 +89,7 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
             log.info("Crash Log FileName: '%s'", fileName)
             with open(fileName, 'w') as f:
                 for i in range(1, 1000):
-                    data = "%d\n" % i
+                    data = f"{i}\n"
                     f.write(data)
 
         if '--network_diagnostics_log' in app_args:
@@ -98,7 +98,7 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
             log.info("Network Diag Log FileName: '%s'", fileName)
             with open(fileName, 'w') as f:
                 for i in range(1, 500):
-                    data = "%d\n" % i
+                    data = f"{i}\n"
                     f.write(data)
 
         if '--end_user_support_log' in app_args:
@@ -107,7 +107,7 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
             log.info("EndUser Support Log FileName: '%s'", fileName)
             with open(fileName, 'w') as f:
                 for i in range(1, 10):
-                    data = "%d\n" % i
+                    data = f"{i}\n"
                     f.write(data)
 
         app_process = subprocess.Popen(

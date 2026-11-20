@@ -42,7 +42,7 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import Nullable
 from matter.interaction_model import Status
 from matter.testing.decorators import has_attribute, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ D_OK_SINGLE = bytes.fromhex(
     '17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018')
 
 
-class TC_ACL_2_7(MatterBaseTest):
+class TC_ACL_2_7(MatterTestCommissionedDevice):
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
@@ -106,8 +106,7 @@ class TC_ACL_2_7(MatterBaseTest):
 
     def steps_TC_ACL_2_7(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH1 commissions DUT using admin node ID",
-                     is_commissioning=True),
+            TestStep(1, "TH1 commissions DUT using admin node ID"),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
                      "Result is SUCCESS, value is stored as F1"),
             TestStep(3, "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin node ID",

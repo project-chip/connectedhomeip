@@ -100,6 +100,40 @@ public:
      * @return Returns a void since any errors are to be reported in the response.status value.
      */
     virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response) = 0;
+
+    /**
+     * Get the mode tag of the Nth core mode tag in the list of core mode tags.
+     * @param tagIndex The index of the tag to be returned. It is assumed that tags are indexable from 0 and with no gaps.
+     * @param tag A reference to the uint16_t variable that is to contain the tag value.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the value was returned successfully.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the tagIndex is beyond the list of available core mode tags.
+     *
+     * Note: This is used by the SDK to populate the CoreModeTags attribute when the CoreModes feature is supported.
+     */
+    virtual CHIP_ERROR GetCoreModeTagByIndex(uint8_t tagIndex, uint16_t & tag) { return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; }
+
+    /**
+     * When a ChangeToModeByCoreTag command is received, if the newModeTag value is in the CoreModeTags list,
+     * this method is called to 1) decide if we should go ahead with transitioning to this mode, 2) determine
+     * which supported mode to transition to, and 3) formulate the ChangeToModeResponse that will be sent back to
+     * the client.
+     *
+     * The default implementation calls HandleChangeToMode with the provided newMode.
+     *
+     * @param newModeTag The core mode tag that the device is requested to transition to.
+     * @param newMode An in-out parameter for the mode ID to transition to. Pre-populated by the cluster with
+     *                a supported mode matching newModeTag. The delegate may modify this to select a different
+     *                supported mode matching the tag.
+     * @param response A reference to a response that will be sent to the client. The contents of which can be modified by the
+     *                 application.
+     *
+     * @return Returns a void since any errors are to be reported in the response.status value.
+     */
+    virtual void HandleChangeToModeByCoreTag(uint16_t newModeTag, uint8_t & newMode,
+                                             ModeBase::Commands::ChangeToModeResponse::Type & response)
+    {
+        HandleChangeToMode(newMode, response);
+    }
 };
 
 } // namespace chip::app::Clusters::ModeBase

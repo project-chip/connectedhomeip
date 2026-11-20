@@ -191,6 +191,70 @@ public:
 using DecodableType = Type;
 
 } // namespace ScheduleTypeStruct
+namespace SensorScheduleTransitionStruct {
+enum class Fields : uint8_t
+{
+    kDayOfWeek            = 0,
+    kTransitionTime       = 1,
+    kEnabledSensorHandles = 2,
+};
+
+struct Type
+{
+public:
+    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeek = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
+    uint16_t transitionTime                          = static_cast<uint16_t>(0);
+    DataModel::List<const chip::ByteSpan> enabledSensorHandles;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeek = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
+    uint16_t transitionTime                          = static_cast<uint16_t>(0);
+    DataModel::DecodableList<chip::ByteSpan> enabledSensorHandles;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace SensorScheduleTransitionStruct
+namespace ThermostatSensorStruct {
+enum class Fields : uint8_t
+{
+    kName         = 0,
+    kSensorHandle = 1,
+    kCluster      = 2,
+    kEndpoint     = 3,
+    kNode         = 4,
+    kFabricIndex  = 5,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan name;
+    chip::ByteSpan sensorHandle;
+    chip::ClusterId cluster = static_cast<chip::ClusterId>(0);
+    Optional<chip::EndpointId> endpoint;
+    Optional<chip::NodeId> node;
+    Optional<chip::FabricIndex> fabricIndex;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ThermostatSensorStruct
 namespace ThermostatSuggestionStruct {
 enum class Fields : uint8_t
 {

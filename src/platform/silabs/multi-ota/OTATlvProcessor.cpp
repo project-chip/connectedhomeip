@@ -20,12 +20,11 @@
 #include <lib/support/BufferReader.h>
 #include <lib/support/TypeTraits.h>
 
-#include <headers/ProvisionManager.h>
-#include <headers/ProvisionStorage.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
-#if SL_MATTER_ENABLE_OTA_ENCRYPTION
+#if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
+#include <provision/ProvisionStorageReader.h>
 #endif
 
 using namespace ::chip::DeviceLayer::Internal;
@@ -148,11 +147,12 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 #if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
+    auto & storageReader = Provision::ProvisionStorageReader::GetInstance();
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
-    ReturnErrorOnFailure(Provision::Manager::GetInstance().GetStorage().DecryptUsingOtaTlvEncryptionKey(block, mIVOffset));
+    ReturnErrorOnFailure(storageReader.DecryptUsingOtaTlvEncryptionKey(block, mIVOffset));
 #else  // MBEDTLS_USE_PSA_CRYPTO
     uint32_t keyId;
-    ReturnErrorOnFailure(Provision::Manager::GetInstance().GetStorage().GetOtaTlvEncryptionKeyId(keyId));
+    ReturnErrorOnFailure(storageReader.GetOtaTlvEncryptionKeyId(keyId));
     chip::DeviceLayer::Silabs::OtaTlvEncryptionKey key(keyId);
 
     ReturnErrorOnFailure(key.Decrypt(block, mIVOffset));

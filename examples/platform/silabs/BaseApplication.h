@@ -30,6 +30,7 @@
 #include <app/server/AppDelegate.h>
 #include <app/util/config.h>
 #include <ble/Ble.h>
+#include <clusters/Identify/Enums.h>
 #include <cmsis_os2.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
@@ -42,13 +43,13 @@
 #include <app/clusters/identify-server/identify-server.h>
 #endif
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "demo-ui.h"
 #include "lcd.h"
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
 /**********************************************************
  * Defines
@@ -61,6 +62,7 @@
 #define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
+#define APP_ERROR_ALLOCATION_FAILED CHIP_APPLICATION_ERROR(0x07)
 
 class BaseApplicationDelegate : public AppDelegate, public chip::FabricTable::Delegate
 {
@@ -118,13 +120,20 @@ public:
     void UnlinkAppLed() { sAppActionLed = nullptr; }
 
     /**
+     * @brief Check if the application is initialized
+     *
+     * @return Set to true when Init() was called successfully
+     */
+    bool IsApplicationInitialized() const { return mIsApplicationInitialized; }
+
+    /**
      * @brief PostEvent function that add event to AppTask queue for processing
      *
      * @param event AppEvent to post
      */
     static void PostEvent(const AppEvent * event);
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     /**
      * @brief Return LCD object
      */
@@ -151,7 +160,7 @@ public:
      * @param screen The screen to be displayed
      */
     static void PostUpdateDisplayEvent(SilabsLCD::Screen_e screen);
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
     /**
      * @brief Function called to start the LED light timer
@@ -175,6 +184,23 @@ public:
     static void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState);
     static void OnTriggerIdentifyEffect(Identify * identify);
 #endif
+
+    /**
+     * @brief Notification API used by the code-driven identify integration
+     *        (see all-devices-app / PlatformIdentifyIntegration) to drive
+     *        the same status-LED state machine used by the Ember-based
+     *        Identify server plugin.
+     *
+     * The Ember-based Identify server plugin populates `IdentifyPool` via
+     * `emberAfIdentifyClusterInitCallback` and drives blink patterns from
+     * that pool. Code-driven builds (e.g. `all-devices-app`) don't use
+     * Ember, so they call these Notify* entrypoints from their platform
+     * `IdentifyDelegate` implementation instead.
+     */
+    static void NotifyCodeDrivenIdentifyStart();
+    static void NotifyCodeDrivenIdentifyStop();
+    static void NotifyCodeDrivenTriggerEffect(chip::app::Clusters::Identify::EffectIdentifierEnum effect,
+                                              chip::app::Clusters::Identify::EffectVariantEnum variant);
 
     /**
      * @brief Updates the static boolean isCommissioned to the desired state
@@ -291,5 +317,6 @@ protected:
     bool mSyncClusterToButtonAction;
 
 private:
+    bool mIsApplicationInitialized = false;
     static void InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState);
 };

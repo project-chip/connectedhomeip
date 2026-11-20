@@ -17,7 +17,9 @@
 
 import asyncio
 import logging
-from typing import Optional
+import threading
+import time
+from dataclasses import dataclass
 
 from .command import WebRTCProviderCommand
 from .libdatachannel_webrtc_client import LibdatachannelWebRTCClient
@@ -25,6 +27,16 @@ from .types import Events, IceCandidate, IceCandidateList, PeerConnectionState
 from .utils import AsyncEventQueue
 
 LOGGER = logging.getLogger(__name__)
+
+
+@dataclass
+class MediaDeliveryStats:
+    """Statistics of RTP video and audio media received by a WebRTC peer connection."""
+
+    video_frames: int
+    video_bytes: int
+    audio_packets: int
+    audio_bytes: int
 
 
 class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
@@ -43,13 +55,18 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         PeerConnection
     """
 
-    def __init__(self, node_id: int, fabric_index: int, endpoint: int, event_loop: Optional[asyncio.AbstractEventLoop] = None):
+    def __init__(self, node_id: int, fabric_index: int, endpoint: int, event_loop: asyncio.AbstractEventLoop | None = None):
         super().__init__()
         self.event_loop = event_loop or asyncio.get_running_loop()
 
         self._ice_candidates = IceCandidateList()
         # Sentinel to indicate end of ice candidates collection.
         self._ice_sentinel = "___ICE_DONE___"
+
+        # Remote candidates arrive on the Matter thread; remote descriptions are set from the test's thread.
+        self._remote_candidates_lock = threading.Lock()
+        self._remote_description_set = False
+        self._held_remote_candidates: list[IceCandidate] = []
 
         self._peer_state = PeerConnectionState.NEW
 
@@ -86,7 +103,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         default_stun_url = "stun:stun.l.google.com:19302"
         self.create_peer_connection(stun_url=default_stun_url)
 
-    async def get_local_ice_candidates(self, timeout_s: Optional[int] = None) -> list[IceCandidate]:
+    async def get_local_ice_candidates(self, timeout_s: int | None = None) -> list[IceCandidate]:
         """Retrieves the local ICE candidates for the WebRTC peer connection.
 
         Waits for gathering complete to return ice candidates.
@@ -117,13 +134,46 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
     def set_remote_ice_candidates(self, remote_candidates: list[IceCandidate]) -> None:
         """Sets the remote ICE candidates for the WebRTC peer connection.
 
+        Candidates received before a remote description is set are held,
+        and set_remote_description() applies them. Adding remote ICE
+        candidates before a remote description is set can fail, so they
+        must be buffered until the peer is ready.
+
         Args:
             remote_candidates (list[IceCandidate]): A list of remote ICE candidates to be set.
         """
+        with self._remote_candidates_lock:
+            if not self._remote_description_set:
+                LOGGER.debug("Holding %d remote ICE candidates until a remote description is set", len(remote_candidates))
+                self._held_remote_candidates.extend(remote_candidates)
+                return
+        self._add_remote_ice_candidates(remote_candidates)
+
+    def _add_remote_ice_candidates(self, remote_candidates: list[IceCandidate]) -> None:
         for candidate in remote_candidates:
             self.add_ice_candidate(candidate.candidate, candidate.sdpMid or "video")
 
-    async def get_local_answer(self, timeout_sec: Optional[int] = None) -> str:
+    def set_remote_description(self, sdp: str, type_: str) -> None:
+        """Sets the remote SDP, then applies the held remote ICE candidates in arrival order.
+
+        Candidates that arrive while held ones are being applied are held too, so a later candidate never
+        reaches libdatachannel ahead of an earlier one.
+
+        Args:
+            sdp (str): The remote SDP.
+            type_ (str): The SDP type, "offer" or "answer".
+        """
+        super().set_remote_description(sdp, type_)
+        while True:
+            with self._remote_candidates_lock:
+                held_candidates, self._held_remote_candidates = self._held_remote_candidates, []
+                if not held_candidates:
+                    self._remote_description_set = True
+                    return
+            LOGGER.debug("Applying %d remote ICE candidates held until the remote description was set", len(held_candidates))
+            self._add_remote_ice_candidates(held_candidates)
+
+    async def get_local_answer(self, timeout_sec: int | None = None) -> str:
         """Fetches the local SDP answer for the WebRTC peer connection.
 
         Args:
@@ -161,7 +211,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         """
         self.set_remote_description(answer_sdp, "answer")
 
-    async def get_local_offer(self, timeout_sec: Optional[int] = None) -> str:
+    async def get_local_offer(self, timeout_sec: int | None = None) -> str:
         """Fetches the local SDP offer for the WebRTC peer connection.
 
         Args:
@@ -184,7 +234,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         """
         self.set_remote_description(offer_sdp, "offer")
 
-    async def get_remote_offer(self, timeout_s: Optional[int] = None) -> tuple[int, str]:
+    async def get_remote_offer(self, timeout_s: int | None = None) -> tuple[int, str]:
         """Waits for a remote SDP offer to be received through a matter command.
 
         Args:
@@ -200,7 +250,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         LOGGER.debug("Waiting for remote offer")
         return await self._remote_events[Events.OFFER].get(timeout_s)
 
-    async def get_remote_answer(self, timeout_s: Optional[int] = None) -> tuple[int, str]:
+    async def get_remote_answer(self, timeout_s: int | None = None) -> tuple[int, str]:
         """Waits for a remote SDP answer to be received through a matter command.
 
         Args:
@@ -216,7 +266,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         LOGGER.debug("Waiting for remote answer")
         return await self._remote_events[Events.ANSWER].get(timeout_s)
 
-    async def get_remote_ice_candidates(self, timeout_s: Optional[int] = None) -> tuple[int, list[IceCandidate]]:
+    async def get_remote_ice_candidates(self, timeout_s: int | None = None) -> tuple[int, list[IceCandidate]]:
         """Waits for a list of remote ICE Candidates to be received through a matter command.
 
         Args:
@@ -334,11 +384,11 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
     def on_remote_ice_candidates(self, sessionId: int, candidates: list[IceCandidate]) -> None:
         """Callback function called when a remote ICE candidates are received through a matter command.
 
-        Implements trickle ICE by immediately applying received candidates to the peer connection.
+        Implements trickle ICE by applying received candidates to the peer connection, or holding them until a
+        remote description is set (see set_remote_ice_candidates()).
         Also stores them in the event queue for tests that may need to wait for and verify them.
         """
-        # Immediately apply candidates for trickle ICE support
-        LOGGER.debug("Applying %s candidates for trickle ICE support: %s", len(candidates), candidates)
+        LOGGER.debug("Received %s candidates for trickle ICE support: %s", len(candidates), candidates)
         self.set_remote_ice_candidates(candidates)
 
         # Also put in event queue for any waiting consumers
@@ -347,3 +397,36 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
     def on_remote_end(self, sessionId: int, reason: int) -> None:
         """Callback function called when a remote END session is received through a matter command."""
         self._remote_events[Events.END].put((sessionId, reason))
+
+    async def wait_for_media_delivery(
+        self,
+        expect_video: bool = True,
+        expect_audio: bool = True,
+        timeout_s: float = 5.0,
+    ) -> MediaDeliveryStats:
+        """Waits for RTP video frames and/or audio packets to be received by the native WebRTCClient.
+
+        Polls the per-PeerConnection native atomic counters directly, avoiding any UDP socket
+        binding or port conflict issues.
+
+        Returns:
+            MediaDeliveryStats containing video_frames, video_bytes, audio_packets, and audio_bytes.
+        """
+        self.reset_media_counters()
+        poll_interval = 0.05
+        deadline = time.monotonic() + timeout_s
+        while time.monotonic() < deadline:
+            v_frames = self.get_video_frame_count()
+            a_packets = self.get_audio_packet_count()
+            video_ok = (not expect_video) or (v_frames > 0)
+            audio_ok = (not expect_audio) or (a_packets > 0)
+            if video_ok and audio_ok:
+                break
+            await asyncio.sleep(poll_interval)
+
+        return MediaDeliveryStats(
+            video_frames=self.get_video_frame_count(),
+            video_bytes=self.get_video_bytes_count(),
+            audio_packets=self.get_audio_packet_count(),
+            audio_bytes=self.get_audio_bytes_count(),
+        )

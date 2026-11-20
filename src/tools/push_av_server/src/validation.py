@@ -5,7 +5,6 @@ Validation service for media uploads.
 import logging
 import re
 import xml.etree.ElementTree
-from typing import Optional
 
 from models import Session, Stream, SupportedIngestInterface, Track, TrackState
 
@@ -27,12 +26,12 @@ class MatterCMAFUploadValidator:
     def validate_upload(
         self,
         stream: Stream,
-        session: Optional[Session],
+        session: Session | None,
         file_path: str,
         ext: str,
         body: bytes,
         headers: dict
-    ) -> tuple[list[str], Optional[Session]]:
+    ) -> tuple[list[str], Session | None]:
         """
         Validate a media upload.
         Returns a tuple of (errors, session).
@@ -53,10 +52,10 @@ class MatterCMAFUploadValidator:
     def _validate_mpd_upload(
         self,
         stream: Stream,
-        session: Optional[Session],
+        session: Session | None,
         file_path: str,
         body: bytes
-    ) -> tuple[list[str], Optional[Session]]:
+    ) -> tuple[list[str], Session | None]:
         """Validate DASH manifest upload."""
         errors = []
 
@@ -91,10 +90,10 @@ class MatterCMAFUploadValidator:
     def _validate_m3u8_upload(
         self,
         stream: Stream,
-        session: Optional[Session],
+        session: Session | None,
         file_path: str,
         body: bytes
-    ) -> tuple[list[str], Optional[Session]]:
+    ) -> tuple[list[str], Session | None]:
         """Validate HLS manifest upload."""
         errors = []
 
@@ -125,9 +124,9 @@ class MatterCMAFUploadValidator:
     def _validate_hls_multi_variant(
         self,
         stream: Stream,
-        session: Optional[Session],
+        session: Session | None,
         lines: list[str]
-    ) -> tuple[list[str], Optional[Session]]:
+    ) -> tuple[list[str], Session | None]:
         """Validate HLS multi-variant playlist."""
         errors = []
 
@@ -156,12 +155,12 @@ class MatterCMAFUploadValidator:
     def _validate_hls_media_playlist(
         self,
         stream: Stream,
-        session: Optional[Session],
+        session: Session | None,
         file_path: str,
         is_media_playlist: re.Match,
         lines: list[str],
         body_str: str
-    ) -> tuple[list[str], Optional[Session]]:
+    ) -> tuple[list[str], Session | None]:
         """Validate HLS media playlist."""
         errors = []
 
@@ -242,11 +241,11 @@ class MatterCMAFUploadValidator:
     def _validate_segment_upload(
         self,
         stream: Stream,
-        session: Optional[Session],
+        session: Session | None,
         file_path: str,
         ext: str,
         headers: dict
-    ) -> tuple[list[str], Optional[Session]]:
+    ) -> tuple[list[str], Session | None]:
         """Validate segment upload (m4s or init)."""
         errors = []
 

@@ -74,9 +74,8 @@ enum class Fields : uint8_t
     kBLTChannelSoundingDeviceRoleConfig = 3,
     kFrequencyBand                      = 4,
     kBandwidth                          = 5,
-    kSecurityMode                       = 6,
-    kTrigger                            = 7,
-    kReportingCondition                 = 8,
+    kTrigger                            = 6,
+    kReportingCondition                 = 7,
 };
 
 struct Type
@@ -92,7 +91,6 @@ public:
     Optional<Structs::BLTChannelSoundingDeviceRoleConfigStruct::Type> BLTChannelSoundingDeviceRoleConfig;
     Optional<chip::BitMask<RadioBandBitmap>> frequencyBand;
     Optional<chip::BitMask<RangingBandwidthBitmap>> bandwidth;
-    RangingSecurityEnum securityMode = static_cast<RangingSecurityEnum>(0);
     Structs::RangingTriggerConditionStruct::Type trigger;
     Optional<Structs::ReportingConditionStruct::Type> reportingCondition;
 
@@ -116,7 +114,6 @@ public:
     Optional<Structs::BLTChannelSoundingDeviceRoleConfigStruct::DecodableType> BLTChannelSoundingDeviceRoleConfig;
     Optional<chip::BitMask<RadioBandBitmap>> frequencyBand;
     Optional<chip::BitMask<RangingBandwidthBitmap>> bandwidth;
-    RangingSecurityEnum securityMode = static_cast<RangingSecurityEnum>(0);
     Structs::RangingTriggerConditionStruct::DecodableType trigger;
     Optional<Structs::ReportingConditionStruct::DecodableType> reportingCondition;
 
@@ -126,8 +123,7 @@ public:
 namespace StartRangingResponse {
 enum class Fields : uint8_t
 {
-    kResultCode = 0,
-    kSessionID  = 1,
+    kSessionID = 0,
 };
 
 struct Type
@@ -137,8 +133,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StartRangingResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
 
-    ResultCodeEnum resultCode = static_cast<ResultCodeEnum>(0);
-    DataModel::Nullable<uint8_t> sessionID;
+    uint8_t sessionID = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -153,8 +148,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StartRangingResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
 
-    ResultCodeEnum resultCode = static_cast<ResultCodeEnum>(0);
-    DataModel::Nullable<uint8_t> sessionID;
+    uint8_t sessionID = static_cast<uint8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

@@ -289,7 +289,11 @@ public:
 
         return paseShouldBeOpen == paseIsOpen;
     }
-    bool CheckStageSuccessful(uint8_t stage) { return mReceivedStageSuccess[stage]; }
+    bool CheckStageSuccessful(uint8_t stage)
+    {
+        VerifyOrDie(stage < kNumCommissioningStages);
+        return mReceivedStageSuccess[stage];
+    }
     void Reset()
     {
         mTestCommissionerUsed              = false;
@@ -726,6 +730,30 @@ PyChipError pychip_OpCreds_SetGroupKey(chip::Controller::DeviceCommissioner * de
     return ToPyChipError(err);
 }
 
+PyChipError pychip_OpCreds_RemoveGroupInfo(chip::Controller::DeviceCommissioner * devCtrl, uint16_t groupId)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    CHIP_ERROR err = sGroupDataProvider.RemoveGroupInfo(devCtrl->GetFabricIndex(), groupId);
+    return ToPyChipError(err);
+}
+
+PyChipError pychip_OpCreds_RemoveKeySet(chip::Controller::DeviceCommissioner * devCtrl, uint16_t keysetId)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    CHIP_ERROR err = sGroupDataProvider.RemoveKeySet(devCtrl->GetFabricIndex(), keysetId);
+    return ToPyChipError(err);
+}
+
+PyChipError pychip_OpCreds_RemoveGroupKeys(chip::Controller::DeviceCommissioner * devCtrl)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    CHIP_ERROR err = sGroupDataProvider.RemoveGroupKeys(devCtrl->GetFabricIndex());
+    return ToPyChipError(err);
+}
+
 PyChipError pychip_OpCreds_SetMaximallyLargeCertsUsed(OpCredsContext * context, bool enabled)
 {
     VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
@@ -828,6 +856,13 @@ bool pychip_SetTestCommissionerSimulateFailureOnReport(uint8_t failStage)
 bool pychip_SetTestCommissionerPrematureCompleteAfter(uint8_t stage)
 {
     return sTestCommissioner.PrematureCompleteAfter(static_cast<chip::Controller::CommissioningStage>(stage));
+}
+
+// Used by src/python_testing/test_testing/TestCommissioningStage.py to check that the Python
+// CommissioningStage enum matches the C++ one.
+const char * pychip_CommissioningStageToString(uint8_t stage)
+{
+    return chip::Controller::StageToString(static_cast<chip::Controller::CommissioningStage>(stage));
 }
 
 PyChipError pychip_GetCompletionError()

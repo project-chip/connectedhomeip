@@ -50,6 +50,12 @@ enum class ModeTag : uint16_t
     // prone, and was removed. See
     // src/app/common/templates/config-data.yaml.
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kCoreModes = 0x2,
+};
 } // namespace DishwasherMode
 } // namespace Clusters
 } // namespace app

@@ -36,19 +36,37 @@ namespace DataModel {
 class EventsGenerator;
 
 namespace internal {
-template <typename T>
+/**
+ * Non-templated EventLoggingDelegate subclass binding an untyped event data pointer with a type-erased encoding callback.
+ * Avoids generating separate vtables, RTTI metadata, and virtual destructors per event type.
+ *
+ * @note aEncodeFn MUST be non-null. Internal construction via EncodeTypedEventPayload guarantees a valid callback function.
+ */
 class SimpleEventPayloadWriter : public EventLoggingDelegate
 {
 public:
-    SimpleEventPayloadWriter(const T & aEventData) : mEventData(aEventData){};
-    CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
-    {
-        return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
-    }
+    using EncodeFn = CHIP_ERROR (*)(const void * data, chip::TLV::TLVWriter & writer);
+
+    SimpleEventPayloadWriter(const void * aData, EncodeFn aEncodeFn) : mEventData(aData), mEncodeFn(aEncodeFn) {}
+
+    CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override { return mEncodeFn(mEventData, aWriter); }
 
 private:
-    const T & mEventData;
+    const void * mEventData;
+    EncodeFn mEncodeFn;
 };
+
+/**
+ * Type-erased TLV encoding helper for typed event payload structures.
+ *
+ * @note `data` MUST be non-null. Internal construction via GenerateEvent guarantees a valid pointer.
+ *       Omitting redundant runtime null checks avoids per-event-type template Flash code growth.
+ */
+template <typename T>
+inline CHIP_ERROR EncodeTypedEventPayload(const void * data, chip::TLV::TLVWriter & writer)
+{
+    return DataModel::Encode(writer, TLV::ContextTag(EventDataIB::Tag::kData), *static_cast<const T *>(data));
+}
 
 std::optional<EventNumber> GenerateEvent(const EventOptions & eventOptions, EventsGenerator & generator,
                                          EventLoggingDelegate & delegate, bool isFabricSensitiveEvent);
@@ -94,7 +112,7 @@ public:
     template <typename T>
     std::optional<EventNumber> GenerateEvent(const T & eventData, EndpointId endpointId)
     {
-        internal::SimpleEventPayloadWriter<T> eventPayloadWriter(eventData);
+        internal::SimpleEventPayloadWriter eventPayloadWriter(&eventData, &internal::EncodeTypedEventPayload<T>);
         constexpr bool isFabricSensitiveEvent = DataModel::IsFabricScoped<T>::value;
         return internal::GenerateEvent({ endpointId, eventData }, *this, eventPayloadWriter, isFabricSensitiveEvent);
     }

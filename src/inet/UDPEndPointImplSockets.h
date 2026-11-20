@@ -57,6 +57,17 @@ private:
     void HandlePendingIO(System::SocketEvents events);
     static void HandlePendingIO(System::SocketEvents events, intptr_t data);
 
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    void PortUnreachableHandlerChanged() override;
+
+    // Linux delivers ICMP errors for an IPV6_RECVERR socket on a separate per-socket error queue, read with
+    // recvmsg(MSG_ERRQUEUE). EnableErrorQueue sets the option; DrainErrorQueue reads every queued error and reports
+    // each port-unreachable one to OnPortUnreachable.
+    void EnableErrorQueue();
+    void DrainErrorQueue();
+    bool mErrorQueueEnabled = false;
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
     InterfaceId mBoundIntfId;
     uint16_t mBoundPort;
 

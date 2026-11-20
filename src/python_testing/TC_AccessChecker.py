@@ -65,7 +65,6 @@
 import logging
 from copy import deepcopy
 from enum import Enum, auto
-from typing import Optional
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import ValueDecodeFailure
@@ -95,7 +94,7 @@ def step_number_with_privilege(step: int, substep: str, privilege: Clusters.Acce
 
 
 def operation_allowed(spec_requires: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
-                      acl_set_to: Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]) -> bool:
+                      acl_set_to: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum | None) -> bool:
     ''' Determines if the action is allowed on the device based on the spec_requirements and the current ACL privilege granted.
 
         The spec parsing uses kUnknownEnumValue to indicate that NO access is allowed for this attribute
@@ -163,7 +162,7 @@ class AccessChecker(BasicCompositionTests):
         await self.default_controller.WriteAttribute(self.dut_node_id, attributes=[
             (0, Clusters.AccessControl.Attributes.Acl(self.default_acl))])
 
-    async def _setup_acl(self, privilege: Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]):
+    async def _setup_acl(self, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum | None):
         if privilege is None:
             return
         new_acl = deepcopy(self.default_acl)
@@ -257,6 +256,14 @@ class AccessChecker(BasicCompositionTests):
 
         log.info('Testing commands on %s at privilege %s', xml_cluster.name, privilege)
         for command_id in checkable_commands(cluster_id, device_cluster_data, xml_cluster):
+            # TODO(spec): ChangeToModeByCoreTag in ModeBase.adoc / data_model/1.7/clusters/ModeBase.xml
+            # is missing `<access invokePrivilege="operate"/>`. As a result, spec_parsing defaults
+            # its privilege to UNKNOWN, causing TC_AccessChecker to expect UNSUPPORTED_ACCESS at Operate
+            # privilege even though the device implementation correctly allows Operate access.
+            if xml_cluster.accepted_commands[command_id].name == "ChangeToModeByCoreTag":
+                log.warning("Skipping ChangeToModeByCoreTag access check due to missing invokePrivilege in spec XML")
+                continue
+
             spec_requires = xml_cluster.accepted_commands[command_id].privilege
             command = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS.get(cluster_id, {}).get(command_id)
             if command is None:

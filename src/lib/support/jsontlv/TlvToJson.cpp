@@ -34,6 +34,7 @@ namespace {
 // JSON format never has this and TLV payload contains "implicit profile"
 // and this value is never stored.
 constexpr uint32_t kTemporaryImplicitProfileId = 0xFF01;
+constexpr size_t kMaxTlvNestingDepth           = 32;
 
 /// RAII to switch the implicit profile id for a reader
 class ImplicitProfileIdChange
@@ -151,7 +152,7 @@ void InsertJsonElement(Json::Value & json, const JsonObjectElementContext & ctx,
     }
 }
 
-static CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & jsonObj);
+static CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & jsonObj, size_t depth);
 
 /*
  * Given a TLVReader positioned at TLV structure this function:
@@ -159,8 +160,10 @@ static CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & jsonObj);
  *   - converts all elements of a structure into JSON object representation
  *   - exits structure
  */
-CHIP_ERROR TlvStructToJson(TLV::TLVReader & reader, Json::Value & jsonObj)
+static CHIP_ERROR TlvStructToJson(TLV::TLVReader & reader, Json::Value & jsonObj, size_t depth)
 {
+    VerifyOrReturnError(depth < kMaxTlvNestingDepth, CHIP_ERROR_RECURSION_DEPTH_LIMIT);
+
     CHIP_ERROR err;
     TLV::TLVType containerType;
 
@@ -177,14 +180,14 @@ CHIP_ERROR TlvStructToJson(TLV::TLVReader & reader, Json::Value & jsonObj)
         }
 
         // Recursively convert to JSON the item within the struct.
-        ReturnErrorOnFailure(TlvToJson(reader, jsonObj));
+        ReturnErrorOnFailure(TlvToJson(reader, jsonObj, depth + 1));
     }
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     return reader.ExitContainer(containerType);
 }
 
-CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & jsonObj)
+static CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & jsonObj, size_t depth)
 {
     JsonObjectElementContext context(reader);
 
@@ -247,6 +250,12 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & jsonObj)
         ByteSpan span;
         ReturnErrorOnFailure(reader.Get(span));
 
+        // Base64Encode takes and returns a uint16_t length, so a byte string whose raw or
+        // base64-encoded size exceeds 65535 would be silently truncated instead of encoded.
+        // Reject it, matching the guard the sibling Json<->TLV converters already apply.
+        VerifyOrReturnError(CanCastTo<uint16_t>(span.size()), CHIP_ERROR_INVALID_TLV_ELEMENT);
+        VerifyOrReturnError(CanCastTo<uint16_t>(BASE64_ENCODED_LEN(span.size())), CHIP_ERROR_INVALID_TLV_ELEMENT);
+
         Platform::ScopedMemoryBuffer<char> byteString;
         byteString.Alloc(BASE64_ENCODED_LEN(span.size()) + 1);
         VerifyOrReturnError(byteString.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -274,12 +283,14 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & jsonObj)
 
     case TLV::kTLVType_Structure: {
         Json::Value jsonStruct(Json::objectValue);
-        ReturnErrorOnFailure(TlvStructToJson(reader, jsonStruct));
+        ReturnErrorOnFailure(TlvStructToJson(reader, jsonStruct, depth));
         InsertJsonElement(jsonObj, context, jsonStruct);
         break;
     }
 
     case TLV::kTLVType_Array: {
+        VerifyOrReturnError(depth < kMaxTlvNestingDepth, CHIP_ERROR_RECURSION_DEPTH_LIMIT);
+
         CHIP_ERROR err;
         Json::Value jsonArray(Json::arrayValue);
         ElementTypeContext prevSubType;
@@ -310,7 +321,7 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & jsonObj)
             }
 
             // Recursively convert to JSON the encompassing item within the array.
-            ReturnErrorOnFailure(TlvToJson(reader, jsonArray));
+            ReturnErrorOnFailure(TlvToJson(reader, jsonArray, depth + 1));
         }
 
         VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
@@ -351,7 +362,7 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, std::string & jsonString)
     ImplicitProfileIdChange implicitProfileIdChange(reader, kTemporaryImplicitProfileId);
 
     Json::Value jsonObject(Json::objectValue);
-    ReturnErrorOnFailure(TlvStructToJson(reader, jsonObject));
+    ReturnErrorOnFailure(TlvStructToJson(reader, jsonObject, 0));
 
     Json::StyledWriter writer;
     jsonString = writer.write(jsonObject);

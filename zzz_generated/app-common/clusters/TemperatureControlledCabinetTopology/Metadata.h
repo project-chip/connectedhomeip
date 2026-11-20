@@ -28,8 +28,9 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace DisabledCabinets
 namespace Topology {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Topology::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Topology::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Topology
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     DisabledCabinets::kMetadataEntry,

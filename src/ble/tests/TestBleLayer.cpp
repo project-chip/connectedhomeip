@@ -62,8 +62,11 @@ class TestBleLayer : public BleLayer,
 public:
     // Add mOnBleConnectionCompleteCalls and mOnBleConnectionErrorCalls
     // to check if the callbacks are invoked correctly.
-    int mOnBleConnectionCompleteCalls = 0;
-    int mOnBleConnectionErrorCalls    = 0;
+    int mOnBleConnectionCompleteCalls           = 0;
+    int mOnBleConnectionErrorCalls              = 0;
+    int mCloseConnectionCalls                   = 0;
+    unsigned mCancelConnectionCalls             = 0;
+    BLE_CONNECTION_OBJECT mLastClosedConnection = BLE_CONNECTION_UNINITIALIZED;
 
     static void SetUpTestSuite()
     {
@@ -82,6 +85,9 @@ public:
         // Reset the connection flags before each test.
         mOnBleConnectionCompleteCalls = 0;
         mOnBleConnectionErrorCalls    = 0;
+        mCloseConnectionCalls         = 0;
+        mCancelConnectionCalls        = 0;
+        mLastClosedConnection         = BLE_CONNECTION_UNINITIALIZED;
         ASSERT_EQ(Init(this, this, this, &DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
         mBleTransport = this;
     }
@@ -113,10 +119,10 @@ public:
 
     // Passing capabilities request message to HandleWriteReceived should create
     // new BLE endpoint which later can be used to receive more data.
-    bool HandleWriteReceivedCapabilitiesRequest(BLE_CONNECTION_OBJECT connObj)
+    bool HandleWriteReceivedCapabilitiesRequest(BLE_CONNECTION_OBJECT connObj, uint8_t windowSize = BLE_MAX_RECEIVE_WINDOW_SIZE)
     {
-        constexpr uint8_t capReq[] = { 0x65, 0x6c, 0x54, 0x00, 0x00, 0x00, 0xc8, 0x00, 0x06 };
-        auto buf                   = System::PacketBufferHandle::NewWithData(capReq, sizeof(capReq));
+        const uint8_t capReq[] = { 0x65, 0x6c, 0x54, 0x00, 0x00, 0x00, 0xc8, 0x00, windowSize };
+        auto buf               = System::PacketBufferHandle::NewWithData(capReq, sizeof(capReq));
         return HandleWriteReceived(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID, std::move(buf));
     }
 
@@ -137,7 +143,17 @@ public:
 
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override {}
     void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {}
-    CHIP_ERROR CancelConnection() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR CancelConnection() override
+    {
+        ++mCancelConnectionCalls;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR CancelPendingConnection() override
+    {
+        mCanceledPendingConnection = true;
+        return CancelConnection();
+    }
+    bool mCanceledPendingConnection = false;
     CHIP_ERROR NewConnection(BleLayer * bleLayer, void * appState, const Span<const SetupDiscriminator> & discriminators,
                              OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
                              OnConnectionErrorFunct onConnectionError) override
@@ -170,7 +186,12 @@ public:
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT connObj) override
+    {
+        mCloseConnectionCalls++;
+        mLastClosedConnection = connObj;
+        return CHIP_NO_ERROR;
+    }
     uint16_t GetMTU(BLE_CONNECTION_OBJECT) const override { return 0; }
     CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *, PacketBufferHandle) override
     {
@@ -232,6 +253,14 @@ TEST_F(TestBleLayer, HandleWriteReceivedCapabilitiesRequest)
 {
     auto connObj = GetConnectionObject();
     EXPECT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
+}
+
+// A window size of zero would underflow the receive window counters to 255 on the
+// first subscription and data fragment, so the handshake must be rejected.
+TEST_F(TestBleLayer, HandleWriteReceivedCapabilitiesRequestZeroWindowSize)
+{
+    auto connObj = GetConnectionObject();
+    EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj, 0));
 }
 
 TEST_F(TestBleLayer, HandleSubscribeReceivedInvalidUUID)
@@ -402,6 +431,37 @@ TEST_F(TestBleLayer, CloseBleConnection)
     CloseBleConnection(connObj);
 }
 
+TEST_F(TestBleLayer, CloseUnclaimedConnection)
+{
+    const auto connObj = GetConnectionObject();
+
+    EXPECT_EQ(BleLayer::CloseUnclaimedConnection(connObj), CHIP_NO_ERROR);
+    EXPECT_EQ(mCloseConnectionCalls, 1);
+    EXPECT_EQ(mLastClosedConnection, connObj);
+}
+
+TEST_F(TestBleLayer, DetachedSuccessWhileClosingClosesConnection)
+{
+    const auto connObj = GetConnectionObject();
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), static_cast<BleLayer *>(this)), CHIP_NO_ERROR);
+    IndicateBleClosing();
+    EXPECT_EQ(CancelBleIncompleteConnection(), CHIP_ERROR_INCORRECT_STATE);
+
+    BleConnectionDelegate::OnConnectionComplete(static_cast<BleLayer *>(this), connObj);
+
+    EXPECT_EQ(mOnBleConnectionCompleteCalls, 0);
+    EXPECT_EQ(mOnBleConnectionErrorCalls, 0);
+    EXPECT_EQ(mCloseConnectionCalls, 1);
+    EXPECT_EQ(mLastClosedConnection, connObj);
+}
+
+TEST_F(TestBleLayer, CloseUnclaimedConnectionAfterShutdownRejectsDelegateUse)
+{
+    Shutdown();
+    EXPECT_EQ(BleLayer::CloseUnclaimedConnection(GetConnectionObject()), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(mCloseConnectionCalls, 0);
+}
+
 TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
 {
     for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
@@ -486,6 +546,58 @@ TEST_F(TestBleLayer, NewBleConnectionByObjectThenCancel)
 
     EXPECT_EQ(mOnBleConnectionCompleteCalls, 0);
     EXPECT_EQ(mOnBleConnectionErrorCalls, 0);
+}
+
+TEST_F(TestBleLayer, OwnerAndUnconditionalCancellationUseDistinctDelegatePaths)
+{
+    unsigned owner = 0;
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &owner), CHIP_NO_ERROR);
+    ASSERT_EQ(CancelBleIncompleteConnection(&owner), CHIP_NO_ERROR);
+    EXPECT_TRUE(mCanceledPendingConnection);
+
+    mCanceledPendingConnection = false;
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &owner), CHIP_NO_ERROR);
+    ASSERT_EQ(CancelBleIncompleteConnection(), CHIP_NO_ERROR);
+    EXPECT_FALSE(mCanceledPendingConnection);
+    EXPECT_EQ(mCancelConnectionCalls, 2u);
+}
+
+TEST_F(TestBleLayer, OwnerCancellationAfterCompletionPreservesEstablishedEndpoint)
+{
+    struct Context
+    {
+        TestBleLayer * layer;
+        unsigned successes = 0;
+        unsigned errors    = 0;
+    } owner{ this };
+    auto onSuccess = [](void * appState, BLE_CONNECTION_OBJECT connection) {
+        auto & context = *static_cast<Context *>(appState);
+        ++context.successes;
+        EXPECT_EQ(context.layer->CancelBleIncompleteConnection(&context), CHIP_NO_ERROR);
+        EXPECT_EQ(context.layer->NewBleConnectionByObject(connection), CHIP_NO_ERROR);
+    };
+    auto onError = [](void * appState, CHIP_ERROR) { ++static_cast<Context *>(appState)->errors; };
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &owner, onSuccess, onError), CHIP_NO_ERROR);
+    BleConnectionDelegate::OnConnectionComplete(static_cast<BleLayer *>(this), GetConnectionObject());
+    EXPECT_EQ(owner.successes, 1u);
+    EXPECT_EQ(mOnBleConnectionCompleteCalls, 1);
+    EXPECT_EQ(CancelBleIncompleteConnection(&owner), CHIP_NO_ERROR);
+    EXPECT_EQ(mCancelConnectionCalls, 0u);
+    EXPECT_EQ(mCloseConnectionCalls, 0);
+
+    Context replacement{ this };
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &replacement, onSuccess, onError), CHIP_NO_ERROR);
+    EXPECT_EQ(CancelBleIncompleteConnection(&owner), CHIP_NO_ERROR);
+    EXPECT_EQ(mCancelConnectionCalls, 0u);
+    EXPECT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &owner, onSuccess, onError), CHIP_ERROR_BUSY);
+    BleConnectionDelegate::OnConnectionError(static_cast<BleLayer *>(this), CHIP_ERROR_CONNECTION_ABORTED);
+    EXPECT_EQ(replacement.errors, 1u);
+    EXPECT_EQ(CancelBleIncompleteConnection(&replacement), CHIP_NO_ERROR);
+    EXPECT_EQ(mCancelConnectionCalls, 0u);
+    EXPECT_EQ(mCloseConnectionCalls, 0);
+
+    CloseAllBleConnections();
+    EXPECT_EQ(mCloseConnectionCalls, 1);
 }
 
 // Verify connection attempt fails when BleLayer is uninitialized

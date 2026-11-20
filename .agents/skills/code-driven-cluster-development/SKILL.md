@@ -544,6 +544,7 @@ framework.
 ### Standard structure
 
 ```cpp
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 #include <app/clusters/<name>-server/FooCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -566,7 +567,7 @@ public:
 
 struct TestFooCluster : public ::testing::Test
 {
-    static void SetUpTestSuite()   { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void SetUpTestSuite()   { ASSERT_SUCCESS(chip::Platform::MemoryInit()); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
     TestServerClusterContext testContext;
 };
@@ -576,11 +577,10 @@ struct TestFooCluster : public ::testing::Test
 TEST_F(TestFooCluster, AttributeList)
 {
     FooCluster cluster(kRootEndpointId);
-    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attrs;
-    ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, Foo::Id), attrs),
-              CHIP_NO_ERROR);
+    ASSERT_SUCCESS(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, Foo::Id), attrs));
     // verify expected attribute set ...
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -589,12 +589,12 @@ TEST_F(TestFooCluster, AttributeList)
 TEST_F(TestFooCluster, ReadAttributes)
 {
     FooCluster cluster(kRootEndpointId);
-    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(cluster.Startup(testContext.Get()));
     ClusterTester tester(cluster);
 
     // Read mandatory attributes
     uint16_t revision{};
-    ASSERT_EQ(tester.ReadAttribute(Foo::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(tester.ReadAttribute(Foo::Attributes::ClusterRevision::Id, revision));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

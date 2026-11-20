@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace MediaPlayback {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -69,8 +69,20 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace AvailableTextTracks
-constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+namespace AvailableCommands {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AvailableCommands::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace AvailableCommands
+namespace ContentInfo {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ContentInfo::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace ContentInfo
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     CurrentState::kMetadataEntry,
+    AvailableCommands::kMetadataEntry,
+    ContentInfo::kMetadataEntry,
 
 };
 

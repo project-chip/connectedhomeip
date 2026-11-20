@@ -26,7 +26,7 @@
 #include <string.h>
 
 #ifdef PW_RPC_ENABLED
-#include "PigweedLogger.h"
+#include "pigweed_rpc/PigweedLogger.h"
 #endif
 
 // RTT Buffer size and name
@@ -56,7 +56,7 @@
 #ifndef LOG_RTT_BUFFER_SIZE
 #define LOG_RTT_BUFFER_SIZE 256
 #endif
-
+#if SILABS_LOG_ENABLED
 #if SILABS_LOG_OUT_UART
 #include "uart.h"
 #endif
@@ -66,7 +66,7 @@
 #include "SEGGER_RTT.h"
 #include "SEGGER_RTT_Conf.h"
 #endif
-
+#endif // SILABS_LOG_ENABLED
 using namespace chip::Logging::Platform;
 
 #if SILABS_LOG_ENABLED
@@ -180,16 +180,19 @@ void HandleLog(const char * module, LogCategory category, const char * aFormat, 
         formattedMsg[sizeof formattedMsg - 1] = '\0';
     }
 
+    if (sLogInitialized)
+    {
 #if SILABS_LOG_OUT_UART
-    // Silabs UART Log trunc
-    uint8_t messageLen = len + prefixLen > 255 ? 255 : static_cast<uint8_t>(len + prefixLen);
-    uartLogWrite(formattedMsg, messageLen, category, chip::System::SystemClock().GetMonotonicMilliseconds64().count());
+        // Silabs UART Log trunc
+        uint8_t messageLen = len + prefixLen > 255 ? 255 : static_cast<uint8_t>(len + prefixLen);
+        uartLogWrite(formattedMsg, messageLen, category, chip::System::SystemClock().GetMonotonicMilliseconds64().count());
 #else
-    PrintLog(formattedMsg);
+        PrintLog(formattedMsg);
 #endif // SILABS_LOG_OUT_UART
 
-    // Let the application know that a log message has been emitted.
-    chip::DeviceLayer::OnLogOutput();
+        // Let the application know that a log message has been emitted.
+        chip::DeviceLayer::OnLogOutput();
+    }
 }
 
 } // namespace Platform
@@ -202,19 +205,16 @@ void HandleLog(const char * module, LogCategory category, const char * aFormat, 
  */
 static void PrintLog(const char * msg)
 {
-    if (sLogInitialized)
-    {
-        size_t sz;
-        sz                   = strlen(msg);
-        const char * newline = "\r\n";
+    size_t sz;
+    sz                   = strlen(msg);
+    const char * newline = "\r\n";
 #if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
-        PigweedLogger::putString(msg, sz);
-        PigweedLogger::putString(newline, 2);
+    PigweedLogger::putString(msg, sz);
+    PigweedLogger::putString(newline, 2);
 #else
-        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
-        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, 2);
+    SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
+    SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, 2);
 #endif // PW_RPC_ENABLED
-    }
 }
 #endif // !SILABS_LOG_OUT_UART
 #endif // SILABS_LOG_ENABLED

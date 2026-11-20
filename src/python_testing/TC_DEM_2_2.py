@@ -55,13 +55,13 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
+class TC_DEM_2_2(MatterTestCommissionedDevice, DEMTestBase):
     """Implementation of test case TC_DEM_2_2."""
 
     def desc_TC_DEM_2_2(self) -> str:
@@ -77,8 +77,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
     def steps_TC_DEM_2_2(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
                      "Verify that the DUT response contains the _FeatureMap_ attribute. Verify PowerAdjustment is supported."),
             TestStep("3", "Set up a subscription to all DeviceEnergyManagement cluster events"),
@@ -95,7 +94,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
             TestStep("6", "TH sends command PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event DEM.S.E00(PowerAdjustStart) sent"),
             TestStep("6a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x04 (PowerAdjustActive)"),
+                     "Value has to be 0x03 (PowerAdjustActive)"),
             TestStep("6b", "TH reads from the DUT the PowerAdjustmentCapability",
                      "Value has to include Cause=LocalOptimizationAdjustment."),
             TestStep("7", "TH sends command CancelPowerAdjustRequest",
@@ -121,15 +120,15 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
             TestStep("14", "TH sends command PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=GridOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and no event sent"),
             TestStep("14a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x04 (PowerAdjustActive)"),
+                     "Value has to be 0x03 (PowerAdjustActive)"),
             TestStep("14b", "TH reads from the DUT the PowerAdjustmentCapability",
                      "Value has to include Cause=GridOptimizationAdjustment."),
             TestStep("15", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00) and no event sent"),
             TestStep("15a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x04 (PowerAdjustActive)"),
+                     "Value has to be 0x03 (PowerAdjustActive)"),
             TestStep("15b", "TH reads from the DUT the OptOutState",
-                     "Value has to be 0x02 (LocalOptOut)"),
+                     "Value has to be 0x01 (LocalOptOut)"),
             TestStep("16", "TH sends command PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep("17", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Grid Optimization Test Event",
@@ -149,7 +148,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
             TestStep("19", "TH sends command PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and event DEM.S.E00(PowerAdjustStart) sent"),
             TestStep("19a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x04 (PowerAdjustActive)"),
+                     "Value has to be 0x03 (PowerAdjustActive)"),
             TestStep("19b", "TH reads from the DUT the PowerAdjustmentCapability",
                      "Value has to include Cause=LocalOptimizationAdjustment."),
             TestStep("20", "Wait 10 seconds",
@@ -177,7 +176,8 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
         # Commission DUT - already done
 
         self.step("2")
-        await self.validate_feature_map([Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerAdjustment], [])
+        await self.validate_feature_map([Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerAdjustment],
+                                        [Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerRangeAdjustment])
 
         self.step("3")
         # Subscribe to Events and when they are sent push them to a queue for checking later

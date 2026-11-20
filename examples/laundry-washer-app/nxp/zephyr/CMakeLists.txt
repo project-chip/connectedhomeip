@@ -21,6 +21,7 @@ get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-cluster
 get_filename_component(LAUNDRY_WASHER_NXP_COMMON_DIR ${CHIP_ROOT}/examples/laundry-washer-app/nxp/common REALPATH)
 get_filename_component(EXAMPLE_PLATFORM_NXP_COMMON_DIR ${CHIP_ROOT}/examples/platform/nxp/common REALPATH)
 get_filename_component(EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR ${CHIP_ROOT}/examples/platform/nxp/zephyr REALPATH)
+get_filename_component(NXP_MATTER_SUPPORT_DIR ${CHIP_ROOT}/third_party/nxp/nxp_matter_support REALPATH)
 
 # Perform common operations like detecting extra overlays in the platform folder for the target board
 # This must be called before find_package(Zephyr)
@@ -70,6 +71,15 @@ target_sources(app
     ${EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR}/factory_data/source/AppFactoryDataExample.cpp
 )
 
+if(CONFIG_CHIP_APP_IDENTIFY)
+    target_include_directories(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/clusters/include
+    )
+    target_sources(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/clusters/source/Identify.cpp
+    )
+endif()
+
 if(CONFIG_CHIP_CUSTOM_BLE_ADV_DATA)
     target_sources(app PRIVATE
                     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BleZephyrManagerApp.cpp
@@ -95,6 +105,14 @@ if (CONFIG_CHIP_FACTORY_DATA)
         ${CHIP_ROOT}/src/platform/nxp/zephyr/FactoryDataProviderImpl.cpp
         ${CHIP_ROOT}/src/platform/nxp/common/factory_data/legacy/FactoryDataProvider.cpp
     )
+    if (CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION)
+        target_sources(app PRIVATE
+            ${NXP_MATTER_SUPPORT_DIR}/gn_build/rt_sdk/sdk_hook/els_pkc/ELSFactoryData.c
+        )
+        target_include_directories(app PRIVATE
+            ${NXP_MATTER_SUPPORT_DIR}/gn_build/rt_sdk/sdk_hook/els_pkc
+        )
+    endif()
 endif()
 
 chip_configure_data_model(app

@@ -7,12 +7,14 @@
 #pragma mark - Private Cluster IDs
 
 typedef NS_ENUM(uint32_t, MTRPrivateClusterIDType) {
-    MTRPrivateClusterIDTypeReserved MTR_NEWLY_AVAILABLE = 0xFFFFFFFF,
+    MTRPrivateClusterIDTypeReserved MTR_PROVISIONALLY_AVAILABLE = 0xFFFFFFFF,
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
 {{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
     MTRPrivateClusterIDType{{>cluster}}ID {{availability (asUpperCamelCase label preserveAcronyms=true) minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" isForIds=true deprecationMessage=(concat "The " (asUpperCamelCase label preserveAcronyms=true) " cluster will be removed")}} = {{asMEI manufacturerCode code}},
+#endif
 {{/if}}
 {{/if}}
 {{/zcl_clusters}}
@@ -21,7 +23,7 @@ typedef NS_ENUM(uint32_t, MTRPrivateClusterIDType) {
 #pragma mark - Private Attribute IDs
 
 typedef NS_ENUM(uint32_t, MTRPrivateAttributeIDType) {
-    MTRPrivateAttributeIDTypeReserved MTR_NEWLY_AVAILABLE = 0xFFFFFFFF,
+    MTRPrivateAttributeIDTypeReserved MTR_PROVISIONALLY_AVAILABLE = 0xFFFFFFFF,
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#*inline "attributeIDs"}}
@@ -36,7 +38,9 @@ typedef NS_ENUM(uint32_t, MTRPrivateAttributeIDType) {
 {{/zcl_attributes_server}}
 {{/inline}}
 
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 {{> attributeIDs clusterName=label}}
+#endif
 {{/if}}
 {{/zcl_clusters}}
 {{#zcl_clusters}}
@@ -55,7 +59,9 @@ typedef NS_ENUM(uint32_t, MTRPrivateAttributeIDType) {
 {{/zcl_attributes_server}}
 {{/inline}}
 
+#if MTR_INCLUDE_CLUSTER_EXTENSION_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 {{> attributeIDs clusterName=label}}
+#endif
 {{/if}}
 {{/zcl_clusters}}
 };
@@ -63,7 +69,7 @@ typedef NS_ENUM(uint32_t, MTRPrivateAttributeIDType) {
 #pragma mark - Private Command IDs
 
 typedef NS_ENUM(uint32_t, MTRPrivateCommandIDType) {
-    MTRPrivateCommandIDTypeReserved MTR_NEWLY_AVAILABLE = 0xFFFFFFFF,
+    MTRPrivateCommandIDTypeReserved MTR_PROVISIONALLY_AVAILABLE = 0xFFFFFFFF,
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#*inline "commandIDs"}}
@@ -76,7 +82,9 @@ typedef NS_ENUM(uint32_t, MTRPrivateCommandIDType) {
 {{/zcl_commands}}
 {{/inline}}
 
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 {{> commandIDs clusterName=label}}
+#endif
 {{/if}}
 {{/zcl_clusters}}
 {{#zcl_clusters}}
@@ -93,7 +101,9 @@ typedef NS_ENUM(uint32_t, MTRPrivateCommandIDType) {
 {{/zcl_commands}}
 {{/inline}}
 
+#if MTR_INCLUDE_CLUSTER_EXTENSION_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 {{> commandIDs clusterName=label}}
+#endif
 {{/if}}
 {{/zcl_clusters}}
 };
@@ -101,7 +111,7 @@ typedef NS_ENUM(uint32_t, MTRPrivateCommandIDType) {
 #pragma mark - Private Event IDs
 
 typedef NS_ENUM(uint32_t, MTRPrivateEventIDType) {
-    MTRPrivateEventIDTypeReserved MTR_NEWLY_AVAILABLE = 0xFFFFFFFF,
+    MTRPrivateEventIDTypeReserved MTR_PROVISIONALLY_AVAILABLE = 0xFFFFFFFF,
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#*inline "eventIDs"}}
@@ -114,7 +124,9 @@ typedef NS_ENUM(uint32_t, MTRPrivateEventIDType) {
 {{/zcl_events}}
 {{/inline}}
 
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 {{> eventIDs clusterName=label}}
+#endif
 {{/if}}
 {{/zcl_clusters}}
 {{#zcl_clusters}}
@@ -131,7 +143,9 @@ typedef NS_ENUM(uint32_t, MTRPrivateEventIDType) {
 {{/zcl_events}}
 {{/inline}}
 
+#if MTR_INCLUDE_CLUSTER_EXTENSION_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 {{> eventIDs clusterName=label}}
+#endif
 {{/if}}
 {{/zcl_clusters}}
 };

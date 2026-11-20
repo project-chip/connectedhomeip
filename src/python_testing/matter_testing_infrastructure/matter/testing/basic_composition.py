@@ -26,7 +26,7 @@ import typing
 from dataclasses import dataclass
 from importlib.resources.abc import Traversable
 from pprint import pformat, pprint
-from typing import Any, Optional
+from typing import Any
 
 from mobly import asserts
 
@@ -36,11 +36,12 @@ from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import AttributeCache, ValueDecodeFailure
 from matter.MatterTlvJson import TLVJsonConverter
 from matter.testing.conformance import ConformanceException
+from matter.testing.json_dump_to_html import generate_html_from_dump_dict
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import ProblemNotice
-from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlCluster, XmlDeviceType, build_xml_clusters,
-                                         build_xml_device_types, dm_from_spec_version)
+from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlCluster, XmlDeviceType, XmlNamespace, build_xml_clusters,
+                                         build_xml_device_types, build_xml_namespaces, dm_from_spec_version)
 from matter.tlv import uint
 
 LOGGER = logging.getLogger(__name__)
@@ -142,6 +143,8 @@ def JsonToMatterTlv(json_filename: str) -> AttributeCache:
 
 
 class BasicCompositionTests(MatterBaseTest):
+    # Disabled because these tests can run over PASE
+    disable_wildcard_subscription = True
     # These attributes are initialized/provided by the inheriting test class (MatterBaseTest)
     # or its setup process. Providing type hints here for mypy.
     default_controller: ChipDeviceController
@@ -153,9 +156,10 @@ class BasicCompositionTests(MatterBaseTest):
     endpoints_tlv: dict[int, Any]  # Wildcard read result (raw TLV)
     xml_clusters: dict[uint, XmlCluster]
     xml_device_types: dict[int, XmlDeviceType]
+    xml_namespaces: dict[int, XmlNamespace]
 
-    def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]) -> tuple[str, str]:
-        """ Dumps a json and a txt file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
+    def dump_wildcard(self, dump_device_composition_path: str | None) -> tuple[str, str]:
+        """ Dumps a json, txt, and html file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
             Returns the json and txt as strings.
         """
         node_dump_dict = {endpoint_id: MatterTlvToJson(self.endpoints_tlv[endpoint_id]) for endpoint_id in self.endpoints_tlv}
@@ -167,6 +171,7 @@ class BasicCompositionTests(MatterBaseTest):
                 json.dump(node_dump_dict, outfile, indent=2)
             with open(pathlib.Path(dump_device_composition_path).with_suffix(".txt"), "w+") as outfile:
                 pprint(self.endpoints, outfile, indent=1, width=200, compact=True)
+            generate_html_from_dump_dict(node_dump_dict, pathlib.Path(dump_device_composition_path).with_suffix(".html"))
         return (json_dump_string, pformat(self.endpoints, indent=1, width=200, compact=True))
 
     async def setup_class_helper(self, allow_pase: bool = True):
@@ -180,13 +185,17 @@ class BasicCompositionTests(MatterBaseTest):
             LOGGER.info("###########################################################")
 
         if self.test_from_file:
+            # File-mode runs have no DUT: skip the pre-test DUT-state capture used by
+            # teardown cleanup and the background wildcard subscription, both gated on
+            # requires_dut in setup_test.
+            self.requires_dut = False
             cache = JsonToMatterTlv(self.test_from_file)
             self.endpoints = cache.GetUpdatedAttributeCache()
             self.endpoints_tlv = cache.attributeTLVCache
             log_test_start()
             return
 
-        dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
+        dump_device_composition_path: str | None = self.user_params.get("dump_device_composition_path", None)
 
         node_id = self.dut_node_id
 
@@ -238,7 +247,7 @@ class BasicCompositionTests(MatterBaseTest):
             return "<unknown_test>"
         return frame.f_code.co_name
 
-    def fail_current_test(self, msg: Optional[str] = None) -> typing.NoReturn:  # type: ignore[misc]
+    def fail_current_test(self, msg: str | None = None) -> typing.NoReturn:  # type: ignore[misc]
         if not msg:
             # Without a message, just log the last problem seen
             asserts.fail(msg=self.problems[-1].problem)
@@ -274,4 +283,6 @@ class BasicCompositionTests(MatterBaseTest):
         LOGGER.info("----------------------------------------------------------------------------------")
         self.xml_clusters, self.problems = build_xml_clusters(dm, errata_path=errata_path)
         self.xml_device_types, problems = build_xml_device_types(dm)
+        self.problems.extend(problems)
+        self.xml_namespaces, problems = build_xml_namespaces(dm)
         self.problems.extend(problems)

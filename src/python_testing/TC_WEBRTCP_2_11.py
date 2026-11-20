@@ -45,20 +45,20 @@ from test_plan_support import commission_if_required
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import Objects, WebRTCTransportProvider
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 log = logging.getLogger(__name__)
 
 
-class TC_WEBRTCP_2_11(MatterBaseTest, WEBRTCPTestBase):
+class TC_WEBRTCP_2_11(MatterTestCommissionedDevice, WEBRTCPTestBase):
     def desc_TC_WEBRTCP_2_11(self) -> str:
         return "[TC-WEBRTCP-2.11] Validate deferred Offer command timing"
 
     def steps_TC_WEBRTCP_2_11(self) -> list[TestStep]:
         return [
-            TestStep("precondition-1", commission_if_required(), is_commissioning=True),
+            TestStep("precondition-1", commission_if_required()),
             TestStep("precondition-2", "Confirm no active WebRTC sessions exist in DUT"),
             TestStep(
                 1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",

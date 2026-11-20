@@ -20,7 +20,8 @@ import io
 import json
 import pathlib
 import sys
-from typing import IO, Any, Callable, Mapping, Optional, Protocol, Sequence, TypeAlias
+from collections.abc import Callable, Mapping, Sequence
+from typing import IO, Any, Protocol, TypeAlias
 
 import cxxfilt  # type: ignore
 import memdf.df
@@ -161,7 +162,7 @@ OutputOption: TypeAlias = IO | str | None
 @contextlib.contextmanager
 def open_output(config: Config,
                 output: OutputOption = None,
-                suffix: Optional[str] = None):
+                suffix: str | None = None):
     if isinstance(output, io.IOBase):
         yield output
         return
@@ -360,8 +361,8 @@ class Writer:
     def __init__(self,
                  group: Callable,
                  single: Callable,
-                 defaults: Optional[dict] = None,
-                 overrides: Optional[dict] = None):
+                 defaults: dict | None = None,
+                 overrides: dict | None = None):
         self.group = group
         self.single = single
         self.defaults = defaults or {}
@@ -395,8 +396,8 @@ class Writer:
 
 class MarkdownWriter(Writer):
     def __init__(self,
-                 defaults: Optional[dict] = None,
-                 overrides: Optional[dict] = None):
+                 defaults: dict | None = None,
+                 overrides: dict | None = None):
         d = {'index': False}
         d.update(defaults or {})
         super().__init__(write_one, write_markdown, d, overrides)
@@ -404,16 +405,16 @@ class MarkdownWriter(Writer):
 
 class JsonWriter(Writer):
     def __init__(self,
-                 defaults: Optional[dict] = None,
-                 overrides: Optional[dict] = None):
+                 defaults: dict | None = None,
+                 overrides: dict | None = None):
         super().__init__(write_jsons, write_json, defaults, overrides)
         self.overrides['hierify'] = False
 
 
 class CsvWriter(Writer):
     def __init__(self,
-                 defaults: Optional[dict] = None,
-                 overrides: Optional[dict] = None):
+                 defaults: dict | None = None,
+                 overrides: dict | None = None):
         d = {'index': False}
         d.update(defaults or {})
         super().__init__(write_many, write_csv, d, overrides)
@@ -488,7 +489,7 @@ OUTPUT_CONFIG: ConfigDescription = {
 def write_dfs(config: Config,
               frames: DFs,
               output: OutputOption = None,
-              method: Optional[str] = None,
+              method: str | None = None,
               **kwargs) -> None:
     """Write a group of memory usage data frames."""
     kwargs['method'] = method or config['output.format']
@@ -498,7 +499,7 @@ def write_dfs(config: Config,
 def write_df(config: Config,
              frame: DF,
              output: OutputOption = None,
-             method: Optional[str] = None,
+             method: str | None = None,
              **kwargs) -> None:
     """Write a memory usage data frame."""
     kwargs['method'] = method or config['output.format']

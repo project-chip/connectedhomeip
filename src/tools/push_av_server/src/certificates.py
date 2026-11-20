@@ -9,7 +9,7 @@ import random
 import string
 import sys
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -89,14 +89,15 @@ class CAHierarchy:
                 ),
             ]
         )
+        now = datetime.datetime.now(datetime.UTC)
         self.root_cert = (
             x509.CertificateBuilder()
             .subject_name(root_cert_subject)
             .issuer_name(root_cert_subject)
             .public_key(self.root_key.public_key())
             .serial_number(x509.random_serial_number())
-            .not_valid_before(datetime.datetime.now(datetime.UTC))
-            .not_valid_after(datetime.datetime.now(datetime.UTC) + self.default_ca_duration)
+            .not_valid_before(now - datetime.timedelta(days=1))
+            .not_valid_after(now + self.default_ca_duration)
             .add_extension(
                 # We make it so that our root can only issue leaf certificates, no intermediate here.
                 x509.BasicConstraints(ca=True, path_length=0), critical=True
@@ -129,9 +130,9 @@ class CAHierarchy:
         self,
         name: str,
         cert: x509.Certificate,
-        key: Optional[CertificateIssuerPrivateKeyTypes],
+        key: CertificateIssuerPrivateKeyTypes | None,
         bundle_root: bool,
-    ) -> tuple[Optional[Path], Path]:
+    ) -> tuple[Path | None, Path]:
         """
         Private method that help with saving certificate and key to the hierarchy folder.
         This tool isn't meant to be used in production, but instead to help with development
@@ -164,7 +165,7 @@ class CAHierarchy:
         dns: str,
         public_key: CertificatePublicKeyTypes,
         duration: datetime.timedelta,
-        ip_address: Optional[str] = None
+        ip_address: str | None = None
     ) -> x509.Certificate:
         """
         Generate and sign a certificate.
@@ -184,14 +185,15 @@ class CAHierarchy:
         extended_key_usage = [ExtendedKeyUsageOID.CLIENT_AUTH] if self.kind == "client" else [
             ExtendedKeyUsageOID.SERVER_AUTH]
 
+        now = datetime.datetime.now(datetime.UTC)
         builder = (x509.CertificateBuilder()
                    .subject_name(subject)
                    .issuer_name(self.root_cert.subject)
                    .public_key(public_key)
                    .serial_number(x509.random_serial_number())
-                   .not_valid_before(datetime.datetime.now(datetime.UTC))
+                   .not_valid_before(now - datetime.timedelta(days=1))
                    .not_valid_after(
-            datetime.datetime.now(datetime.UTC) + duration
+            now + duration
         )
             .add_extension(
                 x509.BasicConstraints(ca=False, path_length=None),
@@ -264,7 +266,7 @@ class CAHierarchy:
     def gen_keypair(self, dns: str,
                     override=False,
                     duration: datetime.timedelta = datetime.timedelta(hours=1),
-                    ip_address: Optional[str] = None) -> tuple[Path, Path, bool]:
+                    ip_address: str | None = None) -> tuple[Path, Path, bool]:
         """
         Generate a private key as well as the associated certificate signed by this CA
         hierarchy. Returns the path to the key, cert, and whether it was reused or not.

@@ -22,7 +22,7 @@ CONFIG_CHIP_PW_RPC=y
 
 # Add support for C++17 to build Pigweed components
 CONFIG_STD_CPP14=n
-CONFIG_STD_CPP17=y
+CONFIG_STD_CPP20=y
 
 # Add support for Zephyr console component to use it for Pigweed console purposes
 CONFIG_CONSOLE_SUBSYS=y

@@ -17,10 +17,10 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     factory-reset: true
 #     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -37,7 +37,7 @@ import matter.case_capture as case_capture
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body, pics
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 # Matter spec constants (Section 4.4 / 4.13.2)
@@ -49,7 +49,7 @@ GENERAL_CODE_SUCCESS = 0
 PROTOCOL_CODE_SESSION_ESTABLISHMENT_SUCCESS = 0
 
 
-class TC_SC_3_1(MatterBaseTest):
+class TC_SC_3_1(MatterTestCommissionedDevice):
 
     @pics('MCORE.ROLE.COMMISSIONEE')
     @async_test_body
@@ -58,7 +58,7 @@ class TC_SC_3_1(MatterBaseTest):
         self.th = self.default_controller
         case_capture.SetObserver(self.th)
 
-        self.step("1a", "TH and the DUT are commissioned.", is_commissioning=True)
+        self.step("1a", "TH and the DUT are commissioned.")
         try:
             await self.th.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False)
         except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Can not use assert_raises because error is not expected
@@ -82,8 +82,8 @@ class TC_SC_3_1(MatterBaseTest):
 
         self.step("1d",
                   "Initiator constructs and sends a TLV-encoded Sigma1 to the Responder. "
-                  "Verify I=1, S=0, DSIZ=0, sigma-1-struct TLV, Session Type=0 (Unicast), Protocol ID=0x0000 (SECURE_CHANNEL), Opcode=0x30 (CASE Sigma1). "
-                  "NOTE: This step is done automatically and verified by successful completion of the read in step 1c.")
+                  "Sending Sigma1 is performed automatically as part of the CASE handshake and is not "
+                  "independently captured; its success is confirmed by the successful completion of the read in step 1c.")
 
         self.step(2,
                   "Upon receiving Sigma1, the Responder generates Sigma2.",
@@ -121,9 +121,8 @@ class TC_SC_3_1(MatterBaseTest):
 
         self.step(5,
                   "Initiator constructs and sends a TLV-encoded Sigma3 message. "
-                  "Verify I=1, S=0, DSIZ=0, sigma-3-struct TLV, Session Type=0 (Unicast), "
-                  "Protocol ID=0x0000 (SECURE_CHANNEL), Opcode=0x32 (CASE Sigma3). "
-                  " NOTE: This step is done automatically and verified by successful completion of the read in step 1c.")
+                  "Sending Sigma3 is performed automatically as part of the CASE handshake and is not "
+                  "independently captured; its success is confirmed by the successful completion of the read in step 1c.")
 
         self.step(6,
                   "Session establishment completes.",

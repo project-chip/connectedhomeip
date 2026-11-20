@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import parse_qs
 
 from route_configuration import Route
 
 
-def match_route(routing: list[Route], method: str, path: str, query: Optional[dict[str, Any] | str] = None) -> Optional[Route]:
+def match_route(routing: list[Route], method: str, path: str, query: dict[str, Any] | str | None = None) -> Route | None:
     """
     Finds the best matching route configuration for an incoming HTTP request.
 

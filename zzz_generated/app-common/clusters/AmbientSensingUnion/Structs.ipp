@@ -29,14 +29,32 @@ namespace Clusters {
 namespace AmbientSensingUnion {
 namespace Structs {
 
-namespace UnionContributorStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+namespace ContributorStatusChangeStruct {
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
     encoder.Encode(to_underlying(Fields::kContributorNodeID), contributorNodeID);
     encoder.Encode(to_underlying(Fields::kContributorEndpointID), contributorEndpointID);
     encoder.Encode(to_underlying(Fields::kContributorName), contributorName);
-    encoder.Encode(to_underlying(Fields::kContributorHealth), contributorHealth);
+    encoder.Encode(to_underlying(Fields::kPreviousContributorStatus), previousContributorStatus);
+    encoder.Encode(to_underlying(Fields::kCurrentContributorStatus), currentContributorStatus);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
     return encoder.Finalize();
 }
 
@@ -62,9 +80,82 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, contributorName);
         }
-        else if (__context_tag == to_underlying(Fields::kContributorHealth))
+        else if (__context_tag == to_underlying(Fields::kPreviousContributorStatus))
         {
-            err = DataModel::Decode(reader, contributorHealth);
+            err = DataModel::Decode(reader, previousContributorStatus);
+        }
+        else if (__context_tag == to_underlying(Fields::kCurrentContributorStatus))
+        {
+            err = DataModel::Decode(reader, currentContributorStatus);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace ContributorStatusChangeStruct
+
+namespace UnionContributorStruct {
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
+    encoder.Encode(to_underlying(Fields::kContributorNodeID), contributorNodeID);
+    encoder.Encode(to_underlying(Fields::kContributorEndpointID), contributorEndpointID);
+    encoder.Encode(to_underlying(Fields::kContributorName), contributorName);
+    encoder.Encode(to_underlying(Fields::kContributorStatus), contributorStatus);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kContributorNodeID))
+        {
+            err = DataModel::Decode(reader, contributorNodeID);
+        }
+        else if (__context_tag == to_underlying(Fields::kContributorEndpointID))
+        {
+            err = DataModel::Decode(reader, contributorEndpointID);
+        }
+        else if (__context_tag == to_underlying(Fields::kContributorName))
+        {
+            err = DataModel::Decode(reader, contributorName);
+        }
+        else if (__context_tag == to_underlying(Fields::kContributorStatus))
+        {
+            err = DataModel::Decode(reader, contributorStatus);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
         }
 
         ReturnErrorOnFailure(err);

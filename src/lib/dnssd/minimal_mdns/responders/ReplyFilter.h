@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <lib/dnssd/minimal_mdns/core/Constants.h>
-#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/wire/Constants.h>
+#include <lib/dnssd/wire/QName.h>
 
 namespace mdns {
 namespace Minimal {
@@ -30,7 +30,7 @@ public:
     virtual ~ReplyFilter() {}
 
     /// Returns true if specified answer should be sent back as a reply
-    virtual bool Accept(QType qType, QClass qClass, FullQName qname) = 0;
+    virtual bool Accept(chip::Dnssd::QType qType, chip::Dnssd::QClass qClass, chip::Dnssd::FullQName qname) = 0;
 };
 
 } // namespace Minimal

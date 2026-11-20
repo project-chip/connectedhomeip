@@ -95,9 +95,11 @@ public:
     /**
      * @brief Initializes the ClosureDimensionEndpoint instance.
      *
+     * @param conformance The conformance for the cluster.
+     * @param clusterInitParameters The init parameters for the cluster.
      * @return CHIP_ERROR indicating the result of the initialization.
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(ClusterConformance & conformance, ClusterInitParameters & clusterInitParameters);
 
     /**
      * @brief Retrieves the delegate associated with this Closure Dimension endpoint.

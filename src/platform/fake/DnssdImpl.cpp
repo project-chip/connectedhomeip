@@ -17,6 +17,11 @@
 #include "DnssdImpl.h"
 #include "lib/dnssd/platform/Dnssd.h"
 
+#include <algorithm>
+
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/CodeUtils.h>
+
 namespace chip {
 namespace Dnssd {
 
@@ -26,6 +31,10 @@ static constexpr size_t kMaxExpectedCalls = 10;
 size_t numExpectedCalls                   = 0;
 ExpectedCall expectedCalls[kMaxExpectedCalls];
 bool foundCall[kMaxExpectedCalls] = {};
+
+static constexpr size_t kMaxResolvedAddresses = 16;
+size_t numResolvedAddresses                   = 0;
+Inet::IPAddress resolvedAddresses[kMaxResolvedAddresses];
 } // namespace
 
 CHIP_ERROR AddExpectedCall(const ExpectedCall & call)
@@ -42,9 +51,19 @@ CHIP_ERROR AddExpectedCall(const ExpectedCall & call)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR SetResolvedAddresses(Span<const Inet::IPAddress> addresses)
+{
+    VerifyOrReturnError(!addresses.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(addresses.size() <= kMaxResolvedAddresses, CHIP_ERROR_NO_MEMORY);
+    std::copy(addresses.begin(), addresses.end(), resolvedAddresses);
+    numResolvedAddresses = addresses.size();
+    return CHIP_NO_ERROR;
+}
+
 void Reset()
 {
-    numExpectedCalls = 0;
+    numExpectedCalls     = 0;
+    numResolvedAddresses = 0;
     for (auto & found : foundCall)
     {
         found = false;
@@ -129,7 +148,21 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
                             void * context)
 
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(test::numResolvedAddresses != 0, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    DnssdService result   = *browseResult;
+    result.mInterface     = interface;
+    result.mPort          = CHIP_PORT;
+    result.mTextEntries   = nullptr;
+    result.mTextEntrySize = 0;
+    result.mSubTypes      = nullptr;
+    result.mSubTypeSize   = 0;
+
+    // The callback may reorder the addresses, so give it a copy.
+    Inet::IPAddress addresses[test::kMaxResolvedAddresses];
+    std::copy(test::resolvedAddresses, test::resolvedAddresses + test::numResolvedAddresses, addresses);
+    callback(context, &result, Span<Inet::IPAddress>(addresses, test::numResolvedAddresses), CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
 }
 
 void ChipDnssdResolveNoLongerNeeded(const char * instanceName) {}

@@ -36,7 +36,8 @@ using namespace chip::app::Clusters;
     defined(MATTER_DM_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
     defined(MATTER_DM_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
     defined(MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                 \
-    defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
+    defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
+    defined(MATTER_DM_PLUGIN_SMOKE_CONCENTRATION_MEASUREMENT_SERVER)
 #include <app/clusters/concentration-measurement-server/concentration-measurement-server.h>
 using namespace chip::app::Clusters::ConcentrationMeasurement;
 
@@ -52,6 +53,7 @@ static std::map<int, Instance<true, true, true, true, true, true> *> gPm10Concen
 static std::map<int, Instance<true, true, true, true, true, true> *> gRadonConcentrationMeasurementInstance{};
 static std::map<int, Instance<true, true, true, true, true, true> *>
     gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance{};
+static std::map<int, Instance<true, true, true, true, true, true> *> gSmokeConcentrationMeasurementInstance{};
 
 template <bool NumericMeasurementEnabled, bool LevelIndicationEnabled, bool MediumLevelEnabled, bool CriticalLevelEnabled,
           bool PeakMeasurementEnabled, bool AverageMeasurementEnabled>
@@ -157,6 +159,11 @@ Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(ch
             gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance,
             TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint, clusterId,
             attributeMetadata, buffer);
+        break;
+    case Clusters::SmokeConcentrationMeasurement::Id:
+        ret = chefConcentrationMeasurementWriteCallback<true, true, true, true, true, true>(
+            gSmokeConcentrationMeasurementInstance, SmokeConcentrationMeasurement::Attributes::MeasuredValue::Id, endpoint,
+            clusterId, attributeMetadata, buffer);
         break;
 
     default:
@@ -405,5 +412,25 @@ void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterInitCall
         ->SetAverageMeasuredValueWindow(3600);
     TEMPORARY_RETURN_IGNORED gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(
         LevelValueEnum::kLow);
+}
+#endif
+
+#ifdef MATTER_DM_PLUGIN_SMOKE_CONCENTRATION_MEASUREMENT_SERVER
+void emberAfSmokeConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
+{
+    gSmokeConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
+        EndpointId(endpoint), SmokeConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPcft);
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMaxMeasuredValue(
+        MakeNullable(100.0f));
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetUncertainty(1.0f);
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance[EndpointId(endpoint)]->Init();
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetPeakMeasuredValueWindow(3600);
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValue(
+        MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetAverageMeasuredValueWindow(3600);
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance[EndpointId(endpoint)]->SetLevelValue(LevelValueEnum::kLow);
 }
 #endif

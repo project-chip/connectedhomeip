@@ -150,11 +150,8 @@ public:
         FanModeSequenceEnum defaultFanModeSequence =
             features.Has(FanControl::Feature::kAuto) ? FanModeSequenceEnum::kOffLowHighAuto : FanModeSequenceEnum::kOffLowHigh;
 
-        FanModeSequenceEnum fanModeSequence = defaultFanModeSequence;
-        if (FanModeSequence::GetDefault(endpointId, &fanModeSequence) != Status::Success)
-        {
-            fanModeSequence = defaultFanModeSequence;
-        }
+        FanModeSequenceEnum fanModeSequence{};
+        FanModeSequence::GetDefaultOr(endpointId, fanModeSequence, defaultFanModeSequence);
 
         if (EnsureKnownEnumValue(fanModeSequence) == FanModeSequenceEnum::kUnknownEnumValue)
         {
@@ -165,29 +162,23 @@ public:
 
         if (features.Has(FanControl::Feature::kMultiSpeed))
         {
-            uint8_t speedMax = 100;
-            if (SpeedMax::GetDefault(endpointId, &speedMax) != Status::Success)
-            {
-                speedMax = 100;
-            }
+            uint8_t speedMax{};
+            SpeedMax::GetDefaultOr(endpointId, speedMax, 100);
             config.WithSpeedMax(speedMax);
         }
         if (features.Has(FanControl::Feature::kRocking))
         {
+            // RockSupport is mandatory with RCK and the spec requires at least one bit to be set, so the
+            // value has to come from the endpoint configuration: there is no capability to fall back to.
             BitMask<RockBitmap> rockSupport;
-            if (RockSupport::GetDefault(endpointId, &rockSupport) != Status::Success)
-            {
-                rockSupport = BitMask<RockBitmap>(RockBitmap::kRockLeftRight, RockBitmap::kRockUpDown, RockBitmap::kRockRound);
-            }
+            VerifyOrDie(RockSupport::GetDefault(endpointId, rockSupport) == Status::Success && rockSupport.HasAny());
             config.WithRockSupport(rockSupport);
         }
         if (features.Has(FanControl::Feature::kWind))
         {
+            // WindSupport is mandatory with WND and the spec requires at least one bit to be set.
             BitMask<WindBitmap> windSupport;
-            if (WindSupport::GetDefault(endpointId, &windSupport) != Status::Success)
-            {
-                windSupport = BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind);
-            }
+            VerifyOrDie(WindSupport::GetDefault(endpointId, windSupport) == Status::Success && windSupport.HasAny());
             config.WithWindSupport(windSupport);
         }
         if (features.Has(FanControl::Feature::kAirflowDirection))

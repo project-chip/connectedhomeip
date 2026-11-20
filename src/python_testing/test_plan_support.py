@@ -14,17 +14,16 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-import typing
 
 
-def read_attribute(attribute: str, cluster: typing.Optional[str] = None):
+def read_attribute(attribute: str, cluster: str | None = None):
     attr = f'reads the {attribute} attribute'
     if cluster:
         return f'{attr} from {cluster}'
     return attr
 
 
-def send_command(command: str, cluster: typing.Optional[str] = None):
+def send_command(command: str, cluster: str | None = None):
     cmd = f"sends the {command} command"
     if cluster:
         return f'{cmd} from {cluster}'
@@ -47,7 +46,7 @@ def verify_success() -> str:
 # -----------------------
 
 
-def commission_if_required(controller: typing.Optional[str] = None) -> str:
+def commission_if_required(controller: str | None = None) -> str:
     controller_str = f'to {controller} ' if controller is not None else ''
     return f'Commission DUT {controller_str}if not already done'
 

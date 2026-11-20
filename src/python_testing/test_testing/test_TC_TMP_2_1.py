@@ -17,7 +17,6 @@
 #
 
 import sys
-import typing
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -29,8 +28,8 @@ from matter.testing.runner import MockTestRunner
 
 @dataclass
 class TestSpec:
-    min: typing.Optional[int]
-    max: typing.Optional[int]
+    min: int | None
+    max: int | None
     measured: int
     tolerance: int
     expect_pass: bool

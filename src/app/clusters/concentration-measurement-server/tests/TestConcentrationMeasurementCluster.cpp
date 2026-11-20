@@ -26,7 +26,10 @@
 #include <clusters/CarbonDioxideConcentrationMeasurement/AttributeIds.h>
 #include <clusters/CarbonDioxideConcentrationMeasurement/Enums.h>
 #include <clusters/CarbonDioxideConcentrationMeasurement/Metadata.h>
+#include <clusters/SmokeConcentrationMeasurement/ClusterId.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <algorithm>
 
 using namespace chip;
 using namespace chip::app;
@@ -55,6 +58,20 @@ ConcentrationMeasurementCluster::Config MakeNumericConfig(BitFlags<Feature> extr
         DataModel::MakeNullable(kTestMin),
         DataModel::MakeNullable(kTestMax),
         kTestUncertainty,
+    };
+}
+
+// Numeric config with caller-supplied bounds, used to exercise IsInRange
+// (via SetMeasuredValue) for null / non-null combinations of Min/MaxMeasuredValue.
+ConcentrationMeasurementCluster::Config MakeBoundsConfig(DataModel::Nullable<float> minV, DataModel::Nullable<float> maxV)
+{
+    return {
+        kTestClusterId,
+        BitFlags<Feature>(Feature::kNumericMeasurement),
+        MeasurementMediumEnum::kAir,
+        MeasurementUnitEnum::kPpm,
+        minV,
+        maxV,
     };
 }
 
@@ -202,16 +219,64 @@ TEST_F(TestNumericMeasurementCluster, SetMeasuredValue_RangeValidation)
     // In-range: strictly between min (0) and max (100).
     EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable(50.0f)), CHIP_NO_ERROR);
 
-    // Boundary — strict comparison, so exactly min/max is out of range.
-    EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable(kTestMin)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable(kTestMax)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    // Boundary — bounds are inclusive per the spec's "MinMeasuredValue to MaxMeasuredValue"
+    // range, so a value exactly at min or max is in range.
+    EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable(kTestMin)), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable(kTestMax)), CHIP_NO_ERROR);
 
-    // Out of range.
+    // Out of range (strictly below min / above max).
     EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable(-1.0f)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable(200.0f)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     // Null always passes regardless of configured bounds.
     EXPECT_EQ(cluster.SetMeasuredValue(DataModel::Nullable<float>()), CHIP_NO_ERROR);
+}
+
+// IsInRange (exercised via SetMeasuredValue) — null bounds mean "unbounded" on that side.
+
+TEST_F(TestNumericMeasurementCluster, SetMeasuredValue_BothBoundsNull_AlwaysInRange)
+{
+    ConcentrationMeasurementCluster unbounded(kTestEndpointId,
+                                              MakeBoundsConfig(DataModel::Nullable<float>(), DataModel::Nullable<float>()));
+    ClusterTester localTester(unbounded);
+    ASSERT_EQ(unbounded.Startup(localTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // With no bounds defined, any finite value (including large negatives/positives) is accepted.
+    EXPECT_EQ(unbounded.SetMeasuredValue(DataModel::MakeNullable(-1000.0f)), CHIP_NO_ERROR);
+    EXPECT_EQ(unbounded.SetMeasuredValue(DataModel::MakeNullable(0.0f)), CHIP_NO_ERROR);
+    EXPECT_EQ(unbounded.SetMeasuredValue(DataModel::MakeNullable(1000000.0f)), CHIP_NO_ERROR);
+    EXPECT_EQ(unbounded.SetMeasuredValue(DataModel::Nullable<float>()), CHIP_NO_ERROR);
+
+    unbounded.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestNumericMeasurementCluster, SetMeasuredValue_MaxNull_OnlyMinEnforced)
+{
+    // This mirrors the default Config (min = 0.0, max = null): every write used to fail.
+    ConcentrationMeasurementCluster minOnly(kTestEndpointId,
+                                            MakeBoundsConfig(DataModel::MakeNullable(0.0f), DataModel::Nullable<float>()));
+    ClusterTester localTester(minOnly);
+    ASSERT_EQ(minOnly.Startup(localTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(minOnly.SetMeasuredValue(DataModel::MakeNullable(0.0f)), CHIP_NO_ERROR);   // at min (inclusive)
+    EXPECT_EQ(minOnly.SetMeasuredValue(DataModel::MakeNullable(500.0f)), CHIP_NO_ERROR); // above min, no max
+    EXPECT_EQ(minOnly.SetMeasuredValue(DataModel::MakeNullable(-0.1f)), CHIP_IM_GLOBAL_STATUS(ConstraintError)); // below min
+
+    minOnly.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestNumericMeasurementCluster, SetMeasuredValue_MinNull_OnlyMaxEnforced)
+{
+    ConcentrationMeasurementCluster maxOnly(kTestEndpointId,
+                                            MakeBoundsConfig(DataModel::Nullable<float>(), DataModel::MakeNullable(100.0f)));
+    ClusterTester localTester(maxOnly);
+    ASSERT_EQ(maxOnly.Startup(localTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(maxOnly.SetMeasuredValue(DataModel::MakeNullable(100.0f)), CHIP_NO_ERROR);  // at max (inclusive)
+    EXPECT_EQ(maxOnly.SetMeasuredValue(DataModel::MakeNullable(-500.0f)), CHIP_NO_ERROR); // below max, no min
+    EXPECT_EQ(maxOnly.SetMeasuredValue(DataModel::MakeNullable(100.1f)), CHIP_IM_GLOBAL_STATUS(ConstraintError)); // above max
+
+    maxOnly.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // SetPeakMeasuredValueWindow / SetAverageMeasuredValueWindow
@@ -311,4 +376,25 @@ TEST_F(TestNumericMeasurementCluster, FeatureImplication_PeakImpliesNumeric)
     EXPECT_TRUE((features & to_underlying(Feature::kNumericMeasurement)) != 0);
 
     peakCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestNumericMeasurementCluster, IncludesSmokeAndOpticalUnits)
+{
+    EXPECT_NE(std::find(AliasedClusters.begin(), AliasedClusters.end(), SmokeConcentrationMeasurement::Id), AliasedClusters.end());
+    EXPECT_EQ(AliasedClusters.size(), 11u);
+
+    ConcentrationMeasurementCluster::Config smokeConfig{
+        SmokeConcentrationMeasurement::Id, BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kLevelIndication),
+        MeasurementMediumEnum::kAir,       MeasurementUnitEnum::kPcft,
+        DataModel::MakeNullable(0.0f),     DataModel::MakeNullable(100.0f),
+    };
+    ConcentrationMeasurementCluster smokeCluster(kTestEndpointId, smokeConfig);
+    ClusterTester smokeTester(smokeCluster);
+    ASSERT_EQ(smokeCluster.Startup(smokeTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    MeasurementUnitEnum unit{};
+    ASSERT_EQ(smokeTester.ReadAttribute(Attributes::MeasurementUnit::Id, unit), CHIP_NO_ERROR);
+    EXPECT_EQ(unit, MeasurementUnitEnum::kPcft);
+
+    smokeCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

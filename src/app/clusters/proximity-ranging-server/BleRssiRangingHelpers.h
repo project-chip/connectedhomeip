@@ -21,6 +21,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/Span.h>
 
+#include <cstddef>
 #include <cstdint>
 
 namespace chip {
@@ -33,47 +34,87 @@ namespace BleRssi {
 /// equal this value. Platform adapters should re-roll on collision.
 inline constexpr uint64_t kInvalidBleDeviceId = 0;
 
+/// Length of the ObfuscatedBLEDeviceId field carried in the advertisement
+/// payload. An obfuscation function fills exactly this many bytes.
+inline constexpr size_t kBleObfuscatedIdLength = sizeof(Ble::ChipBLEProximityRangingIdentificationInfo::ObfuscatedBLEDeviceId);
+
+/**
+ * Function type to produce BLE RSSI ObfuscatedBLEDeviceId beacon field from a
+ * (BLEDeviceID, messageCounter, sessionKey) tuple.
+ *
+ * @param bleDeviceId     The BLEDeviceID to obfuscate.
+ * @param messageCounter  Beacon message counter mixed into the output.
+ * @param sessionKey      Per-session key.
+ * @param outObfuscatedId Output span of exactly kBleObfuscatedIdLength bytes.
+ *
+ * @return CHIP_NO_ERROR on success; an error otherwise (e.g.
+ *         CHIP_ERROR_INVALID_ARGUMENT for an empty key, or a crypto error).
+ */
+using ObfuscateBleDeviceIdFunction = CHIP_ERROR (*)(uint64_t bleDeviceId, uint16_t messageCounter, ByteSpan sessionKey,
+                                                    MutableByteSpan outObfuscatedId);
+
+/**
+ * Produces the ObfuscatedBLEDeviceId according to the Proximity Ranging cluster specification
+ * using HMAC-SHA256(sessionKey, BLEDeviceID (big-endian) || messageCounter (big-endian)).
+ *
+ * @return CHIP_NO_ERROR on success; CHIP_ERROR_INVALID_ARGUMENT if @p sessionKey
+ *         is empty; CHIP_ERROR_BUFFER_TOO_SMALL if @p outObfuscatedId is too small;
+ *         a crypto error if HMAC computation fails.
+ */
+CHIP_ERROR HmacObfuscateBleDeviceId(uint64_t bleDeviceId, uint16_t messageCounter, ByteSpan sessionKey,
+                                    MutableByteSpan outObfuscatedId);
+
+/**
+ * Produces raw BLEDeviceId in big-endian form and ignores @p sessionKey.
+ *
+ * @note This leaks the device identifier over air and MUST NOT be used in production; it exists
+ * for testing purposes only without requiring shared session key. Both ranging peers need to use this
+ * unsecure function when testing.
+ */
+CHIP_ERROR PlaintextObfuscateBleDeviceId(uint64_t bleDeviceId, uint16_t messageCounter, ByteSpan sessionKey,
+                                         MutableByteSpan outObfuscatedId);
+
 /**
  * Encode a BLEDeviceID into a Proximity Ranging BLE advertisement payload.
  *
  * Populates @p outPayload with the OpCode, message counter, Tx power, and
  * obfuscated BLEDeviceID fields per the Matter Proximity Ranging spec's
- * advertisement format.
- *
- * @note The current implementation encodes the BLEDeviceID in plain
- *       big-endian form in the first 8 bytes of the obfuscated field. The
- *       HMAC-based obfuscation step keyed on @p sessionKey is a TODO; until
- *       it lands, @p sessionKey is unused and may be empty.
+ * advertisement format. The BLEDeviceID is obfuscated by @p obfuscate, which
+ * defaults to the secure HMAC-SHA256 strategy.
  *
  * @param bleDeviceId    The local device's 64-bit BLEDeviceID.
  * @param messageCounter Monotonic counter for replay protection.
  * @param txPower        Transmit power in dBm reported in the advertisement.
- * @param sessionKey     Per-session HMAC key (unused until obfuscation is wired up).
+ * @param sessionKey     Per-session key passed through to @p obfuscate.
  * @param outPayload     Output. Initialised in-place; caller need not pre-init.
+ * @param obfuscate      Obfuscation strategy; defaults to HmacObfuscateBleDeviceId.
  *
- * @return CHIP_NO_ERROR on success.
+ * @return CHIP_NO_ERROR on success; whatever error @p obfuscate returns.
  */
 CHIP_ERROR EncodeBeaconPayload(uint64_t bleDeviceId, uint16_t messageCounter, int8_t txPower, ByteSpan sessionKey,
-                               Ble::ChipBLEProximityRangingIdentificationInfo & outPayload);
+                               Ble::ChipBLEProximityRangingIdentificationInfo & outPayload,
+                               ObfuscateBleDeviceIdFunction obfuscate = HmacObfuscateBleDeviceId);
 
 /**
  * Verify that a received BLE Proximity Ranging advertisement matches a
  * candidate BLEDeviceID.
  *
  * Used by adapters in BLE-Scanning role to test whether an observed beacon
- * was emitted by a peer whose BLEDeviceID is @p candidateBleDeviceId.
- *
- * @note Mirrors EncodeBeaconPayload - when HMAC obfuscation lands, this will
- *       compute the expected HMAC tag rather than comparing plain bytes.
+ * was emitted by a peer whose BLEDeviceID is @p candidateBleDeviceId. Mirrors
+ * EncodeBeaconPayload: it recomputes the expected obfuscated field with the
+ * same @p obfuscate strategy and constant-time compares it against the payload.
+ * The caller MUST pass the same strategy used to encode.
  *
  * @param payload              The decoded advertisement payload.
  * @param candidateBleDeviceId The BLEDeviceID to verify against.
- * @param sessionKey           Per-session HMAC key (unused until obfuscation is wired up).
+ * @param sessionKey           Per-session key passed through to @p obfuscate.
+ * @param obfuscate            Obfuscation strategy; defaults to HmacObfuscateBleDeviceId.
  *
- * @return CHIP_NO_ERROR on match, CHIP_ERROR_NOT_FOUND on mismatch.
+ * @return CHIP_NO_ERROR on match, CHIP_ERROR_NOT_FOUND on mismatch; whatever
+ *         error @p obfuscate returns if the expected field cannot be computed.
  */
 CHIP_ERROR DecodeBeaconPayload(const Ble::ChipBLEProximityRangingIdentificationInfo & payload, uint64_t candidateBleDeviceId,
-                               ByteSpan sessionKey);
+                               ByteSpan sessionKey, ObfuscateBleDeviceIdFunction obfuscate = HmacObfuscateBleDeviceId);
 
 /**
  * Generate a non-zero random 64-bit BLEDeviceID using the platform CSPRNG.

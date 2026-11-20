@@ -339,6 +339,10 @@
 #include <clusters/LowPower/Commands.h>
 #include <clusters/LowPower/Events.h>
 #include <clusters/LowPower/Structs.h>
+#include <clusters/MediaFileManagement/Attributes.h>
+#include <clusters/MediaFileManagement/Commands.h>
+#include <clusters/MediaFileManagement/Events.h>
+#include <clusters/MediaFileManagement/Structs.h>
 #include <clusters/MediaInput/Attributes.h>
 #include <clusters/MediaInput/Commands.h>
 #include <clusters/MediaInput/Events.h>
@@ -555,6 +559,10 @@
 #include <clusters/Thermostat/Commands.h>
 #include <clusters/Thermostat/Events.h>
 #include <clusters/Thermostat/Structs.h>
+#include <clusters/ThermostatMode/Attributes.h>
+#include <clusters/ThermostatMode/Commands.h>
+#include <clusters/ThermostatMode/Events.h>
+#include <clusters/ThermostatMode/Structs.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Attributes.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Commands.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Events.h>

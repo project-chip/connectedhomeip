@@ -1130,6 +1130,17 @@ constexpr uint8_t sOID_Extension_CRLDistributionPoint[]   = { 0x55, 0x1D, 0x1F }
 
 } // anonymous namespace
 
+// ML-DSA attestation operations are not implemented by this backend.
+bool IsMlDsa44Supported()
+{
+    return false;
+}
+
+bool IsMlDsa65Supported()
+{
+    return false;
+}
+
 CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
@@ -1837,10 +1848,8 @@ CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, Mutable
 
     p   = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(serial).CHIP_CRYPTO_PAL_PRIVATE_X509(p);
     len = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(serial).CHIP_CRYPTO_PAL_PRIVATE_X509(len);
-    VerifyOrExit(len <= serialNumber.size(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    memcpy(serialNumber.data(), p, len);
-    serialNumber.reduce_size(len);
+    SuccessOrExit(error = StripDerIntegerSignByte(ByteSpan(p, len), serialNumber));
 
 exit:
     _log_mbedTLS_error(result);

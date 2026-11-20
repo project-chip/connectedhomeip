@@ -39,11 +39,11 @@
 #endif
 
 // Define the start of the KMU slots for Matter.
-#define KMU_NOC_SLOT_START PSA_KEY_HANDLE_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW, CONFIG_CHIP_KMU_SLOT_RANGE_START)
+#define KMU_NOC_SLOT_START PSA_KEY_ID_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW, CONFIG_CHIP_KMU_SLOT_RANGE_START)
 #define KMU_ICD_SLOT_START                                                                                                         \
-    PSA_KEY_HANDLE_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW, (KMU_NOC_SLOT_START + KMU_SLOTS_NOC_MAX_NUMBER))
+    PSA_KEY_ID_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW, (KMU_NOC_SLOT_START + KMU_SLOTS_NOC_MAX_NUMBER))
 #define KMU_GROUP_KEYS_SLOT_START                                                                                                  \
-    PSA_KEY_HANDLE_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW, (KMU_ICD_SLOT_START + KMU_SLOTS_ICD_MAX_NUMBER))
+    PSA_KEY_ID_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW, (KMU_ICD_SLOT_START + KMU_SLOTS_ICD_MAX_NUMBER))
 
 // Check whether the DAC KMU slot does not overlap with the KMU slots dedicated for Matter core.
 #if defined(CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU) &&                                                                            \
@@ -59,8 +59,7 @@ class KMUKeyAllocator : public chip::Crypto::PSAKeyAllocator
 public:
     psa_key_id_t GetDacKeyId() override
     {
-        return PSA_KEY_HANDLE_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW,
-                                                   CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU_SLOT_ID);
+        return PSA_KEY_ID_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW, CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU_SLOT_ID);
     }
     psa_key_id_t GetOpKeyId(FabricIndex fabricIndex) override
     {
@@ -79,9 +78,9 @@ public:
     {
         // Set the key lifetime to persistent and the location to CRACEN_KMU if key is in a proper range
         if (psa_get_key_id(&attrs) >=
-                PSA_KEY_HANDLE_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW, CONFIG_CHIP_KMU_SLOT_RANGE_START) &&
+                PSA_KEY_ID_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW, CONFIG_CHIP_KMU_SLOT_RANGE_START) &&
             psa_get_key_id(&attrs) <
-                PSA_KEY_HANDLE_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW, CONFIG_CHIP_KMU_SLOT_RANGE_END))
+                PSA_KEY_ID_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW, CONFIG_CHIP_KMU_SLOT_RANGE_END))
         {
             psa_set_key_lifetime(
                 &attrs, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_PERSISTENCE_DEFAULT, PSA_KEY_LOCATION_CRACEN_KMU));

@@ -17,6 +17,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/config/standalone/args.gni")
+import("${chip_root}/examples/platform/linux/openthread.gni")
 
 chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
 chip_project_config_include = "<CHIPProjectAppConfig.h>"
@@ -33,4 +34,4 @@ chip_enable_rotating_device_id = true
 
 chip_enable_read_client = false
 
-chip_config_enable_groupcast = false
+chip_config_enable_groupcast = true

@@ -168,6 +168,8 @@
 #include <clusters/LocalizationConfiguration/MetadataProvider.h>
 #include <clusters/LowPower/Ids.h>
 #include <clusters/LowPower/MetadataProvider.h>
+#include <clusters/MediaFileManagement/Ids.h>
+#include <clusters/MediaFileManagement/MetadataProvider.h>
 #include <clusters/MediaInput/Ids.h>
 #include <clusters/MediaInput/MetadataProvider.h>
 #include <clusters/MediaPlayback/Ids.h>
@@ -276,6 +278,8 @@
 #include <clusters/TestHiddenManufacturerSpecific/MetadataProvider.h>
 #include <clusters/Thermostat/Ids.h>
 #include <clusters/Thermostat/MetadataProvider.h>
+#include <clusters/ThermostatMode/Ids.h>
+#include <clusters/ThermostatMode/MetadataProvider.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Ids.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/MetadataProvider.h>
 #include <clusters/ThreadBorderRouterManagement/Ids.h>
@@ -736,6 +740,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == LowPower::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowPower::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == MediaFileManagement::Id) || ...))
+    {
+        if (id == MediaFileManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, MediaFileManagement::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == MediaInput::Id) || ...))
     {
         if (id == MediaInput::Id)
@@ -1008,6 +1017,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == Thermostat::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Thermostat::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ThermostatMode::Id) || ...))
+    {
+        if (id == ThermostatMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ThermostatMode::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ThermostatUserInterfaceConfiguration::Id) || ...))
     {

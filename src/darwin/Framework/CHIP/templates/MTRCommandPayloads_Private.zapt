@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 {{#zcl_commands}}
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
 
@@ -21,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{> command_internal_methods_decl categoryName="PrivateMethods"}}
 
 {{/zcl_commands}}
+#endif
 {{/if}}
 {{/zcl_clusters}}
 

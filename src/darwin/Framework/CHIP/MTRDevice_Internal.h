@@ -134,9 +134,13 @@ MTR_DIRECT_MEMBERS
 // For device controller or other objects to call
 - (BOOL)delegateExists;
 
+- (nullable NSArray<id> *)unionOfInterestedPathsForAttributes;
+- (nullable NSArray<id> *)unionOfInterestedPathsForEvents;
+
 // Must be called by subclasses or MTRDevice implementation only.
 - (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate;
 - (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate;
+- (void)_interestedPathsChanged;
 
 #ifdef DEBUG
 // Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
@@ -165,6 +169,9 @@ MTR_DIRECT_MEMBERS
 
 - (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter;
 
+// Called from the -dealloc of a waiter that had not completed; the weak waiter table no longer returns it.
+- (void)_pendingAttributeWaiterDeallocated;
+
 /**
  * Returns true if a diagnostic log transfer is ongoing.
  */
@@ -173,8 +180,21 @@ MTR_DIRECT_MEMBERS
 @end
 
 @interface MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)
+/**
+ * Returns true when a subscription's reports cannot be relied on to keep the
+ * cached value of this attribute current, so reading it with these params
+ * should also read it from the device.
+ *
+ * Depends on the cluster revisions the device has reported, but not on the
+ * state of its subscription.
+ */
+- (BOOL)_attributeReadNeedsReadThroughForPath:(MTRAttributePath *)attributePath params:(MTRReadParams * _Nullable)params;
 - (void)_deviceMayBeReachable;
 @end
+
+// The answer -[MTRDevice _attributeReadNeedsReadThroughForPath:params:] gives
+// for a device that has not reported any cluster revisions.
+BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadParams * _Nullable params);
 
 #pragma mark - MTRDevice internal state monitoring
 @protocol MTRDeviceInternalStateDelegate

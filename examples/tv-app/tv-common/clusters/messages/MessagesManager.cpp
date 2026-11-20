@@ -17,7 +17,12 @@
 
 #include "MessagesManager.h"
 
+#include <algorithm>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <string>
 #include <vector>
 
@@ -27,16 +32,31 @@ using namespace chip::app::Clusters::Messages;
 using Message               = chip::app::Clusters::Messages::Structs::MessageStruct::Type;
 using MessageResponseOption = chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type;
 
+MessagesManager::~MessagesManager()
+{
+    for (auto & context : mTimerContexts)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(OnMessageTimerExpired, context.get());
+    }
+}
+
 // Commands
 CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     const ByteSpan & messageId, const MessagePriorityEnum & priority, const BitMask<MessageControlBitmap> & messageControl,
     const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
-    const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
+    const Optional<DataModel::DecodableList<MessageResponseOption>> & responses, const Optional<CharSpan> & languageCode,
+    const Optional<CharSpan> & messageUri, FabricIndex fabricIndex)
 {
     ChipLogProgress(Zcl, "HandlePresentMessagesRequest message:%s", std::string(messageText.data(), messageText.size()).c_str());
 
-    auto cachedMessage = CachedMessage(messageId, priority, messageControl, startTime, duration,
-                                       std::string(messageText.data(), messageText.size()));
+    auto cachedMessage = CachedMessage(
+        messageId, priority, messageControl, startTime, duration, std::string(messageText.data(), messageText.size()),
+        (languageCode.HasValue() && !languageCode.Value().empty())
+            ? std::string(languageCode.Value().data(), languageCode.Value().size())
+            : std::string(),
+        (messageUri.HasValue() && !messageUri.Value().empty()) ? std::string(messageUri.Value().data(), messageUri.Value().size())
+                                                               : std::string(),
+        fabricIndex);
     if (responses.HasValue())
     {
         auto iter = responses.Value().begin();
@@ -51,9 +71,28 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
         }
     }
 
-    mCachedMessages.push_back(cachedMessage);
+    // Re-presenting an already-queued MessageID replaces the prior entry (and its pending
+    // timers) instead of silently duplicating it, keeping MessageID usable as a real key.
+    CancelMessageTimers(messageId);
+    auto existing = FindCachedMessage(messageId);
+    if (existing != mCachedMessages.end())
+    {
+        if (existing->GetState() == MessageState::kPresented)
+        {
+            CompleteMessage(messageId);
+        }
+        else
+        {
+            mCachedMessages.erase(existing);
+        }
+    }
 
-    // Add your code to present Message
+    mCachedMessages.push_back(cachedMessage);
+    NotifyMessagesChanged();
+    LogErrorOnFailure(LogMessageQueuedEvent(mEndpointId, messageId));
+
+    ScheduleOrPresentMessage(messageId);
+
     ChipLogProgress(Zcl, "HandlePresentMessagesRequest complete");
     return CHIP_NO_ERROR;
 }
@@ -65,8 +104,21 @@ CHIP_ERROR MessagesManager::HandleCancelMessagesRequest(const DataModel::Decodab
     {
         auto & id = iter.GetValue();
 
-        mCachedMessages.remove_if([id](CachedMessage & entry) { return entry.MessageIdMatches(id); });
-        // per spec, the command succeeds even when the message id does not match an existing message
+        CancelMessageTimers(id);
+        auto it = FindCachedMessage(id);
+        if (it == mCachedMessages.end())
+        {
+            continue;
+        }
+        if (it->GetState() == MessageState::kPresented)
+        {
+            CompleteMessage(id);
+        }
+        else
+        {
+            mCachedMessages.erase(it);
+            NotifyMessagesChanged();
+        }
     }
     return CHIP_NO_ERROR;
 }
@@ -88,8 +140,28 @@ CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(AttributeValueEncoder & aE
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (CachedMessage & entry : mCachedMessages)
         {
-            ReturnErrorOnFailure(encoder.Encode(entry.GetMessage().messageID));
+            if (entry.GetState() == MessageState::kPresented)
+            {
+                ReturnErrorOnFailure(encoder.Encode(entry.GetMessage().messageID));
+            }
         }
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR MessagesManager::HandleGetSupportedLanguageCodes(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        ReturnErrorOnFailure(encoder.Encode("en-US"_span));
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR MessagesManager::HandleGetSupportedMimeTypes(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        ReturnErrorOnFailure(encoder.Encode("audio/mpeg"_span));
+        ReturnErrorOnFailure(encoder.Encode("audio/ogg"_span));
         return CHIP_NO_ERROR;
     });
 }
@@ -102,10 +174,286 @@ uint32_t MessagesManager::GetFeatureMap(EndpointId endpoint)
     FeatureMap.Set(Feature::kConfirmationResponse);
     FeatureMap.Set(Feature::kConfirmationReply);
     FeatureMap.Set(Feature::kProtectedMessages);
+    FeatureMap.Set(Feature::kSpokenMessages);
+    FeatureMap.Set(Feature::kAudioMessages);
+    FeatureMap.Set(Feature::kMultiModalMessages);
 
     uint32_t featureMap = FeatureMap.Raw();
     ChipLogProgress(Zcl, "GetFeatureMap featureMap=%d", featureMap);
     // forcing to all features since this implementation supports all
     // Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
+}
+
+// State machine
+
+void MessagesManager::NotifyMessagesChanged()
+{
+    // Messages lists every cached message and ActiveMessageIDs only the presented ones, so any
+    // change to the list or to a message's state can move either. Reporting both is cheaper
+    // than reasoning about which one moved, and a subscriber that never hears about a change
+    // is left holding a stale list.
+    VerifyOrReturn(mEndpointId != kInvalidEndpointId);
+    MatterReportingAttributeChangeCallback(mEndpointId, Id, Attributes::Messages::Id);
+    MatterReportingAttributeChangeCallback(mEndpointId, Id, Attributes::ActiveMessageIDs::Id);
+}
+
+std::list<CachedMessage>::iterator MessagesManager::FindCachedMessage(ByteSpan messageId)
+{
+    return std::find_if(mCachedMessages.begin(), mCachedMessages.end(),
+                        [&messageId](CachedMessage & entry) { return entry.MessageIdMatches(messageId); });
+}
+
+void MessagesManager::ScheduleOrPresentMessage(ByteSpan messageId)
+{
+    auto it = FindCachedMessage(messageId);
+    if (it == mCachedMessages.end())
+    {
+        // Already cancelled/completed before this ran.
+        return;
+    }
+
+    const auto & startTime = it->GetStartTime();
+    if (startTime.IsNull())
+    {
+        PresentOrSuppressMessage(it);
+        return;
+    }
+
+    uint32_t nowEpochS = 0;
+    CHIP_ERROR err     = System::Clock::GetClock_MatterEpochS(nowEpochS);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Zcl, "MessagesManager: could not read current time (%" CHIP_ERROR_FORMAT "), rechecking in %u s",
+                        err.Format(), kClockRecheckIntervalSeconds);
+        StartMessageTimer(messageId, MessageTimerType::kPresent, kClockRecheckIntervalSeconds * 1000);
+        return;
+    }
+
+    if (startTime.Value() > nowEpochS)
+    {
+        // Cap the delay so `delaySeconds * 1000` can't overflow uint32_t (~49.7 days worth of
+        // ms); if StartTime is further out than that, wait the max chunk and let this function
+        // re-run and re-check/reschedule, same as the clock-error retry above.
+        constexpr uint32_t kMaxSingleTimerDelaySeconds = UINT32_MAX / 1000;
+        uint32_t delaySeconds                          = startTime.Value() - nowEpochS;
+        if (delaySeconds > kMaxSingleTimerDelaySeconds)
+        {
+            delaySeconds = kMaxSingleTimerDelaySeconds;
+        }
+        StartMessageTimer(messageId, MessageTimerType::kPresent, delaySeconds * 1000);
+        return;
+    }
+
+    PresentOrSuppressMessage(it);
+}
+
+void MessagesManager::SetDoNotDisturb(bool enabled)
+{
+    const bool wasEnabled = mDoNotDisturb;
+    mDoNotDisturb         = enabled;
+
+    // A High priority message held back while muted has to be presented once the device
+    // leaves the muted state, so release whatever is still queued.
+    if (wasEnabled && !enabled)
+    {
+        PresentQueuedMessages();
+    }
+}
+
+void MessagesManager::PresentQueuedMessages()
+{
+    // Copy the ids out first: releasing a message can erase it from the list, which would
+    // invalidate both the loop and any span pointing into the element being removed.
+    std::vector<MessageIdBuffer> queued;
+    for (CachedMessage & message : mCachedMessages)
+    {
+        if (message.GetState() == MessageState::kQueued)
+        {
+            MessageIdBuffer id;
+            memcpy(id.data(), message.GetMessageId().data(), id.size());
+            queued.push_back(id);
+        }
+    }
+
+    for (const MessageIdBuffer & id : queued)
+    {
+        // A message whose StartTime has not arrived yet is also queued, with a timer already
+        // pending for it. Going back through ScheduleOrPresentMessage re-checks StartTime so
+        // such a message is not presented early, and cancelling first leaves it with a single
+        // armed timer rather than two.
+        const ByteSpan messageId(id.data(), id.size());
+        CancelMessageTimers(messageId);
+        ScheduleOrPresentMessage(messageId);
+    }
+}
+
+void MessagesManager::PresentOrSuppressMessage(std::list<CachedMessage>::iterator it)
+{
+    if (mDoNotDisturb)
+    {
+        // While muted, how a message is handled depends on its Priority: Low and Medium are
+        // dropped outright, High waits in the queue until the device is unmuted, and Critical
+        // is presented anyway.
+        switch (it->GetPriority())
+        {
+        case MessagePriorityEnum::kLow:
+        case MessagePriorityEnum::kMedium:
+            LogErrorOnFailure(LogMessageNotPresentedEvent(mEndpointId, it->GetMessageId(), true, it->GetFabricIndex()));
+            mCachedMessages.erase(it);
+            NotifyMessagesChanged();
+            return;
+        case MessagePriorityEnum::kHigh:
+            // Reported as not presented but kept queued, so RemovedFromQueue is false.
+            LogErrorOnFailure(LogMessageNotPresentedEvent(mEndpointId, it->GetMessageId(), false, it->GetFabricIndex()));
+            return;
+        case MessagePriorityEnum::kCritical:
+            break;
+        default:
+            break;
+        }
+    }
+    PresentMessage(*it);
+}
+
+void MessagesManager::PresentMessage(CachedMessage & message)
+{
+    auto messageStruct = message.GetMessage();
+    std::string text(messageStruct.messageText.data(), messageStruct.messageText.size());
+    const auto & controlBits = message.GetMessageControl();
+
+    if (controlBits.Has(MessageControlBitmap::kSpokenMessage))
+    {
+        std::string language = (messageStruct.languageCode.HasValue())
+            ? std::string(messageStruct.languageCode.Value().data(), messageStruct.languageCode.Value().size())
+            : "en-US";
+        ChipLogProgress(Zcl, "MessagesManager: [simulated TTS, language=%s] \"%s\"", language.c_str(), text.c_str());
+    }
+    else if (controlBits.Has(MessageControlBitmap::kAudioMessage))
+    {
+        std::string uri = (messageStruct.messageURI.HasValue())
+            ? std::string(messageStruct.messageURI.Value().data(), messageStruct.messageURI.Value().size())
+            : "<no URI>";
+        ChipLogProgress(Zcl, "MessagesManager: [simulated audio playback, uri=%s] \"%s\"", uri.c_str(), text.c_str());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "MessagesManager: [presented] \"%s\"", text.c_str());
+    }
+
+    message.SetState(MessageState::kPresented);
+    NotifyMessagesChanged();
+    LogErrorOnFailure(LogMessagePresentedEvent(mEndpointId, message.GetMessageId()));
+
+    const auto & duration = message.GetDuration();
+    if (!duration.IsNull())
+    {
+        uint64_t durationMs = duration.Value();
+        if (durationMs > UINT32_MAX)
+        {
+            durationMs = UINT32_MAX;
+        }
+        StartMessageTimer(message.GetMessageId(), MessageTimerType::kComplete, static_cast<uint32_t>(durationMs));
+    }
+}
+
+void MessagesManager::CompleteMessage(ByteSpan messageId)
+{
+    auto it = FindCachedMessage(messageId);
+    if (it == mCachedMessages.end())
+    {
+        return;
+    }
+
+    // Auto-dismissed after Duration elapsed with no real user response available
+    // (this example app has no UI to collect one).
+    LogErrorOnFailure(LogMessageCompleteEvent(mEndpointId, messageId, Optional<DataModel::Nullable<uint32_t>>(),
+                                              Optional<DataModel::Nullable<CharSpan>>(),
+                                              DataModel::Nullable<FutureMessagePreferenceEnum>()));
+
+    mCachedMessages.erase(it);
+    NotifyMessagesChanged();
+}
+
+void MessagesManager::StartMessageTimer(ByteSpan messageId, MessageTimerType type, uint32_t delayMs)
+{
+    if (messageId.size() != sizeof(MessageTimerContext::messageId))
+    {
+        ChipLogError(Zcl, "MessagesManager: unexpected message id size %u", static_cast<unsigned>(messageId.size()));
+        return;
+    }
+
+    auto context     = std::make_shared<MessageTimerContext>();
+    context->manager = this;
+    context->type    = type;
+    memcpy(context->messageId, messageId.data(), sizeof(context->messageId));
+
+    CHIP_ERROR err =
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(delayMs), OnMessageTimerExpired, context.get());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "MessagesManager: failed to start timer: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
+    mTimerContexts.push_back(context);
+}
+
+void MessagesManager::CancelMessageTimers(ByteSpan messageId)
+{
+    for (auto it = mTimerContexts.begin(); it != mTimerContexts.end();)
+    {
+        if (ByteSpan((*it)->messageId).data_equal(messageId))
+        {
+            DeviceLayer::SystemLayer().CancelTimer(OnMessageTimerExpired, it->get());
+            it = mTimerContexts.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
+
+void MessagesManager::OnMessageTimerExpired(System::Layer * systemLayer, void * context)
+{
+    auto * ctx             = reinterpret_cast<MessageTimerContext *>(context);
+    MessagesManager * self = ctx->manager;
+    MessageTimerType type  = ctx->type;
+    // Copied out to a local buffer *before* erasing below, since that erase may drop the last
+    // owning shared_ptr to `ctx` -- it must not be dereferenced again after this point.
+    uint8_t messageIdBuffer[kMessageIdLength];
+    memcpy(messageIdBuffer, ctx->messageId, sizeof(messageIdBuffer));
+    ByteSpan messageId(messageIdBuffer);
+
+    self->mTimerContexts.erase(
+        std::remove_if(self->mTimerContexts.begin(), self->mTimerContexts.end(),
+                       [ctx](const std::shared_ptr<MessageTimerContext> & entry) { return entry.get() == ctx; }),
+        self->mTimerContexts.end());
+
+    if (type == MessageTimerType::kPresent)
+    {
+        self->ScheduleOrPresentMessage(messageId);
+    }
+    else
+    {
+        self->CompleteMessage(messageId);
+    }
+}
+
+void MessagesManager::LogCachedMessages() const
+{
+    ChipLogProgress(Zcl, "MessagesManager: do-not-disturb=%s", mDoNotDisturb ? "on" : "off");
+    if (mCachedMessages.empty())
+    {
+        ChipLogProgress(Zcl, "MessagesManager: no cached messages");
+        return;
+    }
+    for (const CachedMessage & entry : mCachedMessages)
+    {
+        auto messageStruct = entry.GetMessage();
+        std::string text(messageStruct.messageText.data(), messageStruct.messageText.size());
+        const char * state = entry.GetState() == MessageState::kQueued ? "Queued" : "Presented";
+        ChipLogProgress(Zcl, "MessagesManager:   [%s] priority=%u \"%s\"", state, to_underlying(messageStruct.priority),
+                        text.c_str());
+    }
 }

@@ -849,6 +849,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     error = output.SetLength(bbuf.Needed());
 
 exit:
+    ClearSecretData(privateKey, sizeof(privateKey));
     LogPsaError(status);
 
     return error;
@@ -1409,6 +1410,17 @@ constexpr uint8_t sOID_Extension_CRLDistributionPoint[]   = { 0x55, 0x1D, 0x1F }
     ((MBEDTLS_ASN1_OID == (oidBuf).CHIP_CRYPTO_PAL_PRIVATE_X509(tag)) &&                                                           \
      (sizeof(oid) == (oidBuf).CHIP_CRYPTO_PAL_PRIVATE_X509(len)) &&                                                                \
      (memcmp((oid), (oidBuf).CHIP_CRYPTO_PAL_PRIVATE_X509(p), (oidBuf).CHIP_CRYPTO_PAL_PRIVATE_X509(len)) == 0))
+
+// ML-DSA attestation operations are not implemented by this backend.
+bool IsMlDsa44Supported()
+{
+    return false;
+}
+
+bool IsMlDsa65Supported()
+{
+    return false;
+}
 
 CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType)
 {
@@ -2176,10 +2188,8 @@ CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, Mutable
 
     p   = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(serial).CHIP_CRYPTO_PAL_PRIVATE_X509(p);
     len = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(serial).CHIP_CRYPTO_PAL_PRIVATE_X509(len);
-    VerifyOrExit(len <= serialNumber.size(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    memcpy(serialNumber.data(), p, len);
-    serialNumber.reduce_size(len);
+    SuccessOrExit(error = StripDerIntegerSignByte(ByteSpan(p, len), serialNumber));
 
 exit:
     _log_mbedTLS_error(result);

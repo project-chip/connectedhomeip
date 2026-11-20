@@ -19,37 +19,10 @@
 
 #pragma once
 
-/**********************************************************
- * Includes
- *********************************************************/
-
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "AppEvent.h"
 #include "BaseApplication.h"
-
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
-#include <ble/BLEEndPoint.h>
+#include <app/ConcreteAttributePath.h>
+#include <cstdint>
 #include <lib/core/CHIPError.h>
-#include <platform/CHIPDeviceLayer.h>
-
-/**********************************************************
- * Defines
- *********************************************************/
-
-// Application-defined error codes in the CHIP_ERROR space.
-#define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
-#define APP_ERROR_CREATE_TASK_FAILED CHIP_APPLICATION_ERROR(0x02)
-#define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
-#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
-#define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
-#define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
-
-/**********************************************************
- * AppTask Declaration
- *********************************************************/
 
 class AppTask : public BaseApplication
 {
@@ -57,7 +30,8 @@ class AppTask : public BaseApplication
 public:
     AppTask() = default;
 
-    static AppTask & GetAppTask() { return sAppTask; }
+    /** @brief Returns the active app instance */
+    static AppTask & GetAppTask();
 
     /**
      * @brief AppTask task main loop function
@@ -66,57 +40,31 @@ public:
      */
     static void AppTaskMain(void * pvParameter);
 
+    /** @brief Creates and starts the AppTask thread */
     CHIP_ERROR StartAppTask();
 
     /**
-     * @brief Event handler when a button is pressed
-     * Function posts an event for button processing
+     * @brief Event handler when a button is pressed.
      *
-     * @param buttonHandle APP_FUNCTION_BUTTON
-     * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
-     *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
+     * @param button    APP_CLOSURE_BUTTON or APP_FUNCTION_BUTTON
+     * @param btnAction SL_SIMPLE_BUTTON_PRESSED, SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
-#ifdef DISPLAY_ENABLED
-    /**
-     * @brief Updates the closure UI with current closure state
-     */
-    static void UpdateClosureUI();
-
-    /**
-     * @brief Event handler for UI update events
-     * Called from app task context to safely update UI with chip stack locked
-     *
-     * @param aEvent pointer to the UI update event being processed
-     */
-    static void UpdateClosureUIHandler(AppEvent * aEvent);
-#endif // DISPLAY_ENABLED
-
-    /**
-     * @brief Closure button action event handler
-     * Handles button press events for closure control operations
-     *
-     * @param aEvent pointer to the button event being processed
-     */
+    /** @brief AppTask thread event handler for closure button actions */
     static void ClosureButtonActionEventHandler(AppEvent * aEvent);
 
-private:
-    static AppTask sAppTask;
+    /** @brief Data model hook invoked when a cluster attribute changes */
+    void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value);
 
-    /**
-     * @brief Override of BaseApplication::AppInit() virtual method, called by BaseApplication::Init()
-     *
-     * @return CHIP_ERROR
-     */
+    /** @brief ClosureControl cluster attribute-change hook */
+    void DMClosureControlClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+    /** @brief ClosureDimension cluster attribute-change hook */
+    void DMClosureDimensionClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+protected:
+    /** @brief Override of `BaseApplication::AppInit()` */
     CHIP_ERROR AppInit() override;
-
-    /**
-     * @brief PB0 Button event processing function
-     *        Press and hold will trigger a factory reset timer start
-     *        Press and release will restart BLEAdvertising if not commisionned
-     *
-     * @param aEvent button event being processed
-     */
-    static void ButtonHandler(AppEvent * aEvent);
 };

@@ -36,6 +36,23 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs2
+#       --device water-heater
+#       --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -46,13 +63,13 @@ import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_WHM_2_1(MatterBaseTest):
+class TC_WHM_2_1(MatterTestCommissionedDevice):
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -60,7 +77,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
     def steps_TC_WHM_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read the SupportedModes attribute"),
             TestStep(3, "Read the CurrentMode attribute"),
             TestStep(4, "Send ChangeToMode command with NewMode"),

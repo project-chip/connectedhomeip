@@ -45,7 +45,6 @@ import os
 import shutil
 import sys
 import time
-import typing
 import uuid
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -93,7 +92,7 @@ sys.path.append(os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_t
 @dataclass
 class Failure:
     step: str
-    exception: typing.Optional[Exception]
+    exception: Exception | None
 
 
 class Hooks:
@@ -161,6 +160,7 @@ class DclCheck(BasicCompositionTests):
 
     @async_test_body
     async def setup_class(self):
+        super().setup_class()
         setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
         await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
         bi = Clusters.BasicInformation
@@ -415,6 +415,10 @@ class TestConfig:
         global_test_params = {'use_pase_only': True, 'post_cert_test': True}
         self.config = MatterTestConfig(endpoint=0, dut_node_ids=[
             1], global_test_params=global_test_params, storage_path=self.admin_storage)
+        # These tests run over PASE against an uncommissioned device: the background
+        # wildcard subscription cannot be established (it requires CASE), and its
+        # setup/teardown delays let a BLE PASE transport idle out between tests.
+        self.config.no_wildcard_subscription = True
         if code_type == SetupCodeType.QR:
             self.config.qr_code_content = [code]
         else:

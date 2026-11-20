@@ -32,6 +32,18 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -43,7 +55,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 from matter.testing.timeoperations import (utc_datetime_from_matter_epoch_us, utc_datetime_from_posix_time_ms,
                                            utc_time_in_matter_epoch)
@@ -51,7 +63,7 @@ from matter.testing.timeoperations import (utc_datetime_from_matter_epoch_us, ut
 log = logging.getLogger(__name__)
 
 
-class TC_DGGEN_2_4(MatterBaseTest):
+class TC_DGGEN_2_4(MatterTestCommissionedDevice):
     async def read_diags_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.GeneralDiagnostics
         return await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=attribute)

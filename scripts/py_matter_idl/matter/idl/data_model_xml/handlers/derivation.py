@@ -16,7 +16,8 @@
 
 import dataclasses
 import logging
-from typing import Iterable, Optional, Protocol, TypeVar
+from collections.abc import Iterable
+from typing import Protocol, TypeVar
 
 from matter.idl.matter_idl_types import Attribute, AttributeQuality, Bitmap, Cluster, Command, Enum, Event, Idl, Struct
 
@@ -35,7 +36,7 @@ class HasName(Protocol):
 NAMED = TypeVar('NAMED', bound=HasName)
 
 
-def get_item_with_name(items: Iterable[NAMED], name: str) -> Optional[NAMED]:
+def get_item_with_name(items: Iterable[NAMED], name: str) -> NAMED | None:
     """Find an item with the given name.
 
     Returns none if that item does not exist
@@ -82,11 +83,15 @@ def merge_event_into(e: Event, cluster: Cluster):
     cluster.events.append(e)
 
 
+# The attribute qualities that an attribute's <quality> element sets.
+_QUALITY_ELEMENT_QUALITIES = AttributeQuality.FIXED | AttributeQuality.CHANGES_OMITTED
+
+
 def merge_attribute_into(a: Attribute, cluster: Cluster):
     """Pushes an attribute from a base cluster into an already
        parsed cluster.
     """
-    existing: Optional[Attribute] = None
+    existing: Attribute | None = None
     for existing_a in cluster.attributes:
         if existing_a.definition.name == a.definition.name:
             existing = existing_a
@@ -106,9 +111,11 @@ def merge_attribute_into(a: Attribute, cluster: Cluster):
             api_maturity=existing.definition.api_maturity,
         )
 
-        # Inherit attribute quality
-        if existing.qualities == AttributeQuality.NONE:
-            existing.qualities = a.qualities
+        # A derived attribute can override its access and its <quality> qualities independently,
+        # so each one is inherited unless the derived attribute sets it.
+        for group in (_QUALITY_ELEMENT_QUALITIES, ~_QUALITY_ELEMENT_QUALITIES):
+            if not (existing.qualities & group):
+                existing.qualities |= a.qualities & group
 
         return
 
@@ -170,7 +177,7 @@ class AddBaseInfoPostProcessor(IdlPostProcessor):
     def FinalizeProcessing(self, idl: Idl):
         # attempt to find the base. It may be in the "names without ID" however it may also be inside
         # existing clusters (e.g. Basic Information)
-        base: Optional[Cluster] = None
+        base: Cluster | None = None
         if self.source_name in self.context.abstract_base_clusters:
             base = self.context.abstract_base_clusters[self.source_name]
         else:

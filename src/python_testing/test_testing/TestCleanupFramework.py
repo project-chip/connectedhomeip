@@ -102,13 +102,13 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import _has_attribute, _has_cluster, async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TestCleanupFramework(MatterBaseTest):
+class TestCleanupFramework(MatterTestCommissionedDevice):
 
     def desc_TestCleanupFramework(self) -> str:
         return "[TestCleanupFramework] Validates the MatterBaseTest cleanup framework"
@@ -342,14 +342,15 @@ class TestCleanupFramework(MatterBaseTest):
         # Generate a minimal self-signed root certificate for provisioning
         key = ec.generate_private_key(ec.SECP256R1())
         subject = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "cleanup-test-root")])
+        now = datetime.datetime.now(datetime.UTC)
         cert_bytes = (
             x509.CertificateBuilder()
             .subject_name(subject)
             .issuer_name(subject)
             .public_key(key.public_key())
             .serial_number(x509.random_serial_number())
-            .not_valid_before(datetime.datetime.now(datetime.UTC))
-            .not_valid_after(datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=365))
+            .not_valid_before(now - datetime.timedelta(days=1))
+            .not_valid_after(now + datetime.timedelta(days=365))
             .add_extension(x509.BasicConstraints(ca=True, path_length=0), critical=True)
             .sign(key, hashes.SHA256())
             .public_bytes(serialization.Encoding.DER)

@@ -56,13 +56,13 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import JFAdministratorSubprocess, JFControllerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_JFADMIN_1_4(MatterBaseTest):
+class TC_JFADMIN_1_4(MatterTestCommissioner):
     _JOINT_FABRIC_ADMINISTRATOR_ENDPOINT = 1
     _OJCW_TIMEOUT_SPEC = 180  # Minimum timeout allowed by the spec, required by the test plan
     _OJCW_TIMEOUT_CI = 15  # Lower than spec to keep CI fast

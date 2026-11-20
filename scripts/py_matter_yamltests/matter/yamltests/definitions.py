@@ -16,7 +16,6 @@
 import enum
 import glob
 import io
-from typing import Optional
 
 from matter.idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, Enum, Event, FieldQuality, Struct, StructQuality,
                                          StructTag)
@@ -289,7 +288,7 @@ class SpecDefinitions:
         return global_target | target
 
 
-def SpecDefinitionsFromPaths(paths: str, pseudo_clusters: Optional[PseudoClusters] = PseudoClusters([])):
+def SpecDefinitionsFromPaths(paths: str, pseudo_clusters: PseudoClusters | None = PseudoClusters([])):
     filenames = []
     for path in paths:
         if '*' in path or '?' in path:

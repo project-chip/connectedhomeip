@@ -51,7 +51,6 @@ CHIP_ERROR BdxTransfer::AcceptAndReceiveData()
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode  = TransferControlFlags::kSenderDrive;
     acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
-    acceptData.StartOffset  = mTransfer.GetStartOffset();
     acceptData.Length       = mTransfer.GetTransferLength();
     return mTransfer.AcceptTransfer(acceptData);
 }
@@ -60,13 +59,22 @@ CHIP_ERROR BdxTransfer::AcceptAndSendData(const ByteSpan & data_to_send)
 {
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
     mAwaitingAccept = false;
+
+    const uint64_t startOffset = mTransfer.GetStartOffset();
+    if (startOffset > data_to_send.size())
+    {
+        ReturnErrorOnFailure(mTransfer.RejectTransfer(StatusCode::kStartOffsetNotSupported));
+        mRejected = true;
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     mData.assign(data_to_send.begin(), data_to_send.end());
-    mDataCount = data_to_send.size();
+    mDataCount            = data_to_send.size();
+    mDataTransferredCount = static_cast<size_t>(startOffset);
 
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode  = TransferControlFlags::kReceiverDrive;
     acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
-    acceptData.StartOffset  = mTransfer.GetStartOffset();
     acceptData.Length       = mTransfer.GetTransferLength();
     return mTransfer.AcceptTransfer(acceptData);
 }
@@ -75,6 +83,7 @@ CHIP_ERROR BdxTransfer::Reject()
 {
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
     mAwaitingAccept = false;
+    mRejected       = true;
     return mTransfer.RejectTransfer(StatusCode::kTransferFailedUnknownError);
 }
 
@@ -117,14 +126,22 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
             // TODO: Ending the session here means the StandaloneAck for the BlockAckEOF message hasn't been received.
             EndSession(CHIP_NO_ERROR);
         }
+        else if (mRejected && event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
+        {
+            // A rejected session emits no further event; end it here so the transfer is released.
+            EndSession(CHIP_NO_ERROR);
+        }
         break;
     case TransferSession::OutputEventType::kAckEOFReceived:
         EndSession(CHIP_NO_ERROR);
         break;
-    case TransferSession::OutputEventType::kQueryWithSkipReceived:
-        mDataTransferredCount = std::min<size_t>(mDataTransferredCount + event.bytesToSkip.BytesToSkip, mDataCount);
+    case TransferSession::OutputEventType::kQueryWithSkipReceived: {
+        // Compared with what is left rather than added first, so that a huge skip cannot wrap around into the data.
+        const uint64_t dataRemaining = mDataCount - mDataTransferredCount;
+        mDataTransferredCount += static_cast<size_t>(std::min<uint64_t>(event.bytesToSkip.BytesToSkip, dataRemaining));
         TEMPORARY_RETURN_IGNORED SendBlock();
         break;
+    }
     case TransferSession::OutputEventType::kQueryReceived:
         TEMPORARY_RETURN_IGNORED SendBlock();
         break;

@@ -66,6 +66,7 @@ static_library("Ameba") {
   public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
 
   public_deps = [
+    "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]

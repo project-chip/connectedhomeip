@@ -61,7 +61,7 @@ static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kP
                                           Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
                                           Feature::kConstraintBasedAdjustment);
 
-chip::BitMask<Feature> GetFeatureMapFromCmdLine()
+chip::BitMask<Feature> GetFeatureMap()
 {
     return sFeatureMap;
 }

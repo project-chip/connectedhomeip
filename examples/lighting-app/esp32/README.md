@@ -24,6 +24,20 @@ ESP32-C6 supports both Wi-Fi and Thread transport protocols.
     idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.esp32c6_thread" set-target esp32c6 build
     ```
 
+### Memory-optimized build
+
+`sdkconfig.optimized` is an optional overlay that increases heap headroom by
+trading WiFi throughput and the debug shell. Use it on RAM-constrained SoCs
+(e.g. ESP32-C3), where concurrent BLE + WiFi + CASE crypto during commissioning
+can otherwise run out of internal RAM:
+
+```
+idf.py -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.optimized" set-target esp32c3 build
+```
+
+On ESP32-C3 this frees roughly 30 kB of static RAM (mostly code moved from IRAM
+to flash) plus runtime savings from smaller WiFi buffer pools.
+
 ### Enabling ESP-Insights:
 
 -   Before building the app, enable the options: `ESP_INSIGHTS_ENABLED` and

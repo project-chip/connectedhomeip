@@ -23,17 +23,23 @@ namespace Attributes {
 
 namespace DeviceTypeList {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(DeviceTypeList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(DeviceTypeList::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace DeviceTypeList
 namespace ServerList {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(ServerList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(ServerList::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ServerList
 namespace ClientList {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(ClientList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(ClientList::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ClientList
 namespace PartsList {
@@ -43,12 +49,15 @@ inline constexpr DataModel::AttributeEntry
 } // namespace PartsList
 namespace TagList {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(TagList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(TagList::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace TagList
 namespace EndpointUniqueID {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(EndpointUniqueID::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(EndpointUniqueID::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace EndpointUniqueID
 constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
     DeviceTypeList::kMetadataEntry,

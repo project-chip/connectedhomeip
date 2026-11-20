@@ -67,6 +67,16 @@ struct Type;
 struct DecodableType;
 } // namespace Logout
 
+namespace GetDeviceAuthURI {
+struct Type;
+struct DecodableType;
+} // namespace GetDeviceAuthURI
+
+namespace GetDeviceAuthURIResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetDeviceAuthURIResponse
+
 } // namespace Commands
 
 namespace Commands {
@@ -211,6 +221,80 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace Logout
+namespace GetDeviceAuthURI {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDeviceAuthURI::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return true; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDeviceAuthURI::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
+    static constexpr bool kIsFabricScoped = true;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+};
+}; // namespace GetDeviceAuthURI
+namespace GetDeviceAuthURIResponse {
+enum class Fields : uint8_t
+{
+    kUserCode                = 0,
+    kVerificationURI         = 1,
+    kVerificationURIComplete = 2,
+    kExpiresIn               = 3,
+    kInterval                = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDeviceAuthURIResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
+
+    chip::CharSpan userCode;
+    chip::CharSpan verificationURI;
+    Optional<chip::CharSpan> verificationURIComplete;
+    uint16_t expiresIn = static_cast<uint16_t>(0);
+    uint8_t interval   = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDeviceAuthURIResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
+
+    chip::CharSpan userCode;
+    chip::CharSpan verificationURI;
+    Optional<chip::CharSpan> verificationURIComplete;
+    uint16_t expiresIn = static_cast<uint16_t>(0);
+    uint8_t interval   = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetDeviceAuthURIResponse
 } // namespace Commands
 } // namespace AccountLogin
 } // namespace Clusters

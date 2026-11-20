@@ -69,7 +69,7 @@ static MTRTestKeys * sTestKeys = nil;
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
 {
     XCTAssertNotNil(error);
-    XCTAssertEqual(error.domain, MTRErrorDomain);
+    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
     XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
     [_expectation fulfill];
     _expectation = nil;

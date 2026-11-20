@@ -33,8 +33,9 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kManage, std::nullopt);
 } // namespace Clients
 namespace ClientTableSize {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ClientTableSize::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ClientTableSize::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ClientTableSize
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     ActiveNetworkIdentities::kMetadataEntry,

@@ -21,9 +21,6 @@
 
 #include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryStorage.h>
 #include <clusters/ThreadNetworkDirectory/Commands.h>
-#include <lib/core/CHIPError.h>
-
-#include <optional>
 
 namespace chip {
 namespace app {

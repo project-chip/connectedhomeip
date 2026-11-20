@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "LockConfig.h"
 #include "silabs_utils.h"
 
 // ---- Door lock Example App Config ----
@@ -26,14 +27,6 @@
 #define APP_TASK_NAME "Lock"
 
 #define BLE_DEV_NAME "SL-" APP_TASK_NAME
-
-// Time it takes in ms for the simulated actuator to move from one
-// state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 10
-
-// Time the device will be left in the unlatched state before sending it back to the unlocked state.
-// Left at 100 ms for testing purposes.
-#define UNLATCH_TIME_MS 100
 
 #define ON_DEMO_BITMAP                                                                                                             \
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  \

@@ -20,8 +20,9 @@ import json
 import logging
 import sqlite3
 import zipfile
+from collections.abc import Iterable
 from pathlib import Path
-from typing import IO, Iterable, Optional
+from typing import IO
 
 import memdf.util.sqlite
 
@@ -137,7 +138,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
             log.warning("Unknown file type '%s' ignored", filename)
 
     def select_thing_id(self, platform: str, config: str,
-                        target: str) -> Optional[str]:
+                        target: str) -> str | None:
         cur = self.execute(
             'SELECT id FROM thing WHERE platform=? AND config=? AND target=?',
             (platform, config, target))
@@ -199,7 +200,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
         builds: set[int] = set()
         stale_builds: set[int] = set()
         stale_artifacts: set[int] = set()
-        previous: Optional[sqlite3.Row] = None
+        previous: sqlite3.Row | None = None
         rows = []
 
         for row in cur.fetchall():

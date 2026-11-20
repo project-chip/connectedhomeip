@@ -43,6 +43,18 @@ namespace Clusters {
 namespace AccountLogin {
 namespace Attributes {
 
+namespace OAuthLoggedIn {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OAuthLoggedIn::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace OAuthLoggedIn
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -82,6 +94,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::OAuthLoggedIn::TypeInfo::DecodableType OAuthLoggedIn = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

@@ -24,7 +24,8 @@ namespace Attributes {
 namespace SupportedFormats {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedFormats::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedFormats
 namespace CurrentConnections {
@@ -33,6 +34,10 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace CurrentConnections
+namespace MaxZones {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxZones::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace MaxZones
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     SupportedFormats::kMetadataEntry,
     CurrentConnections::kMetadataEntry,
@@ -76,6 +81,12 @@ inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(FindTransport::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
                    Access::Privilege::kOperate);
 } // namespace FindTransport
+namespace UpdateMotionZoneOptions {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(UpdateMotionZoneOptions::Id,
+                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kOperate);
+} // namespace UpdateMotionZoneOptions
 
 } // namespace Commands
 

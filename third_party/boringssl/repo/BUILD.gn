@@ -34,8 +34,14 @@ config("boringssl_config_disable_warnings") {
 
   cflags_c = [ "-Wno-unterminated-string-initialization" ]
 
+  # TODO: Remove these discarded-qualifiers flags once BoringSSL is updated to
+  # a newer upstream version (where OPENSSL_memchr uses C++ const overloads
+  # compatible with glibc 2.42+ ISO C23 qualifier-preserving memchr).
   if (is_clang) {
     cflags += [ "-Wno-shorten-64-to-32" ]
+    cflags_c += [ "-Wno-incompatible-pointer-types-discards-qualifiers" ]
+  } else {
+    cflags_c += [ "-Wno-discarded-qualifiers" ]
   }
 }
 

@@ -47,7 +47,7 @@ import logging
 import os
 import re
 import shlex
-from typing import Any, Optional
+from typing import Any
 
 import click
 import coloredlogs
@@ -132,7 +132,7 @@ class ParsedCommands:
         # }
         return [e for e in self.json_data if re.search(r, e["file"])]
 
-    def find(self, reg_expr: str) -> Optional[CompileCommand]:
+    def find(self, reg_expr: str) -> CompileCommand | None:
         """
         Returns the FIRST match of reg_expr, processed as a CompileCommmand
         """
