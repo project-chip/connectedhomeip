@@ -1983,6 +1983,18 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     });
 }
 
+- (void)asyncGetOperationalCredentialsDelegateOnMatterQueue:(void (^)(MTROperationalCredentialsDelegate *,
+                                                                chip::Controller::DeviceCommissioner *))block
+{
+    dispatch_async(_chipWorkQueue, ^{
+        // Shutdown clears _cppCommissioner and then deletes the delegate, both on this queue.
+        if (![self isRunning] || self->_operationalCredentialsDelegate == nullptr) {
+            return;
+        }
+        block(self->_operationalCredentialsDelegate, self->_cppCommissioner);
+    });
+}
+
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
 {
     auto adapter = ^(chip::Controller::DeviceCommissioner *) {
