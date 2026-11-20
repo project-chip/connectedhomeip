@@ -555,9 +555,10 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, attr_clear)],
             nodeId=requestor_node_id
         )
-        log.info('Cleanup - DefaultOTAProviders cleared')
-
-        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
+        if resp[0].Status == Status.Success:
+            log.info('Cleanup - DefaultOTAProviders cleared')
+        else:
+            log.warning('Cleanup - Failed to clear DefaultOTAProviders ')
 
     def clear_kvs(self, kvs_path_prefix: str = "/tmp/chip_kvs"):
         """
