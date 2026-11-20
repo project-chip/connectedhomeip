@@ -1294,10 +1294,12 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     // Handle Group message counter here spec 4.7.3
     // spec 4.5.1.2 for msg counter
     Transport::PeerMessageCounter * counter = nullptr;
+    groups->SetListener(&gGroupPeerTable.get());
 
     if (CHIP_NO_ERROR ==
-        gGroupPeerTable->FindOrAddPeer(groupContext.fabric_index, packetHeaderCopy.GetSourceNodeId().Value(),
-                                       packetHeaderCopy.IsSecureSessionControlMsg(), counter))
+        gGroupPeerTable->FindOrAddPeer(groupContext.fabric_index, groupContext.keyset_id,
+                                       packetHeaderCopy.GetSourceNodeId().Value(), packetHeaderCopy.IsSecureSessionControlMsg(),
+                                       counter))
     {
         if (Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst == groupContext.security_policy)
         {
