@@ -170,6 +170,27 @@ class TestConformanceTest(DeviceConformanceTests):
         asserts.assert_false(success, "Unexpected success on a cluster with no FeatureMap")
         asserts.assert_equal([p.location for p in problems], [expected], f"Unexpected problems: {problems}")
 
+    def test_unreadable_cluster_revision(self):
+        self.endpoints_tlv = create_onoff_endpoint(1)
+        revision_id = Clusters.Identify.Attributes.ClusterRevision.attribute_id
+        for cluster_id, cluster in self.endpoints_tlv[1].items():
+            cluster[revision_id] = int(self.xml_clusters[cluster_id].revision)
+        success, problems = self.check_revisions(ignore_in_progress_test_event_only_disallowed_for_certification_and_sve=False)
+        asserts.assert_true(success, f"Unexpected revision problems with every revision matching the spec data: {problems}")
+
+        expected = AttributePathLocation(endpoint_id=1, cluster_id=Clusters.Identify.id, attribute_id=revision_id)
+        self.endpoints_tlv[1][Clusters.Identify.id][revision_id] = ValueDecodeFailure()
+        success, problems = self.check_revisions(ignore_in_progress_test_event_only_disallowed_for_certification_and_sve=False)
+        asserts.assert_false(success, "Unexpected success on a cluster whose ClusterRevision could not be read")
+        asserts.assert_equal([p.location for p in problems], [expected], f"Unexpected problems: {problems}")
+        asserts.assert_in("could not be read", problems[0].problem)
+
+        del self.endpoints_tlv[1][Clusters.Identify.id][revision_id]
+        success, problems = self.check_revisions(ignore_in_progress_test_event_only_disallowed_for_certification_and_sve=False)
+        asserts.assert_false(success, "Unexpected success on a cluster with no ClusterRevision")
+        asserts.assert_equal([p.location for p in problems], [expected], f"Unexpected problems: {problems}")
+        asserts.assert_in("could not be read", problems[0].problem)
+
     def add_macl(self, root_endpoint: dict[int, dict[int, Any]], populate_arl: bool = False, populate_commissioning_arl: bool = False):
         ac = Clusters.AccessControl
         root_endpoint[ac.id][ac.Attributes.FeatureMap.attribute_id] = ac.Bitmaps.Feature.kManagedDevice

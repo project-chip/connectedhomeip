@@ -319,11 +319,16 @@ class DeviceConformanceTests(BasicCompositionTests):
                     continue
                 if cluster_id in ignore_revisions:
                     continue
-                if int(self.xml_clusters[cluster_id].revision) != cluster[GlobalAttributeIds.CLUSTER_REVISION_ID]:
-                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
-                                                     attribute_id=GlobalAttributeIds.CLUSTER_REVISION_ID)
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                 attribute_id=GlobalAttributeIds.CLUSTER_REVISION_ID)
+                revision = cluster.get(GlobalAttributeIds.CLUSTER_REVISION_ID)
+                if revision is None or isinstance(revision, ValueDecodeFailure):
+                    record_error(location=location,
+                                 problem='ClusterRevision could not be read, so the revision cannot be checked for this cluster')
+                    continue
+                if int(self.xml_clusters[cluster_id].revision) != revision:
                     record_error(
-                        location=location, problem=f'Revision found on cluster ({cluster[GlobalAttributeIds.CLUSTER_REVISION_ID]}) does not match revision listed in the spec ({self.xml_clusters[cluster_id].revision})')
+                        location=location, problem=f'Revision found on cluster ({revision}) does not match revision listed in the spec ({self.xml_clusters[cluster_id].revision})')
 
         return success, problems
 
