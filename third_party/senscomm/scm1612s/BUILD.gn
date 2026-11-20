@@ -56,7 +56,7 @@ if (exclude_pattern != []) {
 }
 
 # Use relative Path
-_script_args += [ "--relative", "--objects" ]
+_script_args += [ "--relative" ]
 # GN treats json as a whole string, parse line by line
 #_script_args += [ "--json" ]
 
@@ -68,6 +68,7 @@ _wise_sdk_libs = exec_script(
 _config_libs = []
 foreach(lib, _wise_sdk_libs) {
   if (lib != "") {
+    print("Library: " + lib)
     _config_libs += [ "${scm1612s_sdk_root}/${lib}" ]
   }
 }
@@ -177,7 +178,9 @@ config("scm1612s_sdk_config") {
       "-Wl," + crtend_o,
     ]
 
-    # Link the SDK compiler outputs directly.
+    # Pull out static libs (.a files) from SDK
+    # Do not support the wildcard method
+    # libs = ["${scm1612s_sdk_root}/out-libs/*.a",]
     libs = _config_libs
 }
 

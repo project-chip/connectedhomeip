@@ -4,8 +4,6 @@ import os
 import sys
 import json
 import argparse
-import pathlib
-import subprocess
 
 def find_unique_libs(search_dir, exclude_dirs=None, exclude_patterns=None):
 
@@ -67,8 +65,6 @@ def main():
     parser.add_argument("--relative", action="store_true",
                        help="Output paths relative to search_dir")
     
-    parser.add_argument("--objects", action="store_true",
-                        help="List source-built objects from thin archive indexes")
     args = parser.parse_args()
     
     libs = find_unique_libs(
@@ -77,32 +73,10 @@ def main():
         exclude_patterns=args.exclude_patterns
     )
     
-    if args.objects:
-        objects = set()
-        ordered = []
-        for lib in sorted(libs):
-            path = pathlib.Path(lib)
-            with path.open("rb") as archive:
-                if archive.read(8) != b"!<thin>\n":
-                    parser.error(f"expected a source-built thin archive: {path}")
-            members = subprocess.check_output(
-                ["riscv32-elf-ar", "tP", str(path)], text=True
-            ).splitlines()
-            for member in members:
-                obj = pathlib.Path(member).resolve()
-                if obj.suffix != ".o" or not obj.is_file():
-                    parser.error(f"expected a compiled object in {path}: {member}")
-                if obj not in objects:
-                    objects.add(obj)
-                    ordered.append(str(obj))
-        libs = ordered
-
     if args.relative:
-        base = os.path.realpath(args.search_dir) if args.objects else args.search_dir
-        libs = [os.path.relpath(lib, base) for lib in libs]
+        libs = [os.path.relpath(lib, args.search_dir) for lib in libs]
     
-    if not args.objects:
-        libs.sort()
+    libs.sort()
 
     if args.json:
         print(json.dumps(libs))
