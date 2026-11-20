@@ -514,7 +514,8 @@ config("sanitize_memory") {
 
     # Use the MSan runtime from build_msan_sysroot.sh, built against the host
     # glibc, instead of the one prebuilt with Pigweed's clang.
-    "-resource-dir=" + rebase_path("${msan_sysroot}/clang-resource", root_build_dir),
+    "-resource-dir=" +
+        rebase_path("${msan_sysroot}/clang-resource", root_build_dir),
   ]
   defines = [ "CHIP_MEMORY_SANITIZER_ENABLED=1" ]
 }
