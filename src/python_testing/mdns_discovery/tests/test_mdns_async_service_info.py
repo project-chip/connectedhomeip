@@ -20,7 +20,7 @@ import unittest
 from unittest.mock import AsyncMock, Mock
 
 from mdns_discovery.mdns_async_service_info import AddressResolverIPv6, MdnsAsyncServiceInfo
-from zeroconf import DNSText, ServiceInfo, current_time_millis
+from zeroconf import DNSCache, DNSService, DNSText, ServiceInfo, current_time_millis
 from zeroconf._record_update import RecordUpdate
 from zeroconf.const import _CLASS_IN, _TYPE_SRV, _TYPE_TXT
 
@@ -60,6 +60,19 @@ class TestMdnsAsyncServiceInfo(unittest.TestCase):
         self.info.server = "device.local."
         self.info.port = 0
         self.assertTrue(self.info._is_complete)
+
+    def test_srv_and_txt_completes_on_srv(self):
+        self.info._query_record_types = {_TYPE_SRV, _TYPE_TXT}
+        self.assertFalse(self.info._is_complete)
+        self.info.server = "device.local."
+        self.info.port = 5540
+        self.assertTrue(self.info._is_complete)
+        self.assertEqual(self.info.addresses, [])
+
+    def test_txt_alone_does_not_complete_srv_and_txt(self):
+        self.info._query_record_types = {_TYPE_SRV, _TYPE_TXT}
+        self.info.text = b"\x04IC=1"
+        self.assertFalse(self.info._is_complete)
 
     def test_full_service_preserves_base_completion(self):
         for addresses in ([], [b"\xc0\x00\x02\x01"], [b"\x00" * 15 + b"\x01"]):
@@ -102,6 +115,25 @@ class TestMdnsAsyncRequest(unittest.IsolatedAsyncioTestCase):
         zc.async_remove_listener.assert_called_once_with(info)
         for call in zc.async_send.call_args_list:
             self.assertEqual({question.type for question in call.args[0].questions}, {_TYPE_TXT})
+
+    async def test_srv_and_txt_response_captures_txt(self):
+        info = MdnsAsyncServiceInfo(name=SERVICE_NAME, type_=SERVICE_TYPE)
+        info._query_record_types = {_TYPE_SRV, _TYPE_TXT}
+        zc = Mock(started=True, loop=asyncio.get_running_loop(), cache=DNSCache())
+
+        async def receive_srv_and_txt(*args):
+            records = [
+                DNSService(SERVICE_NAME, _TYPE_SRV, _CLASS_IN, 120, 0, 0, 5540, "device.local."),
+                DNSText(SERVICE_NAME, _TYPE_TXT, _CLASS_IN, 120, b"\x04IC=1"),
+            ]
+            info.async_update_records(zc, current_time_millis(), [RecordUpdate(r, None) for r in records])
+
+        info.async_wait = AsyncMock(side_effect=receive_srv_and_txt)
+        self.assertTrue(await info.async_request(zc, timeout_ms=1000))
+        self.assertEqual(info.port, 5540)
+        self.assertEqual(info.decoded_properties, {"IC": "1"})
+        for call in zc.async_send.call_args_list:
+            self.assertEqual({question.type for question in call.args[0].questions}, {_TYPE_SRV, _TYPE_TXT})
 
     async def test_missing_txt_times_out(self):
         info = MdnsAsyncServiceInfo(name=SERVICE_NAME, type_=SERVICE_TYPE)
