@@ -460,16 +460,16 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
     }
 
     uint32_t duration = forecast.endTime - forecast.startTime;
-    if (commandData.requestedStartTime < earliestStartTimeEpoch)
+    if (commandData.requestedStartTime <= earliestStartTimeEpoch)
     {
-        ChipLogError(Zcl, "DEM: Bad requestedStartTime %" PRIu32 ", earlier than earliestStartTime %" PRIu32 ".",
+        ChipLogError(Zcl, "DEM: Bad requestedStartTime %" PRIu32 ", not later than earliestStartTime %" PRIu32 ".",
                      commandData.requestedStartTime, earliestStartTimeEpoch);
         return Status::ConstraintError;
     }
 
-    if ((commandData.requestedStartTime + duration) > latestEndTimeEpoch)
+    if ((commandData.requestedStartTime + duration) >= latestEndTimeEpoch)
     {
-        ChipLogError(Zcl, "DEM: Bad requestedStartTimeEpoch + duration %" PRIu32 ", later than latestEndTime %" PRIu32 ".",
+        ChipLogError(Zcl, "DEM: Bad requestedStartTimeEpoch + duration %" PRIu32 ", not earlier than latestEndTime %" PRIu32 ".",
                      commandData.requestedStartTime + duration, latestEndTimeEpoch);
         return Status::ConstraintError;
     }
