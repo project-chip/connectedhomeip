@@ -19,7 +19,6 @@
 #include <EnergyEvseDelegateImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/EventLogging.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/energy-evse-server/CodegenIntegration.h>
 #include <app/reporting/reporting.h>
@@ -1647,7 +1646,7 @@ Status EnergyEvseDelegate::SendEVConnectedEvent()
 {
     Events::EVConnected::Type event;
 
-    VerifyOrReturnError(mCluster != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
+    VerifyOrReturnError(mCluster != nullptr, Status::Failure, ChipLogError(AppServer, "Cluster is Null"));
     DataModel::Nullable<uint32_t> sessionID = mCluster->GetSessionID();
     VerifyOrReturnError(!sessionID.IsNull(), Status::Failure, ChipLogError(AppServer, "SessionID is Null"));
 
@@ -1661,7 +1660,7 @@ Status EnergyEvseDelegate::SendEVNotDetectedEvent()
 {
     Events::EVNotDetected::Type event;
 
-    VerifyOrReturnError(mCluster != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
+    VerifyOrReturnError(mCluster != nullptr, Status::Failure, ChipLogError(AppServer, "Cluster is Null"));
     DataModel::Nullable<uint32_t> sessionID = mCluster->GetSessionID();
     VerifyOrReturnError(!sessionID.IsNull(), Status::Failure, ChipLogError(AppServer, "SessionID is Null"));
 
@@ -1679,7 +1678,7 @@ Status EnergyEvseDelegate::SendEnergyTransferStartedEvent()
 {
     Events::EnergyTransferStarted::Type event;
 
-    VerifyOrReturnError(mCluster != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
+    VerifyOrReturnError(mCluster != nullptr, Status::Failure, ChipLogError(AppServer, "Cluster is Null"));
     DataModel::Nullable<uint32_t> sessionID = mCluster->GetSessionID();
     VerifyOrReturnError(!sessionID.IsNull(), Status::Failure, ChipLogError(AppServer, "SessionID is Null"));
 
@@ -1718,7 +1717,7 @@ Status EnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedR
 {
     Events::EnergyTransferStopped::Type event;
 
-    VerifyOrReturnError(mCluster != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
+    VerifyOrReturnError(mCluster != nullptr, Status::Failure, ChipLogError(AppServer, "Cluster is Null"));
     DataModel::Nullable<uint32_t> sessionID = mCluster->GetSessionID();
     VerifyOrReturnError(!sessionID.IsNull(), Status::Failure, ChipLogError(AppServer, "SessionID is Null"));
 
@@ -1748,7 +1747,7 @@ Status EnergyEvseDelegate::SendFaultEvent(FaultStateEnum newFaultState)
 {
     Events::Fault::Type event;
 
-    VerifyOrReturnError(mCluster != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
+    VerifyOrReturnError(mCluster != nullptr, Status::Failure, ChipLogError(AppServer, "Cluster is Null"));
     event.sessionID               = mCluster->GetSessionID(); // Note here the event sessionID can be Null!
     event.state                   = GetState();               // This is the state prior to the fault being raised
     event.faultStatePreviousState = GetFaultState();

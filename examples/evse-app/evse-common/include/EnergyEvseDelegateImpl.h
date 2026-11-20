@@ -52,7 +52,7 @@ enum EVSEStateMachineEvent
 /**
  * Helper class to handle session timing and energy meter deltas.
  * Session attribute values are stored in the cluster (EnergyEvseCluster) and
- * updated through Instance setters. This class only tracks the internal
+ * updated through EnergyEvseCluster setters. This class only tracks the internal
  * computation state (start time, energy meter baselines).
  */
 class EvseSession
@@ -63,7 +63,7 @@ public:
     /**
      * @brief Start a new session: assigns a session ID, resets duration/energy counters.
      *
-     * @param instance              - The cluster Instance to update attributes on
+     * @param cluster              - The cluster whose session attributes are updated
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
@@ -72,7 +72,7 @@ public:
     /**
      * @brief Stop the current session: recalculates duration and energy values.
      *
-     * @param instance              - The cluster Instance to update attributes on
+     * @param cluster              - The cluster whose session attributes are updated
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
@@ -81,14 +81,14 @@ public:
     /**
      * @brief Recalculate session duration from start time to now.
      *
-     * @param instance - The cluster Instance to update attributes on
+     * @param cluster - The cluster whose session attributes are updated
      */
     void RecalculateSessionDuration(EnergyEvseCluster * cluster);
 
     /**
      * @brief Update the session's charged energy delta.
      *
-     * @param instance           - The cluster Instance to update attributes on
+     * @param cluster            - The cluster whose session attributes are updated
      * @param chargingMeterValue - The current value of the energy meter (charging) in mWh
      */
     void UpdateEnergyCharged(EnergyEvseCluster * cluster, int64_t chargingMeterValue);
@@ -96,7 +96,7 @@ public:
     /**
      * @brief Update the session's discharged energy delta.
      *
-     * @param instance              - The cluster Instance to update attributes on
+     * @param cluster              - The cluster whose session attributes are updated
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
     void UpdateEnergyDischarged(EnergyEvseCluster * cluster, int64_t dischargingMeterValue);
@@ -274,7 +274,11 @@ public:
     void SetInstance(Instance * aInstance);
     Instance * GetInstance() { return mInstance; }
 
-    void SetCluster(EnergyEvseCluster * aCluster) { mCluster = aCluster; }
+    void SetCluster(EnergyEvseCluster * aCluster)
+    {
+        mInstance = nullptr;
+        mCluster  = aCluster;
+    }
     EnergyEvseCluster * GetCluster() { return mCluster; }
 
     // ------------------------------------------------------------------
