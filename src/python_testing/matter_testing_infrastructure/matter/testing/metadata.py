@@ -34,6 +34,9 @@ NIGHTLY_TAG = "nightly"
 NEEDS_FOLLOWUP_FIXES_TAG = "needs-followup-fixes"
 # The run needs an app and controller built with OpenSSL 3.5, so it runs only in the OpenSSL 3.5 job.
 OPENSSL_3_5_TAG = "openssl-3.5"
+# The run commissions over the mocked BLE and Wi-Fi topology, which needs root and network namespaces, so it runs
+# only in the BLE-WiFi CI step.
+BLE_WIFI_TAG = "ble-wifi"
 
 # A --tag value with this prefix leaves out the runs that have the tag, so no tag name may start with it.
 SKIP_TAG_PREFIX = "skip-"
@@ -42,7 +45,7 @@ SKIP_TAG_PREFIX = "skip-"
 _TAG_NAME = re.compile(r"[a-z0-9][a-z0-9.-]*")
 
 # Runs with these tags run only in their own CI job, so a TagFilter leaves them out unless a --tag value names the tag.
-_DEDICATED_JOB_TAGS = frozenset({NIGHTLY_TAG, OPENSSL_3_5_TAG})
+_DEDICATED_JOB_TAGS = frozenset({BLE_WIFI_TAG, NIGHTLY_TAG, OPENSSL_3_5_TAG})
 
 
 def is_valid_tag_name(name: str) -> bool:
