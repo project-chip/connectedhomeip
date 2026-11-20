@@ -25,6 +25,7 @@ chip_test_suite("tests") {
   sources = [ "CheckOnlyServer.h" ]
 
   test_sources = [
+    "TestAddressPolicyFiltered.cpp",
     "TestMinimalMdnsAllocator.cpp",
     "TestQueryReplyFilter.cpp",
     "TestResponseSender.cpp",
@@ -46,6 +47,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/dnssd/minimal_mdns",
+    "${chip_root}/src/lib/dnssd/minimal_mdns:filtered_policy",
     "${chip_root}/src/transport/raw/tests:helpers",
   ]
 }
