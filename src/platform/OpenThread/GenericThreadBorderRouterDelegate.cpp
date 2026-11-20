@@ -57,6 +57,12 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::Init(AttributeChangeCallback *
 {
     mpActivateDatasetCallback = nullptr;
     mpAttributeChangeCallback = callback;
+    if (callback == nullptr)
+    {
+        // The cluster calls Init(nullptr) from its Shutdown().
+        DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+        return CHIP_NO_ERROR;
+    }
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     // When the Thread Border Router is reboot during SetActiveDataset, we need to revert the active dateset.
     TEMPORARY_RETURN_IGNORED RevertActiveDataset();
@@ -159,18 +165,22 @@ void GenericOpenThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceL
     {
         if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_THREAD_NETIF_STATE)
         {
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
-                [delegate]() { delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::InterfaceEnabled::Id); });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate]() {
+                VerifyOrReturn(delegate->mpAttributeChangeCallback != nullptr);
+                delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::InterfaceEnabled::Id);
+            });
         }
         if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_ACTIVE_DATASET)
         {
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate]() {
+                VerifyOrReturn(delegate->mpAttributeChangeCallback != nullptr);
                 delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::ActiveDatasetTimestamp::Id);
             });
         }
         if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_PENDING_DATASET)
         {
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate]() {
+                VerifyOrReturn(delegate->mpAttributeChangeCallback != nullptr);
                 delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::PendingDatasetTimestamp::Id);
             });
         }

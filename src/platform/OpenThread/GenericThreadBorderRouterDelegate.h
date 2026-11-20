@@ -80,8 +80,10 @@ public:
         TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(name, borderRouterName);
         if (mpAttributeChangeCallback)
         {
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
-                [this]() { mpAttributeChangeCallback->ReportAttributeChanged(Attributes::BorderRouterName::Id); });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                VerifyOrReturn(mpAttributeChangeCallback != nullptr);
+                mpAttributeChangeCallback->ReportAttributeChanged(Attributes::BorderRouterName::Id);
+            });
         }
     }
 
@@ -91,8 +93,10 @@ public:
         {
             // OpenThread doesn't have callback or event for BorderAgentId change, we can only change the BorderAgentId with
             // otBorderAgentSetId(). Please call this function with otBorderAgentSetId().
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
-                [this]() { mpAttributeChangeCallback->ReportAttributeChanged(Attributes::BorderAgentID::Id); });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                VerifyOrReturn(mpAttributeChangeCallback != nullptr);
+                mpAttributeChangeCallback->ReportAttributeChanged(Attributes::BorderAgentID::Id);
+            });
         }
     }
 
