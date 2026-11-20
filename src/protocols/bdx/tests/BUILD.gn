@@ -42,10 +42,12 @@ chip_test_suite("tests") {
     test_sources += [
       "TestAsyncTransferFacilitator.cpp",
       "TestBusyResponder.cpp",
+      "TestTransferDiagnosticLogExchange.cpp",
     ]
     public_deps += [
       "${chip_root}/src/messaging",
       "${chip_root}/src/messaging/tests:helpers",
+      "${chip_root}/src/transport/raw/tests:helpers",
     ]
   }
 
