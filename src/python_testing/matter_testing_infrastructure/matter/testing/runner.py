@@ -1012,7 +1012,8 @@ def matter_test_args_parser() -> argparse.ArgumentParser:
     basic_group.add_argument('--restart-flag-file', type=str, default=None,
                              help="The full path of the file to use to signal a restart to the app")
     basic_group.add_argument('--debug', action="store_true", default=False,
-                             help="Run the script in debug mode. This is needed to capture attribute dump at end of test modules if there are problems found during testing.")
+                             help="Run the script in debug mode. This is needed to capture attribute dump at end of test modules if there are problems found during testing. "
+                             "It also keeps the native SDK logs from the wildcard subscription setup, which are otherwise reduced to errors.")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
