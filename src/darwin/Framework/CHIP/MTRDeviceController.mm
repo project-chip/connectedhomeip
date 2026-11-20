@@ -624,9 +624,12 @@ using namespace chip::Tracing::DarwinFramework;
     commissioningComplete:(NSError * _Nullable)error
                    nodeID:(NSNumber * _Nullable)nodeID
                   metrics:(MTRMetrics *)metrics
+                  context:(NSDictionary<NSString *, id> *)context
 {
     [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-        if ([delegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
+        if ([delegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:context:)]) {
+            [delegate controller:controller commissioningComplete:error nodeID:nodeID metrics:metrics context:context];
+        } else if ([delegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
             [delegate controller:controller commissioningComplete:error nodeID:nodeID metrics:metrics];
         } else if ([delegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)]) {
             [delegate controller:controller commissioningComplete:error nodeID:nodeID];
