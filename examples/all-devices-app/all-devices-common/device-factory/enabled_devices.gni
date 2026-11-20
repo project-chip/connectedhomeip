@@ -247,6 +247,10 @@ _available_devices = [
     "SOIL_SENSOR",
   ],
   [
+    "solar-power",
+    "SOLAR_POWER",
+  ],
+  [
     "speaker",
     "SPEAKER",
   ],
