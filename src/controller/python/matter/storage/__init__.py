@@ -248,6 +248,19 @@ class VolatileTemporaryPersistentStorage(PersistentStorageBase):
 # Regular expression to match CA keys.
 _caKeyMatch = re.compile(r'(ExampleCAIntermediateCert|ExampleCARootCert|ExampleOpCredsCAKey|ExampleOpCredsICAKey)(\d+)')
 
+# Matches a hex-escaped byte in an INI key (see src/lib/support/IniEscaping.cpp).
+_iniKeyEscapeMatch = re.compile(rb'\\x([0-9a-f]{2})')
+
+
+def _escapeIniKey(key: str) -> str:
+    """Escapes the UTF-8 bytes of an INI key the same way as chip-tool's EscapeKey()."""
+    return ''.join(f'\\x{b:02x}' if (b <= 0x20 or b in b'=\\' or b >= 0x7f) else chr(b) for b in key.encode('utf-8'))
+
+
+def _unescapeIniKey(key: str) -> str:
+    """Reverses _escapeIniKey(), decoding the unescaped bytes as UTF-8."""
+    return _iniKeyEscapeMatch.sub(lambda m: bytes([int(m.group(1), 16)]), key.encode('utf-8')).decode('utf-8')
+
 
 class PersistentStorageJSON(PersistentStorageBase):
     """Persistent storage back-end which stores data in a JSON file."""
@@ -317,6 +330,26 @@ class PersistentStorageINI(PersistentStorageBase):
     This persistent storage is compatible with the chip-tool implementation.
     """
 
+    def _caKeysWithNocaListRewrite(self, data: dict, sdkData: dict):
+        """Creates a caList entry if the keys are present
+
+        This typically occurs when chip-tool is used to commission the device.
+        """
+        caKeys = set()
+        for key in sdkData:
+            if match := _caKeyMatch.fullmatch(key):
+                caKeys.add(int(match.group(2)))
+
+        caListRewritten = data.get('caList', {})
+        if caKeys:
+            for key in caKeys:
+                if str(key) not in caListRewritten:
+                    LOGGER.warning("Keys detected for index %d, creating empty caList entry", key)
+                    caListRewritten[str(key)] = []
+
+        data['caList'] = caListRewritten
+        return data, sdkData
+
     class ConfigParser(ConfigParser):
         """Parser that preserves key case and does not use interpolation."""
 
@@ -346,7 +379,7 @@ class PersistentStorageINI(PersistentStorageBase):
             config = PersistentStorageINI.ConfigParser()
             config.read(path)
             if config.has_section('Default'):
-                sdkData = dict(config.items('Default'))
+                sdkData = {_unescapeIniKey(k): v for k, v in config.items('Default')}
             if config.has_section('REPL'):
                 data = {
                     k: json.loads(v) if v else None
@@ -356,7 +389,8 @@ class PersistentStorageINI(PersistentStorageBase):
                 LOGGER.info("Loading fabric configuration from INI file: %s", chipToolFabricStoragePath)
                 config.read(chipToolFabricStoragePath)
                 for key, value in config.items('Default'):
-                    sdkData[key] = value
+                    sdkData[_unescapeIniKey(key)] = value
+            data, sdkData = self._caKeysWithNocaListRewrite(data, sdkData)
         except Exception as ex:
             LOGGER.critical("Could not load configuration from INI file: %s", ex)
         super().__init__(data, sdkData)
@@ -377,7 +411,7 @@ class PersistentStorageINI(PersistentStorageBase):
             except Exception as ex:
                 LOGGER.critical("Could not save fabric configuration to INI file: %s", ex)
         config = PersistentStorageINI.ConfigParser()
-        config['Default'] = sdkConfig
+        config['Default'] = {_escapeIniKey(k): v for k, v in sdkConfig.items()}
         config['REPL'] = {
             k: json.dumps(v, separators=(',', ':'))
             for k, v in self._data.items()
