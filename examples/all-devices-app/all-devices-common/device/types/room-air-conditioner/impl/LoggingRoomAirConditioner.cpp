@@ -37,6 +37,12 @@ LoggingRoomAirConditioner::~LoggingRoomAirConditioner()
     mTimerDelegate.CancelTimer(this);
 }
 
+void LoggingRoomAirConditioner::Unregister(CodeDrivenDataModelProvider & provider)
+{
+    mTimerDelegate.CancelTimer(this);
+    RoomAirConditioner::Unregister(provider);
+}
+
 CHIP_ERROR LoggingRoomAirConditioner::RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                          EndpointComposition composition)
 {
@@ -106,6 +112,7 @@ void LoggingRoomAirConditioner::OnOffStartup(bool on)
     // Schedule the startup logic using the timer delegate.
     // This ensures that all clusters (including ThermostatCluster) are fully
     // initialized and their states are loaded from KVS before we attempt to sync them.
+    mTimerDelegate.CancelTimer(this);
     CHIP_ERROR err = mTimerDelegate.StartTimer(this, System::Clock::Milliseconds32(0));
     LogErrorOnFailure(err);
 }

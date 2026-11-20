@@ -71,18 +71,13 @@ public:
     using RootNode::Register;
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override
     {
+        VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
         DeviceRegistrationTransaction transaction(*this, provider);
         ReturnErrorOnFailure(RootNode::RegisterRootClusters(endpoint, provider, composition));
         ReturnErrorOnFailure(RegisterFeaturesImpl(endpoint, provider, std::index_sequence_for<Features...>{}));
         ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
         transaction.Commit();
         return CHIP_NO_ERROR;
-    }
-
-    void Unregister(CodeDrivenDataModelProvider & provider) override
-    {
-        RootNode::Unregister(provider);
-        UnregisterFeaturesImpl(provider, std::index_sequence_for<Features...>{});
     }
 
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override
@@ -119,6 +114,13 @@ private:
         };
         (attempt(std::get<I>(mFeatures)), ...);
         return err;
+    }
+
+    // Features hold references to base clusters (e.g. GeneralCommissioning), so they are removed
+    // before RootNode destroys those clusters, but only after the endpoint is unregistered.
+    void UnregisterExtraClusters(CodeDrivenDataModelProvider & provider) override
+    {
+        UnregisterFeaturesImpl(provider, std::index_sequence_for<Features...>{});
     }
 
     template <std::size_t... I>

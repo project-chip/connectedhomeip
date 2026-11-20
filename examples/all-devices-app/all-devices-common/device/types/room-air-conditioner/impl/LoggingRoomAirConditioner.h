@@ -36,6 +36,8 @@ public:
                               std::optional<EndpointComposition::SemanticTag> tag = std::nullopt);
     ~LoggingRoomAirConditioner() override;
 
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
+
     Clusters::ThermostatUserInterfaceConfigurationCluster & UserInterfaceCluster() { return mUserInterfaceCluster.Cluster(); }
 
     // TimerContext

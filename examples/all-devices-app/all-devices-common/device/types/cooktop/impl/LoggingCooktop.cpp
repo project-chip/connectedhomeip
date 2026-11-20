@@ -83,8 +83,16 @@ CHIP_ERROR LoggingCooktop::RegisterParts(EndpointIdAllocator & allocator, CodeDr
 
 void LoggingCooktop::UnregisterParts(CodeDrivenDataModelProvider & provider)
 {
-    mSurface2.Unregister(provider);
-    mSurface1.Unregister(provider);
+    // A surface whose registration was rolled back has no endpoint to remove: unregistering it
+    // again would fail in RemoveEndpoint().
+    if (mSurface2.GetEndpointId() != kInvalidEndpointId)
+    {
+        mSurface2.Unregister(provider);
+    }
+    if (mSurface1.GetEndpointId() != kInvalidEndpointId)
+    {
+        mSurface1.Unregister(provider);
+    }
 }
 
 } // namespace chip::app

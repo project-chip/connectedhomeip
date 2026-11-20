@@ -68,6 +68,8 @@ public:
                      Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
                      TestEventTriggerDelegate & testEventTriggerDelegate);
     ~SimulatedClosure() override;
+
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
     Protocols::InteractionModel::Status HandleStopCommand() override;
 
     Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<Clusters::ClosureControl::TargetPositionEnum> & position,

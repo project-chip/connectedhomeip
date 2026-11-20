@@ -33,6 +33,8 @@ public:
     explicit SimulatedClosurePanel(Config config, TimerDelegate & delegate);
     ~SimulatedClosurePanel() override;
 
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
+
     Protocols::InteractionModel::Status HandleSetTarget(const Optional<Percent100ths> & position, const Optional<bool> & latch,
                                                         const Optional<Clusters::Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status HandleStep(const Clusters::ClosureDimension::StepDirectionEnum & direction,
