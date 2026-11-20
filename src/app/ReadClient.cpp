@@ -203,10 +203,19 @@ CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscripti
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ReadClient::AbortRead()
+{
+    VerifyOrReturnError(IsReadType(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!IsIdle(), CHIP_ERROR_INCORRECT_STATE);
+    Close(CHIP_ERROR_CANCELLED, false);
+    return CHIP_NO_ERROR;
+}
+
 void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
 {
     if (IsReadType())
     {
+        MoveToState(ClientState::Idle);
         if (aError != CHIP_NO_ERROR)
         {
             mpCallback.OnError(aError);
@@ -260,6 +269,14 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
     mExchange.Release();
 
     mpCallback.OnDone(this);
+}
+
+void ReadClient::OnExchangeClosing(Messaging::ExchangeContext *)
+{
+    if (IsReadType() && !IsIdle())
+    {
+        Close(CHIP_ERROR_CONNECTION_ABORTED, false);
+    }
 }
 
 const char * ReadClient::GetStateStr() const

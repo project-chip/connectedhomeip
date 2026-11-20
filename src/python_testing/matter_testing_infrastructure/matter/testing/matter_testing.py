@@ -2535,7 +2535,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True, verify_wildcard_subscription: bool | None = None) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True, verify_wildcard_subscription: bool | None = None,
+            *, readOperation: Clusters.Attribute.ReadOperationOptions | None = None) -> object:
         """Read a single attribute value from a device.
 
         Args:
@@ -2548,11 +2549,14 @@ class MatterBaseTest(base_test.BaseTestClass):
                 wildcard-subscription verification.  None (default) defers to the
                 class-level default_verify_wildcard_subscription; False skips
                 the check for this read only.
+            readOperation: Explicit one-shot native abort/deadline options.
+                None preserves the controller's existing read behavior.
 
         Returns:
             The attribute value.
         """
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
+        read_options = {'readOperation': readOperation} if readOperation is not None else {}
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered, **read_options)
         data = result[endpoint]
         attr_ret = list(data.values())[0][attribute]
 
@@ -2570,6 +2574,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 endpoint_id=endpoint,
                 assert_on_error=True,
                 dev_ctrl=dev_ctrl,
+                **read_options,
             )
 
         return attr_ret
@@ -2627,14 +2632,21 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, endpoint: int | None = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD, verify_wildcard_subscription: bool | None = None) -> object:
+            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, endpoint: int | None = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD, verify_wildcard_subscription: bool | None = None,
+            *, readOperation: Clusters.Attribute.ReadOperationOptions | None = None) -> object:
+        """Read and validate an attribute, optionally opting into native abort/deadline handling.
+
+        readOperation is forwarded only when supplied; assertion and subscription-cache
+        verification behavior is unchanged.
+        """
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
             endpoint = self.get_endpoint()
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability)
+        read_options = {'readOperation': readOperation} if readOperation is not None else {}
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability, **read_options)
         attr_ret = result[endpoint][cluster][attribute]
         read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type
@@ -2674,6 +2686,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 test_name=test_name,
                 assert_on_error=True,
                 dev_ctrl=dev_ctrl,
+                **read_options,
             )
 
         return attr_ret
@@ -2705,7 +2718,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             endpoint_id: int | None = None,
             test_name: str = "",
             assert_on_error: bool = True,
-            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None) -> bool:
+            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None,
+            *, readOperation: Clusters.Attribute.ReadOperationOptions | None = None) -> bool:
         """Compare a freshly-read attribute value against the background wildcard subscription cache.
 
         Called automatically from the base-class read helpers so any single-attribute read
@@ -2752,6 +2766,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                              If False, records a problem via record_error() and returns False.
             dev_ctrl:       Controller used for the direct read.  When its fabric differs
                             from the subscription controller's fabric, validation is skipped.
+            readOperation:  Explicit native abort/deadline options for a nested ACL read.
 
         Returns:
             True if the values match or the check was skipped; False on mismatch.
@@ -2832,7 +2847,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 )
                 return True
 
-            if await self._is_subscription_acl_removed():
+            read_options = {'readOperation': readOperation} if readOperation is not None else {}
+            if await self._is_subscription_acl_removed(**read_options):
                 LOGGER.warning(
                     "[verify_subscription] Subscription controller ACL entry removed by test, "
                     "skipping validation for %s on endpoint %s (read=%r, cache=%r)",
@@ -2900,7 +2916,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         filtered_cache = [entry for entry in cached_value if entry.fabricIndex in read_fabric_indices]
         return filtered_cache == read_value
 
-    async def _is_subscription_acl_removed(self) -> bool:
+    async def _is_subscription_acl_removed(
+            self, *, readOperation: Clusters.Attribute.ReadOperationOptions | None = None) -> bool:
         """Check whether the subscription controller's ACL entry has been removed from the DUT.
 
         Returns True if the subscription controller no longer has an ACL entry,
@@ -2909,14 +2926,18 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.subscription_controller is None:
             return False
         sub_node_id = self.matter_test_config.controller_node_id + 123456
+        read_options = {'readOperation': readOperation} if readOperation is not None else {}
         try:
             acl_result = await self.default_controller.ReadAttribute(
                 nodeId=self.dut_node_id,
                 attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+                **read_options,
             )
             current_acl = acl_result[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
             return all(not (entry.subjects and sub_node_id in entry.subjects) for entry in current_acl)
         except Exception as e:
+            if readOperation is not None and isinstance(e, TimeoutError):
+                raise
             LOGGER.warning("[verify_subscription] Could not read ACL to check for conflict: %s", e)
             return False
 

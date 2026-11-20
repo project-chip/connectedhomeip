@@ -31,6 +31,7 @@
 #include <controller/python/matter/native/PyChipError.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
 
@@ -541,6 +542,11 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
 
 exit:
     return ToPyChipError(err);
+}
+
+DLL_EXPORT PyChipError pychip_ReadClient_AbortRead(ReadClient * apReadClient)
+{
+    return ToPyChipError(apReadClient == nullptr ? CHIP_NO_ERROR : apReadClient->AbortRead());
 }
 
 void pychip_ReadClient_ShutdownSubscription(ReadClient * apReadClient)

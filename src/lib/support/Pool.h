@@ -107,9 +107,9 @@ protected:
 
     using Lambda = Loop (*)(void * context, void * object);
     Loop ForEachActiveObjectInner(void * context, Lambda lambda);
-    Loop ForEachActiveObjectInner(void * context, Loop lambda(void * context, const void * object)) const
+    Loop ForEachActiveObjectInner(void * context, Lambda lambda) const
     {
-        return const_cast<StaticAllocatorBitmap *>(this)->ForEachActiveObjectInner(context, reinterpret_cast<Lambda>(lambda));
+        return const_cast<StaticAllocatorBitmap *>(this)->ForEachActiveObjectInner(context, lambda);
     }
 
 private:
@@ -131,7 +131,7 @@ public:
     {
         return static_cast<LambdaProxy *>(context)->mFunction(static_cast<T *>(target));
     }
-    static Loop ConstCall(void * context, const void * target)
+    static Loop ConstCall(void * context, void * target)
     {
         return static_cast<LambdaProxy *>(context)->mFunction(static_cast<const T *>(target));
     }
@@ -171,9 +171,9 @@ struct HeapObjectList : HeapObjectListNode
 
     using Lambda = Loop (*)(void *, void *);
     Loop ForEachNode(void * context, Lambda lambda);
-    Loop ForEachNode(void * context, Loop lambda(void * context, const void * object)) const
+    Loop ForEachNode(void * context, Lambda lambda) const
     {
-        return const_cast<HeapObjectList *>(this)->ForEachNode(context, reinterpret_cast<Lambda>(lambda));
+        return const_cast<HeapObjectList *>(this)->ForEachNode(context, lambda);
     }
 
     /// Cleans up any deferred releases IFF iteration depth is 0

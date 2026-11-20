@@ -49,6 +49,10 @@ config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
 }
 
+config("controller_abi_visibility") {
+  cflags = [ "-fvisibility=default" ]
+}
+
 if (chip_support_commissioning_in_controller) {
   _chip_device_ctrl_output_name = "_ChipDeviceCtrl"
 } else {
@@ -225,7 +229,10 @@ shared_library("ChipDeviceCtrl") {
     public_deps += [ "$chip_data_model" ]
   }
 
-  configs += [ ":controller_wno_deprecate" ]
+  configs += [
+    ":controller_wno_deprecate",
+    ":controller_abi_visibility",
+  ]
 }
 
 pw_python_package("matter-core-module") {
@@ -499,7 +506,10 @@ if (chip_support_commissioning_in_controller) {
         version = chip_python_version
       }
     }
-    tests = [ "tests/test_commissioning_flow_blocks.py" ]
+    tests = [
+      "tests/test_commissioning_flow_blocks.py",
+      "tests/test_read_operation.py",
+    ]
     python_deps = [
       ":matter-clusters-module",
       ":matter-core-module",
