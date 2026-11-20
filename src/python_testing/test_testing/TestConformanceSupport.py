@@ -1073,16 +1073,6 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
             asserts.assert_equal(conformance(info).decision, ConformanceDecision.OPTIONAL, 'Unexpected conformance')
             asserts.assert_equal(conformance(info).choice, Choice('b', False), 'Unexpected choice in conformance')
 
-            # - provisional element in a choice set P, O.a
-            xml = ('<otherwiseConform>'
-                   '<provisionalConform />'
-                   f'<optionalConform {xml_attrs} />'
-                   '</otherwiseConform>')
-            conformance = self.check_good_choice(xml, f'P, O.{suffix}')
-            asserts.assert_equal(conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision,
-                                 ConformanceDecision.PROVISIONAL, 'Unexpected conformance')
-            self.check_decision(more, conformance, 0, [], [])
-
             # Ones that should throw exceptions
 
             def check_bad_choice(xml: str):

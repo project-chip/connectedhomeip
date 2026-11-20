@@ -575,15 +575,10 @@ class otherwise(Conformance):
         # Deprecated items are either on their own, or follow an O as O,D.
         # For O,D, optional applies (leftmost), but we should consider some way to warn here as well,
         # possibly in another function
-        for i, op in enumerate(self.op_list):
+        for op in self.op_list:
             decision_with_choice = op(conformance_assessment_data)
             if decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
                 continue
-            if decision_with_choice.decision == ConformanceDecision.PROVISIONAL:
-                # The terms after P are the element's conformance once it is no longer provisional.
-                # The element counts toward the choice set those terms name (e.g. "P, O.a" is in set a).
-                remaining = otherwise(self.op_list[i + 1:])(conformance_assessment_data)
-                return ConformanceDecisionWithChoice(ConformanceDecision.PROVISIONAL, remaining.choice)
             return decision_with_choice
         return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
 

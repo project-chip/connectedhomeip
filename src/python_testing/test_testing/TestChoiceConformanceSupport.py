@@ -305,7 +305,7 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
         tests = [([], failure), ([0], no_failure), ([1], no_failure), ([0, 1], no_failure)]
         evaluate_test_scenarios(clusters, tests, 1)
 
-    def test_choice_counts_and_provisional_members(self):
+    def test_choice_counts(self):
         def evaluate_test_scenarios(conformances: list[str], tests: list[tuple[list[int], set[str]]]):
             clusters: dict[int, XmlCluster] = {}
             cluster_xml = ElementTree.fromstring(create_cluster_with_attribute_conformances(conformances))
@@ -319,17 +319,9 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
         failure = {'a'}
         no_failure = set()
 
-        # Attr0 = O.a, Attr1 = P, O.a: exactly one, and the provisional element counts
-        tests = [([], failure), ([0], no_failure), ([1], no_failure), ([0, 1], failure)]
-        evaluate_test_scenarios(['<optionalConform choice="a" />',
-                                 '<otherwiseConform><provisionalConform /><optionalConform choice="a" /></otherwiseConform>'],
-                                tests)
-
-        # Attr0 = O.a-, Attr1 = P, O.a-: at most one
+        # Attr0, Attr1 = O.a-: at most one
         tests = [([], no_failure), ([0], no_failure), ([1], no_failure), ([0, 1], failure)]
-        evaluate_test_scenarios(['<optionalConform choice="a" max="1" />',
-                                 '<otherwiseConform><provisionalConform /><optionalConform choice="a" max="1" /></otherwiseConform>'],
-                                tests)
+        evaluate_test_scenarios(['<optionalConform choice="a" max="1" />'] * 2, tests)
 
         # Attr0, Attr1, Attr2 = O.a2+: at least two
         tests = [([], failure), ([0], failure), ([0, 1], no_failure), ([0, 1, 2], no_failure)]
