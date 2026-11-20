@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -206,39 +206,36 @@ public:
                                      IdentificationDeclarationOptions idOptions = IdentificationDeclarationOptions());
 
     /**
-     * @brief This is a continuation of the CastingPlayer/Commissioner-Generated passcode commissioning flow started via the
-     * VerifyOrEstablishConnection() API above. It continues the UDC process by sending a second IdentificationDeclaration message
-     * to Commissioner containing CommissionerPasscode and CommissionerPasscodeReady set to true. At this point it is assumed that
-     * the following have occurred:
+     * @brief Continues a passcode commissioning flow started via VerifyOrEstablishConnection().
      *
-     * 1. Client (Commissionee) has sent the first IdentificationDeclaration message, via VerifyOrEstablishConnection(), to the
-     * Commissioner containing CommissionerPasscode set to true.
-     * 2. Commissioner generated and displayed a passcode.
-     * 3. The Commissioner replied with a CommissionerDecelration message with PasscodeDialogDisplayed and CommissionerPasscode set
-     * to true.
-     * 4. Client has handled the Commissioner's CommissionerDecelration message.
-     * 5. Client prompted user to input Passcode from Commissioner.
-     * 6. Client has updated the commissioning session's PAKE verifier using the user input Passcode by updating the CastingApp's
-     * CommissionableDataProvider
-     * (matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(CommissionableDataProvider)).
+     * This method sends a second IdentificationDeclaration after the following have occurred:
      *
-     * The same connectionCallbacks and commissioningWindowTimeoutSec parameters passed into VerifyOrEstablishConnection() will be
-     * used.
+     * 1. The Client/Commissionee sent an initial IdentificationDeclaration requesting either the Commissioner-Generated Passcode
+     *    flow or Fixed Passcode Commissioning.
+     * 2. The CastingPlayer/Commissioner selected the requested flow in a CommissionerDeclaration.
+     * 3. For the Commissioner-Generated Passcode flow, the user entered the Passcode displayed by the
+     *    CastingPlayer/Commissioner. For Fixed Passcode Commissioning, the Client/Commissionee obtained the stored fixed setup
+     *    Passcode associated with the CastingPlayer/Commissioner.
+     * 4. The Client/Commissionee updated the CastingApp's CommissionableDataProvider to use the selected Passcode.
+     *
+     * The second IdentificationDeclaration contains CommissionerPasscodeReady for the Commissioner-Generated Passcode flow or
+     * FixedPasscodeCommissioningReady for Fixed Passcode Commissioning. It uses the same commissionee instance name as the initial
+     * IdentificationDeclaration. The connection callbacks and commissioning window timeout supplied to
+     * VerifyOrEstablishConnection() are reused.
+     *
      * @return CHIP_NO_ERROR if this function was called with the CastingPlayer in the correct state and an error otherwise.
      */
     CHIP_ERROR ContinueConnecting();
 
     /**
-     * @brief This cancels the CastingPlayer/Commissioner-Generated passcode commissioning flow started via the
-     * VerifyOrEstablishConnection() API above. It constructs and sends an IdentificationDeclaration message to the
+     * @brief Cancels a selected passcode continuation flow started via VerifyOrEstablishConnection(). It constructs and sends an
+     * IdentificationDeclaration message to the
      * CastingPlayer/Commissioner containing CancelPasscode set to true. It is used to indicate that the Client/Commissionee user
      * has cancelled the commissioning process. This indicates that the CastingPlayer/Commissioner can dismiss any dialogs
      * corresponding to commissioning, such as a Passcode input dialog or a Passcode display dialog. Note: StopConnecting() does not
      * call the ConnectCallback() callback passed to the VerifyOrEstablishConnection() API above since no connection is established.
      * @return CHIP_NO_ERROR if this function was called with the CastingPlayer in the correct state and CHIP_ERROR_INCORRECT_STATE.
-     * otherwise. StopConnecting() can only be called by the client during the CastingPlayer/Commissioner-Generated passcode
-     * commissioning flow. Calling StopConnecting() during the Client/Commissionee-Generated commissioning flow will return a
-     * CHIP_ERROR_INCORRECT_STATE error.
+     * otherwise. StopConnecting() can be called during Commissioner-Generated Passcode or Fixed Passcode Commissioning.
      *
      * @note This method will free the calling object as a side effect.
      */
@@ -349,6 +346,7 @@ private:
     uint16_t mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
     ConnectCallback mOnCompleted            = {};
     bool mClientProvidedCommissionerDeclarationCallback;
+    bool mFixedPasscodeCommissioningSelected = false;
 
     /**
      * @brief This internal version of the StopConnecting API cancels the Client/Commissionee-Generated passcode or the

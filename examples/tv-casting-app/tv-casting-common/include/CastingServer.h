@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,6 +41,8 @@
 #include <controller/CHIPCluster.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <functional>
+#include <platform/CommissionableDataProvider.h>
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 
 inline constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = chip::System::Clock::Seconds16(3 * 60);
 
@@ -66,8 +68,21 @@ public:
     void InitAppDelegation();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    using CommissionerDeclarationCallback =
+        std::function<void(const chip::Transport::PeerAddress &,
+                           chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration commissionerDeclaration)>;
+
     void SetCommissionerPasscodeEnabled(bool enabled) { mUdcCommissionerPasscodeEnabled = enabled; };
     void SetCommissionerPasscodeReady() { mUdcCommissionerPasscodeReady = true; };
+
+    /**
+     * @brief Sets the callback invoked when a CommissionerDeclaration UDC message is received.
+     */
+    void SetCommissionerDeclarationCallback(CommissionerDeclarationCallback callback);
+    void SetFixedPasscodeCommissioningEnabled(bool enabled);
+    CHIP_ERROR ContinueFixedPasscodeCommissioning(const chip::Transport::PeerAddress & commissioner,
+                                                  chip::DeviceLayer::CommissionableDataProvider * provider);
+    CHIP_ERROR CancelFixedPasscodeCommissioning(const chip::Transport::PeerAddress & commissioner);
     void OnCommissionerDeclarationMessage(const chip::Transport::PeerAddress & source,
                                           chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd) override;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
@@ -460,7 +475,7 @@ private:
     void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override;
     void OnCommissioningSessionStopped() override;
     void OnCommissioningWindowOpened() override {}
-    void OnCommissioningWindowClosed() override {}
+    void OnCommissioningWindowClosed() override;
 
     static void VerifyOrEstablishConnectionTask(chip::System::Layer * aSystemLayer, void * context);
     CHIP_ERROR ReadMACAddress(TargetEndpointInfo * endpoint);
@@ -482,9 +497,20 @@ private:
     bool mInited        = false;
     bool mUdcInProgress = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    enum class FixedPasscodeCommissioningState
+    {
+        kNone,
+        kRequested,
+        kSelected,
+    };
+
     bool mUdcCommissionerPasscodeEnabled                                                           = false;
     bool mUdcCommissionerPasscodeReady                                                             = false;
     char mUdcCommissionerPasscodeInstanceName[chip::Dnssd::Commission::kInstanceNameMaxLength + 1] = "";
+    bool mUdcFixedPasscodeCommissioningEnabled                                                     = false;
+    FixedPasscodeCommissioningState mUdcFixedPasscodeCommissioningState = FixedPasscodeCommissioningState::kNone;
+    chip::Inet::IPAddress mUdcFixedPasscodeCommissionerAddress          = {};
+    CommissionerDeclarationCallback mCommissionerDeclarationCallback    = {};
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     chip::Dnssd::DiscoveredNodeData mStrNodeDataList[kMaxCachedVideoPlayers];

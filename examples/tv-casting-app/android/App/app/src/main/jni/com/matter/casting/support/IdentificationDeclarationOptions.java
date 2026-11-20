@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Project CHIP Authors All rights reserved.
+ * Copyright (c) 2024-2026 Project CHIP Authors All rights reserved.
  *
  * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  * except in compliance with the License. You may obtain a copy of the License at
@@ -39,6 +39,10 @@ public class IdentificationDeclarationOptions {
    * @param commissionerPasscodeReady the commissioner passcode ready flag.
    * @param cancelPasscode the cancel passcode flag.
    * @param passcodeLength the passcode length.
+   * @param fixedPasscodeCommissioningSupported whether the client supports Fixed Passcode
+   *     Commissioning.
+   * @param fixedPasscodeCommissioningReady whether the fixed-passcode commissioning window is
+   *     ready.
    */
   public IdentificationDeclarationOptions(
       boolean noPasscode,
@@ -46,13 +50,17 @@ public class IdentificationDeclarationOptions {
       boolean commissionerPasscode,
       boolean commissionerPasscodeReady,
       boolean cancelPasscode,
-      int passcodeLength) {
+      int passcodeLength,
+      boolean fixedPasscodeCommissioningSupported,
+      boolean fixedPasscodeCommissioningReady) {
     this.noPasscode = noPasscode;
     this.cdUponPasscodeDialog = cdUponPasscodeDialog;
     this.commissionerPasscode = commissionerPasscode;
     this.commissionerPasscodeReady = commissionerPasscodeReady;
     this.cancelPasscode = cancelPasscode;
     this.passcodeLength = passcodeLength;
+    this.fixedPasscodeCommissioningSupported = fixedPasscodeCommissioningSupported;
+    this.fixedPasscodeCommissioningReady = fixedPasscodeCommissioningReady;
   }
 
   /**
@@ -92,6 +100,10 @@ public class IdentificationDeclarationOptions {
   private boolean cancelPasscode = false;
   /** Feature: Coordinate Passcode Dialogs Flag - to indicate the passcode length. */
   private int passcodeLength = 0;
+  /** Feature: Fixed Passcode Commissioning - The client supports Fixed Passcode Commissioning. */
+  private boolean fixedPasscodeCommissioningSupported = false;
+  /** Feature: Fixed Passcode Commissioning - The fixed-passcode commissioning window is ready. */
+  private boolean fixedPasscodeCommissioningReady = false;
   /**
    * Feature: Target Content Application - The set of content app Vendor IDs (and optionally,
    * Product IDs) that can be used for authentication. Also, if TargetAppInfo is passed in,
@@ -143,6 +155,14 @@ public class IdentificationDeclarationOptions {
     return passcodeLength;
   }
 
+  public boolean isFixedPasscodeCommissioningSupported() {
+    return fixedPasscodeCommissioningSupported;
+  }
+
+  public boolean isFixedPasscodeCommissioningReady() {
+    return fixedPasscodeCommissioningReady;
+  }
+
   public List<TargetAppInfo> getTargetAppInfoList() {
     return targetAppInfos;
   }
@@ -175,6 +195,12 @@ public class IdentificationDeclarationOptions {
         .append("\n");
     sb.append("IdentificationDeclarationOptions::passcodeLength:            ")
         .append(passcodeLength)
+        .append("\n");
+    sb.append("IdentificationDeclarationOptions::fixedPasscodeCommissioningSupported: ")
+        .append(fixedPasscodeCommissioningSupported)
+        .append("\n");
+    sb.append("IdentificationDeclarationOptions::fixedPasscodeCommissioningReady: ")
+        .append(fixedPasscodeCommissioningReady)
         .append("\n");
     sb.append("IdentificationDeclarationOptions::targetAppInfos list: \n");
 

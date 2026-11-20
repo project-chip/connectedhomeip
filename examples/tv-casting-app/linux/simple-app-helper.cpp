@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023-2024 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,16 +34,30 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 #include <protocols/bdx/BdxUri.h>
+#include <setup_payload/SetupPayload.h>
+#include <string>
+#include <unordered_map>
 
 // VendorId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection
-const uint16_t kDesiredEndpointVendorId    = 65521; // 0xFFF1
-const uint16_t kDesiredEndpointVendorIdTwo = 65522; // 0xFFF2
+const uint16_t kDesiredEndpointVendorId             = 65521; // 0xFFF1
+const uint16_t kDesiredEndpointVendorIdTwo          = 65522; // 0xFFF2
+uint32_t gFixedPasscodeCommissioningPasscode        = 1234;
+uint32_t gFixedPasscodeCommissioningAttemptPasscode = 0;
 // Indicates that the Commissioner-Generated passcode commissioning flow is in progress.
 bool gCommissionerGeneratedPasscodeFlowRunning = false;
+// Indicates that the Fixed Passcode Commissioning flow is in progress.
+bool gFixedPasscodeCommissioningFlowRunning = false;
+// Indicates that the CastingPlayer selected Fixed Passcode Commissioning.
+bool gFixedPasscodeCommissioningSelected = false;
+// Indicates whether Fixed Passcode Commissioning is enabled.
+bool gFixedPasscodeCommissioningEnabled = false;
+std::unordered_map<std::string, uint32_t> gRejectedFixedPasscodes;
 
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::_discoveryDelegateImpl = nullptr;
 bool gAwaitingCommissionerPasscodeInput                               = false;
 LinuxCommissionableDataProvider gSimpleAppCommissionableDataProvider;
+std::unique_ptr<LinuxCommissionableDataProvider> gFixedPasscodeCommissionableDataProvider;
+chip::DeviceLayer::CommissionableDataProvider * gOriginalCommissionableDataProvider = nullptr;
 std::shared_ptr<matter::casting::core::CastingPlayer> targetCastingPlayer;
 
 // Endpoint hosting the MediaFileManagement cluster, captured for the staggered
@@ -73,6 +87,8 @@ void DiscoveryDelegateImpl::HandleOnAdded(matter::casting::memory::Strong<matter
             "Include the commissioner-generated-passcode flag to attempt the Commissioner-Generated passcode commissioning flow.");
         ChipLogProgress(AppServer, "Example 1 Commissionee Passcode:     cast request 0");
         ChipLogProgress(AppServer, "Example 2 Commissioner Passcode:     cast request 0 commissioner-generated-passcode");
+        ChipLogProgress(AppServer,
+                        "Fixed Passcode Commissioning is disabled by default. Run cast setusefixedpasscode 1 to enable it.");
         ChipLogProgress(AppServer, "---- Awaiting user input ----");
     }
     ChipLogProgress(AppServer, "Discovered CastingPlayer #%d", commissionersCount);
@@ -617,6 +633,67 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
                          options.payload.discriminator.GetLongValue());
 }
 
+chip::Optional<uint32_t> GetRememberedFixedPasscode(const matter::casting::core::CastingPlayer & castingPlayer)
+{
+    auto rejectedPasscode = gRejectedFixedPasscodes.find(castingPlayer.GetId());
+    if (rejectedPasscode != gRejectedFixedPasscodes.end() && rejectedPasscode->second == gFixedPasscodeCommissioningPasscode)
+    {
+        return chip::NullOptional;
+    }
+
+    // A production client can retrieve a passcode associated with castingPlayer from a platform credential API.
+    return chip::MakeOptional(gFixedPasscodeCommissioningPasscode);
+}
+
+CHIP_ERROR ConfigureFixedPasscodeCommissioning(uint32_t passcode)
+{
+    VerifyOrReturnError(!gFixedPasscodeCommissioningFlowRunning, CHIP_ERROR_INCORRECT_STATE);
+
+    chip::DeviceLayer::CommissionableDataProvider * currentProvider = chip::DeviceLayer::GetCommissionableDataProvider();
+    VerifyOrReturnError(currentProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    uint16_t discriminator = 0;
+    ReturnErrorOnFailure(currentProvider->GetSetupDiscriminator(discriminator));
+
+    gFixedPasscodeCommissionableDataProvider = std::make_unique<LinuxCommissionableDataProvider>();
+    chip::Optional<std::vector<uint8_t>> noVerifier;
+    chip::Optional<std::vector<uint8_t>> noSalt;
+    ReturnErrorOnFailure(gFixedPasscodeCommissionableDataProvider->Init(
+        noVerifier, noSalt, chip::Crypto::kSpake2p_Min_PBKDF_Iterations, chip::MakeOptional(passcode), discriminator));
+
+    gOriginalCommissionableDataProvider = currentProvider;
+    ReturnErrorOnFailure(matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(
+        gFixedPasscodeCommissionableDataProvider.get()));
+
+    gFixedPasscodeCommissioningAttemptPasscode = passcode;
+    gFixedPasscodeCommissioningFlowRunning     = true;
+    ChipLogProgress(AppServer, "Configured Fixed Passcode Commissioning");
+    return CHIP_NO_ERROR;
+}
+
+void RestoreCommissionableDataProvider()
+{
+    if (!gFixedPasscodeCommissioningFlowRunning)
+    {
+        return;
+    }
+
+    CHIP_ERROR err =
+        matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(gOriginalCommissionableDataProvider);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer,
+                     "Failed to restore CommissionableDataProvider after Fixed Passcode Commissioning: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        return;
+    }
+
+    gOriginalCommissionableDataProvider = nullptr;
+    gFixedPasscodeCommissionableDataProvider.reset();
+    gFixedPasscodeCommissioningFlowRunning = false;
+    ChipLogProgress(AppServer, "Restored CommissionableDataProvider after Fixed Passcode Commissioning");
+}
+
 void LogEndpointsDetails(const std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> & endpoints)
 {
     ChipLogProgress(AppServer, "simple-app-helper.cpp::LogEndpointsDetails() Number of Endpoints: %d",
@@ -630,6 +707,12 @@ void LogEndpointsDetails(const std::vector<matter::casting::memory::Strong<matte
 void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer)
 {
     ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler()");
+    RestoreCommissionableDataProvider();
+    if (err == CHIP_NO_ERROR)
+    {
+        gFixedPasscodeCommissioningAttemptPasscode = 0;
+        gFixedPasscodeCommissioningSelected        = false;
+    }
 
     // For a connection failure, called back with an error and nullptr.
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -720,6 +803,58 @@ void CommissionerDeclarationCallback(const chip::Transport::PeerAddress & source
     ChipLogProgress(AppServer,
                     "simple-app-helper.cpp::CommissionerDeclarationCallback() called with CommissionerDeclaration message:");
     cd.DebugLog();
+    if (cd.GetErrorCode() == chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError::kPaseAuthFailed &&
+        gFixedPasscodeCommissioningSelected)
+    {
+        if (targetCastingPlayer != nullptr)
+        {
+            gRejectedFixedPasscodes[targetCastingPlayer->GetId()] = gFixedPasscodeCommissioningAttemptPasscode;
+        }
+        gFixedPasscodeCommissioningAttemptPasscode = 0;
+        gFixedPasscodeCommissioningSelected        = false;
+        RestoreCommissionableDataProvider();
+        ChipLogError(AppServer,
+                     "The stored fixed setup passcode does not match this CastingPlayer. Update the stored passcode or use another "
+                     "passcode flow.");
+    }
+    if (cd.GetCancelPasscode())
+    {
+        gFixedPasscodeCommissioningAttemptPasscode = 0;
+        gFixedPasscodeCommissioningSelected        = false;
+        RestoreCommissionableDataProvider();
+    }
+    if (cd.GetFixedPasscodeCommissioningSelected() && !gFixedPasscodeCommissioningFlowRunning)
+    {
+        gFixedPasscodeCommissioningSelected = true;
+        CHIP_ERROR err                      = CHIP_ERROR_NOT_FOUND;
+        if (targetCastingPlayer != nullptr)
+        {
+            chip::Optional<uint32_t> passcode = GetRememberedFixedPasscode(*targetCastingPlayer);
+            if (passcode.HasValue())
+            {
+                err = ConfigureFixedPasscodeCommissioning(passcode.Value());
+            }
+        }
+        if (err == CHIP_NO_ERROR && targetCastingPlayer != nullptr)
+        {
+            err = targetCastingPlayer->ContinueConnecting();
+        }
+        if (err != CHIP_NO_ERROR)
+        {
+            gFixedPasscodeCommissioningAttemptPasscode = 0;
+            gFixedPasscodeCommissioningSelected        = false;
+            ChipLogError(AppServer, "Failed to continue Fixed Passcode Commissioning: %" CHIP_ERROR_FORMAT, err.Format());
+            if (targetCastingPlayer != nullptr)
+            {
+                CHIP_ERROR stopErr = targetCastingPlayer->StopConnecting();
+                if (stopErr != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Failed to cancel Fixed Passcode Commissioning: %" CHIP_ERROR_FORMAT, stopErr.Format());
+                }
+            }
+            RestoreCommissionableDataProvider();
+        }
+    }
     if (cd.GetCommissionerPasscode())
     {
         ChipLogProgress(AppServer, "---- Awaiting user input ----");
@@ -761,6 +896,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
     if (strcmp(argv[0], "request") == 0)
     {
         ChipLogProgress(AppServer, "CommandHandler() request");
+        VerifyOrReturnError(!gFixedPasscodeCommissioningFlowRunning, CHIP_ERROR_INCORRECT_STATE);
         if (argc < 2)
         {
             return PrintAllCommands();
@@ -773,7 +909,9 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                             ChipLogError(AppServer, "Invalid casting player index provided: %lu", index));
         targetCastingPlayer = castingPlayers.at(index);
 
-        gCommissionerGeneratedPasscodeFlowRunning = false;
+        gCommissionerGeneratedPasscodeFlowRunning  = false;
+        gFixedPasscodeCommissioningAttemptPasscode = 0;
+        gFixedPasscodeCommissioningSelected        = false;
 
         // Specify the TargetApp that the client wants to interact with after commissioning. If this value is passed in,
         // VerifyOrEstablishConnection() will force UDC, in case the desired TargetApp is not found in the on-device
@@ -813,6 +951,12 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
             }
         }
 
+        if (gFixedPasscodeCommissioningEnabled && GetRememberedFixedPasscode(*targetCastingPlayer).HasValue())
+        {
+            idOptions.mFixedPasscodeCommissioningSupported = true;
+            ChipLogProgress(AppServer, "CommandHandler() request %lu. Advertising Fixed Passcode Commissioning support", index);
+        }
+
         CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
         if (result != CHIP_NO_ERROR)
         {
@@ -826,7 +970,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                          result.Format());
         }
 
-        if (!gCommissionerGeneratedPasscodeFlowRunning)
+        if (!gCommissionerGeneratedPasscodeFlowRunning && !gFixedPasscodeCommissioningFlowRunning)
         {
             uint32_t defaultTestPasscode = 0;
             chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
@@ -916,6 +1060,31 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
+    if (strcmp(argv[0], "setusefixedpasscode") == 0)
+    {
+        if (argc != 2 || (strcmp(argv[1], "0") != 0 && strcmp(argv[1], "1") != 0))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        gFixedPasscodeCommissioningEnabled = strcmp(argv[1], "1") == 0;
+        ChipLogProgress(AppServer, "Fixed Passcode Commissioning %s", gFixedPasscodeCommissioningEnabled ? "enabled" : "disabled");
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "setfixedpasscode") == 0)
+    {
+        uint32_t passcode = 0;
+        if (argc != 2 || !chip::ArgParser::ParseInt(argv[1], passcode))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        VerifyOrReturnError(!gFixedPasscodeCommissioningFlowRunning, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(chip::SetupPayload::IsValidSetupPIN(passcode), CHIP_ERROR_INVALID_ARGUMENT);
+
+        gFixedPasscodeCommissioningPasscode = passcode;
+        gRejectedFixedPasscodes.clear();
+        ChipLogProgress(AppServer, "Updated the remembered Fixed Passcode Commissioning passcode");
+        return CHIP_NO_ERROR;
+    }
     if (strcmp(argv[0], "stop-connecting") == 0)
     {
         ChipLogProgress(AppServer, "CommandHandler() stop-connecting");
@@ -925,6 +1094,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
             ChipLogError(AppServer, "CommandHandler() stop-connecting, err %" CHIP_ERROR_FORMAT, err.Format());
             return err;
         }
+        RestoreCommissionableDataProvider();
     }
     if (strcmp(argv[0], "print-bindings") == 0)
     {
@@ -959,7 +1129,13 @@ CHIP_ERROR PrintAllCommands()
     streamer_printf(sout, "  stop-discovery       Stop Discovery of Casting Players. Usage: cast stop-discovery\r\n");
     streamer_printf(sout,
                     "  request <index>                                  Request connecting to discovered Casting Player with "
-                    "[index] using the Commissionee-Generated passcode commissioning flow. Usage: cast request 0\r\n");
+                    "[index]. Usage: cast request 0\r\n");
+    streamer_printf(sout,
+                    "  setusefixedpasscode <0|1>                       Disable or enable Fixed Passcode Commissioning for "
+                    "subsequent requests. Usage: cast setusefixedpasscode 1\r\n");
+    streamer_printf(sout,
+                    "  setfixedpasscode <passcode>                     Update the remembered Fixed Passcode Commissioning "
+                    "passcode. Usage: cast setfixedpasscode 1234\r\n");
     streamer_printf(sout,
                     "  request <index> commissioner-generated-passcode  Request connecting to discovered Casting Player with "
                     "[index] using the Commissioner-Generated passcode commissioning flow. Usage: cast request 0 "

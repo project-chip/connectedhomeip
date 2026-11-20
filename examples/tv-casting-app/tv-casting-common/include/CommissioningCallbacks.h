@@ -47,6 +47,11 @@ struct CommissioningCallbacks
     std::function<void()> sessionEstablishmentStopped = {};
 
     /**
+     * This is called when the commissioning window is closed.
+     */
+    std::function<void()> commissioningWindowClosed = {};
+
+    /**
      * This is called when the commissioning has been completed
      */
     std::function<void(CHIP_ERROR)> commissioningComplete = {};

@@ -793,6 +793,18 @@ Commissioner-Generated Passcode UDC feature, if the
 `supportsCommissionerGeneratedPasscode` flag on the `selectedCastingPlayer` is
 set to `true`.
 
+For Fixed Passcode Commissioning, the Casting Client opens its initial
+commissioning window with the regular passcode and sends
+`FixedPasscodeCommissioningSupported=true` in the UDC Identification
+Declaration. If the CastingPlayer replies with
+`FixedPasscodeCommissioningSelected=true`, the client closes the initial window,
+retrieves the remembered passcode for that CastingPlayer from its platform
+integration, configures the passcode, opens a new window, and sends
+`FixedPasscodeCommissioningReady=true` using the original commissionee instance
+name. A CastingPlayer that does not understand the new field continues the
+regular passcode flow. The example platform integration returns `1234`; the UDC
+protocol does not define or transport the passcode value.
+
 For a Casting Client to connect to a `CastingPlayer` using the optional
 `CastingPlayer` / Commissioner-Generated Passcode UDC feature, the Casting
 Client may specify optional parameters in the `VerifyOrEstablishConnection`
@@ -919,7 +931,11 @@ On Android, the Casting Client may call `verifyOrEstablishConnection` on the
 can connect to a `CastingPlayer`, using the `CastingPlayer` /
 Commissioner-Generated Passcode UDC feature by successfully calling
 `verifyOrEstablishConnection`, updating the commissioning passcode and then
-calling `continueConnecting` on the `CastingPlayer`.
+calling `continueConnecting` on the `CastingPlayer`. For Fixed Passcode
+Commissioning, set `fixedPasscodeCommissioningSupported` in the initial
+`IdentificationDeclarationOptions`. Configure the fixed passcode and call
+`continueConnecting` only after receiving a Commissioner Declaration with
+`fixedPasscodeCommissioningSelected=true`.
 
 ```java
 private static final short MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;

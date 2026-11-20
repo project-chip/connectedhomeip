@@ -65,10 +65,13 @@ public class MainActivity extends AppCompatActivity
 
   @Override
   public void handleConnectionButtonClicked(
-      CastingPlayer castingPlayer, boolean useCommissionerGeneratedPasscode) {
+      CastingPlayer castingPlayer,
+      boolean useCommissionerGeneratedPasscode,
+      Long fixedPasscodeCommissioningPasscode) {
     Log.i(TAG, "MainActivity.handleConnectionButtonClicked()");
     showFragment(
-        ConnectionExampleFragment.newInstance(castingPlayer, useCommissionerGeneratedPasscode));
+        ConnectionExampleFragment.newInstance(
+            castingPlayer, useCommissionerGeneratedPasscode, fixedPasscodeCommissioningPasscode));
   }
 
   @Override

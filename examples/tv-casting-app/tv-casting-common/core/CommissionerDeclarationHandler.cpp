@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,12 +43,52 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
 {
     ChipLogProgress(AppServer, "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage()");
 
-    // During UDC with CastingPlayer/Commissioner-Generated Passcode, the Commissioner responds with a CommissionerDeclaration
-    // message with CommissionerPasscode set to true. The CommissionerPasscode flag indicates that a Passcode is now displayed for
-    // the user by the CastingPlayer /Commissioner. With this CommissionerDeclaration message, we also know that commissioning via
-    // AccountLogin cluster has failed. Therefore, we close the commissioning window. We will open a new commissioning window prior
-    // to sending the next/2nd IdentificationDeclaration message to the Commissioner.
-    if (cd.GetCommissionerPasscode())
+    CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
+    // FixedPasscodeCommissioningSelected is valid only when it comes from the current target CastingPlayer after the
+    // Client/Commissionee requested Fixed Passcode Commissioning for this connection attempt.
+    bool sourceMatchesTarget = false;
+    if (targetCastingPlayer != nullptr)
+    {
+        for (size_t i = 0; i < targetCastingPlayer->mAttributes.numIPs; ++i)
+        {
+            if (targetCastingPlayer->mAttributes.ipAddresses[i] == source.GetIPAddress())
+            {
+                sourceMatchesTarget = true;
+                break;
+            }
+        }
+    }
+    bool fixedPasscodeCommissioningSelected = cd.GetFixedPasscodeCommissioningSelected() && sourceMatchesTarget &&
+        targetCastingPlayer->mIdOptions.mFixedPasscodeCommissioningSupported;
+    bool fixedPasscodeAuthenticationFailed =
+        cd.GetErrorCode() == chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError::kPaseAuthFailed &&
+        targetCastingPlayer != nullptr && targetCastingPlayer->mFixedPasscodeCommissioningSelected;
+
+    if (fixedPasscodeAuthenticationFailed && !sourceMatchesTarget)
+    {
+        ChipLogError(AppServer,
+                     "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() ignoring PASE authentication failure "
+                     "from a non-target Commissioner");
+        return;
+    }
+
+    if (cd.GetFixedPasscodeCommissioningSelected() && !fixedPasscodeCommissioningSelected)
+    {
+        ChipLogError(AppServer,
+                     "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() ignoring unsolicited "
+                     "FixedPasscodeCommissioningSelected");
+        cd.SetFixedPasscodeCommissioningSelected(false);
+    }
+
+    if (fixedPasscodeCommissioningSelected)
+    {
+        targetCastingPlayer->mFixedPasscodeCommissioningSelected = true;
+    }
+
+    // During a passcode flow that requires a second IdentificationDeclaration, the selected Passcode differs from the one used by
+    // the current commissioning window. Close that window before the Client/Commissionee updates its
+    // CommissionableDataProvider and opens a new commissioning window using the selected Passcode.
+    if (cd.GetCommissionerPasscode() || fixedPasscodeCommissioningSelected)
     {
         ChipLogProgress(AppServer,
                         "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(), calling CloseCommissioningWindow()");
@@ -68,6 +108,14 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
         TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
     }
 
+    // End the selected Fixed Passcode Commissioning attempt when the Commissioner reports a PASE authentication failure.
+    if (fixedPasscodeAuthenticationFailed)
+    {
+        chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+        TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
+        targetCastingPlayer->mFixedPasscodeCommissioningSelected = false;
+    }
+
     // Flag to indicate when the CastingPlayer/Commissioner user has decided to exit the commissioning process.
     if (cd.GetCancelPasscode())
     {
@@ -83,7 +131,6 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
         // CastingPlayer/Commissioner user and the Casting Client/Commissionee user are not necessarily the same user. For example,
         // in an enviroment with multiple CastingPlayer/Commissioner TVs, one user 1 might be controlling the Client/Commissionee
         // and user 2 might be controlling the CastingPlayer/Commissioner TV.
-        CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
         // Avoid crashing if we recieve this CommissionerDeclaration message when targetCastingPlayer is nullptr.
         if (targetCastingPlayer != nullptr)
         {

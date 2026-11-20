@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -63,6 +63,12 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout, "  discover             Discover commissioners. Usage: cast discover\r\n");
     streamer_printf(
         sout, "  request <index>      Request commissioning from discovered commissioner with [index]. Usage: cast request 0\r\n");
+    streamer_printf(sout,
+                    "  setusefixedpasscode <0|1> Disable or enable Fixed Passcode Commissioning for subsequent requests. "
+                    "Usage: cast setusefixedpasscode 1\r\n");
+    streamer_printf(sout,
+                    "  setfixedpasscode <passcode> Update the remembered Fixed Passcode Commissioning passcode. "
+                    "Usage: cast setfixedpasscode 1234\r\n");
     streamer_printf(sout, "  launch <url> <display>   Launch content. Usage: cast launch https://www.yahoo.com Hello\r\n");
     streamer_printf(
         sout,
@@ -138,6 +144,23 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         char * eptr;
         int useCP = (int) strtol(argv[1], &eptr, 10);
         CastingServer::GetInstance()->SetCommissionerPasscodeEnabled(useCP == 1);
+    }
+    if (strcmp(argv[0], "setusefixedpasscode") == 0)
+    {
+        if (argc != 2 || (strcmp(argv[1], "0") != 0 && strcmp(argv[1], "1") != 0))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        return SetUseFixedPasscodeCommissioning(strcmp(argv[1], "1") == 0);
+    }
+    if (strcmp(argv[0], "setfixedpasscode") == 0)
+    {
+        uint32_t passcode = 0;
+        if (argc != 2 || !ArgParser::ParseInt(argv[1], passcode))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        return SetFixedPasscodeCommissioningPasscode(passcode);
     }
     if (strcmp(argv[0], "launch") == 0)
     {

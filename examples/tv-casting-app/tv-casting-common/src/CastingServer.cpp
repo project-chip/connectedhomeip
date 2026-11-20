@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,8 @@
 
 #include "app/clusters/bindings/BindingManager.h"
 #include <app/server/Dnssd.h>
+
+#include <utility>
 
 using namespace chip;
 using namespace chip::Controller;
@@ -163,6 +165,9 @@ CHIP_ERROR CastingServer::OpenBasicCommissioningWindow(CommissioningCallbacks co
 void CastingServer::OnCommissioningSessionStarted()
 {
     ChipLogProgress(AppServer, "CastingServer::OnCommissioningSessionStarted");
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    mUdcFixedPasscodeCommissioningState = FixedPasscodeCommissioningState::kNone;
+#endif
     if (mCommissioningCallbacks.sessionEstablished)
     {
 
@@ -188,6 +193,15 @@ void CastingServer::OnCommissioningSessionStopped()
     }
 }
 
+void CastingServer::OnCommissioningWindowClosed()
+{
+    ChipLogProgress(AppServer, "CastingServer::OnCommissioningWindowClosed");
+    if (mCommissioningCallbacks.commissioningWindowClosed)
+    {
+        mCommissioningCallbacks.commissioningWindowClosed();
+    }
+}
+
 void CastingServer::OnCommissioningSessionEstablishmentStarted()
 {
     ChipLogProgress(AppServer, "CastingServer::OnCommissioningSessionEstablishmentStarted");
@@ -198,11 +212,78 @@ void CastingServer::OnCommissioningSessionEstablishmentStarted()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+void CastingServer::SetCommissionerDeclarationCallback(CommissionerDeclarationCallback callback)
+{
+    mCommissionerDeclarationCallback = std::move(callback);
+}
+
+void CastingServer::SetFixedPasscodeCommissioningEnabled(bool enabled)
+{
+    mUdcFixedPasscodeCommissioningEnabled = enabled;
+    if (!enabled)
+    {
+        mUdcFixedPasscodeCommissioningState = FixedPasscodeCommissioningState::kNone;
+    }
+}
+
 void CastingServer::OnCommissionerDeclarationMessage(const chip::Transport::PeerAddress & source,
                                                      chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
 {
     ChipLogProgress(AppServer, "CastingServer::OnCommissionerDeclarationMessage");
-    // TODO: call a mCommissioningCallbacks
+    if (cd.GetFixedPasscodeCommissioningSelected())
+    {
+        if (mUdcFixedPasscodeCommissioningState == FixedPasscodeCommissioningState::kRequested &&
+            source.GetIPAddress() == mUdcFixedPasscodeCommissionerAddress)
+        {
+            Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+            mUdcFixedPasscodeCommissioningState = FixedPasscodeCommissioningState::kSelected;
+        }
+        else
+        {
+            ChipLogError(AppServer, "Ignoring unsolicited FixedPasscodeCommissioningSelected");
+            cd.SetFixedPasscodeCommissioningSelected(false);
+        }
+    }
+    if (cd.GetErrorCode() == Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError::kPaseAuthFailed &&
+        mUdcFixedPasscodeCommissioningState == FixedPasscodeCommissioningState::kSelected &&
+        source.GetIPAddress() == mUdcFixedPasscodeCommissionerAddress)
+    {
+        Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+        mUdcFixedPasscodeCommissioningState = FixedPasscodeCommissioningState::kNone;
+    }
+    if (mCommissionerDeclarationCallback)
+    {
+        mCommissionerDeclarationCallback(source, cd);
+    }
+}
+
+CHIP_ERROR CastingServer::ContinueFixedPasscodeCommissioning(const chip::Transport::PeerAddress & commissioner,
+                                                             chip::DeviceLayer::CommissionableDataProvider * provider)
+{
+    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mUdcFixedPasscodeCommissioningState == FixedPasscodeCommissioningState::kSelected,
+                        CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(commissioner.GetIPAddress() == mUdcFixedPasscodeCommissionerAddress, CHIP_ERROR_INVALID_ARGUMENT);
+
+    chip::DeviceLayer::SetCommissionableDataProvider(provider);
+    ReturnErrorOnFailure(
+        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(kCommissioningWindowTimeout));
+
+    Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+    id.SetFixedPasscodeCommissioningReady(true);
+    id.SetInstanceName(mUdcCommissionerPasscodeInstanceName);
+    id.SetCdPort(app::DnssdServer::Instance().GetSecuredPort());
+    return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner, id);
+}
+
+CHIP_ERROR CastingServer::CancelFixedPasscodeCommissioning(const chip::Transport::PeerAddress & commissioner)
+{
+    Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+    Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+    id.SetCancelPasscode(true);
+    id.SetInstanceName(mUdcCommissionerPasscodeInstanceName);
+    mUdcFixedPasscodeCommissioningState = FixedPasscodeCommissioningState::kNone;
+    return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner, id);
 }
 
 CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner)
@@ -230,6 +311,22 @@ CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(chip::Transport::
             {
                 id.SetInstanceName(mUdcCommissionerPasscodeInstanceName);
             }
+        }
+    }
+    if (mUdcFixedPasscodeCommissioningEnabled && !id.GetCommissionerPasscodeReady())
+    {
+        id.SetFixedPasscodeCommissioningSupported(true);
+        mUdcFixedPasscodeCommissioningState  = FixedPasscodeCommissioningState::kRequested;
+        mUdcFixedPasscodeCommissionerAddress = commissioner.GetIPAddress();
+        CHIP_ERROR err = app::DnssdServer::Instance().GetCommissionableInstanceName(mUdcCommissionerPasscodeInstanceName,
+                                                                                    sizeof(mUdcCommissionerPasscodeInstanceName));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to get mdns instance name error: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            id.SetInstanceName(mUdcCommissionerPasscodeInstanceName);
         }
     }
     return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner, id);

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +33,10 @@ CHIP_ERROR ProcessClusterCommand(int argc, char ** argv);
 CHIP_ERROR DiscoverCommissioners();
 
 CHIP_ERROR RequestCommissioning(int index);
+
+CHIP_ERROR SetUseFixedPasscodeCommissioning(bool enabled);
+
+CHIP_ERROR SetFixedPasscodeCommissioningPasscode(uint32_t passcode);
 
 void PrepareForCommissioning(const chip::Dnssd::CommissionNodeData * selectedCommissioner = nullptr);
 

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2023 Project CHIP Authors
+ *   Copyright (c) 2023-2026 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -129,6 +129,14 @@ public final class CastingApp {
       return MatterError.CHIP_ERROR_INVALID_ARGUMENT;
     }
     return MatterError.NO_ERROR;
+  }
+
+  /**
+   * Refreshes the Android CHIP platform after the application's CommissionableData provider
+   * changes.
+   */
+  public MatterError updateCommissionableDataProvider() {
+    return updateAndroidChipPlatformWithCommissionableData();
   }
 
   /**
