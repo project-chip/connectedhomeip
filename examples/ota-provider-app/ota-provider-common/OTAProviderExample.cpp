@@ -411,6 +411,7 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
 {
     bool requestorCanConsent = commandData.requestorCanConsent.ValueOr(false);
 
+    ++mQueryImageRequestCount;
     SaveCommandSnapshot(commandData);
 
     if (mIgnoreQueryImageCount > 0)

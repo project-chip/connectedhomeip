@@ -53,6 +53,7 @@ public:
 
     Json::Value BuildApplyUpdateRequestSnapshot(uint16_t endpoint);
     Json::Value BuildOtaProviderSnapshot(uint16_t endpoint);
+    Json::Value BuildBlockSizeSnapshot(uint16_t endpoint);
 
     struct PrivateCtorTag
     {
