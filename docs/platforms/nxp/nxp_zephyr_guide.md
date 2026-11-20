@@ -38,10 +38,10 @@ The example supports:
 
 The supported boards are:
 
-- `rd_rw612_bga`
-- `frdm_rw612`
-- `mimxrt1060_evk@C/mimxrt1062/qspi` (MIMXRT1060-EVKC) with an M.2 Wi-Fi/BT
-  module, see [MIMXRT1060-EVKC with IW610 / IW612](#mimxrt1060-evkc)
+-   `rd_rw612_bga`
+-   `frdm_rw612`
+-   `mimxrt1060_evk@C/mimxrt1062/qspi` (MIMXRT1060-EVKC) with an M.2 Wi-Fi/BT
+    module, see [MIMXRT1060-EVKC with IW610 / IW612](#mimxrt1060-evkc)
 
 <a name="building"></a>
 
@@ -133,11 +133,11 @@ west build -b mimxrt1060_evk@C/mimxrt1062/qspi --shield nxp_m2_2el_wifi_bt -p au
 
 Hardware setup:
 
-- The BT HCI UART requires a rework of the MIMXRT1060-EVKC: mount R93 and R96,
-  remove R193, connect J109 and connect J76 pins 2-3. Refer to the
-  `nxp_m2_wifi_bt` shield documentation of the NXP Zephyr SDK.
-- The IW612 module requires an external 5V power supply (J45, J40 1-2, SW6
-  on).
+-   The BT HCI UART requires a rework of the MIMXRT1060-EVKC: mount R93 and R96,
+    remove R193, connect J109 and connect J76 pins 2-3. Refer to the
+    `nxp_m2_wifi_bt` shield documentation of the NXP Zephyr SDK.
+-   The IW612 module requires an external 5V power supply (J45, J40 1-2, SW6
+    on).
 
 Flash `zephyr.bin` at address `0x60000000` (or `zephyr_full.bin` when OTA is
 enabled).
