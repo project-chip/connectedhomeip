@@ -981,14 +981,71 @@ void DeleteGroupEndpoints(PersistentStorageDelegate * storage, const GroupData &
     }
 }
 
-// Takes all KeyMapData entries for group_id out of the list in `fabric`, without emitting GroupModified:
-// the GroupListener contract is that OnGroupModified is not called during group removal.
-//
-// `fabric` is changed in memory only. Each entry is taken out of the list before its record is deleted, so `fabric`
-// describes the stored list after any error. The caller must save `fabric` whether or not an error is returned,
-// with no return in between. A record whose delete fails stays in storage without a reference.
-CHIP_ERROR UnlinkGroupKeys(PersistentStorageDelegate * storage, FabricData & fabric, GroupId group_id)
+struct PendingKeyMapDeletes
 {
+    static constexpr size_t kCapacity = 8;
+
+    struct Entry
+    {
+        uint16_t id      = 0;
+        uint16_t prev_id = 0; // 0 when unlinked from fabric.first_map
+    };
+
+    Entry entries[kCapacity] = {};
+    size_t count             = 0;
+
+    bool IsFull() const { return count >= kCapacity; }
+
+    void Add(uint16_t id, uint16_t prev_id)
+    {
+        VerifyOrReturn(!IsFull());
+        entries[count++] = { id, prev_id };
+    }
+
+    void DeleteAll(PersistentStorageDelegate * storage, FabricIndex fabric_index)
+    {
+        for (size_t entry_index = 0; entry_index < count; entry_index++)
+        {
+            KeyMapData entry(fabric_index, entries[entry_index].id);
+            LogErrorOnFailure(entry.Delete(storage));
+        }
+        count = 0;
+    }
+
+    // Best-effort undo of predecessor `next` links written before a failed fabric.Save().
+    // Unlinked nodes stay intact in storage and entries sharing a predecessor are contiguous
+    // in list order, so the first entry for each predecessor holds its original `next`.
+    void RestorePredecessors(PersistentStorageDelegate * storage, FabricIndex fabric_index)
+    {
+        uint16_t last_restored_prev = 0;
+        for (size_t entry_index = 0; entry_index < count; entry_index++)
+        {
+            const uint16_t prev_id = entries[entry_index].prev_id;
+            if (prev_id == 0 || prev_id == last_restored_prev)
+            {
+                continue;
+            }
+            last_restored_prev = prev_id;
+
+            KeyMapData prev_data(fabric_index, prev_id);
+            CHIP_ERROR err = prev_data.Load(storage);
+            if (err == CHIP_NO_ERROR)
+            {
+                prev_data.next = entries[entry_index].id;
+                err            = prev_data.Save(storage);
+            }
+            LogErrorOnFailure(err);
+        }
+        count = 0;
+    }
+};
+
+// Unlinks up to `PendingKeyMapDeletes::kCapacity` KeyMapData entries for `group_id` from `fabric`
+// without deleting their records yet; the caller must save `fabric` before calling `pending.DeleteAll()`.
+CHIP_ERROR UnlinkGroupKeysBatch(PersistentStorageDelegate * storage, FabricData & fabric, GroupId group_id,
+                                PendingKeyMapDeletes & pending, bool & has_more)
+{
+    has_more                         = false;
     const uint16_t initial_map_count = fabric.map_count;
     KeyMapData current(fabric.fabric_index, fabric.first_map);
     uint16_t prev_id = 0;
@@ -1001,9 +1058,15 @@ CHIP_ERROR UnlinkGroupKeys(PersistentStorageDelegate * storage, FabricData & fab
 
         if (current.group_id == group_id)
         {
+            if (pending.IsFull())
+            {
+                has_more = true;
+                return CHIP_NO_ERROR;
+            }
             if (at_head)
             {
                 fabric.first_map = next_id;
+                pending.Add(current.id, 0);
             }
             else
             {
@@ -1011,9 +1074,9 @@ CHIP_ERROR UnlinkGroupKeys(PersistentStorageDelegate * storage, FabricData & fab
                 ReturnErrorOnFailure(prev_data.Load(storage));
                 prev_data.next = next_id;
                 ReturnErrorOnFailure(prev_data.Save(storage));
+                pending.Add(current.id, prev_id);
             }
             fabric.map_count--;
-            LogErrorOnFailure(current.Delete(storage));
         }
         else
         {
@@ -1022,6 +1085,58 @@ CHIP_ERROR UnlinkGroupKeys(PersistentStorageDelegate * storage, FabricData & fab
         }
 
         current.id = next_id;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+// Saves `fabric` and, when `group_id_to_unlink` is set, removes all KeyMapData entries for that group
+// without emitting OnGroupModified (the GroupListener contract forbids OnGroupModified during group removal).
+//
+// Unlinked records are deleted only after `fabric.Save()` succeeds so a failed save never leaves persisted
+// links pointing to deleted records. Deletion failures after a successful save are logged and left
+// unreferenced in storage. Mapping unlink errors are best effort because the group record is already deleted.
+CHIP_ERROR SaveFabricAndUnlinkGroupKeys(PersistentStorageDelegate * storage, FabricData & fabric,
+                                        std::optional<GroupId> group_id_to_unlink)
+{
+    if (!group_id_to_unlink.has_value())
+    {
+        return fabric.Save(storage);
+    }
+
+    PendingKeyMapDeletes pending;
+    bool has_more = false;
+    LogErrorOnFailure(UnlinkGroupKeysBatch(storage, fabric, *group_id_to_unlink, pending, has_more));
+
+    CHIP_ERROR save_err = fabric.Save(storage);
+    if (save_err != CHIP_NO_ERROR)
+    {
+        pending.RestorePredecessors(storage, fabric.fabric_index);
+        return save_err;
+    }
+    pending.DeleteAll(storage, fabric.fabric_index);
+
+    while (has_more)
+    {
+        CHIP_ERROR unlink_err = UnlinkGroupKeysBatch(storage, fabric, *group_id_to_unlink, pending, has_more);
+        LogErrorOnFailure(unlink_err);
+
+        if (pending.count > 0)
+        {
+            CHIP_ERROR batch_save_err = fabric.Save(storage);
+            if (batch_save_err != CHIP_NO_ERROR)
+            {
+                LogErrorOnFailure(batch_save_err);
+                pending.RestorePredecessors(storage, fabric.fabric_index);
+                break;
+            }
+            pending.DeleteAll(storage, fabric.fabric_index);
+        }
+
+        if (unlink_err != CHIP_NO_ERROR)
+        {
+            break;
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -1101,13 +1216,9 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
         prev.next = group.group_id;
         ReturnErrorOnFailure(prev.Save(mStorage));
     }
-    if (replaced_group_id.has_value() && IsGroupcastEnabled())
-    {
-        // Best effort: the replaced group is already deleted. Must stay directly before the save, see UnlinkGroupKeys.
-        LogErrorOnFailure(UnlinkGroupKeys(mStorage, fabric, *replaced_group_id));
-    }
-    // Update fabric
-    ReturnErrorOnFailure(fabric.Save(mStorage));
+    const std::optional<GroupId> group_to_unlink =
+        (replaced_group_id.has_value() && IsGroupcastEnabled()) ? replaced_group_id : std::nullopt;
+    ReturnErrorOnFailure(SaveFabricAndUnlinkGroupKeys(mStorage, fabric, group_to_unlink));
     GroupAdded(fabric_index, group);
     return CHIP_NO_ERROR;
 }
@@ -1165,14 +1276,9 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
     {
         fabric.group_count--;
     }
-    if (IsGroupcastEnabled())
-    {
-        // GroupKeyManagement rejects GroupKeyMap writes when Groupcast is enabled, so Groupcast owns the mapping lifecycle.
-        // Best effort: the group is already deleted. Must stay directly before the save, see UnlinkGroupKeys.
-        LogErrorOnFailure(UnlinkGroupKeys(mStorage, fabric, group.group_id));
-    }
-    // Update fabric info
-    ReturnErrorOnFailure(fabric.Save(mStorage));
+    // GroupKeyManagement rejects GroupKeyMap writes when Groupcast is enabled, so Groupcast owns the mapping lifecycle.
+    const std::optional<GroupId> group_to_unlink = IsGroupcastEnabled() ? std::make_optional(group.group_id) : std::nullopt;
+    ReturnErrorOnFailure(SaveFabricAndUnlinkGroupKeys(mStorage, fabric, group_to_unlink));
     GroupRemoved(fabric_index, group);
     return CHIP_NO_ERROR;
 }
