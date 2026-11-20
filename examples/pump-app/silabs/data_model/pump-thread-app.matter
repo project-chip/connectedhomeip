@@ -2529,34 +2529,34 @@ endpoint 1 {
   }
 
   server cluster PumpConfigurationAndControl {
-    ram      attribute maxPressure;
-    ram      attribute maxSpeed;
-    ram      attribute maxFlow;
-    ram      attribute minConstPressure;
-    ram      attribute maxConstPressure;
-    ram      attribute minCompPressure;
-    ram      attribute maxCompPressure;
-    ram      attribute minConstSpeed;
-    ram      attribute maxConstSpeed;
-    ram      attribute minConstFlow;
-    ram      attribute maxConstFlow;
-    ram      attribute minConstTemp;
-    ram      attribute maxConstTemp;
-    ram      attribute pumpStatus default = 0;
-    ram      attribute effectiveOperationMode default = 0;
-    ram      attribute effectiveControlMode default = 0;
-    ram      attribute capacity;
-    ram      attribute speed;
-    ram      attribute lifetimeRunningHours default = 0x000000;
-    ram      attribute power;
-    ram      attribute lifetimeEnergyConsumed default = 0x00000000;
-    ram      attribute operationMode default = 0x00;
-    ram      attribute controlMode default = 0x00;
+    callback attribute maxPressure;
+    callback attribute maxSpeed;
+    callback attribute maxFlow;
+    callback attribute minConstPressure;
+    callback attribute maxConstPressure;
+    callback attribute minCompPressure;
+    callback attribute maxCompPressure;
+    callback attribute minConstSpeed;
+    callback attribute maxConstSpeed;
+    callback attribute minConstFlow;
+    callback attribute maxConstFlow;
+    callback attribute minConstTemp;
+    callback attribute maxConstTemp;
+    callback attribute pumpStatus;
+    callback attribute effectiveOperationMode;
+    callback attribute effectiveControlMode default = 0;
+    callback attribute capacity;
+    callback attribute speed;
+    callback attribute lifetimeRunningHours;
+    callback attribute power;
+    callback attribute lifetimeEnergyConsumed;
+    callback attribute operationMode default = 0x00;
+    callback attribute controlMode default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 31;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute featureMap default = 31;
+    callback attribute clusterRevision;
   }
 
   server cluster TemperatureMeasurement {

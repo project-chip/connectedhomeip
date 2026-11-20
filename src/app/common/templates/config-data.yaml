@@ -56,7 +56,6 @@ ClustersWithInitFunctions:
     - Level Control
     - Mode Select
     - On/Off
-    - Pump Configuration and Control
     - Sample MEI
     # keep-sorted end
 
@@ -64,7 +63,6 @@ ClustersWithAttributeChangedFunctions:
     # keep-sorted start
     - Bridged Device Basic Information
     - Door Lock
-    - Pump Configuration and Control
     # keep-sorted end
 
 ClustersWithShutdownFunctions:
@@ -81,7 +79,6 @@ ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
     - Level Control
-    - Pump Configuration and Control
     # keep-sorted end
     # Code Driven clusters are clusters that implement the ServerClusterInterface.
     # The clusters in this list require Init() and/or Shutdown() callbacks, defined
@@ -155,6 +152,7 @@ CodeDrivenClusters:
     - Power Topology
     - Pressure Measurement
     - Proximity Ranging
+    - Pump Configuration and Control
     - Push AV Stream Transport
     - RVC Clean Mode
     - RVC Operational State

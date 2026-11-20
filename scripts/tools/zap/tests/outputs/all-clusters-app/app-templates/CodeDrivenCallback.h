@@ -254,6 +254,10 @@ void MatterWindowCoveringClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterWindowCoveringClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterPumpConfigurationAndControlClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterPumpConfigurationAndControlClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterThermostatClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterThermostatClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);

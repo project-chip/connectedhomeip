@@ -2087,19 +2087,19 @@ endpoint 1 {
   }
 
   server cluster PumpConfigurationAndControl {
-    ram      attribute maxPressure default = 32767;
-    ram      attribute maxSpeed default = 65534;
-    ram      attribute maxFlow default = 65534;
-    ram      attribute pumpStatus default = 32;
-    persist  attribute effectiveOperationMode default = 0;
-    persist  attribute effectiveControlMode default = 0;
-    ram      attribute capacity;
-    persist  attribute operationMode default = 0;
+    callback attribute maxPressure default = 32767;
+    callback attribute maxSpeed default = 65534;
+    callback attribute maxFlow default = 65534;
+    callback attribute pumpStatus;
+    callback attribute effectiveOperationMode;
+    callback attribute effectiveControlMode default = 0;
+    callback attribute capacity;
+    callback attribute operationMode default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
   }
 
   server cluster TemperatureMeasurement {

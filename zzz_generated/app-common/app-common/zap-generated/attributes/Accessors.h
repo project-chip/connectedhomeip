@@ -8846,14 +8846,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & val
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MaxPressure
 
 namespace MaxSpeed {
@@ -8866,14 +8858,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & va
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MaxSpeed
 
 namespace MaxFlow {
@@ -8886,14 +8870,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & va
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MaxFlow
 
 namespace MinConstPressure {
@@ -8906,14 +8882,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & val
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MinConstPressure
 
 namespace MaxConstPressure {
@@ -8926,14 +8894,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & val
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MaxConstPressure
 
 namespace MinCompPressure {
@@ -8946,14 +8906,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & val
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MinCompPressure
 
 namespace MaxCompPressure {
@@ -8966,14 +8918,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & val
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MaxCompPressure
 
 namespace MinConstSpeed {
@@ -8986,14 +8930,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & va
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MinConstSpeed
 
 namespace MaxConstSpeed {
@@ -9006,14 +8942,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & va
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MaxConstSpeed
 
 namespace MinConstFlow {
@@ -9026,14 +8954,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & va
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MinConstFlow
 
 namespace MaxConstFlow {
@@ -9046,14 +8966,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & va
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MaxConstFlow
 
 namespace MinConstTemp {
@@ -9066,14 +8978,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & val
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MinConstTemp
 
 namespace MaxConstTemp {
@@ -9086,14 +8990,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & val
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MaxConstTemp
 
 namespace PumpStatus {
@@ -9108,13 +9004,6 @@ inline void GetDefaultOr(EndpointId endpoint,
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> value,
-                                        MarkAttributeDirty markDirty);
 } // namespace PumpStatus
 
 namespace EffectiveOperationMode {
@@ -9128,12 +9017,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::PumpConfigura
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value, MarkAttributeDirty markDirty);
 } // namespace EffectiveOperationMode
 
 namespace EffectiveControlMode {
@@ -9147,12 +9030,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::PumpConfigura
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value, MarkAttributeDirty markDirty);
 } // namespace EffectiveControlMode
 
 namespace Capacity {
@@ -9165,14 +9042,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & val
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace Capacity
 
 namespace Speed {
@@ -9185,14 +9054,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & va
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace Speed
 
 namespace LifetimeRunningHours {
@@ -9205,14 +9066,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & va
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace LifetimeRunningHours
 
 namespace Power {
@@ -9225,14 +9078,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & va
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace Power
 
 namespace LifetimeEnergyConsumed {
@@ -9245,14 +9090,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & va
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace LifetimeEnergyConsumed
 
 namespace OperationMode {
@@ -9266,12 +9103,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::PumpConfigura
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value, MarkAttributeDirty markDirty);
 } // namespace OperationMode
 
 namespace ControlMode {
@@ -9285,12 +9116,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::PumpConfigura
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value, MarkAttributeDirty markDirty);
 } // namespace ControlMode
 
 namespace FeatureMap {
@@ -9302,9 +9127,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace FeatureMap
 
 namespace ClusterRevision {
@@ -9316,9 +9138,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
