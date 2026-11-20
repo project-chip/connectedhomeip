@@ -740,9 +740,11 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
 
     VerifyOrReturnError(CanCastTo<boringssl_size_t_openssl_int>(key_length), CHIP_ERROR_INVALID_ARGUMENT);
 
+    unsigned int mac_out_len = 0;
     VerifyOrReturnError(HMAC(EVP_sha256(), Uint8::to_const_uchar(key), static_cast<boringssl_size_t_openssl_int>(key_length),
-                             Uint8::to_const_uchar(message), message_length, Uint8::to_uchar(out_buffer), nullptr) != nullptr,
+                             Uint8::to_const_uchar(message), message_length, Uint8::to_uchar(out_buffer), &mac_out_len) != nullptr,
                         CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mac_out_len == kSHA256_Hash_Length, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }
