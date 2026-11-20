@@ -21,21 +21,27 @@ guides to get started.
         ENABLE_ENERGY_EVSE_TRIGGER
         ENABLE_ENERGY_REPORTING_TRIGGER
 
--   Device Energy Management feature support: Depending on the capabilities of
-    the device it may support Power Forecast Reporting `PFR` or State Forecast
-    Reporting `SFR`. However it is not allowed to support both of these at once.
+-   Device Energy Management (DEM) feature support: run `idf.py menuconfig`
+    and, under "EVSE App Configuration", select:
 
-    By default `PFR` is enabled in the build. To change this run
-    `idf.py menuconfig` and search for the following config entries:
+    -   The power adjustment feature: Power Adjustment `PA` (default), Power
+        Range Adjustment `PRA`, or none.
+    -   The forecast reporting feature: Power Forecast Reporting `PFR`
+        (default), State Forecast Reporting `SFR`, or none.
+    -   Any of Start Time Adjustment `STA`, Pausable `PAU`, Forecast
+        Adjustment `FA` and Constraint Based Adjustment `CON` (all enabled by
+        default).
 
-        DEM_SUPPORT_STATE_FORECAST_REPORTING
-        DEM_SUPPORT_POWER_FORECAST_REPORTING
+    The menu only offers combinations allowed by the Matter specification:
 
-    Note only one of these can be enabled to meet Matter specification
-    conformance.
+    -   `PA` and `PRA` cannot both be supported.
+    -   `SFR` is only allowed when neither `PA` nor `PRA` is supported.
+    -   `STA`, `PAU`, `FA` and `CON` require `PFR` or `SFR`.
+    -   At least one feature must be supported.
 
-    When running in test events, some test cases (e.g. TC_DEM_2.7 and
-    TC_DEM_2.8) depend on the correct setting to be used in the binary DUT.
+    When running in test events, some test cases (e.g. TC_DEM_2.7, TC_DEM_2.8
+    and TC_DEM_2.11) depend on the correct setting to be used in the binary
+    DUT.
 
 ### Cluster Control
 
