@@ -302,5 +302,10 @@ struct ResolveContext : public GenericContext
     bool Matches(const char * otherInstanceName) const { return instanceName == otherInstanceName; }
 };
 
+void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err, const char * fullname,
+               const char * hostname, uint16_t port, uint16_t txtLen, const unsigned char * txtRecord, void * context);
+void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err, const char * hostname,
+                   const struct sockaddr * address, uint32_t ttl, void * context);
+
 } // namespace Dnssd
 } // namespace chip

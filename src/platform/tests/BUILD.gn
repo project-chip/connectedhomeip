@@ -49,6 +49,10 @@ if (chip_device_platform != "none") {
 
     if (chip_mdns != "none" && chip_enable_dnssd_tests &&
         (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
+      if (chip_device_platform == "darwin") {
+        test_sources += [ "TestDarwinDnssdResolveCallbacks.cpp" ]
+        public_deps += [ "${chip_root}/src/platform/Darwin:dnssd_buildconfig" ]
+      }
       test_sources += [ "TestDnssd.cpp" ]
       public_deps += [
         "${chip_root}/src/lib/dnssd",
