@@ -181,7 +181,7 @@ public:
         kHandleSigma3Pending = 9,
     };
 
-    State GetState() { return mState; }
+    State GetState() const { return mState; }
 
     // Returns true if the CASE session handshake was stuck due to failing to schedule work on the Matter thread.
     // If this function returns true, the CASE session has been reset and is ready for a new session establishment.

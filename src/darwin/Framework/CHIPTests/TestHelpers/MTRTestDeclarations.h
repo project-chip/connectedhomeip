@@ -56,9 +56,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)syncRunOnWorkQueue:(void (^)(void))block error:(NSError * __autoreleasing *)error;
 - (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
 - (nullable MTRDevice *)_existingDeviceForNodeID:(NSNumber *)nodeID;
+- (void)operationalInstanceAdded:(NSNumber *)nodeID;
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 @property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
+@end
+
+@interface MTRBaseDevice (Test)
+- (void)invalidateCASESession;
 @end
 
 MTR_TESTABLE_DIRECT_MEMBERS
@@ -91,6 +96,15 @@ MTR_TESTABLE_DIRECT_MEMBERS
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 @end
 
+// Mirrors OperationalSessionSetup::SetupPhase for tests compiled as Objective-C; MTRDeviceController_Concrete checks the values match.
+typedef NS_ENUM(NSInteger, MTRTestSessionSetupPhase) {
+    MTRTestSessionSetupPhaseNone = -1,
+    MTRTestSessionSetupPhaseResolvingAddress = 0,
+    MTRTestSessionSetupPhaseAwaitingSigma2 = 1,
+    MTRTestSessionSetupPhaseWaitingForRetry = 2,
+    MTRTestSessionSetupPhaseOther = 3,
+};
+
 #pragma mark - Declarations for items compiled only for DEBUG configuration
 
 #ifdef DEBUG
@@ -100,6 +114,9 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds;
 // Syncs onto the Matter queue: call off that queue, while the controller is running.
 - (NSUInteger)unitTestSessionRequestsWaitingOnConnectivityMonitorCount;
+- (BOOL)unitTestIsResolvingAddressForNodeID:(NSNumber *)nodeID;
+// Must be called on the Matter queue.  The node's CASE setup phase, as an MTRTestSessionSetupPhase.
+- (NSInteger)unitTestSessionSetupPhaseForNodeID:(NSNumber *)nodeID;
 @end
 
 @interface MTRBaseDevice (TestDebug)
@@ -121,6 +138,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (BOOL)unitTestShouldDetectTimeSynchronizationLoss;
 - (NSUInteger)unitTestInterestedPathsChangedCount;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
+// Must be called on the Matter queue.
+- (NSUInteger)unitTestCASESetupReleasedForReachabilityCount;
 - (NSUInteger)unitTestEventsReportedSinceLastCheck;
 - (void)unitTestClearClusterData;
 - (MTRInternalDeviceState)_getInternalState;
