@@ -43,6 +43,8 @@ public:
 
     void OnPairingDeleted(CHIP_ERROR error) override;
 
+    void OnCommissioneeReleased(chip::NodeId deviceId, CHIP_ERROR reason) override;
+
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
 
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;

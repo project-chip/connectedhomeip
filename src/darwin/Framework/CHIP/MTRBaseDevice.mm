@@ -18,6 +18,7 @@
 
 #import "MTRAttributeTLVValueDecoder_Internal.h"
 #import "MTRBaseDevice_Internal.h"
+#import "MTRBaseDevice_Test.h"
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRCallbackBridgeBase.h"
 #import "MTRCluster.h"

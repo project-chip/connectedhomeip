@@ -52,6 +52,10 @@ CHIP_ERROR CommissioneeDeviceProxy::SendCommands(app::CommandSender * commandObj
 void CommissioneeDeviceProxy::OnSessionReleased()
 {
     mState = ConnectionState::NotConnected;
+    if (mSessionReleaseDelegate != nullptr)
+    {
+        mSessionReleaseDelegate->OnCommissioneeSessionReleased(*this);
+    }
 }
 
 void CommissioneeDeviceProxy::CloseSession()

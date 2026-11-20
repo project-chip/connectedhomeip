@@ -432,6 +432,18 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     });
 }
 
+- (void)controller:(MTRDeviceController *)controller commissioneeReleasedForNodeID:(NSNumber *)nodeID error:(NSError *)error
+{
+    if (![nodeID isEqual:_commissioningID]) {
+        return;
+    }
+
+    // Only a commissioning that is waiting after PASE has an idle commissionee to lose.
+    if ([_controller commissioneeReleasedWhileWaitingAfterPASE:self]) {
+        [self _dispatchCommissioningError:error];
+    }
+}
+
 - (void)controllerStartingNetworkScan:(MTRDeviceController *)controller
 {
     id<MTRCommissioningDelegate> strongDelegate = _delegate;

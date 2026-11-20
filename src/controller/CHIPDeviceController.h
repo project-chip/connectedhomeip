@@ -488,7 +488,8 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
                                       public app::ClusterStateCache::Callback,
 #endif
-                                      public SessionEstablishmentDelegate
+                                      public SessionEstablishmentDelegate,
+                                      public CommissioneeDeviceProxy::SessionReleaseDelegate
 {
     friend class chip::Testing::DeviceCommissionerTestAccess;
 
@@ -1157,6 +1158,13 @@ private:
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
     CommissioneeDeviceProxy * FindCommissioneeDevice(const Transport::PeerAddress & peerAddress);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
+
+    // Creates a commissionee in the pool that reports the loss of its session to this commissioner.
+    CommissioneeDeviceProxy * CreateCommissioneeDevice();
+
+    // CommissioneeDeviceProxy::SessionReleaseDelegate: a commissionee that is idle (neither in PASE establishment nor being
+    // commissioned) and loses its session is released, and the pairing delegate's OnCommissioneeReleased is called.
+    void OnCommissioneeSessionReleased(CommissioneeDeviceProxy & device) override;
 
     bool ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                    Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,

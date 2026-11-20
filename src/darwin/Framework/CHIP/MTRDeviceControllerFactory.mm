@@ -16,6 +16,7 @@
 
 #import "MTRDeviceControllerFactory.h"
 #import "MTRDeviceControllerFactory_Internal.h"
+#import "MTRDeviceControllerFactory_Test.h"
 
 #import <Matter/MTRDefines.h>
 
@@ -80,12 +81,6 @@ using namespace chip::Tracing::DarwinFramework;
 @end
 
 constexpr uint16_t kPublisherSelectedMaxIntervalFloor = 10 * 60;
-
-MTR_TESTABLE_DIRECT_MEMBERS
-@interface MTRDeviceControllerFactory ()
-+ (uint16_t)publisherSelectedMaxIntervalForMinInterval:(uint16_t)requestedMinInterval
-                                    maxIntervalCeiling:(uint16_t)requestedMaxInterval;
-@end
 
 class MTRApplicationCallback : public app::ReadHandler::ApplicationCallback {
     CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & readHandler, Transport::SecureSession & secureSession) override

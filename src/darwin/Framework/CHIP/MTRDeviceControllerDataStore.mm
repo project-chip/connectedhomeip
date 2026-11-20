@@ -15,6 +15,7 @@
  */
 
 #include "MTRDeviceControllerDataStore.h"
+#import "MTRDeviceControllerDataStore_Test.h"
 
 // Importing MTRBaseDevice.h for the MTRAttributePath class. Needs to change when https://github.com/project-chip/connectedhomeip/issues/31247 is fixed.
 #import "MTRBaseDevice.h"
@@ -107,6 +108,10 @@ static bool IsValidCATNumber(id _Nullable value)
 
     return true;
 }
+
+// Conformance to the test-only declarations in MTRDeviceControllerDataStore_Test.h, so the compiler checks them against this file.
+@interface MTRDeviceControllerDataStore () <MTRDeviceControllerDataStoreAttributeStoreMethods>
+@end
 
 @implementation MTRDeviceControllerDataStore {
     id<MTRDeviceControllerStorageDelegate> _storageDelegate;

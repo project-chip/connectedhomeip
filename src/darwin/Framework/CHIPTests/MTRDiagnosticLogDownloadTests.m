@@ -17,9 +17,9 @@
 // module headers
 #import <Matter/Matter.h>
 
+#import "MTRDeviceController_Test.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
-#import "MTRTestDeclarations.h"
 
 static const uint64_t kDeviceId = 0x12344321;
 static MTRDeviceController * sDeviceController = nil;
