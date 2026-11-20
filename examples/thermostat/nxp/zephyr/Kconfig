@@ -15,5 +15,9 @@
 #
 mainmenu "Matter NXP Thermostat Example Application"
 
+config CHIP_ENABLE_GROUPCAST
+	bool
+	default y
+
 rsource "../../../../config/zephyr/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"

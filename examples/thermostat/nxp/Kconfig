@@ -15,6 +15,10 @@
 #
 mainmenu "Matter NXP Thermostat Example Application"
 
+config CHIP_ENABLE_GROUPCAST
+	bool
+	default y
+
 source "$(CHIP_ROOT)/config/nxp/chip-cmake-freertos/Kconfig.defaults"
 source "$(CHIP_ROOT)/examples/platform/nxp/common/Kconfig"
 source "Kconfig.mcuxpresso"

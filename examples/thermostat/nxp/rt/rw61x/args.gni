@@ -21,3 +21,4 @@ ble_adv_data_custom = true
 # SDK target definitions
 nxp_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 nxp_sdk_driver_target = get_label_info(":sdk_driver", "label_no_toolchain")
+chip_config_enable_groupcast = true
