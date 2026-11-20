@@ -691,16 +691,25 @@ void SimulatedRoboticVacuumCleaner::HandleRunModeChangeToMode(uint8_t newMode,
     case to_underlying(OperationalState::OperationalStateEnum::kStopped):
     case to_underlying(RvcOperationalState::OperationalStateEnum::kDocked):
     case to_underlying(RvcOperationalState::OperationalStateEnum::kCharging):
-        // We could be in the charging state with a run mode != idle.
-        if (currentMode != kRunModeIdle && newMode != kRunModeIdle)
+    case to_underlying(OperationalState::OperationalStateEnum::kPaused):
+        if (newMode == kRunModeIdle)
+        {
+            if (currentState == to_underlying(OperationalState::OperationalStateEnum::kPaused))
+            {
+                LogErrorOnFailure(OperationalState().SetOperationalState(
+                    to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger)));
+            }
+            if (currentMode != kRunModeIdle)
+            {
+                UpdateServiceAreaProgressOnExit();
+            }
+            response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+            return;
+        }
+        if (currentMode != kRunModeIdle)
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
             response.statusText.SetValue("Change to the mapping or cleaning mode is only allowed from idle"_span);
-            return;
-        }
-        if (newMode == kRunModeIdle)
-        {
-            response.status = to_underlying(ModeBase::StatusCode::kSuccess);
             return;
         }
         ClearDockChargingTracking();

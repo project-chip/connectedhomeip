@@ -48,9 +48,24 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
     {
     case to_underlying(OperationalState::OperationalStateEnum::kStopped):
     case to_underlying(RvcOperationalState::OperationalStateEnum::kDocked):
-    case to_underlying(RvcOperationalState::OperationalStateEnum::kCharging): {
-        // We could be in the charging state with an RvcRun mode != idle.
-        if (currentMode != RvcRunMode::ModeIdle && newMode != RvcRunMode::ModeIdle)
+    case to_underlying(RvcOperationalState::OperationalStateEnum::kCharging):
+    case to_underlying(OperationalState::OperationalStateEnum::kPaused): {
+        if (newMode == RvcRunMode::ModeIdle)
+        {
+            if (currentState == to_underlying(OperationalState::OperationalStateEnum::kPaused))
+            {
+                TEMPORARY_RETURN_IGNORED mOperationalStateInstance.SetOperationalState(
+                    to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
+            }
+            if (currentMode != RvcRunMode::ModeIdle)
+            {
+                UpdateServiceAreaProgressOnExit();
+            }
+            response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+            return;
+        }
+
+        if (currentMode != RvcRunMode::ModeIdle)
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
             response.statusText.SetValue("Change to the mapping or cleaning mode is only allowed from idle"_span);
