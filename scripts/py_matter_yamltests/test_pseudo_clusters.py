@@ -16,6 +16,7 @@
 
 import unittest
 
+from matter.yamltests.pseudo_clusters.clusters.value_commands import ValueCommands
 from matter.yamltests.pseudo_clusters.pseudo_clusters import PseudoCluster, PseudoClusters
 
 
@@ -60,6 +61,24 @@ class TestPseudoClusters(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await clusters.execute(unsupported_command_step), default_failure)
         self.assertEqual(await clusters.execute(supported_step), default_success)
         self.assertEqual(await clusters.execute(supported_step_with_custom_success), custom_success)
+
+
+class MockStepWithArguments(MockStep):
+    def __init__(self, cluster: str, command: str, values: list):
+        super().__init__(cluster, command)
+        self.arguments = {'values': values}
+
+
+value_clusters = PseudoClusters([ValueCommands()])
+
+
+class TestValueCommands(unittest.IsolatedAsyncioTestCase):
+    async def test_unsigned_number_value_returns_the_argument(self):
+        for value in (0, 1, 254):
+            step = MockStepWithArguments(
+                'ValueCommands', 'UnsignedNumberValue', [{'name': 'Value', 'value': value}])
+            status, _ = await value_clusters.execute(step)
+            self.assertEqual(status, {'value': {'Value': value}})
 
 
 if __name__ == '__main__':

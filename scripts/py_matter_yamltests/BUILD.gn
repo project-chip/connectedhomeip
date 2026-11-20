@@ -46,6 +46,7 @@ pw_python_package("matter-yamltests") {
     "matter/yamltests/pseudo_clusters/clusters/equality_commands.py",
     "matter/yamltests/pseudo_clusters/clusters/log_commands.py",
     "matter/yamltests/pseudo_clusters/clusters/system_commands.py",
+    "matter/yamltests/pseudo_clusters/clusters/value_commands.py",
     "matter/yamltests/pseudo_clusters/clusters/webrtc.py",
     "matter/yamltests/pseudo_clusters/pseudo_cluster.py",
     "matter/yamltests/pseudo_clusters/pseudo_clusters.py",
