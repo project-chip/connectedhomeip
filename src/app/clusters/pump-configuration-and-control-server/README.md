@@ -19,8 +19,12 @@ store.
 | ------------------------------------------------ | ----------------------------------------------------------------------------- |
 | MaxPressure, MaxSpeed, MaxFlow, Min/Max\* limits | `Config::fixedAttributes`. Fixed, there are no setters.                       |
 | OperationMode, ControlMode                       | Writable. Validated against the FeatureMap. Persisted.                        |
-| EffectiveOperationMode, EffectiveControlMode     | Computed by the cluster (see [Effective modes](#effective-modes)). Persisted. |
+| EffectiveOperationMode                           | Follows OperationMode (see [Effective modes](#effective-modes)). Not persisted: it is rebuilt from the persisted OperationMode. |
+| EffectiveControlMode                             | Computed by the cluster (see [Effective modes](#effective-modes)). Persisted. |
 | LifetimeRunningHours, LifetimeEnergyConsumed     | Writable by clients and the application. Persisted.                           |
+
+LifetimeRunningHours values stored in the 3-byte `int24u` format by earlier
+implementations are loaded at startup and stored again in the current format.
 | PumpStatus, Capacity, Speed, Power               | Set by the application.                                                       |
 
 Optional attributes are enabled with the `Config::optionalAttributes`.
@@ -140,6 +144,8 @@ PumpConfigurationAndControl::Attributes::PumpStatus::Set(endpointId, pumpStatus)
 | `Attributes::<Name>::Set(endpoint, value, MarkAttributeDirty)`  | Not available. The setters report changes                              |
 | `MatterReportingAttributeChangeCallback` after a setter         | Not needed. The setters report changes                                 |
 | `MatterPostAttributeChangeCallback` for this cluster            | Not called. Use `ApplicationDelegate::OnAttributeChanged`              |
+| `Attributes::EffectiveOperationMode::Set` for a physical local override | Same call. The next OperationMode or ControlMode change sets it back to OperationMode, and it is not restored after a reboot |
+| `Attributes::ClusterRevision::Get`                              | Not available. Use `PumpConfigurationAndControl::kRevision`                   |
 | `LogEvent(PumpConfigurationAndControl::Events::X::Type{}, ...)` | `GenerateAlarmEvent(PumpConfigurationAndControl::Events::X::Type{})`   |
 | Remote sensor detection (not supported before)                  | `ApplicationDelegate::GetRemoteSensorType` and `OnRemoteSensorChanged` |
 

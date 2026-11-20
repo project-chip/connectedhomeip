@@ -21,6 +21,7 @@
 #include <clusters/PumpConfigurationAndControl/Metadata.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/odd-sized-integers.h>
 
 namespace chip::app::Clusters {
 
@@ -87,6 +88,27 @@ PumpConfigurationAndControlCluster::PumpStatusBitMask RemoteSensorStatusBits(Rem
         break;
     }
     return PumpConfigurationAndControlCluster::PumpStatusBitMask();
+}
+
+/// Loads a LifetimeRunningHours value stored in the 3-byte int24u attribute format (0xFFFFFF is
+/// null), as written by earlier implementations of this cluster. Returns false if there is no such
+/// value.
+bool LoadInt24uLifetimeRunningHours(AttributePersistenceProvider & provider, const ConcreteAttributePath & path,
+                                    DataModel::Nullable<uint32_t> & value)
+{
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    Traits::StorageType storage;
+    MutableByteSpan buffer(storage);
+    VerifyOrReturnValue(provider.ReadValue(path, buffer) == CHIP_NO_ERROR && buffer.size() == sizeof(storage), false);
+    if (Traits::IsNullValue(storage))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull(Traits::StorageToWorking(storage));
+    }
+    return true;
 }
 
 template <typename T>
@@ -175,15 +197,13 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
     }
 
     // The effective modes are rebuilt from the restored modes instead of trusting the persisted
-    // values, which can be out of date after an interrupted update or a FeatureMap change. Only the
-    // EffectiveControlMode set by the application in Local mode is kept. The delegate is not
-    // notified: it may not be ready yet, and Level Control may not be initialized.
-    OperationModeEnum storedEffectiveOperationMode = OperationModeEnum::kUnknownEnumValue;
-    ControlModeEnum storedEffectiveControlMode     = ControlModeEnum::kUnknownEnumValue;
-    persistence.LoadNativeEndianValue({ endpointId, clusterId, EffectiveOperationMode::Id }, storedEffectiveOperationMode,
-                                      OperationModeEnum::kUnknownEnumValue);
-    persistence.LoadNativeEndianValue({ endpointId, clusterId, EffectiveControlMode::Id }, storedEffectiveControlMode,
-                                      ControlModeEnum::kUnknownEnumValue);
+    // value, which can be out of date after an interrupted update or a FeatureMap change. Only the
+    // EffectiveControlMode set by the application in Local mode is kept. EffectiveOperationMode is
+    // not persisted: it always follows the persisted OperationMode. The delegate is not notified:
+    // it may not be ready yet, and Level Control may not be initialized.
+    ControlModeEnum storedEffectiveControlMode = ControlModeEnum::kUnknownEnumValue;
+    const bool hasStoredEffectiveControlMode   = persistence.LoadNativeEndianValue(
+        { endpointId, clusterId, EffectiveControlMode::Id }, storedEffectiveControlMode, ControlModeEnum::kUnknownEnumValue);
 
     const RemoteSensorType sensorType =
         (mOperationMode == OperationModeEnum::kNormal) ? mDelegate.GetRemoteSensorType(endpointId) : RemoteSensorType::kNoSensor;
@@ -198,11 +218,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
             .Clear(PumpStatusBitmap::kRemoteTemperature)
             .Set(RemoteSensorStatusBits(sensorType));
     }
-    if (mEffectiveOperationMode != storedEffectiveOperationMode)
-    {
-        StoreAttribute(mContext, mPath, EffectiveOperationMode::Id, mEffectiveOperationMode);
-    }
-    if (mEffectiveControlMode != storedEffectiveControlMode)
+    if (hasStoredEffectiveControlMode && mEffectiveControlMode != storedEffectiveControlMode)
     {
         StoreAttribute(mContext, mPath, EffectiveControlMode::Id, mEffectiveControlMode);
     }
@@ -210,7 +226,13 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
     if (mEnabledOptionalAttributes.IsSet(LifetimeRunningHours::Id))
     {
         const DataModel::Nullable<uint32_t> defaultHours = mLifetimeRunningHours;
-        persistence.LoadNativeEndianValue({ endpointId, clusterId, LifetimeRunningHours::Id }, mLifetimeRunningHours, defaultHours);
+        const ConcreteAttributePath path(endpointId, clusterId, LifetimeRunningHours::Id);
+        if (!persistence.LoadNativeEndianValue(path, mLifetimeRunningHours, defaultHours) &&
+            LoadInt24uLifetimeRunningHours(context.attributeStorage, path, mLifetimeRunningHours))
+        {
+            // Store the value in the current format, so that later loads do not need the conversion.
+            StoreAttribute(mContext, mPath, LifetimeRunningHours::Id, mLifetimeRunningHours);
+        }
         if (!IsValidNullableInt24u(mLifetimeRunningHours))
         {
             mLifetimeRunningHours = defaultHours;
@@ -384,6 +406,17 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetEffectiveControlMode(ControlMo
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR PumpConfigurationAndControlCluster::SetEffectiveOperationMode(OperationModeEnum operationMode)
+{
+    VerifyOrReturnError(EnsureKnownEnumValue(operationMode) != OperationModeEnum::kUnknownEnumValue,
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    if (SetAttributeValue(mEffectiveOperationMode, operationMode, EffectiveOperationMode::Id))
+    {
+        mDelegate.OnAttributeChanged(mPath.mEndpointId, EffectiveOperationMode::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
 bool PumpConfigurationAndControlCluster::WriteEffectiveControlMode(ControlModeEnum controlMode)
 {
     VerifyOrReturnValue(SetAttributeValue(mEffectiveControlMode, controlMode, EffectiveControlMode::Id), false);
@@ -399,6 +432,8 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetPumpStatus(PumpStatusBitMask p
     return CHIP_NO_ERROR;
 }
 
+// TODO: Capacity, Speed and Power have the Q quality since cluster revision 6: report changes at
+// most once per second (and on null transitions) using QuieterReportingAttribute.
 CHIP_ERROR PumpConfigurationAndControlCluster::SetCapacity(DataModel::Nullable<int16_t> capacity)
 {
     VerifyOrReturnError(IsValidNullable(capacity), CHIP_IM_GLOBAL_STATUS(ConstraintError));
@@ -537,7 +572,6 @@ void PumpConfigurationAndControlCluster::UpdateEffectiveModes(ChangedAttributes 
 
     if (SetAttributeValue(mEffectiveOperationMode, mOperationMode, EffectiveOperationMode::Id))
     {
-        StoreAttribute(mContext, mPath, EffectiveOperationMode::Id, mEffectiveOperationMode);
         changed.Add(EffectiveOperationMode::Id);
     }
     if (WriteEffectiveControlMode(ComputeEffectiveControlMode(mOperationMode, mControlMode, sensorType)))

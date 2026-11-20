@@ -56,23 +56,37 @@ public:
     void OnOperationModeMinMax(EndpointId endpointId, OperationModeEnum operationMode) override
     {
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
+        using Protocols::InteractionModel::Status;
+        VerifyOrReturn(emberAfContainsServer(endpointId, LevelControl::Id));
+
+        // MinLevel and MaxLevel are optional: use the Level Control defaults when they are absent.
         uint8_t level = 0;
         if (operationMode == OperationModeEnum::kMaximum)
         {
-            VerifyOrReturn(LevelControl::Attributes::MaxLevel::Get(endpointId, &level) ==
-                           Protocols::InteractionModel::Status::Success);
+            if (LevelControl::Attributes::MaxLevel::Get(endpointId, &level) != Status::Success)
+            {
+                level = MATTER_DM_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL;
+            }
         }
         else
         {
-            VerifyOrReturn(LevelControl::Attributes::MinLevel::Get(endpointId, &level) ==
-                           Protocols::InteractionModel::Status::Success);
+            if (LevelControl::Attributes::MinLevel::Get(endpointId, &level) != Status::Success)
+            {
+                level = MATTER_DM_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL;
+            }
             // A level of 0 stops the pump.
             if (level == 0)
             {
                 level = 1;
             }
         }
-        LevelControl::Attributes::CurrentLevel::Set(endpointId, level);
+
+        const Status status = LevelControl::Attributes::CurrentLevel::Set(endpointId, level);
+        if (status != Status::Success)
+        {
+            ChipLogError(Zcl, "PCC: failed to set Level Control CurrentLevel on endpoint %u: 0x%02x", endpointId,
+                         to_underlying(status));
+        }
 #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL
     }
 
@@ -127,7 +141,7 @@ BitMask<OptionalAttributes> ReadOptionalAttributes(EndpointId endpointId, uint32
     attributes.Set(OptionalAttributes::kMaxConstFlow, enabled.IsSet(MaxConstFlow::Id));
     attributes.Set(OptionalAttributes::kMinConstTemp, enabled.IsSet(MinConstTemp::Id));
     attributes.Set(OptionalAttributes::kMaxConstTemp, enabled.IsSet(MaxConstTemp::Id));
-    // ControlMode (0x21) is above the 31 attribute ids covered by optionalAttributeBits.
+    // ControlMode (0x21) is above the 32 attribute ids (0..31) covered by optionalAttributeBits.
     attributes.Set(OptionalAttributes::kControlMode,
                    emberAfContainsAttribute(endpointId, PumpConfigurationAndControl::Id, ControlMode::Id));
     return attributes;
@@ -476,6 +490,10 @@ namespace EffectiveOperationMode {
 Status Get(EndpointId endpoint, OperationModeEnum * value)
 {
     return GetFromCluster(endpoint, Id, value, [](auto & cluster) { return cluster.GetEffectiveOperationMode(); });
+}
+Status Set(EndpointId endpoint, OperationModeEnum value)
+{
+    return SetOnCluster(endpoint, [value](auto & cluster) { return cluster.SetEffectiveOperationMode(value); });
 }
 } // namespace EffectiveOperationMode
 

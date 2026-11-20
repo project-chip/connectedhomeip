@@ -59,6 +59,10 @@ public:
 
     /// Called after the value of `attributeId` changed, whether the change came from a client
     /// write, an application setter or a value computed by the cluster.
+    ///
+    /// The same attribute can be reported more than once for one change when a callback calls back
+    /// into the cluster. Read the current value from the cluster instead of relying on the number
+    /// of calls.
     virtual void OnAttributeChanged(EndpointId endpointId, AttributeId attributeId) = 0;
 };
 

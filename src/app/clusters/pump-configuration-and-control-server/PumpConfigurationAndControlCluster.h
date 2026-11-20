@@ -147,6 +147,11 @@ public:
     /// OnRemoteSensorChanged in Normal mode) overwrites it.
     CHIP_ERROR SetEffectiveControlMode(PumpConfigurationAndControl::ControlModeEnum controlMode);
     PumpConfigurationAndControl::ControlModeEnum GetEffectiveControlMode() const { return mEffectiveControlMode; }
+
+    /// Overrides EffectiveOperationMode, e.g. to Local while the pump is physically set to run with
+    /// its local settings. The next OperationMode or ControlMode change sets it back to
+    /// OperationMode. The value is not persisted: Startup sets it to OperationMode.
+    CHIP_ERROR SetEffectiveOperationMode(PumpConfigurationAndControl::OperationModeEnum operationMode);
     PumpConfigurationAndControl::OperationModeEnum GetEffectiveOperationMode() const { return mEffectiveOperationMode; }
 
     /// The remote sensor bits (RemotePressure, RemoteFlow, RemoteTemperature) are also updated

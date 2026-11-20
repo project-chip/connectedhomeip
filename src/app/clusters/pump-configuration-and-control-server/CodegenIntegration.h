@@ -166,6 +166,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, BitMask<PumpStatusB
 
 namespace EffectiveOperationMode {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, OperationModeEnum * value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, OperationModeEnum value);
 } // namespace EffectiveOperationMode
 
 namespace EffectiveControlMode {

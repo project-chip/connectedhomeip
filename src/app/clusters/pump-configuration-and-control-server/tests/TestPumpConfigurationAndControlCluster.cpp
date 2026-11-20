@@ -16,11 +16,13 @@
 
 #include <app/clusters/pump-configuration-and-control-server/PumpConfigurationAndControlCluster.h>
 #include <app/persistence/AttributePersistence.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/PumpConfigurationAndControl/Events.h>
 #include <clusters/PumpConfigurationAndControl/Metadata.h>
+#include <lib/support/odd-sized-integers.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
@@ -903,4 +905,91 @@ TEST_F(TestPumpConfigurationAndControlCluster, ReentrantSensorChangeKeepsStateCo
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, StartupLoadsInt24uLifetimeRunningHours)
+{
+    using Int24uTraits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    const ConcreteAttributePath path(kTestEndpointId, PumpConfigurationAndControl::Id, LifetimeRunningHours::Id);
+
+    PumpConfigurationAndControlCluster::Config config = ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed));
+    config.optionalAttributes.Set(OptionalAttributes::kLifetimeRunningHours);
+
+    for (const DataModel::Nullable<uint32_t> & stored :
+         { DataModel::MakeNullable(static_cast<uint32_t>(1234)), DataModel::Nullable<uint32_t>() })
+    {
+        PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+        ClusterTester tester(cluster);
+        AttributePersistenceProvider & provider = tester.GetServerClusterContext().attributeStorage;
+
+        // Earlier implementations stored LifetimeRunningHours in the 3-byte int24u format, with 0xFFFFFF as null.
+        Int24uTraits::StorageType int24uValue;
+        if (stored.IsNull())
+        {
+            Int24uTraits::SetNull(int24uValue);
+        }
+        else
+        {
+            Int24uTraits::WorkingToStorage(stored.Value(), int24uValue);
+        }
+        ASSERT_SUCCESS(provider.WriteValue(path, ByteSpan(int24uValue)));
+
+        ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+        EXPECT_EQ(cluster.GetLifetimeRunningHours(), stored);
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+        // The value was converted to the current format.
+        DataModel::Nullable<uint32_t> converted;
+        AttributePersistence persistence(provider);
+        EXPECT_TRUE(persistence.LoadNativeEndianValue(path, converted, DataModel::MakeNullable(static_cast<uint32_t>(0))));
+        EXPECT_EQ(converted, stored);
+    }
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, EffectiveOperationModeIsNotPersisted)
+{
+    PumpConfigurationAndControlCluster::Config config =
+        ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kLocalOperation));
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+
+    EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kMaximum), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kMaximum);
+
+    uint8_t buffer[4];
+    MutableByteSpan value(buffer);
+    AttributePersistenceProvider & provider = tester.GetServerClusterContext().attributeStorage;
+    EXPECT_NE(provider.ReadValue({ kTestEndpointId, PumpConfigurationAndControl::Id, EffectiveOperationMode::Id }, value),
+              CHIP_NO_ERROR);
+
+    // Without a stored entry, Startup does not write the computed EffectiveControlMode.
+    value = MutableByteSpan(buffer);
+    EXPECT_NE(provider.ReadValue({ kTestEndpointId, PumpConfigurationAndControl::Id, EffectiveControlMode::Id }, value),
+              CHIP_NO_ERROR);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, SetEffectiveOperationMode)
+{
+    PumpConfigurationAndControlCluster::Config config =
+        ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kLocalOperation));
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+
+    mDelegate.mChangedAttributes.clear();
+    EXPECT_SUCCESS(cluster.SetEffectiveOperationMode(OperationModeEnum::kLocal));
+    EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kLocal);
+    EXPECT_EQ(cluster.GetOperationMode(), OperationModeEnum::kNormal);
+    EXPECT_TRUE(mDelegate.WasChanged(EffectiveOperationMode::Id));
+
+    EXPECT_EQ(cluster.SetEffectiveOperationMode(static_cast<OperationModeEnum>(9)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    // The next OperationMode change sets it back to OperationMode.
+    EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kMaximum), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kMaximum);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
