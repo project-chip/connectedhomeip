@@ -261,6 +261,11 @@ void ExpectSignAndVerify(P256Keypair & signer, P256Keypair & verifier)
     EXPECT_SUCCESS(verifier.Pubkey().ECDSA_validate_msg_signature(msg.data(), msg.size(), signature));
 }
 
+constexpr uint8_t kP256CurveOrder[] = { 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
+                                        0xff, 0xff, 0xff, 0xff, 0xff, 0xbc, 0xe6, 0xfa, 0xad, 0xa7, 0x17,
+                                        0x9e, 0x84, 0xf3, 0xb9, 0xca, 0xc2, 0xfc, 0x63, 0x25, 0x51 };
+static_assert(sizeof(kP256CurveOrder) == kP256_PrivateKey_Length);
+
 } // namespace
   //
 
@@ -1470,6 +1475,102 @@ TEST_F(TestChipCryptoPAL, TestECDSA_ValidationFailIncorrectHashSignature)
     EXPECT_EQ(validation_error, CHIP_ERROR_INVALID_SIGNATURE);
 }
 
+// The vectors include signatures whose r or s starts with a zero byte, or has its top bit set. Those
+// take different paths when a backend converts the signature to DER before validating it.
+TEST_F(TestChipCryptoPAL, TestECDSA_ValidationTestVectors)
+{
+    HeapChecker heapChecker;
+
+    for (const auto & tv : ecdsa_det_test_vectors)
+    {
+        P256PublicKey public_key;
+        public_key.Bytes()[0] = 0x04;
+        memcpy(public_key.Bytes() + 1, tv.public_key_x, sizeof(tv.public_key_x));
+        memcpy(public_key.Bytes() + 1 + sizeof(tv.public_key_x), tv.public_key_y, sizeof(tv.public_key_y));
+
+        P256ECDSASignature signature;
+        memcpy(signature.Bytes(), tv.r, kP256_FE_Length);
+        memcpy(signature.Bytes() + kP256_FE_Length, tv.s, kP256_FE_Length);
+        ASSERT_SUCCESS(signature.SetLength(kP256_ECDSA_Signature_Length_Raw));
+
+        CharSpan message = CharSpan::fromCharString(tv.message);
+        EXPECT_SUCCESS(public_key.ECDSA_validate_msg_signature(Uint8::from_const_char(message.data()), message.size(), signature));
+
+        signature.Bytes()[kP256_ECDSA_Signature_Length_Raw - 1] ^= 0x01;
+        EXPECT_EQ(public_key.ECDSA_validate_msg_signature(Uint8::from_const_char(message.data()), message.size(), signature),
+                  CHIP_ERROR_INVALID_SIGNATURE);
+    }
+}
+
+// A signature with r or s equal to zero or to the curve order is never valid. These cases also cover the
+// ends of the raw to DER conversion: a zero integer, and the longest encoding.
+TEST_F(TestChipCryptoPAL, TestECDSA_ValidationFailsSignatureOutOfRange)
+{
+    HeapChecker heapChecker;
+
+    // Both halves of this signature have their top bit set, so replacing either with the curve order
+    // gives the longest DER encoding.
+    const auto & tv = ecdsa_det_test_vectors[0];
+    ASSERT_NE(tv.r[0] & 0x80, 0);
+    ASSERT_NE(tv.s[0] & 0x80, 0);
+
+    P256PublicKey public_key;
+    public_key.Bytes()[0] = 0x04;
+    memcpy(public_key.Bytes() + 1, tv.public_key_x, sizeof(tv.public_key_x));
+    memcpy(public_key.Bytes() + 1 + sizeof(tv.public_key_x), tv.public_key_y, sizeof(tv.public_key_y));
+    CharSpan message = CharSpan::fromCharString(tv.message);
+
+    static constexpr uint8_t kZero[kP256_FE_Length] = {};
+    struct
+    {
+        const uint8_t * r;
+        const uint8_t * s;
+    } const kCases[] = {
+        { kZero, kZero }, { kZero, tv.s }, { tv.r, kZero }, { kP256CurveOrder, tv.s }, { tv.r, kP256CurveOrder },
+    };
+
+    for (const auto & testCase : kCases)
+    {
+        P256ECDSASignature signature;
+        memcpy(signature.Bytes(), testCase.r, kP256_FE_Length);
+        memcpy(signature.Bytes() + kP256_FE_Length, testCase.s, kP256_FE_Length);
+        ASSERT_SUCCESS(signature.SetLength(kP256_ECDSA_Signature_Length_Raw));
+
+        EXPECT_EQ(public_key.ECDSA_validate_msg_signature(Uint8::from_const_char(message.data()), message.size(), signature),
+                  CHIP_ERROR_INVALID_SIGNATURE);
+    }
+}
+
+TEST_F(TestChipCryptoPAL, TestECDSA_ValidationFailsPublicKeyNotOnCurve)
+{
+    HeapChecker heapChecker;
+
+    // The generator with Y + 1, which is not on P-256. The signature is built over an all-zero hash so that
+    // ECDSA verification computes only on the curve that holds this point, where it succeeds. Validation must
+    // therefore fail only because the key is rejected.
+    static constexpr uint8_t kOffCurvePublicKey[kP256_PublicKey_Length] = {
+        0x04, 0x6b, 0x17, 0xd1, 0xf2, 0xe1, 0x2c, 0x42, 0x47, 0xf8, 0xbc, 0xe6, 0xe5, 0x63, 0xa4, 0x40, 0xf2,
+        0x77, 0x03, 0x7d, 0x81, 0x2d, 0xeb, 0x33, 0xa0, 0xf4, 0xa1, 0x39, 0x45, 0xd8, 0x98, 0xc2, 0x96, 0x4f,
+        0xe3, 0x42, 0xe2, 0xfe, 0x1a, 0x7f, 0x9b, 0x8e, 0xe7, 0xeb, 0x4a, 0x7c, 0x0f, 0x9e, 0x16, 0x2b, 0xce,
+        0x33, 0x57, 0x6b, 0x31, 0x5e, 0xce, 0xcb, 0xb6, 0x40, 0x68, 0x37, 0xbf, 0x51, 0xf6,
+    };
+    static constexpr uint8_t kSignatureForOffCurveKey[kP256_ECDSA_Signature_Length_Raw] = {
+        0xac, 0xad, 0x88, 0xae, 0x18, 0x5e, 0x90, 0x45, 0x1f, 0xce, 0x81, 0x6e, 0x5e, 0x80, 0x0d, 0x45,
+        0xde, 0xe7, 0x1f, 0x41, 0xed, 0x0c, 0xf7, 0x3b, 0x04, 0xfe, 0x1e, 0x09, 0x2c, 0xea, 0xf2, 0x27,
+        0x30, 0x0b, 0xd9, 0x04, 0xa4, 0xc7, 0xe9, 0x7d, 0xe9, 0xca, 0xe5, 0xfc, 0x3d, 0x18, 0x4e, 0x49,
+        0x65, 0xc0, 0x80, 0x0e, 0x6a, 0xf9, 0xab, 0xeb, 0xdf, 0x5d, 0x5b, 0x14, 0x59, 0xd2, 0x75, 0x69,
+    };
+    static constexpr uint8_t kZeroHash[kSHA256_Hash_Length] = {};
+
+    P256PublicKey offCurveKey(kOffCurvePublicKey);
+
+    P256ECDSASignature signature;
+    memcpy(signature.Bytes(), kSignatureForOffCurveKey, sizeof(kSignatureForOffCurveKey));
+    ASSERT_SUCCESS(signature.SetLength(sizeof(kSignatureForOffCurveKey)));
+
+    EXPECT_NE(offCurveKey.ECDSA_validate_hash_signature(kZeroHash, sizeof(kZeroHash), signature), CHIP_NO_ERROR);
+}
+
 TEST_F(TestChipCryptoPAL, TestECDSA_SigningMsgInvalidParams)
 {
     HeapChecker heapChecker;
@@ -1635,6 +1736,30 @@ TEST_F(TestChipCryptoPAL, TestECDH_EstablishSecret)
     bool signatures_match = (memcmp(out_secret1.ConstBytes(), out_secret2.ConstBytes(), out_secret1.Length()) == 0);
     EXPECT_TRUE(signatures_match);
 }
+
+// The PSA backend loads a serialized keypair for signing only, so that keypair cannot derive a secret.
+#if !CHIP_CRYPTO_PSA
+TEST_F(TestChipCryptoPAL, TestECDH_SampleInputVectors)
+{
+    HeapChecker heapChecker;
+
+    for (const auto & vector : ecdh_test_vectors)
+    {
+        P256Keypair keypair;
+        ASSERT_SUCCESS(keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(vector.local_pvt_key, vector.local_pvt_key_length),
+                                                                    ByteSpan(vector.local_pub_key, vector.local_pub_key_length)));
+
+        P256PublicKey remote_public_key;
+        ASSERT_EQ(vector.remote_pub_key_length, remote_public_key.Length());
+        memcpy(remote_public_key.Bytes(), vector.remote_pub_key, vector.remote_pub_key_length);
+
+        P256ECDHDerivedSecret secret;
+        ASSERT_SUCCESS(keypair.ECDH_derive_secret(remote_public_key, secret));
+        ASSERT_EQ(secret.Length(), vector.shared_secret_length);
+        EXPECT_EQ(memcmp(secret.ConstBytes(), vector.shared_secret, vector.shared_secret_length), 0);
+    }
+}
+#endif // !CHIP_CRYPTO_PSA
 
 TEST_F(TestChipCryptoPAL, TestECDH_RemotePublicKeyNotOnCurve)
 {
@@ -1802,11 +1927,6 @@ TEST_F(TestChipCryptoPAL, TestP256_InitializeFromBitsOrReject)
         ExpectSignAndVerify(keypair, reference);
         ExpectSignAndVerify(reference, keypair);
     }
-
-    static constexpr uint8_t kP256CurveOrder[] = { 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
-                                                   0xff, 0xff, 0xff, 0xff, 0xff, 0xbc, 0xe6, 0xfa, 0xad, 0xa7, 0x17,
-                                                   0x9e, 0x84, 0xf3, 0xb9, 0xca, 0xc2, 0xfc, 0x63, 0x25, 0x51 };
-    static_assert(sizeof(kP256CurveOrder) == kP256_PrivateKey_Length);
 
     // Test a few values around the curve order boundary. Values up to and including N-2 are valid.
     for (int ofs = -4; ofs < 2; ofs++)

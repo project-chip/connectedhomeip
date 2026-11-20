@@ -25,6 +25,7 @@
 
 #include <optional>
 #include <type_traits>
+#include <utility>
 
 #if CHIP_CRYPTO_BORINGSSL
 #include <openssl/aead.h>
@@ -44,6 +45,11 @@
 #include <openssl/sha.h>
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
+
+#if !CHIP_CRYPTO_BORINGSSL && OPENSSL_VERSION_NUMBER >= 0x30000000L
+#include <openssl/core_names.h>
+#include <openssl/params.h>
+#endif
 
 #include <lib/asn1/ASN1.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -836,6 +842,76 @@ ECName MapECName(SupportedECPKeyTypes keyType)
     }
 }
 
+CHIP_ERROR CreateEvpPkeyFromP256PublicKey(const P256PublicKey & key, ScopedEvpPkey & out_evp_pkey)
+{
+    out_evp_pkey.reset();
+
+    int nid = GetNidForCurve(MapECName(key.Type()));
+    VerifyOrReturnError(nid != NID_undef, CHIP_ERROR_INTERNAL);
+
+    // BoringSSL has no EVP_PKEY_fromdata, and OpenSSL 3.0 deprecates the EC_KEY functions.
+#if CHIP_CRYPTO_BORINGSSL || OPENSSL_VERSION_NUMBER < 0x30000000L
+    // EVP_PKEY_set1_EC_KEY takes its own reference to ec_key, so this one is dropped on the way out.
+    ScopedEcKey ec_key(EC_KEY_new_by_curve_name(nid));
+    VerifyOrReturnError(ec_key, CHIP_ERROR_INTERNAL);
+
+    ScopedEcGroup group(EC_GROUP_new_by_curve_name(nid));
+    VerifyOrReturnError(group, CHIP_ERROR_INTERNAL);
+
+    ScopedEcPoint point(EC_POINT_new(group.get()));
+    VerifyOrReturnError(point, CHIP_ERROR_INTERNAL);
+
+    VerifyOrReturnError(EC_POINT_oct2point(group.get(), point.get(), Uint8::to_const_uchar(key), key.Length(), nullptr) == 1,
+                        CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(EC_KEY_set_public_key(ec_key.get(), point.get()) == 1, CHIP_ERROR_INTERNAL);
+
+    ScopedEvpPkey evp_pkey(EVP_PKEY_new());
+    VerifyOrReturnError(evp_pkey, CHIP_ERROR_INTERNAL);
+
+    VerifyOrReturnError(EVP_PKEY_set1_EC_KEY(evp_pkey.get(), ec_key.get()) == 1, CHIP_ERROR_INTERNAL);
+#else
+    ScopedEvpPkeyCtx import_ctx(EVP_PKEY_CTX_new_from_name(nullptr, "EC", nullptr));
+    VerifyOrReturnError(import_ctx, CHIP_ERROR_INTERNAL);
+
+    // OSSL_PARAM_construct_* take non-const pointers, but EVP_PKEY_fromdata only reads through them.
+    OSSL_PARAM params[] = {
+        OSSL_PARAM_construct_utf8_string(OSSL_PKEY_PARAM_GROUP_NAME, const_cast<char *>(OBJ_nid2sn(nid)), 0),
+        OSSL_PARAM_construct_octet_string(OSSL_PKEY_PARAM_PUB_KEY, const_cast<uint8_t *>(key.ConstBytes()), key.Length()),
+        OSSL_PARAM_construct_end(),
+    };
+
+    EVP_PKEY * imported_key = nullptr;
+    VerifyOrReturnError(EVP_PKEY_fromdata_init(import_ctx.get()) == 1, CHIP_ERROR_INTERNAL);
+    // OpenSSL before 3.0.2 leaves an allocated key in imported_key when the import fails.
+    const int import_result = EVP_PKEY_fromdata(import_ctx.get(), &imported_key, EVP_PKEY_PUBLIC_KEY, params);
+    ScopedEvpPkey evp_pkey(imported_key);
+    VerifyOrReturnError(import_result == 1, CHIP_ERROR_INTERNAL);
+#endif
+
+    out_evp_pkey = std::move(evp_pkey);
+    return CHIP_NO_ERROR;
+}
+
+namespace {
+
+// Runs the crypto library's public key validation on `pkey`.
+CHIP_ERROR CheckP256PublicKey(EVP_PKEY * pkey)
+{
+    // BoringSSL has no EVP_PKEY_public_check, and OpenSSL 3.0 deprecates EC_KEY_check_key.
+#if CHIP_CRYPTO_BORINGSSL || OPENSSL_VERSION_NUMBER < 0x30000000L
+    const EC_KEY * ec_key = EVP_PKEY_get0_EC_KEY(pkey);
+    VerifyOrReturnError(ec_key != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(EC_KEY_check_key(ec_key) == 1, CHIP_ERROR_INTERNAL);
+#else
+    ScopedEvpPkeyCtx check_ctx(EVP_PKEY_CTX_new_from_pkey(nullptr, pkey, nullptr));
+    VerifyOrReturnError(check_ctx, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(EVP_PKEY_public_check(check_ctx.get()) == 1, CHIP_ERROR_INTERNAL);
+#endif
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
+
 CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
                                                        const P256ECDSASignature & signature) const
 {
@@ -851,91 +927,30 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
 CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length,
                                                         const P256ECDSASignature & signature) const
 {
+    VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(hash_length == kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(signature.Length() == kP256_ECDSA_Signature_Length_Raw, CHIP_ERROR_INVALID_ARGUMENT);
+
     ERR_clear_error();
-    CHIP_ERROR error     = CHIP_ERROR_INTERNAL;
-    int nid              = NID_undef;
-    EC_KEY * ec_key      = nullptr;
-    EC_POINT * key_point = nullptr;
-    EC_GROUP * ec_group  = nullptr;
-    ECDSA_SIG * ec_sig   = nullptr;
-    BIGNUM * r           = nullptr;
-    BIGNUM * s           = nullptr;
-    int result           = 0;
+    auto logErrorsOnExit = ScopeExit([] { SSLErrorLog(); });
 
-    VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(hash_length == kSHA256_Hash_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(signature.Length() == kP256_ECDSA_Signature_Length_Raw, error = CHIP_ERROR_INVALID_ARGUMENT);
+    ScopedEvpPkey pkey;
+    ReturnErrorOnFailure(CreateEvpPkeyFromP256PublicKey(*this, pkey));
+    ReturnErrorOnFailure(CheckP256PublicKey(pkey.get()));
 
-    nid = GetNidForCurve(MapECName(Type()));
-    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
+    uint8_t der_signature[kMax_ECDSA_Signature_Length_Der];
+    MutableByteSpan der_signature_span(der_signature);
+    ReturnErrorOnFailure(
+        EcdsaRawSignatureToAsn1(kP256_FE_Length, ByteSpan(signature.ConstBytes(), signature.Length()), der_signature_span));
 
-    ec_group = EC_GROUP_new_by_curve_name(nid);
-    VerifyOrExit(ec_group != nullptr, error = CHIP_ERROR_NO_MEMORY);
+    ScopedEvpPkeyCtx verify_ctx(EVP_PKEY_CTX_new(pkey.get(), nullptr));
+    VerifyOrReturnError(verify_ctx, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(EVP_PKEY_verify_init(verify_ctx.get()) == 1, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(
+        EVP_PKEY_verify(verify_ctx.get(), der_signature, der_signature_span.size(), Uint8::to_const_uchar(hash), hash_length) == 1,
+        CHIP_ERROR_INVALID_SIGNATURE);
 
-    key_point = EC_POINT_new(ec_group);
-    VerifyOrExit(key_point != nullptr, error = CHIP_ERROR_NO_MEMORY);
-
-    result = EC_POINT_oct2point(ec_group, key_point, Uint8::to_const_uchar(*this), Length(), nullptr);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    ec_key = EC_KEY_new_by_curve_name(nid);
-    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_NO_MEMORY);
-
-    result = EC_KEY_set_public_key(ec_key, key_point);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    result = EC_KEY_check_key(ec_key);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    // Build-up the signature object from raw <r,s> tuple
-    r = BN_bin2bn(Uint8::to_const_uchar(signature.ConstBytes()) + 0u, kP256_FE_Length, nullptr);
-    VerifyOrExit(r != nullptr, error = CHIP_ERROR_NO_MEMORY);
-
-    s = BN_bin2bn(Uint8::to_const_uchar(signature.ConstBytes()) + kP256_FE_Length, kP256_FE_Length, nullptr);
-    VerifyOrExit(s != nullptr, error = CHIP_ERROR_NO_MEMORY);
-
-    ec_sig = ECDSA_SIG_new();
-    VerifyOrExit(ec_sig != nullptr, error = CHIP_ERROR_NO_MEMORY);
-
-    result = ECDSA_SIG_set0(ec_sig, r, s);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    result = ECDSA_do_verify(Uint8::to_const_uchar(hash), static_cast<boringssl_size_t_openssl_int>(hash_length), ec_sig, ec_key);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INVALID_SIGNATURE);
-    error = CHIP_NO_ERROR;
-
-exit:
-    SSLErrorLog();
-    if (ec_sig != nullptr)
-    {
-        ECDSA_SIG_free(ec_sig);
-
-        // After ECDSA_SIG_set0 succeeds, r and s memory is managed by ECDSA_SIG object.
-        // We set to nullptr so that we don't try to double-free
-        r = nullptr;
-        s = nullptr;
-    }
-    if (s != nullptr)
-    {
-        BN_clear_free(s);
-    }
-    if (r != nullptr)
-    {
-        BN_clear_free(r);
-    }
-    if (ec_key != nullptr)
-    {
-        EC_KEY_free(ec_key);
-    }
-    if (key_point != nullptr)
-    {
-        EC_POINT_clear_free(key_point);
-    }
-    if (ec_group != nullptr)
-    {
-        EC_GROUP_free(ec_group);
-    }
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 void ClearSecretData(uint8_t * buf, size_t len)
