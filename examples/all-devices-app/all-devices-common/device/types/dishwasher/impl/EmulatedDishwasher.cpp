@@ -90,15 +90,23 @@ void EmulatedDishwasher::StartEmulatedOperationTimer(uint32_t durationSec)
 
 void EmulatedDishwasher::TimerFired()
 {
-    if (OperationalState().GetCurrentOperationalState() !=
-        to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning))
+    const uint8_t state = OperationalState().GetCurrentOperationalState();
+    if (state == to_underlying(Clusters::OperationalState::OperationalStateEnum::kPaused))
+    {
+        return;
+    }
+
+    // The armed cycle has expired. Clear it even if the state moved on, so a later
+    // transition to running does not read the expired deadline.
+    mCountdownTime.SetNull();
+    mOperationEndTime.reset();
+
+    if (state != to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning))
     {
         return;
     }
 
     ChipLogProgress(Zcl, "EmulatedDishwasher: Emulated operation timer finished. Reverting state to Stopped.");
-    mCountdownTime.SetNull();
-    mOperationEndTime.reset();
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
 }
 
