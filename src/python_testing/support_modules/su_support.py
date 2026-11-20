@@ -555,7 +555,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, attr_clear)],
             nodeId=requestor_node_id
         )
-        if resp[0].Status ==  Status.Success:
+        if resp[0].Status == Status.Success:
             log.info('Cleanup - DefaultOTAProviders cleared')
         else:
             log.warning('Cleanup - Failed to clear DefaultOTAProviders ')
