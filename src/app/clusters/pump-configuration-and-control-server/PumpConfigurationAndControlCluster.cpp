@@ -209,8 +209,8 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
         (mOperationMode == OperationModeEnum::kNormal) ? mDelegate.GetRemoteSensorType(endpointId) : RemoteSensorType::kNoSensor;
     mEffectiveOperationMode = mOperationMode;
     mEffectiveControlMode   = (mOperationMode == OperationModeEnum::kLocal && IsControlModeSupported(storedEffectiveControlMode))
-        ? storedEffectiveControlMode
-        : ComputeEffectiveControlMode(mOperationMode, mControlMode, sensorType);
+          ? storedEffectiveControlMode
+          : ComputeEffectiveControlMode(mOperationMode, mControlMode, sensorType);
     if (mEnabledOptionalAttributes.IsSet(PumpStatus::Id))
     {
         mPumpStatus.Clear(PumpStatusBitmap::kRemotePressure)
