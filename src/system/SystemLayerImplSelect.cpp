@@ -371,6 +371,11 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingRead(SocketWatchToken token)
         ev_io_modify(&watch->mIoWatcher, evs);
         ev_io_start(mLibEvLoopP, &watch->mIoWatcher);
     }
+#else
+    // Wake the thread calling select so cross-thread socket watch updates
+    // (e.g. a shell thread starting mDNS/UDP listen while the Matter thread is
+    // blocked in select()) observe the updated read FD set immediately.
+    Signal();
 #endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 
     return CHIP_NO_ERROR;
@@ -401,6 +406,10 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingWrite(SocketWatchToken token
         ev_io_modify(&watch->mIoWatcher, evs);
         ev_io_start(mLibEvLoopP, &watch->mIoWatcher);
     }
+#else
+    // Wake the thread calling select so cross-thread socket watch updates
+    // observe the updated write FD set immediately.
+    Signal();
 #endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 
     return CHIP_NO_ERROR;

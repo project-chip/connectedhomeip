@@ -28,6 +28,11 @@ from urllib.parse import urljoin
 
 import requests
 
+# Upper bound for a single request to the Cirque service. Generous enough for
+# the controller scripts run through device_cmd, but avoids hanging forever if
+# the service stops responding.
+REQUEST_TIMEOUT_SEC = 600
+
 
 class TestResult(IntEnum):
     OK = 0
@@ -88,7 +93,7 @@ class CHIPVirtualHome:
         return test_ret
 
     def query_api(self, end_point, args=[], binary=False):
-        ret = requests.get(self._build_request_url(end_point, args))
+        ret = requests.get(self._build_request_url(end_point, args), timeout=REQUEST_TIMEOUT_SEC)
         if binary:
             return ret.content
         return ret.json()
@@ -97,7 +102,9 @@ class CHIPVirtualHome:
         self.logger.info("device: %s exec: %s", self.get_device_pretty_id(device_id), cmd)
         ret = requests.get(self._build_request_url('device_cmd', [self.home_id, device_id, cmd]),
                            params={'stream': stream},
-                           stream=stream)
+                           stream=stream,
+                           # A streamed response is read by the caller for as long as it needs.
+                           timeout=(REQUEST_TIMEOUT_SEC, None) if stream else REQUEST_TIMEOUT_SEC)
         if stream:
             return ret
 
@@ -315,12 +322,16 @@ class CHIPVirtualHome:
         return urljoin(self.cirque_url, "{}/{}".format(end_point, '/'.join([str(argv) for argv in args])))
 
     def destroy_home(self):
+        if self.home_id is None:
+            # setup() failed before a home was created.
+            return
         self.logger.info("destroying home: %s", self.home_id)
         self.query_api('destroy_home', [self.home_id])
 
     def initialize_home(self):
+        # create_home is not idempotent, so it is sent once and not retried.
         home_id = requests.post(
-            self._build_request_url('create_home'), json=self.device_config).json()
+            self._build_request_url('create_home'), json=self.device_config, timeout=REQUEST_TIMEOUT_SEC).json()
 
         self.logger.info("home id: %s created!", home_id)
 
@@ -403,6 +414,10 @@ class CHIPVirtualHome:
 
     def get_device_pretty_id(self, device_id):
         return f"{self.get_device_pretty_name(device_id)}({device_id[:8]}...)"
+
+    def get_device_ble_adapter_id(self, device_id):
+        """Returns the HCI index (N in hciN) Cirque assigned to the device's Bluetooth capability."""
+        return int(self.device_config[device_id]['capability']['Bluetooth']['ble_adapt_id'])
 
     @property
     def default_base_image(cls):

@@ -22,9 +22,15 @@ SOURCE=${BASH_SOURCE[0]}
 SOURCE_DIR=$(cd "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
 REPO_DIR=$SOURCE_DIR/../../
 TEST_DIR=$REPO_DIR/src/test_driver/linux-cirque
+export PYTHONPATH="$REPO_DIR/third_party/cirque/repo${PYTHONPATH:+:$PYTHONPATH}"
 
 LOG_DIR=${LOG_DIR:-$(mktemp -d)}
 GITHUB_ACTION_RUN=${GITHUB_ACTION_RUN:-"0"}
+# Upper bound for a single test, in seconds.
+CIRQUE_TEST_TIMEOUT=${CIRQUE_TEST_TIMEOUT:-900}
+# Every container Cirque creates for this invocation carries this label, so
+# cleanup only removes containers that belong to this run.
+CIRQUE_RUN_LABEL="org.project-chip.cirque-test-run=${CIRQUE_RUN_ID:-$$}"
 
 # The image build will clone its own ot-br-posix checkout due to limitations of git submodule.
 # Using the same ot-br-posix version as chip
@@ -57,6 +63,9 @@ CIRQUE_TESTS=(
     "SubscriptionResumptionTest"
     "SubscriptionResumptionCapacityTest"
     "SubscriptionResumptionTimeoutTest"
+    "BleMobileDeviceTest:thread"
+    "BleMobileDeviceTest:wifi"
+    "TvCastingTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"
@@ -70,15 +79,27 @@ function __cirquetest_start_flask() {
     # When running the ManualTests, if Ctrl-C is send to the shell, it will stop flask as well.
     # This is not expected. Start a new session to prevent it from receiving signals
     setsid bash -c 'FLASK_APP=cirque/restservice/service.py \
+        CIRQUE_DOCKER_LABELS="'"$CIRQUE_RUN_LABEL"'" \
+        CIRQUE_SKIP_GLOBAL_PRUNE="1" \
         PATH="'"$PATH"'":"'"$REPO_DIR"'"/third_party/openthread/repo/build/simulation/examples/apps/ncp/ \
         python3 -m flask run >"'"$LOG_DIR"'"/"'"$CURRENT_TEST"'"/flask.log 2>&1' &
     FLASK_PID=$!
     echo "Flask running in backgroud with pid $FLASK_PID"
+    for _ in $(seq 1 30); do
+        if curl -sf --max-time 5 http://127.0.0.1:5000/get_homes >/dev/null 2>&1; then
+            return
+        fi
+        sleep 1
+    done
+    echo "Flask did not answer within 30s"
 }
 
 function __cirquetest_clean_flask() {
     echo "Cleanup Flask pid $FLASK_PID"
     kill -SIGTERM -"$FLASK_PID"
+    # Remove containers left behind by this run (e.g. when a test timed out
+    # before destroying its home).
+    docker ps -aq --filter "label=$CIRQUE_RUN_LABEL" | xargs -r docker rm -f >/dev/null 2>&1
     mv "$LOG_DIR/$CURRENT_TEST"/flask.log "$LOG_DIR/$CURRENT_TEST"/flask.log.old
     cat "$LOG_DIR/$CURRENT_TEST"/flask.log.old | sed 's/\\n/\n/g' | sed 's/\\t/ /g' >"$LOG_DIR/$CURRENT_TEST"/flask.log
     rm "$LOG_DIR/$CURRENT_TEST"/flask.log.old
@@ -136,14 +157,27 @@ function cirquetest_bootstrap() {
 
 function cirquetest_run_test() {
     # Start Cirque flash server
-    export CURRENT_TEST="$1"
-    export DEVICE_LOG_DIR="$LOG_DIR/$CURRENT_TEST"/device_logs
+    local test_spec="$1"
+    local test_script="$test_spec"
+    local extra_args=()
     shift
+    if [[ "$test_spec" == *:* ]]; then
+        test_script="${test_spec%%:*}"
+        local test_network="${test_spec#*:}"
+        export CURRENT_TEST="${test_script}_${test_network}"
+        extra_args=(--network "$test_network")
+    else
+        export CURRENT_TEST="$test_spec"
+    fi
+    export DEVICE_LOG_DIR="$LOG_DIR/$CURRENT_TEST"/device_logs
     mkdir -p "$DEVICE_LOG_DIR"
     __cirquetest_start_flask
-    sleep 5
-    CHIP_CIRQUE_BASE_IMAGE="ghcr.io/project-chip/chip-cirque-device-base" "$TEST_DIR/$CURRENT_TEST.py" "$@"
+    CHIP_CIRQUE_BASE_IMAGE="ghcr.io/project-chip/chip-cirque-device-base" \
+        timeout --kill-after=30s "${CIRQUE_TEST_TIMEOUT}s" "$TEST_DIR/$test_script.py" "${extra_args[@]}" "$@"
     exitcode=$?
+    if [[ $exitcode -eq 124 || $exitcode -eq 137 ]]; then
+        echo "$CURRENT_TEST timed out after ${CIRQUE_TEST_TIMEOUT}s"
+    fi
     __cirquetest_clean_flask
     # TODO: Do docker system prune, we cannot filter which container
     # is created by cirque now. This will be implemented later. Currently, only do this on CI
@@ -152,12 +186,11 @@ function cirquetest_run_test() {
     # This is useful when running tests on local workstation, but not for CI.
     if [[ "$CLEANUP_DOCKER_FOR_CI" = "1" ]]; then
         echo "Do docker container and network prune"
-        # TODO: Filter cirque containers ?
-        if ! grep docker.sock /proc/1/mountinfo; then
-            docker ps -aq | xargs docker stop >/dev/null 2>&1
+        if ! grep -q docker.sock /proc/1/mountinfo; then
+            docker ps -aq --filter "label=$CIRQUE_RUN_LABEL" | xargs -r docker stop >/dev/null 2>&1
         fi
-        docker container prune -f >/dev/null 2>&1
-        docker network prune -f >/dev/null 2>&1
+        docker container prune -f --filter "label=$CIRQUE_RUN_LABEL" >/dev/null 2>&1
+        docker network prune -f --filter "label=$CIRQUE_RUN_LABEL" >/dev/null 2>&1
     fi
     echo "Test log can be found at $DEVICE_LOG_DIR"
     return "$exitcode"
@@ -171,7 +204,7 @@ function cirquetest_run_all_tests() {
     mkdir -p "$LOG_DIR"
     for test_name in "${CIRQUE_TESTS[@]}"; do
         echo "[ RUN] $test_name"
-        if cirquetest_run_test "$test_name" >"$LOG_DIR/$test_name.log" 2>&1; then
+        if cirquetest_run_test "$test_name" >"$LOG_DIR/${test_name//:/_}.log" 2>&1; then
             echo -e "[$BOLD_GREEN_TEXT""PASS""$RESET_COLOR] $test_name"
         else
             echo -e "[$BOLD_RED_TEXT""FAIL""$RESET_COLOR] $test_name (Exitcode: $exitcode)"
