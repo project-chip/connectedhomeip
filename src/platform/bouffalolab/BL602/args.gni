@@ -31,3 +31,5 @@ chip_inet_config_enable_dns_resolver = false
 chip_inet_config_enable_tun_endpoint = false
 chip_inet_config_enable_tcp_endpoint = false
 chip_inet_config_enable_udp_endpoint = true
+
+pw_string_CONFIG = "${chip_root}/config/bouffalolab/pw_string:pw_string_config"

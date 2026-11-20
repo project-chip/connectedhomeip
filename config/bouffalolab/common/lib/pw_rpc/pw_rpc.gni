@@ -20,8 +20,7 @@ pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
 pw_sys_io_BACKEND =
     "${chip_root}/examples/platform/bouffalolab/common/rpc/pw_sys_io:pw_sys_io"
 
-pw_string_CONFIG =
-    "${chip_root}/config/bouffalolab/common/lib/pw_rpc:pw_string_dep"
+pw_string_CONFIG = "${chip_root}/config/bouffalolab/pw_string:pw_string_config"
 
 pw_build_LINK_DEPS = [
   "$dir_pw_assert:impl",

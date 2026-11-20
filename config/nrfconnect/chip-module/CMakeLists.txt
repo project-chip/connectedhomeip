@@ -224,11 +224,14 @@ if (CHIP_COMPILER_LAUNCHER)
     matter_add_gn_arg_string("pw_command_launcher" ${CHIP_COMPILER_LAUNCHER})
 endif()
 
-if (CONFIG_CHIP_PW_RPC)
+# When outer CMake loads Pigweed (RPC or test drivers), match its headers in
+# chip-gn without pulling :impl / pw_sys_io into libCHIP.a.
+if (CONFIG_CHIP_PW_RPC OR DEFINED pw_log_BACKEND)
     set(PIGWEED_DIR "//third_party/pigweed/repo")
     matter_add_gn_arg_string("pw_assert_BACKEND" ${PIGWEED_DIR}/pw_assert_log:check_backend)
     matter_add_gn_arg_string("pw_log_BACKEND" ${PIGWEED_DIR}/pw_log_basic)
     matter_add_gn_arg("pw_build_LINK_DEPS" [\"${PIGWEED_DIR}/pw_assert:impl\",\ \"${PIGWEED_DIR}/pw_log:impl\"])
+    matter_add_gn_arg_bool("chip_link_pw_build_deps" FALSE)
 endif()
 
 # Inform users that they use not-optimized settings backend for the nRF54LX series.

@@ -16,23 +16,29 @@
  */
 #include <pw_assert_matter/handler.h>
 
+#include <cstdarg>
+#include <cstddef>
+#include <cstdio>
+
 #include <lib/support/CodeUtils.h>
 #include <pw_preprocessor/compiler.h>
-#include <pw_string/string_builder.h>
 
 void pw_assert_matter_HandleFailure(const char * file_name, int line_number, const char * function_name, const char * format, ...)
 {
+    char buffer[64] = {};
+    int prefix_len =
+        std::snprintf(buffer, sizeof(buffer), "Assertion failed: %s:%d (in %s):", file_name != nullptr ? file_name : "",
+                      line_number, function_name != nullptr ? function_name : "");
 
-    pw::StringBuffer<64> builder;
+    if (prefix_len >= 0 && static_cast<size_t>(prefix_len) < sizeof(buffer) && format != nullptr)
+    {
+        va_list args;
+        va_start(args, format);
+        std::vsnprintf(buffer + prefix_len, sizeof(buffer) - static_cast<size_t>(prefix_len), format, args);
+        va_end(args);
+    }
 
-    builder.Format("Assertion failed: %s:%d (in %s):", file_name, line_number, function_name);
-
-    va_list args;
-    va_start(args, format);
-    builder.FormatVaList(format, args);
-    va_end(args);
-
-    ChipLogError(Support, "%s", builder.c_str());
+    ChipLogError(Support, "%s", buffer);
     chipDie();
 }
 

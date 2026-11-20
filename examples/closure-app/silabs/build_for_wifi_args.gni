@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/chip.gni")
+import("${chip_root}/config/standalone/args.gni")
 
 silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 chip_build_libshell = true

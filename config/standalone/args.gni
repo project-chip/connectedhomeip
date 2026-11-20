@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/config/pigweed_backends.gni")
 
 # Options from standalone-chip.mk that differ from configure defaults. These
 # options are used from examples/.
