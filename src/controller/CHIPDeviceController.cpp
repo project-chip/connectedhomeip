@@ -2304,26 +2304,37 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         // If we're cleaning up because cancellation has been requested via StopPairing(), expire the failsafe
         // in the background and reset our state synchronously, so a new commissioning attempt can be started.
         CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
-        SessionHolder session((commissionee == proxy) ? commissionee->DetachSecureSession().Value()
-                                                      : proxy->GetSecureSession().Value());
+        Optional<SessionHandle> sessionHandle =
+            (commissionee == proxy) ? commissionee->DetachSecureSession() : proxy->GetSecureSession();
 
-        auto request     = DisarmFailsafeRequest();
-        auto onSuccessCb = [session](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
-                                     const decltype(request)::ResponseType & responseData) {
-            ChipLogProgress(Controller, "Failsafe disarmed");
-            MarkForEviction(session.Get());
-        };
-        auto onFailureCb = [session](CHIP_ERROR aError) {
-            ChipLogProgress(Controller, "Ignoring failure to disarm failsafe: %" CHIP_ERROR_FORMAT, aError.Format());
-            MarkForEviction(session.Get());
-        };
-
-        ChipLogProgress(Controller, "Disarming failsafe on device %p in background", proxy);
-        CHIP_ERROR err = InvokeCommandRequest(proxy->GetExchangeManager(), session.Get().Value(), kRootEndpointId, request,
-                                              onSuccessCb, onFailureCb);
-        if (err != CHIP_NO_ERROR)
+        // The session can already be gone here (e.g. it was evicted after a network change). Then there is
+        // nothing to send the disarm on: the device's fail-safe expires by itself, so just reset our state.
+        if (sessionHandle.HasValue())
         {
-            ChipLogError(Controller, "Failed to send command to disarm fail-safe: %" CHIP_ERROR_FORMAT, err.Format());
+            SessionHolder session(sessionHandle.Value());
+
+            auto request     = DisarmFailsafeRequest();
+            auto onSuccessCb = [session](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
+                                         const decltype(request)::ResponseType & responseData) {
+                ChipLogProgress(Controller, "Failsafe disarmed");
+                MarkForEviction(session.Get());
+            };
+            auto onFailureCb = [session](CHIP_ERROR aError) {
+                ChipLogProgress(Controller, "Ignoring failure to disarm failsafe: %" CHIP_ERROR_FORMAT, aError.Format());
+                MarkForEviction(session.Get());
+            };
+
+            ChipLogProgress(Controller, "Disarming failsafe on device %p in background", proxy);
+            CHIP_ERROR err = InvokeCommandRequest(proxy->GetExchangeManager(), session.Get().Value(), kRootEndpointId, request,
+                                                  onSuccessCb, onFailureCb);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "Failed to send command to disarm fail-safe: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+        }
+        else
+        {
+            ChipLogProgress(Controller, "No secure session to device %p; not disarming its failsafe", proxy);
         }
 
         CleanupDoneAfterError();
