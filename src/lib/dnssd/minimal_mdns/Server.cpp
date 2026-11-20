@@ -16,6 +16,7 @@
  */
 
 #include "Server.h"
+#include "PacketSourceFilter.h"
 
 #include <errno.h>
 #include <utility>
@@ -483,15 +484,36 @@ void ServerBase::OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::S
         // Only consider queries that are received on the same interface we are listening on.
         // Without this, queries show up on all addresses on all interfaces, resulting
         // in more replies than one would expect.
-        if (endPoint->GetBoundInterface() == info->Interface)
+        if ((endPoint->GetBoundInterface() == info->Interface) && srv->IsFromLocalLink(*info))
         {
             srv->mDelegate->OnQuery(data, info);
         }
     }
-    else
+    else if (srv->IsFromLocalLink(*info))
     {
         srv->mDelegate->OnResponse(data, info);
     }
+}
+
+bool ServerBase::IsFromLocalLink(const chip::Inet::IPPacketInfo & info) const
+{
+    if (IsLinkScoped(info, BroadcastAddress(info.DestAddress.Type())))
+    {
+        return true;
+    }
+
+    chip::Inet::InterfaceAddressIterator interfaceAddresses;
+    if (IsFromAttachedSubnet(info, interfaceAddresses))
+    {
+        return true;
+    }
+
+#if CHIP_MINMDNS_HIGH_VERBOSITY
+    char srcAddressString[chip::Inet::IPAddress::kMaxStringLength];
+    info.SrcAddress.ToString(srcAddressString);
+    ChipLogDetail(Discovery, "Ignoring mDNS packet from %s: not on an attached subnet", srcAddressString);
+#endif
+    return false;
 }
 
 } // namespace Minimal
