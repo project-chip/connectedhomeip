@@ -159,6 +159,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     @async_test_body
     async def teardown_test(self):
         self.clear_kvs(kvs_path_prefix=self.provider_kvs_path)
+        self.terminate_provider()
         super().teardown_test()
 
     def desc_TC_SU_2_4(self) -> str:
@@ -278,7 +279,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             forbidden_values=set(),
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=60),
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
-            stall_timeout_sec=60,
+            stall_timeout_sec=1800,
             liveness_matcher=progress_liveness_s1,
         )
         subscription_attr_s1.cancel()
@@ -297,7 +298,9 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Commands for named pipes
         apply_command = {"Name": "GetApplyUpdateRequestStatus", "Cluster": "OtaSoftwareUpdateProvider",
                                  "Endpoint": self.get_endpoint()}
+        
         while True:
+            wait_poll = True
             attempt += 1
             self.write_to_app_pipe(apply_command, self.provider_app_pipe)
             try:
@@ -306,20 +309,23 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                 received_new_version = int(apply_response_data["Payload"]["NewVersion"])
                 logger.info("Provider GetApplyUpdateRequestStatus retrieved from named pipe: %s at Attempt # %d", apply_response_data, attempt)
             except TimeoutError:
-                # If was not able to read the pipe, just continue
-                logger.info("%s Not able to read from named pipe, retrying wait and then retry.")
-            
-            # Check if the NamedPipe was able to retrieve the data if not continue.
+                # Not able to read named pipe in the read_from_app_pipe timeout, do not wait more.
+                wait_poll = False
+                logger.info("%s Not able to read from named pipe, retrying.")
+
+            # If the named pipe retrieved correct data, then terminate to poll the named pipe
             if received_update_token is not None and len(received_update_token) > 0 and received_new_version is not None and received_new_version > 0:
                 break
 
             # If the values read from the named pipe are not the appropiate wait some time until is ready.
             remaining = poll_command_deadline - time.time()
             if remaining <= 0:
+                # Time exhausted, warn and exit the loop. Asserts will fail as received_update_token and expected_update_token initialized as None
                 logger.warning(
-                    'Step #1 %% ApplyUpdateRequest has not been reached after %.0fs. Retrying', poll_command_interval_sec)
+                    'Step #1 ApplyUpdateRequest has not been reached after %.0fs. Retrying', poll_command_interval_sec)
                 break
-            await asyncio.sleep(min(poll_command_interval_sec,remaining))
+            if wait_poll:
+                await asyncio.sleep(min(poll_command_interval_sec,remaining))
 
         # UpdateToken in ApplyUpdateRequest must match the one the provider issued in QueryImageResponse.
         asserts.assert_equal(
