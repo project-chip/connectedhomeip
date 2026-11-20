@@ -61,6 +61,13 @@ public:
         }
     }
 
+    CHIP_ERROR TrySetDelegate(PushAvStreamTransportDelegate * delegate)
+    {
+        ReturnErrorOnFailure(mLogic.TrySetDelegate(delegate));
+        delegate->SetPushAvStreamTransportServer(this);
+        return CHIP_NO_ERROR;
+    }
+
     void SetTLSClientManagementDelegate(TLSClientManagementDelegate * delegate) { mLogic.SetTLSClientManagementDelegate(delegate); }
 
     void SetTLSCertificateManagementDelegate(TLSCertificateManagementDelegate * delegate)
