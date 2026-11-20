@@ -37,7 +37,7 @@ import logging
 import math
 
 from mobly import asserts
-from TC_AUDIOCONTROLTestBase import AUDIOCONTROLTestBase
+from support_modules.audiocontrol_testbase import AUDIOCONTROLTestBase
 
 import matter.clusters as Clusters
 from matter.testing import matter_asserts

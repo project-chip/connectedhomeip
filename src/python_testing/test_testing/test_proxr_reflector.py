@@ -15,7 +15,7 @@ from matter.testing.commissioning import PairingStatus
 from matter.testing.matter_testing import MatterBaseTest
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-import TC_PROXRTestBase as proxr  # noqa: E402 isort:skip
+from support_modules import proxr_testbase as proxr  # noqa: E402 isort:skip
 from TC_PROXR_2_3 import TC_PROXR_2_3  # noqa: E402 isort:skip
 from TC_PROXR_2_4 import TC_PROXR_2_4  # noqa: E402 isort:skip
 

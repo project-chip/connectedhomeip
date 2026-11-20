@@ -17,7 +17,7 @@
 
 # N/A - Test requires Thread MeshCoP hardware or simulation and will not run on CI.
 
-from thread_meshcop_testing import establish_pase_over_thread_meshcop, get_setup_code
+from support_modules.thread_meshcop_testing import establish_pase_over_thread_meshcop, get_setup_code
 
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterTestCommissioner

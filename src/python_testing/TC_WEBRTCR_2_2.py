@@ -41,7 +41,7 @@ import tempfile
 import time
 
 from mobly import asserts
-from TC_WEBRTCRTestBase import WEBRTCRTestBase
+from support_modules.webrtcr_testbase import WEBRTCRTestBase
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
