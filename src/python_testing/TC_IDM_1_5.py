@@ -130,6 +130,9 @@ class TC_IDM_1_5(IDMBaseTest):
                 2, "TH establishes a subscription to the Breadcrumb attribute of the GeneralCommissioning cluster on Endpoint 0 of the DUT with MinIntervalFloor set to 0 seconds and MaxIntervalCeiling set to 3600 seconds. TH synchronously awaits the initial prime report from the subscription establishment, records the timestamp t_prime, and verifies the negotiated MaxInterval from the SubscribeResponseMessage is within [0, 3600] seconds and leaves sufficient window for DelayReportData.")
             log.info("Establishing subscription to Breadcrumb attribute on Endpoint 0 with MinIntervalFloor=%ds, MaxIntervalCeiling=%ds",
                      min_interval_floor_sec, max_interval_ceiling_sec)
+            # Record t_prime before sending SubscribeRequest; the publisher's MaxInterval window
+            # cannot begin earlier, giving a conservative remaining-window estimate.
+            t_prime = time.monotonic()
             subscription = await dev_ctrl.ReadAttribute(
                 nodeId=dut_node_id,
                 attributes=[(endpoint, target_attribute)],
@@ -138,9 +141,6 @@ class TC_IDM_1_5(IDMBaseTest):
                 autoResubscribe=False
             )
             subscription.SetAttributeUpdateCallback(tracker)
-
-            # Record timestamp t_prime upon receiving the initial priming report / subscription establishment
-            t_prime = time.monotonic()
 
             _, negotiated_max_interval_sec = subscription.GetReportingIntervalsSeconds()
             log.info("Negotiated subscription intervals: MaxInterval = %ds", negotiated_max_interval_sec)
@@ -161,20 +161,20 @@ class TC_IDM_1_5(IDMBaseTest):
             asserts.assert_in(target_attribute, prime_attrs[endpoint][Clusters.GeneralCommissioning],
                               "Breadcrumb attribute not found in subscription prime report")
             prime_val = prime_attrs[endpoint][Clusters.GeneralCommissioning][target_attribute]
-            log.info("Initial prime report received: Breadcrumb = %r at timestamp %.6f", prime_val, t_prime)
+            log.info("Initial prime report received: Breadcrumb = %r at timestamp %.6f", prime_val, time.monotonic())
 
             sub_elapsed_sec = time.monotonic() - t_prime
             remaining_sub_window_sec = float(negotiated_max_interval_sec) - sub_elapsed_sec
 
-            log.info("Time elapsed since priming report: %.2f s; remaining window: %.2f s "
+            log.info("Time elapsed since subscribe request: %.2f s; remaining window: %.2f s "
                      "(min delay window: %.2f s, worst-case MRP window: %.2f s)",
                      sub_elapsed_sec, remaining_sub_window_sec, min_delay_window_sec, min_required_sub_window_sec)
 
             asserts.assert_greater(
                 remaining_sub_window_sec, min_delay_window_sec,
-                f"Remaining subscription window ({remaining_sub_window_sec:.2f} s, "
-                f"from negotiated MaxInterval={negotiated_max_interval_sec} s) must exceed "
-                f"DelayMinMs + DelayJitterWindowMs ({min_delay_window_sec:.2f} s) so MaxInterval does not clamp DelayReportData"
+                f"Timing precondition failed: remaining subscription window ({remaining_sub_window_sec:.2f} s, "
+                f"from negotiated MaxInterval={negotiated_max_interval_sec} s, subscribe elapsed={sub_elapsed_sec:.2f} s) "
+                f"must exceed DelayMinMs + DelayJitterWindowMs ({min_delay_window_sec:.2f} s) so MaxInterval does not clamp DelayReportData"
             )
 
             if remaining_sub_window_sec < min_required_sub_window_sec:
