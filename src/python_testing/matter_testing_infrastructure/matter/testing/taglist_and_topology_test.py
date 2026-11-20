@@ -42,9 +42,12 @@ def separate_endpoint_types(endpoint_dict: dict[int, Any]) -> tuple[list[int], l
         if endpoint_id == 0:
             continue
         aggregator_id = 0x000e
+        bridgednode_id = 0x0013
         content_app_id = 0x0024
         device_types = [d.deviceType for d in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
         if aggregator_id in device_types:
+            flat.append(endpoint_id)
+        elif bridgednode_id in device_types and len(device_types) == 1:
             flat.append(endpoint_id)
         else:
             if content_app_id in device_types:
