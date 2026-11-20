@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <lib/support/BitFlags.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include "Setpoint.h"
@@ -121,9 +122,9 @@ public:
     /*
     Get the appropriate setpoint range, based on occupancy.
     */
-    SetpointRange & GetRange(chip::app::Clusters::Thermostat::OccupancyBitmap occupancy)
+    SetpointRange & GetRange(BitFlags<chip::app::Clusters::Thermostat::OccupancyBitmap> occupancy)
     {
-        return occupancy == OccupancyBitmap::kOccupied ? occupiedRange : unoccupiedRange;
+        return occupancy.Has(OccupancyBitmap::kOccupied) ? occupiedRange : unoccupiedRange;
     }
 
     /*
