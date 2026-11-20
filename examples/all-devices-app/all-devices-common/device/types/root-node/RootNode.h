@@ -85,7 +85,8 @@ public:
 
     RootNode(const Context & context,
              Span<const DataModel::DeviceTypeEntry> deviceTypes = Span<const DataModel::DeviceTypeEntry>(kDefaultDeviceTypes)) :
-        SingleEndpoint(deviceTypes), mContext(context)
+        SingleEndpoint(deviceTypes),
+        mContext(context)
     {}
     ~RootNode() override = default;
 
