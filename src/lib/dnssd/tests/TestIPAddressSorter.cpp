@@ -74,6 +74,34 @@ public:
     }
 };
 
+// Reports one address as known to be unroutable, and keeps the default scoring.
+class KnownUnroutableScorer : public IPAddressScorer
+{
+public:
+    explicit KnownUnroutableScorer(const Inet::IPAddress & unroutable) : mUnroutable(unroutable) {}
+
+    Inet::RouteLookupResult LookUpRouteTo(const Inet::IPAddress & address, Inet::InterfaceId interfaceId) override
+    {
+        if (address == mUnroutable)
+        {
+            return Inet::RouteLookupResult::Create<Inet::NoRoute>();
+        }
+        return Inet::RouteLookupResult::Create<Inet::UnknownRoute>();
+    }
+
+private:
+    Inet::IPAddress mUnroutable;
+};
+
+// Reports one address as known to be unroutable, and scores every address the same.
+class FlatScorerWithAnUnroutableAddress : public KnownUnroutableScorer
+{
+public:
+    using KnownUnroutableScorer::KnownUnroutableScorer;
+
+    uint8_t ScoreIPAddress(const Inet::IPAddress & address, Inet::InterfaceId interfaceId) override { return 5; }
+};
+
 class ScopedScorer
 {
 public:
@@ -104,6 +132,11 @@ Inet::IPAddress GlobalAddress()
 Inet::IPAddress UniqueLocalAddress()
 {
     return MakeAddress("fdff:aabb:ccdd:1::4");
+}
+
+Inet::IPAddress OtherLinkLocalAddress()
+{
+    return MakeAddress("fe80::1122:3344:5566:7788");
 }
 
 TEST(TestIPAddressSorter, ScoreIPAddressUsesTheInstalledScorer)
@@ -156,6 +189,23 @@ TEST(TestIPAddressSorter, SetIPAddressScorerReturnsTheScorerItReplaces)
     IPAddressScorer * originalScorer = SetIPAddressScorer(&firstScorer);
     EXPECT_EQ(SetIPAddressScorer(&secondScorer), &firstScorer);
     EXPECT_EQ(SetIPAddressScorer(originalScorer), &secondScorer);
+}
+
+TEST(TestIPAddressSorter, DefaultScoreIsInvalidForAKnownUnroutableAddress)
+{
+    KnownUnroutableScorer scorer(LinkLocalAddress());
+    ScopedScorer scopedScorer(scorer);
+
+    EXPECT_EQ(ScoreIPAddress(LinkLocalAddress(), Inet::InterfaceId::Null()), to_underlying(IpScore::kInvalid));
+    EXPECT_EQ(ScoreIPAddress(OtherLinkLocalAddress(), Inet::InterfaceId::Null()), to_underlying(IpScore::kLinkLocal));
+}
+
+TEST(TestIPAddressSorter, ScorerThatOverridesScoringIgnoresTheRouteCheck)
+{
+    FlatScorerWithAnUnroutableAddress scorer(LinkLocalAddress());
+    ScopedScorer scopedScorer(scorer);
+
+    EXPECT_EQ(ScoreIPAddress(LinkLocalAddress(), Inet::InterfaceId::Null()), 5);
 }
 
 } // namespace

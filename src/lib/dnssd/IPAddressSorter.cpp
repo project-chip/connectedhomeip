@@ -69,7 +69,16 @@ IPAddressScorer * sScorer = nullptr;
 
 uint8_t IPAddressScorer::ScoreIPAddress(const Inet::IPAddress & address, Inet::InterfaceId interfaceId)
 {
+    if (LookUpRouteTo(address, interfaceId).Is<Inet::NoRoute>())
+    {
+        return to_underlying(IpScore::kInvalid);
+    }
     return to_underlying(DefaultScore(address, interfaceId));
+}
+
+Inet::RouteLookupResult IPAddressScorer::LookUpRouteTo(const Inet::IPAddress & address, Inet::InterfaceId interfaceId)
+{
+    return Inet::LookUpRouteTo(address, interfaceId);
 }
 
 IPAddressScorer * SetIPAddressScorer(IPAddressScorer * scorer)
@@ -91,7 +100,15 @@ void Sort(const Span<Inet::IPAddress> & addresses, Inet::InterfaceId interfaceId
 
 uint8_t ScoreIPAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
 {
-    return sScorer != nullptr ? sScorer->ScoreIPAddress(ip, interfaceId) : to_underlying(DefaultScore(ip, interfaceId));
+    if (sScorer != nullptr)
+    {
+        return sScorer->ScoreIPAddress(ip, interfaceId);
+    }
+    if (Inet::LookUpRouteTo(ip, interfaceId).Is<Inet::NoRoute>())
+    {
+        return to_underlying(IpScore::kInvalid);
+    }
+    return to_underlying(DefaultScore(ip, interfaceId));
 }
 
 } // namespace IPAddressSorter

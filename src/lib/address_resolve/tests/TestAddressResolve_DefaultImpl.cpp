@@ -114,6 +114,29 @@ Transport::PeerAddress GetAddressWithHighScore(uint16_t port = CHIP_PORT, Inet::
     return Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
 }
 
+// Keeps the default scores but never reports an address as unroutable, so that scores don't depend on the routes of
+// the machine running the test.
+class IgnoreRoutesScorer : public Dnssd::IPAddressSorter::IPAddressScorer
+{
+public:
+    Inet::RouteLookupResult LookUpRouteTo(const Inet::IPAddress & address, Inet::InterfaceId interfaceId) override
+    {
+        return Inet::RouteLookupResult::Create<Inet::UnknownRoute>();
+    }
+};
+
+class ScopedScorer
+{
+public:
+    explicit ScopedScorer(Dnssd::IPAddressSorter::IPAddressScorer & scorer) :
+        mPreviousScorer(Dnssd::IPAddressSorter::SetIPAddressScorer(&scorer))
+    {}
+    ~ScopedScorer() { Dnssd::IPAddressSorter::SetIPAddressScorer(mPreviousScorer); }
+
+private:
+    Dnssd::IPAddressSorter::IPAddressScorer * mPreviousScorer;
+};
+
 #if CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS >= 3
 
 // test requires at least 3 slots: for high, medium and low
@@ -333,6 +356,9 @@ TEST(TestAddressResolveDefaultImpl, LookupResultOrdersResultsByTheInstalledScore
 
 TEST(TestAddressResolveDefaultImpl, TestLookupResult)
 {
+    IgnoreRoutesScorer scorer;
+    ScopedScorer scopedScorer(scorer);
+
     ResolveResult lowResult;
     lowResult.address = GetAddressWithLowScore(static_cast<uint16_t>(1));
 
