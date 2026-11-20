@@ -134,6 +134,8 @@ public:
                     OTARequestorAttributes & attributes, DefaultOTARequestorEventGenerator & eventGenerator);
 
 private:
+    friend class TestDefaultOTARequestorDownload;
+
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
 
@@ -177,13 +179,13 @@ private:
                 return CHIP_NO_ERROR;
             }
 
-            mDownloader->OnMessageReceived(payloadHeader, std::move(payload));
-
             // For a receiver using BDX Protocol, all received messages will require a response except for a StatusReport
             if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
             {
                 ec->WillSendMessage();
             }
+
+            mDownloader->OnMessageReceived(payloadHeader, std::move(payload));
 
             return CHIP_NO_ERROR;
         }
