@@ -360,6 +360,17 @@ CASESession::~CASESession()
 
 void CASESession::OnSessionReleased()
 {
+    if (mDeferSessionRelease)
+    {
+        // A synchronous transport send failure (e.g. TCP connection closing
+        // inside SendSigma1 / SendMessage) can evict our pending SecureSession
+        // while CASESession is still on the call stack. Defer cleanup and error
+        // notification to the active caller's error handling path (which calls
+        // AbortPendingEstablish as its final step) so that `this` is not cleared
+        // or deleted by the delegate mid-stack.
+        return;
+    }
+
     // Clear our own state first, then call the base class.
     //
     // PairingSession::OnSessionReleased() may destroy this object, so we have to do any cleanup
@@ -373,9 +384,28 @@ void CASESession::OnSessionReleased()
     PairingSession::OnSessionReleased();
 }
 
+CHIP_ERROR CASESession::SendSigmaMessage(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle && msg)
+{
+    VerifyOrReturnError(mSecureSessionHolder, CHIP_ERROR_CONNECTION_ABORTED);
+    ScopedDeferSessionRelease deferRelease(*this);
+    ReturnErrorOnFailure(mExchangeCtxt->SendMessage(msgType, std::move(msg), SendFlags(SendMessageFlags::kExpectResponse)));
+    VerifyOrReturnError(mSecureSessionHolder, CHIP_ERROR_CONNECTION_ABORTED);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CASESession::SendStatusReport(const Messaging::ExchangeHolder & exchangeCtxt, uint16_t protocolCode)
+{
+    VerifyOrReturnError(mSecureSessionHolder, CHIP_ERROR_CONNECTION_ABORTED);
+    ScopedDeferSessionRelease deferRelease(*this);
+    ReturnErrorOnFailure(PairingSession::SendStatusReport(exchangeCtxt, protocolCode));
+    VerifyOrReturnError(mSecureSessionHolder, CHIP_ERROR_CONNECTION_ABORTED);
+    return CHIP_NO_ERROR;
+}
+
 void CASESession::Clear()
 {
     MATTER_TRACE_SCOPE("Clear", "CASESession");
+    mDeferSessionRelease = false;
     // Cancel any outstanding work.
     if (mSendSigma3Helper)
     {
@@ -409,6 +439,7 @@ void CASESession::Clear()
     mFabricsTable = nullptr;
     mFabricIndex  = kUndefinedFabricIndex;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    mTCPConnectAttemptError = nullptr;
     if (!mPeerConnState.IsNull())
     {
         // Set the app state callback object in the Connection state to null
@@ -549,8 +580,12 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     if (peerAddress.GetTransportType() == Transport::Type::kTcp)
     {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        err = sessionManager.TCPConnect(peerAddress, nullptr, mPeerConnState);
+        CHIP_ERROR connectCompleteErr = CHIP_NO_ERROR;
+        mTCPConnectAttemptError       = &connectCompleteErr;
+        err                           = sessionManager.TCPConnect(peerAddress, nullptr, mPeerConnState);
+        mTCPConnectAttemptError       = nullptr;
         SuccessOrExit(err);
+        SuccessOrExit(err = connectCompleteErr);
 #else
         err = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -677,19 +712,32 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 void CASESession::HandleConnectionAttemptComplete(const Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR err)
 {
-    VerifyOrReturn(conn == mPeerConnState);
+    VerifyOrReturn(mState == State::kInitialized && !conn.IsNull() && conn == mPeerConnState);
 
     char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
     conn->mPeerAddr.ToString(peerAddrBuf);
 
     auto connectionCleanup = ScopeExit([&, this]() {
-        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->ReleaseTCPConnection();
-        mSecureSessionHolder.Get().Value()->AsSecureSession()->ReleaseTCPConnection();
+        if (mExchangeCtxt && mExchangeCtxt->HasSessionHandle())
+        {
+            mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->ReleaseTCPConnection();
+        }
+        if (mSecureSessionHolder)
+        {
+            mSecureSessionHolder->AsSecureSession()->ReleaseTCPConnection();
+        }
+        if (mTCPConnectAttemptError != nullptr)
+        {
+            *mTCPConnectAttemptError = err;
+            return;
+        }
         AbortPendingEstablish(err);
     });
 
     // Bail if connection setup encountered an error.
     ReturnAndLogOnFailure(err, SecureChannel, "Connection establishment failed with peer at %s", peerAddrBuf);
+
+    VerifyOrReturn(mExchangeCtxt && mExchangeCtxt->HasSessionHandle() && mSecureSessionHolder, err = CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogDetail(SecureChannel, "TCP Connection established with %s before session establishment", peerAddrBuf);
 
@@ -699,9 +747,9 @@ void CASESession::HandleConnectionAttemptComplete(const Transport::ActiveTCPConn
 
     // Associate the connection with the current secure session that is being
     // set up.
-    mSecureSessionHolder.Get().Value()->AsSecureSession()->SetTCPConnection(conn);
+    mSecureSessionHolder->AsSecureSession()->SetTCPConnection(conn);
 
-    // Send Sigma1 after connection is established for sessions over TCP
+    // Send Sigma1 after connection is established for sessions over TCP.
     err = SendSigma1();
     ReturnAndLogOnFailure(err, SecureChannel, "Sigma1 failed to peer %s", peerAddrBuf);
 
@@ -799,9 +847,8 @@ CHIP_ERROR CASESession::SendSigma1()
 
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msgR1->Start(), msgR1->DataLength() }));
 
-    // Call delegate to send the msg to peer
-    ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma1, std::move(msgR1),
-                                                    SendFlags(SendMessageFlags::kExpectResponse)));
+    // Call delegate to send the msg to peer.
+    ReturnErrorOnFailure(SendSigmaMessage(Protocols::SecureChannel::MsgType::CASE_Sigma1, std::move(msgR1)));
 
     if (encodeSigma1Inputs.sessionResumptionRequested)
     {
@@ -1155,8 +1202,7 @@ CHIP_ERROR CASESession::SendSigma2Resume(System::PacketBufferHandle && msgR2Resu
 {
 
     // Call delegate to send the msg to peer
-    ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume, std::move(msgR2Resume),
-                                                    SendFlags(SendMessageFlags::kExpectResponse)));
+    ReturnErrorOnFailure(SendSigmaMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume, std::move(msgR2Resume)));
 
     mState = State::kSentSigma2Resume;
 
@@ -1341,8 +1387,7 @@ CHIP_ERROR CASESession::SendSigma2(System::PacketBufferHandle && msgR2)
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msgR2->Start(), msgR2->DataLength() }));
 
     // Call delegate to send the msg to peer
-    ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2, std::move(msgR2),
-                                                    SendFlags(SendMessageFlags::kExpectResponse)));
+    ReturnErrorOnFailure(SendSigmaMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2, std::move(msgR2)));
 
     mState = State::kSentSigma2;
 
@@ -1355,7 +1400,8 @@ CHIP_ERROR CASESession::SendSigma2(System::PacketBufferHandle && msgR2)
 CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma2Resume", "CASESession");
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    bool statusReportSent = false;
 
     ChipLogDetail(SecureChannel, "Received Sigma2Resume msg");
     MATTER_TRACE_COUNTER("Sigma2Resume");
@@ -1385,7 +1431,9 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     // means the handshake fails (other side will not activate the CASE
     // session). That's why the return value is not ignored, unlike the various
     // error status reports, which are best-effort.
-    SuccessOrExit(err = SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess));
+    err              = SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
+    statusReportSent = true;
+    SuccessOrExit(err);
 
     if (mSessionResumptionStorage != nullptr)
     {
@@ -1400,7 +1448,7 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     Finish();
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR && !statusReportSent)
     {
         RETURN_SAFELY_IGNORED SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
     }
@@ -1450,6 +1498,7 @@ CHIP_ERROR CASESession::ParseSigma2Resume(ContiguousBufferTLVReader & tlvReader,
 CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma2_and_SendSigma3", "CASESession");
+    mState         = State::kSendSigma3Pending;
     CHIP_ERROR err = HandleSigma2(std::move(msg));
     MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
     SuccessOrExit(err);
@@ -1465,7 +1514,6 @@ exit:
     if (CHIP_NO_ERROR != err)
     {
         RETURN_SAFELY_IGNORED SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
-        mState = State::kInitialized;
     }
     return err;
 }
@@ -1759,7 +1807,6 @@ CHIP_ERROR CASESession::SendSigma3a()
             ReturnErrorOnFailure(helper->ScheduleWork());
             mSendSigma3Helper = helper;
             mExchangeCtxt->WillSendMessage();
-            mState = State::kSendSigma3Pending;
         }
         else
         {
@@ -1835,7 +1882,7 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
 
     AutoReleaseSessionKey sr3k(*mSessionManager->GetSessionKeystore());
 
-    VerifyOrDieWithMsg(data.keystore == nullptr || mState == State::kSendSigma3Pending, SecureChannel, "Bad internal state.");
+    VerifyOrDieWithMsg(mState == State::kSendSigma3Pending, SecureChannel, "Bad internal state.");
 
     SuccessOrExit(err = status);
 
@@ -1879,8 +1926,7 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
     SuccessOrExit(err);
 
     // Call delegate to send the Msg3 to peer
-    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma3, std::move(msg_R3),
-                                     SendFlags(SendMessageFlags::kExpectResponse));
+    err = SendSigmaMessage(Protocols::SecureChannel::MsgType::CASE_Sigma3, std::move(msg_R3));
     SuccessOrExit(err);
 
     ChipLogProgress(SecureChannel, "Sent Sigma3 msg");
@@ -2117,7 +2163,8 @@ CHIP_ERROR CASESession::HandleSigma3b(HandleSigma3Data & data, bool & cancel)
 
 CHIP_ERROR CASESession::HandleSigma3c(HandleSigma3Data & data, CHIP_ERROR status)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    bool statusReportSent = false;
 
     VerifyOrExit(mState == State::kHandleSigma3Pending, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -2136,7 +2183,9 @@ CHIP_ERROR CASESession::HandleSigma3c(HandleSigma3Data & data, CHIP_ERROR status
     }
 
     MATTER_LOG_METRIC(kMetricDeviceCASESessionSigmaFinished);
-    SuccessOrExit(err = SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess));
+    err              = SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
+    statusReportSent = true;
+    SuccessOrExit(err);
 
     if (mSessionResumptionStorage != nullptr)
     {
@@ -2155,7 +2204,10 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        RETURN_SAFELY_IGNORED SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
+        if (!statusReportSent)
+        {
+            RETURN_SAFELY_IGNORED SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
+        }
         // Abort the pending establish, which is normally done by CASESession::OnMessageReceived,
         // but in the background processing case must be done here.
         AbortPendingEstablish(err);

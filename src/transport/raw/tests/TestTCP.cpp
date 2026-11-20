@@ -109,6 +109,68 @@ CHIP_ERROR RetryPortSetup(uint16_t & outPort, std::function<CHIP_ERROR(uint16_t)
     return err;
 }
 
+// A deterministic TCPEndPoint test implementation whose ConnectImpl completes
+// the connection synchronously inside Connect(), exercising the path where a
+// newly allocated endpoint invokes OnConnectComplete before Connect() returns.
+class SyncConnectTCPEndPoint : public Inet::TCPEndPoint
+{
+public:
+    using EndPoint = Inet::TCPEndPoint;
+
+    explicit SyncConnectTCPEndPoint(Inet::EndPointManager<Inet::TCPEndPoint> & endPointManager) : Inet::TCPEndPoint(endPointManager)
+    {}
+
+    CHIP_ERROR GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const override
+    {
+        *retAddr = mPeerAddr;
+        *retPort = mPeerPort;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) const override
+    {
+        *retAddr = mPeerAddr;
+        *retPort = mPeerPort;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetInterfaceId(InterfaceId * retInterface) override
+    {
+        *retInterface = mIntfId;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR EnableNoDelay() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR EnableKeepAlive(uint16_t interval, uint16_t timeoutCount) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR DisableKeepAlive() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR AckReceive(size_t len) override { return CHIP_NO_ERROR; }
+#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+    void TCPUserTimeoutHandler() override {}
+#endif
+
+private:
+    CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR ListenImpl(uint16_t backlog) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId) override
+    {
+        mPeerAddr = addr;
+        mPeerPort = port;
+        mIntfId   = intfId;
+        mState    = State::kConnecting;
+        HandleConnectComplete(CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR SendQueuedImpl(bool queueWasEmpty) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR SetUserTimeoutImpl(uint32_t userTimeoutMillis) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR DriveSendingImpl() override { return CHIP_NO_ERROR; }
+    void HandleConnectCompleteImpl() override {}
+    void DoCloseImpl(CHIP_ERROR err, State oldState) override {}
+
+    IPAddress mPeerAddr = IPAddress::Any;
+    uint16_t mPeerPort  = 0;
+    InterfaceId mIntfId = InterfaceId::Null();
+};
+
 class MockTransportMgrDelegate : public chip::TransportMgrDelegate
 {
 public:
@@ -172,6 +234,10 @@ public:
     void HandleConnectionAttemptComplete(ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override
     {
         EXPECT_TRUE(conn);
+        if (mExpectedOutConnHandle != nullptr)
+        {
+            EXPECT_EQ(*mExpectedOutConnHandle, conn);
+        }
         ChipLogProgress(Test, "HandleConnectionAttemptComplete called: %p %s (%" CHIP_ERROR_FORMAT ")", &*conn,
                         PeerAddrString(conn->mPeerAddr), conErr.Format());
         mHandleConnectionCompleteCalled = &*conn;
@@ -217,6 +283,7 @@ public:
         mHandleConnectionCompleteError  = CHIP_NO_ERROR;
         mHandleConnectionCloseCalled    = nullptr;
         mHandleConnectionReceivedCalled = nullptr;
+        mExpectedOutConnHandle          = nullptr;
 
         return CHIP_NO_ERROR;
     }
@@ -355,13 +422,55 @@ public:
     void HandleConnectCompleteCbCalledTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
     {
         // Connect and wait for seeing active connection and connection complete
-        // handler being called.
-        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
+        // handler being called. Verify outPeerConnState (activeTCPConnState) is
+        // already populated at the moment HandleConnectionAttemptComplete fires
+        // (including when connect() completes synchronously).
+        mExpectedOutConnHandle = &activeTCPConnState;
+        CHIP_ERROR err         = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
         EXPECT_EQ(err, CHIP_NO_ERROR);
         EXPECT_TRUE(activeTCPConnState);
 
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
         EXPECT_EQ(mHandleConnectionCompleteCalled, &*activeTCPConnState);
+
+        // Reusing the already-connected TCP connection must populate refHolder and invoke
+        // HandleConnectionAttemptComplete synchronously before TCPConnect returns.
+        mHandleConnectionCompleteCalled = nullptr;
+        mExpectedOutConnHandle          = &refHolder;
+        err                             = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, refHolder);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(refHolder, activeTCPConnState);
+        EXPECT_EQ(mHandleConnectionCompleteCalled, &*refHolder);
+        mExpectedOutConnHandle = nullptr;
+
+        // Also verify the path where a newly allocated endpoint invokes OnConnectComplete
+        // synchronously from inside endPoint->Connect(): outPeerConnState (syncConnState)
+        // must already be populated when HandleConnectionAttemptComplete fires.
+        Inet::EndPointManagerImplPool<SyncConnectTCPEndPoint> syncEndPointManager;
+        ASSERT_SUCCESS(syncEndPointManager.Init(mIOContext->GetSystemLayer()));
+
+        TCPImpl syncTcp;
+        ASSERT_SUCCESS(syncTcp.Init(Transport::TcpListenParameters(&syncEndPointManager)
+                                        .SetAddressType(addr.Type())
+                                        .SetListenPort(port)
+                                        .SetServerListenEnabled(false)));
+
+        TransportMgrBase syncTransportMgr;
+        syncTransportMgr.SetSessionManager(this);
+        ASSERT_SUCCESS(syncTransportMgr.Init(&syncTcp));
+
+        ActiveTCPConnectionHandle syncConnState;
+        mHandleConnectionCompleteCalled = nullptr;
+        mExpectedOutConnHandle          = &syncConnState;
+        err                             = syncTcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, syncConnState);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_TRUE(syncConnState);
+        EXPECT_EQ(mHandleConnectionCompleteCalled, &*syncConnState);
+        mExpectedOutConnHandle = nullptr;
+
+        syncConnState.Release();
+        syncTcp.Close();
+        syncEndPointManager.Shutdown();
     }
 
     void HandleConnectCloseCbCalledTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
@@ -473,11 +582,12 @@ public:
         mConnReceivedCb = connReceivedCb;
     }
 
-    int mReceiveHandlerCallCount              = 0;
-    void * mHandleConnectionCompleteCalled    = nullptr;
-    CHIP_ERROR mHandleConnectionCompleteError = CHIP_NO_ERROR;
-    void * mHandleConnectionCloseCalled       = nullptr;
-    void * mHandleConnectionReceivedCalled    = nullptr;
+    int mReceiveHandlerCallCount                       = 0;
+    void * mHandleConnectionCompleteCalled             = nullptr;
+    CHIP_ERROR mHandleConnectionCompleteError          = CHIP_NO_ERROR;
+    void * mHandleConnectionCloseCalled                = nullptr;
+    void * mHandleConnectionReceivedCalled             = nullptr;
+    ActiveTCPConnectionHandle * mExpectedOutConnHandle = nullptr;
 
 private:
     IOContext * mIOContext;
@@ -1083,6 +1193,55 @@ TEST_F(TestTCP, RepeatedImmediateConnectFailuresDoNotExhaustEndpoints)
         EXPECT_NE(err, CHIP_ERROR_NO_MEMORY);
         EXPECT_TRUE(conn.IsNull());
     }
+}
+
+TEST_F(TestTCP, MaxActiveConnectionsBoundary)
+{
+    Inet::EndPointManagerImplPool<SyncConnectTCPEndPoint> syncEndPointManager;
+    ASSERT_SUCCESS(syncEndPointManager.Init(mIOContext->GetSystemLayer()));
+
+    TCPImpl syncTcp;
+    ASSERT_SUCCESS(syncTcp.Init(
+        Transport::TcpListenParameters(&syncEndPointManager).SetAddressType(IPAddressType::kIPv6).SetServerListenEnabled(false)));
+
+    MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+    TransportMgrBase syncTransportMgr;
+    syncTransportMgr.SetSessionManager(&gMockTransportMgrDelegate);
+    ASSERT_SUCCESS(syncTransportMgr.Init(&syncTcp));
+
+    IPAddress addr;
+    ASSERT_TRUE(IPAddress::FromString("::1", addr));
+
+    constexpr uint16_t kBasePort = 5540;
+    ActiveTCPConnectionHandle conns[kMaxTcpActiveConnectionCount];
+
+    for (size_t i = 0; i < kMaxTcpActiveConnectionCount; ++i)
+    {
+        auto peerAddr  = Transport::PeerAddress::TCP(addr, static_cast<uint16_t>(kBasePort + i));
+        CHIP_ERROR err = syncTcp.TCPConnect(peerAddr, nullptr, conns[i]);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_FALSE(conns[i].IsNull());
+    }
+
+    // With all active connection slots in use, the (kMaxTcpActiveConnectionCount + 1)th
+    // TCPConnect must fail with CHIP_ERROR_NO_MEMORY.
+    ActiveTCPConnectionHandle extraConn;
+    auto extraPeerAddr = Transport::PeerAddress::TCP(addr, static_cast<uint16_t>(kBasePort + kMaxTcpActiveConnectionCount));
+    EXPECT_EQ(syncTcp.TCPConnect(extraPeerAddr, nullptr, extraConn), CHIP_ERROR_NO_MEMORY);
+    EXPECT_TRUE(extraConn.IsNull());
+
+    // Releasing one active connection handle frees a slot, allowing a subsequent TCPConnect to succeed.
+    conns[0].Release();
+    EXPECT_EQ(syncTcp.TCPConnect(extraPeerAddr, nullptr, extraConn), CHIP_NO_ERROR);
+    EXPECT_FALSE(extraConn.IsNull());
+
+    extraConn.Release();
+    for (size_t i = 0; i < kMaxTcpActiveConnectionCount; ++i)
+    {
+        conns[i].Release();
+    }
+    syncTcp.Close();
+    syncEndPointManager.Shutdown();
 }
 
 TEST_F(TestTCP, CheckMaxTCPMessageSizeBoundary)
