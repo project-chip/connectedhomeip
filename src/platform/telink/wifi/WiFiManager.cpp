@@ -55,6 +55,7 @@ NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * r
 
     if (result != nullptr)
     {
+        VerifyOrReturnValue(sizeof(response.ssid) >= result->ssid_length, response);
         // TODO: Distinguish WPA versions
         response.security.Set(result->security == WIFI_SECURITY_TYPE_PSK ? NetworkCommissioning::WiFiSecurity::kWpaPersonal
                                                                          : NetworkCommissioning::WiFiSecurity::kUnencrypted);
