@@ -80,6 +80,8 @@ void ThermostatSetpointsBase::GenerateSetpointEvent(AttributeId attributeId, tem
     case UnoccupiedCoolingSetpoint::Id:
         mCluster.GenerateSetpointChangeEvent(SystemModeEnum::kCool, BitMask<OccupancyBitmap>(), MakeOptional(oldTemp), newTemp);
         break;
+    default:
+        break;
     }
 }
 
@@ -141,7 +143,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeComm
             }
             break;
         default:
-            return Status::InvalidCommand;
+            return Status::ConstraintError;
         }
 
         if (!heat.HasValue() && !cool.HasValue())

@@ -131,6 +131,8 @@ CHIP_ERROR LaundryWasherControlsCluster::SpinSpeedIndexValidity(DataModel::Nulla
 
 CHIP_ERROR LaundryWasherControlsCluster::NumberOfRinsesValidity(NumberOfRinsesEnum numberOfRinses)
 {
+    VerifyOrReturnError(EnsureKnownEnumValue(numberOfRinses) != NumberOfRinsesEnum::kUnknownEnumValue,
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(mDelegate != nullptr, CHIP_IM_GLOBAL_STATUS(InvalidInState));
     NumberOfRinsesEnum supportedRinse;
     for (uint8_t i = 0; i < kMaxSupportedRinsesLength && mDelegate->GetSupportedRinseAtIndex(i, supportedRinse) == CHIP_NO_ERROR;

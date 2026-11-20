@@ -248,6 +248,48 @@ TEST_F(TestLaundryWasherControlsCluster, TestReadWriteAttributeAndBounds)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestLaundryWasherControlsCluster, UndefinedRinseValuesPreserveStateAndDelegate)
+{
+    struct RecordingRinseDelegate : TestLaundryWasherControlsDelegate
+    {
+        uint32_t supportedRinseReads = 0;
+        uint32_t changes             = 0;
+
+        CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse) override
+        {
+            ++supportedRinseReads;
+            return TestLaundryWasherControlsDelegate::GetSupportedRinseAtIndex(index, supportedRinse);
+        }
+
+        void OnNumberOfRinsesChanged(NumberOfRinsesEnum numberOfRinses) override { ++changes; }
+    } delegate;
+
+    LaundryWasherControlsCluster::Config config{ BitFlags<Feature>(Feature::kRinse), delegate };
+    LaundryWasherControlsCluster cluster(kTestEndpointId, config);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetNumberOfRinses(NumberOfRinsesEnum::kNormal), CHIP_NO_ERROR);
+    delegate.supportedRinseReads = 0;
+    delegate.changes             = 0;
+
+    ClusterTester tester(cluster);
+    const uint8_t undefinedValues[] = { 4, 0x7f, 0xff };
+    for (uint8_t value : undefinedValues)
+    {
+        EXPECT_EQ(tester.WriteAttribute(NumberOfRinses::Id, value), Protocols::InteractionModel::Status::ConstraintError);
+        EXPECT_EQ(cluster.SetNumberOfRinses(static_cast<NumberOfRinsesEnum>(value)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        EXPECT_EQ(cluster.GetNumberOfRinses(), NumberOfRinsesEnum::kNormal);
+        EXPECT_EQ(delegate.supportedRinseReads, 0u);
+        EXPECT_EQ(delegate.changes, 0u);
+    }
+
+    EXPECT_EQ(tester.WriteAttribute(NumberOfRinses::Id, NumberOfRinsesEnum::kMax),
+              Protocols::InteractionModel::Status::InvalidInState);
+    EXPECT_GT(delegate.supportedRinseReads, 0u);
+    EXPECT_EQ(cluster.GetNumberOfRinses(), NumberOfRinsesEnum::kNormal);
+    EXPECT_EQ(delegate.changes, 0u);
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestLaundryWasherControlsCluster, TestSettersAndGetters)
 {
     LaundryWasherControlsCluster cluster(kTestEndpointId, testConfig);

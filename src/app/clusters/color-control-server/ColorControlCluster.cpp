@@ -1510,7 +1510,7 @@ CHIP_ERROR ColorControlCluster::HandleApplyScene(ColorControl::EnhancedColorMode
 Status ColorControlCluster::MoveHue(MoveModeEnum moveMode, uint16_t rate, bool isEnhanced, BitMask<OptionsBitmap> optionsMask,
                                     BitMask<OptionsBitmap> optionsOverride)
 {
-    VerifyOrReturnValue(moveMode != MoveModeEnum::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(moveMode != MoveModeEnum::kUnknownEnumValue, Status::ConstraintError);
     VerifyOrReturnValue(rate != 0 || moveMode == MoveModeEnum::kStop, Status::InvalidCommand);
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
 
@@ -1557,7 +1557,7 @@ Status ColorControlCluster::MoveHue(MoveModeEnum moveMode, uint16_t rate, bool i
 Status ColorControlCluster::MoveToHue(uint16_t hue, DirectionEnum dir, uint16_t transitionTimeDs, bool isEnhanced,
                                       BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
-    VerifyOrReturnValue(dir != DirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(dir != DirectionEnum::kUnknownEnumValue, Status::ConstraintError);
     // Both MoveToHue and EnhancedMoveToHue carry a uint16 TransitionTime constrained to max 65534.
     VerifyOrReturnValue(transitionTimeDs <= kMaxTransitionTime, Status::ConstraintError);
     // MoveToHue's Hue is constrained to kMaxCurrentHue; EnhancedMoveToHue's EnhancedHue spans the full uint16 range.
@@ -1593,7 +1593,7 @@ Status ColorControlCluster::MoveToHue(uint16_t hue, DirectionEnum dir, uint16_t 
         up = (upArc >= kHalfHueCircle);
         break; // up is the longer arc
     case DirectionEnum::kUnknownEnumValue:
-        return Status::InvalidCommand;
+        return Status::ConstraintError;
     }
     const int32_t signedArc = up ? upArc : (upArc - kHueCircle);
 
@@ -1636,7 +1636,7 @@ Status ColorControlCluster::StepHue(StepModeEnum stepMode, uint16_t stepSize, ui
 Status ColorControlCluster::MoveSaturation(MoveModeEnum moveMode, uint8_t rate, BitMask<OptionsBitmap> optionsMask,
                                            BitMask<OptionsBitmap> optionsOverride)
 {
-    VerifyOrReturnValue(moveMode != MoveModeEnum::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(moveMode != MoveModeEnum::kUnknownEnumValue, Status::ConstraintError);
     VerifyOrReturnValue(rate != 0 || moveMode == MoveModeEnum::kStop, Status::InvalidCommand);
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
 
@@ -2504,7 +2504,7 @@ Status ColorControlCluster::MoveColorTemp(MoveModeEnum moveMode, uint16_t rate, 
     VerifyOrReturnValue(maxFieldMireds <= kMaxColorTemperatureMireds, Status::ConstraintError);
     // Only when both are set do they describe a window; a crossed one bounds the movement by nothing.
     VerifyOrReturnValue(minFieldMireds == 0 || maxFieldMireds == 0 || minFieldMireds <= maxFieldMireds, Status::ConstraintError);
-    VerifyOrReturnValue(moveMode != MoveModeEnum::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(moveMode != MoveModeEnum::kUnknownEnumValue, Status::ConstraintError);
     VerifyOrReturnValue(rate != 0 || moveMode == MoveModeEnum::kStop, Status::InvalidCommand);
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
 
