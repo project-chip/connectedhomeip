@@ -18,10 +18,9 @@
 import asyncio
 import contextlib
 import logging
-import socket
 
 from mobly import asserts
-from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
+from zeroconf import IPVersion, ServiceBrowser, ServiceListener, Zeroconf
 
 import matter.clusters as Clusters
 from matter.commissioning import ROOT_ENDPOINT_ID
@@ -59,12 +58,10 @@ class MatterServiceListener(ServiceListener):
         try:
             service_info = zc.get_service_info(type_, name)
             if service_info:
-                addresses = []
-                for addr in service_info.addresses:
-                    if len(addr) == 4:  # IPv4
-                        addresses.append(socket.inet_ntoa(addr))
-                    elif len(addr) == 16:  # IPv6
-                        addresses.append(socket.inet_ntop(socket.AF_INET6, addr))
+                addresses = service_info.parsed_addresses(IPVersion.V6Only)
+                if not addresses:
+                    logger.info("MatterServiceListener: %s has no IPv6 address, ignoring", name)
+                    return
                 service_data = {
                     'name': name.replace(f'.{type_}', ''),
                     'type': type_,
@@ -119,7 +116,7 @@ async def find_matter_devices_mdns(target_device_id: int = None) -> list:
         zc = None
         try:
             found_event = asyncio.Event()
-            zc = Zeroconf()
+            zc = Zeroconf(ip_version=IPVersion.V6Only)
             listener = MatterServiceListener(target_device_id, found_event)
             browsers = [ServiceBrowser(zc, stype, listener) for stype in service_types]
 
