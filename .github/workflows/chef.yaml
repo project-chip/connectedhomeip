@@ -14,13 +14,9 @@
 
 name: Build Chef CI examples on all platforms
 
+# Chef CI is disabled on v1.4.2-branch; run it manually if needed.
 on:
-    push:
-        branches:
-            - master
-            - 'v*-branch'
-    pull_request:
-    merge_group:
+    workflow_dispatch:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -53,7 +49,7 @@ jobs:
 
     chef_linux_all_devices:
         name: Chef - Linux CI Examples (All chef devices)
-        timeout-minutes: 120
+        timeout-minutes: 60
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
