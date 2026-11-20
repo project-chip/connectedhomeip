@@ -331,8 +331,8 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
-    std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-    VerifyOrReturnError(invokeRequestMessage.GetDelayReportData(delayReportData) == CHIP_NO_ERROR, Status::InvalidAction);
+    InvokeRequestMessage::ReportDelay reportDelay;
+    VerifyOrReturnError(invokeRequestMessage.GetReportDelay(reportDelay) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::TimedRequestMismatch);
 
     {
@@ -352,33 +352,17 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         mReserveSpaceForMoreChunkMessages = true;
     }
 
-    if (delayReportData.has_value())
+    // Trigger report deferral BEFORE dispatching any commands.
+    // When command handlers execute, they may synchronously modify attributes, calling SetDirty()
+    // and notifying the ReportScheduler via OnBecameReportable(). If report deferral is not applied
+    // beforehand, the scheduler evaluates next timeout as 0 ms, synchronously transitions the node
+    // to TimerFired(), and marks EngineRunScheduled = true. Once EngineRunScheduled is set,
+    // subsequent deferral calls cannot prevent the reporting engine from immediately sending the report
+    // on the next event loop iteration. Triggering report deferral here ensures the deferral window is
+    // active before any attribute mutations occur.
     {
-        EndpointId targetedEndpoints[kMaxTargetedEndpoints];
-        Span<EndpointId> endpointsSpan(targetedEndpoints);
-
-        // Trigger report deferral BEFORE dispatching any commands.
-        // When command handlers execute, they may synchronously modify attributes, calling SetDirty()
-        // and notifying the ReportScheduler via OnBecameReportable(). If report deferral is not applied
-        // beforehand, the scheduler evaluates next timeout as 0 ms, synchronously transitions the node
-        // to TimerFired(), and marks EngineRunScheduled = true. Once EngineRunScheduled is set,
-        // subsequent deferral calls cannot prevent the reporting engine from immediately sending the report
-        // on the next event loop iteration. Triggering report deferral here ensures the deferral window is
-        // active before any attribute mutations occur.
-        if (IsGroupRequest())
-        {
-            VerifyOrReturnError(PopulateGroupTargetedEndpoints(invokeRequests, endpointsSpan) == CHIP_NO_ERROR,
-                                Status::InvalidAction);
-        }
-        else
-        {
-            VerifyOrReturnError(PopulateTargetedEndpoints(invokeRequests, endpointsSpan) == CHIP_NO_ERROR, Status::InvalidAction);
-        }
-
-        if (!endpointsSpan.empty())
-        {
-            TriggerDelayReport(delayReportData.value(), endpointsSpan);
-        }
+        Status reportDelayStatus = ApplyReportDelay(reportDelay, invokeRequests);
+        VerifyOrReturnError(reportDelayStatus == Status::Success, reportDelayStatus);
     }
 
     invokeRequests.GetReader(&invokeRequestsReader);
@@ -1166,9 +1150,9 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: Mandatory TimedRequest field missing");
     VerifyOrDieWithMsg(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: Mandatory InvokeRequests field missing");
-    std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
-    VerifyOrDieWithMsg(invokeRequestMessage.GetDelayReportData(delayReportData) == CHIP_NO_ERROR, DataManagement,
-                       "DUT Failure: Failed to read DelayReportData");
+    InvokeRequestMessage::ReportDelay reportDelay;
+    VerifyOrDieWithMsg(invokeRequestMessage.GetReportDelay(reportDelay) == CHIP_NO_ERROR, DataManagement,
+                       "DUT Failure: Failed to read ReportDelayMinMs or ReportDelayJitterWindowMs");
     VerifyOrDieWithMsg(mTimedRequest == isTimedInvoke, DataManagement,
                        "DUT Failure: TimedRequest value in message mismatches action");
 
@@ -1231,17 +1215,43 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
 }
 #endif // CHIP_WITH_NLFAULTINJECTION
 
-void CommandHandlerImpl::TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData,
-                                            Span<const EndpointId> aTargetedEndpoints)
+Status CommandHandlerImpl::ApplyReportDelay(const InvokeRequestMessage::ReportDelay & aReportDelay,
+                                            const InvokeRequests::Parser & aInvokeRequests)
 {
-    VerifyOrReturn(mpCallback != nullptr);
+    VerifyOrReturnValue(mpCallback != nullptr, Status::Success);
 
-    uint32_t delayMs = aDelayReportData.delayMinMs;
-    if (aDelayReportData.delayJitterWindowMs > 0)
+    // A field that is not present takes the default for how the request arrived, so a request without either field still
+    // gets a delay: zero for unicast, which ends any active deferral, and the configured defaults for groupcast.
+    const bool isGroupRequest = IsGroupRequest();
+    const uint16_t delayMinMs = aReportDelay.minMs.value_or(isGroupRequest ? CHIP_CONFIG_GROUPCAST_REPORT_DELAY_MIN_MS : 0);
+    const uint16_t delayJitterWindowMs =
+        aReportDelay.jitterWindowMs.value_or(isGroupRequest ? CHIP_CONFIG_GROUPCAST_REPORT_DELAY_JITTER_WINDOW_MS : 0);
+
+    uint32_t delayMs = delayMinMs;
+    if (delayJitterWindowMs > 0)
     {
-        delayMs += (chip::Crypto::GetRandU32() % aDelayReportData.delayJitterWindowMs);
+        delayMs += (chip::Crypto::GetRandU32() % delayJitterWindowMs);
     }
-    mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs), aTargetedEndpoints);
+
+    // A zero delay only matters if it cuts short a deferral, so skip finding the targeted endpoints when there is none.
+    VerifyOrReturnValue(delayMs > 0 || mpCallback->IsReportDeferralActive(), Status::Success);
+
+    EndpointId targetedEndpoints[kMaxTargetedEndpoints];
+    Span<EndpointId> endpointsSpan(targetedEndpoints);
+    if (isGroupRequest)
+    {
+        VerifyOrReturnError(PopulateGroupTargetedEndpoints(aInvokeRequests, endpointsSpan) == CHIP_NO_ERROR, Status::InvalidAction);
+    }
+    else
+    {
+        VerifyOrReturnError(PopulateTargetedEndpoints(aInvokeRequests, endpointsSpan) == CHIP_NO_ERROR, Status::InvalidAction);
+    }
+
+    if (!endpointsSpan.empty())
+    {
+        mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs), endpointsSpan);
+    }
+    return Status::Success;
 }
 
 } // namespace app

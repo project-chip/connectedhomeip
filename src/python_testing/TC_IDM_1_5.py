@@ -175,7 +175,7 @@ class TC_IDM_1_5(IDMBaseTest):
                 report_queue.get_nowait()
 
             cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
-            log.info("Sending InvokeRequestMessage for ArmFailSafe with DelayReportData (DelayMinMs=%d, DelayJitterWindowMs=%d)",
+            log.info("Sending InvokeRequestMessage for ArmFailSafe with ReportDelayMinMs=%d, ReportDelayJitterWindowMs=%d",
                      delay_min_ms, delay_jitter_window_ms)
 
             t_invoke_sent = time.monotonic()
@@ -183,7 +183,7 @@ class TC_IDM_1_5(IDMBaseTest):
                 nodeId=dut_node_id,
                 endpoint=endpoint,
                 payload=cmd,
-                delayReportData=ClusterCommand.DelayReportData(delayMinMs=delay_min_ms, delayJitterWindowMs=delay_jitter_window_ms),
+                reportDelay=ClusterCommand.ReportDelay(minMs=delay_min_ms, jitterWindowMs=delay_jitter_window_ms),
             )
             asserts.assert_is_instance(resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse,
                                        "DUT response should be ArmFailSafeResponse")
@@ -197,12 +197,12 @@ class TC_IDM_1_5(IDMBaseTest):
                 report_recv_time, new_val = await asyncio.to_thread(report_queue.get, timeout=report_wait_timeout_sec)
             except queue.Empty:
                 asserts.fail(
-                    f"Did not receive ReportDataMessage within {report_wait_timeout_sec:.2f}s following invoke command with DelayReportData")
+                    f"Did not receive ReportDataMessage within {report_wait_timeout_sec:.2f}s following invoke command with ReportDelayMinMs and ReportDelayJitterWindowMs")
 
             asserts.assert_equal(new_val, 1, f"Expected Breadcrumb report value to be 1, got {new_val}")
 
             delta_t_ms = (report_recv_time - t_invoke_sent) * 1000.0
-            log.info("Measured Delta t between sending InvokeRequest (t_invoke_sent) and receiving ReportData: %.2f ms (DelayMinMs=%d, Jitter=%d)",
+            log.info("Measured Delta t between sending InvokeRequest (t_invoke_sent) and receiving ReportData: %.2f ms (ReportDelayMinMs=%d, ReportDelayJitterWindowMs=%d)",
                      delta_t_ms, delay_min_ms, delay_jitter_window_ms)
 
             min_expected_delta_ms = float(delay_min_ms)

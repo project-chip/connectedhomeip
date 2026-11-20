@@ -61,6 +61,7 @@ public:
     void TestReportDeferral();
     void TestReportDeferralOnce();
     void TestReportDeferralEndpointSpecific();
+    void TestReportDeferralZeroDelay();
 
     /// @brief Mimicks the various operations that happen on a subscription transaction after a read handler was created so that
     /// readhandlers are in the expected state for further tests.
@@ -911,6 +912,62 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportDeferralOnce)
     // The previous deferral (which was at absolute time 3s) is now in the past (since current mock time is 3s and minInterval is
     // 4s). Therefore, the schedule should reset back to minInterval (1s from now), and NOT be deferred any more!
     EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(1));
+
+    // Clean up
+    sScheduler.UnregisterAllHandlers();
+    readHandlerPool.ReleaseAll();
+    exchangeCtx->Close();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportDeferralZeroDelay)
+{
+    NullReadHandlerCallback nullCallback;
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
+    ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
+
+    // Initialize mock timestamp
+    sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(0));
+
+    // Dirty read handler (min = 1s, max = 5s)
+    ReadHandler * readHandler1 =
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
+    EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler1, &sScheduler, 1, 5));
+    readHandler1->ForceDirtyState();
+
+    auto getTimeout = [](ReadHandler * handler) -> System::Clock::Timeout {
+        ReadHandlerNode * node = sScheduler.FindReadHandlerNode(handler);
+        if (node == nullptr)
+        {
+            return System::Clock::Timeout::zero();
+        }
+        size_t position;
+        auto pair = sTestTimerDelegate.FindPair(node, position);
+        if (pair == nullptr)
+        {
+            return System::Clock::Timeout::zero();
+        }
+        return pair->timeout - sTestTimerDelegate.mMockSystemTimestamp;
+    };
+
+    sScheduler.RescheduleAllReports();
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(1));
+    EXPECT_FALSE(sScheduler.HasActiveDeferral());
+
+    sScheduler.DeferReports(System::Clock::Seconds32(3));
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(3));
+    EXPECT_TRUE(sScheduler.HasActiveDeferral());
+
+    // A zero delay ends the deferral, so the report goes back to waiting only for minInterval.
+    sScheduler.DeferReports(System::Clock::kZero);
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(1));
+    EXPECT_FALSE(sScheduler.HasActiveDeferral());
+
+    sScheduler.DeferReports(System::Clock::Seconds32(3));
+    EXPECT_TRUE(sScheduler.HasActiveDeferral());
+    sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(3000));
+    // A deferral stops being active once its time has passed.
+    EXPECT_FALSE(sScheduler.HasActiveDeferral());
 
     // Clean up
     sScheduler.UnregisterAllHandlers();

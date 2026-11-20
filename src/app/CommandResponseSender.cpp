@@ -270,5 +270,10 @@ void CommandResponseSender::OnDelayReport(System::Clock::Timeout aDelay, Span<co
     mpReportScheduler->DeferReports(aDelay, targetedEndpoints);
 }
 
+bool CommandResponseSender::IsReportDeferralActive()
+{
+    return mpReportScheduler != nullptr && mpReportScheduler->HasActiveDeferral();
+}
+
 } // namespace app
 } // namespace chip

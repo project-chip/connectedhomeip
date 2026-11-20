@@ -35,22 +35,21 @@ namespace app {
 namespace InvokeRequestMessage {
 enum class Tag : uint8_t
 {
-    kSuppressResponse = 0,
-    kTimedRequest     = 1,
-    kInvokeRequests   = 2,
-    kDelayReportData  = 3,
+    kSuppressResponse          = 0,
+    kTimedRequest              = 1,
+    kInvokeRequests            = 2,
+    kReportDelayMinMs          = 3,
+    kReportDelayJitterWindowMs = 4,
 };
 
-enum class DelayReportDataTag : uint8_t
+/**
+ * The ReportDelayMinMs and ReportDelayJitterWindowMs fields of an Invoke Request.  A field that is not present takes the
+ * receiver's default for it, which depends on whether the request is unicast or groupcast.
+ */
+struct ReportDelay
 {
-    kDelayMinMs          = 0,
-    kDelayJitterWindowMs = 1,
-};
-
-struct DelayReportData
-{
-    uint16_t delayMinMs          = 0;
-    uint16_t delayJitterWindowMs = 0;
+    std::optional<uint16_t> minMs;
+    std::optional<uint16_t> jitterWindowMs;
 };
 
 class Parser : public MessageParser
@@ -82,9 +81,9 @@ public:
     CHIP_ERROR GetInvokeRequests(InvokeRequests::Parser * const apInvokeRequests) const;
 
     /**
-     * @brief Gets the DelayReportData from the TLV structure if present.
+     * @brief Gets ReportDelayMinMs and ReportDelayJitterWindowMs, each of which is left empty if it is not present.
      */
-    CHIP_ERROR GetDelayReportData(std::optional<DelayReportData> & aDelayReportData) const;
+    CHIP_ERROR GetReportDelay(ReportDelay & aReportDelay) const;
 };
 
 class Builder : public MessageBuilder
@@ -107,9 +106,14 @@ public:
     InvokeRequestMessage::Builder & TimedRequest(const bool aTimedRequest);
 
     /**
-     *  @brief Encode DelayReportData structure.
+     *  @brief Encode ReportDelayMinMs.
      */
-    InvokeRequestMessage::Builder & DelayReport(const DelayReportData & aDelayReportData);
+    InvokeRequestMessage::Builder & ReportDelayMinMs(const uint16_t aReportDelayMinMs);
+
+    /**
+     *  @brief Encode ReportDelayJitterWindowMs.
+     */
+    InvokeRequestMessage::Builder & ReportDelayJitterWindowMs(const uint16_t aReportDelayJitterWindowMs);
 
     /**
      *  @brief Initialize a InvokeRequests::Builder for writing into the TLV stream

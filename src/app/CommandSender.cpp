@@ -397,7 +397,7 @@ void CommandSender::Close()
 {
     mSuppressResponse = false;
     mTimedRequest     = false;
-    mDelayReportData.reset();
+    mReportDelay      = InvokeRequestMessage::ReportDelay();
     MoveToState(State::AwaitingDestruction);
     OnDoneCallback();
 }
@@ -673,9 +673,13 @@ CHIP_ERROR CommandSender::Finalize(System::PacketBufferHandle & commandPacket)
 {
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
-    if (mDelayReportData.has_value())
+    if (mReportDelay.minMs.has_value())
     {
-        mInvokeRequestBuilder.DelayReport(mDelayReportData.value());
+        mInvokeRequestBuilder.ReportDelayMinMs(mReportDelay.minMs.value());
+    }
+    if (mReportDelay.jitterWindowMs.has_value())
+    {
+        mInvokeRequestBuilder.ReportDelayJitterWindowMs(mReportDelay.jitterWindowMs.value());
     }
     ReturnErrorOnFailure(mInvokeRequestBuilder.EndOfInvokeRequestMessage());
     return mCommandMessageWriter.Finalize(&commandPacket);

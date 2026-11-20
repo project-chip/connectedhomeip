@@ -2030,6 +2030,98 @@ TEST_F(TestMessageDef, TestInvokeInvokeRequestMessage)
     ParseInvokeRequestMessage(reader);
 }
 
+namespace {
+
+// Builds an InvokeRequestMessage whose only fields are the ones aEncodeFields writes.
+template <typename EncodeFields>
+chip::System::PacketBufferHandle BuildInvokeRequestMessageWith(EncodeFields && aEncodeFields)
+{
+    chip::System::PacketBufferTLVWriter writer;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    InvokeRequestMessage::Builder invokeRequestMessageBuilder;
+    EXPECT_SUCCESS(invokeRequestMessageBuilder.Init(&writer));
+    aEncodeFields(invokeRequestMessageBuilder);
+    EXPECT_SUCCESS(invokeRequestMessageBuilder.EndOfInvokeRequestMessage());
+    chip::System::PacketBufferHandle buf;
+    EXPECT_SUCCESS(writer.Finalize(&buf));
+    return buf;
+}
+
+CHIP_ERROR ParseReportDelay(chip::System::PacketBufferHandle && aBuf, InvokeRequestMessage::ReportDelay & aReportDelay)
+{
+    chip::System::PacketBufferTLVReader reader;
+    reader.Init(std::move(aBuf));
+    InvokeRequestMessage::Parser invokeRequestMessageParser;
+    ReturnErrorOnFailure(invokeRequestMessageParser.Init(reader));
+    return invokeRequestMessageParser.GetReportDelay(aReportDelay);
+}
+
+} // namespace
+
+TEST_F(TestMessageDef, TestInvokeRequestMessageReportDelay)
+{
+    // Both fields present.
+    {
+        chip::System::PacketBufferHandle buf = BuildInvokeRequestMessageWith(
+            [](InvokeRequestMessage::Builder & aBuilder) { aBuilder.ReportDelayMinMs(200).ReportDelayJitterWindowMs(500); });
+
+        chip::System::PacketBufferTLVReader reader;
+        reader.Init(buf.Retain());
+        EXPECT_SUCCESS(reader.Next());
+        chip::TLV::TLVType containerType;
+        EXPECT_SUCCESS(reader.EnterContainer(containerType));
+        uint16_t value = 0;
+        EXPECT_SUCCESS(reader.Next());
+        // The specification puts ReportDelayMinMs at context tag 3 of InvokeRequestMessage...
+        EXPECT_EQ(reader.GetTag(), chip::TLV::ContextTag(3));
+        EXPECT_SUCCESS(reader.Get(value));
+        EXPECT_EQ(value, 200u);
+        EXPECT_SUCCESS(reader.Next());
+        // ...and ReportDelayJitterWindowMs at context tag 4.
+        EXPECT_EQ(reader.GetTag(), chip::TLV::ContextTag(4));
+        EXPECT_SUCCESS(reader.Get(value));
+        EXPECT_EQ(value, 500u);
+
+        InvokeRequestMessage::ReportDelay reportDelay;
+        EXPECT_SUCCESS(ParseReportDelay(std::move(buf), reportDelay));
+        ASSERT_TRUE(reportDelay.minMs.has_value());
+        EXPECT_EQ(*reportDelay.minMs, 200u);
+        ASSERT_TRUE(reportDelay.jitterWindowMs.has_value());
+        EXPECT_EQ(*reportDelay.jitterWindowMs, 500u);
+    }
+
+    // Only ReportDelayJitterWindowMs present.
+    {
+        InvokeRequestMessage::ReportDelay reportDelay;
+        EXPECT_SUCCESS(ParseReportDelay(
+            BuildInvokeRequestMessageWith([](InvokeRequestMessage::Builder & aBuilder) { aBuilder.ReportDelayJitterWindowMs(0); }),
+            reportDelay));
+        EXPECT_FALSE(reportDelay.minMs.has_value());
+        ASSERT_TRUE(reportDelay.jitterWindowMs.has_value());
+        EXPECT_EQ(*reportDelay.jitterWindowMs, 0u);
+    }
+
+    // Neither field present.
+    {
+        InvokeRequestMessage::ReportDelay reportDelay;
+        reportDelay.minMs = 1;
+        EXPECT_SUCCESS(
+            ParseReportDelay(BuildInvokeRequestMessageWith([](InvokeRequestMessage::Builder & aBuilder) {}), reportDelay));
+        EXPECT_FALSE(reportDelay.minMs.has_value());
+        EXPECT_FALSE(reportDelay.jitterWindowMs.has_value());
+    }
+
+    // A field that is not an unsigned integer cannot be parsed.
+    {
+        InvokeRequestMessage::ReportDelay reportDelay;
+        EXPECT_NE(ParseReportDelay(BuildInvokeRequestMessageWith([](InvokeRequestMessage::Builder & aBuilder) {
+                                       EXPECT_SUCCESS(aBuilder.GetWriter()->PutBoolean(chip::TLV::ContextTag(3), true));
+                                   }),
+                                   reportDelay),
+                  CHIP_NO_ERROR);
+    }
+}
+
 TEST_F(TestMessageDef, TestInvokeRequestMessageEndOfMessageReservation)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

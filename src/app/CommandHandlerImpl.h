@@ -80,7 +80,18 @@ public:
         virtual void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                      TLV::TLVReader & apPayload) = 0;
 
+        /*
+         * Invoked before any command of an Invoke Request is dispatched, with the report delay the request calls for, to
+         * defer the next report on each subscription whose paths include one of targetedEndpoints.  A delay of zero ends any
+         * deferral still in effect for those subscriptions.
+         */
         virtual void OnDelayReport(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints) {}
+
+        /*
+         * Returns whether a deferral from an earlier OnDelayReport may still be in effect for some subscription.  When it
+         * returns false, OnDelayReport is not invoked for a zero delay, since that would change nothing.
+         */
+        virtual bool IsReportDeferralActive() { return false; }
     };
 
     struct InvokeResponseParameters
@@ -480,8 +491,13 @@ private:
 
     void InvalidateHandles();
 
-    void TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData,
-                            Span<const EndpointId> aTargetedEndpoints);
+    /**
+     * Works out this request's report delay from aReportDelay, using the unicast or groupcast default for a field that is not
+     * present, and passes it to mpCallback->OnDelayReport along with the endpoints aInvokeRequests targets.  Must be called
+     * before any command is dispatched.  Returns InvalidAction if aInvokeRequests cannot be parsed.
+     */
+    Protocols::InteractionModel::Status ApplyReportDelay(const InvokeRequestMessage::ReportDelay & aReportDelay,
+                                                         const InvokeRequests::Parser & aInvokeRequests);
 
     bool TestOnlyIsInIdleState() const { return mState == State::Idle; }
 

@@ -72,6 +72,8 @@ public:
 
     void OnDelayReport(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints) override;
 
+    bool IsReportDeferralActive() override;
+
     /**
      * Gets the inner exchange context object, without ownership.
      *
