@@ -185,7 +185,8 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestUpsertSessionCopiesStreamLists)
 {
     TestServerClusterContext context;
     MockWebRTCTransportRequestorDelegate mockDelegate;
-    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
+    FabricTable fabricTable;
+    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate, fabricTable);
     ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
 
     constexpr NodeId kPeerNodeId = 0x1234ULL;
@@ -322,7 +323,8 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestMakeOfferedSessionWithoutStreams
 TEST_F(TestWebRTCTransportRequestorCluster, TestRecordOfferedSessionKeepsSessionOnReOffer)
 {
     MockWebRTCTransportRequestorDelegate mockDelegate;
-    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
+    FabricTable fabricTable;
+    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate, fabricTable);
 
     const uint16_t videoStreams[] = { 3 };
     auto offer                    = MakeTestOffer(7);
