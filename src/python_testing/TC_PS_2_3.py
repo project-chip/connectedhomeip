@@ -22,7 +22,8 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device power-source:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     # The static power-source device never changes its battery attributes, so it sends no reports to rate-limit.
+#     app-args: --device power-source-simulated:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
