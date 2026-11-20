@@ -1704,6 +1704,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
 {
     char protocol[chip::Dnssd::kDnssdProtocolTextMaxSize + 1];
 
+    // For a subtype browse, OpenThread returns the queried name "<subtype>._sub.<type>.<protocol>...".
+    // Skip the subtype so that <type> and <protocol> are read below; the subtype may also be too long for mType.
+    chip::Dnssd::SkipServiceSubtypeLabels(serviceType);
+
     ReturnErrorOnFailure(ReadDomainNameComponent(serviceType, mdnsService.mType));
     ReturnErrorOnFailure(ReadDomainNameComponent(serviceType, protocol));
 
