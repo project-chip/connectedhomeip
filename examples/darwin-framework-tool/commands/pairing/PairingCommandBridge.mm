@@ -87,8 +87,10 @@ void PairingCommandBridge::SetUpDeviceControllerDelegate(NSError * __autoreleasi
             params.countryCode = [NSString stringWithUTF8String:mCountryCode.Value()];
         }
 
+#if MTR_ENABLE_PROVISIONAL
         MaybeDisplayTermsAndConditions(params, error);
         VerifyOrReturn(*error == nil);
+#endif
         [deviceControllerDelegate setParams:params];
     }
 
@@ -98,6 +100,7 @@ void PairingCommandBridge::SetUpDeviceControllerDelegate(NSError * __autoreleasi
     [commissioner setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
 }
 
+#if MTR_ENABLE_PROVISIONAL
 void PairingCommandBridge::MaybeDisplayTermsAndConditions(MTRCommissioningParameters * params, NSError * __autoreleasing * error)
 {
     VerifyOrReturn(mUseDCL.ValueOr(false));
@@ -132,6 +135,7 @@ void PairingCommandBridge::MaybeDisplayTermsAndConditions(MTRCommissioningParame
         params.acceptedTermsAndConditionsVersion = @(version);
     }
 }
+#endif
 
 CHIP_ERROR PairingCommandBridge::RunCommand()
 {
