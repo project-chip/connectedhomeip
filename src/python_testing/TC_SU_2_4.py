@@ -159,8 +159,10 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
     @async_test_body
     async def teardown_test(self):
-        self.clear_kvs(kvs_path_prefix=self.provider_kvs_path)
+        # Once checks are completed clear the ota provider list to then terminate the provider.
+        await self.clear_ota_providers(self.controller, self.requestor_node_id)
         self.terminate_provider()
+        self.clear_kvs(kvs_path_prefix=self.provider_kvs_path)
         super().teardown_test()
 
     def desc_TC_SU_2_4(self) -> str:
@@ -252,6 +254,16 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=60))
         logger.info('%s: UpdateState (updateAvailable sequence) matcher has completed.', step_number_s1)
 
+        # Flow check
+        expected_flows = [
+            [Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading]
+        ]
+        if state_sequence in expected_flows:
+            logger.info('%s: OTA flow is valid: %s', step_number_s1, state_sequence)
+        else:
+            msg = f"Observed OTA flow: {state_sequence}, Expected one of: {expected_flows}"
+            asserts.fail(msg)
+
         # Read the last QueryImageResponse the OTA-P sent, in order to capture the UpdateToken.
         # Reads the QuerySnapshot when the Download is in progress to then retrieve the values for
         # ApplyUpdateRequest when transfer is complete.
@@ -340,10 +352,6 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         asserts.assert_equal(
             received_new_version, self.expected_software_version,
             f"NewVersion from ApplyUpdateRequest ({received_new_version}) does not match the expected software version ({self.expected_software_version}).")
-
-        # Once checks are completed clear the ota provider list to then terminate the provider.
-        await self.clear_ota_providers(self.controller, self.requestor_node_id)
-        self.terminate_provider()
 
 
 if __name__ == "__main__":
