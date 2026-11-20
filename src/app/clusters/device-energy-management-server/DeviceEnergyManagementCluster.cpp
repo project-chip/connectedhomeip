@@ -441,25 +441,23 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
 
     DataModel::Nullable<uint32_t> & earliestStartTimeNullable = forecast.earliestStartTime.Value();
     uint32_t latestEndTimeEpoch                               = forecast.latestEndTime.Value();
-    uint32_t earliestStartTimeEpoch;
-
-    if (earliestStartTimeNullable.IsNull())
+    uint32_t matterEpoch                                      = 0;
+    CHIP_ERROR err                                            = System::Clock::GetClock_MatterEpochS(matterEpoch);
+    if (err != CHIP_NO_ERROR)
     {
-        uint32_t matterEpoch = 0;
-        CHIP_ERROR err       = System::Clock::GetClock_MatterEpochS(matterEpoch);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "DEM: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
-            return Status::Failure;
-        }
-        earliestStartTimeEpoch = matterEpoch; // Null means we can start immediately (NOW)
-    }
-    else
-    {
-        earliestStartTimeEpoch = earliestStartTimeNullable.Value();
+        ChipLogError(Zcl, "DEM: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
     }
 
-    uint32_t duration = forecast.endTime - forecast.startTime;
+    if (commandData.requestedStartTime <= matterEpoch)
+    {
+        ChipLogError(Zcl, "DEM: Bad requestedStartTime %" PRIu32 ", not later than current time %" PRIu32 ".",
+                     commandData.requestedStartTime, matterEpoch);
+        return Status::ConstraintError;
+    }
+
+    uint32_t earliestStartTimeEpoch = earliestStartTimeNullable.IsNull() ? matterEpoch : earliestStartTimeNullable.Value();
+    uint32_t duration               = forecast.endTime - forecast.startTime;
     if (commandData.requestedStartTime < earliestStartTimeEpoch)
     {
         ChipLogError(Zcl, "DEM: Bad requestedStartTime %" PRIu32 ", earlier than earliestStartTime %" PRIu32 ".",
@@ -467,10 +465,11 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
         return Status::ConstraintError;
     }
 
-    if ((commandData.requestedStartTime + duration) > latestEndTimeEpoch)
+    // Subtract only after checking the order, so neither the comparison nor the later end-time update can wrap.
+    if (commandData.requestedStartTime > latestEndTimeEpoch || duration > latestEndTimeEpoch - commandData.requestedStartTime)
     {
-        ChipLogError(Zcl, "DEM: Bad requestedStartTimeEpoch + duration %" PRIu32 ", later than latestEndTime %" PRIu32 ".",
-                     commandData.requestedStartTime + duration, latestEndTimeEpoch);
+        ChipLogError(Zcl, "DEM: Bad requestedStartTime %" PRIu32 " with duration %" PRIu32 ", exceeds latestEndTime %" PRIu32 ".",
+                     commandData.requestedStartTime, duration, latestEndTimeEpoch);
         return Status::ConstraintError;
     }
 

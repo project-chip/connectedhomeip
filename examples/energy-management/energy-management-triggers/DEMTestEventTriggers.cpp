@@ -191,12 +191,12 @@ void SetTestEventTrigger_StartTimeAdjustment()
         ChipLogError(Support, "ConfigureForecast_EarliestStartLatestEndTimes could not get time");
     }
 
-    // planned start time, in UTC, for the entire Forecast.
-    sForecastStruct.startTime = matterEpoch;
+    // Leave time to request the earliest start while it is still in the future.
+    sForecastStruct.startTime = matterEpoch + 120;
 
     // Set the earliest start time, in UTC, to that before the startTime
     sForecastStruct.earliestStartTime =
-        Optional<DataModel::Nullable<uint32_t>>{ DataModel::Nullable<uint32_t>{ matterEpoch - 60 } };
+        Optional<DataModel::Nullable<uint32_t>>{ DataModel::Nullable<uint32_t>{ matterEpoch + 60 } };
 
     // Planned end time, in UTC, for the entire Forecast.
     sForecastStruct.endTime = matterEpoch * 3;
