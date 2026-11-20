@@ -32,6 +32,8 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <transport/raw/GroupcastTesting.h>
 
+#include <optional>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -74,6 +76,19 @@ private:
         uint16_t count = 0;
     };
 
+    // What RollbackJoinGroup needs to undo a failed JoinGroup: the state of the group before the command, and which
+    // changes the command made.
+    struct JoinGroupRollbackState
+    {
+        bool is_new_group           = false;
+        bool had_previous_key       = false;
+        KeysetId previous_keyset_id = kInvalidKeysetId;
+        bool created_keyset         = false;
+        bool group_info_stored      = false;
+        // Only valid when is_new_group is false.
+        Credentials::GroupDataProvider::GroupInfo previous_info;
+    };
+
     Protocols::InteractionModel::Status GroupcastTesting(FabricIndex fabricIndex,
                                                          Groupcast::Commands::GroupcastTesting::DecodableType data);
 
@@ -114,9 +129,20 @@ private:
     Credentials::GroupDataProvider & Provider() { return mGroupcastContext.groupDataProvider; }
     chip::FabricTable & Fabrics() { return mGroupcastContext.fabricTable; }
 
+    // Maps `group_id` to `keyset_id`, creating the keyset first when `key` has a value.
+    // When Success is returned, `created_keyset` tells whether this call created the keyset.
     Protocols::InteractionModel::Status SetKeySet(const ConcreteCommandPath & path,
                                                   const chip::Access::SubjectDescriptor & subjectDescriptor, GroupId group_id,
-                                                  KeysetId keyset_id, const chip::Optional<chip::ByteSpan> & key);
+                                                  KeysetId keyset_id, const chip::Optional<chip::ByteSpan> & key,
+                                                  bool & created_keyset);
+    // Stores the GroupInfo and the endpoints of a validated JoinGroup, and records in `state` what was stored.
+    CHIP_ERROR StoreJoinGroupMembership(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data,
+                                        const Credentials::GroupDataProvider::GroupInfo & info, JoinGroupRollbackState & state);
+    // Undoes the changes of a failed JoinGroup: the GroupInfo, the group-key mapping and a keyset created by the command.
+    // Best effort: the command is already failing, so a step that fails is logged and the remaining steps still run.
+    // Endpoint changes to a group that existed before the command are not undone.
+    void RollbackJoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data,
+                           const JoinGroupRollbackState & state);
     Protocols::InteractionModel::Status RemoveGroup(GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
                                                     EndpointList * endpoints,
                                                     const chip::Access::SubjectDescriptor & subjectDescriptor);
@@ -125,6 +151,11 @@ private:
     void UpdateUsedMcastAddrCount();
     void NotifyUsedMcastAddrCountOnChange();
     void NotifyMembershipChanged();
+    // Removes, for every fabric, the group-key mappings whose group has no GroupInfo.
+    void ReconcileGroupKeys();
+    // Removes group-key mappings of the fabric: those of `group_id` when it has a value, otherwise those whose group
+    // has no GroupInfo. Best effort: a mapping that cannot be removed is logged.
+    void RemoveGroupKeyMappings(FabricIndex fabric_index, std::optional<GroupId> group_id);
 
     GroupcastContext mGroupcastContext;
     const BitFlags<Groupcast::Feature> mFeatures;
