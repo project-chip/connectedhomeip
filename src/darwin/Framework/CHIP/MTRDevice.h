@@ -21,6 +21,7 @@
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRCommandWithRequiredResponse.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRUserInvokeToken.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -191,8 +192,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * @param value       A data-value NSDictionary object as described in
  *                    MTRDeviceResponseHandler.
  *
- * @param expectedValueInterval  maximum interval in milliseconds during which reads of the attribute will return the value being
- * written. This value must be within [1, UINT32_MAX], and will be clamped to this range.
+ * @param expectedValueInterval  interval in milliseconds during which reads of the attribute will return the value being
+ * written, counted from when the write request is sent to the device.  For a timed write, it is counted from when the
+ * Timed Request that precedes the write is sent.  For a controller from +sharedControllerWithID:xpcConnectBlock:, it is
+ * counted from when the write is passed to the XPC service.  While the write is still waiting to be sent (for example
+ * behind other work for the device, or for a session), reads also return the value being written.  If the write fails,
+ * the expected value is removed.  This value must be within [1, UINT32_MAX], and will be clamped to this range.
  *
  * TODO: document that -readAttribute... will return the expected value for the [endpoint,cluster,attribute] until one of the
  * following:
@@ -262,11 +267,20 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *                       The expectedValues and expectedValueInterval arguments need to be both
  *                       nil or both non-nil, or both will be both ignored.
  *
- * @param expectedValueInterval  maximum interval in milliseconds during which reads of the
- *                               attributes that had expected values provided will return the
- *                               expected values. If the value is less than 1, both this value and
- *                               expectedValues will be ignored. If this value is greater than
- *                               UINT32_MAX, it will be clamped to UINT32_MAX.
+ * @param expectedValueInterval  interval in milliseconds during which reads of the attributes
+ *                               that had expected values provided will return the expected
+ *                               values, counted from when the invoke request is sent to the
+ *                               device.  For a timed invoke, it is counted from when the
+ *                               Timed Request that precedes the invoke is sent.  For a
+ *                               controller from +sharedControllerWithID:xpcConnectBlock:, it
+ *                               is counted from when the invoke is passed to the XPC service.
+ *                               While the invoke is still waiting to be sent (for example
+ *                               behind other work for the device, or for a session), reads
+ *                               also return the expected values.  If the invoke fails, the
+ *                               expected values are removed.  If the value is negative, both
+ *                               this value and expectedValues will be ignored.  A value less
+ *                               than 1 that is not negative is treated as 1.  If this value is
+ *                               greater than UINT32_MAX, it will be clamped to UINT32_MAX.
  *
  * @param completion  response handler will receive either values or error.  A
  *                    path-specific error status from the command invocation
@@ -298,6 +312,24 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Like the above, for a user command: one a person is waiting on.
+ *
+ * With a userInvokeToken, the command is queued ahead of reads that have not sent anything yet, its wait in the
+ * queue is bounded by the token's timeout, and the token can cancel it while it is still queued.  See
+ * MTRUserInvokeToken.  With a nil userInvokeToken this is the same as the method above.
+ */
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
+                      commandFields:(id)commandFields
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
+                    userInvokeToken:(MTRUserInvokeToken * _Nullable)userInvokeToken
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Invoke one or more groups of commands.
