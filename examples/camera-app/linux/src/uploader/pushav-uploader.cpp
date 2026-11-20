@@ -36,32 +36,41 @@ PushAVUploader::PushAVUploader() : mIsRunning(false) {}
 
 PushAVUploader::~PushAVUploader()
 {
-    std::pair<std::string, std::string> lastUploadJob;
     {
         std::lock_guard<std::mutex> lock(mQueueMutex);
-        while (mAvData.size() > 1)
-        {
-            mAvData.pop();
-        }
-
-        if (!mAvData.empty())
-        {
-            lastUploadJob = std::move(mAvData.front());
-            mAvData.pop();
-        }
+        mAcceptingData = false;
     }
 
-    if (!lastUploadJob.first.empty() && !lastUploadJob.second.empty())
-    {
-        const std::filesystem::path filePath(lastUploadJob.first);
-
-        if (filePath.extension() == ".mpd" || filePath.extension() == ".upload")
-        {
-            UploadData(lastUploadJob);
-        }
-    }
-
+    // Join the worker first so that no other thread is in UploadData while the queue is drained here.
     Stop();
+
+    const auto deadline = std::chrono::steady_clock::now() + kDrainTimeout;
+    while (true)
+    {
+        std::pair<std::string, std::string> uploadJob;
+        size_t remaining = 0;
+        {
+            std::lock_guard<std::mutex> lock(mQueueMutex);
+            remaining = mAvData.size();
+            if (remaining == 0)
+            {
+                break;
+            }
+            uploadJob = std::move(mAvData.front());
+            mAvData.pop();
+        }
+
+        if (std::chrono::steady_clock::now() >= deadline)
+        {
+            ChipLogError(Camera, "Uploader drain deadline passed, dropping %zu queued files, first dropped: %s", remaining,
+                         uploadJob.first.c_str());
+            break;
+        }
+        if (!uploadJob.first.empty() && !uploadJob.second.empty())
+        {
+            UploadData(uploadJob, deadline);
+        }
+    }
 }
 
 // Helper function to convert certificate from DER format to PEM format
@@ -231,6 +240,11 @@ void PushAVUploader::AddUploadData(const std::string & filename, const std::stri
 {
     ChipLogProgress(Camera, "Added file name %s to queue", filename.c_str());
     std::lock_guard<std::mutex> lock(mQueueMutex);
+    if (!mAcceptingData)
+    {
+        ChipLogError(Camera, "Uploader is shutting down, not queuing %s", filename.c_str());
+        return;
+    }
     auto data = std::make_pair(filename, url);
     mAvData.push(data);
 }
@@ -372,7 +386,25 @@ std::string ProcessM4SUploadPath(std::string path, const std::vector<std::string
     return result;
 }
 
-void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
+CURLcode PushAVUploader::PerformUpload(CURL * curl, std::optional<std::chrono::steady_clock::time_point> deadline)
+{
+    if (deadline.has_value())
+    {
+        const auto remainingMs =
+            std::chrono::duration_cast<std::chrono::milliseconds>(*deadline - std::chrono::steady_clock::now()).count();
+        if (remainingMs <= 0)
+        {
+            ChipLogError(Camera, "Uploader drain deadline passed, skipping upload attempt");
+            return CURLE_OPERATION_TIMEDOUT;
+        }
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, static_cast<long>(remainingMs));
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, static_cast<long>(remainingMs));
+    }
+    return curl_easy_perform(curl);
+}
+
+void PushAVUploader::UploadData(std::pair<std::string, std::string> data,
+                                std::optional<std::chrono::steady_clock::time_point> deadline)
 {
     CURL * curl = curl_easy_init();
     if (!curl)
@@ -385,6 +417,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     if (!file)
     {
         ChipLogError(Camera, "Failed to open file %s", data.first.c_str());
+        curl_easy_cleanup(curl);
         return;
     }
     file.seekg(0, std::ios::end);
@@ -395,6 +428,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     {
         ChipLogError(Camera, "Failed to read file into buffer");
         file.close();
+        curl_easy_cleanup(curl);
         return;
     }
     file.close();
@@ -404,6 +438,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     if (!upload.mData)
     {
         ChipLogError(Camera, "Failed to allocate memory for upload data");
+        curl_easy_cleanup(curl);
         return;
     }
     memcpy(upload.mData, buffer.data(), size);
@@ -535,12 +570,12 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, PushAvUploadCb);
     curl_easy_setopt(curl, CURLOPT_READDATA, &upload);
 
-    res = curl_easy_perform(curl);
+    res = PerformUpload(curl, deadline);
 
     if (res != CURLE_OK)
     {
         ChipLogError(Camera, "CURL upload failed [%s] %s, retrying...", data.first.c_str(), curl_easy_strerror(res));
-        res = curl_easy_perform(curl);
+        res = PerformUpload(curl, deadline);
 
         if (res != CURLE_OK)
         {

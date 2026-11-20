@@ -19,10 +19,12 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
 #include <curl/curl.h>
 #include <filesystem>
 #include <mutex>
+#include <optional>
 #include <queue>
 #include <string>
 #include <thread>
@@ -70,13 +72,22 @@ public:
     void setStreamIdNameMap(const std::vector<std::string> & streamIdNameMap) { mStreamIdNameMap = streamIdNameMap; }
 
 private:
+    /// Time the destructor spends uploading files still queued after the worker thread has stopped.
+    static constexpr std::chrono::seconds kDrainTimeout{ 5 };
+
     void ProcessQueue();
-    void UploadData(std::pair<std::string, std::string> data);
+
+    /// Uploads one file. If deadline is set, each transfer attempt is limited to the time left until the deadline.
+    void UploadData(std::pair<std::string, std::string> data,
+                    std::optional<std::chrono::steady_clock::time_point> deadline = std::nullopt);
+    CURLcode PerformUpload(CURL * curl, std::optional<std::chrono::steady_clock::time_point> deadline);
+
     PushAVCertPath mCertPath;
     PushAVCertBuffer mCertBuffer;
     std::queue<std::pair<std::string, std::string>> mAvData;
     std::mutex mQueueMutex;
     std::atomic<bool> mIsRunning;
+    bool mAcceptingData = true; ///< Protected by mQueueMutex
     std::thread mUploaderThread;
     std::vector<std::string> mStreamIdNameMap;
 };

@@ -65,7 +65,7 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
     mClipInfo.mClipStartPTS = 0;
     mMetadataSet            = false;
     mDeinitializeRecorder   = false;
-    mUploadMPD              = true;
+    mUploadMPD              = mClipInfo.mUploadManifest;
     mCurrentClipStartPts    = AV_NOPTS_VALUE;
     currentPts              = AV_NOPTS_VALUE;
 
@@ -112,7 +112,7 @@ PushAVClipRecorder::~PushAVClipRecorder()
     }
 
     std::filesystem::path mpdPath = mUploadFileBasePath / "index.mpd";
-    if (IsFileReadyForUpload(mpdPath))
+    if (mClipInfo.mUploadManifest && IsFileReadyForUpload(mpdPath))
     {
         UpdateMPDParams(mpdPath.string());
         std::string finalMpdPath = GetUploadMpdPath(mpdPath);
@@ -1292,7 +1292,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(ClipFinalizationReason reason)
             mUploadSegmentID[i]++;
             // For testing purpose
 #ifdef TEST_UPLOAD_MPD_AFTER_EVERY_SEGMENT
-            mUploadMPD = true;
+            mUploadMPD = mClipInfo.mUploadManifest;
 #endif
             segment_path = make_segment_path(i, mUploadSegmentID[i]);
         }
