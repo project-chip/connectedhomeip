@@ -556,14 +556,19 @@ void OTAProviderExample::HandleNotifyUpdateApplied(app::CommandHandler * command
 {
     VerifyOrReturn(commandObj != nullptr, ChipLogError(SoftwareUpdate, "Invalid commandObj, cannot handle NotifyUpdateApplied"));
 
-    char tokenBuf[kUpdateTokenStrLen] = { 0 };
-
-    GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
-    ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.softwareVersion);
+    SaveNotifyUpdateAppliedSnapshot(commandData);
+    ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, mNotifyUpdateAppliedToken,
+                  commandData.softwareVersion);
     mApplyUpdateRequestSent  = false;
     mApplyUpdateRequestCount = 0;
 
     commandObj->AddStatus(commandPath, Status::Success);
+}
+
+void OTAProviderExample::SaveNotifyUpdateAppliedSnapshot(const NotifyUpdateApplied::DecodableType & commandData)
+{
+    GetUpdateTokenString(commandData.updateToken, mNotifyUpdateAppliedToken, kUpdateTokenStrLen);
+    mNotifyUpdateAppliedSoftwareVersion = commandData.softwareVersion;
 }
 
 const char * OTAProviderExample::GetFilePathForDesignator(const char * designator) const
