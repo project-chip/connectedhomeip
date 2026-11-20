@@ -44,6 +44,8 @@ Usage:
 
 from __future__ import annotations
 
+import argparse
+import functools
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
@@ -52,6 +54,7 @@ from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.pixit import (_PIXIT_NO_DEFAULT, PixitDefinition, _type_to_arg_flag, format_pixit_error,
                                   format_pixit_type_errors, format_pixit_value_for_dump, get_pixit_definitions,
                                   validate_pixit_types, validate_pixits)
+from matter.testing.runner import matter_test_args_parser
 
 
 @dataclass(frozen=True)
@@ -67,7 +70,8 @@ class _HarnessParamSpec:
     """Registry entry: how to validate and display a logical harness name."""
 
     description: str
-    cli_hint: str
+    argparse_dest: str
+    alternate_dests: tuple[str, ...]
     sensitive: bool
     is_satisfied: Callable[[MatterTestConfig], bool]
     resolve_runtime: Callable[[MatterTestConfig], Any]
@@ -112,10 +116,51 @@ def _resolve_passcode_display(cfg: MatterTestConfig) -> Any:
     return None
 
 
+@functools.lru_cache(maxsize=1)
+def _harness_parser_actions_by_dest() -> dict[str, argparse.Action]:
+    """Map argparse ``dest`` to its ``Action`` from ``matter_test_args_parser()``."""
+    by_dest: dict[str, argparse.Action] = {}
+    for action in matter_test_args_parser()._actions:
+        if action.dest and action.dest != argparse.SUPPRESS:
+            by_dest[action.dest] = action
+    return by_dest
+
+
+def _long_option_flags(action: argparse.Action) -> tuple[str, ...]:
+    """Return long-form CLI flags for an argparse action, falling back to all option strings."""
+    long_opts = tuple(o for o in action.option_strings if o.startswith('--'))
+    if long_opts:
+        return long_opts
+    return tuple(action.option_strings)
+
+
+def harness_cli_flags_for_dest(dest: str) -> tuple[str, ...]:
+    """Return long-option flags for ``dest`` (derived from ``matter_test_args_parser()``)."""
+    return _long_option_flags(_harness_parser_actions_by_dest()[dest])
+
+
+def harness_cli_hint_for_dest(dest: str) -> str:
+    """Return a single dest hint fragment, e.g. ``--wifi-ssid <SSID>``."""
+    action = _harness_parser_actions_by_dest()[dest]
+    flag = _long_option_flags(action)[0]
+    metavar = action.metavar or '<value>'
+    if isinstance(metavar, tuple):
+        metavar = metavar[0]
+    return f'{flag} {metavar}'
+
+
+def _format_cli_hint(spec: _HarnessParamSpec) -> str:
+    parts = [harness_cli_hint_for_dest(spec.argparse_dest)]
+    for alt_dest in spec.alternate_dests:
+        parts.append(harness_cli_hint_for_dest(alt_dest))
+    return '  or  '.join(parts)
+
+
 HARNESS_PARAM_REGISTRY: dict[str, _HarnessParamSpec] = {
     "discriminator": _HarnessParamSpec(
         description="Long discriminator for commissioning (or use --qr-code / --manual-code).",
-        cli_hint="--discriminator <value>  or  --qr-code <payload>  or  --manual-code <code>",
+        argparse_dest="discriminators",
+        alternate_dests=("qr_code", "manual_code"),
         sensitive=False,
         is_satisfied=_commissioning_credentials_satisfied,
         resolve_runtime=_resolve_discriminator_runtime,
@@ -123,7 +168,8 @@ HARNESS_PARAM_REGISTRY: dict[str, _HarnessParamSpec] = {
     ),
     "passcode": _HarnessParamSpec(
         description="PAKE passcode for commissioning (or use --qr-code / --manual-code).",
-        cli_hint="--passcode <value>  or  --qr-code / --manual-code",
+        argparse_dest="passcodes",
+        alternate_dests=("qr_code", "manual_code"),
         sensitive=True,
         is_satisfied=_passcode_satisfied,
         resolve_runtime=_resolve_passcode_runtime,
@@ -131,7 +177,8 @@ HARNESS_PARAM_REGISTRY: dict[str, _HarnessParamSpec] = {
     ),
     "wifi_ssid": _HarnessParamSpec(
         description="Wi-Fi network SSID (e.g. for ble-wifi commissioning).",
-        cli_hint="--wifi-ssid <SSID>",
+        argparse_dest="wifi_ssid",
+        alternate_dests=(),
         sensitive=False,
         is_satisfied=lambda cfg: cfg.wifi_ssid is not None,
         resolve_runtime=lambda cfg: cfg.wifi_ssid,
@@ -139,7 +186,8 @@ HARNESS_PARAM_REGISTRY: dict[str, _HarnessParamSpec] = {
     ),
     "wifi_passphrase": _HarnessParamSpec(
         description="Wi-Fi network passphrase.",
-        cli_hint="--wifi-passphrase <passphrase>",
+        argparse_dest="wifi_passphrase",
+        alternate_dests=(),
         sensitive=True,
         is_satisfied=lambda cfg: cfg.wifi_passphrase is not None,
         resolve_runtime=lambda cfg: cfg.wifi_passphrase,
@@ -147,7 +195,8 @@ HARNESS_PARAM_REGISTRY: dict[str, _HarnessParamSpec] = {
     ),
     "commissioning_method": _HarnessParamSpec(
         description="Commissioning method name (see runner --commissioning-method choices).",
-        cli_hint="--commissioning-method <method>",
+        argparse_dest="commissioning_method",
+        alternate_dests=(),
         sensitive=False,
         is_satisfied=lambda cfg: cfg.commissioning_method is not None and str(cfg.commissioning_method).strip() != "",
         resolve_runtime=lambda cfg: cfg.commissioning_method,
@@ -155,7 +204,8 @@ HARNESS_PARAM_REGISTRY: dict[str, _HarnessParamSpec] = {
     ),
     "dut_node_id": _HarnessParamSpec(
         description="DUT node id on the fabric.",
-        cli_hint="--dut-node-id <id>",
+        argparse_dest="dut_node_ids",
+        alternate_dests=(),
         sensitive=False,
         is_satisfied=lambda cfg: bool(cfg.dut_node_ids),
         resolve_runtime=lambda cfg: cfg.dut_node_ids[0] if cfg.dut_node_ids else None,
@@ -163,7 +213,8 @@ HARNESS_PARAM_REGISTRY: dict[str, _HarnessParamSpec] = {
     ),
     "endpoint": _HarnessParamSpec(
         description="Endpoint under test (may be implicit; declare if the test requires an explicit value).",
-        cli_hint="--endpoint <n>",
+        argparse_dest="endpoint",
+        alternate_dests=(),
         sensitive=False,
         is_satisfied=lambda cfg: cfg.endpoint is not None,
         resolve_runtime=lambda cfg: cfg.endpoint,
@@ -171,19 +222,12 @@ HARNESS_PARAM_REGISTRY: dict[str, _HarnessParamSpec] = {
     ),
     "thread_dataset": _HarnessParamSpec(
         description="Thread operational dataset hex (ble-thread / similar).",
-        cli_hint="--thread-dataset-hex <hex>",
+        argparse_dest="thread_dataset_hex",
+        alternate_dests=(),
         sensitive=True,
         is_satisfied=lambda cfg: cfg.thread_operational_dataset is not None,
         resolve_runtime=lambda cfg: cfg.thread_operational_dataset,
         resolve_display=lambda cfg: cfg.thread_operational_dataset,
-    ),
-    "commissionee_ip": _HarnessParamSpec(
-        description="Commissionee IP (on-network-ip commissioning).",
-        cli_hint="--ip-addr <address>",
-        sensitive=False,
-        is_satisfied=lambda cfg: cfg.commissionee_ip_address_just_for_testing is not None,
-        resolve_runtime=lambda cfg: cfg.commissionee_ip_address_just_for_testing,
-        resolve_display=lambda cfg: cfg.commissionee_ip_address_just_for_testing,
     ),
 }
 
@@ -263,7 +307,7 @@ def format_harness_error(
     for hdef in missing_required:
         spec = HARNESS_PARAM_REGISTRY[hdef.name]
         lines.append(f"  - {hdef.name}: {spec.description}")
-        lines.append(f"    Provide via: {spec.cli_hint}")
+        lines.append(f"    Provide via: {_format_cli_hint(spec)}")
 
     if optional_declared:
         lines.append("")
@@ -271,7 +315,7 @@ def format_harness_error(
         for hdef in optional_declared:
             spec = HARNESS_PARAM_REGISTRY[hdef.name]
             lines.append(f"  - {hdef.name}: {spec.description}")
-            lines.append(f"    Set via: {spec.cli_hint}")
+            lines.append(f"    Set via: {_format_cli_hint(spec)}")
 
     return "\n".join(lines)
 
@@ -385,7 +429,7 @@ def format_declared_parameters_for_failure(
         req_label = "required" if hdef.required else "optional"
         lines.append(f"  [harness] {hdef.name} ({req_label}): {spec.description}")
         lines.append(f"            value: {val}")
-        lines.append(f"            Set via: {spec.cli_hint}")
+        lines.append(f"            Set via: {_format_cli_hint(spec)}")
         lines.append("")
 
     return "\n".join(lines).rstrip() + "\n"
