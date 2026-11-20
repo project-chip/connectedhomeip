@@ -99,6 +99,8 @@ void ReadClient::ClearActiveSubscriptionState()
     mSuppressResponse             = false;
     // Data for this cluster may not have been received completely, so don't commit its version.
     mPendingDataVersionCluster = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
+    mSessionHangListener.Release();
+    CancelLivenessCheckTimer();
 
     MoveToState(ClientState::Idle);
 }
@@ -1031,6 +1033,12 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 
     CancelLivenessCheckTimer();
 
+    mSessionHangListener.Release();
+    if (!mReadPrepareParams.mSessionHolder || !mSessionHangListener.Grab(mReadPrepareParams.mSessionHolder.Get().Value()))
+    {
+        ChipLogProgress(DataManagement, "Subscription 0x%08" PRIx32 " has no active session to watch for hangs", mSubscriptionId);
+    }
+
     System::Clock::Timeout timeout;
     ReturnErrorOnFailure(ComputeLivenessCheckTimerTimeout(&timeout));
 
@@ -1125,6 +1133,26 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
     }
 
     _this->TriggerResubscriptionForLivenessTimeout(subscriptionTerminationCause);
+}
+
+void ReadClient::SessionHangListener::OnSessionHang()
+{
+    VerifyOrReturn(mClient.IsSubscriptionActive() && mClient.mpImEngine != nullptr);
+
+    ChipLogProgress(DataManagement, "Session hang on subscription 0x%08" PRIx32 " to peer %02x:" ChipLogFormatX64,
+                    mClient.mSubscriptionId, mClient.GetFabricIndex(), ChipLogValueX64(mClient.GetPeerNodeId()));
+
+    // A LIT peer with a check-in token is left to the liveness timer, which then waits for a check-in instead.
+    if (mClient.mIsPeerLIT && mClient.mReadPrepareParams.mRegisteredCheckInToken)
+    {
+        return;
+    }
+
+    // The publisher may have lost the subscription (e.g. it restarted), so handle this as a liveness timeout. Defer it: the
+    // session is notifying its holders and must not be changed from here. If the timer can't start, the normal liveness
+    // timeout still applies.
+    LogErrorOnFailure(mClient.mpImEngine->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+        System::Clock::kZero, OnLivenessTimeoutCallback, &mClient));
 }
 
 void ReadClient::TriggerResubscriptionForLivenessTimeout(CHIP_ERROR aReason)
