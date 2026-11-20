@@ -743,6 +743,8 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
 
 void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::DiscoveredNodeData & nodeData)
 {
+    VerifyOrReturn(mWaitingForDiscovery[kIPTransport]);
+
     if (!NodeMatchesCurrentFilter(nodeData))
     {
         return;
