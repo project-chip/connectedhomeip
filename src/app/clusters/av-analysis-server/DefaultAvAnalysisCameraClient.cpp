@@ -478,7 +478,7 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::SendPendingCommand()
     // must not be replaced while a previous one's callbacks can still fire.
     VerifyOrReturnError(!mCommandSender, CHIP_ERROR_INCORRECT_STATE);
 
-    mCommandSender = Platform::MakeUnique<CommandSender>(this, &mRequest.ExchangeManager());
+    mCommandSender = Platform::MakeUnique<CommandSender>(this, &mRequest.ExchangeManager(), mRequest.Session().Value());
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Recorded before sending: a send can dispatch the interaction's completion synchronously, and

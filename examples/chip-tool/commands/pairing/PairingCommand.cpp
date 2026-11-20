@@ -1031,7 +1031,7 @@ void PairingCommand::OnProxyDeviceConnected(void * context, chip::Messaging::Exc
     self->mProxySession.Grab(sessionHandle);
 
     // Step 2: send ProxyConnectRequest to the proxy.
-    auto cmdSender = chip::Platform::MakeUnique<chip::app::CommandSender>(self, &exchangeMgr);
+    auto cmdSender = chip::Platform::MakeUnique<chip::app::CommandSender>(self, &exchangeMgr, sessionHandle);
     if (!cmdSender)
     {
         ChipLogError(chipTool, "PairViaProxy: failed to allocate CommandSender");
@@ -1332,7 +1332,7 @@ void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr, bool aCancelPending
 
     // Allocate only once the local session is retired: releasing the CASE session while
     // the transport is still active would leave nothing able to deactivate it.
-    auto cmdSender = chip::Platform::MakeUnique<chip::app::CommandSender>(this, mProxyExchangeMgr);
+    auto cmdSender = chip::Platform::MakeUnique<chip::app::CommandSender>(this, mProxyExchangeMgr, mProxySession.Get().Value());
     if (cmdSender == nullptr)
     {
         ChipLogError(chipTool, "PairViaProxy: failed to allocate CommandSender for ProxyDisconnectRequest");
@@ -1391,8 +1391,9 @@ CHIP_ERROR PairingCommand::SendProxyMessageRequest(uint16_t sessionId,
 
     // Allow large payload so that commissioning messages fit inside ProxyMessageRequest.
     auto cmdSender =
-        chip::Platform::MakeUnique<chip::app::CommandSender>(this, mProxyExchangeMgr, /* aIsTimedRequest */ false,
-                                                             /* aSuppressResponse */ false, /* aAllowLargePayload */ true);
+        chip::Platform::MakeUnique<chip::app::CommandSender>(this, mProxyExchangeMgr, mProxySession.Get().Value(),
+                                                             /* aIsTimedRequest */ false, /* aSuppressResponse */ false,
+                                                             /* aAllowLargePayload */ true);
     VerifyOrReturnError(cmdSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     Commands::ProxyMessageRequest::Type request;
