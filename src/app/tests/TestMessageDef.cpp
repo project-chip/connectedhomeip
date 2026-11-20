@@ -1739,6 +1739,32 @@ TEST_F(TestMessageDef, TestStatusIB)
     ParseStatusIB(StatusIBParser);
 }
 
+TEST_F(TestMessageDef, TestStatusIBMissingStatus)
+{
+    // Build a StatusIB that carries only the optional ClusterStatus field and omits the
+    // mandatory Status field. The encoder never produces this, but a peer can send it on
+    // the wire. Decoding must reject it rather than leave mStatus at its default (Success).
+    StatusIB::Parser statusIBParser;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+
+    chip::TLV::TLVType container;
+    EXPECT_SUCCESS(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, container));
+    EXPECT_SUCCESS(writer.Put(chip::TLV::ContextTag(StatusIB::Tag::kClusterStatus), static_cast<uint8_t>(1)));
+    EXPECT_SUCCESS(writer.EndContainer(container));
+
+    chip::System::PacketBufferHandle buf;
+    EXPECT_SUCCESS(writer.Finalize(&buf));
+
+    reader.Init(std::move(buf));
+    EXPECT_SUCCESS(reader.Next());
+    EXPECT_SUCCESS(statusIBParser.Init(reader));
+
+    StatusIB statusIB;
+    EXPECT_EQ(statusIBParser.DecodeStatusIB(statusIB), CHIP_ERROR_MISSING_TLV_ELEMENT);
+}
+
 TEST_F(TestMessageDef, TestEventStatusIB)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
