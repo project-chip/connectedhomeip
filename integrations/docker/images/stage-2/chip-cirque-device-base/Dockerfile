@@ -1,4 +1,5 @@
 FROM ubuntu:24.04
+LABEL org.opencontainers.image.source=https://github.com/project-chip/connectedhomeip
 
 ARG OT_BR_POSIX_CHECKOUT=main
 
