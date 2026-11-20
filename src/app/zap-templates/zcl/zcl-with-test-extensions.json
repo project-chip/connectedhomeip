@@ -678,12 +678,31 @@
             }
         ],
         "Meter Identification": [
-            "MeterType",
-            "PointOfDelivery",
-            "MeterSerialNumber",
-            "ProtocolVersion",
-            "PowerThreshold",
-            "FeatureMap"
+            "ClusterRevision",
+            {
+                "name": "MeterType",
+                "keepDefault": true
+            },
+            {
+                "name": "PointOfDelivery",
+                "keepDefault": true
+            },
+            {
+                "name": "MeterSerialNumber",
+                "keepDefault": true
+            },
+            {
+                "name": "ProtocolVersion",
+                "keepDefault": true
+            },
+            {
+                "name": "PowerThreshold",
+                "keepDefault": true
+            },
+            {
+                "name": "FeatureMap",
+                "keepDefault": true
+            }
         ],
         "Network Commissioning": [
             "ClusterRevision",
