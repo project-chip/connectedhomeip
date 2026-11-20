@@ -31,8 +31,13 @@ NS_ASSUME_NONNULL_BEGIN
 // MTRDeviceControllerDataStore.h includes C++ header, and so we need to declare the methods separately
 @protocol MTRDeviceControllerDataStoreAttributeStoreMethods
 - (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByNodeID:(NSNumber *)nodeID;
+- (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByResumptionID:(NSData *)resumptionID;
+- (void)storeResumptionInfo:(MTRCASESessionResumptionInfo *)resumptionInfo;
+- (void)clearResumptionInfoForNodeID:(NSNumber *)nodeID;
+- (void)clearAllResumptionInfo;
 - (nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)getStoredClusterDataForNodeID:(NSNumber *)nodeID;
 - (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID;
+- (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData deviceData:(nullable NSDictionary<NSString *, id> *)deviceData forNodeID:(NSNumber *)nodeID;
 - (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID;
 - (void)clearAllStoredClusterData;
 - (void)unitTestPruneEmptyStoredClusterDataBranches;
@@ -45,6 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable MTRDeviceClusterData *)_fetchClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 - (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID;
 - (void)clearDeviceDataForNodeID:(NSNumber *)nodeID;
+- (NSString *)_deviceDataKeyForNodeID:(NSNumber *)nodeID;
 
 @property (readonly, nonatomic) NSArray<NSNumber *> * nodesWithStoredData;
 @end
