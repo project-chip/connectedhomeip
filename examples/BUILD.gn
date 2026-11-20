@@ -33,6 +33,13 @@ if (chip_build_tests) {
         "${chip_root}/examples/evse-app/evse-common/tests:tests-delegate",
       ]
     }
+
+    # The OTA provider example's tests build the app server and BDX into the test binary, so they run on hosts.
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+      tests +=
+          [ "${chip_root}/examples/ota-provider-app/ota-provider-common/tests" ]
+    }
+
     tests += [
       "${chip_root}/examples/all-devices-app/posix/app_options/tests",
       "${chip_root}/examples/all-devices-app/posix/emulated_network/tests",

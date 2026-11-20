@@ -420,7 +420,8 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
 
     __block NSFileHandle * readHandle;
     __block uint64_t imageSize;
-    __block uint64_t fileOffset;
+    // The requestor may resume an interrupted download, so the data is served from the offset it asks for.
+    __block uint64_t fileOffset = 0;
     __block uint64_t transferBlockSize;
     __block uint32_t lastBlockIndex = UINT32_MAX;
 
@@ -443,8 +444,6 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
         XCTAssertEqualObjects(nodeID, nodeID);
         XCTAssertEqual(controller, sController);
         XCTAssertEqualObjects(fileDesignator, imagePath);
-        // chip-ota-requestor-app always starts its download at offset 0.
-        XCTAssertEqualObjects(offset, @(0));
         fileOffset = offset.unsignedLongLongValue;
 
         readHandle = [NSFileHandle fileHandleForReadingAtPath:fileDesignator];
@@ -1153,7 +1152,10 @@ static BOOL sStackInitRan = NO;
                                                   applyUpdateAction:MTROTASoftwareUpdateProviderApplyUpdateActionDiscontinue
                                          bytesToSkipAfterFirstBlock:bytesToSkip
                                                            testcase:self];
-    // The downloaded image is missing the skipped bytes, so it must not be applied.
+    // The downloaded image is missing the skipped bytes, so it fails the requestor's check of its payload size and digest:
+    // the requestor ends the download as failed and never asks to apply it.  The provider still sees the transfer end
+    // normally, since the check runs after BlockAckEOF.
+    checker.applyUpdateRequestExpectation.inverted = YES;
     checker.notifyUpdateAppliedExpectation.inverted = YES;
 
     XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
@@ -1161,10 +1163,11 @@ static BOOL sStackInitRan = NO;
     [self waitForExpectations:@[ checker.queryExpectation, checker.bdxBeginExpectation, checker.bdxQueryExpectation ]
                       timeout:(kTimeoutWithUpdateInSeconds) enforceOrder:YES];
 
-    [self waitForExpectations:@[ checker.bdxEndExpectation, checker.applyUpdateRequestExpectation, announceResponseExpectation ]
-                      timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ checker.bdxEndExpectation, announceResponseExpectation ] timeout:kTimeoutInSeconds];
 
-    [self waitForExpectations:@[ checker.notifyUpdateAppliedExpectation ] timeout:kTimeoutInSeconds];
+    // Both are inverted: waiting fails the test if the requestor asks to apply the image or reports it applied.
+    [self waitForExpectations:@[ checker.applyUpdateRequestExpectation, checker.notifyUpdateAppliedExpectation ]
+                      timeout:kTimeoutInSeconds];
 }
 
 - (void)test004b_DoBDXTransferWithBlockQueryWithSkip
@@ -1299,6 +1302,8 @@ static BOOL sStackInitRan = NO;
 
     __block NSFileHandle * readHandle;
     __block uint64_t imageSize;
+    // The requestor may resume an interrupted download, so the data is served from the offset it asks for.
+    __block uint64_t startOffset = 0;
     __block uint32_t lastBlockIndex = UINT32_MAX;
     const uint16_t busyDelay = 30; // 30 second
 
@@ -1334,7 +1339,7 @@ static BOOL sStackInitRan = NO;
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
         XCTAssertEqual(controller, sController);
         XCTAssertEqualObjects(fileDesignator, imagePath1);
-        XCTAssertEqualObjects(offset, @(0));
+        startOffset = offset.unsignedLongLongValue;
 
         readHandle = [NSFileHandle fileHandleForReadingAtPath:fileDesignator];
         XCTAssertNotNil(readHandle);
@@ -1382,7 +1387,7 @@ static BOOL sStackInitRan = NO;
         XCTAssertTrue(blockSize.unsignedLongLongValue < imageSize);
 
         XCTAssertNotNil(readHandle);
-        uint64_t offset = blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
+        uint64_t offset = startOffset + blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
         NSError * seekError = nil;
         [readHandle seekToOffset:offset error:&seekError];
         XCTAssertNil(seekError);
@@ -1437,7 +1442,7 @@ static BOOL sStackInitRan = NO;
             XCTAssertEqualObjects(nodeID, @(kDeviceId2));
             XCTAssertEqual(controller, sController);
             XCTAssertEqualObjects(fileDesignator, imagePath2);
-            XCTAssertEqualObjects(offset, @(0));
+            startOffset = offset.unsignedLongLongValue;
 
             readHandle = [NSFileHandle fileHandleForReadingAtPath:fileDesignator];
             XCTAssertNotNil(readHandle);
@@ -1460,7 +1465,7 @@ static BOOL sStackInitRan = NO;
             XCTAssertTrue(blockSize.unsignedLongLongValue < imageSize);
 
             XCTAssertNotNil(readHandle);
-            uint64_t offset = blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
+            uint64_t offset = startOffset + blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
             NSError * seekError = nil;
             [readHandle seekToOffset:offset error:&seekError];
             XCTAssertNil(seekError);
