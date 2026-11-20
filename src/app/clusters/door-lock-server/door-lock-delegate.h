@@ -273,6 +273,11 @@ public:
     /**
      * @brief Create/modify/clear a credential. A status of kAvailable deletes
      * the credential (credential data may be an empty span then).
+     *
+     * When a set of credentials is deleted as part of clearing a user record,
+     * the delegate should treat the batch atomically: on a failure, restoring
+     * the already deleted credentials keeps the user record and its credential
+     * set from diverging.
      */
     virtual bool SetCredential(CredentialIndex credentialIndex, FabricIndex creator, FabricIndex modifier,
                                DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,

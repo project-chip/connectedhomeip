@@ -29,6 +29,7 @@
 #include <clusters/DoorLock/Events.h>
 #include <clusters/DoorLock/Metadata.h>
 #include <clusters/DoorLock/Structs.h>
+#include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
@@ -83,7 +84,9 @@ struct OptionalAttributes
 /// attributes describe the physical lock and must match the actual hardware.
 struct Config
 {
-    explicit Config(TimerDelegate & timerDelegateIn) : timerDelegate(timerDelegateIn) {}
+    explicit Config(TimerDelegate & timerDelegateIn, FabricTable & fabricTableIn) :
+        timerDelegate(timerDelegateIn), fabricTable(fabricTableIn)
+    {}
 
     // ---- Feature configuration ----------------------------------------------
     BitFlags<Feature> features;
@@ -151,6 +154,10 @@ struct Config
 
     /// Timer delegate used for auto-relock scheduling and monotonic timestamps.
     TimerDelegate & timerDelegate;
+
+    /// Fabric table the cluster registers its fabric-removal observer with
+    /// ([USR] feature).
+    FabricTable & fabricTable;
 };
 
 /**
@@ -168,7 +175,7 @@ class DoorLockCluster : public DefaultServerCluster
 public:
     DoorLockCluster(EndpointId endpointId, Delegate & delegate, const Config & config);
 
-    ~DoorLockCluster() override = default;
+    ~DoorLockCluster() override;
 
     // ---- ServerClusterInterface implementation --------------------------------
 
@@ -190,6 +197,8 @@ public:
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
     // ---- Application-facing API ------------------------------------------------
 
@@ -312,6 +321,27 @@ private:
     };
     AutoRelockTimerContext mAutoRelockTimerContext;
 
+    /// FabricTable observer that reclaims this endpoint's user records when a
+    /// fabric used for a user record is removed. Kept as a composed observer
+    /// (not a base class): deriving from FabricTable::Delegate would inject
+    /// its "Delegate" name into the class scope, shadowing DoorLock::Delegate
+    /// for the delegate member declarations.
+    class FabricTableObserver : public FabricTable::Delegate
+    {
+    public:
+        explicit FabricTableObserver(DoorLockCluster & clusterIn) : mCluster(clusterIn) {}
+        void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+        {
+            mCluster.OnFabricRemoved(fabricIndex);
+        }
+
+    private:
+        DoorLockCluster & mCluster;
+    };
+    FabricTableObserver mFabricTableObserver;
+
+    FabricTable & mFabricTable;
+
     // ---- Internal helpers -----------------------------------------------------------
 
     using DelegateLockOpHandler = std::optional<OperationErrorEnum> (Delegate::*)(const LockOperationRequest &);
@@ -324,9 +354,9 @@ private:
 
     void HandleSetUser(const DataModel::InvokeRequest & request, const Commands::SetUser::DecodableType & commandData,
                        CommandHandler * handler, const ConcreteCommandPath & path);
-    void HandleGetUser(const DataModel::InvokeRequest & request, uint16_t userIndex, CommandHandler * handler,
+    void HandleGetUser(const DataModel::InvokeRequest & request, UserIndex userIndex, CommandHandler * handler,
                        const ConcreteCommandPath & path);
-    void HandleClearUser(const DataModel::InvokeRequest & request, uint16_t userIndex, CommandHandler * handler,
+    void HandleClearUser(const DataModel::InvokeRequest & request, UserIndex userIndex, CommandHandler * handler,
                          const ConcreteCommandPath & path);
     // ---- Command helpers (ported from the ember implementation) -----------------
 
@@ -343,44 +373,48 @@ private:
     bool SupportsAliroProvisioning() const { return mFeatures.Has(Feature::kAliroProvisioning); }
     bool SupportsAliroBLEUWB() const { return mFeatures.Has(Feature::kAliroBLEUWB); }
 
-    bool UserIndexValid(uint16_t userIndex) const;
-    bool UserIndexValid(uint16_t userIndex, uint16_t & maxNumberOfUsers) const;
-    bool UserExists(uint16_t userIndex) const;
+    bool UserIndexValid(UserIndex userIndex) const;
+    bool UserIndexValid(UserIndex userIndex, uint16_t & maxNumberOfUsers) const;
+    bool UserExists(UserIndex userIndex) const;
 
-    bool FindOccupiedUserSlot(uint16_t startIndex, uint16_t & userIndex) const;
-    bool FindUnoccupiedUserSlot(uint16_t & userIndex) const;
-    bool FindUnoccupiedUserSlot(uint16_t startIndex, uint16_t & userIndex) const;
+    /// Sets userIndex to the first occupied slot at or after startIndex, or the
+    /// invalid index when no occupied slot exists. Returns CHIP_ERROR_INTERNAL
+    /// on a delegate lookup failure so callers can distinguish it from "no more
+    /// users".
+    CHIP_ERROR FindOccupiedUserSlot(UserIndex startIndex, UserIndex & userIndex) const;
+    bool FindUnoccupiedUserSlot(UserIndex & userIndex) const;
+    bool FindUnoccupiedUserSlot(UserIndex startIndex, UserIndex & userIndex) const;
     bool WeekDayIndexValid(uint8_t weekDayIndex) const;
     bool YearDayIndexValid(uint8_t yearDayIndex) const;
     bool HolidayIndexValid(uint8_t holidayIndex) const;
     bool IsUserScheduleRestricted(const UserInfo & user) const;
 
     chip::Protocols::InteractionModel::ClusterStatusCode
-    CreateUser(FabricIndex creatorFabricIdx, NodeId sourceNodeId, uint16_t userIndex,
+    CreateUser(FabricIndex creatorFabricIdx, NodeId sourceNodeId, UserIndex userIndex,
                const DataModel::Nullable<CharSpan> & userName, const DataModel::Nullable<uint32_t> & userUniqueId,
                const DataModel::Nullable<UserStatusEnum> & userStatus, const DataModel::Nullable<UserTypeEnum> & userType,
                const DataModel::Nullable<CredentialRuleEnum> & credentialRule,
                const DataModel::Nullable<CredentialStruct> & credential = DataModel::Nullable<CredentialStruct>());
-    chip::Protocols::InteractionModel::Status ModifyUser(FabricIndex modifierFabricIndex, NodeId sourceNodeId, uint16_t userIndex,
+    chip::Protocols::InteractionModel::Status ModifyUser(FabricIndex modifierFabricIndex, NodeId sourceNodeId, UserIndex userIndex,
                                                          const DataModel::Nullable<CharSpan> & userName,
                                                          const DataModel::Nullable<uint32_t> & userUniqueId,
                                                          const DataModel::Nullable<UserStatusEnum> & userStatus,
                                                          const DataModel::Nullable<UserTypeEnum> & userType,
                                                          const DataModel::Nullable<CredentialRuleEnum> & credentialRule);
-    chip::Protocols::InteractionModel::Status ClearUser(FabricIndex modifierFabricId, NodeId sourceNodeId, uint16_t userIndex,
+    chip::Protocols::InteractionModel::Status ClearUser(FabricIndex modifierFabricId, NodeId sourceNodeId, UserIndex userIndex,
                                                         const UserInfo & user, bool sendUserChangeEvent);
-    chip::Protocols::InteractionModel::Status ClearUser(FabricIndex modifierFabricId, NodeId sourceNodeId, uint16_t userIndex,
+    chip::Protocols::InteractionModel::Status ClearUser(FabricIndex modifierFabricId, NodeId sourceNodeId, UserIndex userIndex,
                                                         bool sendUserChangeEvent);
 
     chip::Protocols::InteractionModel::Status ClearCredentials(FabricIndex modifier, NodeId sourceNodeId);
     chip::Protocols::InteractionModel::Status ClearCredentials(FabricIndex modifier, NodeId sourceNodeId,
                                                                CredentialTypeEnum credentialType);
     bool ClearFabricFromUsers(FabricIndex fabricIndex) const;
-    chip::app::Clusters::DoorLock::DlStatus ClearWeekDaySchedule(uint16_t userIndex, uint8_t weekDayIndex) const;
-    DlStatus ClearWeekDaySchedules(uint16_t userIndex) const;
-    DlStatus ClearSchedules(uint16_t userIndex) const;
-    chip::app::Clusters::DoorLock::DlStatus ClearYearDaySchedule(uint16_t userIndex, uint8_t yearDayIndex) const;
-    DlStatus ClearYearDaySchedules(uint16_t userIndex) const;
+    chip::app::Clusters::DoorLock::DlStatus ClearWeekDaySchedule(UserIndex userIndex, ScheduleIndex weekDayIndex) const;
+    DlStatus ClearWeekDaySchedules(UserIndex userIndex) const;
+    DlStatus ClearSchedules(UserIndex userIndex) const;
+    chip::app::Clusters::DoorLock::DlStatus ClearYearDaySchedule(UserIndex userIndex, ScheduleIndex yearDayIndex) const;
+    DlStatus ClearYearDaySchedules(UserIndex userIndex) const;
     DlStatus ClearHolidaySchedule(uint8_t holidayIndex) const;
     DlStatus ClearHolidaySchedules() const;
 
@@ -391,7 +425,11 @@ private:
     void LoadPersistentAttributes(ServerClusterContext & context);
 
     /// Stores LockState into the attribute persistence storage.
-    void StoreLockState() const;
+    CHIP_ERROR StoreLockState() const;
+
+    /// Reclaims the user records that fabricIndex created or last modified.
+    /// Invoked by the fabric table observer on fabric removal.
+    void OnFabricRemoved(FabricIndex fabricIndex);
 
     // ---- Response encoding helpers ------------------------------------------------
 

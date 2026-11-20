@@ -26,6 +26,7 @@
 #include <lib/support/TimerDelegateMock.h>
 #include <pw_unit_test/framework.h>
 
+#include <app/server/Server.h>
 #include <lib/support/CHIPMem.h>
 
 #include <cstring>
@@ -133,9 +134,9 @@ public:
     }
 };
 
-Config BasicConfig(TimerDelegate & timerDelegate)
+Config BasicConfig(TimerDelegate & timerDelegate, FabricTable & fabricTable)
 {
-    Config config(timerDelegate);
+    Config config(timerDelegate, fabricTable);
     return config;
 }
 
@@ -159,9 +160,9 @@ public:
     int mStartCount  = 0;
 };
 
-Config FeaturedConfig(TimerDelegate & timerDelegate)
+Config FeaturedConfig(TimerDelegate & timerDelegate, FabricTable & fabricTable)
 {
-    Config config(timerDelegate);
+    Config config(timerDelegate, fabricTable);
     config.features.Set(Feature::kPinCredential).Set(Feature::kUser).Set(Feature::kDoorPositionSensor).Set(Feature::kUnbolt);
     config.optionalAttributes.language                     = true;
     config.optionalAttributes.ledSettings                  = true;
@@ -183,9 +184,9 @@ Config FeaturedConfig(TimerDelegate & timerDelegate)
 /// PIN-only config without the USR feature, so SendPINOverTheAir exists
 /// (it is only present when the User feature is NOT supported and PIN is,
 /// and its optional attribute flag is set).
-Config PinWithoutUserConfig(TimerDelegate & timerDelegate)
+Config PinWithoutUserConfig(TimerDelegate & timerDelegate, FabricTable & fabricTable)
 {
-    Config config(timerDelegate);
+    Config config(timerDelegate, fabricTable);
     config.features.Set(Feature::kPinCredential);
     config.optionalAttributes.sendPINOverTheAir = true;
     config.numberOfPINUsersSupported            = 10;
@@ -197,9 +198,9 @@ Config PinWithoutUserConfig(TimerDelegate & timerDelegate)
 }
 
 /// Aliro config: ALIRO provisioning with BLE UWB.
-Config AliroConfig(TimerDelegate & timerDelegate)
+Config AliroConfig(TimerDelegate & timerDelegate, FabricTable & fabricTable)
 {
-    Config config(timerDelegate);
+    Config config(timerDelegate, fabricTable);
     config.features.Set(Feature::kAliroProvisioning).Set(Feature::kAliroBLEUWB);
     return config;
 }
@@ -211,7 +212,9 @@ public:
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    TestDoorLockClusterBasic() : mCluster(kTestEndpointId, mDelegate, BasicConfig(mTimerDelegate)) {}
+    TestDoorLockClusterBasic() :
+        mCluster(kTestEndpointId, mDelegate, BasicConfig(mTimerDelegate, chip::Server::GetInstance().GetFabricTable()))
+    {}
 
     void SetUp() override { ASSERT_EQ(mCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR); }
 
@@ -228,7 +231,9 @@ public:
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    TestDoorLockClusterFeatured() : mCluster(kTestEndpointId, mDelegate, FeaturedConfig(mTimerDelegate)) {}
+    TestDoorLockClusterFeatured() :
+        mCluster(kTestEndpointId, mDelegate, FeaturedConfig(mTimerDelegate, chip::Server::GetInstance().GetFabricTable()))
+    {}
 
     void SetUp() override { ASSERT_EQ(mCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR); }
 
@@ -294,6 +299,9 @@ TEST_F(TestDoorLockClusterBasic, FeatureGatedCommandsAreAbsent)
     {
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::UnsupportedCommand);
     }
+
+    // No command implemented by this stage produces a response without USR.
+    EXPECT_TRUE(Testing::IsGeneratedCommandsListEqualTo(mCluster, {}));
 }
 
 TEST_F(TestDoorLockClusterBasic, LockDoorWithoutHardwareSupportFails)
@@ -302,7 +310,8 @@ TEST_F(TestDoorLockClusterBasic, LockDoorWithoutHardwareSupportFails)
     // command reports Failure and a LockOperationError event is emitted.
     RejectingDelegate rejectingDelegate;
     TimerDelegateMock timerDelegate;
-    DoorLockCluster cluster(kTestEndpointId, rejectingDelegate, BasicConfig(timerDelegate));
+    DoorLockCluster cluster(kTestEndpointId, rejectingDelegate,
+                            BasicConfig(timerDelegate, chip::Server::GetInstance().GetFabricTable()));
     ClusterTester rejectingTester(cluster);
     ASSERT_EQ(cluster.Startup(rejectingTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -499,7 +508,8 @@ TEST_F(TestDoorLockClusterFeatured, RescheduledAutoRelockCancelsPendingTimer)
     // TimerDelegate::StartTimer requires cancelling a pending timer for the
     // same context first: a re-schedule must replace the previous auto-relock.
     TrackingTimerDelegate timerDelegate;
-    DoorLockCluster cluster(kTestEndpointId, mDelegate, FeaturedConfig(timerDelegate));
+    DoorLockCluster cluster(kTestEndpointId, mDelegate,
+                            FeaturedConfig(timerDelegate, chip::Server::GetInstance().GetFabricTable()));
     ClusterTester relockTester(cluster);
     ASSERT_EQ(cluster.Startup(relockTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -584,7 +594,9 @@ public:
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    TestDoorLockClusterAliro() : mCluster(kTestEndpointId, mDelegate, AliroConfig(mTimerDelegate)) {}
+    TestDoorLockClusterAliro() :
+        mCluster(kTestEndpointId, mDelegate, AliroConfig(mTimerDelegate, chip::Server::GetInstance().GetFabricTable()))
+    {}
 
     void SetUp() override { ASSERT_EQ(mCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR); }
 
@@ -607,7 +619,8 @@ TEST_F(TestDoorLockClusterFeatured, SendPINOverTheAirPresentWithoutUserFeature)
 {
     // With PIN but without USR, SendPINOverTheAir is present and writable.
     TrackingTimerDelegate timerDelegate;
-    DoorLockCluster cluster(kTestEndpointId, mDelegate, PinWithoutUserConfig(timerDelegate));
+    DoorLockCluster cluster(kTestEndpointId, mDelegate,
+                            PinWithoutUserConfig(timerDelegate, chip::Server::GetInstance().GetFabricTable()));
     ClusterTester pinTester(cluster);
     ASSERT_EQ(cluster.Startup(pinTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -691,54 +704,59 @@ constexpr uint8_t kStorageCredentialsPerUser = 5;
 class StorageDelegate : public TestDelegateBase
 {
 public:
-    bool GetUser(uint16_t userIndex, UserInfo & user) const override
+    bool GetUser(UserIndex userIndex, UserInfo & user) const override
     {
-        VerifyOrReturnValue(userIndex >= 1 && userIndex <= kStorageUsers, false);
-        user = mUsers[userIndex - 1];
+        VerifyOrReturnValue(userIndex.IsWithin(static_cast<uint16_t>(kStorageUsers)), false);
+        user = mUsers[userIndex.ZeroBased()];
         return true;
     }
 
-    bool SetUser(uint16_t userIndex, FabricIndex creator, FabricIndex modifier, const CharSpan & userName, uint32_t uniqueId,
+    bool SetUser(UserIndex userIndex, FabricIndex creator, FabricIndex modifier, const CharSpan & userName, uint32_t uniqueId,
                  UserStatusEnum userStatus, UserTypeEnum userType, CredentialRuleEnum credentialRule,
                  const CredentialStruct * credentials, size_t totalCredentials) override
     {
-        VerifyOrReturnValue(userIndex >= 1 && userIndex <= kStorageUsers, false);
+        VerifyOrReturnValue(userIndex.IsWithin(static_cast<uint16_t>(kStorageUsers)), false);
         // Copy the credentials into owned storage: callers pass buffers that
         // may go out of scope (or get modified) right after this call.
         VerifyOrReturnValue(totalCredentials == 0 || (credentials != nullptr && totalCredentials <= kStorageCredentialsPerUser),
                             false);
-        auto & user = mUsers[userIndex - 1];
+        auto & user     = mUsers[userIndex.ZeroBased()];
+        const auto zero = userIndex.ZeroBased();
         VerifyOrReturnValue(userName.size() <= kDoorLockMaxUsernameSize, false);
-        memcpy(mUserNames[userIndex - 1], userName.data(), userName.size());
-        user.userName       = CharSpan(mUserNames[userIndex - 1], userName.size());
-        user.userUniqueId   = uniqueId;
-        user.userStatus     = userStatus;
-        user.userType       = userType;
-        user.credentialRule = credentialRule;
-        user.createdBy      = creator;
-        user.lastModifiedBy = modifier;
+        memcpy(mUserNames[zero], userName.data(), userName.size());
+        user.userName           = CharSpan(mUserNames[zero], userName.size());
+        user.userUniqueId       = uniqueId;
+        user.userStatus         = userStatus;
+        user.userType           = userType;
+        user.credentialRule     = credentialRule;
+        user.creationSource     = DlAssetSource::kMatterIM;
+        user.createdBy          = creator;
+        user.modificationSource = DlAssetSource::kMatterIM;
+        user.lastModifiedBy     = modifier;
         for (size_t i = 0; i < totalCredentials; i++)
         {
-            mUserCredentialsBacking[userIndex - 1][i] = credentials[i];
+            mUserCredentialsBacking[zero][i] = credentials[i];
         }
-        user.credentials = Span<const CredentialStruct>(mUserCredentialsBacking[userIndex - 1], totalCredentials);
+        user.credentials = Span<const CredentialStruct>(mUserCredentialsBacking[zero], totalCredentials);
         return true;
     }
 
-    bool GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType, CredentialInfo & credential) const override
+    bool GetCredential(CredentialIndex credentialIndex, CredentialTypeEnum credentialType,
+                       CredentialInfo & credential) const override
     {
         // Storage is shared between PIN and RFID; the index range is the same.
-        VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex), false);
-        credential = mCredentials[credentialIndex];
+        VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex.OneBased()), false);
+        credential = mCredentials[credentialIndex.OneBased()];
         return true;
     }
 
-    bool SetCredential(uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier, DlCredentialStatus credentialStatus,
-                       CredentialTypeEnum credentialType, const ByteSpan & credentialData) override
+    bool SetCredential(CredentialIndex credentialIndex, FabricIndex creator, FabricIndex modifier,
+                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                       const ByteSpan & credentialData) override
     {
-        VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex), false);
+        VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex.OneBased()), false);
 
-        auto & slot = mCredentials[credentialIndex];
+        auto & slot = mCredentials[credentialIndex.OneBased()];
         if (credentialStatus == DlCredentialStatus::kAvailable)
         {
             slot = StorageCredentialInfo{};
@@ -757,10 +775,10 @@ public:
         return true;
     }
 
-    DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, WeekDaySchedule & schedule) const override
+    DlStatus GetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, WeekDaySchedule & schedule) const override
     {
-        VerifyOrReturnValue(IsValidScheduleIndex(weekDayIndex, userIndex), DlStatus::kFailure);
-        auto & slot = mWeekDaySchedules[userIndex - 1][weekDayIndex - 1];
+        VerifyOrReturnValue(IsValidScheduleIndex(weekDayIndex.OneBased(), userIndex.OneBased()), DlStatus::kFailure);
+        auto & slot = mWeekDaySchedules[userIndex.ZeroBased()][weekDayIndex.ZeroBased()];
         if (slot.status != DlScheduleStatus::kOccupied)
         {
             return DlStatus::kNotFound;
@@ -769,11 +787,11 @@ public:
         return DlStatus::kSuccess;
     }
 
-    DlStatus SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour,
-                         uint8_t startMinute, uint8_t endHour, uint8_t endMinute) override
+    DlStatus SetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, DlScheduleStatus status, DaysMaskMap daysMask,
+                         uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute) override
     {
-        VerifyOrReturnValue(IsValidScheduleIndex(weekDayIndex, userIndex), DlStatus::kFailure);
-        auto & slot = mWeekDaySchedules[userIndex - 1][weekDayIndex - 1];
+        VerifyOrReturnValue(IsValidScheduleIndex(weekDayIndex.OneBased(), userIndex.OneBased()), DlStatus::kFailure);
+        auto & slot = mWeekDaySchedules[userIndex.ZeroBased()][weekDayIndex.ZeroBased()];
         if (status == DlScheduleStatus::kAvailable && slot.status == DlScheduleStatus::kAvailable)
         {
             return DlStatus::kNotFound;
@@ -783,10 +801,10 @@ public:
         return DlStatus::kSuccess;
     }
 
-    DlStatus GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, YearDaySchedule & schedule) const override
+    DlStatus GetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, YearDaySchedule & schedule) const override
     {
-        VerifyOrReturnValue(IsValidScheduleIndex(yearDayIndex, userIndex), DlStatus::kFailure);
-        auto & slot = mYearDaySchedules[userIndex - 1][yearDayIndex - 1];
+        VerifyOrReturnValue(IsValidScheduleIndex(yearDayIndex.OneBased(), userIndex.OneBased()), DlStatus::kFailure);
+        auto & slot = mYearDaySchedules[userIndex.ZeroBased()][yearDayIndex.ZeroBased()];
         if (slot.status != DlScheduleStatus::kOccupied)
         {
             return DlStatus::kNotFound;
@@ -795,11 +813,11 @@ public:
         return DlStatus::kSuccess;
     }
 
-    DlStatus SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status, uint32_t localStartTime,
+    DlStatus SetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, DlScheduleStatus status, uint32_t localStartTime,
                          uint32_t localEndTime) override
     {
-        VerifyOrReturnValue(IsValidScheduleIndex(yearDayIndex, userIndex), DlStatus::kFailure);
-        auto & slot = mYearDaySchedules[userIndex - 1][yearDayIndex - 1];
+        VerifyOrReturnValue(IsValidScheduleIndex(yearDayIndex.OneBased(), userIndex.OneBased()), DlStatus::kFailure);
+        auto & slot = mYearDaySchedules[userIndex.ZeroBased()][yearDayIndex.ZeroBased()];
         if (status == DlScheduleStatus::kAvailable && slot.status == DlScheduleStatus::kAvailable)
         {
             return DlStatus::kNotFound;
@@ -809,10 +827,10 @@ public:
         return DlStatus::kSuccess;
     }
 
-    DlStatus GetSchedule(uint8_t holidayIndex, HolidaySchedule & schedule) const override
+    DlStatus GetSchedule(ScheduleIndex holidayIndex, HolidaySchedule & schedule) const override
     {
-        VerifyOrReturnValue(holidayIndex >= 1 && holidayIndex <= kStorageSchedules, DlStatus::kFailure);
-        auto & slot = mHolidaySchedules[holidayIndex - 1];
+        VerifyOrReturnValue(holidayIndex.IsWithin(static_cast<uint8_t>(kStorageSchedules)), DlStatus::kFailure);
+        auto & slot = mHolidaySchedules[holidayIndex.ZeroBased()];
         if (slot.status != DlScheduleStatus::kOccupied)
         {
             return DlStatus::kNotFound;
@@ -821,11 +839,11 @@ public:
         return DlStatus::kSuccess;
     }
 
-    DlStatus SetSchedule(uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
+    DlStatus SetSchedule(ScheduleIndex holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
                          OperatingModeEnum operatingMode) override
     {
-        VerifyOrReturnValue(holidayIndex >= 1 && holidayIndex <= kStorageSchedules, DlStatus::kFailure);
-        auto & slot = mHolidaySchedules[holidayIndex - 1];
+        VerifyOrReturnValue(holidayIndex.IsWithin(static_cast<uint8_t>(kStorageSchedules)), DlStatus::kFailure);
+        auto & slot = mHolidaySchedules[holidayIndex.ZeroBased()];
         if (status == DlScheduleStatus::kAvailable && slot.status == DlScheduleStatus::kAvailable)
         {
             return DlStatus::kNotFound;
@@ -879,7 +897,7 @@ private:
         HolidaySchedule schedule{};
     };
 
-    UserInfo mUsers[kStorageUsers];
+    UserInfo mUsers[kStorageUsers]{};
     char mUserNames[kStorageUsers][kDoorLockUsernameBufferSize];
     CredentialStruct mUserCredentialsBacking[kStorageUsers][kStorageCredentialsPerUser];
     StorageCredentialInfo mCredentials[kStorageCredentials + 1];
@@ -891,9 +909,9 @@ private:
 
 /// Storage config: PIN + RFID + user management + all schedules, capacities
 /// matching the storage delegate database.
-Config StorageConfig(TimerDelegate & timerDelegate)
+Config StorageConfig(TimerDelegate & timerDelegate, FabricTable & fabricTable)
 {
-    Config config(timerDelegate);
+    Config config(timerDelegate, fabricTable);
     config.features.Set(Feature::kPinCredential)
         .Set(Feature::kRfidCredential)
         .Set(Feature::kUser)
@@ -923,7 +941,9 @@ public:
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    TestDoorLockClusterStorage() : mCluster(kTestEndpointId, mDelegate, StorageConfig(mTimerDelegate)) {}
+    TestDoorLockClusterStorage() :
+        mCluster(kTestEndpointId, mDelegate, StorageConfig(mTimerDelegate, chip::Server::GetInstance().GetFabricTable()))
+    {}
 
     void SetUp() override { ASSERT_EQ(mCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR); }
 
@@ -933,9 +953,43 @@ public:
     ClusterTester tester{ mCluster };
 };
 
+namespace {
+
+void ExpectLockUserChangeEvent(ClusterTester & tester, DataOperationTypeEnum operation, uint16_t userIndex)
+{
+    auto event = tester.GetNextGeneratedEvent();
+    ASSERT_TRUE(event.has_value());
+    if (!event.has_value())
+    {
+        return;
+    }
+
+    Events::LockUserChange::DecodableType data;
+    ASSERT_EQ(event->GetEventData(data), CHIP_NO_ERROR);
+    EXPECT_EQ(data.lockDataType, LockDataTypeEnum::kUserIndex);
+    EXPECT_EQ(data.dataOperationType, operation);
+    ASSERT_FALSE(data.userIndex.IsNull());
+    EXPECT_EQ(data.userIndex.Value(), userIndex);
+}
+
+} // namespace
+
 // =============================================================================
 // User / credential / schedule / aliro command tests
 // =============================================================================
+
+TEST_F(TestDoorLockClusterBasic, StartupRejectsUserCapacityCollidingWithClearAll)
+{
+    // 0xFFFE is the ClearUser clear-all index: a user capacity reaching it
+    // cannot be addressed by a valid user index and would collide with the
+    // wildcard.
+    Config config(mTimerDelegate, chip::Server::GetInstance().GetFabricTable());
+    config.features.Set(Feature::kUser);
+    config.numberOfTotalUsersSupported = 0xFFFE;
+
+    DoorLockCluster collidingCluster(kTestEndpointId + 1, mDelegate, config);
+    EXPECT_NE(collidingCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+}
 
 TEST_F(TestDoorLockClusterBasic, UserManagementUnsupportedWithoutFeature)
 {
@@ -964,6 +1018,12 @@ TEST_F(TestDoorLockClusterBasic, UserManagementUnsupportedWithoutFeature)
     }
 }
 
+TEST_F(TestDoorLockClusterStorage, GeneratedCommandListContainsGetUserResponse)
+{
+    // GetUser is the only command accepted by this stage that has a response.
+    EXPECT_TRUE(Testing::IsGeneratedCommandsListEqualTo(mCluster, { Commands::GetUserResponse::Id }));
+}
+
 TEST_F(TestDoorLockClusterStorage, SetUserCreateModifyClearEmitsUserChangeEvents)
 {
     // Create user 1 with a name.
@@ -982,7 +1042,7 @@ TEST_F(TestDoorLockClusterStorage, SetUserCreateModifyClearEmitsUserChangeEvents
         EXPECT_EQ(createResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
     }
     EXPECT_EQ(mDelegate.OccupiedUsers(), 1u);
-    ASSERT_TRUE(tester.GetNextGeneratedEvent().has_value()); // LockUserChange (add)
+    ExpectLockUserChangeEvent(tester, DataOperationTypeEnum::kAdd, 1);
 
     // Creating on the same slot again reports the cluster-specific OCCUPIED (3).
     auto occupiedResult = tester.Invoke(Commands::SetUser::Id, request);
@@ -1007,7 +1067,7 @@ TEST_F(TestDoorLockClusterStorage, SetUserCreateModifyClearEmitsUserChangeEvents
         EXPECT_EQ(modifyUser.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
     }
     EXPECT_EQ(mDelegate.OccupiedUsers(), 1u);
-    ASSERT_TRUE(tester.GetNextGeneratedEvent().has_value()); // LockUserChange (modify)
+    ExpectLockUserChangeEvent(tester, DataOperationTypeEnum::kModify, 1);
 
     // Clear: the user goes away.
     Commands::ClearUser::Type clearRequest;
@@ -1019,7 +1079,7 @@ TEST_F(TestDoorLockClusterStorage, SetUserCreateModifyClearEmitsUserChangeEvents
         EXPECT_EQ(clearResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
     }
     EXPECT_EQ(mDelegate.OccupiedUsers(), 0u);
-    ASSERT_TRUE(tester.GetNextGeneratedEvent().has_value()); // LockUserChange (clear)
+    ExpectLockUserChangeEvent(tester, DataOperationTypeEnum::kClear, 1);
 }
 
 TEST_F(TestDoorLockClusterStorage, SetUserIndexBoundsAndInvalidStatus)
@@ -1060,6 +1120,7 @@ TEST_F(TestDoorLockClusterStorage, SetUserIndexBoundsAndInvalidStatus)
     {
         EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
     }
+    EXPECT_EQ(mDelegate.OccupiedUsers(), 0u);
 }
 
 TEST_F(TestDoorLockClusterStorage, GetUserResponseOnOccupiedAndEmptySlots)
@@ -1093,9 +1154,12 @@ TEST_F(TestDoorLockClusterStorage, GetUserResponseOnOccupiedAndEmptySlots)
         EXPECT_EQ(result.response->userIndex, 2u);
         EXPECT_TRUE(result.response->nextUserIndex.IsNull());
         ASSERT_FALSE(result.response->userName.IsNull());
-        EXPECT_EQ(result.response->userName.Value().size(), 3u);
+        EXPECT_TRUE(result.response->userName.Value().data_equal("bob"_span));
         ASSERT_FALSE(result.response->userUniqueID.IsNull());
         EXPECT_EQ(result.response->userUniqueID.Value(), 42u);
+        // SetUser records Matter as the creation and modification source.
+        EXPECT_FALSE(result.response->creatorFabricIndex.IsNull());
+        EXPECT_FALSE(result.response->lastModifiedFabricIndex.IsNull());
     }
 
     // Empty slot: fields stay null, only userIndex is set.
