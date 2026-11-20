@@ -18,8 +18,10 @@
 
 #include <set>
 #include <string.h>
+#include <string>
 #include <tuple>
 #include <utility>
+#include <vector>
 
 #include <pw_unit_test/framework.h>
 
@@ -139,15 +141,19 @@ class TestListener : public GroupDataProvider::GroupListener
 public:
     chip::FabricIndex fabric_index = kUndefinedFabricIndex;
     GroupInfo latest;
-    size_t added_count   = 0;
-    size_t removed_count = 0;
+    GroupId latest_modified = kUndefinedGroupId;
+    size_t added_count      = 0;
+    size_t removed_count    = 0;
+    size_t modified_count   = 0;
 
     void Reset()
     {
-        fabric_index  = kUndefinedFabricIndex;
-        latest        = GroupInfo();
-        added_count   = 0;
-        removed_count = 0;
+        fabric_index    = kUndefinedFabricIndex;
+        latest          = GroupInfo();
+        latest_modified = kUndefinedGroupId;
+        added_count     = 0;
+        removed_count   = 0;
+        modified_count  = 0;
     }
 
     void OnGroupAdded(chip::FabricIndex fabric, const GroupInfo & new_group) override
@@ -161,6 +167,12 @@ public:
         fabric_index = fabric;
         latest.Copy(old_group);
         removed_count++;
+    }
+    void OnGroupModified(chip::FabricIndex fabric, const GroupId & modified_group_id) override
+    {
+        fabric_index    = fabric;
+        latest_modified = modified_group_id;
+        modified_count++;
     }
 };
 static TestListener sListener;
@@ -1342,6 +1354,343 @@ TEST_F(TestGroupDataProvider, TestGroupDecryption)
     }
     EXPECT_EQ(count, total);
     it->Release();
+}
+
+TEST_F(TestGroupDataProvider, TestRemoveGroupInfoKeyMapLifecycleByMode)
+{
+    chip::TestPersistentStorageDelegate delegate;
+    chip::Crypto::DefaultSessionKeystore keystore;
+    GroupDataProviderImpl provider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+    TestListener listener;
+
+    provider.SetStorageDelegate(&delegate);
+    provider.SetSessionKeystore(&keystore);
+    provider.SetListener(&listener);
+    ASSERT_EQ(provider.Init(), CHIP_NO_ERROR);
+
+    // Legacy Groups mode (IsGroupcastEnabled() == false): GroupKeyMap lifecycle is independent of GroupInfo removal.
+    provider.SetGroupcastEnabled(false);
+    EXPECT_EQ(provider.SetGroupInfo(kFabric1, kGroupInfo1_1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.SetGroupKey(kFabric1, kGroup1, kKeysetId1), CHIP_NO_ERROR);
+    listener.Reset();
+
+    EXPECT_EQ(provider.RemoveGroupInfo(kFabric1, kGroup1), CHIP_NO_ERROR);
+    KeysetId retrievedKeyset = kInvalidKeysetId;
+    EXPECT_EQ(provider.GetGroupKey(kFabric1, kGroup1, retrievedKeyset), CHIP_NO_ERROR);
+    EXPECT_EQ(retrievedKeyset, kKeysetId1);
+    EXPECT_EQ(listener.removed_count, 1u);
+    EXPECT_EQ(listener.modified_count, 0u);
+    EXPECT_EQ(provider.RemoveGroupKeys(kFabric1), CHIP_NO_ERROR);
+
+    // Groupcast mode (IsGroupcastEnabled() == true): removing a group reclaims all matching KeyMapData entries
+    // and invalidates its active group sessions without emitting OnGroupModified.
+    provider.SetGroupcastEnabled(true);
+    EXPECT_EQ(provider.SetKeySet(kFabric1, kCompressedFabricId1, kKeySet1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.SetGroupInfo(kFabric1, kGroupInfo1_1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.SetGroupKey(kFabric1, kGroup1, kKeysetId1), CHIP_NO_ERROR);
+
+    auto * keyContext = provider.GetKeyContext(kFabric1, kGroup1);
+    ASSERT_NE(keyContext, nullptr);
+    const uint16_t group1SessionId = keyContext->GetKeyHash();
+    keyContext->Release();
+
+    auto * preRemoveSessionIter = provider.IterateGroupSessions(group1SessionId);
+    ASSERT_NE(preRemoveSessionIter, nullptr);
+    EXPECT_EQ(preRemoveSessionIter->Count(), 1u);
+    preRemoveSessionIter->Release();
+
+    EXPECT_EQ(provider.SetGroupInfo(kFabric1, kGroupInfo1_2), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.SetGroupKey(kFabric1, kGroup2, kKeysetId2), CHIP_NO_ERROR);
+
+    EXPECT_EQ(provider.SetGroupInfo(kFabric1, kGroupInfo1_3), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.AddEndpoint(kFabric1, kGroup3, kEndpointId1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.SetGroupKey(kFabric1, kGroup3, kKeysetId3), CHIP_NO_ERROR);
+
+    // Also insert duplicate mappings for kGroup4 via SetGroupKeyAt to verify all matching mappings are unlinked.
+    EXPECT_EQ(provider.SetGroupInfo(kFabric1, kGroupInfo3_4), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.SetGroupKeyAt(kFabric1, 3, GroupKey(kGroup4, kKeysetId1)), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.SetGroupKeyAt(kFabric1, 4, GroupKey(kGroup4, kKeysetId2)), CHIP_NO_ERROR);
+
+    listener.Reset();
+
+    EXPECT_EQ(provider.RemoveGroupInfo(kFabric1, kGroup1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.GetGroupKey(kFabric1, kGroup1, retrievedKeyset), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(listener.removed_count, 1u);
+    EXPECT_EQ(listener.modified_count, 0u);
+
+    auto * postRemoveSessionIter = provider.IterateGroupSessions(group1SessionId);
+    ASSERT_NE(postRemoveSessionIter, nullptr);
+    EXPECT_EQ(postRemoveSessionIter->Count(), 0u);
+    GroupSession staleSession;
+    EXPECT_FALSE(postRemoveSessionIter->Next(staleSession));
+    postRemoveSessionIter->Release();
+
+    EXPECT_EQ(provider.RemoveGroupInfoAt(kFabric1, 0), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.GetGroupKey(kFabric1, kGroup2, retrievedKeyset), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(listener.removed_count, 2u);
+    EXPECT_EQ(listener.modified_count, 0u);
+
+    EXPECT_EQ(provider.RemoveEndpoint(kFabric1, kGroup3, kEndpointId1, GroupDataProvider::GroupCleanupPolicy::kDeleteGroupIfEmpty),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(provider.GetGroupKey(kFabric1, kGroup3, retrievedKeyset), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(listener.removed_count, 3u);
+    EXPECT_EQ(listener.modified_count, 0u);
+
+    EXPECT_EQ(provider.RemoveGroupInfo(kFabric1, kGroup4), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.GetGroupKey(kFabric1, kGroup4, retrievedKeyset), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(listener.removed_count, 4u);
+    EXPECT_EQ(listener.modified_count, 0u);
+
+    auto * keyIter = provider.IterateGroupKeys(kFabric1);
+    ASSERT_NE(keyIter, nullptr);
+    EXPECT_EQ(keyIter->Count(), 0u);
+    keyIter->Release();
+
+    provider.Finish();
+}
+
+TEST_F(TestGroupDataProvider, TestSetGroupInfoAtPreservesEndpointsAndAuxAclAndReplacesCleanly)
+{
+    chip::TestPersistentStorageDelegate delegate;
+    chip::Crypto::DefaultSessionKeystore keystore;
+    GroupDataProviderImpl provider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+    TestListener listener;
+
+    provider.SetStorageDelegate(&delegate);
+    provider.SetSessionKeystore(&keystore);
+    provider.SetListener(&listener);
+    ASSERT_EQ(provider.Init(), CHIP_NO_ERROR);
+    provider.SetGroupcastEnabled(true);
+
+    GroupInfo initialGroup(kGroup1, "Initial");
+    EXPECT_EQ(provider.SetGroupInfoAt(kFabric1, 0, initialGroup), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.AddEndpoint(kFabric1, kGroup1, kEndpointId1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.AddEndpoint(kFabric1, kGroup1, kEndpointId2), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.SetGroupKey(kFabric1, kGroup1, kKeysetId1), CHIP_NO_ERROR);
+    EXPECT_FALSE(provider.ConsumeAuxAclNotificationNeeded());
+
+    listener.Reset();
+
+    // Updating an existing group at its current index preserves endpoints, sets AuxACL notification, and notifies modification.
+    GroupInfo updatedGroup(kGroup1, "Updated", static_cast<uint8_t>(GroupInfo::Flags::kHasAuxiliaryACL));
+    EXPECT_EQ(provider.SetGroupInfoAt(kFabric1, 0, updatedGroup), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(provider.HasEndpoint(kFabric1, kGroup1, kEndpointId1));
+    EXPECT_TRUE(provider.HasEndpoint(kFabric1, kGroup1, kEndpointId2));
+    EXPECT_TRUE(provider.ConsumeAuxAclNotificationNeeded());
+    EXPECT_FALSE(provider.ConsumeAuxAclNotificationNeeded());
+    EXPECT_EQ(listener.added_count, 0u);
+    EXPECT_EQ(listener.removed_count, 0u);
+    EXPECT_EQ(listener.modified_count, 1u);
+    EXPECT_EQ(listener.latest_modified, kGroup1);
+
+    // Appending a second group via SetGroupInfoAt must start with zero endpoints (not inherit kGroup1's first_endpoint).
+    GroupInfo secondGroup(kGroup2, "Second");
+    EXPECT_EQ(provider.SetGroupInfoAt(kFabric1, 1, secondGroup), CHIP_NO_ERROR);
+    EXPECT_FALSE(provider.HasEndpoint(kFabric1, kGroup2, kEndpointId1));
+
+    listener.Reset();
+
+    // Replacing index 0 with a new GroupId deletes kGroup1's endpoints and KeyMapData and triggers AuxACL notification.
+    GroupInfo replacementGroup(kGroup3, "Replacement");
+    EXPECT_EQ(provider.SetGroupInfoAt(kFabric1, 0, replacementGroup), CHIP_NO_ERROR);
+
+    GroupInfo retrieved;
+    EXPECT_EQ(provider.GetGroupInfo(kFabric1, kGroup1, retrieved), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(provider.GetGroupInfoAt(kFabric1, 0, retrieved), CHIP_NO_ERROR);
+    EXPECT_EQ(retrieved, replacementGroup);
+    EXPECT_FALSE(provider.HasEndpoint(kFabric1, kGroup1, kEndpointId1));
+    EXPECT_FALSE(provider.HasEndpoint(kFabric1, kGroup3, kEndpointId1));
+
+    auto * epIter = provider.IterateEndpoints(kFabric1);
+    ASSERT_NE(epIter, nullptr);
+    EXPECT_EQ(epIter->Count(), 0u);
+    epIter->Release();
+
+    KeysetId keysetId = kInvalidKeysetId;
+    EXPECT_EQ(provider.GetGroupKey(kFabric1, kGroup1, keysetId), CHIP_ERROR_NOT_FOUND);
+    EXPECT_TRUE(provider.ConsumeAuxAclNotificationNeeded());
+    EXPECT_EQ(listener.removed_count, 1u);
+    EXPECT_EQ(listener.added_count, 1u);
+    EXPECT_EQ(listener.modified_count, 0u);
+
+    // Replacing an index in legacy Groups mode deletes the replaced group's endpoints while retaining its KeyMapData.
+    provider.SetGroupcastEnabled(false);
+    EXPECT_EQ(provider.AddEndpoint(kFabric1, kGroup2, kEndpointId2), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.SetGroupKey(kFabric1, kGroup2, kKeysetId2), CHIP_NO_ERROR);
+
+    GroupInfo legacyReplacement(kGroup4, "LegacyReplace");
+    EXPECT_EQ(provider.SetGroupInfoAt(kFabric1, 1, legacyReplacement), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.GetGroupInfo(kFabric1, kGroup2, retrieved), CHIP_ERROR_NOT_FOUND);
+    EXPECT_FALSE(provider.HasEndpoint(kFabric1, kGroup2, kEndpointId2));
+    EXPECT_FALSE(provider.HasEndpoint(kFabric1, kGroup4, kEndpointId2));
+    EXPECT_EQ(provider.GetGroupKey(kFabric1, kGroup2, keysetId), CHIP_NO_ERROR);
+    EXPECT_EQ(keysetId, kKeysetId2);
+
+    provider.Finish();
+}
+
+class KeyTrackingStorageDelegate : public chip::TestPersistentStorageDelegate
+{
+public:
+    size_t GetDistinctKeysWrittenCount() const { return mDistinctKeysWritten.size(); }
+
+protected:
+    CHIP_ERROR SyncSetKeyValueInternal(const char * key, const void * value, uint16_t size) override
+    {
+        if (key != nullptr)
+        {
+            mDistinctKeysWritten.insert(key);
+        }
+        return TestPersistentStorageDelegate::SyncSetKeyValueInternal(key, value, size);
+    }
+
+private:
+    std::set<std::string> mDistinctKeysWritten;
+};
+
+TEST_F(TestGroupDataProvider, TestGroupKeyLinkIdReuseWithoutWrapAround)
+{
+    KeyTrackingStorageDelegate delegate;
+    chip::Crypto::DefaultSessionKeystore keystore;
+    constexpr uint16_t kLargeMaxGroups = 70;
+    GroupDataProviderImpl provider(kLargeMaxGroups, kMaxGroupKeysPerFabric);
+
+    provider.SetStorageDelegate(&delegate);
+    provider.SetSessionKeystore(&keystore);
+    ASSERT_EQ(provider.Init(), CHIP_NO_ERROR);
+    ASSERT_EQ(provider.SetKeySet(kFabric1, kCompressedFabricId1, kKeySet1), CHIP_NO_ERROR);
+    ASSERT_EQ(provider.SetKeySet(kFabric1, kCompressedFabricId1, kKeySet2), CHIP_NO_ERROR);
+
+    // Keep at least one mapping live across FIFO insertions and removals so the list never empties.
+    // Reusing freed slots keeps the total number of distinct KVS keys ever written constant (2 group-key slots),
+    // whereas a monotonic link-ID counter allocates a new KVS key on every cycle and eventually wraps uint16_t.
+    GroupId activeGroup = kMinApplicationGroupId;
+    ASSERT_EQ(provider.SetGroupKey(kFabric1, activeGroup, kKeysetId1), CHIP_NO_ERROR);
+
+    const GroupId secondGroup = static_cast<GroupId>(kMinApplicationGroupId + 1);
+    ASSERT_EQ(provider.SetGroupKey(kFabric1, secondGroup, kKeysetId2), CHIP_NO_ERROR);
+    ASSERT_EQ(provider.RemoveGroupKeyAt(kFabric1, 0), CHIP_NO_ERROR);
+    activeGroup = secondGroup;
+
+    const size_t baselineDistinctKeys = delegate.GetDistinctKeysWrittenCount();
+
+    constexpr uint32_t kChurnCycles = 512;
+    for (uint32_t cycle = 0; cycle < kChurnCycles; cycle++)
+    {
+        const GroupId nextGroup = (activeGroup == kMinApplicationGroupId) ? secondGroup : kMinApplicationGroupId;
+        ASSERT_EQ(provider.SetGroupKey(kFabric1, nextGroup, kKeysetId2), CHIP_NO_ERROR);
+        ASSERT_EQ(provider.RemoveGroupKeyAt(kFabric1, 0), CHIP_NO_ERROR);
+        activeGroup = nextGroup;
+    }
+
+    EXPECT_EQ(delegate.GetDistinctKeysWrittenCount(), baselineDistinctKeys);
+
+    auto * iter = provider.IterateGroupKeys(kFabric1);
+    ASSERT_NE(iter, nullptr);
+    EXPECT_EQ(iter->Count(), 1u);
+    GroupKey outKey;
+    EXPECT_TRUE(iter->Next(outKey));
+    EXPECT_EQ(outKey.group_id, activeGroup);
+    EXPECT_FALSE(iter->Next(outKey));
+    iter->Release();
+
+    ASSERT_EQ(provider.RemoveGroupKeyAt(kFabric1, 0), CHIP_NO_ERROR);
+
+    // Exercise the multi-window (> 64 simultaneous mappings) allocator and verify freed slots in both windows are reused.
+    constexpr uint16_t kSimultaneousCount = 68;
+    for (uint16_t offset = 0; offset < kSimultaneousCount; offset++)
+    {
+        const GroupId groupId = static_cast<GroupId>(kMinApplicationGroupId + offset);
+        ASSERT_EQ(provider.SetGroupKey(kFabric1, groupId, kKeysetId1), CHIP_NO_ERROR);
+    }
+
+    const size_t multiWindowDistinctKeys = delegate.GetDistinctKeysWrittenCount();
+
+    ASSERT_EQ(provider.RemoveGroupKeyAt(kFabric1, 0), CHIP_NO_ERROR);
+    ASSERT_EQ(provider.RemoveGroupKeyAt(kFabric1, 64), CHIP_NO_ERROR);
+    ASSERT_EQ(provider.SetGroupKey(kFabric1, static_cast<GroupId>(kMinApplicationGroupId + 100), kKeysetId2), CHIP_NO_ERROR);
+    ASSERT_EQ(provider.SetGroupKey(kFabric1, static_cast<GroupId>(kMinApplicationGroupId + 101), kKeysetId2), CHIP_NO_ERROR);
+
+    EXPECT_EQ(delegate.GetDistinctKeysWrittenCount(), multiWindowDistinctKeys);
+
+    iter = provider.IterateGroupKeys(kFabric1);
+    ASSERT_NE(iter, nullptr);
+    EXPECT_EQ(iter->Count(), kSimultaneousCount);
+    size_t visited = 0;
+    while (iter->Next(outKey))
+    {
+        visited++;
+    }
+    EXPECT_EQ(visited, kSimultaneousCount);
+    iter->Release();
+
+    provider.Finish();
+}
+
+TEST_F(TestGroupDataProvider, TestRemoveGroupInfoCompletesWhenGroupKeyRecordsFail)
+{
+    chip::TestPersistentStorageDelegate delegate;
+    chip::Crypto::DefaultSessionKeystore keystore;
+    GroupDataProviderImpl provider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+
+    provider.SetStorageDelegate(&delegate);
+    provider.SetSessionKeystore(&keystore);
+    ASSERT_EQ(provider.Init(), CHIP_NO_ERROR);
+    provider.SetGroupcastEnabled(true);
+
+    for (const GroupInfo * group : { &kGroupInfo1_1, &kGroupInfo1_2, &kGroupInfo1_3 })
+    {
+        ASSERT_EQ(provider.SetGroupInfo(kFabric1, *group), CHIP_NO_ERROR);
+        ASSERT_EQ(provider.SetGroupKey(kFabric1, group->group_id, kKeysetId1), CHIP_NO_ERROR);
+    }
+
+    // The link ID that a mapping record is stored under is internal to the provider, so find the records in storage.
+    std::vector<std::string> mappingRecords;
+    for (uint16_t linkId = 0; linkId <= kMaxGroupsPerFabric + 1; linkId++)
+    {
+        const std::string recordKey = DefaultStorageKeyAllocator::FabricGroupKey(kFabric1, linkId).KeyName();
+        if (delegate.HasKey(recordKey))
+        {
+            mappingRecords.push_back(recordKey);
+        }
+    }
+    ASSERT_EQ(mappingRecords.size(), 3u);
+
+    GroupInfo info;
+    KeysetId keysetId = kInvalidKeysetId;
+
+    // Writes and deletes of mapping records fail. The mapping of kGroup1 is the first of the list, so taking it out
+    // of the list writes no other mapping record: the mapping is gone even though its record cannot be deleted.
+    for (const std::string & recordKey : mappingRecords)
+    {
+        delegate.AddPoisonKey(recordKey, /* readPattern = */ -1, /* writePattern = */ 0);
+    }
+    EXPECT_EQ(provider.RemoveGroupInfo(kFabric1, kGroup1), CHIP_NO_ERROR);
+    delegate.ClearPoisonKeys();
+
+    EXPECT_EQ(provider.GetGroupInfo(kFabric1, kGroup1, info), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(provider.GetGroupKey(kFabric1, kGroup1, keysetId), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(provider.GetGroupKey(kFabric1, kGroup2, keysetId), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.GetGroupKey(kFabric1, kGroup3, keysetId), CHIP_NO_ERROR);
+
+    // Reads of mapping records fail. The group is still removed and the group list stays usable.
+    for (const std::string & recordKey : mappingRecords)
+    {
+        delegate.AddPoisonKey(recordKey, /* readPattern = */ 0, /* writePattern = */ -1);
+    }
+    EXPECT_EQ(provider.RemoveGroupInfo(kFabric1, kGroup2), CHIP_NO_ERROR);
+    delegate.ClearPoisonKeys();
+
+    EXPECT_EQ(provider.GetGroupInfo(kFabric1, kGroup2, info), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(provider.GetGroupInfo(kFabric1, kGroup3, info), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.GetGroupKey(kFabric1, kGroup3, keysetId), CHIP_NO_ERROR);
+
+    // With working storage, the mapping list is still usable: removing kGroup3 also removes its mapping.
+    EXPECT_EQ(provider.RemoveGroupInfo(kFabric1, kGroup3), CHIP_NO_ERROR);
+    EXPECT_EQ(provider.GetGroupKey(kFabric1, kGroup3, keysetId), CHIP_ERROR_NOT_FOUND);
+
+    provider.Finish();
 }
 
 } // namespace TestGroups

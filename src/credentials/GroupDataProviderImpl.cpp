@@ -52,12 +52,11 @@ struct LinkedData : public PersistableData<kPersistentBufferMax>
 
     LinkedData() = default;
     LinkedData(uint16_t linked_id) : id(linked_id) {}
-    uint16_t id     = kMinLinkId;
-    uint16_t index  = 0;
-    uint16_t next   = 0;
-    uint16_t prev   = 0;
-    uint16_t max_id = 0;
-    bool first      = true;
+    uint16_t id    = kMinLinkId;
+    uint16_t index = 0;
+    uint16_t next  = 0;
+    uint16_t prev  = 0;
+    bool first     = true;
 };
 
 struct FabricData : public PersistableData<kPersistentBufferMax>
@@ -93,6 +92,8 @@ struct FabricData : public PersistableData<kPersistentBufferMax>
     {
         first_group  = kUndefinedGroupId;
         group_count  = 0;
+        first_map    = 0;
+        map_count    = 0;
         first_keyset = kInvalidKeysetId;
         keyset_count = 0;
         next         = kUndefinedFabricIndex;
@@ -277,7 +278,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistableData<kPersist
     chip::GroupId prev              = 0;
     bool first                      = true;
 
-    GroupData() : GroupInfo(nullptr){};
+    GroupData() : GroupInfo(nullptr) {};
     GroupData(chip::FabricIndex fabric) : fabric_index(fabric) {}
     GroupData(chip::FabricIndex fabric, chip::GroupId group) : GroupInfo(group, nullptr), fabric_index(fabric) {}
 
@@ -412,7 +413,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
     chip::GroupId group_id         = kUndefinedGroupId;
     chip::KeysetId keyset_id       = 0;
 
-    KeyMapData(){};
+    KeyMapData() {};
     KeyMapData(chip::FabricIndex fabric, uint16_t link_id = 0, chip::GroupId group = kUndefinedGroupId, chip::KeysetId keyset = 0) :
         GroupKey(group, keyset), LinkedData(link_id), fabric_index(fabric)
     {}
@@ -462,7 +463,6 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
     {
         fabric_index = fabric.fabric_index;
         id           = fabric.first_map;
-        max_id       = 0;
         index        = 0;
         first        = true;
 
@@ -477,14 +477,12 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
                 // Target index found
                 return true;
             }
-            max_id = std::max(id, max_id);
-            first  = false;
-            prev   = id;
-            id     = next;
+            first = false;
+            prev  = id;
+            id    = next;
             index++;
         }
 
-        id = static_cast<uint16_t>(max_id + 1);
         return false;
     }
 
@@ -492,7 +490,6 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
     {
         fabric_index = fabric.fabric_index;
         id           = fabric.first_map;
-        max_id       = 0;
         index        = 0;
         first        = true;
 
@@ -507,14 +504,12 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
                 // Match found
                 return true;
             }
-            max_id = std::max(id, max_id);
-            first  = false;
-            prev   = id;
-            id     = next;
+            first = false;
+            prev  = id;
+            id    = next;
             index++;
         }
 
-        id = static_cast<uint16_t>(max_id + 1);
         return false;
     }
 
@@ -523,7 +518,6 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
     {
         fabric_index = fabric.fabric_index;
         id           = fabric.first_map;
-        max_id       = 0;
         index        = 0;
         first        = true;
 
@@ -538,15 +532,53 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
                 // Match found
                 return index;
             }
-            max_id = std::max(id, max_id);
-            first  = false;
-            prev   = id;
-            id     = next;
+            first = false;
+            prev  = id;
+            id    = next;
             index++;
         }
 
-        id = static_cast<uint16_t>(max_id + 1);
         return std::numeric_limits<size_t>::max();
+    }
+
+    // A KeyMapData record is stored under a 16-bit link ID that is not derived from its content, so a new record needs
+    // an ID that no record of the fabric uses. Returns the lowest such ID, or 0 if the list cannot be read.
+    //
+    // The list holds map_count records, so the map_count + 1 candidates in [kMinLinkId, map_count + 1] always include
+    // an unused ID. IDs therefore stay within the capacity of the list and cannot wrap around uint16_t.
+    //
+    // The capacity is a runtime value and the heap is not used, so the search tracks kIdsPerWalk candidates in a bitmap
+    // on the stack and walks the list once per kIdsPerWalk candidates: one walk for up to 63 mappings, and at most
+    // ceil((map_count + 1) / kIdsPerWalk) walks above that.
+    static uint16_t FindUnusedLinkId(PersistentStorageDelegate * storage, const FabricData & fabric)
+    {
+        constexpr uint32_t kIdsPerWalk = 64;
+        const uint32_t last_candidate  = static_cast<uint32_t>(fabric.map_count) + kMinLinkId;
+
+        for (uint32_t first_candidate = kMinLinkId; first_candidate <= last_candidate; first_candidate += kIdsPerWalk)
+        {
+            uint64_t used_ids = 0;
+            KeyMapData entry(fabric.fabric_index, fabric.first_map);
+            for (uint16_t visited = 0; visited < fabric.map_count; visited++)
+            {
+                VerifyOrReturnValue(CHIP_NO_ERROR == entry.Load(storage), 0);
+                if (entry.id >= first_candidate && (entry.id - first_candidate) < kIdsPerWalk)
+                {
+                    used_ids |= (uint64_t{ 1 } << (entry.id - first_candidate));
+                }
+                entry.id = entry.next;
+            }
+
+            for (uint32_t offset = 0; offset < kIdsPerWalk; offset++)
+            {
+                if ((used_ids & (uint64_t{ 1 } << offset)) == 0)
+                {
+                    return static_cast<uint16_t>(first_candidate + offset);
+                }
+            }
+        }
+
+        return 0;
     }
 };
 
@@ -563,9 +595,7 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, PersistableData<kPersist
 
     EndpointData() = default;
     EndpointData(chip::FabricIndex fabric, chip::GroupId group = kUndefinedGroupId,
-                 chip::EndpointId endpoint = kInvalidEndpointId) :
-        GroupEndpoint(group, endpoint),
-        fabric_index(fabric)
+                 chip::EndpointId endpoint = kInvalidEndpointId) : GroupEndpoint(group, endpoint), fabric_index(fabric)
     {}
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) const override
@@ -865,6 +895,22 @@ void GroupDataProviderImpl::SetStorageDelegate(PersistentStorageDelegate * stora
     mStorage = storage;
 }
 
+namespace {
+
+CHIP_ERROR SaveExistingGroupInfo(PersistentStorageDelegate * storage, GroupData & group, const GroupDataProvider::GroupInfo & info,
+                                 bool groupcast_enabled, bool & aux_acl_notification_needed)
+{
+    if (groupcast_enabled && group.endpoint_count > 0 && (group.HasAuxiliaryACL() != info.HasAuxiliaryACL()))
+    {
+        aux_acl_notification_needed = true;
+    }
+
+    group.Copy(info);
+    return group.Save(storage);
+}
+
+} // namespace
+
 //
 // Group Info
 //
@@ -882,14 +928,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, c
 
     if (group.Find(mStorage, fabric, info.group_id))
     {
-        // Existing group_id
-        if (IsGroupcastEnabled() && group.endpoint_count > 0 && (group.HasAuxiliaryACL() != info.HasAuxiliaryACL()))
-        {
-            mAuxAclNotificationNeeded = true;
-        }
-
-        group.Copy(info);
-        ReturnErrorOnFailure(group.Save(mStorage));
+        ReturnErrorOnFailure(SaveExistingGroupInfo(mStorage, group, info, IsGroupcastEnabled(), mAuxAclNotificationNeeded));
         GroupModified(fabric_index, info.group_id);
         return CHIP_NO_ERROR;
     }
@@ -923,6 +962,71 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfo(chip::FabricIndex fabric_index
     return RemoveGroupInfoAt(fabric_index, group.index);
 }
 
+namespace {
+
+void DeleteGroupEndpoints(PersistentStorageDelegate * storage, const GroupData & group)
+{
+    EndpointData endpoint(group.fabric_index, group.group_id, group.first_endpoint);
+    size_t count = 0;
+    while (count++ < group.endpoint_count)
+    {
+        if (CHIP_NO_ERROR != endpoint.Load(storage))
+        {
+            break;
+        }
+        LogErrorOnFailure(endpoint.Delete(storage));
+        endpoint.endpoint_id = endpoint.next;
+    }
+}
+
+// Takes all KeyMapData entries for group_id out of the list in `fabric`, without emitting GroupModified:
+// the GroupListener contract is that OnGroupModified is not called during group removal.
+//
+// `fabric` is changed in memory only. Each entry is taken out of the list before its record is deleted, so `fabric`
+// describes the stored list after any error. The caller must save `fabric` whether or not an error is returned,
+// with no return in between. A record whose delete fails stays in storage without a reference.
+CHIP_ERROR UnlinkGroupKeys(PersistentStorageDelegate * storage, FabricData & fabric, GroupId group_id)
+{
+    const uint16_t initial_map_count = fabric.map_count;
+    KeyMapData current(fabric.fabric_index, fabric.first_map);
+    uint16_t prev_id = 0;
+    bool at_head     = true;
+
+    for (uint16_t visited = 0; visited < initial_map_count; visited++)
+    {
+        ReturnErrorOnFailure(current.Load(storage));
+        const uint16_t next_id = current.next;
+
+        if (current.group_id == group_id)
+        {
+            if (at_head)
+            {
+                fabric.first_map = next_id;
+            }
+            else
+            {
+                KeyMapData prev_data(fabric.fabric_index, prev_id);
+                ReturnErrorOnFailure(prev_data.Load(storage));
+                prev_data.next = next_id;
+                ReturnErrorOnFailure(prev_data.Save(storage));
+            }
+            fabric.map_count--;
+            LogErrorOnFailure(current.Delete(storage));
+        }
+        else
+        {
+            at_head = false;
+            prev_id = current.id;
+        }
+
+        current.id = next_id;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
+
 CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, const GroupInfo & info)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
@@ -938,29 +1042,37 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     bool found = group.Find(mStorage, fabric, info.group_id);
     VerifyOrReturnError(!found || (group.index == index), CHIP_ERROR_DUPLICATE_KEY_ID);
 
-    group.Copy(info);
-    group.endpoint_count = 0;
-
     if (found)
     {
-        // Update existing entry
-        if (IsGroupcastEnabled() && group.endpoint_count > 0 && (group.HasAuxiliaryACL() != info.HasAuxiliaryACL()))
-        {
-            mAuxAclNotificationNeeded = true;
-        }
-        return group.Save(mStorage);
+        // Update existing entry while preserving its endpoint list
+        ReturnErrorOnFailure(SaveExistingGroupInfo(mStorage, group, info, IsGroupcastEnabled(), mAuxAclNotificationNeeded));
+        GroupModified(fabric_index, info.group_id);
+        return CHIP_NO_ERROR;
     }
+
+    group.Copy(info);
+    group.first_endpoint = kInvalidEndpointId;
+    group.endpoint_count = 0;
+    group.next           = 0;
+
+    std::optional<GroupId> replaced_group_id;
     if (index < fabric.group_count)
     {
         // Replace existing entry with a new group
         GroupData old_group;
-        old_group.Get(mStorage, fabric, index);
+        VerifyOrReturnError(old_group.Get(mStorage, fabric, index), CHIP_ERROR_NOT_FOUND);
         group.first = old_group.first;
         group.prev  = old_group.prev;
         group.next  = old_group.next;
 
-        ReturnErrorOnFailure(RemoveEndpoints(fabric_index, old_group.group_id));
+        const bool notifyNeeded = (IsGroupcastEnabled() && old_group.HasAuxiliaryACL() && old_group.endpoint_count > 0);
+        DeleteGroupEndpoints(mStorage, old_group);
         ReturnErrorOnFailure(old_group.Delete(mStorage));
+        replaced_group_id = old_group.group_id;
+        if (notifyNeeded)
+        {
+            mAuxAclNotificationNeeded = true;
+        }
         GroupRemoved(fabric_index, old_group);
     }
     else
@@ -968,6 +1080,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
         // Insert last
         VerifyOrReturnError(fabric.group_count == index, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(fabric.group_count < GetMaxGroupsPerFabric(), CHIP_ERROR_INVALID_LIST_LENGTH);
+        VerifyOrReturnError(group.index == fabric.group_count, CHIP_ERROR_INTERNAL);
         fabric.group_count++;
     }
 
@@ -985,6 +1098,11 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
         ReturnErrorOnFailure(prev.Load(mStorage));
         prev.next = group.group_id;
         ReturnErrorOnFailure(prev.Save(mStorage));
+    }
+    if (replaced_group_id.has_value() && IsGroupcastEnabled())
+    {
+        // Best effort: the replaced group is already deleted. Must stay directly before the save, see UnlinkGroupKeys.
+        LogErrorOnFailure(UnlinkGroupKeys(mStorage, fabric, *replaced_group_id));
     }
     // Update fabric
     ReturnErrorOnFailure(fabric.Save(mStorage));
@@ -1019,18 +1137,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
 
     bool notifyNeeded = (IsGroupcastEnabled() && group.HasAuxiliaryACL() && group.endpoint_count > 0);
 
-    // Remove endpoints
-    EndpointData endpoint(fabric_index, group.group_id, group.first_endpoint);
-    size_t count = 0;
-    while (count++ < group.endpoint_count)
-    {
-        if (CHIP_NO_ERROR != endpoint.Load(mStorage))
-        {
-            break;
-        }
-        TEMPORARY_RETURN_IGNORED endpoint.Delete(mStorage);
-        endpoint.endpoint_id = endpoint.next;
-    }
+    DeleteGroupEndpoints(mStorage, group);
 
     ReturnErrorOnFailure(group.Delete(mStorage));
 
@@ -1055,6 +1162,12 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
     if (fabric.group_count > 0)
     {
         fabric.group_count--;
+    }
+    if (IsGroupcastEnabled())
+    {
+        // GroupKeyManagement rejects GroupKeyMap writes when Groupcast is enabled, so Groupcast owns the mapping lifecycle.
+        // Best effort: the group is already deleted. Must stay directly before the save, see UnlinkGroupKeys.
+        LogErrorOnFailure(UnlinkGroupKeys(mStorage, fabric, group.group_id));
     }
     // Update fabric info
     ReturnErrorOnFailure(fabric.Save(mStorage));
@@ -1247,8 +1360,7 @@ GroupDataProvider::GroupInfoIterator * GroupDataProviderImpl::IterateGroupInfo(c
 
 GroupDataProviderImpl::GroupInfoIteratorImpl::GroupInfoIteratorImpl(GroupDataProviderImpl & provider,
                                                                     chip::FabricIndex fabric_index) :
-    mProvider(provider),
-    mFabric(fabric_index)
+    mProvider(provider), mFabric(fabric_index)
 {
     FabricData fabric(fabric_index);
     if (CHIP_NO_ERROR == fabric.Load(provider.mStorage))
@@ -1292,8 +1404,7 @@ GroupDataProvider::EndpointIterator * GroupDataProviderImpl::IterateEndpoints(ch
 
 GroupDataProviderImpl::EndpointIteratorImpl::EndpointIteratorImpl(GroupDataProviderImpl & provider, chip::FabricIndex fabric_index,
                                                                   std::optional<GroupId> group_id) :
-    mProvider(provider),
-    mFabric(fabric_index)
+    mProvider(provider), mFabric(fabric_index)
 {
     FabricData fabric(fabric_index);
     VerifyOrReturn(CHIP_NO_ERROR == fabric.Load(provider.mStorage));
@@ -1490,6 +1601,9 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, 
     // Insert last
     VerifyOrReturnError(fabric.map_count == index, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(fabric.map_count < GetMaxGroupsPerFabric(), CHIP_ERROR_INVALID_LIST_LENGTH);
+    VerifyOrReturnError(map.index == fabric.map_count, CHIP_ERROR_INTERNAL);
+    map.id = KeyMapData::FindUnusedLinkId(mStorage, fabric);
+    VerifyOrReturnError(map.id != 0, CHIP_ERROR_INTERNAL);
 
     map.next = 0;
     ReturnErrorOnFailure(map.Save(mStorage));
@@ -1618,8 +1732,7 @@ GroupDataProvider::GroupKeyIterator * GroupDataProviderImpl::IterateGroupKeys(ch
 
 GroupDataProviderImpl::GroupKeyIteratorImpl::GroupKeyIteratorImpl(GroupDataProviderImpl & provider,
                                                                   chip::FabricIndex fabric_index) :
-    mProvider(provider),
-    mFabric(fabric_index)
+    mProvider(provider), mFabric(fabric_index)
 {
     FabricData fabric(fabric_index);
     if (CHIP_NO_ERROR == fabric.Load(provider.mStorage))
