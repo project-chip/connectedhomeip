@@ -360,13 +360,15 @@ static bStatus_t CHIPoBLEProfile_WriteAttrCB(uint16_t connHandle, gattAttribute_
     {
         if (!memcmp(pAttr->type.uuid, chipOBleProfileRxCharUUID, pAttr->type.len))
         {
-            // offset and len come from the ATT write; a Prepare Write can carry an
-            // offset past the fixed Rx buffer, so bound the destination before copying.
-            if (offset > CHIPOBLEPROFILE_CHAR_LEN)
+            // offset and len come from the ATT write. The application reads the Rx
+            // buffer from offset 0 with only len, so a write at a nonzero offset
+            // (e.g. a Prepare Write fragment) would hand it the wrong bytes. CHIPoBLE
+            // writes always use offset 0, so reject anything else and bound len.
+            if (offset != 0)
             {
                 status = ATT_ERR_INVALID_OFFSET;
             }
-            else if (offset + (uint32_t) len > CHIPOBLEPROFILE_CHAR_LEN)
+            else if (len > CHIPOBLEPROFILE_CHAR_LEN)
             {
                 status = ATT_ERR_INVALID_VALUE_SIZE;
             }
