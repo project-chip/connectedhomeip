@@ -53,6 +53,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceInfoProvider.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app_config/enabled_devices.h>
@@ -234,7 +235,10 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     sDataModelProvider = std::make_unique<chip::app::CodeDrivenDataModelProvider>(storage, sAttributePersistenceProvider);
     VerifyOrReturnError(sDataModelProvider != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    chip::DeviceLayer::DeviceInstanceInfoProvider * deviceInfoProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
+    chip::DeviceLayer::DeviceInstanceInfoProvider * deviceInstanceInfoProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
+    VerifyOrReturnError(deviceInstanceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    chip::DeviceLayer::DeviceInfoProvider * deviceInfoProvider = chip::DeviceLayer::GetDeviceInfoProvider();
     VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     static chip::app::DefaultTimerDelegate sTimerDelegate;
@@ -249,7 +253,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .accessControl              = chip::Server::GetInstance().GetAccessControl(),
         .persistentStorage          = storage,
         .failSafeContext            = chip::Server::GetInstance().GetFailSafeContext(),
-        .deviceInstanceInfoProvider = *deviceInfoProvider,
+        .deviceInstanceInfoProvider = *deviceInstanceInfoProvider,
         .platformManager            = chip::DeviceLayer::PlatformMgr(),
         .groupDataProvider          = *groupDataProvider,
         .sessionManager             = chip::Server::GetInstance().GetSecureSessionManager(),
@@ -375,6 +379,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .bindingHandler           = sBindingHandler,
         .testEventTriggerDelegate = sTestEventTriggerDelegate,
         .identifyDelegate         = sIdentifyDelegate,
+        .deviceInfoProvider       = *deviceInfoProvider,
     });
 
     auto & deviceFactory = chip::app::NoHooksDeviceFactory::GetInstance();

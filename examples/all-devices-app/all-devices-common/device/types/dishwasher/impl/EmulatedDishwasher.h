@@ -16,15 +16,17 @@
 
 #pragma once
 
+#include <optional>
+
 #include <device/types/dishwasher/Dishwasher.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
-class EmulatedDishwasher : public Dishwasher,
-                           public Clusters::OperationalState::Delegate,
+class EmulatedDishwasher : public Clusters::OperationalState::Delegate,
                            public Clusters::ModeBase::AppDelegate,
-                           public TimerContext
+                           public TimerContext,
+                           public Dishwasher
 {
 public:
     struct Context
@@ -76,9 +78,8 @@ private:
     void StartEmulatedOperationTimer(uint32_t durationSec = kEmulatedOperationDurationSec);
 
     TimerDelegate & mTimerDelegate;
-    Clusters::OperationalState::OperationalStateEnum mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
     DataModel::Nullable<uint32_t> mCountdownTime;
-    System::Clock::Timestamp mOperationEndTime{};
+    std::optional<System::Clock::Timestamp> mOperationEndTime;
 };
 
 } // namespace chip::app

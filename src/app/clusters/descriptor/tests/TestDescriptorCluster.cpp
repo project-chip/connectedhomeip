@@ -23,12 +23,13 @@
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/Descriptor/Enums.h>
 #include <clusters/Descriptor/Metadata.h>
+#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <data-model-providers/codedriven/endpoint/SpanEndpoint.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/DiagnosticDataProvider.h>
-
-#include <cmath>
 
 namespace {
 
@@ -66,6 +67,106 @@ TEST_F(TestDescriptorCluster, AttributesTest)
                                             Descriptor::Attributes::ClientList::kMetadataEntry,
                                             Descriptor::Attributes::PartsList::kMetadataEntry,
                                         }));
+}
+
+TEST_F(TestDescriptorCluster, OnEndpointChangedTest)
+{
+    Testing::TestServerClusterContext mContext;
+    auto & listener = mContext.ReleaseListener();
+
+    SpanEndpoint rootEndpoint = SpanEndpoint::Builder().Build();
+    SpanEndpoint endpoint1    = SpanEndpoint::Builder().Build();
+    SpanEndpoint endpoint2    = SpanEndpoint::Builder().Build();
+    SpanEndpoint endpoint3    = SpanEndpoint::Builder().Build();
+    SpanEndpoint endpoint4    = SpanEndpoint::Builder().Build();
+
+    // Deliberately set the composition patter to tree, it still should behave like full-family.
+    EndpointInterfaceRegistration rootEndpointRegistration(
+        rootEndpoint,
+        { .id                 = kRootEndpointId,
+          .parentId           = kInvalidEndpointId,
+          .compositionPattern = chip::app::DataModel::EndpointCompositionPattern::kTree });
+
+    EndpointInterfaceRegistration endpointRegistration1(
+        endpoint1,
+        { .id                 = 1,
+          .parentId           = rootEndpointRegistration.GetEndpointEntry().id,
+          .compositionPattern = chip::app::DataModel::EndpointCompositionPattern::kFullFamily });
+
+    EndpointInterfaceRegistration endpointRegistration2(
+        endpoint2,
+        { .id                 = 2,
+          .parentId           = endpointRegistration1.GetEndpointEntry().id,
+          .compositionPattern = chip::app::DataModel::EndpointCompositionPattern::kTree });
+
+    EndpointInterfaceRegistration endpointRegistration3(
+        endpoint3,
+        { .id                 = 3,
+          .parentId           = endpointRegistration2.GetEndpointEntry().id,
+          .compositionPattern = chip::app::DataModel::EndpointCompositionPattern::kTree });
+
+    EndpointInterfaceRegistration endpointRegistration4(
+        endpoint4,
+        { .id                 = 4,
+          .parentId           = endpointRegistration3.GetEndpointEntry().id,
+          .compositionPattern = chip::app::DataModel::EndpointCompositionPattern::kTree });
+
+    DescriptorCluster rootDescriptor(rootEndpointRegistration.GetEndpointEntry().id, {}, {});
+    DescriptorCluster descriptor1(endpointRegistration1.GetEndpointEntry().id, {}, {});
+    DescriptorCluster descriptor2(endpointRegistration2.GetEndpointEntry().id, {}, {});
+    DescriptorCluster descriptor3(endpointRegistration3.GetEndpointEntry().id, {}, {});
+    DescriptorCluster descriptor4(endpointRegistration4.GetEndpointEntry().id, {}, {});
+
+    ServerClusterRegistration rootDescriptorEntry(rootDescriptor);
+    ServerClusterRegistration descriptorEntry1(descriptor1);
+    ServerClusterRegistration descriptorEntry2(descriptor2);
+    ServerClusterRegistration descriptorEntry3(descriptor3);
+    ServerClusterRegistration descriptorEntry4(descriptor4);
+
+    CodeDrivenDataModelProvider provider(mContext.StorageDelegate(), mContext.AttributePersistenceProvider());
+    ASSERT_SUCCESS(provider.Startup(mContext.ImContext()));
+
+    ASSERT_SUCCESS(provider.AddCluster(rootDescriptorEntry));
+    ASSERT_SUCCESS(provider.AddCluster(descriptorEntry1));
+    ASSERT_SUCCESS(provider.AddCluster(descriptorEntry2));
+    ASSERT_SUCCESS(provider.AddCluster(descriptorEntry3));
+    ASSERT_SUCCESS(provider.AddCluster(descriptorEntry4));
+
+    ASSERT_SUCCESS(provider.AddEndpoint(rootEndpointRegistration));
+    ASSERT_SUCCESS(provider.AddEndpoint(endpointRegistration1));
+    ASSERT_SUCCESS(provider.AddEndpoint(endpointRegistration2));
+    ASSERT_SUCCESS(provider.AddEndpoint(endpointRegistration3));
+
+    // Start testing, enable the notifications.
+    provider.RegisterAttributeChangeListener(listener);
+
+    EXPECT_SUCCESS(provider.AddEndpoint(endpointRegistration4));
+
+    // Root endpoint, endpoint1 because it is full-family, endpoint3 because it is the parent endpoint
+    EXPECT_TRUE(mContext.ChangeListener().IsDirty(
+        ConcreteAttributePath{ rootEndpointRegistration.GetEndpointEntry().id, Descriptor::Id, PartsList::Id }));
+    EXPECT_TRUE(mContext.ChangeListener().IsDirty(
+        ConcreteAttributePath{ endpointRegistration1.GetEndpointEntry().id, Descriptor::Id, PartsList::Id }));
+    EXPECT_TRUE(mContext.ChangeListener().IsDirty(
+        ConcreteAttributePath{ endpointRegistration3.GetEndpointEntry().id, Descriptor::Id, PartsList::Id }));
+
+    EXPECT_EQ(mContext.ChangeListener().DirtyList().size(), 3u);
+
+    listener.DirtyList().clear();
+
+    EXPECT_SUCCESS(provider.RemoveEndpoint(endpointRegistration4.GetEndpointEntry().id));
+
+    // Root endpoint, endpoint1 because it is full-family, endpoint3 because it is the parent endpoint
+    EXPECT_TRUE(mContext.ChangeListener().IsDirty(
+        ConcreteAttributePath{ rootEndpointRegistration.GetEndpointEntry().id, Descriptor::Id, PartsList::Id }));
+    EXPECT_TRUE(mContext.ChangeListener().IsDirty(
+        ConcreteAttributePath{ endpointRegistration1.GetEndpointEntry().id, Descriptor::Id, PartsList::Id }));
+    EXPECT_TRUE(mContext.ChangeListener().IsDirty(
+        ConcreteAttributePath{ endpointRegistration3.GetEndpointEntry().id, Descriptor::Id, PartsList::Id }));
+
+    EXPECT_EQ(mContext.ChangeListener().DirtyList().size(), 3u);
+
+    EXPECT_SUCCESS(provider.Shutdown());
 }
 
 } // namespace

@@ -59,6 +59,24 @@ class MEDIAPLAYBACKTestBase:
         asserts.assert_equal(len(set(preset_ids)), len(preset_ids), "All PresetIDs in Presets must be unique")
         asserts.assert_equal(len(set(preset_names)), len(preset_names), "All Names in Presets must be unique")
 
+    def confirm_playback_started(self, ordinal: str):
+        """Ask the operator to confirm that the DUT is actually playing the content just started.
+
+        Playback is otherwise only observed through attribute reads that follow immediately,
+        which an operator cannot check. A 'n' answer fails the test rather than being skipped.
+        Not asked in the CI simulator, which has no operator.
+        """
+        if self.is_pics_sdk_ci_only:
+            return
+        response = self.wait_for_user_input(
+            prompt_msg=f"Confirm the DUT is playing the {ordinal} content now (audio or on-screen).\n"
+            "Enter 'y' if playback started, or 'n' if it did not.\n",
+            prompt_msg_placeholder="y", default_value="y")
+        asserts.assert_is_not_none(response, f"No response to the {ordinal} playback prompt, expected 'y' or 'n'")
+        response = response.lower()
+        asserts.assert_in(response, ["y", "n"], f"Invalid response to the {ordinal} playback prompt, expected 'y' or 'n'")
+        asserts.assert_equal(response, "y", f"Operator reports the {ordinal} content did not start playing")
+
     async def switch_content(self, endpoint, presets, index: int):
         """Start playing the content at ``index`` in the Presets list.
 
