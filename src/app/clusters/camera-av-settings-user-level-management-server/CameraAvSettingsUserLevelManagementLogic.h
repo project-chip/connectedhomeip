@@ -231,7 +231,13 @@ private:
     CHIP_ERROR StoreDPTZStreams();
     CHIP_ERROR LoadDPTZStreams();
 
-    CHIP_ERROR StoreMPTZPresets();
+    /**
+     * @brief Persist the current list, optionally omitting one entry while leaving the active list unchanged.
+     * @param excludedPreset An entry in the active list to omit, or nullptr to store every entry.
+     * The borrowed entry must remain valid throughout the call.
+     * @return CHIP_NO_ERROR on success, or a missing-provider, allocation, encoding, or persistence error.
+     */
+    CHIP_ERROR StoreMPTZPresets(const CameraAvSettingsUserLevelManagement::MPTZPresetHelper * excludedPreset = nullptr);
     CHIP_ERROR LoadMPTZPresets();
 
     /**
