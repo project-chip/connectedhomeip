@@ -107,6 +107,9 @@
 		3D010DCF2D408FA300CFFA02 /* MTRCommissioneeInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3D010DCE2D408FA300CFFA02 /* MTRCommissioneeInfo.mm */; };
 		3D010DD02D408FA300CFFA02 /* MTRCommissioneeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D010DCD2D408FA300CFFA02 /* MTRCommissioneeInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D010DD22D4091CC00CFFA02 /* MTRCommissioneeInfo_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D010DD12D4091C800CFFA02 /* MTRCommissioneeInfo_Internal.h */; };
+		AA190988478A0000000000A3 /* MTRUserInvokeToken.h in Headers */ = {isa = PBXBuildFile; fileRef = AA190988478A0000000000A1 /* MTRUserInvokeToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA190988478A0000000000A4 /* MTRUserInvokeToken.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA190988478A0000000000A2 /* MTRUserInvokeToken.mm */; };
+		AA190988478A0000000000A6 /* MTRUserInvokeToken_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = AA190988478A0000000000A5 /* MTRUserInvokeToken_Internal.h */; };
 		3D09F1292FD785B70056DBAD /* PCSC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D09F1282FD785B70056DBAD /* PCSC.framework */; platformFilters = (macos, ); };
 		3D0C484B29DA4FA0006D811F /* MTRErrorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */; };
 		3D3928D72BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m */; settings = {COMPILER_FLAGS = "-UMTR_NO_AVAILABILITY -Wno-unguarded-availability-new"; }; };
@@ -674,6 +677,9 @@
 		3D010DCD2D408FA300CFFA02 /* MTRCommissioneeInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCommissioneeInfo.h; sourceTree = "<group>"; };
 		3D010DCE2D408FA300CFFA02 /* MTRCommissioneeInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCommissioneeInfo.mm; sourceTree = "<group>"; };
 		3D010DD12D4091C800CFFA02 /* MTRCommissioneeInfo_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCommissioneeInfo_Internal.h; sourceTree = "<group>"; };
+		AA190988478A0000000000A1 /* MTRUserInvokeToken.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRUserInvokeToken.h; sourceTree = "<group>"; };
+		AA190988478A0000000000A2 /* MTRUserInvokeToken.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRUserInvokeToken.mm; sourceTree = "<group>"; };
+		AA190988478A0000000000A5 /* MTRUserInvokeToken_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRUserInvokeToken_Internal.h; sourceTree = "<group>"; };
 		3D09F1282FD785B70056DBAD /* PCSC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PCSC.framework; path = System/Library/Frameworks/PCSC.framework; sourceTree = SDKROOT; };
 		3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRErrorTests.m; sourceTree = "<group>"; };
 		3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRAvailabilityTests.m; sourceTree = "<group>"; };
@@ -1882,6 +1888,9 @@
 				3D010DCD2D408FA300CFFA02 /* MTRCommissioneeInfo.h */,
 				3D010DD12D4091C800CFFA02 /* MTRCommissioneeInfo_Internal.h */,
 				3D010DCE2D408FA300CFFA02 /* MTRCommissioneeInfo.mm */,
+				AA190988478A0000000000A1 /* MTRUserInvokeToken.h */,
+				AA190988478A0000000000A5 /* MTRUserInvokeToken_Internal.h */,
+				AA190988478A0000000000A2 /* MTRUserInvokeToken.mm */,
 				51445F6E2E5E565F003C7C98 /* MTRCommissioningDelegate.h */,
 				51445F6F2E5E565F003C7C98 /* MTRCommissioningDelegate_Internal.h */,
 				51445F702E5E565F003C7C98 /* MTRCommissioningOperation.h */,
@@ -2388,6 +2397,8 @@
 				7596A83E28751220004DAE0E /* MTRBaseClusters_Internal.h in Headers */,
 				997DED182695344800975E97 /* MTRThreadOperationalDataset.h in Headers */,
 				3D010DD02D408FA300CFFA02 /* MTRCommissioneeInfo.h in Headers */,
+				AA190988478A0000000000A3 /* MTRUserInvokeToken.h in Headers */,
+				AA190988478A0000000000A6 /* MTRUserInvokeToken_Internal.h in Headers */,
 				51F12DBE2E8C732600E6B095 /* MTRSessionParameters.h in Headers */,
 				9956064426420367000C28DE /* MTRSetupPayload_Internal.h in Headers */,
 				27A53C1727FBC6920053F131 /* MTRAttestationTrustStoreBridge.h in Headers */,
@@ -2792,6 +2803,7 @@
 				7592BCF92CBEE98C00EB74A0 /* CodegenDataModelProvider.cpp in Sources */,
 				7592BCFA2CBEE98C00EB74A0 /* CodegenDataModelProvider_Write.cpp in Sources */,
 				3D010DCF2D408FA300CFFA02 /* MTRCommissioneeInfo.mm in Sources */,
+				AA190988478A0000000000A4 /* MTRUserInvokeToken.mm in Sources */,
 				93B2CF9A2B56E45C00E4D187 /* MTRClusterNames.mm in Sources */,
 				998F287126D56940001846C6 /* MTRP256KeypairBridge.mm in Sources */,
 				516416012B6B483C00D5CE11 /* MTRIMDispatch.mm in Sources */,

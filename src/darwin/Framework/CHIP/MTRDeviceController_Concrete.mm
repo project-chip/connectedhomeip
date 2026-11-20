@@ -165,6 +165,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
 @synthesize otaProviderDelegateQueue = _otaProviderDelegateQueue;
 @synthesize commissionableBrowser = _commissionableBrowser;
 @synthesize concurrentSubscriptionPool = _concurrentSubscriptionPool;
+@synthesize sessionAttemptPool = _sessionAttemptPool;
 @synthesize storageBehaviorConfiguration = _storageBehaviorConfiguration;
 @synthesize controllerNodeID = _controllerNodeID;
 
@@ -323,6 +324,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
         MTR_LOG("%@ Setting up pool size of MTRDeviceController with: %lu", self, static_cast<unsigned long>(concurrentSubscriptionPoolSize));
 
         _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
+        _sessionAttemptPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
 
         _storedFabricIndex = chip::kUndefinedFabricIndex;
         _storedCompressedFabricID = std::nullopt;
@@ -1792,7 +1794,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     assertChipStackLockedByCurrentThread();
 
-    // Queue this with subscription attempts as well, to help with throttling Thread traffic.
+    // Throttle new session attempts to Thread nodes, in their own lane rather than the subscription pool, whose slots
+    // a single CASE attempt to a sleepy peer can hold for minutes.
     __block MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
     [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
         MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
@@ -1816,13 +1819,20 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     void (^enqueueWorkItemOnce)(BOOL) = ^(BOOL timedOut) {
         // Ensure the work item is queued only once, since this handler could be called multiple times in a row
         if (workItem) {
-            if (timedOut && [self _completeWithExistingSessionForNode:nodeID parameters:parameters completion:completion]) {
-                MTR_LOG("%@ connectivity monitor did not report for node 0x%016llX within %.0f seconds, used existing session", self, nodeID, monitorWaitSeconds);
+            // A session to the node can appear while the request waits, set up by another request or by the peer.
+            // Check for one whenever the wait ends, whether the monitor reported or the wait timed out, before
+            // queueing a new session attempt.
+            if ([self _completeWithExistingSessionForNode:nodeID parameters:parameters completion:completion]) {
+                if (timedOut) {
+                    MTR_LOG("%@ connectivity monitor did not report for node 0x%016llX within %.0f seconds, used existing session", self, nodeID, monitorWaitSeconds);
+                } else {
+                    MTR_LOG("%@ connectivity monitor reported for node 0x%016llX, used existing session", self, nodeID);
+                }
             } else {
                 if (timedOut) {
                     MTR_LOG_ERROR("%@ connectivity monitor did not report for node 0x%016llX within %.0f seconds, proceeding with connection attempt", self, nodeID, monitorWaitSeconds);
                 }
-                [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
+                [self->_sessionAttemptPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
             }
             workItem = nil;
             [self _stopWaitingOnDeviceConnectivityMonitor:deviceConnectivityMonitor];
@@ -1841,7 +1851,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         // DNS-SD monitoring failed to start - proceed with immediate connection attempt
         // (This is unlikely, but needed so that the workItem block always executes.)
         MTR_LOG("%@ DNS-SD monitoring unavailable for node 0x%016llX, proceeding with connection attempt", self, nodeID);
-        [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX (no DNS-SD)", nodeID];
+        [self->_sessionAttemptPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX (no DNS-SD)", nodeID];
         return;
     }
 

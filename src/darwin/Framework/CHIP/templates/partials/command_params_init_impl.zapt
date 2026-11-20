@@ -11,6 +11,7 @@
 {{/if}}
 {{#if (isStrEqual source "client")}}
     _serverSideProcessingTimeout = nil;
+    _userInvokeToken = nil;
 {{/if}}
   }
   return self;
