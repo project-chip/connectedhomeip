@@ -145,6 +145,8 @@ public:
     /// Overrides EffectiveControlMode. The application owns EffectiveControlMode while
     /// OperationMode is Local. The next recompute (an OperationMode or ControlMode change, or
     /// OnRemoteSensorChanged in Normal mode) overwrites it.
+    ///
+    /// Returns ConstraintError if the mode requires a feature that is not enabled.
     CHIP_ERROR SetEffectiveControlMode(PumpConfigurationAndControl::ControlModeEnum controlMode);
     PumpConfigurationAndControl::ControlModeEnum GetEffectiveControlMode() const { return mEffectiveControlMode; }
 

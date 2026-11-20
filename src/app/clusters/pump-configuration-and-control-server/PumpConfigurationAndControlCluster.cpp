@@ -209,8 +209,8 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
         (mOperationMode == OperationModeEnum::kNormal) ? mDelegate.GetRemoteSensorType(endpointId) : RemoteSensorType::kNoSensor;
     mEffectiveOperationMode = mOperationMode;
     mEffectiveControlMode   = (mOperationMode == OperationModeEnum::kLocal && IsControlModeSupported(storedEffectiveControlMode))
-          ? storedEffectiveControlMode
-          : ComputeEffectiveControlMode(mOperationMode, mControlMode, sensorType);
+        ? storedEffectiveControlMode
+        : ComputeEffectiveControlMode(mOperationMode, mControlMode, sensorType);
     if (mEnabledOptionalAttributes.IsSet(PumpStatus::Id))
     {
         mPumpStatus.Clear(PumpStatusBitmap::kRemotePressure)
@@ -397,8 +397,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetControlMode(ControlModeEnum co
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetEffectiveControlMode(ControlModeEnum controlMode)
 {
-    VerifyOrReturnError(EnsureKnownEnumValue(controlMode) != ControlModeEnum::kUnknownEnumValue,
-                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(IsControlModeSupported(controlMode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     if (WriteEffectiveControlMode(controlMode))
     {
         mDelegate.OnAttributeChanged(mPath.mEndpointId, EffectiveControlMode::Id);

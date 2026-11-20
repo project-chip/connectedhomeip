@@ -993,3 +993,26 @@ TEST_F(TestPumpConfigurationAndControlCluster, SetEffectiveOperationMode)
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
+
+TEST_F(TestPumpConfigurationAndControlCluster, SetEffectiveControlModeRequiresFeature)
+{
+    PumpConfigurationAndControlCluster::Config config =
+        ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantFlow, Feature::kLocalOperation));
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+    EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kLocal), CHIP_NO_ERROR);
+
+    mDelegate.mChangedAttributes.clear();
+    // ConstantPressure requires the ConstantPressure feature; 6 is not a ControlModeEnum value.
+    EXPECT_EQ(cluster.SetEffectiveControlMode(ControlModeEnum::kConstantPressure), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(cluster.SetEffectiveControlMode(static_cast<ControlModeEnum>(6)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantSpeed);
+    EXPECT_TRUE(mDelegate.mChangedAttributes.empty());
+
+    EXPECT_SUCCESS(cluster.SetEffectiveControlMode(ControlModeEnum::kConstantFlow));
+    EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantFlow);
+    EXPECT_TRUE(mDelegate.WasChanged(EffectiveControlMode::Id));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
