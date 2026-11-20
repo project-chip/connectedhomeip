@@ -41,6 +41,7 @@ void EmulatedLaundryWasher::Unregister(CodeDrivenDataModelProvider & provider)
 {
     CancelTimer();
     mCountdownTime.SetNull();
+    mOperationEndTime.reset();
     LaundryWasher::Unregister(provider);
 }
 
@@ -56,17 +57,22 @@ DataModel::Nullable<uint32_t> EmulatedLaundryWasher::GetCountdownTime()
         return DataModel::NullNullable;
     }
 
+    if (!mOperationEndTime.has_value())
+    {
+        return DataModel::NullNullable;
+    }
+
     // Per Matter Operational State Specification Section 1.14.5.1 (CountdownTime Attribute):
     // Standard 1-second countdown progress at 1 unit/sec SHALL NOT trigger attribute reporting to prevent
     // network flooding. Therefore, CountdownTime is dynamically computed on read from the target completion timestamp,
     // avoiding 1-second timers or reporting spam.
     auto now = System::SystemClock().GetMonotonicTimestamp();
-    if (now >= mOperationEndTime)
+    if (now >= mOperationEndTime.value())
     {
         return DataModel::MakeNullable<uint32_t>(0);
     }
 
-    auto remainingSec = std::chrono::duration_cast<System::Clock::Seconds32>(mOperationEndTime - now).count();
+    auto remainingSec = std::chrono::duration_cast<System::Clock::Seconds32>(mOperationEndTime.value() - now).count();
     return DataModel::MakeNullable<uint32_t>(static_cast<uint32_t>(remainingSec));
 }
 
@@ -93,6 +99,7 @@ void EmulatedLaundryWasher::TimerFired()
 
     ChipLogProgress(Zcl, "EmulatedLaundryWasher: Emulated operation timer finished. Reverting state to Stopped.");
     mCountdownTime.SetNull();
+    mOperationEndTime.reset();
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
 }
 
@@ -135,6 +142,7 @@ void EmulatedLaundryWasher::HandlePauseStateCallback(Clusters::OperationalState:
 {
     ChipLogProgress(Zcl, "EmulatedLaundryWasher: Pause command received.");
     mCountdownTime = GetCountdownTime();
+    mOperationEndTime.reset();
     CancelTimer();
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kPaused));
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
@@ -162,6 +170,7 @@ void EmulatedLaundryWasher::HandleStopStateCallback(Clusters::OperationalState::
     ChipLogProgress(Zcl, "EmulatedLaundryWasher: Stop command received.");
     CancelTimer();
     mCountdownTime.SetNull();
+    mOperationEndTime.reset();
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
 }

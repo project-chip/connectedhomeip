@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <device/types/laundry-washer/LaundryWasher.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -84,7 +86,7 @@ private:
 
     TimerDelegate & mTimerDelegate;
     DataModel::Nullable<uint32_t> mCountdownTime;
-    System::Clock::Timestamp mOperationEndTime{};
+    std::optional<System::Clock::Timestamp> mOperationEndTime;
 };
 
 } // namespace chip::app
