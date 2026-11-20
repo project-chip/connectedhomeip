@@ -41,7 +41,7 @@ public:
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
     {
         const EndpointId endpoint = GetEndpointIdFromEventTrigger(eventTrigger);
-        VerifyOrReturnError(endpoint == 0 || endpoint == mEndpoint, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(endpoint == kRootEndpointId || endpoint == mEndpoint, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(clearEndpointInEventTrigger(eventTrigger) == static_cast<uint64_t>(EnergyEvseTrigger::kEVPluggedIn),
                             CHIP_ERROR_INVALID_ARGUMENT);
         mPluggedIn = true;

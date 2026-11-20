@@ -181,7 +181,7 @@ void SimulatedClosure::TimerFired()
 
 CHIP_ERROR SimulatedClosure::HandleEventTrigger(uint64_t eventTrigger)
 {
-    const auto triggerEndpoint = static_cast<EndpointId>((eventTrigger >> 32) & 0xFFFF);
+    const auto triggerEndpoint = GetEndpointIdFromEventTrigger(eventTrigger);
     VerifyOrReturnError(triggerEndpoint == kRootEndpointId || triggerEndpoint == GetEndpointId(), CHIP_ERROR_INVALID_ARGUMENT);
 
     eventTrigger = clearEndpointInEventTrigger(eventTrigger);
