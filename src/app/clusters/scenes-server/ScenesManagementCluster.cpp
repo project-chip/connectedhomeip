@@ -810,6 +810,10 @@ ScenesManagementCluster::HandleRecallScene(FabricIndex fabricIndex,
 
     // Verify the attributes are respecting constraints
     VerifyOrReturnError(req.sceneID != scenes::kUndefinedSceneId, Status::ConstraintError);
+    if (req.transitionTime.HasValue() && !req.transitionTime.Value().IsNull())
+    {
+        VerifyOrReturnError(req.transitionTime.Value().Value() <= scenes::kScenesMaxTransitionTime, Status::ConstraintError);
+    }
 
     CHIP_ERROR err = RecallSceneParse(fabricIndex, req.groupID, req.sceneID, req.transitionTime);
 
