@@ -485,6 +485,80 @@ TEST_F(TestPushAVStreamTransportServerLogic, AllocatePushTransportRejectsEndpoin
     EXPECT_EQ(status.GetClusterSpecificCode().value(), to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
 }
 
+// Provisions any endpoint ID with a client certificate ID derived from it and records the lookups.
+class TestTLSClientManagementDelegateRecordingLookups : public TestTLSClientManagementDelegate
+{
+public:
+    struct Lookup
+    {
+        FabricIndex fabric;
+        uint16_t endpointID;
+    };
+
+    CHIP_ERROR FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                           LoadedEndpointCallback callback) override
+    {
+        mLookups.push_back({ fabric, endpointID });
+        TlsClientManagement::Structs::TLSEndpointStruct::DecodableType endpoint;
+        endpoint.endpointID = endpointID;
+        endpoint.caid       = 0;
+        endpoint.ccdid.SetNonNull(static_cast<uint16_t>(endpointID + 10));
+        return callback(endpoint);
+    }
+
+    std::vector<Lookup> mLookups;
+};
+
+// Counts SetTLSCerts() calls.
+class TestPushAVStreamTransportDelegateCountingCerts : public TestPushAVStreamTransportDelegateImpl
+{
+public:
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+    {
+        mSetTLSCertsCount++;
+    }
+
+    size_t mSetTLSCertsCount = 0;
+};
+
+TEST_F(TestPushAVStreamTransportServerLogic, LoadTLSCertsIntoDelegateRequiresDelegates)
+{
+    TestPushAVStreamTransportDelegateCountingCerts delegate;
+
+    EXPECT_EQ(mServer.GetLogic().LoadTLSCertsIntoDelegate(1, 1), CHIP_ERROR_INCORRECT_STATE);
+
+    mServer.GetLogic().SetDelegate(&delegate);
+    EXPECT_EQ(mServer.GetLogic().LoadTLSCertsIntoDelegate(1, 1), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(delegate.mSetTLSCertsCount, (size_t) 0);
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, LoadTLSCertsIntoDelegateLooksUpGivenFabricAndEndpoint)
+{
+    TestPushAVStreamTransportDelegateCountingCerts delegate;
+    TestTLSClientManagementDelegateRecordingLookups tlsClientManagementDelegate;
+    mServer.GetLogic().SetDelegate(&delegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+
+    ASSERT_SUCCESS(mServer.GetLogic().LoadTLSCertsIntoDelegate(2, 7));
+
+    EXPECT_EQ(delegate.mSetTLSCertsCount, (size_t) 1);
+    ASSERT_EQ(tlsClientManagementDelegate.mLookups.size(), (size_t) 1);
+    EXPECT_EQ(tlsClientManagementDelegate.mLookups[0].fabric, 2);
+    EXPECT_EQ(tlsClientManagementDelegate.mLookups[0].endpointID, 7);
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, LoadTLSCertsIntoDelegateRejectsEndpointWithNullClientCertificateId)
+{
+    TestPushAVStreamTransportDelegateCountingCerts delegate;
+    TestTLSClientManagementDelegateNullClientCertId tlsClientManagementDelegate;
+    mServer.GetLogic().SetDelegate(&delegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+
+    EXPECT_EQ(mServer.GetLogic().LoadTLSCertsIntoDelegate(1, 1), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(delegate.mSetTLSCertsCount, (size_t) 0);
+}
+
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
 {
     CMAFContainerOptionsStruct cmafContainerOptions;
