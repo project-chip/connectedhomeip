@@ -61,12 +61,8 @@ SimulatedClosure::~SimulatedClosure()
 
 void SimulatedClosure::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    // Pending timers would touch clusters that Unregister() destroys.
+    // A pending timer would touch clusters that Unregister() destroys.
     CancelTimer();
-    for (auto & panel : mSimulatedClosurePanel)
-    {
-        panel->CancelTimer();
-    }
     Closure::Unregister(provider);
 }
 

@@ -38,7 +38,7 @@ CHIP_ERROR DecreasingBatteryPowerSource::Register(EndpointId endpoint, CodeDrive
     CHIP_ERROR err = mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval);
     if (err != CHIP_NO_ERROR)
     {
-        BatteryPowerSource::Unregister(provider);
+        Unregister(provider);
         return err;
     }
     return CHIP_NO_ERROR;

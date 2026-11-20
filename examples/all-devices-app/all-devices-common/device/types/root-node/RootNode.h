@@ -106,6 +106,9 @@ protected:
     /// Called after the endpoint has been unregistered and before the base clusters are removed,
     /// so subclasses can remove the extra clusters they registered. The provider rejects cluster
     /// removal while the endpoint is still registered, so this cannot run any earlier.
+    ///
+    /// Also called when registration fails part-way, in which case some extra clusters were never
+    /// constructed or added: overrides must tolerate that.
     virtual void UnregisterExtraClusters(CodeDrivenDataModelProvider & provider) {}
 
     Context mContext;
