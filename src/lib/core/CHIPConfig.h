@@ -1505,6 +1505,25 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS 45000
 #endif // CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS
 
+/**
+ * @def CHIP_CONFIG_CASE_SIGMA1_TRANSMISSIONS_BEFORE_NEXT_ADDRESS
+ *
+ * @brief When an operational lookup returned more than one address, CASE moves on to
+ *        the next address if Sigma1 to an address is still unacknowledged once the MRP
+ *        ack windows of this many transmissions have ended (at least this many go out),
+ *        instead of spending the whole MRP retransmission budget on it. The last (or
+ *        only) address always gets the whole budget, and so does an address that
+ *        acknowledges Sigma1 or answers it with Busy.
+ *
+ *        Lower values reach a working address sooner when an earlier one is dead, at
+ *        the cost of abandoning a reachable address whose first transmissions were all
+ *        lost. 0, or a value above CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS, keeps the whole
+ *        budget for every address.
+ */
+#ifndef CHIP_CONFIG_CASE_SIGMA1_TRANSMISSIONS_BEFORE_NEXT_ADDRESS
+#define CHIP_CONFIG_CASE_SIGMA1_TRANSMISSIONS_BEFORE_NEXT_ADDRESS 3
+#endif // CHIP_CONFIG_CASE_SIGMA1_TRANSMISSIONS_BEFORE_NEXT_ADDRESS
+
 /*
  * @def CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
  *
