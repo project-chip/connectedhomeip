@@ -134,6 +134,7 @@ public:
     void ReadHandlerSendReportDataAfterSessionReleaseDoesNotCrash();
     void WriteHandlerSendWriteResponseAfterSessionReleaseDoesNotCrash();
     void CommandResponseSenderSendCommandResponseAfterSessionReleaseDoesNotCrash();
+    void CommandResponseSenderBufferSizeFollowsPeerMaxTcpPayload();
 };
 
 // ---------------------------------------------------------------------------
@@ -390,6 +391,67 @@ TEST_F_FROM_FIXTURE(TestSessionRelease, CommandResponseSenderSendCommandResponse
     // CommandResponseSender destructor calls ExchangeHolder::Release().
     // mExchangeCtx is non-null and IsSendExpected()==true, so Release() calls
     // Abort() on the still-alive EC: DoClose(no-op) + Release() → freed.
+}
+
+namespace {
+// Restores a session's peer address and remote parameters when it goes out of scope.
+class ScopedSessionRestore
+{
+public:
+    explicit ScopedSessionRestore(Transport::SecureSession & session) :
+        mSession(session), mPeerAddress(session.GetPeerAddress()), mParams(session.GetRemoteSessionParameters())
+    {}
+    ~ScopedSessionRestore()
+    {
+        mSession.SetRemoteSessionParameters(mParams);
+        mSession.SetPeerAddress(mPeerAddress);
+    }
+
+    const SessionParameters & OriginalParams() const { return mParams; }
+
+private:
+    Transport::SecureSession & mSession;
+    Transport::PeerAddress mPeerAddress;
+    SessionParameters mParams;
+};
+} // namespace
+
+TEST_F_FROM_FIXTURE(TestSessionRelease, CommandResponseSenderBufferSizeFollowsPeerMaxTcpPayload)
+{
+#if !INET_CONFIG_ENABLE_TCP_ENDPOINT
+    GTEST_SKIP() << "TCP endpoint / large packet buffers disabled on this platform.";
+#else
+    Transport::SecureSession * session = GetSessionAliceToBob()->AsSecureSession();
+    ScopedSessionRestore restore(*session);
+    session->SetPeerAddress(Transport::PeerAddress::TCP(GetAddress(), CHIP_PORT + 1));
+    ASSERT_TRUE(session->AllowsLargePayload());
+
+    DoNothingExchangeDelegate ecDelegate;
+    ExchangeContext * ec = MakeRawExchangeWillSend(*this, ecDelegate);
+    NullCommandResponseSenderCallback crsCallback;
+    NullCommandHandlerImplCallback cmdCallback;
+    CommandResponseSender crs(&crsCallback, &cmdCallback);
+    crs.mExchangeCtx.Grab(ec);
+
+    auto bufferSizeForPeerMaxTcpPayloadSize = [&](uint32_t peerMaxTcpPayloadSize) {
+        SessionParameters params = restore.OriginalParams();
+        params.SetMaxTCPPayloadSize(peerMaxTcpPayloadSize);
+        session->SetRemoteSessionParameters(params);
+        return crs.GetCommandResponseMaxBufferSize();
+    };
+
+    // The advertised size covers the whole message; the response buffer holds the payload and the MIC.
+    EXPECT_EQ(bufferSizeForPeerMaxTcpPayloadSize(64), 64 - kMaxMessageOverheadBytes + kMaxTagLen);
+    EXPECT_EQ(bufferSizeForPeerMaxTcpPayloadSize(static_cast<uint32_t>(kMaxMessageOverheadBytes)), kMaxTagLen);
+    EXPECT_EQ(bufferSizeForPeerMaxTcpPayloadSize(1), kMaxTagLen);
+    // A peer that does not advertise a size gets the legacy default.
+    EXPECT_EQ(bufferSizeForPeerMaxTcpPayloadSize(0),
+              std::min<size_t>(std::min(kLegacyDefaultMaxLargeAppMessageLen, kMaxLargeAppMessageLen) + kMaxTagLen,
+                               System::PacketBuffer::kMaxAllocSize));
+    // The buffer never exceeds what this node can allocate.
+    EXPECT_EQ(bufferSizeForPeerMaxTcpPayloadSize(UINT32_MAX),
+              std::min<size_t>(kMaxLargeAppMessageLen + kMaxTagLen, System::PacketBuffer::kMaxAllocSize));
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 }
 
 } // namespace app
