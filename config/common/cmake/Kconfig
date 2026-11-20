@@ -421,6 +421,14 @@ config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
 	  When enabled, the single-part AEAD API is used with a large buffer
 	  allocated on the stack. Otherwise, the multipart API path is used.
 
+config CHIP_CRYPTO_PSA_LOG_ERROR_LOCATION
+	bool "Log source location of PSA errors"
+	depends on CHIP_CRYPTO_PSA
+	help
+	  When enabled, the PSA error log message also contains the file, line and
+	  function name of the code that reported the error. This is useful for
+	  debugging, but increases the firmware size because of the added strings.
+
 config CHIP_PERSISTENT_SUBSCRIPTIONS
 	bool "Persistent subscriptions"
 	help

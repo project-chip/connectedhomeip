@@ -112,7 +112,12 @@ private:
 /**
  * @brief Log PSA status code if it indicates an error.
  */
+#if CHIP_CRYPTO_PSA_LOG_ERROR_LOCATION
+void LogPsaError(psa_status_t status, const char * file = __builtin_FILE(), int line = __builtin_LINE(),
+                 const char * func = __builtin_FUNCTION());
+#else
 void LogPsaError(psa_status_t status);
+#endif
 
 } // namespace Crypto
 } // namespace chip
