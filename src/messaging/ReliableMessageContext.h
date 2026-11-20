@@ -184,6 +184,10 @@ protected:
         ///     IsResponseExpected() is true).
         /// (2) We have received neither a response nor an ack for that message.
         kFlagWaitingForResponseOrAck = (1u << 11),
+
+        kFlagAckNotificationPending = (1u << 12),
+
+        kFlagDeliveryFailed = (1u << 13),
     };
 
     BitFlags<Flags> mFlags; // Internal state flags

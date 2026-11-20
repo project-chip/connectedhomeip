@@ -62,6 +62,7 @@ class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
+    friend class ReliableMessageMgr;
 
 public:
     typedef System::Clock::Timeout Timeout; // Type used to express the timeout in this ExchangeContext
@@ -221,6 +222,8 @@ public:
      */
     bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
+    bool IsAckNotificationPending() const { return mFlags.Has(Flags::kFlagAckNotificationPending); }
+
     /**
      * Tracks whether we have received at least one application level message
      * during the life-time of this exchange
@@ -266,8 +269,9 @@ private:
 
     ExchangeMessageDispatch & mDispatch;
 
-    ExchangeSessionHolder mSession; // The connection state
-    uint16_t mExchangeId;           // Assigned exchange ID.
+    ExchangeSessionHolder mSession;              // The connection state
+    uint16_t mExchangeId;                        // Assigned exchange ID.
+    CHIP_ERROR mAckFailure = CHIP_ERROR_TIMEOUT; // Reported if a kNotifyOnAck message leaves the retrans table unacked.
 
     /**
      *  Track whether we are now expecting a response to a message sent via this exchange (because that
@@ -299,6 +303,8 @@ private:
      * be closed.
      */
     void NotifyResponseTimeout(bool aCloseIfNeeded);
+
+    void NotifyAckOutcome(CHIP_ERROR aError, bool aCloseIfNeeded);
 
     CHIP_ERROR StartResponseTimer();
 

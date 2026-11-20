@@ -316,6 +316,8 @@ public:
      * The callback passed in has to outlive this CommandSender object.
      * If used in a groups setting, callbacks do not need to be passed.
      * If callbacks are passed the only one that will be called in a group sesttings is the onDone
+     * With aSuppressResponse over MRP, OnDone follows the peer's ack, after OnError if the request was not delivered; MRP, not
+     * the response timeout, bounds that wait.
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false, bool aAllowLargePayload = false);
@@ -523,6 +525,7 @@ private:
         AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
         AwaitingTimedStatus, ///< Sent a Timed Request and waiting for response.
         AwaitingResponse,    ///< The command has been sent successfully, and we are awaiting invoke response.
+        AwaitingAck,         ///< Sent with SuppressResponse, awaiting the MRP ack.
         ResponseReceived,    ///< Received a response to our invoke and request and processing the response.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
@@ -580,6 +583,7 @@ private:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
+    void OnAckOutcome(Messaging::ExchangeContext * apExchangeContext, CHIP_ERROR aError) override;
 
     void FlushNoCommandResponse();
     //
