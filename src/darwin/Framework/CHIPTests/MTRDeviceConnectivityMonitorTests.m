@@ -19,6 +19,7 @@
 #import <Network/Network.h>
 #import <dns_sd.h>
 #import <fcntl.h>
+#import <netinet/in.h>
 #import <stdatomic.h>
 #import <sys/socket.h>
 
@@ -1598,6 +1599,54 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
     XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0 || errors.count > 0); } timeout:kMonitorWaitSeconds + kPromptSeconds description:@"monitor wait timed out"]);
     XCTAssertEqual([controller unitTestSessionRequestsWaitingOnConnectivityMonitorCount], 0, @"a request whose wait timed out is no longer failed by shutdown");
     XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test053_StuckSigma1IsRestartedAtTheNewlyAdvertisedAddress
+{
+#ifdef DEBUG
+    const uint16_t kWrongPort = 15053;
+    NSNumber * peerNodeID = @(0x1053);
+    MTRDeviceController * controller = [self controllerWithControllerPeer:peerNodeID peer:nil];
+    NSString * instanceName = [NSString stringWithFormat:@"%016llX-%016llX", controller.compressedFabricID.unsignedLongLongValue, peerNodeID.unsignedLongLongValue];
+
+    // Receives the Sigma1 but never answers it, like a peer that is no longer at this address.
+    int wrongAddressSocket = socket(AF_INET6, SOCK_DGRAM, 0);
+    XCTAssertGreaterThanOrEqual(wrongAddressSocket, 0);
+    int v6Only = 0;
+    setsockopt(wrongAddressSocket, IPPROTO_IPV6, IPV6_V6ONLY, &v6Only, sizeof(v6Only));
+    struct timeval receiveTimeout = { .tv_sec = (time_t) kPromptSeconds, .tv_usec = 0 };
+    setsockopt(wrongAddressSocket, SOL_SOCKET, SO_RCVTIMEO, &receiveTimeout, sizeof(receiveTimeout));
+    struct sockaddr_in6 wrongAddress = { .sin6_len = sizeof(wrongAddress), .sin6_family = AF_INET6, .sin6_port = htons(kWrongPort), .sin6_addr = in6addr_any };
+    XCTAssertEqual(bind(wrongAddressSocket, (struct sockaddr *) &wrongAddress, sizeof(wrongAddress)), 0);
+
+    DNSServiceRef advertiser = NULL;
+    XCTAssertEqual(DNSServiceRegister(&advertiser, kDNSServiceFlagsNoAutoRename, 0, instanceName.UTF8String, kOperationalType, kLocalDot, NULL, htons(kWrongPort), 0, NULL, TestRegisterCallback, NULL), kDNSServiceErr_NoError);
+
+    __block BOOL reachable = NO;
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    delegate.onReachable = ^{
+        reachable = YES;
+    };
+    MTRDevice * device = [MTRDevice deviceWithNodeID:peerNodeID controller:controller];
+    [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    [_deviceDelegates addObject:delegate];
+
+    uint8_t sigma1[1280];
+    XCTAssertGreaterThan(recv(wrongAddressSocket, sigma1, sizeof(sigma1), 0), 0, @"Sigma1 sent to the wrong address");
+
+    [self stopAdvertisingInstance:instanceName advertiser:advertiser];
+    XCTAssertEqual(DNSServiceRegister(&advertiser, kDNSServiceFlagsNoAutoRename, 0, instanceName.UTF8String, kOperationalType, kLocalDot, NULL, htons(kControllerPeerPort), 0, NULL, TestRegisterCallback, NULL), kDNSServiceErr_NoError);
+    [controller asyncDispatchToMatterQueue:^{
+        [device nodeMayBeAdvertisingOperational];
+    } errorHandler:nil];
+    XCTAssertTrue([self waitUntil:^{ return reachable; } timeout:kPromptSeconds description:@"CASE restarted at the newly advertised address"]);
+
+    [self stopAdvertisingInstance:instanceName advertiser:advertiser];
+    close(wrongAddressSocket);
 #else
     XCTSkip(@"Requires DEBUG test hooks");
 #endif
