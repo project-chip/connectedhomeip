@@ -15,11 +15,13 @@
  *    limitations under the License.
  */
 
+#include <app/TestEventTriggerDelegate.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Zephyr/ZephyrConfig.h>
 #include <provision/ProvisionStorageWriter.h>
 #include <provision/zephyr/ProvisionStorageZephyr.h>
+#include <zephyr/devicetree.h>
 #if defined(SL_PROVISION_GENERATOR) && SL_PROVISION_GENERATOR
 #include <settings/settings_nvs.h>
 #endif
@@ -62,8 +64,8 @@ CHIP_ERROR ProvisionStorageWriter::Commit()
 }
 CHIP_ERROR ProvisionStorageWriter::GetFlashPageSize(uint32_t & size)
 {
-    (void) size;
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    size = DT_PROP(DT_CHOSEN(zephyr_flash), erase_block_size);
+    return CHIP_NO_ERROR;
 }
 CHIP_ERROR ProvisionStorageWriter::SetCredentialsBaseAddress(uint32_t address)
 {
@@ -226,8 +228,8 @@ CHIP_ERROR ProvisionStorageWriter::SetOtaTlvEncryptionKey(const ByteSpan & value
 }
 CHIP_ERROR ProvisionStorageWriter::SetTestEventTriggerKey(const ByteSpan & value)
 {
-    (void) value;
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError(value.size() == TestEventTriggerDelegate::kEnableKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueBin(ZephyrStorage::kConfigKeyTestEventTriggerKey, value.data(), value.size());
 }
 } // namespace Provision
 } // namespace Silabs

@@ -44,6 +44,7 @@ DEFINE_CONFIG_KEY(kConfigKeySetupPayload, "setup-payload");
 DEFINE_CONFIG_KEY(kConfigKeyProvisionRequest, "provision-req");
 DEFINE_CONFIG_KEY(kConfigKeyProvisionVersion, "provision-ver");
 DEFINE_CONFIG_KEY(kConfigKeyDacKeyId, "dac-key-id");
+DEFINE_CONFIG_KEY(kConfigKeyTestEventTriggerKey, "test-event-trigger");
 
 #undef DEFINE_CONFIG_KEY
 

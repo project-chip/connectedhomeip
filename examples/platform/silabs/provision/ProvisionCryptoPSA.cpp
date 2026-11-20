@@ -192,7 +192,7 @@ CHIP_ERROR ProvisionCrypto::GenerateDeviceAttestationCSR(uint16_t vid, uint16_t 
     VerifyOrReturnError(commonName.size() <= 64, CHIP_ERROR_INVALID_ARGUMENT);
 
     char commonNameBuffer[65] = { 0 };
-    if (!commonName.empty())
+    if (!commonName.empty() && commonName[0] != '\0')
     {
         memcpy(commonNameBuffer, commonName.data(), commonName.size());
     }
