@@ -65,7 +65,12 @@ public:
         return mAvData.size();
     }
 
-    void setCertificateBuffer(const PushAVCertBuffer & certBuffer) { mCertBuffer = certBuffer; }
+    /// Safe to call while the uploader thread is running; uploads already in progress keep the previous certificates.
+    void setCertificateBuffer(const PushAVCertBuffer & certBuffer)
+    {
+        std::lock_guard<std::mutex> lock(mCertMutex);
+        mCertBuffer = certBuffer;
+    }
     void setCertificatePath(const PushAVCertPath & certPath) { mCertPath = certPath; }
     void setStreamIdNameMap(const std::vector<std::string> & streamIdNameMap) { mStreamIdNameMap = streamIdNameMap; }
 
@@ -73,7 +78,8 @@ private:
     void ProcessQueue();
     void UploadData(std::pair<std::string, std::string> data);
     PushAVCertPath mCertPath;
-    PushAVCertBuffer mCertBuffer;
+    PushAVCertBuffer mCertBuffer; // Guarded by mCertMutex.
+    std::mutex mCertMutex;
     std::queue<std::pair<std::string, std::string>> mAvData;
     std::mutex mQueueMutex;
     std::atomic<bool> mIsRunning;

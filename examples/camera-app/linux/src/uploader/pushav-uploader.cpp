@@ -459,6 +459,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     std::string rootCertPEM;
     std::string clientCertPEM;
     std::string derKeyToPemstr;
+    PushAVCertBuffer certBuffer;
     std::error_code ec;
     size_t sessionPos;
     CURLcode res;
@@ -496,17 +497,22 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     // TODO: The logic to provide DER-formatted certificates and keys in memory (blob) format to curl is currently unstable. As a
     // temporary workaround, PEM-format files are being provided as input to curl.
 
-    rootCertPEM   = DerCertToPem(mCertBuffer.mRootCertBuffer);
-    clientCertPEM = DerCertToPem(mCertBuffer.mClientCertBuffer);
-    if (!mCertBuffer.mIntermediateCertBuffer.empty())
+    {
+        std::lock_guard<std::mutex> lock(mCertMutex);
+        certBuffer = mCertBuffer;
+    }
+
+    rootCertPEM   = DerCertToPem(certBuffer.mRootCertBuffer);
+    clientCertPEM = DerCertToPem(certBuffer.mClientCertBuffer);
+    if (!certBuffer.mIntermediateCertBuffer.empty())
     {
         clientCertPEM.append("\n"); // Add newline separator between certs in PEM format
     }
-    for (size_t i = 0; i < mCertBuffer.mIntermediateCertBuffer.size(); ++i)
+    for (size_t i = 0; i < certBuffer.mIntermediateCertBuffer.size(); ++i)
     {
-        clientCertPEM.append(DerCertToPem(mCertBuffer.mIntermediateCertBuffer[i]) + "\n");
+        clientCertPEM.append(DerCertToPem(certBuffer.mIntermediateCertBuffer[i]) + "\n");
     }
-    derKeyToPemstr = ConvertECDSAPrivateKey_DER_to_PEM(mCertBuffer.mClientKeyBuffer);
+    derKeyToPemstr = ConvertECDSAPrivateKey_DER_to_PEM(certBuffer.mClientKeyBuffer);
 
     SaveCertToFile(rootCertPEM, "/tmp/root.pem");
     SaveCertToFile(clientCertPEM, "/tmp/dev.pem");
@@ -518,9 +524,9 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     curl_easy_setopt(curl, CURLOPT_SSLCERT, "/tmp/dev.pem");
     curl_easy_setopt(curl, CURLOPT_SSLKEY, "/tmp/dev.key");
 
-    //  curl_blob rootBlob   = { mCertBuffer.mRootCertBuffer.data(), mCertBuffer.mRootCertBuffer.size(), CURL_BLOB_COPY };
-    //  curl_blob clientBlob = { mCertBuffer.mClientCertBuffer.data(), mCertBuffer.mClientCertBuffer.size(), CURL_BLOB_COPY };
-    //  curl_blob keyBlob    = { mCertBuffer.mClientKeyBuffer.data(), mCertBuffer.mClientKeyBuffer.size(), CURL_BLOB_COPY };
+    //  curl_blob rootBlob   = { certBuffer.mRootCertBuffer.data(), certBuffer.mRootCertBuffer.size(), CURL_BLOB_COPY };
+    //  curl_blob clientBlob = { certBuffer.mClientCertBuffer.data(), certBuffer.mClientCertBuffer.size(), CURL_BLOB_COPY };
+    //  curl_blob keyBlob    = { certBuffer.mClientKeyBuffer.data(), certBuffer.mClientKeyBuffer.size(), CURL_BLOB_COPY };
 
     // curl_easy_setopt(curl, CURLOPT_CAINFO_BLOB, &rootBlob);
     // curl_easy_setopt(curl, CURLOPT_SSLCERT_BLOB, &clientBlob);
