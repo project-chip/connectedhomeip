@@ -70,6 +70,13 @@ public:
 
     void SetDeviceBeingCommissioned(DeviceProxy * device) { mCommissioner->mDeviceBeingCommissioned = device; }
 
+    DeviceProxy * GetDeviceBeingCommissioned() const { return mCommissioner->mDeviceBeingCommissioned; }
+
+    void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const Controller::CompletionStatus & completionStatus)
+    {
+        mCommissioner->CleanupCommissioning(proxy, nodeId, completionStatus);
+    }
+
     Controller::SetUpCodePairer & GetSetUpCodePairer() { return mCommissioner->mSetUpCodePairer; }
 
     void FailPASE(CHIP_ERROR error) { mCommissioner->OnSessionEstablishmentError(error); }
