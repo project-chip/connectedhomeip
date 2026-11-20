@@ -20,11 +20,9 @@
 #include <EnergyEvseManager.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/EventManagement.h>
-#include <app/EventReporter.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <gtest/gtest.h>
-#include <lib/support/CHIPCounter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -54,20 +52,6 @@ void RecordStateChange(const EVSECbInfo * cb, intptr_t arg)
         reinterpret_cast<std::vector<StateEnum> *>(arg)->push_back(cb->StateChange.state);
     }
 }
-
-// Records the ID of every event logged, to check which events the delegate generates
-class RecordingEventReporter : public EventReporter
-{
-public:
-    CHIP_ERROR NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesConsumed) override
-    {
-        mEventIds.push_back(aPath.mEventId);
-        return CHIP_NO_ERROR;
-    }
-    void ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex) override {}
-
-    std::vector<EventId> mEventIds;
-};
 
 constexpr EventId kStarted = Events::EnergyTransferStarted::Id;
 constexpr EventId kStopped = Events::EnergyTransferStopped::Id;
@@ -108,44 +92,34 @@ public:
 
     void SetUp() override
     {
-        const LogStorageResources logStorageResources[] = {
-            { mDebugEventBuffer, sizeof(mDebugEventBuffer), PriorityLevel::Debug },
-            { mInfoEventBuffer, sizeof(mInfoEventBuffer), PriorityLevel::Info },
-            { mCritEventBuffer, sizeof(mCritEventBuffer), PriorityLevel::Critical },
-        };
-        ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        ASSERT_EQ(EventManagement::GetInstance().Init(nullptr, MATTER_ARRAY_SIZE(logStorageResources), mCircularEventBuffer,
-                                                      logStorageResources, &mEventCounter,
-                                                      System::SystemClock().GetMonotonicMilliseconds64(), &mEventReporter),
-                  CHIP_NO_ERROR);
-
         ASSERT_EQ(mProvider.Init(&mStorage), CHIP_NO_ERROR);
         SetSafeAttributePersistenceProvider(&mProvider);
 
         mDelegate.SetInstance(&mInstance);
+        ASSERT_SUCCESS(mInstance.GetCluster().Startup(mClusterContext.Get()));
         ASSERT_EQ(mDelegate.HwSetCircuitCapacity(kCircuitCapacity_mA), Status::Success);
     }
 
     void TearDown() override
     {
         mDelegate.CancelActiveTimers();
+        mInstance.GetCluster().Shutdown(ClusterShutdownType::kClusterShutdown);
         mDelegate.SetInstance(nullptr);
-        EventManagement::DestroyEventManagement();
     }
 
 protected:
     // The EnergyTransferStarted/Stopped events logged so far, in order
     std::vector<EventId> TransferEvents()
     {
-        std::vector<EventId> events;
-        for (EventId id : mEventReporter.mEventIds)
+        while (auto event = mClusterContext.EventsGenerator().GetNextEvent())
         {
+            const EventId id = event->eventOptions.mPath.mEventId;
             if (id == kStarted || id == kStopped)
             {
-                events.push_back(id);
+                mTransferEvents.push_back(id);
             }
         }
-        return events;
+        return mTransferEvents;
     }
 
     ConcreteAttributePath Path(AttributeId id) { return ConcreteAttributePath(kEndpointId, EnergyEvse::Id, id); }
@@ -175,21 +149,125 @@ protected:
         ASSERT_EQ(mInstance.GetState(), StateEnum::kPluggedInCharging);
     }
 
-    uint8_t mDebugEventBuffer[64];
-    uint8_t mInfoEventBuffer[1024];
-    uint8_t mCritEventBuffer[256];
-    CircularEventBuffer mCircularEventBuffer[3];
-    MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
-    RecordingEventReporter mEventReporter;
-
     TestPersistentStorageDelegate mStorage;
     DefaultSafeAttributePersistenceProvider mProvider;
+    Testing::TestServerClusterContext mClusterContext;
+    std::vector<EventId> mTransferEvents;
     std::vector<StateEnum> mStateChanges; // declared before mDelegate so it outlives the registered callback
     PendingTimerDelegate mTimerDelegate;
     EvseTargetsDelegate mTargetsDelegate;
     EnergyEvseDelegate mDelegate;
     Instance mInstance;
 };
+
+TEST_F(TestEnergyEvseDelegate, DirectClusterBindingClearsPreviousInstance)
+{
+    ASSERT_EQ(mDelegate.GetInstance(), &mInstance);
+    ASSERT_EQ(mDelegate.GetCluster(), &mInstance.GetCluster());
+    EnergyEvseCluster cluster(
+        EnergyEvseCluster::Config(kEndpointId, mDelegate, BitMask<Feature>(Feature::kChargingPreferences), {}, {}));
+
+    mDelegate.SetCluster(&cluster);
+
+    EXPECT_EQ(mDelegate.GetInstance(), nullptr);
+    EXPECT_EQ(mDelegate.GetCluster(), &cluster);
+
+    mDelegate.SetInstance(&mInstance);
+    EXPECT_EQ(mDelegate.GetInstance(), &mInstance);
+    EXPECT_EQ(mDelegate.GetCluster(), &mInstance.GetCluster());
+}
+
+TEST_F(TestEnergyEvseDelegate, NullClusterBindingClearsPreviousInstance)
+{
+    ASSERT_EQ(mDelegate.GetInstance(), &mInstance);
+    ASSERT_EQ(mDelegate.GetCluster(), &mInstance.GetCluster());
+
+    mDelegate.SetCluster(nullptr);
+
+    EXPECT_EQ(mDelegate.GetInstance(), nullptr);
+    EXPECT_EQ(mDelegate.GetCluster(), nullptr);
+}
+
+TEST_F(TestEnergyEvseDelegate, ClusterEventsReachFixtureRecorder)
+{
+    constexpr uint8_t uid[] = { 1, 2, 3, 4 };
+
+    EXPECT_EQ(mDelegate.HwSetRFID(ByteSpan(uid)), Status::Success);
+    auto event = mClusterContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+    EXPECT_EQ(event->eventOptions.mPath.mEventId, Events::Rfid::Id);
+    EXPECT_FALSE(mClusterContext.EventsGenerator().GetNextEvent().has_value());
+}
+
+TEST_F(TestEnergyEvseDelegate, EventSendersWithOnlyClusterBound)
+{
+    for (bool v2x : { false, true })
+    {
+        Testing::TestServerClusterContext context;
+        EvseTargetsDelegate targets;
+        EnergyEvseDelegate delegate(targets, mTimerDelegate);
+        BitMask<Feature> features(Feature::kChargingPreferences);
+        features.Set(Feature::kV2x, v2x);
+        EnergyEvseCluster cluster(EnergyEvseCluster::Config(kEndpointId, delegate, features, {}, {}));
+        delegate.SetCluster(&cluster);
+        ASSERT_EQ(delegate.GetInstance(), nullptr);
+        ASSERT_SUCCESS(cluster.Startup(context.Get()));
+        ASSERT_SUCCESS(cluster.SetSessionID(DataModel::Nullable<uint32_t>(1u)));
+        ASSERT_EQ(delegate.HwRegisterEvseCallbackHandler(
+                      [](const EVSECbInfo * cb, intptr_t) {
+                          if (cb->type == EVSECallbackType::EnergyMeterReadingRequested)
+                          {
+                              *cb->EnergyMeterReadingRequest.energyMeterValuePtr = 0;
+                          }
+                      },
+                      0),
+                  Status::Success);
+
+        ASSERT_EQ(delegate.SendEnergyTransferStartedEvent(), Status::Success);
+        auto started = context.EventsGenerator().GetNextEvent();
+        ASSERT_TRUE(started.has_value());
+        EXPECT_EQ(started->eventOptions.mPath.mEventId, kStarted);
+        Events::EnergyTransferStarted::DecodableType startedData;
+        ASSERT_SUCCESS(started->GetEventData(startedData));
+        EXPECT_EQ(startedData.sessionID, 1u);
+        EXPECT_EQ(startedData.maximumDischargeCurrent.HasValue(), v2x);
+
+        ASSERT_EQ(delegate.SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped), Status::Success);
+        auto stopped = context.EventsGenerator().GetNextEvent();
+        ASSERT_TRUE(stopped.has_value());
+        EXPECT_EQ(stopped->eventOptions.mPath.mEventId, kStopped);
+        Events::EnergyTransferStopped::DecodableType stoppedData;
+        ASSERT_SUCCESS(stopped->GetEventData(stoppedData));
+        EXPECT_EQ(stoppedData.sessionID, 1u);
+        EXPECT_EQ(stoppedData.energyDischarged.HasValue(), v2x);
+
+        constexpr uint8_t uid[] = { 1, 2, 3, 4 };
+        ASSERT_SUCCESS(cluster.SetSessionDuration(DataModel::Nullable<uint32_t>(0u)));
+        ASSERT_SUCCESS(cluster.SetSessionEnergyCharged(DataModel::Nullable<int64_t>(0)));
+        ASSERT_SUCCESS(cluster.SetSessionEnergyDischarged(DataModel::Nullable<int64_t>(0)));
+        EXPECT_EQ(delegate.HwSetRFID(ByteSpan(uid)), Status::Success);
+        EXPECT_EQ(delegate.SendEVConnectedEvent(), Status::Success);
+        EXPECT_EQ(delegate.SendEVNotDetectedEvent(), Status::Success);
+        EXPECT_EQ(delegate.SendFaultEvent(FaultStateEnum::kOther), Status::Success);
+        for (EventId id : { Events::Rfid::Id, Events::EVConnected::Id, Events::EVNotDetected::Id, Events::Fault::Id })
+        {
+            auto event = context.EventsGenerator().GetNextEvent();
+            ASSERT_TRUE(event.has_value());
+            EXPECT_EQ(event->eventOptions.mPath.mEventId, id);
+        }
+
+        // A cluster without a runtime context rejects event logging.
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+        EXPECT_EQ(delegate.HwSetRFID(ByteSpan(uid)), Status::Failure);
+        EXPECT_EQ(delegate.SendEVConnectedEvent(), Status::Failure);
+        EXPECT_EQ(delegate.SendEVNotDetectedEvent(), Status::Failure);
+        EXPECT_EQ(delegate.SendEnergyTransferStartedEvent(), Status::Failure);
+        EXPECT_EQ(delegate.SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped), Status::Failure);
+        EXPECT_EQ(delegate.SendFaultEvent(FaultStateEnum::kOther), Status::Failure);
+        EXPECT_FALSE(context.EventsGenerator().GetNextEvent().has_value());
+        delegate.SetCluster(nullptr);
+    }
+}
 
 TEST_F(TestEnergyEvseDelegate, EnableDischargingIndefinitelyPersistsEnabledUntil)
 {
@@ -631,11 +709,13 @@ public:
     {
         TestEnergyEvseDelegate::SetUp();
         mManagerDelegate.SetInstance(&mManager);
+        ASSERT_SUCCESS(mManager.GetCluster().Startup(mClusterContext.Get()));
     }
 
     void TearDown() override
     {
         mManagerDelegate.CancelActiveTimers();
+        mManager.GetCluster().Shutdown(ClusterShutdownType::kClusterShutdown);
         mManagerDelegate.SetInstance(nullptr);
         TestEnergyEvseDelegate::TearDown();
     }

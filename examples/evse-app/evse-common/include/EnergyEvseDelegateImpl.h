@@ -52,7 +52,7 @@ enum EVSEStateMachineEvent
 /**
  * Helper class to handle session timing and energy meter deltas.
  * Session attribute values are stored in the cluster (EnergyEvseCluster) and
- * updated through Instance setters. This class only tracks the internal
+ * updated through EnergyEvseCluster setters. This class only tracks the internal
  * computation state (start time, energy meter baselines).
  */
 class EvseSession
@@ -63,43 +63,43 @@ public:
     /**
      * @brief Start a new session: assigns a session ID, resets duration/energy counters.
      *
-     * @param instance              - The cluster Instance to update attributes on
+     * @param cluster              - The cluster whose session attributes are updated
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void StartSession(Instance * instance, int64_t chargingMeterValue, int64_t dischargingMeterValue);
+    void StartSession(EnergyEvseCluster * cluster, int64_t chargingMeterValue, int64_t dischargingMeterValue);
 
     /**
      * @brief Stop the current session: recalculates duration and energy values.
      *
-     * @param instance              - The cluster Instance to update attributes on
+     * @param cluster              - The cluster whose session attributes are updated
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void StopSession(Instance * instance, int64_t chargingMeterValue, int64_t dischargingMeterValue);
+    void StopSession(EnergyEvseCluster * cluster, int64_t chargingMeterValue, int64_t dischargingMeterValue);
 
     /**
      * @brief Recalculate session duration from start time to now.
      *
-     * @param instance - The cluster Instance to update attributes on
+     * @param cluster - The cluster whose session attributes are updated
      */
-    void RecalculateSessionDuration(Instance * instance);
+    void RecalculateSessionDuration(EnergyEvseCluster * cluster);
 
     /**
      * @brief Update the session's charged energy delta.
      *
-     * @param instance           - The cluster Instance to update attributes on
+     * @param cluster            - The cluster whose session attributes are updated
      * @param chargingMeterValue - The current value of the energy meter (charging) in mWh
      */
-    void UpdateEnergyCharged(Instance * instance, int64_t chargingMeterValue);
+    void UpdateEnergyCharged(EnergyEvseCluster * cluster, int64_t chargingMeterValue);
 
     /**
      * @brief Update the session's discharged energy delta.
      *
-     * @param instance              - The cluster Instance to update attributes on
+     * @param cluster              - The cluster whose session attributes are updated
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void UpdateEnergyDischarged(Instance * instance, int64_t dischargingMeterValue);
+    void UpdateEnergyDischarged(EnergyEvseCluster * cluster, int64_t dischargingMeterValue);
 
 private:
     uint32_t mStartTime                     = 0; // Epoch_s - 0 means it hasn't started yet
@@ -271,8 +271,15 @@ public:
 
     // ------------------------------------------------------------------
     // Instance management for codegen integration
-    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
+    void SetInstance(Instance * aInstance);
     Instance * GetInstance() { return mInstance; }
+
+    void SetCluster(EnergyEvseCluster * aCluster)
+    {
+        mInstance = nullptr;
+        mCluster  = aCluster;
+    }
+    EnergyEvseCluster * GetCluster() { return mCluster; }
 
     // ------------------------------------------------------------------
     // Local getters for internal delegate use - delegates to cluster instance
@@ -370,8 +377,8 @@ private:
     TimerDelegate & mTimerDelegate;
     EnableDeadlineTimerContext mEnableDeadlineTimerContext;
 
-    /* Instance pointer for accessing cluster */
-    Instance * mInstance = nullptr;
+    Instance * mInstance         = nullptr;
+    EnergyEvseCluster * mCluster = nullptr;
 
     /* Session Object - delegate owns session state management */
     EvseSession mSession = EvseSession();
