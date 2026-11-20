@@ -278,7 +278,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistableData<kPersist
     chip::GroupId prev              = 0;
     bool first                      = true;
 
-    GroupData() : GroupInfo(nullptr) {};
+    GroupData() : GroupInfo(nullptr){};
     GroupData(chip::FabricIndex fabric) : fabric_index(fabric) {}
     GroupData(chip::FabricIndex fabric, chip::GroupId group) : GroupInfo(group, nullptr), fabric_index(fabric) {}
 
@@ -413,7 +413,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
     chip::GroupId group_id         = kUndefinedGroupId;
     chip::KeysetId keyset_id       = 0;
 
-    KeyMapData() {};
+    KeyMapData(){};
     KeyMapData(chip::FabricIndex fabric, uint16_t link_id = 0, chip::GroupId group = kUndefinedGroupId, chip::KeysetId keyset = 0) :
         GroupKey(group, keyset), LinkedData(link_id), fabric_index(fabric)
     {}
@@ -595,7 +595,9 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, PersistableData<kPersist
 
     EndpointData() = default;
     EndpointData(chip::FabricIndex fabric, chip::GroupId group = kUndefinedGroupId,
-                 chip::EndpointId endpoint = kInvalidEndpointId) : GroupEndpoint(group, endpoint), fabric_index(fabric)
+                 chip::EndpointId endpoint = kInvalidEndpointId) :
+        GroupEndpoint(group, endpoint),
+        fabric_index(fabric)
     {}
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) const override
@@ -1360,7 +1362,8 @@ GroupDataProvider::GroupInfoIterator * GroupDataProviderImpl::IterateGroupInfo(c
 
 GroupDataProviderImpl::GroupInfoIteratorImpl::GroupInfoIteratorImpl(GroupDataProviderImpl & provider,
                                                                     chip::FabricIndex fabric_index) :
-    mProvider(provider), mFabric(fabric_index)
+    mProvider(provider),
+    mFabric(fabric_index)
 {
     FabricData fabric(fabric_index);
     if (CHIP_NO_ERROR == fabric.Load(provider.mStorage))
@@ -1404,7 +1407,8 @@ GroupDataProvider::EndpointIterator * GroupDataProviderImpl::IterateEndpoints(ch
 
 GroupDataProviderImpl::EndpointIteratorImpl::EndpointIteratorImpl(GroupDataProviderImpl & provider, chip::FabricIndex fabric_index,
                                                                   std::optional<GroupId> group_id) :
-    mProvider(provider), mFabric(fabric_index)
+    mProvider(provider),
+    mFabric(fabric_index)
 {
     FabricData fabric(fabric_index);
     VerifyOrReturn(CHIP_NO_ERROR == fabric.Load(provider.mStorage));
@@ -1732,7 +1736,8 @@ GroupDataProvider::GroupKeyIterator * GroupDataProviderImpl::IterateGroupKeys(ch
 
 GroupDataProviderImpl::GroupKeyIteratorImpl::GroupKeyIteratorImpl(GroupDataProviderImpl & provider,
                                                                   chip::FabricIndex fabric_index) :
-    mProvider(provider), mFabric(fabric_index)
+    mProvider(provider),
+    mFabric(fabric_index)
 {
     FabricData fabric(fabric_index);
     if (CHIP_NO_ERROR == fabric.Load(provider.mStorage))

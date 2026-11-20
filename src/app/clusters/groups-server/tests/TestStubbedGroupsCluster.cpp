@@ -51,9 +51,9 @@ public:
     void SetUp() override
     {
         mCluster       = std::make_unique<StubbedGroupsCluster>(kTestEndpointId,
-                                                                StubbedGroupsCluster::Context{
+                                                          StubbedGroupsCluster::Context{
                                                                     .groupDataProvider = mGroupDataProvider,
-                                                                });
+                                                          });
         mClusterTester = std::make_unique<ClusterTester>(*mCluster);
 
         mGroupDataProvider.SetStorageDelegate(&mClusterTester->GetServerClusterContext().storage);
