@@ -33,11 +33,28 @@ details.
 
                 $ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
 
--   Build the example application:
+-   Clone the repo (this assumes you are checking the code out in your home
+    folder)
+
+                $ cd ~
+                $ git clone https://github.com/project-chip/connectedhomeip.git
+
+-   Ensure your repo is up to date with submodules fetched
+
+                $ cd connectedhomeip
+                $ ./scripts/checkout_submodules.py --platform linux --recursive
+
+                # Alternatively you can check out all submodules and re-sync with:
+                $ git submodule sync --recursive && git submodule update --init --recursive
+
+-   Activate your shell (do this every time you open the new terminal window)
+
+                $ cd ~/connectedhomeip
+                $ source ./scripts/activate.sh
+
+-   Build the example application (in the activated shell - see above):
 
                 $ cd ~/connectedhomeip/examples/evse-app/linux
-                $ git submodule update --init
-                $ source third_party/connectedhomeip/scripts/activate.sh
                 $ gn gen out/debug
                 $ ninja -C out/debug
 
@@ -45,14 +62,6 @@ details.
 
                 $ cd ~/connectedhomeip/examples/evse-app/linux
                 $ rm -rf out/
-
--   Build the example with pigweed RPC
-
-                $ cd ~/connectedhomeip/examples/evse-app/linux
-                $ git submodule update --init
-                $ source third_party/connectedhomeip/scripts/activate.sh
-                $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-                $ ninja -C out/debug
 
 ## Commandline arguments
 
