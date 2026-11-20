@@ -124,7 +124,7 @@ struct LocationDescriptorStruct
 {
     std::string mLocationName;
     std::optional<int16_t> mFloorNumber;
-    std::optional<Globals::AreaTypeTag> mAreaType;
+    std::optional<Globals::CommonAreaTag> mAreaType;
 };
 
 // This intentionally mirrors Structs::EcosystemLocationStruct::Type but has ownership
@@ -150,7 +150,7 @@ public:
 
         Builder & SetLocationName(std::string aLocationName);
         Builder & SetFloorNumber(std::optional<int16_t> aFloorNumber);
-        Builder & SetAreaTypeTag(std::optional<Globals::AreaTypeTag> aAreaTypeTag);
+        Builder & SetAreaTypeTag(std::optional<Globals::CommonAreaTag> aAreaTypeTag);
         Builder & SetLocationDescriptorLastEdit(uint64_t aLocationDescriptorLastEditEpochUs);
 
         // Upon success this object will have moved all ownership of underlying

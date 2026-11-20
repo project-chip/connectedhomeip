@@ -84,7 +84,7 @@ Globals::Structs::LocationDescriptorStruct::Type BridgedDeviceBasicInformationCl
     return {
         .locationName = { locationName.data(), locationName.size() },
         .floorNumber  = floorNumber.has_value() ? DataModel::MakeNullable(*floorNumber) : DataModel::Nullable<int16_t>(),
-        .areaType     = areaType.has_value() ? DataModel::MakeNullable(*areaType) : DataModel::Nullable<Globals::AreaTypeTag>(),
+        .areaType     = areaType.has_value() ? DataModel::MakeNullable(*areaType) : DataModel::Nullable<Globals::CommonAreaTag>(),
     };
 }
 

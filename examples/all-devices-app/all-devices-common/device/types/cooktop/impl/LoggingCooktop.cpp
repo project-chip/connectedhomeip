@@ -53,14 +53,14 @@ namespace {
 
 const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface1Tag = {
     .mfgCode     = DataModel::NullNullable,
-    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
-    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft),
+    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceID::kCommonPosition),
+    .tag         = static_cast<uint8_t>(Clusters::Globals::CommonPositionTag::kLeft),
 };
 
 const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface2Tag = {
     .mfgCode     = DataModel::NullNullable,
-    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
-    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight),
+    .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceID::kCommonPosition),
+    .tag         = static_cast<uint8_t>(Clusters::Globals::CommonPositionTag::kRight),
 };
 
 } // namespace

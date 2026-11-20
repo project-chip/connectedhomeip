@@ -48,7 +48,7 @@ public:
     {
         std::string locationName;
         std::optional<int16_t> floorNumber;
-        std::optional<Globals::AreaTypeTag> areaType;
+        std::optional<Globals::CommonAreaTag> areaType;
 
         OwnedDeviceLocation() = default;
         OwnedDeviceLocation(const Globals::Structs::LocationDescriptorStruct::Type & other) { *this = other; }

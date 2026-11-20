@@ -473,7 +473,7 @@ struct Type
 public:
     chip::CharSpan locationName;
     DataModel::Nullable<int16_t> floorNumber;
-    DataModel::Nullable<Globals::AreaTypeTag> areaType;
+    DataModel::Nullable<Globals::CommonAreaTag> areaType;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

@@ -60,16 +60,16 @@ const WaterValveConfig kValveConfig3 = {
     .tsTracker          = nullptr,
 };
 const EndpointComposition::SemanticTag kValve1[] = {
-    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kLocation), .tag = kLocationZoneTag },
-    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber), .tag = 1 },
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceID::kCommonLocation), .tag = kLocationZoneTag },
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceID::kCommonNumber), .tag = 1 },
 };
 const EndpointComposition::SemanticTag kValve2[] = {
-    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kLocation), .tag = kLocationZoneTag },
-    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber), .tag = 2 },
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceID::kCommonLocation), .tag = kLocationZoneTag },
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceID::kCommonNumber), .tag = 2 },
 };
 const EndpointComposition::SemanticTag kValve3[] = {
-    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kLocation), .tag = kLocationZoneTag },
-    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber), .tag = 3 },
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceID::kCommonLocation), .tag = kLocationZoneTag },
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceID::kCommonNumber), .tag = 3 },
 };
 
 } // namespace

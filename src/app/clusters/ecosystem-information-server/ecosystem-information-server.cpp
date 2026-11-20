@@ -197,7 +197,7 @@ EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetFloorNum
 }
 
 EcosystemLocationStruct::Builder &
-EcosystemLocationStruct::Builder::SetAreaTypeTag(std::optional<Globals::AreaTypeTag> aAreaTypeTag)
+EcosystemLocationStruct::Builder::SetAreaTypeTag(std::optional<Globals::CommonAreaTag> aAreaTypeTag)
 {
     VerifyOrDie(!mIsAlreadyBuilt);
     mLocationDescriptor.mAreaType = aAreaTypeTag;

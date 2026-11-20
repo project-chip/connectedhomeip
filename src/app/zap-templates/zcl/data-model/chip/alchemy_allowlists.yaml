@@ -30,7 +30,6 @@ MANUAL_ALLOWLIST:
     - proxy-valid-cluster.xml
     - pwm-cluster.xml
     - sample-mei-cluster.xml
-    - semantic-tag-namespace-enums.xml
     - test-cluster.xml
     - test-hidden-manufacturer-specific-cluster.xml
 
