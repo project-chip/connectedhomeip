@@ -18,12 +18,14 @@
 
 #include <app/clusters/door-lock-server/DoorLockCluster.h>
 
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/DoorLock/Events.h>
 #include <clusters/DoorLock/Metadata.h>
 #include <lib/support/TimerDelegateMock.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <lib/support/CHIPMem.h>
@@ -133,9 +135,9 @@ public:
     }
 };
 
-Config BasicConfig(TimerDelegate & timerDelegate)
+Config BasicConfig(TimerDelegate & timerDelegate, FabricTable & fabricTable)
 {
-    Config config(timerDelegate);
+    Config config(timerDelegate, fabricTable);
     return config;
 }
 
@@ -159,9 +161,9 @@ public:
     int mStartCount  = 0;
 };
 
-Config FeaturedConfig(TimerDelegate & timerDelegate)
+Config FeaturedConfig(TimerDelegate & timerDelegate, FabricTable & fabricTable)
 {
-    Config config(timerDelegate);
+    Config config(timerDelegate, fabricTable);
     config.features.Set(Feature::kPinCredential).Set(Feature::kUser).Set(Feature::kDoorPositionSensor).Set(Feature::kUnbolt);
     config.optionalAttributes.language                     = true;
     config.optionalAttributes.ledSettings                  = true;
@@ -183,9 +185,9 @@ Config FeaturedConfig(TimerDelegate & timerDelegate)
 /// PIN-only config without the USR feature, so SendPINOverTheAir exists
 /// (it is only present when the User feature is NOT supported and PIN is,
 /// and its optional attribute flag is set).
-Config PinWithoutUserConfig(TimerDelegate & timerDelegate)
+Config PinWithoutUserConfig(TimerDelegate & timerDelegate, FabricTable & fabricTable)
 {
-    Config config(timerDelegate);
+    Config config(timerDelegate, fabricTable);
     config.features.Set(Feature::kPinCredential);
     config.optionalAttributes.sendPINOverTheAir = true;
     config.numberOfPINUsersSupported            = 10;
@@ -197,9 +199,9 @@ Config PinWithoutUserConfig(TimerDelegate & timerDelegate)
 }
 
 /// Aliro config: ALIRO provisioning with BLE UWB.
-Config AliroConfig(TimerDelegate & timerDelegate)
+Config AliroConfig(TimerDelegate & timerDelegate, FabricTable & fabricTable)
 {
-    Config config(timerDelegate);
+    Config config(timerDelegate, fabricTable);
     config.features.Set(Feature::kAliroProvisioning).Set(Feature::kAliroBLEUWB);
     return config;
 }
@@ -211,12 +213,18 @@ public:
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    TestDoorLockClusterBasic() : mCluster(kTestEndpointId, mDelegate, BasicConfig(mTimerDelegate)) {}
+    TestDoorLockClusterBasic() : mCluster(kTestEndpointId, mDelegate, BasicConfig(mTimerDelegate, fabricFixture.GetFabricTable()))
+    {
+        EXPECT_EQ(fabricFixture.SetUpTestFabric(testFabricIndex), CHIP_NO_ERROR);
+    }
 
     void SetUp() override { ASSERT_EQ(mCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR); }
 
     AcceptingDelegate mDelegate;
     TimerDelegateMock mTimerDelegate;
+    chip::TestPersistentStorageDelegate fabricStorage;
+    chip::Testing::FabricTestFixture fabricFixture{ &fabricStorage };
+    chip::FabricIndex testFabricIndex = 1;
     DoorLockCluster mCluster;
     ClusterTester tester{ mCluster };
 };
@@ -228,12 +236,16 @@ public:
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    TestDoorLockClusterFeatured() : mCluster(kTestEndpointId, mDelegate, FeaturedConfig(mTimerDelegate)) {}
+    TestDoorLockClusterFeatured() :
+        mCluster(kTestEndpointId, mDelegate, FeaturedConfig(mTimerDelegate, fabricFixture.GetFabricTable()))
+    {}
 
     void SetUp() override { ASSERT_EQ(mCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR); }
 
     AcceptingDelegate mDelegate;
     TimerDelegateMock mTimerDelegate;
+    chip::TestPersistentStorageDelegate fabricStorage;
+    chip::Testing::FabricTestFixture fabricFixture{ &fabricStorage };
     DoorLockCluster mCluster;
     ClusterTester tester{ mCluster };
 };
@@ -294,6 +306,9 @@ TEST_F(TestDoorLockClusterBasic, FeatureGatedCommandsAreAbsent)
     {
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::UnsupportedCommand);
     }
+
+    // No command implemented by this stage produces a response without USR.
+    EXPECT_TRUE(Testing::IsGeneratedCommandsListEqualTo(mCluster, {}));
 }
 
 TEST_F(TestDoorLockClusterBasic, LockDoorWithoutHardwareSupportFails)
@@ -302,7 +317,7 @@ TEST_F(TestDoorLockClusterBasic, LockDoorWithoutHardwareSupportFails)
     // command reports Failure and a LockOperationError event is emitted.
     RejectingDelegate rejectingDelegate;
     TimerDelegateMock timerDelegate;
-    DoorLockCluster cluster(kTestEndpointId, rejectingDelegate, BasicConfig(timerDelegate));
+    DoorLockCluster cluster(kTestEndpointId, rejectingDelegate, BasicConfig(timerDelegate, fabricFixture.GetFabricTable()));
     ClusterTester rejectingTester(cluster);
     ASSERT_EQ(cluster.Startup(rejectingTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -499,7 +514,7 @@ TEST_F(TestDoorLockClusterFeatured, RescheduledAutoRelockCancelsPendingTimer)
     // TimerDelegate::StartTimer requires cancelling a pending timer for the
     // same context first: a re-schedule must replace the previous auto-relock.
     TrackingTimerDelegate timerDelegate;
-    DoorLockCluster cluster(kTestEndpointId, mDelegate, FeaturedConfig(timerDelegate));
+    DoorLockCluster cluster(kTestEndpointId, mDelegate, FeaturedConfig(timerDelegate, fabricFixture.GetFabricTable()));
     ClusterTester relockTester(cluster);
     ASSERT_EQ(cluster.Startup(relockTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -584,12 +599,15 @@ public:
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    TestDoorLockClusterAliro() : mCluster(kTestEndpointId, mDelegate, AliroConfig(mTimerDelegate)) {}
+    TestDoorLockClusterAliro() : mCluster(kTestEndpointId, mDelegate, AliroConfig(mTimerDelegate, fabricFixture.GetFabricTable()))
+    {}
 
     void SetUp() override { ASSERT_EQ(mCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR); }
 
     UnconfiguredAliroDelegate mDelegate;
     TimerDelegateMock mTimerDelegate;
+    chip::TestPersistentStorageDelegate fabricStorage;
+    chip::Testing::FabricTestFixture fabricFixture{ &fabricStorage };
     DoorLockCluster mCluster;
     ClusterTester tester{ mCluster };
 };
@@ -607,7 +625,7 @@ TEST_F(TestDoorLockClusterFeatured, SendPINOverTheAirPresentWithoutUserFeature)
 {
     // With PIN but without USR, SendPINOverTheAir is present and writable.
     TrackingTimerDelegate timerDelegate;
-    DoorLockCluster cluster(kTestEndpointId, mDelegate, PinWithoutUserConfig(timerDelegate));
+    DoorLockCluster cluster(kTestEndpointId, mDelegate, PinWithoutUserConfig(timerDelegate, fabricFixture.GetFabricTable()));
     ClusterTester pinTester(cluster);
     ASSERT_EQ(cluster.Startup(pinTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -674,3 +692,919 @@ TEST_F(TestDoorLockClusterAliro, ReaderGroupSubIdentifierIsNotNullable)
 }
 
 } // namespace
+
+// =============================================================================
+// Storage delegate: an in-RAM user / credential / schedule database, mirroring
+// the application data model. Used for the user/credential/schedule/aliro
+// command tests.
+// =============================================================================
+
+namespace {
+
+constexpr size_t kStorageUsers        = 10;
+constexpr size_t kStorageCredentials  = 10;
+constexpr uint16_t kClearAllUserIndex = 0xFFFE;
+// Seed slot lists carry the uint16_t type of the userIndex field: ranged-for
+// literal lists would otherwise deduce unsigned int and trip -Wconversion.
+constexpr uint16_t kSeedUserSlots12[] = { 1, 2 };
+constexpr uint16_t kSeedUserSlots13[] = { 1, 3 };
+// Rows are keyed by the credential type: 0 = programming PIN, 1 = PIN,
+// 2 = RFID (the to_underlying values of CredentialTypeEnum).
+constexpr size_t kStorageCredentialTypes     = 3;
+constexpr size_t kStorageSchedules           = 10;
+constexpr uint8_t kStorageCredentialsPerUser = 5;
+
+class StorageDelegate : public TestDelegateBase
+{
+public:
+    bool GetUser(UserIndex userIndex, UserInfo & user) const override
+    {
+        VerifyOrReturnValue(userIndex.IsWithin(static_cast<uint16_t>(kStorageUsers)), false);
+        user = mUsers[userIndex.ZeroBased()];
+        return true;
+    }
+
+    bool SetUser(UserIndex userIndex, FabricIndex creator, FabricIndex modifier, const CharSpan & userName, uint32_t uniqueId,
+                 UserStatusEnum userStatus, UserTypeEnum userType, CredentialRuleEnum credentialRule,
+                 const CredentialStruct * credentials, size_t totalCredentials) override
+    {
+        VerifyOrReturnValue(userIndex.IsWithin(static_cast<uint16_t>(kStorageUsers)), false);
+        // Copy the credentials into owned storage: callers pass buffers that
+        // may go out of scope (or get modified) right after this call.
+        VerifyOrReturnValue(totalCredentials == 0 || (credentials != nullptr && totalCredentials <= kStorageCredentialsPerUser),
+                            false);
+        auto & user     = mUsers[userIndex.ZeroBased()];
+        const auto zero = userIndex.ZeroBased();
+        VerifyOrReturnValue(userName.size() <= kDoorLockMaxUsernameSize, false);
+        MutableCharSpan storedName(mUserNames[zero]);
+        LogErrorOnFailure(CopyCharSpanToMutableCharSpan(userName, storedName));
+        user.userName           = CharSpan(mUserNames[zero], userName.size());
+        user.userUniqueId       = uniqueId;
+        user.userStatus         = userStatus;
+        user.userType           = userType;
+        user.credentialRule     = credentialRule;
+        user.creationSource     = DlAssetSource::kMatterIM;
+        user.createdBy          = creator;
+        user.modificationSource = DlAssetSource::kMatterIM;
+        user.lastModifiedBy     = modifier;
+        for (size_t i = 0; i < totalCredentials; i++)
+        {
+            mUserCredentialsBacking[zero][i] = credentials[i];
+        }
+        user.credentials = Span<const CredentialStruct>(mUserCredentialsBacking[zero], totalCredentials);
+        return true;
+    }
+
+    bool ClearUser(UserIndex userIndex) override
+    {
+        VerifyOrReturnValue(userIndex.IsWithin(static_cast<uint16_t>(kStorageUsers)), false);
+        const auto index = userIndex.ZeroBased();
+
+        // Clearing an available slot is a no-op per the delegate contract, so
+        // the failure hook only applies to occupied rows.
+        const auto savedCredentials = mUsers[index].credentials;
+        if (clearUserFails && UserStatusEnum::kAvailable != mUsers[index].userStatus)
+        {
+            return false;
+        }
+
+        // The saved span points into the backing storage: clear the
+        // referenced credential rows first, then wipe the backing.
+        for (const auto & credential : savedCredentials)
+        {
+            mCredentials[to_underlying(credential.credentialType)][credential.credentialIndex] = StorageCredentialInfo{};
+        }
+        mUsers[index] = UserInfo{};
+        for (auto & credential : mUserCredentialsBacking[index])
+        {
+            credential = CredentialStruct{};
+        }
+        for (auto & schedule : mWeekDaySchedules[index])
+        {
+            schedule = WeekDaySlot{};
+        }
+        for (auto & schedule : mYearDaySchedules[index])
+        {
+            schedule = YearDaySlot{};
+        }
+        return true;
+    }
+
+    bool GetCredential(CredentialIndex credentialIndex, CredentialTypeEnum credentialType,
+                       CredentialInfo & credential) const override
+    {
+        VerifyOrReturnValue(
+            to_underlying(credentialType) < kStorageCredentialTypes && IsValidCredentialIndex(credentialIndex.OneBased()), false);
+        credential = mCredentials[to_underlying(credentialType)][credentialIndex.OneBased()];
+        return true;
+    }
+
+    bool SetCredential(CredentialIndex credentialIndex, FabricIndex creator, FabricIndex modifier,
+                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                       const ByteSpan & credentialData) override
+    {
+        VerifyOrReturnValue(
+            to_underlying(credentialType) < kStorageCredentialTypes && IsValidCredentialIndex(credentialIndex.OneBased()), false);
+
+        auto & slot = mCredentials[to_underlying(credentialType)][credentialIndex.OneBased()];
+        if (credentialStatus == DlCredentialStatus::kAvailable)
+        {
+            slot = StorageCredentialInfo{};
+            return true;
+        }
+
+        VerifyOrReturnValue(credentialData.size() <= sizeof(slot.mCredentialDataBuffer), false);
+        slot.status             = DlCredentialStatus::kOccupied;
+        slot.credentialType     = credentialType;
+        slot.creationSource     = credentialData.empty() ? DlAssetSource::kUnspecified : DlAssetSource::kMatterIM;
+        slot.createdBy          = creator;
+        slot.modificationSource = DlAssetSource::kMatterIM;
+        slot.lastModifiedBy     = modifier;
+        memcpy(slot.mCredentialDataBuffer, credentialData.data(), credentialData.size());
+        slot.credentialData = ByteSpan(reinterpret_cast<uint8_t *>(slot.mCredentialDataBuffer), credentialData.size());
+        return true;
+    }
+
+    DlStatus GetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, WeekDaySchedule & schedule) const override
+    {
+        VerifyOrReturnValue(IsValidScheduleIndex(weekDayIndex.OneBased(), userIndex.OneBased()), DlStatus::kFailure);
+        auto & slot = mWeekDaySchedules[userIndex.ZeroBased()][weekDayIndex.ZeroBased()];
+        if (slot.status != DlScheduleStatus::kOccupied)
+        {
+            return DlStatus::kNotFound;
+        }
+        schedule = slot.schedule;
+        return DlStatus::kSuccess;
+    }
+
+    DlStatus SetSchedule(ScheduleIndex weekDayIndex, UserIndex userIndex, DlScheduleStatus status, DaysMaskMap daysMask,
+                         uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute) override
+    {
+        VerifyOrReturnValue(IsValidScheduleIndex(weekDayIndex.OneBased(), userIndex.OneBased()), DlStatus::kFailure);
+        auto & slot = mWeekDaySchedules[userIndex.ZeroBased()][weekDayIndex.ZeroBased()];
+        if (status == DlScheduleStatus::kAvailable && slot.status == DlScheduleStatus::kAvailable)
+        {
+            return DlStatus::kNotFound;
+        }
+        slot.status   = status;
+        slot.schedule = WeekDaySchedule{ daysMask, startHour, startMinute, endHour, endMinute };
+        return DlStatus::kSuccess;
+    }
+
+    DlStatus GetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, YearDaySchedule & schedule) const override
+    {
+        VerifyOrReturnValue(IsValidScheduleIndex(yearDayIndex.OneBased(), userIndex.OneBased()), DlStatus::kFailure);
+        auto & slot = mYearDaySchedules[userIndex.ZeroBased()][yearDayIndex.ZeroBased()];
+        if (slot.status != DlScheduleStatus::kOccupied)
+        {
+            return DlStatus::kNotFound;
+        }
+        schedule = slot.schedule;
+        return DlStatus::kSuccess;
+    }
+
+    DlStatus SetSchedule(ScheduleIndex yearDayIndex, UserIndex userIndex, DlScheduleStatus status, uint32_t localStartTime,
+                         uint32_t localEndTime) override
+    {
+        VerifyOrReturnValue(IsValidScheduleIndex(yearDayIndex.OneBased(), userIndex.OneBased()), DlStatus::kFailure);
+        auto & slot = mYearDaySchedules[userIndex.ZeroBased()][yearDayIndex.ZeroBased()];
+        if (status == DlScheduleStatus::kAvailable && slot.status == DlScheduleStatus::kAvailable)
+        {
+            return DlStatus::kNotFound;
+        }
+        slot.status   = status;
+        slot.schedule = YearDaySchedule{ localStartTime, localEndTime };
+        return DlStatus::kSuccess;
+    }
+
+    DlStatus GetSchedule(ScheduleIndex holidayIndex, HolidaySchedule & schedule) const override
+    {
+        VerifyOrReturnValue(holidayIndex.IsWithin(static_cast<uint8_t>(kStorageSchedules)), DlStatus::kFailure);
+        auto & slot = mHolidaySchedules[holidayIndex.ZeroBased()];
+        if (slot.status != DlScheduleStatus::kOccupied)
+        {
+            return DlStatus::kNotFound;
+        }
+        schedule = slot.schedule;
+        return DlStatus::kSuccess;
+    }
+
+    DlStatus SetSchedule(ScheduleIndex holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
+                         OperatingModeEnum operatingMode) override
+    {
+        VerifyOrReturnValue(holidayIndex.IsWithin(static_cast<uint8_t>(kStorageSchedules)), DlStatus::kFailure);
+        auto & slot = mHolidaySchedules[holidayIndex.ZeroBased()];
+        if (status == DlScheduleStatus::kAvailable && slot.status == DlScheduleStatus::kAvailable)
+        {
+            return DlStatus::kNotFound;
+        }
+        slot.status   = status;
+        slot.schedule = HolidaySchedule{ localStartTime, localEndTime, operatingMode };
+        return DlStatus::kSuccess;
+    }
+
+    /// Test hook: ClearUser rejects with this set, leaving storage untouched.
+    bool clearUserFails       = false;
+    size_t fabricRemovedCalls = 0;
+
+    void OnFabricRemoved(chip::FabricIndex fabricIndex) override { fabricRemovedCalls++; }
+
+    UserStatusEnum StoredUserStatus(UserIndex userIndex) const { return mUsers[userIndex.ZeroBased()].userStatus; }
+
+    CharSpan StoredUserName(UserIndex userIndex) const { return mUsers[userIndex.ZeroBased()].userName; }
+
+    bool IsWeekDayScheduleOccupied(UserIndex userIndex, ScheduleIndex weekDayIndex) const
+    {
+        return mWeekDaySchedules[userIndex.ZeroBased()][weekDayIndex.ZeroBased()].status == DlScheduleStatus::kOccupied;
+    }
+
+    bool IsYearDayScheduleOccupied(UserIndex userIndex, ScheduleIndex yearDayIndex) const
+    {
+        return mYearDaySchedules[userIndex.ZeroBased()][yearDayIndex.ZeroBased()].status == DlScheduleStatus::kOccupied;
+    }
+
+    /// Returns the number of currently occupied user slots.
+    size_t OccupiedUsers() const
+    {
+        size_t occupied = 0;
+        for (auto & user : mUsers)
+        {
+            if (user.userStatus != UserStatusEnum::kAvailable)
+            {
+                occupied++;
+            }
+        }
+        return occupied;
+    }
+
+private:
+    // The delegate database holds slots 0..kStorageCredentials: 0 is the
+    // programming-PIN slot, 1..kStorageCredentials the regular ones.
+    static bool IsValidCredentialIndex(uint16_t credentialIndex) { return credentialIndex <= kStorageCredentials; }
+    static bool IsValidScheduleIndex(uint8_t scheduleIndex, uint16_t userIndex)
+    {
+        return scheduleIndex >= 1 && scheduleIndex <= kStorageSchedules && userIndex >= 1 && userIndex <= kStorageUsers;
+    }
+
+    struct StorageCredentialInfo : public CredentialInfo
+    {
+        char mCredentialDataBuffer[65];
+    };
+
+    struct WeekDaySlot
+    {
+        DlScheduleStatus status = DlScheduleStatus::kAvailable;
+        WeekDaySchedule schedule{ DaysMaskMap(0) };
+    };
+    struct YearDaySlot
+    {
+        DlScheduleStatus status = DlScheduleStatus::kAvailable;
+        YearDaySchedule schedule{};
+    };
+    struct HolidaySlot
+    {
+        DlScheduleStatus status = DlScheduleStatus::kAvailable;
+        HolidaySchedule schedule{};
+    };
+
+    UserInfo mUsers[kStorageUsers]{};
+    char mUserNames[kStorageUsers][kDoorLockUsernameBufferSize];
+    CredentialStruct mUserCredentialsBacking[kStorageUsers][kStorageCredentialsPerUser];
+    StorageCredentialInfo mCredentials[kStorageCredentialTypes][kStorageCredentials + 1]{};
+    WeekDaySlot mWeekDaySchedules[kStorageUsers][kStorageSchedules];
+    YearDaySlot mYearDaySchedules[kStorageUsers][kStorageSchedules];
+    HolidaySlot mHolidaySchedules[kStorageSchedules];
+};
+} // namespace
+
+/// Storage config: PIN + RFID + user management + all schedules, capacities
+/// matching the storage delegate database.
+Config StorageConfig(TimerDelegate & timerDelegate, FabricTable & fabricTable)
+{
+    Config config(timerDelegate, fabricTable);
+    config.features.Set(Feature::kPinCredential)
+        .Set(Feature::kRfidCredential)
+        .Set(Feature::kUser)
+        .Set(Feature::kWeekDayAccessSchedules)
+        .Set(Feature::kYearDayAccessSchedules)
+        .Set(Feature::kHolidaySchedules);
+    config.numberOfTotalUsersSupported         = kStorageUsers;
+    config.numberOfPINUsersSupported           = kStorageCredentials;
+    config.numberOfRFIDUsersSupported          = kStorageCredentials;
+    config.numberOfWeekDaySchedulesPerUser     = kStorageSchedules;
+    config.numberOfYearDaySchedulesPerUser     = kStorageSchedules;
+    config.numberOfHolidaySchedulesSupported   = kStorageSchedules;
+    config.numberOfCredentialsSupportedPerUser = kStorageCredentialsPerUser;
+    config.maxPINCodeLength                    = 8;
+    config.minPINCodeLength                    = 4;
+    config.maxRFIDCodeLength                   = 20;
+    config.minRFIDCodeLength                   = 10;
+    config.wrongCodeEntryLimit                 = 5;
+    config.userCodeTemporaryDisableTime        = 10;
+    // EnableAutoRelock = false (no relock in the storage tests).
+    return config;
+}
+
+class TestDoorLockClusterStorage : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    TestDoorLockClusterStorage() :
+        mCluster(kTestEndpointId, mDelegate, StorageConfig(mTimerDelegate, fabricFixture.GetFabricTable()))
+    {}
+
+    void SetUp() override { ASSERT_EQ(mCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR); }
+
+    StorageDelegate mDelegate;
+    TimerDelegateMock mTimerDelegate;
+    chip::TestPersistentStorageDelegate fabricStorage;
+    chip::Testing::FabricTestFixture fabricFixture{ &fabricStorage };
+    DoorLockCluster mCluster;
+    ClusterTester tester{ mCluster };
+};
+
+namespace {
+
+void ExpectLockUserChangeEvent(ClusterTester & tester, DataOperationTypeEnum operation, uint16_t userIndex)
+{
+    auto event = tester.GetNextGeneratedEvent();
+    ASSERT_TRUE(event.has_value());
+    if (!event.has_value())
+    {
+        return;
+    }
+
+    Events::LockUserChange::DecodableType data;
+    ASSERT_EQ(event->GetEventData(data), CHIP_NO_ERROR);
+    EXPECT_EQ(data.lockDataType, LockDataTypeEnum::kUserIndex);
+    EXPECT_EQ(data.dataOperationType, operation);
+    ASSERT_FALSE(data.userIndex.IsNull());
+    EXPECT_EQ(data.userIndex.Value(), userIndex);
+}
+
+} // namespace
+
+// =============================================================================
+// User / credential / schedule / aliro command tests
+// =============================================================================
+
+TEST_F(TestDoorLockClusterBasic, StartupRejectsUserCapacityCollidingWithClearAll)
+{
+    // 0xFFFE is the ClearUser clear-all index: a user capacity reaching it
+    // cannot be addressed by a valid user index and would collide with the
+    // wildcard.
+    Config config(mTimerDelegate, fabricFixture.GetFabricTable());
+    config.features.Set(Feature::kUser);
+    config.numberOfTotalUsersSupported = 0xFFFE;
+
+    // Records user-storage accesses: with the broken capacity, the command
+    // handlers must reject before touching the user store.
+    class AccessCountingDelegate : public TestDelegateBase
+    {
+    public:
+        bool GetUser(UserIndex, UserInfo &) const override { return ++userStorageAccesses, false; }
+        bool SetUser(UserIndex, FabricIndex, FabricIndex, const CharSpan &, uint32_t, UserStatusEnum, UserTypeEnum,
+                     CredentialRuleEnum, const CredentialStruct *, size_t) override
+        {
+            return ++userStorageAccesses, false;
+        }
+        bool ClearUser(UserIndex) override { return ++userStorageAccesses, false; }
+
+        mutable size_t userStorageAccesses = 0;
+    };
+    AccessCountingDelegate countingDelegate;
+    DoorLockCluster collidingCluster(kTestEndpointId + 1, countingDelegate, config);
+
+    // The registry keeps the cluster reachable even though its Startup failed,
+    // so only the user command handlers keep the broken capacity from
+    // affecting the user commands. The registry performs the startup attempt:
+    // a second startup on the same cluster would short-circuit in the base.
+    {
+        // The registration must outlive the registry for its cleanup, and is
+        // unregistered explicitly before the scope ends.
+        ServerClusterRegistration registration(collidingCluster);
+        ServerClusterInterfaceRegistry registry;
+        EXPECT_EQ(registry.Register(registration), CHIP_NO_ERROR);
+
+        ServerClusterContext context(tester.GetServerClusterContext());
+        EXPECT_EQ(registry.SetContext(std::move(context)), CHIP_ERROR_HAD_FAILURES);
+        EXPECT_NE(registry.Get(ConcreteClusterPath(kTestEndpointId + 1, DoorLock::Id)), nullptr);
+
+        ClusterTester collidingTester{ collidingCluster };
+        EXPECT_EQ(countingDelegate.userStorageAccesses, 0u);
+
+        Commands::ClearUser::Type clearRequest;
+        clearRequest.userIndex = kClearAllUserIndex; // the clear-all wildcard
+        auto clearAll          = collidingTester.Invoke(Commands::ClearUser::Id, clearRequest);
+        ASSERT_TRUE(clearAll.status.has_value());
+        EXPECT_EQ(clearAll.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Failure);
+        EXPECT_EQ(countingDelegate.userStorageAccesses, 0u);
+
+        Commands::SetUser::Type setUserRequest;
+        setUserRequest.userIndex      = 1;
+        setUserRequest.operationType  = DataOperationTypeEnum::kAdd;
+        setUserRequest.userStatus     = DataModel::Nullable<UserStatusEnum>(UserStatusEnum::kOccupiedEnabled);
+        setUserRequest.userType       = DataModel::Nullable<UserTypeEnum>(UserTypeEnum::kUnrestrictedUser);
+        setUserRequest.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kSingle);
+        auto setUser                  = collidingTester.Invoke(Commands::SetUser::Id, setUserRequest);
+        ASSERT_TRUE(setUser.status.has_value());
+        EXPECT_EQ(setUser.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Failure);
+        EXPECT_EQ(countingDelegate.userStorageAccesses, 0u);
+
+        Commands::GetUser::Type getUserRequest;
+        getUserRequest.userIndex = 1;
+        auto getUser             = collidingTester.Invoke(Commands::GetUser::Id, getUserRequest);
+        ASSERT_TRUE(getUser.status.has_value());
+        EXPECT_EQ(getUser.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Failure);
+        EXPECT_EQ(countingDelegate.userStorageAccesses, 0u);
+
+        registry.ClearContext();
+        EXPECT_EQ(registry.Unregister(&collidingCluster), CHIP_NO_ERROR);
+    }
+}
+
+TEST_F(TestDoorLockClusterBasic, UserManagementUnsupportedWithoutFeature)
+{
+    // USR feature is required for the user commands.
+    Commands::SetUser::Type request;
+    request.userIndex      = 1;
+    request.operationType  = DataOperationTypeEnum::kAdd;
+    request.userName       = DataModel::Nullable<CharSpan>(CharSpan::fromCharString("alice"));
+    request.userUniqueID   = DataModel::Nullable<uint32_t>(1);
+    request.userStatus     = DataModel::Nullable<UserStatusEnum>(UserStatusEnum::kOccupiedEnabled);
+    request.userType       = DataModel::Nullable<UserTypeEnum>(UserTypeEnum::kUnrestrictedUser);
+    request.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kSingle);
+
+    auto result = tester.Invoke(Commands::SetUser::Id, request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::UnsupportedCommand);
+
+    Commands::GetUser::Type getUserRequest;
+    getUserRequest.userIndex = 1;
+    auto getUser             = tester.Invoke(Commands::GetUser::Id, getUserRequest);
+    ASSERT_TRUE(getUser.status.has_value());
+    EXPECT_EQ(getUser.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::UnsupportedCommand);
+}
+
+TEST_F(TestDoorLockClusterStorage, GeneratedCommandListContainsGetUserResponse)
+{
+    // GetUser is the only command accepted by this stage that has a response.
+    EXPECT_TRUE(Testing::IsGeneratedCommandsListEqualTo(mCluster, { Commands::GetUserResponse::Id }));
+}
+
+TEST_F(TestDoorLockClusterStorage, SetUserCreateModifyClearEmitsUserChangeEvents)
+{
+    // Create user 1 with a name.
+    Commands::SetUser::Type request;
+    request.userIndex      = 1;
+    request.operationType  = DataOperationTypeEnum::kAdd;
+    request.userName       = DataModel::Nullable<CharSpan>(CharSpan::fromCharString("alice"));
+    request.userUniqueID   = DataModel::Nullable<uint32_t>(); // null => default 0xFFFFFFFF
+    request.userStatus     = DataModel::Nullable<UserStatusEnum>(UserStatusEnum::kOccupiedEnabled);
+    request.userType       = DataModel::Nullable<UserTypeEnum>(UserTypeEnum::kUnrestrictedUser);
+    request.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kSingle);
+    auto createResult      = tester.Invoke(Commands::SetUser::Id, request);
+    ASSERT_TRUE(createResult.status.has_value());
+    if (createResult.status.has_value())
+    {
+        EXPECT_EQ(createResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+    }
+    EXPECT_EQ(mDelegate.OccupiedUsers(), 1u);
+    ExpectLockUserChangeEvent(tester, DataOperationTypeEnum::kAdd, 1);
+
+    // Creating on the same slot again reports the cluster-specific OCCUPIED (3).
+    auto occupiedResult = tester.Invoke(Commands::SetUser::Id, request);
+    ASSERT_TRUE(occupiedResult.status.has_value());
+    if (occupiedResult.status.has_value())
+    {
+        auto clusterCode = occupiedResult.status->GetStatusCode().GetClusterSpecificCode();
+        ASSERT_TRUE(clusterCode.has_value());
+        if (clusterCode.has_value())
+        {
+            EXPECT_EQ(clusterCode.value(), to_underlying(DlStatus::kOccupied));
+        }
+    }
+
+    // Modify user 1: keeps a single occupied user.
+    request.operationType = DataOperationTypeEnum::kModify;
+    request.userName      = DataModel::Nullable<CharSpan>(CharSpan::fromCharString("alicia"));
+    auto modifyUser       = tester.Invoke(Commands::SetUser::Id, request);
+    ASSERT_TRUE(modifyUser.status.has_value());
+    if (modifyUser.status.has_value())
+    {
+        EXPECT_EQ(modifyUser.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+    }
+    EXPECT_EQ(mDelegate.OccupiedUsers(), 1u);
+    ExpectLockUserChangeEvent(tester, DataOperationTypeEnum::kModify, 1);
+
+    // The modify stored the new name.
+    {
+        Commands::GetUser::Type readRequest;
+        readRequest.userIndex = 1;
+        auto read             = tester.Invoke(Commands::GetUser::Id, readRequest);
+        ASSERT_TRUE(read.IsSuccess());
+        ASSERT_TRUE(read.response.has_value());
+        if (read.response.has_value())
+        {
+            ASSERT_FALSE(read.response->userName.IsNull());
+            EXPECT_TRUE(read.response->userName.Value().data_equal("alicia"_span));
+        }
+    }
+
+    // Clear: the user goes away.
+    Commands::ClearUser::Type clearRequest;
+    clearRequest.userIndex = 1;
+    auto clearResult       = tester.Invoke(Commands::ClearUser::Id, clearRequest);
+    ASSERT_TRUE(clearResult.status.has_value());
+    if (clearResult.status.has_value())
+    {
+        EXPECT_EQ(clearResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+    }
+    EXPECT_EQ(mDelegate.OccupiedUsers(), 0u);
+    ExpectLockUserChangeEvent(tester, DataOperationTypeEnum::kClear, 1);
+}
+
+TEST_F(TestDoorLockClusterStorage, ClearUserFailsAtomicallyWhenDelegateRejectsTheBatch)
+{
+    Commands::SetUser::Type request;
+    request.userIndex      = 1;
+    request.operationType  = DataOperationTypeEnum::kAdd;
+    request.userName       = DataModel::Nullable<CharSpan>(CharSpan::fromCharString("alice"));
+    request.userUniqueID   = DataModel::Nullable<uint32_t>(7);
+    request.userStatus     = DataModel::Nullable<UserStatusEnum>(UserStatusEnum::kOccupiedEnabled);
+    request.userType       = DataModel::Nullable<UserTypeEnum>(UserTypeEnum::kUnrestrictedUser);
+    request.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kSingle);
+    {
+        auto create = tester.Invoke(Commands::SetUser::Id, request);
+        ASSERT_TRUE(create.IsSuccess());
+    }
+    ExpectLockUserChangeEvent(tester, DataOperationTypeEnum::kAdd, 1);
+
+    // Seed a referenced credential and both schedule kinds so the batch check
+    // covers every record the user owns.
+    CredentialStruct pinCredential{ CredentialTypeEnum::kPin, 1 };
+    EXPECT_TRUE(mDelegate.SetUser(UserIndex::FromOneBased(1), 2, 2, CharSpan::fromCharString("alice"), 0,
+                                  UserStatusEnum::kOccupiedEnabled, UserTypeEnum::kUnrestrictedUser, CredentialRuleEnum::kSingle,
+                                  &pinCredential, 1));
+    uint8_t pinData[] = { 0x11, 0x22, 0x33, 0x44 };
+    EXPECT_TRUE(mDelegate.SetCredential(CredentialIndex::FromOneBased(1), 2, 2, DlCredentialStatus::kOccupied,
+                                        CredentialTypeEnum::kPin, ByteSpan(pinData)));
+    EXPECT_EQ(mDelegate.SetSchedule(ScheduleIndex::FromOneBased(1), UserIndex::FromOneBased(1), DlScheduleStatus::kOccupied,
+                                    DaysMaskMap(0x01), 6, 0, 8, 0),
+              DlStatus::kSuccess);
+    EXPECT_EQ(
+        mDelegate.SetSchedule(ScheduleIndex::FromOneBased(1), UserIndex::FromOneBased(1), DlScheduleStatus::kOccupied, 100, 200),
+        DlStatus::kSuccess);
+
+    // A rejected batch leaves every record untouched: the command reports
+    // FAILURE while the user, its credential and both schedules stay.
+    mDelegate.clearUserFails = true;
+    Commands::ClearUser::Type clearRequest;
+    clearRequest.userIndex = 1;
+    auto failedClear       = tester.Invoke(Commands::ClearUser::Id, clearRequest);
+    ASSERT_TRUE(failedClear.status.has_value());
+    EXPECT_EQ(failedClear.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Failure);
+
+    CredentialInfo storedCredential;
+    EXPECT_TRUE(mDelegate.GetCredential(CredentialIndex::FromOneBased(1), CredentialTypeEnum::kPin, storedCredential));
+    EXPECT_EQ(storedCredential.status, DlCredentialStatus::kOccupied);
+    EXPECT_EQ(mDelegate.StoredUserStatus(UserIndex::FromOneBased(1)), UserStatusEnum::kOccupiedEnabled);
+    EXPECT_TRUE(mDelegate.StoredUserName(UserIndex::FromOneBased(1)).data_equal("alice"_span));
+    EXPECT_TRUE(mDelegate.IsWeekDayScheduleOccupied(UserIndex::FromOneBased(1), ScheduleIndex::FromOneBased(1)));
+    EXPECT_TRUE(mDelegate.IsYearDayScheduleOccupied(UserIndex::FromOneBased(1), ScheduleIndex::FromOneBased(1)));
+    EXPECT_EQ(mDelegate.OccupiedUsers(), 1u);
+
+    mDelegate.clearUserFails = false;
+    auto clear               = tester.Invoke(Commands::ClearUser::Id, clearRequest);
+    ASSERT_TRUE(clear.IsSuccess());
+
+    EXPECT_TRUE(mDelegate.GetCredential(CredentialIndex::FromOneBased(1), CredentialTypeEnum::kPin, storedCredential));
+    EXPECT_EQ(storedCredential.status, DlCredentialStatus::kAvailable);
+    EXPECT_EQ(mDelegate.StoredUserStatus(UserIndex::FromOneBased(1)), UserStatusEnum::kAvailable);
+    EXPECT_FALSE(mDelegate.IsWeekDayScheduleOccupied(UserIndex::FromOneBased(1), ScheduleIndex::FromOneBased(1)));
+    EXPECT_FALSE(mDelegate.IsYearDayScheduleOccupied(UserIndex::FromOneBased(1), ScheduleIndex::FromOneBased(1)));
+    EXPECT_EQ(mDelegate.OccupiedUsers(), 0u);
+    ExpectLockUserChangeEvent(tester, DataOperationTypeEnum::kClear, 1);
+}
+
+TEST_F(TestDoorLockClusterStorage, LockStateIsPersistedAndRestoredWithAStartupRelock)
+{
+    // Unlock the first cluster with auto-relock disabled so the persisted
+    // state stays unlocked (the StorageConfig sets AutoRelockTime to 0 and
+    // the fixture's mock timer is advanced freely afterwards).
+    DataModel::Nullable<chip::FabricIndex> noFabric;
+    DataModel::Nullable<chip::NodeId> noNode;
+    Span<const CredentialStruct> noCredentials;
+    EXPECT_EQ(mCluster.SetLockState(DlLockState::kUnlocked, OperationSourceEnum::kUnspecified, DataModel::Nullable<uint16_t>(),
+                                    noCredentials, noFabric, noNode),
+              CHIP_NO_ERROR);
+    tester.GetNextGeneratedEvent();
+
+    // The reload keeps the persisted state and schedules an auto-relock for
+    // the restored unlocked state.
+    Config reloadedConfig         = StorageConfig(mTimerDelegate, fabricFixture.GetFabricTable());
+    reloadedConfig.autoRelockTime = 30;
+    DoorLockCluster reloadedCluster(kTestEndpointId, mDelegate, reloadedConfig);
+    EXPECT_EQ(reloadedCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    DataModel::Nullable<DlLockState> lockState;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::LockState::Id, lockState), CHIP_NO_ERROR);
+    ASSERT_FALSE(lockState.IsNull());
+    EXPECT_EQ(lockState.Value(), DlLockState::kUnlocked);
+
+    // Relock scheduling on a restored unlocked door: the mock timer fires
+    // and the reloaded cluster locks the door again.
+    ClusterTester reloadedTester{ reloadedCluster };
+    mTimerDelegate.AdvanceClock(System::Clock::Seconds32(30));
+    EXPECT_EQ(reloadedTester.ReadAttribute(Attributes::LockState::Id, lockState), CHIP_NO_ERROR);
+    ASSERT_FALSE(lockState.IsNull());
+    EXPECT_EQ(lockState.Value(), DlLockState::kLocked);
+
+    reloadedCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestDoorLockClusterStorage, ModifyUserAppliesTheCrossFabricRules)
+{
+    // Seed user 1 created by a different fabric than the tester's.
+    EXPECT_TRUE(mDelegate.SetUser(UserIndex::FromOneBased(1), 2, 2, CharSpan::fromCharString("alice"), 7,
+                                  UserStatusEnum::kOccupiedEnabled, UserTypeEnum::kUnrestrictedUser, CredentialRuleEnum::kSingle,
+                                  nullptr, 0));
+
+    // The name and the unique id only change with the creator fabric.
+    Commands::SetUser::Type request;
+    request.userIndex      = 1;
+    request.operationType  = DataOperationTypeEnum::kModify;
+    request.userName       = DataModel::Nullable<CharSpan>(CharSpan::fromCharString("alicia"));
+    request.userUniqueID   = DataModel::Nullable<uint32_t>(9);
+    request.userStatus     = DataModel::Nullable<UserStatusEnum>(UserStatusEnum::kOccupiedEnabled);
+    request.userType       = DataModel::Nullable<UserTypeEnum>(UserTypeEnum::kUnrestrictedUser);
+    request.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kSingle);
+    auto modifyNamed       = tester.Invoke(Commands::SetUser::Id, request);
+    ASSERT_TRUE(modifyNamed.status.has_value());
+    EXPECT_EQ(modifyNamed.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    EXPECT_TRUE(mDelegate.StoredUserName(UserIndex::FromOneBased(1)).data_equal("alice"_span));
+
+    // A status-only modify (name and id null) is allowed for other fabrics.
+    request.userName     = DataModel::Nullable<CharSpan>();
+    request.userUniqueID = DataModel::Nullable<uint32_t>();
+    auto modifyStatus    = tester.Invoke(Commands::SetUser::Id, request);
+    ASSERT_TRUE(modifyStatus.status.has_value());
+    EXPECT_EQ(modifyStatus.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(mDelegate.StoredUserStatus(UserIndex::FromOneBased(1)), UserStatusEnum::kOccupiedEnabled);
+
+    // Modifying an empty slot is rejected.
+    request.userIndex = 4;
+    request.userName  = DataModel::Nullable<CharSpan>(CharSpan::fromCharString("someone"));
+    auto emptyModify  = tester.Invoke(Commands::SetUser::Id, request);
+    ASSERT_TRUE(emptyModify.status.has_value());
+    EXPECT_EQ(emptyModify.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+}
+
+TEST_F(TestDoorLockClusterStorage, ClearAllRemovesEveryUserAndEmitsOneWildcardEvent)
+{
+    for (auto slot : kSeedUserSlots12)
+    {
+        Commands::SetUser::Type request;
+        request.userIndex      = slot;
+        request.operationType  = DataOperationTypeEnum::kAdd;
+        request.userStatus     = DataModel::Nullable<UserStatusEnum>(UserStatusEnum::kOccupiedEnabled);
+        request.userType       = DataModel::Nullable<UserTypeEnum>(UserTypeEnum::kUnrestrictedUser);
+        request.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kSingle);
+        auto create            = tester.Invoke(Commands::SetUser::Id, request);
+        ASSERT_TRUE(create.IsSuccess());
+    }
+    tester.GetNextGeneratedEvent();
+    tester.GetNextGeneratedEvent();
+
+    Commands::ClearUser::Type clearRequest;
+    clearRequest.userIndex = kClearAllUserIndex;
+    auto clear             = tester.Invoke(Commands::ClearUser::Id, clearRequest);
+    ASSERT_TRUE(clear.IsSuccess());
+    EXPECT_EQ(mDelegate.OccupiedUsers(), 0u);
+
+    // One wildcard event represents the whole clear-all command.
+    auto event = tester.GetNextGeneratedEvent();
+    ASSERT_TRUE(event.has_value());
+    if (event.has_value())
+    {
+        Events::LockUserChange::DecodableType data;
+        ASSERT_EQ(event->GetEventData(data), CHIP_NO_ERROR);
+        ASSERT_FALSE(data.userIndex.IsNull());
+        EXPECT_EQ(to_underlying(data.dataOperationType), to_underlying(DataOperationTypeEnum::kClear));
+        EXPECT_EQ(data.userIndex.Value(), static_cast<uint16_t>(0xFFFEu));
+        EXPECT_FALSE(tester.GetNextGeneratedEvent().has_value());
+    }
+}
+
+TEST_F(TestDoorLockClusterStorage, ClearAllFailsWithoutAnyEventWhenABatchFails)
+{
+    for (auto slot : kSeedUserSlots13)
+    {
+        Commands::SetUser::Type request;
+        request.userIndex      = slot;
+        request.operationType  = DataOperationTypeEnum::kAdd;
+        request.userStatus     = DataModel::Nullable<UserStatusEnum>(UserStatusEnum::kOccupiedEnabled);
+        request.userType       = DataModel::Nullable<UserTypeEnum>(UserTypeEnum::kUnrestrictedUser);
+        request.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kSingle);
+        auto create            = tester.Invoke(Commands::SetUser::Id, request);
+        ASSERT_TRUE(create.IsSuccess());
+    }
+    tester.GetNextGeneratedEvent();
+    tester.GetNextGeneratedEvent();
+
+    // The failure in the clear-all batch aborts the whole command and no
+    // wildcard event is emitted: user 1 is already removed, user 3 stays.
+    mDelegate.clearUserFails = true;
+    Commands::ClearUser::Type clearRequest;
+    clearRequest.userIndex = kClearAllUserIndex;
+    auto clear             = tester.Invoke(Commands::ClearUser::Id, clearRequest);
+    ASSERT_TRUE(clear.status.has_value());
+    EXPECT_EQ(clear.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Failure);
+    EXPECT_EQ(mDelegate.StoredUserStatus(UserIndex::FromOneBased(3)), UserStatusEnum::kOccupiedEnabled);
+    EXPECT_FALSE(tester.GetNextGeneratedEvent().has_value());
+    EXPECT_EQ(mDelegate.fabricRemovedCalls, 0u);
+}
+
+TEST_F(TestDoorLockClusterStorage, FabricRemovalReclaimsUserRecordsAndNotifiesTheDelegate)
+{
+    // Seed a user created by fabric 2 (outside the tester fabric setup).
+    EXPECT_TRUE(mDelegate.SetUser(UserIndex::FromOneBased(1), 2, 2, CharSpan::fromCharString("alice"), 0,
+                                  UserStatusEnum::kOccupiedEnabled, UserTypeEnum::kUnrestrictedUser, CredentialRuleEnum::kSingle,
+                                  nullptr, 0));
+
+    mCluster.OnFabricRemoved(2);
+    EXPECT_EQ(mDelegate.fabricRemovedCalls, 1u);
+    EXPECT_EQ(mDelegate.StoredUserStatus(UserIndex::FromOneBased(1)), UserStatusEnum::kOccupiedEnabled);
+
+    Commands::GetUser::Type request;
+    request.userIndex = 1;
+    auto result       = tester.Invoke(Commands::GetUser::Id, request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    if (result.response.has_value())
+    {
+        // The record keeps its user fields, but the removed fabric identity
+        // is gone.
+        EXPECT_TRUE(result.response->creatorFabricIndex.IsNull());
+        EXPECT_TRUE(result.response->lastModifiedFabricIndex.IsNull());
+    }
+}
+
+TEST_F(TestDoorLockClusterStorage, SetUserIndexBoundsAndInvalidStatus)
+{
+    Commands::SetUser::Type request;
+    request.userIndex      = 0; // out of bounds
+    request.operationType  = DataOperationTypeEnum::kAdd;
+    request.userName       = DataModel::Nullable<CharSpan>(CharSpan::fromCharString(""));
+    request.userUniqueID   = DataModel::Nullable<uint32_t>(5);
+    request.userStatus     = DataModel::Nullable<UserStatusEnum>(UserStatusEnum::kOccupiedEnabled);
+    request.userType       = DataModel::Nullable<UserTypeEnum>(UserTypeEnum::kUnrestrictedUser);
+    request.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kSingle);
+
+    auto result = tester.Invoke(Commands::SetUser::Id, request);
+    ASSERT_TRUE(result.status.has_value());
+    if (result.status.has_value())
+    {
+        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
+
+    // Status 0x00 is reserved / not settable.
+    request.userIndex  = 1;
+    request.userStatus = DataModel::Nullable<UserStatusEnum>(static_cast<UserStatusEnum>(0));
+    result             = tester.Invoke(Commands::SetUser::Id, request);
+    ASSERT_TRUE(result.status.has_value());
+    if (result.status.has_value())
+    {
+        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
+
+    // Clear is not an allowed SetUser operation.
+    request.userStatus    = DataModel::Nullable<UserStatusEnum>(UserStatusEnum::kOccupiedEnabled);
+    request.userIndex     = 1;
+    request.operationType = DataOperationTypeEnum::kClear;
+    result                = tester.Invoke(Commands::SetUser::Id, request);
+    ASSERT_TRUE(result.status.has_value());
+    if (result.status.has_value())
+    {
+        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
+    EXPECT_EQ(mDelegate.OccupiedUsers(), 0u);
+}
+
+TEST_F(TestDoorLockClusterStorage, SetUserRejectsUnadvertisedCredentialRule)
+{
+    // CredentialRulesSupport defaults to the single rule only.
+    Commands::SetUser::Type request;
+    request.userIndex      = 1;
+    request.operationType  = DataOperationTypeEnum::kAdd;
+    request.userName       = DataModel::Nullable<CharSpan>(CharSpan::fromCharString("alice"));
+    request.userUniqueID   = DataModel::Nullable<uint32_t>(1);
+    request.userStatus     = DataModel::Nullable<UserStatusEnum>(UserStatusEnum::kOccupiedEnabled);
+    request.userType       = DataModel::Nullable<UserTypeEnum>(UserTypeEnum::kUnrestrictedUser);
+    request.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kDual);
+    auto result            = tester.Invoke(Commands::SetUser::Id, request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    EXPECT_EQ(mDelegate.OccupiedUsers(), 0u);
+
+    // The advertised rule is accepted.
+    request.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kSingle);
+    auto accepted          = tester.Invoke(Commands::SetUser::Id, request);
+    ASSERT_TRUE(accepted.IsSuccess());
+    EXPECT_EQ(mDelegate.OccupiedUsers(), 1u);
+}
+
+TEST_F(TestDoorLockClusterStorage, GetUserReportsNextUserIndex)
+{
+    // Seed occupied users 1 and 3; reading user 1 reports 3 as next.
+    for (auto slot : kSeedUserSlots13)
+    {
+        Commands::SetUser::Type request;
+        request.userIndex      = static_cast<uint16_t>(slot);
+        request.operationType  = DataOperationTypeEnum::kAdd;
+        request.userName       = DataModel::Nullable<CharSpan>(CharSpan::fromCharString("u"));
+        request.userStatus     = DataModel::Nullable<UserStatusEnum>(UserStatusEnum::kOccupiedEnabled);
+        request.userType       = DataModel::Nullable<UserTypeEnum>(UserTypeEnum::kUnrestrictedUser);
+        request.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kSingle);
+        auto create            = tester.Invoke(Commands::SetUser::Id, request);
+        ASSERT_TRUE(create.IsSuccess());
+    }
+    tester.GetNextGeneratedEvent();
+    tester.GetNextGeneratedEvent();
+
+    Commands::GetUser::Type request;
+    request.userIndex = 1;
+    auto result       = tester.Invoke(Commands::GetUser::Id, request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    if (result.response.has_value())
+    {
+        ASSERT_FALSE(result.response->nextUserIndex.IsNull());
+        EXPECT_EQ(result.response->nextUserIndex.Value(), 3u);
+    }
+
+    // Reading the last occupied slot reports no next user.
+    request.userIndex = 3;
+    result            = tester.Invoke(Commands::GetUser::Id, request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    if (result.response.has_value())
+    {
+        EXPECT_TRUE(result.response->nextUserIndex.IsNull());
+    }
+}
+
+TEST_F(TestDoorLockClusterStorage, GetUserResponseOnOccupiedAndEmptySlots)
+{
+    // Create user 2 via SetUser then read back through GetUser.
+    Commands::SetUser::Type setUserRequest;
+    setUserRequest.userIndex      = 2;
+    setUserRequest.operationType  = DataOperationTypeEnum::kAdd;
+    setUserRequest.userName       = DataModel::Nullable<CharSpan>(CharSpan::fromCharString("bob"));
+    setUserRequest.userUniqueID   = DataModel::Nullable<uint32_t>(42);
+    setUserRequest.userStatus     = DataModel::Nullable<UserStatusEnum>(UserStatusEnum::kOccupiedEnabled);
+    setUserRequest.userType       = DataModel::Nullable<UserTypeEnum>(UserTypeEnum::kUnrestrictedUser);
+    setUserRequest.credentialRule = DataModel::Nullable<CredentialRuleEnum>(CredentialRuleEnum::kSingle);
+    {
+        auto setStatus = tester.Invoke(Commands::SetUser::Id, setUserRequest);
+        ASSERT_TRUE(setStatus.status.has_value());
+        if (setStatus.status.has_value())
+        {
+            ASSERT_TRUE(setStatus.status->IsSuccess());
+        }
+    }
+    tester.GetNextGeneratedEvent();
+
+    Commands::GetUser::Type request;
+    request.userIndex = 2;
+    auto result       = tester.Invoke(Commands::GetUser::Id, request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response->userIndex, 2u);
+        EXPECT_TRUE(result.response->nextUserIndex.IsNull());
+        ASSERT_FALSE(result.response->userName.IsNull());
+        EXPECT_TRUE(result.response->userName.Value().data_equal("bob"_span));
+        ASSERT_FALSE(result.response->userUniqueID.IsNull());
+        EXPECT_EQ(result.response->userUniqueID.Value(), 42u);
+        // SetUser records Matter as the creation and modification source.
+        EXPECT_FALSE(result.response->creatorFabricIndex.IsNull());
+        EXPECT_FALSE(result.response->lastModifiedFabricIndex.IsNull());
+    }
+
+    // Empty slot: fields stay null, only userIndex is set.
+    request.userIndex = 3;
+    result            = tester.Invoke(Commands::GetUser::Id, request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response->userIndex, 3u);
+        EXPECT_TRUE(result.response->userName.IsNull());
+        EXPECT_TRUE(result.response->userUniqueID.IsNull());
+        EXPECT_TRUE(result.response->nextUserIndex.IsNull());
+    }
+}

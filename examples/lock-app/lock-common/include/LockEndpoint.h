@@ -104,6 +104,10 @@ public:
                  uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
                  const CredentialStruct * credentials, size_t totalCredentials) override;
 
+    /// Removes the user record, its credentials and its schedules as one
+    /// batch; available slots are a no-op.
+    bool ClearUser(UserIndex userIndex) override;
+
     bool SetDoorState(DoorStateEnum newState);
 
     DoorStateEnum GetDoorState() const;
