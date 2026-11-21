@@ -462,6 +462,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
 - (BOOL)unitTestPretendWiFiPoolEnabled:(MTRDevice *)device;
 - (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
+- (void)unitTestSubscriptionPoolAdmitted:(MTRDevice *)device usesWiFiPool:(BOOL)usesWiFiPool;
 - (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device;
 - (void)unitTestClusterDataPersisted:(MTRDevice *)device;
 - (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device;
@@ -1720,6 +1721,13 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
                 mtr_strongify(self);
                 if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionPoolDequeue:)]) {
                     [testDelegate unitTestSubscriptionPoolDequeue:self];
+                }
+            }];
+            // Synchronous, under the lock, while this work item still holds its pool slot, so a test can
+            // read which pool admitted it before the slot can be released.
+            [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+                if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionPoolAdmitted:usesWiFiPool:)]) {
+                    [testDelegate unitTestSubscriptionPoolAdmitted:self usesWiFiPool:usesWiFiPool];
                 }
             }];
 #endif

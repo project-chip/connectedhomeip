@@ -112,6 +112,13 @@
     }
 }
 
+- (void)unitTestSubscriptionPoolAdmitted:(MTRDevice *)device usesWiFiPool:(BOOL)usesWiFiPool
+{
+    if (self.onSubscriptionPoolAdmitted != nil) {
+        self.onSubscriptionPoolAdmitted(usesWiFiPool);
+    }
+}
+
 - (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device
 {
     if (self.onSubscriptionPoolWorkComplete != nil) {
