@@ -70,7 +70,8 @@ public:
      *
      *   - CHIP_NO_ERROR:   the stack is in central role.
      *   - CHIP_ERROR_BUSY: prior peripheral activity is still winding down; the
-     *                      ProxyConnectRequest is answered BUSY and may be retried.
+     *                      transport calls again periodically while the
+     *                      ProxyConnectRequest is pending.
      *   - other error:     the switch failed; the request is answered FAILURE.
      */
     virtual CHIP_ERROR EnableCentralRole() = 0;

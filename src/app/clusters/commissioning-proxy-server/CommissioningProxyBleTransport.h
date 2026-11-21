@@ -171,12 +171,23 @@ private:
     };
 
     /// Separate TimerContexts because TimerDelegate keys a timer on its context, and the
-    /// connect timeout and the scan window can be armed at the same time.
+    /// connect timeout, the central-role retry and the scan window can be armed at the
+    /// same time.
     class ConnectTimeoutTimer : public TimerContext
     {
     public:
         explicit ConnectTimeoutTimer(CommissioningProxyBleTransport & owner) : mOwner(owner) {}
         void TimerFired() override { mOwner.OnConnectTimeout(); }
+
+    private:
+        CommissioningProxyBleTransport & mOwner;
+    };
+
+    class CentralRoleRetryTimer : public TimerContext
+    {
+    public:
+        explicit CentralRoleRetryTimer(CommissioningProxyBleTransport & owner) : mOwner(owner) {}
+        void TimerFired() override { mOwner.OnCentralRoleRetry(); }
 
     private:
         CommissioningProxyBleTransport & mOwner;
@@ -203,7 +214,13 @@ private:
                                            uint16_t productId);
 
     void OnConnectTimeout();
+    void OnCentralRoleRetry();
     void OnScanWindowExpired();
+
+    /// Switch BLE to central role and start the scan/connect for mPendingConnect. While the
+    /// switch is refused as busy, this arms mCentralRoleRetryTimer, which calls it again,
+    /// and reports success.
+    CHIP_ERROR TryStartCentralConnect();
 
     /// Build the kBle ScanResultStruct the cluster stores. Shared by the foreground and
     /// background paths so the field set cannot drift between them.
@@ -229,6 +246,7 @@ private:
     ProxyBleDelegate mProxyDelegate{ *this };
     BgScanHardware mBgScanHardware{ *this };
     ConnectTimeoutTimer mConnectTimer{ *this };
+    CentralRoleRetryTimer mCentralRoleRetryTimer{ *this };
     ScanWindowTimer mScanTimer{ *this };
 
     /// Declared after mBgScanHardware so the registry is destroyed first: its destructor
