@@ -488,7 +488,8 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
                                       public app::ClusterStateCache::Callback,
 #endif
-                                      public SessionEstablishmentDelegate
+                                      public SessionEstablishmentDelegate,
+                                      public CommissioneeDeviceProxy::SessionReleaseDelegate
 {
     friend class chip::Testing::DeviceCommissionerTestAccess;
 
@@ -650,6 +651,13 @@ public:
     CHIP_ERROR ContinueCommissioningAfterConnectNetworkRequest(NodeId remoteDeviceId);
 #endif
 
+    /**
+     * Looks up the commissionee for deviceId. The returned pointer is owned by the commissioner and is valid only until the
+     * commissionee is released, which can happen without any call from the application: when its PASE session is released
+     * (the peer closing it, or the session being evicted), when commissioning for it ends, on StopPairing() or a replacing
+     * EstablishPASEConnection() for it, and on Shutdown(). Do not keep it; look the commissionee up again for each use.
+     * DevicePairingDelegate::OnCommissioneeReleased() reports the release of an idle commissionee.
+     */
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
     /**
@@ -901,6 +909,20 @@ private:
 
     DeviceProxy * mDeviceBeingCommissioned               = nullptr;
     CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
+
+    // True while commissioning is running for this commissionee, whichever proxy the commissioning stage is using.
+    bool IsBeingCommissioned(const CommissioneeDeviceProxy & device) const;
+
+    // True for a commissionee that has finished PASE establishment and is not being commissioned (the Idle state described
+    // in DevicePairingDelegate.h).
+    bool IsIdleCommissionee(const CommissioneeDeviceProxy & device) const;
+
+    // True if the commissionee for this node ID still has a PASE session.
+    bool HasLivePASESession(NodeId nodeId);
+
+    // Ends a commissioning that failed at or after network setup: keeps the commissionee and its PASE session for a retry,
+    // or, when the session is gone, releases the commissionee. Either way, sends the completion callbacks.
+    void FinishKeepingPASESession(NodeId nodeId);
 
     Optional<System::Clock::Timeout> mCommissioningStepTimeout; // Note: For multi-interaction steps this is per interaction
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
@@ -1157,6 +1179,12 @@ private:
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
     CommissioneeDeviceProxy * FindCommissioneeDevice(const Transport::PeerAddress & peerAddress);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
+
+    // Creates a commissionee in the pool that reports the loss of its session to this commissioner.
+    CommissioneeDeviceProxy * CreateCommissioneeDevice();
+
+    // CommissioneeDeviceProxy::SessionReleaseDelegate implementation.
+    void OnCommissioneeSessionReleased(CommissioneeDeviceProxy & device) override;
 
     bool ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                    Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
