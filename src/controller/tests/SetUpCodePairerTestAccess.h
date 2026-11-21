@@ -57,6 +57,8 @@ public:
         mPairer->mCurrentPASEParameters.SetValue(params);
     }
 
+    void SetConnectionType(Controller::SetupCodePairerBehaviour type) { mPairer->mConnectionType = type; }
+
     void ExpectPASEEstablishment() { mPairer->ExpectPASEEstablishment(); }
 
     void SetSetupPayload(const SetupPayload & payload) { mPairer->mSetupPayloads = { payload }; }
@@ -75,8 +77,30 @@ public:
     }
 
     void CallOnPairingComplete(CHIP_ERROR error) { mPairer->OnPairingComplete(error, std::nullopt, std::nullopt); }
+    void CallOnStatusUpdate(Controller::DevicePairingDelegate::Status status) { mPairer->OnStatusUpdate(status); }
+
+    void PushSetupPayload(const SetupPayload & payload) { mPairer->mSetupPayloads.push_back(payload); }
+    size_t GetSetupPayloadsCount() const { return mPairer->mSetupPayloads.size(); }
+    void PushDiscoveredParameters(const Controller::SetUpCodePairerParameters & params)
+    {
+        mPairer->mDiscoveredParameters.push_back(params);
+    }
+    bool CallConnectToDiscoveredDevice() { return mPairer->ConnectToDiscoveredDevice(); }
 
     void FireTimeoutCallback() { Controller::SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(nullptr, mPairer); }
+
+    void ArmDiscoveryTimer()
+    {
+        TEMPORARY_RETURN_IGNORED mPairer->mSystemLayer->StartTimer(
+            System::Clock::Milliseconds32(60000), Controller::SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback, mPairer);
+    }
+    bool IsDiscoveryTimerActive()
+    {
+        return mPairer->mSystemLayer->IsTimerActive(Controller::SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback, mPairer);
+    }
+
+    // Set only when ConnectToDiscoveredDevice starts a PASE attempt, so it shows a candidate was attempted.
+    bool GetLastPASEAttemptWasOverNFC() const { return mPairer->mLastPASEAttemptWasOverNFC; }
 
 private:
     Controller::SetUpCodePairer * mPairer = nullptr;
