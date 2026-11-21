@@ -7512,8 +7512,16 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     __block NSUInteger poolSlotReleaseCountWhenSubscribed = 0;
     __block NSUInteger subscriptionSetupCount = 0;
     __block NSUInteger subscriptionResetCount = 0;
+    // Both pools send the same dequeue callback, so the pool counts taken at the first dequeue show
+    // which pool admitted the resubscription.
+    __block NSUInteger wifiPoolItemCountAtFirstDequeue = NSNotFound;
+    __block NSUInteger threadPoolItemCountAtFirstDequeue = NSNotFound;
     dispatch_sync(queue, ^{
         delegate.onSubscriptionPoolDequeue = ^{
+            if (poolDequeueCount == 0) {
+                wifiPoolItemCountAtFirstDequeue = sController.concurrentWiFiSubscriptionPool.itemCount;
+                threadPoolItemCountAtFirstDequeue = sController.concurrentSubscriptionPool.itemCount;
+            }
             poolDequeueCount++;
         };
         delegate.onSubscriptionPoolWorkComplete = ^{
@@ -7539,6 +7547,8 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     // A device that is not on Thread resubscribes through the Wi-Fi subscription pool, holding its slot
     // until the subscription is established, and never takes a slot in the Thread pool.
     XCTAssertGreaterThanOrEqual(poolDequeueCountWhenSubscribed, 1, @"ReadClient resubscription did not go through the Wi-Fi subscription pool");
+    XCTAssertEqual(wifiPoolItemCountAtFirstDequeue, baselineWiFiPoolItemCount + 1, @"ReadClient resubscription was not admitted by the Wi-Fi subscription pool");
+    XCTAssertEqual(threadPoolItemCountAtFirstDequeue, baselineThreadPoolItemCount, @"ReadClient resubscription took a slot in the Thread subscription pool");
     XCTAssertEqual(poolDequeueCountWhenSubscribed - poolSlotReleaseCountWhenSubscribed, 1, @"ReadClient resubscription did not hold its Wi-Fi pool slot until it was established");
     XCTAssertEqual(subscriptionSetupCount, 0, @"new subscription set up instead of resubscribing the existing ReadClient");
     XCTAssertEqual(subscriptionResetCount, 0);

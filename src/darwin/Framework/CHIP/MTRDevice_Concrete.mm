@@ -3062,6 +3062,14 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     [clusterData storeValue:value forAttribute:path.attribute];
 
     if ([self _attributePathAffectsDescriptionData:path]) {
+        // A cluster seen for the first time in a report without a data version is not in
+        // _clusterDataToPersist yet, so make it visible before the description data reads it.
+        if (_clusterDataToPersist[clusterPath] == nil) {
+            if (_clusterDataToPersist == nil) {
+                _clusterDataToPersist = [NSMutableDictionary dictionary];
+            }
+            _clusterDataToPersist[clusterPath] = clusterData;
+        }
         [self _updateAttributeDependentDescriptionData];
     }
 

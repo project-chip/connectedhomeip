@@ -3604,6 +3604,73 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertFalse([controller isRunning]);
 }
 
+// A device's first root-endpoint NetworkCommissioning FeatureMap can arrive in a report with no data
+// version. That report must still be remembered for the cold-cache fallback, as a versioned one is.
+- (void)testDeviceRemembersRootFeaturesFromUnversionedFirstReport
+{
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(123);
+    NSNumber * fabricID = @(456);
+
+    NSError * error;
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    uint32_t threadFeatureMap = MTRNetworkCommissioningFeatureThreadNetworkInterface;
+
+    NSNumber * deviceID = @(22);
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+
+    XCTestExpectation * reportEndExpectation = [self expectationWithDescription:@"Injected report ended"];
+    delegate.onReportEnd = ^{
+        [reportEndExpectation fulfill];
+    };
+    [device setDelegate:delegate queue:queue];
+
+    XCTAssertNil([device unitTestGetLastKnownNetworkFeatures]);
+
+    // No MTRDataVersionKey: the cluster is new to the device and has no data version yet.
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[
+        @{
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeNetworkCommissioningID) attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)],
+            MTRDataKey : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(threadFeatureMap),
+            }
+        },
+    ];
+
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [self waitForExpectations:@[ reportEndExpectation ] timeout:kTimeoutInSeconds];
+
+    NSNumber * lastKnownNetworkFeatures = [device unitTestGetLastKnownNetworkFeatures];
+    XCTAssertNotNil(lastKnownNetworkFeatures, @"The root FeatureMap from an unversioned first report was not remembered");
+    XCTAssertEqual(lastKnownNetworkFeatures.unsignedIntValue, threadFeatureMap);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
 - (MTRDevice *)getMTRDevice:(NSNumber *)deviceID
 {
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
