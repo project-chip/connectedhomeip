@@ -376,8 +376,14 @@ static bStatus_t CHIPoBLEProfile_WriteAttrCB(uint16_t connHandle, gattAttribute_
             {
                 VOID osal_memcpy((pAttr->pValue) + offset, pValue, len);
 
-                // Send notification to BLE Event handler
-                notifyApp = CHIPOBLEPROFILE_RX_CHAR;
+                // CHIPoBLEProfile_GetParameter copies the whole characteristic when its len is
+                // 0, so an empty write must not be forwarded: the handler sizes its receive
+                // buffer from len and would get CHIPOBLEPROFILE_CHAR_LEN bytes copied into it.
+                if (len != 0)
+                {
+                    // Send notification to BLE Event handler
+                    notifyApp = CHIPOBLEPROFILE_RX_CHAR;
+                }
             }
         }
         else
