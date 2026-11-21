@@ -212,6 +212,18 @@ v4l2-ctl -d /dev/video0 --list-formats-ext
 Wave your hand in front of the camera to trigger live view; a video window will
 appear, confirming that the stream is active.
 
+4. To stop the active live view stream, use the `liveview stop` command. The
+   `--video-stream-id` flag is optional; when omitted, the controller stops the
+   stream it is currently tracking for that node.
+
+```
+# Stop the current live view on node 1
+liveview stop 1
+
+# Specify the stream ID when it is not tracked (e.g. after a restart)
+liveview stop 1 --video-stream-id <video-stream-id>
+```
+
 ### 4. Running the Video Recording Upload Demo
 
 The Push AV Server acts as the recording destination (like a cloud service) for
