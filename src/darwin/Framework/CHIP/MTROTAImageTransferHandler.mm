@@ -263,6 +263,11 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
 
                     CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
                     LogErrorOnFailure(err);
+                    if (mTransfer.GetStartOffset() > 0) {
+                        // A delegate that cannot serve the image from the requested offset rejects it as the BDX
+                        // specification requires, so the requestor downloads from offset 0 instead.
+                        LogErrorOnFailure(mTransfer.AbortTransfer(bdx::StatusCode::kStartOffsetNotSupported));
+                    }
                     NotifyEventHandled(eventType, err);
                     return;
                 }
