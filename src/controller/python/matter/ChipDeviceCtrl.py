@@ -129,6 +129,14 @@ _DevicePairingDelegate_OnCommissioningStageStartFunct = CFUNCTYPE(
 
 _DevicePairingDelegate_OnFabricCheckFunct = CFUNCTYPE(
     None, c_uint64)
+
+DevicePairingDelegate_OnInitialPhaseCompleteFunct: typing.TypeAlias = typing.Callable[
+    [int, bytes, bool],
+    None,
+]
+_DevicePairingDelegate_OnInitialPhaseCompleteFunct = CFUNCTYPE(
+    None, c_uint64, c_char_p, c_bool)
+
 # void (*)(Device *, CHIP_ERROR).
 #
 # CHIP_ERROR is actually signed, so using c_uint32 is weird, but everything
@@ -188,6 +196,7 @@ class CommissioningStage(enum.IntEnum):
     FailsafeBeforeThreadEnable = enum.auto()
     WiFiNetworkEnable = enum.auto()
     ThreadNetworkEnable = enum.auto()
+    InitialPhaseComplete = enum.auto()
     EvictPreviousCaseSessions = enum.auto()
     FindOperationalForStayActive = enum.auto()
     FindOperationalForCommissioningComplete = enum.auto()
@@ -202,7 +211,6 @@ class CommissioningStage(enum.IntEnum):
     RequestWiFiCredentials = enum.auto()
     RequestThreadCredentials = enum.auto()
     PDCGetNetworkIdentity = enum.auto()
-    UnpoweredPhaseComplete = enum.auto()
     Cleanup = enum.auto()
 
 
@@ -744,6 +752,14 @@ class ChipDeviceControllerBase:
         callback: DevicePairingDelegate_OnCommissioningStageStartFunct,
     ) -> None:
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback(
+            self.pairingDelegate, callback
+        )
+
+    def setInitialPhaseCompleteCallback(
+        self,
+        callback: DevicePairingDelegate_OnInitialPhaseCompleteFunct,
+    ) -> None:
+        self._dmLib.pychip_ScriptDevicePairingDelegate_SetInitialPhaseCompleteCallback(
             self.pairingDelegate, callback
         )
 
@@ -2998,6 +3014,10 @@ class ChipDeviceControllerBase:
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnFabricCheckFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.restype = PyChipError
+
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetInitialPhaseCompleteCallback.argtypes = [
+                c_void_p, _DevicePairingDelegate_OnInitialPhaseCompleteFunct]
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetInitialPhaseCompleteCallback.restype = PyChipError
 
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete.argtypes = [
                 c_void_p, c_bool]
