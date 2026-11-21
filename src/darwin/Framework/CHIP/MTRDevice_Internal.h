@@ -204,6 +204,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
 #pragma mark - Constants
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
+static NSString * const kDefaultWiFiSubscriptionPoolSizeOverrideKey = @"wifiSubscriptionPoolSizeOverride";
 static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage";
 static NSString * const kDisableTimeSyncLossDetectionKey = @"disableTimeSyncLossDetection";
 

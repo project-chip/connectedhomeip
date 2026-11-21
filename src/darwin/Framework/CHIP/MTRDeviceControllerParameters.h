@@ -94,6 +94,20 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @property (nonatomic, assign) NSUInteger concurrentSubscriptionEstablishmentsAllowedOnThread MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
+ * Sets the maximum simultaneous subscription establishments that can be happening
+ * at one time for devices on Wi-Fi (that is, devices that are not on Thread).
+ *
+ * Unlike Thread, Wi-Fi is not mesh-constrained, so this defaults to a larger
+ * number than a typical mesh could tolerate. The purpose of bounding it at all
+ * is to keep a controller that manages many devices from attempting an
+ * unbounded number of simultaneous subscription establishments, which can
+ * overwhelm the local device.
+ *
+ * If this value is 0, the maximum subscription establishments allowed at a time will be set to 1.
+ */
+@property (nonatomic, assign) NSUInteger concurrentSubscriptionEstablishmentsAllowedOnWiFi MTR_NEWLY_AVAILABLE;
+
+/**
  * Sets the storage behavior configuration - see MTRDeviceStorageBehaviorConfiguration.h for details
  *
  * If this value is nil, a default storage behavior configuration will be used.

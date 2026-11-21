@@ -107,10 +107,22 @@
     return self.pretendThreadEnabled;
 }
 
+- (BOOL)unitTestPretendWiFiPoolEnabled:(MTRDevice *)device
+{
+    return self.pretendWiFiPoolEnabled;
+}
+
 - (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device
 {
     if (self.onSubscriptionPoolDequeue != nil) {
         self.onSubscriptionPoolDequeue();
+    }
+}
+
+- (void)unitTestSubscriptionPoolAdmitted:(MTRDevice *)device usesWiFiPool:(BOOL)usesWiFiPool
+{
+    if (self.onSubscriptionPoolAdmitted != nil) {
+        self.onSubscriptionPoolAdmitted(usesWiFiPool);
     }
 }
 

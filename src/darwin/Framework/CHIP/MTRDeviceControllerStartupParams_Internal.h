@@ -29,6 +29,12 @@
 // MTRDeviceController_Concrete.h imports this header, so we can't import it.
 @class MTRDeviceController_Concrete;
 
+// Wi-Fi is not mesh-constrained the way Thread is, so this is bounded only to
+// keep a controller that manages many accessories from attempting an unbounded
+// number of simultaneous subscription establishments. Controllers started with
+// MTRDeviceControllerStartupParams, which cannot configure the pool, get it too.
+constexpr NSUInteger kDefaultConcurrentWiFiSubscriptionPoolSize = 30;
+
 namespace chip {
 class FabricTable;
 
