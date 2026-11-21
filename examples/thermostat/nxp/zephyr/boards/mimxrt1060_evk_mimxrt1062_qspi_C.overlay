@@ -1,0 +1,60 @@
+/*
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/*
+ * MIMXRT1060-EVKC with an IW610 (nxp_m2_2ll_wifi_bt) or IW612
+ * (nxp_m2_2el_wifi_bt) M.2 Wi-Fi/BT module.
+ *
+ * Matter uses Wi-Fi and BLE at the same time. The BT HCI driver must not
+ * toggle the M.2 module reset / power pins: they also reset the Wi-Fi CPU
+ * after its firmware has been downloaded over SDIO. Give the pins to the
+ * Wi-Fi driver instead.
+ */
+&m2_hci_bt_uart {
+	bt_hci_uart: bt_hci_uart {
+		m2_bt_module: m2_bt_module {
+			/delete-property/ sdio-reset-gpios;
+			/delete-property/ w-disable-gpios;
+		};
+	};
+};
+
+&usdhc1 {
+	nxp_wifi {
+		pwr-gpios = <&gpio1 19 GPIO_ACTIVE_HIGH>;
+		sd-gpios = <&gpio1 24 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+/* Reserve one flash sector for Matter factory data. */
+/delete-node/ &storage_partition;
+
+&w25q128jw {
+	partitions {
+		storage_partition: partition@e20000 {
+			compatible = "zephyr,mapped-partition";
+			label = "storage";
+			reg = <0x00e20000 0x001bf000>;
+		};
+
+		factory_partition: partition@fdf000 {
+			compatible = "zephyr,mapped-partition";
+			label = "factory-data";
+			reg = <0x00fdf000 DT_SIZE_K(4)>;
+		};
+	};
+};

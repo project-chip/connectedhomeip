@@ -40,6 +40,8 @@ The supported boards are:
 
 -   `rd_rw612_bga`
 -   `frdm_rw612`
+-   `mimxrt1060_evk@C/mimxrt1062/qspi` (MIMXRT1060-EVKC) with an M.2 Wi-Fi/BT
+    module, see [MIMXRT1060-EVKC with IW610 / IW612](#mimxrt1060-evkc)
 
 <a name="building"></a>
 
@@ -95,6 +97,13 @@ As an example with the `frdm_rw612` board:
 west build -b frdm_rw612 -p auto -d build_zephyr examples/all-clusters-app/nxp/zephyr
 ```
 
+As an example with the `mimxrt1060_evk@C/mimxrt1062/qspi` board and an IW610 M.2
+module (see [MIMXRT1060-EVKC with IW610 / IW612](#mimxrt1060-evkc)):
+
+```shell
+west build -b mimxrt1060_evk@C/mimxrt1062/qspi --shield nxp_m2_2ll_wifi_bt -p auto -d build_zephyr examples/all-clusters-app/nxp/zephyr
+```
+
 A folder `build_zephyr` will be created in the same folder you run the command
 from. The binaries will be created in `build_zephyr/zephyr` with the name
 `zephyr.elf` and `zephyr.bin`. We recommend using the `-d build_zephyr` if you
@@ -103,6 +112,42 @@ is tracked by git.
 
 You can get more details on `west build` with
 [Zephyr's building guide](https://docs.zephyrproject.org/3.7.0/develop/west/build-flash-debug.html#building-west-build)
+
+<a name="mimxrt1060-evkc"></a>
+
+### MIMXRT1060-EVKC with IW610 / IW612
+
+The MIMXRT1060-EVKC board (board target `mimxrt1060_evk@C/mimxrt1062/qspi`) uses
+an M.2 Wi-Fi/BT module. Wi-Fi is connected over SDIO (USDHC1) and BLE over an
+HCI UART (LPUART3). The module is selected with the Zephyr `--shield` option:
+
+| Module                | Chipset | Shield               |
+| --------------------- | ------- | -------------------- |
+| Murata 2LL M.2 module | IW610   | `nxp_m2_2ll_wifi_bt` |
+| Murata 2EL M.2 module | IW612   | `nxp_m2_2el_wifi_bt` |
+
+```shell
+west build -b mimxrt1060_evk@C/mimxrt1062/qspi --shield nxp_m2_2ll_wifi_bt -p auto -d build_zephyr <path to example folder>
+west build -b mimxrt1060_evk@C/mimxrt1062/qspi --shield nxp_m2_2el_wifi_bt -p auto -d build_zephyr <path to example folder>
+```
+
+Hardware setup:
+
+-   The BT HCI UART requires a rework of the MIMXRT1060-EVKC: mount R93 and R96,
+    remove R193, connect J109 and connect J76 pins 2-3. Refer to the
+    `nxp_m2_wifi_bt` shield documentation of the NXP Zephyr SDK.
+-   The IW612 module requires an external 5V power supply (J45, J40 1-2, SW6
+    on).
+
+Flash `zephyr.bin` at address `0x60000000` (or `zephyr_full.bin` when OTA is
+enabled).
+
+> **Note**: The examples provide a
+> `boards/mimxrt1060_evk_mimxrt1062_qspi_C.overlay` file which, in addition to
+> the factory data partition, removes the M.2 module reset GPIOs from the BT HCI
+> node. The BT HCI driver would otherwise reset the whole M.2 module, including
+> the Wi-Fi CPU, while downloading the BT firmware, after the Wi-Fi firmware has
+> been downloaded.
 
 <a name="flashing-and-debugging"></a>
 
@@ -160,6 +205,9 @@ w25q512jvfiq: w25q512jvfiq@0 {
     };
 };
 ```
+
+On `mimxrt1060_evk@C/mimxrt1062/qspi`, the factory data partition is reserved at
+0x60FDF000, aligned with FreeRTOS.
 
 > **Note**: You may also refer to `<board>.overlay` file in each NXP Zephyr
 > examples folder to check other memory partitions used by the platform, such as
