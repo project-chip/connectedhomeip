@@ -169,6 +169,67 @@ bool LockEndpoint::SetUser(UserIndex userIndex, chip::FabricIndex creator, chip:
     return true;
 }
 
+bool LockEndpoint::ClearUser(UserIndex userIndex)
+{
+    if (!userIndex.IsWithin(static_cast<uint16_t>(mLockUsers.size())))
+    {
+        ChipLogError(Zcl, "Cannot clear user - index out of range [endpoint=%d,index=%u]", mEndpointId, userIndex.OneBased());
+        return false;
+    }
+
+    auto & userInStorage    = mLockUsers[userIndex.ZeroBased()];
+    auto & weekDaySchedules = mWeekDaySchedules[userIndex.ZeroBased()];
+    auto & yearDaySchedules = mYearDaySchedules[userIndex.ZeroBased()];
+
+    // Validate the referenced credential slots before mutating anything, so a
+    // rejected batch leaves all records untouched.
+    for (const auto & credential : userInStorage.credentials)
+    {
+        if (to_underlying(credential.credentialType) >= mLockCredentials.size() ||
+            credential.credentialIndex >= mLockCredentials.at(to_underlying(credential.credentialType)).size() ||
+            (0 == credential.credentialIndex && CredentialTypeEnum::kProgrammingPIN != credential.credentialType))
+        {
+            ChipLogError(Zcl,
+                         "Cannot clear user - referenced credential slot is invalid "
+                         "[endpoint=%d,index=%u,credentialType=%u,credentialIndex=%u]",
+                         mEndpointId, userIndex.OneBased(), to_underlying(credential.credentialType), credential.credentialIndex);
+            return false;
+        }
+    }
+
+    // Schedules are reset even for an already available slot: SetUser never
+    // touches the schedule rows, so a cleared slot could otherwise hand
+    // occupied schedules to a replacement user.
+    for (auto & schedule : weekDaySchedules)
+    {
+        schedule.status   = DlScheduleStatus::kAvailable;
+        schedule.schedule = EmberAfPluginDoorLockWeekDaySchedule{ static_cast<DaysMaskMap>(0), 0, 0, 0, 0 };
+    }
+    for (auto & schedule : yearDaySchedules)
+    {
+        schedule.status   = DlScheduleStatus::kAvailable;
+        schedule.schedule = EmberAfPluginDoorLockYearDaySchedule{ 0, 0 };
+    }
+
+    for (const auto & credential : userInStorage.credentials)
+    {
+        mLockCredentials.at(to_underlying(credential.credentialType)).at(credential.credentialIndex) = LockCredentialInfo{};
+    }
+
+    // Reset the user fields individually: replacing the record with a default
+    // constructed one would drop the credentials vector's reserved capacity.
+    userInStorage.userStatus     = UserStatusEnum::kAvailable;
+    userInStorage.userType       = UserTypeEnum::kUnrestrictedUser;
+    userInStorage.credentialRule = CredentialRuleEnum::kSingle;
+    userInStorage.userUniqueId   = 0;
+    userInStorage.createdBy      = chip::kUndefinedFabricIndex;
+    userInStorage.lastModifiedBy = chip::kUndefinedFabricIndex;
+    userInStorage.credentials.clear();
+
+    ChipLogProgress(Zcl, "Successfully cleared the user [mEndpointId=%d,index=%u]", mEndpointId, userIndex.OneBased());
+    return true;
+}
+
 DoorStateEnum LockEndpoint::GetDoorState() const
 {
     return mDoorState;

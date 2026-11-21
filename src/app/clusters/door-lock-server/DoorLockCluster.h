@@ -107,26 +107,15 @@ struct Config
     uint8_t numberOfYearDaySchedulesPerUser     = 0;
     uint8_t numberOfHolidaySchedulesSupported   = 0;
     uint8_t numberOfCredentialsSupportedPerUser = 0;
-    BitMask<DlCredentialRuleMask> credentialRulesSupport;
+    // Credential rules the cluster accepts for SetUser. The default rule
+    // (kSingle) is always accepted; dual and tri only when added here, so an
+    // unconfigured cluster keeps the single-user behavior.
+    BitMask<DlCredentialRuleMask> credentialRulesSupport{ DlCredentialRuleMask::kSingle };
 
     uint8_t maxPINCodeLength  = 0;
     uint8_t minPINCodeLength  = 0;
     uint8_t maxRFIDCodeLength = 0;
     uint8_t minRFIDCodeLength = 0;
-
-    // The fingerprint / finger-vein / face credential kinds have no spec-defined
-    // attributes for their capacities, so their hardware limits are static
-    // configuration (0 = credential kind not present on the hardware).
-    uint16_t numberOfFingerprintCredentialsSupported = 0;
-    uint16_t numberOfFingerVeinCredentialsSupported  = 0;
-    uint16_t numberOfFaceCredentialsSupported        = 0;
-
-    uint8_t minFingerprintCredentialLength = 0;
-    uint8_t maxFingerprintCredentialLength = 0;
-    uint8_t minFingerVeinCredentialLength  = 0;
-    uint8_t maxFingerVeinCredentialLength  = 0;
-    uint8_t minFaceCredentialLength        = 0;
-    uint8_t maxFaceCredentialLength        = 0;
 
     // ---- Initial values for mutable attributes --------------------------------
     DataModel::Nullable<DlLockState> lockState;
@@ -202,6 +191,10 @@ public:
 
     // ---- Application-facing API ------------------------------------------------
 
+    /// Reclaims the user records that fabricIndex created or last modified.
+    /// Invoked by the fabric table observer on fabric removal.
+    void OnFabricRemoved(FabricIndex fabricIndex);
+
     /// Applies a lock-state change originating from a local operation and emits the
     /// corresponding LockOperation / LockOperationError events.
     CHIP_ERROR SetLockState(DlLockState newState, OperationSourceEnum opSource, const DataModel::Nullable<uint16_t> & userIndex,
@@ -240,17 +233,15 @@ public:
     bool GetRequirePINforRemoteOperation() const { return mRequirePINforRemoteOperation; }
 
     /// Updates the ActuatorEnabled read-only state (application reported).
-    CHIP_ERROR SetActuatorEnabled(bool actuatorEnabled)
+    void SetActuatorEnabled(bool actuatorEnabled)
     {
         SetAttributeValue(mActuatorEnabled, actuatorEnabled, Attributes::ActuatorEnabled::Id);
-        return CHIP_NO_ERROR;
     }
 
     /// Updates the AutoRelockTime attribute without changing any pending relock.
-    CHIP_ERROR SetAutoRelockTime(uint32_t autoRelockTime)
+    void SetAutoRelockTime(uint32_t autoRelockTime)
     {
         SetAttributeValue(mAutoRelockTime, autoRelockTime, Attributes::AutoRelockTime::Id);
-        return CHIP_NO_ERROR;
     }
 
 private:
@@ -274,15 +265,6 @@ private:
     const uint8_t mMinPINCodeLength;
     const uint8_t mMaxRFIDCodeLength;
     const uint8_t mMinRFIDCodeLength;
-    const uint16_t mNumberOfFingerprintCredentialsSupported;
-    const uint16_t mNumberOfFingerVeinCredentialsSupported;
-    const uint16_t mNumberOfFaceCredentialsSupported;
-    const uint8_t mMinFingerprintCredentialLength;
-    const uint8_t mMaxFingerprintCredentialLength;
-    const uint8_t mMinFingerVeinCredentialLength;
-    const uint8_t mMaxFingerVeinCredentialLength;
-    const uint8_t mMinFaceCredentialLength;
-    const uint8_t mMaxFaceCredentialLength;
 
     // ---- Mutable attribute storage ----------------------------------------------
     DataModel::Nullable<DlLockState> mLockState;
@@ -352,42 +334,36 @@ private:
     // events); the response is always sent to the CommandHandler here, so the
     // InvokeCommand dispatch returns std::nullopt after calling them.
 
-    void HandleSetUser(const DataModel::InvokeRequest & request, const Commands::SetUser::DecodableType & commandData,
-                       CommandHandler * handler, const ConcreteCommandPath & path);
-    void HandleGetUser(const DataModel::InvokeRequest & request, UserIndex userIndex, CommandHandler * handler,
-                       const ConcreteCommandPath & path);
-    void HandleClearUser(const DataModel::InvokeRequest & request, UserIndex userIndex, CommandHandler * handler,
-                         const ConcreteCommandPath & path);
+    /// Computes the command status; the caller adds it to the CommandHandler
+    /// through the allocation-failure-tolerant AddStatus overload.
+    chip::Protocols::InteractionModel::ClusterStatusCode HandleSetUser(const DataModel::InvokeRequest & request,
+                                                                       const Commands::SetUser::DecodableType & commandData);
+    /// Sends the GetUserResponse through the CommandHandler and reports a
+    /// status only when the request did not produce one.
+    std::optional<chip::Protocols::InteractionModel::Status> HandleGetUser(const DataModel::InvokeRequest & request,
+                                                                           UserIndex userIndex, CommandHandler * handler);
+    chip::Protocols::InteractionModel::ClusterStatusCode HandleClearUser(const DataModel::InvokeRequest & request,
+                                                                         UserIndex userIndex);
     // ---- Command helpers (ported from the ember implementation) -----------------
 
     /// True when the user management feature is enabled (also required for
     /// per-user schedules and user-scoped credentials).
     bool SupportsUSR() const { return mFeatures.Has(Feature::kUser); }
-    bool SupportsWeekDaySchedules() const { return mFeatures.Has(Feature::kWeekDayAccessSchedules); }
-    bool SupportsYearDaySchedules() const { return mFeatures.Has(Feature::kYearDayAccessSchedules); }
-    bool SupportsHolidaySchedules() const { return mFeatures.Has(Feature::kHolidaySchedules); }
-    bool SupportsPIN() const { return mFeatures.Has(Feature::kPinCredential); }
-    bool SupportsRFID() const { return mFeatures.Has(Feature::kRfidCredential); }
-    bool SupportsFingers() const { return mFeatures.Has(Feature::kFingerCredentials); }
-    bool SupportsFace() const { return mFeatures.Has(Feature::kFaceCredentials); }
-    bool SupportsAliroProvisioning() const { return mFeatures.Has(Feature::kAliroProvisioning); }
-    bool SupportsAliroBLEUWB() const { return mFeatures.Has(Feature::kAliroBLEUWB); }
 
     bool UserIndexValid(UserIndex userIndex) const;
     bool UserIndexValid(UserIndex userIndex, uint16_t & maxNumberOfUsers) const;
-    bool UserExists(UserIndex userIndex) const;
+
+    /// ClearUser reserves 0xFFFE as the clear-all wildcard: a user capacity at
+    /// or above the sentinel can not address its last slots. A failed Startup
+    /// does not unregister the cluster, so the command handlers verify this
+    /// again instead of trusting the Startup check.
+    bool UserCapacityValid() const;
 
     /// Sets userIndex to the first occupied slot at or after startIndex, or the
     /// invalid index when no occupied slot exists. Returns CHIP_ERROR_INTERNAL
     /// on a delegate lookup failure so callers can distinguish it from "no more
     /// users".
     CHIP_ERROR FindOccupiedUserSlot(UserIndex startIndex, UserIndex & userIndex) const;
-    bool FindUnoccupiedUserSlot(UserIndex & userIndex) const;
-    bool FindUnoccupiedUserSlot(UserIndex startIndex, UserIndex & userIndex) const;
-    bool WeekDayIndexValid(uint8_t weekDayIndex) const;
-    bool YearDayIndexValid(uint8_t yearDayIndex) const;
-    bool HolidayIndexValid(uint8_t holidayIndex) const;
-    bool IsUserScheduleRestricted(const UserInfo & user) const;
 
     chip::Protocols::InteractionModel::ClusterStatusCode
     CreateUser(FabricIndex creatorFabricIdx, NodeId sourceNodeId, UserIndex userIndex,
@@ -402,21 +378,9 @@ private:
                                                          const DataModel::Nullable<UserTypeEnum> & userType,
                                                          const DataModel::Nullable<CredentialRuleEnum> & credentialRule);
     chip::Protocols::InteractionModel::Status ClearUser(FabricIndex modifierFabricId, NodeId sourceNodeId, UserIndex userIndex,
-                                                        const UserInfo & user, bool sendUserChangeEvent);
-    chip::Protocols::InteractionModel::Status ClearUser(FabricIndex modifierFabricId, NodeId sourceNodeId, UserIndex userIndex,
                                                         bool sendUserChangeEvent);
 
-    chip::Protocols::InteractionModel::Status ClearCredentials(FabricIndex modifier, NodeId sourceNodeId);
-    chip::Protocols::InteractionModel::Status ClearCredentials(FabricIndex modifier, NodeId sourceNodeId,
-                                                               CredentialTypeEnum credentialType);
-    bool ClearFabricFromUsers(FabricIndex fabricIndex) const;
-    chip::app::Clusters::DoorLock::DlStatus ClearWeekDaySchedule(UserIndex userIndex, ScheduleIndex weekDayIndex) const;
-    DlStatus ClearWeekDaySchedules(UserIndex userIndex) const;
-    DlStatus ClearSchedules(UserIndex userIndex) const;
-    chip::app::Clusters::DoorLock::DlStatus ClearYearDaySchedule(UserIndex userIndex, ScheduleIndex yearDayIndex) const;
-    DlStatus ClearYearDaySchedules(UserIndex userIndex) const;
-    DlStatus ClearHolidaySchedule(uint8_t holidayIndex) const;
-    DlStatus ClearHolidaySchedules() const;
+    void ClearFabricFromUsers(FabricIndex fabricIndex) const;
 
     void SendRemoteLockUserChange(LockDataTypeEnum dataType, DataOperationTypeEnum operation, NodeId nodeId,
                                   FabricIndex fabricIndex, uint16_t userIndex, uint16_t dataIndex) const;
@@ -426,10 +390,6 @@ private:
 
     /// Stores LockState into the attribute persistence storage.
     CHIP_ERROR StoreLockState() const;
-
-    /// Reclaims the user records that fabricIndex created or last modified.
-    /// Invoked by the fabric table observer on fabric removal.
-    void OnFabricRemoved(FabricIndex fabricIndex);
 
     // ---- Response encoding helpers ------------------------------------------------
 
