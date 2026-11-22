@@ -2437,10 +2437,10 @@ TEST_F(TestCASESession, RejectedSigma1WithLargeMRPIntervalsUsesDefaultConfig)
     encodeParams.destinationId      = ByteSpan(destinationId);
     encodeParams.initiatorEphPubKey = &ephemeralKey.Pubkey();
     const auto defaultMRPConfig     = GetDefaultMRPConfig();
-    const auto attackerMRPConfig =
+    const auto largeIntervalMRPConfig =
         ReliableMessageProtocolConfig(System::Clock::Milliseconds32(UINT32_MAX), System::Clock::Milliseconds32(UINT32_MAX),
                                       defaultMRPConfig.mActiveThresholdTime);
-    encodeParams.initiatorSessionParams.SetMRPConfig(attackerMRPConfig);
+    encodeParams.initiatorSessionParams.SetMRPConfig(largeIntervalMRPConfig);
 
     System::PacketBufferHandle data;
     ASSERT_SUCCESS(CASESessionAccess::EncodeSigma1(data, encodeParams));
