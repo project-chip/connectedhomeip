@@ -905,7 +905,6 @@ CHIP_ERROR CheckP256PublicKey(EVP_PKEY * pkey)
 #else
     ScopedEvpPkeyCtx check_ctx(EVP_PKEY_CTX_new_from_pkey(nullptr, pkey, nullptr));
     VerifyOrReturnError(check_ctx, CHIP_ERROR_NO_MEMORY);
-    // P-256 has cofactor 1, so the order check that the quick variant skips cannot fail.
     VerifyOrReturnError(EVP_PKEY_public_check_quick(check_ctx.get()) == 1, CHIP_ERROR_INTERNAL);
 #endif
     return CHIP_NO_ERROR;
