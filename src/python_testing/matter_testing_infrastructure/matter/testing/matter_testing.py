@@ -988,7 +988,9 @@ class MatterBaseTest(base_test.BaseTestClass):
     def _configure_pase_session(self, controller: ChipDeviceCtrl.ChipDeviceController) -> None:
         """Apply this test's default PASE transport to a controller."""
         config = self.matter_test_config
-        method = config.in_test_commissioning_method or config.commissioning_method
+        method = config.commissioning_method
+        if not self.is_commissioning:
+            method = config.in_test_commissioning_method or method
         if method == "thread-meshcop":
             if not config.thread_ba_host or config.thread_ba_port is None:
                 raise ValueError("Thread MeshCoP PASE requires both border agent host and port")
