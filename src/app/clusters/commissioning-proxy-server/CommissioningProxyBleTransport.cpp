@@ -606,10 +606,16 @@ CHIP_ERROR CommissioningProxyBleTransport::TryStartCentralConnect()
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Sequential mode switch: the CP started in BLE peripheral mode so it could be
-    // commissioned onto the fabric (Step 1). The first BLE ProxyConnectRequest
-    // transitions BLE to central role so we can scan / connect to the commissionee
-    // (Step 2). Subsequent ProxyConnectRequest calls are no-ops.
+    // The spec states a ProxyConnectRequest terminates an active ProxyScanRequest.
+    // The ProxyScanResponse carries the results collected so far.
+    if (mScanInProgress)
+    {
+        mTimerDelegate.CancelTimer(&mScanTimer);
+        OnScanWindowExpired();
+    }
+
+    // The proxy starts as a BLE peripheral so it can be commissioned; EnableCentralRole()
+    // does nothing once BLE is in central role.
     CHIP_ERROR err = mAdapter.EnableCentralRole();
     if (err == CHIP_ERROR_BUSY)
     {

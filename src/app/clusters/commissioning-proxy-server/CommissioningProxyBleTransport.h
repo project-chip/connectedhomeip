@@ -171,8 +171,8 @@ private:
     };
 
     /// Separate TimerContexts because TimerDelegate keys a timer on its context, and the
-    /// connect timeout, the central-role retry and the scan window can be armed at the
-    /// same time.
+    /// connect timeout, the central-role retry and the scan window can run at the same
+    /// time.
     class ConnectTimeoutTimer : public TimerContext
     {
     public:
@@ -217,9 +217,9 @@ private:
     void OnCentralRoleRetry();
     void OnScanWindowExpired();
 
-    /// Switch BLE to central role and start the scan/connect for mPendingConnect. While the
-    /// switch is refused as busy, this arms mCentralRoleRetryTimer, which calls it again,
-    /// and reports success.
+    /// Switch BLE to central role and start the scan/connect for mPendingConnect, ending a
+    /// running foreground scan first. If the switch is refused, start mCentralRoleRetryTimer,
+    /// which tries it again.
     CHIP_ERROR TryStartCentralConnect();
 
     /// Build the kBle ScanResultStruct the cluster stores. Shared by the foreground and

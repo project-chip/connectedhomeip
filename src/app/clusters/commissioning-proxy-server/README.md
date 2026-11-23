@@ -419,9 +419,10 @@ or a platform with no BLE stack — can depend on `commissioning-proxy-server`
 without pulling in `src/ble`. It drives a BTP connection through
 `chip::Ble::BleLayer`:
 
--   `Connect()` — on the first BLE connect the proxy flips its own BLE role from
-    peripheral to central, waiting within the request's Timeout while a
-    peripheral link (such as the one the proxy was commissioned over) is still
+-   `Connect()` — stops a running foreground scan (its results go out in the
+    ProxyScanResponse). On the first BLE connect the proxy flips its own BLE
+    role from peripheral to central, waiting within the request's Timeout while
+    a peripheral link (such as the one the proxy was commissioned over) is still
     closing, then calls `BleLayer::NewBleConnectionByDiscriminator()` to open an
     L2CAP/BTP connection to the commissionee.
 -   `SendMessage()` — calls `BLEEndPoint::Send()` to push the tunneled
