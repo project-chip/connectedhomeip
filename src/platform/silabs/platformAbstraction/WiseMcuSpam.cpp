@@ -28,16 +28,8 @@
 #include "silabs_utils.h"
 #endif // SILABS_LOG_ENABLED
 
-#define SOC_PLL_REF_FREQUENCY 40000000 // /* PLL input REFERENCE clock 40MHZ */
-// Note: Change this macro to required PLL frequency in hertz
-#define PS4_SOC_FREQ 180000000 /* PLL out clock 180MHz */
-#define SWITCH_QSPI_TO_SOC_PLL
 #define ICACHE_DISABLE
 #define DEBUG_DISABLE
-
-/* QSPI clock config params */
-#define INTF_PLL_500_CTRL_VALUE 0xD900
-#define INTF_PLL_CLK 80000000 /* PLL out clock 80 MHz */
 
 // TODO add includes ?
 extern "C" {
@@ -45,7 +37,6 @@ extern "C" {
 #include "rsi_board.h"
 #endif // SL_SI91X_BOARD_INIT
 
-#include "rsi_rom_clks.h"
 #include "sl_si91x_hal_soc_soft_reset.h"
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
@@ -104,8 +95,10 @@ static bool sSiWxKeepAwakePs4Active      = false;
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && (SL_MATTER_GN_BUILD == 0)
 
+<<<<<<< HEAD
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
-int soc_pll_config(void)
+    int
+    soc_pll_config(void)
 {
     int32_t status = RSI_OK;
 
@@ -138,16 +131,14 @@ int soc_pll_config(void)
     return status;
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+=======
+>>>>>>> b186d2d ([Silabs] Remove all PLL Frequency modification in matter layer (#75057))
 } // namespace
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
-    // Configuration the clock rate
-    soc_pll_config();
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #if SILABS_LOG_ENABLED
     silabsInitLog();
