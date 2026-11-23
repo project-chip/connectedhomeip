@@ -411,7 +411,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
     }
 
-#if CHIP_PROGRESS_LOGGING
+#if CHIP_DETAIL_LOGGING
     CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
 
     if (fabricIndex != kUndefinedFabricIndex && mFabricTable != nullptr)
@@ -463,11 +463,11 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     //
     // Legend that can be used to decode this log line can be found in messaging/README.md
     //
-    ChipLogProgress(ExchangeManager,
-                    "<<< [E:%s S:%u M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX %s [%s] --- Type %s (%s:%s) (B:%u)",
-                    exchangeStr, sessionHandle->SessionIdForLogging(), packetHeader.GetMessageCounter(), ackBuf,
-                    Transport::GetSessionTypeString(sessionHandle), sourceDestinationStr, addressStr, typeStr, protocolName,
-                    msgTypeName, static_cast<unsigned>(message->TotalLength()));
+    ChipLogDetail(ExchangeManager,
+                  "<<< [E:%s S:%u M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX %s [%s] --- Type %s (%s:%s) (B:%u)", exchangeStr,
+                  sessionHandle->SessionIdForLogging(), packetHeader.GetMessageCounter(), ackBuf,
+                  Transport::GetSessionTypeString(sessionHandle), sourceDestinationStr, addressStr, typeStr, protocolName,
+                  msgTypeName, static_cast<unsigned>(message->TotalLength()));
 #endif
 
     preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));

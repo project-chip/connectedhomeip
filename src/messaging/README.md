@@ -2,7 +2,7 @@
 
 ## Debug Prints
 
-When progress logging is enabled, the message layer emits a number of prints
+When detail logging is enabled, the message layer emits a number of prints
 that provide more details on the messages being sent or received. Most of these
 are fairly self explanatory with the exception of the ones listed below.
 
