@@ -1788,6 +1788,8 @@ CHIP_ERROR GroupDataProviderImpl::RemoveKeySet(chip::FabricIndex fabric_index, u
     ReturnErrorOnFailure(fabric.Load(mStorage));
     VerifyOrReturnError(keyset.Find(mStorage, fabric, target_id), CHIP_ERROR_NOT_FOUND);
     ReturnErrorOnFailure(keyset.Delete(mStorage));
+    // Keyset is deleted from storage, so listeners must be notified even if later cleanup fails.
+    // Run on exit rather than inline so linked-list metadata and group mappings update before callbacks.
     auto notifyKeySetRemoved = ScopeExit([&]() { KeySetRemoved(fabric_index, target_id); });
 
     if (keyset.first)
