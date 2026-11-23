@@ -459,7 +459,8 @@ PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::De
                                                             uint16_t discriminator, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_EstablishPASESessionThreadMeshcop(chip::Controller::DeviceCommissioner * devCtrl,
                                                                       const char * baHost, uint16_t port, const char * setUpCode,
-                                                                      chip::NodeId nodeid);
+                                                                      chip::NodeId nodeid, const uint8_t * threadDataset,
+                                                                      uint32_t threadDatasetSize);
 PyChipError pychip_DeviceController_EstablishPASESession(chip::Controller::DeviceCommissioner * devCtrl, const char * setUpCode,
                                                          chip::NodeId nodeid);
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
@@ -1183,7 +1184,8 @@ PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::De
 
 PyChipError pychip_DeviceController_EstablishPASESessionThreadMeshcop(chip::Controller::DeviceCommissioner * devCtrl,
                                                                       const char * baHost, uint16_t baPort, const char * setUpCode,
-                                                                      chip::NodeId nodeId)
+                                                                      chip::NodeId nodeId, const uint8_t * threadDataset,
+                                                                      uint32_t threadDatasetSize)
 {
 #if CHIP_SUPPORT_THREAD_MESHCOP
     const uint32_t kDefaultDiscoveryTimeoutMsec = 1000000;
@@ -1191,20 +1193,22 @@ PyChipError pychip_DeviceController_EstablishPASESessionThreadMeshcop(chip::Cont
 
     CHIP_ERROR err = GetSetupPasscodeFromOnboardingPayload(setUpCode, setupPasscode);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
-    err = sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, nullptr, devCtrl,
-                                               kDefaultDiscoveryTimeoutMsec, true);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
-    VerifyOrReturnError(sCommissioningParameters.GetThreadOperationalDataset().HasValue(),
-                        ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    const auto datasetBytes = threadDataset == nullptr ? sCommissioningParameters.GetThreadOperationalDataset()
+                                                       : MakeOptional(ByteSpan(threadDataset, threadDatasetSize));
+    VerifyOrReturnError(datasetBytes.HasValue(), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
     chip::Inet::IPAddress baAddr;
     SetUpCodePairer::ThreadMeshcopCommissionParameters meshcopParams;
     VerifyOrReturnError(chip::Inet::IPAddress::FromString(baHost, baAddr), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
     meshcopParams.mBorderAgentAddress.SetTransportType(chip::Transport::Type::kThreadMeshcop).SetIPAddress(baAddr).SetPort(baPort);
     Thread::OperationalDatasetView dataset;
-    err = dataset.Init(sCommissioningParameters.GetThreadOperationalDataset().Value());
+    err = dataset.Init(datasetBytes.Value());
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
     err = dataset.GetPSKc(meshcopParams.mPSKcBuffer);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+
+    err = sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, CommissioningParameters(), nullptr, devCtrl,
+                                               kDefaultDiscoveryTimeoutMsec, true);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
     return ToPyChipError(
         devCtrl->EstablishPASEConnection(nodeId, setUpCode, DiscoveryType::kAll, NullOptional, MakeOptional(meshcopParams)));

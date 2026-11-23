@@ -1127,7 +1127,8 @@ class ChipDeviceControllerBase:
             nodeId
         )
 
-    async def EstablishPASESessionThreadMeshcop(self, baAddr: str, setupCode: str, nodeId: int, baPort: int) -> None:
+    async def EstablishPASESessionThreadMeshcop(self, baAddr: str, setupCode: str, nodeId: int, baPort: int,
+                                             *, threadOperationalDataset: bytes | None = None) -> None:
         '''
         Establish a PASE session over Thread MeshCoP.
 
@@ -1139,13 +1140,16 @@ class ChipDeviceControllerBase:
             setupCode (str): The setup code of the device.
             nodeId (int): The node ID of the device.
             baPort (int): IP port of BorderAgent.
+            threadOperationalDataset: Dataset containing the Border Agent PSKc for this request.
+                If omitted, uses the dataset set by SetThreadOperationalDataset.
 
         Returns:
             None
         '''
         await self._establishPASESession(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop(
-                self.devCtrl, baAddr.encode("utf-8"), baPort, setupCode.encode("utf-8"), nodeId),
+                self.devCtrl, baAddr.encode("utf-8"), baPort, setupCode.encode("utf-8"), nodeId,
+                threadOperationalDataset, 0 if threadOperationalDataset is None else len(threadOperationalDataset)),
             nodeId
         )
 
@@ -1662,15 +1666,14 @@ class ChipDeviceControllerBase:
         if res.is_success:
             return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
-        if threadMeshCoPConfig is None and self._defaultThreadMeshCoPConfig is not None:
-            threadMeshCoPConfig, dataset = self._defaultThreadMeshCoPConfig
-            self.SetThreadOperationalDataset(dataset)
-
-        if threadMeshCoPConfig is None:
-            await self.EstablishPASESession(setupCode, nodeId)
+        if threadMeshCoPConfig is not None:
+            host, port = threadMeshCoPConfig
+            await self.EstablishPASESessionThreadMeshcop(host, setupCode, nodeId, port)
+        elif self._defaultThreadMeshCoPConfig is not None:
+            (host, port), dataset = self._defaultThreadMeshCoPConfig
+            await self.EstablishPASESessionThreadMeshcop(host, setupCode, nodeId, port, threadOperationalDataset=dataset)
         else:
-            threadBorderAgentHost, threadBorderAgentPort = threadMeshCoPConfig
-            await self.EstablishPASESessionThreadMeshcop(threadBorderAgentHost, setupCode, nodeId, threadBorderAgentPort)
+            await self.EstablishPASESession(setupCode, nodeId)
 
         res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
             self.devCtrl, nodeId, byref(returnDevice)), timeoutMs)
@@ -2956,7 +2959,7 @@ class ChipDeviceControllerBase:
             self._dmLib.pychip_DeviceController_EstablishPASESessionIP.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.argtypes = [
-                c_void_p, c_char_p, c_uint16, c_char_p, c_uint64]
+                c_void_p, c_char_p, c_uint16, c_char_p, c_uint64, c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson.argtypes = [
