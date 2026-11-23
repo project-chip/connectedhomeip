@@ -17,6 +17,7 @@
  */
 #include <vector>
 
+#include <pw_preprocessor/compiler.h>
 #include <pw_unit_test/framework.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -27,6 +28,7 @@
 #include <app/clusters/push-av-stream-transport-server/MigratePushAvStreamTransportServerStorage.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/tests/AppTestContext.h>
@@ -42,6 +44,7 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace app {
@@ -485,6 +488,859 @@ TEST_F(TestPushAVStreamTransportServerLogic, AllocatePushTransportRejectsEndpoin
     EXPECT_EQ(status.GetClusterSpecificCode().value(), to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
 }
 
+namespace {
+
+PW_NO_INLINE void CheckMotionZoneResponse(Testing::MockCommandHandler & handler, const std::vector<uint16_t> & expectedIds)
+{
+    Commands::AllocatePushTransportResponse::DecodableType response;
+    ASSERT_EQ(handler.DecodeResponse(response), CHIP_NO_ERROR);
+    ASSERT_TRUE(response.transportConfiguration.transportOptions.HasValue());
+    const auto & storedZones = response.transportConfiguration.transportOptions.Value().triggerOptions.motionZones;
+    ASSERT_TRUE(storedZones.HasValue());
+    ASSERT_FALSE(storedZones.Value().IsNull());
+    auto storedIter = storedZones.Value().Value().begin();
+    for (const uint16_t expectedId : expectedIds)
+    {
+        ASSERT_TRUE(storedIter.Next());
+        EXPECT_EQ(storedIter.GetValue().zone.Value(), expectedId);
+    }
+    EXPECT_FALSE(storedIter.Next());
+    EXPECT_EQ(storedIter.GetStatus(), CHIP_NO_ERROR);
+}
+
+PW_NO_INLINE void CheckMotionZonePersistence(PushAvStreamTransportServer & server, MutableByteSpan sourceTlv,
+                                             const std::vector<uint16_t> & expectedIds)
+{
+    uint8_t encoded[2048];
+    TLV::TLVWriter storedWriter;
+    storedWriter.Init(encoded, sizeof(encoded));
+    ASSERT_EQ(server.GetLogic().mCurrentConnections[0].EncodeForRead(storedWriter, TLV::AnonymousTag(), 1), CHIP_NO_ERROR);
+    ASSERT_EQ(storedWriter.Finalize(), CHIP_NO_ERROR);
+    memset(sourceTlv.data(), 0, sourceTlv.size());
+    TLV::TLVReader storedReader;
+    storedReader.Init(encoded, storedWriter.GetLengthWritten());
+    ASSERT_EQ(storedReader.Next(), CHIP_NO_ERROR);
+    Structs::TransportConfigurationStruct::DecodableType decoded;
+    ASSERT_EQ(decoded.Decode(storedReader), CHIP_NO_ERROR);
+    ASSERT_TRUE(decoded.transportOptions.HasValue());
+    TransportOptionsStorage reloaded(decoded.transportOptions.Value());
+    ASSERT_TRUE(reloaded.triggerOptions.motionZones.HasValue());
+    ASSERT_FALSE(reloaded.triggerOptions.motionZones.Value().IsNull());
+    size_t reloadedIndex = 0;
+    for (const auto & zone : reloaded.triggerOptions.motionZones.Value().Value())
+    {
+        ASSERT_LT(reloadedIndex, expectedIds.size());
+        EXPECT_EQ(zone.zone.Value(), expectedIds[reloadedIndex++]);
+    }
+    EXPECT_EQ(reloadedIndex, expectedIds.size());
+}
+
+} // namespace
+
+TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreservesValidationOrder)
+{
+    struct ScopedShutdown
+    {
+        PushAvStreamTransportServer & server;
+        ~ScopedShutdown() { server.Shutdown(ClusterShutdownType::kClusterShutdown); }
+    };
+    class ZoneDelegate : public TestPushAVStreamTransportDelegateImpl
+    {
+    public:
+        bool ValidateStreamUsage(StreamUsageEnum streamUsage) override { return true; }
+
+        Status AllocatePushTransport(const TransportOptionsStruct & options, uint16_t connectionId,
+                                     FabricIndex fabricIndex) override
+        {
+            ++allocations;
+            return TestPushAVStreamTransportDelegateImpl::AllocatePushTransport(options, connectionId, fabricIndex);
+        }
+        Status ModifyPushTransport(uint16_t connectionId, const TransportOptionsStorage options) override
+        {
+            ++modifications;
+            return TestPushAVStreamTransportDelegateImpl::ModifyPushTransport(connectionId, options);
+        }
+        Status ValidateZoneId(uint16_t zoneId) override
+        {
+            checkedIds.push_back(zoneId);
+            return zoneId == 129 ? Status::Failure : Status::Success;
+        }
+        bool ValidateMotionZoneListSize(size_t zoneListSize) override
+        {
+            ++sizeChecks;
+            return zoneListSize <= 2;
+        }
+        size_t allocations   = 0;
+        size_t modifications = 0;
+        size_t sizeChecks    = 0;
+        std::vector<uint16_t> checkedIds;
+    };
+    enum class ZonesCase
+    {
+        Omitted,
+        Null,
+        Empty,
+        Unique,
+        Duplicate,
+        NonadjacentDuplicate,
+        DuplicateNull,
+        SingleNull,
+        Invalid,
+        HighIds,
+        SpreadIds,
+        PairedBuckets,
+        PairedBucketDuplicate,
+        MalformedFirst,
+        MalformedAfterUnique,
+        DuplicateBeforeMalformed,
+        Truncated,
+    };
+
+    for (const bool perZoneSensitivity : { false, true })
+    {
+        for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext })
+        {
+            for (const bool modify : { false, true })
+            {
+                for (const size_t count : { 2u, 3u, 128u, 254u, 255u, 256u, 257u, 512u, 513u })
+                {
+                    for (const auto zonesCase :
+                         { ZonesCase::Omitted, ZonesCase::Null, ZonesCase::Empty, ZonesCase::Unique, ZonesCase::Duplicate,
+                           ZonesCase::NonadjacentDuplicate, ZonesCase::DuplicateNull, ZonesCase::SingleNull, ZonesCase::Invalid,
+                           ZonesCase::HighIds, ZonesCase::SpreadIds, ZonesCase::PairedBuckets, ZonesCase::PairedBucketDuplicate,
+                           ZonesCase::MalformedFirst, ZonesCase::MalformedAfterUnique, ZonesCase::DuplicateBeforeMalformed,
+                           ZonesCase::Truncated })
+                    {
+                        ZoneDelegate delegate;
+                        TestTLSClientManagementDelegate tlsDelegate;
+                        PushAvStreamTransportServer server{ 1,
+                                                            perZoneSensitivity ? BitFlags<Feature>(Feature::kPerZoneSensitivity)
+                                                                               : BitFlags<Feature>() };
+                        Testing::ClusterTester tester(server);
+                        ASSERT_EQ(server.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+                        ScopedShutdown shutdown{ server };
+                        server.GetLogic().SetDelegate(&delegate);
+                        server.GetLogic().SetTLSClientManagementDelegate(&tlsDelegate);
+                        ASSERT_EQ(server.Init(), CHIP_NO_ERROR);
+
+                        CMAFContainerOptionsStruct cmaf;
+                        cmaf.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+                        cmaf.segmentDuration = 1000;
+                        cmaf.chunkDuration   = 500;
+                        Commands::AllocatePushTransport::DecodableType commandData;
+                        auto & options      = commandData.transportOptions;
+                        options.streamUsage = StreamUsageEnum::kAnalysis;
+                        options.videoStreamID.SetValue(1);
+                        options.TLSEndpointID              = 1;
+                        options.url                        = "https://example.com/stream/"_span;
+                        options.triggerOptions.triggerType = triggerType;
+                        options.triggerOptions.maxPreRollLen.SetValue(1000);
+                        if (!perZoneSensitivity && triggerType == TransportTriggerTypeEnum::kMotion)
+                        {
+                            options.triggerOptions.motionSensitivity.SetValue(DataModel::NullNullable);
+                        }
+                        TransportMotionTriggerTimeControlDecodableStruct timeControl;
+                        timeControl.initialDuration = 1;
+                        timeControl.maxDuration     = 1;
+                        if (triggerType == TransportTriggerTypeEnum::kMotion)
+                        {
+                            options.triggerOptions.motionTimeControl.SetValue(timeControl);
+                        }
+                        options.containerOptions.containerType = ContainerFormatEnum::kCmaf;
+                        options.containerOptions.CMAFContainerOptions.SetValue(cmaf);
+
+                        constexpr size_t kTlvBufferSize = 8192;
+                        Platform::ScopedMemoryBuffer<uint8_t> tlvBuffer;
+                        ASSERT_TRUE(tlvBuffer.Alloc(kTlvBufferSize));
+                        TLV::TLVWriter writer;
+                        writer.Init(tlvBuffer.Get(), kTlvBufferSize);
+                        TLV::TLVType arrayType;
+                        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+                        const size_t zoneCount = zonesCase == ZonesCase::Empty ? 0u : count;
+                        const bool malformed   = zonesCase == ZonesCase::MalformedFirst ||
+                            zonesCase == ZonesCase::MalformedAfterUnique || zonesCase == ZonesCase::DuplicateBeforeMalformed;
+                        std::vector<uint16_t> expectedIds;
+                        for (size_t zoneIndex = 0; zoneIndex < zoneCount; ++zoneIndex)
+                        {
+                            if (malformed && zoneIndex == (zonesCase == ZonesCase::MalformedFirst ? 0u : zoneCount - 1))
+                            {
+                                TLV::TLVType structType;
+                                ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType),
+                                          CHIP_NO_ERROR);
+                                ASSERT_EQ(
+                                    writer.Put(TLV::ContextTag(to_underlying(Structs::TransportZoneOptionsStruct::Fields::kZone)),
+                                               true),
+                                    CHIP_NO_ERROR);
+                                ASSERT_EQ(writer.EndContainer(structType), CHIP_NO_ERROR);
+                                continue;
+                            }
+                            Structs::TransportZoneOptionsStruct::Type zone;
+                            uint16_t zoneId = static_cast<uint16_t>(zoneCount - zoneIndex);
+                            if (zonesCase == ZonesCase::Duplicate || zonesCase == ZonesCase::DuplicateBeforeMalformed ||
+                                (zonesCase == ZonesCase::NonadjacentDuplicate && zoneIndex == zoneCount - 1))
+                            {
+                                zoneId = static_cast<uint16_t>(zoneCount);
+                            }
+                            else if (zonesCase == ZonesCase::HighIds)
+                            {
+                                zoneId = static_cast<uint16_t>(UINT16_MAX - 1 - zoneIndex);
+                            }
+                            else if (zonesCase == ZonesCase::SpreadIds)
+                            {
+                                zoneId = static_cast<uint16_t>((zoneIndex % 256) * 256 + zoneIndex / 256);
+                            }
+                            else if (zonesCase == ZonesCase::PairedBuckets || zonesCase == ZonesCase::PairedBucketDuplicate)
+                            {
+                                zoneId = static_cast<uint16_t>((zoneIndex / 2 % 256) * 256 + (zoneIndex / 512) * 2 + zoneIndex % 2);
+                                if (zonesCase == ZonesCase::PairedBucketDuplicate && zoneIndex == zoneCount - 1)
+                                {
+                                    zoneId = 0;
+                                }
+                            }
+                            else if (zonesCase == ZonesCase::Invalid && zoneIndex == 0)
+                            {
+                                zoneId = 129;
+                            }
+                            else if (zonesCase == ZonesCase::Invalid && zoneId == 129)
+                            {
+                                zoneId = static_cast<uint16_t>(zoneCount);
+                            }
+                            if (zonesCase == ZonesCase::DuplicateNull || (zonesCase == ZonesCase::SingleNull && zoneIndex == 0))
+                            {
+                                zone.zone.SetNull();
+                            }
+                            else
+                            {
+                                zone.zone.SetNonNull(zoneId);
+                                expectedIds.push_back(zoneId);
+                            }
+                            if (perZoneSensitivity)
+                            {
+                                zone.sensitivity.SetValue(5);
+                            }
+                            ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), zone), CHIP_NO_ERROR);
+                        }
+                        ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+                        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+                        TLV::TLVReader reader;
+                        reader.Init(tlvBuffer.Get(), writer.GetLengthWritten() - (zonesCase == ZonesCase::Truncated ? 3 : 0));
+                        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+                        DataModel::DecodableList<TransportZoneOptionsDecodableStruct> zones;
+                        if (zonesCase == ZonesCase::Truncated)
+                        {
+                            TLV::TLVType truncatedArray;
+                            ASSERT_EQ(reader.EnterContainer(truncatedArray), CHIP_NO_ERROR);
+                            zones.SetReader(reader);
+                        }
+                        else
+                        {
+                            ASSERT_EQ(zones.Decode(reader), CHIP_NO_ERROR);
+                        }
+                        if (zonesCase == ZonesCase::Null)
+                        {
+                            options.triggerOptions.motionZones.SetValue(DataModel::NullNullable);
+                        }
+                        else if (zonesCase != ZonesCase::Omitted)
+                        {
+                            options.triggerOptions.motionZones.SetValue(DataModel::MakeNullable(zones));
+                        }
+
+                        const bool duplicate = zonesCase == ZonesCase::Duplicate || zonesCase == ZonesCase::NonadjacentDuplicate ||
+                            zonesCase == ZonesCase::DuplicateNull || zonesCase == ZonesCase::PairedBucketDuplicate;
+                        const bool rejectedBeforeZones =
+                            zonesCase == ZonesCase::Omitted || malformed || zonesCase == ZonesCase::Truncated;
+                        const bool reachesSize      = !rejectedBeforeZones && zonesCase != ZonesCase::Null && !duplicate;
+                        const Status expectedStatus = rejectedBeforeZones ? Status::InvalidCommand
+                            : duplicate                                   ? Status::AlreadyExists
+                            : reachesSize && zoneCount > 2                ? Status::DynamicConstraintError
+                            : zonesCase == ZonesCase::Invalid             ? Status::Failure
+                                                                          : Status::Success;
+                        Testing::MockCommandHandler handler;
+                        handler.SetFabricIndex(1);
+                        Commands::ModifyPushTransport::DecodableType modifyData;
+                        if (modify)
+                        {
+                            auto seed = commandData;
+                            seed.transportOptions.triggerOptions.motionZones.SetValue(DataModel::NullNullable);
+                            Testing::MockCommandHandler seedHandler;
+                            seedHandler.SetFabricIndex(1);
+                            const ConcreteCommandPath seedPath{ 1, PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+                            EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(seedHandler, seedPath, seed), std::nullopt);
+                            ASSERT_TRUE(seedHandler.HasResponse());
+                            ASSERT_EQ(server.GetLogic().mCurrentConnections.size(), 1u);
+                            modifyData.connectionID     = server.GetLogic().mCurrentConnections[0].connectionID;
+                            modifyData.transportOptions = options;
+                            delegate.sizeChecks         = 0;
+                            delegate.allocations        = 0;
+                            delegate.checkedIds.clear();
+                        }
+                        const ConcreteCommandPath path{ 1, PushAvStreamTransport::Id,
+                                                        modify ? Commands::ModifyPushTransport::Id
+                                                               : Commands::AllocatePushTransport::Id };
+                        const auto started = System::SystemClock().GetMonotonicMicroseconds64();
+                        const auto result  = modify ? server.GetLogic().HandleModifyPushTransport(handler, path, modifyData)
+                                                    : server.GetLogic().HandleAllocatePushTransport(handler, path, commandData);
+                        const auto elapsed = System::SystemClock().GetMonotonicMicroseconds64() - started;
+                        if (!perZoneSensitivity && !modify && triggerType == TransportTriggerTypeEnum::kMotion &&
+                            ((count >= 254 && (zonesCase == ZonesCase::Unique || zonesCase == ZonesCase::SpreadIds)) ||
+                             zonesCase == ZonesCase::PairedBuckets))
+                        {
+                            ChipLogProgress(Zcl, "MotionZoneTiming count=%u spread=%u paired=%u elapsed_us=%" PRIu64,
+                                            static_cast<unsigned>(count), static_cast<unsigned>(zonesCase == ZonesCase::SpreadIds),
+                                            static_cast<unsigned>(zonesCase == ZonesCase::PairedBuckets), elapsed.count());
+                        }
+                        if (result.has_value())
+                        {
+                            EXPECT_EQ(result->GetStatusCode().GetStatus(), expectedStatus);
+                            EXPECT_FALSE(handler.HasStatus());
+                            EXPECT_FALSE(handler.HasResponse());
+                            handler.AddStatus(path, result->GetStatusCode());
+                        }
+                        if (expectedStatus == Status::Success)
+                        {
+                            if (modify)
+                            {
+                                ASSERT_TRUE(handler.HasStatus());
+                                EXPECT_EQ(handler.GetStatuses()[0].status.GetStatus(), Status::Success);
+                            }
+                            else
+                            {
+                                EXPECT_TRUE(handler.HasResponse());
+                            }
+                            if (!modify && (zonesCase == ZonesCase::Unique || zonesCase == ZonesCase::HighIds))
+                            {
+                                CheckMotionZoneResponse(handler, expectedIds);
+                            }
+                        }
+                        else
+                        {
+                            ASSERT_TRUE(handler.HasStatus());
+                            ASSERT_EQ(handler.GetStatuses().size(), 1u);
+                            EXPECT_EQ(handler.GetStatuses()[0].status.GetStatus(), expectedStatus);
+                            if (expectedStatus == Status::Failure)
+                            {
+                                EXPECT_EQ(handler.GetStatuses()[0].status.GetClusterSpecificCode(),
+                                          to_underlying(StatusCodeEnum::kInvalidZone));
+                            }
+                        }
+                        EXPECT_EQ(delegate.sizeChecks, reachesSize ? 1u : 0u);
+                        EXPECT_EQ(delegate.allocations, !modify && expectedStatus == Status::Success ? 1u : 0u);
+                        EXPECT_EQ(delegate.modifications, modify && expectedStatus == Status::Success ? 1u : 0u);
+                        if (reachesSize && expectedStatus == Status::Success)
+                        {
+                            EXPECT_EQ(delegate.checkedIds, expectedIds);
+                        }
+                        else if (expectedStatus == Status::Failure)
+                        {
+                            ASSERT_EQ(delegate.checkedIds.size(), 1u);
+                            EXPECT_EQ(delegate.checkedIds[0], 129u);
+                        }
+                        else
+                        {
+                            EXPECT_TRUE(delegate.checkedIds.empty());
+                        }
+                        EXPECT_EQ(server.GetLogic().mCurrentConnections.size(),
+                                  modify || expectedStatus == Status::Success ? 1u : 0u);
+                        if (expectedStatus == Status::Success &&
+                            (zonesCase == ZonesCase::Unique || zonesCase == ZonesCase::HighIds))
+                        {
+                            CheckMotionZonePersistence(server, MutableByteSpan(tlvBuffer.Get(), kTlvBufferSize), expectedIds);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, AmbientZoneSensitivityRequiresSupportedFeatureField)
+{
+    struct ScopedShutdown
+    {
+        PushAvStreamTransportServer & server;
+        ~ScopedShutdown() { server.Shutdown(ClusterShutdownType::kClusterShutdown); }
+    };
+    class ZoneDelegate : public TestPushAVStreamTransportDelegateImpl
+    {
+    public:
+        Status AllocatePushTransport(const TransportOptionsStruct & options, uint16_t connectionId,
+                                     FabricIndex fabricIndex) override
+        {
+            ++allocations;
+            return TestPushAVStreamTransportDelegateImpl::AllocatePushTransport(options, connectionId, fabricIndex);
+        }
+        Status ModifyPushTransport(uint16_t connectionId, const TransportOptionsStorage options) override
+        {
+            ++modifications;
+            return TestPushAVStreamTransportDelegateImpl::ModifyPushTransport(connectionId, options);
+        }
+        bool ValidateMotionZoneListSize(size_t size) override
+        {
+            ++sizeChecks;
+            return size <= 2;
+        }
+        Status ValidateZoneId(uint16_t zoneId) override
+        {
+            ++idChecks;
+            return zoneId == 129 ? Status::Failure : Status::Success;
+        }
+        Status SetVideoStream(uint16_t streamId) override
+        {
+            ++streamChecks;
+            return invalidStream ? Status::Failure : Status::Success;
+        }
+        PushAvStreamTransportStatusEnum GetTransportBusyStatus(uint16_t connectionId) override
+        {
+            return busy ? PushAvStreamTransportStatusEnum::kBusy : PushAvStreamTransportStatusEnum::kIdle;
+        }
+        void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                         Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+        {
+            ++certificateUpdates;
+        }
+        size_t allocations        = 0;
+        size_t modifications      = 0;
+        size_t sizeChecks         = 0;
+        size_t idChecks           = 0;
+        size_t streamChecks       = 0;
+        size_t certificateUpdates = 0;
+        bool busy                 = false;
+        bool invalidStream        = false;
+    };
+    class TLSDelegate : public TestTLSClientManagementDelegate
+    {
+    public:
+        CHIP_ERROR FindProvisionedEndpointByID(EndpointId endpoint, FabricIndex fabric, uint16_t endpointId,
+                                               LoadedEndpointCallback callback) override
+        {
+            ++lookups;
+            return TestTLSClientManagementDelegate::FindProvisionedEndpointByID(endpoint, fabric, endpointId, callback);
+        }
+        ClusterStatusCode ProvisionEndpoint(EndpointId endpoint, FabricIndex fabric,
+                                            const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & request,
+                                            uint16_t & endpointId) override
+        {
+            ++provisions;
+            return TestTLSClientManagementDelegate::ProvisionEndpoint(endpoint, fabric, request, endpointId);
+        }
+        CHIP_ERROR MutateEndpointReferenceCount(EndpointId endpoint, FabricIndex fabric, uint16_t endpointId, int8_t delta) override
+        {
+            ++referenceUpdates;
+            return TestTLSClientManagementDelegate::MutateEndpointReferenceCount(endpoint, fabric, endpointId, delta);
+        }
+        size_t lookups          = 0;
+        size_t provisions       = 0;
+        size_t referenceUpdates = 0;
+    };
+    class CountingPersistence : public DefaultAttributePersistenceProvider
+    {
+    public:
+        CHIP_ERROR WriteValue(const ConcreteAttributePath & path, const ByteSpan & value) override
+        {
+            ++writes;
+            return DefaultAttributePersistenceProvider::WriteValue(path, value);
+        }
+        size_t writes = 0;
+    };
+    enum class ZoneCase
+    {
+        Valid,
+        Mixed,
+        NullId,
+        Duplicate,
+        DuplicateNull,
+        MalformedFirst,
+        MissingZone,
+        MalformedTail,
+        DuplicateMalformed,
+        Truncated,
+        Oversized,
+        InvalidId,
+        InvalidTLS,
+        Busy,
+        NotFound,
+        InvalidStream,
+        TimeControl,
+        GlobalSensitivity,
+    };
+
+    for (const bool feature : { false, true })
+    {
+        for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext })
+        {
+            for (const bool modify : { false, true })
+            {
+                for (const int sensitivity : { -1, 0, 1, 5, 10, 11, 255 })
+                {
+                    for (const auto zoneCase :
+                         { ZoneCase::Valid, ZoneCase::Mixed, ZoneCase::NullId, ZoneCase::Duplicate, ZoneCase::DuplicateNull,
+                           ZoneCase::MalformedFirst, ZoneCase::MalformedTail, ZoneCase::DuplicateMalformed, ZoneCase::Truncated,
+                           ZoneCase::MissingZone, ZoneCase::Oversized, ZoneCase::InvalidId, ZoneCase::InvalidTLS, ZoneCase::Busy,
+                           ZoneCase::NotFound, ZoneCase::InvalidStream, ZoneCase::TimeControl, ZoneCase::GlobalSensitivity })
+                    {
+                        if (zoneCase != ZoneCase::Valid && zoneCase != ZoneCase::Mixed && sensitivity != (feature ? 5 : -1))
+                        {
+                            continue;
+                        }
+                        if ((modify && zoneCase == ZoneCase::InvalidTLS) ||
+                            (!modify && (zoneCase == ZoneCase::Busy || zoneCase == ZoneCase::NotFound)))
+                        {
+                            continue;
+                        }
+                        ZoneDelegate delegate;
+                        TLSDelegate tlsDelegate;
+                        TestTLSClientManagementDelegateNullClientCertId invalidTlsDelegate;
+                        PushAvStreamTransportServer server{ 1,
+                                                            feature ? BitFlags<Feature>(Feature::kPerZoneSensitivity)
+                                                                    : BitFlags<Feature>() };
+                        Testing::ClusterTester tester(server);
+                        CountingPersistence persistence;
+                        auto & originalContext = tester.GetServerClusterContext();
+                        ASSERT_EQ(persistence.Init(&originalContext.storage), CHIP_NO_ERROR);
+                        ServerClusterContext context{ originalContext.provider, originalContext.storage, persistence,
+                                                      originalContext.interactionContext };
+                        ASSERT_EQ(server.Startup(context), CHIP_NO_ERROR);
+                        ScopedShutdown shutdown{ server };
+                        auto & logic = server.GetLogic();
+                        logic.SetDelegate(&delegate);
+                        logic.SetTLSClientManagementDelegate(&tlsDelegate);
+                        ASSERT_EQ(server.Init(), CHIP_NO_ERROR);
+                        Commands::AllocatePushTransport::DecodableType allocate;
+                        auto & options      = allocate.transportOptions;
+                        options.streamUsage = StreamUsageEnum::kAnalysis;
+                        options.videoStreamID.SetValue(1);
+                        options.TLSEndpointID = 1;
+                        options.url           = "https://example.com/modified/"_span;
+                        auto & trigger        = options.triggerOptions;
+                        trigger.triggerType   = triggerType;
+                        trigger.maxPreRollLen.SetValue(1000);
+                        TransportMotionTriggerTimeControlDecodableStruct timeControl;
+                        timeControl.initialDuration = 1;
+                        timeControl.maxDuration     = 1;
+                        if (triggerType == TransportTriggerTypeEnum::kMotion)
+                        {
+                            trigger.motionTimeControl.SetValue(timeControl);
+                            if (!feature)
+                            {
+                                trigger.motionSensitivity.SetValue(DataModel::NullNullable);
+                            }
+                        }
+                        CMAFContainerOptionsStruct cmaf;
+                        cmaf.CMAFInterface                     = CMAFInterfaceEnum::kInterface1;
+                        cmaf.segmentDuration                   = 1000;
+                        cmaf.chunkDuration                     = 500;
+                        options.containerOptions.containerType = ContainerFormatEnum::kCmaf;
+                        options.containerOptions.CMAFContainerOptions.SetValue(cmaf);
+                        Commands::ModifyPushTransport::DecodableType modification;
+                        std::shared_ptr<TransportOptionsStorage> retained;
+                        const ConcreteCommandPath allocatePath{ 1, PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+                        const ConcreteAttributePath persistencePath{ 1, PushAvStreamTransport::Id,
+                                                                     Attributes::CurrentConnections::Id };
+                        uint8_t beforeBuffer[1024];
+                        MutableByteSpan before(beforeBuffer);
+                        if (modify)
+                        {
+                            auto seed                 = allocate;
+                            seed.transportOptions.url = "https://example.com/original/"_span;
+                            seed.transportOptions.triggerOptions.motionZones.SetValue(DataModel::NullNullable);
+                            Testing::MockCommandHandler seedHandler;
+                            seedHandler.SetFabricIndex(1);
+                            EXPECT_EQ(logic.HandleAllocatePushTransport(seedHandler, allocatePath, seed), std::nullopt);
+                            ASSERT_TRUE(seedHandler.HasResponse());
+                            ASSERT_EQ(logic.mCurrentConnections.size(), 1u);
+                            retained                  = logic.mCurrentConnections[0].GetTransportOptionsPtr();
+                            modification.connectionID = logic.mCurrentConnections[0].connectionID;
+                            ASSERT_EQ(persistence.ReadValue(persistencePath, before), CHIP_NO_ERROR);
+                        }
+                        const size_t writesBefore = persistence.writes;
+                        delegate.allocations = delegate.modifications = delegate.sizeChecks = delegate.idChecks =
+                            delegate.streamChecks                                           = 0;
+                        const size_t count                                                  = zoneCase == ZoneCase::NullId
+                                                                             ? 1u
+                                                                             : (zoneCase == ZoneCase::Oversized || zoneCase == ZoneCase::DuplicateMalformed ? 3u : 2u);
+                        uint8_t buffer[128];
+                        TLV::TLVWriter writer;
+                        writer.Init(buffer, sizeof(buffer));
+                        TLV::TLVType arrayType;
+                        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+                        for (size_t index = 0; index < count; ++index)
+                        {
+                            if (zoneCase == ZoneCase::MissingZone && index == 0)
+                            {
+                                TLV::TLVType structType;
+                                ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType),
+                                          CHIP_NO_ERROR);
+                                if (feature)
+                                {
+                                    ASSERT_EQ(writer.Put(TLV::ContextTag(to_underlying(
+                                                             Structs::TransportZoneOptionsStruct::Fields::kSensitivity)),
+                                                         static_cast<uint8_t>(5)),
+                                              CHIP_NO_ERROR);
+                                }
+                                ASSERT_EQ(writer.EndContainer(structType), CHIP_NO_ERROR);
+                                continue;
+                            }
+                            if ((zoneCase == ZoneCase::MalformedFirst && index == 0) ||
+                                ((zoneCase == ZoneCase::MalformedTail || zoneCase == ZoneCase::DuplicateMalformed) &&
+                                 index == count - 1))
+                            {
+                                TLV::TLVType structType;
+                                ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType),
+                                          CHIP_NO_ERROR);
+                                ASSERT_EQ(
+                                    writer.Put(TLV::ContextTag(to_underlying(Structs::TransportZoneOptionsStruct::Fields::kZone)),
+                                               true),
+                                    CHIP_NO_ERROR);
+                                ASSERT_EQ(writer.EndContainer(structType), CHIP_NO_ERROR);
+                                continue;
+                            }
+                            Structs::TransportZoneOptionsStruct::Type zone;
+                            zone.zone.SetNonNull(static_cast<uint16_t>(index + 1));
+                            if (zoneCase == ZoneCase::Duplicate || zoneCase == ZoneCase::DuplicateMalformed)
+                            {
+                                zone.zone.SetNonNull(1);
+                            }
+                            if (zoneCase == ZoneCase::NullId || zoneCase == ZoneCase::DuplicateNull)
+                            {
+                                zone.zone.SetNull();
+                            }
+                            if (zoneCase == ZoneCase::InvalidId && index == 0)
+                            {
+                                zone.zone.SetNonNull(129);
+                            }
+                            if (zoneCase == ZoneCase::Mixed && index == 0)
+                            {
+                                if (feature)
+                                {
+                                    zone.sensitivity.SetValue(5);
+                                }
+                            }
+                            else if (sensitivity >= 0)
+                            {
+                                zone.sensitivity.SetValue(static_cast<uint8_t>(sensitivity));
+                            }
+                            ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), zone), CHIP_NO_ERROR);
+                        }
+                        ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+                        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+                        TLV::TLVReader reader;
+                        reader.Init(buffer, writer.GetLengthWritten() - (zoneCase == ZoneCase::Truncated ? 3 : 0));
+                        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+                        DataModel::DecodableList<TransportZoneOptionsDecodableStruct> zones;
+                        if (zoneCase == ZoneCase::Truncated)
+                        {
+                            TLV::TLVType truncatedArray;
+                            ASSERT_EQ(reader.EnterContainer(truncatedArray), CHIP_NO_ERROR);
+                            zones.SetReader(reader);
+                        }
+                        else
+                        {
+                            ASSERT_EQ(zones.Decode(reader), CHIP_NO_ERROR);
+                        }
+                        trigger.motionZones.SetValue(DataModel::MakeNullable(zones));
+                        if (zoneCase == ZoneCase::TimeControl)
+                        {
+                            if (triggerType == TransportTriggerTypeEnum::kMotion)
+                            {
+                                trigger.motionTimeControl.ClearValue();
+                            }
+                            else
+                            {
+                                trigger.motionTimeControl.SetValue(timeControl);
+                            }
+                        }
+                        if (zoneCase == ZoneCase::GlobalSensitivity)
+                        {
+                            trigger.motionSensitivity.SetValue(DataModel::MakeNullable(static_cast<uint8_t>(0)));
+                        }
+                        if (zoneCase == ZoneCase::InvalidTLS)
+                        {
+                            logic.SetTLSClientManagementDelegate(&invalidTlsDelegate);
+                        }
+                        delegate.busy          = zoneCase == ZoneCase::Busy;
+                        delegate.invalidStream = zoneCase == ZoneCase::InvalidStream;
+                        if (zoneCase == ZoneCase::NotFound)
+                        {
+                            modification.connectionID = UINT16_MAX;
+                        }
+                        Status sensitivityStatus = feature
+                            ? (sensitivity < 0 ? Status::InvalidCommand
+                                               : (sensitivity < 1 || sensitivity > 10 ? Status::ConstraintError : Status::Success))
+                            : (sensitivity < 0 ? Status::Success : Status::InvalidCommand);
+                        const bool motion        = triggerType == TransportTriggerTypeEnum::kMotion;
+                        const bool malformed     = zoneCase == ZoneCase::MalformedFirst || zoneCase == ZoneCase::MalformedTail ||
+                            zoneCase == ZoneCase::DuplicateMalformed || zoneCase == ZoneCase::Truncated;
+                        Status expected = Status::Success;
+                        std::optional<uint8_t> clusterStatus;
+                        size_t sizeChecks   = 0;
+                        size_t idChecks     = 0;
+                        size_t streamChecks = 0;
+                        if (zoneCase == ZoneCase::MalformedFirst || zoneCase == ZoneCase::MissingZone)
+                        {
+                            expected = Status::InvalidCommand;
+                        }
+                        else if (sensitivityStatus != Status::Success)
+                        {
+                            expected = sensitivityStatus;
+                        }
+                        else if (malformed || zoneCase == ZoneCase::TimeControl || zoneCase == ZoneCase::GlobalSensitivity)
+                        {
+                            expected = zoneCase == ZoneCase::GlobalSensitivity && motion && !feature ? Status::ConstraintError
+                                                                                                     : Status::InvalidCommand;
+                        }
+                        else if (zoneCase == ZoneCase::InvalidTLS)
+                        {
+                            expected      = Status::Failure;
+                            clusterStatus = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
+                        }
+                        else if (zoneCase == ZoneCase::Busy || zoneCase == ZoneCase::NotFound)
+                        {
+                            expected = zoneCase == ZoneCase::Busy ? Status::Busy : Status::NotFound;
+                        }
+                        else if (zoneCase == ZoneCase::Duplicate || zoneCase == ZoneCase::DuplicateNull ||
+                                 zoneCase == ZoneCase::DuplicateMalformed)
+                        {
+                            expected = Status::AlreadyExists;
+                        }
+                        else if (malformed)
+                        {
+                            expected = Status::InvalidCommand;
+                        }
+                        else
+                        {
+                            sizeChecks = 1;
+                            if (zoneCase == ZoneCase::Oversized)
+                            {
+                                expected = Status::DynamicConstraintError;
+                            }
+                            else
+                            {
+                                idChecks = zoneCase == ZoneCase::NullId ? 0u : zoneCase == ZoneCase::InvalidId ? 1u : count;
+                                if (zoneCase == ZoneCase::InvalidId)
+                                {
+                                    expected      = Status::Failure;
+                                    clusterStatus = to_underlying(StatusCodeEnum::kInvalidZone);
+                                }
+                                else
+                                {
+                                    streamChecks = 1;
+                                    if (zoneCase == ZoneCase::InvalidStream)
+                                    {
+                                        expected      = Status::Failure;
+                                        clusterStatus = to_underlying(StatusCodeEnum::kInvalidStream);
+                                    }
+                                }
+                            }
+                        }
+                        modification.transportOptions = options;
+                        const size_t tlsLookupsBefore = tlsDelegate.lookups;
+                        const auto directStatus       = logic.ValidateIncomingTransportOptions(options);
+                        const bool invalidInput       = malformed || sensitivityStatus != Status::Success ||
+                            zoneCase == ZoneCase::TimeControl || zoneCase == ZoneCase::GlobalSensitivity ||
+                            zoneCase == ZoneCase::MissingZone;
+                        EXPECT_EQ(directStatus, invalidInput ? expected : Status::Success);
+                        EXPECT_EQ(tlsDelegate.lookups, tlsLookupsBefore);
+                        EXPECT_EQ(tlsDelegate.provisions, 0u);
+                        EXPECT_EQ(tlsDelegate.referenceUpdates, 0u);
+                        EXPECT_EQ(delegate.certificateUpdates, 0u);
+                        Testing::MockCommandHandler handler;
+                        handler.SetFabricIndex(1);
+                        const ConcreteCommandPath path{ 1, PushAvStreamTransport::Id,
+                                                        modify ? Commands::ModifyPushTransport::Id
+                                                               : Commands::AllocatePushTransport::Id };
+                        const auto result  = modify ? logic.HandleModifyPushTransport(handler, path, modification)
+                                                    : logic.HandleAllocatePushTransport(handler, path, allocate);
+                        const bool success = expected == Status::Success;
+                        if (result.has_value())
+                        {
+                            EXPECT_EQ(result->GetStatusCode().GetStatus(), expected);
+                            EXPECT_FALSE(handler.HasStatus());
+                            EXPECT_FALSE(handler.HasResponse());
+                            handler.AddStatus(path, result->GetStatusCode());
+                        }
+                        if (modify || !success)
+                        {
+                            ASSERT_EQ(handler.GetStatuses().size(), 1u);
+                            EXPECT_EQ(handler.GetStatuses()[0].status.GetStatus(), expected);
+                            if (clusterStatus.has_value())
+                            {
+                                EXPECT_EQ(handler.GetStatuses()[0].status.GetClusterSpecificCode(), clusterStatus);
+                            }
+                        }
+                        EXPECT_EQ(handler.HasResponse(), success && !modify);
+                        EXPECT_EQ(delegate.sizeChecks, sizeChecks);
+                        EXPECT_EQ(delegate.idChecks, idChecks);
+                        EXPECT_EQ(delegate.streamChecks, streamChecks);
+                        EXPECT_EQ(delegate.allocations, success && !modify ? 1u : 0u);
+                        EXPECT_EQ(delegate.modifications, success && modify ? 1u : 0u);
+                        EXPECT_EQ(persistence.writes - writesBefore, success ? 1u : 0u);
+                        if (invalidInput)
+                        {
+                            EXPECT_EQ(tlsDelegate.lookups, tlsLookupsBefore);
+                            EXPECT_EQ(tlsDelegate.provisions, 0u);
+                            EXPECT_EQ(tlsDelegate.referenceUpdates, 0u);
+                            EXPECT_EQ(delegate.certificateUpdates, 0u);
+                        }
+                        EXPECT_EQ(logic.mCurrentConnections.size(), modify || success ? 1u : 0u);
+                        if (modify && !success)
+                        {
+                            EXPECT_EQ(logic.mCurrentConnections[0].GetTransportOptionsPtr(), retained);
+                            uint8_t afterBuffer[1024];
+                            MutableByteSpan after(afterBuffer);
+                            ASSERT_EQ(persistence.ReadValue(persistencePath, after), CHIP_NO_ERROR);
+                            EXPECT_TRUE(before.data_equal(after));
+                        }
+                        if (success)
+                        {
+                            if (!modify)
+                            {
+                                Commands::AllocatePushTransportResponse::DecodableType response;
+                                ASSERT_EQ(handler.DecodeResponse(response), CHIP_NO_ERROR);
+                                ASSERT_TRUE(response.transportConfiguration.transportOptions.HasValue());
+                                const auto & responseZones =
+                                    response.transportConfiguration.transportOptions.Value().triggerOptions.motionZones;
+                                auto responseIter = responseZones.Value().Value().begin();
+                                ASSERT_TRUE(responseIter.Next());
+                                EXPECT_EQ(responseIter.GetValue().sensitivity.HasValue(), feature);
+                            }
+                            memset(buffer, 0, sizeof(buffer));
+                            logic.mCurrentConnections.clear();
+                            ASSERT_EQ(logic.Init(persistence), CHIP_NO_ERROR);
+                            ASSERT_EQ(logic.mCurrentConnections.size(), 1u);
+                            tester.GetCommandHandler().SetFabricIndex(1);
+                            Attributes::CurrentConnections::TypeInfo::DecodableType current;
+                            ASSERT_EQ(tester.ReadAttribute(Attributes::CurrentConnections::Id, current), CHIP_NO_ERROR);
+                            auto connectionIter = current.begin();
+                            ASSERT_TRUE(connectionIter.Next());
+                            ASSERT_TRUE(connectionIter.GetValue().transportOptions.HasValue());
+                            const auto & storedTrigger = connectionIter.GetValue().transportOptions.Value().triggerOptions;
+                            EXPECT_EQ(storedTrigger.triggerType, triggerType);
+                            EXPECT_EQ(storedTrigger.motionTimeControl.HasValue(), motion);
+                            auto zoneIter = storedTrigger.motionZones.Value().Value().begin();
+                            size_t index  = 0;
+                            while (zoneIter.Next())
+                            {
+                                EXPECT_EQ(zoneIter.GetValue().zone.IsNull(), zoneCase == ZoneCase::NullId);
+                                EXPECT_EQ(zoneIter.GetValue().sensitivity.HasValue(), feature);
+                                if (feature)
+                                {
+                                    EXPECT_EQ(zoneIter.GetValue().sensitivity.Value(),
+                                              zoneCase == ZoneCase::Mixed && index == 0 ? 5 : sensitivity);
+                                }
+                                ++index;
+                            }
+                            EXPECT_EQ(index, count);
+                            EXPECT_EQ(zoneIter.GetStatus(), CHIP_NO_ERROR);
+                            EXPECT_FALSE(connectionIter.Next());
+                            EXPECT_EQ(connectionIter.GetStatus(), CHIP_NO_ERROR);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
 {
     CMAFContainerOptionsStruct cmafContainerOptions;
@@ -588,6 +1444,1641 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
     transportOptions.containerOptions = containerOptions;
     EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::Success);
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, TestMotionZonesPresence)
+{
+    uint8_t tlvBuffer[16];
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuffer, sizeof(tlvBuffer));
+    TLV::TLVType containerType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(containerType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    reader.Init(tlvBuffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+    DataModel::DecodableList<TransportZoneOptionsDecodableStruct> emptyZones;
+    ASSERT_EQ(emptyZones.Decode(reader), CHIP_NO_ERROR);
+
+    for (const auto features : { BitFlags<Feature>(), BitFlags<Feature>(Feature::kPerZoneSensitivity) })
+    {
+        PushAvStreamTransportServerLogic logic(1, features);
+        for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext })
+        {
+            CMAFContainerOptionsStruct cmafContainerOptions;
+            cmafContainerOptions.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+            cmafContainerOptions.segmentDuration = 1000;
+            cmafContainerOptions.chunkDuration   = 500;
+
+            TransportOptionsDecodableStruct transportOptions;
+            transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+            transportOptions.videoStreamID.SetValue(1);
+            transportOptions.TLSEndpointID                  = 1;
+            transportOptions.url                            = "https://example.com/stream/"_span;
+            transportOptions.triggerOptions.triggerType     = triggerType;
+            transportOptions.containerOptions.containerType = ContainerFormatEnum::kCmaf;
+            transportOptions.containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+            transportOptions.triggerOptions.maxPreRollLen.SetValue(1000);
+
+            if (triggerType == TransportTriggerTypeEnum::kMotion)
+            {
+                TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+                motionTimeControl.initialDuration = 1;
+                motionTimeControl.maxDuration     = 1;
+                transportOptions.triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+                if (!features.Has(Feature::kPerZoneSensitivity))
+                {
+                    transportOptions.triggerOptions.motionSensitivity.SetValue(DataModel::NullNullable);
+                }
+            }
+
+            EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::InvalidCommand);
+
+            transportOptions.triggerOptions.motionZones.SetValue(DataModel::NullNullable);
+            EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::Success);
+
+            transportOptions.triggerOptions.motionZones.SetValue(DataModel::MakeNullable(emptyZones));
+            EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::Success);
+        }
+    }
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, TestAllocatePushTransportMotionZones)
+{
+    class ZoneDelegate : public TestPushAVStreamTransportDelegateImpl
+    {
+    public:
+        Status AllocatePushTransport(const TransportOptionsStruct & options, uint16_t connectionId,
+                                     FabricIndex fabricIndex) override
+        {
+            ++allocations;
+            return TestPushAVStreamTransportDelegateImpl::AllocatePushTransport(options, connectionId, fabricIndex);
+        }
+        Status ValidateZoneId(uint16_t zoneId) override { return zoneId <= 3 ? Status::Success : Status::Failure; }
+        bool ValidateMotionZoneListSize(size_t zoneListSize) override { return zoneListSize <= 2; }
+        size_t allocations = 0;
+    } delegate;
+    TestTLSClientManagementDelegate tlsDelegate;
+    ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    mServer.GetLogic().SetDelegate(&delegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsDelegate);
+    ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    enum class ZonesCase
+    {
+        Omitted,
+        Null,
+        Empty,
+        Valid,
+        Duplicate,
+        DuplicateNull,
+        Oversized,
+        Invalid,
+        MalformedFirst,
+        MalformedAfterValid,
+    };
+
+    for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext,
+                                    TransportTriggerTypeEnum::kContinuous, TransportTriggerTypeEnum::kCommand })
+    {
+        for (const auto zonesCase : { ZonesCase::Omitted, ZonesCase::Null, ZonesCase::Empty, ZonesCase::Valid, ZonesCase::Duplicate,
+                                      ZonesCase::DuplicateNull, ZonesCase::Oversized, ZonesCase::Invalid, ZonesCase::MalformedFirst,
+                                      ZonesCase::MalformedAfterValid })
+        {
+            CMAFContainerOptionsStruct cmafContainerOptions;
+            cmafContainerOptions.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+            cmafContainerOptions.segmentDuration = 1000;
+            cmafContainerOptions.chunkDuration   = 500;
+
+            Commands::AllocatePushTransport::DecodableType commandData;
+            auto & options      = commandData.transportOptions;
+            options.streamUsage = StreamUsageEnum::kAnalysis;
+            options.videoStreamID.SetValue(1);
+            options.TLSEndpointID                  = 1;
+            options.url                            = "https://example.com/stream/"_span;
+            options.triggerOptions.triggerType     = triggerType;
+            options.containerOptions.containerType = ContainerFormatEnum::kCmaf;
+            options.containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+            if (triggerType != TransportTriggerTypeEnum::kContinuous)
+            {
+                options.triggerOptions.maxPreRollLen.SetValue(1000);
+            }
+            if (triggerType == TransportTriggerTypeEnum::kMotion)
+            {
+                TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+                motionTimeControl.initialDuration = 1;
+                motionTimeControl.maxDuration     = 1;
+                options.triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+            }
+
+            uint8_t tlvBuffer[128];
+            TLV::TLVWriter writer;
+            writer.Init(tlvBuffer, sizeof(tlvBuffer));
+            TLV::TLVType containerType;
+            ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerType), CHIP_NO_ERROR);
+            const size_t zoneCount = zonesCase == ZonesCase::Oversized ? 3 : (zonesCase == ZonesCase::Empty ? 0 : 2);
+            for (size_t zoneIndex = 0; zoneIndex < zoneCount; ++zoneIndex)
+            {
+                if ((zonesCase == ZonesCase::MalformedFirst && zoneIndex == 0) ||
+                    (zonesCase == ZonesCase::MalformedAfterValid && zoneIndex == 1))
+                {
+                    TLV::TLVType structType;
+                    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType), CHIP_NO_ERROR);
+                    ASSERT_EQ(writer.Put(TLV::ContextTag(to_underlying(Structs::TransportZoneOptionsStruct::Fields::kZone)), true),
+                              CHIP_NO_ERROR);
+                    ASSERT_EQ(writer.EndContainer(structType), CHIP_NO_ERROR);
+                    continue;
+                }
+                Structs::TransportZoneOptionsStruct::Type zone;
+                zone.zone.SetNonNull(static_cast<uint16_t>(zoneIndex + 1));
+                zone.sensitivity.SetValue(5);
+                if (zonesCase == ZonesCase::Duplicate)
+                {
+                    zone.zone.SetNonNull(1);
+                }
+                else if (zonesCase == ZonesCase::DuplicateNull)
+                {
+                    zone.zone.SetNull();
+                }
+                else if (zonesCase == ZonesCase::Invalid)
+                {
+                    zone.zone.SetNonNull(static_cast<uint16_t>(zoneIndex + 4));
+                }
+                ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), zone), CHIP_NO_ERROR);
+            }
+            ASSERT_EQ(writer.EndContainer(containerType), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+            TLV::TLVReader reader;
+            reader.Init(tlvBuffer, writer.GetLengthWritten());
+            ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+            DataModel::DecodableList<TransportZoneOptionsDecodableStruct> zones;
+            ASSERT_EQ(zones.Decode(reader), CHIP_NO_ERROR);
+            size_t decodedSize = 0;
+            ASSERT_EQ(zones.ComputeSize(&decodedSize), CHIP_NO_ERROR);
+            ASSERT_EQ(decodedSize, zoneCount);
+            if (zonesCase == ZonesCase::MalformedFirst || zonesCase == ZonesCase::MalformedAfterValid)
+            {
+                auto iter          = zones.begin();
+                size_t validPrefix = 0;
+                while (iter.Next())
+                {
+                    ++validPrefix;
+                }
+                EXPECT_EQ(validPrefix, zonesCase == ZonesCase::MalformedFirst ? 0u : 1u);
+                ASSERT_NE(iter.GetStatus(), CHIP_NO_ERROR);
+            }
+            if (zonesCase == ZonesCase::Null)
+            {
+                options.triggerOptions.motionZones.SetValue(DataModel::NullNullable);
+            }
+            else if (zonesCase != ZonesCase::Omitted)
+            {
+                options.triggerOptions.motionZones.SetValue(DataModel::MakeNullable(zones));
+            }
+
+            Status expectedStatus = Status::Success;
+            if (triggerType == TransportTriggerTypeEnum::kContinuous || triggerType == TransportTriggerTypeEnum::kCommand)
+            {
+                expectedStatus = zonesCase == ZonesCase::Omitted ? Status::Success : Status::InvalidCommand;
+            }
+            else if (zonesCase == ZonesCase::Omitted)
+            {
+                expectedStatus = Status::InvalidCommand;
+            }
+            else if (zonesCase == ZonesCase::MalformedFirst || zonesCase == ZonesCase::MalformedAfterValid)
+            {
+                expectedStatus = Status::InvalidCommand;
+            }
+            else if (zonesCase == ZonesCase::Duplicate || zonesCase == ZonesCase::DuplicateNull)
+            {
+                expectedStatus = Status::AlreadyExists;
+            }
+            else if (zonesCase == ZonesCase::Oversized)
+            {
+                expectedStatus = Status::DynamicConstraintError;
+            }
+            else if (zonesCase == ZonesCase::Invalid)
+            {
+                expectedStatus = Status::Failure;
+            }
+
+            Testing::MockCommandHandler handler;
+            handler.SetFabricIndex(1);
+            const ConcreteCommandPath path{ 1, PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+            delegate.allocations = 0;
+            const auto result    = mServer.GetLogic().HandleAllocatePushTransport(handler, path, commandData);
+            std::optional<ClusterStatusCode> status;
+            if (result.has_value())
+            {
+                status = result->GetStatusCode();
+            }
+            else if (handler.HasStatus())
+            {
+                ASSERT_EQ(handler.GetStatuses().size(), 1u);
+                status = handler.GetStatuses()[0].status;
+            }
+
+            EXPECT_EQ(handler.HasResponse(), expectedStatus == Status::Success);
+            EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), expectedStatus == Status::Success ? 1u : 0u);
+            EXPECT_EQ(delegate.allocations, expectedStatus == Status::Success ? 1u : 0u);
+            if (expectedStatus != Status::Success)
+            {
+                EXPECT_TRUE(status.has_value());
+                if (status.has_value())
+                {
+                    EXPECT_EQ(status->GetStatus(), expectedStatus);
+                    if (expectedStatus == Status::Failure)
+                    {
+                        EXPECT_EQ(status->GetClusterSpecificCode(), to_underlying(StatusCodeEnum::kInvalidZone));
+                    }
+                }
+            }
+            if (handler.HasResponse())
+            {
+                if (expectedStatus == Status::Success)
+                {
+                    const bool present = triggerType == TransportTriggerTypeEnum::kMotion ||
+                        triggerType == TransportTriggerTypeEnum::kAmbientContext;
+                    const auto expectZones = [&](const TransportTriggerOptionsDecodableStruct & trigger) {
+                        EXPECT_EQ(trigger.triggerType, triggerType);
+                        ASSERT_EQ(trigger.motionZones.HasValue(), present);
+                        if (!present)
+                        {
+                            return;
+                        }
+                        ASSERT_EQ(trigger.motionZones.Value().IsNull(), zonesCase == ZonesCase::Null);
+                        if (zonesCase == ZonesCase::Null)
+                        {
+                            return;
+                        }
+                        auto iter    = trigger.motionZones.Value().Value().begin();
+                        size_t count = 0;
+                        while (iter.Next())
+                        {
+                            const auto & zone = iter.GetValue();
+                            ASSERT_FALSE(zone.zone.IsNull());
+                            EXPECT_EQ(zone.zone.Value(), count + 1);
+                            EXPECT_EQ(zone.sensitivity.HasValue(),
+                                      zoneCount != 0 && mServer.GetLogic().HasFeature(Feature::kPerZoneSensitivity));
+                            if (zone.sensitivity.HasValue())
+                            {
+                                EXPECT_EQ(zone.sensitivity.Value(), 5);
+                            }
+                            ++count;
+                        }
+                        EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+                        EXPECT_EQ(count, zonesCase == ZonesCase::Valid ? 2u : 0u);
+                    };
+
+                    memset(tlvBuffer, 0, sizeof(tlvBuffer));
+                    Commands::AllocatePushTransportResponse::DecodableType response;
+                    ASSERT_EQ(handler.DecodeResponse(response), CHIP_NO_ERROR);
+                    ASSERT_TRUE(response.transportConfiguration.transportOptions.HasValue());
+                    expectZones(response.transportConfiguration.transportOptions.Value().triggerOptions);
+
+                    mClusterTester.GetCommandHandler().SetFabricIndex(1);
+                    Attributes::CurrentConnections::TypeInfo::DecodableType current;
+                    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentConnections::Id, current), CHIP_NO_ERROR);
+                    auto currentIter = current.begin();
+                    ASSERT_TRUE(currentIter.Next());
+                    ASSERT_TRUE(currentIter.GetValue().transportOptions.HasValue());
+                    expectZones(currentIter.GetValue().transportOptions.Value().triggerOptions);
+                    EXPECT_FALSE(currentIter.Next());
+                    EXPECT_EQ(currentIter.GetStatus(), CHIP_NO_ERROR);
+
+                    mServer.GetLogic().mCurrentConnections.clear();
+                    ASSERT_EQ(mServer.GetLogic().Init(mClusterTester.GetServerClusterContext().attributeStorage), CHIP_NO_ERROR);
+                    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), 1u);
+                    const auto & connection = mServer.GetLogic().mCurrentConnections[0];
+                    ASSERT_TRUE(connection.transportOptions.HasValue());
+                    EXPECT_EQ(connection.GetFabricIndex(), 1);
+                    EXPECT_EQ(connection.connectionID, response.transportConfiguration.connectionID);
+                    const auto & storedZones = connection.transportOptions.Value().triggerOptions.motionZones;
+                    EXPECT_EQ(storedZones.HasValue(), present);
+                    if (present && storedZones.HasValue())
+                    {
+                        ASSERT_EQ(storedZones.Value().IsNull(), zonesCase == ZonesCase::Null);
+                        if (!storedZones.Value().IsNull())
+                        {
+                            EXPECT_EQ(storedZones.Value().Value().size(), zonesCase == ZonesCase::Valid ? 2u : 0u);
+                        }
+                    }
+
+                    for (bool findAll : { false, true })
+                    {
+                        Commands::FindTransport::DecodableType find;
+                        if (findAll)
+                        {
+                            find.connectionID.SetNull();
+                        }
+                        else
+                        {
+                            find.connectionID.SetNonNull(connection.connectionID);
+                        }
+                        Testing::MockCommandHandler findHandler;
+                        findHandler.SetFabricIndex(1);
+                        const ConcreteCommandPath findPath{ 1, PushAvStreamTransport::Id, Commands::FindTransport::Id };
+                        EXPECT_EQ(mServer.GetLogic().HandleFindTransport(findHandler, findPath, find), std::nullopt);
+                        Commands::FindTransportResponse::DecodableType found;
+                        ASSERT_EQ(findHandler.DecodeResponse(found), CHIP_NO_ERROR);
+                        auto foundIter = found.transportConfigurations.begin();
+                        ASSERT_TRUE(foundIter.Next());
+                        ASSERT_TRUE(foundIter.GetValue().transportOptions.HasValue());
+                        expectZones(foundIter.GetValue().transportOptions.Value().triggerOptions);
+                        EXPECT_FALSE(foundIter.Next());
+                        EXPECT_EQ(foundIter.GetStatus(), CHIP_NO_ERROR);
+                    }
+                }
+                Commands::DeallocatePushTransport::DecodableType deallocate;
+                deallocate.connectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
+                Testing::MockCommandHandler deallocateHandler;
+                deallocateHandler.SetFabricIndex(1);
+                const ConcreteCommandPath deallocatePath{ 1, PushAvStreamTransport::Id, Commands::DeallocatePushTransport::Id };
+                EXPECT_EQ(mServer.GetLogic().HandleDeallocatePushTransport(deallocateHandler, deallocatePath, deallocate),
+                          std::nullopt);
+                EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+            }
+        }
+    }
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, TestModifyPushTransportMotionZones)
+{
+    class ZoneDelegate : public TestPushAVStreamTransportDelegateImpl
+    {
+    public:
+        Status ModifyPushTransport(uint16_t connectionId, const TransportOptionsStorage options) override
+        {
+            ++modifications;
+            lastModification = std::make_unique<TransportOptionsStorage>(options);
+            return TestPushAVStreamTransportDelegateImpl::ModifyPushTransport(connectionId, options);
+        }
+        Status UpdateMotionZoneOptions(uint16_t connectionId, const TransportOptionsStorage & options) override
+        {
+            ++updates;
+            return TestPushAVStreamTransportDelegateImpl::UpdateMotionZoneOptions(connectionId, options);
+        }
+        Status ValidateZoneId(uint16_t zoneId) override { return zoneId <= 3 ? Status::Success : Status::Failure; }
+        bool ValidateMotionZoneListSize(size_t size) override { return size <= 2; }
+        size_t modifications = 0;
+        size_t updates       = 0;
+        std::unique_ptr<TransportOptionsStorage> lastModification;
+    };
+    class CountingPersistence : public DefaultAttributePersistenceProvider
+    {
+    public:
+        CHIP_ERROR WriteValue(const ConcreteAttributePath & path, const ByteSpan & value) override
+        {
+            ++writes;
+            return DefaultAttributePersistenceProvider::WriteValue(path, value);
+        }
+        size_t writes = 0;
+    };
+    enum class ZonesCase
+    {
+        Omitted,
+        Null,
+        Empty,
+        Valid,
+        Duplicate,
+        DuplicateNull,
+        Oversized,
+        Invalid,
+        MalformedFirst,
+        MalformedAfterValid,
+    };
+
+    for (const auto features : { BitFlags<Feature>(), BitFlags<Feature>(Feature::kPerZoneSensitivity) })
+    {
+        PushAvStreamTransportServer server{ 1, features };
+        Testing::ClusterTester tester(server);
+        CountingPersistence persistence;
+        ASSERT_EQ(persistence.Init(&tester.GetServerClusterContext().storage), CHIP_NO_ERROR);
+        auto & originalContext = tester.GetServerClusterContext();
+        ServerClusterContext context{ originalContext.provider, originalContext.storage, persistence,
+                                      originalContext.interactionContext };
+        ASSERT_EQ(server.Startup(context), CHIP_NO_ERROR);
+        ZoneDelegate delegate;
+        TestTLSClientManagementDelegate tlsDelegate;
+        auto & logic = server.GetLogic();
+        logic.SetDelegate(&delegate);
+        logic.SetTLSClientManagementDelegate(&tlsDelegate);
+        ASSERT_EQ(server.Init(), CHIP_NO_ERROR);
+
+        for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext,
+                                        TransportTriggerTypeEnum::kContinuous, TransportTriggerTypeEnum::kCommand })
+        {
+            for (const auto zonesCase : { ZonesCase::Omitted, ZonesCase::Null, ZonesCase::Empty, ZonesCase::Valid,
+                                          ZonesCase::Duplicate, ZonesCase::DuplicateNull, ZonesCase::Oversized, ZonesCase::Invalid,
+                                          ZonesCase::MalformedFirst, ZonesCase::MalformedAfterValid })
+            {
+                uint8_t originalTlv[64];
+                TLV::TLVWriter originalWriter;
+                originalWriter.Init(originalTlv, sizeof(originalTlv));
+                TLV::TLVType originalArray;
+                ASSERT_EQ(originalWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, originalArray), CHIP_NO_ERROR);
+                Structs::TransportZoneOptionsStruct::Type originalZone;
+                originalZone.zone.SetNonNull(3);
+                if (features.Has(Feature::kPerZoneSensitivity))
+                {
+                    originalZone.sensitivity.SetValue(5);
+                }
+                ASSERT_EQ(DataModel::Encode(originalWriter, TLV::AnonymousTag(), originalZone), CHIP_NO_ERROR);
+                ASSERT_EQ(originalWriter.EndContainer(originalArray), CHIP_NO_ERROR);
+                ASSERT_EQ(originalWriter.Finalize(), CHIP_NO_ERROR);
+                TLV::TLVReader originalReader;
+                originalReader.Init(originalTlv, originalWriter.GetLengthWritten());
+                ASSERT_EQ(originalReader.Next(), CHIP_NO_ERROR);
+                DataModel::DecodableList<TransportZoneOptionsDecodableStruct> originalZones;
+                ASSERT_EQ(originalZones.Decode(originalReader), CHIP_NO_ERROR);
+
+                CMAFContainerOptionsStruct cmaf;
+                cmaf.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+                cmaf.segmentDuration = 1000;
+                cmaf.chunkDuration   = 500;
+                TransportMotionTriggerTimeControlDecodableStruct timeControl;
+                timeControl.initialDuration = 1;
+                timeControl.maxDuration     = 1;
+                Commands::AllocatePushTransport::DecodableType allocate;
+                auto & original      = allocate.transportOptions;
+                original.streamUsage = StreamUsageEnum::kAnalysis;
+                original.videoStreamID.SetValue(1);
+                original.TLSEndpointID                  = 1;
+                original.url                            = "https://example.com/original/"_span;
+                original.containerOptions.containerType = ContainerFormatEnum::kCmaf;
+                original.containerOptions.CMAFContainerOptions.SetValue(cmaf);
+                original.triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+                original.triggerOptions.motionZones.SetValue(DataModel::MakeNullable(originalZones));
+                original.triggerOptions.motionTimeControl.SetValue(timeControl);
+                original.triggerOptions.maxPreRollLen.SetValue(1000);
+                if (!features.Has(Feature::kPerZoneSensitivity))
+                {
+                    original.triggerOptions.motionSensitivity.SetValue(DataModel::NullNullable);
+                }
+                Testing::MockCommandHandler allocateHandler;
+                allocateHandler.SetFabricIndex(1);
+                const ConcreteCommandPath allocatePath{ 1, PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+                EXPECT_EQ(logic.HandleAllocatePushTransport(allocateHandler, allocatePath, allocate), std::nullopt);
+                ASSERT_TRUE(allocateHandler.HasResponse());
+                ASSERT_EQ(logic.mCurrentConnections.size(), 1u);
+                const auto originalStorage  = logic.mCurrentConnections[0].GetTransportOptionsPtr();
+                const uint16_t connectionId = logic.mCurrentConnections[0].connectionID;
+                const ConcreteAttributePath persistencePath{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
+                auto beforeBuffer = std::make_unique<uint8_t[]>(1024);
+                MutableByteSpan before(beforeBuffer.get(), 1024);
+                ASSERT_EQ(persistence.ReadValue(persistencePath, before), CHIP_NO_ERROR);
+                const size_t writesBefore = persistence.writes;
+                delegate.modifications    = 0;
+
+                Commands::ModifyPushTransport::DecodableType modify;
+                modify.connectionID = connectionId;
+                auto & options      = modify.transportOptions;
+                options             = original;
+                options.url         = "https://example.com/modified/"_span;
+                auto & trigger      = options.triggerOptions;
+                trigger.triggerType = triggerType;
+                trigger.motionZones.ClearValue();
+                if (triggerType != TransportTriggerTypeEnum::kMotion)
+                {
+                    trigger.motionTimeControl.ClearValue();
+                    trigger.motionSensitivity.ClearValue();
+                }
+                if (triggerType == TransportTriggerTypeEnum::kContinuous)
+                {
+                    trigger.maxPreRollLen.ClearValue();
+                }
+
+                uint8_t tlvBuffer[128];
+                TLV::TLVWriter writer;
+                writer.Init(tlvBuffer, sizeof(tlvBuffer));
+                TLV::TLVType arrayType;
+                ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+                const size_t count = zonesCase == ZonesCase::Oversized ? 3u : (zonesCase == ZonesCase::Empty ? 0u : 2u);
+                for (size_t index = 0; index < count; ++index)
+                {
+                    if ((zonesCase == ZonesCase::MalformedFirst && index == 0) ||
+                        (zonesCase == ZonesCase::MalformedAfterValid && index == 1))
+                    {
+                        TLV::TLVType structType;
+                        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType), CHIP_NO_ERROR);
+                        ASSERT_EQ(
+                            writer.Put(TLV::ContextTag(to_underlying(Structs::TransportZoneOptionsStruct::Fields::kZone)), true),
+                            CHIP_NO_ERROR);
+                        ASSERT_EQ(writer.EndContainer(structType), CHIP_NO_ERROR);
+                        continue;
+                    }
+                    Structs::TransportZoneOptionsStruct::Type zone;
+                    zone.zone.SetNonNull(static_cast<uint16_t>(zonesCase == ZonesCase::Duplicate ? 1 : index + 1));
+                    if (zonesCase == ZonesCase::DuplicateNull)
+                    {
+                        zone.zone.SetNull();
+                    }
+                    else if (zonesCase == ZonesCase::Invalid)
+                    {
+                        zone.zone.SetNonNull(static_cast<uint16_t>(index + 4));
+                    }
+                    if (features.Has(Feature::kPerZoneSensitivity))
+                    {
+                        zone.sensitivity.SetValue(5);
+                    }
+                    ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), zone), CHIP_NO_ERROR);
+                }
+                ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+                ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+                TLV::TLVReader reader;
+                reader.Init(tlvBuffer, writer.GetLengthWritten());
+                ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+                DataModel::DecodableList<TransportZoneOptionsDecodableStruct> zones;
+                ASSERT_EQ(zones.Decode(reader), CHIP_NO_ERROR);
+                size_t size = 0;
+                ASSERT_EQ(zones.ComputeSize(&size), CHIP_NO_ERROR);
+                ASSERT_EQ(size, count);
+                if (zonesCase == ZonesCase::MalformedFirst || zonesCase == ZonesCase::MalformedAfterValid)
+                {
+                    auto iter     = zones.begin();
+                    size_t prefix = 0;
+                    while (iter.Next())
+                    {
+                        ++prefix;
+                    }
+                    EXPECT_EQ(prefix, zonesCase == ZonesCase::MalformedFirst ? 0u : 1u);
+                    ASSERT_NE(iter.GetStatus(), CHIP_NO_ERROR);
+                }
+                if (zonesCase == ZonesCase::Null)
+                {
+                    trigger.motionZones.SetValue(DataModel::NullNullable);
+                }
+                else if (zonesCase != ZonesCase::Omitted)
+                {
+                    trigger.motionZones.SetValue(DataModel::MakeNullable(zones));
+                }
+
+                Status expected = Status::Success;
+                const bool acceptsZones =
+                    triggerType == TransportTriggerTypeEnum::kMotion || triggerType == TransportTriggerTypeEnum::kAmbientContext;
+                if (!acceptsZones)
+                {
+                    expected = zonesCase == ZonesCase::Omitted ? Status::Success : Status::InvalidCommand;
+                }
+                else if (zonesCase == ZonesCase::Omitted || zonesCase == ZonesCase::MalformedFirst ||
+                         zonesCase == ZonesCase::MalformedAfterValid)
+                {
+                    expected = Status::InvalidCommand;
+                }
+                else if (zonesCase == ZonesCase::Duplicate || zonesCase == ZonesCase::DuplicateNull)
+                {
+                    expected = Status::AlreadyExists;
+                }
+                else if (zonesCase == ZonesCase::Oversized)
+                {
+                    expected = Status::DynamicConstraintError;
+                }
+                else if (zonesCase == ZonesCase::Invalid)
+                {
+                    expected = Status::Failure;
+                }
+                Testing::MockCommandHandler handler;
+                handler.SetFabricIndex(1);
+                const ConcreteCommandPath path{ 1, PushAvStreamTransport::Id, Commands::ModifyPushTransport::Id };
+                delegate.lastModification.reset();
+                const auto result = logic.HandleModifyPushTransport(handler, path, modify);
+                if (result.has_value())
+                {
+                    EXPECT_FALSE(handler.HasStatus());
+                    EXPECT_FALSE(handler.HasResponse());
+                    handler.AddStatus(path, result->GetStatusCode());
+                }
+                ASSERT_EQ(handler.GetStatuses().size(), 1u);
+                EXPECT_EQ(handler.GetStatuses()[0].status.GetStatus(), expected);
+                if (expected == Status::Failure)
+                {
+                    EXPECT_EQ(handler.GetStatuses()[0].status.GetClusterSpecificCode(),
+                              to_underlying(StatusCodeEnum::kInvalidZone));
+                }
+                const bool success = expected == Status::Success;
+                EXPECT_EQ(delegate.modifications, success ? 1u : 0u);
+                EXPECT_EQ(delegate.lastModification != nullptr, success);
+                if (success && delegate.lastModification != nullptr)
+                {
+                    const auto & received = delegate.lastModification->triggerOptions;
+                    EXPECT_EQ(received.triggerType, triggerType);
+                    ASSERT_EQ(received.motionZones.HasValue(), acceptsZones);
+                    if (acceptsZones)
+                    {
+                        ASSERT_EQ(received.motionZones.Value().IsNull(), zonesCase == ZonesCase::Null);
+                        if (zonesCase != ZonesCase::Null)
+                        {
+                            const auto & receivedZones = received.motionZones.Value().Value();
+                            ASSERT_EQ(receivedZones.size(), zonesCase == ZonesCase::Valid ? 2u : 0u);
+                            for (size_t zoneIndex = 0; zoneIndex < receivedZones.size(); ++zoneIndex)
+                            {
+                                ASSERT_FALSE(receivedZones[zoneIndex].zone.IsNull());
+                                EXPECT_EQ(receivedZones[zoneIndex].zone.Value(), zoneIndex + 1);
+                                EXPECT_EQ(receivedZones[zoneIndex].sensitivity.HasValue(),
+                                          features.Has(Feature::kPerZoneSensitivity));
+                            }
+                        }
+                    }
+                }
+                EXPECT_EQ(persistence.writes - writesBefore, success ? 1u : 0u);
+                if (expected == Status::Failure)
+                {
+                    auto dispatchOptions = std::make_unique<TransportOptionsStorage>(modify.transportOptions);
+                    Commands::ModifyPushTransport::Type dispatchRequest;
+                    dispatchRequest.connectionID     = connectionId;
+                    dispatchRequest.transportOptions = *dispatchOptions;
+                    tester.GetCommandHandler().SetFabricIndex(1);
+                    const auto dispatched = tester.Invoke(dispatchRequest);
+                    ASSERT_TRUE(dispatched.GetStatusCode().has_value());
+                    EXPECT_EQ(dispatched.GetStatusCode()->GetStatus(), Status::Failure);
+                    EXPECT_EQ(dispatched.GetStatusCode()->GetClusterSpecificCode(), to_underlying(StatusCodeEnum::kInvalidZone));
+                    EXPECT_FALSE(tester.GetCommandHandler().HasResponse());
+                    EXPECT_EQ(delegate.modifications, 0u);
+                    EXPECT_EQ(persistence.writes, writesBefore);
+                }
+                ASSERT_EQ(logic.mCurrentConnections.size(), 1u);
+                EXPECT_EQ(logic.mCurrentConnections[0].connectionID, connectionId);
+                EXPECT_EQ(logic.mCurrentConnections[0].GetTransportOptionsPtr() == originalStorage, !success);
+                auto afterBuffer = std::make_unique<uint8_t[]>(1024);
+                MutableByteSpan after(afterBuffer.get(), 1024);
+                ASSERT_EQ(persistence.ReadValue(persistencePath, after), CHIP_NO_ERROR);
+                if (!success)
+                {
+                    EXPECT_TRUE(before.data_equal(after));
+                    ASSERT_TRUE(logic.mCurrentConnections[0].transportOptions.HasValue());
+                    const auto & retained = logic.mCurrentConnections[0].transportOptions.Value();
+                    EXPECT_TRUE(retained.url.data_equal("https://example.com/original/"_span));
+                    EXPECT_EQ(retained.triggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
+                    ASSERT_TRUE(retained.triggerOptions.motionZones.HasValue());
+                    ASSERT_FALSE(retained.triggerOptions.motionZones.Value().IsNull());
+                    const auto & retainedZones = retained.triggerOptions.motionZones.Value().Value();
+                    EXPECT_EQ(retainedZones.size(), 1u);
+                    if (retainedZones.size() == 1)
+                    {
+                        EXPECT_FALSE(retainedZones[0].zone.IsNull());
+                        if (!retainedZones[0].zone.IsNull())
+                        {
+                            EXPECT_EQ(retainedZones[0].zone.Value(), 3);
+                        }
+                    }
+                }
+                else
+                {
+                    EXPECT_FALSE(before.data_equal(after));
+                    memset(tlvBuffer, 0, sizeof(tlvBuffer));
+                    logic.mCurrentConnections.clear();
+                    ASSERT_EQ(logic.Init(persistence), CHIP_NO_ERROR);
+                    ASSERT_EQ(logic.mCurrentConnections.size(), 1u);
+                    EXPECT_EQ(logic.mCurrentConnections[0].connectionID, connectionId);
+                    tester.GetCommandHandler().SetFabricIndex(1);
+                    Attributes::CurrentConnections::TypeInfo::DecodableType current;
+                    ASSERT_EQ(tester.ReadAttribute(Attributes::CurrentConnections::Id, current), CHIP_NO_ERROR);
+                    auto iter = current.begin();
+                    ASSERT_TRUE(iter.Next());
+                    ASSERT_TRUE(iter.GetValue().transportOptions.HasValue());
+                    const auto & storedOptions = iter.GetValue().transportOptions.Value();
+                    EXPECT_TRUE(storedOptions.url.data_equal("https://example.com/modified/"_span));
+                    const auto & storedTrigger = storedOptions.triggerOptions;
+                    EXPECT_EQ(storedTrigger.triggerType, triggerType);
+                    ASSERT_EQ(storedTrigger.motionZones.HasValue(), acceptsZones);
+                    if (acceptsZones)
+                    {
+                        ASSERT_EQ(storedTrigger.motionZones.Value().IsNull(), zonesCase == ZonesCase::Null);
+                        if (zonesCase != ZonesCase::Null)
+                        {
+                            auto zoneIter    = storedTrigger.motionZones.Value().Value().begin();
+                            size_t zoneCount = 0;
+                            while (zoneIter.Next())
+                            {
+                                ASSERT_FALSE(zoneIter.GetValue().zone.IsNull());
+                                EXPECT_EQ(zoneIter.GetValue().zone.Value(), zoneCount + 1);
+                                EXPECT_EQ(zoneIter.GetValue().sensitivity.HasValue(), features.Has(Feature::kPerZoneSensitivity));
+                                ++zoneCount;
+                            }
+                            EXPECT_EQ(zoneIter.GetStatus(), CHIP_NO_ERROR);
+                            EXPECT_EQ(zoneCount, zonesCase == ZonesCase::Valid ? 2u : 0u);
+                        }
+                    }
+                    EXPECT_FALSE(iter.Next());
+                    EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+                    Commands::FindTransport::DecodableType find;
+                    find.connectionID.SetNonNull(connectionId);
+                    Testing::MockCommandHandler findHandler;
+                    findHandler.SetFabricIndex(1);
+                    const ConcreteCommandPath findPath{ 1, PushAvStreamTransport::Id, Commands::FindTransport::Id };
+                    EXPECT_EQ(logic.HandleFindTransport(findHandler, findPath, find), std::nullopt);
+                    Commands::FindTransportResponse::DecodableType found;
+                    ASSERT_EQ(findHandler.DecodeResponse(found), CHIP_NO_ERROR);
+                    auto foundIter = found.transportConfigurations.begin();
+                    ASSERT_TRUE(foundIter.Next());
+                    ASSERT_TRUE(foundIter.GetValue().transportOptions.HasValue());
+                    auto foundStorage = std::make_unique<TransportOptionsStorage>(foundIter.GetValue().transportOptions.Value());
+                    const auto & foundOptions = *foundStorage;
+                    EXPECT_TRUE(foundOptions.url.data_equal("https://example.com/modified/"_span));
+                    EXPECT_EQ(foundOptions.triggerOptions.triggerType, triggerType);
+                    ASSERT_EQ(foundOptions.triggerOptions.motionZones.HasValue(), acceptsZones);
+                    if (acceptsZones)
+                    {
+                        ASSERT_EQ(foundOptions.triggerOptions.motionZones.Value().IsNull(), zonesCase == ZonesCase::Null);
+                        if (zonesCase != ZonesCase::Null)
+                        {
+                            const auto & foundZones = foundOptions.triggerOptions.motionZones.Value().Value();
+                            EXPECT_EQ(foundZones.size(), zonesCase == ZonesCase::Valid ? 2u : 0u);
+                            for (size_t zoneIndex = 0; zoneIndex < foundZones.size(); ++zoneIndex)
+                            {
+                                ASSERT_FALSE(foundZones[zoneIndex].zone.IsNull());
+                                EXPECT_EQ(foundZones[zoneIndex].zone.Value(), zoneIndex + 1);
+                            }
+                        }
+                    }
+                    EXPECT_FALSE(foundIter.Next());
+                    EXPECT_EQ(foundIter.GetStatus(), CHIP_NO_ERROR);
+                }
+                if (zonesCase == ZonesCase::Valid &&
+                    (triggerType == TransportTriggerTypeEnum::kMotion || triggerType == TransportTriggerTypeEnum::kAmbientContext))
+                {
+                    enum class UpdateCase
+                    {
+                        Valid,
+                        Null,
+                        Empty,
+                        NullZone,
+                        MissingZone,
+                        DuplicateOversized,
+                        InvalidId,
+                        GlobalSensitivity,
+                        SensitivityLow,
+                        SensitivityHigh,
+                        SensitivityMissing,
+                        SensitivityUnexpected,
+                        Malformed,
+                        Truncated,
+                        DuplicateNull,
+                        DuplicateMalformed,
+                        Oversized,
+                        InvalidGlobalSensitivity
+                    };
+                    for (const auto updateCase :
+                         { UpdateCase::Valid, UpdateCase::Null, UpdateCase::Empty, UpdateCase::NullZone, UpdateCase::MissingZone,
+                           UpdateCase::DuplicateOversized, UpdateCase::InvalidId, UpdateCase::GlobalSensitivity,
+                           UpdateCase::SensitivityLow, UpdateCase::SensitivityHigh, UpdateCase::SensitivityMissing,
+                           UpdateCase::SensitivityUnexpected, UpdateCase::Malformed, UpdateCase::Truncated,
+                           UpdateCase::DuplicateNull, UpdateCase::DuplicateMalformed, UpdateCase::Oversized,
+                           UpdateCase::InvalidGlobalSensitivity })
+                    {
+                        const auto beforeOptions = logic.mCurrentConnections[0].GetTransportOptionsPtr();
+                        uint8_t updateBeforeBuffer[1024];
+                        MutableByteSpan updateBefore(updateBeforeBuffer);
+                        ASSERT_EQ(persistence.ReadValue(persistencePath, updateBefore), CHIP_NO_ERROR);
+                        const auto updateWritesBefore = persistence.writes;
+                        const auto updatesBefore      = delegate.updates;
+                        uint8_t updateBuffer[128];
+                        TLV::TLVWriter updateWriter;
+                        updateWriter.Init(updateBuffer);
+                        TLV::TLVType updateArray;
+                        ASSERT_EQ(updateWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, updateArray),
+                                  CHIP_NO_ERROR);
+                        const bool duplicateLarge =
+                            updateCase == UpdateCase::DuplicateOversized || updateCase == UpdateCase::DuplicateMalformed;
+                        const size_t updateCount = updateCase == UpdateCase::Empty    ? 0u
+                            : (duplicateLarge || updateCase == UpdateCase::Oversized) ? 3u
+                            : updateCase == UpdateCase::NullZone                      ? 1u
+                                                                                      : 2u;
+                        for (size_t index = 0; index < updateCount; ++index)
+                        {
+                            if ((updateCase == UpdateCase::Malformed || updateCase == UpdateCase::DuplicateMalformed) &&
+                                index == updateCount - 1)
+                            {
+                                TLV::TLVType malformedZone;
+                                ASSERT_EQ(updateWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, malformedZone),
+                                          CHIP_NO_ERROR);
+                                ASSERT_EQ(
+                                    updateWriter.Put(
+                                        TLV::ContextTag(to_underlying(Structs::TransportZoneOptionsStruct::Fields::kZone)), true),
+                                    CHIP_NO_ERROR);
+                                ASSERT_EQ(updateWriter.EndContainer(malformedZone), CHIP_NO_ERROR);
+                                continue;
+                            }
+                            if (updateCase == UpdateCase::MissingZone && index == updateCount - 1)
+                            {
+                                TLV::TLVType missingZone;
+                                ASSERT_EQ(updateWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, missingZone),
+                                          CHIP_NO_ERROR);
+                                if (features.Has(Feature::kPerZoneSensitivity))
+                                {
+                                    ASSERT_EQ(updateWriter.Put(TLV::ContextTag(to_underlying(
+                                                                   Structs::TransportZoneOptionsStruct::Fields::kSensitivity)),
+                                                               uint8_t{ 5 }),
+                                              CHIP_NO_ERROR);
+                                }
+                                ASSERT_EQ(updateWriter.EndContainer(missingZone), CHIP_NO_ERROR);
+                                continue;
+                            }
+                            Structs::TransportZoneOptionsStruct::Type updateZone;
+                            updateZone.zone.SetNonNull(duplicateLarge ? uint16_t{ 1 }
+                                                           : updateCase == UpdateCase::InvalidId && index == 0
+                                                           ? uint16_t{ 129 }
+                                                           : static_cast<uint16_t>(index + 1));
+                            if (updateCase == UpdateCase::NullZone || updateCase == UpdateCase::DuplicateNull)
+                            {
+                                updateZone.zone.SetNull();
+                            }
+                            if (features.Has(Feature::kPerZoneSensitivity) || updateCase == UpdateCase::SensitivityLow ||
+                                updateCase == UpdateCase::SensitivityHigh || updateCase == UpdateCase::SensitivityUnexpected)
+                            {
+                                updateZone.sensitivity.SetValue(updateCase == UpdateCase::SensitivityLow        ? 0
+                                                                    : updateCase == UpdateCase::SensitivityHigh ? 11
+                                                                                                                : 5);
+                            }
+                            if (updateCase == UpdateCase::SensitivityMissing)
+                            {
+                                updateZone.sensitivity.ClearValue();
+                            }
+                            ASSERT_EQ(DataModel::Encode(updateWriter, TLV::AnonymousTag(), updateZone), CHIP_NO_ERROR);
+                        }
+                        ASSERT_EQ(updateWriter.EndContainer(updateArray), CHIP_NO_ERROR);
+                        ASSERT_EQ(updateWriter.Finalize(), CHIP_NO_ERROR);
+                        TLV::TLVReader updateReader;
+                        updateReader.Init(updateBuffer,
+                                          updateWriter.GetLengthWritten() - (updateCase == UpdateCase::Truncated ? 3u : 0u));
+                        ASSERT_EQ(updateReader.Next(), CHIP_NO_ERROR);
+                        DataModel::DecodableList<TransportZoneOptionsDecodableStruct> updatedZones;
+                        if (updateCase == UpdateCase::Truncated)
+                        {
+                            TLV::TLVType truncatedArray;
+                            ASSERT_EQ(updateReader.EnterContainer(truncatedArray), CHIP_NO_ERROR);
+                            updatedZones.SetReader(updateReader);
+                        }
+                        else
+                        {
+                            ASSERT_EQ(updatedZones.Decode(updateReader), CHIP_NO_ERROR);
+                        }
+                        Commands::UpdateMotionZoneOptions::DecodableType update;
+                        update.connectionID = connectionId;
+                        update.motionZones.SetValue(DataModel::MakeNullable(updatedZones));
+                        if (updateCase == UpdateCase::Null)
+                        {
+                            update.motionZones.SetValue(DataModel::NullNullable);
+                        }
+                        const bool globalSensitivity =
+                            updateCase == UpdateCase::GlobalSensitivity || updateCase == UpdateCase::InvalidGlobalSensitivity;
+                        if (globalSensitivity)
+                        {
+                            update.motionSensitivity.SetValue(DataModel::MakeNullable(
+                                static_cast<uint8_t>(updateCase == UpdateCase::InvalidGlobalSensitivity ? 0 : 7)));
+                        }
+                        Status updateExpected = Status::Success;
+                        if (globalSensitivity &&
+                            (triggerType != TransportTriggerTypeEnum::kMotion || features.Has(Feature::kPerZoneSensitivity)))
+                        {
+                            updateExpected = Status::InvalidCommand;
+                        }
+                        else if (updateCase == UpdateCase::InvalidGlobalSensitivity)
+                        {
+                            updateExpected = Status::ConstraintError;
+                        }
+                        else if (updateCase == UpdateCase::MissingZone || updateCase == UpdateCase::Malformed ||
+                                 updateCase == UpdateCase::DuplicateMalformed || updateCase == UpdateCase::Truncated ||
+                                 (updateCase == UpdateCase::SensitivityMissing && features.Has(Feature::kPerZoneSensitivity)) ||
+                                 ((updateCase == UpdateCase::SensitivityLow || updateCase == UpdateCase::SensitivityHigh ||
+                                   updateCase == UpdateCase::SensitivityUnexpected) &&
+                                  !features.Has(Feature::kPerZoneSensitivity)))
+                        {
+                            updateExpected = Status::InvalidCommand;
+                        }
+                        else if (updateCase == UpdateCase::SensitivityLow || updateCase == UpdateCase::SensitivityHigh)
+                        {
+                            updateExpected = Status::ConstraintError;
+                        }
+                        else if (updateCase == UpdateCase::DuplicateOversized || updateCase == UpdateCase::DuplicateNull)
+                        {
+                            updateExpected = Status::AlreadyExists;
+                        }
+                        else if (updateCase == UpdateCase::Oversized)
+                        {
+                            updateExpected = Status::DynamicConstraintError;
+                        }
+                        else if (updateCase == UpdateCase::InvalidId)
+                        {
+                            updateExpected = Status::Failure;
+                        }
+                        Testing::MockCommandHandler updateHandler;
+                        updateHandler.SetFabricIndex(1);
+                        const ConcreteCommandPath updatePath{ 1, PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+                        EXPECT_EQ(logic.HandleUpdateMotionZoneOptions(updateHandler, updatePath, update), std::nullopt);
+                        ASSERT_EQ(updateHandler.GetStatuses().size(), 1u);
+                        EXPECT_EQ(updateHandler.GetLastStatus().status.GetStatus(), updateExpected);
+                        if (updateCase == UpdateCase::InvalidId)
+                        {
+                            EXPECT_EQ(updateHandler.GetLastStatus().status.GetClusterSpecificCode(),
+                                      to_underlying(StatusCodeEnum::kInvalidZone));
+                        }
+                        const bool updateSuccess = updateExpected == Status::Success;
+                        EXPECT_EQ(delegate.updates - updatesBefore, updateSuccess ? 1u : 0u);
+                        EXPECT_EQ(persistence.writes - updateWritesBefore, updateSuccess ? 1u : 0u);
+                        EXPECT_FALSE(updateHandler.HasResponse());
+                        if (!updateSuccess)
+                        {
+                            EXPECT_EQ(logic.mCurrentConnections[0].GetTransportOptionsPtr(), beforeOptions);
+                            uint8_t updateAfterBuffer[1024];
+                            MutableByteSpan updateAfter(updateAfterBuffer);
+                            ASSERT_EQ(persistence.ReadValue(persistencePath, updateAfter), CHIP_NO_ERROR);
+                            EXPECT_TRUE(updateBefore.data_equal(updateAfter));
+                        }
+                    }
+                }
+                Commands::DeallocatePushTransport::DecodableType deallocate;
+                deallocate.connectionID = connectionId;
+                Testing::MockCommandHandler deallocateHandler;
+                deallocateHandler.SetFabricIndex(1);
+                const ConcreteCommandPath deallocatePath{ 1, PushAvStreamTransport::Id, Commands::DeallocatePushTransport::Id };
+                EXPECT_EQ(logic.HandleDeallocatePushTransport(deallocateHandler, deallocatePath, deallocate), std::nullopt);
+                EXPECT_TRUE(logic.mCurrentConnections.empty());
+            }
+        }
+        server.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, MalformedPersistedMotionZonesDoNotPublishDecodedPrefix)
+{
+    class RestoredConnectionDelegate : public TestPushAVStreamTransportDelegateImpl
+    {
+    public:
+        void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override { associatedServer = server; }
+        PushAvStreamTransportServer * associatedServer = nullptr;
+        bool requireAssociation                        = false;
+        CHIP_ERROR PersistentAttributesLoadedCallback() override
+        {
+            if (requireAssociation && associatedServer == nullptr)
+            {
+                return CHIP_ERROR_INCORRECT_STATE;
+            }
+            ++restorations;
+            if (restoreBeforeFailure)
+            {
+                activeConnection = 1;
+            }
+            return restorationError;
+        }
+        Status DeallocatePushTransport(const uint16_t connectionId) override
+        {
+            ++deallocationCalls;
+            if (activeConnection == connectionId)
+            {
+                if (deallocationBusy)
+                {
+                    return Status::Busy;
+                }
+                activeConnection = 0;
+                return Status::Success;
+            }
+            return Status::NotFound;
+        }
+        Status ValidateZoneId(uint16_t zoneId) override
+        {
+            ++zoneIdChecks;
+            return zonesAvailable ? TestPushAVStreamTransportDelegateImpl::ValidateZoneId(zoneId) : Status::Failure;
+        }
+        bool zonesAvailable = true;
+        size_t zoneIdChecks = 0;
+        bool ValidateMotionZoneListSize(size_t zoneCount) override { return !enforceZoneCapacity || zoneCount <= 2; }
+        size_t restorations         = 0;
+        CHIP_ERROR restorationError = CHIP_NO_ERROR;
+        bool restoreBeforeFailure   = false;
+        uint16_t activeConnection   = 0;
+        size_t deallocationCalls    = 0;
+        bool deallocationBusy       = false;
+        bool enforceZoneCapacity    = false;
+    } delegate;
+    mServer.GetLogic().SetDelegate(&delegate);
+    DefaultAttributePersistenceProvider persistence;
+    ASSERT_EQ(persistence.Init(&mClusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
+    auto & originalContext = mClusterTester.GetServerClusterContext();
+    ServerClusterContext context{ originalContext.provider, originalContext.storage, persistence,
+                                  originalContext.interactionContext };
+    ASSERT_EQ(mServer.Startup(context), CHIP_NO_ERROR);
+    for (const auto scenario : { 0, 1, 2, 3 })
+    {
+        const auto triggerType = scenario < 2 ? TransportTriggerTypeEnum::kMotion : TransportTriggerTypeEnum::kAmbientContext;
+        const bool missingZone = scenario % 2 != 0;
+        delegate.restorations  = 0;
+        uint8_t buffer[1024];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType arrayType;
+        TLV::TLVType configType;
+        TLV::TLVType optionsType;
+        TLV::TLVType triggerContainer;
+        TLV::TLVType zonesType;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, configType), CHIP_NO_ERROR);
+        ASSERT_EQ(
+            writer.Put(TLV::ContextTag(to_underlying(Structs::TransportConfigurationStruct::Fields::kConnectionID)), uint16_t{ 1 }),
+            CHIP_NO_ERROR);
+        ASSERT_EQ(DataModel::Encode(writer,
+                                    TLV::ContextTag(to_underlying(Structs::TransportConfigurationStruct::Fields::kTransportStatus)),
+                                    TransportStatusEnum::kInactive),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(254), FabricIndex{ 1 }), CHIP_NO_ERROR);
+        ASSERT_EQ(
+            writer.StartContainer(TLV::ContextTag(to_underlying(Structs::TransportConfigurationStruct::Fields::kTransportOptions)),
+                                  TLV::kTLVType_Structure, optionsType),
+            CHIP_NO_ERROR);
+        ASSERT_EQ(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Structs::TransportOptionsStruct::Fields::kStreamUsage)),
+                                    StreamUsageEnum::kAnalysis),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(
+            writer.Put(TLV::ContextTag(to_underlying(Structs::TransportOptionsStruct::Fields::kTLSEndpointID)), uint16_t{ 1 }),
+            CHIP_NO_ERROR);
+        ASSERT_EQ(writer.PutString(TLV::ContextTag(to_underlying(Structs::TransportOptionsStruct::Fields::kUrl)),
+                                   "https://example.com/stream/"),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(writer.StartContainer(TLV::ContextTag(to_underlying(Structs::TransportOptionsStruct::Fields::kTriggerOptions)),
+                                        TLV::kTLVType_Structure, triggerContainer),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(DataModel::Encode(writer,
+                                    TLV::ContextTag(to_underlying(Structs::TransportTriggerOptionsStruct::Fields::kTriggerType)),
+                                    triggerType),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(
+            writer.StartContainer(TLV::ContextTag(to_underlying(Structs::TransportTriggerOptionsStruct::Fields::kMotionZones)),
+                                  TLV::kTLVType_Array, zonesType),
+            CHIP_NO_ERROR);
+        Structs::TransportZoneOptionsStruct::Type zone;
+        zone.zone.SetNonNull(1);
+        zone.sensitivity.SetValue(5);
+        ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), zone), CHIP_NO_ERROR);
+        if (missingZone)
+        {
+            TLV::TLVType missingZoneType;
+            ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, missingZoneType), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.Put(TLV::ContextTag(to_underlying(Structs::TransportZoneOptionsStruct::Fields::kSensitivity)),
+                                 static_cast<uint8_t>(5)),
+                      CHIP_NO_ERROR);
+            ASSERT_EQ(writer.EndContainer(missingZoneType), CHIP_NO_ERROR);
+        }
+        else
+        {
+            ASSERT_EQ(writer.Put(TLV::AnonymousTag(), true), CHIP_NO_ERROR);
+        }
+        ASSERT_EQ(writer.EndContainer(zonesType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(triggerContainer), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(optionsType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(configType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        TLV::TLVType decodedArray;
+        ASSERT_EQ(reader.EnterContainer(decodedArray), CHIP_NO_ERROR);
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        Structs::TransportConfigurationStruct::DecodableType decoded;
+        ASSERT_EQ(decoded.Decode(reader), CHIP_NO_ERROR);
+        ASSERT_TRUE(decoded.transportOptions.HasValue());
+        const auto & zones = decoded.transportOptions.Value().triggerOptions.motionZones.Value().Value();
+        auto iter          = zones.begin();
+        ASSERT_TRUE(iter.Next());
+        if (missingZone)
+        {
+            ASSERT_TRUE(iter.Next());
+        }
+        ASSERT_FALSE(iter.Next());
+        EXPECT_EQ(iter.GetStatus() == CHIP_NO_ERROR, missingZone);
+
+        const ConcreteAttributePath path{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
+        const std::vector<uint8_t> persisted(buffer, buffer + writer.GetLengthWritten());
+        ASSERT_EQ(persistence.WriteValue(path, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+        EXPECT_EQ(mServer.Init(), missingZone ? CHIP_ERROR_MISSING_TLV_ELEMENT : iter.GetStatus());
+        EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+        EXPECT_EQ(delegate.restorations, 0u);
+        EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+        DataModel::DecodableList<Structs::TransportConfigurationStruct::DecodableType> currentConnections;
+        EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentConnections::Id, currentConnections).GetStatusCode().GetStatus(),
+                  Status::Failure);
+
+        uint8_t commandBuffer[64];
+        TLV::TLVWriter commandWriter;
+        commandWriter.Init(commandBuffer);
+        Commands::DeallocatePushTransport::Type deallocate;
+        deallocate.connectionID = 1;
+        ASSERT_EQ(DataModel::Encode(commandWriter, TLV::AnonymousTag(), deallocate), CHIP_NO_ERROR);
+        ASSERT_EQ(commandWriter.Finalize(), CHIP_NO_ERROR);
+        TLV::TLVReader commandReader;
+        commandReader.Init(commandBuffer, commandWriter.GetLengthWritten());
+        ASSERT_EQ(commandReader.Next(), CHIP_NO_ERROR);
+        const ConcreteCommandPath commandPath{ 1, PushAvStreamTransport::Id, Commands::DeallocatePushTransport::Id };
+        Access::SubjectDescriptor subject;
+        subject.fabricIndex = 1;
+        const DataModel::InvokeRequest request(commandPath, subject);
+        Testing::MockCommandHandler handler;
+        const auto result = mServer.InvokeCommand(request, commandReader, &handler);
+        ASSERT_TRUE(result.has_value());
+        EXPECT_EQ(result->GetStatusCode().GetStatus(), Status::Failure);
+        EXPECT_FALSE(handler.HasStatus());
+        EXPECT_FALSE(handler.HasResponse());
+
+        MutableByteSpan retained(buffer);
+        ASSERT_EQ(persistence.ReadValue(path, retained), CHIP_NO_ERROR);
+        EXPECT_TRUE(retained.data_equal(ByteSpan(persisted.data(), persisted.size())));
+
+        writer.Init(buffer);
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(persistence.WriteValue(path, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+        ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
+        EXPECT_TRUE(mServer.GetLogic().IsInitialized());
+        EXPECT_EQ(delegate.restorations, 1u);
+        EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+        EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentConnections::Id, currentConnections), CHIP_NO_ERROR);
+
+        commandReader.Init(commandBuffer, commandWriter.GetLengthWritten());
+        ASSERT_EQ(commandReader.Next(), CHIP_NO_ERROR);
+        Testing::MockCommandHandler recoveredHandler;
+        EXPECT_EQ(mServer.InvokeCommand(request, commandReader, &recoveredHandler), std::nullopt);
+        ASSERT_TRUE(recoveredHandler.HasStatus());
+        EXPECT_EQ(recoveredHandler.GetLastStatus().status.GetStatus(), Status::NotFound);
+
+        delegate.restorationError = CHIP_ERROR_INTERNAL;
+        EXPECT_EQ(mServer.Init(), CHIP_ERROR_INTERNAL);
+        EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+        delegate.restorationError = CHIP_NO_ERROR;
+        EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+        EXPECT_TRUE(mServer.GetLogic().IsInitialized());
+        EXPECT_EQ(delegate.restorations, 3u);
+    }
+
+    enum class MalformedField
+    {
+        MissingOptions,
+        VideoStreams,
+        AudioStreams,
+        OversizedVideoStreams,
+        OversizedAudioStreams,
+    };
+    for (const auto field : { MalformedField::MissingOptions, MalformedField::VideoStreams, MalformedField::AudioStreams,
+                              MalformedField::OversizedVideoStreams, MalformedField::OversizedAudioStreams })
+    {
+        delegate.restorations = 0;
+        uint8_t buffer[1024];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType arrayType;
+        TLV::TLVType configType;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, configType), CHIP_NO_ERROR);
+        ASSERT_EQ(
+            writer.Put(TLV::ContextTag(to_underlying(Structs::TransportConfigurationStruct::Fields::kConnectionID)), uint16_t{ 1 }),
+            CHIP_NO_ERROR);
+        ASSERT_EQ(DataModel::Encode(writer,
+                                    TLV::ContextTag(to_underlying(Structs::TransportConfigurationStruct::Fields::kTransportStatus)),
+                                    TransportStatusEnum::kInactive),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(254), FabricIndex{ 1 }), CHIP_NO_ERROR);
+        if (field != MalformedField::MissingOptions)
+        {
+            TLV::TLVType optionsType;
+            TLV::TLVType streamsType;
+            ASSERT_EQ(writer.StartContainer(
+                          TLV::ContextTag(to_underlying(Structs::TransportConfigurationStruct::Fields::kTransportOptions)),
+                          TLV::kTLVType_Structure, optionsType),
+                      CHIP_NO_ERROR);
+            const bool video     = field == MalformedField::VideoStreams || field == MalformedField::OversizedVideoStreams;
+            const bool oversized = field == MalformedField::OversizedVideoStreams || field == MalformedField::OversizedAudioStreams;
+            const auto streamsField = video ? Structs::TransportOptionsStruct::Fields::kVideoStreams
+                                            : Structs::TransportOptionsStruct::Fields::kAudioStreams;
+            ASSERT_EQ(writer.StartContainer(TLV::ContextTag(to_underlying(streamsField)), TLV::kTLVType_Array, streamsType),
+                      CHIP_NO_ERROR);
+            const size_t streamCount = oversized ? (video ? kMaxVideoStreams : kMaxAudioStreams) + 1 : 1;
+            for (size_t streamIndex = 0; streamIndex < streamCount; ++streamIndex)
+            {
+                if (video)
+                {
+                    Structs::VideoStreamStruct::Type stream{};
+                    ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), stream), CHIP_NO_ERROR);
+                }
+                else
+                {
+                    Structs::AudioStreamStruct::Type stream{};
+                    ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), stream), CHIP_NO_ERROR);
+                }
+            }
+            if (!oversized)
+            {
+                ASSERT_EQ(writer.Put(TLV::AnonymousTag(), true), CHIP_NO_ERROR);
+            }
+            ASSERT_EQ(writer.EndContainer(streamsType), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.EndContainer(optionsType), CHIP_NO_ERROR);
+        }
+        ASSERT_EQ(writer.EndContainer(configType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        TLV::TLVType decodedArray;
+        ASSERT_EQ(reader.EnterContainer(decodedArray), CHIP_NO_ERROR);
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        Structs::TransportConfigurationStruct::DecodableType decoded;
+        ASSERT_EQ(decoded.Decode(reader), CHIP_NO_ERROR);
+        CHIP_ERROR expectedError = CHIP_ERROR_MISSING_TLV_ELEMENT;
+        if (field == MalformedField::MissingOptions)
+        {
+            ASSERT_FALSE(decoded.transportOptions.HasValue());
+        }
+        else
+        {
+            ASSERT_TRUE(decoded.transportOptions.HasValue());
+            const bool video     = field == MalformedField::VideoStreams || field == MalformedField::OversizedVideoStreams;
+            const bool oversized = field == MalformedField::OversizedVideoStreams || field == MalformedField::OversizedAudioStreams;
+            const auto checkStreamError = [&expectedError, video, oversized](const auto & streams) {
+                ASSERT_TRUE(streams.HasValue());
+                auto iter = streams.Value().begin();
+                if (oversized)
+                {
+                    size_t count = 0;
+                    while (iter.Next())
+                    {
+                        ++count;
+                    }
+                    ASSERT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+                    EXPECT_EQ(count, (video ? kMaxVideoStreams : kMaxAudioStreams) + 1);
+                    expectedError = CHIP_ERROR_BUFFER_TOO_SMALL;
+                }
+                else
+                {
+                    ASSERT_TRUE(iter.Next());
+                    ASSERT_FALSE(iter.Next());
+                    ASSERT_NE(iter.GetStatus(), CHIP_NO_ERROR);
+                    expectedError = iter.GetStatus();
+                }
+            };
+            if (video)
+            {
+                checkStreamError(decoded.transportOptions.Value().videoStreams);
+            }
+            else
+            {
+                checkStreamError(decoded.transportOptions.Value().audioStreams);
+            }
+        }
+
+        const ConcreteAttributePath path{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
+        const std::vector<uint8_t> persisted(buffer, buffer + writer.GetLengthWritten());
+        ASSERT_EQ(persistence.WriteValue(path, ByteSpan(persisted.data(), persisted.size())), CHIP_NO_ERROR);
+        EXPECT_EQ(mServer.Init(), expectedError);
+        EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+        EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+        EXPECT_EQ(delegate.restorations, 0u);
+        MutableByteSpan retained(buffer);
+        ASSERT_EQ(persistence.ReadValue(path, retained), CHIP_NO_ERROR);
+        EXPECT_TRUE(retained.data_equal(ByteSpan(persisted.data(), persisted.size())));
+    }
+
+    Structs::TransportOptionsStruct::Type options;
+    options.streamUsage                    = StreamUsageEnum::kAnalysis;
+    options.TLSEndpointID                  = 1;
+    options.url                            = "https://example.com/stream/"_span;
+    options.triggerOptions.triggerType     = TransportTriggerTypeEnum::kContinuous;
+    options.containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    Structs::CMAFContainerOptionsStruct::Type cmaf;
+    cmaf.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+    cmaf.segmentDuration = 1000;
+    cmaf.chunkDuration   = 500;
+    options.containerOptions.CMAFContainerOptions.SetValue(cmaf);
+    std::vector<Structs::VideoStreamStruct::Type> maximumVideoStreams(kMaxVideoStreams);
+    std::vector<Structs::AudioStreamStruct::Type> maximumAudioStreams(kMaxAudioStreams);
+    options.videoStreams.SetValue(
+        DataModel::List<const Structs::VideoStreamStruct::Type>(maximumVideoStreams.data(), maximumVideoStreams.size()));
+    options.audioStreams.SetValue(
+        DataModel::List<const Structs::AudioStreamStruct::Type>(maximumAudioStreams.data(), maximumAudioStreams.size()));
+    uint8_t restoredBuffer[1024];
+    TLV::TLVWriter restoredWriter;
+    restoredWriter.Init(restoredBuffer);
+    TLV::TLVType restoredArray;
+    ASSERT_EQ(restoredWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, restoredArray), CHIP_NO_ERROR);
+    for (const uint16_t connectionId : { uint16_t{ 1 }, uint16_t{ 2 } })
+    {
+        Structs::TransportConfigurationStruct::Type config;
+        config.connectionID    = connectionId;
+        config.transportStatus = TransportStatusEnum::kInactive;
+        config.fabricIndex     = 1;
+        config.transportOptions.SetValue(options);
+        ASSERT_EQ(config.EncodeForRead(restoredWriter, TLV::AnonymousTag(), config.GetFabricIndex()), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(restoredWriter.EndContainer(restoredArray), CHIP_NO_ERROR);
+    ASSERT_EQ(restoredWriter.Finalize(), CHIP_NO_ERROR);
+    const ConcreteAttributePath restoredPath{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
+    const std::vector<uint8_t> savedRestoration(restoredBuffer, restoredBuffer + restoredWriter.GetLengthWritten());
+    enum class InvalidZoneCase
+    {
+        ZeroSensitivity,
+        ExcessiveSensitivity,
+        DuplicateZones,
+        OversizedZones,
+    };
+    delegate.enforceZoneCapacity = true;
+    for (const auto invalidCase : { InvalidZoneCase::ZeroSensitivity, InvalidZoneCase::ExcessiveSensitivity,
+                                    InvalidZoneCase::DuplicateZones, InvalidZoneCase::OversizedZones })
+    {
+        std::vector<Structs::TransportZoneOptionsStruct::Type> zones(invalidCase == InvalidZoneCase::OversizedZones ? 3u : 2u);
+        for (size_t index = 0; index < zones.size(); ++index)
+        {
+            zones[index].zone.SetNonNull(invalidCase == InvalidZoneCase::DuplicateZones ? uint16_t{ 1 }
+                                                                                        : static_cast<uint16_t>(index + 1));
+            zones[index].sensitivity.SetValue(5);
+        }
+        if (invalidCase == InvalidZoneCase::ZeroSensitivity || invalidCase == InvalidZoneCase::ExcessiveSensitivity)
+        {
+            zones.back().sensitivity.SetValue(invalidCase == InvalidZoneCase::ZeroSensitivity ? uint8_t{ 0 } : uint8_t{ 255 });
+        }
+        auto invalidOptions                       = options;
+        invalidOptions.triggerOptions.triggerType = TransportTriggerTypeEnum::kAmbientContext;
+        invalidOptions.triggerOptions.motionZones.SetValue(
+            DataModel::MakeNullable(DataModel::List<const Structs::TransportZoneOptionsStruct::Type>(zones.data(), zones.size())));
+        Structs::TransportConfigurationStruct::Type invalidConfig;
+        invalidConfig.connectionID    = 7;
+        invalidConfig.transportStatus = TransportStatusEnum::kInactive;
+        invalidConfig.fabricIndex     = 1;
+        invalidConfig.transportOptions.SetValue(invalidOptions);
+        restoredWriter.Init(restoredBuffer);
+        ASSERT_EQ(restoredWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, restoredArray), CHIP_NO_ERROR);
+        ASSERT_EQ(invalidConfig.EncodeForRead(restoredWriter, TLV::AnonymousTag(), invalidConfig.GetFabricIndex()), CHIP_NO_ERROR);
+        ASSERT_EQ(restoredWriter.EndContainer(restoredArray), CHIP_NO_ERROR);
+        ASSERT_EQ(restoredWriter.Finalize(), CHIP_NO_ERROR);
+        const std::vector<uint8_t> invalidBytes(restoredBuffer, restoredBuffer + restoredWriter.GetLengthWritten());
+        ASSERT_EQ(persistence.WriteValue(restoredPath, ByteSpan(invalidBytes.data(), invalidBytes.size())), CHIP_NO_ERROR);
+        delegate.restorations = 0;
+        EXPECT_EQ(mServer.Init(), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+        EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+        EXPECT_EQ(delegate.restorations, 0u);
+        MutableByteSpan retainedInvalid(restoredBuffer);
+        ASSERT_EQ(persistence.ReadValue(restoredPath, retainedInvalid), CHIP_NO_ERROR);
+        EXPECT_TRUE(retainedInvalid.data_equal(ByteSpan(invalidBytes.data(), invalidBytes.size())));
+    }
+    delegate.zonesAvailable = false;
+    for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext })
+    {
+        Structs::TransportZoneOptionsStruct::Type restartZones[2];
+        restartZones[0].zone.SetNonNull(1);
+        restartZones[1].zone.SetNonNull(2);
+        restartZones[0].sensitivity.SetValue(5);
+        restartZones[1].sensitivity.SetValue(5);
+        auto restartOptions                       = options;
+        restartOptions.triggerOptions.triggerType = triggerType;
+        restartOptions.triggerOptions.motionZones.SetValue(
+            DataModel::MakeNullable(DataModel::List<const Structs::TransportZoneOptionsStruct::Type>(restartZones)));
+        Structs::TransportConfigurationStruct::Type restartConfig;
+        restartConfig.connectionID    = 7;
+        restartConfig.transportStatus = TransportStatusEnum::kInactive;
+        restartConfig.fabricIndex     = 1;
+        restartConfig.transportOptions.SetValue(restartOptions);
+        restoredWriter.Init(restoredBuffer);
+        ASSERT_EQ(restoredWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, restoredArray), CHIP_NO_ERROR);
+        ASSERT_EQ(restartConfig.EncodeForRead(restoredWriter, TLV::AnonymousTag(), restartConfig.GetFabricIndex()), CHIP_NO_ERROR);
+        ASSERT_EQ(restoredWriter.EndContainer(restoredArray), CHIP_NO_ERROR);
+        ASSERT_EQ(restoredWriter.Finalize(), CHIP_NO_ERROR);
+        const std::vector<uint8_t> restartBytes(restoredBuffer, restoredBuffer + restoredWriter.GetLengthWritten());
+        ASSERT_EQ(persistence.WriteValue(restoredPath, ByteSpan(restartBytes.data(), restartBytes.size())), CHIP_NO_ERROR);
+        delegate.zoneIdChecks = 0;
+        delegate.restorations = 0;
+        ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
+        EXPECT_TRUE(mServer.GetLogic().IsInitialized());
+        EXPECT_EQ(delegate.restorations, 1u);
+        EXPECT_EQ(delegate.zoneIdChecks, 0u);
+        ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), 1u);
+        const auto restored = mServer.GetLogic().mCurrentConnections.front().GetTransportOptionsPtr();
+        ASSERT_NE(restored, nullptr);
+        ASSERT_TRUE(restored->triggerOptions.motionZones.HasValue());
+        ASSERT_FALSE(restored->triggerOptions.motionZones.Value().IsNull());
+        EXPECT_EQ(restored->triggerOptions.motionZones.Value().Value().size(), 2u);
+        uint8_t restartReadBuffer[1024];
+        MutableByteSpan restartRead(restartReadBuffer);
+        ASSERT_EQ(persistence.ReadValue(restoredPath, restartRead), CHIP_NO_ERROR);
+        EXPECT_TRUE(restartRead.data_equal(ByteSpan(restartBytes.data(), restartBytes.size())));
+        uint8_t zoneBuffer[64];
+        TLV::TLVWriter zoneWriter;
+        zoneWriter.Init(zoneBuffer);
+        ASSERT_EQ(DataModel::Encode(zoneWriter, TLV::AnonymousTag(),
+                                    DataModel::List<const Structs::TransportZoneOptionsStruct::Type>(restartZones)),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(zoneWriter.Finalize(), CHIP_NO_ERROR);
+        TLV::TLVReader zoneReader;
+        zoneReader.Init(zoneBuffer, zoneWriter.GetLengthWritten());
+        ASSERT_EQ(zoneReader.Next(), CHIP_NO_ERROR);
+        DataModel::DecodableList<TransportZoneOptionsDecodableStruct> decodedZones;
+        ASSERT_EQ(decodedZones.Decode(zoneReader), CHIP_NO_ERROR);
+        Commands::UpdateMotionZoneOptions::DecodableType update;
+        update.connectionID = 7;
+        update.motionZones.SetValue(DataModel::MakeNullable(decodedZones));
+        Testing::MockCommandHandler commandHandler;
+        commandHandler.SetFabricIndex(1);
+        const ConcreteCommandPath commandPath{ 1, PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        EXPECT_EQ(mServer.GetLogic().HandleUpdateMotionZoneOptions(commandHandler, commandPath, update), std::nullopt);
+        ASSERT_EQ(commandHandler.GetStatuses().size(), 1u);
+        EXPECT_EQ(commandHandler.GetLastStatus().status.GetStatus(), Status::Failure);
+        EXPECT_EQ(commandHandler.GetLastStatus().status.GetClusterSpecificCode(), to_underlying(StatusCodeEnum::kInvalidZone));
+        EXPECT_EQ(delegate.zoneIdChecks, 1u);
+        EXPECT_EQ(mServer.GetLogic().mCurrentConnections.front().GetTransportOptionsPtr(), restored);
+        restartRead = MutableByteSpan(restartReadBuffer);
+        ASSERT_EQ(persistence.ReadValue(restoredPath, restartRead), CHIP_NO_ERROR);
+        EXPECT_TRUE(restartRead.data_equal(ByteSpan(restartBytes.data(), restartBytes.size())));
+        mServer.GetLogic().Shutdown();
+    }
+    delegate.zonesAvailable = true;
+    restoredWriter.Init(restoredBuffer);
+    ASSERT_EQ(restoredWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, restoredArray), CHIP_NO_ERROR);
+    ASSERT_EQ(restoredWriter.EndContainer(restoredArray), CHIP_NO_ERROR);
+    ASSERT_EQ(restoredWriter.Finalize(), CHIP_NO_ERROR);
+    ASSERT_EQ(persistence.WriteValue(restoredPath, ByteSpan(restoredBuffer, restoredWriter.GetLengthWritten())), CHIP_NO_ERROR);
+    ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
+    mServer.GetLogic().Shutdown();
+    delegate.deallocationCalls   = 0;
+    delegate.enforceZoneCapacity = false;
+    ASSERT_EQ(persistence.WriteValue(restoredPath, ByteSpan(savedRestoration.data(), savedRestoration.size())), CHIP_NO_ERROR);
+    delegate.restorations         = 0;
+    delegate.restoreBeforeFailure = true;
+    delegate.restorationError     = CHIP_ERROR_INTERNAL;
+    EXPECT_EQ(mServer.Init(), CHIP_ERROR_INTERNAL);
+    EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+    EXPECT_EQ(delegate.activeConnection, 0u);
+    EXPECT_EQ(delegate.deallocationCalls, 2u);
+    EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+    MutableByteSpan retainedRestoration(restoredBuffer);
+    ASSERT_EQ(persistence.ReadValue(restoredPath, retainedRestoration), CHIP_NO_ERROR);
+    EXPECT_TRUE(retainedRestoration.data_equal(ByteSpan(savedRestoration.data(), savedRestoration.size())));
+    delegate.deallocationBusy  = true;
+    delegate.deallocationCalls = 0;
+    EXPECT_EQ(mServer.Init(), CHIP_ERROR_INTERNAL);
+    EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+    EXPECT_EQ(delegate.activeConnection, 1u);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), 1u);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.front().connectionID, 1u);
+    EXPECT_EQ(delegate.deallocationCalls, 2u);
+    delegate.restoreBeforeFailure = false;
+    delegate.restorationError     = CHIP_NO_ERROR;
+    TestPushAVStreamTransportDelegateImpl replacementDelegate;
+    mServer.GetLogic().SetDelegate(&replacementDelegate);
+    EXPECT_EQ(mServer.GetLogic().TrySetDelegate(&replacementDelegate), CHIP_ERROR_BUSY);
+    EXPECT_EQ(mServer.GetLogic().TrySetDelegate(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(mServer.GetLogic().TrySetDelegate(&delegate), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.associatedServer, nullptr);
+    EXPECT_EQ(mServer.TrySetDelegate(&replacementDelegate), CHIP_ERROR_BUSY);
+    EXPECT_EQ(mServer.TrySetDelegate(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    delegate.requireAssociation = true;
+    EXPECT_EQ(mServer.TrySetDelegate(&delegate), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.associatedServer, &mServer);
+    const auto restorationsBeforeRetry = delegate.restorations;
+    EXPECT_EQ(mServer.Init(), CHIP_ERROR_BUSY);
+    EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+    EXPECT_EQ(delegate.restorations, restorationsBeforeRetry);
+    EXPECT_EQ(delegate.activeConnection, 1u);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), 1u);
+    retainedRestoration = MutableByteSpan(restoredBuffer);
+    ASSERT_EQ(persistence.ReadValue(restoredPath, retainedRestoration), CHIP_NO_ERROR);
+    EXPECT_TRUE(retainedRestoration.data_equal(ByteSpan(savedRestoration.data(), savedRestoration.size())));
+    mServer.GetLogic().SetDelegate(&delegate);
+    delegate.deallocationBusy = false;
+    ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
+    EXPECT_TRUE(mServer.GetLogic().IsInitialized());
+    EXPECT_EQ(delegate.activeConnection, 0u);
+    EXPECT_EQ(delegate.deallocationCalls, 4u);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), 2u);
+    const auto restoredOptions = mServer.GetLogic().mCurrentConnections.front().GetTransportOptionsPtr();
+    ASSERT_NE(restoredOptions, nullptr);
+    ASSERT_TRUE(restoredOptions->videoStreams.HasValue());
+    EXPECT_EQ(restoredOptions->videoStreams.Value().size(), kMaxVideoStreams);
+    ASSERT_TRUE(restoredOptions->audioStreams.HasValue());
+    EXPECT_EQ(restoredOptions->audioStreams.Value().size(), kMaxAudioStreams);
+    using TimerContext         = PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallbackContext;
+    auto timerContext          = std::make_shared<TimerContext>();
+    timerContext->instance     = &mServer.GetLogic();
+    timerContext->connectionID = 1;
+    const std::weak_ptr<TimerContext> retainedTimerContext = timerContext;
+    mServer.GetLogic().mTimerContexts.push_back(timerContext);
+    timerContext.reset();
+    ASSERT_FALSE(retainedTimerContext.expired());
+    delegate.activeConnection  = 1;
+    delegate.deallocationCalls = 0;
+    restoredWriter.Init(restoredBuffer);
+    ASSERT_EQ(restoredWriter.Put(TLV::AnonymousTag(), true), CHIP_NO_ERROR);
+    ASSERT_EQ(restoredWriter.Finalize(), CHIP_NO_ERROR);
+    const std::vector<uint8_t> corruptReload(restoredBuffer, restoredBuffer + restoredWriter.GetLengthWritten());
+    ASSERT_EQ(persistence.WriteValue(restoredPath, ByteSpan(corruptReload.data(), corruptReload.size())), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Init(), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mServer.GetLogic().IsInitialized());
+    EXPECT_EQ(delegate.activeConnection, 1u);
+    EXPECT_EQ(delegate.deallocationCalls, 0u);
+    EXPECT_FALSE(mServer.GetLogic().mTimerContexts.empty());
+    EXPECT_FALSE(retainedTimerContext.expired());
+    mServer.GetLogic().Shutdown();
+    EXPECT_EQ(mServer.Init(), CHIP_ERROR_WRONG_TLV_TYPE);
+    EXPECT_FALSE(mServer.GetLogic().IsInitialized());
+    EXPECT_EQ(delegate.activeConnection, 0u);
+    EXPECT_EQ(delegate.deallocationCalls, 2u);
+    EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+    EXPECT_TRUE(mServer.GetLogic().mTimerContexts.empty());
+    EXPECT_TRUE(retainedTimerContext.expired());
+    retainedRestoration = MutableByteSpan(restoredBuffer);
+    ASSERT_EQ(persistence.ReadValue(restoredPath, retainedRestoration), CHIP_NO_ERROR);
+    EXPECT_TRUE(retainedRestoration.data_equal(ByteSpan(corruptReload.data(), corruptReload.size())));
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, LegacyAmbientZonesReloadAsExplicitAllZones)
+{
+    class RestoredConnectionDelegate : public TestPushAVStreamTransportDelegateImpl
+    {
+    public:
+        Status ModifyPushTransport(uint16_t connectionId, const TransportOptionsStorage options) override
+        {
+            ++modifications;
+            return Status::Success;
+        }
+        size_t modifications = 0;
+    } delegate;
+    TestTLSClientManagementDelegate tlsDelegate;
+    auto & logic = mServer.GetLogic();
+    logic.SetDelegate(&delegate);
+    logic.SetTLSClientManagementDelegate(&tlsDelegate);
+    DefaultAttributePersistenceProvider persistence;
+    ASSERT_EQ(persistence.Init(&mClusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
+    Structs::TransportOptionsStruct::Type options;
+    options.streamUsage = StreamUsageEnum::kAnalysis;
+    options.videoStreamID.SetValue(1);
+    options.TLSEndpointID              = 1;
+    options.url                        = "https://example.com/original/"_span;
+    options.triggerOptions.triggerType = TransportTriggerTypeEnum::kAmbientContext;
+    options.triggerOptions.maxPreRollLen.SetValue(0);
+    options.containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    Structs::CMAFContainerOptionsStruct::Type cmaf;
+    cmaf.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+    cmaf.segmentDuration = 1000;
+    cmaf.chunkDuration   = 500;
+    options.containerOptions.CMAFContainerOptions.SetValue(cmaf);
+    Structs::TransportConfigurationStruct::Type config;
+    config.connectionID    = 1;
+    config.transportStatus = TransportStatusEnum::kInactive;
+    config.fabricIndex     = 1;
+    config.transportOptions.SetValue(options);
+    uint8_t buffer[1024];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+    ASSERT_EQ(config.EncodeForRead(writer, TLV::AnonymousTag(), config.GetFabricIndex()), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+    const ConcreteAttributePath persistencePath{ 1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id };
+    ASSERT_EQ(persistence.WriteValue(persistencePath, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    ASSERT_EQ(logic.Init(persistence), CHIP_NO_ERROR);
+    ASSERT_EQ(logic.mCurrentConnections.size(), 1u);
+    ASSERT_TRUE(logic.mCurrentConnections[0].transportOptions.HasValue());
+    const auto & restored = logic.mCurrentConnections[0].transportOptions.Value();
+    ASSERT_TRUE(restored.triggerOptions.motionZones.HasValue());
+    EXPECT_TRUE(restored.triggerOptions.motionZones.Value().IsNull());
+    EXPECT_EQ(restored.triggerOptions.triggerType, TransportTriggerTypeEnum::kAmbientContext);
+    EXPECT_TRUE(restored.url.data_equal(options.url));
+    ASSERT_NE(logic.mCurrentConnections[0].GetTransportOptionsPtr(), nullptr);
+    auto copied = std::make_unique<TransportOptionsStorage>(*logic.mCurrentConnections[0].GetTransportOptionsPtr());
+    ASSERT_TRUE(copied->triggerOptions.motionZones.HasValue());
+    EXPECT_TRUE(copied->triggerOptions.motionZones.Value().IsNull());
+    auto assigned = std::make_unique<TransportOptionsStorage>();
+    *assigned     = *logic.mCurrentConnections[0].GetTransportOptionsPtr();
+    ASSERT_TRUE(assigned->triggerOptions.motionZones.HasValue());
+    EXPECT_TRUE(assigned->triggerOptions.motionZones.Value().IsNull());
+
+    Testing::MockCommandHandler findHandler;
+    findHandler.SetFabricIndex(1);
+    Commands::FindTransport::DecodableType find;
+    find.connectionID.SetNonNull(1);
+    const ConcreteCommandPath findPath{ 1, PushAvStreamTransport::Id, Commands::FindTransport::Id };
+    EXPECT_EQ(logic.HandleFindTransport(findHandler, findPath, find), std::nullopt);
+    Commands::FindTransportResponse::DecodableType found;
+    ASSERT_EQ(findHandler.DecodeResponse(found), CHIP_NO_ERROR);
+    auto iter = found.transportConfigurations.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_TRUE(iter.GetValue().transportOptions.HasValue());
+    Commands::ModifyPushTransport::DecodableType modify;
+    modify.connectionID         = 1;
+    modify.transportOptions     = iter.GetValue().transportOptions.Value();
+    modify.transportOptions.url = "https://example.com/modified/"_span;
+    Testing::MockCommandHandler modifyHandler;
+    modifyHandler.SetFabricIndex(1);
+    const ConcreteCommandPath modifyPath{ 1, PushAvStreamTransport::Id, Commands::ModifyPushTransport::Id };
+    const auto result = logic.HandleModifyPushTransport(modifyHandler, modifyPath, modify);
+    EXPECT_EQ(result, std::nullopt);
+    ASSERT_TRUE(modifyHandler.HasStatus());
+    EXPECT_EQ(modifyHandler.GetLastStatus().status.GetStatus(), Status::Success);
+    EXPECT_EQ(delegate.modifications, 1u);
+    EXPECT_TRUE(logic.mCurrentConnections[0].transportOptions.Value().url.data_equal(modify.transportOptions.url));
 }
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestValidateIncomingTransportOptions_StreamCountConstraint)
