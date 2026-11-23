@@ -1651,6 +1651,16 @@ class ChipDeviceControllerBase:
         """Whether this controller has a default Border Agent and Thread dataset for PASE."""
         return self._defaultThreadMeshCoPConfig is not None
 
+    async def FindPASESession(self, nodeId: int, timeoutMs: int | None = None) -> DeviceProxyWrapper | None:
+        """Look up the node's commissionee proxy without starting session establishment."""
+        self.CheckIsActive()
+        device = c_void_p(None)
+        result = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+            self.devCtrl, nodeId, byref(device)), timeoutMs)
+        if result.is_success:
+            return DeviceProxyWrapper(device, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
+        return None
+
     async def FindOrEstablishPASESession(self, setupCode: str, nodeId: int, timeoutMs: int | None = None,
                                          threadMeshCoPConfig: tuple[str, int] | None = None,
                                          *, useThreadMeshCoPDefaults: bool = True) -> DeviceProxyWrapper | None:
@@ -1667,12 +1677,9 @@ class ChipDeviceControllerBase:
         Returns:
             DeviceProxyWrapper on success, if not is None.
         '''
-        self.CheckIsActive()
-        returnDevice = c_void_p(None)
-        res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
-            self.devCtrl, nodeId, byref(returnDevice)), timeoutMs)
-        if res.is_success:
-            return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
+        session = await self.FindPASESession(nodeId, timeoutMs)
+        if session is not None:
+            return session
 
         if threadMeshCoPConfig is not None:
             host, port = threadMeshCoPConfig
@@ -1683,12 +1690,7 @@ class ChipDeviceControllerBase:
         else:
             await self.EstablishPASESession(setupCode, nodeId)
 
-        res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
-            self.devCtrl, nodeId, byref(returnDevice)), timeoutMs)
-        if res.is_success:
-            return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
-
-        return None
+        return await self.FindPASESession(nodeId, timeoutMs)
 
     def GetConnectedDeviceSync(self, nodeId: int, allowPASE=True, timeoutMs: int | None = None, payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
@@ -1776,15 +1778,13 @@ class ChipDeviceControllerBase:
         Returns:
             DeviceProxyWrapper on success.
         '''
-        self.CheckIsActive()
-
         if allowPASE:
-            returnDevice = c_void_p(None)
-            res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
-                self.devCtrl, nodeId, byref(returnDevice)), timeoutMs)
-            if res.is_success:
+            session = await self.FindPASESession(nodeId, timeoutMs)
+            if session is not None:
                 LOGGER.info('Using PASE connection')
-                return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
+                return session
+        else:
+            self.CheckIsActive()
 
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()

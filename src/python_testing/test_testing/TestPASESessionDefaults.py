@@ -23,10 +23,12 @@ from types import MethodType, SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, Mock, call, patch
 
 from matter.ChipDeviceCtrl import BareChipDeviceController, CallbackContext, ChipDeviceControllerBase, DeviceProxyWrapper
+from matter.exceptions import ChipStackError
 from matter.FabricAdmin import FabricAdmin
 from matter.testing import global_stash
 from matter.testing.basic_composition import BasicCompositionTests
-from matter.testing.commissioning import Commission, CommissioningInfo, SetupPayloadInfo
+from matter.testing.commissioning import Commission, CommissioningInfo, EstablishedSessionKind, SetupPayloadInfo, _establish_pase_or_case_session
+from matter.testing.commissioning_types import PaseParams
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import generate_mobly_test_config
@@ -392,11 +394,13 @@ class TestPASESessionFrameworkConfig(unittest.IsolatedAsyncioTestCase):
 
     async def test_composition_setup_uses_meshcop_after_case_fails(self):
         self.controller.GetConnectedDevice = AsyncMock(side_effect=TimeoutError("CASE unavailable"))
+        self.controller._dmLib.pychip_GetDeviceBeingCommissioned.side_effect = [
+            SimpleNamespace(is_success=False), SimpleNamespace(is_success=False), SimpleNamespace(is_success=True)]
         composition = self.setup_composition()
 
         await composition.setup_class_helper()
 
-        self.controller.GetConnectedDevice.assert_awaited_once_with(nodeId=NODE_ID, allowPASE=False)
+        self.controller.GetConnectedDevice.assert_awaited_once_with(nodeId=NODE_ID, allowPASE=False, timeoutMs=10_000)
         self.controller._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.assert_called_once_with(
             None, BORDER_AGENT[0].encode(), BORDER_AGENT[1], SETUP_CODE.encode(), NODE_ID, DATASET, len(DATASET))
         self.controller.Read.assert_awaited_once_with(NODE_ID, [()])
@@ -407,19 +411,47 @@ class TestPASESessionFrameworkConfig(unittest.IsolatedAsyncioTestCase):
 
         await composition.setup_class_helper()
 
-        self.controller.GetConnectedDevice.assert_awaited_once_with(nodeId=NODE_ID, allowPASE=False)
+        self.controller.GetConnectedDevice.assert_awaited_once_with(nodeId=NODE_ID, allowPASE=False, timeoutMs=10_000)
         self.controller._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.assert_not_called()
         self.controller.Read.assert_awaited_once_with(NODE_ID, [()])
 
-    async def test_composition_setup_reports_meshcop_pase_failure(self):
-        self.controller.GetConnectedDevice = AsyncMock(side_effect=TimeoutError("CASE unavailable"))
-        self.controller._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.side_effect = RuntimeError("PASE failed")
+    async def test_composition_setup_reuses_existing_pase_without_probing_case(self):
+        self.controller.GetConnectedDevice = AsyncMock()
+        self.controller._dmLib.pychip_GetDeviceBeingCommissioned.side_effect = [SimpleNamespace(is_success=True)]
         composition = self.setup_composition()
 
-        with self.assertRaisesRegex(RuntimeError, "PASE failed"):
+        await composition.setup_class_helper()
+
+        self.controller.GetConnectedDevice.assert_not_awaited()
+        self.controller._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.assert_not_called()
+        self.controller.Read.assert_awaited_once_with(NODE_ID, [()])
+
+    async def test_composition_setup_reports_both_case_and_pase_errors(self):
+        pase_error = ChipStackError(0x32, "MeshCoP discovery timed out")
+        self.controller.GetConnectedDevice = AsyncMock(side_effect=TimeoutError("CASE unavailable"))
+        self.controller._dmLib.pychip_GetDeviceBeingCommissioned.side_effect = [SimpleNamespace(is_success=False)] * 2
+        self.controller._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.side_effect = pase_error
+        composition = self.setup_composition()
+
+        with self.assertRaisesRegex(
+            RuntimeError, "PASE error: MeshCoP discovery timed out, CASE error: CASE unavailable"
+        ) as error:
             await composition.setup_class_helper()
 
+        self.assertIs(error.exception.__cause__, pase_error)
         self.controller.Read.assert_not_awaited()
+
+    async def test_stub_and_mock_controllers_use_generic_session_establishment(self):
+        for controller in (SimpleNamespace(), MagicMock()):
+            with self.subTest(controller=type(controller).__name__):
+                controller.GetConnectedDevice = AsyncMock(side_effect=TimeoutError("CASE unavailable"))
+                controller.FindOrEstablishPASESession = AsyncMock(return_value=Mock(spec=DeviceProxyWrapper))
+
+                result = await _establish_pase_or_case_session(controller, NODE_ID, PaseParams(setup_code=SETUP_CODE))
+
+                self.assertEqual(result, EstablishedSessionKind.PASE)
+                controller.GetConnectedDevice.assert_awaited_once_with(nodeId=NODE_ID, allowPASE=False)
+                controller.FindOrEstablishPASESession.assert_awaited_once_with(SETUP_CODE, NODE_ID)
 
 
 if __name__ == "__main__":

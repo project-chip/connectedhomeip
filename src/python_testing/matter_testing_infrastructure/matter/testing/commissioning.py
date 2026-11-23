@@ -510,9 +510,9 @@ async def _establish_pase_or_case_session(
     - Not commissioned (PASE will succeed if pase_params provided)
     - Commissioned but DNS-SD failed for some reason (CASE will succeed)
 
-    Try CASE first when Thread MeshCoP defaults are configured because MeshCoP discovery
-    runs synchronously on the stack thread. Otherwise use the first successful connection
-    and cancel any pending attempt.
+    With Thread MeshCoP defaults, reuse any existing PASE session, then try a bounded
+    CASE probe before starting synchronous MeshCoP discovery on the stack thread.
+    Otherwise use the first successful connection and cancel any pending attempt.
 
     Args:
         dev_ctrl: The chip device controller instance
@@ -537,13 +537,25 @@ async def _establish_pase_or_case_session(
             raise RuntimeError(f"Failed to establish a PASE session for node {node_id}")
         return EstablishedSessionKind.PASE
 
-    if dev_ctrl.hasDefaultThreadMeshCoPConfig:
+    def session_error(pase_error: Exception, case_error: Exception) -> RuntimeError:
+        return RuntimeError(
+            f"Both PASE and CASE connection attempts failed for node {node_id}. "
+            f"PASE error: {pase_error}, CASE error: {case_error}"
+        )
+
+    if getattr(dev_ctrl, "hasDefaultThreadMeshCoPConfig", False) is True:
+        if await dev_ctrl.FindPASESession(node_id) is not None:
+            return EstablishedSessionKind.PASE
+
         # A pending CASE attempt cannot complete while MeshCoP discovery occupies the CHIP stack thread.
         try:
-            await dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
-        except (ChipStackError, RuntimeError, OSError) as err:
-            LOGGER.info("CASE failed for node %s (%s), trying PASE with Thread MeshCoP defaults", node_id, err)
-            return await establish_pase(setup_code)
+            await dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False, timeoutMs=10_000)
+        except (ChipStackError, RuntimeError, OSError) as case_error:
+            LOGGER.info("CASE failed for node %s (%s), trying PASE with Thread MeshCoP defaults", node_id, case_error)
+            try:
+                return await establish_pase(setup_code)
+            except (ChipStackError, RuntimeError, OSError) as pase_error:
+                raise session_error(pase_error, case_error) from pase_error
         return EstablishedSessionKind.CASE
 
     case_task = asyncio.create_task(dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False), name="CASE")
@@ -565,10 +577,7 @@ async def _establish_pase_or_case_session(
             task.cancel()
         await asyncio.gather(case_task, pase_task, return_exceptions=True)
 
-    raise RuntimeError(
-        f"Both PASE and CASE connection attempts failed for node {node_id}. "
-        f"PASE error: {errors['PASE']}, CASE error: {errors['CASE']}"
-    ) from errors['CASE']
+    raise session_error(errors["PASE"], errors["CASE"]) from errors["CASE"]
 
 
 async def is_commissioned(
