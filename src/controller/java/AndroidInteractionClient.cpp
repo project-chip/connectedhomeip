@@ -178,11 +178,15 @@ exit:
             env->ExceptionDescribe();
             env->ExceptionClear();
         }
-        callback->OnError(err);
+        // Delete the ReadClient before OnError: OnError releases the stack lock while it calls into Java, and
+        // until then this subscription is still on the InteractionModelEngine's list, where a concurrent
+        // shutdownSubscriptions() could close it and run OnDone on the callback.
         if (readClient != nullptr)
         {
             Platform::Delete(readClient);
+            readClient = nullptr;
         }
+        callback->OnError(err);
         // The Java *CallbackJni wrapper owns the native callback and frees it from its finalizer
         // (deleteCallback), so deleting it here would free it twice. Release our global reference to
         // the wrapper instead, as OnDone does, so the wrapper can be collected.
