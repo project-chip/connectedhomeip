@@ -73,7 +73,7 @@ class CHIPVirtualHome:
     # The entrance of the whole test
     def run_test(self, save_logs=True):
         def _handle_sigterm(signum, frame):
-            raise _TestTerminated()
+            raise _TestTerminated
 
         prev_sigterm = signal.signal(signal.SIGTERM, _handle_sigterm)
         try:
