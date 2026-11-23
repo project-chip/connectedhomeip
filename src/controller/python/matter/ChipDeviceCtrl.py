@@ -1128,7 +1128,7 @@ class ChipDeviceControllerBase:
         )
 
     async def EstablishPASESessionThreadMeshcop(self, baAddr: str, setupCode: str, nodeId: int, baPort: int,
-                                             *, threadOperationalDataset: bytes | None = None) -> None:
+                                                *, threadOperationalDataset: bytes | None = None) -> None:
         '''
         Establish a PASE session over Thread MeshCoP.
 

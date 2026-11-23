@@ -99,23 +99,23 @@ class TestPASESessionDefaults(unittest.IsolatedAsyncioTestCase):
 
         self.controller._dmLib.pychip_GetDeviceBeingCommissioned.side_effect = get_device
 
-        async with asyncio.TaskGroup() as requests:
-            async with self.controller._pase_establishment_context:
-                self.controller.SetDefaultThreadMeshCoPConfig(BORDER_AGENT, DATASET)
-                first = requests.create_task(self.controller.FindOrEstablishPASESession(SETUP_CODE, NODE_ID))
-                self.assertEqual(await asyncio.wait_for(lookups.get(), timeout=5), NODE_ID)
+        async with asyncio.TaskGroup() as requests, self.controller._pase_establishment_context:
+            self.controller.SetDefaultThreadMeshCoPConfig(BORDER_AGENT, DATASET)
+            first = requests.create_task(self.controller.FindOrEstablishPASESession(SETUP_CODE, NODE_ID))
+            self.assertEqual(await asyncio.wait_for(lookups.get(), timeout=5), NODE_ID)
 
-                self.controller.SetDefaultThreadMeshCoPConfig(other_agent, other_dataset)
-                second = requests.create_task(self.controller.FindOrEstablishPASESession(SETUP_CODE, other_node_id))
-                self.assertEqual(await asyncio.wait_for(lookups.get(), timeout=5), other_node_id)
-                self.meshcop.assert_not_called()
-                self.set_dataset.assert_not_called()
+            self.controller.SetDefaultThreadMeshCoPConfig(other_agent, other_dataset)
+            second = requests.create_task(self.controller.FindOrEstablishPASESession(SETUP_CODE, other_node_id))
+            self.assertEqual(await asyncio.wait_for(lookups.get(), timeout=5), other_node_id)
+            self.meshcop.assert_not_called()
+            self.set_dataset.assert_not_called()
 
         self.assertIsInstance(first.result(), DeviceProxyWrapper)
         self.assertIsInstance(second.result(), DeviceProxyWrapper)
         self.assertEqual(self.meshcop.call_args_list, [
             call(None, BORDER_AGENT[0].encode(), BORDER_AGENT[1], SETUP_CODE.encode(), NODE_ID, DATASET, len(DATASET)),
-            call(None, other_agent[0].encode(), other_agent[1], SETUP_CODE.encode(), other_node_id, other_dataset, len(other_dataset)),
+            call(None, other_agent[0].encode(), other_agent[1], SETUP_CODE.encode(),
+                 other_node_id, other_dataset, len(other_dataset)),
         ])
 
     async def test_bare_controller_uses_default_thread_dataset(self):
