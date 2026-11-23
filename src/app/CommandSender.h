@@ -324,8 +324,10 @@ public:
      *     the information available from the session.
      *   - Passing std::nullopt keeps an encoding that every receiver accepts. Use it when the session is not
      *     known at construction time.
-     *   - Unicast must be sent on the same session as the one passed to the constructor, if a session was passed to the constructor.
-     *   - Groupcast must use the same group ID and fabric index as the session passed to the constructor, if a session was passed to the constructor.
+     *   - Unicast must be sent on the same session as the one passed to the constructor, if a session was passed to the
+     * constructor.
+     *   - Groupcast must use the same group ID and fabric index as the session passed to the constructor, if a session was passed
+     * to the constructor.
      *   - A mismatched destination when sending fails with CHIP_ERROR_INVALID_ARGUMENT.
      *   - An unavailable or released construction session causes encoding and sending to fail with
      *     CHIP_ERROR_INCORRECT_STATE. A newer CASE session does not replace the construction session.

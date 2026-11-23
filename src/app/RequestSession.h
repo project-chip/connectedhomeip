@@ -47,7 +47,8 @@ public:
     ///
     /// 1) If we were constructed without a session, any session is allowed here.
     /// 2) If we were constructed with a unicast session, the session being checked must be the same session.
-    /// 3) If we were constructed with a groupcast session, the session being checked must also be a groupcast session that has the same group ID and fabric.
+    /// 3) If we were constructed with a groupcast session, the session being checked must also be a groupcast session that has the
+    /// same group ID and fabric.
     CHIP_ERROR CheckSession(const SessionHandle & session) const;
 
     /// Releases the retained session and prevents further use of this request destination.
