@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusResponseMessage.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
@@ -41,6 +42,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <pw_unit_test/framework.h>
+#include <transport/GroupSession.h>
 
 namespace {
 
@@ -193,15 +195,26 @@ public:
     static void AddAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
     static void AddInvalidAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
     static void AddAttributeStatus(WriteHandler & aWriteHandler);
-    static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload);
+    static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload, bool aIncludeTimedRequest = true);
     static CHIP_ERROR GenerateOptionalFlagWriteRequest(System::PacketBufferHandle & payload, std::optional<bool> suppressResponse,
                                                        std::optional<bool> moreChunks, bool listWrite);
+    void TestWriteHandlerOptionalRequestFlags();
+    void TestWriteClientUnicastOmitsFalseRequestFlags();
+    void TestWriteClientConstructionSessionIsEnforced();
+    void TestWriteClientConstructionSessionDoesNotShift();
+    void TestWriteClientReleasedConstructionSessionIsRejected();
+    void TestWriteClientInactiveConstructionSessionIsRejected();
+    void TestWriteClientRecreatedGroupSession();
+    void TestWriteClientCompletionReleasesConstructionSession();
+    void TestWriteClientRevision14ChunkedRequestFlags();
     static void GenerateSuppressResponseChunkedWriteRequest(System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(System::PacketBufferHandle & aPayload);
 
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
+
+namespace {
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
 {
@@ -233,6 +246,8 @@ private:
 
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
+
+} // namespace
 
 class TestWriteClientCallback : public chip::app::WriteClient::Callback
 {
@@ -391,15 +406,19 @@ void TestWriteInteraction::AddAttributeStatus(WriteHandler & aWriteHandler)
     EXPECT_EQ(aWriteHandler.AddStatus(attributePath, Protocols::InteractionModel::Status::Success), CHIP_NO_ERROR);
 }
 
-void TestWriteInteraction::GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload)
+void TestWriteInteraction::GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload,
+                                                bool aIncludeTimedRequest)
 {
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
     WriteRequestMessage::Builder writeRequestBuilder;
     EXPECT_EQ(writeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
-    writeRequestBuilder.TimedRequest(aIsTimedWrite);
-    EXPECT_EQ(writeRequestBuilder.GetError(), CHIP_NO_ERROR);
+    if (aIncludeTimedRequest)
+    {
+        writeRequestBuilder.TimedRequest(aIsTimedWrite);
+        EXPECT_EQ(writeRequestBuilder.GetError(), CHIP_NO_ERROR);
+    }
     AttributeDataIBs::Builder & attributeDataIBsBuilder = writeRequestBuilder.CreateWriteRequests();
     EXPECT_EQ(writeRequestBuilder.GetError(), CHIP_NO_ERROR);
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeDataIBsBuilder.CreateAttributeDataIBBuilder();
@@ -587,7 +606,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClient)
     for (EncodingMethod encoding : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
     {
         TestWriteClientCallback callback;
-        app::WriteClient writeClient(&GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, std::nullopt, /* aTimedWriteTimeoutMs = */ NullOptional);
 
         System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
         AddAttributeDataIB(writeClient, encoding);
@@ -611,22 +630,377 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientGroup)
 {
     for (EncodingMethod encodingMethod : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
     {
-        TestWriteClientCallback callback;
-        app::WriteClient writeClient(&GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
+        for (bool passSessionAtConstruction : { false, true })
+        {
+            TestWriteClientCallback callback;
+            SessionHandle groupSession = GetSessionBobToFriends();
+            app::WriteClient writeClient(&GetExchangeManager(), &callback,
+                                         passSessionAtConstruction ? OptionalSessionHandleRef(groupSession) : std::nullopt,
+                                         /* aTimedWriteTimeoutMs = */ NullOptional);
 
-        System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-        AddAttributeDataIB(writeClient, encodingMethod);
+            AddAttributeDataIB(writeClient, encodingMethod);
+            chip::Testing::MessageCapturer messageLog(*this);
+            ASSERT_SUCCESS(writeClient.SendWriteRequest(groupSession));
 
-        SessionHandle groupSession = GetSessionBobToFriends();
-        EXPECT_TRUE(groupSession->IsGroupSession());
+            DrainAndServiceIO();
 
-        EXPECT_EQ(writeClient.SendWriteRequest(groupSession), CHIP_NO_ERROR);
+            ASSERT_EQ(messageLog.MessageCount(), 1u);
+            ASSERT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::WriteRequest));
+            System::PacketBufferTLVReader reader;
+            reader.Init(messageLog.MessagePayload(0).Retain());
+            WriteRequestMessage::Parser parser;
+            ASSERT_SUCCESS(parser.Init(reader));
+            bool flag = true;
+            if (passSessionAtConstruction)
+            {
+                EXPECT_EQ(parser.GetSuppressResponse(&flag), CHIP_END_OF_TLV);
+                EXPECT_EQ(parser.GetTimedRequest(&flag), CHIP_END_OF_TLV);
+            }
+            else
+            {
+                ASSERT_SUCCESS(parser.GetSuppressResponse(&flag));
+                EXPECT_FALSE(flag);
+                flag = true;
+                ASSERT_SUCCESS(parser.GetTimedRequest(&flag));
+                EXPECT_FALSE(flag);
+            }
 
-        DrainAndServiceIO();
-
-        // The WriteClient should be shutdown once we SendWriteRequest for group.
-        EXPECT_EQ(writeClient.mState, WriteClient::State::AwaitingDestruction);
+            EXPECT_EQ(writeClient.mState, WriteClient::State::AwaitingDestruction);
+            EXPECT_EQ(callback.mOnDoneCalled, 1);
+            EXPECT_EQ(callback.mOnSuccessCalled, 0);
+            EXPECT_EQ(callback.mOnErrorCalled, 0);
+            EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+        }
     }
+}
+
+TEST_F(TestWriteInteraction, TestWriteClientGroupcastEncodingIsEnforced)
+{
+    const AttributePathParams path(Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+
+    // A WriteClient constructed for a group session does not encode the fields a unicast peer may require,
+    // so it cannot send unicast.
+    {
+        TestWriteClientCallback callback;
+        SessionHandle groupSession = GetSessionBobToFriends();
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, groupSession, /* aTimedWriteTimeoutMs = */ NullOptional);
+        EXPECT_SUCCESS(writeClient.EncodeAttribute(path, true));
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // A WriteClient constructed for a unicast session cannot send groupcast.
+    {
+        TestWriteClientCallback callback;
+        SessionHandle unicastSession = GetSessionBobToAlice();
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, unicastSession, /* aTimedWriteTimeoutMs = */ NullOptional);
+        EXPECT_SUCCESS(writeClient.EncodeAttribute(path, true));
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToFriends()), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Groupcast cannot be timed: the first attribute is rejected when the group session is passed at construction,
+    // and the send is rejected otherwise.
+    {
+        TestWriteClientCallback callback;
+        SessionHandle groupSession = GetSessionBobToFriends();
+        app::WriteClient timedClient(&GetExchangeManager(), &callback, groupSession, MakeOptional(static_cast<uint16_t>(1000)));
+        EXPECT_EQ(timedClient.EncodeAttribute(path, true), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    {
+        TestWriteClientCallback callback;
+        app::WriteClient timedClient(&GetExchangeManager(), &callback, std::nullopt, MakeOptional(static_cast<uint16_t>(1000)));
+        ASSERT_SUCCESS(timedClient.EncodeAttribute(path, true));
+        EXPECT_EQ(timedClient.SendWriteRequest(GetSessionBobToFriends()), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // The test-only flag override cannot make a timed group request valid.
+    {
+        TestWriteClientCallback callback;
+        SessionHandle groupSession = GetSessionBobToFriends();
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, groupSession, NullOptional,
+                                     /* aTimedRequestFieldValue = */ true, WriteClient::TestOnlyOverrideTimedRequestFieldTag{});
+        EXPECT_EQ(writeClient.EncodeAttribute(path, true), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    {
+        TestWriteClientCallback callback;
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, std::nullopt, NullOptional,
+                                     /* aTimedRequestFieldValue = */ true, WriteClient::TestOnlyOverrideTimedRequestFieldTag{});
+        ASSERT_SUCCESS(writeClient.EncodeAttribute(path, true));
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToFriends()), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientUnicastOmitsFalseRequestFlags)
+{
+    struct EncodedFlags
+    {
+        CHIP_ERROR suppressResponseError;
+        bool suppressResponse;
+        CHIP_ERROR timedRequestError;
+        bool timedRequest;
+    };
+
+    auto encodeUnicastWrite = [this](std::optional<uint16_t> aPeerRevision, bool aIsTimedWrite, bool aSuppressResponse) {
+        SessionParameters peerParameters;
+        peerParameters.SetMRPConfig(GetDefaultMRPConfig());
+        if (aPeerRevision.has_value())
+        {
+            peerParameters.SetInteractionModelRevision(*aPeerRevision);
+        }
+        SessionHandle session = GetSessionBobToAlice();
+        session->AsSecureSession()->SetRemoteSessionParameters(peerParameters);
+
+        TestWriteClientCallback callback;
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, session,
+                                     aIsTimedWrite ? MakeOptional(static_cast<uint16_t>(1000)) : NullOptional, aSuppressResponse);
+        EXPECT_SUCCESS(writeClient.EncodeAttribute(
+            AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id), true));
+        EXPECT_SUCCESS(writeClient.FinalizeMessage(/* aHasMoreChunks = */ false));
+
+        System::PacketBufferHandle encoded = writeClient.mChunks.PopHead();
+        EXPECT_FALSE(encoded.IsNull());
+
+        System::PacketBufferTLVReader reader;
+        reader.Init(encoded.CloneData());
+        WriteRequestMessage::Parser parser;
+        EXPECT_SUCCESS(parser.Init(reader));
+
+        EncodedFlags flags{ CHIP_NO_ERROR, true, CHIP_NO_ERROR, true };
+        flags.suppressResponseError = parser.GetSuppressResponse(&flags.suppressResponse);
+        flags.timedRequestError     = parser.GetTimedRequest(&flags.timedRequest);
+        return flags;
+    };
+
+    using chip::Revision::kFirstRevisionWithOptionalRequestFlags;
+
+    // The peer accepts omission: only a TRUE value is encoded.
+    EncodedFlags flags =
+        encodeUnicastWrite(kFirstRevisionWithOptionalRequestFlags, /* aIsTimedWrite = */ false, /* aSuppressResponse = */ false);
+    EXPECT_EQ(flags.suppressResponseError, CHIP_END_OF_TLV);
+    EXPECT_EQ(flags.timedRequestError, CHIP_END_OF_TLV);
+
+    flags = encodeUnicastWrite(kFirstRevisionWithOptionalRequestFlags, /* aIsTimedWrite = */ true, /* aSuppressResponse = */ false);
+    EXPECT_EQ(flags.suppressResponseError, CHIP_END_OF_TLV);
+    EXPECT_SUCCESS(flags.timedRequestError);
+    EXPECT_TRUE(flags.timedRequest);
+
+    flags = encodeUnicastWrite(kFirstRevisionWithOptionalRequestFlags, /* aIsTimedWrite = */ false, /* aSuppressResponse = */ true);
+    EXPECT_SUCCESS(flags.suppressResponseError);
+    EXPECT_TRUE(flags.suppressResponse);
+    EXPECT_EQ(flags.timedRequestError, CHIP_END_OF_TLV);
+
+    // An older or unknown peer revision requires both fields.
+    for (std::optional<uint16_t> peerRevision :
+         { std::optional<uint16_t>(kFirstRevisionWithOptionalRequestFlags - 1), std::optional<uint16_t>() })
+    {
+        flags = encodeUnicastWrite(peerRevision, /* aIsTimedWrite = */ false, /* aSuppressResponse = */ false);
+        EXPECT_SUCCESS(flags.suppressResponseError);
+        EXPECT_FALSE(flags.suppressResponse);
+        EXPECT_SUCCESS(flags.timedRequestError);
+        EXPECT_FALSE(flags.timedRequest);
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientConstructionSessionIsEnforced)
+{
+    const AttributePathParams path(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+
+    auto setPeerRevision = [this](std::optional<uint16_t> aPeerRevision) {
+        SessionParameters peerParameters;
+        peerParameters.SetMRPConfig(GetDefaultMRPConfig());
+        if (aPeerRevision.has_value())
+        {
+            peerParameters.SetInteractionModelRevision(*aPeerRevision);
+        }
+        GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(peerParameters);
+    };
+
+    using chip::Revision::kFirstRevisionWithOptionalRequestFlags;
+
+    // A send session that is not the construction session is rejected, even when both are unicast.
+    {
+        TestWriteClientCallback callback;
+        SessionHandle session = GetSessionBobToAlice();
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, session, /* aTimedWriteTimeoutMs = */ NullOptional);
+        EXPECT_SUCCESS(writeClient.EncodeAttribute(path, true));
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionAliceToBob()), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Without a session at construction, the request can be sent on any session.
+    {
+        setPeerRevision(kFirstRevisionWithOptionalRequestFlags);
+        TestWriteClientCallback callback;
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, std::nullopt, /* aTimedWriteTimeoutMs = */ NullOptional);
+        EXPECT_SUCCESS(writeClient.EncodeAttribute(path, true));
+        ASSERT_SUCCESS(writeClient.SendWriteRequest(GetSessionBobToAlice()));
+        DrainAndServiceIO();
+        EXPECT_EQ(callback.mOnSuccessCalled, 1);
+        EXPECT_EQ(callback.mOnErrorCalled, 0);
+        EXPECT_EQ(callback.mOnDoneCalled, 1);
+    }
+
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientConstructionSessionDoesNotShift)
+{
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ASSERT_SUCCESS(CreateCASESessionBobToAlice());
+    ASSERT_SUCCESS(CreateCASESessionAliceToBob());
+
+    const AttributePathParams path(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    SessionHandle originalSession = GetSessionBobToAlice();
+    TestWriteClientCallback callback;
+    app::WriteClient originalClient(&GetExchangeManager(), &callback, originalSession, NullOptional);
+    app::WriteClient replacementClient(&GetExchangeManager(), &callback, originalSession, NullOptional);
+    ASSERT_SUCCESS(originalClient.EncodeAttribute(path, true));
+    ASSERT_SUCCESS(replacementClient.EncodeAttribute(path, true));
+
+    SessionHolder replacement;
+    ASSERT_SUCCESS(GetSecureSessionManager().InjectCaseSessionWithTestKey(
+        replacement, 0x1234, 0x2345, GetBobFabric()->GetNodeId(), GetAliceFabric()->GetNodeId(), GetBobFabricIndex(),
+        GetAliceAddress(), CryptoContext::SessionRole::kInitiator));
+    auto replacementSession = replacement.Get();
+    ASSERT_TRUE(replacementSession.HasValue());
+    EXPECT_EQ(originalSession->GetPeer(), replacementSession.Value()->GetPeer());
+    EXPECT_FALSE(originalSession == replacementSession.Value());
+    GetSecureSessionManager().GetSecureSessions().NewerSessionAvailable(replacementSession.Value()->AsSecureSession());
+
+    EXPECT_EQ(replacementClient.SendWriteRequest(replacementSession.Value()), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_SUCCESS(originalClient.SendWriteRequest(originalSession));
+    DrainAndServiceIO();
+    EXPECT_EQ(callback.mOnSuccessCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientReleasedConstructionSessionIsRejected)
+{
+    const AttributePathParams path(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    SessionHandle session = GetSessionBobToAlice();
+    TestWriteClientCallback callback;
+    app::WriteClient writeClient(&GetExchangeManager(), &callback, session, NullOptional);
+    ASSERT_SUCCESS(writeClient.EncodeAttribute(path, true));
+    ExpireSessionBobToAlice();
+
+    EXPECT_EQ(writeClient.EncodeAttribute(path, false), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(writeClient.SendWriteRequest(session), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(callback.mOnDoneCalled, 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientInactiveConstructionSessionIsRejected)
+{
+    const AttributePathParams path(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    SessionHandle session = GetSessionBobToAlice();
+    ExpireSessionBobToAlice();
+    ASSERT_FALSE(session->IsActiveSession());
+
+    TestWriteClientCallback callback;
+    app::WriteClient writeClient(&GetExchangeManager(), &callback, session, NullOptional);
+    EXPECT_EQ(writeClient.EncodeAttribute(path, true), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(writeClient.SendWriteRequest(session), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(callback.mOnDoneCalled, 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientRecreatedGroupSession)
+{
+    const AttributePathParams path(Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    TestWriteClientCallback callback;
+    std::unique_ptr<app::WriteClient> writeClient;
+    {
+        Transport::OutgoingGroupSession constructionSession(GetFriendsGroupId(), GetBobFabricIndex());
+        SessionHandle session(constructionSession);
+        writeClient = std::make_unique<app::WriteClient>(&GetExchangeManager(), &callback, session, NullOptional);
+    }
+    ASSERT_SUCCESS(writeClient->EncodeAttribute(path, true));
+
+    Transport::OutgoingGroupSession differentGroup(static_cast<GroupId>(GetFriendsGroupId() + 1), GetBobFabricIndex());
+    EXPECT_EQ(writeClient->SendWriteRequest(SessionHandle(differentGroup)), CHIP_ERROR_INVALID_ARGUMENT);
+    Transport::OutgoingGroupSession differentFabric(GetFriendsGroupId(), GetAliceFabricIndex());
+    EXPECT_EQ(writeClient->SendWriteRequest(SessionHandle(differentFabric)), CHIP_ERROR_INVALID_ARGUMENT);
+
+    Transport::OutgoingGroupSession equivalentSession(GetFriendsGroupId(), GetBobFabricIndex());
+    ASSERT_SUCCESS(writeClient->SendWriteRequest(SessionHandle(equivalentSession)));
+    DrainAndServiceIO();
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientCompletionReleasesConstructionSession)
+{
+    const AttributePathParams path(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    SessionHandle session     = GetSessionBobToAlice();
+    auto * secureSession      = session->AsSecureSession();
+    const auto referenceCount = secureSession->GetReferenceCount();
+    TestWriteClientCallback callback;
+    app::WriteClient writeClient(&GetExchangeManager(), &callback, session, NullOptional);
+    EXPECT_EQ(secureSession->GetReferenceCount(), referenceCount + 1);
+    ASSERT_SUCCESS(writeClient.EncodeAttribute(path, true));
+    ASSERT_SUCCESS(writeClient.SendWriteRequest(session));
+    DrainAndServiceIO();
+
+    EXPECT_EQ(callback.mOnSuccessCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(secureSession->GetReferenceCount(), referenceCount);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientRevision14ChunkedRequestFlags)
+{
+    SessionHandle session = GetSessionBobToAlice();
+    SessionParameters parameters;
+    parameters.SetMRPConfig(GetDefaultMRPConfig());
+    parameters.SetInteractionModelRevision(Revision::kFirstRevisionWithOptionalRequestFlags);
+    session->AsSecureSession()->SetRemoteSessionParameters(parameters);
+
+    TestWriteClientCallback callback;
+    app::WriteClient writeClient(&GetExchangeManager(), &callback, session, NullOptional,
+                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 128));
+    const AttributePathParams path(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+    constexpr int kAttributeCount = 12;
+    for (int index = 0; index < kAttributeCount; ++index)
+    {
+        ASSERT_SUCCESS(writeClient.EncodeAttribute(path, true));
+    }
+    ASSERT_TRUE(writeClient.IsWriteRequestChunked());
+
+    chip::Testing::MessageCapturer messages(*this);
+    ASSERT_SUCCESS(writeClient.SendWriteRequest(session));
+    DrainAndServiceIO();
+    EXPECT_EQ(callback.mOnSuccessCalled, kAttributeCount);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_TRUE(callback.mStatus.IsSuccess());
+
+    size_t requestCount        = 0;
+    bool previousHasMoreChunks = true;
+    for (size_t index = 0; index < messages.MessageCount(); ++index)
+    {
+        if (!messages.IsMessageType(index, Protocols::InteractionModel::MsgType::WriteRequest))
+        {
+            continue;
+        }
+        EXPECT_TRUE(previousHasMoreChunks);
+        System::PacketBufferTLVReader reader;
+        reader.Init(messages.MessagePayload(index).Retain());
+        WriteRequestMessage::Parser parser;
+        ASSERT_SUCCESS(parser.Init(reader));
+        bool flag = true;
+        EXPECT_EQ(parser.GetSuppressResponse(&flag), CHIP_END_OF_TLV);
+        EXPECT_EQ(parser.GetTimedRequest(&flag), CHIP_END_OF_TLV);
+        ASSERT_SUCCESS(parser.GetMoreChunkedMessages(&previousHasMoreChunks));
+        ++requestCount;
+    }
+    EXPECT_GT(requestCount, 1u);
+    EXPECT_FALSE(previousHasMoreChunks);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestWriteInteraction, TestWriteHandler)
@@ -824,7 +1198,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerListWriteEndAfterExcha
     {
         ASSERT_SUCCESS(writeHandler.Init(&provider, InteractionModelEngine::GetInstance()));
         TestWriteClientCallback writeCallback;
-        WriteClient writeClient(&GetExchangeManager(), &writeCallback, NullOptional);
+        WriteClient writeClient(&GetExchangeManager(), &writeCallback, std::nullopt, NullOptional);
         ASSERT_SUCCESS(writeClient.EncodeAttribute(attributePath, DataModel::List<uint8_t>()));
         ASSERT_SUCCESS(writeClient.FinalizeMessage(true /* aHasMoreChunks */));
         ASSERT_FALSE(writeClient.mChunks.IsNull());
@@ -900,7 +1274,7 @@ void TestWriteInteraction::TestListWriteTermination(ListWriteTermination termina
             GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
         }
         TestWriteClientCallback writeCallback;
-        WriteClient writeClient(&GetExchangeManager(), &writeCallback, NullOptional);
+        WriteClient writeClient(&GetExchangeManager(), &writeCallback, std::nullopt, NullOptional);
         ASSERT_SUCCESS(writeClient.EncodeAttribute(attributePath, DataModel::List<uint8_t>()));
         ASSERT_SUCCESS(writeClient.FinalizeMessage(true /* aHasMoreChunks */));
         ASSERT_FALSE(writeClient.mChunks.IsNull());
@@ -941,7 +1315,7 @@ void TestWriteInteraction::TestListWriteTermination(ListWriteTermination termina
             System::PacketBufferHandle payload;
             if (termination == ListWriteTermination::kFinalChunk)
             {
-                WriteClient finalWriteClient(&GetExchangeManager(), &writeCallback, NullOptional);
+                WriteClient finalWriteClient(&GetExchangeManager(), &writeCallback, std::nullopt, NullOptional);
                 ASSERT_SUCCESS(finalWriteClient.EncodeAttribute(attributePath, DataModel::List<uint8_t>()));
                 ASSERT_SUCCESS(finalWriteClient.FinalizeMessage(false /* aHasMoreChunks */));
                 ASSERT_FALSE(finalWriteClient.mChunks.IsNull());
@@ -1032,6 +1406,85 @@ TEST_F(TestWriteInteraction, ListWriteSuccessAfterFinalChunk)
     TestListWriteTermination(ListWriteTermination::kFinalChunk);
 }
 
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerOptionalRequestFlags)
+{
+    using namespace Protocols::InteractionModel;
+
+    // A missing TimedRequest is FALSE on unicast too, which mismatches a Timed Write transaction.
+    for (bool isTimedWrite : { false, true })
+    {
+        app::WriteHandler writeHandler;
+        System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        EXPECT_SUCCESS(writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(),
+                                         chip::app::InteractionModelEngine::GetInstance()));
+        GenerateWriteRequest(/* aIsTimedWrite = */ false, buf, /* aIncludeTimedRequest = */ false);
+
+        TestExchangeDelegate delegate;
+        Messaging::ExchangeContext * exchange = NewExchangeToBob(&delegate);
+        Status status                         = writeHandler.OnWriteRequest(exchange, std::move(buf), isTimedWrite);
+        EXPECT_EQ(status, isTimedWrite ? Status::TimedRequestMismatch : Status::Success);
+        DrainAndServiceIO();
+    }
+
+    auto deliverGroupWrite = [this](System::PacketBufferHandle && payload) {
+        app::WriteHandler writeHandler;
+        EXPECT_SUCCESS(writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(),
+                                         chip::app::InteractionModelEngine::GetInstance()));
+
+        TestExchangeDelegate delegate;
+        Transport::IncomingGroupSession incomingSession(0x0101, GetBobFabricIndex(), GetBobFabric()->GetNodeId());
+        SessionHandle sessionHandle(incomingSession);
+        Messaging::ExchangeContext * exchange = GetExchangeManager().NewContext(sessionHandle, &delegate);
+        EXPECT_NE(exchange, nullptr);
+        if (exchange == nullptr)
+        {
+            return Status::Failure;
+        }
+        return writeHandler.OnWriteRequest(exchange, std::move(payload), /* aIsTimedWrite = */ false);
+    };
+
+    {
+        TestWriteClientCallback callback;
+        SessionHandle groupSession = GetSessionBobToFriends();
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, groupSession, /* aTimedWriteTimeoutMs = */ NullOptional);
+        EXPECT_SUCCESS(writeClient.EncodeAttribute(
+            AttributePathParams(Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id), true));
+        EXPECT_SUCCESS(writeClient.FinalizeMessage(/* aHasMoreChunks = */ false));
+
+        System::PacketBufferHandle encoded = writeClient.mChunks.PopHead();
+        ASSERT_FALSE(encoded.IsNull());
+
+        {
+            System::PacketBufferTLVReader reader;
+            reader.Init(encoded.CloneData());
+            WriteRequestMessage::Parser parser;
+            EXPECT_SUCCESS(parser.Init(reader));
+            bool flag = true;
+            EXPECT_EQ(parser.GetSuppressResponse(&flag), CHIP_END_OF_TLV);
+            EXPECT_EQ(parser.GetTimedRequest(&flag), CHIP_END_OF_TLV);
+        }
+
+        EXPECT_EQ(deliverGroupWrite(std::move(encoded)), Status::Success);
+        DrainAndServiceIO();
+    }
+
+    {
+        System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        GenerateWriteRequest(/* aIsTimedWrite = */ false, buf);
+        // Older senders include TimedRequest set to false; its presence is not an error.
+        EXPECT_EQ(deliverGroupWrite(std::move(buf)), Status::Success);
+        DrainAndServiceIO();
+    }
+
+    {
+        System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        GenerateWriteRequest(/* aIsTimedWrite = */ true, buf);
+        // A groupcast write is never part of a timed transaction, so TimedRequest set to true is a mismatch.
+        EXPECT_EQ(deliverGroupWrite(std::move(buf)), Status::TimedRequestMismatch);
+        DrainAndServiceIO();
+    }
+}
+
 TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
 {
 
@@ -1046,7 +1499,7 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
@@ -1136,7 +1589,7 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMatch)
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
-    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
@@ -1181,7 +1634,7 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMismatch
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
-    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
@@ -1232,7 +1685,7 @@ TEST_F(TestWriteInteraction, TestWriteRoundtrip)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
         AddAttributeDataIB(writeClient, encodingMethod);
@@ -1269,7 +1722,7 @@ TEST_F(TestWriteInteraction, TestWriteClientSuppressResponseFlow)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing(),
                                      /* aSuppressResponse = */ true);
 
         AddAttributeDataIB(writeClient, encodingMethod);
@@ -1306,7 +1759,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientSuppressResponseFlowWit
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing(),
                                      /* aSuppressResponse */ true);
 
         AddInvalidAttributeDataIB(writeClient, encodingMethod);
@@ -1357,7 +1810,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
 
     // Reserve all except the last 60 bytes, so that we make sure to chunk. it was empirically determined that with a list of 10
     // ByteSpan items, we will be able to fit 5/6 list items into the initial ReplaceAll list; thus triggering chunking.
-    app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, std::nullopt, Optional<uint16_t>::Missing(),
                                  static_cast<uint16_t>(kMaxSecureSduLengthBytes - 60) /* reserved buffer size */);
 
     constexpr uint8_t kTestListLength = 10;
@@ -1427,7 +1880,7 @@ TEST_F(TestWriteInteraction, TestWriteHandlerInvalidateFabric)
 
     // Reserve all except the last 60 bytes, so that we make sure to chunk. it was empirically determined that with a list of 10
     // ByteSpan items, we will be able to fit 5/6 list items into the initial ReplaceAll list; thus triggering chunking.
-    app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, std::nullopt, Optional<uint16_t>::Missing(),
                                  static_cast<uint16_t>(kMaxSecureSduLengthBytes - 60) /* reserved buffer size */);
 
     constexpr uint8_t kTestListLength = 10;
@@ -1512,7 +1965,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientRejectsSuppressedChunke
     EXPECT_SUCCESS(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()));
 
     // Reserve most of the buffer so the list is forced to chunk (same technique as the chunked-write tests above).
-    app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, std::nullopt, Optional<uint16_t>::Missing(),
                                  static_cast<uint16_t>(kMaxSecureSduLengthBytes - 60) /* reserved buffer size */);
     writeClient.mSuppressResponse = true;
 
@@ -1587,7 +2040,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage1)
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
-    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     AddAttributeDataIB(writeClient);
@@ -1658,7 +2111,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage2)
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
-    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     AddAttributeDataIB(writeClient);
@@ -1728,7 +2181,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage3)
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
-    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     AddAttributeDataIB(writeClient);
@@ -1799,7 +2252,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage4)
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
-    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     AddAttributeDataIB(writeClient);
@@ -1871,7 +2324,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage5)
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     // Reserve buffer to trigger chunking
-    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing(),
                                  static_cast<uint16_t>(kMaxSecureSduLengthBytes - 60) /* reserved buffer size */);
 
     app::AttributePathParams attributePath(2, 3, 4);
