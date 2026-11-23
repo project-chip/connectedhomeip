@@ -1788,6 +1788,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveKeySet(chip::FabricIndex fabric_index, u
     ReturnErrorOnFailure(fabric.Load(mStorage));
     VerifyOrReturnError(keyset.Find(mStorage, fabric, target_id), CHIP_ERROR_NOT_FOUND);
     ReturnErrorOnFailure(keyset.Delete(mStorage));
+    auto notifyKeySetRemoved = ScopeExit([&]() { KeySetRemoved(fabric_index, target_id); });
 
     if (keyset.first)
     {
@@ -1825,7 +1826,6 @@ CHIP_ERROR GroupDataProviderImpl::RemoveKeySet(chip::FabricIndex fabric_index, u
         // open to suggestsions for the correct behavior.
         TEMPORARY_RETURN_IGNORED RemoveGroupKeyAt(fabric_index, idx);
     }
-    KeySetRemoved(fabric_index, target_id);
     return CHIP_NO_ERROR;
 }
 

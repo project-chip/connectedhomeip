@@ -1208,9 +1208,15 @@ TEST_F(TestSessionManagerDispatch, TestGroupSharedKeySetCounterAndRotation)
     ASSERT_SUCCESS(ctx->ReceivePacket(group1Counter200));
     EXPECT_EQ(ctx->mDelegate.mReceivedCount, 1u);
 
-    // Same counter 200 on kGroup2 under the same keyset is rejected.
+    // Same counter 200 on kGroup2 under the same keyset is rejected, while a fresh counter on kGroup2 is delivered.
     ASSERT_SUCCESS(ctx->ReceivePacket(group2Counter200));
     EXPECT_EQ(ctx->mDelegate.mReceivedCount, 1u);
+
+    System::PacketBufferHandle group2Counter201;
+    ASSERT_SUCCESS(ctx->BuildEncryptedGroupPacket(kGroup2, kSenderNodeId, 201u, group2Counter201));
+    ASSERT_SUCCESS(ctx->ReceivePacket(group2Counter201));
+    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 2u);
+    EXPECT_EQ(ctx->mDelegate.mLastGroupId, kGroup2);
 
     // Overlapping epoch-key rotation ([E0] -> [E0, E1, E2]) preserves replay state across old and new epoch keys.
     KeySet rotated(kSharedKeySet, SecurityPolicy::kTrustFirst, 3);
@@ -1224,32 +1230,32 @@ TEST_F(TestSessionManagerDispatch, TestGroupSharedKeySetCounterAndRotation)
 
     // Replay of counter 200 under E0 or E1 is still rejected, while counter 202 under E0 succeeds.
     ASSERT_SUCCESS(ctx->ReceivePacket(group1Counter200));
-    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 1u);
+    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 2u);
 
     System::PacketBufferHandle group1Epoch1Counter200;
     ASSERT_SUCCESS(ctx->BuildEncryptedGroupPacket(kGroup1, kSenderNodeId, 200u, group1Epoch1Counter200));
     ASSERT_SUCCESS(ctx->ReceivePacket(group1Epoch1Counter200));
-    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 1u);
+    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 2u);
 
     ASSERT_SUCCESS(ctx->ReceivePacket(group1Epoch0Counter202));
-    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 2u);
+    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 3u);
 
     // Advance kSharedKeySet by +2^30 under E1, then overwrite kSharedKeySet with disjoint keys;
     // OnKeySetRemoved clears the previous keyset's counter state.
     System::PacketBufferHandle highCounterUnderEpoch1;
     ASSERT_SUCCESS(ctx->BuildEncryptedGroupPacket(kGroup1, kSenderNodeId, 202u + 0x40000000u, highCounterUnderEpoch1));
     ASSERT_SUCCESS(ctx->ReceivePacket(highCounterUnderEpoch1));
-    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 3u);
+    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 4u);
 
     ASSERT_SUCCESS(ctx->InstallGroupKeySet(kSharedKeySet, kDisjoint));
     System::PacketBufferHandle freshAfterDisjointReplacement;
     ASSERT_SUCCESS(ctx->BuildEncryptedGroupPacket(kGroup1, kSenderNodeId, 203u, freshAfterDisjointReplacement));
     ASSERT_SUCCESS(ctx->ReceivePacket(freshAfterDisjointReplacement));
-    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 4u);
+    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 5u);
 
     // Before RemoveKeySet, replaying counter 203u is rejected as a duplicate.
     ASSERT_SUCCESS(ctx->ReceivePacket(freshAfterDisjointReplacement));
-    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 4u);
+    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 5u);
 
     // Explicit RemoveKeySet clears GroupPeerTable counter state via OnKeySetRemoved;
     // re-installing the same keyset ID accepts counter 203u again.
@@ -1257,7 +1263,7 @@ TEST_F(TestSessionManagerDispatch, TestGroupSharedKeySetCounterAndRotation)
     ASSERT_SUCCESS(ctx->InstallGroupKeySet(kSharedKeySet, kDisjoint));
     ASSERT_SUCCESS(ctx->mProvider.SetGroupKey(GroupKeySetDispatchContext::kFabric, kGroup1, kSharedKeySet));
     ASSERT_SUCCESS(ctx->ReceivePacket(freshAfterDisjointReplacement));
-    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 5u);
+    EXPECT_EQ(ctx->mDelegate.mReceivedCount, 6u);
 }
 
 } // namespace

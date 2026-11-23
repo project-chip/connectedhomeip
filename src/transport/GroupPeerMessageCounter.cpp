@@ -148,9 +148,10 @@ CHIP_ERROR FindOrAddPeerInList(GroupSender * list, uint32_t maxLimit, uint8_t & 
 CHIP_ERROR FindOrAddPeerInFabric(GroupFabric & groupFabric, KeysetId keysetId, NodeId nodeId, bool isControl,
                                  chip::Transport::PeerMessageCounter *& outCounter)
 {
-    static_assert(CHIP_CONFIG_MAX_GROUP_DATA_PEERS >= 1 && CHIP_CONFIG_MAX_GROUP_DATA_PEERS <= UINT8_MAX &&
-                      CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS >= 1 && CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS <= UINT8_MAX,
-                  "Group data and control peer limits must be in [1, 255]");
+    static_assert(CHIP_CONFIG_MAX_GROUP_DATA_PEERS >= 2 && CHIP_CONFIG_MAX_GROUP_DATA_PEERS <= UINT8_MAX,
+                  "CHIP_CONFIG_MAX_GROUP_DATA_PEERS must be in [2, 255]");
+    static_assert(CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS >= 1 && CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS <= UINT8_MAX,
+                  "CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS must be in [1, 255]");
 
     if (isControl)
     {
