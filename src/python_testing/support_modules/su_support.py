@@ -561,7 +561,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 log.info('Cleanup - DefaultOTAProviders cleared')
             else:
                 log.warning('Cleanup - Failed to clear DefaultOTAProviders ')
-        except  InteractionModelError:
+        except InteractionModelError:
             log.warning("Cleanup - Unable to clear DefaultOTAProviders due to InteractionModelError")
 
     def clear_kvs(self, kvs_path_prefix: str = "/tmp/chip_kvs"):
