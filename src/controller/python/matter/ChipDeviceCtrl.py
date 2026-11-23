@@ -1128,7 +1128,7 @@ class ChipDeviceControllerBase:
         )
 
     async def EstablishPASESessionThreadMeshcop(self, baAddr: str, setupCode: str, nodeId: int, baPort: int,
-                                                *, threadOperationalDataset: bytes | None = None) -> None:
+                                                *, threadOperationalDataset: bytes | bytearray | None = None) -> None:
         '''
         Establish a PASE session over Thread MeshCoP.
 
@@ -1146,10 +1146,11 @@ class ChipDeviceControllerBase:
         Returns:
             None
         '''
+        dataset = None if threadOperationalDataset is None else bytes(threadOperationalDataset)
         await self._establishPASESession(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop(
                 self.devCtrl, baAddr.encode("utf-8"), baPort, setupCode.encode("utf-8"), nodeId,
-                threadOperationalDataset, 0 if threadOperationalDataset is None else len(threadOperationalDataset)),
+                dataset, 0 if dataset is None else len(dataset)),
             nodeId
         )
 
@@ -1621,7 +1622,7 @@ class ChipDeviceControllerBase:
         ).raise_on_error()
 
     def SetDefaultThreadMeshCoPConfig(self, threadMeshCoPConfig: tuple[str, int] | None,
-                                      threadOperationalDataset: bytes | None = None) -> None:
+                                      threadOperationalDataset: bytes | bytearray | None = None) -> None:
         """Set controller defaults for PASE establishment over Thread MeshCoP.
 
         Args:
@@ -1638,14 +1639,21 @@ class ChipDeviceControllerBase:
             return
 
         host, port = threadMeshCoPConfig
-        if not host or not 1 <= port <= 65535:
+        if not isinstance(host, str) or not host.strip() or isinstance(port, bool) or not isinstance(port, int) or not 1 <= port <= 65535:
             raise ValueError("Thread MeshCoP requires a border agent host and a port in the range 1..65535")
         if not threadOperationalDataset:
             raise ValueError("Thread MeshCoP requires a Thread operational dataset")
 
-        self._defaultThreadMeshCoPConfig = (threadMeshCoPConfig, bytes(threadOperationalDataset))
+        self._defaultThreadMeshCoPConfig = ((host.strip(), port), bytes(threadOperationalDataset))
 
-    async def FindOrEstablishPASESession(self, setupCode: str, nodeId: int, timeoutMs: int | None = None, threadMeshCoPConfig: tuple[str, int] | None = None) -> DeviceProxyWrapper | None:
+    @property
+    def hasDefaultThreadMeshCoPConfig(self) -> bool:
+        """Whether this controller has a default Border Agent and Thread dataset for PASE."""
+        return self._defaultThreadMeshCoPConfig is not None
+
+    async def FindOrEstablishPASESession(self, setupCode: str, nodeId: int, timeoutMs: int | None = None,
+                                         threadMeshCoPConfig: tuple[str, int] | None = None,
+                                         *, useThreadMeshCoPDefaults: bool = True) -> DeviceProxyWrapper | None:
         '''
         Find or establish a PASE session.
 
@@ -1654,7 +1662,7 @@ class ChipDeviceControllerBase:
             nodeId (int): The node ID of the device.
             timeoutMs (Optional[int]): Optional timeout in milliseconds.
             threadMeshCoPConfig (Optional[tuple[str, int]]): Optional Border Agent host and port for Thread MeshCoP PASE.
-                When None, uses the defaults configured by SetDefaultThreadMeshCoPConfig, if any.
+            useThreadMeshCoPDefaults: Whether to use the controller's MeshCoP defaults when no Border Agent is provided.
 
         Returns:
             DeviceProxyWrapper on success, if not is None.
@@ -1669,7 +1677,7 @@ class ChipDeviceControllerBase:
         if threadMeshCoPConfig is not None:
             host, port = threadMeshCoPConfig
             await self.EstablishPASESessionThreadMeshcop(host, setupCode, nodeId, port)
-        elif self._defaultThreadMeshCoPConfig is not None:
+        elif useThreadMeshCoPDefaults and self._defaultThreadMeshCoPConfig is not None:
             (host, port), dataset = self._defaultThreadMeshCoPConfig
             await self.EstablishPASESessionThreadMeshcop(host, setupCode, nodeId, port, threadOperationalDataset=dataset)
         else:

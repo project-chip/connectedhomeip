@@ -26,6 +26,7 @@ from matter.ChipDeviceCtrl import BareChipDeviceController, CallbackContext, Chi
 from matter.FabricAdmin import FabricAdmin
 from matter.testing import global_stash
 from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.commissioning import Commission, CommissioningInfo, SetupPayloadInfo
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import generate_mobly_test_config
@@ -139,6 +140,36 @@ class TestPASESessionDefaults(unittest.IsolatedAsyncioTestCase):
         self.set_dataset.assert_not_called()
         self.controller.EstablishPASESession.assert_not_awaited()
 
+    async def test_caller_can_opt_out_of_meshcop_defaults(self):
+        self.controller.SetDefaultThreadMeshCoPConfig(BORDER_AGENT, DATASET)
+
+        result = await self.controller.FindOrEstablishPASESession(SETUP_CODE, NODE_ID, useThreadMeshCoPDefaults=False)
+
+        self.assertIsInstance(result, DeviceProxyWrapper)
+        self.controller.EstablishPASESession.assert_awaited_once_with(SETUP_CODE, NODE_ID)
+        self.meshcop.assert_not_called()
+        self.assertTrue(self.controller.hasDefaultThreadMeshCoPConfig)
+
+    async def test_defaults_copy_the_border_agent_and_dataset(self):
+        agent = [f" {BORDER_AGENT[0]} ", BORDER_AGENT[1]]
+        dataset = bytearray(DATASET)
+        self.controller.SetDefaultThreadMeshCoPConfig(agent, dataset)
+        agent[1] = 49155
+        dataset[-1] = 0
+
+        await self.controller.FindOrEstablishPASESession(SETUP_CODE, NODE_ID)
+
+        self.meshcop.assert_called_once_with(
+            None, BORDER_AGENT[0].encode(), BORDER_AGENT[1], SETUP_CODE.encode(), NODE_ID, DATASET, len(DATASET))
+
+    async def test_direct_meshcop_call_accepts_a_bytearray_dataset(self):
+        await self.controller.EstablishPASESessionThreadMeshcop(
+            BORDER_AGENT[0], SETUP_CODE, NODE_ID, BORDER_AGENT[1], threadOperationalDataset=bytearray(DATASET))
+
+        self.assertIsInstance(self.meshcop.call_args.args[5], bytes)
+        self.meshcop.assert_called_once_with(
+            None, BORDER_AGENT[0].encode(), BORDER_AGENT[1], SETUP_CODE.encode(), NODE_ID, DATASET, len(DATASET))
+
     async def test_existing_session_is_reused_without_changing_dataset(self):
         self.controller.SetDefaultThreadMeshCoPConfig(BORDER_AGENT, DATASET)
         self.controller._dmLib.pychip_GetDeviceBeingCommissioned.side_effect = [SimpleNamespace(is_success=True)]
@@ -190,7 +221,8 @@ class TestPASESessionDefaults(unittest.IsolatedAsyncioTestCase):
     async def test_invalid_defaults_do_not_replace_valid_configuration(self):
         self.controller.SetDefaultThreadMeshCoPConfig(BORDER_AGENT, DATASET)
         for agent, dataset in [(BORDER_AGENT, None), (BORDER_AGENT, b""), (("", 49154), DATASET),
-                               (("::1", 0), DATASET), (("::1", 65536), DATASET)]:
+                               (("::1", 0), DATASET), (("::1", 65536), DATASET), ((" ", 49154), DATASET),
+                               ((None, 49154), DATASET), (("::1", True), DATASET), (("::1", 49154.0), DATASET)]:
             with self.subTest(agent=agent, dataset=dataset), self.assertRaises(ValueError):
                 self.controller.SetDefaultThreadMeshCoPConfig(agent, dataset)
 
@@ -230,13 +262,18 @@ class TestPASESessionFrameworkConfig(unittest.IsolatedAsyncioTestCase):
 
     def test_commissioning_pretest_uses_commissioning_method(self):
         self.test.is_commissioning = True
-        self.config.commissioning_method = "ble-thread"
-        self.config.in_test_commissioning_method = "thread-meshcop"
-        controller = Mock(spec=ChipDeviceControllerBase)
+        for method, in_test_method, expected in (
+            ("ble-thread", "thread-meshcop", (None,)),
+            ("thread-meshcop", "ble-thread", (BORDER_AGENT, DATASET)),
+        ):
+            with self.subTest(method=method, in_test_method=in_test_method):
+                self.config.commissioning_method = method
+                self.config.in_test_commissioning_method = in_test_method
+                controller = Mock(spec=ChipDeviceControllerBase)
 
-        self.test._configure_pase_session(controller)
+                self.test._configure_pase_session(controller)
 
-        controller.SetDefaultThreadMeshCoPConfig.assert_called_once_with(None)
+                controller.SetDefaultThreadMeshCoPConfig.assert_called_once_with(*expected)
 
     def test_other_transports_clear_stale_meshcop_defaults(self):
         for method, in_test_method in [(None, None), ("ble-thread", None), (None, "on-network"),
@@ -282,32 +319,107 @@ class TestPASESessionFrameworkConfig(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.controller._defaultThreadMeshCoPConfig, (BORDER_AGENT, DATASET))
         self.assertEqual(self.test._extra_controllers, [])
 
-    async def test_composition_setup_uses_meshcop_without_changing_the_pase_caller(self):
+    def test_controller_and_ca_are_tracked_when_default_configuration_fails(self):
+        self.config.in_test_commissioning_method = "thread-meshcop"
+        self.config.thread_operational_dataset = None
+        ca = Mock()
+        self.controller.fabricAdmin = SimpleNamespace(certificateAuthority=ca)
+
+        with self.assertRaisesRegex(ValueError, "requires a Thread operational dataset"):
+            MatterBaseTest._on_new_controller_created(self.test, self.controller)
+
+        self.assertEqual(self.test._extra_controllers, [self.controller])
+        self.assertEqual(self.test._extra_cas, [ca])
+
+    def test_teardown_clears_defaults_when_framework_cleanup_fails(self):
+        controller = Mock(spec=ChipDeviceControllerBase)
+        controller.isActive = True
+        mobly_config = generate_mobly_test_config(self.config)
+        with asyncio.Runner() as runner, patch.dict(global_stash._GLOBAL_DATA), patch.object(
+                FabricAdmin, "_new_controller_hook", Mock()):
+            mobly_config.user_params["default_controller"] = global_stash.stash_globally(controller)
+            test = MatterBaseTest(mobly_config)
+            test.event_loop = runner.get_loop()
+            with patch.object(test, "_run_framework_cleanup", new=AsyncMock(side_effect=RuntimeError("cleanup failed"))), \
+                    self.assertRaisesRegex(RuntimeError, "cleanup failed"):
+                test.teardown_class()
+            self.assertIsNone(FabricAdmin._new_controller_hook)
+
+        controller.SetDefaultThreadMeshCoPConfig.assert_called_once_with(None)
+
+    async def test_non_meshcop_commissioning_bypasses_controller_defaults(self):
+        self.controller.SetDefaultThreadMeshCoPConfig(BORDER_AGENT, DATASET)
+        commission = Commission(self.controller, NODE_ID, SetupPayloadInfo(setup_code=SETUP_CODE),
+                                CommissioningInfo(commissioning_method="ble-thread"))
+
+        await commission._find_or_establish_pase_if_needed()
+
+        self.controller.EstablishPASESession.assert_awaited_once_with(SETUP_CODE, NODE_ID)
+        self.controller._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.assert_not_called()
+
+    async def test_ntl_pase_bypasses_controller_defaults(self):
+        self.controller.SetDefaultThreadMeshCoPConfig(BORDER_AGENT, DATASET)
+        self.test.default_controller = self.controller
+        payload = SimpleNamespace(setup_passcode=20202021, vendor_id=0xFFF1, product_id=0x8000,
+                                  long_discriminator=3840, commissioning_flow=0, version=0)
+
+        with patch("matter.testing.matter_testing.SetupPayload") as setup_payload:
+            setup_payload.return_value.GenerateQrCode.return_value = SETUP_CODE
+            result = await MatterBaseTest.find_or_establish_pase_session_over_ntl(self.test, payload, NODE_ID)
+
+        self.assertIsInstance(result, DeviceProxyWrapper)
+        self.controller.EstablishPASESession.assert_awaited_once_with(SETUP_CODE, NODE_ID)
+        self.controller._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.assert_not_called()
+
+    def setup_composition(self) -> BasicCompositionTests:
         self.config.in_test_commissioning_method = "thread-meshcop"
         self.config.manual_code = [SETUP_CODE]
         self.config.dut_node_ids = [NODE_ID]
         self.controller._Cluster = Mock()
-
-        async def wait_for_case(**_kwargs):
-            await asyncio.Future()
-
-        self.controller.GetConnectedDevice = AsyncMock(side_effect=wait_for_case)
         self.controller.Read = AsyncMock(return_value=SimpleNamespace(attributes={}, tlvAttributes={}))
         mobly_config = generate_mobly_test_config(self.config)
 
-        with patch.dict(global_stash._GLOBAL_DATA), patch.object(FabricAdmin, "_new_controller_hook", None):
-            mobly_config.user_params["default_controller"] = global_stash.stash_globally(self.controller)
-            mobly_config.user_params["matter_test_config"] = global_stash.stash_globally(self.config)
-            composition = BasicCompositionTests(mobly_config)
-            with patch("matter.testing.matter_testing.ClusterMapper"), \
-                    patch.object(composition, "_build_cq_excluded_ids", return_value=frozenset()):
-                composition.setup_class()
+        self.enterContext(patch.dict(global_stash._GLOBAL_DATA))
+        self.enterContext(patch.object(FabricAdmin, "_new_controller_hook", None))
+        mobly_config.user_params["default_controller"] = global_stash.stash_globally(self.controller)
+        mobly_config.user_params["matter_test_config"] = global_stash.stash_globally(self.config)
+        composition = BasicCompositionTests(mobly_config)
+        with patch("matter.testing.matter_testing.ClusterMapper"), \
+                patch.object(composition, "_build_cq_excluded_ids", return_value=frozenset()):
+            composition.setup_class()
 
-            await composition.setup_class_helper()
+        return composition
 
+    async def test_composition_setup_uses_meshcop_after_case_fails(self):
+        self.controller.GetConnectedDevice = AsyncMock(side_effect=TimeoutError("CASE unavailable"))
+        composition = self.setup_composition()
+
+        await composition.setup_class_helper()
+
+        self.controller.GetConnectedDevice.assert_awaited_once_with(nodeId=NODE_ID, allowPASE=False)
         self.controller._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.assert_called_once_with(
             None, BORDER_AGENT[0].encode(), BORDER_AGENT[1], SETUP_CODE.encode(), NODE_ID, DATASET, len(DATASET))
         self.controller.Read.assert_awaited_once_with(NODE_ID, [()])
+
+    async def test_composition_setup_uses_case_when_dut_is_operational(self):
+        self.controller.GetConnectedDevice = AsyncMock()
+        composition = self.setup_composition()
+
+        await composition.setup_class_helper()
+
+        self.controller.GetConnectedDevice.assert_awaited_once_with(nodeId=NODE_ID, allowPASE=False)
+        self.controller._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.assert_not_called()
+        self.controller.Read.assert_awaited_once_with(NODE_ID, [()])
+
+    async def test_composition_setup_reports_meshcop_pase_failure(self):
+        self.controller.GetConnectedDevice = AsyncMock(side_effect=TimeoutError("CASE unavailable"))
+        self.controller._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.side_effect = RuntimeError("PASE failed")
+        composition = self.setup_composition()
+
+        with self.assertRaisesRegex(RuntimeError, "PASE failed"):
+            await composition.setup_class_helper()
+
+        self.controller.Read.assert_not_awaited()
 
 
 if __name__ == "__main__":

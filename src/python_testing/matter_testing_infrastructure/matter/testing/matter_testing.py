@@ -665,10 +665,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         Test authors that implement this method should ensure super().teardown_class()
         is called after any custom teardown code.
         """
-        self.event_loop.run_until_complete(self._run_framework_cleanup())
-
-        # Clear the hook set in setup_class; self._extra_controllers, if any, is fully populated by now.
-        matter.FabricAdmin.FabricAdmin._new_controller_hook = None
+        try:
+            self.event_loop.run_until_complete(self._run_framework_cleanup())
+        finally:
+            matter.FabricAdmin.FabricAdmin._new_controller_hook = None
+            controller = self.default_controller
+            if controller is not None and controller.isActive:
+                controller.SetDefaultThreadMeshCoPConfig(None)
 
         if len(self.problems) > 0:
             # Attempt to dump device attribute data for debugging when problems are found during Confirmation Tests
@@ -1009,7 +1012,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         Args:
             controller: The controller that was created.
         """
-        self._configure_pase_session(controller)
         if not getattr(controller, '_is_default_controller', False) and not getattr(controller, '_skip_cleanup_tracking', False):
 
             # Track controller for shutdown in teardown_class
@@ -1022,6 +1024,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 ca = fa.certificateAuthority
                 if ca not in self._extra_cas:
                     self._extra_cas.append(ca)
+
+        self._configure_pase_session(controller)
 
     def _shutdown_extra_controllers(self) -> None:
         """Shuts down all extra controllers created during the test run and
@@ -2520,7 +2524,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Setup a PASE only session over NTL
         return await self.default_controller.FindOrEstablishPASESession(
             setupCode=ntl_onboarding_data,
-            nodeId=node_id
+            nodeId=node_id,
+            useThreadMeshCoPDefaults=False,
         )
 
     async def open_commissioning_window(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, timeout: int = 900) -> CustomCommissioningParameters:

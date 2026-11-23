@@ -148,11 +148,11 @@ public:
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #if CHIP_SUPPORT_THREAD_MESHCOP
-    void SetThreadMeshcopCommissionParamsAndProxy(ThreadMeshcopCommissionParameters & meshcopCommissionParams,
+    void SetThreadMeshcopCommissionParamsAndProxy(const Optional<ThreadMeshcopCommissionParameters> & meshcopCommissionParams,
                                                   ThreadMeshcopCommissionProxy * proxy)
     {
-        mThreadMeshcopCommissionProxy = proxy;
-        mThreadMeshcopCommissionParams.SetValue(meshcopCommissionParams);
+        mThreadMeshcopCommissionParams = meshcopCommissionParams;
+        mThreadMeshcopCommissionProxy  = meshcopCommissionParams.HasValue() ? proxy : nullptr;
     }
 #endif
 
