@@ -2,12 +2,12 @@
 |:-------------------------------|------------:|
 | build-example-ti-cc13xx-26xx   |           0 |
 | build-example-ti-cc32xx        |           0 |
-| check-sme-label-reviewers      |           0 |
 | delete-old-artifacts           |           0 |
 | daily-run-for-slow-tests       |           0 |
-| build-example-telink           |         100 |
 | build-example-efr32            |         100 |
+| build-example-telink           |         100 |
 | process-stale-issues-and-prs   |         100 |
+| recent-fail-summary            |         100 |
 | build-example-infineon         |         100 |
 | chef-ci                        |         100 |
 | lint-code-base                 |         100 |
@@ -15,8 +15,7 @@
 | build-example-stm32            |         100 |
 | build-example-realtek          |         100 |
 | cancel-workflows-on-failing-ci |         100 |
-| recent-fail-summary            |         100 |
-| build-example-nrf-connect-sdk  |         100 |
+| build-example-linux-standalone |         100 |
 | codeql                         |         100 |
 | unit-integration-tests         |         100 |
 | build-example-ameba            |         100 |
@@ -30,12 +29,12 @@
 | full-builds-android            |         100 |
 | minimal-build-linux-configure  |         100 |
 | build-example-zephyr           |         100 |
-| test-tv-casting-example        |         100 |
-| build-example-linux-standalone |         100 |
-| tv-casting-example-darwin      |         100 |
 | darwin                         |         100 |
-| build-example-linux-arm        |         100 |
+| test-tv-casting-example        |         100 |
+| build-example-nrf-connect-sdk  |         100 |
 | darwin-tests                   |         100 |
+| tv-casting-example-darwin      |         100 |
+| build-example-linux-arm        |         100 |
 | build-example-i-mx-linux       |         100 |
 | qemu                           |         100 |
 | zap                            |         100 |
