@@ -351,6 +351,11 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingRead(SocketWatchToken token)
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    assertChipStackLockedByCurrentThread();
+
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+    const bool wasPending = watch->mPendingIO.Has(SocketEventFlags::kRead);
+#endif
     watch->mPendingIO.Set(SocketEventFlags::kRead);
 
 #if CHIP_SYSTEM_CONFIG_USE_LIBEV
@@ -371,6 +376,15 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingRead(SocketWatchToken token)
         ev_io_modify(&watch->mIoWatcher, evs);
         ev_io_start(mLibEvLoopP, &watch->mIoWatcher);
     }
+#else
+    // A caller holding the Matter stack lock on another thread (for example, an
+    // Android JNI callback) can enable read interest while the event loop thread
+    // has released the stack lock around WaitForEvents() / select(). Wake
+    // select() on the 0 -> 1 transition so PrepareEvents() adds the FD.
+    if (!wasPending)
+    {
+        Signal();
+    }
 #endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 
     return CHIP_NO_ERROR;
@@ -381,6 +395,11 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingWrite(SocketWatchToken token
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    assertChipStackLockedByCurrentThread();
+
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+    const bool wasPending = watch->mPendingIO.Has(SocketEventFlags::kWrite);
+#endif
     watch->mPendingIO.Set(SocketEventFlags::kWrite);
 
 #if CHIP_SYSTEM_CONFIG_USE_LIBEV
@@ -400,6 +419,15 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingWrite(SocketWatchToken token
         ev_io_stop(mLibEvLoopP, &watch->mIoWatcher);
         ev_io_modify(&watch->mIoWatcher, evs);
         ev_io_start(mLibEvLoopP, &watch->mIoWatcher);
+    }
+#else
+    // A caller holding the Matter stack lock on another thread (for example, an
+    // Android JNI callback) can enable write interest while the event loop thread
+    // has released the stack lock around WaitForEvents() / select(). Wake
+    // select() on the 0 -> 1 transition so PrepareEvents() adds the FD.
+    if (!wasPending)
+    {
+        Signal();
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 
