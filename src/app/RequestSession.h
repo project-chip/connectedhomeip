@@ -40,11 +40,14 @@ public:
     bool IsGroupSession() const { return mKind == Kind::kGroupcast; }
     std::optional<uint16_t> GetPeerInteractionModelRevision() const { return mPeerInteractionModelRevision; }
 
-    /// Returns CHIP_ERROR_INCORRECT_STATE if the construction session was unavailable or has been released.
+    /// Returns CHIP_ERROR_INCORRECT_STATE if the session was not available in the constructor or has since been released.
     CHIP_ERROR Validate() const;
 
-    /// Unicast must use the construction session; groupcast must use the construction group ID and fabric.
-    /// Passing std::nullopt at construction permits any session.
+    /// Check that the provided session matches we were constructed, with as follows:
+    ///
+    /// 1) If we were constructed without a session, any session is allowed here.
+    /// 2) If we were constructed with a unicast session, the session being checked must be the same session.
+    /// 3) If we were constructed with a groupcast session, the session being checked must also be a groupcast session that has the same group ID and fabric.
     CHIP_ERROR CheckSession(const SessionHandle & session) const;
 
     /// Releases the retained session and prevents further use of this request destination.

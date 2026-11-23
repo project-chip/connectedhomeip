@@ -206,7 +206,7 @@ CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session)
     ReturnErrorOnFailure(mRequestSession.CheckSession(session));
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     // Needed when no session was passed at construction.
-    VerifyOrReturnError(session->IsGroupSession(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(session->GetSessionType() == Transport::Session::SessionType::kGroupOutgoing, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!mTimedRequest && !mTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(Finalize(mPendingInvokeData));
