@@ -1,1 +1,1 @@
-latest : update ubuntu mirror server for cirque
+1 : add tcpdump and tshark for in-container packet capture and PID 1 signal handling

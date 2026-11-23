@@ -44,6 +44,7 @@
 #include <lib/support/TimerDelegate.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
@@ -117,6 +118,7 @@ public:
         Access::AccessControl & accessControl;
         FailSafeContext & failSafeContext;
         DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
+        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;

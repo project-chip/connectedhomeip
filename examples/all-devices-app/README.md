@@ -136,6 +136,11 @@ The application supports the following device types (specified via the
 -   `smoke-co-alarm`
 -   `soil-sensor`
 -   `soil-sensor-simulated`
+-   `solar-power`
+-   `solar-power-four-panels`
+-   `solar-power-three-phase`
+-   `solar-power-two-strings`
+-   `solar-power-two-strings-four-panels`
 -   `speaker`
 -   `temperature-sensor`
 -   `temperature-sensor-simulated`
