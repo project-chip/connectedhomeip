@@ -40,7 +40,9 @@ public:
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 };
 
-/// Sets the given delegate on an endpoint configured via code-generation
+/// Sets the given delegate on an endpoint configured via code-generation.
+/// This loads the persisted transports and calls PersistentAttributesLoadedCallback(), so set the TLS delegates
+/// below first if the delegate needs the TLS certificates of persisted transports there.
 void SetDelegate(chip::EndpointId endpointId, PushAvStreamTransportDelegate * delegate);
 
 /// Sets the given TLS Client Management delegate on an endpoint configured via code-generation

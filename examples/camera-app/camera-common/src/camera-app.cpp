@@ -395,14 +395,14 @@ void CameraApp::InitCameraDeviceClusters()
 
     CreateAndInitializeCameraAVStreamMgmt();
 
-    // Only init PushAV once AVSM is init
-    Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
-
+    // Only init PushAV once AVSM is init. The TLS delegates must be set before SetDelegate(), see CodegenIntegration.h.
     Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(mEndpoint,
                                                                     &Clusters::TlsClientManagementCommandDelegate::GetInstance());
 
     Clusters::PushAvStreamTransport::SetTLSCertificateManagementDelegate(
         mEndpoint, &Clusters::TlsCertificateManagementCommandDelegate::GetInstance());
+
+    Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
 
     // Set the WebRTCTransportProvider server in the manager
     mCameraDevice->SetWebRTCTransportProvider(&mWebRTCTransportProviderServer.Cluster());

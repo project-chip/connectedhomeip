@@ -118,6 +118,19 @@ public:
                              const PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType & transportOptions,
                              const std::shared_ptr<PushAvStreamTransport::TransportOptionsStorage> transportOptionsPtr);
 
+    /**
+     * Looks up the client certificate, key and root certificate of TLS endpoint `tlsEndpointID` on `fabricIndex` and
+     * passes them to PushAvStreamTransportDelegate::SetTLSCerts(). The delegate holds one set of certificates, so call
+     * this immediately before allocating the transport that uses the endpoint.
+     *
+     * Requires the delegate and the TLS Client Management delegate. Without a TLS Certificate Management delegate,
+     * the certificates passed on are empty.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE if a required delegate is missing, CHIP_ERROR_INVALID_ARGUMENT if the
+     *         endpoint has no client certificate, otherwise the error from the endpoint or certificate lookup.
+     */
+    CHIP_ERROR LoadTLSCertsIntoDelegate(FabricIndex fabricIndex, uint16_t tlsEndpointID);
+
     std::optional<DataModel::ActionReturnStatus>
     HandleAllocatePushTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const PushAvStreamTransport::Commands::AllocatePushTransport::DecodableType & commandData);
