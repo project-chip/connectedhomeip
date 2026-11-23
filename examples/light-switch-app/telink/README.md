@@ -105,7 +105,7 @@ following states:
 | :-------------------------- | :--------------------------------------------------------------------------- |
 | Blinks with short pulses    | Device is not commissioned to Thread, Thread is disabled                     |
 | Blinks with frequent pulses | Device is commissioned, Thread enabled. Device trying to JOIN thread network |
-| Blinks with wide pulses     | Device commissioned and joined Thread network as CHILD                    |
+| Blinks with wide pulses     | Device commissioned and joined Thread network as CHILD                       |
 
 #### Indicate identify of device
 
