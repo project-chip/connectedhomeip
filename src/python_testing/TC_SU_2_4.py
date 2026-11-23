@@ -142,7 +142,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             discriminator=self.provider_discriminator,
             port=self.provider_port,
             extra_args=['--app-pipe', self.provider_app_pipe, '--app-pipe-out',
-                        self.provider_app_pipe_out, '--delayedApplyActionTimeSec', '60'],
+                        self.provider_app_pipe_out, '--delayedApplyActionTimeSec', '120'],
             kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
             timeout=20

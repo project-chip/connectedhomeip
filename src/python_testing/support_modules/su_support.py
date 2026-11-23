@@ -553,7 +553,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         attr_clear = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[])
         resp = await controller.WriteAttribute(
             attributes=[(0, attr_clear)],
-            nodeId=requestor_node_id
+            nodeId=requestor_node_id,
+            timedRequestTimeoutMs=15000,
         )
         if resp[0].Status == Status.Success:
             log.info('Cleanup - DefaultOTAProviders cleared')
