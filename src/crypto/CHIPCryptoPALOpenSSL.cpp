@@ -897,7 +897,7 @@ namespace {
 // Runs the crypto library's public key validation on `pkey`.
 CHIP_ERROR CheckP256PublicKey(EVP_PKEY * pkey)
 {
-    // BoringSSL has no EVP_PKEY_public_check, and OpenSSL 3.0 deprecates EC_KEY_check_key.
+    // BoringSSL has no EVP_PKEY_public_check_quick, and OpenSSL 3.0 deprecates EC_KEY_check_key.
 #if CHIP_CRYPTO_BORINGSSL || OPENSSL_VERSION_NUMBER < 0x30000000L
     const EC_KEY * ec_key = EVP_PKEY_get0_EC_KEY(pkey);
     VerifyOrReturnError(ec_key != nullptr, CHIP_ERROR_INTERNAL);
@@ -905,7 +905,8 @@ CHIP_ERROR CheckP256PublicKey(EVP_PKEY * pkey)
 #else
     ScopedEvpPkeyCtx check_ctx(EVP_PKEY_CTX_new_from_pkey(nullptr, pkey, nullptr));
     VerifyOrReturnError(check_ctx, CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(EVP_PKEY_public_check(check_ctx.get()) == 1, CHIP_ERROR_INTERNAL);
+    // P-256 has cofactor 1, so the order check that the quick variant skips cannot fail.
+    VerifyOrReturnError(EVP_PKEY_public_check_quick(check_ctx.get()) == 1, CHIP_ERROR_INTERNAL);
 #endif
     return CHIP_NO_ERROR;
 }
