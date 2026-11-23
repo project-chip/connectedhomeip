@@ -27,7 +27,8 @@ from matter.exceptions import ChipStackError
 from matter.FabricAdmin import FabricAdmin
 from matter.testing import global_stash
 from matter.testing.basic_composition import BasicCompositionTests
-from matter.testing.commissioning import Commission, CommissioningInfo, EstablishedSessionKind, SetupPayloadInfo, _establish_pase_or_case_session
+from matter.testing.commissioning import (Commission, CommissioningInfo, EstablishedSessionKind, SetupPayloadInfo,
+                                          _establish_pase_or_case_session)
 from matter.testing.commissioning_types import PaseParams
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
