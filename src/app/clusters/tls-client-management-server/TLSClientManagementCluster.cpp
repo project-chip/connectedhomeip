@@ -142,6 +142,19 @@ CHIP_ERROR TLSClientManagementCluster::GeneratedCommands(const ConcreteClusterPa
     return builder.ReferenceExisting(kGeneratedCommands);
 }
 
+void TLSClientManagementCluster::NotifyProvisionedEndpointsChanged()
+{
+    NotifyAttributeChanged(TlsClientManagement::Attributes::ProvisionedEndpoints::Id);
+}
+
+void TLSClientManagementDelegate::NotifyProvisionedEndpointsChanged()
+{
+    if (mTLSClientManagementCluster != nullptr)
+    {
+        mTLSClientManagementCluster->NotifyProvisionedEndpointsChanged();
+    }
+}
+
 uint8_t TLSClientManagementCluster::GetMaxProvisioned() const
 {
     return mMaxProvisioned;
