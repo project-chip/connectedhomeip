@@ -1617,7 +1617,7 @@ class ChipDeviceControllerBase:
         ).raise_on_error()
 
     def SetDefaultThreadMeshCoPConfig(self, threadMeshCoPConfig: tuple[str, int] | None,
-                                    threadOperationalDataset: bytes | None = None) -> None:
+                                      threadOperationalDataset: bytes | None = None) -> None:
         """Set controller defaults for PASE establishment over Thread MeshCoP.
 
         Args:

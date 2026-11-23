@@ -157,9 +157,8 @@ class TestPASESessionDefaults(unittest.IsolatedAsyncioTestCase):
         self.controller.SetDefaultThreadMeshCoPConfig(BORDER_AGENT, DATASET)
         for agent, dataset in [(BORDER_AGENT, None), (BORDER_AGENT, b""), (("", 49154), DATASET),
                                (("::1", 0), DATASET), (("::1", 65536), DATASET)]:
-            with self.subTest(agent=agent, dataset=dataset):
-                with self.assertRaises(ValueError):
-                    self.controller.SetDefaultThreadMeshCoPConfig(agent, dataset)
+            with self.subTest(agent=agent, dataset=dataset), self.assertRaises(ValueError):
+                self.controller.SetDefaultThreadMeshCoPConfig(agent, dataset)
 
         await self.controller.FindOrEstablishPASESession(SETUP_CODE, NODE_ID)
 
