@@ -588,6 +588,22 @@ public:
     void TestCommandHandler_DelayReportData_Groupcast();
     void TestInteractionModelCommands_SendCommand_DelayReportData();
     void TestInteractionModelCommands_SendGroupCommand_DelayReportData();
+    void TestCommandHandler_SmallResponseBufferKeepsHandlerUsable();
+    void TestCommandHandler_SmallResponseBufferTwoCommandInvoke();
+
+    enum class FirstResponse
+    {
+        kStatus,
+        kData,
+    };
+
+    // Adds aFirst for one path, then a status for a second path, with room for aAppMessageLen bytes of payload.
+    // Returns the number of responses queued for sending.
+    static size_t AddTwoResponsesAndCount(size_t aAppMessageLen, FirstResponse aFirst);
+
+    // Like AddTwoResponsesAndCount, but sends a two-command InvokeRequest through OnInvokeCommandRequest;
+    // each command answers with a status.
+    size_t InvokeTwoCommandsAndCountResponses(size_t aAppMessageLen);
 
     /**
      * With the introduction of batch invoke commands, CommandHandler keeps track of incoming
@@ -2902,6 +2918,182 @@ TEST(TestEncodableResponsePayloadAdapter, EncodeToBothWriters)
         writer.Init(buffer);
         EXPECT_EQ(adapter.EncodeTo(writer, TLV::AnonymousTag()), CHIP_ERROR_INCORRECT_STATE);
     }
+}
+
+namespace {
+// Responder whose response buffer is capped at a fixed size, as when the session peer advertises a small
+// maximum message size. The size includes the MIC reserve (kMaxTagLen).
+class SizedCommandResponder : public MockCommandResponder
+{
+public:
+    explicit SizedCommandResponder(size_t aMaxBufferSize) : mMaxBufferSize(aMaxBufferSize) {}
+    size_t GetCommandResponseMaxBufferSize() override { return mMaxBufferSize; }
+
+private:
+    size_t mMaxBufferSize;
+};
+
+// Application message lengths to test: 0 (no room at all) up to past the point where two responses fit.
+constexpr size_t kLargestTestedAppMessageLen = 96;
+
+// Large enough for every response these tests produce.
+constexpr size_t kDefaultAppMessageLen = kMaxSecureSduLengthBytes;
+
+// Returns the number of InvokeResponseIB entries across every chunk in aChunks.
+size_t CountInvokeResponses(System::PacketBufferHandle && aChunks)
+{
+    size_t count = 0;
+    while (!aChunks.IsNull())
+    {
+        System::PacketBufferTLVReader reader;
+        reader.Init(aChunks.PopHead());
+        InvokeResponseMessage::Parser message;
+        InvokeResponseIBs::Parser responses;
+        TLV::TLVReader responsesReader;
+        EXPECT_SUCCESS(message.Init(reader));
+        EXPECT_SUCCESS(message.GetInvokeResponses(&responses));
+        responses.GetReader(&responsesReader);
+        CHIP_ERROR err;
+        while ((err = responsesReader.Next()) == CHIP_NO_ERROR)
+        {
+            count++;
+        }
+        EXPECT_EQ(err, CHIP_END_OF_TLV);
+    }
+    return count;
+}
+
+void ExpectAddedOrOutOfSpace(CHIP_ERROR err)
+{
+    EXPECT_TRUE(err == CHIP_NO_ERROR || err == CHIP_ERROR_NO_MEMORY);
+}
+
+} // namespace
+
+size_t TestCommandInteraction::AddTwoResponsesAndCount(size_t aAppMessageLen, FirstResponse aFirst)
+{
+    const ConcreteCommandPath path1 = { kTestEndpointId, kTestClusterId, kTestCommandIdWithData };
+    const ConcreteCommandPath path2 = { kTestEndpointId2, kTestClusterId, kTestCommandIdWithData };
+
+    BasicCommandPathRegistry<4> registry;
+    SizedCommandResponder responder(aAppMessageLen + kMaxTagLen);
+    CommandHandlerImpl::TestOnlyOverrides overrides{ &registry, &responder };
+    CommandHandlerImpl handler(overrides, &mockCommandHandlerDelegate);
+    // Two responses only happen in an invoke with more than one command, and such an invoke reserves room
+    // in each message for the MoreChunkedMessages flag.
+    handler.mReserveSpaceForMoreChunkMessages = true;
+    EXPECT_SUCCESS(registry.Add(path1, std::make_optional<uint16_t>(1)));
+    EXPECT_SUCCESS(registry.Add(path2, std::make_optional<uint16_t>(2)));
+
+    CHIP_ERROR firstErr = CHIP_NO_ERROR;
+    if (aFirst == FirstResponse::kData)
+    {
+        SimpleTLVPayload payload;
+        firstErr = handler.AddResponseData(path1, kTestCommandIdCommandSpecificResponse, payload);
+    }
+    else
+    {
+        firstErr = handler.FallibleAddStatus(path1, Protocols::InteractionModel::Status::Success);
+    }
+    CHIP_ERROR secondErr = handler.FallibleAddStatus(path2, Protocols::InteractionModel::Status::Success);
+    ExpectAddedOrOutOfSpace(firstErr);
+    ExpectAddedOrOutOfSpace(secondErr);
+
+    const size_t added = (firstErr == CHIP_NO_ERROR ? 1u : 0u) + (secondErr == CHIP_NO_ERROR ? 1u : 0u);
+    // Finalizing fails when the last message holds no response, e.g. after a retry in a new message did not fit.
+    CHIP_ERROR finalizeErr = handler.FinalizeLastInvokeResponseMessage();
+    if (finalizeErr != CHIP_NO_ERROR)
+    {
+        EXPECT_EQ(finalizeErr, CHIP_ERROR_INCORRECT_STATE);
+    }
+    EXPECT_EQ(CountInvokeResponses(std::move(responder.mChunks)), added);
+    return added;
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_SmallResponseBufferKeepsHandlerUsable)
+{
+    for (FirstResponse first : { FirstResponse::kStatus, FirstResponse::kData })
+    {
+        size_t previous = 0;
+        for (size_t appMessageLen = 0; appMessageLen <= kLargestTestedAppMessageLen; appMessageLen++)
+        {
+            size_t added = AddTwoResponsesAndCount(appMessageLen, first);
+            // A larger buffer never fits fewer responses.
+            EXPECT_GE(added, previous);
+            previous = added;
+        }
+        EXPECT_EQ(previous, 2u);
+        EXPECT_EQ(AddTwoResponsesAndCount(kDefaultAppMessageLen, first), 2u);
+    }
+}
+
+size_t TestCommandInteraction::InvokeTwoCommandsAndCountResponses(size_t aAppMessageLen)
+{
+    const EndpointId endpoints[] = { kTestEndpointId, kTestEndpointId2 };
+
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
+    app::CommandSender::ConfigParameters configParameters;
+    configParameters.SetRemoteMaxPathsPerInvoke(2);
+    EXPECT_SUCCESS(commandSender.SetCommandSenderConfig(configParameters));
+
+    for (uint16_t i = 0; i < 2; i++)
+    {
+        CommandPathParams commandPath = MakeTestCommandPath(endpoints[i], kTestClusterId, kTestCommandIdWithData);
+        app::CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.SetStartDataStruct(true).SetCommandRef(i);
+        if (commandSender.PrepareCommand(commandPath, prepareCommandParams) != CHIP_NO_ERROR)
+        {
+            ADD_FAILURE();
+            return 0;
+        }
+        TLV::TLVWriter * writer = commandSender.GetCommandDataIBTLVWriter();
+        if (writer == nullptr)
+        {
+            ADD_FAILURE();
+            return 0;
+        }
+        EXPECT_SUCCESS(writer->PutBoolean(chip::TLV::ContextTag(1), true));
+        app::CommandSender::FinishCommandParameters finishCommandParams;
+        finishCommandParams.SetEndDataStruct(true).SetCommandRef(i);
+        EXPECT_SUCCESS(commandSender.FinishCommand(finishCommandParams));
+    }
+
+    System::PacketBufferHandle commandDatabuf;
+    EXPECT_SUCCESS(commandSender.Finalize(commandDatabuf));
+
+    BasicCommandPathRegistry<4> registry;
+    SizedCommandResponder responder(aAppMessageLen + kMaxTagLen);
+    CommandHandlerImpl::TestOnlyOverrides overrides{ &registry, &responder };
+    CommandHandlerImpl commandHandler(overrides, &mockCommandHandlerDelegate);
+    // Allow two paths per invoke, as a build with CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1 does.
+    commandHandler.mMaxPathsPerInvoke = 2;
+
+    sendResponse           = true;
+    commandDispatchedCount = 0;
+    Protocols::InteractionModel::Status status =
+        commandHandler.OnInvokeCommandRequest(responder, std::move(commandDatabuf), /* isTimedInvoke = */ false);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(commandDispatchedCount, 2u);
+    // Dropped responses are not reported yet, see TODO(#30453) in AddStatus.
+    EXPECT_FALSE(responder.mResponseDropped);
+    return CountInvokeResponses(std::move(responder.mChunks));
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_SmallResponseBufferTwoCommandInvoke)
+{
+    size_t previous = 0;
+    for (size_t appMessageLen = 0; appMessageLen <= kLargestTestedAppMessageLen; appMessageLen++)
+    {
+        size_t received = InvokeTwoCommandsAndCountResponses(appMessageLen);
+        EXPECT_LE(received, 2u);
+        EXPECT_GE(received, previous);
+        previous = received;
+    }
+    EXPECT_EQ(previous, 2u);
+    EXPECT_EQ(InvokeTwoCommandsAndCountResponses(kDefaultAppMessageLen), 2u);
 }
 
 } // namespace app
