@@ -26,6 +26,7 @@ namespace app {
 namespace {
 
 constexpr System::Clock::Seconds16 kIncreaseTemperatureIntervalSec = System::Clock::Seconds16(10);
+constexpr int16_t kTemperatureStepCentiCelsius                     = 1;
 
 } // namespace
 
@@ -75,24 +76,23 @@ void IncreasingTemperatureSensor::UnregisterAdditionalClusters(CodeDrivenDataMod
 
 void IncreasingTemperatureSensor::TimerFired()
 {
+    auto & cluster = mTemperatureMeasurementCluster.Cluster();
+
+    const DataModel::Nullable<int16_t> maxTempAttr = cluster.GetMaxMeasuredValue();
     const int16_t minTemp =
-        mTempConfig.minMeasuredValue.ValueOr(!mTempConfig.maxMeasuredValue.IsNull() && mTempConfig.maxMeasuredValue.Value() < -1000
-                                                 ? mTempConfig.maxMeasuredValue.Value()
-                                                 : -1000);
-    const int16_t maxTemp = mTempConfig.maxMeasuredValue.ValueOr(INT16_MAX);
+        cluster.GetMinMeasuredValue().ValueOr(!maxTempAttr.IsNull() && maxTempAttr.Value() < -1000 ? maxTempAttr.Value() : -1000);
+    const int16_t maxTemp = maxTempAttr.ValueOr(INT16_MAX);
 
-    // Simulate increasing temperature
-    if (mTemperatureMeasuredValue.IsNull() || mTemperatureMeasuredValue.Value() >= maxTemp)
+    const DataModel::Nullable<int16_t> currentTemp = cluster.GetMeasuredValue();
+    int16_t nextTemp                               = minTemp;
+    if (!currentTemp.IsNull() && currentTemp.Value() >= minTemp &&
+        static_cast<int32_t>(currentTemp.Value()) + kTemperatureStepCentiCelsius <= maxTemp)
     {
-        mTemperatureMeasuredValue.SetNonNull(minTemp);
-    }
-    else
-    {
-        mTemperatureMeasuredValue.SetNonNull(static_cast<int16_t>(mTemperatureMeasuredValue.Value() + 1));
+        nextTemp = static_cast<int16_t>(currentTemp.Value() + kTemperatureStepCentiCelsius);
     }
 
-    ChipLogProgress(AppServer, "IncreasingTemperatureValue: Increasing to %d", mTemperatureMeasuredValue.Value());
-    LogErrorOnFailure(mTemperatureMeasurementCluster.Cluster().SetMeasuredValue(mTemperatureMeasuredValue));
+    ChipLogProgress(AppServer, "IncreasingTemperatureValue: Increasing to %d", nextTemp);
+    LogErrorOnFailure(cluster.SetMeasuredValue(DataModel::MakeNullable(nextTemp)));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreaseTemperatureIntervalSec));
 }

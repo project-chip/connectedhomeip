@@ -41,7 +41,7 @@
 #include "OTARequestorInitiator.h"
 #endif
 
-#if CHIP_APP_FAILSAFE_EARLY_EXPIRY
+#if CONFIG_CHIP_APP_FAILSAFE_EARLY_EXPIRY
 #include <app/server/Server.h>
 #include <openthread/thread.h>
 #include <platform/ThreadStackManager.h>
@@ -55,7 +55,7 @@ using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
 
-#if CHIP_APP_FAILSAFE_EARLY_EXPIRY
+#if CONFIG_CHIP_APP_FAILSAFE_EARLY_EXPIRY
 namespace {
 constexpr uint32_t kMaxAttachAttemptsAfterBleLoss = 3;
 constexpr System::Clock::Seconds32 kAttachPollInterval(1);
@@ -91,6 +91,16 @@ void ResetEarlyExpiry()
     sAttachBaseline         = 0;
 }
 
+// Schedules the next attach poll. On failure, stop the watch and fall back to the natural fail-safe expiry.
+void ScheduleAttachPoll()
+{
+    if (SystemLayer().StartTimer(kAttachPollInterval, PollAttach, nullptr) != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Fail-safe early expiry: cannot schedule attach poll");
+        ResetEarlyExpiry();
+    }
+}
+
 void ExpireFailSafe(const char * reason)
 {
     ChipLogProgress(AppServer, "Fail-safe early expiry: %s", reason);
@@ -120,7 +130,7 @@ void PollAttach(System::Layer *, void *)
         return;
     }
 
-    TEMPORARY_RETURN_IGNORED SystemLayer().StartTimer(kAttachPollInterval, PollAttach, nullptr);
+    ScheduleAttachPoll();
 }
 
 // Fail-safe armed for a PASE commissioning session carried over BLE
@@ -166,7 +176,7 @@ void StartAttachWatch()
 
     sAttachWatch = true;
     ChipLogProgress(AppServer, "Fail-safe early expiry: CHIPoBLE closed after ConnectNetwork, Thread restarted");
-    TEMPORARY_RETURN_IGNORED SystemLayer().StartTimer(kAttachPollInterval, PollAttach, nullptr);
+    ScheduleAttachPoll();
 }
 
 void HandleFailSafeEarlyExpiry(const ChipDeviceEvent * event)
@@ -195,7 +205,7 @@ void HandleFailSafeEarlyExpiry(const ChipDeviceEvent * event)
         ble.ClearChipobleConId();
         VerifyOrReturn(IsBleCommissioningFailSafe());
 
-        if (!sConnectNetworkReceived)
+        if (!sConnectNetworkReceived && !ConnectivityMgr().IsThreadProvisioned())
         {
             // Case (i): PASE over BLE was the only bearer, so it cannot be recovered.
             ExpireFailSafe("CHIPoBLE closed before ConnectNetwork");
@@ -203,7 +213,7 @@ void HandleFailSafeEarlyExpiry(const ChipDeviceEvent * event)
         }
 
         // Already on the operational network: the commissioner may continue over CASE.
-        // StartAttachWatch() re-checks this undet the Thread stack lock.
+        // StartAttachWatch() re-checks this under the Thread stack lock.
         VerifyOrReturn(!ConnectivityMgr().IsThreadAttached());
 
         // Case (ii)
@@ -228,12 +238,12 @@ void HandleFailSafeEarlyExpiry(const ChipDeviceEvent * event)
     }
 }
 } // namespace
-#endif // CHIP_APP_FAILSAFE_EARLY_EXPIRY
+#endif // CONFIG_CHIP_APP_FAILSAFE_EARLY_EXPIRY
 
 void chip::NXP::App::CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
     ChipLogDetail(DeviceLayer, "DeviceEventCallback: 0x%04x", event->Type);
-#if CHIP_APP_FAILSAFE_EARLY_EXPIRY
+#if CONFIG_CHIP_APP_FAILSAFE_EARLY_EXPIRY
     HandleFailSafeEarlyExpiry(event);
 #endif
     switch (event->Type)

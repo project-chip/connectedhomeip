@@ -4112,6 +4112,18 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                                                attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeNOCsID)];
 
     void (^checkNOCsReadIsNotFabricFiltered)(MTRReadParams * _Nullable) = ^(MTRReadParams * _Nullable params) {
+        // Ensure that MTRDevice does not coalesce our read with a previous read
+        // that's still in its work queue.  The queue runs one item at a time,
+        // so once a marker item runs, every earlier work item has completed.
+        XCTestExpectation * earlierWorkItemsCompletedExpectation = [self expectationWithDescription:@"Earlier work items completed"];
+        MTRAsyncWorkItem * markerWorkItem = [[MTRAsyncWorkItem alloc] initWithQueue:queue];
+        [markerWorkItem setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+            completion(MTRAsyncWorkComplete);
+            [earlierWorkItemsCompletedExpectation fulfill];
+        }];
+        [device.asyncWorkQueue enqueueWorkItem:markerWorkItem description:@"Marker before NOCs read"];
+        [self waitForExpectations:@[ earlierWorkItemsCompletedExpectation ] timeout:kTimeoutInSeconds];
+
         XCTestExpectation * readFromDeviceExpectation = [self expectationWithDescription:@"NOCs read from device"];
         __block NSArray * nocsReadFromDevice;
         delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
