@@ -606,8 +606,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     //
     // TODO: That's not technically InvalidAction, and we should probably make
     // our callees hand out Status as well.
-    Status status = Status::InvalidAction;
-
+    Status status                = Status::InvalidAction;
     mLastSuccessfullyWrittenPath = std::nullopt;
 
     reader.Init(std::move(aPayload));
@@ -620,6 +619,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
     bool boolValue;
 
+<<<<<<< HEAD
     boolValue = mStateFlags.Has(StateBits::kSuppressResponse);
     err       = writeRequestParser.GetSuppressResponse(&boolValue);
     if (err == CHIP_END_OF_TLV)
@@ -631,6 +631,16 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 
     boolValue = mStateFlags.Has(StateBits::kIsTimedRequest);
     err       = writeRequestParser.GetTimedRequest(&boolValue);
+=======
+    // SuppressResponse may be omitted when false, so do not inherit its value from a previous message.
+    boolValue = false;
+    err       = writeRequestParser.GetSuppressResponse(&boolValue).NoErrorIf(CHIP_END_OF_TLV);
+    SuccessOrExit(err);
+    mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
+
+    boolValue = false;
+    err       = writeRequestParser.GetTimedRequest(&boolValue).NoErrorIf(CHIP_END_OF_TLV);
+>>>>>>> f4f4cdd ([IM] Remove the encoding for the SuppressRespond and TimedRequest (#75091))
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 

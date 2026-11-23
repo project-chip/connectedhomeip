@@ -340,7 +340,7 @@ TEST_F(TestAclAttribute, AccessDeniedPrecedenceOverUnsupportedEndpoint_Write)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         AttributePathParams attributePathParams;
         attributePathParams.mEndpointId  = kTestUnsupportedEndpointId;
@@ -380,7 +380,7 @@ TEST_F(TestAclAttribute, AccessDeniedPrecedenceOverUnsupportedEndpoint_Write)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         AttributePathParams attributePathParams;
         attributePathParams.mEndpointId  = kTestUnsupportedEndpointId;
@@ -423,7 +423,7 @@ TEST_F(TestAclAttribute, AccessDeniedPrecedenceOverUnsupportedCluster_Write)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         AttributePathParams attributePathParams;
         attributePathParams.mEndpointId  = kTestDeniedEndpointId;
@@ -463,7 +463,7 @@ TEST_F(TestAclAttribute, AccessDeniedPrecedenceOverUnsupportedCluster_Write)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         AttributePathParams attributePathParams;
         attributePathParams.mEndpointId  = kTestEndpointId;
@@ -506,7 +506,7 @@ TEST_F(TestAclAttribute, AccessDeniedPrecedenceOverUnsupportedAttribute_Write)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         AttributePathParams attributePathParams;
         attributePathParams.mEndpointId  = kTestDeniedEndpointId;
@@ -546,7 +546,7 @@ TEST_F(TestAclAttribute, AccessDeniedPrecedenceOverUnsupportedAttribute_Write)
         EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
                   CHIP_NO_ERROR);
 
-        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
         AttributePathParams attributePathParams;
         attributePathParams.mEndpointId  = kTestEndpointId;
@@ -626,7 +626,7 @@ TEST_F(TestAclAttribute, LegacyEncodingCacheReuseDuringWrite)
     auto * engine = InteractionModelEngine::GetInstance();
 
     TestWriteClientCallback callback;
-    WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+    WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
 
     // Encode Attribute
     uint8_t tlvBuf[64];
@@ -666,5 +666,96 @@ TEST_F(TestAclAttribute, LegacyEncodingCacheReuseDuringWrite)
     Access::GetAccessControl().Finish();
 }
 
+<<<<<<< HEAD
+=======
+// A cached write grant must apply only to its exact path; any other path is re-checked against the current ACL.
+void TestAclAttribute::ExpectSecondWriteDeniedAfterRevoke(const AttributePathParams & firstPath,
+                                                          const AttributePathParams & secondPath)
+{
+    using namespace Protocols::InteractionModel;
+
+    WriterRevokedAfterFirstAttributeDataIBDelegate aclDelegate;
+    Access::GetAccessControl().Finish();
+    EXPECT_SUCCESS(Access::GetAccessControl().Init(&aclDelegate, gDeviceTypeResolver));
+
+    auto * engine = InteractionModelEngine::GetInstance();
+
+    TestWriteClientCallback callback;
+    WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
+    EXPECT_SUCCESS(writeClient.EncodeAttribute(firstPath, static_cast<uint8_t>(1)));
+    EXPECT_SUCCESS(writeClient.EncodeAttribute(secondPath, static_cast<uint8_t>(2)));
+    EXPECT_SUCCESS(writeClient.SendWriteRequest(GetSessionBobToAlice()));
+    DrainAndServiceIO();
+
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnSuccessCalled, 2);
+    EXPECT_EQ(callback.mFirstStatus.mStatus, Status::Success);
+    EXPECT_EQ(callback.mStatus.mStatus, Status::UnsupportedAccess);
+    EXPECT_EQ(callback.mFirstPath.mEndpointId, firstPath.mEndpointId);
+    EXPECT_EQ(callback.mFirstPath.mClusterId, firstPath.mClusterId);
+    EXPECT_EQ(callback.mFirstPath.mAttributeId, firstPath.mAttributeId);
+    EXPECT_EQ(callback.mLastPath.mEndpointId, secondPath.mEndpointId);
+    EXPECT_EQ(callback.mLastPath.mClusterId, secondPath.mClusterId);
+    EXPECT_EQ(callback.mLastPath.mAttributeId, secondPath.mAttributeId);
+    EXPECT_TRUE(aclDelegate.mWriterRevoked);
+    // The UnsupportedAccess above comes from WriterRevokedAfterFirstAttributeDataIBDelegate, not from the path. Exactly 3 checks:
+    // 2 for the first write, then the second write's kView check, which is denied. A cache hit would make it 2.
+    EXPECT_EQ(aclDelegate.mCheckCount, 3);
+
+    Access::GetAccessControl().Finish();
+}
+
+// Two scalar writes to the same path: the second reuses the first write's grant even though the writer was revoked in between,
+// so the cache applies to ordinary attribute writes and not only to legacy-encoded ACL list writes.
+TEST_F(TestAclAttribute, WriteCacheReusesGrantForSamePathScalarWrite)
+{
+    using namespace Protocols::InteractionModel;
+
+    WriterRevokedAfterFirstAttributeDataIBDelegate aclDelegate;
+    Access::GetAccessControl().Finish();
+    EXPECT_SUCCESS(Access::GetAccessControl().Init(&aclDelegate, gDeviceTypeResolver));
+
+    auto * engine = InteractionModelEngine::GetInstance();
+
+    const AttributePathParams path(kTestEndpointId, kTestClusterId, kTestAttributeId);
+    TestWriteClientCallback callback;
+    WriteClient writeClient(engine->GetExchangeManager(), &callback, std::nullopt, Optional<uint16_t>::Missing());
+    EXPECT_SUCCESS(writeClient.EncodeAttribute(path, static_cast<uint8_t>(1)));
+    EXPECT_SUCCESS(writeClient.EncodeAttribute(path, static_cast<uint8_t>(2)));
+    EXPECT_SUCCESS(writeClient.SendWriteRequest(GetSessionBobToAlice()));
+    DrainAndServiceIO();
+
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnSuccessCalled, 2);
+    EXPECT_EQ(callback.mFirstStatus.mStatus, Status::Success);
+    EXPECT_EQ(callback.mStatus.mStatus, Status::Success);
+    EXPECT_TRUE(aclDelegate.mWriterRevoked);
+    // 2 checks for the first write; the second write hits the cache and is not checked.
+    EXPECT_EQ(aclDelegate.mCheckCount, 2);
+
+    Access::GetAccessControl().Finish();
+}
+
+TEST_F(TestAclAttribute, WriteCacheDoesNotLeakAcrossDifferentEndpoint)
+{
+    ExpectSecondWriteDeniedAfterRevoke(AttributePathParams(kTestEndpointId, kTestClusterId, kTestAttributeId),
+                                       AttributePathParams(kOtherEndpointId, kTestClusterId, kTestAttributeId));
+}
+
+TEST_F(TestAclAttribute, WriteCacheDoesNotLeakAcrossDifferentCluster)
+{
+    ExpectSecondWriteDeniedAfterRevoke(AttributePathParams(kTestEndpointId, kTestClusterId, kTestAttributeId),
+                                       AttributePathParams(kTestEndpointId, kOtherClusterId, kTestAttributeId));
+}
+
+TEST_F(TestAclAttribute, WriteCacheDoesNotLeakAcrossDifferentAttribute)
+{
+    ExpectSecondWriteDeniedAfterRevoke(AttributePathParams(kTestEndpointId, kTestClusterId, kTestAttributeId),
+                                       AttributePathParams(kTestEndpointId, kTestClusterId, kOtherAttributeId));
+}
+
+>>>>>>> f4f4cdd ([IM] Remove the encoding for the SuppressRespond and TimedRequest (#75091))
 } // namespace app
 } // namespace chip
