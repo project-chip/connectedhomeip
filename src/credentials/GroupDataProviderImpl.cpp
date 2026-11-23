@@ -165,11 +165,7 @@ struct FabricData : public PersistableData<kPersistentBufferMax>
         FabricData fabric(fabric_list.first_entry);
         for (size_t i = 0; i < fabric_list.entry_count; i++)
         {
-            err = fabric.Load(storage);
-            if (CHIP_NO_ERROR != err)
-            {
-                break;
-            }
+            ReturnErrorOnFailure(fabric.Load(storage));
             if (fabric.fabric_index == this->fabric_index)
             {
                 // Fabric already registered
@@ -902,13 +898,16 @@ namespace {
 CHIP_ERROR SaveExistingGroupInfo(PersistentStorageDelegate * storage, GroupData & group, const GroupDataProvider::GroupInfo & info,
                                  bool groupcast_enabled, bool & aux_acl_notification_needed)
 {
-    if (groupcast_enabled && group.endpoint_count > 0 && (group.HasAuxiliaryACL() != info.HasAuxiliaryACL()))
+    const bool aux_acl_changed =
+        groupcast_enabled && group.endpoint_count > 0 && (group.HasAuxiliaryACL() != info.HasAuxiliaryACL());
+
+    group.Copy(info);
+    ReturnErrorOnFailure(group.Save(storage));
+    if (aux_acl_changed)
     {
         aux_acl_notification_needed = true;
     }
-
-    group.Copy(info);
-    return group.Save(storage);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace
@@ -2278,13 +2277,15 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
         FabricData fabric(mFabric);
         VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mProvider.mStorage), false);
 
-        if (mMapCount >= fabric.map_count)
+        KeyMapData mapping(mFabric, mFirstMap ? fabric.first_map : mMapping);
+        if (mMapCount >= fabric.map_count || CHIP_NO_ERROR != mapping.Load(mProvider.mStorage))
         {
-            // No more keyset/group mappings on the current fabric, try next fabric
+            // No more readable keyset/group mappings on the current fabric, try next fabric
             mFabric = fabric.next;
             mFabricCount++;
             mFirstMap = true;
             mMapCount = 0;
+            mKeyIndex = 0;
             continue;
         }
 
@@ -2293,9 +2294,6 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
             mMapping  = fabric.first_map;
             mFirstMap = false;
         }
-
-        KeyMapData mapping(mFabric, mMapping);
-        VerifyOrReturnError(CHIP_NO_ERROR == mapping.Load(mProvider.mStorage), false);
 
         // Group found, get the keyset
         KeySetData keyset;

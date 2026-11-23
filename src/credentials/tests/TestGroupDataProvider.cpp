@@ -1602,10 +1602,8 @@ public:
 protected:
     CHIP_ERROR SyncSetKeyValueInternal(const char * key, const void * value, uint16_t size) override
     {
-        if (key != nullptr)
-        {
-            mDistinctKeysWritten.insert(key);
-        }
+        VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        mDistinctKeysWritten.insert(key);
         return TestPersistentStorageDelegate::SyncSetKeyValueInternal(key, value, size);
     }
 
@@ -2019,6 +2017,161 @@ TEST_F(TestGroupDataProvider, TestUnlinkGroupKeysMultiBatchAndSecondBatchSaveFai
         EXPECT_SUCCESS(provider.SetGroupKey(kFabric1, kGroup3, kKeysetId2));
         provider.Finish();
     }
+}
+
+TEST_F(TestGroupDataProvider, TestSaveExistingGroupInfoDefersAuxAclNotificationUntilSaveSucceeds)
+{
+    chip::TestPersistentStorageDelegate delegate;
+    chip::Crypto::DefaultSessionKeystore keystore;
+    GroupDataProviderImpl provider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+
+    provider.SetStorageDelegate(&delegate);
+    provider.SetSessionKeystore(&keystore);
+    ASSERT_SUCCESS(provider.Init());
+    provider.SetGroupcastEnabled(true);
+
+    GroupInfo initialGroup(kGroup1, "Initial");
+    ASSERT_SUCCESS(provider.SetGroupInfoAt(kFabric1, 0, initialGroup));
+    ASSERT_SUCCESS(provider.AddEndpoint(kFabric1, kGroup1, kEndpointId1));
+    EXPECT_FALSE(provider.ConsumeAuxAclNotificationNeeded());
+
+    const std::string groupKey = DefaultStorageKeyAllocator::FabricGroup(kFabric1, kGroup1).KeyName();
+    GroupInfo auxAclGroup(kGroup1, "WithAuxAcl", static_cast<uint8_t>(GroupInfo::Flags::kHasAuxiliaryACL));
+
+    // Failed writes via both SetGroupInfoAt and SetGroupInfo must not mark an AuxACL notification pending.
+    delegate.AddPoisonKey(groupKey, /* readPattern = */ -1, /* writePattern = */ 0);
+    EXPECT_EQ(provider.SetGroupInfoAt(kFabric1, 0, auxAclGroup), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    EXPECT_FALSE(provider.ConsumeAuxAclNotificationNeeded());
+    EXPECT_EQ(provider.SetGroupInfo(kFabric1, auxAclGroup), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    EXPECT_FALSE(provider.ConsumeAuxAclNotificationNeeded());
+    delegate.ClearPoisonKeys();
+
+    // Once storage recovers, the successful save sets the pending notification.
+    EXPECT_SUCCESS(provider.SetGroupInfoAt(kFabric1, 0, auxAclGroup));
+    EXPECT_TRUE(provider.ConsumeAuxAclNotificationNeeded());
+    EXPECT_FALSE(provider.ConsumeAuxAclNotificationNeeded());
+
+    // A subsequent failed save must preserve an already-pending notification.
+    EXPECT_SUCCESS(provider.SetGroupInfo(kFabric1, initialGroup));
+    delegate.AddPoisonKey(groupKey, /* readPattern = */ -1, /* writePattern = */ 0);
+    EXPECT_EQ(provider.SetGroupInfoAt(kFabric1, 0, auxAclGroup), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    delegate.ClearPoisonKeys();
+    EXPECT_TRUE(provider.ConsumeAuxAclNotificationNeeded());
+
+    provider.Finish();
+}
+
+TEST_F(TestGroupDataProvider, TestFabricRegisterReturnsReadErrorWithoutCorruptingFabricList)
+{
+    chip::TestPersistentStorageDelegate delegate;
+    chip::Crypto::DefaultSessionKeystore keystore;
+    GroupDataProviderImpl provider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+
+    provider.SetStorageDelegate(&delegate);
+    provider.SetSessionKeystore(&keystore);
+    ASSERT_SUCCESS(provider.Init());
+    provider.SetGroupcastEnabled(true);
+
+    // Register kFabric2 first so FabricList is kFabric1 -> kFabric2.
+    ASSERT_SUCCESS(provider.SetKeySet(kFabric2, kCompressedFabricId2, kKeySet2));
+    ASSERT_SUCCESS(provider.SetGroupInfo(kFabric2, kGroupInfo2_1));
+    ASSERT_SUCCESS(provider.SetGroupKey(kFabric2, kGroup1, kKeysetId2));
+
+    ASSERT_SUCCESS(provider.SetGroupInfo(kFabric1, kGroupInfo1_1));
+
+    auto * fabric2KeyContext = provider.GetKeyContext(kFabric2, kGroup1);
+    ASSERT_NE(fabric2KeyContext, nullptr);
+    const uint16_t fabric2SessionId = fabric2KeyContext->GetKeyHash();
+    fabric2KeyContext->Release();
+
+    // Allow the initial fabric.Load() in SetGroupInfoAt to succeed, then fail the scan read inside FabricData::Register().
+    const std::string fabric1Key = DefaultStorageKeyAllocator::FabricGroups(kFabric1).KeyName();
+    delegate.AddPoisonKey(fabric1Key, /* readPattern = */ 0b1, /* writePattern = */ -1);
+    EXPECT_EQ(provider.SetGroupInfoAt(kFabric1, 1, kGroupInfo1_2), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    delegate.ClearPoisonKeys();
+
+    // FabricList must not have self-linked or duplicated kFabric1; kFabric2 remains reachable.
+    auto * sessionIter = provider.IterateGroupSessions(fabric2SessionId);
+    ASSERT_NE(sessionIter, nullptr);
+    EXPECT_EQ(sessionIter->Count(), 1u);
+    GroupSession session;
+    EXPECT_TRUE(sessionIter->Next(session));
+    EXPECT_EQ(session.fabric_index, kFabric2);
+    EXPECT_EQ(session.group_id, kGroup1);
+    EXPECT_FALSE(sessionIter->Next(session));
+    sessionIter->Release();
+
+    provider.Finish();
+}
+
+TEST_F(TestGroupDataProvider, TestGroupSessionIteratorAdvancesPastUnreadableMappingToNextFabric)
+{
+    chip::TestPersistentStorageDelegate delegate;
+    chip::Crypto::DefaultSessionKeystore keystore;
+    GroupDataProviderImpl provider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+
+    provider.SetStorageDelegate(&delegate);
+    provider.SetSessionKeystore(&keystore);
+    ASSERT_SUCCESS(provider.Init());
+    provider.SetGroupcastEnabled(true);
+
+    // Register kFabric2 first so FabricList visits kFabric1 before kFabric2.
+    ASSERT_SUCCESS(provider.SetKeySet(kFabric2, kCompressedFabricId2, kKeySet2));
+    ASSERT_SUCCESS(provider.SetGroupInfo(kFabric2, kGroupInfo2_1));
+    ASSERT_SUCCESS(provider.SetGroupKey(kFabric2, kGroup1, kKeysetId2));
+
+    ASSERT_SUCCESS(provider.SetKeySet(kFabric1, kCompressedFabricId1, kKeySet1));
+    ASSERT_SUCCESS(provider.SetGroupInfo(kFabric1, kGroupInfo1_1));
+    ASSERT_SUCCESS(provider.SetGroupInfo(kFabric1, kGroupInfo1_2));
+    ASSERT_SUCCESS(provider.SetGroupInfo(kFabric1, kGroupInfo1_3));
+    ASSERT_SUCCESS(provider.SetGroupKeyAt(kFabric1, 0, GroupKey(kGroup1, kKeysetId1)));
+    ASSERT_SUCCESS(provider.SetGroupKeyAt(kFabric1, 1, GroupKey(kGroup2, kKeysetId1)));
+    ASSERT_SUCCESS(provider.SetGroupKeyAt(kFabric1, 2, GroupKey(kGroup3, kKeysetId1)));
+
+    auto * fabric1KeyContext = provider.GetKeyContext(kFabric1, kGroup1);
+    ASSERT_NE(fabric1KeyContext, nullptr);
+    const uint16_t fabric1SessionId = fabric1KeyContext->GetKeyHash();
+    fabric1KeyContext->Release();
+
+    auto * fabric2KeyContext = provider.GetKeyContext(kFabric2, kGroup1);
+    ASSERT_NE(fabric2KeyContext, nullptr);
+    const uint16_t fabric2SessionId = fabric2KeyContext->GetKeyHash();
+    fabric2KeyContext->Release();
+
+    // Fail both fabric.Save() and the subsequent RestorePredecessors() write on link 1, leaving kFabric1
+    // with persisted map_count == 3 and only two reachable links (1 -> 3 -> 0).
+    const std::string fabric1Key = DefaultStorageKeyAllocator::FabricGroups(kFabric1).KeyName();
+    const std::string predMapKey = DefaultStorageKeyAllocator::FabricGroupKey(kFabric1, 1).KeyName();
+    delegate.AddPoisonKey(fabric1Key, /* readPattern = */ -1, /* writePattern = */ 0);
+    delegate.AddPoisonKey(predMapKey, /* readPattern = */ -1, /* writePattern = */ 0b1);
+    EXPECT_EQ(provider.RemoveGroupInfo(kFabric1, kGroup2), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    delegate.ClearPoisonKeys();
+
+    // Even with a truncated chain on kFabric1, GroupSessionIterator must still yield kFabric1's reachable
+    // sessions and advance to kFabric2 rather than aborting cross-fabric iteration.
+    auto * fabric1Iter = provider.IterateGroupSessions(fabric1SessionId);
+    ASSERT_NE(fabric1Iter, nullptr);
+    EXPECT_EQ(fabric1Iter->Count(), 2u);
+    GroupSession session;
+    EXPECT_TRUE(fabric1Iter->Next(session));
+    EXPECT_EQ(session.fabric_index, kFabric1);
+    EXPECT_EQ(session.group_id, kGroup1);
+    EXPECT_TRUE(fabric1Iter->Next(session));
+    EXPECT_EQ(session.fabric_index, kFabric1);
+    EXPECT_EQ(session.group_id, kGroup3);
+    EXPECT_FALSE(fabric1Iter->Next(session));
+    fabric1Iter->Release();
+
+    auto * fabric2Iter = provider.IterateGroupSessions(fabric2SessionId);
+    ASSERT_NE(fabric2Iter, nullptr);
+    EXPECT_EQ(fabric2Iter->Count(), 1u);
+    EXPECT_TRUE(fabric2Iter->Next(session));
+    EXPECT_EQ(session.fabric_index, kFabric2);
+    EXPECT_EQ(session.group_id, kGroup1);
+    EXPECT_FALSE(fabric2Iter->Next(session));
+    fabric2Iter->Release();
+
+    provider.Finish();
 }
 
 } // namespace TestGroups
