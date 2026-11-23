@@ -864,7 +864,7 @@ config HEAP_MEM_POOL_SIZE
 	default 122880
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
-	default 8192 if SOC_SERIES_MCXW7XX # 8 kB
+	default 9216 if SOC_SERIES_MCXW7XX # 9 kB
 	default 28672 # 28 kB
 
 # Enable heap watermarks support for SoftwareDiagnostics cluster
@@ -951,6 +951,9 @@ config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
 # the SGI-PKC HW driver are dropped from the image (Flash/RAM saving).
 config TF_PSA_CRYPTO_USER_CONFIG_FILE
 	default "nxp_mcxw70_psa_crypto_config.h" if PSA_CRYPTO_DRIVER_SGI_PKC
+
+config MBEDTLS_NIST_KW_C
+	default y if NXP_FACTORY_DAC_BLOB_GENERATION && SOC_FAMILY_NXP_RW
 
 
 endif # CHIP_CRYPTO_PSA

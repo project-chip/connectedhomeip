@@ -20,6 +20,9 @@ impl/LoggingOnOffLight -> OnOffLight (Device Type) -> OnOffLoad (Capability) -> 
     of OnOff/Identify/Scenes/Groups.
 -   **`fan-load`** (`FanLoad`): Shared FanControl, Identify, Groups, and
     optional OnOff wiring.
+-   **`service-area`** (`impl/LoggingServiceAreaStorageDelegate`): In-memory
+    Service Area list storage shared by the device types that mandate or enable
+    the Service Area cluster.
 
 ## Architectural Guidelines (When NOT to Use Capabilities)
 

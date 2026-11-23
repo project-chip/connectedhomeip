@@ -88,6 +88,7 @@ static_library("camera-controller-utils") {
   deps = [
     "${chip_root}/src/app:events",
     "${chip_root}/src/app/clusters/webrtc-transport-requestor-server",
+    "webrtc-manager:offer-stream-validation",
   ]
 
   sources += [ "commands/interactive/InteractiveCommands.cpp" ]

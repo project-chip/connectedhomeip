@@ -185,6 +185,14 @@ struct ExpectedCall
 };
 
 CHIP_ERROR AddExpectedCall(const ExpectedCall & call);
+
+/**
+ * Makes ChipDnssdResolve report a successful resolution with these addresses, in this
+ * order, by calling its callback before it returns. Until this is called, and after
+ * Reset(), ChipDnssdResolve returns CHIP_ERROR_NOT_IMPLEMENTED.
+ */
+CHIP_ERROR SetResolvedAddresses(Span<const Inet::IPAddress> addresses);
+
 void Reset();
 
 } // namespace test
