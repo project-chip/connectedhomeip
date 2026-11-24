@@ -146,6 +146,8 @@
 #define CHIP_CONFIG_MEMORY_MGMT_PLATFORM 1
 #define CHIP_CONFIG_MEMORY_MGMT_MALLOC 0
 
+#include <app/icd/server/ICDServerConfig.h>
+
 #if (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
 
 #if (CHIP_CONFIG_ENABLE_ICD_LIT == 1)
