@@ -28,14 +28,21 @@ from enum import IntEnum
 from urllib.parse import urljoin
 
 import requests
+import urllib3
 
 # Upper bound for a single request to the Cirque service. Generous enough for
 # the controller scripts run through device_cmd, but avoids hanging forever if
 # the service stops responding.
 REQUEST_TIMEOUT_SEC = 600
-# Bounded timeout for cleanup calls after SIGTERM so logs/destroy_home finish
-# before cirque_tests.sh's --kill-after=30s sends SIGKILL.
-CLEANUP_TIMEOUT_SEC = 10
+# Bounded total teardown budget after SIGTERM so log collection and
+# destroy_home finish before cirque_tests.sh's --kill-after=30s sends SIGKILL.
+CLEANUP_TOTAL_TIMEOUT_SEC = 25
+# Minimum time reserved within CLEANUP_TOTAL_TIMEOUT_SEC for destroy_home().
+DESTROY_HOME_TIMEOUT_SEC = 10
+
+
+class _RequestDeadlineExceeded(requests.exceptions.Timeout):
+    """Raised when an HTTP request exceeds its wall-clock deadline."""
 
 
 class TestResult(IntEnum):
@@ -68,6 +75,7 @@ class CHIPVirtualHome:
         self.non_ap_devices = []
         self.thread_devices = []
         self.ap_devices = []
+        self._cleanup_deadline = None
 
         for device in device_config.values():
             if device.get("base_image", "@default") == "@default":
@@ -75,7 +83,11 @@ class CHIPVirtualHome:
 
     # The entrance of the whole test
     def run_test(self, save_logs=True):
+        self._cleanup_deadline = None
+
         def _handle_sigterm(signum, frame):
+            if self._cleanup_deadline is None:
+                self._cleanup_deadline = time.monotonic() + CLEANUP_TOTAL_TIMEOUT_SEC
             raise _TestTerminated
 
         prev_sigterm = signal.signal(signal.SIGTERM, _handle_sigterm)
@@ -83,6 +95,7 @@ class CHIPVirtualHome:
             test_ret, terminated = self._run_test_body(save_logs)
         finally:
             signal.signal(signal.SIGTERM, prev_sigterm)
+            self._cleanup_deadline = None
         if terminated:
             raise SystemExit(143)
         return test_ret
@@ -105,18 +118,25 @@ class CHIPVirtualHome:
             # Other errors indicate a failure in system.
             test_ret = TestResult.SYSTEM_FAILURE
             traceback.print_exc(file=sys.stderr)
-        cleanup_timeout = CLEANUP_TIMEOUT_SEC if terminated else REQUEST_TIMEOUT_SEC
         if save_logs:
             try:
-                self.save_device_logs(timeout=cleanup_timeout)
+                logs_deadline = (
+                    self._cleanup_deadline - DESTROY_HOME_TIMEOUT_SEC
+                    if self._cleanup_deadline is not None
+                    else None
+                )
+                self.save_device_logs(timeout=REQUEST_TIMEOUT_SEC, deadline=logs_deadline)
             except _TestTerminated:
                 terminated = True
-                cleanup_timeout = CLEANUP_TIMEOUT_SEC
             except Exception:
                 test_ret = TestResult.SYSTEM_FAILURE
                 traceback.print_exc(file=sys.stderr)
         try:
-            self.destroy_home(timeout=cleanup_timeout)
+            if self._cleanup_deadline is not None:
+                destroy_timeout = max(1.0, self._cleanup_deadline - time.monotonic())
+                self.destroy_home(timeout=destroy_timeout, deadline=self._cleanup_deadline)
+            else:
+                self.destroy_home(timeout=REQUEST_TIMEOUT_SEC)
         except _TestTerminated:
             terminated = True
         except requests.exceptions.RequestException:
@@ -124,11 +144,85 @@ class CHIPVirtualHome:
             traceback.print_exc(file=sys.stderr)
         return test_ret, terminated
 
-    def query_api(self, end_point, args=[], binary=False, timeout=REQUEST_TIMEOUT_SEC):
-        ret = requests.get(self._build_request_url(end_point, args), timeout=timeout)
+    @staticmethod
+    def _is_read_timeout_connection_error(exc: requests.exceptions.ConnectionError) -> bool:
+        timeout_types = (urllib3.exceptions.ReadTimeoutError, TimeoutError)
+        if any(isinstance(arg, timeout_types) for arg in getattr(exc, "args", ())):
+            return True
+        return any(
+            isinstance(getattr(exc, attr, None), timeout_types)
+            for attr in ("__context__", "__cause__")
+        )
+
+    @staticmethod
+    def _set_stream_socket_timeout(resp, timeout_sec: float) -> None:
+        raw = getattr(getattr(getattr(resp.raw, "_fp", None), "fp", None), "raw", None)
+        sock = getattr(raw, "_sock", None)
+        if sock is not None:
+            sock.settimeout(timeout_sec)
+
+    @staticmethod
+    def _read_response_chunk_fallback(raw) -> bytes:
+        try:
+            return raw.read(65536, decode_content=True)
+        except TypeError:
+            return raw.read(65536)
+
+    @staticmethod
+    def _read_response_chunk(raw) -> bytes:
+        if hasattr(raw, "read1"):
+            try:
+                return raw.read1(65536, decode_content=True)
+            except TypeError:
+                # Fall through to raw.read() for streams without decode_content on read1.
+                return CHIPVirtualHome._read_response_chunk_fallback(raw)
+        return CHIPVirtualHome._read_response_chunk_fallback(raw)
+
+    def query_api(self, end_point, args=[], binary=False, timeout=REQUEST_TIMEOUT_SEC, deadline=None):
+        url = self._build_request_url(end_point, args)
+        now = time.monotonic()
+        effective_deadline = now + timeout
+        if deadline is not None:
+            effective_deadline = min(effective_deadline, deadline)
+        remaining = effective_deadline - now
+        if remaining <= 0:
+            raise _RequestDeadlineExceeded(f"Request to {url} exceeded deadline")
+
+        chunks = []
+        try:
+            with requests.get(url, timeout=remaining, stream=True) as ret:
+                while True:
+                    left = effective_deadline - time.monotonic()
+                    if left <= 0:
+                        raise _RequestDeadlineExceeded(f"Request to {url} exceeded deadline")
+                    self._set_stream_socket_timeout(ret, max(0.001, left))
+                    try:
+                        chunk = self._read_response_chunk(ret.raw)
+                    except (urllib3.exceptions.ReadTimeoutError, TimeoutError) as exc:
+                        raise _RequestDeadlineExceeded(str(exc)) from exc
+                    except urllib3.exceptions.ProtocolError as exc:
+                        raise requests.exceptions.ChunkedEncodingError(exc) from exc
+                    if not chunk:
+                        break
+                    chunks.append(chunk)
+                    if getattr(ret.raw, "closed", False) or (
+                        hasattr(ret.raw, "isclosed") and ret.raw.isclosed()
+                    ):
+                        break
+                    if time.monotonic() >= effective_deadline:
+                        raise _RequestDeadlineExceeded(f"Request to {url} exceeded deadline")
+        except requests.exceptions.ConnectionError as exc:
+            if self._is_read_timeout_connection_error(exc):
+                raise _RequestDeadlineExceeded(str(exc)) from exc
+            raise
+
+        content = b"".join(chunks)
         if binary:
-            return ret.content
-        return ret.json()
+            return content
+        try:
+            return json.loads(content)
+        except json.JSONDecodeError as exc:
+            raise requests.exceptions.JSONDecodeError(exc.msg, exc.doc, exc.pos) from exc
 
     def execute_device_cmd(self, device_id, cmd, stream=False):
         self.logger.info("device: %s exec: %s", self.get_device_pretty_id(device_id), cmd)
@@ -315,23 +409,32 @@ class CHIPVirtualHome:
                 pass
         return None
 
-    def get_device_log(self, device_id, timeout=REQUEST_TIMEOUT_SEC):
-        return self.query_api('device_log', [self.home_id, device_id], binary=True, timeout=timeout)
+    def get_device_log(self, device_id, timeout=REQUEST_TIMEOUT_SEC, deadline=None):
+        return self.query_api(
+            'device_log',
+            [self.home_id, device_id],
+            binary=True,
+            timeout=timeout,
+            deadline=deadline,
+        )
 
     def wait_for_device_output(self, device_id, pattern, timeout=1):
-        due = time.time() + timeout
+        due = time.monotonic() + timeout
         while True:
-            remaining = due - time.time()
+            remaining = due - time.monotonic()
+            if remaining <= 0:
+                break
             try:
                 log_bytes = self.get_device_log(
                     device_id,
-                    timeout=min(REQUEST_TIMEOUT_SEC, max(0.1, remaining)),
+                    timeout=min(REQUEST_TIMEOUT_SEC, remaining),
+                    deadline=due,
                 )
             except requests.exceptions.Timeout:
                 break
-            if self.sequenceMatch(log_bytes.decode(), [pattern]):
+            if self.sequenceMatch(log_bytes.decode('utf-8', errors='replace'), [pattern]):
                 return True
-            remaining = due - time.time()
+            remaining = due - time.monotonic()
             if remaining > 0:
                 time.sleep(min(1, remaining))
             else:
@@ -372,14 +475,15 @@ class CHIPVirtualHome:
             return urljoin(self.cirque_url, end_point)
         return urljoin(self.cirque_url, "{}/{}".format(end_point, '/'.join([str(argv) for argv in args])))
 
-    def destroy_home(self, timeout=REQUEST_TIMEOUT_SEC):
+    def destroy_home(self, timeout=REQUEST_TIMEOUT_SEC, deadline=None):
         if self.home_id is None:
             # setup() failed before a home was created.
             return
         home_id = self.home_id
         self.home_id = None
-        self.logger.info("destroying home: %s", home_id)
-        self.query_api('destroy_home', [home_id], timeout=timeout)
+        if self.logger is not None:
+            self.logger.info("destroying home: %s", home_id)
+        self.query_api('destroy_home', [home_id], timeout=timeout, deadline=deadline)
 
     def initialize_home(self):
         # create_home is not idempotent, so it is sent once and not retried.
@@ -422,17 +526,32 @@ class CHIPVirtualHome:
         self.ap_devices = [device for device in self.device_config.values()
                            if device['type'] == 'wifi_ap']
 
-    def save_device_logs(self, timeout=REQUEST_TIMEOUT_SEC):
+    def save_device_logs(self, timeout=REQUEST_TIMEOUT_SEC, deadline=None):
         timestamp = int(time.time())
         log_dir = os.environ.get("DEVICE_LOG_DIR")
         if log_dir is not None and not os.path.exists(log_dir):
             os.makedirs("logs")
 
         for device in self.non_ap_devices:
-            ret_log = self.get_device_log(device['id'], timeout=timeout)
+            if deadline is not None and time.monotonic() >= deadline:
+                if self.logger is not None:
+                    self.logger.warning("Cleanup log deadline reached; skipping remaining device logs")
+                break
+            try:
+                ret_log = self.get_device_log(device['id'], timeout=timeout, deadline=deadline)
+            except requests.exceptions.Timeout:
+                if deadline is not None:
+                    if self.logger is not None:
+                        self.logger.warning(
+                            "Timed out fetching logs for %s before cleanup deadline; skipping remaining device logs",
+                            self.get_device_pretty_id(device['id']),
+                        )
+                    break
+                raise
             # Use this format for easier sort
             f_name = f"{device['type']}-{timestamp}-{device['id'][:8]}.log"
-            self.logger.debug("device log name: \n%s", f_name)
+            if self.logger is not None:
+                self.logger.debug("device log name: \n%s", f_name)
             with open(os.path.join(log_dir, f_name), 'wb') as fp:
                 fp.write(ret_log)
 
