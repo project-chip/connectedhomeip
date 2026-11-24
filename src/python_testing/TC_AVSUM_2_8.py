@@ -66,11 +66,13 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
             TestStep(10, "Read the DPTZStreams attribute, verify that the new viewport is the old viewport + deltaX"),
             TestStep(11, "Setup deltaY to move the viewport down, send via DPTZRelativeMove. Verify success"),
             TestStep(12, "Read the DPTZStreams attribute, verify that the new viewport is the old viewport + deltaY"),
-            TestStep(13, "Move the viewport to the bottom right corner of the sensor, send DPTZRelativeMove with a Zoom Delta of +100%, verify the viewport is at least MinViewportResolution and remains within the sensor bounds. Send a second Zoom Delta of +100% and verify the viewport is unchanged"),
-            TestStep(14, "Repeatedly invoke DPTZRelativeMove with a Zoom Delta of -100% until the viewport stops changing, verify it fills the sensor in at least one dimension and remains within the sensor bounds"),
-            TestStep(15, "Create values of deltaX and deltaY that would move the viewport beyond the sensor's Cartesian plane"),
-            TestStep(16, "Via DPTZRelativeMove send the created values of deltaX and deltaY. Verify success"),
-            TestStep(17, "Read the DPTZStreams attribute, verify that the viewport moved by deltaX and deltaY, clamped inside the sensor with its size unchanged"),
+            TestStep(13, "Move the viewport to the bottom right corner of the sensor, send DPTZRelativeMove with a Zoom Delta of +100%.",
+                         "Verify the viewport is at least MinViewportResolution and remains within the sensor bounds."),
+            TestStep(14, "Send a Zoom Delta of +100% and verify the viewport is unchanged"),
+            TestStep(15, "Repeatedly invoke DPTZRelativeMove with a Zoom Delta of -100% until the viewport stops changing, verify it fills the sensor in at least one dimension and remains within the sensor bounds"),
+            TestStep(16, "Create values of deltaX and deltaY that would move the viewport beyond the sensor's Cartesian plane"),
+            TestStep(17, "Via DPTZRelativeMove send the created values of deltaX and deltaY. Verify success"),
+            TestStep(18, "Read the DPTZStreams attribute, verify that the viewport moved by deltaX and deltaY, clamped inside the sensor with its size unchanged"),
         ]
 
     def pics_TC_AVSUM_2_8(self) -> list[str]:
@@ -206,6 +208,7 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
         asserts.assert_true(zoomedInViewport.y2 <= sensordimensions.sensorHeight,
                             "Zoomed-in viewport exceeded the sensor height")
 
+        self.step(14)
         # A zoom-in of +100% saturates at the minimum viewport size, so a second zoom-in must
         # leave the viewport unchanged. This catches a per-call drift of the viewport origin
         # when the size is recomputed at the minimum.
@@ -213,7 +216,7 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
         asserts.assert_equal(await self.read_dptz_viewport(endpoint, videoStreamID), zoomedInViewport,
                              "Repeated zoom-in at the minimum size moved the viewport")
 
-        self.step(14)
+        self.step(15)
         # Zoom out until a further zoom-out leaves the viewport unchanged. The largest viewport keeps the
         # stream's aspect ratio, so it fills the sensor in at least one dimension but not necessarily both.
         maxviewport = await self.read_dptz_viewport(endpoint, videoStreamID)
@@ -233,7 +236,7 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
         asserts.assert_true(maxviewport.x2 <= sensordimensions.sensorWidth and maxviewport.y2 <= sensordimensions.sensorHeight,
                             f"Zoomed-out viewport {maxviewport} exceeds the sensor")
 
-        self.step(15)
+        self.step(16)
         # The viewport is at its largest size, so it fills the sensor in at least one dimension and any
         # movement right and down leaves the sensor's Cartesian plane. Use positive deltas so the direction
         # matches the reported issue, where a positive move at the full-sensor viewport pushed the viewport
@@ -241,10 +244,10 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
         deltaX = sensordimensions.sensorWidth // 10
         deltaY = sensordimensions.sensorHeight // 10
 
-        self.step(16)
+        self.step(17)
         await self.send_dptz_relative_move_command(endpoint, videoStreamID, deltaX, deltaY)
 
-        self.step(17)
+        self.step(18)
         # The move is clamped, so the viewport keeps its size and stays inside the sensor.
         expectedx1 = min(maxviewport.x1 + deltaX, sensordimensions.sensorWidth - maxwidth)
         expectedy1 = min(maxviewport.y1 + deltaY, sensordimensions.sensorHeight - maxheight)
