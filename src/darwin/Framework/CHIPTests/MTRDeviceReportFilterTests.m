@@ -23,6 +23,8 @@
 #import "MTRTestDeclarations.h"
 #import "MTRTestResponseValues.h"
 
+#import <os/lock.h>
+
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId1 = 0x12344321;
 
@@ -223,4 +225,88 @@ static const uint64_t kDeviceId1 = 0x12344321;
     XCTAssertEqualObjects(eventPaths, @[ [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(59) eventID:@(1)] ]);
     [device removeDelegate:delegate];
 }
+- (NSArray<NSDictionary<NSString *, id> *> *)_unitTestingReportAcrossEndpointCount:(NSUInteger)endpointCount dataVersion:(unsigned int)dataVersion
+{
+    NSMutableArray * report = [NSMutableArray array];
+    for (NSUInteger endpoint = 1; endpoint <= endpointCount; ++endpoint) {
+        for (NSUInteger attribute = 0; attribute < 2; ++attribute) {
+            [report addObject:@{
+                MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(endpoint) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(attribute)],
+                MTRDataKey : @ {
+                    MTRDataVersionKey : @(dataVersion),
+                    MTRTypeKey : MTRUnsignedIntegerValueType,
+                    MTRValueKey : @(attribute),
+                }
+            }];
+        }
+    }
+    return report;
+}
+
+- (void)test006_DataVersionUpdatesLogOneSummaryLinePerReport
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:[self createControllerOnTestFabric]];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device setDelegate:delegate queue:queue];
+
+    const NSUInteger clusterCount = 5;
+    NSString * deviceTag = [NSString stringWithFormat:@"node 0x%016llX", kDeviceId1];
+
+    __block os_unfair_lock linesLock = OS_UNFAIR_LOCK_INIT;
+    NSMutableArray<NSString *> * defaultLines = [NSMutableArray array];
+    NSMutableArray<NSString *> * detailLines = [NSMutableArray array];
+    MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if (![message containsString:deviceTag]) {
+            return;
+        }
+        os_unfair_lock_lock(&linesLock);
+        [(type == MTRLogTypeDetail ? detailLines : defaultLines) addObject:message];
+        os_unfair_lock_unlock(&linesLock);
+    });
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(MTRLogTypeError, nil);
+    }];
+
+    NSArray<NSString *> * (^linesContaining)(NSArray<NSString *> *, NSString *) = ^(NSArray<NSString *> * lines, NSString * text) {
+        os_unfair_lock_lock(&linesLock);
+        NSArray * matching = [lines filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF CONTAINS %@", text]];
+        os_unfair_lock_unlock(&linesLock);
+        return matching;
+    };
+    void (^clearLines)(void) = ^{
+        os_unfair_lock_lock(&linesLock);
+        [defaultLines removeAllObjects];
+        [detailLines removeAllObjects];
+        os_unfair_lock_unlock(&linesLock);
+    };
+
+    XCTestExpectation * firstEnd = [self expectationWithDescription:@"first report end"];
+    delegate.onReportEnd = ^{
+        [firstEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:[self _unitTestingReportAcrossEndpointCount:clusterCount dataVersion:1] fromSubscription:YES];
+    [self waitForExpectations:@[ firstEnd ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqual(linesContaining(defaultLines, @" updated DataVersion for <MTRClusterPath").count, 0);
+    // Until report end commits pendingDataVersion, each further attribute of a changed cluster
+    // notes the version again, so this is one Detail line per attribute (10 here), not per cluster.
+    XCTAssertGreaterThanOrEqual(linesContaining(detailLines, @" updated DataVersion for <MTRClusterPath").count, clusterCount);
+    NSString * summaryText = [NSString stringWithFormat:@"data versions updated for %lu clusters", (unsigned long) clusterCount];
+    XCTAssertEqual(linesContaining(defaultLines, summaryText).count, 1);
+
+    clearLines();
+    XCTestExpectation * unchangedEnd = [self expectationWithDescription:@"unchanged report end"];
+    delegate.onReportEnd = ^{
+        [unchangedEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:[self _unitTestingReportAcrossEndpointCount:clusterCount dataVersion:1] fromSubscription:YES];
+    [self waitForExpectations:@[ unchangedEnd ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqual(linesContaining(defaultLines, @"updated DataVersion").count, 0);
+    XCTAssertEqual(linesContaining(defaultLines, @"data versions updated").count, 0);
+}
+
 @end
