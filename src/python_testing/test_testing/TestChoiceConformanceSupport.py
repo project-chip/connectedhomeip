@@ -309,6 +309,8 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
             attribute_string="""
                 <attribute id="0" name="Attr0" type="uint16"><optionalConform choice="a"/></attribute>
                 <attribute id="1" name="Attr1" type="uint16"><otherwiseConform><provisionalConform/><optionalConform choice="a"/></otherwiseConform></attribute>
+                <attribute id="2" name="Attr2" type="uint16"><optionalConform choice="c"/></attribute>
+                <attribute id="3" name="Attr3" type="uint16"><otherwiseConform><provisionalConform/><optionalConform choice="c"><greaterOrEqualTerm><revision value="current"/><revision value="2"/></greaterOrEqualTerm></optionalConform></otherwiseConform></attribute>
             """,
             command_string="""
                 <command id="0" name="Cmd0" direction="commandToServer" response="Y"><optionalConform choice="a"/></command>
@@ -366,13 +368,14 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
         clusters[1].is_provisional = False
 
         # Attributes & Commands: 0=O.a, 1=P, O.a (tested with both allow_provisional=False and True)
+        # Attributes also include .c: 2=O.c, 3=P, [Rev>=2].c
         for ids, false_failures, true_failures in [
             ([], {'a'}, {'a'}),
             ([0], set(), set()),
             ([1], {'a'}, set()),
             ([0, 1], set(), {'a'}),
         ]:
-            info = ConformanceAssessmentData(feature_map=0, attribute_list=ids, all_command_list=ids, cluster_revision=1)
+            info = ConformanceAssessmentData(feature_map=0, attribute_list=ids + [2], all_command_list=ids, cluster_revision=1)
             self._evaluate_problems(evaluate_attribute_choice_conformance(0, 1, clusters, info, allow_provisional=False),
                                     false_failures)
             self._evaluate_problems(evaluate_attribute_choice_conformance(0, 1, clusters, info, allow_provisional=True),
@@ -380,6 +383,31 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
             self._evaluate_problems(evaluate_command_choice_conformance(0, 1, clusters, info, allow_provisional=False),
                                     false_failures)
             self._evaluate_problems(evaluate_command_choice_conformance(0, 1, clusters, info, allow_provisional=True),
+                                    true_failures)
+
+        # Conditional provisional fallback (.c): Attr2=O.c, Attr3=P, [Rev>=2].c
+        # At revision 1, [Rev>=2].c is NOT_APPLICABLE, so Attr3 is excluded from choice counts even with allow_provisional=True.
+        for attr_ids, expected_failures in [
+            ([0], {'c'}),
+            ([0, 2], set()),
+            ([0, 3], {'c'}),
+            ([0, 2, 3], set()),
+        ]:
+            info = ConformanceAssessmentData(feature_map=0, attribute_list=attr_ids, all_command_list=[], cluster_revision=1)
+            self._evaluate_problems(evaluate_attribute_choice_conformance(0, 1, clusters, info, allow_provisional=True),
+                                    expected_failures)
+
+        # At revision 2, [Rev>=2].c is applicable, so Attr3 participates when allow_provisional=True and is skipped when False.
+        for attr_ids, false_failures, true_failures in [
+            ([0], {'c'}, {'c'}),
+            ([0, 2], set(), set()),
+            ([0, 3], {'c'}, set()),
+            ([0, 2, 3], set(), {'c'}),
+        ]:
+            info = ConformanceAssessmentData(feature_map=0, attribute_list=attr_ids, all_command_list=[], cluster_revision=2)
+            self._evaluate_problems(evaluate_attribute_choice_conformance(0, 1, clusters, info, allow_provisional=False),
+                                    false_failures)
+            self._evaluate_problems(evaluate_attribute_choice_conformance(0, 1, clusters, info, allow_provisional=True),
                                     true_failures)
 
 

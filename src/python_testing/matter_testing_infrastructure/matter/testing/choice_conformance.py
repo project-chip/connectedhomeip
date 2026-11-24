@@ -15,10 +15,8 @@
 #    limitations under the License.
 #
 
-from collections.abc import Callable
-
-from matter.testing.conformance import (Choice, ConformanceAssessmentData, ConformanceDecision, ConformanceDecisionWithChoice,
-                                        otherwise)
+from matter.testing.conformance import (Choice, Conformance, ConformanceAssessmentData, ConformanceDecision,
+                                        ConformanceDecisionWithChoice, otherwise)
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import AttributePathLocation, ProblemNotice, ProblemSeverity
 from matter.testing.spec_parsing import XmlCluster
@@ -33,7 +31,7 @@ class ChoiceConformanceProblemNotice(ProblemNotice):
         self.count = count
 
 
-def _get_choice_decision(conformance: Callable, conformance_assessment_data: ConformanceAssessmentData, allow_provisional: bool) -> tuple[ConformanceDecisionWithChoice, bool]:
+def _get_choice_decision(conformance: Conformance, conformance_assessment_data: ConformanceAssessmentData, allow_provisional: bool) -> tuple[ConformanceDecisionWithChoice, bool]:
     decision_with_choice = conformance(conformance_assessment_data)
     if decision_with_choice.decision == ConformanceDecision.PROVISIONAL:
         if allow_provisional and isinstance(conformance, otherwise):
