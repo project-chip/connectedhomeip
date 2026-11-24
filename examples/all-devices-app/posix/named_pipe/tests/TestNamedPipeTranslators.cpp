@@ -581,6 +581,9 @@ TEST_F(TestNamedPipeTranslators, HeatPumpTranslator)
     EXPECT_EQ(translator.TranslateAndExecute(3, ParseJson(R"({"Name": "HeatPumpSetpointRaiseLower", "Mode": 0, "Amount": 200})"),
                                              mRegistry),
               CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(translator.TranslateAndExecute(
+                  3, ParseJson(R"({"Name": "HeatPumpSetpointRaiseLower", "Mode": 0, "Amount": 18446744073709551615})"), mRegistry),
+              CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(translator.TranslateAndExecute(3, ParseJson(R"({"Name": "HeatPumpSetpointRaiseLower", "Mode": -1, "Amount": 5})"),
                                              mRegistry),
               CHIP_ERROR_INVALID_ARGUMENT);

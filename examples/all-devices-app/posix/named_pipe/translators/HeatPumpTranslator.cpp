@@ -26,7 +26,7 @@ namespace {
 
 std::optional<int8_t> ExtractInt8(const Json::Value & json, const char * key)
 {
-    if (!json.isMember(key) || !json[key].isIntegral())
+    if (!json.isMember(key) || !json[key].isIntegral() || !json[key].isInt64())
     {
         return std::nullopt;
     }
