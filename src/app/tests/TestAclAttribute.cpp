@@ -55,6 +55,12 @@ using namespace chip::Testing;
 constexpr AttributeId kTestUnsupportedAttributeId = 77;
 constexpr AttributeId kTestAttributeId            = 4;
 
+// Each differs from {kTestEndpointId, kTestClusterId, kTestAttributeId} in one field and exists in TestMockNodeConfig(), so a
+// write to it reaches the ACL check instead of failing as an unsupported path.
+constexpr EndpointId kOtherEndpointId   = kTestDeniedEndpointId; // endpoint with kTestClusterId / kTestAttributeId
+constexpr ClusterId kOtherClusterId     = kTestDeniedClusterId2; // cluster on kTestEndpointId with kTestAttributeId
+constexpr AttributeId kOtherAttributeId = 1;                     // attribute 1 of kTestClusterId on kTestEndpointId
+
 const MockNodeConfig & TestMockNodeConfig()
 {
     using namespace chip::app;
@@ -147,10 +153,22 @@ public:
 class TestWriteClientCallback : public WriteClient::Callback
 {
 public:
-    void ResetCounter() { mOnSuccessCalled = mOnErrorCalled = mOnDoneCalled = 0; }
+    void ResetCounter()
+    {
+        mOnSuccessCalled = mOnErrorCalled = mOnDoneCalled = 0;
+        mFirstStatus                                      = StatusIB();
+        mFirstPath                                        = ConcreteDataAttributePath();
+        mLastPath                                         = ConcreteDataAttributePath();
+    }
     void OnResponse(const WriteClient * apWriteClient, const ConcreteDataAttributePath & path, StatusIB status) override
     {
-        mStatus = status;
+        if (mOnSuccessCalled == 0)
+        {
+            mFirstStatus = status;
+            mFirstPath   = path;
+        }
+        mLastPath = path;
+        mStatus   = status;
         mOnSuccessCalled++;
     }
     void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override
@@ -164,6 +182,9 @@ public:
     int mOnSuccessCalled = 0;
     int mOnErrorCalled   = 0;
     int mOnDoneCalled    = 0;
+    StatusIB mFirstStatus;
+    ConcreteDataAttributePath mFirstPath;
+    ConcreteDataAttributePath mLastPath;
     StatusIB mStatus;
     StatusIB mLastErrorReason;
     CHIP_ERROR mError = CHIP_NO_ERROR;
@@ -192,6 +213,9 @@ public:
         AppContext::TearDown();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
     }
+
+protected:
+    void ExpectSecondWriteDeniedAfterRevoke(const AttributePathParams & firstPath, const AttributePathParams & secondPath);
 
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
