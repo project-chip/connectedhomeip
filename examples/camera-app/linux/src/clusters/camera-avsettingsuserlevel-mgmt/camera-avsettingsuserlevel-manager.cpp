@@ -129,6 +129,41 @@ Status CameraAVSettingsUserLevelManager::MPTZRemovePreset(uint8_t aPreset)
     return Status::Success;
 }
 
+namespace {
+
+// Smallest and largest viewport sizes with the stream's aspect ratio that cover MinViewportResolution
+// and fit inside the sensor.
+struct ViewportLimits
+{
+    int minWidth;
+    int minHeight;
+    int maxWidth;
+    int maxHeight;
+};
+
+ViewportLimits GetViewportLimits(const VideoResolutionStruct & streamRes, const VideoResolutionStruct & minResolution,
+                                 const VideoSensorParamsStruct & sensorParms)
+{
+    const int streamWidth  = static_cast<int>(streamRes.width);
+    const int streamHeight = static_cast<int>(streamRes.height);
+
+    ViewportLimits limits;
+    limits.minWidth  = std::max<int>(static_cast<int>(minResolution.width),
+                                     (static_cast<int>(minResolution.height) * streamWidth + streamHeight - 1) / streamHeight);
+    limits.minHeight = (limits.minWidth * streamHeight + streamWidth - 1) / streamWidth;
+    limits.maxWidth  = std::min<int>(static_cast<int>(sensorParms.sensorWidth),
+                                     static_cast<int>(sensorParms.sensorHeight) * streamWidth / streamHeight);
+    limits.maxHeight = (limits.maxWidth * streamHeight + streamWidth - 1) / streamWidth;
+
+    // A minimum that does not fit inside the sensor at the stream aspect ratio is limited to the
+    // maximum, so the viewport stays inside the sensor and the clamp limits are valid.
+    limits.minWidth  = std::min(limits.minWidth, limits.maxWidth);
+    limits.minHeight = std::min(limits.minHeight, limits.maxHeight);
+    return limits;
+}
+
+} // namespace
+
 Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
@@ -139,18 +174,16 @@ Status CameraAVSettingsUserLevelManager::DPTZSetViewport(uint16_t aVideoStreamID
     {
         if (stream.videoStreamParams.videoStreamID == aVideoStreamID && stream.isAllocated)
         {
-            // Validate the received viewport dimensions
-            //
-            // Ensure pixel count is > min pixels
-            // Esnure width does not exceed sensor width
-            // Ensure height does not exceed sensor height
+            // Validate the received viewport dimensions against the minimum and maximum sizes
+            // for the stream's aspect ratio.
             //
             uint16_t requestedWidth             = aViewport.x2 - aViewport.x1;
             uint16_t requestedHeight            = aViewport.y2 - aViewport.y1;
             VideoResolutionStruct minResolution = mCameraDeviceHAL->GetCameraHALInterface().GetMinViewport();
             VideoSensorParamsStruct sensorParms = mCameraDeviceHAL->GetCameraHALInterface().GetVideoSensorParams();
-            if ((requestedWidth < minResolution.width) || (requestedHeight < minResolution.height) ||
-                (requestedWidth > sensorParms.sensorWidth) || (requestedHeight > sensorParms.sensorHeight))
+            const ViewportLimits limits         = GetViewportLimits(stream.videoStreamParams.maxResolution, minResolution, sensorParms);
+            if ((requestedWidth < limits.minWidth) || (requestedHeight < limits.minHeight) ||
+                (requestedWidth > limits.maxWidth) || (requestedHeight > limits.maxHeight))
             {
                 ChipLogError(Camera, "CameraApp: DPTZSetViewport with invalid viewport dimensions");
                 return Status::ConstraintError;
@@ -204,20 +237,15 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
             int width  = static_cast<int>(viewport.x2) - static_cast<int>(viewport.x1);
             int height = static_cast<int>(viewport.y2) - static_cast<int>(viewport.y1);
 
-            // The viewport aspect ratio must match the stream's aspect ratio, compared at 2 decimal
-            // places the same way DPTZSetViewport compares them. The minimum and maximum sizes are
-            // the smallest and largest stream-aspect rectangles that cover MinViewportResolution and
-            // fit inside the sensor.
+            // The viewport keeps the aspect ratio of the stream's maxResolution, compared at 2 decimal
+            // places. The minimum and maximum sizes are the smallest and largest rectangles with that
+            // aspect ratio that cover MinViewportResolution and fit inside the sensor.
             const int streamWidth  = static_cast<int>(stream.videoStreamParams.maxResolution.width);
             const int streamHeight = static_cast<int>(stream.videoStreamParams.maxResolution.height);
             float streamAR         = floorf((static_cast<float>(streamWidth) / streamHeight) * 100) / 100;
 
-            int minWidth  = std::max(static_cast<int>(minResolution.width),
-                                     (static_cast<int>(minResolution.height) * streamWidth + streamHeight - 1) / streamHeight);
-            int minHeight = (minWidth * streamHeight + streamWidth - 1) / streamWidth;
-            int maxWidth  = std::min(static_cast<int>(sensorParms.sensorWidth),
-                                     static_cast<int>(sensorParms.sensorHeight) * streamWidth / streamHeight);
-            int maxHeight = (maxWidth * streamHeight + streamWidth - 1) / streamWidth;
+            const auto [minWidth, minHeight, maxWidth, maxHeight] =
+                GetViewportLimits(stream.videoStreamParams.maxResolution, minResolution, sensorParms);
 
             // Apply the minimum and maximum size on every command, not only when a zoom is present,
             // so a stored out-of-range size is corrected even by a translation-only move.
