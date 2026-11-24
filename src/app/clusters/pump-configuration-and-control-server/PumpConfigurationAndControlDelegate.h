@@ -45,7 +45,8 @@ public:
     ///
     /// While OperationMode is Normal, a remote sensor overrides ControlMode:
     /// a flow sensor selects ConstantFlow, a pressure sensor selects ConstantPressure
-    /// and a temperature sensor selects ConstantTemperature.
+    /// and a temperature sensor selects ConstantTemperature. A sensor whose control mode
+    /// feature is not enabled is ignored.
     ///
     /// Also called from PumpConfigurationAndControlCluster::Startup while OperationMode is Normal.
     /// Call PumpConfigurationAndControlCluster::OnRemoteSensorChanged when the returned value changes.

@@ -15,6 +15,7 @@
  */
 #pragma once
 
+#include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/clusters/pump-configuration-and-control-server/PumpConfigurationAndControlDelegate.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -65,7 +66,8 @@ public:
     using PumpStatusBitMask = BitMask<PumpConfigurationAndControl::PumpStatusBitmap>;
 
     /// Values of the attributes with the Fixed quality. They describe the pump hardware and
-    /// do not change at runtime.
+    /// do not change at runtime. Out-of-range values (such as reserved null sentinels,
+    /// temperatures below -27315, or MaxConstTemp < MinConstTemp) are replaced with null.
     struct FixedAttributes
     {
         DataModel::Nullable<int16_t> maxPressure;
@@ -143,35 +145,40 @@ public:
     void OnRemoteSensorChanged();
 
     /// Overrides EffectiveControlMode. The application owns EffectiveControlMode while
-    /// OperationMode is Local. The next recompute (an OperationMode or ControlMode change, or
-    /// OnRemoteSensorChanged in Normal mode) overwrites it.
+    /// OperationMode is Local, and in Normal mode when no remote sensor is active and either
+    /// ControlMode is Automatic or the ControlMode attribute is disabled. The next recompute (an
+    /// OperationMode or ControlMode change, or OnRemoteSensorChanged in Normal mode) overwrites it.
     ///
     /// Returns ConstraintError if the mode requires a feature that is not enabled.
     CHIP_ERROR SetEffectiveControlMode(PumpConfigurationAndControl::ControlModeEnum controlMode);
     PumpConfigurationAndControl::ControlModeEnum GetEffectiveControlMode() const { return mEffectiveControlMode; }
 
     /// Overrides EffectiveOperationMode, e.g. to Local while the pump is physically set to run with
-    /// its local settings. The next OperationMode or ControlMode change sets it back to
-    /// OperationMode. The value is not persisted: Startup sets it to OperationMode.
+    /// its local settings. The next recompute (an OperationMode or ControlMode change, or
+    /// OnRemoteSensorChanged in Normal mode) sets it back to OperationMode. The value is not
+    /// persisted: Startup sets it to OperationMode.
+    ///
+    /// Returns ConstraintError if the mode requires a feature that is not enabled.
     CHIP_ERROR SetEffectiveOperationMode(PumpConfigurationAndControl::OperationModeEnum operationMode);
     PumpConfigurationAndControl::OperationModeEnum GetEffectiveOperationMode() const { return mEffectiveOperationMode; }
 
-    /// The remote sensor bits (RemotePressure, RemoteFlow, RemoteTemperature) are also updated
-    /// by the cluster when the effective modes are computed.
+    /// Sets the application-controlled bits of PumpStatus. The remote sensor bits
+    /// (RemotePressure, RemoteFlow, RemoteTemperature) are owned by the cluster and ignored in
+    /// `pumpStatus`.
     ///
     /// Returns ConstraintError if a bit outside of PumpStatusBitmap is set.
     CHIP_ERROR SetPumpStatus(PumpStatusBitMask pumpStatus);
     PumpStatusBitMask GetPumpStatus() const { return mPumpStatus; }
 
     CHIP_ERROR SetCapacity(DataModel::Nullable<int16_t> capacity);
-    DataModel::Nullable<int16_t> GetCapacity() const { return mCapacity; }
+    DataModel::Nullable<int16_t> GetCapacity() const { return mCapacity.value(); }
 
     CHIP_ERROR SetSpeed(DataModel::Nullable<uint16_t> speed);
-    DataModel::Nullable<uint16_t> GetSpeed() const { return mSpeed; }
+    DataModel::Nullable<uint16_t> GetSpeed() const { return mSpeed.value(); }
 
     /// Power is an int24u: non-null values above 0xFFFFFE are rejected.
     CHIP_ERROR SetPower(DataModel::Nullable<uint32_t> power);
-    DataModel::Nullable<uint32_t> GetPower() const { return mPower; }
+    DataModel::Nullable<uint32_t> GetPower() const { return mPower.value(); }
 
     /// LifetimeRunningHours is an int24u: non-null values above 0xFFFFFE are rejected.
     CHIP_ERROR SetLifetimeRunningHours(DataModel::Nullable<uint32_t> hours);
@@ -230,8 +237,13 @@ private:
         return true;
     }
 
+    template <typename T>
+    bool UpdateQuietAttribute(QuieterReportingAttribute<T> & attr, const DataModel::Nullable<T> & value, AttributeId attributeId);
+
     bool IsOperationModeSupported(PumpConfigurationAndControl::OperationModeEnum operationMode) const;
     bool IsControlModeSupported(PumpConfigurationAndControl::ControlModeEnum controlMode) const;
+    bool CanApplicationOwnEffectiveControlMode(PumpConfigurationAndControl::RemoteSensorType sensorType) const;
+    PumpConfigurationAndControl::RemoteSensorType GetActiveRemoteSensor() const;
     PumpConfigurationAndControl::ControlModeEnum
     SelectInitialControlMode(std::optional<PumpConfigurationAndControl::ControlModeEnum> configured) const;
 
@@ -266,9 +278,8 @@ private:
     /// and its update is not overwritten by this one.
     void UpdateEffectiveModes(ChangedAttributes & changed);
 
-    /// Writes and persists EffectiveControlMode without calling the delegate. Returns true if the
-    /// value changed.
-    bool WriteEffectiveControlMode(PumpConfigurationAndControl::ControlModeEnum controlMode);
+    /// Invalidates any persisted EffectiveControlMode override.
+    void ClearStoredEffectiveControlModeOverride();
 
     const BitFlags<PumpConfigurationAndControl::Feature> mFeatures;
     const EnabledAttributeSet mEnabledOptionalAttributes;
@@ -280,10 +291,11 @@ private:
     PumpConfigurationAndControl::ControlModeEnum mControlMode;
     PumpConfigurationAndControl::OperationModeEnum mEffectiveOperationMode;
     PumpConfigurationAndControl::ControlModeEnum mEffectiveControlMode;
+    bool mHasStoredEffectiveControlModeOverride = false;
     PumpStatusBitMask mPumpStatus{ 0 };
-    DataModel::Nullable<int16_t> mCapacity;
-    DataModel::Nullable<uint16_t> mSpeed;
-    DataModel::Nullable<uint32_t> mPower;
+    QuieterReportingAttribute<int16_t> mCapacity{ DataModel::NullNullable };
+    QuieterReportingAttribute<uint16_t> mSpeed{ DataModel::NullNullable };
+    QuieterReportingAttribute<uint32_t> mPower{ DataModel::NullNullable };
     DataModel::Nullable<uint32_t> mLifetimeRunningHours;
     DataModel::Nullable<uint32_t> mLifetimeEnergyConsumed;
 };

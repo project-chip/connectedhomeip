@@ -50,7 +50,8 @@ public:
 /// Can be called before or after the cluster is created. If it is installed before, the cluster asks
 /// it for the remote sensor during startup. If the cluster already exists, the remote sensor is
 /// queried again (see PumpConfigurationAndControlCluster::OnRemoteSensorChanged). The delegate is
-/// removed when the cluster shuts down, and must outlive its installation.
+/// preserved across temporary endpoint shutdowns, removed when the endpoint is permanently removed,
+/// and must outlive its installation.
 ///
 /// Returns CHIP_ERROR_NOT_FOUND if the endpoint has no Pump Configuration and Control server.
 CHIP_ERROR SetApplicationDelegate(EndpointId endpointId, ApplicationDelegate * delegate);

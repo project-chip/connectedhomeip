@@ -22,6 +22,8 @@
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
+#include <algorithm>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -36,6 +38,13 @@ constexpr size_t kPumpConfigurationAndControlFixedClusterCount =
     PumpConfigurationAndControl::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kPumpConfigurationAndControlMaxClusterCount =
     kPumpConfigurationAndControlFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kPumpConfigurationAndControlTableSize = std::max<size_t>(1, kPumpConfigurationAndControlMaxClusterCount);
+
+static_assert(kPumpConfigurationAndControlFixedClusterCount ==
+                  MATTER_DM_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT,
+              "PumpConfigurationAndControl static cluster config must match ZAP server endpoint count");
+static_assert(kPumpConfigurationAndControlMaxClusterCount < kEmberInvalidEndpointIndex,
+              "PumpConfigurationAndControl cluster table size error");
 
 /// Delegate of each cluster created from the ZAP configuration.
 ///
@@ -45,7 +54,27 @@ constexpr size_t kPumpConfigurationAndControlMaxClusterCount =
 class CodegenDelegate : public PumpConfigurationAndControl::Delegate
 {
 public:
-    void SetApplicationDelegate(ApplicationDelegate * delegate) { mApplicationDelegate = delegate; }
+    void SetApplicationDelegate(EndpointId endpointId, ApplicationDelegate * delegate)
+    {
+        mEndpointId          = endpointId;
+        mApplicationDelegate = delegate;
+    }
+
+    void BindEndpoint(EndpointId endpointId)
+    {
+        // A dynamic endpoint slot may be reused by a different endpoint, which must not inherit the previous delegate.
+        if (mEndpointId != endpointId)
+        {
+            mApplicationDelegate = nullptr;
+            mEndpointId          = endpointId;
+        }
+    }
+
+    void Reset()
+    {
+        mApplicationDelegate = nullptr;
+        mEndpointId          = kInvalidEndpointId;
+    }
 
     RemoteSensorType GetRemoteSensorType(EndpointId endpointId) override
     {
@@ -98,10 +127,11 @@ public:
 
 private:
     ApplicationDelegate * mApplicationDelegate = nullptr;
+    EndpointId mEndpointId                     = kInvalidEndpointId;
 };
 
-LazyRegisteredServerCluster<PumpConfigurationAndControlCluster> gServers[kPumpConfigurationAndControlMaxClusterCount];
-CodegenDelegate gDelegates[kPumpConfigurationAndControlMaxClusterCount];
+LazyRegisteredServerCluster<PumpConfigurationAndControlCluster> gServers[kPumpConfigurationAndControlTableSize];
+CodegenDelegate gDelegates[kPumpConfigurationAndControlTableSize];
 
 PumpConfigurationAndControlCluster::FixedAttributes ReadFixedAttributeDefaults(EndpointId endpointId)
 {
@@ -162,10 +192,17 @@ std::optional<ControlModeEnum> ReadControlModeDefault(EndpointId endpointId, boo
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
+    explicit IntegrationDelegate(MatterClusterShutdownType shutdownType = MatterClusterShutdownType::kClusterShutdown) :
+        mShutdownType(shutdownType)
+    {}
+
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        PumpConfigurationAndControlCluster::Config config(gDelegates[clusterInstanceIndex]);
+        CodegenDelegate & delegate = gDelegates[clusterInstanceIndex];
+        delegate.BindEndpoint(endpointId);
+
+        PumpConfigurationAndControlCluster::Config config(delegate);
         config.features           = BitFlags<Feature>(featureMap);
         config.optionalAttributes = ReadOptionalAttributes(endpointId, optionalAttributeBits);
         config.fixedAttributes    = ReadFixedAttributeDefaults(endpointId);
@@ -185,8 +222,14 @@ public:
     void ReleaseRegistration(unsigned clusterInstanceIndex) override
     {
         gServers[clusterInstanceIndex].Destroy();
-        gDelegates[clusterInstanceIndex].SetApplicationDelegate(nullptr);
+        if (mShutdownType == MatterClusterShutdownType::kPermanentRemove)
+        {
+            gDelegates[clusterInstanceIndex].Reset();
+        }
     }
+
+private:
+    const MatterClusterShutdownType mShutdownType;
 };
 
 } // namespace
@@ -209,7 +252,7 @@ void MatterPumpConfigurationAndControlClusterInitCallback(EndpointId endpointId)
 
 void MatterPumpConfigurationAndControlClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    IntegrationDelegate integrationDelegate;
+    IntegrationDelegate integrationDelegate(shutdownType);
 
     CodegenClusterIntegration::UnregisterServer(
         {
@@ -248,7 +291,7 @@ CHIP_ERROR SetApplicationDelegate(EndpointId endpointId, ApplicationDelegate * d
                                                                 kPumpConfigurationAndControlFixedClusterCount);
     VerifyOrReturnError(index < kPumpConfigurationAndControlMaxClusterCount, CHIP_ERROR_NOT_FOUND);
 
-    gDelegates[index].SetApplicationDelegate(delegate);
+    gDelegates[index].SetApplicationDelegate(endpointId, delegate);
     if (gServers[index].IsConstructed())
     {
         gServers[index].Cluster().OnRemoteSensorChanged();

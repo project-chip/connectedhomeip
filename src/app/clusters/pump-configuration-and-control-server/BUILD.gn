@@ -23,6 +23,7 @@ source_set("pump-configuration-and-control-server") {
 
   public_deps = [
     "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/cluster-building-blocks",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/PumpConfigurationAndControl",
   ]

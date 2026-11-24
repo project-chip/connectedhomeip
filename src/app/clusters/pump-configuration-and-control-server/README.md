@@ -15,17 +15,17 @@ store.
 
 ## Attributes
 
-| Attribute group                                  | Source of the value                                                                                                             |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| MaxPressure, MaxSpeed, MaxFlow, Min/Max\* limits | `Config::fixedAttributes`. Fixed, there are no setters.                                                                         |
-| OperationMode, ControlMode                       | Writable. Validated against the FeatureMap. Persisted.                                                                          |
-| EffectiveOperationMode                           | Follows OperationMode (see [Effective modes](#effective-modes)). Not persisted: it is rebuilt from the persisted OperationMode. |
-| EffectiveControlMode                             | Computed by the cluster (see [Effective modes](#effective-modes)). Persisted.                                                   |
-| LifetimeRunningHours, LifetimeEnergyConsumed     | Writable by clients and the application. Persisted.                                                                             |
+| Attribute group                                  | Source of the value                                                                                                                                                   |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MaxPressure, MaxSpeed, MaxFlow, Min/Max\* limits | `Config::fixedAttributes`. Fixed, there are no setters. Out-of-range values are replaced with null.                                                                   |
+| OperationMode, ControlMode                       | Writable. Validated against the FeatureMap. Persisted.                                                                                                                |
+| EffectiveOperationMode                           | Follows OperationMode (see [Effective modes](#effective-modes)). Not persisted: it is rebuilt from the persisted OperationMode.                                       |
+| EffectiveControlMode                             | Computed by the cluster, or set by the application when owned by the application (see [Effective modes](#effective-modes)). Only application overrides are persisted. |
+| LifetimeRunningHours, LifetimeEnergyConsumed     | Writable by clients and the application. Persisted.                                                                                                                   |
+| PumpStatus, Capacity, Speed, Power               | Set by the application. Capacity, Speed and Power use quieter reporting (`Q` quality): changes are marked reportable at most once per second and on null transitions. |
 
-LifetimeRunningHours values stored in the 3-byte `int24u` format by earlier
-implementations are loaded at startup and stored again in the current format. |
-PumpStatus, Capacity, Speed, Power | Set by the application. |
+`LifetimeRunningHours` values stored in the 3-byte `int24u` format by earlier
+implementations are loaded at startup and stored again in the current format.
 
 Optional attributes are enabled with the `Config::optionalAttributes`.
 `OptionalAttributes` is used instead of `OptionalAttributeSet` because the
@@ -55,15 +55,16 @@ the cluster.
 
 ## Effective modes
 
-| OperationMode    | EffectiveControlMode                                                                | Delegate call           |
-| ---------------- | ----------------------------------------------------------------------------------- | ----------------------- |
-| Normal           | Remote sensor mode if `GetRemoteSensorType` reports a sensor, otherwise ControlMode | `GetRemoteSensorType`   |
-| Minimum, Maximum | ConstantSpeed                                                                       | `OnOperationModeMinMax` |
-| Local            | ControlMode. The application may override it with `SetEffectiveControlMode`.        | none                    |
+| OperationMode    | EffectiveControlMode                                                                                                                                             | Delegate call           |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| Normal           | Remote sensor mode if `GetRemoteSensorType` reports a sensor, otherwise ControlMode. When no sensor is reported and ControlMode is Automatic or disabled, the application may override it with `SetEffectiveControlMode`. | `GetRemoteSensorType`   |
+| Minimum, Maximum | ConstantSpeed                                                                                                                                                    | `OnOperationModeMinMax` |
+| Local            | ControlMode. The application may override it with `SetEffectiveControlMode`.                                                                                     | none                    |
 
 The effective modes are computed when OperationMode or ControlMode changes. The
-RemotePressure, RemoteFlow and RemoteTemperature bits of PumpStatus are updated
-with the same computation.
+RemotePressure, RemoteFlow and RemoteTemperature bits of PumpStatus are owned by
+the cluster (ignored in `SetPumpStatus`) and updated with the same computation.
+A remote sensor whose control mode feature is not enabled is ignored.
 
 Call `OnRemoteSensorChanged()` when the value returned by `GetRemoteSensorType`
 changes. It only has an effect while OperationMode is Normal, so it never
@@ -71,13 +72,13 @@ overwrites the EffectiveControlMode set by the application in Local mode and
 never calls `OnOperationModeMinMax`.
 
 At startup, the effective modes are rebuilt from the restored OperationMode and
-ControlMode instead of using the persisted values, which can be out of date
-after an interrupted update or a FeatureMap change:
+ControlMode instead of persisting computed values:
 
 -   EffectiveOperationMode is set to OperationMode.
 -   In Normal mode, the delegate is asked for the remote sensor.
--   In Local mode, the persisted EffectiveControlMode is kept if its feature is
-    enabled.
+-   An application override of EffectiveControlMode (in Local mode, or in Normal
+    mode without an active remote sensor when ControlMode is Automatic or
+    disabled) is kept if its feature is enabled.
 
 Startup does not call `OnOperationModeMinMax` or `OnAttributeChanged`, because
 the application and the Level Control cluster may not be ready yet.
@@ -120,7 +121,8 @@ if (auto * pump = PumpConfigurationAndControl::FindClusterOnEndpoint(endpointId)
 ```
 
 `SetApplicationDelegate` queries the remote sensor again if the cluster already
-exists. The `ApplicationDelegate` is removed when the cluster shuts down.
+exists. The `ApplicationDelegate` is preserved across temporary endpoint
+shutdowns and removed when the endpoint is permanently removed.
 
 ## Migrating from the Ember implementation
 
@@ -144,7 +146,7 @@ PumpConfigurationAndControl::Attributes::PumpStatus::Set(endpointId, pumpStatus)
 | `Attributes::<Name>::Set(endpoint, value, MarkAttributeDirty)`          | Not available. The setters report changes                                                                                    |
 | `MatterReportingAttributeChangeCallback` after a setter                 | Not needed. The setters report changes                                                                                       |
 | `MatterPostAttributeChangeCallback` for this cluster                    | Not called. Use `ApplicationDelegate::OnAttributeChanged`                                                                    |
-| `Attributes::EffectiveOperationMode::Set` for a physical local override | Same call. The next OperationMode or ControlMode change sets it back to OperationMode, and it is not restored after a reboot |
+| `Attributes::EffectiveOperationMode::Set` for a physical local override | Same call (validated against the FeatureMap). The next recompute (OperationMode or ControlMode change, or `OnRemoteSensorChanged` in Normal mode) sets it back to OperationMode, and it is not restored after a reboot |
 | `Attributes::ClusterRevision::Get`                                      | Not available. Use `PumpConfigurationAndControl::kRevision`                                                                  |
 | `LogEvent(PumpConfigurationAndControl::Events::X::Type{}, ...)`         | `GenerateAlarmEvent(PumpConfigurationAndControl::Events::X::Type{})`                                                         |
 | Remote sensor detection (not supported before)                          | `ApplicationDelegate::GetRemoteSensorType` and `OnRemoteSensorChanged`                                                       |
