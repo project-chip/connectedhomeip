@@ -185,7 +185,7 @@ private:
         return mSendResultAfterRecording;
     }
 
-    CommandSender mSender{ nullptr, nullptr };
+    CommandSender mSender{ nullptr, nullptr, std::nullopt };
 };
 
 constexpr uint16_t kVideoStreamId = 42;
@@ -1028,7 +1028,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, CallbacksOfAnotherSenderAreIgnored)
     mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
 
     // A sender this request never used speaks up: none of it is this request's outcome
-    CommandSender stranger{ nullptr, nullptr };
+    CommandSender stranger{ nullptr, nullptr, std::nullopt };
     FeedOfferResponseFrom(&stranger, 99, kVideoStreamId);
     mClient.OnError(&stranger, StatusIB(Status::ResourceExhausted).ToChipError());
     mClient.OnDone(&stranger);

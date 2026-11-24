@@ -152,6 +152,12 @@ WriteRequestMessage::Builder & WriteRequestMessage::Builder::TimedRequest(const 
     return *this;
 }
 
+WriteRequestMessage::Builder & WriteRequestMessage::Builder::RequestFlags(const RequestFlagsOptions & options)
+{
+    mError = EncodeRequestFlags(options, TLV::ContextTag(Tag::kSuppressResponse), TLV::ContextTag(Tag::kTimedRequest));
+    return *this;
+}
+
 AttributeDataIBs::Builder & WriteRequestMessage::Builder::CreateWriteRequests()
 {
     // skip if error has already been set

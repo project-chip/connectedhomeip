@@ -183,6 +183,12 @@ InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::TimedRequest(cons
     return *this;
 }
 
+InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::RequestFlags(const RequestFlagsOptions & options)
+{
+    mError = EncodeRequestFlags(options, TLV::ContextTag(Tag::kSuppressResponse), TLV::ContextTag(Tag::kTimedRequest));
+    return *this;
+}
+
 InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::DelayReport(const DelayReportData & aDelayReportData)
 {
     if (mError == CHIP_NO_ERROR)
