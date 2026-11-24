@@ -125,7 +125,61 @@ function cirquetest_bootstrap() {
 
     git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
 
-    "$REPO_DIR"/integrations/docker/images/stage-2/chip-cirque-device-base/build.sh --build-arg OT_BR_POSIX_CHECKOUT="$OT_BR_POSIX_CHECKOUT"
+    local cirque_base_dir="$REPO_DIR/integrations/docker/images/stage-2/chip-cirque-device-base"
+    local base_version
+    base_version=${DOCKER_BUILD_VERSION:-$(sed 's/ .*//' "$cirque_base_dir/version")}
+    local image_ref="ghcr.io/${DOCKER_BUILD_ORG:-project-chip}/${DOCKER_BUILD_IMAGE:-chip-cirque-device-base}"
+    local build_args=(--latest --build-arg "OT_BR_POSIX_CHECKOUT=$OT_BR_POSIX_CHECKOUT")
+    local build_version="$base_version"
+    local have_base_image=false
+    if docker image inspect "$image_ref:$base_version" >/dev/null 2>&1 || docker pull "$image_ref:$base_version" >/dev/null 2>&1; then
+        have_base_image=true
+    fi
+
+    local dirty_status
+    dirty_status=$(cd "$REPO_DIR" && git status --porcelain -- integrations/docker/images/stage-2/chip-cirque-device-base)
+
+    if [[ -n "$dirty_status" ]]; then
+        local dirty_hash
+        dirty_hash=$({
+            "$cirque_base_dir/cachekey.sh"
+            printf '%s\n' "$dirty_status"
+        } | shasum | awk '{ print substr($1, 1, 12) }')
+        build_version="${base_version}-dirty-${dirty_hash}"
+    else
+        local qualify_tag=false
+        if [[ "$have_base_image" = true ]]; then
+            local baked_checkout
+            baked_checkout=$(docker image inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$image_ref:$base_version" 2>/dev/null | sed -n 's/^OT_BR_POSIX_CHECKOUT=//p' | head -n 1 || true)
+            if [[ "$baked_checkout" != "$OT_BR_POSIX_CHECKOUT" ]]; then
+                qualify_tag=true
+            fi
+        else
+            # Initial inspect/pull failed, so OT_BR_POSIX_CHECKOUT on
+            # $image_ref:$base_version could not be verified. Qualify the tag so
+            # build.sh rebuilds instead of reusing an unverified tag if a later
+            # pull succeeds.
+            qualify_tag=true
+        fi
+        if [[ "$qualify_tag" = true ]]; then
+            local cache_hash
+            cache_hash=$("$cirque_base_dir/cachekey.sh" | shasum | awk '{ print substr($1, 1, 12) }')
+            build_version="${base_version}-${cache_hash}"
+        fi
+    fi
+
+    if [[ "$build_version" != "$base_version" ]]; then
+        if [[ "$have_base_image" = true ]]; then
+            build_args+=(--cache-from "$image_ref:$base_version")
+        elif [[ "$base_version" =~ ^[0-9]+$ ]] && ((10#$base_version > 0)); then
+            local prev_image="$image_ref:$((10#$base_version - 1))"
+            if docker image inspect "$prev_image" >/dev/null 2>&1 || docker pull "$prev_image" >/dev/null 2>&1; then
+                build_args+=(--cache-from "$prev_image")
+            fi
+        fi
+    fi
+
+    DOCKER_BUILD_VERSION="$build_version" "$cirque_base_dir/build.sh" "${build_args[@]}"
 
     __cirquetest_build_ot_lazy
     pip3 install --break-system-packages -r requirements_nogrpc.txt

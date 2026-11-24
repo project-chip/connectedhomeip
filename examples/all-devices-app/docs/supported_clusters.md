@@ -189,7 +189,7 @@ To update or validate this list manually, follow these steps:
 | 143       | Time Synchronization                                       | 56 (0x0038)   | Yes                | No                  |                                                      |
 | 144       | Total Volatile Organic Compounds Concentration Measurement | 1070 (0x042E) | Yes                | Yes                 | Instance of Concentration Measurement                |
 | 145       | Unit Localization                                          | 45 (0x002D)   | Yes                | No                  |                                                      |
-| 146       | User Label                                                 | 65 (0x0041)   | Yes                | No                  |                                                      |
+| 146       | User Label                                                 | 65 (0x0041)   | Yes                | Yes                 |                                                      |
 | 147       | Valid Proxies                                              | 68 (0x0044)   | No                 | No                  |                                                      |
 | 148       | Valve Configuration and Control                            | 129 (0x0081)  | Yes                | Yes                 | Water Valve                                          |
 | 149       | Wake On LAN                                                | 1283 (0x0503) | No                 | No                  |                                                      |
@@ -203,4 +203,4 @@ To update or validate this list manually, follow these steps:
 | 157       | Window Covering                                            | 258 (0x0102)  | Yes                | Yes                 | window-covering-\*                                   |
 | 158       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                                      |
 | 159       | Smoke Concentration Measurement                            | 1076 (0x0434) | Yes                | Yes                 | Instance of Concentration Measurement                |
-| **Total** | **159**                                                    |               | **109**            | **74**              |                                                      |
+| **Total** | **159**                                                    |               | **109**            | **75**              |                                                      |

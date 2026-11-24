@@ -26,5 +26,25 @@ CHIP_ERROR MessageBuilder::EncodeInteractionModelRevision()
 {
     return mpWriter->Put(TLV::ContextTag(Revision::kInteractionModelRevisionTag), Revision::kInteractionModelRevision);
 }
+
+CHIP_ERROR MessageBuilder::EncodeRequestFlags(const RequestFlagsOptions & options, TLV::Tag suppressResponseTag,
+                                              TLV::Tag timedRequestTag)
+{
+    ReturnErrorOnFailure(mError);
+    VerifyOrReturnError(!(options.isGroupcast && options.timedRequest), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!options.isGroupcast, CHIP_NO_ERROR);
+
+    const bool omitFalseFlags =
+        options.peerRevision.has_value() && *options.peerRevision >= Revision::kFirstRevisionWithOptionalRequestFlags;
+    if (options.suppressResponse || !omitFalseFlags)
+    {
+        ReturnErrorOnFailure(mpWriter->PutBoolean(suppressResponseTag, options.suppressResponse));
+    }
+    if (options.timedRequest || !omitFalseFlags)
+    {
+        ReturnErrorOnFailure(mpWriter->PutBoolean(timedRequestTag, options.timedRequest));
+    }
+    return CHIP_NO_ERROR;
+}
 } // namespace app
 } // namespace chip

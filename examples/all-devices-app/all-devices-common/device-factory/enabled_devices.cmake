@@ -49,6 +49,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/Closure.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/ClosureVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/SimulatedClosure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure-controller/ClosureController.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/ClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/impl/SimulatedClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/color-temperature-light/ColorTemperatureLight.cpp"
@@ -59,6 +60,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-light/DimmableLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-light/impl/LoggingDimmableLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-plug-in-unit/DimmablePlugInUnit.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-plug-in-unit/impl/LoggingDimmablePlugInUnit.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/Dishwasher.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/impl/EmulatedDishwasher.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/doorbell/Doorbell.cpp"
@@ -68,6 +70,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/extended-color-light/ExtendedColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extended-color-light/impl/LoggingExtendedColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extractor-hood/ExtractorHood.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/extractor-hood/impl/LoggingExtractorHood.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/fan/Fan.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/fan/impl/LoggingFan.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/FlowSensor.cpp"
@@ -91,7 +94,9 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/mode-select/ModeSelect.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/mode-select/impl/SimulatedModeSelect.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-dimmable-load-control/impl/LoggingMountedDimmableLoadControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-on-off-control/MountedOnOffControl.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-on-off-control/impl/LoggingMountedOnOffControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/NetworkInfrastructureManager.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/impl/SimulatedNetworkInfrastructureManager.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/OccupancySensor.cpp"
@@ -100,6 +105,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/impl/LoggingOnOffLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light-switch/OnOffLightSwitch.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/OnOffPlugInUnit.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/impl/LoggingOnOffPlugInUnit.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/Oven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/impl/LoggingOven.cpp"
@@ -112,7 +118,6 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/Refrigerator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/impl/LoggingRefrigerator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp"
@@ -124,6 +129,11 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/SmokeCoAlarm.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/SoilSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/SolarPower.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/SolarPowerTags.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/PanelElectricalSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/SimulatedSolarPower.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/SolarPowerVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/speaker/Speaker.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/speaker/impl/LoggingSpeaker.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-controlled-cabinet/TemperatureControlledCabinetPart.cpp"
@@ -156,6 +166,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/identify/LoggingIdentifyDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/OnOffLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/impl/LoggingOnOffDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/service-area/impl/LoggingServiceAreaStorageDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/allocator/DynamicEndpointIdAllocator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/Interface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/SingleEndpoint.cpp"
@@ -198,6 +209,7 @@ foreach(_key
         bridged-node
         chime
         closure
+        closure-controller
         color-temperature-light
         commissioning-proxy
         contact-sensor
@@ -238,6 +250,7 @@ foreach(_key
         room-air-conditioner
         smoke-co-alarm
         soil-sensor
+        solar-power
         speaker
         temperature-sensor
         thermostat

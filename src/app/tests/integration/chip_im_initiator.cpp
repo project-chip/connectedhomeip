@@ -464,7 +464,7 @@ void CommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appSta
 
     if (gCommandRespCount < kMaxCommandMessageCount)
     {
-        auto commandSender = std::make_unique<chip::app::CommandSender>(&gMockDelegate, &gExchangeManager);
+        auto commandSender = std::make_unique<chip::app::CommandSender>(&gMockDelegate, &gExchangeManager, gSession.Get().Value());
         VerifyOrExit(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         err = SendCommandRequest(std::move(commandSender));
@@ -490,7 +490,7 @@ void BadCommandRequestTimerHandler(chip::System::Layer * systemLayer, void * app
 {
     // Test with invalid endpoint / cluster / command combination.
     CHIP_ERROR err     = CHIP_NO_ERROR;
-    auto commandSender = std::make_unique<chip::app::CommandSender>(&gMockDelegate, &gExchangeManager);
+    auto commandSender = std::make_unique<chip::app::CommandSender>(&gMockDelegate, &gExchangeManager, gSession.Get().Value());
     VerifyOrExit(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     err = SendBadCommandRequest(std::move(commandSender));
@@ -554,7 +554,7 @@ void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState
     if (gWriteRespCount < kMaxWriteMessageCount)
     {
         chip::app::WriteClient writeClient(chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager(), &gMockDelegate,
-                                           chip::Optional<uint16_t>::Missing());
+                                           gSession.Get().Value(), chip::Optional<uint16_t>::Missing());
         SuccessOrExit(err);
 
         err = SendWriteRequest(writeClient);

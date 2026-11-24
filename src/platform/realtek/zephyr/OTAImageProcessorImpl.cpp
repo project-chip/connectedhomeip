@@ -144,6 +144,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     if (rtk_matter_ota_prepare() != 0)
     {
         ChipLogError(SoftwareUpdate, "HandlePrepareDownload: rtk_matter_ota_prepare failed");
+        TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_INTERNAL);
         return;
     }
 
@@ -232,10 +233,10 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         return;
     }
 
-    ChipLogProgress(SoftwareUpdate, "Rebooting in 10 seconds...");
+    ChipLogProgress(SoftwareUpdate, "Rebooting in 2 seconds...");
 
     DeviceLayer::SystemLayer().StartTimer(
-        System::Clock::Seconds32(10),
+        System::Clock::Seconds32(2),
         [](chip::System::Layer *, void *) {
             ChipLogProgress(SoftwareUpdate, "Rebooting...");
             rtk_matter_ota_apply();

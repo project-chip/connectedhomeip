@@ -976,6 +976,15 @@ void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
 
     mDeviceIds.erase(deviceId);
 
+    /* Reset the subscribed flag so that a new subscription from the next
+     * commissioning attempt is not ignored. */
+#if BLE_LAYER_NUM_BLE_ENDPOINTS == 1
+    mDeviceSubscribed = false;
+#endif
+
+    /* mChipobleConId is NOT cleared here: the kCHIPoBLEConnectionClosed consumer needs it
+     * to recognise the commissioning link and clears it via ClearChipobleConId(). */
+
     ChipDeviceEvent event;
     event.Type                           = DeviceEventType::kCHIPoBLEConnectionClosed;
     event.CHIPoBLEConnectionError.ConId  = deviceId;
@@ -1040,6 +1049,7 @@ void BLEManagerCommon::HandleTXCharCCCDWrite(blekw_msg_t * msg)
         if (!mDeviceSubscribed)
         {
             mDeviceSubscribed             = true;
+            mChipobleConId                = att_wr_data->device_id;
             event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
             event.CHIPoBLESubscribe.ConId = att_wr_data->device_id;
             err                           = PlatformMgr().PostEvent(&event);
@@ -1047,7 +1057,9 @@ void BLEManagerCommon::HandleTXCharCCCDWrite(blekw_msg_t * msg)
     }
     else
     {
-        mDeviceSubscribed             = false;
+        mDeviceSubscribed = false;
+        /* Keep mChipobleConId: a central may unsubscribe right before disconnecting
+         * (BLEEndPoint::DoClose); the ID is needed when the close event arrives. */
         event.Type                    = DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = att_wr_data->device_id;
         err                           = PlatformMgr().PostEvent(&event);

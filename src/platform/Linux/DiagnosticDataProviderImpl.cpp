@@ -27,6 +27,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/Defer.h>
+#include <lib/support/ParseDecimal.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/ConnectivityUtils.h>
@@ -311,11 +312,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
         /* proc available, iterate through tasks... */
         while ((entry = readdir(proc_dir)) != nullptr)
         {
-            if (entry->d_name[0] == '.')
+            pid_t tid;
+            if (!ParseDecimal(entry->d_name, tid))
+            {
                 continue;
+            }
 
             ThreadMetrics * thread = new ThreadMetrics();
-            pid_t tid              = atoi(entry->d_name);
             thread->id             = tid;
 
             if (GetThreadName(tid, thread->NameBuf, sizeof(thread->NameBuf)) == CHIP_NO_ERROR)

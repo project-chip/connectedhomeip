@@ -111,6 +111,7 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
         .bindingHandler           = mContext.bindingHandler,
         .testEventTriggerDelegate = mContext.testEventTriggerDelegate,
         .identifyDelegate         = mContext.identifyDelegate,
+        .deviceInfoProvider       = mContext.deviceInfoProvider,
     });
     PosixDeviceFactory::ExecuteRegistrationHooks(mRootNode.RootDevice());
 

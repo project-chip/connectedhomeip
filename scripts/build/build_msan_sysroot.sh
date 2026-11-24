@@ -18,7 +18,8 @@
 # The sysroot contains libc++/libc++abi and a few common third-party
 # dependencies (OpenSSL, zlib, libffi, pcre2, GLib) all compiled with
 # -fsanitize=memory so MSAN reports are not poisoned by uninstrumented
-# library internals.
+# library internals. It also holds an MSan runtime built for the host glibc,
+# under clang-resource/.
 #
 # Idempotent: if the sysroot is already built and its inputs (this script,
 # msan_ignorelist.txt, clang version) have not changed, the script exits
@@ -241,6 +242,45 @@ if [[ "$OSS_FUZZ" -eq 0 ]]; then
         -DLIBCXX_ENABLE_SHARED=OFF -DLIBCXXABI_ENABLE_SHARED=OFF -DLIBCXXABI_USE_LLVM_UNWINDER=OFF
     ninja -C "$SRC/libcxx" -j"$(nproc)" cxx cxxabi
     ninja -C "$SRC/libcxx" install-cxx install-cxxabi
+
+    # MSan runtime, built against the host glibc. The runtime wraps libc calls such as stat()
+    # to mark their output buffers as initialized, and which calls it wraps depends on the glibc
+    # headers it is compiled with. A runtime built for a different glibc can miss some, which
+    # shows up as false positives on reads of those buffers.
+    echo ">>> compiler-rt (MSan runtime)"
+    RT_TRIPLE="x86_64-unknown-linux-gnu"
+    cmake -GNinja -S "$SRC/llvm-project/runtimes" -B "$SRC/compiler-rt" \
+        -DCMAKE_C_COMPILER="$CC_BIN" -DCMAKE_CXX_COMPILER="$CXX_BIN" -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_C_COMPILER_TARGET="$RT_TRIPLE" -DCMAKE_CXX_COMPILER_TARGET="$RT_TRIPLE" \
+        -DLLVM_ENABLE_RUNTIMES=compiler-rt -DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON \
+        -DCOMPILER_RT_SANITIZERS_TO_BUILD=msan -DCOMPILER_RT_BUILD_BUILTINS=OFF \
+        -DCOMPILER_RT_BUILD_LIBFUZZER=OFF -DCOMPILER_RT_BUILD_PROFILE=OFF \
+        -DCOMPILER_RT_BUILD_XRAY=OFF -DCOMPILER_RT_BUILD_MEMPROF=OFF \
+        -DCOMPILER_RT_BUILD_ORC=OFF -DCOMPILER_RT_BUILD_CTX_PROFILE=OFF
+    ninja -C "$SRC/compiler-rt" -j"$(nproc)" \
+        clang_rt.msan-x86_64 clang_rt.msan_cxx-x86_64 \
+        clang_rt.msan-x86_64-symbols clang_rt.msan_cxx-x86_64-symbols
+
+    # Resource directory passed to the linker via -resource-dir (see sanitize_memory in
+    # build/config/compiler/BUILD.gn): symlinks to Pigweed's, with the MSan runtime replaced.
+    PW_RESOURCE_DIR="$("$CC_BIN" -print-resource-dir)"
+    RESOURCE_DIR="$SYSROOT/clang-resource"
+    rm -rf "$RESOURCE_DIR"
+    mkdir -p "$RESOURCE_DIR/lib/$RT_TRIPLE"
+    for entry in "$PW_RESOURCE_DIR"/*; do
+        [[ "$(basename "$entry")" == "lib" ]] || ln -s "$entry" "$RESOURCE_DIR/"
+    done
+    for entry in "$PW_RESOURCE_DIR"/lib/*; do
+        [[ "$(basename "$entry")" == "$RT_TRIPLE" ]] || ln -s "$entry" "$RESOURCE_DIR/lib/"
+    done
+    ln -s "$PW_RESOURCE_DIR/lib/$RT_TRIPLE"/* "$RESOURCE_DIR/lib/$RT_TRIPLE/"
+    for rt in msan msan_cxx; do
+        for suffix in a a.syms; do
+            rm -f "$RESOURCE_DIR/lib/$RT_TRIPLE/libclang_rt.$rt.$suffix"
+            cp "$SRC/compiler-rt/compiler-rt/lib/linux/libclang_rt.$rt-x86_64.$suffix" \
+                "$RESOURCE_DIR/lib/$RT_TRIPLE/libclang_rt.$rt.$suffix"
+        done
+    done
 fi
 
 # OpenSSL

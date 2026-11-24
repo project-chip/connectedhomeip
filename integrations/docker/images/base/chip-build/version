@@ -1,1 +1,1 @@
-219 : [Ameba] Update Docker image for supporting mbedtls 3.6.7
+222 : [CI] Publish chip-build and chip-build-minimal as multi-arch (amd64 + arm64) images

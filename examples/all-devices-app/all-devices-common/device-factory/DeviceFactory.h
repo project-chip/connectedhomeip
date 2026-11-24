@@ -34,18 +34,19 @@
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
+#include <device/types/closure-controller/ClosureController.h>
 #include <device/types/closure/impl/ClosureVariants.h>
 #include <device/types/closure/impl/SimulatedClosure.h>
 #include <device/types/color-temperature-light/impl/LoggingColorTemperatureLight.h>
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
-#include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
+#include <device/types/dimmable-plug-in-unit/impl/LoggingDimmablePlugInUnit.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
 #include <device/types/doorbell/Doorbell.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/extended-color-light/impl/LoggingExtendedColorLight.h>
-#include <device/types/extractor-hood/ExtractorHood.h>
+#include <device/types/extractor-hood/impl/LoggingExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
 #include <device/types/flow-sensor/FlowSensor.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
@@ -60,13 +61,13 @@
 #include <device/types/light-sensor/impl/IncreasingLightSensor.h>
 #include <device/types/microwave-oven/impl/EmulatedMicrowaveOven.h>
 #include <device/types/mode-select/impl/SimulatedModeSelect.h>
-#include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
-#include <device/types/mounted-on-off-control/MountedOnOffControl.h>
+#include <device/types/mounted-dimmable-load-control/impl/LoggingMountedDimmableLoadControl.h>
+#include <device/types/mounted-on-off-control/impl/LoggingMountedOnOffControl.h>
 #include <device/types/network-infrastructure-manager/impl/SimulatedNetworkInfrastructureManager.h>
 #include <device/types/occupancy-sensor/impl/LoggingOccupancySensor.h>
 #include <device/types/on-off-light-switch/OnOffLightSwitch.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
-#include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
+#include <device/types/on-off-plug-in-unit/impl/LoggingOnOffPlugInUnit.h>
 #include <device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.h>
 #include <device/types/oven/impl/LoggingOven.h>
 #include <device/types/power-source/BatteryPowerSource.h>
@@ -82,6 +83,7 @@
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
 #include <device/types/soil-sensor/SoilSensor.h>
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
+#include <device/types/solar-power/impl/SolarPowerVariants.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/TemperatureSensor.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
@@ -96,6 +98,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/Optional.h>
 #include <platform/DefaultTimerDelegate.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 
@@ -313,6 +316,7 @@ public:
         BindingHandler & bindingHandler;
         TestEventTriggerDelegate & testEventTriggerDelegate;
         Clusters::IdentifyDelegate & identifyDelegate;
+        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
     };
 
     static DeviceFactory & GetInstance()
@@ -546,6 +550,20 @@ private:
             RegisterAlias("closure", "closure-simulated");
             RegisterAlias("closure-no-ps-no-sp", "closure-no-ps-no-sp-simulated");
         }
+        if constexpr (ALL_DEVICES_ENABLE_CLOSURE_CONTROLLER)
+        {
+            RegisterCreator("closure-controller", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<ClosureController>(ClosureController::Config{
+                    .bindingTable               = mContext->bindingTable,
+                    .bindingManager             = mContext->bindingManager,
+                    .platformManager            = mContext->platformManager,
+                    .bindingHandler             = mContext->bindingHandler,
+                    .withIdentifyClient         = true,
+                    .withClosureDimensionClient = true,
+                });
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
         {
             RegisterCreator("water-leak-detector", [this]() {
@@ -613,14 +631,14 @@ private:
         {
             RegisterCreator("dimmable-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<DimmablePlugInUnit>(
-                    DimmablePlugInUnit::Context{
+                return MakeDevice<LoggingDimmablePlugInUnit>(
+                    LoggingDimmablePlugInUnit::Context{
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                         .identifyDelegate  = mContext->identifyDelegate,
                     },
-                    DimmablePlugInUnit::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
+                    LoggingDimmablePlugInUnit::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DISHWASHER)
@@ -649,14 +667,15 @@ private:
         {
             RegisterCreator("mounted-dimmable-load-control", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<MountedDimmableLoadControl>(
-                    MountedDimmableLoadControl::Context{
+                return MakeDevice<LoggingMountedDimmableLoadControl>(
+                    LoggingMountedDimmableLoadControl::Context{
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                         .identifyDelegate  = mContext->identifyDelegate,
                     },
-                    MountedDimmableLoadControl::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
+                    LoggingMountedDimmableLoadControl::Config{ .levelControl =
+                                                                   DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DOORBELL)
@@ -677,7 +696,7 @@ private:
         {
             RegisterCreator("mounted-on-off-control", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<MountedOnOffControl>(MountedOnOffControl::Context{
+                return MakeDevice<LoggingMountedOnOffControl>(LoggingMountedOnOffControl::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -735,7 +754,7 @@ private:
                     .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
-                return MakeDevice<OnOffPlugInUnit>(OnOffPlugInUnit::Context{
+                return MakeDevice<LoggingOnOffPlugInUnit>(LoggingOnOffPlugInUnit::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -903,6 +922,23 @@ private:
                                                                         kDefaultSoilTemperatureConfig);
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_SOLAR_POWER)
+        {
+            for (const auto & variant : SolarPowerVariants())
+            {
+                RegisterCreator(variant.name, [this, makeConfig = variant.makeConfig]() {
+                    VerifyOrDie(mContext.has_value());
+                    return MakeDevice<SimulatedSolarPower>(
+                        SimulatedSolarPower::Context{
+                            .timerDelegate            = mContext->timerDelegate,
+                            .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                            .fabricTable              = mContext->fabricTable,
+                            .deviceInfoProvider       = mContext->deviceInfoProvider,
+                        },
+                        makeConfig());
+                });
+            }
+        }
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
             static const Clusters::TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
@@ -984,7 +1020,7 @@ private:
         {
             RegisterCreator("extractor-hood", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<ExtractorHood>(ExtractorHood::Context{
+                return MakeDevice<LoggingExtractorHood>(LoggingExtractorHood::Context{
                     .groupDataProvider   = mContext->groupDataProvider,
                     .fabricTable         = mContext->fabricTable,
                     .timerDelegate       = mContext->timerDelegate,

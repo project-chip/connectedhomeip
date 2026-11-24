@@ -105,7 +105,7 @@ following states:
 | :-------------------------- | :--------------------------------------------------------------------------- |
 | Blinks with short pulses    | Device is not commissioned to Thread, Thread is disabled                     |
 | Blinks with frequent pulses | Device is commissioned, Thread enabled. Device trying to JOIN thread network |
-| Blinks with wide pulses     | Device commissioned and joined to thread network as CHILD                    |
+| Blinks with wide pulses     | Device commissioned and joined Thread network as CHILD                       |
 
 #### Indicate identify of device
 
@@ -211,7 +211,10 @@ In this scenario, commands are provided for a light switch device with the
 `nodeId = <light-switch-node-id>` and a light bulb device with
 `nodeId = <lighting-node-id>`, both commissioned to the same Matter network.
 
-To perform the unicast binding process, complete the following steps:
+For builds with `CONFIG_CHIP_ENABLE_GROUPCAST=y` (Groups cluster revision 5),
+use `Groupcast.JoinGroup` instead of the legacy `TestGroupDemoConfig` commands.
+
+To perform the group multicast binding process, complete the following steps:
 
 1.  Add an ACL to the lighting endpoint permissions by running the following
     command:
@@ -235,7 +238,7 @@ To perform the unicast binding process, complete the following steps:
     command:
 
     ```bash
-    $ ./chip-tool tests TestGroupDemoConfig --nodeId <light-switch-node-id>
+    $ ./chip-tool groupcast join-group 257 '[]' 1 <light-switch-node-id> 0 --Key hex:00112233445566778899aabbccddeeff
     ```
 
 3.  Add all light bulbs to the same multicast group by applying command below
@@ -245,8 +248,10 @@ To perform the unicast binding process, complete the following steps:
     light-switch) for each of them:
 
     ```bash
-    $ ./chip-tool tests TestGroupDemoConfig --nodeId <lighting-node-id>
+    $ ./chip-tool groupcast join-group 257 '[1]' 1 <lighting-node-id> 0 --Key hex:00112233445566778899aabbccddeeff --UseAuxiliaryACL 1
     ```
+
+    The same key must be used on all devices (example key for testing only).
 
 4.  Add Binding commands for group multicast:
 
