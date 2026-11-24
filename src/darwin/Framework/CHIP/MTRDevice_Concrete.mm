@@ -4577,13 +4577,13 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
 }
 
 // Update cluster data version and also note the change, so at onReportEnd it can be persisted
-- (void)_noteDataVersion:(NSNumber *)dataVersion forClusterPath:(MTRClusterPath *)clusterPath
+- (BOOL)_noteDataVersion:(NSNumber *)dataVersion forClusterPath:(MTRClusterPath *)clusterPath
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
     if (dataVersion == nil || clusterPath == nil) {
         MTR_LOG_ERROR("%@ Attempted to update data version with a nil value. clusterPath: %@, dataVersion: %@", self, clusterPath, dataVersion);
-        return;
+        return NO;
     }
 
     BOOL dataVersionChanged = NO;
@@ -4604,8 +4604,9 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
         }
         _clusterDataToPersist[clusterPath] = clusterData;
 
-        MTR_LOG("node 0x%016llX updated DataVersion for %@ to %@", _nodeID.unsignedLongLongValue, clusterPath, dataVersion);
+        MTR_LOG_DEBUG("node 0x%016llX updated DataVersion for %@ to %@", _nodeID.unsignedLongLongValue, clusterPath, dataVersion);
     }
+    return dataVersionChanged;
 }
 
 - (BOOL)_attributeAffectsDeviceConfiguration:(MTRAttributePath *)attributePath
@@ -4800,6 +4801,7 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     NSUInteger noDataCount = 0;
     NSUInteger sameAsReadCacheCount = 0;
     NSUInteger expectedValuePresentCount = 0;
+    NSMutableSet<MTRClusterPath *> * clustersWithUpdatedDataVersion = nil;
     for (NSDictionary<NSString *, id> * attributeResponseValue in reportedAttributeValues) {
         MTRAttributePath * attributePath = attributeResponseValue[MTRAttributePathKey];
         MTRDeviceDataValueDictionary _Nullable attributeDataValue = attributeResponseValue[MTRDataKey];
@@ -4831,7 +4833,12 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
             NSNumber * dataVersion = attributeDataValue[MTRDataVersionKey];
             MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:attributePath.endpoint clusterID:attributePath.cluster];
             if (dataVersion) {
-                [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
+                if ([self _noteDataVersion:dataVersion forClusterPath:clusterPath]) {
+                    if (!clustersWithUpdatedDataVersion) {
+                        clustersWithUpdatedDataVersion = [NSMutableSet set];
+                    }
+                    [clustersWithUpdatedDataVersion addObject:clusterPath];
+                }
 
                 // Remove data version from what we cache in memory
                 attributeDataValue = [self _dataValueWithoutDataVersion:attributeDataValue];
@@ -4968,6 +4975,9 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     MTR_LOG("node 0x%016llX report of %lu attributes: %lu values, %lu errors, %lu same as read cache, %lu expected value still present, %lu no data", _nodeID.unsignedLongLongValue,
         static_cast<unsigned long>(reportedAttributeValues.count), static_cast<unsigned long>(valueCount), static_cast<unsigned long>(errorCount), static_cast<unsigned long>(sameAsReadCacheCount),
         static_cast<unsigned long>(expectedValuePresentCount), static_cast<unsigned long>(noDataCount));
+    if (clustersWithUpdatedDataVersion.count > 0) {
+        MTR_LOG("node 0x%016llX data versions updated for %lu clusters", _nodeID.unsignedLongLongValue, static_cast<unsigned long>(clustersWithUpdatedDataVersion.count));
+    }
 
     return attributesToReport;
 }
