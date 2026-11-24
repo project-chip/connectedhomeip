@@ -127,27 +127,28 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
         };
 
-    mResolveExecutorService.execute(() -> {
-      if (nsdManagerResolverAvailState != null) {
-        nsdManagerResolverAvailState.acquireResolver();
-      }
+    mResolveExecutorService.execute(
+        () -> {
+          if (nsdManagerResolverAvailState != null) {
+            nsdManagerResolverAvailState.acquireResolver();
+          }
 
-      ScheduledFuture<?> resolveTimeoutExecutor =
-          Executors.newSingleThreadScheduledExecutor()
-              .schedule(timeoutRunnable, timeout, TimeUnit.MILLISECONDS);
+          ScheduledFuture<?> resolveTimeoutExecutor =
+              Executors.newSingleThreadScheduledExecutor()
+                  .schedule(timeoutRunnable, timeout, TimeUnit.MILLISECONDS);
 
-      NsdServiceFinderAndResolver serviceFinderResolver =
-          new NsdServiceFinderAndResolver(
-              this.nsdManager,
-              serviceInfo,
-              callbackHandle,
-              contextHandle,
-              chipMdnsCallback,
-              multicastLock,
-              resolveTimeoutExecutor,
-              nsdManagerResolverAvailState);
-      serviceFinderResolver.start();
-    });
+          NsdServiceFinderAndResolver serviceFinderResolver =
+              new NsdServiceFinderAndResolver(
+                  this.nsdManager,
+                  serviceInfo,
+                  callbackHandle,
+                  contextHandle,
+                  chipMdnsCallback,
+                  multicastLock,
+                  resolveTimeoutExecutor,
+                  nsdManagerResolverAvailState);
+          serviceFinderResolver.start();
+        });
   }
 
   @Override
@@ -198,36 +199,37 @@ public class NsdManagerServiceResolver implements ServiceResolver {
         mActiveRegistrations.remove(mapKey);
       }
 
-      NsdServiceInfo serviceInfo = new NsdServiceInfo();
-      serviceInfo.setServiceName(serviceName);
-      applyServiceTypeAndSubtypesLocked(serviceInfo, type, subTypeSet);
-      serviceInfo.setPort(port);
-
-      Log.i(
-          TAG,
-          "publish serviceName="
-              + serviceName
-              + " type="
-              + serviceInfo.getServiceType()
-              + " subTypes="
-              + subTypeSet
-              + " port="
-              + port);
-      for (Map.Entry<String, String> entry : txtAttributes.entrySet()) {
-        serviceInfo.setAttribute(entry.getKey(), entry.getValue());
-        Log.i(TAG, "     " + entry.getKey() + "=" + entry.getValue());
-      }
-
-      ActiveRegistration reg = new ActiveRegistration(mapKey, port, txtAttributes, subTypeSet);
-      if (!publishMulticastLock.isHeld()) {
-        publishMulticastLock.acquire();
-      }
-      mActiveRegistrations.put(mapKey, reg);
-
+      ActiveRegistration reg = null;
       try {
+        NsdServiceInfo serviceInfo = new NsdServiceInfo();
+        serviceInfo.setServiceName(serviceName);
+        applyServiceTypeAndSubtypesLocked(serviceInfo, type, subTypeSet);
+        serviceInfo.setPort(port);
+
+        Log.i(
+            TAG,
+            "publish serviceName="
+                + serviceName
+                + " type="
+                + serviceInfo.getServiceType()
+                + " subTypes="
+                + subTypeSet
+                + " port="
+                + port);
+        for (Map.Entry<String, String> entry : txtAttributes.entrySet()) {
+          serviceInfo.setAttribute(entry.getKey(), entry.getValue());
+          Log.i(TAG, "     " + entry.getKey() + "=" + entry.getValue());
+        }
+
+        reg = new ActiveRegistration(mapKey, port, txtAttributes, subTypeSet);
+        if (!publishMulticastLock.isHeld()) {
+          publishMulticastLock.acquire();
+        }
+        mActiveRegistrations.put(mapKey, reg);
+
         nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, reg.listener);
       } catch (RuntimeException e) {
-        if (mActiveRegistrations.get(mapKey) == reg) {
+        if (reg != null && mActiveRegistrations.get(mapKey) == reg) {
           mActiveRegistrations.remove(mapKey);
         }
         releasePublishLockIfEmptyLocked();
