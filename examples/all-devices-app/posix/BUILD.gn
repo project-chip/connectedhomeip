@@ -77,6 +77,7 @@ source_set("device-instances") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/flow-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/generic-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/heat-pump:simulated",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/heat-pump:simulated-posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-conditioner",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/irrigation-system",

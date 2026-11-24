@@ -15,6 +15,7 @@
  */
 
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
+#include <device/types/heat-pump/impl/OOBAccessors.h>
 #include <device/types/heat-pump/impl/SimulatedHeatPump.h>
 #include <pw_unit_test/framework.h>
 
@@ -32,11 +33,14 @@
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/power-source/WiredPowerSource.h>
 #include <devices/Types.h>
+#include <lib/core/TLV.h>
 #include <lib/support/TimerDelegateMock.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
+#include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <algorithm>
+#include <optional>
 #include <vector>
 
 using namespace chip;
@@ -109,6 +113,50 @@ Platform::UniquePtr<BindingCommand> MakeCommand(const CommandType & command)
 {
     return Platform::UniquePtr<BindingCommand>(Platform::New<SimpleBindingCommand<CommandType>>(command));
 }
+
+/// Builds the HeatPumpSetpointRaiseLower payload { 1: endpointId, 2: mode, 3: amount }, omitting unset fields.
+class SetpointRaiseLowerPayload
+{
+public:
+    SetpointRaiseLowerPayload(EndpointId endpointId, std::optional<uint8_t> mode, std::optional<int8_t> amount)
+    {
+        mError = Encode(endpointId, mode, amount);
+    }
+
+    ByteSpan Span() const
+    {
+        EXPECT_SUCCESS(mError);
+        return ByteSpan(mBuffer, mLength);
+    }
+
+private:
+    CHIP_ERROR Encode(EndpointId endpointId, std::optional<uint8_t> mode, std::optional<int8_t> amount)
+    {
+        TLV::TLVWriter writer;
+        writer.Init(mBuffer, sizeof(mBuffer));
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(1), endpointId));
+        if (mode.has_value())
+        {
+            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(2), *mode));
+        }
+        if (amount.has_value())
+        {
+            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(3), *amount));
+        }
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
+        ReturnErrorOnFailure(writer.Finalize());
+        mLength = writer.GetLengthWritten();
+        return CHIP_NO_ERROR;
+    }
+
+    uint8_t mBuffer[32];
+    size_t mLength    = 0;
+    CHIP_ERROR mError = CHIP_NO_ERROR;
+};
+
+constexpr CharSpan kSetpointRaiseLowerAction = "HeatPumpSetpointRaiseLower"_span;
 
 class TestHeatPump : public ::testing::Test
 {
@@ -258,6 +306,55 @@ TEST_F(TestHeatPump, DispatchRequiresRegistrationAndThermostatClient)
     ConsecutiveEndpointIdAllocator endpointAllocator;
     ASSERT_SUCCESS(endpointHeatPump.Register(endpointAllocator, mProvider));
     EXPECT_EQ(endpointHeatPump.Dispatch(MakeCommand(setpointRaiseLower)), CHIP_ERROR_INVALID_ARGUMENT);
+    endpointHeatPump.Unregister(mProvider);
+}
+
+TEST_F(TestHeatPump, HasThermostatControlFindsClientOrThermostatEndpoint)
+{
+    SimulatedHeatPump clientHeatPump(MakeContext(), ThermostatControl::kThermostatClient);
+    EXPECT_TRUE(clientHeatPump.HasThermostatControl(mProvider));
+
+    // The Thermostat endpoint only counts once it is registered as a child of the heat pump endpoint.
+    SimulatedHeatPump endpointHeatPump(MakeContext(), ThermostatControl::kThermostatEndpoint);
+    EXPECT_FALSE(endpointHeatPump.HasThermostatControl(mProvider));
+
+    ConsecutiveEndpointIdAllocator allocator;
+    ASSERT_SUCCESS(endpointHeatPump.Register(allocator, mProvider));
+    EXPECT_TRUE(endpointHeatPump.HasThermostatControl(mProvider));
+
+    endpointHeatPump.Unregister(mProvider);
+    EXPECT_FALSE(endpointHeatPump.HasThermostatControl(mProvider));
+}
+
+TEST_F(TestHeatPump, SetpointRaiseLowerAccessorValidatesPayload)
+{
+    SimulatedHeatPump clientHeatPump(MakeContext(), ThermostatControl::kThermostatClient);
+    ConsecutiveEndpointIdAllocator allocator;
+    ASSERT_SUCCESS(clientHeatPump.Register(allocator, mProvider));
+    const EndpointId endpoint = clientHeatPump.GetEndpointId();
+
+    InMemoryOOBAccessorRegistry registry;
+    RegisterOOBAccessors(clientHeatPump, registry);
+
+    // Other endpoints are left to other accessors.
+    EXPECT_EQ(registry.HandleAction(kSetpointRaiseLowerAction, SetpointRaiseLowerPayload(endpoint + 100, 0, 10).Span()),
+              CHIP_ERROR_NOT_FOUND);
+    // Mode 3 is outside SetpointRaiseLowerModeEnum (Heat, Cool, Both).
+    EXPECT_EQ(registry.HandleAction(kSetpointRaiseLowerAction, SetpointRaiseLowerPayload(endpoint, 3, 10).Span()),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(registry.HandleAction(kSetpointRaiseLowerAction, SetpointRaiseLowerPayload(endpoint, 0, std::nullopt).Span()),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    clientHeatPump.Unregister(mProvider);
+
+    // Without a Thermostat client the device has nothing to send the command with.
+    SimulatedHeatPump endpointHeatPump(MakeContext(), ThermostatControl::kThermostatEndpoint);
+    ConsecutiveEndpointIdAllocator endpointAllocator;
+    ASSERT_SUCCESS(endpointHeatPump.Register(endpointAllocator, mProvider));
+    InMemoryOOBAccessorRegistry endpointRegistry;
+    RegisterOOBAccessors(endpointHeatPump, endpointRegistry);
+    EXPECT_EQ(endpointRegistry.HandleAction(kSetpointRaiseLowerAction,
+                                            SetpointRaiseLowerPayload(endpointHeatPump.GetEndpointId(), 0, 10).Span()),
+              CHIP_ERROR_INVALID_ARGUMENT);
     endpointHeatPump.Unregister(mProvider);
 }
 

@@ -35,6 +35,8 @@ source_set("named_pipe") {
     "translators/DoorbellTranslator.h",
     "translators/ElectricalEnergyMeasurementTranslator.cpp",
     "translators/ElectricalEnergyMeasurementTranslator.h",
+    "translators/HeatPumpTranslator.cpp",
+    "translators/HeatPumpTranslator.h",
     "translators/ModeSelectTranslator.cpp",
     "translators/ModeSelectTranslator.h",
     "translators/OccupancyTranslator.cpp",

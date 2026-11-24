@@ -20,7 +20,6 @@
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/power-source/WiredPowerSource.h>
-#include <device/types/thermostat/impl/LoggingThermostat.h>
 
 namespace chip {
 namespace app {
@@ -29,7 +28,7 @@ namespace {
 
 const ClusterId kThermostatClientClusters[] = { Clusters::Thermostat::Id };
 
-HeatPump::Parts MakeParts(const SimulatedHeatPump::Context & context, SimulatedHeatPump::ThermostatControl thermostatControl)
+HeatPump::Parts MakeParts(const SimulatedHeatPump::Context & context)
 {
     HeatPump::Parts parts;
     parts.powerSource =
@@ -45,22 +44,23 @@ HeatPump::Parts MakeParts(const SimulatedHeatPump::Context & context, SimulatedH
     parts.electricalSensor = std::make_unique<SimulatedElectricalSensor>(
         context.timerDelegate, context.testEventTriggerDelegate, Span<const Clusters::Globals::Structs::SemanticTagStruct::Type>(),
         SimulatedElectricalSensorDelegate::Role::kGrid);
-    if (thermostatControl == SimulatedHeatPump::ThermostatControl::kThermostatEndpoint)
-    {
-        parts.thermostat = std::make_unique<LoggingThermostat>(LoggingThermostat::Context{
-            .fabricTable       = context.fabricTable,
-            .groupDataProvider = context.groupDataProvider,
-            .timerDelegate     = context.timerDelegate,
-        });
-    }
     return parts;
 }
 
 } // namespace
 
 SimulatedHeatPump::SimulatedHeatPump(const Context & context, ThermostatControl thermostatControl) :
-    HeatPump(Config{}, MakeParts(context, thermostatControl)), mContext(context), mThermostatControl(thermostatControl)
-{}
+    HeatPump(Config{}, MakeParts(context)), mContext(context), mThermostatControl(thermostatControl)
+{
+    if (mThermostatControl == ThermostatControl::kThermostatEndpoint)
+    {
+        mThermostat = std::make_unique<LoggingThermostat>(LoggingThermostat::Context{
+            .fabricTable       = context.fabricTable,
+            .groupDataProvider = context.groupDataProvider,
+            .timerDelegate     = context.timerDelegate,
+        });
+    }
+}
 
 CHIP_ERROR SimulatedHeatPump::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
 {
@@ -109,6 +109,21 @@ void SimulatedHeatPump::UnregisterOptionalClusters(CodeDrivenDataModelProvider &
     {
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
         mIdentifyCluster.Destroy();
+    }
+}
+
+CHIP_ERROR SimulatedHeatPump::RegisterOptionalEndpoints(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                                        EndpointId parent)
+{
+    VerifyOrReturnError(mThermostat != nullptr, CHIP_NO_ERROR);
+    return mThermostat->Register(allocator.Allocate(), provider, EndpointComposition::WithParent(parent));
+}
+
+void SimulatedHeatPump::UnregisterOptionalEndpoints(CodeDrivenDataModelProvider & provider)
+{
+    if (mThermostat != nullptr && mThermostat->GetEndpointId() != kInvalidEndpointId)
+    {
+        mThermostat->Unregister(provider);
     }
 }
 

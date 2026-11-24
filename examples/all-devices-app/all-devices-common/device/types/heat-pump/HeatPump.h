@@ -24,9 +24,13 @@
 namespace chip {
 namespace app {
 
-/// Heat Pump device type (0x0309). The spec requires one or more Thermostat endpoints or a
-/// Thermostat client: provide Parts::thermostat, or override ClientClusters() to report the
-/// Thermostat client. Register() fails with CHIP_ERROR_INCORRECT_STATE when neither is present.
+/// Heat Pump device type (0x0309) with its mandatory composed Power Source, Device Energy
+/// Management and Electrical Sensor endpoints.
+///
+/// Optional child endpoints (Thermostat, Temperature Sensor, Water Heater) are added by subclasses
+/// through RegisterOptionalEndpoints(). The spec requires one or more Thermostat endpoints or a
+/// Thermostat client, so Register() fails with CHIP_ERROR_INCORRECT_STATE when
+/// HasThermostatControl() is false after all endpoints are registered.
 class HeatPump : public DeviceInterface
 {
 public:
@@ -35,13 +39,12 @@ public:
         Span<const EndpointComposition::SemanticTag> tags = {};
     };
 
-    /// Endpoints composed under the heat pump endpoint. All are mandatory except `thermostat`.
+    /// Mandatory endpoints composed under the heat pump endpoint. None may be null.
     struct Parts
     {
         std::unique_ptr<SingleEndpoint> powerSource;
         std::unique_ptr<SingleEndpoint> energyManagement;
         std::unique_ptr<SingleEndpoint> electricalSensor;
-        std::unique_ptr<SingleEndpoint> thermostat;
     };
 
     HeatPump(const Config & config, Parts parts);
@@ -52,6 +55,10 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     EndpointId GetEndpointId() const { return mEndpointId; }
+
+    /// True when ClientClusters() reports the Thermostat cluster, or when `provider` has an endpoint
+    /// with the Thermostat device type whose parent is this heat pump endpoint.
+    bool HasThermostatControl(CodeDrivenDataModelProvider & provider) const;
 
 protected:
     /// Called before the heat pump endpoint is added, within the registration transaction.
@@ -64,8 +71,18 @@ protected:
     /// Overrides must tolerate clusters that were not constructed or registered.
     virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
 
+    /// Called after the mandatory endpoints are registered, to add optional child endpoints under `parent`.
+    virtual CHIP_ERROR RegisterOptionalEndpoints(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                                 EndpointId parent)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    /// Called before the mandatory endpoints are removed, including on partial registration failure.
+    /// Overrides must tolerate endpoints that were not registered.
+    virtual void UnregisterOptionalEndpoints(CodeDrivenDataModelProvider & provider) {}
+
 private:
-    bool HasThermostatControl() const;
     CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider);
     void UnregisterParts(CodeDrivenDataModelProvider & provider);
 
@@ -74,7 +91,6 @@ private:
     std::unique_ptr<SingleEndpoint> mPowerSource;
     std::unique_ptr<SingleEndpoint> mEnergyManagement;
     std::unique_ptr<SingleEndpoint> mElectricalSensor;
-    std::unique_ptr<SingleEndpoint> mThermostat;
 };
 
 } // namespace app

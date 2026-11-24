@@ -36,6 +36,8 @@ source_set("heat-pump") {
 
 source_set("simulated") {
   sources = [
+    "impl/OOBAccessors.cpp",
+    "impl/OOBAccessors.h",
     "impl/SimulatedHeatPump.cpp",
     "impl/SimulatedHeatPump.h",
   ]
@@ -47,9 +49,22 @@ source_set("simulated") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thermostat:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
     "${chip_root}/src/app/clusters/bindings",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/credentials",
     "${chip_root}/src/platform",
+  ]
+}
+
+source_set("simulated-posix") {
+  sources = [
+    "impl/NamedPipeTranslators.cpp",
+    "impl/NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":simulated",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
   ]
 }

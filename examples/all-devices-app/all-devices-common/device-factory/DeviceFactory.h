@@ -1205,12 +1205,10 @@ private:
                     },
                     thermostatControl);
             };
-            RegisterCreator("heat-pump", [makeHeatPump]() {
-                return makeHeatPump(SimulatedHeatPump::ThermostatControl::kThermostatEndpoint);
-            });
-            RegisterCreator("heat-pump-thermostat-client", [makeHeatPump]() {
-                return makeHeatPump(SimulatedHeatPump::ThermostatControl::kThermostatClient);
-            });
+            RegisterCreator("heat-pump",
+                            [makeHeatPump]() { return makeHeatPump(SimulatedHeatPump::ThermostatControl::kThermostatEndpoint); });
+            RegisterCreator("heat-pump-thermostat-client",
+                            [makeHeatPump]() { return makeHeatPump(SimulatedHeatPump::ThermostatControl::kThermostatClient); });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_CONDITIONER)
         {

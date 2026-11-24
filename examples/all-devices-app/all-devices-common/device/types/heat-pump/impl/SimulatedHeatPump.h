@@ -26,8 +26,11 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <device/types/heat-pump/HeatPump.h>
+#include <device/types/thermostat/impl/LoggingThermostat.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/PlatformManager.h>
+
+#include <memory>
 
 namespace chip {
 namespace app {
@@ -85,11 +88,17 @@ protected:
     CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
     void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) override;
 
+    CHIP_ERROR RegisterOptionalEndpoints(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                         EndpointId parent) override;
+    void UnregisterOptionalEndpoints(CodeDrivenDataModelProvider & provider) override;
+
 private:
     const Context mContext;
     const ThermostatControl mThermostatControl;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::BindingCluster> mBindingCluster;
+    /// Only constructed for ThermostatControl::kThermostatEndpoint.
+    std::unique_ptr<LoggingThermostat> mThermostat;
 };
 
 } // namespace app

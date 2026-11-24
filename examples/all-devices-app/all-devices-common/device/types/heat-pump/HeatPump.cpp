@@ -18,6 +18,7 @@
 
 #include <clusters/Thermostat/ClusterId.h>
 #include <devices/Types.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -25,7 +26,7 @@ namespace app {
 HeatPump::HeatPump(const Config & config, Parts parts) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kHeatPump, 1)), mConfig(config),
     mPowerSource(std::move(parts.powerSource)), mEnergyManagement(std::move(parts.energyManagement)),
-    mElectricalSensor(std::move(parts.electricalSensor)), mThermostat(std::move(parts.thermostat))
+    mElectricalSensor(std::move(parts.electricalSensor))
 {
     VerifyOrDie(mPowerSource != nullptr && mEnergyManagement != nullptr && mElectricalSensor != nullptr);
 }
@@ -34,7 +35,6 @@ CHIP_ERROR HeatPump::Register(EndpointIdAllocator & allocator, CodeDrivenDataMod
                               EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(HasThermostatControl(), CHIP_ERROR_INCORRECT_STATE);
     const EndpointId endpoint = allocator.Allocate();
     VerifyOrReturnError(endpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -50,12 +50,21 @@ CHIP_ERROR HeatPump::Register(EndpointIdAllocator & allocator, CodeDrivenDataMod
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
     ReturnErrorOnFailure(RegisterParts(allocator, provider));
+    ReturnErrorOnFailure(RegisterOptionalEndpoints(allocator, provider, mEndpointId));
+
+    if (!HasThermostatControl(provider))
+    {
+        ChipLogError(AppServer, "Heat Pump on endpoint %u has neither a Thermostat endpoint nor a Thermostat client", mEndpointId);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     transaction.Commit();
     return CHIP_NO_ERROR;
 }
 
 void HeatPump::Unregister(CodeDrivenDataModelProvider & provider)
 {
+    UnregisterOptionalEndpoints(provider);
     UnregisterParts(provider);
     if (mEndpointId != kInvalidEndpointId)
     {
@@ -65,15 +74,41 @@ void HeatPump::Unregister(CodeDrivenDataModelProvider & provider)
     UnregisterOptionalClusters(provider);
 }
 
-bool HeatPump::HasThermostatControl() const
+bool HeatPump::HasThermostatControl(CodeDrivenDataModelProvider & provider) const
 {
-    VerifyOrReturnValue(mThermostat == nullptr, true);
-
     ReadOnlyBufferBuilder<ClusterId> clientClusters;
-    VerifyOrReturnValue(ClientClusters(clientClusters) == CHIP_NO_ERROR, false);
-    for (ClusterId clusterId : clientClusters.TakeBuffer())
+    if (ClientClusters(clientClusters) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnValue(clusterId != Clusters::Thermostat::Id, true);
+        for (ClusterId clusterId : clientClusters.TakeBuffer())
+        {
+            if (clusterId == Clusters::Thermostat::Id)
+            {
+                return true;
+            }
+        }
+    }
+
+    VerifyOrReturnValue(mEndpointId != kInvalidEndpointId, false);
+    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpoints;
+    VerifyOrReturnValue(provider.Endpoints(endpoints) == CHIP_NO_ERROR, false);
+    for (const auto & endpoint : endpoints.TakeBuffer())
+    {
+        if (endpoint.parentId != mEndpointId)
+        {
+            continue;
+        }
+        ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> deviceTypes;
+        if (provider.DeviceTypes(endpoint.id, deviceTypes) != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+        for (const auto & deviceType : deviceTypes.TakeBuffer())
+        {
+            if (deviceType.deviceTypeId == Device::Type::kThermostat.deviceTypeId)
+            {
+                return true;
+            }
+        }
     }
     return false;
 }
@@ -85,19 +120,11 @@ CHIP_ERROR HeatPump::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDa
     ReturnErrorOnFailure(mPowerSource->Register(allocator, provider, child));
     ReturnErrorOnFailure(mEnergyManagement->Register(allocator, provider, child));
     ReturnErrorOnFailure(mElectricalSensor->Register(allocator, provider, child));
-    if (mThermostat != nullptr)
-    {
-        ReturnErrorOnFailure(mThermostat->Register(allocator, provider, child));
-    }
     return CHIP_NO_ERROR;
 }
 
 void HeatPump::UnregisterParts(CodeDrivenDataModelProvider & provider)
 {
-    if (mThermostat != nullptr && mThermostat->GetEndpointId() != kInvalidEndpointId)
-    {
-        mThermostat->Unregister(provider);
-    }
     if (mElectricalSensor->GetEndpointId() != kInvalidEndpointId)
     {
         mElectricalSensor->Unregister(provider);
