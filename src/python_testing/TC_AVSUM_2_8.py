@@ -41,7 +41,7 @@ from TC_AVSUMTestBase import AVSUMTestBase
 import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import Status
-from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.decorators import all_of, has_command, has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -73,24 +73,16 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
             TestStep(17, "Read the DPTZStreams attribute, verify that the new viewport is set to the sensor max"),
         ]
 
-    async def read_dptz_viewport(self, endpoint, videoStreamID: int) -> Globals.Structs.ViewportStruct:
-        """Read the viewport of a video stream from the DPTZStreams attribute."""
-        dptz_streams_dut = await self.read_avsum_attribute_expect_success(endpoint, Clusters.Objects.CameraAvSettingsUserLevelManagement.Attributes.DPTZStreams)
-        for streams in dptz_streams_dut:
-            if streams.videoStreamID == videoStreamID:
-                return streams.viewport
-        asserts.assert_fail(f"Stream {videoStreamID} not found in DPTZStreams")
-        return None
-
     def pics_TC_AVSUM_2_8(self) -> list[str]:
         return [
-            "AVSUM.S", "AVSUM.S.F00", "AVSM.S"
+            "AVSUM.S", "AVSUM.S.F00", "AVSUM.S.C06.Rsp", "AVSM.S"
         ]
 
-    @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
-                                         Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kDigitalPTZ) and
-                             has_feature(Clusters.CameraAvStreamManagement,
-                                         Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo))
+    @run_if_endpoint_matches(all_of(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
+                                                Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kDigitalPTZ),
+                                    has_feature(Clusters.CameraAvStreamManagement,
+                                                Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo),
+                                    has_command(Clusters.CameraAvSettingsUserLevelManagement.Commands.DPTZRelativeMove)))
     async def test_TC_AVSUM_2_8(self):
         clusterAVSTR = Clusters.Objects.CameraAvStreamManagement
         attributesAVSTR = clusterAVSTR.Attributes
@@ -121,11 +113,19 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
         sensordimensions = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.VideoSensorParams)
         minviewport = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.MinViewportResolution)
 
-        viewportwidth = max(sensordimensions.sensorWidth // 2, minviewport.width)
-        viewportheight = round(viewportwidth * sensordimensions.sensorHeight / sensordimensions.sensorWidth)
+        # DPTZSetViewport requires the viewport aspect ratio to match the stream's maxResolution,
+        # which can differ from the sensor size when a stream was already allocated before this
+        # test ran.
+        allocatedstreams = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.AllocatedVideoStreams)
+        stream = next(s for s in allocatedstreams if s.videoStreamID == videoStreamID)
+        streamwidth = stream.maxResolution.width
+        streamheight = stream.maxResolution.height
+
+        viewportwidth = max(streamwidth // 2, minviewport.width)
+        viewportheight = round(viewportwidth * streamheight / streamwidth)
         if viewportheight < minviewport.height:
             viewportheight = minviewport.height
-            viewportwidth = round(viewportheight * sensordimensions.sensorWidth / sensordimensions.sensorHeight)
+            viewportwidth = round(viewportheight * streamwidth / streamheight)
 
         x1 = sensordimensions.sensorWidth - viewportwidth
         passingviewport = Globals.Structs.ViewportStruct(x1=x1, y1=0, x2=sensordimensions.sensorWidth, y2=viewportheight)
@@ -204,6 +204,13 @@ class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
                             "Zoomed-in viewport exceeded the sensor width")
         asserts.assert_true(zoomedInViewport.y2 <= sensordimensions.sensorHeight,
                             "Zoomed-in viewport exceeded the sensor height")
+
+        # A zoom-in of +100% saturates at the minimum viewport size, so a second zoom-in must
+        # leave the viewport unchanged. This catches a per-call drift of the viewport origin
+        # when the size is recomputed at the minimum.
+        await self.send_dptz_relative_move_command(endpoint, videoStreamID, zoomDelta=100)
+        asserts.assert_equal(await self.read_dptz_viewport(endpoint, videoStreamID), zoomedInViewport,
+                             "Repeated zoom-in at the minimum size moved the viewport")
 
         self.step(14)
         # Repeatedly zoom out until the viewport reaches the sensor max. Zoom results are rounded,

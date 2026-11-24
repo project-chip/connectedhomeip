@@ -204,6 +204,26 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
             int width  = static_cast<int>(viewport.x2) - static_cast<int>(viewport.x1);
             int height = static_cast<int>(viewport.y2) - static_cast<int>(viewport.y1);
 
+            // The viewport aspect ratio must match the stream's aspect ratio, compared at 2 decimal
+            // places the same way DPTZSetViewport compares them. The minimum and maximum sizes are
+            // the smallest and largest stream-aspect rectangles that cover MinViewportResolution and
+            // fit inside the sensor.
+            const int streamWidth  = static_cast<int>(stream.videoStreamParams.maxResolution.width);
+            const int streamHeight = static_cast<int>(stream.videoStreamParams.maxResolution.height);
+            float streamAR         = floorf((static_cast<float>(streamWidth) / streamHeight) * 100) / 100;
+
+            int minWidth  = std::max(static_cast<int>(minResolution.width),
+                                     (static_cast<int>(minResolution.height) * streamWidth + streamHeight - 1) / streamHeight);
+            int minHeight = (minWidth * streamHeight + streamWidth - 1) / streamWidth;
+            int maxWidth  = std::min(static_cast<int>(sensorParms.sensorWidth),
+                                     static_cast<int>(sensorParms.sensorHeight) * streamWidth / streamHeight);
+            int maxHeight = (maxWidth * streamHeight + streamWidth - 1) / streamWidth;
+
+            // Apply the minimum and maximum size on every command, not only when a zoom is present,
+            // so a stored out-of-range size is corrected even by a translation-only move.
+            width  = std::clamp(width, minWidth, maxWidth);
+            height = std::clamp(height, minHeight, maxHeight);
+
             if (aDeltaX.HasValue())
             {
                 x1 += aDeltaX.Value();
@@ -223,27 +243,16 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 uint32_t zoomDeltaInPixels = originalSize * static_cast<uint32_t>(abs(zoomDelta)) / 100;
                 uint32_t newSize           = (zoomDelta < 0) ? originalSize + zoomDeltaInPixels : originalSize - zoomDeltaInPixels;
 
-                // If the new viewport after zoom would be less than the min, scale it to the min
+                // The new width of a rectangle with a defined aspect ratio is the square root of the
+                // new size of that rectangle multiplied by the aspect ratio
                 //
-                if (newSize < (minResolution.width * minResolution.height))
-                {
-                    newSize = minResolution.width * minResolution.height;
-                }
+                int newWidth  = static_cast<int>(round(sqrt(newSize * streamAR)));
+                int newHeight = static_cast<int>(newWidth / streamAR);
 
-                // The new width of a rectangle with a defined aspect ratio is the square root of the new size
-                // of that rectangle multiplied by the aspect ratio
-                //
-                double viewportAR = floorf((static_cast<float>(width) / height) * 100) / 100;
-
-                int newWidth  = static_cast<int>(round(sqrt(newSize * viewportAR)));
-                int newHeight = static_cast<int>(newWidth / viewportAR);
-
-                // Cap the new size to the minimum and the sensor dimensions before positioning the
+                // Cap the new size to the minimum and maximum before positioning the
                 // viewport, so the capping does not shift the viewport centre.
-                newWidth  = std::max(newWidth, static_cast<int>(minResolution.width));
-                newHeight = std::max(newHeight, static_cast<int>(minResolution.height));
-                newWidth  = std::min(newWidth, static_cast<int>(sensorParms.sensorWidth));
-                newHeight = std::min(newHeight, static_cast<int>(sensorParms.sensorHeight));
+                newWidth  = std::clamp(newWidth, minWidth, maxWidth);
+                newHeight = std::clamp(newHeight, minHeight, maxHeight);
 
                 // Scale the moved viewport about its centre
                 int centerX = x1 + width / 2;
@@ -254,8 +263,8 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
                 height      = newHeight;
             }
 
-            // Move the upper-left corner inside the sensor. The size is capped to the sensor, so the
-            // clamp limits are valid and the viewport keeps its size as it pins against an edge.
+            // Move the upper-left corner inside the sensor. The size is capped inside the sensor, so
+            // the clamp limits are valid and the viewport keeps its size as it pins against an edge.
             x1 = std::clamp(x1, 0, static_cast<int>(sensorParms.sensorWidth) - width);
             y1 = std::clamp(y1, 0, static_cast<int>(sensorParms.sensorHeight) - height);
 
