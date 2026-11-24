@@ -83,6 +83,7 @@
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
 #include <device/types/soil-sensor/SoilSensor.h>
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
+#include <device/types/solar-power/impl/SolarPowerVariants.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/TemperatureSensor.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
@@ -97,6 +98,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/Optional.h>
 #include <platform/DefaultTimerDelegate.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 
@@ -314,6 +316,7 @@ public:
         BindingHandler & bindingHandler;
         TestEventTriggerDelegate & testEventTriggerDelegate;
         Clusters::IdentifyDelegate & identifyDelegate;
+        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
     };
 
     static DeviceFactory & GetInstance()
@@ -918,6 +921,23 @@ private:
                                                                         GetDefaultSoilMoistureLimits(),
                                                                         kDefaultSoilTemperatureConfig);
             });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_SOLAR_POWER)
+        {
+            for (const auto & variant : SolarPowerVariants())
+            {
+                RegisterCreator(variant.name, [this, makeConfig = variant.makeConfig]() {
+                    VerifyOrDie(mContext.has_value());
+                    return MakeDevice<SimulatedSolarPower>(
+                        SimulatedSolarPower::Context{
+                            .timerDelegate            = mContext->timerDelegate,
+                            .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                            .fabricTable              = mContext->fabricTable,
+                            .deviceInfoProvider       = mContext->deviceInfoProvider,
+                        },
+                        makeConfig());
+                });
+            }
         }
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {

@@ -36,6 +36,7 @@
 #include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 #include <device/types/root-node/RootNode.h>
 #include <platform/DeviceControlServer.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <setup_payload/OnboardingCodesUtil.h>
@@ -138,6 +139,9 @@ CHIP_ERROR CreateAndRegisterRootNode(CommonCaseDeviceServerInitParams & initPara
 
 CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams & initParams)
 {
+    DeviceInfoProvider * deviceInfoProvider = GetDeviceInfoProvider();
+    VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     ReturnErrorOnFailure(gAttributePersistenceProvider.Init(initParams.persistentStorageDelegate));
     ReturnErrorOnFailure(gSafeAttributePersistenceProvider.Init(initParams.persistentStorageDelegate));
 
@@ -173,6 +177,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         .bindingHandler           = gBindingHandler,
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
         .identifyDelegate         = gIdentifyDelegate,
+        .deviceInfoProvider       = *deviceInfoProvider,
     });
 
     VerifyOrReturnError(!gDeviceType.empty(), CHIP_ERROR_INVALID_ARGUMENT);

@@ -41,11 +41,11 @@ OnEndCallback gOnEndCallback                     = nullptr;
 
 using namespace chip::python;
 
-void WebRTCTransportRequestorManager::Init()
+void WebRTCTransportRequestorManager::Init(chip::FabricTable & fabricTable)
 {
     Controller::AccessControl::InitAccessControl(kWebRTCRequesterDynamicEndpointId);
 
-    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, *this);
+    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, *this, fabricTable);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());
     if (err != CHIP_NO_ERROR)
     {

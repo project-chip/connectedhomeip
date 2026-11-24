@@ -202,10 +202,21 @@ public:
     CHIP_ERROR GetSecurityPolicy(uint32_t & aSecurityPolicy) const;
 
     /**
+     * Retrieves the Pending Timestamp from the dataset.
+     *
+     * @param[out]  aPendingTimestamp   A reference to receive the pending timestamp.
+     *
+     * @retval CHIP_NO_ERROR                    Successfully retrieved the pending timestamp.
+     * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND     Thread pending timestamp is not present in the dataset.
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT   If the TLV element is invalid.
+     */
+    CHIP_ERROR GetPendingTimestamp(uint64_t & aPendingTimestamp) const;
+
+    /**
      * Retrieves the Delay Timer from the dataset.
      *
      * @retval CHIP_NO_ERROR on success.
-     * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND if no security policy is present in the dataset.
+     * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND if no delay timer is present in the dataset.
      * @retval CHIP_ERROR_INVALID_TLV_ELEMENT if the TLV element is invalid.
      */
     CHIP_ERROR GetDelayTimer(uint32_t & aDelayMillis) const;
@@ -382,6 +393,16 @@ public:
      * @retval CHIP_ERROR_NO_MEMORY if there is insufficient space within the dataset.
      */
     CHIP_ERROR SetSecurityPolicy(uint32_t aSecurityPolicy);
+
+    /**
+     * Sets the Pending Timestamp in the dataset.
+     *
+     * @param[in]   aPendingTimestamp   The Thread pending timestamp.
+     *
+     * @retval CHIP_NO_ERROR           Successfully set the pending timestamp.
+     * @retval CHIP_ERROR_NO_MEMORY    Insufficient memory in the dataset for setting Thread pending timestamp.
+     */
+    CHIP_ERROR SetPendingTimestamp(uint64_t aPendingTimestamp);
 
     /**
      * Sets the Delay Timer value in the dataset.

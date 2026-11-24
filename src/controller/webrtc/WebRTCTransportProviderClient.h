@@ -125,7 +125,7 @@ private:
                            chip::CommandId commandId, const T & requestData)
     {
         mCommandSender =
-            std::make_unique<chip::app::CommandSender>(this, &exchangeMgr,
+            std::make_unique<chip::app::CommandSender>(this, &exchangeMgr, sessionHandle,
                                                        /* isTimedRequest = */ false,
                                                        /* suppressResponse   = */ false, sessionHandle->AllowsLargePayload());
         VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);

@@ -1,4 +1,5 @@
 FROM ubuntu:24.04
+LABEL org.opencontainers.image.source=https://github.com/project-chip/connectedhomeip
 
 ARG OT_BR_POSIX_CHECKOUT=main
 
@@ -39,6 +40,8 @@ RUN apt-get update \
   python3-pip \
   python3 \
   sudo \
+  tcpdump \
+  tshark \
   wireless-tools \
   wpasupplicant \
   && ln -fs /usr/share/zoneinfo/UTC /etc/localtime \

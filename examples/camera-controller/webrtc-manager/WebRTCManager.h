@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <credentials/FabricTable.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <functional>
 #include <platform/CHIPDeviceLayer.h>
@@ -40,7 +41,7 @@ public:
         return instance;
     }
 
-    void Init();
+    void Init(chip::FabricTable & fabricTable);
 
     /**
      * @brief Set callback to be invoked when WebRTC session is established

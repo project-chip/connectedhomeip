@@ -385,7 +385,8 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
 void CameraApp::InitCameraDeviceClusters()
 {
     // Initialize Cluster Servers
-    mWebRTCTransportProviderServer.Create(mEndpoint, mCameraDevice->GetWebRTCProviderDelegate());
+    mWebRTCTransportProviderServer.Create(mEndpoint, mCameraDevice->GetWebRTCProviderDelegate(),
+                                          Server::GetInstance().GetFabricTable());
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCTransportProviderServer.Registration());
     if (err != CHIP_NO_ERROR)
     {
