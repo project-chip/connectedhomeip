@@ -94,7 +94,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     @async_test_body
     async def setup_test(self):
         super().setup_test()
-
+        self.cleanup = True
         self.ota_prov = Clusters.OtaSoftwareUpdateProvider
         self.ota_req = Clusters.OtaSoftwareUpdateRequestor
         self.requestor_node_id = self.dut_node_id
@@ -142,7 +142,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             discriminator=self.provider_discriminator,
             port=self.provider_port,
             extra_args=['--app-pipe', self.provider_app_pipe, '--app-pipe-out',
-                        self.provider_app_pipe_out, '--delayedApplyActionTimeSec', '120'],
+                        self.provider_app_pipe_out, '--delayedApplyActionTimeSec', '120', '--applyUpdateAction' ,'awaitNextAction'],
             kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
             timeout=20
@@ -157,11 +157,15 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         await self.set_default_ota_providers_list(controller=self.controller, provider_node_id=self.provider_node_id, endpoint=0, requestor_node_id=self.requestor_node_id)
         await self.create_acl_entry(dev_ctrl=self.controller, provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id)
 
+    async def _cleanup_test(self):
+        if self.cleanup:
+            await self.clear_ota_providers(self.controller, self.requestor_node_id)
+            self.terminate_provider()
+
     @async_test_body
     async def teardown_test(self):
         # Once checks are completed clear the ota provider list to then terminate the provider.
-        await self.clear_ota_providers(self.controller, self.requestor_node_id)
-        self.terminate_provider()
+        await self._cleanup_test()
         self.clear_kvs(kvs_path_prefix=self.provider_kvs_path)
         super().teardown_test()
 
@@ -330,6 +334,7 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
             # If the named pipe retrieved correct data, then terminate to poll the named pipe
             if received_update_token is not None and len(received_update_token) > 0 and received_new_version is not None and received_new_version > 0:
+                logger.info("%s - Named pipe ApplyUpdateRequest value found at Attempt # %d", step_number_s1, attempt)
                 break
 
             # If the values read from the named pipe are not the appropiate wait some time until is ready.
@@ -352,6 +357,9 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         asserts.assert_equal(
             received_new_version, self.expected_software_version,
             f"NewVersion from ApplyUpdateRequest ({received_new_version}) does not match the expected software version ({self.expected_software_version}).")
+        # Clean up and terminate if this is completed dont perform this action on teardown
+        await self._cleanup_test()
+        self.cleanup = False
 
 
 if __name__ == "__main__":
