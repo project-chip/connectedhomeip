@@ -233,10 +233,10 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         return;
     }
 
-    ChipLogProgress(SoftwareUpdate, "Rebooting in 10 seconds...");
+    ChipLogProgress(SoftwareUpdate, "Rebooting in 2 seconds...");
 
     DeviceLayer::SystemLayer().StartTimer(
-        System::Clock::Seconds32(10),
+        System::Clock::Seconds32(2),
         [](chip::System::Layer *, void *) {
             ChipLogProgress(SoftwareUpdate, "Rebooting...");
             rtk_matter_ota_apply();

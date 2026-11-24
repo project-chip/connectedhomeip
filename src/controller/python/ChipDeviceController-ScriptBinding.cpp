@@ -206,7 +206,7 @@ public:
 
         using namespace chip::app::Clusters::CommissioningProxy;
 
-        auto cmdSender = chip::Platform::MakeUnique<chip::app::CommandSender>(this, mProxyExchangeMgr,
+        auto cmdSender = chip::Platform::MakeUnique<chip::app::CommandSender>(this, mProxyExchangeMgr, sessionOpt.Value(),
                                                                               /* aIsTimedRequest */ false,
                                                                               /* aSuppressResponse */ false,
                                                                               /* aAllowLargePayload */ true);

@@ -86,8 +86,6 @@ int main(int argc, char * argv[])
     registerCommandsWebRTC(commands, &credIssuerCommands);
     registerCommandsLiveView(commands, &credIssuerCommands);
 
-    WebRTCManager::Instance().Init();
-
     std::vector<char *> c_args;
     for (auto & arg : args)
     {

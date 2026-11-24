@@ -18,4 +18,4 @@
 
 service dbus start
 service avahi-daemon start
-/bin/CHIPCirqueDaemon.py --server otbr-agent
+exec /bin/CHIPCirqueDaemon.py --server otbr-agent

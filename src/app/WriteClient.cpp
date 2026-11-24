@@ -35,6 +35,7 @@ void WriteClient::Close()
 {
     MoveToState(State::AwaitingDestruction);
     mExchangeCtx.Release();
+    mRequestSession.Release();
 
     if (mpCallback)
     {
@@ -156,6 +157,7 @@ CHIP_ERROR WriteClient::FinalizeMessage(bool aHasMoreChunks)
 
 CHIP_ERROR WriteClient::EnsureMessage()
 {
+    ReturnErrorOnFailure(mRequestSession.Validate());
     if (mState != State::AddAttribute)
     {
         return StartNewMessage();
@@ -165,6 +167,7 @@ CHIP_ERROR WriteClient::EnsureMessage()
 
 CHIP_ERROR WriteClient::StartNewMessage()
 {
+    ReturnErrorOnFailure(mRequestSession.Validate());
     uint16_t reservedSize = 0;
 
     if (mState == State::AddAttribute)
@@ -177,6 +180,8 @@ CHIP_ERROR WriteClient::StartNewMessage()
     // false when the request is chunked.
     VerifyOrReturnError(!((mTimedWriteTimeoutMs.HasValue() || mSuppressResponse) && !mChunks.IsNull()),
                         CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrReturnError(!(mRequestSession.IsGroupSession() && (mTimedWriteTimeoutMs.HasValue() || mTimedRequestFieldValue)),
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -204,8 +209,12 @@ CHIP_ERROR WriteClient::StartNewMessage()
     ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(reservedSize));
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
-    mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
-    mWriteRequestBuilder.TimedRequest(mTimedRequestFieldValue);
+    RequestFlagsOptions flags;
+    flags.suppressResponse = mSuppressResponse;
+    flags.timedRequest     = mTimedRequestFieldValue;
+    flags.peerRevision     = mRequestSession.GetPeerInteractionModelRevision();
+    flags.isGroupcast      = mRequestSession.IsGroupSession();
+    mWriteRequestBuilder.RequestFlags(flags);
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     mWriteRequestBuilder.CreateWriteRequests();
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
@@ -458,6 +467,11 @@ void WriteClient::MoveToState(const State aTargetState)
 CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ReturnErrorOnFailure(mRequestSession.CheckSession(session));
+    // Also needed when no session was passed at construction, since nothing rejected the timed write earlier.
+    VerifyOrReturnError(!(session->IsGroupSession() && (mTimedWriteTimeoutMs.HasValue() || mTimedRequestFieldValue)),
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrExit(mState == State::AddAttribute, err = CHIP_ERROR_INCORRECT_STATE);
 
