@@ -219,6 +219,14 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
+    // The spec requires at least one of these features (conformance O.a+).
+    if (!mFeatures.HasAny(Feature::kConstantPressure, Feature::kCompensatedPressure, Feature::kConstantFlow,
+                          Feature::kConstantSpeed, Feature::kConstantTemperature))
+    {
+        ChipLogError(Zcl, "PCC: FeatureMap 0x%" PRIx32 " on endpoint %u has no control mode feature", mFeatures.Raw(),
+                     mPath.mEndpointId);
+    }
+
     AttributePersistence persistence(context.attributeStorage);
     const EndpointId endpointId = mPath.mEndpointId;
     const ClusterId clusterId   = mPath.mClusterId;
@@ -250,6 +258,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::Startup(ServerClusterContext & co
         { endpointId, clusterId, EffectiveControlMode::Id }, storedEffectiveControlMode, ControlModeEnum::kUnknownEnumValue);
 
     const RemoteSensorType sensorType = GetActiveRemoteSensor();
+    mActiveRemoteSensor               = sensorType;
     mEffectiveOperationMode           = mOperationMode;
     if (CanApplicationOwnEffectiveControlMode(sensorType) && IsControlModeSupported(storedEffectiveControlMode))
     {
@@ -425,7 +434,11 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetOperationMode(OperationModeEnu
 
     ChangedAttributes changed;
     changed.Add(OperationMode::Id);
-    UpdateEffectiveModes(changed);
+    if (SetAttributeValue(mEffectiveOperationMode, mOperationMode, EffectiveOperationMode::Id))
+    {
+        changed.Add(EffectiveOperationMode::Id);
+    }
+    UpdateEffectiveModes(changed, GetActiveRemoteSensor());
     return CHIP_NO_ERROR;
 }
 
@@ -438,13 +451,14 @@ CHIP_ERROR PumpConfigurationAndControlCluster::SetControlMode(ControlModeEnum co
 
     ChangedAttributes changed;
     changed.Add(ControlMode::Id);
-    UpdateEffectiveModes(changed);
+    UpdateEffectiveModes(changed, GetActiveRemoteSensor());
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::SetEffectiveControlMode(ControlModeEnum controlMode)
 {
     VerifyOrReturnError(IsControlModeSupported(controlMode), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(CanApplicationOwnEffectiveControlMode(mActiveRemoteSensor), CHIP_IM_GLOBAL_STATUS(InvalidInState));
     const bool changed = SetAttributeValue(mEffectiveControlMode, controlMode, EffectiveControlMode::Id);
     if (mContext != nullptr && (changed || !mHasStoredEffectiveControlModeOverride))
     {
@@ -655,20 +669,17 @@ bool PumpConfigurationAndControlCluster::IsAttributeEnabled(AttributeId attribut
 
 void PumpConfigurationAndControlCluster::OnRemoteSensorChanged()
 {
-    VerifyOrReturn(mOperationMode == OperationModeEnum::kNormal);
+    const RemoteSensorType sensorType = GetActiveRemoteSensor();
+    VerifyOrReturn(sensorType != mActiveRemoteSensor);
     ChangedAttributes changed;
-    UpdateEffectiveModes(changed);
+    UpdateEffectiveModes(changed, sensorType);
 }
 
-void PumpConfigurationAndControlCluster::UpdateEffectiveModes(ChangedAttributes & changed)
+void PumpConfigurationAndControlCluster::UpdateEffectiveModes(ChangedAttributes & changed, RemoteSensorType sensorType)
 {
-    const EndpointId endpointId       = mPath.mEndpointId;
-    const RemoteSensorType sensorType = GetActiveRemoteSensor();
+    const EndpointId endpointId = mPath.mEndpointId;
+    mActiveRemoteSensor         = sensorType;
 
-    if (SetAttributeValue(mEffectiveOperationMode, mOperationMode, EffectiveOperationMode::Id))
-    {
-        changed.Add(EffectiveOperationMode::Id);
-    }
     if (SetAttributeValue(mEffectiveControlMode, ComputeEffectiveControlMode(mOperationMode, mControlMode, sensorType),
                           EffectiveControlMode::Id))
     {

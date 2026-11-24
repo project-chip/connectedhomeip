@@ -137,26 +137,28 @@ public:
     CHIP_ERROR SetControlMode(PumpConfigurationAndControl::ControlModeEnum controlMode);
     PumpConfigurationAndControl::ControlModeEnum GetControlMode() const { return mControlMode; }
 
-    /// Asks the delegate for the remote sensor again and updates EffectiveControlMode and the
-    /// remote sensor bits of PumpStatus. Call it when the value returned by
-    /// Delegate::GetRemoteSensorType changes.
+    /// Asks the delegate for the remote sensor again. If the active remote sensor is different from
+    /// the one used for the last computation, updates EffectiveControlMode and the remote sensor bits
+    /// of PumpStatus. Call it when the value returned by Delegate::GetRemoteSensorType changes.
     ///
     /// Has no effect unless OperationMode is Normal: a remote sensor only applies in Normal mode.
+    /// Never changes EffectiveOperationMode.
     void OnRemoteSensorChanged();
 
     /// Overrides EffectiveControlMode. The application owns EffectiveControlMode while
     /// OperationMode is Local, and in Normal mode when no remote sensor is active and either
     /// ControlMode is Automatic or the ControlMode attribute is disabled. The next recompute (an
-    /// OperationMode or ControlMode change, or OnRemoteSensorChanged in Normal mode) overwrites it.
+    /// OperationMode or ControlMode change, or a remote sensor change reported with
+    /// OnRemoteSensorChanged) overwrites it.
     ///
     /// Returns ConstraintError if the mode requires a feature that is not enabled.
+    /// Returns InvalidInState if the application does not own EffectiveControlMode.
     CHIP_ERROR SetEffectiveControlMode(PumpConfigurationAndControl::ControlModeEnum controlMode);
     PumpConfigurationAndControl::ControlModeEnum GetEffectiveControlMode() const { return mEffectiveControlMode; }
 
     /// Overrides EffectiveOperationMode, e.g. to Local while the pump is physically set to run with
-    /// its local settings. The next recompute (an OperationMode or ControlMode change, or
-    /// OnRemoteSensorChanged in Normal mode) sets it back to OperationMode. The value is not
-    /// persisted: Startup sets it to OperationMode.
+    /// its local settings. The next OperationMode change sets it back to OperationMode. The value is
+    /// not persisted: Startup sets it to OperationMode.
     ///
     /// Returns ConstraintError if the mode requires a feature that is not enabled.
     CHIP_ERROR SetEffectiveOperationMode(PumpConfigurationAndControl::OperationModeEnum operationMode);
@@ -268,15 +270,15 @@ private:
         size_t mCount = 0;
     };
 
-    /// Recomputes EffectiveOperationMode, EffectiveControlMode and the remote sensor bits of
-    /// PumpStatus, then calls the delegate: OnOperationModeMinMax if applicable, then
-    /// OnAttributeChanged for `changed` and for every attribute changed here.
+    /// Recomputes EffectiveControlMode and the remote sensor bits of PumpStatus for `sensorType`
+    /// (the result of GetActiveRemoteSensor), then calls the delegate: OnOperationModeMinMax if
+    /// applicable, then OnAttributeChanged for `changed` and for every attribute changed here.
     ///
     /// The delegate is called only after all values are written, and the state is not modified
     /// after the first delegate call. A delegate that calls back into the cluster (e.g.
     /// OnRemoteSensorChanged from OnAttributeChanged) therefore starts from a consistent state,
     /// and its update is not overwritten by this one.
-    void UpdateEffectiveModes(ChangedAttributes & changed);
+    void UpdateEffectiveModes(ChangedAttributes & changed, PumpConfigurationAndControl::RemoteSensorType sensorType);
 
     /// Invalidates any persisted EffectiveControlMode override.
     void ClearStoredEffectiveControlModeOverride();
@@ -292,6 +294,9 @@ private:
     PumpConfigurationAndControl::OperationModeEnum mEffectiveOperationMode;
     PumpConfigurationAndControl::ControlModeEnum mEffectiveControlMode;
     bool mHasStoredEffectiveControlModeOverride = false;
+    /// Remote sensor used for the last EffectiveControlMode computation. kNoSensor unless
+    /// OperationMode is Normal.
+    PumpConfigurationAndControl::RemoteSensorType mActiveRemoteSensor = PumpConfigurationAndControl::RemoteSensorType::kNoSensor;
     PumpStatusBitMask mPumpStatus{ 0 };
     QuieterReportingAttribute<int16_t> mCapacity{ DataModel::NullNullable };
     QuieterReportingAttribute<uint16_t> mSpeed{ DataModel::NullNullable };

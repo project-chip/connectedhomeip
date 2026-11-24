@@ -42,6 +42,10 @@ When no ControlMode value is configured, or when the configured mode requires a
 feature that is not enabled, the first supported mode in `ControlModeEnum` order
 is used.
 
+The spec requires at least one of the ConstantPressure, CompensatedPressure,
+ConstantFlow, ConstantSpeed and ConstantTemperature features. `Startup` logs an
+error when none of them is enabled.
+
 ## Delegate
 
 A `Delegate` is required. It is passed by reference in `Config` and must outlive
@@ -61,15 +65,22 @@ the cluster.
 | Minimum, Maximum | ConstantSpeed                                                                                                                                                    | `OnOperationModeMinMax` |
 | Local            | ControlMode. The application may override it with `SetEffectiveControlMode`.                                                                                     | none                    |
 
-The effective modes are computed when OperationMode or ControlMode changes. The
-RemotePressure, RemoteFlow and RemoteTemperature bits of PumpStatus are owned by
-the cluster (ignored in `SetPumpStatus`) and updated with the same computation.
-A remote sensor whose control mode feature is not enabled is ignored.
+EffectiveOperationMode is set to OperationMode when OperationMode changes.
+EffectiveControlMode is computed when OperationMode or ControlMode changes, and
+when the active remote sensor changes. The RemotePressure, RemoteFlow and
+RemoteTemperature bits of PumpStatus are owned by the cluster (ignored in
+`SetPumpStatus`) and updated with the same computation. A remote sensor whose
+control mode feature is not enabled is ignored.
+
+`SetEffectiveControlMode` returns `InvalidInState` when the cluster computes
+EffectiveControlMode: in Minimum and Maximum mode, while a remote sensor is
+active, and in Normal mode when ControlMode is enabled and not Automatic.
 
 Call `OnRemoteSensorChanged()` when the value returned by `GetRemoteSensorType`
-changes. It only has an effect while OperationMode is Normal, so it never
-overwrites the EffectiveControlMode set by the application in Local mode and
-never calls `OnOperationModeMinMax`.
+changes. It only has an effect while OperationMode is Normal and the active
+remote sensor differs from the one used for the last computation. It never
+changes EffectiveOperationMode, never overwrites the EffectiveControlMode set by
+the application in Local mode and never calls `OnOperationModeMinMax`.
 
 At startup, the effective modes are rebuilt from the restored OperationMode and
 ControlMode instead of persisting computed values:
@@ -121,8 +132,10 @@ if (auto * pump = PumpConfigurationAndControl::FindClusterOnEndpoint(endpointId)
 ```
 
 `SetApplicationDelegate` queries the remote sensor again if the cluster already
-exists. The `ApplicationDelegate` is preserved across temporary endpoint
-shutdowns and removed when the endpoint is permanently removed.
+exists. If the new delegate reports the same remote sensor, nothing changes: an
+EffectiveControlMode override restored at startup is kept. The
+`ApplicationDelegate` is preserved across temporary endpoint shutdowns and
+removed when the endpoint is permanently removed.
 
 ## Migrating from the Ember implementation
 
@@ -146,7 +159,8 @@ PumpConfigurationAndControl::Attributes::PumpStatus::Set(endpointId, pumpStatus)
 | `Attributes::<Name>::Set(endpoint, value, MarkAttributeDirty)`          | Not available. The setters report changes                                                                                    |
 | `MatterReportingAttributeChangeCallback` after a setter                 | Not needed. The setters report changes                                                                                       |
 | `MatterPostAttributeChangeCallback` for this cluster                    | Not called. Use `ApplicationDelegate::OnAttributeChanged`                                                                    |
-| `Attributes::EffectiveOperationMode::Set` for a physical local override | Same call (validated against the FeatureMap). The next recompute (OperationMode or ControlMode change, or `OnRemoteSensorChanged` in Normal mode) sets it back to OperationMode, and it is not restored after a reboot |
+| `Attributes::EffectiveOperationMode::Set` for a physical local override | Same call (validated against the FeatureMap). The next OperationMode change sets it back to OperationMode, and it is not restored after a reboot |
+| `Attributes::EffectiveControlMode::Set`                                 | Same call (validated against the FeatureMap). Returns `InvalidInState` when the cluster computes EffectiveControlMode (see [Effective modes](#effective-modes)) |
 | `Attributes::ClusterRevision::Get`                                      | Not available. Use `PumpConfigurationAndControl::kRevision`                                                                  |
 | `LogEvent(PumpConfigurationAndControl::Events::X::Type{}, ...)`         | `GenerateAlarmEvent(PumpConfigurationAndControl::Events::X::Type{})`                                                         |
 | Remote sensor detection (not supported before)                          | `ApplicationDelegate::GetRemoteSensorType` and `OnRemoteSensorChanged`                                                       |

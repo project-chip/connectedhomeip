@@ -1346,6 +1346,117 @@ TEST_F(TestPumpConfigurationAndControlCluster, SetEffectiveControlModeRequiresFe
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestPumpConfigurationAndControlCluster, SetEffectiveControlModeRejectedWhenComputedByCluster)
+{
+    PumpConfigurationAndControlCluster::Config config =
+        ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantPressure, Feature::kAutomatic));
+    config.optionalAttributes.Set(OptionalAttributes::kControlMode).Set(OptionalAttributes::kPumpStatus);
+    config.controlMode = ControlModeEnum::kConstantSpeed;
+
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+
+    const CHIP_ERROR kInvalidInState = CHIP_IM_GLOBAL_STATUS(InvalidInState);
+
+    // Normal mode with a ControlMode other than Automatic: EffectiveControlMode follows ControlMode.
+    EXPECT_EQ(cluster.SetEffectiveControlMode(ControlModeEnum::kConstantPressure), kInvalidInState);
+    EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantSpeed);
+
+    EXPECT_EQ(tester.WriteAttribute(ControlMode::Id, ControlModeEnum::kAutomatic), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(cluster.SetEffectiveControlMode(ControlModeEnum::kConstantSpeed));
+
+    // An active remote sensor selects EffectiveControlMode, matching the Remote* bit of PumpStatus.
+    mDelegate.mRemoteSensorType = RemoteSensorType::kPressureSensor;
+    cluster.OnRemoteSensorChanged();
+    ASSERT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantPressure);
+    EXPECT_EQ(cluster.SetEffectiveControlMode(ControlModeEnum::kConstantSpeed), kInvalidInState);
+    EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantPressure);
+    EXPECT_TRUE(cluster.GetPumpStatus().Has(PumpStatusBitmap::kRemotePressure));
+
+    // Minimum and Maximum run the pump at a constant speed.
+    mDelegate.mRemoteSensorType = RemoteSensorType::kNoSensor;
+    EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kMaximum), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantSpeed);
+    EXPECT_EQ(cluster.SetEffectiveControlMode(ControlModeEnum::kConstantPressure), kInvalidInState);
+    EXPECT_EQ(cluster.GetEffectiveControlMode(), ControlModeEnum::kConstantSpeed);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, UnchangedRemoteSensorKeepsEffectiveControlModeOverride)
+{
+    // SetApplicationDelegate calls OnRemoteSensorChanged on a started cluster. When the remote
+    // sensor did not change, the override restored at startup is kept in memory and in storage.
+    PumpConfigurationAndControlCluster::Config config =
+        ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantPressure, Feature::kAutomatic));
+    config.optionalAttributes.Set(OptionalAttributes::kControlMode);
+    config.controlMode = ControlModeEnum::kAutomatic;
+
+    TestServerClusterContext sharedContext;
+    {
+        PumpConfigurationAndControlCluster firstCluster(kTestEndpointId, config);
+        ASSERT_SUCCESS(firstCluster.Startup(sharedContext.Get()));
+        EXPECT_SUCCESS(firstCluster.SetEffectiveControlMode(ControlModeEnum::kConstantPressure));
+        firstCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        PumpConfigurationAndControlCluster secondCluster(kTestEndpointId, config);
+        ASSERT_SUCCESS(secondCluster.Startup(sharedContext.Get()));
+        ASSERT_EQ(secondCluster.GetEffectiveControlMode(), ControlModeEnum::kConstantPressure);
+
+        mDelegate.mChangedAttributes.clear();
+        secondCluster.OnRemoteSensorChanged();
+        EXPECT_EQ(secondCluster.GetEffectiveControlMode(), ControlModeEnum::kConstantPressure);
+        EXPECT_TRUE(mDelegate.mChangedAttributes.empty());
+        secondCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        PumpConfigurationAndControlCluster thirdCluster(kTestEndpointId, config);
+        ASSERT_SUCCESS(thirdCluster.Startup(sharedContext.Get()));
+        EXPECT_EQ(thirdCluster.GetEffectiveControlMode(), ControlModeEnum::kConstantPressure);
+
+        // A new remote sensor takes precedence over the override.
+        mDelegate.mRemoteSensorType = RemoteSensorType::kPressureSensor;
+        thirdCluster.OnRemoteSensorChanged();
+        mDelegate.mRemoteSensorType = RemoteSensorType::kNoSensor;
+        thirdCluster.OnRemoteSensorChanged();
+        EXPECT_EQ(thirdCluster.GetEffectiveControlMode(), ControlModeEnum::kAutomatic);
+        thirdCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+TEST_F(TestPumpConfigurationAndControlCluster, EffectiveOperationModeOverrideKeptUntilOperationModeChanges)
+{
+    PumpConfigurationAndControlCluster::Config config =
+        ConfigWithFeatures(BitFlags<Feature>(Feature::kConstantSpeed, Feature::kConstantPressure, Feature::kLocalOperation));
+    config.optionalAttributes.Set(OptionalAttributes::kControlMode);
+    config.controlMode = ControlModeEnum::kConstantSpeed;
+
+    PumpConfigurationAndControlCluster cluster(kTestEndpointId, config);
+    ClusterTester tester(cluster);
+    ASSERT_SUCCESS(cluster.Startup(tester.GetServerClusterContext()));
+    EXPECT_SUCCESS(cluster.SetEffectiveOperationMode(OperationModeEnum::kLocal));
+
+    // EffectiveOperationMode only depends on OperationMode: ControlMode and remote sensor changes keep the override.
+    mDelegate.mChangedAttributes.clear();
+    EXPECT_EQ(tester.WriteAttribute(ControlMode::Id, ControlModeEnum::kConstantPressure), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kLocal);
+
+    mDelegate.mRemoteSensorType = RemoteSensorType::kPressureSensor;
+    cluster.OnRemoteSensorChanged();
+    EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kLocal);
+    EXPECT_FALSE(mDelegate.WasChanged(EffectiveOperationMode::Id));
+
+    EXPECT_EQ(tester.WriteAttribute(OperationMode::Id, OperationModeEnum::kMaximum), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetEffectiveOperationMode(), OperationModeEnum::kMaximum);
+    EXPECT_TRUE(mDelegate.WasChanged(EffectiveOperationMode::Id));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestPumpConfigurationAndControlCluster, WriteRejectsReadOnlyAndDisabledAttributes)
 {
     {
