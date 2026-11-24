@@ -1088,7 +1088,7 @@ Status EnergyEvseDelegate::HandleEVPluggedInEvent()
 
         /* EV was not plugged in - start a new session */
         // TODO get energy meter readings - #35370
-        mSession.StartSession(mCluster, 0, 0);
+        mSession.StartSession(*mCluster, 0, 0);
         SendEVConnectedEvent();
 
         /* Any transfer state saved before a fault belongs to the previous session */
@@ -1118,7 +1118,7 @@ Status EnergyEvseDelegate::HandleEVNotDetectedEvent()
     mStateBeforeFault = StateEnum::kUnknownEnumValue;
 
     // TODO get energy meter readings - #35370
-    mSession.StopSession(mCluster, 0, 0);
+    mSession.StopSession(*mCluster, 0, 0);
     SendEVNotDetectedEvent();
     return SetStateFromHardwareState(StateEnum::kNotPluggedIn);
 }
@@ -1134,7 +1134,7 @@ Status EnergyEvseDelegate::HandleEVNoDemandEvent()
         /*
          * EV was transferring current - EV decided to stop
          */
-        mSession.RecalculateSessionDuration(mCluster);
+        mSession.RecalculateSessionDuration(*mCluster);
         SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVStopped, transferState);
     }
 
@@ -2009,10 +2009,8 @@ bool EnergyEvseDelegate::IsEvsePluggedIn()
  * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
  * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
  */
-void EvseSession::StartSession(EnergyEvseCluster * cluster, int64_t chargingMeterValue, int64_t dischargingMeterValue)
+void EvseSession::StartSession(EnergyEvseCluster & cluster, int64_t chargingMeterValue, int64_t dischargingMeterValue)
 {
-    VerifyOrReturn(cluster != nullptr);
-
     /* Get Timestamp */
     uint32_t matterEpochSeconds = 0;
     CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
@@ -2027,20 +2025,20 @@ void EvseSession::StartSession(EnergyEvseCluster * cluster, int64_t chargingMete
     mSessionEnergyDischargedAtStart = dischargingMeterValue;
 
     // Compute next session ID
-    DataModel::Nullable<uint32_t> currentSessionID = cluster->GetSessionID();
+    DataModel::Nullable<uint32_t> currentSessionID = cluster.GetSessionID();
     if (currentSessionID.IsNull())
     {
-        LogErrorOnFailure(cluster->SetSessionID(MakeNullable(static_cast<uint32_t>(0))));
+        LogErrorOnFailure(cluster.SetSessionID(MakeNullable(static_cast<uint32_t>(0))));
     }
     else
     {
-        LogErrorOnFailure(cluster->SetSessionID(MakeNullable(currentSessionID.Value() + 1)));
+        LogErrorOnFailure(cluster.SetSessionID(MakeNullable(currentSessionID.Value() + 1)));
     }
 
     // Reset session counters
-    LogErrorOnFailure(cluster->SetSessionDuration(MakeNullable(static_cast<uint32_t>(0))));
-    LogErrorOnFailure(cluster->SetSessionEnergyCharged(MakeNullable(static_cast<int64_t>(0))));
-    LogErrorOnFailure(cluster->SetSessionEnergyDischarged(MakeNullable(static_cast<int64_t>(0))));
+    LogErrorOnFailure(cluster.SetSessionDuration(MakeNullable(static_cast<uint32_t>(0))));
+    LogErrorOnFailure(cluster.SetSessionEnergyCharged(MakeNullable(static_cast<int64_t>(0))));
+    LogErrorOnFailure(cluster.SetSessionEnergyDischarged(MakeNullable(static_cast<int64_t>(0))));
 
     // TODO persist mStartTime
     // TODO persist mSessionEnergyChargedAtStart
@@ -2054,7 +2052,7 @@ void EvseSession::StartSession(EnergyEvseCluster * cluster, int64_t chargingMete
  * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
  * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
  */
-void EvseSession::StopSession(EnergyEvseCluster * cluster, int64_t chargingMeterValue, int64_t dischargingMeterValue)
+void EvseSession::StopSession(EnergyEvseCluster & cluster, int64_t chargingMeterValue, int64_t dischargingMeterValue)
 {
     RecalculateSessionDuration(cluster);
     UpdateEnergyCharged(cluster, chargingMeterValue);
@@ -2068,10 +2066,8 @@ void EvseSession::StopSession(EnergyEvseCluster * cluster, int64_t chargingMeter
  *
  * @param endpointId            - The endpoint to report the update on
  */
-void EvseSession::RecalculateSessionDuration(EnergyEvseCluster * cluster)
+void EvseSession::RecalculateSessionDuration(EnergyEvseCluster & cluster)
 {
-    VerifyOrReturn(cluster != nullptr);
-
     uint32_t matterEpochSeconds = 0;
     CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
     if (err != CHIP_NO_ERROR)
@@ -2082,7 +2078,7 @@ void EvseSession::RecalculateSessionDuration(EnergyEvseCluster * cluster)
     }
 
     uint32_t duration = matterEpochSeconds - mStartTime;
-    LogErrorOnFailure(cluster->SetSessionDuration(MakeNullable(duration)));
+    LogErrorOnFailure(cluster.SetSessionDuration(MakeNullable(duration)));
 }
 
 /**
@@ -2091,10 +2087,9 @@ void EvseSession::RecalculateSessionDuration(EnergyEvseCluster * cluster)
  * @param endpointId            - The endpoint to report the update on
  * @param chargingMeterValue    - The value of the energy meter (charging) in mWh
  */
-void EvseSession::UpdateEnergyCharged(EnergyEvseCluster * cluster, int64_t chargingMeterValue)
+void EvseSession::UpdateEnergyCharged(EnergyEvseCluster & cluster, int64_t chargingMeterValue)
 {
-    VerifyOrReturn(cluster != nullptr);
-    LogErrorOnFailure(cluster->SetSessionEnergyCharged(MakeNullable(chargingMeterValue - mSessionEnergyChargedAtStart)));
+    LogErrorOnFailure(cluster.SetSessionEnergyCharged(MakeNullable(chargingMeterValue - mSessionEnergyChargedAtStart)));
 }
 
 /**
@@ -2103,10 +2098,9 @@ void EvseSession::UpdateEnergyCharged(EnergyEvseCluster * cluster, int64_t charg
  * @param endpointId            - The endpoint to report the update on
  * @param dischargingMeterValue - The value of the energy meter (discharging) in mWh
  */
-void EvseSession::UpdateEnergyDischarged(EnergyEvseCluster * cluster, int64_t dischargingMeterValue)
+void EvseSession::UpdateEnergyDischarged(EnergyEvseCluster & cluster, int64_t dischargingMeterValue)
 {
-    VerifyOrReturn(cluster != nullptr);
-    LogErrorOnFailure(cluster->SetSessionEnergyDischarged(MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart)));
+    LogErrorOnFailure(cluster.SetSessionEnergyDischarged(MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart)));
 }
 
 // ------------------------------------------------------------------

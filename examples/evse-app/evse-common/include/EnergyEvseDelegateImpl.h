@@ -67,7 +67,7 @@ public:
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void StartSession(EnergyEvseCluster * cluster, int64_t chargingMeterValue, int64_t dischargingMeterValue);
+    void StartSession(EnergyEvseCluster & cluster, int64_t chargingMeterValue, int64_t dischargingMeterValue);
 
     /**
      * @brief Stop the current session: recalculates duration and energy values.
@@ -76,14 +76,14 @@ public:
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void StopSession(EnergyEvseCluster * cluster, int64_t chargingMeterValue, int64_t dischargingMeterValue);
+    void StopSession(EnergyEvseCluster & cluster, int64_t chargingMeterValue, int64_t dischargingMeterValue);
 
     /**
      * @brief Recalculate session duration from start time to now.
      *
      * @param cluster - The cluster whose session attributes are updated
      */
-    void RecalculateSessionDuration(EnergyEvseCluster * cluster);
+    void RecalculateSessionDuration(EnergyEvseCluster & cluster);
 
     /**
      * @brief Update the session's charged energy delta.
@@ -91,7 +91,7 @@ public:
      * @param cluster            - The cluster whose session attributes are updated
      * @param chargingMeterValue - The current value of the energy meter (charging) in mWh
      */
-    void UpdateEnergyCharged(EnergyEvseCluster * cluster, int64_t chargingMeterValue);
+    void UpdateEnergyCharged(EnergyEvseCluster & cluster, int64_t chargingMeterValue);
 
     /**
      * @brief Update the session's discharged energy delta.
@@ -99,7 +99,7 @@ public:
      * @param cluster              - The cluster whose session attributes are updated
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void UpdateEnergyDischarged(EnergyEvseCluster * cluster, int64_t dischargingMeterValue);
+    void UpdateEnergyDischarged(EnergyEvseCluster & cluster, int64_t dischargingMeterValue);
 
 private:
     uint32_t mStartTime                     = 0; // Epoch_s - 0 means it hasn't started yet
