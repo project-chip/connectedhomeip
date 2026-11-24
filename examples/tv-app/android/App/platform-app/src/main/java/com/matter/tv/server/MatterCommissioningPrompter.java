@@ -14,10 +14,8 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.EditText;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
 import com.matter.tv.server.databinding.LayoutDialogBinding;
 import com.matter.tv.server.databinding.LayoutInputDialogBinding;
@@ -187,9 +185,12 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   public void promptCommissioningFailed(String commissioneeName, String error) {
     Log.d(TAG, "Received prompt for failure Commissionee: " + commissioneeName);
 
+    Bundle bundle = new Bundle();
+    bundle.putString(MsgHandler.KEY_COMMISSIONEE_NAME, commissioneeName);
+    bundle.putString(MsgHandler.KEY_COMMISSIONING_ERROR, error);
     android.os.Message obtained = android.os.Message.obtain();
     obtained.what = MsgHandler.MSG_CommissioningFailed;
-    obtained.obj = commissioneeName;
+    obtained.setData(bundle);
     mHandler.sendMessage(obtained);
   }
 
@@ -409,22 +410,32 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   }
 
   private void handleCommissioningFailed(android.os.Message msg) {
-    String commissioneeName = (String) msg.obj;
-    String error = (String) msg.obj;
-    AlertDialog.Builder abuilder = new AlertDialog.Builder(getContext());
-    AlertDialog alertDialog =
-        abuilder
-            .setMessage("Failed. " + commissioneeName + " experienced error: " + error + ".")
-            .setTitle("Connection Failed")
-            .create();
-    alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_PANEL);
-    alertDialog.show();
+    Bundle bundle = msg.getData();
+    String commissioneeName = bundle.getString(MsgHandler.KEY_COMMISSIONEE_NAME);
+    String error = bundle.getString(MsgHandler.KEY_COMMISSIONING_ERROR);
+    String message = "Failed. " + commissioneeName + " experienced error: " + error + ".";
+
+    PromptDialogManager promptDialogManager =
+        new PromptDialogManager.Builder()
+            .setCancelable(true)
+            .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 300))
+            .setStyle(PromptDialogManager.DIALOG_STYLE_3)
+            .build();
+
+    LayoutDialogBinding dialogBinding =
+        LayoutDialogBinding.inflate(
+            LayoutInflater.from(
+                MatterTvServerApplication.getApplication().getApplicationContext()));
+    dialogBinding.tvContent.setText(message);
+    dialogBinding.tvTitle.setText("Connection Failed");
+    dialogBinding.llAction.setVisibility(View.GONE);
+    promptDialogManager.addView(dialogBinding.getRoot(), null);
 
     NotificationCompat.Builder builder =
         new NotificationCompat.Builder(getContext(), CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_clear_24)
             .setContentTitle("Connection Failed")
-            .setContentText("Failed. " + commissioneeName + " experienced error: " + error + ".")
+            .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
     notificationManager.notify(FAIL_ID, builder.build());
@@ -532,6 +543,8 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     public static final int MSG_FixedPasscodeCommissioningLockout = 109;
     public static final String KEY_PROMPT_COMMISSIONER_PASSCODE =
         "KEY_PROMPT_COMMISSIONER_PASSCODE";
+    public static final String KEY_COMMISSIONEE_NAME = "KEY_COMMISSIONEE_NAME";
+    public static final String KEY_COMMISSIONING_ERROR = "KEY_COMMISSIONING_ERROR";
     private final WeakReference<MatterCommissioningPrompter> mPrompterWeakReference;
 
     public MsgHandler(MatterCommissioningPrompter commissioningPrompter) {

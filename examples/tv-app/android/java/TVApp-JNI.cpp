@@ -21,6 +21,7 @@
 #include "CommissionerMain.h"
 #include "ContentLauncherManager.h"
 #include "DeviceCallbacks.h"
+#include "DeviceInfoProviderImpl.h"
 #include "JNIDACProvider.h"
 #include "KeypadInputManager.h"
 #include "LevelManager.h"
@@ -170,6 +171,7 @@ JNI_METHOD(void, preServerInit)(JNIEnv *, jobject app)
 {
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Zcl, "TvAppJNI::preServerInit");
+    chip::DeviceLayer::SetDeviceInfoProvider(&chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance());
 }
 
 JNI_METHOD(void, postServerInit)(JNIEnv *, jobject app, jobject contentAppEndpointManager)
