@@ -31,8 +31,14 @@ namespace Revision {
  * See section 8.1.1. "Revision History" in the "Interaction Model
  * Specification" chapter of the core Matter specification.
  */
-inline constexpr InteractionModelRevision kInteractionModelRevision = 12;
+inline constexpr InteractionModelRevision kInteractionModelRevision = 14;
 inline constexpr uint8_t kInteractionModelRevisionTag               = 0xFF;
+
+/**
+ * First interaction model revision where SuppressResponse and TimedRequest are
+ * optional in Write Request and Invoke Request messages.
+ */
+inline constexpr InteractionModelRevision kFirstRevisionWithOptionalRequestFlags = 14;
 
 /**
  * A monotonic number identifying the revision number of the Data Model against

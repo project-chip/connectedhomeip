@@ -441,7 +441,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
         SingleWriteCallback * writeCb = this->GetWriteCallback();
 
-        WriteClient writeClient(&GetExchangeManager(), this->GetWriteCallback(), Optional<uint16_t>::Missing());
+        WriteClient writeClient(&GetExchangeManager(), this->GetWriteCallback(), std::nullopt, Optional<uint16_t>::Missing());
         AttributePathParams attributePath{ kTestEndpointId, Clusters::UnitTesting::Id,
                                            Clusters::UnitTesting::Attributes::Int8u::Id };
         constexpr uint8_t attributeValue = 1u;
@@ -472,7 +472,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
         SingleWriteCallback * writeCb = this->GetWriteCallback();
 
-        WriteClient writeClient(&GetExchangeManager(), this->GetWriteCallback(), Optional<uint16_t>::Missing());
+        WriteClient writeClient(&GetExchangeManager(), this->GetWriteCallback(), std::nullopt, Optional<uint16_t>::Missing());
         AttributePathParams attributePath{ kTestEndpointId, Clusters::UnitTesting::Id,
                                            Clusters::UnitTesting::Attributes::Int8u::Id };
 

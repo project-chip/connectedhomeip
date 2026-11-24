@@ -1047,10 +1047,13 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
     // A Sigma1 without the session parameters struct leaves the remote session parameters at their defaults,
     // not at the values of a previous handshake.
     SetRemoteSessionParameters(parsedSigma1.initiatorSessionParams);
-    if (parsedSigma1.initiatorSessionParamStructPresent)
-    {
-        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(GetRemoteSessionParameters());
-    }
+
+    auto applyInitiatorSessionParams = [this, &parsedSigma1]() {
+        if (parsedSigma1.initiatorSessionParamStructPresent)
+        {
+            mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(GetRemoteSessionParameters());
+        }
+    };
 
     if (parsedSigma1.sessionResumptionRequested &&
         parsedSigma1.resumptionId.size() == SessionResumptionStorage::kResumptionIdSize &&
@@ -1058,6 +1061,8 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
             TryResumeSession(SessionResumptionStorage::ConstResumptionIdView(parsedSigma1.resumptionId.data()),
                              parsedSigma1.initiatorResumeMIC, parsedSigma1.initiatorRandom))
     {
+        applyInitiatorSessionParams();
+
         std::copy(parsedSigma1.initiatorRandom.begin(), parsedSigma1.initiatorRandom.end(), mInitiatorRandom);
         std::copy(parsedSigma1.resumptionId.begin(), parsedSigma1.resumptionId.end(), mResumeResumptionId.begin());
 
@@ -1081,6 +1086,8 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
 
         // Side-effect of FindLocalNodeFromDestinationId success was that mFabricIndex/mLocalNodeId are now
         // set to the local fabric and associated NodeId that was targeted by the initiator.
+
+        applyInitiatorSessionParams();
 
         return NextStep::Create<Step>(Step::kSendSigma2);
     }

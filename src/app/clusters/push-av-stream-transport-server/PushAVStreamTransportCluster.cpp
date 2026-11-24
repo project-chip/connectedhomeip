@@ -57,6 +57,11 @@ constexpr CommandId kGeneratedCommands[] = {
 using Protocols::InteractionModel::Status;
 using namespace PushAvStreamTransport::Commands;
 
+void PushAvStreamTransportServer::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    mLogic.OnFabricRemoved(fabricIndex);
+}
+
 CHIP_ERROR PushAvStreamTransportServer::Attributes(const ConcreteClusterPath & path,
                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {

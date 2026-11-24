@@ -18,3 +18,7 @@
 #if CHIP_HAVE_CONFIG_H
 #include <minmdns/MinMdnsBuildConfig.h>
 #endif
+
+#ifndef CHIP_MINMDNS_INTERFACE_MONITOR
+#define CHIP_MINMDNS_INTERFACE_MONITOR 0
+#endif
