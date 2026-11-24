@@ -162,6 +162,13 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             await self.clear_ota_providers(self.controller, self.requestor_node_id)
             self.terminate_provider()
 
+    async def _wait_for_idle_after_software_update(self, update_state_handler):
+        # Wait for the DUT to return to Idle after the Provider is canceled.
+        update_state_match = AttributeMatcher.from_callable(
+            "UpdateState is Idle",
+            lambda report: report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+        update_state_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
+
     @async_test_body
     async def teardown_test(self):
         # Once checks are completed clear the ota provider list to then terminate the provider.
@@ -300,7 +307,6 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             stall_timeout_sec=1800,
             liveness_matcher=progress_liveness_s1,
         )
-        subscription_attr_s1.cancel()
 
         # Pool for a max of 30 seconds the read the last ApplyUpdateRequest that the OTA-P received from the DUT to avoid a race condition.
         # A delayedApplyActionTimeSec of 60 secs to cover the poll time.
@@ -360,6 +366,9 @@ class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Clean up and terminate if this is completed dont perform this action on teardown
         await self._cleanup_test()
         self.cleanup = False
+        # Wait DUT go back to kIdle
+        await self._wait_for_idle_after_software_update(update_state_handler=subscription_attr_s1)
+        subscription_attr_s1.cancel()
 
 
 if __name__ == "__main__":
