@@ -151,8 +151,9 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::InvokeOnHeldSession(CommandId aCommand
     VerifyOrReturnError(!mCommandSender, CHIP_ERROR_INCORRECT_STATE);
 
     auto session   = mRequest.Session();
-    mCommandSender = Platform::MakeUnique<CommandSender>(this, &mRequest.ExchangeManager(), /* aIsTimedRequest = */ false,
-                                                         /* aSuppressResponse = */ false, session.Value()->AllowsLargePayload());
+    mCommandSender = Platform::MakeUnique<CommandSender>(this, &mRequest.ExchangeManager(), session.Value(),
+                                                         /* aIsTimedRequest = */ false, /* aSuppressResponse = */ false,
+                                                         session.Value()->AllowsLargePayload());
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Recorded before sending: a send can dispatch the interaction's completion synchronously, and

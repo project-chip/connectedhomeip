@@ -120,11 +120,11 @@ WebRTCManager::~WebRTCManager()
     Disconnect();
 }
 
-void WebRTCManager::Init()
+void WebRTCManager::Init(chip::FabricTable & fabricTable)
 {
     Controller::AccessControl::InitAccessControl(kWebRTCRequesterDynamicEndpointId);
 
-    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate);
+    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate, fabricTable);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());
     if (err != CHIP_NO_ERROR)
     {
