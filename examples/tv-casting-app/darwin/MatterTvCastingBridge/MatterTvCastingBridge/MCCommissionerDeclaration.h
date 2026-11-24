@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -85,15 +85,21 @@ typedef NS_ENUM(NSInteger, CdError) {
 @property (nonatomic, readonly) BOOL cancelPasscode;
 /** Feature: Commissioner-Generated Passcode - length of passcode displayed. */
 @property (nonatomic, readonly) NSInteger passcodeLength;
+/**
+ * Feature: Fixed Passcode Commissioning - Flag to indicate whether the Commissioner selected
+ * Fixed Passcode Commissioning for this commissioning attempt.
+ */
+@property (nonatomic, readonly) BOOL fixedPasscodeCommissioningSelected;
 
 - (instancetype)initWithOptions:(NSInteger)errorCode
-                  needsPasscode:(BOOL)needsPasscode
-                    noAppsFound:(BOOL)noAppsFound
-        passcodeDialogDisplayed:(BOOL)passcodeDialogDisplayed
-           commissionerPasscode:(BOOL)commissionerPasscode
-                qRCodeDisplayed:(BOOL)qRCodeDisplayed
-                 cancelPasscode:(BOOL)cancelPasscode
-                 passcodeLength:(NSInteger)passcodeLength;
+                         needsPasscode:(BOOL)needsPasscode
+                           noAppsFound:(BOOL)noAppsFound
+               passcodeDialogDisplayed:(BOOL)passcodeDialogDisplayed
+                  commissionerPasscode:(BOOL)commissionerPasscode
+                       qRCodeDisplayed:(BOOL)qRCodeDisplayed
+                        cancelPasscode:(BOOL)cancelPasscode
+                        passcodeLength:(NSInteger)passcodeLength
+    fixedPasscodeCommissioningSelected:(BOOL)fixedPasscodeCommissioningSelected;
 
 /**
  * Function to return the error code as a string.

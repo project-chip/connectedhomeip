@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -59,6 +59,16 @@
  */
 @property (nonatomic, readonly) NSInteger passcodeLength;
 /**
+ * Feature: Fixed Passcode Commissioning - Flag to indicate whether the Commissionee supports and
+ * requests Fixed Passcode Commissioning for this commissioning attempt.
+ */
+@property (nonatomic, readonly) BOOL fixedPasscodeCommissioningSupported;
+/**
+ * Feature: Fixed Passcode Commissioning - Flag to indicate whether the Commissionee has opened a
+ * commissioning window using its fixed setup Passcode.
+ */
+@property (nonatomic, readonly) BOOL fixedPasscodeCommissioningReady;
+/**
  * Feature: UDC request - custom instance name
  */
 @property (nonatomic, readonly) NSString * instanceName;
@@ -67,7 +77,13 @@
 
 - (instancetype)initWithCommissionerPasscodeOnly:(BOOL)commissionerPasscode;
 
+- (instancetype)initWithCommissionerPasscode:(BOOL)commissionerPasscode
+         fixedPasscodeCommissioningSupported:(BOOL)fixedPasscodeCommissioningSupported;
+
 - (instancetype)initWithPasscodeLengthOnly:(NSInteger)passcodeLength;
+
+- (instancetype)initWithPasscodeLength:(NSInteger)passcodeLength
+    fixedPasscodeCommissioningSupported:(BOOL)fixedPasscodeCommissioningSupported;
 
 - (instancetype)initWithInstanceName:(NSString *)instanceName
                           noPasscode:(BOOL)noPasscode;
