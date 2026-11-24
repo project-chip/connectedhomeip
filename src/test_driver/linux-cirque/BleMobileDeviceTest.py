@@ -126,12 +126,6 @@ class TestBleMobileDevice(CHIPVirtualHome):
             'sh -c "ip addr flush dev eth0 && ip link set eth0 down"',
             "eth0 isolation",
         )
-        # Restart avahi so it advertises on wlan0 only.
-        self.run_checked_device_cmd(
-            device_id,
-            'sh -c "(service dbus status >/dev/null 2>&1 || service dbus start) && service avahi-daemon restart"',
-            "avahi restart",
-        )
 
     def _device_ids_by_type(self, device_type: str) -> list[str]:
         return [d['id'] for d in self.non_ap_devices if d['type'] == device_type]
