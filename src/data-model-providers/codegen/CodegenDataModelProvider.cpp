@@ -270,13 +270,12 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
     // Codegen logic specific: CommandHandlerInterface is tried BEFORE the server cluster interface, so that applications
     // that installed a CommandHandlerInterface before the cluster was converted to a server cluster interface keep working.
     // Same rule as AttributeAccessInterface in ReadAttribute/WriteAttribute, and only for ember-registered clusters.
-    if ((handler != nullptr) &&
-        (FindServerCluster(ConcreteClusterPath(request.path.mEndpointId, request.path.mClusterId)) != nullptr))
+    if (handler != nullptr)
     {
         CommandHandlerInterface * handler_interface =
             CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
-        if (handler_interface != nullptr)
+        if ((handler_interface != nullptr) && (FindServerCluster(request.path) != nullptr))
         {
             // The handler gets its own reader, so input_arguments still points at the start of the
             // command fields if the handler reads them and then leaves the command unhandled.
@@ -550,23 +549,18 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
 CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
                                                       ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    // Same precedence as InvokeCommand: CommandHandlerInterface first, then the server cluster interface.
     // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
     // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
     // it claims to support.
-    const EmberAfCluster * serverCluster = FindServerCluster(path);
-
-    // Same precedence as InvokeCommand: CommandHandlerInterface first, then the server cluster interface.
-    if (serverCluster != nullptr)
+    CommandHandlerInterface * interface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
+    if ((interface != nullptr) && (FindServerCluster(path) != nullptr))
     {
-        CommandHandlerInterface * interface =
-            CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-        if (interface != nullptr)
-        {
-            CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
-            // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal processing.
-            // Otherwise we finished.
-            VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
-        }
+        CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
+        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal processing.
+        // Otherwise we finished.
+        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
@@ -574,6 +568,7 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
         return cluster->AcceptedCommands(path, builder);
     }
 
+    const EmberAfCluster * serverCluster = FindServerCluster(path);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
 
@@ -599,23 +594,18 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
 
 CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
+    // Same precedence as InvokeCommand: CommandHandlerInterface first, then the server cluster interface.
     // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
     // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
     // it claims to support.
-    const EmberAfCluster * serverCluster = FindServerCluster(path);
-
-    // Same precedence as InvokeCommand: CommandHandlerInterface first, then the server cluster interface.
-    if (serverCluster != nullptr)
+    CommandHandlerInterface * interface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
+    if ((interface != nullptr) && (FindServerCluster(path) != nullptr))
     {
-        CommandHandlerInterface * interface =
-            CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
-        if (interface != nullptr)
-        {
-            CHIP_ERROR err = interface->RetrieveGeneratedCommands(path, builder);
-            // If retrieving generated commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
-            // Otherwise we finished.
-            VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
-        }
+        CHIP_ERROR err = interface->RetrieveGeneratedCommands(path, builder);
+        // If retrieving generated commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
+        // Otherwise we finished.
+        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
@@ -623,6 +613,7 @@ CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath
         return cluster->GeneratedCommands(path, builder);
     }
 
+    const EmberAfCluster * serverCluster = FindServerCluster(path);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     VerifyOrReturnError(serverCluster->generatedCommandList != nullptr, CHIP_NO_ERROR);
 
