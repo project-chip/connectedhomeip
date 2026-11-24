@@ -666,8 +666,6 @@ TEST_F(TestAclAttribute, LegacyEncodingCacheReuseDuringWrite)
     Access::GetAccessControl().Finish();
 }
 
-<<<<<<< HEAD
-=======
 // A cached write grant must apply only to its exact path; any other path is re-checked against the current ACL.
 void TestAclAttribute::ExpectSecondWriteDeniedAfterRevoke(const AttributePathParams & firstPath,
                                                           const AttributePathParams & secondPath)
@@ -756,6 +754,5 @@ TEST_F(TestAclAttribute, WriteCacheDoesNotLeakAcrossDifferentAttribute)
                                        AttributePathParams(kTestEndpointId, kTestClusterId, kOtherAttributeId));
 }
 
->>>>>>> f4f4cdd ([IM] Remove the encoding for the SuppressRespond and TimedRequest (#75091))
 } // namespace app
 } // namespace chip

@@ -263,17 +263,7 @@ protected:
             chip::app::CommandSender::AddRequestDataParameters addRequestDataParams(mTimedInteractionTimeoutMs);
             // Using TestOnly AddRequestData to allow for an intentionally malformed request for server validation testing.
             ReturnErrorOnFailure(commandSender->TestOnlyAddRequestDataNoTimedCheck(commandPath, value, addRequestDataParams));
-<<<<<<< HEAD
-            ReturnErrorOnFailure(commandSender->SendCommandRequest(device->GetSecureSession().Value()));
-=======
-            if (mDelayReportMinMs.HasValue() || mDelayReportJitterWindowMs.HasValue())
-            {
-                chip::app::InvokeRequestMessage::DelayReportData delayReportData = { mDelayReportMinMs.ValueOr(0),
-                                                                                     mDelayReportJitterWindowMs.ValueOr(0) };
-                commandSender->SetDelayReportData(delayReportData);
-            }
             ReturnErrorOnFailure(commandSender->SendCommandRequest(session));
->>>>>>> f4f4cdd ([IM] Remove the encoding for the SuppressRespond and TimedRequest (#75091))
             mCommandSender.push_back(std::move(commandSender));
 
             if (mBusyWaitForMs.HasValue())

@@ -31,11 +31,8 @@
 #include <app/CommandHandlerImpl.h>
 #include <app/CommandResponseSender.h>
 #include <app/InteractionModelEngine.h>
-<<<<<<< HEAD
-=======
 #include <app/OperationalSessionSetup.h>
 #include <app/SpecificationDefinedRevisions.h>
-    >>>>>>> f4f4cdd ([IM] Remove the encoding for the SuppressRespond and TimedRequest (#75091))
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Encode.h>
 #include <app/tests/AppTestContext.h>
@@ -60,7 +57,7 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/GroupSession.h>
 
-    using namespace chip::Protocols;
+using namespace chip::Protocols;
 
 namespace {
 
@@ -591,8 +588,6 @@ public:
 #endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
     void TestCommandHandler_DelayReportData_InvalidCommandPath();
     void TestCommandHandler_DelayReportData_Groupcast();
-<<<<<<< HEAD
-=======
     void TestInteractionModelCommands_SendCommand_DelayReportData();
     void TestInteractionModelCommands_SendGroupCommand_DelayReportData();
     void TestCommandHandler_UnicastMissingSuppressResponseAndTimedRequestAreFalse();
@@ -607,7 +602,6 @@ public:
     void TestCommandResponseSender_GroupcastValidationFailureSendsNoStatusResponse();
     void TestCommandResponseSender_MalformedGroupcastSendsNoStatusResponse();
     void TestInteractionModelCommands_SendCommandWithoutSession();
->>>>>>> f4f4cdd ([IM] Remove the encoding for the SuppressRespond and TimedRequest (#75091))
 
     /**
      * With the introduction of batch invoke commands, CommandHandler keeps track of incoming
@@ -3072,8 +3066,6 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_G
     EXPECT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints[0], kTestEndpointId);
 }
 
-<<<<<<< HEAD
-=======
 namespace {
 
 class TestInteractionModelCommands : public InteractionModelCommands
@@ -3381,7 +3373,6 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestInteractionModelCommands_SendGro
     }
 }
 
->>>>>>> f4f4cdd ([IM] Remove the encoding for the SuppressRespond and TimedRequest (#75091))
 TEST(TestEncodableResponsePayloadAdapter, EncodeToBothWriters)
 {
     struct TestData

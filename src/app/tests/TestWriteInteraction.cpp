@@ -192,9 +192,6 @@ public:
     static void AddAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
     static void AddInvalidAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
     static void AddAttributeStatus(WriteHandler & aWriteHandler);
-<<<<<<< HEAD
-    static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload);
-=======
     static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload, bool aIncludeTimedRequest = true);
     static CHIP_ERROR GenerateOptionalFlagWriteRequest(System::PacketBufferHandle & payload, std::optional<bool> suppressResponse,
                                                        std::optional<bool> moreChunks, bool listWrite);
@@ -207,7 +204,6 @@ public:
     void TestWriteClientRecreatedGroupSession();
     void TestWriteClientCompletionReleasesConstructionSession();
     void TestWriteClientRevision14ChunkedRequestFlags();
->>>>>>> f4f4cdd ([IM] Remove the encoding for the SuppressRespond and TimedRequest (#75091))
     static void GenerateSuppressResponseChunkedWriteRequest(System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(System::PacketBufferHandle & aPayload);
 

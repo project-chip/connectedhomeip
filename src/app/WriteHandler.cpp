@@ -617,30 +617,15 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     TEMPORARY_RETURN_IGNORED writeRequestParser.PrettyPrint();
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
-    bool boolValue;
 
-<<<<<<< HEAD
-    boolValue = mStateFlags.Has(StateBits::kSuppressResponse);
-    err       = writeRequestParser.GetSuppressResponse(&boolValue);
-    if (err == CHIP_END_OF_TLV)
-    {
-        err = CHIP_NO_ERROR;
-    }
-    SuccessOrExit(err);
-    mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
-
-    boolValue = mStateFlags.Has(StateBits::kIsTimedRequest);
-    err       = writeRequestParser.GetTimedRequest(&boolValue);
-=======
     // SuppressResponse may be omitted when false, so do not inherit its value from a previous message.
-    boolValue = false;
-    err       = writeRequestParser.GetSuppressResponse(&boolValue).NoErrorIf(CHIP_END_OF_TLV);
+    bool boolValue = false;
+    err            = writeRequestParser.GetSuppressResponse(&boolValue).NoErrorIf(CHIP_END_OF_TLV);
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
 
     boolValue = false;
     err       = writeRequestParser.GetTimedRequest(&boolValue).NoErrorIf(CHIP_END_OF_TLV);
->>>>>>> f4f4cdd ([IM] Remove the encoding for the SuppressRespond and TimedRequest (#75091))
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 
