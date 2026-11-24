@@ -182,7 +182,13 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     def steps_TC_SU_2_5(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done"),
-            TestStep(1, "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action field is set to \"AwaitNextAction\", DelayedActionTime is set to 1 minute. Terminate the TH/OTA-P after the DUT changes the UpdateState to kDelayedOnApply.", "Verify that the DUT waits for the minimum interval defined by spec which is 2 minutes before re-sending the ApplyUpdateRequest to the OTA-P and the DUT UpdateState changes to kApplying."
+            TestStep(1, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to \"UpdateAvailable\". Set ImageURI to the location where the image is located."
+                     "After the DUT transfers the image, the DUT should send ApplyUpdateRequest to the OTA-P, OTA-P/TH sends the ApplyUpdateResponse Command to the DUT." 
+                     "Action field is set to \"AwaitNextAction\", DelayedActionTime is set to 1 minute. Terminate the TH/OTA-P after the DUT changes the UpdateState to kDelayedOnApply.", 
+                     "Verify that the DUT waits for the minimum interval defined by spec which is 2 minutes before re-sending the ApplyUpdateRequest to the OTA-P and the DUT UpdateState changes to kApplying."
+                     "Verify that the ApplyUpdateRequest received on the OTA-P has the following mandatory fields."
+                     "UpdateToken - verify that it is same as the one sent in the QueryImageResponse."
+                     "NewVersion - verify that this is the same as the software version that was downloaded."
                      "Verify that the DUT does not apply the software update within this time."),
             TestStep(2, "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action field is set to \"AwaitNextAction\", DelayedActionTime is set to 3 minutes. Terminate the TH/OTA-P after the DUT changes the UpdateState to kDelayedOnApply.", "Verify that the DUT waits for 3 minutes before sending the ApplyUpdateRequest to the OTA-P and the DUT UpdateState changes to kApplying."
                      "Verify that the DUT does not apply the software update within this time."),
@@ -304,6 +310,17 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             [matcher_combined_obj],
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
 
+        # Read the last QueryImageResponse the OTA-P sent, in order to capture the UpdateToken.
+        # Reads the QuerySnapshot when the Download is in progress to then retrieve the values for
+        # ApplyUpdateRequest when transfer is complete.
+        logger.info("About to read  the named pipe OtaSoftwareUpdateProvider from provider")
+        query_command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider",
+                         "Endpoint": self.get_endpoint()}
+        self.write_to_app_pipe(query_command, self.provider_app_pipe)
+        query_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        logger.info("Provider QueryImageResponse snapshot: %s", query_response_data)
+        expected_update_token = query_response_data['Payload']["UpdateToken"]
+
         logger.info('%s: Step #1.0 - OTA Download in progress waiting for kDelayedOnApply', step_number_s1)
         # Create a liveness matcher to wait for the kDelayedOnApply
         progress_liveness_last_progress = [None]
@@ -327,15 +344,77 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             liveness_matcher=progress_liveness
         )
         logger.info('%s: Step #1.0 - kDelayedOnApply observed after the download completed', step_number_s1)
-        await asyncio.sleep(0.1)
-        self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
-        pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+
+        # DUT completed the image transfer and sends a ApplyUpdateRequest to Provider.
+        # Pool for a max of 30 seconds (under the 120 seconds wait period) the read the last ApplyUpdateRequest that the OTA-P received from the DUT to avoid a race condition.
+        # The provider exposes this snapshot via the "GetApplyUpdateRequestStatus" pipe command,
+        # which returns UpdateToken and NewVersion under Payload alongside the existing fields.
+        poll_command_timeout_sec = 30
+        poll_command_interval_sec = 1
+        poll_command_deadline = time.time() + poll_command_timeout_sec
+        poll_start_time = time.time()
+        attempt = 0
+        # Variables to retrieve values from named pipes
+        received_update_token = None
+        received_new_version = None
+        apply_update_request_action_response = None
+        apply_update_request_count = 0
+        # Commands for named pipes
+        apply_command = {"Name": "GetApplyUpdateRequestStatus", "Cluster": "OtaSoftwareUpdateProvider",
+                                 "Endpoint": self.get_endpoint()}
+        while True:
+            wait_poll = True
+            attempt += 1
+            self.write_to_app_pipe(apply_command, self.provider_app_pipe)
+            try:
+                apply_response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+                received_update_token = apply_response_data["Payload"]["UpdateToken"]
+                received_new_version = int(apply_response_data["Payload"]["NewVersion"])
+                apply_update_request_action_response = apply_response_data["Payload"]["ApplyUpdateRequestActionResponse"]
+                apply_update_request_count = apply_response_data["Payload"]["ApplyUpdateRequestCount"]
+                logger.info("Provider GetApplyUpdateRequestStatus retrieved from named pipe: %s at Attempt # %d",
+                            apply_response_data, attempt)
+            except TimeoutError:
+                # Not able to read named pipe in the read_from_app_pipe timeout, do not wait more.
+                wait_poll = False
+                logger.info("%s Not able to read from named pipe, retrying.")
+
+            # If the named pipe retrieved correct data, then terminate to poll the named pipe
+            if received_update_token is not None and len(received_update_token) > 0 and received_new_version is not None and received_new_version > 0:
+                logger.info("%s - Named pipe ApplyUpdateRequest value found at Attempt # %d", step_number_s1, attempt)
+                break
+
+            # If the values read from the named pipe are not the appropiate wait some time until is ready.
+            remaining = poll_command_deadline - time.time()
+            if remaining <= 0:
+                # Time exhausted, warn and exit the loop. Asserts will fail as received_update_token and expected_update_token initialized as None
+                logger.warning(
+                    'Step #1 ApplyUpdateRequest has not been reached after %.0fs. Retrying', poll_command_interval_sec)
+                break
+            if wait_poll:
+                await asyncio.sleep(min(poll_command_interval_sec, remaining))
+        poll_end_time = time.time()
+        # END 
         logger.info("%s Provider pipe status after kDelayedOnApply %s", step_number_s1, pipe_data)
         # Assert the values from the Provider named pipes
-        asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestActionResponse'],
+        asserts.assert_equal(apply_update_request_action_response,
                              Clusters.OtaSoftwareUpdateProvider.Enums.ApplyUpdateActionEnum.kAwaitNextAction, "Error on TH: the action from the Provider is not AwaitNextAction")
-        asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestCount'],
+        asserts.assert_equal(apply_update_request_count,
                              1, "Error on TH: Only one request should be sent from the Provider to DUT (Requestor).")
+
+        # Validate values for TC-SU-2.4
+        # UpdateToken in ApplyUpdateRequest must match the one the provider issued in QueryImageResponse.
+        asserts.assert_equal(
+            received_update_token, expected_update_token,
+            f"UpdateToken from ApplyUpdateRequest ({received_update_token}) does not match the UpdateToken from QueryImageResponse ({expected_update_token}).")
+
+        # NewVersion in ApplyUpdateRequest must match the software version that was downloaded
+        # (i.e. the target version advertised by the OTA image).
+        asserts.assert_equal(
+            received_new_version, self.expected_software_version,
+            f"NewVersion from ApplyUpdateRequest ({received_new_version}) does not match the expected software version ({self.expected_software_version}).")
+        logger.info("%s - ApplyUpdateRequestStatus and NewVersion matched.", step_number_s1)
+        # End Validate values for TC-SU-2.4
 
         # The Provider must be terminated just before it tries to send the second ApplyUpdateRequest.
         logger.info("%s Terminating the Provider to prevent the device from completing the update", step_number_s1)
@@ -364,10 +443,10 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             f"Software Version should be: {current_sw_version}",
             lambda report: report.value == current_sw_version)
         # Guard the software version attribute
-        logger.info("%s Starting software-version monitoring for 120 seconds", step_number_s1)
+        logger.info("%s Starting software-version monitoring for %d seconds", step_number_s1, spec_wait_time)
         software_version_attr_handler.wait_all_final_values_reported_persisted(
             expected_matchers=[software_version_match], timeout_sec=spec_wait_time)
-        logger.info("%s Completed software-version monitoring with no changes for 120 seconds", step_number_s1)
+        logger.info("%s Completed software-version monitoring with no changes for %d seconds", step_number_s1, spec_wait_time)
 
         # Read the events immediately.
         # After this period of time we want to verify if kApplying was triggered after the 120-second timeframe.
