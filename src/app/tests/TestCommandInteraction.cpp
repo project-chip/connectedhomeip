@@ -35,7 +35,7 @@
 =======
 #include <app/OperationalSessionSetup.h>
 #include <app/SpecificationDefinedRevisions.h>
->>>>>>> f4f4cdd ([IM] Remove the encoding for the SuppressRespond and TimedRequest (#75091))
+    >>>>>>> f4f4cdd ([IM] Remove the encoding for the SuppressRespond and TimedRequest (#75091))
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Encode.h>
 #include <app/tests/AppTestContext.h>
@@ -60,7 +60,7 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/GroupSession.h>
 
-using namespace chip::Protocols;
+    using namespace chip::Protocols;
 
 namespace {
 
