@@ -278,6 +278,23 @@ TEST_F(ElectricalEnergyTariffTestFixture, ActiveTariffRequiresCurrentTag)
     device.Unregister(mProvider);
 }
 
+TEST_F(ElectricalEnergyTariffTestFixture, RejectsDefaultCurrentTagWhenNotActiveTariff)
+{
+    TestTariff device{ ElectricalEnergyTariff::ActiveTariffTagList() };
+
+    EXPECT_EQ(device.Register(kEndpointId, mProvider), CHIP_ERROR_INVALID_ARGUMENT);
+    ExpectNothingRegistered(device);
+}
+
+TEST_F(ElectricalEnergyTariffTestFixture, RejectsCompositionCurrentTagWhenNotActiveTariff)
+{
+    TestTariff device;
+
+    EXPECT_EQ(device.Register(kEndpointId, mProvider, WithTags(ElectricalEnergyTariff::ActiveTariffTagList())),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    ExpectNothingRegistered(device);
+}
+
 TEST_F(ElectricalEnergyTariffTestFixture, RejectsRepeatedRegistrationAndAllowsReuse)
 {
     TestTariff device;

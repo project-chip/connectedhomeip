@@ -34,7 +34,7 @@ namespace chip::app {
  * Descriptor TagList requirements, checked by Register():
  *   - The ElectricalEnergy tag (Commodity Tariff Commodity namespace) is mandatory.
  *   - The Current tag (Commodity Tariff Chronology namespace) is mandatory when IsActiveTariff()
- *     returns true.
+ *     returns true, and not allowed otherwise.
  */
 class ElectricalEnergyTariff : public SingleEndpoint
 {
@@ -71,6 +71,7 @@ public:
 protected:
     /// Returns true if this endpoint represents the currently active tariff (the ActiveTariff
     /// condition of the device type). Subclasses that register Commodity Price SHALL return true.
+    /// Register() requires the Current tag when this returns true, and rejects it otherwise.
     virtual bool IsActiveTariff() const { return false; }
 
     /// Called by Register() after the Descriptor is registered and before the endpoint is added.

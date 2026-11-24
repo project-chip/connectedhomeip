@@ -107,12 +107,10 @@ CHIP_ERROR ElectricalEnergyTariff::ValidateTagList(Span<const SemanticTag> tagLi
     VerifyOrReturnError(
         ContainsStandardTag(tagList, kCommodityTariffCommodityNamespaceId, kCommodityTariffCommodityElectricalEnergyTag),
         CHIP_ERROR_INVALID_ARGUMENT);
-    if (IsActiveTariff())
-    {
-        VerifyOrReturnError(
-            ContainsStandardTag(tagList, kCommodityTariffChronologyNamespaceId, kCommodityTariffChronologyCurrentTag),
-            CHIP_ERROR_INVALID_ARGUMENT);
-    }
+
+    const bool hasCurrentTag =
+        ContainsStandardTag(tagList, kCommodityTariffChronologyNamespaceId, kCommodityTariffChronologyCurrentTag);
+    VerifyOrReturnError(hasCurrentTag == IsActiveTariff(), CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
 

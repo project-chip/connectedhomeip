@@ -28,6 +28,7 @@ CHIP_ERROR SimulatedElectricalEnergyTariff::RegisterOptionalClusters(EndpointId 
     mCommodityPriceCluster.Create(endpoint);
 
     CommodityPrice::CommodityPriceCluster & cluster = mCommodityPriceCluster.Cluster();
+    ReturnErrorOnFailure(cluster.SetTariffUnit(Globals::TariffUnitEnum::kKWh));
     ReturnErrorOnFailure(cluster.SetCurrency(DataModel::MakeNullable(Globals::Structs::CurrencyStruct::Type{
         .currency      = kCurrencyEur,
         .decimalPoints = kCurrencyDecimalPoints,
