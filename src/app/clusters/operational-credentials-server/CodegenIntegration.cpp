@@ -44,17 +44,22 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
+        auto & dacProvider = *Credentials::GetDeviceAttestationCredentialsProvider();
+        BitFlags<OperationalCredentials::Feature> configuredFeatureMap;
+        configuredFeatureMap.Set(OperationalCredentials::Feature::kPQCDeviceAttestation, dacProvider.HasRequiredPqcCredentials());
+
         OperationalCredentialsCluster::Context context = {
             .fabricTable                = Server::GetInstance().GetFabricTable(),
             .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
             .dnssdServer                = app::DnssdServer::Instance(),
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-            .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
+            .dacProvider                = dacProvider,
             .groupDataProvider          = *Credentials::GetGroupDataProvider(),
             .accessControl              = Server::GetInstance().GetAccessControl(),
             .platformManager            = DeviceLayer::PlatformMgr(),
             .eventManagement            = EventManagement::GetInstance(),
+            .featureMap                 = configuredFeatureMap,
         };
         gServer.Create(endpointId, context);
         return gServer.Registration();

@@ -33,7 +33,6 @@ class NrfApp(Enum):
     PUMP = auto()
     PUMP_CONTROLLER = auto()
     SWITCH = auto()
-    WINDOW_COVERING = auto()
     UNIT_TESTS = auto()
 
     def AppPath(self):
@@ -53,11 +52,9 @@ class NrfApp(Enum):
             return 'examples/pump-app'
         if self == NrfApp.PUMP_CONTROLLER:
             return 'examples/pump-controller-app'
-        if self == NrfApp.WINDOW_COVERING:
-            return 'examples/window-app'
         if self == NrfApp.UNIT_TESTS:
             return 'src/test_driver'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == NrfApp.ALL_CLUSTERS:
@@ -76,11 +73,9 @@ class NrfApp(Enum):
             return 'chip-nrf-pump-example'
         if self == NrfApp.PUMP_CONTROLLER:
             return 'chip-nrf-pump-controller-example'
-        if self == NrfApp.WINDOW_COVERING:
-            return 'chip-nrf-window-example'
         if self == NrfApp.UNIT_TESTS:
             return 'chip-nrf-unit-tests'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def _FlashBundlePrefix(self):
         if self == NrfApp.ALL_CLUSTERS:
@@ -99,12 +94,10 @@ class NrfApp(Enum):
             return 'chip-nrfconnect-pump-example'
         if self == NrfApp.PUMP_CONTROLLER:
             return 'chip-nrfconnect-pump-controller-example'
-        if self == NrfApp.WINDOW_COVERING:
-            return 'chip-nrfconnect-window-example'
         if self == NrfApp.UNIT_TESTS:
             raise Exception(
                 'Unit tests compile natively and do not have a flashbundle')
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def FlashBundleName(self):
         '''
@@ -129,7 +122,7 @@ class NrfBoard(Enum):
             return 'nrf5340dk/nrf5340cpuapp'
         if self == NrfBoard.NATIVE_SIM:
             return 'native_sim'
-        raise Exception('Unknown board type: %r' % self)
+        raise Exception(f'Unknown board type: {self!r}')
 
 
 class NrfConnectBuilder(Builder):
@@ -189,7 +182,7 @@ class NrfConnectBuilder(Builder):
                 # overall perform a git fetch on that location
                 if not os.access(nrfconnect_sdk, os.W_OK):
                     raise Exception(
-                        "Directory %s not writable. NRFConnect builds require updates to this directory." % nrfconnect_sdk)
+                        f"Directory {nrfconnect_sdk} not writable. NRFConnect builds require updates to this directory.")
 
             cmd = self._prepare_environment()
 
@@ -232,12 +225,10 @@ class NrfConnectBuilder(Builder):
     @lock_output_dir
     def build_outputs(self):
         yield BuilderOutput(
-            os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.elf'),
-            '%s.elf' % self.app.AppNamePrefix())
+            os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.elf'), f'{self.app.AppNamePrefix()}.elf')
         if self.options.enable_link_map_file:
             yield BuilderOutput(
-                os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.map'),
-                '%s.map' % self.app.AppNamePrefix())
+                os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.map'), f'{self.app.AppNamePrefix()}.map')
 
     @lock_output_dir
     def bundle_outputs(self):

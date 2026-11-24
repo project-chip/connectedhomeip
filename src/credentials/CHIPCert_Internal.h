@@ -31,9 +31,10 @@ inline constexpr size_t kNetworkIdentityTBSLength = 244;
 
 // Constants for Network (Client) Identities as per section 11.24 (Wi-Fi
 // Authentication with Per-Device Credentials) of the Matter spec.
-inline constexpr CharSpan kNetworkIdentityCN                = "*"_span;
-inline constexpr uint8_t kNetworkIdentitySerialNumber       = 1;
-inline constexpr ByteSpan kNetworkIdentitySerialNumberBytes = ByteSpan((uint8_t[1]){ kNetworkIdentitySerialNumber });
+inline constexpr CharSpan kNetworkIdentityCN                 = "*"_span;
+inline constexpr uint8_t kNetworkIdentitySerialNumber        = 1;
+inline constexpr uint8_t kNetworkIdentitySerialNumberArray[] = { kNetworkIdentitySerialNumber };
+inline constexpr ByteSpan kNetworkIdentitySerialNumberBytes  = ByteSpan(kNetworkIdentitySerialNumberArray);
 
 inline constexpr uint32_t kNetworkIdentityNotBeforeTime = 1;
 inline constexpr uint32_t kNetworkIdentityNotAfterTime  = kNullCertTime;

@@ -761,7 +761,9 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
         // keys_count
         ReturnErrorOnFailure(reader.Next(TagNumKeys()));
         ReturnErrorOnFailure(reader.Get(keys_count));
-        // TODO(#21614): Enforce maximum number of 3 keys in a keyset
+        // A keyset stores at most kEpochKeysMax operational keys; reject a corrupted count so callers that
+        // index operational_keys by keys_count (e.g. GroupSessionIteratorImpl::Count) stay in bounds.
+        VerifyOrReturnError(keys_count <= KeySet::kEpochKeysMax, CHIP_ERROR_INVALID_TLV_ELEMENT);
         {
             // operational_keys
             ReturnErrorOnFailure(reader.Next(TagGroupCredentials()));
@@ -1904,7 +1906,10 @@ Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeyContext(FabricIndex f
         {
             // Group found, get the keyset
             KeySetData keyset;
-            VerifyOrReturnError(keyset.Find(mStorage, fabric, mapping.keyset_id), nullptr);
+            if (!keyset.Find(mStorage, fabric, mapping.keyset_id))
+            {
+                continue;
+            }
             Crypto::GroupOperationalCredentials * creds = keyset.GetCurrentGroupCredentials();
             if (nullptr != creds)
             {
@@ -2028,7 +2033,7 @@ size_t GroupDataProviderImpl::GroupSessionIteratorImpl::Count()
             KeySetData keyset;
             if (!keyset.Find(mProvider.mStorage, fabric, mapping.keyset_id))
             {
-                break;
+                continue;
             }
             for (uint16_t k = 0; k < keyset.keys_count; ++k)
             {
@@ -2070,11 +2075,10 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
 
         // Group found, get the keyset
         KeySetData keyset;
-        VerifyOrReturnError(keyset.Find(mProvider.mStorage, fabric, mapping.keyset_id), false);
-
-        if (mKeyIndex >= keyset.keys_count || (mKeyIndex >= KeySet::kEpochKeysMax))
+        if (!keyset.Find(mProvider.mStorage, fabric, mapping.keyset_id) || (mKeyIndex >= keyset.keys_count) ||
+            (mKeyIndex >= KeySet::kEpochKeysMax))
         {
-            // No more keys in current keyset, try next
+            // KeySet not found, or no more keys are in the current keyset. Try next
             mMapping = mapping.next;
             mMapCount++;
             mKeyIndex = 0;

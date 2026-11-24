@@ -78,6 +78,7 @@ macro(flashing_script)
             --after ${CONFIG_ESPTOOLPY_AFTER}
             --application "${application}"
             --bootloader "${bootloader}"
+            --bootloader-offset ${CONFIG_BOOTLOADER_OFFSET_IN_FLASH}
             --partition "${partition_table}"
             --use-partition-file "${build_dir}/${partition_table}"
             --use-parttool ${idf_path}/components/partition_table/parttool.py

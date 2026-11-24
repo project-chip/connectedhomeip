@@ -339,14 +339,14 @@ TEST_F(TestChipCert, TestChipCert_ChipDN)
     EXPECT_TRUE(chip_dn.IsEmpty());
     EXPECT_EQ(certType, CertType::kNotSpecified);
 
-    EXPECT_EQ(chip_dn.AddAttribute_CommonName(CharSpan(noc_rdn, strlen(noc_rdn)), false), CHIP_NO_ERROR);
+    EXPECT_EQ(chip_dn.AddAttribute_CommonName(CharSpan::fromCharString(noc_rdn), false), CHIP_NO_ERROR);
     EXPECT_EQ(chip_dn.AddAttribute_MatterNodeId(0xAAAABBBBCCCCDDDD), CHIP_NO_ERROR);
     EXPECT_EQ(chip_dn.AddAttribute_MatterFabricId(0xFAB00000FAB00001), CHIP_NO_ERROR);
-    EXPECT_EQ(chip_dn.AddAttribute_GivenName(CharSpan(noc_rdn2, strlen(noc_rdn2)), true), CHIP_NO_ERROR);
+    EXPECT_EQ(chip_dn.AddAttribute_GivenName(CharSpan::fromCharString(noc_rdn2), true), CHIP_NO_ERROR);
     EXPECT_EQ(chip_dn.AddCATs(noc_cats), CHIP_NO_ERROR);
     EXPECT_EQ(chip_dn.RDNCount(), 5);
 
-    EXPECT_EQ(chip_dn.AddAttribute_GivenName(CharSpan(noc_rdn2, strlen(noc_rdn2)), true), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(chip_dn.AddAttribute_GivenName(CharSpan::fromCharString(noc_rdn2), true), CHIP_ERROR_NO_MEMORY);
     EXPECT_EQ(chip_dn.RDNCount(), 5);
 
     EXPECT_EQ(chip_dn.GetCertType(certType), CHIP_NO_ERROR);
@@ -1600,11 +1600,11 @@ TEST_F(TestChipCert, TestChipCert_GenerateNOCICA)
     const static char noc_name_rdn[]      = "Smith";
 
     ChipDN noc_dn;
-    EXPECT_EQ(noc_dn.AddAttribute_CommonName(CharSpan(noc_cn_rdn, strlen(noc_cn_rdn)), false), CHIP_NO_ERROR);
+    EXPECT_EQ(noc_dn.AddAttribute_CommonName(CharSpan::fromCharString(noc_cn_rdn), false), CHIP_NO_ERROR);
     EXPECT_EQ(noc_dn.AddAttribute_MatterNodeId(0xAAAABBBBCCCCDDDD), CHIP_NO_ERROR);
     EXPECT_EQ(noc_dn.AddAttribute_MatterFabricId(0xFAB00000FAB00001), CHIP_NO_ERROR);
-    EXPECT_EQ(noc_dn.AddAttribute_GivenName(CharSpan(noc_givenname_rdn, strlen(noc_givenname_rdn)), true), CHIP_NO_ERROR);
-    EXPECT_EQ(noc_dn.AddAttribute_Name(CharSpan(noc_name_rdn, strlen(noc_name_rdn)), true), CHIP_NO_ERROR);
+    EXPECT_EQ(noc_dn.AddAttribute_GivenName(CharSpan::fromCharString(noc_givenname_rdn), true), CHIP_NO_ERROR);
+    EXPECT_EQ(noc_dn.AddAttribute_Name(CharSpan::fromCharString(noc_name_rdn), true), CHIP_NO_ERROR);
 
     ChipDN ica_dn;
     EXPECT_EQ(ica_dn.AddAttribute_MatterICACId(0x8888999944442222), CHIP_NO_ERROR);
@@ -1789,7 +1789,7 @@ TEST_F(TestChipCert, TestChipCert_VerifyGeneratedCertsNoICA)
     const static char root_cn_rdn[] = "Test Root Operational Cert";
 
     ChipDN root_dn;
-    EXPECT_EQ(root_dn.AddAttribute_CommonName(CharSpan(root_cn_rdn, strlen(root_cn_rdn)), false), CHIP_NO_ERROR);
+    EXPECT_EQ(root_dn.AddAttribute_CommonName(CharSpan::fromCharString(root_cn_rdn), false), CHIP_NO_ERROR);
     EXPECT_EQ(root_dn.AddAttribute_MatterRCACId(0xAAAABBBBCCCCDDDD), CHIP_NO_ERROR);
     EXPECT_EQ(root_dn.AddAttribute_MatterFabricId(0xFAB0000000008888), CHIP_NO_ERROR);
 
@@ -1802,7 +1802,7 @@ TEST_F(TestChipCert, TestChipCert_VerifyGeneratedCertsNoICA)
     const static char noc_cn_rdn[] = "Test NOC";
 
     ChipDN noc_dn;
-    EXPECT_EQ(noc_dn.AddAttribute_CommonName(CharSpan(noc_cn_rdn, strlen(noc_cn_rdn)), true), CHIP_NO_ERROR);
+    EXPECT_EQ(noc_dn.AddAttribute_CommonName(CharSpan::fromCharString(noc_cn_rdn), true), CHIP_NO_ERROR);
     EXPECT_EQ(noc_dn.AddAttribute_MatterNodeId(0xAABBCCDDAABBCCDD), CHIP_NO_ERROR);
     EXPECT_EQ(noc_dn.AddAttribute_MatterFabricId(0xFAB0000000008888), CHIP_NO_ERROR);
     EXPECT_EQ(noc_dn.AddAttribute_MatterCASEAuthTag(0xABCD0010), CHIP_NO_ERROR);
@@ -2102,6 +2102,53 @@ TEST_F(TestChipCert, TestChipCert_ExtractAndValidateCATsFromOpCert)
     }
 }
 
+// Regression test: CAT identifier 0x0000 must be accepted by both the TLV and
+// ASN.1 cert parsing paths in CHIPCert.cpp. Previously IsValidCATIdentifier()
+// incorrectly rejected it, causing CHIP_ERROR_WRONG_CERT_DN / CHIP_ERROR_INVALID_ARGUMENT
+// on NOCs issued by clients using that identifier.
+TEST_F(TestChipCert, TestChipCert_CATIdentifierZeroIsValid)
+{
+    // CAT with identifier 0x0000 and version 1 — must be accepted.
+    constexpr CASEAuthTag kCATIdentifierZero = 0x0000'0001;
+
+    P256Keypair keypair;
+    EXPECT_EQ(keypair.Initialize(ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+
+    P256Keypair noc_keypair;
+    EXPECT_EQ(noc_keypair.Initialize(ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+
+    ChipDN noc_dn;
+    EXPECT_EQ(noc_dn.AddAttribute_MatterNodeId(0xDEDEDEDE00010001), CHIP_NO_ERROR);
+    EXPECT_EQ(noc_dn.AddAttribute_MatterFabricId(0xFAB000000000001D), CHIP_NO_ERROR);
+    EXPECT_EQ(noc_dn.AddAttribute_MatterCASEAuthTag(kCATIdentifierZero), CHIP_NO_ERROR);
+
+    ChipDN issuer_dn;
+    EXPECT_EQ(issuer_dn.AddAttribute_MatterRCACId(0x8888999944442222), CHIP_NO_ERROR);
+
+    X509CertRequestParams noc_params = { 1, 631161876, 729942000, noc_dn, issuer_dn };
+
+    uint8_t x509Buf[kMaxDERCertLength];
+    MutableByteSpan x509Cert(x509Buf);
+
+    // Exercise the ASN.1 path: NewNodeOperationalX509Cert calls ChipDN::EncodeToASN1
+    // which goes through the AddAttribute / AddCATs validation.
+    EXPECT_EQ(NewNodeOperationalX509Cert(noc_params, noc_keypair.Pubkey(), keypair, x509Cert), CHIP_NO_ERROR);
+
+    uint8_t chipBuf[kMaxCHIPCertLength];
+    MutableByteSpan chipCert(chipBuf);
+
+    // Exercise the TLV path: ConvertX509CertToChipCert + DecodeChipCert.
+    EXPECT_EQ(ConvertX509CertToChipCert(x509Cert, chipCert), CHIP_NO_ERROR);
+
+    ChipCertificateData certData;
+    EXPECT_EQ(DecodeChipCert(chipCert, certData), CHIP_NO_ERROR);
+
+    // Verify the CAT round-tripped correctly.
+    CATValues cats;
+    EXPECT_EQ(ExtractCATsFromOpCert(chipCert, cats), CHIP_NO_ERROR);
+    EXPECT_TRUE(cats.Contains(kCATIdentifierZero));
+}
+
 TEST_F(TestChipCert, TestChipCert_ExtractSubjectDNFromChipCert)
 {
     struct TestCase
@@ -2130,8 +2177,7 @@ TEST_F(TestChipCert, TestChipCert_ExtractSubjectDNFromChipCert)
     ChipDN expectedSubjectDN_Node02_03;
     EXPECT_EQ(expectedSubjectDN_Node02_03.AddAttribute_MatterNodeId(0xDEDEDEDE00020003), CHIP_NO_ERROR);
     EXPECT_EQ(expectedSubjectDN_Node02_03.AddAttribute_MatterFabricId(0xFAB000000000001D), CHIP_NO_ERROR);
-    EXPECT_EQ(expectedSubjectDN_Node02_03.AddAttribute_CommonName(CharSpan(commonName_RDN, strlen(commonName_RDN)), false),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(expectedSubjectDN_Node02_03.AddAttribute_CommonName(CharSpan::fromCharString(commonName_RDN), false), CHIP_NO_ERROR);
     EXPECT_EQ(expectedSubjectDN_Node02_03.AddAttribute_MatterCASEAuthTag(0xABCD0001), CHIP_NO_ERROR);
 
     // clang-format off

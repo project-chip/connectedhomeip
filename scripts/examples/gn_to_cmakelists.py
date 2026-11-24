@@ -34,6 +34,7 @@
 
 
 import functools
+import hashlib
 import itertools
 import json
 import os
@@ -62,6 +63,9 @@ def CMakeDoubleStringEscape(a):
     return a.replace('"', '\\\\\\"')
 
 
+CHUNK_SIZE = 50
+
+
 def CMakeTargetEscape(a):
     """Escapes the string 'a' for use as a CMake target name.
 
@@ -72,7 +76,14 @@ def CMakeTargetEscape(a):
         if c in string.ascii_letters or c in string.digits or c in '_.+-':
             return c
         return '__'
-    return ''.join(map(Escape, a))
+    escaped = ''.join(map(Escape, a))
+    # Truncate overly long target names with a unique hash to avoid exceeding
+    # CMake object file path limits and filesystem path length limits
+    # (e.g., Windows MAX_PATH of 260 characters and Ninja build paths).
+    if len(escaped) > 150:
+        digest = hashlib.sha256(escaped.encode('utf-8')).hexdigest()[:16]
+        return f'{escaped[:130]}_{digest}'
+    return escaped
 
 
 def RemoveByPrefix(str_list, prefixs):
@@ -100,11 +111,13 @@ def SetVariableList(out, variable_name, values):
     if len(values) == 1:
         SetVariable(out, variable_name, values[0])
         return
-    out.write('list(APPEND "')
-    out.write(CMakeStringEscape(variable_name))
-    out.write('"\n  "')
-    out.write('"\n  "'.join([CMakeStringEscape(value) for value in values]))
-    out.write('")\n')
+    for i in range(0, len(values), CHUNK_SIZE):
+        chunk = values[i:i + CHUNK_SIZE]
+        out.write('list(APPEND "')
+        out.write(CMakeStringEscape(variable_name))
+        out.write('"\n  "')
+        out.write('"\n  "'.join([CMakeStringEscape(value) for value in chunk]))
+        out.write('")\n')
 
 
 def SetFilesProperty(output, variable, property_name, values, sep):
@@ -194,6 +207,9 @@ class Project:
         build_settings = project_json['build_settings']
         self.root_path = build_settings['root_path']
         self.build_path = self.GetAbsolutePath(build_settings['build_dir'])
+        self._obj_source_deps_cache = {}
+        self._obj_lib_deps_cache = {}
+        self._action_deps_cache = {}
 
     def GetAbsolutePath(self, path):
         if path.startswith('//'):
@@ -202,24 +218,102 @@ class Project:
 
     def GetObjectSourceDependencies(self, gn_target_name, object_dependencies):
         """All OBJECT libraries whose sources have not been absorbed."""
-        dependencies = self.targets[gn_target_name].get('deps', [])
-        for dependency in dependencies:
+        cached = self._obj_source_deps_cache.get(gn_target_name)
+        if cached is not None:
+            object_dependencies.update(cached)
+            return
+        deps_set = set()
+        visited = set()
+        stack = list(self.targets[gn_target_name].get('deps', []))
+        while stack:
+            dependency = stack.pop()
+            if dependency in visited:
+                continue
+            visited.add(dependency)
             dependency_type = self.targets[dependency].get('type', None)
             if dependency_type == 'source_set':
-                object_dependencies.add(dependency)
-            if dependency_type not in gn_target_types_that_absorb_objects:
-                self.GetObjectSourceDependencies(
-                    dependency, object_dependencies)
+                deps_set.add(dependency)
+            if dependency_type in gn_target_types_that_absorb_objects:
+                continue
+            if dependency in self._obj_source_deps_cache:
+                deps_set.update(self._obj_source_deps_cache[dependency])
+                continue
+            stack.extend(self.targets[dependency].get('deps', []))
+        self._obj_source_deps_cache[gn_target_name] = deps_set
+        object_dependencies.update(deps_set)
 
     def GetObjectLibraryDependencies(self, gn_target_name, object_dependencies):
         """All OBJECT libraries whose libraries have not been absorbed."""
-        dependencies = self.targets[gn_target_name].get('deps', [])
-        for dependency in dependencies:
+        cached = self._obj_lib_deps_cache.get(gn_target_name)
+        if cached is not None:
+            object_dependencies.update(cached)
+            return
+        deps_set = set()
+        visited = set()
+        stack = list(self.targets[gn_target_name].get('deps', []))
+        while stack:
+            dependency = stack.pop()
+            if dependency in visited:
+                continue
+            visited.add(dependency)
             dependency_type = self.targets[dependency].get('type', None)
-            if dependency_type == 'source_set':
-                object_dependencies.add(dependency)
-                self.GetObjectLibraryDependencies(
-                    dependency, object_dependencies)
+            if dependency_type != 'source_set':
+                continue
+            deps_set.add(dependency)
+            if dependency in self._obj_lib_deps_cache:
+                deps_set.update(self._obj_lib_deps_cache[dependency])
+                continue
+            stack.extend(self.targets[dependency].get('deps', []))
+        self._obj_lib_deps_cache[gn_target_name] = deps_set
+        object_dependencies.update(deps_set)
+
+    def GetExpandedDependencies(
+            self, gn_target_name, expanded_deps, visited=None):
+        """Recursively expand dependencies of groups."""
+        if visited is None:
+            visited = set()
+        if gn_target_name in visited:
+            return
+        visited.add(gn_target_name)
+        target = self.targets.get(gn_target_name)
+        if not target:
+            return
+        for dep in target.get('deps', []):
+            expanded_deps.add(dep)
+            dep_target = self.targets.get(dep, {})
+            if dep_target.get('type') == 'group':
+                self.GetExpandedDependencies(dep, expanded_deps, visited)
+
+    def GetTransitiveActionDependencies(
+            self, gn_target_name, action_dependencies):
+        """All transitive action/custom targets that generate headers or
+        code."""
+        cached = self._action_deps_cache.get(gn_target_name)
+        if cached is not None:
+            action_dependencies.update(cached)
+            return
+        deps_set = set()
+        visited = set()
+        stack = list(self.targets.get(gn_target_name, {}).get('deps', []))
+        while stack:
+            dependency = stack.pop()
+            if dependency in visited:
+                continue
+            visited.add(dependency)
+            dep_target = self.targets.get(dependency)
+            if not dep_target:
+                continue
+            dep_type = dep_target.get('type', None)
+            cmake_type = cmake_target_types.get(
+                dep_type, CMakeTargetType.custom)
+            if cmake_type.command != 'add_library':
+                deps_set.add(self.GetCMakeTargetName(dependency))
+            if dependency in self._action_deps_cache:
+                deps_set.update(self._action_deps_cache[dependency])
+                continue
+            stack.extend(dep_target.get('deps', []))
+        self._action_deps_cache[gn_target_name] = deps_set
+        action_dependencies.update(deps_set)
 
     def GetCMakeTargetName(self, gn_target_name):
         # See <chromium>/src/tools/gn/label.cc#Resolve
@@ -306,7 +400,7 @@ def WriteAction(out, target, project, sources, synthetic_dependencies):
         out.write('"')
     out.write('\n')
 
-    out.write('  DEPENDS ')
+    out.write('  DEPENDS')
     for sources_type_name in sources.values():
         WriteVariable(out, sources_type_name, ' ')
     out.write('\n')
@@ -430,7 +524,7 @@ def WriteCopy(out, target, project, sources, synthetic_dependencies):
         out.write(CMakeStringEscape(dst))
         out.write('"\n')
 
-    out.write('  DEPENDS ')
+    out.write('  DEPENDS')
     for sources_type_name in sources.values():
         WriteVariable(out, sources_type_name, ' ')
     out.write('\n')
@@ -564,11 +658,20 @@ gn_target_types_that_absorb_objects = (
 )
 
 
+def _ShouldKeepCustomPath(path, is_custom, build_path):
+    if not is_custom:
+        return True
+    if os.path.exists(path):
+        return True
+    # Keep generated files located within the build directory
+    return path == build_path or path.startswith(build_path + posixpath.sep)
+
+
 def WriteSourceVariables(out, target, project):
     # gn separates the sheep from the goats based on file extensions.
     # A full separation is done here because of flag handing (see Compile flags).
     source_types = {'cxx': [], 'c': [], 'asm': [], 'objc': [], 'objcc': [],
-                    'obj': [], 'obj_target': [], 'input': [], 'other': []}
+                    'obj': [], 'input': [], 'other': []}
 
     all_sources = target.properties.get('sources', [])
 
@@ -578,34 +681,40 @@ def WriteSourceVariables(out, target, project):
         all_sources.append(posixpath.join(project.build_path, 'empty.cpp'))
 
     # TODO .def files on Windows
+    is_custom = target.cmake_type.command == 'add_custom_target'
     for source in all_sources:
         _, ext = posixpath.splitext(source)
         source_abs_path = project.GetAbsolutePath(source)
+        if not _ShouldKeepCustomPath(source_abs_path, is_custom, project.build_path):
+            continue
         source_types[source_file_types.get(
             ext, 'other')].append(source_abs_path)
 
     for input_path in target.properties.get('inputs', []):
         input_abs_path = project.GetAbsolutePath(input_path)
+        if not _ShouldKeepCustomPath(input_abs_path, is_custom, project.build_path):
+            continue
         source_types['input'].append(input_abs_path)
 
     # OBJECT library dependencies need to be listed as sources.
     # Only executables and non-OBJECT libraries may reference an OBJECT library.
     # https://gitlab.kitware.com/cmake/cmake/issues/14778
+    obj_target_sources = []
     if target.gn_type in gn_target_types_that_absorb_objects:
         object_dependencies = set()
         project.GetObjectSourceDependencies(
             target.gn_name, object_dependencies)
-        for dependency in object_dependencies:
+        for dependency in sorted(object_dependencies):
             cmake_dependency_name = project.GetCMakeTargetName(dependency)
-            obj_target_sources = '$<TARGET_OBJECTS:' + cmake_dependency_name + '>'
-            source_types['obj_target'].append(obj_target_sources)
+            obj_target_sources.append(
+                '$<TARGET_OBJECTS:' + cmake_dependency_name + '>')
 
     sources = {}
     for source_type, sources_of_type in source_types.items():
         if sources_of_type:
             sources[source_type] = '${target}__' + source_type + '_srcs'
             SetVariableList(out, sources[source_type], sources_of_type)
-    return sources
+    return sources, obj_target_sources
 
 
 def WriteTarget(out, target, project):
@@ -614,13 +723,12 @@ def WriteTarget(out, target, project):
     out.write('\n')
 
     if target.cmake_type is None:
-        print('Target %s has unknown target type %s, skipping.' %
-              (target.gn_name,            target.gn_type))
+        print(f'Target {target.gn_name} has unknown target type {target.gn_type}, skipping.')
         return
 
     SetVariable(out, 'target', target.cmake_name)
 
-    sources = WriteSourceVariables(out, target, project)
+    sources, obj_target_sources = WriteSourceVariables(out, target, project)
 
     synthetic_dependencies = set()
     if target.gn_type == 'action':
@@ -636,13 +744,20 @@ def WriteTarget(out, target, project):
     if target.cmake_type.modifier is not None:
         out.write(' ')
         out.write(target.cmake_type.modifier)
-    for sources_type_name in sources.values():
+    for source_type, sources_type_name in sources.items():
         WriteVariable(out, sources_type_name, ' ')
     if synthetic_dependencies:
         out.write(' DEPENDS')
         for synthetic_dependencie in synthetic_dependencies:
             WriteVariable(out, synthetic_dependencie, ' ')
     out.write(')\n')
+
+    if obj_target_sources:
+        for i in range(0, len(obj_target_sources), CHUNK_SIZE):
+            chunk = obj_target_sources[i:i + CHUNK_SIZE]
+            out.write('target_sources("${target}" PRIVATE\n  ')
+            out.write('\n  '.join(chunk))
+            out.write('\n)\n')
 
     if target.cmake_type.command != 'add_custom_target':
         WriteCompilerFlags(out, target, project, sources)
@@ -662,10 +777,18 @@ def WriteTarget(out, target, project):
         dependencies.update(project.targets.get(
             object_dependency).get('deps', []))
 
+    expanded_deps = set()
+    for dep in dependencies:
+        dep_type = project.targets.get(dep, {}).get('type')
+        if dep_type == 'group':
+            project.GetExpandedDependencies(dep, expanded_deps)
+    dependencies.update(expanded_deps)
+
     for dependency in dependencies:
         gn_dependency_type = project.targets.get(
             dependency, {}).get('type', None)
-        cmake_dependency_type = cmake_target_types.get(gn_dependency_type)
+        cmake_dependency_type = cmake_target_types.get(
+            gn_dependency_type, CMakeTargetType.custom)
         cmake_dependency_name = project.GetCMakeTargetName(dependency)
 
         if cmake_dependency_type.command != 'add_library':
@@ -676,16 +799,21 @@ def WriteTarget(out, target, project):
             else:
                 nonlibraries.add(cmake_dependency_name)
 
+    if target.cmake_type.command != 'add_custom_target':
+        action_dependencies = set()
+        project.GetTransitiveActionDependencies(
+            target.gn_name, action_dependencies)
+        nonlibraries.update(action_dependencies)
+
     # Non-library dependencies.
     if nonlibraries:
         nonlibrarieslist = list(nonlibraries)
         nonlibrarieslist.sort()
-        out.write('add_dependencies("${target}"')
-        for nonlibrary in nonlibrarieslist:
-            out.write('\n  "')
-            out.write(nonlibrary)
-            out.write('"')
-        out.write(')\n')
+        for i in range(0, len(nonlibrarieslist), CHUNK_SIZE):
+            chunk = nonlibrarieslist[i:i + CHUNK_SIZE]
+            out.write('add_dependencies("${target}"\n  "')
+            out.write('"\n  "'.join([CMakeStringEscape(val) for val in chunk]))
+            out.write('")\n')
 
     # Non-OBJECT library dependencies.
     combined_library_lists = [target.properties.get(
@@ -742,7 +870,6 @@ def WriteProject(project):
     with open(posixpath.join(project.build_path, "CMakeLists.txt"), "w+") as out:
         out.write('# Generated by gn_to_cmake.py.\n')
         out.write('cmake_minimum_required(VERSION 3.20 FATAL_ERROR)\n')
-        out.write('cmake_policy(VERSION 3.7)\n')
         out.write('project(MatterAndroid)\n\n')
 
         out.write('file(WRITE "')

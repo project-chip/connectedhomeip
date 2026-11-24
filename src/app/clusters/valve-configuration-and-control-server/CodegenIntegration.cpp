@@ -68,24 +68,15 @@ public:
     {
         // Get DefaultOpenDuration
         DataModel::Nullable<uint32_t> defaultOpenDuration{};
-        if (DefaultOpenDuration::GetDefault(endpointId, defaultOpenDuration) != Status::Success)
-        {
-            defaultOpenDuration = DataModel::NullNullable;
-        }
+        DefaultOpenDuration::GetDefaultOr(endpointId, defaultOpenDuration, DataModel::NullNullable);
 
         // Get the DefaultOpenLevel
         Percent defaultOpenLevel{};
-        if (DefaultOpenLevel::GetDefault(endpointId, &defaultOpenLevel) != Status::Success)
-        {
-            defaultOpenLevel = ValveConfigurationAndControlCluster::kDefaultOpenLevel;
-        }
+        DefaultOpenLevel::GetDefaultOr(endpointId, defaultOpenLevel, ValveConfigurationAndControlCluster::kDefaultOpenLevel);
 
         // Get the LevelStep
         uint8_t levelStep{};
-        if (LevelStep::GetDefault(endpointId, &levelStep) != Status::Success)
-        {
-            levelStep = ValveConfigurationAndControlCluster::kDefaultLevelStep;
-        }
+        LevelStep::GetDefaultOr(endpointId, levelStep, ValveConfigurationAndControlCluster::kDefaultLevelStep);
 
         ValveConfigurationAndControlCluster::StartupConfiguration startupConfig{ .defaultOpenDuration = defaultOpenDuration,
                                                                                  .defaultOpenLevel    = defaultOpenLevel,

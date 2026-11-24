@@ -620,6 +620,12 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising()
     err = ConfigureAdvertisingData();
     SuccessOrExit(err);
 
+    // Initialize C3 characteristic data (rotating device id contained in the additional data payload)
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    err = PrepareC3CharData();
+    SuccessOrExit(err);
+#endif
+
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
         mAdvertiseStartTime = System::SystemClock().GetMonotonicTimestamp();
@@ -803,10 +809,9 @@ void BLEManagerImpl::HandleRXCharWrite(uint8_t * p_value, uint16_t len, uint8_t 
 }
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-void BLEManagerImpl::HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data)
+CHIP_ERROR BLEManagerImpl::PrepareC3CharData()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    static PacketBufferHandle bufferHandle;
     BitFlags<AdditionalDataFields> additionalDataFields;
     AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
 
@@ -822,18 +827,28 @@ void BLEManagerImpl::HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data)
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
 #endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
 
-    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, bufferHandle,
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, c3CharDataBufferHandle,
                                                                          additionalDataFields);
-    SuccessOrExit(err);
-    p_data->msg_data.write.p_value = bufferHandle->Start();
-    p_data->msg_data.write.len     = bufferHandle->DataLength();
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data (%s)", __func__);
     }
-    return;
+
+    return err;
+}
+
+void BLEManagerImpl::HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data)
+{
+    if (c3CharDataBufferHandle.IsNull())
+    {
+        ChipLogError(DeviceLayer, "C3 characteristic data is not prepared");
+        return;
+    }
+
+    p_data->msg_data.write.p_value = c3CharDataBufferHandle->Start();
+    p_data->msg_data.write.len     = c3CharDataBufferHandle->DataLength();
 }
 #endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
 

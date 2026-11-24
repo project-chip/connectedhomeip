@@ -20,20 +20,6 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --endpoint 1
-#     factory-reset: true
-#     quiet: true
-#   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --device chime
 #     script-args: >
@@ -56,20 +42,20 @@ from TC_CHIMETestBase import CHIMETestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
+class TC_CHIME_2_4(MatterTestCommissionedDevice, CHIMETestBase):
 
     def desc_TC_CHIME_2_4(self) -> str:
         return "[TC-CHIME-2.4] Verify functionality of the PlayChimeSound command"
 
     def steps_TC_CHIME_2_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Write the value of False to the Enabled attribute."),
             TestStep(3, "Invoke the PlayChimeSound command. Verify a success response, and no chime is played."),
             TestStep(4, "Write the value of True to the Enabled attribute."),

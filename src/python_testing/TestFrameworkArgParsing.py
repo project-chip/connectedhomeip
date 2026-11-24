@@ -58,11 +58,11 @@ from typing import Any
 from mobly import asserts
 
 from matter.testing.conversions import bytes_from_hex
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.runner import default_matter_test_main
 
 
-class TestFrameworkArgParsing(MatterBaseTest):
+class TestFrameworkArgParsing(CertificationUnitTestNoDevice):
     def check_arg(self, expected_name: str, expected_val: Any) -> None:
         # Why do we have both? No idea, but folks expect stuff to be in both, so let's check both
         asserts.assert_in(expected_name, self.matter_test_config.global_test_params.keys(),

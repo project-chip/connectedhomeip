@@ -117,6 +117,8 @@ public:
 
     void HandleZoneTrigger(const std::vector<uint16_t> & zoneIds);
 
+    void HandleAmbientContextTrigger(uint8_t namespaceId, uint8_t tagId, const std::vector<uint16_t> & aZoneIds);
+
     void RecordingStreamPrivacyModeChanged(bool privacyModeEnabled);
 
     // Method to reset transport sink state - called by transports when starting transmission
@@ -138,7 +140,6 @@ private:
     std::vector<uint8_t> mBufferClientCert;
     std::vector<uint8_t> mBufferClientCertKey;
     std::vector<std::vector<uint8_t>> mBufferIntermediateCerts;
-    std::vector<PushAvStream> pushavStreams;
 
     CHIP_ERROR IsAnyPrivacyModeActive(bool & isActive);
 

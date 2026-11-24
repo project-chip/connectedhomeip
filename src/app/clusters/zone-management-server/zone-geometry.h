@@ -24,8 +24,14 @@
 
 #pragma once
 
+#include <algorithm>
+#include <array>
 #include <clusters/ZoneManagement/Attributes.h>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <set>
+#include <utility>
 #include <vector>
 
 namespace chip {
@@ -208,7 +214,315 @@ public:
         return false; // No self-intersection found
     }
 
+    /**
+     * Scales a single 2D Cartesian vertex from [0..maxCartesian.x, 0..maxCartesian.y]
+     * into target frame pixel coordinates [0..frameWidth - 1, 0..frameHeight - 1].
+     */
+    static TwoDCartesianVertexStruct ScaleVertex(const TwoDCartesianVertexStruct & vertex,
+                                                 const TwoDCartesianVertexStruct & maxCartesian, uint16_t frameWidth,
+                                                 uint16_t frameHeight)
+    {
+        if (frameWidth == 0 || frameHeight == 0 || maxCartesian.x == 0 || maxCartesian.y == 0)
+        {
+            return TwoDCartesianVertexStruct{ 0, 0 };
+        }
+
+        const uint64_t clampedX = std::min<uint64_t>(vertex.x, maxCartesian.x);
+        const uint64_t clampedY = std::min<uint64_t>(vertex.y, maxCartesian.y);
+
+        const uint16_t scaledX = (frameWidth <= 1)
+            ? static_cast<uint16_t>(0)
+            : static_cast<uint16_t>((clampedX * static_cast<uint64_t>(frameWidth - 1U) + (maxCartesian.x / 2U)) / maxCartesian.x);
+        const uint16_t scaledY = (frameHeight <= 1)
+            ? static_cast<uint16_t>(0)
+            : static_cast<uint16_t>((clampedY * static_cast<uint64_t>(frameHeight - 1U) + (maxCartesian.y / 2U)) / maxCartesian.y);
+
+        return TwoDCartesianVertexStruct{ scaledX, scaledY };
+    }
+
+    /**
+     * Scales a polygon's vertices from [0..maxCartesian.x, 0..maxCartesian.y]
+     * into target frame pixel coordinates [0..frameWidth - 1, 0..frameHeight - 1].
+     */
+    static std::vector<TwoDCartesianVertexStruct> ScaleVertices(const std::vector<TwoDCartesianVertexStruct> & vertices,
+                                                                const TwoDCartesianVertexStruct & maxCartesian, uint16_t frameWidth,
+                                                                uint16_t frameHeight)
+    {
+        std::vector<TwoDCartesianVertexStruct> scaled;
+        scaled.reserve(vertices.size());
+        for (const auto & v : vertices)
+        {
+            scaled.push_back(ScaleVertex(v, maxCartesian, frameWidth, frameHeight));
+        }
+        return scaled;
+    }
+
+    /**
+     * Returns true if `point` is inside or on the boundary of the simple polygon defined by `polygon` (3..12 vertices).
+     */
+    static bool IsPointInPolygon(const std::vector<TwoDCartesianVertexStruct> & polygon, const TwoDCartesianVertexStruct & point)
+    {
+        const size_t n = polygon.size();
+        if (n < 3)
+        {
+            return false;
+        }
+
+        const int64_t px = static_cast<int64_t>(point.x);
+        const int64_t py = static_cast<int64_t>(point.y);
+        bool inside      = false;
+
+        for (size_t i = 0, j = n - 1; i < n; j = i++)
+        {
+            const auto & vi = polygon[i];
+            const auto & vj = polygon[j];
+
+            if (Orientation(vj, vi, point) == OrientationEnum::kCollinear && OnSegment(vj, point, vi))
+            {
+                return true;
+            }
+
+            const int64_t xi = static_cast<int64_t>(vi.x);
+            const int64_t yi = static_cast<int64_t>(vi.y);
+            const int64_t xj = static_cast<int64_t>(vj.x);
+            const int64_t yj = static_cast<int64_t>(vj.y);
+
+            if ((yi > py) != (yj > py))
+            {
+                const int64_t dy  = yj - yi;
+                const int64_t lhs = (px - xi) * dy;
+                const int64_t rhs = (xj - xi) * (py - yi);
+                if ((dy > 0 && lhs < rhs) || (dy < 0 && lhs > rhs))
+                {
+                    inside = !inside;
+                }
+            }
+        }
+
+        return inside;
+    }
+
+    static constexpr size_t kMaxZoneVertices = 12;
+
+    /**
+     * Replaces all pixels inside `scaledPolygon` with black (Y=0, U=128, V=128) in an I420 planar buffer.
+     *
+     * When `padPixels > 0` (the default is 1), every pixel that the scaled edges pass through is included
+     * and each horizontal span is dilated by `padPixels` in both x and y so that frame pixels partially
+     * covered by a downscaled sensor-space privacy zone remain masked. When `padPixels == 0`, only pixels
+     * whose integer coordinates satisfy `IsPointInPolygon` are masked.
+     */
+    static void ApplyPrivacyMaskI420(uint8_t * yPlane, size_t yStride, uint8_t * uPlane, size_t uStride, uint8_t * vPlane,
+                                     size_t vStride, uint16_t width, uint16_t height,
+                                     const std::vector<TwoDCartesianVertexStruct> & scaledPolygon, uint16_t padPixels = 1)
+    {
+        if (yPlane == nullptr || uPlane == nullptr || vPlane == nullptr || width == 0 || height == 0 || scaledPolygon.size() < 3 ||
+            scaledPolygon.size() > kMaxZoneVertices)
+        {
+            return;
+        }
+
+        uint16_t minX = scaledPolygon[0].x;
+        uint16_t maxX = scaledPolygon[0].x;
+        uint16_t minY = scaledPolygon[0].y;
+        uint16_t maxY = scaledPolygon[0].y;
+        for (const auto & v : scaledPolygon)
+        {
+            minX = std::min(minX, v.x);
+            maxX = std::max(maxX, v.x);
+            minY = std::min(minY, v.y);
+            maxY = std::max(maxY, v.y);
+        }
+
+        if (minX >= width || minY >= height)
+        {
+            return;
+        }
+
+        maxX = std::min<uint16_t>(maxX, static_cast<uint16_t>(width - 1U));
+        maxY = std::min<uint16_t>(maxY, static_cast<uint16_t>(height - 1U));
+
+        const bool includeEdgeTraversal = (padPixels > 0);
+        SpanArray spans;
+        size_t spanCount = 0;
+
+        for (uint32_t y = minY; y <= maxY; ++y)
+        {
+            ComputeScanlineSpans(scaledPolygon, static_cast<uint16_t>(y), minX, maxX, includeEdgeTraversal, spans, spanCount);
+            if (spanCount == 0)
+            {
+                continue;
+            }
+
+            const uint16_t yStart = (y > padPixels) ? static_cast<uint16_t>(y - padPixels) : static_cast<uint16_t>(0);
+            const uint16_t yEnd =
+                static_cast<uint16_t>(std::min<uint32_t>(static_cast<uint32_t>(height - 1U), y + static_cast<uint32_t>(padPixels)));
+
+            for (size_t sIdx = 0; sIdx < spanCount; ++sIdx)
+            {
+                const uint16_t rawStart = spans[sIdx].first;
+                const uint16_t rawEnd   = spans[sIdx].second;
+                const uint16_t xStart =
+                    (rawStart > padPixels) ? static_cast<uint16_t>(rawStart - padPixels) : static_cast<uint16_t>(0);
+                const uint16_t xEnd  = static_cast<uint16_t>(std::min<uint32_t>(
+                    static_cast<uint32_t>(width - 1U), static_cast<uint32_t>(rawEnd) + static_cast<uint32_t>(padPixels)));
+                const size_t yCount  = static_cast<size_t>(xEnd - xStart + 1U);
+                const size_t uvStart = static_cast<size_t>(xStart / 2U);
+                const size_t uvCount = static_cast<size_t>(xEnd / 2U) - uvStart + 1U;
+
+                for (uint32_t targetY = yStart; targetY <= yEnd; ++targetY)
+                {
+                    uint8_t * yRow = yPlane + static_cast<size_t>(targetY) * yStride;
+                    std::memset(yRow + xStart, 0, yCount);
+                    if (targetY == yStart || (targetY & 1U) == 0U)
+                    {
+                        uint8_t * uRow = uPlane + static_cast<size_t>(targetY / 2U) * uStride;
+                        uint8_t * vRow = vPlane + static_cast<size_t>(targetY / 2U) * vStride;
+                        std::memset(uRow + uvStart, 128, uvCount);
+                        std::memset(vRow + uvStart, 128, uvCount);
+                    }
+                }
+            }
+        }
+    }
+
 private:
+    static constexpr size_t kMaxRawIntervals = kMaxZoneVertices * 2;
+    using SpanArray                          = std::array<std::pair<uint16_t, uint16_t>, kMaxRawIntervals>;
+
+    static int64_t FloorDiv(int64_t a, int64_t b)
+    {
+        int64_t q = a / b;
+        int64_t r = a % b;
+        if (r < 0)
+        {
+            --q;
+        }
+        return q;
+    }
+
+    static void ComputeScanlineSpans(const std::vector<TwoDCartesianVertexStruct> & polygon, uint16_t y, uint16_t minX,
+                                     uint16_t maxX, bool includeEdgeTraversal, SpanArray & outSpans, size_t & outSpanCount)
+    {
+        outSpanCount   = 0;
+        const size_t n = polygon.size();
+        if (n < 3 || n > kMaxZoneVertices || minX > maxX)
+        {
+            return;
+        }
+
+        const int64_t py = static_cast<int64_t>(y);
+        std::array<int64_t, kMaxZoneVertices> crossingMaxPx{};
+        size_t crossingCount = 0;
+        std::array<std::pair<int64_t, int64_t>, kMaxRawIntervals> rawIntervals{};
+        size_t rawIntervalCount = 0;
+
+        for (size_t i = 0, j = n - 1; i < n; j = i++)
+        {
+            const int64_t xi = static_cast<int64_t>(polygon[i].x);
+            const int64_t yi = static_cast<int64_t>(polygon[i].y);
+            const int64_t xj = static_cast<int64_t>(polygon[j].x);
+            const int64_t yj = static_cast<int64_t>(polygon[j].y);
+
+            if (yi == yj)
+            {
+                if (yi == py)
+                {
+                    rawIntervals[rawIntervalCount++] = { std::min(xi, xj), std::max(xi, xj) };
+                }
+                continue;
+            }
+
+            const int64_t edgeMinY = std::min(yi, yj);
+            const int64_t edgeMaxY = std::max(yi, yj);
+            if (py >= edgeMinY && py <= edgeMaxY)
+            {
+                if (includeEdgeTraversal)
+                {
+                    const int64_t x0                 = (yi < yj) ? xi : xj;
+                    const int64_t y0                 = (yi < yj) ? yi : yj;
+                    const int64_t x1                 = (yi < yj) ? xj : xi;
+                    const int64_t y1                 = (yi < yj) ? yj : yi;
+                    const int64_t dyPos              = y1 - y0;
+                    const int64_t y2Low              = std::max(2 * y0, 2 * py - 1);
+                    const int64_t y2High             = std::min(2 * y1, 2 * py + 1);
+                    const int64_t numLow             = 2 * x0 * dyPos + (x1 - x0) * (y2Low - 2 * y0);
+                    const int64_t numHigh            = 2 * x0 * dyPos + (x1 - x0) * (y2High - 2 * y0);
+                    const int64_t numMin             = std::min(numLow, numHigh);
+                    const int64_t numMax             = std::max(numLow, numHigh);
+                    const int64_t xLeft              = FloorDiv(numMin, 2 * dyPos);
+                    const int64_t xRight             = FloorDiv(numMax + 2 * dyPos - 1, 2 * dyPos);
+                    rawIntervals[rawIntervalCount++] = { xLeft, xRight };
+                }
+                else
+                {
+                    const int64_t dy  = yi - yj;
+                    const int64_t num = (xi - xj) * (py - yj);
+                    if (num % dy == 0)
+                    {
+                        const int64_t xOnEdge            = xj + (num / dy);
+                        rawIntervals[rawIntervalCount++] = { xOnEdge, xOnEdge };
+                    }
+                }
+            }
+
+            if ((yi > py) != (yj > py))
+            {
+                const int64_t x0               = (yi < yj) ? xi : xj;
+                const int64_t y0               = (yi < yj) ? yi : yj;
+                const int64_t x1               = (yi < yj) ? xj : xi;
+                const int64_t y1               = (yi < yj) ? yj : yi;
+                const int64_t dyPos            = y1 - y0;
+                const int64_t num              = x0 * dyPos + (x1 - x0) * (py - y0);
+                crossingMaxPx[crossingCount++] = FloorDiv(num - 1, dyPos);
+            }
+        }
+
+        std::sort(crossingMaxPx.begin(), crossingMaxPx.begin() + static_cast<std::ptrdiff_t>(crossingCount));
+        for (size_t k = 0; k + 1 < crossingCount; k += 2)
+        {
+            const int64_t spanStart = crossingMaxPx[k] + 1;
+            const int64_t spanEnd   = crossingMaxPx[k + 1];
+            if (spanStart <= spanEnd)
+            {
+                rawIntervals[rawIntervalCount++] = { spanStart, spanEnd };
+            }
+        }
+
+        const int64_t clampMinX = static_cast<int64_t>(minX);
+        const int64_t clampMaxX = static_cast<int64_t>(maxX);
+        for (size_t idx = 0; idx < rawIntervalCount; ++idx)
+        {
+            const int64_t s = std::max(rawIntervals[idx].first, clampMinX);
+            const int64_t e = std::min(rawIntervals[idx].second, clampMaxX);
+            if (s <= e)
+            {
+                outSpans[outSpanCount++] = { static_cast<uint16_t>(s), static_cast<uint16_t>(e) };
+            }
+        }
+
+        if (outSpanCount <= 1)
+        {
+            return;
+        }
+
+        std::sort(outSpans.begin(), outSpans.begin() + static_cast<std::ptrdiff_t>(outSpanCount));
+        size_t writeIdx = 0;
+        for (size_t readIdx = 1; readIdx < outSpanCount; ++readIdx)
+        {
+            if (static_cast<uint32_t>(outSpans[readIdx].first) <= static_cast<uint32_t>(outSpans[writeIdx].second) + 1U)
+            {
+                outSpans[writeIdx].second = std::max(outSpans[writeIdx].second, outSpans[readIdx].second);
+            }
+            else
+            {
+                ++writeIdx;
+                outSpans[writeIdx] = outSpans[readIdx];
+            }
+        }
+        outSpanCount = writeIdx + 1U;
+    }
+
     // Helper function: Check if point q lies on segment pr (assuming p, q, r are collinear)
     // Checks if q is within the bounding box defined by p and r.
     // Returns true if the coordinates of q are greater than the min and smaller

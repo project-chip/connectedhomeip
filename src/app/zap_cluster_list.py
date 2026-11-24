@@ -19,8 +19,7 @@ def get_cluster_sources(clusters: set[str], source_map: dict[str, list[str]], si
 
     for cluster in clusters:
         if cluster not in source_map:
-            raise ValueError("Unhandled %s cluster: %s"
-                             " (hint: add to src/app/zap_cluster_list.json)" % (side, cluster))
+            raise ValueError(f"Unhandled {side} cluster: {cluster} (hint: add to src/app/zap_cluster_list.json)")
 
         cluster_sources.update(source_map[cluster])
 
@@ -63,7 +62,7 @@ def dump_zapfile_clusters(zap_file_path: pathlib.Path,
                 elif side == 'server':
                     clusters_set = server_clusters
                 else:
-                    raise ValueError("Invalid side for cluster: %s" % side)
+                    raise ValueError(f"Invalid side for cluster: {side}")
 
                 if cluster.get('enabled') == 1:
                     clusters_set.add(cluster.get('define'))

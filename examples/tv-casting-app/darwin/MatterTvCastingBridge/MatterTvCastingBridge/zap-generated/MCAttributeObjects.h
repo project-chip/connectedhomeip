@@ -328,4 +328,33 @@
 @interface MCApplicationBasicClusterClusterRevisionAttribute : MCAttribute <NSNumber *>
 @end
 
+// MediaFileManagement cluster attributes:
+
+@interface MCMediaFileManagementClusterTotalStorageAttribute : MCAttribute <NSNumber *>
+@end
+
+@interface MCMediaFileManagementClusterAvailableStorageAttribute : MCAttribute <NSNumber *>
+@end
+
+@interface MCMediaFileManagementClusterAvailableFilesAttribute : MCAttribute <NSArray *>
+@end
+
+@interface MCMediaFileManagementClusterSupportedMimeTypesAttribute : MCAttribute <NSArray *>
+@end
+
+@interface MCMediaFileManagementClusterGeneratedCommandListAttribute : MCAttribute <NSArray *>
+@end
+
+@interface MCMediaFileManagementClusterAcceptedCommandListAttribute : MCAttribute <NSArray *>
+@end
+
+@interface MCMediaFileManagementClusterAttributeListAttribute : MCAttribute <NSArray *>
+@end
+
+@interface MCMediaFileManagementClusterFeatureMapAttribute : MCAttribute <NSNumber *>
+@end
+
+@interface MCMediaFileManagementClusterClusterRevisionAttribute : MCAttribute <NSNumber *>
+@end
+
 #endif /* MCAttributeObjects_h */

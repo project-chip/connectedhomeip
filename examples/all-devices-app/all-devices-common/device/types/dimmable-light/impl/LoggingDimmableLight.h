@@ -17,12 +17,13 @@
 
 #pragma once
 
-#include <device/capabilities/dimmable-load/impl/LoggingDimmableLoad.h>
+#include <device/capabilities/dimmable-load/impl/LoggingDimmableDelegate.h>
+#include <device/types/dimmable-light/DimmableLight.h>
 
 namespace chip {
 namespace app {
 
-class LoggingDimmableLight : public LoggingDimmableLoad
+class LoggingDimmableLight : private LoggingDimmableDelegate, public DimmableLight
 {
 public:
     LoggingDimmableLight(const Context & context, const Config & config = {});

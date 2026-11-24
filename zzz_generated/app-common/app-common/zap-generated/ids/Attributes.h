@@ -154,6 +154,7 @@
 #include <clusters/TemperatureMeasurement/AttributeIds.h>
 #include <clusters/TestHiddenManufacturerSpecific/AttributeIds.h>
 #include <clusters/Thermostat/AttributeIds.h>
+#include <clusters/ThermostatMode/AttributeIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/AttributeIds.h>
 #include <clusters/ThreadBorderRouterManagement/AttributeIds.h>
 #include <clusters/ThreadNetworkDiagnostics/AttributeIds.h>

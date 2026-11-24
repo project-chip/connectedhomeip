@@ -25,12 +25,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_ENABLE_OPENTHREAD)
-
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
-
-extern "C" {
-#include "addons_cli.h"
-}
 #endif
 
 #define MATTER_CLI_LOG(message) (chip::Shell::streamer_printf(chip::Shell::streamer_get(), message))
@@ -89,12 +84,6 @@ void chip::NXP::App::AppCLIBase::RegisterDefaultCommands(void)
     /* Register common shell commands */
     cmd_misc_init();
     cmd_otcli_init();
-#if (CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_ENABLE_OPENTHREAD)
-    /* verify that otInstance is not null before initializing addons */
-    otInstance * instance = otInstanceGetSingle();
-    VerifyOrDie(instance != nullptr);
-    otAppCliAddonsInit(instance);
-#endif
 #if CHIP_SHELL_ENABLE_CMD_SERVER
     cmd_app_server_init();
 #endif /* CHIP_SHELL_ENABLE_CMD_SERVER */

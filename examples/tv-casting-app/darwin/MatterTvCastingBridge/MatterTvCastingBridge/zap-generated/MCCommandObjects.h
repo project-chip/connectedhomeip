@@ -159,4 +159,21 @@
 
 // ApplicationBasic cluster:
 
+// MediaFileManagement cluster:
+
+@interface MCMediaFileManagementClusterAddFileCommand : MCCommand <MCMediaFileManagementClusterAddFileParams *, MCMediaFileManagementClusterAddFileResponseParams *>
+@end
+
+@interface MCMediaFileManagementClusterDeleteFileCommand : MCCommand <MCMediaFileManagementClusterDeleteFileParams *, MCNullObjectType *>
+@end
+
+@interface MCMediaFileManagementClusterRequestSharedFilesCommand : MCCommand <MCMediaFileManagementClusterRequestSharedFilesParams *, MCNullObjectType *>
+@end
+
+@interface MCMediaFileManagementClusterGetSharedFileCommand : MCCommand <MCMediaFileManagementClusterGetSharedFileParams *, MCMediaFileManagementClusterGetSharedFileResponseParams *>
+@end
+
+@interface MCMediaFileManagementClusterOfferFileCommand : MCCommand <MCMediaFileManagementClusterOfferFileParams *, MCNullObjectType *>
+@end
+
 #endif /* MCCommandObjects_h */

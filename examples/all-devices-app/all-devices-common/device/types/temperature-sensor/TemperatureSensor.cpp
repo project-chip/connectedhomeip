@@ -23,10 +23,10 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-TemperatureSensor::TemperatureSensor(TimerDelegate & timerDelegate,
-                                     TemperatureMeasurementCluster::StartupConfiguration tempConfig) :
+TemperatureSensor::TemperatureSensor(TimerDelegate & timerDelegate, TemperatureMeasurementCluster::StartupConfiguration tempConfig,
+                                     TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kTemperatureSensor, 1)),
-    mTimerDelegate(timerDelegate), mTempConfig(tempConfig)
+    mTimerDelegate(timerDelegate), mTempConfig(tempConfig), mOptionalAttributes(optionalAttributes)
 {}
 
 CHIP_ERROR TemperatureSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -41,9 +41,10 @@ CHIP_ERROR TemperatureSensor::Register(EndpointId endpoint, CodeDrivenDataModelP
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     // Create the temperature measurement cluster
-    TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributeSet{ 0 };
-    mTemperatureMeasurementCluster.Create(endpoint, optionalAttributeSet, mTempConfig);
+    mTemperatureMeasurementCluster.Create(endpoint, mOptionalAttributes, mTempConfig);
     ReturnErrorOnFailure(provider.AddCluster(mTemperatureMeasurementCluster.Registration()));
+
+    ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
@@ -53,6 +54,7 @@ CHIP_ERROR TemperatureSensor::Register(EndpointId endpoint, CodeDrivenDataModelP
 void TemperatureSensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+    UnregisterAdditionalClusters(provider);
     if (mTemperatureMeasurementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mTemperatureMeasurementCluster.Cluster()));

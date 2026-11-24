@@ -1111,8 +1111,8 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetNightVision(TriStateAutoEnum aNig
         mNightVision     = aNightVision;
         auto path        = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVision::Id);
         auto nightVision = to_underlying(mNightVision);
-        ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(
-            path, ByteSpan(reinterpret_cast<const uint8_t *>(&nightVision), sizeof(nightVision))));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        ReturnErrorOnFailure(attrPersistence.StoreNativeEndianValue(path, nightVision));
         mDelegate.OnAttributeChanged(Attributes::NightVision::Id);
         NotifyAttributeChanged(Attributes::NightVision::Id);
     }
@@ -1126,8 +1126,8 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetNightVisionIllum(TriStateAutoEnum
         mNightVisionIllum = aNightVisionIllum;
         auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVisionIllum::Id);
         auto nightVisionIllum = to_underlying(mNightVisionIllum);
-        ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(
-            path, ByteSpan(reinterpret_cast<const uint8_t *>(&nightVisionIllum), sizeof(nightVisionIllum))));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        ReturnErrorOnFailure(attrPersistence.StoreNativeEndianValue(path, nightVisionIllum));
         mDelegate.OnAttributeChanged(Attributes::NightVisionIllum::Id);
         NotifyAttributeChanged(Attributes::NightVisionIllum::Id);
     }
@@ -1289,8 +1289,8 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetStatusLightBrightness(Globals::Th
         mStatusLightBrightness = aStatusLightBrightness;
         auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id);
         auto statusLightBrightness = to_underlying(mStatusLightBrightness);
-        ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(
-            path, ByteSpan(reinterpret_cast<const uint8_t *>(&statusLightBrightness), sizeof(statusLightBrightness))));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        ReturnErrorOnFailure(attrPersistence.StoreNativeEndianValue(path, statusLightBrightness));
         mDelegate.OnAttributeChanged(Attributes::StatusLightBrightness::Id);
         NotifyAttributeChanged(Attributes::StatusLightBrightness::Id);
     }

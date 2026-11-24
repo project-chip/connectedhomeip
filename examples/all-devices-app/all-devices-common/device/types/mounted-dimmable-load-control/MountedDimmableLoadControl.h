@@ -18,15 +18,18 @@
 
 #pragma once
 
-#include <device/capabilities/dimmable-load/impl/LoggingDimmableLoad.h>
+#include <device/capabilities/dimmable-load/DimmableLoad.h>
 
 namespace chip {
 namespace app {
 
-class MountedDimmableLoadControl : public LoggingDimmableLoad
+class MountedDimmableLoadControl : public DimmableLoad
 {
 public:
-    MountedDimmableLoadControl(const Context & context, const Config & config = {});
+    using Context = DimmableLoad::Context;
+    using Config  = DimmableLoad::Config;
+
+    MountedDimmableLoadControl(const Context & context, const Delegates & delegates, const Config & config = {});
     ~MountedDimmableLoadControl() override = default;
 };
 

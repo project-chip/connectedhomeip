@@ -15,7 +15,11 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
+#include <app/clusters/push-av-stream-transport-server/MigratePushAvStreamTransportServerStorage.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/PushAvStreamTransport.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -35,7 +39,8 @@ static constexpr size_t kPushAvStreamTransportFixedClusterCount =
 static constexpr size_t kPushAvStreamTransportMaxClusterCount =
     kPushAvStreamTransportFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<PushAvStreamTransportServer> gServers[kPushAvStreamTransportMaxClusterCount];
+LazyRegisteredServerCluster<PushAvStreamTransport::CodegenPushAvStreamTransportServer>
+    gServers[kPushAvStreamTransportMaxClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -44,7 +49,8 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         ChipLogProgress(AppServer, "Registering Push AV Stream Transport on endpoint %u, %d", endpointId, clusterInstanceIndex);
-        gServers[clusterInstanceIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(featureMap));
+        gServers[clusterInstanceIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(featureMap),
+                                              Server::GetInstance().GetFabricTable());
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -109,6 +115,17 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
+
+CHIP_ERROR CodegenPushAvStreamTransportServer::Startup(ServerClusterContext & context)
+{
+    SafeAttributePersistenceProvider * srcProvider = GetSafeAttributePersistenceProvider();
+    if (srcProvider != nullptr)
+    {
+        LogErrorOnFailure(MigratePushAvStreamTransportServerStorage(mPath.mEndpointId, *srcProvider, context.attributeStorage));
+    }
+
+    return PushAvStreamTransportServer::Startup(context);
+}
 
 void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate)
 {

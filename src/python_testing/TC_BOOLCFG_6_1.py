@@ -48,20 +48,20 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_BOOLCFG_6_1(MatterBaseTest):
+class TC_BOOLCFG_6_1(MatterTestCommissionedDevice):
 
     def desc_TC_BOOLCFG_6_1(self) -> str:
         return "[TC-BOOLCFG-6.1] Sensor fault functionality with DUT as Server"
 
     def steps_TC_BOOLCFG_6_1(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH", is_commissioning=True),
+            TestStep("1", "Commission DUT to TH"),
             TestStep("2a", "TH reads FeatureMap attribute.", "DUT replies with FeatureMap attribute."),
             TestStep("2b", "TH reads AttributeList attribute.", "DUT replies with AttributeList attribute."),
             TestStep("3", "If FAULTEV feature is not supported, "

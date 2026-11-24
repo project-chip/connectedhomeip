@@ -51,9 +51,6 @@ namespace app {
  *       the Startup() method on each ServerClusterInterface will be called when the EndpointInterface is added (Step 4).
  *       If the provider hasn't been started, the Startup() method will be called when the provider is started (Step 5).
  *
- * TODO: Notify composition changes when the provider is started up and endpoints are added/removed at runtime.
- *       For now, applications are responsible for handling composition changes and calling markDirty() when needed.
- *
  * Lifecycle:
  * - The CodeDrivenDataModelProvider stores raw pointers to EndpointInterface and ServerClusterInterface.
  *   It does NOT take ownership. Callers must ensure these instances outlive the provider.

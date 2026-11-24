@@ -66,6 +66,16 @@ CHIP_ERROR FanLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvi
                           });
     ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
+    // Fan
+    FanControlCluster::Config fanConfig(endpoint, mFanDelegate);
+    fanConfig.WithSpeedMax(10)
+        .WithStep()
+        .WithWindSupport(BitMask<FanControl::WindBitmap>(FanControl::WindBitmap::kSleepWind, FanControl::WindBitmap::kNaturalWind))
+        .WithRockSupport(BitMask<FanControl::RockBitmap>(FanControl::RockBitmap::kRockLeftRight))
+        .WithAirflowDirection();
+    mFanControlCluster.Create(fanConfig);
+    ReturnErrorOnFailure(provider.AddCluster(mFanControlCluster.Registration()));
+
     // OnOff
     if (mOnOffDelegate != nullptr)
     {
@@ -80,16 +90,6 @@ CHIP_ERROR FanLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvi
             table->RegisterHandler(&mOnOffCluster.Cluster());
         }
     }
-
-    // Fan
-    FanControlCluster::Config fanConfig(endpoint, mFanDelegate);
-    fanConfig.WithSpeedMax(10)
-        .WithStep()
-        .WithWindSupport(BitMask<FanControl::WindBitmap>(FanControl::WindBitmap::kSleepWind, FanControl::WindBitmap::kNaturalWind))
-        .WithRockSupport(BitMask<FanControl::RockBitmap>(FanControl::RockBitmap::kRockLeftRight))
-        .WithAirflowDirection();
-    mFanControlCluster.Create(fanConfig);
-    ReturnErrorOnFailure(provider.AddCluster(mFanControlCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();

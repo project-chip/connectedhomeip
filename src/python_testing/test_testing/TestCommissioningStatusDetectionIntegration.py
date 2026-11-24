@@ -55,7 +55,7 @@ from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import _is_device_operational_via_dnssd, is_commissioned
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import default_matter_test_main
 
 # Add python_testing directory to path so mdns_discovery module is available
@@ -65,7 +65,7 @@ with PythonPath('..', relative_to=__file__):
 LOGGER = logging.getLogger(__name__)
 
 
-class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
+class TestCommissioningStatusDetectionIntegration(MatterTestCommissioner):
     """
     Integration tests for commissioning status detection with real Matter apps.
 

@@ -45,11 +45,11 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_WebRTCP_2_29(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_29(MatterTestCommissionedDevice, WEBRTCPTestBase):
 
     def desc_TC_WebRTCP_2_29(self) -> str:
         """Returns a description of this test"""
@@ -57,7 +57,7 @@ class TC_WebRTCP_2_29(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WebRTCP_2_29(self) -> list[TestStep]:
         return [
-            TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
+            TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send ProvideOffer with no VideoStreams or AudioStreams => expect INVALID_COMMAND"),
             TestStep(3, "Allocate Audio and Video streams via CameraAVStreamManagement"),
             TestStep(4, "Send ProvideOffer with VideoStreams containing invalid VideoStreamID => expect DYNAMIC_CONSTRAINT_ERROR"),

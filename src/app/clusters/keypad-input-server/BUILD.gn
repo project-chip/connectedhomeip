@@ -11,5 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("keypad-input-server") {
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("keypad-input-server") {
+  sources = [
+    "KeypadInputCluster.cpp",
+    "KeypadInputCluster.h",
+    "keypad-input-delegate.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/clusters/KeypadInput",
+  ]
 }

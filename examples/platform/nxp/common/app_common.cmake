@@ -55,6 +55,9 @@ if (CONFIG_CHIP_APP_COMMON)
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/source/AppTaskZephyr.cpp
         )
     endif()
+    if (CONFIG_CHIP_APP_FAILSAFE_EARLY_EXPIRY)
+        target_compile_definitions(app PRIVATE CHIP_APP_FAILSAFE_EARLY_EXPIRY=1)
+    endif()
 endif()
 
 if (CONFIG_CHIP_APP_CLUSTERS)
@@ -312,6 +315,11 @@ endif()
 set_source_files_properties(
      ${CHIP_ROOT}/examples/lock-app/lock-common/src/LockEndpoint.cpp
      PROPERTIES COMPILE_FLAGS "-Wno-error=format"
+)
+
+set_source_files_properties(
+     ${CHIP_ROOT}/src/app/clusters/door-lock-server/CodegenIntegration.cpp
+     PROPERTIES COMPILE_FLAGS "-Wno-error=maybe-uninitialized"
 )
 
 # Use MCUX post-build function to convert the executable to binary format

@@ -27,6 +27,8 @@
 #include <app/server/Server.h> // nogncheck
 #endif
 
+#include <algorithm>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -90,22 +92,16 @@ void ICDManagementFabricDelegate::OnFabricRemoved(const FabricTable & fabricTabl
 
 ICDManagementCluster::ICDManagementCluster(EndpointId endpointId, Crypto::SymmetricKeystore & symmetricKeystore,
                                            FabricTable & fabricTable, ICDConfigurationData & icdConfigurationData,
-                                           OptionalAttributeSet optionalAttributeSet,
-                                           BitMask<IcdManagement::OptionalCommands> enabledCommands,
+                                           OptionalAttributeSet optionalAttributeSet, OptionalCommandSet enabledCommands,
                                            BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerBitmap,
                                            CharSpan userActiveModeTriggerInstruction) :
     DefaultServerCluster({ endpointId, IcdManagement::Id }),
     mSymmetricKeystore(symmetricKeystore), mFabricTable(fabricTable), mICDConfigurationData(icdConfigurationData),
     mOptionalAttributeSet(optionalAttributeSet), mUserActiveModeTriggerBitmap(userActiveModeTriggerBitmap),
-    mEnabledCommands(enabledCommands), mUserActiveModeTriggerInstructionLength(0)
-{
-    static_assert(sizeof(mUserActiveModeTriggerInstruction) <= UINT8_MAX,
-                  "mUserActiveModeTriggerInstruction size must fit in uint8_t");
-
-    MutableCharSpan buffer(mUserActiveModeTriggerInstruction);
-    CopyCharSpanToMutableCharSpanWithTruncation(userActiveModeTriggerInstruction, buffer);
-    mUserActiveModeTriggerInstructionLength = static_cast<uint8_t>(buffer.size());
-}
+    mEnabledCommands(enabledCommands),
+    mUserActiveModeTriggerInstruction(userActiveModeTriggerInstruction.SubSpan(
+        0, std::min(userActiveModeTriggerInstruction.size(), kUserActiveModeTriggerInstructionMaxLength)))
+{}
 
 CHIP_ERROR ICDManagementCluster::Startup(ServerClusterContext & context)
 {
@@ -161,7 +157,7 @@ DataModel::ActionReturnStatus ICDManagementCluster::ReadAttribute(const DataMode
         return aEncoder.Encode(mUserActiveModeTriggerBitmap);
 
     case IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id:
-        return aEncoder.Encode(CharSpan(mUserActiveModeTriggerInstruction, mUserActiveModeTriggerInstructionLength));
+        return aEncoder.Encode(mUserActiveModeTriggerInstruction);
 
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
@@ -217,7 +213,7 @@ CHIP_ERROR ICDManagementCluster::AcceptedCommands(const ConcreteClusterPath & pa
                                                   ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (mICDConfigurationData.GetFeatureMap().Has(Feature::kLongIdleTimeSupport) ||
-        mEnabledCommands.Has(OptionalCommands::kStayActive))
+        mEnabledCommands.IsSet(Commands::StayActiveRequest::Id))
     {
         static constexpr DataModel::AcceptedCommandEntry kStayActiveCommand[] = {
             Commands::StayActiveRequest::kMetadataEntry,
@@ -230,7 +226,7 @@ CHIP_ERROR ICDManagementCluster::AcceptedCommands(const ConcreteClusterPath & pa
 CHIP_ERROR ICDManagementCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     if (mICDConfigurationData.GetFeatureMap().Has(Feature::kLongIdleTimeSupport) ||
-        mEnabledCommands.Has(OptionalCommands::kStayActive))
+        mEnabledCommands.IsSet(Commands::StayActiveRequest::Id))
     {
         static constexpr CommandId kStayActiveResponse[] = {
             Commands::StayActiveResponse::Id,
@@ -258,8 +254,7 @@ CHIP_ERROR ICDManagementCluster::ReadOperatingMode(AttributeValueEncoder & encod
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 ICDManagementClusterWithCIP::ICDManagementClusterWithCIP(
     EndpointId endpointId, Crypto::SymmetricKeystore & symmetricKeystore, FabricTable & fabricTable,
-    ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
-    BitMask<IcdManagement::OptionalCommands> enabledCommands,
+    ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet, OptionalCommandSet enabledCommands,
     BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerBitmap, CharSpan userActiveModeTriggerInstruction) :
     ICDManagementCluster(endpointId, symmetricKeystore, fabricTable, icdConfigurationData, optionalAttributeSet, enabledCommands,
                          userActiveModeTriggerBitmap, userActiveModeTriggerInstruction)

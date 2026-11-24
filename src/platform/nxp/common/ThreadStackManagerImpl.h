@@ -77,6 +77,16 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    void SetThreadEnabledForTest(bool enabled) { mThreadEnabledForTest.SetValue(enabled); }
+    void SetThreadAttachedForTest(bool attached) { mAttached = attached; }
+    void ResetThreadStateForTest()
+    {
+        mThreadEnabledForTest.ClearValue();
+        mAttached = false;
+    }
+#endif
+
 #if CHIP_DEVICE_CONFIG_PROCESS_BLE_IN_THREAD
     using ThreadStackManager::ProcessThreadActivity;
     void ProcessThreadActivity();
@@ -85,6 +95,23 @@ public:
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
     CHIP_ERROR _InitThreadStack(void);
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    bool _IsThreadEnabled()
+    {
+        if (mThreadEnabledForTest.HasValue())
+        {
+            return mThreadEnabledForTest.Value();
+        }
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        return Internal::GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::_IsThreadEnabled();
+#else
+        return Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_IsThreadEnabled();
+#endif
+    }
+
+    bool _IsThreadAttached() { return mAttached; }
+#endif
 
 private:
     // ===== Members for internal use by the following friends.
@@ -95,6 +122,11 @@ private:
     static ThreadStackManagerImpl sInstance;
 
     static bool IsInitialized();
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    bool mAttached = false;
+    chip::Optional<bool> mThreadEnabledForTest;
+#endif
 
     // ===== Private members for use by this class only.
 

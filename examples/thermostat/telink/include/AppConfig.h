@@ -20,5 +20,4 @@
 
 // ---- Thermostat Example App Config ----
 
-#define APP_SET_DEVICE_INFO_PROVIDER 1
 #define APP_SET_NETWORK_COMM_ENDPOINT_SEC 0

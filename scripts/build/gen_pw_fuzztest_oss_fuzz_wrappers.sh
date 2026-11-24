@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Generates OSS-Fuzz fuzz-target wrappers for GN-built pw_fuzzer FuzzTest binaries.
+# Generates OSS-Fuzz fuzz-target wrappers for GN-built FuzzTest binaries.
 #
 # A single FuzzTest binary hosts many FUZZ_TEST() cases and is run as a libFuzzer
 # target one case at a time (--fuzz=<Suite.Case>), whereas OSS-Fuzz expects one fuzz

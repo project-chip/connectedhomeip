@@ -42,13 +42,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_ZONEMGMT_2_3(MatterBaseTest):
+class TC_ZONEMGMT_2_3(MatterTestCommissionedDevice):
     def desc_TC_ZONEMGMT_2_3(self) -> str:
         return "[TC-ZONEMGMT-2.3] Verify UpdateTwoDCartesianZone command with Server as DUT"
 
@@ -57,7 +57,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
 
     def steps_TC_ZONEMGMT_2_3(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "If DUT supports TwoDCartesianZone and User defined zones, TH sends CreateTwoDCartesianZone command with",
                      " valid parameters",
                      "Verify that the DUT response contains a new zoneId and the corresponding zone information matches."),

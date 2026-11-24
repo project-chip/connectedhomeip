@@ -1,0 +1,137 @@
+#
+#    Copyright (c) 2026 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+#    Description:
+#      CI and local builds use this to select the M5Stack CoreS3 for all-devices-app.
+#
+CONFIG_IDF_TARGET="esp32s3"
+CONFIG_IDF_TARGET_ESP32S3=y
+CONFIG_DEVICE_TYPE_M5STACK_CORES3=y
+
+# Default to 921600 baud when flashing and monitoring device
+CONFIG_ESPTOOLPY_BAUD_921600B=y
+CONFIG_ESPTOOLPY_BAUD=921600
+CONFIG_ESPTOOLPY_COMPRESSED=y
+CONFIG_ESPTOOLPY_MONITOR_BAUD_115200B=y
+CONFIG_ESPTOOLPY_MONITOR_BAUD=115200
+
+# Enable BT
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y
+
+# Disable BT connection reattempt
+CONFIG_BT_NIMBLE_ENABLE_CONN_REATTEMPT=n
+
+# Enable lwip ipv6 autoconfig
+CONFIG_LWIP_IPV6_AUTOCONFIG=y
+
+# Use a custom partition table sized for the 16MB flash on the CoreS3
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions_16mb.csv"
+CONFIG_PARTITION_TABLE_FILENAME="partitions_16mb.csv"
+
+# Vendor and product id
+CONFIG_DEVICE_VENDOR_ID=0xFFF1
+CONFIG_DEVICE_PRODUCT_ID=0x8001
+
+# Main task needs more stack (5k)
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=5120
+
+# Enable debug shell
+CONFIG_ENABLE_CHIP_SHELL=y
+
+# Route the console to the USB Serial/JTAG peripheral. The CoreS3 exposes the
+# ESP32-S3 native USB on its USB-C port and has no USB-to-UART bridge, so UART0
+# is unreachable. Leaving the IDF default (UART0 primary, USB Serial/JTAG as a
+# secondary output-only console) produces logs over USB but no shell input.
+CONFIG_ESP_CONSOLE_UART_DEFAULT=n
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+CONFIG_ESP_CONSOLE_SECONDARY_NONE=y
+
+# Enable lwIP route hooks
+CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT=y
+CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT=y
+
+# Serial Flasher config
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="16MB"
+CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
+CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
+
+# Disable softap support by default
+CONFIG_ESP_WIFI_SOFTAP_SUPPORT=n
+
+# Enable HKDF in mbedtls
+CONFIG_MBEDTLS_HKDF_C=y
+
+# Move functions from IRAM to flash
+CONFIG_FREERTOS_PLACE_FUNCTIONS_INTO_FLASH=y
+
+# Increase LwIP IPv6 address number
+CONFIG_LWIP_IPV6_NUM_ADDRESSES=6
+
+# Disable Read Client (saves memory)
+CONFIG_DISABLE_READ_CLIENT=y
+
+# Reduce event logging buffer DRAM usage
+CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE=512
+CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE=512
+CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE=512
+
+# Optimize Flash
+CONFIG_NEWLIB_NANO_FORMAT=y
+
+# Proximity Ranging support for BLE post-commissioning
+CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING=n
+
+# Enable SPIRAM / PSRAM support. The CoreS3 carries 8MB of quad-mode PSRAM.
+# Octal mode must not be used: it would claim GPIO 33-37, which this board wires
+# to the LCD, and its bootloader init leaves flash unreadable ("invalid header").
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_QUAD=y
+CONFIG_SPIRAM_SPEED_80M=y
+CONFIG_SPIRAM_BOOT_INIT=y
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY=y
+CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=0
+CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP=y
+
+# Display: the board support package drives the panel through LVGL.
+#
+# The BSP defaults to two 320x100 draw buffers in internal DMA-capable RAM
+# (128kB).  40 rows is enough for smooth updates of the screens used here and
+# leaves that memory to the WiFi, BLE and Matter stacks.
+CONFIG_BSP_LCD_DRAW_BUF_HEIGHT=40
+
+# Let LVGL allocate from the IDF heap, which is backed by PSRAM here, instead of
+# reserving its own 64kB pool in internal RAM.
+CONFIG_LV_USE_CLIB_MALLOC=y
+
+# The commissioning screen renders the onboarding payload as a QR code.
+CONFIG_LV_USE_QRCODE=y
+
+# Navigation widgets
+CONFIG_LV_USE_TABVIEW=y
+CONFIG_LV_USE_MSGBOX=y
+
+# Touch responsiveness: 60Hz polling & refresh, higher scroll threshold to avoid accidental scroll drag
+CONFIG_LV_DEF_REFR_PERIOD=16
+CONFIG_LV_INDEV_DEF_SCROLL_LIMIT=20
+
+# Use dark theme
+CONFIG_LV_THEME_DEFAULT_DARK=y
+
+

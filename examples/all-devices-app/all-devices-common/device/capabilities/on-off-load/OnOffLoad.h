@@ -61,6 +61,8 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
+        Clusters::IdentifyDelegate & identifyDelegate;
+        Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {};
     };
 
     OnOffLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,

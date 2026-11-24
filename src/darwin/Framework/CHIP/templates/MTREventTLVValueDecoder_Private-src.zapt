@@ -23,6 +23,7 @@ using namespace chip::app;
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 static id _Nullable DecodeEventPayloadFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::{{asUpperCamelCase name}};
@@ -62,6 +63,7 @@ static id _Nullable DecodeEventPayloadFor{{asUpperCamelCase name preserveAcronym
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+#endif
 {{/if}}
 {{/if}}
 {{/zcl_clusters}}
@@ -72,9 +74,11 @@ id _Nullable MTRPrivateDecodeEventPayload(const ConcreteEventPath & aPath, TLV::
         {{#zcl_clusters}}
         {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
         {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
         case Clusters::{{asUpperCamelCase name}}::Id: {
             return DecodeEventPayloadFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aPath.mEventId, aReader, aError);
         }
+#endif
         {{/if}}
         {{/if}}
         {{/zcl_clusters}}

@@ -41,7 +41,7 @@ class TC_TLSCERT_Base(MatterBaseTest):
 
     def get_common_substeps(self, step_prefix: string = "1") -> list[TestStep]:
         return [
-            TestStep(f'{step_prefix}.1', test_plan_support.commission_if_required('CR1'), is_commissioning=True),
+            TestStep(f'{step_prefix}.1', test_plan_support.commission_if_required('CR1')),
             TestStep(f'{step_prefix}.2', "CR1 reads ProvisionedRootCertificates attribute using a fabric-filtered read",
                      "A list of TLSCertStruct. Store all resulting CAID in caidToClean."),
             TestStep(

@@ -24,7 +24,8 @@ namespace Attributes {
 namespace RangingCapabilities {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(RangingCapabilities::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace RangingCapabilities
 namespace WiFiDevIK {
@@ -40,18 +41,26 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(BLTDevIK::Id, BitFlags
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace BLTDevIK
 namespace BLTCSSecurityLevel {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BLTCSSecurityLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BLTCSSecurityLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BLTCSSecurityLevel
 namespace BLTCSModeCapability {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BLTCSModeCapability::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BLTCSModeCapability::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BLTCSModeCapability
 namespace SessionIDList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SessionIDList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SessionIDList
+namespace RangingConstraints {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RangingConstraints::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace RangingConstraints
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     RangingCapabilities::kMetadataEntry,
     SessionIDList::kMetadataEntry,

@@ -22,8 +22,9 @@ inline constexpr uint32_t kRevision = 3;
 namespace Attributes {
 
 namespace MaxNetworks {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxNetworks::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kAdminister, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxNetworks::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kAdminister, std::nullopt);
 } // namespace MaxNetworks
 namespace Networks {
 inline constexpr DataModel::AttributeEntry
@@ -31,12 +32,14 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kAdminister, std::nullopt);
 } // namespace Networks
 namespace ScanMaxTimeSeconds {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ScanMaxTimeSeconds::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ScanMaxTimeSeconds::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ScanMaxTimeSeconds
 namespace ConnectMaxTimeSeconds {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ConnectMaxTimeSeconds::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ConnectMaxTimeSeconds::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ConnectMaxTimeSeconds
 namespace InterfaceEnabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(InterfaceEnabled::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -57,16 +60,20 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LastConnectErrorValue:
 namespace SupportedWiFiBands {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedWiFiBands::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedWiFiBands
 namespace SupportedThreadFeatures {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedThreadFeatures::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedThreadFeatures::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace SupportedThreadFeatures
 namespace ThreadVersion {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ThreadVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ThreadVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ThreadVersion
 constexpr std::array<DataModel::AttributeEntry, 6> kMandatoryMetadata = {
     MaxNetworks::kMetadataEntry,          Networks::kMetadataEntry,      InterfaceEnabled::kMetadataEntry,

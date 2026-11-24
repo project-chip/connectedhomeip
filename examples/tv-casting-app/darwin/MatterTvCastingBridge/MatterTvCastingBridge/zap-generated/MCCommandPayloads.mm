@@ -2745,4 +2745,422 @@ NS_ASSUME_NONNULL_BEGIN
 
 // ApplicationBasic cluster:
 
+// MediaFileManagement cluster:
+
+@implementation MCMediaFileManagementClusterAddFileParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _name = @"";
+
+        _size = @(0);
+
+        _mimeType = @"";
+
+        _imageURI = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MCMediaFileManagementClusterAddFileParams alloc] init];
+
+    other.name = self.name;
+    other.size = self.size;
+    other.mimeType = self.mimeType;
+    other.imageURI = self.imageURI;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; size:%@; mimeType:%@; imageURI:%@; >", NSStringFromClass([self class]), _name, _size, _mimeType, _imageURI];
+    return descriptionString;
+}
+
+- (std::any)getCppRequestFromObjCRequest
+{
+    chip::app::Clusters::MediaFileManagement::Commands::AddFile::Type cppStruct;
+    ListFreer listFreer;
+    {
+        cppStruct.name = AsCharSpan(self.name);
+    }
+    {
+        cppStruct.size = self.size.unsignedLongLongValue;
+    }
+    {
+        cppStruct.mimeType = AsCharSpan(self.mimeType);
+    }
+    {
+        cppStruct.imageURI = AsCharSpan(self.imageURI);
+    }
+
+    return std::any(cppStruct);
+}
+
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppDecodableStruct
+{
+    // Default implementation
+    return CHIP_NO_ERROR;
+}
+@end
+
+@implementation MCMediaFileManagementClusterAddFileResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _fileID = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MCMediaFileManagementClusterAddFileResponseParams alloc] init];
+
+    other.status = self.status;
+    other.fileID = self.fileID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; fileID:%@; >", NSStringFromClass([self class]), _status, _fileID];
+    return descriptionString;
+}
+
+- (std::any)getCppRequestFromObjCRequest
+{
+    // Default implementation
+    return CHIP_NO_ERROR;
+}
+
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppResponse
+{
+    std::shared_ptr<const chip::app::Clusters::MediaFileManagement::Commands::AddFileResponse::DecodableType> responseSharedPtr = std::any_cast<std::shared_ptr<const chip::app::Clusters::MediaFileManagement::Commands::AddFileResponse::DecodableType>>(cppResponse);
+    const chip::app::Clusters::MediaFileManagement::Commands::AddFileResponse::DecodableType cppDecodableStruct = *responseSharedPtr;
+
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppDecodableStruct.status)];
+    }
+    {
+        if (cppDecodableStruct.fileID.IsNull()) {
+            self.fileID = nil;
+        } else {
+            self.fileID = [NSNumber numberWithUnsignedLongLong:cppDecodableStruct.fileID.Value()];
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+@end
+
+@implementation MCMediaFileManagementClusterDeleteFileParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fileID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MCMediaFileManagementClusterDeleteFileParams alloc] init];
+
+    other.fileID = self.fileID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fileID:%@; >", NSStringFromClass([self class]), _fileID];
+    return descriptionString;
+}
+
+- (std::any)getCppRequestFromObjCRequest
+{
+    chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::Type cppStruct;
+    ListFreer listFreer;
+    {
+        cppStruct.fileID = self.fileID.unsignedLongLongValue;
+    }
+
+    return std::any(cppStruct);
+}
+
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppDecodableStruct
+{
+    // Default implementation
+    return CHIP_NO_ERROR;
+}
+@end
+
+@implementation MCMediaFileManagementClusterRequestSharedFilesParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientName = @"";
+
+        _requestID = @(0);
+
+        _supportedMimeTypes = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MCMediaFileManagementClusterRequestSharedFilesParams alloc] init];
+
+    other.clientName = self.clientName;
+    other.requestID = self.requestID;
+    other.supportedMimeTypes = self.supportedMimeTypes;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientName:%@; requestID:%@; supportedMimeTypes:%@; >", NSStringFromClass([self class]), _clientName, _requestID, _supportedMimeTypes];
+    return descriptionString;
+}
+
+- (std::any)getCppRequestFromObjCRequest
+{
+    chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Type cppStruct;
+    ListFreer listFreer;
+    {
+        cppStruct.clientName = AsCharSpan(self.clientName);
+    }
+    {
+        cppStruct.requestID = self.requestID.unsignedShortValue;
+    }
+    {
+        if (self.supportedMimeTypes != nil) {
+            auto & definedValue_0 = cppStruct.supportedMimeTypes.Emplace();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.supportedMimeTypes.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.supportedMimeTypes.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.supportedMimeTypes.count; ++i_1) {
+                        if (![self.supportedMimeTypes[i_1] isKindOfClass:[NSString class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_1 = (NSString *) self.supportedMimeTypes[i_1];
+                        listHolder_1->mList[i_1] = AsCharSpan(element_1);
+                    }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.supportedMimeTypes.count);
+                } else {
+                    definedValue_0 = ListType_1();
+                }
+            }
+        }
+    }
+
+    return std::any(cppStruct);
+}
+
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppDecodableStruct
+{
+    // Default implementation
+    return CHIP_NO_ERROR;
+}
+@end
+
+@implementation MCMediaFileManagementClusterGetSharedFileParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _responseID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MCMediaFileManagementClusterGetSharedFileParams alloc] init];
+
+    other.responseID = self.responseID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: responseID:%@; >", NSStringFromClass([self class]), _responseID];
+    return descriptionString;
+}
+
+- (std::any)getCppRequestFromObjCRequest
+{
+    chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Type cppStruct;
+    ListFreer listFreer;
+    {
+        cppStruct.responseID = self.responseID.unsignedShortValue;
+    }
+
+    return std::any(cppStruct);
+}
+
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppDecodableStruct
+{
+    // Default implementation
+    return CHIP_NO_ERROR;
+}
+@end
+
+@implementation MCMediaFileManagementClusterGetSharedFileResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _fileDescription = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MCMediaFileManagementClusterGetSharedFileResponseParams alloc] init];
+
+    other.status = self.status;
+    other.fileDescription = self.fileDescription;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; fileDescription:%@; >", NSStringFromClass([self class]), _status, _fileDescription];
+    return descriptionString;
+}
+
+- (std::any)getCppRequestFromObjCRequest
+{
+    // Default implementation
+    return CHIP_NO_ERROR;
+}
+
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppResponse
+{
+    std::shared_ptr<const chip::app::Clusters::MediaFileManagement::Commands::GetSharedFileResponse::DecodableType> responseSharedPtr = std::any_cast<std::shared_ptr<const chip::app::Clusters::MediaFileManagement::Commands::GetSharedFileResponse::DecodableType>>(cppResponse);
+    const chip::app::Clusters::MediaFileManagement::Commands::GetSharedFileResponse::DecodableType cppDecodableStruct = *responseSharedPtr;
+
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppDecodableStruct.status)];
+    }
+    {
+        if (cppDecodableStruct.fileDescription.IsNull()) {
+            self.fileDescription = nil;
+        } else {
+            self.fileDescription = [MCMediaFileManagementClusterFileDescriptionStruct new];
+            self.fileDescription.fileID = [NSNumber numberWithUnsignedLongLong:cppDecodableStruct.fileDescription.Value().fileID];
+            self.fileDescription.name = AsString(cppDecodableStruct.fileDescription.Value().name);
+            if (self.fileDescription.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+            self.fileDescription.size = [NSNumber numberWithUnsignedLongLong:cppDecodableStruct.fileDescription.Value().size];
+            self.fileDescription.mimeType = AsString(cppDecodableStruct.fileDescription.Value().mimeType);
+            if (self.fileDescription.mimeType == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+            self.fileDescription.imageURI = AsString(cppDecodableStruct.fileDescription.Value().imageURI);
+            if (self.fileDescription.imageURI == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+@end
+
+@implementation MCMediaFileManagementClusterOfferFileParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientName = @"";
+
+        _name = @"";
+
+        _size = @(0);
+
+        _mimeType = @"";
+
+        _imageURI = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MCMediaFileManagementClusterOfferFileParams alloc] init];
+
+    other.clientName = self.clientName;
+    other.name = self.name;
+    other.size = self.size;
+    other.mimeType = self.mimeType;
+    other.imageURI = self.imageURI;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientName:%@; name:%@; size:%@; mimeType:%@; imageURI:%@; >", NSStringFromClass([self class]), _clientName, _name, _size, _mimeType, _imageURI];
+    return descriptionString;
+}
+
+- (std::any)getCppRequestFromObjCRequest
+{
+    chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Type cppStruct;
+    ListFreer listFreer;
+    {
+        cppStruct.clientName = AsCharSpan(self.clientName);
+    }
+    {
+        cppStruct.name = AsCharSpan(self.name);
+    }
+    {
+        cppStruct.size = self.size.unsignedLongLongValue;
+    }
+    {
+        cppStruct.mimeType = AsCharSpan(self.mimeType);
+    }
+    {
+        cppStruct.imageURI = AsCharSpan(self.imageURI);
+    }
+
+    return std::any(cppStruct);
+}
+
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppDecodableStruct
+{
+    // Default implementation
+    return CHIP_NO_ERROR;
+}
+@end
+
 NS_ASSUME_NONNULL_END

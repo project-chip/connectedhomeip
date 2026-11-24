@@ -19,9 +19,11 @@
 #include <tracing/json/json_tracing.h>
 
 #include <lib/address_resolve/TracingStructs.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ChunkSplitter.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/StringSplitter.h>
 #include <log_json/log_json_build_config.h>
@@ -464,14 +466,22 @@ void JsonBackend::CloseFile()
 
 CHIP_ERROR JsonBackend::OpenFile(const char * path)
 {
+    VerifyOrReturnError(path != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(*path != '\0', CHIP_ERROR_INVALID_ARGUMENT);
+
     CloseFile();
 
-    std::error_code ec;
-    std::filesystem::path filePath(path);
-    // Create directories if they don't exist
-    if (!std::filesystem::create_directories(filePath.remove_filename(), ec))
+    // Create the leading directories if they don't exist. create_directories() returns false
+    // when they already exist, so only the error code signals a failure.
+    std::filesystem::path directory = std::filesystem::path(path).parent_path();
+    if (!directory.empty())
     {
-        return CHIP_ERROR_POSIX(ec.value());
+        std::error_code ec;
+        std::filesystem::create_directories(directory, ec);
+        if (ec)
+        {
+            return CHIP_ERROR_POSIX(ec.value());
+        }
     }
 
     mOutputFile.open(path, std::ios_base::out);
@@ -516,7 +526,8 @@ void JsonBackend::OutputValue(::Json::Value & value)
         chip::CharSpan line;
         while (splitter.Next(line))
         {
-            constexpr size_t kMaxLogLineLength = 256;
+            constexpr size_t kMaxLogLineLength = CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1;
+            static_assert(kMaxLogLineLength > 16, "Log message max size is too small");
             chip::ChunkSplitter<kMaxLogLineLength> chunkSplitter(line); // we try to log smaller chunks, to not allocate huge arrays
             chip::CharSpan chunk;
             while (chunkSplitter.Next(chunk))

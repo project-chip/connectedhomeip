@@ -28,7 +28,7 @@ namespace OvenCavityOperationalState {
 class OvenCavityOperationalStateCluster : public OperationalState::OperationalStateCluster
 {
 public:
-    OvenCavityOperationalStateCluster(EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate * delegate,
+    OvenCavityOperationalStateCluster(EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate & delegate,
                                       const OperationalState::OperationalStateCluster::Config & config = {});
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,

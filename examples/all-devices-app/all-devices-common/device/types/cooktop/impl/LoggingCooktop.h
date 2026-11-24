@@ -21,7 +21,7 @@
 
 namespace chip::app {
 
-class LoggingCookSurfacePart : public CookSurfacePart, public Clusters::OnOffDelegate, public Clusters::IdentifyDelegate
+class LoggingCookSurfacePart : public Clusters::OnOffDelegate, public Clusters::IdentifyDelegate, public CookSurfacePart
 {
 public:
     LoggingCookSurfacePart(TimerDelegate & timerDelegate, const char * name);
@@ -47,9 +47,16 @@ public:
     explicit LoggingCooktop(TimerDelegate & timerDelegate);
     ~LoggingCooktop() override = default;
 
+    LoggingCookSurfacePart & Surface1() { return mSurface1; }
+    LoggingCookSurfacePart & Surface2() { return mSurface2; }
+
+protected:
+    CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) override;
+    void UnregisterParts(CodeDrivenDataModelProvider & provider) override;
+
 private:
-    LoggingCookSurfacePart mLoggingSurface1;
-    LoggingCookSurfacePart mLoggingSurface2;
+    LoggingCookSurfacePart mSurface1;
+    LoggingCookSurfacePart mSurface2;
 };
 
 } // namespace chip::app

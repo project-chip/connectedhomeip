@@ -29,7 +29,7 @@ class RtkOsUsed(Enum):
             return 'zephyr'
         if self == RtkOsUsed.FREERTOS:
             return 'freertos'
-        raise Exception('Unknown OS type: %r' % self)
+        raise Exception(f'Unknown OS type: {self!r}')
 
 
 class RealtekBoard(Enum):
@@ -42,14 +42,13 @@ class RealtekBoard(Enum):
             return 'rtl8777g'
         if self == RealtekBoard.RTL87X2G:
             return 'rtl87x2g'
-        raise Exception('Unknown board type: %r' % self)
+        raise Exception(f'Unknown board type: {self!r}')
 
 
 class RealtekApp(Enum):
     LIGHT = auto()
     LIGHT_SWITCH = auto()
     LOCK = auto()
-    WINDOW = auto()
     ALL_CLUSTERS = auto()
     THERMOSTAT = auto()
     OTA_REQUESTOR = auto()
@@ -62,15 +61,13 @@ class RealtekApp(Enum):
             return 'light-switch-app'
         if self == RealtekApp.LOCK:
             return 'lock-app'
-        if self == RealtekApp.WINDOW:
-            return 'window-app'
         if self == RealtekApp.ALL_CLUSTERS:
             return 'all-clusters-app'
         if self == RealtekApp.OTA_REQUESTOR:
             return 'ota-requestor-app'
         if self == RealtekApp.THERMOSTAT:
             return 'thermostat'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     @property
     def TargetName(self):
@@ -80,15 +77,13 @@ class RealtekApp(Enum):
             return 'matter-cli-mtd'
         if self == RealtekApp.LOCK:
             return 'matter-cli-mtd'
-        if self == RealtekApp.WINDOW:
-            return 'matter-cli-mtd'
         if self == RealtekApp.ALL_CLUSTERS:
             return 'matter-cli-ftd'
         if self == RealtekApp.OTA_REQUESTOR:
             return 'matter-cli-ftd'
         if self == RealtekApp.THERMOSTAT:
             return 'matter-cli-mtd'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     @property
     def AppNamePrefix(self):
@@ -98,15 +93,13 @@ class RealtekApp(Enum):
             return 'chip-rtl8777g-light-switch-app'
         if self == RealtekApp.LOCK:
             return 'chip-rtl8777g-lock-app'
-        if self == RealtekApp.WINDOW:
-            return 'chip-rtl8777g-window-app'
         if self == RealtekApp.ALL_CLUSTERS:
             return 'chip-rtl8777g-all-clusters-app'
         if self == RealtekApp.OTA_REQUESTOR:
             return 'chip-rtl8777g-ota-requestor-app'
         if self == RealtekApp.THERMOSTAT:
             return 'chip-rtl8777g-thermostat-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
 
 class RealtekBuilder(Builder):
@@ -134,7 +127,7 @@ class RealtekBuilder(Builder):
         elif self.board == RealtekBoard.RTL8777G:
             self.os_env = RtkOsUsed.FREERTOS
         else:
-            raise Exception('Unknown board type: %r' % self.board)
+            raise Exception(f'Unknown board type: {self.board!r}')
 
     def CmakeBuildFlags(self) -> str:
         flags = [
@@ -177,14 +170,11 @@ class RealtekBuilder(Builder):
         if self.os_env != RtkOsUsed.FREERTOS:
             # For freertos, app.ld needs to be precompiled with gcc
             return
-        cmd = 'arm-none-eabi-gcc -D BUILD_BANK=0 -E -P -x c {ot_src_dir}/src/rtl87x2g/{board_name}/app.ld -o {ot_src_dir}/src/rtl87x2g/{board_name}/app.ld.gen'.format(
-            ot_src_dir=self.ot_src_dir,
-            board_name=self.board.BoardName)
+        cmd = (f'arm-none-eabi-gcc -D BUILD_BANK=0 -E -P -x c {self.ot_src_dir}/src/rtl87x2g/{self.board.BoardName}/app.ld '
+               f'-o {self.ot_src_dir}/src/rtl87x2g/{self.board.BoardName}/app.ld.gen')
         self._Execute(['bash', '-c', cmd])
-        cmd = 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} -DPython3_EXECUTABLE=$(which python3) {example_folder} -B{out_folder}'.format(
-            build_flags=self.CmakeBuildFlags(),
-            example_folder=self.rtk_matter_dir,
-            out_folder=self.output_dir)
+        cmd = (f'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {self.CmakeBuildFlags()} -DPython3_EXECUTABLE=$(which python3) '
+               f'{self.rtk_matter_dir} -B{self.output_dir}')
         self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
     @lock_output_dir

@@ -17,13 +17,14 @@
 
 #include "QueryResponder.h"
 
-#include <lib/dnssd/minimal_mdns/core/QNameString.h>
-#include <lib/dnssd/minimal_mdns/records/Ptr.h>
+#include <lib/dnssd/wire/QNameString.h>
+#include <lib/dnssd/wire/records/Ptr.h>
 
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace mdns {
 namespace Minimal {
+using namespace chip::Dnssd;
 
 const QNamePart kDnsSdQueryPath[] = { "_services", "_dns-sd", "_udp", "local" };
 

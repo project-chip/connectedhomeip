@@ -29,8 +29,8 @@
 #include <utility>
 #include <vector>
 
-#include <pw_fuzzer/fuzztest.h>
-#include <pw_unit_test/framework.h>
+#include <fuzztest/fuzztest_core.h>
+#include <gtest/gtest.h>
 
 #include <ble/Ble.h>
 #include <lib/support/CHIPMem.h>

@@ -18,11 +18,39 @@
 
 #include "cert.h"
 
+#include <controller/AutoCommissioner.h>
+#include <controller/CertificateChainRequestTracker.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::Credentials;
+
+PyChipError pychip_ValidateAttestationCertificateProfile(const uint8_t * certificate, size_t certificateLen, uint8_t subjectProfile,
+                                                         uint8_t issuerProfile)
+{
+    return ToPyChipError(ValidateAttestationCertificateProfile(ByteSpan(certificate, certificateLen),
+                                                               static_cast<DeviceAttestationCertProfile>(subjectProfile),
+                                                               static_cast<DeviceAttestationCertProfile>(issuerProfile)));
+}
+
+uint32_t pychip_GetSupportedAttestationProfiles()
+{
+    return Controller::Internal::GetControllerSupportedAttestationRequestProfiles().Raw();
+}
+
+uint32_t pychip_GetMaxCertificateChainDocumentSize()
+{
+    return Controller::CertificateChainRequestTracker::kMaxCertificateDocumentSize;
+}
+
+uint32_t pychip_GetCertificateChainDocumentSizeForProfiles(uint8_t subjectProfile, uint8_t issuerProfile)
+{
+    using Tracker = Controller::CertificateChainRequestTracker;
+    return Tracker::MaxCertificateDocumentSize(static_cast<Tracker::CryptoProfile>(subjectProfile),
+                                               static_cast<Tracker::CryptoProfile>(issuerProfile));
+}
 
 PyChipError pychip_ConvertX509CertToChipCert(const uint8_t * x509Cert, size_t x509CertLen, uint8_t * chipCert, size_t * chipCertLen)
 {

@@ -31,14 +31,14 @@ class Instance
 {
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
-             OptionalCommands aOptionalCmds);
+             EnergyEvseCluster::OptionalCommandSet aOptionalCmds);
 
     CHIP_ERROR Init();
     void Shutdown();
 
     bool HasFeature(Feature aFeature) const;
     bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
-    bool SupportsOptCmd(OptionalCommands aOptionalCmds) const;
+    bool SupportsStartDiagnostics() const;
 
     // Attribute accessors - pass through to cluster
     StateEnum GetState() const;

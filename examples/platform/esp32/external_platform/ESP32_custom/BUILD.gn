@@ -109,6 +109,7 @@ static_library("ESP32_custom") {
 
   public_deps = [
     ":platform_buildconfig",
+    "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]

@@ -248,6 +248,14 @@ void WebrtcTransport::AddRemoteCandidate(const std::string & candidate, const st
 void WebrtcTransport::OnLocalDescription(const std::string & sdp, SDPType type)
 {
     ChipLogProgress(Camera, "Local description received for sessionID: %u", mRequestArgs.sessionId);
+
+    // Only the description this state is producing goes to the peer
+    if ((mState == State::SendingAnswer && type != SDPType::Answer) || (mState == State::SendingOffer && type != SDPType::Offer))
+    {
+        ChipLogProgress(Camera, "Ignoring local description of the wrong type for state %s", GetStateStr());
+        return;
+    }
+
     mLocalSdp     = sdp;
     mLocalSdpType = type;
     if (mOnLocalDescription)

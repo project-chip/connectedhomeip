@@ -191,6 +191,10 @@ namespace DeviceLayer {
         dispatch_source_set_event_handler(source, ^{
             dispatch_async(mWorkQueue, block);
         });
+        dispatch_set_context(source, (__bridge_retained void *) dispatch_semaphore_create(0));
+        dispatch_set_finalizer_f(source, [](void * context) {
+            dispatch_semaphore_signal((__bridge_transfer dispatch_semaphore_t) context);
+        });
 
         mSignalSources[sig] = source;
         dispatch_resume(source);
@@ -205,20 +209,21 @@ namespace DeviceLayer {
         __auto_type it = mSignalSources.find(sig);
         VerifyOrReturnValue(it != mSignalSources.end(), false); // Not registered
 
+        __auto_type disposed = (__bridge dispatch_semaphore_t) dispatch_get_context(it->second);
         dispatch_source_cancel(it->second);
         mSignalSources.erase(it);
         signal(sig, SIG_DFL);
+
+        dispatch_semaphore_wait(disposed, DISPATCH_TIME_FOREVER);
 
         return true;
     }
 
     void PlatformManagerImpl::UnregisterAllSignalHandlers()
     {
-        for (auto & [sig, source] : mSignalSources) {
-            dispatch_source_cancel(source);
-            signal(sig, SIG_DFL);
+        while (!mSignalSources.empty()) {
+            UnregisterSignalHandler(mSignalSources.begin()->first);
         }
-        mSignalSources.clear();
     }
 
 } // namespace DeviceLayer

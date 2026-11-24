@@ -16,7 +16,9 @@
  */
 
 #include "SlNetConfig.h"
+#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
 #include "ble_config.h"
+#endif // SLI_SI91X_ENABLE_BLE
 
 #include <lib/support/CodeUtils.h>
 

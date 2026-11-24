@@ -214,6 +214,22 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
     return true;
 }
 
+bool ContainsPrivateKey(EVP_PKEY * key)
+{
+#if CHIP_CERT_ML_DSA_AVAILABLE
+    if (IsMLDSAKey(key))
+    {
+        std::unique_ptr<EVP_PKEY_CTX, void (*)(EVP_PKEY_CTX *)> context(
+            EVP_PKEY_CTX_new_from_pkey(nullptr, key, nullptr), &EVP_PKEY_CTX_free);
+
+        return context != nullptr && EVP_PKEY_private_check(context.get()) == 1;
+    }
+#endif
+
+    std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EVP_PKEY_get1_EC_KEY(key), &EC_KEY_free);
+    return ecKey != nullptr && EC_KEY_get0_private_key(ecKey.get()) != nullptr;
+}
+
 } // namespace
 
 bool Cmd_ConvertKey(int argc, char * argv[])
@@ -236,7 +252,7 @@ bool Cmd_ConvertKey(int argc, char * argv[])
     res = ReadKey(gInFileNameOrStr, key);
     VerifyTrueOrExit(res);
 
-    if (IsPrivateKeyFormat(gOutFormat) && EC_KEY_get0_private_key(EVP_PKEY_get1_EC_KEY(key.get())) == nullptr)
+    if (IsPrivateKeyFormat(gOutFormat) && !ContainsPrivateKey(key.get()))
     {
         fprintf(stderr, "Cannot convert to the private key format as the original key doesn't include private key.\n");
         return false;

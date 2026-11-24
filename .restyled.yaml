@@ -209,14 +209,14 @@ restylers:
           - "**/*.yml"
           - "**/*.yaml"
     - name: shellharden
-      image: restyled/restyler-shellharden:v4.1.1-2
-      enabled: true
+      image: public.ecr.aws/restyled-io/restyler-shellharden:v4.3
+      enabled: false
       include:
           - "**/*.sh"
           - "**/*.bash"
     - name: shfmt
-      image: restyled/restyler-shfmt:v3.0.1
-      enabled: true
+      image: public.ecr.aws/restyled-io/restyler-shfmt:v3.13
+      enabled: false # Moved to pre-commit.ci
       command:
           - shfmt
           - "-w"

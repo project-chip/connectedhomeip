@@ -30,12 +30,12 @@
 #include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
-#include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
 #include <lib/dnssd/minimal_mdns/responders/IP.h>
 #include <lib/dnssd/minimal_mdns/responders/Ptr.h>
 #include <lib/dnssd/minimal_mdns/responders/QueryResponder.h>
 #include <lib/dnssd/minimal_mdns/responders/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
+#include <lib/dnssd/wire/FlatAllocatedQName.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/IntrusiveList.h>
@@ -47,6 +47,7 @@ namespace {
 
 using chip::Platform::UniquePtr;
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 #if CHIP_MINMDNS_HIGH_VERBOSITY
 const char * ToString(QClass qClass)
@@ -154,13 +155,15 @@ enum BroadcastAdvertiseType
 };
 
 class AdvertiserMinMdns : public ServiceAdvertiser,
-                          public MdnsPacketDelegate, // receive query packets
-                          public ParserDelegate      // parses queries
+                          public MdnsPacketDelegate,                       // receive query packets
+                          public ParserDelegate,                           // parses queries
+                          public mdns::Minimal::ServerBase::ListenDelegate // announces on interfaces added later
 {
 public:
     AdvertiserMinMdns() : mResponseSender(&GlobalMinimalMdnsServer::Server())
     {
         GlobalMinimalMdnsServer::Instance().SetQueryDelegate(this);
+        GlobalMinimalMdnsServer::Instance().SetListenDelegate(this);
 
         CHIP_ERROR err = mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissionable.GetQueryResponder());
 
@@ -196,6 +199,9 @@ public:
     void OnResource(ResourceType type, const ResourceData & data) override {}
     void OnQuery(const QueryData & data) override;
 
+    // ListenDelegate
+    void OnEndpointAdded(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType) override;
+
 private:
     /// Advertise available records configured within the server.
     ///
@@ -203,6 +209,12 @@ private:
     /// for a specific purpose (e.g. boot time advertises everything, shut-down
     /// removes all records by advertising a 0 TTL)
     void AdvertiseRecords(BroadcastAdvertiseType type);
+
+    /// Advertises them on one interface and address type.
+    void AdvertiseRecordsOn(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
+                            BroadcastAdvertiseType type);
+
+    void ClearBroadcastThrottles();
 
     FullQName GetCommissioningTxtEntries(const CommissionAdvertisingParameters & params);
     FullQName GetOperationalTxtEntries(OperationalQueryAllocator::Allocator * allocator,
@@ -331,7 +343,7 @@ void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::In
 #endif
 
     mCurrentSource = info;
-    if (!ParsePacket(data, this))
+    if (!ParseMdnsPacket(data, this))
     {
         ChipLogError(Discovery, "Failed to parse mDNS query");
 #if CHIP_MINMDNS_HIGH_VERBOSITY
@@ -364,8 +376,8 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEn
 {
     // TODO: Per API documentation, Init() should be a no-op if mIsInitialized
     // is true.  But we don't handle updates to our set of interfaces right now,
-    // so rely on the logic in this function to shut down and restart the
-    // GlobalMinimalMdnsServer to handle that.
+    // except on Linux with NetlinkInterfaceMonitor, so rely on the logic in this
+    // function to shut down and restart the GlobalMinimalMdnsServer to handle that.
     GlobalMinimalMdnsServer::Server().ShutdownEndpoints();
 
     if (!mIsInitialized)
@@ -394,7 +406,7 @@ void AdvertiserMinMdns::Shutdown()
 
     AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
 
-    GlobalMinimalMdnsServer::Server().Shutdown();
+    GlobalMinimalMdnsServer::Instance().ShutdownServer();
     mIsInitialized = false;
 }
 
@@ -919,13 +931,6 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
 
 void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
 {
-    ResponseConfiguration responseConfiguration;
-    if (type == BroadcastAdvertiseType::kRemovingAll)
-    {
-        // make a "remove all records now" broadcast
-        responseConfiguration.SetTtlSecondsOverride(0);
-    }
-
     UniquePtr<ListenIterator> allInterfaces = GetAddressPolicy()->GetListenEndpoints();
     VerifyOrDieWithMsg(allInterfaces != nullptr, Discovery, "Failed to allocate memory for endpoints.");
 
@@ -934,67 +939,89 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
 
     while (allInterfaces->Next(&interfaceId, &addressType))
     {
-        UniquePtr<IpAddressIterator> allIps = GetAddressPolicy()->GetIpAddressesForEndpoint(interfaceId, addressType);
-        VerifyOrDieWithMsg(allIps != nullptr, Discovery, "Failed to allocate memory for ip addresses.");
-
-        chip::Inet::IPPacketInfo packetInfo;
-
-        packetInfo.Clear();
-
-        // advertising on every interface requires a valid IP address
-        // since we use "BROADCAST" (unicast is false), we do not actually care about
-        // the source IP address value, just that it has the right "type"
-        //
-        // NOTE: cannot use Broadcast address as the source as they have the type kAny.
-        //
-        // TODO: ideally we may want to have a destination that is explicit as "unicast/destIp"
-        //       vs "multicast/addressType". Such a change requires larger code updates.
-        packetInfo.SrcAddress  = chip::Inet::IPAddress::Loopback(addressType);
-        packetInfo.DestAddress = BroadcastIpAddresses::Get(addressType);
-        packetInfo.SrcPort     = kMdnsPort;
-        packetInfo.DestPort    = kMdnsPort;
-        packetInfo.Interface   = interfaceId;
-
-        // Advertise all records
-        //
-        // TODO: Consider advertising delta changes.
-        //
-        // Current advertisement does not have a concept of "delta" to only
-        // advertise changes. Current implementation is to always
-        //    1. advertise TTL=0 (clear all caches)
-        //    2. advertise available records (with longer TTL)
-        //
-        // It would be nice if we could selectively advertise what changes, like
-        // send TTL=0 for anything removed/about to be removed (and only those),
-        // then only advertise new items added.
-        //
-        // This optimization likely will take more logic and state storage, so
-        // for now it is not done.
-        QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
-        queryData.SetIsAnnounceBroadcast(true);
-
-        for (auto & it : mOperationalResponders)
-        {
-            it.GetAllocator()->GetQueryResponder()->ClearBroadcastThrottle();
-        }
-        mQueryResponderAllocatorCommissionable.GetQueryResponder()->ClearBroadcastThrottle();
-        mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
-
-        CHIP_ERROR err = mResponseSender.Respond(0, queryData, &packetInfo, responseConfiguration);
-
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Failed to advertise records: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        AdvertiseRecordsOn(interfaceId, addressType, type);
     }
 
     // Once all automatic broadcasts are done, allow immediate replies once.
+    ClearBroadcastThrottles();
+}
+
+void AdvertiserMinMdns::AdvertiseRecordsOn(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
+                                           BroadcastAdvertiseType type)
+{
+    ResponseConfiguration responseConfiguration;
+    if (type == BroadcastAdvertiseType::kRemovingAll)
+    {
+        // make a "remove all records now" broadcast
+        responseConfiguration.SetTtlSecondsOverride(0);
+    }
+
+    UniquePtr<IpAddressIterator> allIps = GetAddressPolicy()->GetIpAddressesForEndpoint(interfaceId, addressType);
+    VerifyOrDieWithMsg(allIps != nullptr, Discovery, "Failed to allocate memory for ip addresses.");
+
+    chip::Inet::IPPacketInfo packetInfo;
+
+    packetInfo.Clear();
+
+    // advertising on every interface requires a valid IP address
+    // since we use "BROADCAST" (unicast is false), we do not actually care about
+    // the source IP address value, just that it has the right "type"
+    //
+    // NOTE: cannot use Broadcast address as the source as they have the type kAny.
+    //
+    // TODO: ideally we may want to have a destination that is explicit as "unicast/destIp"
+    //       vs "multicast/addressType". Such a change requires larger code updates.
+    packetInfo.SrcAddress  = chip::Inet::IPAddress::Loopback(addressType);
+    packetInfo.DestAddress = BroadcastIpAddresses::Get(addressType);
+    packetInfo.SrcPort     = kMdnsPort;
+    packetInfo.DestPort    = kMdnsPort;
+    packetInfo.Interface   = interfaceId;
+
+    // Advertise all records
+    //
+    // TODO: Consider advertising delta changes.
+    //
+    // Current advertisement does not have a concept of "delta" to only
+    // advertise changes. Current implementation is to always
+    //    1. advertise TTL=0 (clear all caches)
+    //    2. advertise available records (with longer TTL)
+    //
+    // It would be nice if we could selectively advertise what changes, like
+    // send TTL=0 for anything removed/about to be removed (and only those),
+    // then only advertise new items added.
+    //
+    // This optimization likely will take more logic and state storage, so
+    // for now it is not done.
+    QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
+    queryData.SetIsAnnounceBroadcast(true);
+
+    ClearBroadcastThrottles();
+
+    CHIP_ERROR err = mResponseSender.Respond(0, queryData, &packetInfo, responseConfiguration);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to advertise records: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+void AdvertiserMinMdns::ClearBroadcastThrottles()
+{
     for (auto & it : mOperationalResponders)
     {
         it.GetAllocator()->GetQueryResponder()->ClearBroadcastThrottle();
     }
     mQueryResponderAllocatorCommissionable.GetQueryResponder()->ClearBroadcastThrottle();
     mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
+}
+
+void AdvertiserMinMdns::OnEndpointAdded(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType)
+{
+    // Only a running advertiser announces; Init() announces on every interface itself.
+    VerifyOrReturn(mIsInitialized);
+
+    AdvertiseRecordsOn(interfaceId, addressType, BroadcastAdvertiseType::kStarted);
+    ClearBroadcastThrottles();
 }
 
 AdvertiserMinMdns gAdvertiser;

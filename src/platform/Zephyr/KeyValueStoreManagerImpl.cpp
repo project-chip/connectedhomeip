@@ -28,11 +28,7 @@
 #include <system/SystemError.h>
 
 #include <zephyr/settings/settings.h>
-#if defined(CONFIG_ZEPHYR_VERSION_3_3)
-#include <version.h>
-#else
 #include <zephyr/version.h>
-#endif
 
 #if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 #include <ncs_version.h>
@@ -204,7 +200,7 @@ void LoadOneAndVerifyResult(const char * fullkey, void * dest_buf, size_t dest_s
         *result = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
-    *readSize = (bytesRead > 0) ? bytesRead : 0;
+    *readSize = (bytesRead > 0) ? static_cast<size_t>(bytesRead) : 0;
 
     return;
 }

@@ -14,14 +14,13 @@
  *    limitations under the License.
  */
 
-#include "DimmablePlugInUnit.h"
-
+#include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <devices/Types.h>
 
 namespace chip::app {
 
-DimmablePlugInUnit::DimmablePlugInUnit(const Context & context, const Config & config) :
-    LoggingDimmableLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmablePlugInUnit, 1), context, config)
+DimmablePlugInUnit::DimmablePlugInUnit(const Context & context, const Delegates & delegates, const Config & config) :
+    DimmableLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmablePlugInUnit, 1), context, delegates, config)
 {}
 
 } // namespace chip::app

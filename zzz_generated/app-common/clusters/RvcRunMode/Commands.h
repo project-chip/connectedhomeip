@@ -57,6 +57,11 @@ struct Type;
 struct DecodableType;
 } // namespace ChangeToModeResponse
 
+namespace ChangeToModeByCoreTag {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeByCoreTag
+
 } // namespace Commands
 
 namespace Commands {
@@ -130,6 +135,40 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeToModeResponse
+namespace ChangeToModeByCoreTag {
+enum class Fields : uint8_t
+{
+    kNewModeTag = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeByCoreTag::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunMode::Id; }
+
+    uint16_t newModeTag = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeByCoreTag::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunMode::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t newModeTag = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeByCoreTag
 } // namespace Commands
 } // namespace RvcRunMode
 } // namespace Clusters

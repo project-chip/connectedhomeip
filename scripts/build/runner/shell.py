@@ -27,7 +27,7 @@ class SubcommandException(Exception):
     def __init__(self, command, returncode) -> None:
         self.command = command
         self.returncode = returncode
-        super().__init__('Command %r failed: %d' % (command, returncode))
+        super().__init__(f"Command {command!r} failed: {returncode}")
 
 
 class LogPipe(threading.Thread):

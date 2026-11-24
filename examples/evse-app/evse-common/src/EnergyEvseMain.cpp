@@ -33,6 +33,7 @@
 #include <app/server/Server.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DefaultTimerDelegate.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -68,6 +69,7 @@ std::unique_ptr<ElectricalSensorManager> gESManager;
 bool gCommonClustersInitialized = false;
 
 // EVSE-specific instances
+chip::app::DefaultTimerDelegate gEvseTimerDelegate;
 std::unique_ptr<EnergyEvseDelegate> gEvseDelegate;
 std::unique_ptr<EvseTargetsDelegate> gEvseTargetsDelegate;
 std::unique_ptr<EnergyEvseManager> gEvseInstance;
@@ -93,7 +95,7 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    gEvseDelegate = std::make_unique<EnergyEvseDelegate>(*gEvseTargetsDelegate);
+    gEvseDelegate = std::make_unique<EnergyEvseDelegate>(*gEvseTargetsDelegate, gEvseTimerDelegate);
     if (!gEvseDelegate)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EnergyEvseDelegate");
@@ -109,7 +111,7 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
         BitMask<EnergyEvse::OptionalAttributes, uint32_t>(EnergyEvse::OptionalAttributes::kSupportsUserMaximumChargingCurrent,
                                                           EnergyEvse::OptionalAttributes::kSupportsRandomizationWindow,
                                                           EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),
-        BitMask<EnergyEvse::OptionalCommands, uint32_t>(EnergyEvse::OptionalCommands::kSupportsStartDiagnostics));
+        EnergyEvseCluster::OptionalCommandSet().Set<EnergyEvse::Commands::StartDiagnostics::Id>());
 
     if (!gEvseInstance)
     {
@@ -128,9 +130,6 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
         gEvseDelegate.reset();
         return err;
     }
-
-    // Link the delegate to the instance for attribute access
-    gEvseDelegate->SetInstance(gEvseInstance.get());
 
     err = gEvseTargetsDelegate->LoadTargets();
     if (err != CHIP_NO_ERROR)
@@ -214,7 +213,7 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
 {
     if (!gCommonClustersInitialized)
     {
-        chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
+        chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMap();
         ReturnErrorOnFailure(DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, featureMap));
 
         // Initialize ElectricalSensorManager (owns both EPM and EEM)
@@ -252,7 +251,9 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
         };
 
         ElectricalSensorManager::PtConfig ptConfig{
-            .features = BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
+            .features    = BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology,
+                                                                  PowerTopology::Feature::kElectricalCircuit),
+            .fabricTable = &Server::GetInstance().GetFabricTable(),
         };
 
         ReturnErrorOnFailure(gESManager->Init(endpointId, epmConfig, eemConfig, ptConfig));

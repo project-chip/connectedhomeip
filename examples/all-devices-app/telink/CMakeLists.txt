@@ -39,7 +39,8 @@ target_include_directories(app PRIVATE
                            ${CHIP_ROOT}/examples/all-devices-app/all-devices-common
                            ${CHIP_ROOT}/src/data-model-providers/codedriven
                            ${CHIP_ROOT}/src/data-model-providers
-                           ${CMAKE_CURRENT_BINARY_DIR}) # for generated app_config/enabled_devices.h
+                           ${CMAKE_CURRENT_BINARY_DIR} # for generated app_config/enabled_devices.h
+                           ${ALL_DEVICES_EXTRA_INCLUDE_DIRS})
 
 target_sources(app PRIVATE
                # Code-driven data model
@@ -72,12 +73,14 @@ target_sources(app PRIVATE
 
 if(CONFIG_NET_L2_OPENTHREAD)
   target_sources(app PRIVATE
-    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/ThreadRootNode.cpp
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/features/ThreadFeature.cpp
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/features/ThreadFeature.h
     ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/ThreadRootNode.h
   )
 elseif(CONFIG_CHIP_WIFI)
   target_sources(app PRIVATE
-    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/WifiRootNode.cpp
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/features/WifiFeature.cpp
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/features/WifiFeature.h
     ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/WifiRootNode.h
   )
 endif()
@@ -90,11 +93,11 @@ if(CONFIG_BOOTLOADER_MCUBOOT)
   target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
 endif()
 
-if(CONFIG_MCUMGR_TRANSPORT_BT)
-  zephyr_library_link_libraries(MCUBOOT_BOOTUTIL)
-  target_sources(app PRIVATE ${TELINK_COMMON}/util/src/DFUOverSMP.cpp)
-endif()
-
 if (CONFIG_CHIP_PW_RPC)
   include(${TELINK_COMMON}/Rpc.cmake)
+endif()
+
+if(CONFIG_OPENTHREAD_SNTP_CLIENT)
+  target_sources(app PRIVATE
+                   ${TELINK_COMMON}/util/src/ThreadTimeSync.cpp)
 endif()

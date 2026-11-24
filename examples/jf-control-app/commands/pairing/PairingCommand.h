@@ -58,6 +58,7 @@ enum class PairingMode
     AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
     Nfc,
+    Proxy,
 };
 
 enum class PairingNetworkType
@@ -178,6 +179,8 @@ public:
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("index", 0, UINT16_MAX, &mIndex);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
+            break;
+        case PairingMode::Proxy:
             break;
         }
 

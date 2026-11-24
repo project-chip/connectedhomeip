@@ -25,6 +25,7 @@ typedef enum _MCEndpointClusterType
     MCEndpointClusterTypeContentLauncher,
     MCEndpointClusterTypeKeypadInput,
     MCEndpointClusterTypeMediaPlayback,
+    MCEndpointClusterTypeMediaFileManagement,
     MCEndpointClusterTypeOnOff,
     MCEndpointClusterTypeTargetNavigator
 } MCEndpointClusterType;

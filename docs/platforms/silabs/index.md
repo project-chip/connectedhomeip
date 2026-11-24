@@ -10,5 +10,6 @@
 
 [CLI guide](./silabs_cli_guide.md)
 [Common app behavior](./silabs_common_app_behavior.md)
+[Extending base app implementation](./silabs_extending_base_app_implementation.md)
 [EFR32 software update](./silabs_efr32_software_update.md)
 [Getting Started](./silabs_getting_started.md)

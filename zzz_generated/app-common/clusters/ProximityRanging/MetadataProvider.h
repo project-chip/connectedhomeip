@@ -37,6 +37,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ProximityRan
             return BLTCSModeCapability::kMetadataEntry;
         case SessionIDList::Id:
             return SessionIDList::kMetadataEntry;
+        case RangingConstraints::Id:
+            return RangingConstraints::kMetadataEntry;
         default:
             return std::nullopt;
         }

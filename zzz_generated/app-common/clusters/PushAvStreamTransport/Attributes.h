@@ -72,6 +72,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentConnections
+namespace MaxZones {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxZones::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxZones
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -113,6 +125,7 @@ struct TypeInfo
 
         Attributes::SupportedFormats::TypeInfo::DecodableType supportedFormats;
         Attributes::CurrentConnections::TypeInfo::DecodableType currentConnections;
+        Attributes::MaxZones::TypeInfo::DecodableType maxZones;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

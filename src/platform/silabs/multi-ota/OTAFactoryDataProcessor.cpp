@@ -66,7 +66,7 @@ exit:
     }
     else
     {
-        error = Provision::Manager::GetInstance().GetStorage().Commit();
+        error = mStorageWriter.Commit();
         VerifyOrReturnError(error == CHIP_NO_ERROR, error,
                             ChipLogError(SoftwareUpdate, "Failed to commit factory data. Error: %s", ErrorStr(error)));
     }
@@ -135,16 +135,16 @@ CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue
     {
     case (int) FactoryTags::kDacKey:
         ChipLogDetail(SoftwareUpdate, "Set Device Attestation Key");
-        return Provision::Manager::GetInstance().GetStorage().SetDeviceAttestationKey(newValue);
+        return mCrypto.ImportDeviceAttestationKey(newValue);
     case (int) FactoryTags::kDacCert:
         ChipLogDetail(SoftwareUpdate, "Set Device Attestation Cert");
-        return Provision::Manager::GetInstance().GetStorage().SetDeviceAttestationCert(newValue);
+        return mStorageWriter.SetDeviceAttestationCert(newValue);
     case (int) FactoryTags::kPaiCert:
         ChipLogDetail(SoftwareUpdate, "Set Product Attestation Intermediate Cert");
-        return Provision::Manager::GetInstance().GetStorage().SetProductAttestationIntermediateCert(newValue);
+        return mStorageWriter.SetProductAttestationIntermediateCert(newValue);
     case (int) FactoryTags::kCdCert:
         ChipLogDetail(SoftwareUpdate, "Set Certification Declaration");
-        return Provision::Manager::GetInstance().GetStorage().SetCertificationDeclaration(newValue);
+        return mStorageWriter.SetCertificationDeclaration(newValue);
     }
 
     ChipLogError(DeviceLayer, "Failed to find tag %d.", tag);

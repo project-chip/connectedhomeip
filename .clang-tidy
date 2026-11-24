@@ -8,6 +8,14 @@
 #     assertions (already NOLINTed for bugprone-use-after-move) plus a TLVReader.h false positive.
 #   - clang-analyzer-cplusplus.NewDeleteLeaks: std::function / self-deleting-callback lifetimes
 #     that the analyzer cannot model (e.g. controller InvokeInteraction/ReadInteraction templates).
+#
+# bugprone checks intentionally left disabled:
+#   - bugprone-casting-through-void: GLib's GObject cast macros (G_OBJECT() etc.) cast through void *.
+#   - bugprone-assignment-in-selection-statement: like bugprone-assignment-in-if-condition, flags
+#     the Objective-C `if (self = [super init])` idiom.
+#   - bugprone-derived-method-shadowing-base-method: tests (and static polymorphism such as the
+#     variant-based StateMachine) hide non-virtual base methods on purpose.
+#   - bugprone-random-generator-seed: tests and examples seed with constants for repeatable runs.
 Checks: >
   bugprone-*,
   clang-analyzer-core.*,
@@ -25,9 +33,10 @@ Checks: >
   readability-redundant-string-cstr,
   readability-redundant-string-init,
   -bugprone-assignment-in-if-condition,
+  -bugprone-assignment-in-selection-statement,
   -bugprone-branch-clone,
-  -bugprone-casting-through-void, #TODO remove this after fixing issues in source code, issue 34008
-  -bugprone-copy-constructor-init,
+  -bugprone-casting-through-void,
+  -bugprone-derived-method-shadowing-base-method,
   -bugprone-easily-swappable-parameters,
   -bugprone-forward-declaration-namespace,
   -bugprone-forwarding-reference-overload,
@@ -38,6 +47,7 @@ Checks: >
   -bugprone-narrowing-conversions,
   -bugprone-not-null-terminated-result,
   -bugprone-pointer-arithmetic-on-polymorphic-object,
+  -bugprone-random-generator-seed,
   -bugprone-reserved-identifier,
   -bugprone-signed-bitwise,
   -bugprone-signed-char-misuse,

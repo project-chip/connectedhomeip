@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <optional>
+
 #include <app/AppConfig.h>
 #include <app/MessageDef/EventFilterIBs.h>
 #include <app/MessageDef/EventStatusIB.h>
@@ -28,6 +30,7 @@
 #include <app/MessageDef/TimedRequestMessage.h>
 #include <app/MessageDef/WriteRequestMessage.h>
 #include <app/MessageDef/WriteResponseMessage.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CHIPMem.h>
@@ -2205,6 +2208,184 @@ TEST_F(TestMessageDef, TestWriteRequestMessage)
 
     reader.Init(std::move(buf));
     ParseWriteRequestMessage(reader);
+}
+
+struct RequestFlagsCase
+{
+    bool suppressResponse;
+    bool timedRequest;
+    std::optional<uint16_t> peerRevision;
+    bool isGroupcast;
+    bool expectSuppressResponseEncoded;
+    bool expectTimedRequestEncoded;
+};
+
+constexpr uint16_t kRevisionWithOptionalFlags = chip::Revision::kFirstRevisionWithOptionalRequestFlags;
+
+const RequestFlagsCase kRequestFlagsCases[] = {
+    // Groupcast cannot be timed and omits both fields, regardless of SuppressResponse or peer revision.
+    { false, false, std::nullopt, true, false, false },
+    { true, false, std::nullopt, true, false, false },
+    { false, false, kRevisionWithOptionalFlags, true, false, false },
+    { true, false, kRevisionWithOptionalFlags, true, false, false },
+    // Peer at the first revision with optional flags: only TRUE fields are encoded.
+    { false, false, kRevisionWithOptionalFlags, false, false, false },
+    { true, false, kRevisionWithOptionalFlags, false, true, false },
+    { false, true, kRevisionWithOptionalFlags, false, false, true },
+    { true, true, static_cast<uint16_t>(kRevisionWithOptionalFlags + 1), false, true, true },
+    // Older or unknown peer revision: both fields are always encoded.
+    { false, false, static_cast<uint16_t>(kRevisionWithOptionalFlags - 1), false, true, true },
+    { false, false, std::nullopt, false, true, true },
+    { false, true, std::nullopt, false, true, true },
+    { true, true, static_cast<uint16_t>(kRevisionWithOptionalFlags - 1), false, true, true },
+};
+
+template <typename Parser>
+void CheckRequestFlags(const Parser & parser, const RequestFlagsCase & testCase)
+{
+    bool value = !testCase.suppressResponse;
+    if (testCase.expectSuppressResponseEncoded)
+    {
+        EXPECT_SUCCESS(parser.GetSuppressResponse(&value));
+        EXPECT_EQ(value, testCase.suppressResponse);
+    }
+    else
+    {
+        EXPECT_EQ(parser.GetSuppressResponse(&value), CHIP_END_OF_TLV);
+    }
+
+    value = !testCase.timedRequest;
+    if (testCase.expectTimedRequestEncoded)
+    {
+        EXPECT_SUCCESS(parser.GetTimedRequest(&value));
+        EXPECT_EQ(value, testCase.timedRequest);
+    }
+    else
+    {
+        EXPECT_EQ(parser.GetTimedRequest(&value), CHIP_END_OF_TLV);
+    }
+}
+
+TEST_F(TestMessageDef, TestInvokeRequestMessageRequestFlags)
+{
+    for (const auto & testCase : kRequestFlagsCases)
+    {
+        chip::System::PacketBufferTLVWriter writer;
+        writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+        InvokeRequestMessage::Builder builder;
+        ASSERT_SUCCESS(builder.Init(&writer));
+        RequestFlagsOptions options;
+        options.suppressResponse = testCase.suppressResponse;
+        options.timedRequest     = testCase.timedRequest;
+        options.peerRevision     = testCase.peerRevision;
+        options.isGroupcast      = testCase.isGroupcast;
+        EXPECT_SUCCESS(builder.RequestFlags(options).GetError());
+        EXPECT_SUCCESS(builder.CreateInvokeRequests().EndOfInvokeRequests());
+        ASSERT_SUCCESS(builder.EndOfInvokeRequestMessage());
+        chip::System::PacketBufferHandle buf;
+        ASSERT_SUCCESS(writer.Finalize(&buf));
+
+        chip::System::PacketBufferTLVReader reader;
+        reader.Init(std::move(buf));
+        InvokeRequestMessage::Parser parser;
+        ASSERT_SUCCESS(parser.Init(reader));
+        CheckRequestFlags(parser, testCase);
+    }
+}
+
+TEST_F(TestMessageDef, TestWriteRequestMessageRequestFlags)
+{
+    for (const auto & testCase : kRequestFlagsCases)
+    {
+        chip::System::PacketBufferTLVWriter writer;
+        writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+        WriteRequestMessage::Builder builder;
+        ASSERT_SUCCESS(builder.Init(&writer));
+        RequestFlagsOptions options;
+        options.suppressResponse = testCase.suppressResponse;
+        options.timedRequest     = testCase.timedRequest;
+        options.peerRevision     = testCase.peerRevision;
+        options.isGroupcast      = testCase.isGroupcast;
+        EXPECT_SUCCESS(builder.RequestFlags(options).GetError());
+        EXPECT_SUCCESS(builder.CreateWriteRequests().EndOfAttributeDataIBs());
+        ASSERT_SUCCESS(builder.EndOfWriteRequestMessage());
+        chip::System::PacketBufferHandle buf;
+        ASSERT_SUCCESS(writer.Finalize(&buf));
+
+        chip::System::PacketBufferTLVReader reader;
+        reader.Init(std::move(buf));
+        WriteRequestMessage::Parser parser;
+        ASSERT_SUCCESS(parser.Init(reader));
+        CheckRequestFlags(parser, testCase);
+    }
+}
+
+template <typename RequestBuilder>
+void CheckGroupcastRejectsTimedRequestFlag()
+{
+    for (const auto & peerRevision : { std::optional<uint16_t>(), std::optional<uint16_t>(kRevisionWithOptionalFlags - 1),
+                                       std::optional<uint16_t>(kRevisionWithOptionalFlags) })
+    {
+        for (bool suppressResponse : { false, true })
+        {
+            uint8_t buffer[32];
+            chip::TLV::TLVWriter writer;
+            writer.Init(buffer);
+            RequestBuilder builder;
+            ASSERT_SUCCESS(builder.Init(&writer));
+            const uint32_t length = writer.GetLengthWritten();
+
+            RequestFlagsOptions options;
+            options.suppressResponse = suppressResponse;
+            options.timedRequest     = true;
+            options.peerRevision     = peerRevision;
+            options.isGroupcast      = true;
+            EXPECT_EQ(builder.RequestFlags(options).GetError(), CHIP_ERROR_INVALID_ARGUMENT);
+            EXPECT_EQ(writer.GetLengthWritten(), length);
+
+            builder.ResetError(CHIP_ERROR_NO_MEMORY);
+            EXPECT_EQ(builder.RequestFlags(options).GetError(), CHIP_ERROR_NO_MEMORY);
+            EXPECT_EQ(writer.GetLengthWritten(), length);
+        }
+    }
+}
+
+TEST_F(TestMessageDef, TestInvokeRequestMessageGroupcastRejectsTimedRequestFlag)
+{
+    CheckGroupcastRejectsTimedRequestFlag<InvokeRequestMessage::Builder>();
+}
+
+TEST_F(TestMessageDef, TestWriteRequestMessageGroupcastRejectsTimedRequestFlag)
+{
+    CheckGroupcastRejectsTimedRequestFlag<WriteRequestMessage::Builder>();
+}
+
+template <typename RequestBuilder>
+void CheckRequestFlagsBufferError()
+{
+    for (uint32_t bufferSize : { 2u, 4u })
+    {
+        uint8_t buffer[4];
+        chip::TLV::TLVWriter writer;
+        writer.Init(buffer, bufferSize);
+        RequestBuilder builder;
+        ASSERT_SUCCESS(builder.Init(&writer));
+
+        RequestFlagsOptions options;
+        EXPECT_EQ(builder.RequestFlags(options).GetError(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        options.isGroupcast = true;
+        EXPECT_EQ(builder.RequestFlags(options).GetError(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+}
+
+TEST_F(TestMessageDef, TestInvokeRequestMessageRequestFlagsPreserveBufferError)
+{
+    CheckRequestFlagsBufferError<InvokeRequestMessage::Builder>();
+}
+
+TEST_F(TestMessageDef, TestWriteRequestMessageRequestFlagsPreserveBufferError)
+{
+    CheckRequestFlagsBufferError<WriteRequestMessage::Builder>();
 }
 
 TEST_F(TestMessageDef, TestWriteResponseMessage)

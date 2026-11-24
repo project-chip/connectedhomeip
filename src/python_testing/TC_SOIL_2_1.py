@@ -18,19 +18,6 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --endpoint 1
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device soil-sensor --discriminator 1234 --KVS kvs1
 #     script-args: >
@@ -50,11 +37,11 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_SOIL_2_1(MatterBaseTest):
+class TC_SOIL_2_1(MatterTestCommissionedDevice):
     async def read_soil_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.SoilMeasurement
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -64,7 +51,7 @@ class TC_SOIL_2_1(MatterBaseTest):
 
     def steps_TC_SOIL_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read SoilMoistureMeasurementLimits attribute and saves the value as soil_moisture_limits"),
             TestStep(3, "Verify the MeasurementType field in soil_moisture_limits"),
             TestStep(4, "Verify the MinMeasuredValue field in soil_moisture_limits and save the MinMeasuredValue field as min_bound"),

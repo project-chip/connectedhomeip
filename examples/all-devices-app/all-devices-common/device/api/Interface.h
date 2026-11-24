@@ -20,47 +20,29 @@
 #include <app/clusters/descriptor/DescriptorCluster.h>
 #include <app/util/basic-types.h>
 #include <clusters/Descriptor/Structs.h>
+#include <clusters/shared/Enums.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
 #include <device/api/allocator/EndpointIdAllocator.h>
 #include <lib/support/Span.h>
 
-#include <cstdint>
-
 namespace chip::app {
-
-// Constants for semantic tags. Defined in "Matter Standard Namespaces"
-//
-// TODO: Generate standard namespace ID constants from spec and place them in libCHIP.
-//       We need:
-//          - namespace id generation
-//          - tag value generation
-//       Specification describes these in `src/namespaces`
-namespace CommonNamespace {
-
-constexpr uint16_t kCompassDirectionId          = 0x02;
-constexpr uint16_t kCompassLocationId           = 0x03;
-constexpr uint16_t kDirectionId                 = 0x04;
-constexpr uint16_t kLevelId                     = 0x05;
-constexpr uint16_t kLocationId                  = 0x06; // Clusters::Globals::LocationTag
-constexpr uint16_t kNumberId                    = 0x07;
-constexpr uint16_t kPositionId                  = 0x08; // Clusters::Globals::PositionTag
-constexpr uint16_t kElectricalMeasurementId     = 0x0A;
-constexpr uint16_t kCommodityTariffChronologyId = 0x0B;
-constexpr uint16_t kCommodityTariffDirectionId  = 0x0D;
-constexpr uint16_t kLaundryId                   = 0x0E;
-constexpr uint16_t kPowerSourceId               = 0x0F;
-constexpr uint16_t kCommonAreaId                = 0x10; // Clusters::Globals::AreaTypeTag
-constexpr uint16_t kCommonLandmarkId            = 0x11; // Clusters::Globals::LandmarkTag
-constexpr uint16_t kRelativePositionId          = 0x12; // Clusters::Globals::RelativePositionTag
-
-} // namespace CommonNamespace
 
 /// Structural configuration for registering an endpoint within a node hierarchy.
 ///
 /// Encapsulates parent-child relationship, family composition pattern, and static semantic tags.
 struct EndpointComposition
 {
+    /// Namespace IDs (`Clusters::Globals::SemanticTagNamespaceId`) and tag values (e.g. `Clusters::Globals::ClosureTag`)
+    /// are generated from semantic-tag-namespace-enums.xml into <clusters/shared/Enums.h>.
+    /// To add a missing namespace ID or tag, edit that XML and run:
+    ///     ./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'
+    //
+    // TODO: semantic-tag-namespace-enums.xml is maintained by hand. Generate it from the spec instead.
+    //       We need:
+    //          - namespace id generation
+    //          - tag value generation
+    //       Specification describes these in `src/namespaces`
     using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
 
     EndpointId parentId                           = kInvalidEndpointId;
@@ -91,10 +73,16 @@ public:
     virtual CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                 EndpointComposition composition = {}) = 0;
 
-    /// Removes a device's clusters from the given provider. This
+    /// Removes a device's clusters and endpoint from the given provider. This
     /// must only be called when register has succeeded before. Expected
     /// usage of this function is for when the device is no longer needed
     /// (for example, on shutdown), to destroy the device's clusters.
+    ///
+    /// Required teardown order:
+    /// Subclasses MUST call UnregisterDescriptor() (which unregisters the endpoint from the provider
+    /// via provider.RemoveEndpoint()) BEFORE unregistering or destroying any device-specific clusters
+    /// via provider.RemoveCluster(). Once the provider has been started, attempting to call RemoveCluster()
+    /// while the endpoint remains registered will fail with CHIP_ERROR_INCORRECT_STATE.
     virtual void Unregister(CodeDrivenDataModelProvider & provider) = 0;
 
     // Endpoint interface implementation
@@ -114,7 +102,12 @@ protected:
     virtual CHIP_ERROR RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                           EndpointComposition composition = {});
 
-    /// Reverse of `RegisterDescrioptor`
+    /// Unregisters the endpoint from the data model provider (via provider.RemoveEndpoint()) and
+    /// unregisters/destroys the Descriptor cluster.
+    ///
+    /// This MUST be called FIRST in any device's Unregister() implementation before removing any
+    /// other clusters from the provider, because CodeDrivenDataModelProvider disallows removing
+    /// clusters while their associated endpoint is still registered once the provider has been started.
     virtual void UnregisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider);
 
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;

@@ -76,6 +76,10 @@ def human_text_string(value: StructTag | StructQuality | EventPriority | EventQu
             result += "writeonly "
         if AttributeQuality.NOSUBSCRIBE in value:
             result += "nosubscribe "
+        if AttributeQuality.CHANGES_OMITTED in value:
+            result += "changes_omitted "
+        if AttributeQuality.FIXED in value:
+            result += "fixed "
         return result
     elif type(value) is CommandQuality:
         result = ""
@@ -102,7 +106,7 @@ def human_text_string(value: StructTag | StructQuality | EventPriority | EventQu
             return "callback"
 
     # wrong value in general
-    return "Unknown/unsupported: %r" % value
+    return f"Unknown/unsupported: {value!r}"
 
 
 def event_access_string(e: Event) -> str:

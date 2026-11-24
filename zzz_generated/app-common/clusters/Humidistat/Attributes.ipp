@@ -32,10 +32,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::Mode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, mode);
-    case Attributes::SystemState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, systemState);
+    case Attributes::SupportedModes::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedModes);
+    case Attributes::HumidistatMode::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, humidistatMode);
+    case Attributes::HumidistatSystemState::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, humidistatSystemState);
     case Attributes::UserSetpoint::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, userSetpoint);
     case Attributes::MinSetpoint::TypeInfo::GetAttributeId():
@@ -54,6 +56,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, sleep);
     case Attributes::Optimal::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, optimal);
+    case Attributes::CondPumpEnabled::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, condPumpEnabled);
+    case Attributes::CondRunCount::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, condRunCount);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

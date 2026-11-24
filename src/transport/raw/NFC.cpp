@@ -86,8 +86,6 @@ bool NFCBase::CanSendToPeer(const Transport::PeerAddress & address)
 
 void NFCBase::OnNfcTagResponse(const Transport::PeerAddress & address, System::PacketBufferHandle && buffer)
 {
-    ChipLogProgress(Controller, "NFCBase::OnNfcTagResponse");
-
     HandleMessageReceived(address, std::move(buffer));
 }
 

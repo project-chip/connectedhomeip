@@ -30,7 +30,8 @@ namespace app {
 class IncreasingLightSensor : public LightSensor, public TimerContext
 {
 public:
-    IncreasingLightSensor(TimerDelegate & timerDelegate);
+    IncreasingLightSensor(TimerDelegate & timerDelegate, Clusters::IlluminanceMeasurementCluster::StartupConfiguration lightConfig,
+                          Clusters::IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes = {});
     ~IncreasingLightSensor() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -38,9 +39,6 @@ public:
 
     // TimerContext
     void TimerFired() override;
-
-private:
-    uint16_t mLightMeasuredValue = 0;
 };
 
 } // namespace app

@@ -27,11 +27,13 @@ class AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
   val contributorStatusChange:
     List<
       chip.devicecontroller.cluster.structs.AmbientSensingUnionClusterContributorStatusChangeStruct
-    >
+    >,
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("AmbientSensingUnionClusterUnionContributorStatusChangedEvent {\n")
     append("\tcontributorStatusChange : $contributorStatusChange\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -43,12 +45,14 @@ class AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
         item.toTlv(AnonymousTag, this)
       }
       endArray()
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
 
   companion object {
     private const val TAG_CONTRIBUTOR_STATUS_CHANGE = 0
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -69,10 +73,14 @@ class AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
           }
           tlvReader.exitContainer()
         }
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
-      return AmbientSensingUnionClusterUnionContributorStatusChangedEvent(contributorStatusChange)
+      return AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
+        contributorStatusChange,
+        fabricIndex,
+      )
     }
   }
 }

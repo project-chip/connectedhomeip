@@ -40,29 +40,29 @@ import tabulate
 import yaml
 
 with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-    from matter.testing.metadata import extract_runs_args
+    from matter.testing.metadata import TAG_OPTION_HELP, TagFilter, extract_runs_args, runs_in_pull_requests, unused_tag_values
     from matter.testing.tasks import SubprocessKind
 
 
 log = logging.getLogger(__name__)
 
 
-def _get_apps_from_script(path: str) -> list[str]:
+def _get_runs_from_script(path: str) -> dict[str, dict]:
     """
-    Parses a python script and returns the apps it is for.
+    Parses a python script and returns its runs, keyed by run name.
     """
     try:
-        runs_args = extract_runs_args(path)
-        apps = set()
-        for run_config in runs_args.values():
-            if run_config and 'app' in run_config:
-                # app is like "${ALL_CLUSTERS_APP}"
-                app_name = run_config['app'].strip('${}')
-                apps.add(app_name)
-        return list(apps)
+        return extract_runs_args(path)
     except Exception as e:
         log.warning("Failed to parse metadata from '%s': %r", path, e)
-        return []
+        return {}
+
+
+def _get_app_from_run(run_config: dict) -> str:
+    """
+    Returns the app a run is for, like "ALL_CLUSTERS_APP" for "${ALL_CLUSTERS_APP}".
+    """
+    return run_config.get('app', '').strip('${}')
 
 
 def _get_native_machine_target():
@@ -205,6 +205,15 @@ def _get_targets(coverage: bool | None) -> list[ApplicationTarget]:
             cli_key="evse",
             target=f"{target_prefix}-evse-{suffix}",
             binary="chip-evse-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="ELECTRICAL_PROTECTION_APP",
+            cli_key="electrical-protection",
+            target=f"{target_prefix}-electrical-protection-{suffix}",
+            binary="chip-electrical-protection-app",
         )
     )
     targets.append(
@@ -922,11 +931,10 @@ def gen_coverage(flat):
     help="Run only tests that are for the given app. Comma separated list of apps. E.g. --app-filter ALL_CLUSTERS_APP,CHIP_TOOL",
 )
 @click.option(
-    "--include-nightly",
-    default=False,
-    is_flag=True,
-    show_default=True,
-    help="Include nightly tests (normally excluded as they are slow and reserved for nightly CI runs).",
+    "--tag",
+    "tags",
+    multiple=True,
+    help=TAG_OPTION_HELP,
 )
 def python_tests(
     test_filter,
@@ -941,7 +949,7 @@ def python_tests(
     fail_log_dir,
     override_binary_path,
     app_filter,
-    include_nightly,
+    tags,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -949,6 +957,11 @@ def python_tests(
     Constructs the run yaml in `out/test_env.yaml`. Assumes that binaries
     were built already, generally with `build` (or separate `build-python` and `build-apps`).
     """
+    try:
+        tag_filter = TagFilter.parse(tags)
+    except ValueError as e:
+        raise click.BadParameter(str(e), param_hint="--tag")
+
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage
@@ -977,6 +990,8 @@ def python_tests(
 
         # PushAV is special
         f.write("PUSH_AV_SERVER: src/tools/push_av_server/src/server.py\n")
+        # The COMPRO tests' app is the script that brings up their mocked topology
+        f.write("COMPRO_RUNNER: scripts/tests/run_compro_test.py\n")
 
         # Disable OTA requestor v2 for now
         # This would be built by a shell script like this:
@@ -1002,7 +1017,7 @@ def python_tests(
         app_filter_list = _parse_filters(app_filter)
 
     if skip:
-        print("SKIP IS %r" % skip)
+        print(f"SKIP IS {skip!r}")
         skip = _parse_filters(skip)
 
     if from_filter:
@@ -1027,34 +1042,52 @@ def python_tests(
     with open("src/python_testing/test_metadata.yaml") as f:
         metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
-    nightly_tests = {item["name"] for item in metadata["nightly"]}
+    dedicated_runner_tests = {item["name"]: item["reason"] for item in metadata["dedicated_runner"]}
 
     # NOTE: for slow tests. we add logs to not get impatient
     slow_test_duration = {
-        item["name"]: item["duration"] for item in metadata["slow_tests"] + metadata["nightly"]
+        item["name"]: item["duration"] for item in metadata["slow_tests"]
     }
 
     if not os.path.isdir("src/python_testing"):
         raise NotADirectoryError("Script meant to be run from the CHIP checkout root (src/python_testing must exist).")
 
     test_scripts = []
+    skipped_dedicated_runner = []
     for file in glob.glob(os.path.join("src/python_testing/", "*.py")):
         if os.path.basename(file) in excluded_patterns:
             continue
-        if not include_nightly and os.path.basename(file) in nightly_tests:
+        if os.path.basename(file) in dedicated_runner_tests:
+            skipped_dedicated_runner.append(os.path.basename(file))
             continue
         test_scripts.append(file)
     test_scripts.append("src/controller/python/tests/scripts/mobile-device-test.py")
     test_scripts.sort()  # order consistent
+
+    for name in sorted(skipped_dedicated_runner):
+        log.warning("Skipping '%s': %s", name, dedicated_runner_tests[name])
+
+    if tags:
+        used_tags = {tag for script in test_scripts for run_config in _get_runs_from_script(script).values()
+                     for tag in run_config['tags']}
+        if unused := unused_tag_values(tags, used_tags):
+            raise click.BadParameter(f"no run has the tag in {', '.join(map(repr, unused))}", param_hint="--tag")
 
     execution_times = []
     failed_tests = []
     try:
         to_run = []
         for script in [t for t in test_scripts if test_filter.any_matches(t)]:
+            runs = _get_runs_from_script(script)
+            if not tag_filter.matches_script(runs):
+                log.info("Skipping '%s': none of its runs match the tag filter '%s'", script, tag_filter)
+                continue
+            selected_runs = [name for name, run_config in runs.items() if tag_filter.matches(run_config['tags'])]
+
             if app_filter_list:
-                required_apps = _get_apps_from_script(script)
-                if not any(app_filter_list.any_matches(app) for app in required_apps):
+                selected_runs = [name for name in selected_runs if app_filter_list.any_matches(_get_app_from_run(runs[name]))]
+                if not selected_runs:
+                    required_apps = sorted({_get_app_from_run(run_config) for run_config in runs.values()})
                     log.info("Skipping '%s' due to app filter (requires %r)", script, required_apps)
                     continue
 
@@ -1074,19 +1107,19 @@ def python_tests(
                     log.info("EXPLICIT SKIP '%s'", script)
                     continue
 
-            to_run.append(script)
+            # Without --run or --tag, run_python_test.py executes the runs PR CI runs.
+            default_runs = [name for name, run_config in runs.items() if runs_in_pull_requests(run_config['tags'])]
+            to_run.append((script, [] if selected_runs == default_runs else selected_runs))
 
         with alive_progress.alive_bar(len(to_run), title="Running tests") as bar:
-            for script in to_run:
+            for script, run_names in to_run:
                 bar.text(script)
                 cmd = [
                     "scripts/run_in_python_env.sh",
                     "out/venv",
-                    f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}",
+                    f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}"
+                    + "".join(f" --run {name}" for name in run_names),
                 ]
-
-                if app_filter_list:
-                    cmd.extend(('--app-filter', app_filter))
 
                 if dry_run:
                     print(shlex.join(cmd))

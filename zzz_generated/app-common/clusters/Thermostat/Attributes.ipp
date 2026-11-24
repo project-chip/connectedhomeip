@@ -160,6 +160,20 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, currentThermostatSuggestion);
     case Attributes::ThermostatSuggestionNotFollowingReason::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, thermostatSuggestionNotFollowingReason);
+    case Attributes::CriticalFreezeProtection::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, criticalFreezeProtection);
+    case Attributes::CriticalOverheatProtection::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, criticalOverheatProtection);
+    case Attributes::Sensors::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, sensors);
+    case Attributes::AvailableSensorHandles::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, availableSensorHandles);
+    case Attributes::EnabledSensorHandles::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, enabledSensorHandles);
+    case Attributes::NumberOfSensorScheduleTransitions::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, numberOfSensorScheduleTransitions);
+    case Attributes::SensorSchedule::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, sensorSchedule);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

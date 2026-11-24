@@ -22,17 +22,19 @@
 import asyncio
 import logging
 
-from mobly import asserts
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mobly import asserts, signals
 
 import matter.clusters as Clusters
+from matter.exceptions import ChipStackError
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CNET_4_12(MatterBaseTest):
+class TC_CNET_4_12(MatterTestCommissionedDevice):
     """
     This test verifies the DUT connectivity to the Thread network using the ConnectNetwork Command,
     including validation for two Thread operational datasets.
@@ -51,6 +53,60 @@ class TC_CNET_4_12(MatterBaseTest):
     CLUSTER_DESC = Clusters.Descriptor
     CLUSTER_CGEN = Clusters.GeneralCommissioning
     failsafe_expiration_seconds = 900
+
+    # The test repeatedly switches the DUT between two Thread networks (steps 7, 16, 21)
+    # and expires the TH's CASE sessions to it (self.default_controller.ExpireSessions)
+    # while waiting on mDNS/SRP for the new address. A background wildcard subscription
+    # cannot survive those DUT-side network transitions and only adds noise/instability,
+    # similar to the issue avoided in TC_CGEN_2_2
+    # (https://github.com/project-chip/connectedhomeip/issues/72732).
+    disable_wildcard_subscription = True
+
+    def get_dut_instance_name(self) -> str:
+        # TODO: Consolidate this with other tests after SVE
+        node_id = self.dut_node_id
+        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
+        return f'{compressed_fabric_id:016X}-{node_id:016X}'
+
+    async def wait_for_srp_addresses(self, timeout_seconds: int = 180) -> list[str]:
+        """Fetches the IPv6 (AAAA) addresses of the DUT's operational service.
+
+        Waits until the DUT's operational record is published via SRP and resolves to at least one
+        IPv6 address, then returns those addresses. Fails the test if none is found within timeout_seconds.
+        """
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + timeout_seconds
+        mdns = MdnsDiscovery()
+
+        # The SRV record is needed first: it provides the DUT's host name, which the AAAA lookup requires
+        # (the host name can't be derived from the instance name), so the two lookups can't run in parallel.
+        instance_qname = f"{self.get_dut_instance_name()}.{MdnsServiceType.OPERATIONAL.value}"
+        srv_record = await mdns.get_srv_record(
+            service_name=instance_qname,
+            service_type=MdnsServiceType.OPERATIONAL.value,
+            query_timeout_sec=timeout_seconds,
+            log_output=True
+        )
+        srv_record_returned = srv_record is not None and srv_record.service_name == instance_qname
+        asserts.assert_true(srv_record_returned, "Unable to find device")
+
+        # SRV addresses may include IPv4 (A records); keep IPv6 only.
+        ipv6_addresses = [address for address in (srv_record.addresses or []) if ":" in address]
+        if ipv6_addresses:
+            return ipv6_addresses
+
+        # The SRV lookup returned no address. AAAA records in an SRV response are optional additional records
+        # (RFC 6763), and python-zeroconf can also drop AAAA records that precede the SRV record in the same
+        # packet. Query the host's AAAA records explicitly; get_quada_records resends the query until an answer
+        # arrives or the timeout expires.
+        remaining = deadline - loop.time()
+        if remaining <= 0:
+            asserts.fail(f"Timed out after {timeout_seconds}s waiting for an IP address of the DUT via SRP")
+        log.info("SRV record for %s returned no IPv6 addresses, querying AAAA for %s",
+                 srv_record.service_name, srv_record.hostname)
+        quada_records = await mdns.get_quada_records(hostname=srv_record.hostname, query_timeout_sec=remaining)
+        asserts.assert_true(quada_records, f"No IP address found for {srv_record.hostname} within {timeout_seconds}s")
+        return [record.address for record in quada_records]
 
     async def validate_thread_dataset(self, dataset_bytes, dataset_name):
         """
@@ -154,7 +210,7 @@ class TC_CNET_4_12(MatterBaseTest):
 
     def steps_TC_CNET_4_12(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "TH is commissioned", is_commissioning=True),
+            TestStep("precondition", "TH is commissioned"),
             TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900",
                      "Verify that DUT responds with ArmFailSafeResponse to the TH"),
             TestStep(2, "TH reads Networks attribute from the DUT and saves the number of entries as `NumNetworks`",
@@ -236,7 +292,6 @@ class TC_CNET_4_12(MatterBaseTest):
         # All required endpoint and Threads dataset are set and assigned, Thread dataset as str
         log.info('Precondition: All required arguments are set and assigned, Thread dataset as str: THREADS_ENDPOINT = %s, THREAD_1ST_OPERATIONALDATASET = %s, PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = %s',
                  endpoint, thread_dataset_1, thread_dataset_2)
-        # thread_dataset_1_bytes = bytes.fromhex(thread_dataset_1)
         thread_dataset_1_bytes = thread_dataset_1
         thread_dataset_2_bytes = bytes.fromhex(thread_dataset_2)
 
@@ -357,22 +412,24 @@ class TC_CNET_4_12(MatterBaseTest):
         )
 
         self.step(7)
-        cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=thread_network_id_bytes_th2, breadcrumb=2)
-        resp = await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cmd=cmd
-        )
-        log.info('Step #7: ConnectNetwork resp for THREAD_2ND: (%s)', vars(resp))
-        log.info('Step #7: ConnectNetwork Status for THREAD_2ND is success: (%s)', resp.networkingStatus)
-        # Verify that the DUT responds with AddThreadNConnectNetworketwork with NetworkingStatus as 'Success'(0)
-        asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             "Failure status returned from ConnectNetwork")
+        try:
+            cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=thread_network_id_bytes_th2, breadcrumb=2)
+            resp = await self.send_single_cmd(
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id,
+                cmd=cmd
+            )
+        except ChipStackError:  # chipstack-ok
+            # This is OK - if the device does not send the response before swapping networks
+            # then we will not receive a response and that is fine.
+            # Will will be able to tell if this succeeded by whether we can reach the
+            # device on the second network and by the networks attribute.
+            pass
 
-        # TODO: Consider replacing the sleep (connect_max_time + fudge_factor) with dns-sd adverts check as improvement.
-        # Wait for the device to establish connection with the new Thread network
-        # Includes a fudge factor for SRP record propagation.
-        await asyncio.sleep(connect_max_time_seconds + fudge_factor_seconds)
+        log.info("Step #7: Awaiting device on SRP")
+        th2_addresses = await self.wait_for_srp_addresses()
+        th2_ip = th2_addresses[0]
+        self.default_controller.ExpireSessions(self.dut_node_id)
         log.info("Step #7: Sleep completed for Thread network connection and SRP record propagation")
 
         self.step(8)
@@ -386,7 +443,7 @@ class TC_CNET_4_12(MatterBaseTest):
         await self.verify_thread_network_connected(networks, thread_network_id_bytes_th2, "THREAD_2ND", "#8")
 
         self.step(9)
-        # Expired session is re-established the new session reading attribute (Breadcrum)
+        # Expired session is re-established the new session reading attribute (Breadcrumb)
         breadcrumb_info = await self.read_single_attribute_check_success(
             cluster=Clusters.GeneralCommissioning,
             attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb
@@ -396,22 +453,49 @@ class TC_CNET_4_12(MatterBaseTest):
                              "The Breadcrumb attribute is not 2")
 
         self.step(10)
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0)
-        resp = await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cmd=cmd
-        )
-        # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
-        log.info('Step #10: ArmFailSafeResponse with ErrorCode as OK: (%s)', resp.errorCode)
-        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-                             "Failure status returned from arm failsafe")
+        try:
+            cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0)
+            resp = await self.send_single_cmd(
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id,
+                cmd=cmd
+            )
+            # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
+            log.info('Step #10: ArmFailSafeResponse with ErrorCode as OK: (%s)', resp.errorCode)
+            asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                                 "Failure status returned from arm failsafe")
+        except ChipStackError:  # chipstack-ok
+            # When ArmFailSafe expires or is disarmed to 0, the DUT immediately drops its interface
+            # on the secondary network to revert to the primary network. If interface teardown occurs
+            # before the response is transmitted, a ChipStackError is expected and spec-compliant.
+            pass
 
         self.step(11)
         # Step 11: When the failsafe is disarmed, the device should automatically return to THREAD_1ST.
         # This means the THREAD_2ND network will be removed,
         # and the device will reconnect to Thread 1 without further intervention.
         log.info('Step #11: DUT automatically return to THREAD_1ST')
+        self.default_controller.ExpireSessions(self.dut_node_id)
+
+        log.info("Step #11: Polling SRP until IP address changes from THREAD_2ND (%s)...", th2_ip)
+        start_time = asyncio.get_running_loop().time()
+        timeout_seconds = 60
+
+        while asyncio.get_running_loop().time() - start_time < timeout_seconds:
+            try:
+                addresses = await self.wait_for_srp_addresses(timeout_seconds=5)
+                # Check if we got an IP list that does NOT contain the old THREAD_2ND IP
+                if th2_ip not in addresses:
+                    log.info("Step #11: Device confirmed on THREAD_1ST with new address(es): %s", addresses)
+                    break
+            except (TimeoutError, signals.TestFailure, AssertionError):
+                # Catching expected assertion failures or timeouts from wait_for_srp_addresses
+                # while waiting for the SRP record to migrate subnets
+                pass
+            await asyncio.sleep(1)
+        else:
+            asserts.fail(
+                f"Step #11: Timeout ({timeout_seconds}s) waiting for device to drop THREAD_2ND IP and return to THREAD_1ST")
 
         self.step(12)
         networks = await self.read_single_attribute_check_success(
@@ -420,20 +504,17 @@ class TC_CNET_4_12(MatterBaseTest):
         )
         log.info('Step #12: Networks attribute: %s', networks)
 
-        # Session expired and re-establish the new session reading attribute (Breadcrum)
-        await asyncio.sleep(connect_max_time_seconds + 5)
+        # Session expired and re-establish the new session reading attribute (Breadcrumb)
         breadcrumb_info = await self.read_single_attribute_check_success(
             cluster=Clusters.GeneralCommissioning,
             attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb
         )
         log.info('Step #12: Breadcrumb attribute: %s', breadcrumb_info)
-
-        await asyncio.sleep(connect_max_time_seconds + 5)
         networks = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks
         )
-        log.info('Step #12: Networks attribute after read atribute: %s', networks)
+        log.info('Step #12: Networks attribute after read attribute: %s', networks)
         await self.verify_thread_network_connected(networks, thread_network_id_bytes_th1, "THREAD_1ST", "#12")
 
         self.step(13)
@@ -488,21 +569,26 @@ class TC_CNET_4_12(MatterBaseTest):
         )
         log.info('Step #16: Networks attribute: %s', networks)
 
-        cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=thread_network_id_bytes_th2, breadcrumb=3)
-        resp = await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cmd=cmd
-        )
-        log.info('Step #16: ConnectNetwork resp for THREAD_2ND: (%s)', vars(resp))
-        log.info('Step #16: ConnectNetwork Status for THREAD_2ND is success (%s)', resp.networkingStatus)
-        # Verify that the DUT responds with AddThreadNConnectNetworketwork with NetworkingStatus as 'Success'(0)
-        asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             "Failure status returned from ConnectNetwork")
+        try:
+            cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=thread_network_id_bytes_th2, breadcrumb=3)
+            resp = await self.send_single_cmd(
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id,
+                cmd=cmd
+            )
+        except ChipStackError:  # chipstack-ok
+            # When ConnectNetwork is invoked, the DUT immediately tears down its active Thread interface
+            # to transition subnets. If interface teardown occurs before the response acknowledgment
+            # can be transmitted over the air, a ChipStackError is expected and spec-compliant.
+            # Connection success is verified via subsequent mDNS discovery and Networks attribute reads.
+            pass
 
         # Wait for the device to establish connection with the new Thread network
         # Includes a fudge factor for SRP record propagation.
-        await asyncio.sleep(connect_max_time_seconds + fudge_factor_seconds)
+        log.info("Step #16: Awaiting device on SRP")
+        await self.wait_for_srp_addresses()
+        self.default_controller.ExpireSessions(self.dut_node_id)
+
         log.info("Step #16: Sleep completed for Thread network connection and SRP record propagation")
 
         self.step(17)
@@ -594,24 +680,28 @@ class TC_CNET_4_12(MatterBaseTest):
 
         await self.verify_thread_network_response(resp)
 
-        cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
-            networkID=thread_network_id_bytes_th1
-        )
-
-        resp = await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cmd=cmd
-        )
-        log.info('Step #21: ConnectNetwork resp for for THREAD_1ST: (%s)', vars(resp))
-        # Verify that the DUT responds with ConnectNetwork with NetworkingStatus as 'Success'(0)
-        asserts.assert_equal(resp.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             "Failure status returned from ConnectNetwork")
+        try:
+            cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
+                networkID=thread_network_id_bytes_th1
+            )
+            resp = await self.send_single_cmd(
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id,
+                cmd=cmd
+            )
+        except ChipStackError:  # chipstack-ok
+            # When ConnectNetwork is invoked, the DUT immediately tears down its active Thread interface
+            # to transition subnets. If interface teardown occurs before the response acknowledgment
+            # can be transmitted over the air, a ChipStackError is expected and spec-compliant.
+            # Connection success is verified via subsequent mDNS discovery and Networks attribute reads.
+            pass
 
         # TODO: Consider replacing the sleep (connect_max_time + fudge_factor) with dns-sd adverts check as improvement.
         # Wait for the device to establish connection with the new Thread network
         # Includes a fudge factor for SRP record propagation.
-        await asyncio.sleep(connect_max_time_seconds + fudge_factor_seconds)
+        log.info("Step #21: Awaiting device on SRP")
+        await self.wait_for_srp_addresses()
+        self.default_controller.ExpireSessions(self.dut_node_id)
         log.info("Step #21: Sleep completed for Thread network connection and SRP record propagation")
 
         # THREAD_1ST Successfully connects to the DUT from previous step

@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2026 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,14 +52,6 @@ static_library("mt793x") {
     "SystemPlatformConfig.h",
   ]
 
-  if (chip_enable_ota_requestor) {
-    sources += [
-      "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
-    ]
-    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
-  }
-
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   public_deps += [ "${chip_root}/third_party/mt793x_sdk/mDNSResponder" ]
@@ -69,6 +61,14 @@ static_library("mt793x") {
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/platform/logging:headers",
   ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
+  }
 
   # mDNS
   if (chip_mdns == "platform") {
@@ -80,6 +80,10 @@ static_library("mt793x") {
       "ConnectivityManagerImpl_WIFI.cpp",
       "NetworkCommissioningWiFiDriver.cpp",
       "NetworkCommissioningWiFiDriver.h",
+      "route_hook/mtk_route_hook.c",
+      "route_hook/mtk_route_hook.h",
+      "route_hook/mtk_route_table.c",
+      "route_hook/mtk_route_table.h",
     ]
   }
 }
