@@ -73,6 +73,7 @@ matter_add_flags(-DNL_ASSERT_USE_FLAGS_DEFAULT=1)
 zephyr_include_directories(
     ${CHIP_ROOT}/src/platform/realtek/zephyr
     ${ZEPHYR_BASE}/../modules/crypto/mbedtls/library/
+    ${ZEPHYR_BASE}/../realtek-zephyr-project/applications/matter_common
 )
 
 if (CONFIG_BOARD_RTL87X3G_EVB)
