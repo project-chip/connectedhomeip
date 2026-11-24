@@ -66,9 +66,7 @@
 #if (OTA_SUPPORT == 1)
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #endif /* (OTA_SUPPORT == 1) */
-// #if (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
-// #include <app/icd/server/ICDManager.h>
-// #endif /* (CHIP_CONFIG_ENABLE_ICD_SERVER == 1) */
+
 
 #include "app_bsp.h"
 #include "app_conf.h"
@@ -118,9 +116,6 @@ static bool sGenericSwitchLongPressActive = false;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
-namespace {
-constexpr chip::EndpointId kGenericSwitchEndpoint = 1;
-} // namespace
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -197,6 +192,7 @@ CHIP_ERROR AppTask::Init()
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    constexpr int extDiscTimeoutSecs = 30;
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
 #endif
 
@@ -238,14 +234,12 @@ CHIP_ERROR AppTask::Init()
     }
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     static SoftwareDiagnosticsTestEventTriggerHandler sSoftwareDiagnosticsTestEventTriggerHandler;
-    err = sTestEventTriggerDelegate.AddHandler(&sSoftwareDiagnosticsTestEventTriggerHandler);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sSoftwareDiagnosticsTestEventTriggerHandler)== CHIP_NO_ERROR);
 #if (OTA_SUPPORT == 1)
     static OTATestEventTriggerHandler sOTATestEventTriggerHandler;
-    err = sTestEventTriggerDelegate.AddHandler(&sOTATestEventTriggerHandler);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOTATestEventTriggerHandler)== CHIP_NO_ERROR);
 #endif /* (OTA_SUPPORT == 1) */
-#if (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
-    err = sTestEventTriggerDelegate.AddHandler(&Server::GetInstance().GetICDManager());
-#endif /* (CHIP_CONFIG_ENABLE_ICD_SERVER == 1) */
+    
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -426,10 +420,6 @@ void AppTask::ButtonEventHandler(ButtonDesc_t * Button)
         }
         sAppTask.PostEvent(&event);
     }
-    else
-    {
-        return;
-    }
 }
 #endif /* (CFG_JOYSTICK_SUPPORTED ==1) */
 
@@ -460,13 +450,6 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-/**
- * Update cluster status after application level changes
- */
-void AppTask::UpdateClusterState(void)
-{
-    ChipLogProgress(NotSpecified, "UpdateClusterState");
-}
 
 void AppTask::UpdateNvmEventHandler(AppEvent * aEvent)
 {
@@ -557,6 +540,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
     case DeviceEventType::kCommissioningComplete: {
         sFabricNeedSaved = true;
         sHaveFabric      = true;
+        sFailCommissioning = false;
 
         if (sHaveBLEConnections == false)
         {
@@ -603,15 +587,15 @@ void AppTask::UpdateLCD(void)
         BSP_LCD_Refresh(LCD1);
         UTIL_LCD_DisplayStringAt(0, LINE(1), (uint8_t *) "BLE Connected", LEFT_MODE);
     }
-    if (sHaveFabric)
+    else if (sHaveFabric)
     {
         UTIL_LCD_ClearStringLine(1);
         BSP_LCD_Refresh(LCD1);
         UTIL_LCD_DisplayStringAt(0, LINE(1), (uint8_t *) "Fabric Created", LEFT_MODE);
     }
-    if (sFailCommissioning == true)
+    else if (sFailCommissioning == true)
     {
-        UTIL_LCD_DisplayStringAt(0, LINE(1), (uint8_t *) "", LEFT_MODE);
+        UTIL_LCD_ClearStringLine(1);
         BSP_LCD_Refresh(LCD1);
         UTIL_LCD_DisplayStringAt(0, LINE(1), (uint8_t *) "Fabric Failed", LEFT_MODE);
     }

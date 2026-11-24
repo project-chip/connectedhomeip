@@ -114,10 +114,10 @@ stm32_executable("lighting_app") {
 
   sources = [
     "${stm32_app_common}/App/Src/app_entry.cpp",
+    "${examples_plat_dir}/STM32WBA65I-DK1/Common/Src/SoftwareDiagnosticsTestEventTriggerHandler.cpp",
     "src/AppTask.cpp",
     "src/IdentifierEffect.cpp",
     "src/LightingManager.cpp",
-    "src/SoftwareDiagnosticsTestEventTriggerHandler.cpp",
     "src/ZclCallbacks.cpp",
   ]
 
@@ -132,7 +132,6 @@ stm32_executable("lighting_app") {
 
   public = [
     "${chip_root}/src/platform/stm32/stm32wba/FactoryDataProvider.h",
-    "${chip_root}/src/platform/stm32/stm32wba/OTAImageProcessorImpl.h",
   ]
 
   # Add the startup file to the target
@@ -160,6 +159,9 @@ stm32_executable("lighting_app") {
       "${stm32_oemirot_ns_app}/Core/Src/system_stm32wbaxx.c",
       "src/ota.cpp",
     ]
+    public += [
+    "${chip_root}/src/platform/stm32/stm32wba/OTAImageProcessorImpl.h",
+  ]
   } else {
     sources += [
       "${stm32_app_src}/Src/main.c",

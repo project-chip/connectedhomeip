@@ -34,9 +34,9 @@ class stm32App(Enum):
 
     def AppNamePrefix(self):
         if self == stm32App.LIGHT:
-            return 'chip-stm32-lighting-example'
+            return 'STM32WBA65I-DK1-lighting'
         if self == stm32App.LIT:
-            return 'chip-stm32-lit-example'
+            return 'STM32WBA65I-DK1-lit-icd-app'
         raise Exception(f'Unknown app type: {self!r}')
 
     def FlashBundleName(self):
@@ -72,10 +72,8 @@ class stm32Builder(GnBuilder):
         self.board = board
         self.app = app
 
-        stm32App = self.app.ExampleName()
         stm32_chip = self.board.GetIC()
         self.extra_gn_options = [f'stm32_board="{stm32_chip}"']
-        self.extra_gn_options.append(f'stm32_app="{stm32App}"')
 
         self.extra_gn_options.append('chip_config_network_layer_ble=true')
         self.extra_gn_options.append('treat_warnings_as_errors=false')

@@ -29,6 +29,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/switch-server/switch-server.h>
+#include <app/icd/server/ICDNotifier.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
@@ -107,7 +108,6 @@ void GenericSwitchManager::GenericSwitchWorkerFunction(intptr_t context)
 
     CHIP_ERROR err                = CHIP_NO_ERROR;
     GenericSwitchEventData * data = reinterpret_cast<GenericSwitchEventData *>(context);
-    LOG_ERROR_APP("P5 Worker: event=%lu endpoint=%u\n", (unsigned long) data->event, (unsigned int) data->endpoint);
 
     switch (data->event)
     {
@@ -116,8 +116,11 @@ void GenericSwitchManager::GenericSwitchWorkerFunction(intptr_t context)
 
         if (auto * switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint))
         {
-            err = switchCluster->SetCurrentPosition(currentPosition);
-            switchCluster->OnInitialPress(currentPosition);
+            if(switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
+            {
+                switchCluster->OnInitialPress(currentPosition);
+            }
+            ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
         }
         break;
     }
@@ -136,8 +139,10 @@ void GenericSwitchManager::GenericSwitchWorkerFunction(intptr_t context)
 
         if (auto * switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint))
         {
-            err = switchCluster->SetCurrentPosition(currentPosition);
-            switchCluster->OnShortRelease(previousPosition);
+            if(switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
+            {
+                switchCluster->OnShortRelease(previousPosition);
+            }
         }
         break;
     }
@@ -147,8 +152,10 @@ void GenericSwitchManager::GenericSwitchWorkerFunction(intptr_t context)
 
         if (auto * switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint))
         {
-            err = switchCluster->SetCurrentPosition(currentPosition);
-            switchCluster->OnLongRelease(previousPosition);
+            if(switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
+            {
+               switchCluster->OnLongRelease(previousPosition);
+            }
         }
         break;
     }

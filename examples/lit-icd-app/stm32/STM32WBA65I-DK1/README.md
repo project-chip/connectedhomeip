@@ -58,7 +58,7 @@ The LIT ICD timing values documented for this example are:
 | `CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS`  | 5,000 ms | Active-mode threshold     |
 
 In the STM32 project, these timing macros are defined in
-`Middlewares/Third_Party/connectedhomeip/src/platform/stm32/stm32wba/CHIPDevicePlatformConfig.h`.
+`src/platform/stm32/stm32wba/CHIPDevicePlatformConfig.h`.
 
 The ICD Management cluster is separate from the Switch cluster: ICD behavior
 controls how the device sleeps and becomes reachable, while Generic Switch

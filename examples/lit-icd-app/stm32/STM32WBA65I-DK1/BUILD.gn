@@ -34,14 +34,6 @@ declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
 
-  # Monitor & log memory usage at runtime.
-  enable_heap_monitoring = true
-
-  # Enable Sleepy end device
-  enable_sleepy_device = false
-
-  # OTA timeout in seconds
-  OTA_periodic_query_timeout = 86400
 }
 
 # Sanity check
@@ -64,7 +56,6 @@ stm32_sdk("sdk") {
 
   defines = [
     "BOARD_ID=${stm32_board}",
-    "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
     "STM32STORE_MAX_KEY_SIZE=75",
   ]
 }
@@ -83,10 +74,10 @@ stm32_executable("lit_icd_app") {
     "${stm32_app_src}/Src/syscalls.c",
     "${stm32_app_src}/Src/sysmem.c",
     "${stm32_app_src}/Src/system_stm32wbaxx.c",
+    "${examples_plat_dir}/STM32WBA65I-DK1/Common/Src/SoftwareDiagnosticsTestEventTriggerHandler.cpp",
     "src/AppTask.cpp",
     "src/GenericSwitchManager.cpp",
     "src/IdentifierEffect.cpp",
-    "src/SoftwareDiagnosticsTestEventTriggerHandler.cpp",
     "src/ZclCallbacks.cpp",
   ]
 
@@ -101,7 +92,6 @@ stm32_executable("lit_icd_app") {
 
   public = [
     "${chip_root}/src/platform/stm32/stm32wba/FactoryDataProvider.h",
-    "${chip_root}/src/platform/stm32/stm32wba/OTAImageProcessorImpl.h",
   ]
 
   sources += [

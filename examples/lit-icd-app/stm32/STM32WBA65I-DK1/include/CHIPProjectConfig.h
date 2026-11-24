@@ -52,7 +52,6 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x8004: example lighting app
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8004
 
@@ -92,13 +91,6 @@
  */
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
 
-// For convenience, enable Chip Security Test Mode and disable the requirement for
-// authentication in various protocols.
-//
-//    WARNING: These options make it possible to circumvent basic Chip security functionality,
-//    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
-//
-#define CHIP_CONFIG_SECURITY_TEST_MODE 0
 #define CHIP_CONFIG_REQUIRE_AUTH 1
 
 /**
@@ -185,12 +177,6 @@
 // Enable subscriptions synchronization
 #define CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED 0
 
-/**
- * CHIP_CONFIG_ENABLE_ICD_SERVER
- *
- * Enable ICD management
- */
-#define CHIP_CONFIG_ENABLE_ICD_SERVER 1 // set to 1 for GenericSwitch-App
 #define CHIP_DEVICE_CONFIG_ENABLE_SED 1 // to enable SED feature
 
 #endif /* CHIPPROJECTCONFIG_H */

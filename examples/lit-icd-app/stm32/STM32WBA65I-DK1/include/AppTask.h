@@ -38,7 +38,6 @@ public:
     CHIP_ERROR Init();
     static void AppTaskMain(void * pvParameter);
     void PostEvent(const AppEvent * event);
-    void UpdateClusterState();
     CHIP_ERROR InitMatter(void);
     static void ButtonEventHandler(ButtonDesc_t * Button);
 
@@ -47,11 +46,7 @@ protected:
 
 private:
     friend AppTask & GetAppTask(void);
-    void CancelTimer(void);
     void DispatchEvent(AppEvent * event);
-    static void FunctionHandler(AppEvent * aEvent);
-
-    static void TimerEventHandler(TimerHandle_t xTimer);
     static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     static void UpdateLCD(void);
     static void UpdateNvmEventHandler(AppEvent * aEvent);
@@ -60,8 +55,6 @@ private:
     enum Function_t
     {
         kFunction_NoneSelected   = 0,
-        kFunction_SoftwareUpdate = 0,
-        kFunction_Joiner         = 1,
         kFunction_SaveNvm        = 2,
         kFunction_FactoryReset   = 3,
         kFunction_ShortRelease   = 4,
@@ -73,9 +66,6 @@ private:
     } Function;
 
     Function_t mFunction;
-    bool mFunctionTimerActive;
-    bool mSyncClusterToButtonAction;
-
     static AppTask sAppTask;
 };
 

@@ -32,8 +32,6 @@ public:
         chip::EventId event;
     };
 
-    CHIP_ERROR Init(chip::EndpointId genericSwitchEndpoint);
-
     void GenericSwitchOnInitialPress();
     void GenericSwitchOnShortRelease();
     void GenericSwitchOnLongRelease();

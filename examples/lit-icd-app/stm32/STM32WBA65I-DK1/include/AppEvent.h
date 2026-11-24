@@ -34,8 +34,6 @@ struct AppEvent
     {
         kEventType_Button = 0,
         kEventType_Timer,
-        kEventType_Level,
-        kEventType_Install,
     };
 
     uint16_t Type;
@@ -51,11 +49,6 @@ struct AppEvent
         {
             void * Context;
         } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Color;
-        } LightingEvent;
     };
 
     EventHandler Handler;
