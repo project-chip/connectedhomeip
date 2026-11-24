@@ -151,8 +151,8 @@ function __cirquetest_start_flask() {
             echo "Flask process $FLASK_PID exited before becoming ready"
             return 1
         fi
-        if __cirquetest_pid_owns_port_5000 "$FLASK_PID" \
-            && curl -sf --max-time 5 http://127.0.0.1:5000/get_homes >/dev/null 2>&1; then
+        if __cirquetest_pid_owns_port_5000 "$FLASK_PID" &&
+            curl -sf --max-time 5 http://127.0.0.1:5000/get_homes >/dev/null 2>&1; then
             return 0
         fi
         sleep 1
