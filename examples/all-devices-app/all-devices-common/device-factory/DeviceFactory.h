@@ -612,7 +612,7 @@ private:
         {
             RegisterCreator("device-energy-management", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<EnergyManagement>(mContext->timerDelegate);
+                return MakeDevice<EnergyManagement>();
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DIMMABLE_LIGHT)

@@ -66,7 +66,7 @@ Clusters::TemperatureMeasurementCluster::StartupConfiguration InverterTemperatur
 SimulatedSolarPower::SimulatedSolarPower(const Context & context, const Config & config) :
     SolarPower(), mTimerDelegate(context.timerDelegate), mTags(config.tags),
     mOutputElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, AcOutputTag(), config.outputSensorRole),
-    mPanelCount(config.panels.size()), mEnergyManagement(context.timerDelegate, SolarPowerEnergyManagementConfig()),
+    mPanelCount(config.panels.size()), mEnergyManagement(SolarPowerEnergyManagementConfig()),
     mInverterTemperatureSensor(context.timerDelegate, InverterTemperatureConfig())
 {
     VerifyOrDie(mPanelCount <= kMaxPanelCount);

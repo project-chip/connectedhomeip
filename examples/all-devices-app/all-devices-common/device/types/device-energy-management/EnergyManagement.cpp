@@ -32,11 +32,10 @@ constexpr Structs::PowerAdjustStruct::Type kDefaultPowerAdjustEntry = {
 
 namespace chip::app {
 
-EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate) : EnergyManagement(timerDelegate, Config{}) {}
+EnergyManagement::EnergyManagement() : EnergyManagement(Config{}) {}
 
-EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate, Config config) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDeviceEnergyManagement, 1)),
-    mTimerDelegate(timerDelegate), mConfig(config)
+EnergyManagement::EnergyManagement(Config config) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDeviceEnergyManagement, 1)), mConfig(config)
 {
     if (!mConfig.featureFlags.Has(Feature::kPowerAdjustment))
     {
@@ -57,9 +56,6 @@ CHIP_ERROR EnergyManagement::Register(EndpointId endpoint, CodeDrivenDataModelPr
 
     mProvider = &provider;
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
-
-    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
-    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     Clusters::DeviceEnergyManagementCluster::Config config(endpoint, mConfig.featureFlags, *this);
     mDemCluster.Create(config);
@@ -85,12 +81,6 @@ void EnergyManagement::Unregister(CodeDrivenDataModelProvider & provider)
     {
         LogErrorOnFailure(provider.RemoveCluster(&mDemCluster.Cluster()));
         mDemCluster.Destroy();
-    }
-
-    if (mIdentifyCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
-        mIdentifyCluster.Destroy();
     }
 }
 

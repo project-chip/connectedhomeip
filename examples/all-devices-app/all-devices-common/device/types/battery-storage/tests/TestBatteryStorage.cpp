@@ -422,8 +422,7 @@ TEST_F(BatteryStorageTestFixture, RegistersRequiredTopologyAndDeviceTypes)
     ExpectSingleDeviceType(mProvider, batterySourceEndpoint, Device::Type::kPowerSource);
 
     ExpectServerClusters(mProvider, parentEndpoint, { Clusters::Descriptor::Id, Clusters::Identify::Id });
-    ExpectServerClusters(mProvider, energyEndpoint,
-                         { Clusters::Descriptor::Id, Clusters::Identify::Id, Clusters::DeviceEnergyManagement::Id });
+    ExpectServerClusters(mProvider, energyEndpoint, { Clusters::Descriptor::Id, Clusters::DeviceEnergyManagement::Id });
     for (EndpointId sensorEndpoint : { gridSensorEndpoint, batterySensorEndpoint })
     {
         ExpectServerClusters(mProvider, sensorEndpoint,

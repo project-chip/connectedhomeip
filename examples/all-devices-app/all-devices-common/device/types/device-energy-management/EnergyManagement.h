@@ -17,10 +17,8 @@
 #pragma once
 
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementCluster.h>
-#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <device/api/SingleEndpoint.h>
-#include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
@@ -37,8 +35,8 @@ public:
         bool esaCanGenerate                                   = false;
     };
 
-    explicit EnergyManagement(TimerDelegate & timerDelegate);
-    explicit EnergyManagement(TimerDelegate & timerDelegate, Config config);
+    EnergyManagement();
+    explicit EnergyManagement(Config config);
     ~EnergyManagement() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -80,13 +78,11 @@ public:
     CHIP_ERROR SetESAState(Clusters::DeviceEnergyManagement::ESAStateEnum state) override;
 
     // Public getters for programmatic control
-    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::DeviceEnergyManagementCluster & EnergyManagementCluster() { return mDemCluster.Cluster(); }
 
 private:
     CHIP_ERROR SetPowerAdjustmentCause(Clusters::DeviceEnergyManagement::PowerAdjustReasonEnum cause);
 
-    TimerDelegate & mTimerDelegate;
     Config mConfig;
     CodeDrivenDataModelProvider * mProvider                  = nullptr;
     Clusters::DeviceEnergyManagement::ESAStateEnum mESAState = Clusters::DeviceEnergyManagement::ESAStateEnum::kOnline;
@@ -94,7 +90,6 @@ private:
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type> mForecast;
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::Type> mPowerRangeAdjustment;
 
-    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::DeviceEnergyManagementCluster> mDemCluster;
 };
 
