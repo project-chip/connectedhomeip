@@ -52,6 +52,7 @@
 #include <device/types/flow-sensor/FlowSensor.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
 #include <device/types/generic-switch/GenericSwitch.h>
+#include <device/types/heat-pump/impl/SimulatedHeatPump.h>
 #include <device/types/humidity-conditioner/impl/LoggingHumidityConditioner.h>
 #include <device/types/humidity-sensor/HumiditySensor.h>
 #include <device/types/humidity-sensor/impl/IncreasingHumiditySensor.h>
@@ -1184,6 +1185,31 @@ private:
             RegisterCreator("water-valve", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<LoggingWaterValve>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_HEAT_PUMP)
+        {
+            auto makeHeatPump = [this](SimulatedHeatPump::ThermostatControl thermostatControl) {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedHeatPump>(
+                    SimulatedHeatPump::Context{
+                        .timerDelegate            = mContext->timerDelegate,
+                        .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                        .identifyDelegate         = mContext->identifyDelegate,
+                        .fabricTable              = mContext->fabricTable,
+                        .groupDataProvider        = mContext->groupDataProvider,
+                        .platformManager          = mContext->platformManager,
+                        .bindingTable             = mContext->bindingTable,
+                        .bindingManager           = mContext->bindingManager,
+                        .bindingHandler           = mContext->bindingHandler,
+                    },
+                    thermostatControl);
+            };
+            RegisterCreator("heat-pump", [makeHeatPump]() {
+                return makeHeatPump(SimulatedHeatPump::ThermostatControl::kThermostatEndpoint);
+            });
+            RegisterCreator("heat-pump-thermostat-client", [makeHeatPump]() {
+                return makeHeatPump(SimulatedHeatPump::ThermostatControl::kThermostatClient);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_CONDITIONER)
