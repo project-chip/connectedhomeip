@@ -76,7 +76,6 @@ END_DEVICE_DIAG_CMDS = (
 )
 TBR_DIAG_CMDS = (
     'cat /tmp/otbr-agent.log',
-    'cat /tmp/srp_bridger.log',
     'cat /etc/avahi/services/*',
     'cat /etc/avahi/hosts',
     'ip -6 route show table all',
@@ -107,14 +106,15 @@ ANDROID_FULL_LOGCAT_CMD = 'adb logcat -d -v threadtime'
 #   - Operational discovery: THREAD_END_DEVICE_JOINER_HELPER waits for the
 #     end device to attach, reads its operational instance name from
 #     /tmp/chip-all-clusters.log and registers it with `ot-ctl srp client`;
-#     srp_bridger on the ThreadBorderRouter copies SRP server services into
-#     /etc/avahi/hosts and /etc/avahi/services for Avahi to publish.
+#     the ThreadBorderRouter runs `otbr-agent -I wpan0 -B wlan0` and publishes
+#     SRP services via OpenThread's native SRP Advertising Proxy over Avahi.
 #   - Android IPv6 routing: static fd11:22::3/64 nodad on wlan0;
 #     fdde:ad00:beef:0::/64 via fd11:22::2 in the main, wlan0 and eth0
 #     routing tables; ff02::fb/128 dev wlan0 in table eth0.
-#   - CHIPEndDevice routing: fd11:22::/64 dev wpan0 once attached (the route
-#     the ThreadBorderRouter publishes in Network Data, which otbr-agent does
-#     not install into the kernel).
+#   - CHIPEndDevice routing: fallback `fd11:22::/64 dev wpan0` once attached
+#     when not already installed by otbr-agent (automatic once
+#     chip-cirque-device-base is rebuilt with
+#     OT_POSIX_INSTALL_EXTERNAL_ROUTES=ON).
 #   - ThreadBorderRouter addressing: static fd11:22::2/64 nodad on wlan0,
 #     fd11:33::1/64 on wpan0, ip6tables flushed with FORWARD ACCEPT, and
 #     avahi-daemon reflecting between eth0, wlan0 and wpan0.
@@ -153,10 +153,12 @@ for _ in range(300):
     break
   time.sleep(0.4)
 
-# otbr-agent does not install Network Data external routes into the kernel
-# (OT_POSIX_INSTALL_EXTERNAL_ROUTES is OFF), so without this the replies to the
-# Android controller on the TBR's Wi-Fi prefix are dropped with ENETUNREACH.
-print("[SRP-Shim] route: " + sh("ip -6 route replace fd11:22::/64 dev wpan0 && ip -6 route get fd11:22::3"), flush=True)
+# Fallback when chip-cirque-device-base was built without
+# OT_POSIX_INSTALL_EXTERNAL_ROUTES=ON (once rebuilt, otbr-agent installs
+# Network Data external routes automatically and this branch is skipped).
+if "fd11:22::/64" not in sh("ip -6 route show dev wpan0"):
+  sh("ip -6 route replace fd11:22::/64 dev wpan0")
+print("[SRP-Shim] route: " + sh("ip -6 route get fd11:22::3"), flush=True)
 
 # Get instance name from logs
 instance_name = None
@@ -426,9 +428,14 @@ class TestAndroidBleThreadMobileDevice(CHIPVirtualHome):
                     ' 2>/dev/null || true; fi; if ! pidof avahi-daemon >/dev/null; then'
                     ' avahi-daemon --daemonize --no-drop-root 2>/dev/null || true; else'
                     ' kill -HUP $(cat /var/run/avahi-daemon/pid 2>/dev/null)'
-                    ' 2>/dev/null || true; fi; killall -9 ot-rcp otbr-agent 2>/dev/null'
-                    ' || true; otbr-agent -I wpan0 spinel+hdlc+uart:///dev/ttyUSB0'
-                    ' >/tmp/otbr-agent.log 2>&1 &"',
+                    ' 2>/dev/null || true; fi;'
+                    ' kill -9 $(pidof otbr-agent 2>/dev/null) 2>/dev/null || true;'
+                    ' sleep 0.5;'
+                    ' otbr-agent -I wpan0 -B wlan0 -d 6 -v -s'
+                    " spinel+hdlc+uart:/''/''/dev/ttyUSB0"
+                    ' >/tmp/otbr-agent.log 2>&1 &'
+                    ' for i in 1 2 3 4 5 6 7 8 9 10; do'
+                    ' ot-ctl state >/dev/null 2>&1 && break; sleep 0.5; done"',
                 )
             else:
                 # CHIPEndDevice (pure BLE+Thread without wlan0)
@@ -579,69 +586,7 @@ class TestAndroidBleThreadMobileDevice(CHIPVirtualHome):
                 tbr_id, 'sh -c "ot-ctl srp server enable 2>/dev/null || true"'
             )
 
-            # 5. Start SRP to Avahi bridger on TBR
-            srp_bridger = r'''
-import time, subprocess, re, os
-while True:
-  try:
-    out = subprocess.check_output("ot-ctl srp server service", shell=True).decode("utf-8")
-    blocks = out.split("\n\n")
-    for block in blocks:
-      if "_matter._tcp" not in block: continue
-      lines = block.split("\n")
-      instance = None
-      port = 5540
-      ip = None
-      for line in lines:
-        if line.strip().startswith("port:"): port = int(line.split(":")[1].strip())
-        if line.strip().startswith("host:"): instance = line.split(":", 1)[1].strip()
-        if line.strip().startswith("addresses:"):
-          m = re.search(r"\[(fd[^\]]+)\]", line)
-          if m and "ff:fe00" not in m.group(1): ip = m.group(1)
-      if instance and ip:
-        short_inst = instance.split(".")[0]
-        host_name = f"{short_inst}.local"
-        with open(f"/etc/avahi/hosts", "a+") as f:
-          f.seek(0)
-          if ip not in f.read():
-            f.write(f"\n{ip} {host_name}\n")
-        svc_path = f"/etc/avahi/services/srp_{short_inst}.service"
-        if not os.path.exists(svc_path):
-          sub_id = short_inst.split("-")[0]
-          xml = f"""<?xml version="1.0" standalone='no'?>
-<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
-<service-group>
-  <name replace-wildcards="yes">{short_inst}</name>
-  <service>
-    <type>_matter._tcp</type>
-    <port>{port}</port>
-    <host-name>{host_name}</host-name>
-    <txt-record>SII=500</txt-record>
-    <txt-record>SAI=300</txt-record>
-    <txt-record>T=1</txt-record>
-  </service>
-</service-group>
-"""
-          with open(svc_path, "w") as f:
-            f.write(xml)
-          subprocess.run("kill -HUP $(cat /var/run/avahi-daemon/pid 2>/dev/null) 2>/dev/null || true", shell=True, check=False)
-          print(f"Bridged {short_inst} ({ip}:{port}) to Avahi", flush=True)
-  except Exception as e:
-    print("Error:", e)
-  time.sleep(2)
-'''
-            b64_bridger = base64.b64encode(srp_bridger.encode('utf-8')).decode(
-                'ascii'
-            )
-            self.execute_device_cmd(
-                tbr_id,
-                f'sh -c "echo \\"{b64_bridger}\\" | base64 -d > /tmp/srp_bridger.py'
-                ' && nohup python3 -u /tmp/srp_bridger.py > /tmp/srp_bridger.log'
-                ' 2>&1 &"',
-            )
-            time.sleep(2)
-
-            # 6. Extract active dataset
+            # 5. Extract active dataset
             active_dataset = self._get_tbr_active_dataset(tbr_id)
             self.logger.info(
                 'ThreadBorderRouter %s active dataset: %s', tbr_id, active_dataset
