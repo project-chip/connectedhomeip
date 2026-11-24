@@ -125,7 +125,6 @@ CPUcontextRestore:
         MOV    SP, R4                  /* restore the SP from R4 */
         POP    { R4 - R12, PC }        /* load R4 to R12 and PC (10 words) from C stack */
 
-  .global backup_system_register
   .type backup_system_register, %function
 backup_system_register:
 /* R0 -> register_backup_table array current item address */
@@ -153,7 +152,6 @@ backup_loop_iter:
 backup_loop_end:
         BX LR                                    /* Return to caller */
 
-  .global restore_system_register
   .type restore_system_register, %function
 restore_system_register:
 /* R0 -> register_backup_table array current item address */
@@ -193,3 +191,4 @@ restore_loop_end:
         BX LR                                    /* Return to caller */
 /* end of specific code section for standby */
         .end
+
