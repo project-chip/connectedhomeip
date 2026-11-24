@@ -113,8 +113,8 @@ stm32_executable("lighting_app") {
   defines = []
 
   sources = [
-    "${stm32_app_common}/App/Src/app_entry.cpp",
     "${examples_plat_dir}/STM32WBA65I-DK1/Common/Src/SoftwareDiagnosticsTestEventTriggerHandler.cpp",
+    "${stm32_app_common}/App/Src/app_entry.cpp",
     "src/AppTask.cpp",
     "src/IdentifierEffect.cpp",
     "src/LightingManager.cpp",
@@ -130,9 +130,7 @@ stm32_executable("lighting_app") {
     app_data_model,
   ]
 
-  public = [
-    "${chip_root}/src/platform/stm32/stm32wba/FactoryDataProvider.h",
-  ]
+  public = [ "${chip_root}/src/platform/stm32/stm32wba/FactoryDataProvider.h" ]
 
   # Add the startup file to the target
   # OEMiROT TrustZone NonSecure configuration
@@ -159,9 +157,8 @@ stm32_executable("lighting_app") {
       "${stm32_oemirot_ns_app}/Core/Src/system_stm32wbaxx.c",
       "src/ota.cpp",
     ]
-    public += [
-    "${chip_root}/src/platform/stm32/stm32wba/OTAImageProcessorImpl.h",
-  ]
+    public +=
+        [ "${chip_root}/src/platform/stm32/stm32wba/OTAImageProcessorImpl.h" ]
   } else {
     sources += [
       "${stm32_app_src}/Src/main.c",

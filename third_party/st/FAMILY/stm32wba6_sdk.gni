@@ -326,7 +326,6 @@ INCLUDE_DIRS = [
   "${stm32_wb_sdk}/CMSIS/RTOS2/Include",
 ]
 
-
 DEFINES = [
   "CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>",
   "CHIP_HAVE_CONFIG_H",

@@ -33,7 +33,6 @@ app_data_model =
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
-
 }
 
 # Sanity check
@@ -67,6 +66,7 @@ stm32_executable("lit_icd_app") {
   defines = []
 
   sources = [
+    "${examples_plat_dir}/STM32WBA65I-DK1/Common/Src/SoftwareDiagnosticsTestEventTriggerHandler.cpp",
     "${stm32_app_common}/App/Src/app_entry.cpp",
     "${stm32_app_src}/Src/main.c",
     "${stm32_app_src}/Src/stm32wbaxx_hal_msp.c",
@@ -74,7 +74,6 @@ stm32_executable("lit_icd_app") {
     "${stm32_app_src}/Src/syscalls.c",
     "${stm32_app_src}/Src/sysmem.c",
     "${stm32_app_src}/Src/system_stm32wbaxx.c",
-    "${examples_plat_dir}/STM32WBA65I-DK1/Common/Src/SoftwareDiagnosticsTestEventTriggerHandler.cpp",
     "src/AppTask.cpp",
     "src/GenericSwitchManager.cpp",
     "src/IdentifierEffect.cpp",
@@ -90,9 +89,7 @@ stm32_executable("lit_icd_app") {
     app_data_model,
   ]
 
-  public = [
-    "${chip_root}/src/platform/stm32/stm32wba/FactoryDataProvider.h",
-  ]
+  public = [ "${chip_root}/src/platform/stm32/stm32wba/FactoryDataProvider.h" ]
 
   sources += [
     "${examples_plat_dir}/startup_files/startup_stm32wba65xx.s",
