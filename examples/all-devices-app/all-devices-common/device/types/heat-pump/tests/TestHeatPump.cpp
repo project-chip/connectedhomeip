@@ -17,6 +17,7 @@
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/types/heat-pump/impl/OOBAccessors.h>
 #include <device/types/heat-pump/impl/SimulatedHeatPump.h>
+#include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -26,8 +27,10 @@
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/Identify/ClusterId.h>
 #include <clusters/OnOff/Commands.h>
+#include <clusters/PowerSource/ClusterId.h>
 #include <clusters/Thermostat/ClusterId.h>
 #include <clusters/Thermostat/Commands.h>
+#include <clusters/UserLabel/ClusterId.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
@@ -99,6 +102,28 @@ std::vector<ClusterId> GetServerClusters(CodeDrivenDataModelProvider & provider,
     }
     std::sort(clusters.begin(), clusters.end());
     return clusters;
+}
+
+bool HasTagList(CodeDrivenDataModelProvider & provider, EndpointId endpoint)
+{
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
+    EXPECT_SUCCESS(provider.Attributes(ConcreteClusterPath(endpoint, Clusters::Descriptor::Id), builder));
+    const auto attributes = builder.TakeBuffer();
+    return std::any_of(attributes.begin(), attributes.end(),
+                       [](const auto & entry) { return entry.attributeId == Clusters::Descriptor::Attributes::TagList::Id; });
+}
+
+EndpointId FindEndpointWithServerCluster(CodeDrivenDataModelProvider & provider, ClusterId clusterId)
+{
+    for (const auto & entry : GetEndpoints(provider))
+    {
+        const auto clusters = GetServerClusters(provider, entry.id);
+        if (std::find(clusters.begin(), clusters.end(), clusterId) != clusters.end())
+        {
+            return entry.id;
+        }
+    }
+    return kInvalidEndpointId;
 }
 
 std::vector<ClusterId> GetClientClusters(const DeviceInterface & device)
@@ -173,6 +198,7 @@ protected:
             .testEventTriggerDelegate = mTestEventTriggerDelegate,
             .identifyDelegate         = mIdentifyDelegate,
             .fabricTable              = mFabricTable,
+            .deviceInfoProvider       = mDeviceInfoProvider,
             .groupDataProvider        = mGroupDataProvider,
             .platformManager          = DeviceLayer::PlatformMgr(),
             .bindingTable             = mBindingManager.GetBindingTable(),
@@ -187,6 +213,7 @@ protected:
     SimpleTestEventTriggerDelegate mTestEventTriggerDelegate;
     NoopIdentifyDelegate mIdentifyDelegate;
     FabricTable mFabricTable;
+    DeviceLayer::AllDevicesExampleDeviceInfoProviderImpl mDeviceInfoProvider;
     Credentials::GroupDataProviderImpl mGroupDataProvider;
     Clusters::Binding::Manager mBindingManager;
     BindingHandler mBindingHandler;
@@ -220,11 +247,16 @@ TEST_F(TestHeatPump, ThermostatEndpointVariantComposesThermostatChild)
               (std::vector<ClusterId>{ Clusters::Identify::Id, Clusters::Descriptor::Id }));
     EXPECT_TRUE(GetClientClusters(heatPump).empty());
 
-    const auto thermostatEndpoint = std::find_if(endpoints.begin(), endpoints.end(), [this](const auto & entry) {
-        const auto clusters = GetServerClusters(mProvider, entry.id);
-        return std::find(clusters.begin(), clusters.end(), Clusters::Thermostat::Id) != clusters.end();
-    });
-    EXPECT_NE(thermostatEndpoint, endpoints.end());
+    // Heat Pump component requirements: Thermostat has a TagList and User Label; Power Source has a TagList.
+    const EndpointId thermostatEndpoint = FindEndpointWithServerCluster(mProvider, Clusters::Thermostat::Id);
+    ASSERT_NE(thermostatEndpoint, kInvalidEndpointId);
+    EXPECT_TRUE(HasTagList(mProvider, thermostatEndpoint));
+    const auto thermostatClusters = GetServerClusters(mProvider, thermostatEndpoint);
+    EXPECT_NE(std::find(thermostatClusters.begin(), thermostatClusters.end(), Clusters::UserLabel::Id), thermostatClusters.end());
+
+    const EndpointId powerSourceEndpoint = FindEndpointWithServerCluster(mProvider, Clusters::PowerSource::Id);
+    ASSERT_NE(powerSourceEndpoint, kInvalidEndpointId);
+    EXPECT_TRUE(HasTagList(mProvider, powerSourceEndpoint));
 
     heatPump.Unregister(mProvider);
     EXPECT_TRUE(GetEndpoints(mProvider).empty());
@@ -255,12 +287,7 @@ TEST_F(TestHeatPump, ConfigTagsAreExposedOnDescriptor)
     ConsecutiveEndpointIdAllocator allocator;
     ASSERT_SUCCESS(heatPump.Register(allocator, mProvider));
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_SUCCESS(mProvider.Attributes(ConcreteClusterPath(heatPump.GetEndpointId(), Clusters::Descriptor::Id), attributes));
-    const auto attributeBuffer = attributes.TakeBuffer();
-    EXPECT_NE(std::find_if(attributeBuffer.begin(), attributeBuffer.end(),
-                           [](const auto & entry) { return entry.attributeId == Clusters::Descriptor::Attributes::TagList::Id; }),
-              attributeBuffer.end());
+    EXPECT_TRUE(HasTagList(mProvider, heatPump.GetEndpointId()));
 
     heatPump.Unregister(mProvider);
 }

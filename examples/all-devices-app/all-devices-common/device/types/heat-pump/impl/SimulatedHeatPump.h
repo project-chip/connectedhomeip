@@ -28,6 +28,7 @@
 #include <device/types/heat-pump/HeatPump.h>
 #include <device/types/thermostat/impl/LoggingThermostat.h>
 #include <lib/support/TimerDelegate.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/PlatformManager.h>
 
 #include <memory>
@@ -55,6 +56,7 @@ public:
         TestEventTriggerDelegate & testEventTriggerDelegate;
         Clusters::IdentifyDelegate & identifyDelegate;
         FabricTable & fabricTable;
+        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
         Credentials::GroupDataProvider & groupDataProvider;
         DeviceLayer::PlatformManager & platformManager;
         Clusters::Binding::Table & bindingTable;

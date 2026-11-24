@@ -1209,6 +1209,7 @@ private:
                         .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
                         .identifyDelegate         = mContext->identifyDelegate,
                         .fabricTable              = mContext->fabricTable,
+                        .deviceInfoProvider       = mContext->deviceInfoProvider,
                         .groupDataProvider        = mContext->groupDataProvider,
                         .platformManager          = mContext->platformManager,
                         .bindingTable             = mContext->bindingTable,

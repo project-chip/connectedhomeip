@@ -17,11 +17,22 @@
 #include "HeatPump.h"
 
 #include <clusters/Thermostat/ClusterId.h>
+#include <clusters/shared/Enums.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
+
+namespace {
+
+const EndpointComposition::SemanticTag kGridPowerSourceTag[] = {
+    { .mfgCode     = DataModel::NullNullable,
+      .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPowerSource),
+      .tag         = 0x01 },
+};
+
+} // namespace
 
 HeatPump::HeatPump(const Config & config, Parts parts) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kHeatPump, 1)), mConfig(config),
@@ -117,7 +128,9 @@ CHIP_ERROR HeatPump::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDa
 {
     const EndpointComposition child = EndpointComposition::WithParent(mEndpointId);
 
-    ReturnErrorOnFailure(mPowerSource->Register(allocator, provider, child));
+    ReturnErrorOnFailure(mPowerSource->Register(
+        allocator, provider,
+        EndpointComposition(mEndpointId, DataModel::EndpointCompositionPattern::kTree, Span(kGridPowerSourceTag))));
     ReturnErrorOnFailure(mEnergyManagement->Register(allocator, provider, child));
     ReturnErrorOnFailure(mElectricalSensor->Register(allocator, provider, child));
     return CHIP_NO_ERROR;

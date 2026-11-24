@@ -16,7 +16,9 @@
 
 #include <device/types/heat-pump/impl/SimulatedHeatPump.h>
 
+#include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <clusters/Thermostat/ClusterId.h>
+#include <clusters/shared/Enums.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/power-source/WiredPowerSource.h>
@@ -27,6 +29,45 @@ namespace app {
 namespace {
 
 const ClusterId kThermostatClientClusters[] = { Clusters::Thermostat::Id };
+
+const EndpointComposition::SemanticTag kThermostatTag[] = {
+    { .mfgCode     = DataModel::NullNullable,
+      .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kLocation),
+      .tag         = to_underlying(Clusters::Globals::LocationTag::kIndoor) },
+};
+
+/// Thermostat composed under a Heat Pump, which requires the User Label cluster.
+class HeatPumpThermostat : public LoggingThermostat
+{
+public:
+    HeatPumpThermostat(const Context & context, DeviceLayer::DeviceInfoProvider & deviceInfoProvider) :
+        LoggingThermostat(context), mDeviceInfoProvider(deviceInfoProvider)
+    {}
+
+protected:
+    CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override
+    {
+        ReturnErrorOnFailure(LoggingThermostat::RegisterAdditionalClusters(endpoint, provider));
+        mUserLabelCluster.Create(
+            endpoint,
+            Clusters::UserLabelCluster::Context{ .deviceInfoProvider = mDeviceInfoProvider, .fabricTable = GetFabricTable() });
+        return provider.AddCluster(mUserLabelCluster.Registration());
+    }
+
+    void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override
+    {
+        if (mUserLabelCluster.IsConstructed())
+        {
+            LogErrorOnFailure(provider.RemoveCluster(&mUserLabelCluster.Cluster()));
+            mUserLabelCluster.Destroy();
+        }
+        LoggingThermostat::UnregisterAdditionalClusters(provider);
+    }
+
+private:
+    DeviceLayer::DeviceInfoProvider & mDeviceInfoProvider;
+    LazyRegisteredServerCluster<Clusters::UserLabelCluster> mUserLabelCluster;
+};
 
 HeatPump::Parts MakeParts(const SimulatedHeatPump::Context & context)
 {
@@ -54,11 +95,13 @@ SimulatedHeatPump::SimulatedHeatPump(const Context & context, ThermostatControl 
 {
     if (mThermostatControl == ThermostatControl::kThermostatEndpoint)
     {
-        mThermostat = std::make_unique<LoggingThermostat>(LoggingThermostat::Context{
-            .fabricTable       = context.fabricTable,
-            .groupDataProvider = context.groupDataProvider,
-            .timerDelegate     = context.timerDelegate,
-        });
+        mThermostat = std::make_unique<HeatPumpThermostat>(
+            LoggingThermostat::Context{
+                .fabricTable       = context.fabricTable,
+                .groupDataProvider = context.groupDataProvider,
+                .timerDelegate     = context.timerDelegate,
+            },
+            context.deviceInfoProvider);
     }
 }
 
@@ -116,7 +159,8 @@ CHIP_ERROR SimulatedHeatPump::RegisterOptionalEndpoints(EndpointIdAllocator & al
                                                         EndpointId parent)
 {
     VerifyOrReturnError(mThermostat != nullptr, CHIP_NO_ERROR);
-    return mThermostat->Register(allocator.Allocate(), provider, EndpointComposition::WithParent(parent));
+    return mThermostat->Register(allocator.Allocate(), provider,
+                                 EndpointComposition(parent, DataModel::EndpointCompositionPattern::kTree, Span(kThermostatTag)));
 }
 
 void SimulatedHeatPump::UnregisterOptionalEndpoints(CodeDrivenDataModelProvider & provider)
