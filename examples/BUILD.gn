@@ -43,6 +43,7 @@ if (chip_build_tests) {
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/battery-storage/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/closure-controller/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/doorbell/tests",
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-energy-tariff/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/flow-sensor/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-sensor/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/light-sensor/tests",
