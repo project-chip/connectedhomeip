@@ -334,13 +334,13 @@ void VerifyCrossThreadRequestWake(LayerImplSelect & impl, SocketEventFlags flag)
     cv.notify_one();
 
     const auto start = System::SystemClock().GetMonotonicTimestamp();
+    System::Clock::Timestamp elapsed{};
     {
         DeviceLayer::StackUnlock unlock;
         impl.WaitForEvents();
+        elapsed = System::SystemClock().GetMonotonicTimestamp() - start;
+        worker.join();
     }
-    const auto elapsed = System::SystemClock().GetMonotonicTimestamp() - start;
-
-    worker.join();
     impl.HandleEvents();
     impl.EventSourceRemove(&timeoutSource);
 
