@@ -1803,21 +1803,20 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                             step_number_s10, notify_response_data, attempt)
             except TimeoutError:
                 # If was not able to read the pipe, just continue
-                logger.info("%s Not able to read from named pipe, retrying wait and then retry.", step_number_s10)
-            
-            # Check if the NamedPipe was able to retrieve the data if not continue.
-            if len(received_update_token) > 0 and received_software_version > 0:
-                break
-
-            # If the values read from the named pipe are not the appropiate wait some time until is ready.
-            remaining = pool_command_deadline - time.time()
-            if remaining <= 0:
-                logger.warning(
-                    '%s: Step #10.1 - 1%% has not been reached after %.0fs (last UpdateStateProgress=%s); '
-                    'continuing to kill the provider.',
-                    step_number_s10, progress_poll_timeout_sec, update_state_progress)
-                break
-            await asyncio.sleep(min(poll_command_interval_sec,remaining))
+                logger.info("%s - TimeoutError not able to read from named pipe.", step_number_s10)
+            else:
+                # Retrieved data check if is valida data.
+                if received_update_token is not None and len(received_update_token) > 0 and received_software_version is not None and received_software_version > 0:
+                    logger.info("%s - Retrieved data from named pipe at Attempt #%d",step_number_s10, attempt)
+                    break
+            finally:
+                # Wait some time to then try again.
+                remaining = pool_command_deadline - time.time()
+                if remaining <= 0:
+                    logger.warning(
+                        '%s: Step #10.1 - Unable to read the named pipe after %d seconds on Attempt #%s', step_number_s10, pool_command_timeout_sec, attempt)
+                    break
+                await asyncio.sleep(min(poll_command_interval_sec,remaining))
 
         # Compare the UpdateToken and Software Version with previously stored values.
         asserts.assert_equal(
@@ -1846,7 +1845,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             asserts.assert_equal(boot_reason, Clusters.GeneralDiagnostics.Enums.BootReasonEnum.kSoftwareUpdateCompleted,
                                 "BootReason is not SoftwareUpdateCompleted")
         else:
-            logger.info("%s Attribute BootReason (optional) from GeneralDiagnostics not found.", step_number_s11)
+            logger.info("%s Attribute BootReason (optional) from GeneralDiagnostics not found. Skipping step.", step_number_s11)
             self.mark_current_step_skipped()
 
         self.step(12)
