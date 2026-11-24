@@ -2339,6 +2339,246 @@ TEST_F(TestCodegenModelViaMocks, AAISkippedIfNoEmberMetadata)
     EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
 }
 
+namespace {
+
+constexpr uint32_t kInvokePayloadValue = 0x12345678;
+
+/// Reads context tag 0 (as uint32_t) out of a command payload positioned on the command structure.
+CHIP_ERROR ReadInvokePayloadValue(TLV::TLVReader & reader, uint32_t & value)
+{
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(reader.EnterContainer(outerType));
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(0)));
+    return reader.Get(value);
+}
+
+/// Server cluster that records the payload value it decodes from InvokeCommand.
+class PayloadDecodingServerCluster : public FakeDefaultServerCluster
+{
+public:
+    using FakeDefaultServerCluster::FakeDefaultServerCluster;
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override
+    {
+        mDecodeResult = ReadInvokePayloadValue(input_arguments, mDecodedValue);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    CHIP_ERROR mDecodeResult = CHIP_ERROR_INTERNAL;
+    uint32_t mDecodedValue   = 0;
+};
+
+/// Command handler that reads the payload and then leaves the command unhandled.
+class PayloadConsumingCommandHandler : public CommandHandlerInterface
+{
+public:
+    PayloadConsumingCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) :
+        CommandHandlerInterface(endpointId, clusterId)
+    {
+        EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    }
+    ~PayloadConsumingCommandHandler()
+    {
+        EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this));
+    }
+
+    void InvokeCommand(HandlerContext & handlerContext) override
+    {
+        mDecodeResult = ReadInvokePayloadValue(handlerContext.mPayload, mDecodedValue);
+        handlerContext.SetCommandNotHandled();
+    }
+
+    CHIP_ERROR mDecodeResult = CHIP_ERROR_INTERNAL;
+    uint32_t mDecodedValue   = 0;
+};
+
+/// Holds a command payload `{ 0: kInvokePayloadValue }` and a reader positioned on its structure.
+class InvokePayload
+{
+public:
+    CHIP_ERROR Init()
+    {
+        TLV::TLVWriter writer;
+        writer.Init(mBuffer);
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(0), kInvokePayloadValue));
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
+        ReturnErrorOnFailure(writer.Finalize());
+
+        mReader.Init(mBuffer, writer.GetLengthWritten());
+        return mReader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag());
+    }
+
+    TLV::TLVReader & Reader() { return mReader; }
+
+private:
+    uint8_t mBuffer[32];
+    TLV::TLVReader mReader;
+};
+
+} // namespace
+
+TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceTakesPrecedenceOverServerClusterInterface)
+{
+    // For backwards compatibility, a CommandHandlerInterface installed on an ember cluster is tried before
+    // the server cluster interface (same rule as AttributeAccessInterface).
+    TestServerClusterContext testContext;
+    RestartWith(testContext);
+
+    CodegenDataModelProvider & model = CodegenDataModelProvider::Instance();
+
+    // kTestClusterPath must be a valid ember cluster path so the CommandHandlerInterface is consulted.
+    const ConcreteClusterPath kTestClusterPath(kMockEndpoint3, MockClusterId(4));
+    const ConcreteCommandPath kCommandPath(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kMockCommandId1);
+    FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
+    ServerClusterRegistration registration(fakeClusterServer);
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+
+    MockCommandHandler commandHandler;
+    InvokeRequest invokeRequest(kCommandPath, chip::Testing::kAdminSubjectDescriptor);
+
+    {
+        CustomListCommandHandler handler(MakeOptional(kTestClusterPath.mEndpointId), kTestClusterPath.mClusterId);
+
+        // Handled by the CommandHandlerInterface: the server cluster is not called.
+        handler.SetHandleCommands(true);
+        {
+            chip::TLV::TLVReader tlvReader;
+            EXPECT_EQ(model.InvokeCommand(invokeRequest, tlvReader, &commandHandler), std::nullopt);
+        }
+
+        // Not handled by the CommandHandlerInterface: the server cluster is called.
+        handler.SetHandleCommands(false);
+        {
+            chip::TLV::TLVReader tlvReader;
+            std::optional<ActionReturnStatus> result = model.InvokeCommand(invokeRequest, tlvReader, &commandHandler);
+            ASSERT_TRUE(result.has_value());
+            EXPECT_EQ(result->GetUnderlyingError(), CHIP_ERROR_INCORRECT_STATE);
+        }
+
+        // Command lists not implemented by the CommandHandlerInterface come from the server cluster.
+        {
+            ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
+            ASSERT_EQ(model.AcceptedCommands(kTestClusterPath, builder), CHIP_NO_ERROR);
+            EXPECT_TRUE(
+                Span<const AcceptedCommandEntry>(FakeDefaultServerCluster::kAcceptedCommands).data_equal(builder.TakeBuffer()));
+        }
+        {
+            ReadOnlyBufferBuilder<CommandId> builder;
+            ASSERT_EQ(model.GeneratedCommands(kTestClusterPath, builder), CHIP_NO_ERROR);
+            EXPECT_TRUE(Span<const CommandId>(FakeDefaultServerCluster::kGeneratedCommands).data_equal(builder.TakeBuffer()));
+        }
+
+        // Command lists implemented by the CommandHandlerInterface override the server cluster.
+        handler.SetOverrideAccepted(true);
+        handler.SetOverrideGenerated(true);
+        handler.AcceptedVec().push_back({ 1234 });
+        handler.GeneratedVec().push_back(33);
+        {
+            ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
+            ASSERT_EQ(model.AcceptedCommands(kTestClusterPath, builder), CHIP_NO_ERROR);
+            auto accepted = builder.TakeBuffer();
+            ASSERT_EQ(accepted.size(), 1u);
+            EXPECT_EQ(accepted[0].commandId, 1234u);
+        }
+        {
+            ReadOnlyBufferBuilder<CommandId> builder;
+            ASSERT_EQ(model.GeneratedCommands(kTestClusterPath, builder), CHIP_NO_ERROR);
+            const CommandId kExpectedGenerated[] = { 33 };
+            EXPECT_TRUE(builder.TakeBuffer().data_equal(Span<const CommandId>(kExpectedGenerated)));
+        }
+    }
+
+    // Without the CommandHandlerInterface, the server cluster handles the command.
+    {
+        chip::TLV::TLVReader tlvReader;
+        std::optional<ActionReturnStatus> result = model.InvokeCommand(invokeRequest, tlvReader, &commandHandler);
+        ASSERT_TRUE(result.has_value());
+        EXPECT_EQ(result->GetUnderlyingError(), CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
+}
+
+TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceFallthroughKeepsPayloadForServerCluster)
+{
+    TestServerClusterContext testContext;
+    RestartWith(testContext);
+
+    CodegenDataModelProvider & model = CodegenDataModelProvider::Instance();
+
+    const ConcreteClusterPath kTestClusterPath(kMockEndpoint3, MockClusterId(4));
+    const ConcreteCommandPath kCommandPath(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kMockCommandId1);
+    PayloadDecodingServerCluster clusterServer(kTestClusterPath);
+    ServerClusterRegistration registration(clusterServer);
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+
+    {
+        PayloadConsumingCommandHandler handler(MakeOptional(kTestClusterPath.mEndpointId), kTestClusterPath.mClusterId);
+
+        InvokePayload payload;
+        ASSERT_SUCCESS(payload.Init());
+
+        MockCommandHandler commandHandler;
+        InvokeRequest invokeRequest(kCommandPath, chip::Testing::kAdminSubjectDescriptor);
+        std::optional<ActionReturnStatus> result = model.InvokeCommand(invokeRequest, payload.Reader(), &commandHandler);
+        ASSERT_TRUE(result.has_value());
+        EXPECT_EQ(result->GetUnderlyingError(), CHIP_ERROR_INCORRECT_STATE);
+
+        // Both the CommandHandlerInterface and the server cluster decode the full payload.
+        EXPECT_SUCCESS(handler.mDecodeResult);
+        EXPECT_EQ(handler.mDecodedValue, kInvokePayloadValue);
+        EXPECT_SUCCESS(clusterServer.mDecodeResult);
+        EXPECT_EQ(clusterServer.mDecodedValue, kInvokePayloadValue);
+    }
+
+    EXPECT_SUCCESS(model.Registry().Unregister(&clusterServer));
+}
+
+TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceSkippedIfNoEmberMetadata)
+{
+    TestServerClusterContext testContext;
+    RestartWith(testContext);
+
+    CodegenDataModelProvider & model = CodegenDataModelProvider::Instance();
+
+    // kMockEndpoint1 has no MockClusterId(10) in ember, so the CommandHandlerInterface is skipped.
+    const ConcreteClusterPath kTestClusterPath(kMockEndpoint1, MockClusterId(10));
+    const ConcreteCommandPath kCommandPath(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kMockCommandId1);
+    FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
+    ServerClusterRegistration registration(fakeClusterServer);
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+
+    {
+        // Wildcard handler that would handle everything if it was consulted.
+        CustomListCommandHandler handler(NullOptional, kTestClusterPath.mClusterId);
+        handler.SetHandleCommands(true);
+        handler.SetOverrideAccepted(true);
+        handler.SetOverrideGenerated(true);
+
+        MockCommandHandler commandHandler;
+        InvokeRequest invokeRequest(kCommandPath, chip::Testing::kAdminSubjectDescriptor);
+        chip::TLV::TLVReader tlvReader;
+        std::optional<ActionReturnStatus> result = model.InvokeCommand(invokeRequest, tlvReader, &commandHandler);
+        ASSERT_TRUE(result.has_value());
+        EXPECT_EQ(result->GetUnderlyingError(), CHIP_ERROR_INCORRECT_STATE);
+
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> acceptedBuilder;
+        ASSERT_EQ(model.AcceptedCommands(kTestClusterPath, acceptedBuilder), CHIP_NO_ERROR);
+        EXPECT_TRUE(
+            Span<const AcceptedCommandEntry>(FakeDefaultServerCluster::kAcceptedCommands).data_equal(acceptedBuilder.TakeBuffer()));
+
+        ReadOnlyBufferBuilder<CommandId> generatedBuilder;
+        ASSERT_EQ(model.GeneratedCommands(kTestClusterPath, generatedBuilder), CHIP_NO_ERROR);
+        EXPECT_TRUE(Span<const CommandId>(FakeDefaultServerCluster::kGeneratedCommands).data_equal(generatedBuilder.TakeBuffer()));
+    }
+
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
+}
+
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
 {
     TestEmberScalarTypeWrite<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>(0x12);
