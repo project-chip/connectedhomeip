@@ -1189,7 +1189,19 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_HEAT_PUMP)
         {
-            auto makeHeatPump = [this](SimulatedHeatPump::ThermostatControl thermostatControl) {
+            // Tagged with distinct Position tags to disambiguate the two variants under wildcard allocation (*).
+            static const EndpointComposition::SemanticTag kHeatPumpTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const EndpointComposition::SemanticTag kHeatPumpThermostatClientTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kPosition),
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+            auto makeHeatPump = [this](SimulatedHeatPump::ThermostatControl thermostatControl,
+                                       const EndpointComposition::SemanticTag & tag) {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedHeatPump>(
                     SimulatedHeatPump::Context{
@@ -1203,12 +1215,14 @@ private:
                         .bindingManager           = mContext->bindingManager,
                         .bindingHandler           = mContext->bindingHandler,
                     },
-                    thermostatControl);
+                    thermostatControl, SimulatedHeatPump::Config{ .tags = Span(&tag, 1) });
             };
-            RegisterCreator("heat-pump",
-                            [makeHeatPump]() { return makeHeatPump(SimulatedHeatPump::ThermostatControl::kThermostatEndpoint); });
-            RegisterCreator("heat-pump-thermostat-client",
-                            [makeHeatPump]() { return makeHeatPump(SimulatedHeatPump::ThermostatControl::kThermostatClient); });
+            RegisterCreator("heat-pump", [makeHeatPump]() {
+                return makeHeatPump(SimulatedHeatPump::ThermostatControl::kThermostatEndpoint, kHeatPumpTag);
+            });
+            RegisterCreator("heat-pump-thermostat-client", [makeHeatPump]() {
+                return makeHeatPump(SimulatedHeatPump::ThermostatControl::kThermostatClient, kHeatPumpThermostatClientTag);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_CONDITIONER)
         {

@@ -22,6 +22,7 @@
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <binding-handler/SimpleBindingCommand.h>
 #include <clusters/Binding/ClusterId.h>
+#include <clusters/Descriptor/AttributeIds.h>
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/Identify/ClusterId.h>
 #include <clusters/OnOff/Commands.h>
@@ -244,6 +245,24 @@ TEST_F(TestHeatPump, ThermostatClientVariantAddsBindingAndClient)
 
     heatPump.Unregister(mProvider);
     EXPECT_TRUE(GetEndpoints(mProvider).empty());
+}
+
+TEST_F(TestHeatPump, ConfigTagsAreExposedOnDescriptor)
+{
+    const EndpointComposition::SemanticTag tag = { .namespaceID = 0x08, .tag = 0x02 };
+    SimulatedHeatPump heatPump(MakeContext(), ThermostatControl::kThermostatClient,
+                               SimulatedHeatPump::Config{ .tags = Span(&tag, 1) });
+    ConsecutiveEndpointIdAllocator allocator;
+    ASSERT_SUCCESS(heatPump.Register(allocator, mProvider));
+
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
+    ASSERT_SUCCESS(mProvider.Attributes(ConcreteClusterPath(heatPump.GetEndpointId(), Clusters::Descriptor::Id), attributes));
+    const auto attributeBuffer = attributes.TakeBuffer();
+    EXPECT_NE(std::find_if(attributeBuffer.begin(), attributeBuffer.end(),
+                           [](const auto & entry) { return entry.attributeId == Clusters::Descriptor::Attributes::TagList::Id; }),
+              attributeBuffer.end());
+
+    heatPump.Unregister(mProvider);
 }
 
 TEST_F(TestHeatPump, RegisterFailsWithoutThermostatEndpointOrClient)

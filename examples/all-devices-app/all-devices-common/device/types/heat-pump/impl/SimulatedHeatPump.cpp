@@ -49,8 +49,8 @@ HeatPump::Parts MakeParts(const SimulatedHeatPump::Context & context)
 
 } // namespace
 
-SimulatedHeatPump::SimulatedHeatPump(const Context & context, ThermostatControl thermostatControl) :
-    HeatPump(Config{}, MakeParts(context)), mContext(context), mThermostatControl(thermostatControl)
+SimulatedHeatPump::SimulatedHeatPump(const Context & context, ThermostatControl thermostatControl, const Config & config) :
+    HeatPump(config, MakeParts(context)), mContext(context), mThermostatControl(thermostatControl)
 {
     if (mThermostatControl == ThermostatControl::kThermostatEndpoint)
     {

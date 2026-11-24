@@ -62,7 +62,7 @@ public:
         BindingHandler & bindingHandler;
     };
 
-    SimulatedHeatPump(const Context & context, ThermostatControl thermostatControl);
+    SimulatedHeatPump(const Context & context, ThermostatControl thermostatControl, const Config & config = {});
     ~SimulatedHeatPump() override = default;
 
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
