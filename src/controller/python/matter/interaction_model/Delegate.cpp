@@ -54,7 +54,7 @@ PyChipError pychip_InteractionModel_GetCommandSenderHandle(uint64_t * commandSen
 {
     chip::app::CommandSender * commandSenderObj = nullptr;
     VerifyOrReturnError(commandSender != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
-    commandSenderObj = new (std::nothrow) chip::app::CommandSender(nullptr, nullptr);
+    commandSenderObj = new (std::nothrow) chip::app::CommandSender(nullptr, nullptr, std::nullopt);
     VerifyOrReturnError(commandSenderObj != nullptr, ToPyChipError((CHIP_ERROR_NO_MEMORY)));
     *commandSender = reinterpret_cast<uint64_t>(commandSenderObj);
     return ToPyChipError(CHIP_NO_ERROR);
