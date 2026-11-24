@@ -48,17 +48,18 @@ public:
 
     enum : uint8_t
     {
-        kChannel         = 0,
-        kPanId           = 1,
-        kExtendedPanId   = 2,
-        kNetworkName     = 3,
-        kPSKc            = 4,
-        kMasterKey       = 5,
-        kMeshLocalPrefix = 7,
-        kSecurityPolicy  = 12,
-        kActiveTimestamp = 14,
-        kDelayTimer      = 52,
-        kChannelMask     = 53,
+        kChannel          = 0,
+        kPanId            = 1,
+        kExtendedPanId    = 2,
+        kNetworkName      = 3,
+        kPSKc             = 4,
+        kMasterKey        = 5,
+        kMeshLocalPrefix  = 7,
+        kSecurityPolicy   = 12,
+        kActiveTimestamp  = 14,
+        kPendingTimestamp = 51,
+        kDelayTimer       = 52,
+        kChannelMask      = 53,
     };
 
     size_t GetSize() const
@@ -300,6 +301,15 @@ CHIP_ERROR OperationalDatasetView::GetSecurityPolicy(uint32_t & aSecurityPolicy)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR OperationalDatasetView::GetPendingTimestamp(uint64_t & aPendingTimestamp) const
+{
+    const ThreadTLV * tlv = Locate(ThreadTLV::kPendingTimestamp);
+    VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_TLV_TAG_NOT_FOUND);
+    VerifyOrReturnError(tlv->GetLength() == sizeof(aPendingTimestamp), CHIP_ERROR_INVALID_TLV_ELEMENT);
+    tlv->Get64(aPendingTimestamp);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR OperationalDatasetView::GetDelayTimer(uint32_t & aDelayMillis) const
 {
     const ThreadTLV * tlv = Locate(ThreadTLV::kDelayTimer);
@@ -485,6 +495,15 @@ CHIP_ERROR OperationalDataset::SetSecurityPolicy(uint32_t aSecurityPolicy)
     ThreadTLV * tlv = InsertOrReplace(ThreadTLV::kSecurityPolicy, sizeof(aSecurityPolicy));
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
     tlv->Set32(aSecurityPolicy);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OperationalDataset::SetPendingTimestamp(uint64_t aPendingTimestamp)
+{
+    static_assert(sizeof(aPendingTimestamp) <= kMaxDatasetElementLength);
+    ThreadTLV * tlv = InsertOrReplace(ThreadTLV::kPendingTimestamp, sizeof(aPendingTimestamp));
+    VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
+    tlv->Set64(aPendingTimestamp);
     return CHIP_NO_ERROR;
 }
 
