@@ -8,7 +8,6 @@
 To update or validate this list manually, follow these steps:
 
 1. **Verify Implemented Device Types**:
-
     - Inspect
       `examples/all-devices-app/all-devices-common/device-factory/DeviceFactory.h`.
     - Look at the `DeviceFactory` constructor. Every
@@ -25,7 +24,6 @@ To update or validate this list manually, follow these steps:
       `examples/all-devices-app/all-devices-common/device/types/root-node/`.
 
 2. **Verify Server Clusters per Device Type**:
-
     - Locate the device type definition in the Matter Specification (e.g. under
       `device_library/` in the spec repository, or locally generated markdown
       files).
@@ -113,8 +111,9 @@ To update or validate this list manually, follow these steps:
 | 58  | Water Leak Detector            | 67 (0x0043)   |                                                                                                                                                                                                             |                             |
 | 59  | Water Valve                    | 66 (0x0042)   |                                                                                                                                                                                                             |                             |
 | 60  | Window Covering                | 514 (0x0202)  |                                                                                                                                                                                                             |                             |
+| 61  | Window Covering                | 515 (0x0203)  |                                                                                                                                                                                                             |                             |
 
-## Unimplemented Device Types (45 total)
+## Unimplemented Device Types (44 total)
 
 | #   | Device Type Name                  | ID            | Ready Clusters                                                                                                                                                                                                                                            | Missing Clusters                                                                                                                                                                                                                     | Notes           |
 | --- | --------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
@@ -162,4 +161,3 @@ To update or validate this list manually, follow these steps:
 | 42  | Thread Border Router              | 145 (0x0091)  | Thread Network Diagnostics, Thread Border Router Management, Thread Network Directory [O]                                                                                                                                                                 | Thread Border Router Diagnostics [O]                                                                                                                                                                                                 | Minimally Ready |
 | 43  | Video Doorbell                    | 323 (0x0143)  | None                                                                                                                                                                                                                                                      | None                                                                                                                                                                                                                                 | Ready           |
 | 44  | Video Remote Control              | 42 (0x002A)   | None                                                                                                                                                                                                                                                      | None                                                                                                                                                                                                                                 | Ready           |
-| 45  | Window Covering Controller        | 515 (0x0203)  | Identify [O]                                                                                                                                                                                                                                              | None                                                                                                                                                                                                                                 | Ready           |
